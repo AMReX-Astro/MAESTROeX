@@ -94,11 +94,11 @@ private:
   // advance a single level for a single time step, updates flux registers
   void Advance (int lev, amrex::Real time);
 
-  // a wrapper for EstTimeStep(0
+  // a wrapper for ComputeDtLevel
   void ComputeDt ();
 
-  // compute dt from CFL considerations
-  Real EstTimeStep (int lev, bool local=false) const;
+  // compute dt at a level from CFL considerations
+  Real ComputeDtLevel (int lev) const;
 
   // get plotfile name
   std::string PlotFileName (int lev) const;
@@ -116,7 +116,6 @@ private:
   // private data members
 
   amrex::Array<int> istep;      // which step?
-  amrex::Array<int> nsubsteps;  // how many substeps on each level?
 
   // keep track of old time, new time, and time step at each level
   amrex::Array<amrex::Real> t_new;  
