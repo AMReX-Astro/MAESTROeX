@@ -57,6 +57,10 @@ MAESTRO::Evolve ()
 
   for (int step = istep[0]; step < max_step && cur_time < stop_time; ++step)
   {
+    
+    // move the regridding check from timeStep to here
+
+
     amrex::Print() << "\nCoarse STEP " << step+1 << " starts ..." << std::endl;
 
     ComputeDt();
@@ -86,6 +90,25 @@ MAESTRO::Evolve ()
   if (plot_int > 0 && istep[0] > last_plot_file_step) {
     WritePlotFile();
   }
+}
+
+// this routine advances all levels of the solution
+// it does not call any recursive Advance routine
+// NOTES: it will replace timeStep()
+// the basic idea is for Strang splitting is to:
+// -advance the reactions for dt/2 then synchronize
+// -advance the hydro for dt then synchronize
+// -perform a multilevel diffusion solve then synchronize
+// -advance the reactions for dt/2 then synchronize
+// -advance the velocity for dt then synchronize
+void
+MAESTRO::AdvanceTimeStep ()
+{
+  // for now this is a non-recursive rewrite of the 
+  // Advection_AmrCore non-subcycling algorithm
+
+
+
 }
 
 // initializes multilevel data

@@ -63,8 +63,12 @@ private:
   ////////////////
   // private member functions
 
+  // this routine advances all levels of the solution
+  // it does not call any recursive Advance routine
+  void AdvanceTimeStep ();
+
   // read in some parameters from inputs file
-  void ReadParameters();
+  void ReadParameters ();
 
   // set covered coarse cells to be the average of overlying fine cells
   void AverageDown ();
