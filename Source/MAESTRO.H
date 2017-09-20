@@ -63,10 +63,6 @@ private:
     ////////////////
     // private member functions
 
-    // this routine advances all levels of the solution
-    // it does not call any recursive Advance routine
-    void AdvanceTimeStep ();
-
     // read in some parameters from inputs file
     void ReadParameters ();
 
@@ -91,12 +87,8 @@ private:
     void GetData (int lev, amrex::Real time, amrex::Array<amrex::MultiFab*>& data,
                   amrex::Array<amrex::Real>& datatime);
 
-    // advance a level by dt
-    // includes a recursive call for finer levels
-    void timeStep (amrex::Real time);
-
-    // advance a single level for a single time step, updates flux registers
-    void Advance (amrex::Real time);
+    // advance solution at all levels for a single time step
+    void AdvanceTimeStep (amrex::Real time);
 
     // a wrapper for ComputeDtLevel
     void ComputeDt ();
@@ -123,8 +115,8 @@ private:
     int istep;
 
     // keep track of old time, new time, and time step at each level
-    amrex::Array<amrex::Real> t_new;  
-    amrex::Array<amrex::Real> t_old;
+    amrex::Real t_new;
+    amrex::Real t_old;
     amrex::Real dt;
 
     // array of multifabs to store the solution at each level of refinement

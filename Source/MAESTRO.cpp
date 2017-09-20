@@ -26,8 +26,8 @@ MAESTRO::MAESTRO ()
 
     istep = 0;
 
-    t_new.resize(nlevs_max, 0.0);
-    t_old.resize(nlevs_max, -1.e100);
+    t_new = 0.0;
+    t_old = -1.e100;
 
     // set this to a large number so change_max doesn't affect the first time step
     dt = 1.e100;
@@ -52,27 +52,34 @@ MAESTRO::~MAESTRO ()
 void
 MAESTRO::Evolve ()
 {
-    Real cur_time = t_new[0];
+    Real cur_time = t_new;
     int last_plot_file_step = 0;
 
     for (int step = istep; step < max_step && cur_time < stop_time; ++step)
     {
+
+        if (regrid_int > 0)  // We may need to regrid
+        {
+            if (istep % regrid_int == 0)
+            {
+                // regrid could add newly refine levels (if finest_level < max_level)
+                // so we save the previous finest level index
+                regrid(0, cur_time);
+            }
+        }
     
         amrex::Print() << "\nCoarse STEP " << step+1 << " starts ..." << std::endl;
 
         ComputeDt();
 
-        timeStep(cur_time);
+        AdvanceTimeStep(cur_time);
+
+        ++istep;
 
         cur_time += dt;
 
         amrex::Print() << "Coarse STEP " << step+1 << " ends." << " TIME = " << cur_time
                        << " DT = " << dt  << std::endl;
-
-        // sync up time
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            t_new[lev] = cur_time;
-        }
 
         if (plot_int > 0 && (step+1) % plot_int == 0)
         {
@@ -86,25 +93,6 @@ MAESTRO::Evolve ()
     if (plot_int > 0 && istep > last_plot_file_step) {
         WritePlotFile();
     }
-}
-
-// this routine advances all levels of the solution
-// it does not call any recursive Advance routine
-// NOTES: it will replace timeStep()
-// the basic idea is for Strang splitting is to:
-// -advance the reactions for dt/2 then synchronize
-// -advance the hydro for dt then synchronize
-// -perform a multilevel diffusion solve then synchronize
-// -advance the reactions for dt/2 then synchronize
-// -advance the velocity for dt then synchronize
-void
-MAESTRO::AdvanceTimeStep ()
-{
-    // for now this is a non-recursive rewrite of the 
-    // Advection_AmrCore non-subcycling algorithm
-
-
-
 }
 
 // initializes multilevel data
@@ -133,8 +121,8 @@ MAESTRO::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     phi_new[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
     phi_old[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
 
-    t_new[lev] = time;
-    t_old[lev] = time - 1.e200;
+    t_new = time;
+    t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
         flux_reg[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, ncomp));
@@ -166,8 +154,8 @@ MAESTRO::RemakeLevel (int lev, Real time, const BoxArray& ba,
     std::swap(new_state, phi_new[lev]);
     std::swap(old_state, phi_old[lev]);
 
-    t_new[lev] = time;
-    t_old[lev] = time - 1.e200;
+    t_new = time;
+    t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
         flux_reg[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, ncomp));
@@ -195,8 +183,8 @@ void MAESTRO::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     phi_new[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
     phi_old[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
 
-    t_new[lev] = time;
-    t_old[lev] = time - 1.e200;
+    t_new = time;
+    t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
         flux_reg[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, ncomp));
@@ -204,7 +192,7 @@ void MAESTRO::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
     const Real* dx = geom[lev].CellSize();
     const Real* prob_lo = geom[lev].ProbLo();
-    Real cur_time = t_new[lev];
+    Real cur_time = t_new;
 
     MultiFab& state = *phi_new[lev];
 
@@ -427,57 +415,35 @@ MAESTRO::GetData (int lev, Real time, Array<MultiFab*>& data, Array<Real>& datat
     data.clear();
     datatime.clear();
 
-    const Real teps = (t_new[lev] - t_old[lev]) * 1.e-3;
+    const Real teps = (t_new - t_old) * 1.e-3;
 
-    if (time > t_new[lev] - teps && time < t_new[lev] + teps)
+    if (time > t_new - teps && time < t_new + teps)
     {
         data.push_back(phi_new[lev].get());
-        datatime.push_back(t_new[lev]);
+        datatime.push_back(t_new);
     }
-    else if (time > t_old[lev] - teps && time < t_old[lev] + teps)
+    else if (time > t_old - teps && time < t_old + teps)
     {
         data.push_back(phi_old[lev].get());
-        datatime.push_back(t_old[lev]);
+        datatime.push_back(t_old);
     }
     else
     {
         data.push_back(phi_old[lev].get());
         data.push_back(phi_new[lev].get());
-        datatime.push_back(t_old[lev]);
-        datatime.push_back(t_new[lev]);
+        datatime.push_back(t_old);
+        datatime.push_back(t_new);
     }
-}
-
-
-// advance a level by dt
-// includes a recursive call for finer levels
-void
-MAESTRO::timeStep (Real time)
-{
-
-    // should move regridding stuff to Evolve
-    if (regrid_int > 0)  // We may need to regrid
-    {
-        if (istep % regrid_int == 0)
-        {
-            // regrid could add newly refine levels (if finest_level < max_level)
-            // so we save the previous finest level index
-            regrid(0, time);
-
-        }
-    }
-
-    // advance a single level for a single time step, updates flux registers
-    Advance(time);
-
-    ++istep;
 }
 
 // advance a single level for a single time step, updates flux registers
 void
-MAESTRO::Advance (Real time)
+MAESTRO::AdvanceTimeStep (Real time)
 {
     constexpr int num_grow = 3;
+
+    t_old = t_new;
+    t_new += dt;
 
     for (int lev=0; lev<=finest_level; ++lev) 
     {
@@ -489,13 +455,11 @@ MAESTRO::Advance (Real time)
         }
 
         std::swap(phi_old[lev], phi_new[lev]);
-        t_old[lev] = t_new[lev];
-        t_new[lev] += dt;
 
         MultiFab& S_new = *phi_new[lev];
 
-        const Real old_time = t_old[lev];
-        const Real new_time = t_new[lev];
+        const Real old_time = t_old;
+        const Real new_time = t_new;
         const Real ctr_time = 0.5*(old_time+new_time);
 
         const Real* dx = geom[lev].CellSize();
@@ -635,9 +599,9 @@ MAESTRO::ComputeDt ()
 
     // Limit dt's by the value of stop_time.
     const Real eps = 1.e-3*dt_0;
-    if (t_new[0] + dt_0 > stop_time - eps) {
+    if (t_new + dt_0 > stop_time - eps) {
         amrex::Print() << "Modifying time step to respect stop_time" << std::endl;
-        dt_0 = stop_time - t_new[0];
+        dt_0 = stop_time - t_new;
     }
 
     dt = dt_0;
@@ -653,7 +617,7 @@ MAESTRO::ComputeDtLevel (int lev) const
 
     const Real* dx = geom[lev].CellSize();
     const Real* prob_lo = geom[lev].ProbLo();
-    const Real cur_time = t_new[lev];
+    const Real cur_time = t_new;
     const MultiFab& S_new = *phi_new[lev];
 
 #ifdef _OPENMP
@@ -729,5 +693,5 @@ MAESTRO::WritePlotFile () const
     istep_array.resize(maxLevel()+1, istep);
 
     amrex::WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
-                                   Geom(), t_new[0], istep_array, refRatio());
+                                   Geom(), t_new, istep_array, refRatio());
 }
