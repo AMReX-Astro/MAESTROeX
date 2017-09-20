@@ -35,12 +35,14 @@ MAESTRO::MAESTRO ()
     phi_new.resize(nlevs_max);
     phi_old.resize(nlevs_max);
 
+    amrex::Print() << "nlevs_max " << nlevs_max << std::endl;
+
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
     // NOTE: the flux register associated with flux_reg[lev] is associated
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] is never actually used in the reflux operation
-    flux_reg.resize(nlevs_max+1);
+    flux_reg.resize(nlevs_max);
 }
 
 MAESTRO::~MAESTRO ()
@@ -55,12 +57,12 @@ MAESTRO::Evolve ()
     Real cur_time = t_new;
     int last_plot_file_step = 0;
 
-    for (int step = istep; step < max_step && cur_time < stop_time; ++step)
+    for (istep = 1; istep <= max_step && cur_time < stop_time; ++istep)
     {
 
         if (regrid_int > 0)  // We may need to regrid
         {
-            if (istep % regrid_int == 0)
+            if ( (istep-1) % regrid_int == 0)
             {
                 // regrid could add newly refine levels (if finest_level < max_level)
                 // so we save the previous finest level index
@@ -68,30 +70,29 @@ MAESTRO::Evolve ()
             }
         }
     
-        amrex::Print() << "\nCoarse STEP " << step+1 << " starts ..." << std::endl;
-
         ComputeDt();
+
+        amrex::Print() << "\nTimestep " << istep << " starts with TIME = " << cur_time 
+                       << " DT = " << dt << std::endl << std::endl;
 
         AdvanceTimeStep(cur_time);
 
-        ++istep;
-
         cur_time += dt;
 
-        amrex::Print() << "Coarse STEP " << step+1 << " ends." << " TIME = " << cur_time
-                       << " DT = " << dt  << std::endl;
+        amrex::Print() << "\nTimestep " << istep << " ends with TIME = " << cur_time 
+                       << " DT = " << dt << std::endl;
 
-        if (plot_int > 0 && (step+1) % plot_int == 0)
+        if (plot_int > 0 && istep % plot_int == 0)
         {
-            last_plot_file_step = step+1;
-            WritePlotFile();
+            last_plot_file_step = istep;
+            WritePlotFile(istep);
         }
 
-        if (cur_time >= stop_time - 1.e-6*dt) break;
     }
 
+    // write a final plotfile if we haven't already
     if (plot_int > 0 && istep > last_plot_file_step) {
-        WritePlotFile();
+        WritePlotFile(istep-1);
     }
 }
 
@@ -104,7 +105,7 @@ MAESTRO::InitData ()
     AverageDown();
 
     if (plot_int > 0) {
-        WritePlotFile();
+        WritePlotFile(0);
     }
 }
 
@@ -451,7 +452,7 @@ MAESTRO::AdvanceTimeStep (Real time)
         if (Verbose())
         {
             amrex::Print() << "[Level " << lev << " step " << istep+1 << "] ";
-            amrex::Print() << "ADVANCE with dt = " << dt << std::endl;
+            amrex::Print() << "BEGIN ADVANCE with " << CountCells(lev) << " cells" << std::endl;
         }
 
         std::swap(phi_old[lev], phi_new[lev]);
@@ -536,13 +537,15 @@ MAESTRO::AdvanceTimeStep (Real time)
         // NOTE: the flux register associated with flux_reg[lev] is associated
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
         if (do_reflux) { 
-            if (flux_reg[lev+1]) {
+            if (lev < finest_level)
+            {
                 for (int i = 0; i < BL_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)   
                     flux_reg[lev+1]->CrseInit(fluxes[i],i,0,0,fluxes[i].nComp(), -1.0);
-                }	    
+                }	
             }
-            if (flux_reg[lev]) {
+            if (lev > 0)
+            {
                 for (int i = 0; i < BL_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev) 
                     flux_reg[lev]->FineAdd(fluxes[i],i,0,0,fluxes[i].nComp(), 1.0);
@@ -552,14 +555,18 @@ MAESTRO::AdvanceTimeStep (Real time)
 
         if (Verbose())
         {
-            amrex::Print() << "[Level " << lev << " step " << istep << "] ";
-            amrex::Print() << "Advanced " << CountCells(lev) << " cells" << std::endl;
+            amrex::Print() << "[Level " << lev << " step " << istep+1 << "] ";
+            amrex::Print() << "END ADVANCE" << std::endl;
         }
 
     } // end loop over levels
 
+    if (Verbose())
+    {
+        amrex::Print() << "Synchronizing all levels" << std::endl;
+    }
 
-    // synchronize by refluxing and averagig down, starting from the finest_level/finest_level+1 pair
+    // synchronize by refluxing and averagig down, starting from the finest_level-1/finest_level pair
     for (int lev=finest_level-1; lev>=0; --lev)
     {
         if (do_reflux) {
@@ -682,16 +689,16 @@ MAESTRO::PlotFileVarNames () const
 
 // write plotfile to disk
 void
-MAESTRO::WritePlotFile () const
+MAESTRO::WritePlotFile (int step) const
 {
-    const std::string& plotfilename = PlotFileName(istep);
+    const std::string& plotfilename = PlotFileName(step);
     const auto& mf = PlotFileMF();
     const auto& varnames = PlotFileVarNames();
 
-    // WriteMultiLevelPlotfile expects an array of istep
-    amrex::Array<int> istep_array;
-    istep_array.resize(maxLevel()+1, istep);
+    // WriteMultiLevelPlotfile expects an array of step numbers
+    amrex::Array<int> step_array;
+    step_array.resize(maxLevel()+1, step);
 
     amrex::WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
-                                   Geom(), t_new, istep_array, refRatio());
+                                   Geom(), t_new, step_array, refRatio());
 }

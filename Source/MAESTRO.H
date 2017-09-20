@@ -106,7 +106,7 @@ private:
     amrex::Array<std::string> PlotFileVarNames () const;
 
     // write plotfile to disk
-    void WritePlotFile () const;
+    void WritePlotFile (int step) const;
 
     ////////////////
     // private data members
