@@ -7,13 +7,13 @@
 // Thus there are no physical boundaries. And FillBoundary does nothing.
 
 class MAESTROPhysBC
-  : public amrex::PhysBCFunctBase
+    : public amrex::PhysBCFunctBase
 {
 public:
-  MAESTROPhysBC () {}
-  virtual ~MAESTROPhysBC () {}
-  virtual void FillBoundary (amrex::MultiFab& mf, int, int, amrex::Real time) override { }
-  using amrex::PhysBCFunctBase::FillBoundary;
+    MAESTROPhysBC () {}
+    virtual ~MAESTROPhysBC () {}
+    virtual void FillBoundary (amrex::MultiFab& mf, int, int, amrex::Real time) override { }
+    using amrex::PhysBCFunctBase::FillBoundary;
 };
 
 #endif
