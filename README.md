@@ -5,4 +5,4 @@ Maestro solves the equations of low Mach number hydrodynamics for stratified atm
 
 A description of the algorithm and links to the algorithm papers can be found here:
 
-http://amrex-astro.github.io/MAESTRO/ 
+http://amrex-astro.github.io/MAESTRO/
