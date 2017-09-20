@@ -33,8 +33,18 @@ public:
     // initializes multilevel data
     void InitData ();
 
+    // tag all cells for refinement
+    // overrides the pure virtual function in AmrCore
+    virtual void ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time, int ngrow) override;
+
     // Make a new level from scratch using provided BoxArray and DistributionMapping.
     // Only used during initialization.
+    // overrides the pure virtual function in AmrCore
+    virtual void MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
+                                          const amrex::DistributionMapping& dm) override;
+
+    // Make a new level using provided BoxArray and DistributionMapping and 
+    // fill with interpolated coarse level data.
     // overrides the pure virtual function in AmrCore
     virtual void MakeNewLevelFromCoarse (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                          const amrex::DistributionMapping& dm) override;
@@ -48,15 +58,6 @@ public:
     // Delete level data
     // overrides the pure virtual function in AmrCore
     virtual void ClearLevel (int lev) override;
-
-    // initialize data using a fortran routine to compute initial state
-    // overrides the pure virtual function in AmrCore
-    virtual void MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
-                                          const amrex::DistributionMapping& dm) override;
-
-    // tag all cells for refinement
-    // overrides the pure virtual function in AmrCore
-    virtual void ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time, int ngrow) override;
 
 private:
 
