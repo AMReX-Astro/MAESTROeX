@@ -35,8 +35,6 @@ MAESTRO::MAESTRO ()
     phi_new.resize(nlevs_max);
     phi_old.resize(nlevs_max);
 
-    amrex::Print() << "nlevs_max " << nlevs_max << std::endl;
-
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
     // NOTE: the flux register associated with flux_reg[lev] is associated
@@ -70,6 +68,10 @@ MAESTRO::Evolve ()
             }
         }
     
+        // wallclock time
+        const Real strt_total = ParallelDescriptor::second();
+
+        // compute time step
         ComputeDt();
 
         amrex::Print() << "\nTimestep " << istep << " starts with TIME = " << cur_time 
@@ -82,8 +84,18 @@ MAESTRO::Evolve ()
         amrex::Print() << "\nTimestep " << istep << " ends with TIME = " << cur_time 
                        << " DT = " << dt << std::endl;
 
+        // wallclock time
+        Real end_total = ParallelDescriptor::second() - strt_total;
+	
+        // print wallclock time
+        ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
+        if (Verbose()) {
+            amrex::Print() << "Time to advance time step: " << end_total << '\n';
+        }
+
         if (plot_int > 0 && istep % plot_int == 0)
         {
+            amrex::Print() << "\nWriting plotfile " << istep << std::endl;
             last_plot_file_step = istep;
             WritePlotFile(istep);
         }
@@ -91,7 +103,9 @@ MAESTRO::Evolve ()
     }
 
     // write a final plotfile if we haven't already
-    if (plot_int > 0 && istep > last_plot_file_step) {
+    if (plot_int > 0 && istep > last_plot_file_step)
+    {
+        amrex::Print() << "\nWriting plotfile " << istep-1 << std::endl;
         WritePlotFile(istep-1);
     }
 }
@@ -607,7 +621,9 @@ MAESTRO::ComputeDt ()
     // Limit dt's by the value of stop_time.
     const Real eps = 1.e-3*dt_0;
     if (t_new + dt_0 > stop_time - eps) {
-        amrex::Print() << "Modifying time step to respect stop_time" << std::endl;
+        amrex::Print() << "\nModifying time step to respect stop_time" << std::endl;
+        amrex::Print() << "Original dt = " << dt_0 << std::endl;
+        amrex::Print() << "New dt = " << stop_time-t_new << std::endl;
         dt_0 = stop_time - t_new;
     }
 
