@@ -93,10 +93,10 @@ private:
 
     // advance a level by dt
     // includes a recursive call for finer levels
-    void timeStep (int lev, amrex::Real time);
+    void timeStep (amrex::Real time);
 
     // advance a single level for a single time step, updates flux registers
-    void Advance (int lev, amrex::Real time);
+    void Advance (amrex::Real time);
 
     // a wrapper for ComputeDtLevel
     void ComputeDt ();
@@ -119,7 +119,8 @@ private:
     ////////////////
     // private data members
 
-    amrex::Array<int> istep;      // which step?
+    // which step?
+    int istep;
 
     // keep track of old time, new time, and time step at each level
     amrex::Array<amrex::Real> t_new;  
