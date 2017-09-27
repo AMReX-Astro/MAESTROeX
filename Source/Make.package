@@ -1,3 +1,5 @@
 CEXE_sources += main.cpp Maestro.cpp
 
 CEXE_headers += Maestro.H MaestroPhysBC.H
+
+ca_F90EXE_sources += meth_params.F90

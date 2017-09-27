@@ -10,5 +10,9 @@
 # category: testing
 #-----------------------------------------------------------------------------
 
-# testing parameters setup
-my_test_int                  int           1                  y
+# the effective Courant number to use---we will not allow the hydrodynamic
+# waves to cross more than this fraction of a zone over a single timestep
+cfl                          Real          0.8                y
+
+# do we do the hyperbolic reflux at coarse-fine interfaces?
+do_reflux                    int           1

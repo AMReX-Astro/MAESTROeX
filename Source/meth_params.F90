@@ -12,8 +12,6 @@
 
 module meth_params_module
 
-  use bl_error_module
-
   use amrex_fort_module, only : rt => amrex_real
   implicit none
 
@@ -23,7 +21,7 @@ module meth_params_module
 
   ! Begin the declarations of the ParmParse parameters
 
-  integer         , save :: my_test_int
+  real(rt), save :: cfl
 
   ! End the declarations of the ParmParse parameters
 
@@ -38,10 +36,10 @@ contains
 
     type (amrex_parmparse) :: pp
 
-    my_test_int = 1;
+    cfl = 0.8d0;
 
     call amrex_parmparse_build(pp, "maestro")
-    call pp%query("my_test_int", my_test_int)
+    call pp%query("cfl", cfl)
     call amrex_parmparse_destroy(pp)
 
 

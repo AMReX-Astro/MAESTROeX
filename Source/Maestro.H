@@ -143,15 +143,9 @@ private:
     int max_step = std::numeric_limits<int>::max();
     amrex::Real stop_time = std::numeric_limits<amrex::Real>::max();
 
-    // advective cfl number - dt = cfl*dx/umax
-    amrex::Real cfl = 0.7;
-
     // how often each level regrids the higher levels of refinement
     // (after a level advances that many time steps)
     int regrid_int = 2;
-
-    // hyperbolic refluxing as part of multilevel synchronization
-    int do_reflux = 1;
 
     // plotfile prefix and frequency
     std::string plot_file {"plt"};

@@ -19,6 +19,8 @@ Maestro::Maestro ()
 {
     ReadParameters();
 
+    ca_set_maestro_method_params();
+
     // Geometry on all levels has been defined already.
 
     // No valid BoxArray and DistributionMapping have been defined.
@@ -302,6 +304,14 @@ Maestro::ClearLevel (int lev)
 void
 Maestro::ReadParameters ()
 {
+
+    {
+        ParmParse pp("maestro");
+
+#include <maestro_queries.H>
+
+    }
+
     {
         ParmParse pp;  // Traditionally, max_step and stop_time do not have prefix.
         pp.query("max_step", max_step);
@@ -314,13 +324,6 @@ Maestro::ReadParameters ()
         pp.query("regrid_int", regrid_int);
         pp.query("plot_file", plot_file);
         pp.query("plot_int", plot_int);
-    }
-
-    {
-        ParmParse pp("adv");
-	
-        pp.query("cfl", cfl);
-        pp.query("do_reflux", do_reflux);
     }
 }
 

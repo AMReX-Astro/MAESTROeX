@@ -3,4 +3,5 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-static int my_test_int;
+static amrex::Real cfl;
+static int do_reflux;

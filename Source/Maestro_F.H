@@ -8,6 +8,9 @@ extern "C"
 #endif
 
     // these are interfaces to fortran subroutines
+    void ca_finalize_meth_params();
+
+    void ca_set_maestro_method_params();
 
     void initdata(const int& level, const amrex_real& time, 
                   const int* lo, const int* hi,

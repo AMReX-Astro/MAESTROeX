@@ -3,7 +3,7 @@ MAESTRO_C_HOME  ?= ../../..
 
 TOP := $(MAESTRO_C_HOME)
 
-EBASE := MAESTRO
+EBASE := Maestro
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
 
@@ -13,6 +13,9 @@ Bpack	+= $(foreach dir, $(Bdirs), $(TOP)/$(dir)/Make.package)
 Blocs   += $(foreach dir, $(Bdirs), $(TOP)/$(dir))
 
 include $(Bpack)
+
+f90EXE_sources += $(ca_f90EXE_sources)
+F90EXE_sources += $(ca_F90EXE_sources)
 
 INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)

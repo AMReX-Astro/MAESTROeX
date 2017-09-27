@@ -3,4 +3,5 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-int         Maestro::my_test_int = 1;
+amrex::Real Maestro::cfl = 0.8;
+int         Maestro::do_reflux = 1;
