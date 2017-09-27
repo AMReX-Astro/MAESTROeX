@@ -1,5 +1,5 @@
-#ifndef _MAESTRO_F_H_
-#define _MAESTRO_F_H_
+#ifndef _Maestro_F_H_
+#define _Maestro_F_H_
 #include <AMReX_BLFort.H>
 
 #ifdef __cplusplus

@@ -5,7 +5,7 @@
 #include <AMReX_BLProfiler.H>
 #include <AMReX_ParallelDescriptor.H>
 
-#include <MAESTRO.H>
+#include <Maestro.H>
 
 using namespace amrex;
 
@@ -20,8 +20,8 @@ int main(int argc, char* argv[])
     const Real strt_total = ParallelDescriptor::second();
 
     {
-        // declare an MAESTRO object to manage multilevel data
-        MAESTRO maestro;
+        // declare an Maestro object to manage multilevel data
+        Maestro maestro;
 	
         // initialize AMR data
         maestro.InitData();

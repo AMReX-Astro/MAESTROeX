@@ -5,15 +5,17 @@
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_PlotFileUtil.H>
 
-#include <MAESTRO.H>
-#include <MAESTROPhysBC.H>
-#include <MAESTRO_F.H>
+#include <Maestro.H>
+#include <MaestroPhysBC.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
+#include <maestro_defaults.H>
+
 // constructor - reads in parameters from inputs file
 //             - sizes multilevel arrays and data structures
-MAESTRO::MAESTRO ()
+Maestro::Maestro ()
 {
     ReadParameters();
 
@@ -43,14 +45,14 @@ MAESTRO::MAESTRO ()
     flux_reg.resize(nlevs_max);
 }
 
-MAESTRO::~MAESTRO ()
+Maestro::~Maestro ()
 {
 
 }
 
 // advance solution to final time
 void
-MAESTRO::Evolve ()
+Maestro::Evolve ()
 {
     Real cur_time = t_new;
     int last_plot_file_step = 0;
@@ -112,7 +114,7 @@ MAESTRO::Evolve ()
 
 // initializes multilevel data
 void
-MAESTRO::InitData ()
+Maestro::InitData ()
 {
     const Real time = 0.0;
     InitFromScratch(time);
@@ -126,7 +128,7 @@ MAESTRO::InitData ()
 // tag all cells for refinement
 // overrides the pure virtual function in AmrCore
 void
-MAESTRO::ErrorEst (int lev, TagBoxArray& tags, Real time, int ngrow)
+Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ngrow)
 {
     static bool first = true;
     static Array<Real> phierr;
@@ -198,7 +200,7 @@ MAESTRO::ErrorEst (int lev, TagBoxArray& tags, Real time, int ngrow)
 // Make a new level from scratch using provided BoxArray and DistributionMapping.
 // Only used during initialization.
 // overrides the pure virtual function in AmrCore
-void MAESTRO::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
+void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)
 {
     const int ncomp = 1;
@@ -236,7 +238,7 @@ void MAESTRO::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 // fill with interpolated coarse level data.
 // overrides the pure virtual function in AmrCore
 void
-MAESTRO::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
+Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 				 const DistributionMapping& dm)
 {
     const int ncomp = phi_new[lev-1]->nComp();
@@ -259,7 +261,7 @@ MAESTRO::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 // fill with existing fine and coarse data.
 // overrides the pure virtual function in AmrCore
 void
-MAESTRO::RemakeLevel (int lev, Real time, const BoxArray& ba,
+Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 		      const DistributionMapping& dm)
 {
     const int ncomp = phi_new[lev]->nComp();
@@ -289,7 +291,7 @@ MAESTRO::RemakeLevel (int lev, Real time, const BoxArray& ba,
 // Delete level data
 // overrides the pure virtual function in AmrCore
 void
-MAESTRO::ClearLevel (int lev)
+Maestro::ClearLevel (int lev)
 {
     phi_new[lev].reset(nullptr);
     phi_old[lev].reset(nullptr);
@@ -298,7 +300,7 @@ MAESTRO::ClearLevel (int lev)
 
 // read in some parameters from inputs file
 void
-MAESTRO::ReadParameters ()
+Maestro::ReadParameters ()
 {
     {
         ParmParse pp;  // Traditionally, max_step and stop_time do not have prefix.
@@ -324,7 +326,7 @@ MAESTRO::ReadParameters ()
 
 // set covered coarse cells to be the average of overlying fine cells
 void
-MAESTRO::AverageDown ()
+Maestro::AverageDown ()
 {
     for (int lev = finest_level-1; lev >= 0; --lev)
     {
@@ -336,7 +338,7 @@ MAESTRO::AverageDown ()
 
 // more flexible version of AverageDown() that lets you average down across multiple levels
 void
-MAESTRO::AverageDownTo (int crse_lev)
+Maestro::AverageDownTo (int crse_lev)
 {
     amrex::average_down(*phi_new[crse_lev+1], *phi_new[crse_lev],
                         geom[crse_lev+1], geom[crse_lev],
@@ -345,7 +347,7 @@ MAESTRO::AverageDownTo (int crse_lev)
 
 // compute the number of cells at a level
 long
-MAESTRO::CountCells (int lev)
+Maestro::CountCells (int lev)
 {
     const int N = grids[lev].size();
 
@@ -364,7 +366,7 @@ MAESTRO::CountCells (int lev)
 // compute a new multifab by coping in phi from valid region and filling ghost cells
 // works for single level and 2-level cases (fill fine grid ghost by interpolating from coarse)
 void
-MAESTRO::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
+Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
 {
     if (lev == 0)
     {
@@ -372,7 +374,7 @@ MAESTRO::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
         Array<Real> stime;
         GetData(0, time, smf, stime);
 
-        MAESTROPhysBC physbc;
+        MaestroPhysBC physbc;
         amrex::FillPatchSingleLevel(mf, time, smf, stime, 0, icomp, ncomp,
                                     geom[lev], physbc);
     }
@@ -383,7 +385,7 @@ MAESTRO::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
         GetData(lev-1, time, cmf, ctime);
         GetData(lev  , time, fmf, ftime);
 
-        MAESTROPhysBC cphysbc, fphysbc;
+        MaestroPhysBC cphysbc, fphysbc;
         Interpolater* mapper = &cell_cons_interp;
 
         int lo_bc[] = {INT_DIR, INT_DIR, INT_DIR}; // periodic boundaryies
@@ -400,7 +402,7 @@ MAESTRO::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
 // fill an entire multifab by interpolating from the coarser level
 // this comes into play when a new level of refinement appears
 void
-MAESTRO::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
+Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
 {
     BL_ASSERT(lev > 0);
 
@@ -412,7 +414,7 @@ MAESTRO::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp
         amrex::Abort("FillCoarsePatch: how did this happen?");
     }
 
-    MAESTROPhysBC cphysbc, fphysbc;
+    MaestroPhysBC cphysbc, fphysbc;
     Interpolater* mapper = &cell_cons_interp;
     
     int lo_bc[] = {INT_DIR, INT_DIR, INT_DIR}; // periodic boundaryies
@@ -426,7 +428,7 @@ MAESTRO::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp
 
 // utility to copy in data from phi_old and/or phi_new into another multifab
 void
-MAESTRO::GetData (int lev, Real time, Array<MultiFab*>& data, Array<Real>& datatime)
+Maestro::GetData (int lev, Real time, Array<MultiFab*>& data, Array<Real>& datatime)
 {
     data.clear();
     datatime.clear();
@@ -454,7 +456,7 @@ MAESTRO::GetData (int lev, Real time, Array<MultiFab*>& data, Array<Real>& datat
 
 // advance a single level for a single time step, updates flux registers
 void
-MAESTRO::AdvanceTimeStep (Real time)
+Maestro::AdvanceTimeStep (Real time)
 {
     constexpr int num_grow = 3;
 
@@ -596,7 +598,7 @@ MAESTRO::AdvanceTimeStep (Real time)
 
 // a wrapper for ComputeDtLevel
 void
-MAESTRO::ComputeDt ()
+Maestro::ComputeDt ()
 {
 
     // compute dt at each level from CFL considerations
@@ -633,9 +635,9 @@ MAESTRO::ComputeDt ()
 
 // compute dt at a level from CFL considerations
 Real
-MAESTRO::ComputeDtLevel (int lev) const
+Maestro::ComputeDtLevel (int lev) const
 {
-    BL_PROFILE("MAESTRO::EstTimeStep()");
+    BL_PROFILE("Maestro::EstTimeStep()");
 
     Real dt_est = std::numeric_limits<Real>::max();
 
@@ -681,14 +683,14 @@ MAESTRO::ComputeDtLevel (int lev) const
 
 // get plotfile name
 std::string
-MAESTRO::PlotFileName (int lev) const
+Maestro::PlotFileName (int lev) const
 {
     return amrex::Concatenate(plot_file, lev, 5);
 }
 
 // put together an array of multifabs for writing
 Array<const MultiFab*>
-MAESTRO::PlotFileMF () const
+Maestro::PlotFileMF () const
 {
     Array<const MultiFab*> r;
     for (int i = 0; i <= finest_level; ++i) {
@@ -699,14 +701,14 @@ MAESTRO::PlotFileMF () const
 
 // set plotfile variable names
 Array<std::string>
-MAESTRO::PlotFileVarNames () const
+Maestro::PlotFileVarNames () const
 {
     return {"phi"};
 }
 
 // write plotfile to disk
 void
-MAESTRO::WritePlotFile (int step) const
+Maestro::WritePlotFile (int step) const
 {
     const std::string& plotfilename = PlotFileName(step);
     const auto& mf = PlotFileMF();

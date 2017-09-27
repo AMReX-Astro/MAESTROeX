@@ -6,12 +6,12 @@
 // In this tutorial, we assume the boundaries are all periodic.  
 // Thus there are no physical boundaries. And FillBoundary does nothing.
 
-class MAESTROPhysBC
+class MaestroPhysBC
     : public amrex::PhysBCFunctBase
 {
 public:
-    MAESTROPhysBC () {}
-    virtual ~MAESTROPhysBC () {}
+    MaestroPhysBC () {}
+    virtual ~MaestroPhysBC () {}
     virtual void FillBoundary (amrex::MultiFab& mf, int, int, amrex::Real time) override { }
     using amrex::PhysBCFunctBase::FillBoundary;
 };

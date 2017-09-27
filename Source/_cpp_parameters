@@ -1,0 +1,14 @@
+# name   type   default   need in Fortran?   ifdef    fortran name    fortran type
+#
+# note, name can have two values, as (a, b).  a will be the name used
+# in the inputs file, b is the variable name in the C++ class.
+
+
+@namespace: maestro Maestro static
+
+#-----------------------------------------------------------------------------
+# category: testing
+#-----------------------------------------------------------------------------
+
+# testing parameters setup
+my_test_int                  int           1                  y

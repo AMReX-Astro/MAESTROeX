@@ -1,0 +1,3 @@
+CEXE_headers += maestro_params.H
+CEXE_headers += maestro_queries.H
+CEXE_headers += maestro_defaults.H

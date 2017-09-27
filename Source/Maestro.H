@@ -1,5 +1,5 @@
-#ifndef MAESTRO_H_
-#define MAESTRO_H_
+#ifndef Maestro_H_
+#define Maestro_H_
 
 #include <string>
 #include <limits>
@@ -14,7 +14,7 @@
 
 using namespace amrex;
 
-class MAESTRO
+class Maestro
     : public amrex::AmrCore
 {
 public:
@@ -24,8 +24,8 @@ public:
 
     // constructor - reads in parameters from inputs file
     //             - sizes multilevel arrays and data structures
-    MAESTRO ();
-    virtual ~MAESTRO();
+    Maestro ();
+    virtual ~Maestro();
 
     // advance solution to final time
     void Evolve ();
@@ -136,6 +136,8 @@ private:
     
     ////////////////
     // runtime parameters
+
+#include <maestro_params.H>
 
     // maximum number of steps and stop time
     int max_step = std::numeric_limits<int>::max();
