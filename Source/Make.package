@@ -1,4 +1,4 @@
-CEXE_sources += main.cpp Maestro.cpp
+CEXE_sources += main.cpp Maestro.cpp MaestroPhysBC.cpp
 
 CEXE_headers += Maestro.H MaestroPhysBC.H
 
