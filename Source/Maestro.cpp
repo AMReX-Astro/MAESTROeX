@@ -205,7 +205,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ngrow)
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)
 {
-    const int ncomp = 1;
+    const int ncomp = 2;
     const int nghost = 0;
 
     phi_new[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
@@ -393,7 +393,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
 
         int lo_bc[] = {INT_DIR, INT_DIR, INT_DIR}; // periodic boundaryies
         int hi_bc[] = {INT_DIR, INT_DIR, INT_DIR};
-        Array<BCRec> bcs(1, BCRec(lo_bc, hi_bc));
+        Array<BCRec> bcs(ncomp, BCRec(lo_bc, hi_bc));
 
         amrex::FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
                                   0, icomp, ncomp, geom[lev-1], geom[lev],
@@ -422,7 +422,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp
     
     int lo_bc[] = {INT_DIR, INT_DIR, INT_DIR}; // periodic boundaryies
     int hi_bc[] = {INT_DIR, INT_DIR, INT_DIR};
-    Array<BCRec> bcs(1, BCRec(lo_bc, hi_bc));
+    Array<BCRec> bcs(ncomp, BCRec(lo_bc, hi_bc));
 
     amrex::InterpFromCoarseLevel(mf, time, *cmf[0], 0, icomp, ncomp, geom[lev-1], geom[lev],
                                  cphysbc, fphysbc, refRatio(lev-1),
@@ -706,7 +706,7 @@ Maestro::PlotFileMF () const
 Array<std::string>
 Maestro::PlotFileVarNames () const
 {
-    return {"phi"};
+    return {"phi1", "phi2"};
 }
 
 // write plotfile to disk

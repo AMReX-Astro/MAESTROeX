@@ -21,14 +21,14 @@ subroutine advect(time, lo, hi, &
   integer, intent(in) :: vy_lo(2), vy_hi(2)
   integer, intent(in) :: fx_lo(2), fx_hi(2)
   integer, intent(in) :: fy_lo(2), fy_hi(2)
-  double precision, intent(in   ) :: uin (ui_lo(1):ui_hi(1),ui_lo(2):ui_hi(2))
-  double precision, intent(inout) :: uout(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2))
+  double precision, intent(in   ) :: uin (ui_lo(1):ui_hi(1),ui_lo(2):ui_hi(2),1:2)
+  double precision, intent(inout) :: uout(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2),1:2)
   double precision, intent(in   ) :: vx  (vx_lo(1):vx_hi(1),vx_lo(2):vx_hi(2))
   double precision, intent(in   ) :: vy  (vy_lo(1):vy_hi(1),vy_lo(2):vy_hi(2))
-  double precision, intent(  out) :: flxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2))
-  double precision, intent(  out) :: flxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2))
+  double precision, intent(  out) :: flxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),1:2)
+  double precision, intent(  out) :: flxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),1:2)
 
-  integer :: i, j
+  integer :: i, j, comp
   integer :: glo(2), ghi(2)
   double precision :: dtdx(2), umax, vmax
 
@@ -64,50 +64,39 @@ subroutine advect(time, lo, hi, &
      call bl_error("CFL violation. Use smaller adv.cfl.")
   end if
 
-  ! call a function to compute flux
-  call compute_flux_2d(lo, hi, dt, dx, &
-                       uin, ui_lo, ui_hi, &
-                       vx, vx_lo, vx_hi, &
-                       vy, vy_lo, vy_hi, &
-                       flxx, fx_lo, fx_hi, &
-                       flxy, fy_lo, fy_hi, &
-                       phix_1d, phiy_1d, phix, phiy, slope, glo, ghi)
+  do comp = 1, 2
 
-  ! Final fluxes
-  do    j = lo(2), hi(2)
-     do i = lo(1), hi(1)+1
-        flxx(i,j) = phix(i,j) * vx(i,j)
-     end do
-  end do
-  !
-  do    j = lo(2), hi(2)+1
-     do i = lo(1), hi(1)
-        flxy(i,j) = phiy(i,j) * vy(i,j)
-     end do
-  end do
+     ! call a function to compute flux
+     call compute_flux_2d(lo, hi, dt, dx, &
+                          uin(:,:,comp), ui_lo, ui_hi, &
+                          vx, vx_lo, vx_hi, &
+                          vy, vy_lo, vy_hi, &
+                          flxx(:,:,comp), fx_lo, fx_hi, &
+                          flxy(:,:,comp), fy_lo, fy_hi, &
+                          phix_1d, phiy_1d, phix, phiy, slope, glo, ghi)
 
-  ! Do a conservative update
-  do    j = lo(2),hi(2)
+     ! Do a conservative update
+     do j = lo(2),hi(2)
      do i = lo(1),hi(1)
-        uout(i,j) = uin(i,j) + &
-             ( (flxx(i,j) - flxx(i+1,j)) * dtdx(1) &
-             + (flxy(i,j) - flxy(i,j+1)) * dtdx(2) )
-     enddo
-  enddo
+        uout(i,j,comp) = uin(i,j,comp) + &
+             ( (flxx(i,j,comp) - flxx(i+1,j,comp)) * dtdx(1) &
+             + (flxy(i,j,comp) - flxy(i,j+1,comp)) * dtdx(2) )
+     end do
+     end do
 
-  ! Scale by face area in order to correctly reflx
-  do    j = lo(2), hi(2)
+     ! Scale by face area in order to correctly reflx
+     do j = lo(2), hi(2)
      do i = lo(1), hi(1)+1
-        flxx(i,j) = flxx(i,j) * ( dt * dx(2))
-     enddo
-  enddo
-  
-  ! Scale by face area in order to correctly reflx
-  do    j = lo(2), hi(2)+1 
+        flxx(i,j,comp) = flxx(i,j,comp) * ( dt * dx(2))
+     end do
+     end do
+     do j = lo(2), hi(2)+1 
      do i = lo(1), hi(1)
-        flxy(i,j) = flxy(i,j) * (dt * dx(1))
-     enddo
-  enddo
+        flxy(i,j,comp) = flxy(i,j,comp) * (dt * dx(1))
+     end do
+     end do
+
+  end do
 
   call bl_deallocate(phix_1d)
   call bl_deallocate(phiy_1d)

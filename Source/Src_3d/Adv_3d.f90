@@ -25,16 +25,16 @@ subroutine advect(time, lo, hi, &
   integer, intent(in) :: fx_lo(3), fx_hi(3)
   integer, intent(in) :: fy_lo(3), fy_hi(3)
   integer, intent(in) :: fz_lo(3), fz_hi(3)
-  double precision, intent(in   ) :: uin (ui_lo(1):ui_hi(1),ui_lo(2):ui_hi(2),ui_lo(3):ui_hi(3))
-  double precision, intent(inout) :: uout(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2),uo_lo(3):uo_hi(3))
+  double precision, intent(in   ) :: uin (ui_lo(1):ui_hi(1),ui_lo(2):ui_hi(2),ui_lo(3):ui_hi(3),1:2)
+  double precision, intent(inout) :: uout(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2),uo_lo(3):uo_hi(3),1:2)
   double precision, intent(in   ) :: vx  (vx_lo(1):vx_hi(1),vx_lo(2):vx_hi(2),vx_lo(3):vx_hi(3))
   double precision, intent(in   ) :: vy  (vy_lo(1):vy_hi(1),vy_lo(2):vy_hi(2),vy_lo(3):vy_hi(3))
   double precision, intent(in   ) :: vz  (vz_lo(1):vz_hi(1),vz_lo(2):vz_hi(2),vz_lo(3):vz_hi(3))
-  double precision, intent(  out) :: flxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3))
-  double precision, intent(  out) :: flxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),fy_lo(3):fy_hi(3))
-  double precision, intent(  out) :: flxz(fz_lo(1):fz_hi(1),fz_lo(2):fz_hi(2),fz_lo(3):fz_hi(3))
+  double precision, intent(  out) :: flxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3),1:2)
+  double precision, intent(  out) :: flxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),fy_lo(3):fy_hi(3),1:2)
+  double precision, intent(  out) :: flxz(fz_lo(1):fz_hi(1),fz_lo(2):fz_hi(2),fz_lo(3):fz_hi(3),1:2)
 
-  integer :: i, j, k
+  integer :: i, j, k, comp
   integer :: glo(3), ghi(3)
   double precision :: dtdx(3), umax, vmax, wmax
 
@@ -78,54 +78,58 @@ subroutine advect(time, lo, hi, &
      call bl_error("CFL violation. Use smaller adv.cfl.")
   end if
 
-  ! call a function to compute flux
-  call compute_flux_3d(lo, hi, dt, dx, &
-                       uin, ui_lo, ui_hi, &
-                       vx, vx_lo, vx_hi, &
-                       vy, vy_lo, vy_hi, &
-                       vz, vz_lo, vz_hi, &
-                       flxx, fx_lo, fx_hi, &
-                       flxy, fy_lo, fy_hi, &
-                       flxz, fz_lo, fz_hi, &
-                       phix, phix_y, phix_z, &
-                       phiy, phiy_x, phiy_z, &
-                       phiz, phiz_x, phiz_y, &
-                       slope, glo, ghi)
+  do comp = 1, 2
 
-  ! Do a conservative update
-  do       k = lo(3), hi(3)
-     do    j = lo(2), hi(2)
-        do i = lo(1), hi(1)
-           uout(i,j,k) = uin(i,j,k) + &
-                ( (flxx(i,j,k) - flxx(i+1,j,k)) * dtdx(1) &
-                + (flxy(i,j,k) - flxy(i,j+1,k)) * dtdx(2) &
-                + (flxz(i,j,k) - flxz(i,j,k+1)) * dtdx(3) )
-        enddo
-     enddo
-  enddo
+     ! call a function to compute flux
+     call compute_flux_3d(lo, hi, dt, dx, &
+                          uin(:,:,:,comp), ui_lo, ui_hi, &
+                          vx, vx_lo, vx_hi, &
+                          vy, vy_lo, vy_hi, &
+                          vz, vz_lo, vz_hi, &
+                          flxx(:,:,:,comp), fx_lo, fx_hi, &
+                          flxy(:,:,:,comp), fy_lo, fy_hi, &
+                          flxz(:,:,:,comp), fz_lo, fz_hi, &
+                          phix, phix_y, phix_z, &
+                          phiy, phiy_x, phiy_z, &
+                          phiz, phiz_x, phiz_y, &
+                          slope, glo, ghi)
 
-  ! Scale by face area in order to correctly reflx
-  do       k = lo(3), hi(3)
-     do    j = lo(2), hi(2)
-        do i = lo(1), hi(1)+1
-           flxx(i,j,k) = flxx(i,j,k) * (dt * dx(2)*dx(3))
-        enddo
-     enddo
-  enddo
-  do       k = lo(3), hi(3)
-     do    j = lo(2), hi(2)+1 
-        do i = lo(1), hi(1)
-           flxy(i,j,k) = flxy(i,j,k) * (dt * dx(1)*dx(3))
-        enddo
-     enddo
-  enddo
-  do       k = lo(3), hi(3)+1
-     do    j = lo(2), hi(2)
-        do i = lo(1), hi(1)
-           flxz(i,j,k) = flxz(i,j,k) * (dt * dx(1)*dx(2))
-        enddo
-     enddo
-  enddo
+     ! Do a conservative update
+     do k = lo(3), hi(3)
+     do j = lo(2), hi(2)
+     do i = lo(1), hi(1)
+        uout(i,j,k,comp) = uin(i,j,k,comp) + &
+             ( (flxx(i,j,k,comp) - flxx(i+1,j,k,comp)) * dtdx(1) &
+             + (flxy(i,j,k,comp) - flxy(i,j+1,k,comp)) * dtdx(2) &
+             + (flxz(i,j,k,comp) - flxz(i,j,k+1,comp)) * dtdx(3) )
+     end do
+     end do
+     end do
+
+     ! Scale by face area in order to correctly reflx
+     do k = lo(3), hi(3)
+     do j = lo(2), hi(2)
+     do i = lo(1), hi(1)+1
+        flxx(i,j,k,comp) = flxx(i,j,k,comp) * (dt * dx(2)*dx(3))
+     end do
+     end do
+     end do
+     do k = lo(3), hi(3)
+     do j = lo(2), hi(2)+1 
+     do i = lo(1), hi(1)
+        flxy(i,j,k,comp) = flxy(i,j,k,comp) * (dt * dx(1)*dx(3))
+     end do
+     end do
+     end do
+     do k = lo(3), hi(3)+1
+     do j = lo(2), hi(2)
+     do i = lo(1), hi(1)
+        flxz(i,j,k,comp) = flxz(i,j,k,comp) * (dt * dx(1)*dx(2))
+     end do
+     end do
+     end do
+
+  end do
 
   call bl_deallocate(phix  )
   call bl_deallocate(phix_y)
