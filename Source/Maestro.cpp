@@ -48,14 +48,16 @@ Maestro::Maestro ()
         int bc_lo[AMREX_SPACEDIM];
         int bc_hi[AMREX_SPACEDIM];
 
-        for (int i=0; i<AMREX_SPACEDIM; ++i)
+        bc_lo[0] = INT_DIR;
+        bc_hi[0] = INT_DIR;
+
+        bc_lo[1] = EXT_DIR;
+        bc_hi[1] = EXT_DIR;
+
+        if (AMREX_SPACEDIM == 3)
         {
-            // periodic boundaries
-            bc_lo[i] = INT_DIR;
-            bc_hi[i] = INT_DIR;
-            // walls (Neumann)
-            bc_lo[i] = FOEXTRAP;
-            bc_hi[i] = FOEXTRAP;
+            bc_lo[2] = INT_DIR;
+            bc_hi[2] = INT_DIR;
         }
 
         for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
