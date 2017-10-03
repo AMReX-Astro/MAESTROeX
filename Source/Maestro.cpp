@@ -6,7 +6,7 @@
 #include <AMReX_PlotFileUtil.H>
 
 #include <Maestro.H>
-#include <MaestroPhysBC.H>
+#include <MaestroPhysBCFunct.H>
 #include <Maestro_F.H>
 
 using namespace amrex;
@@ -38,6 +38,59 @@ Maestro::Maestro ()
 
     phi_new.resize(nlevs_max);
     phi_old.resize(nlevs_max);
+
+    const int ncomp = 2;
+    bcs.resize(ncomp);
+    
+    for (int n = 0; n < 1; ++n)
+    {
+
+        int bc_lo[AMREX_SPACEDIM];
+        int bc_hi[AMREX_SPACEDIM];
+
+        for (int i=0; i<AMREX_SPACEDIM; ++i)
+        {
+            // periodic boundaries
+            bc_lo[i] = INT_DIR;
+            bc_hi[i] = INT_DIR;
+            // walls (Neumann)
+            bc_lo[i] = FOEXTRAP;
+            bc_hi[i] = FOEXTRAP;
+        }
+
+        for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+        {
+            
+            // lo-side BCs
+            if (bc_lo[idim] == INT_DIR) {
+                bcs[n].setLo(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
+            }
+            else if (bc_lo[idim] == FOEXTRAP) {
+                bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
+            }
+            else if (bc_lo[idim] == EXT_DIR) {
+                bcs[n].setLo(idim, BCType::ext_dir);  // external Dirichlet
+            }
+            else {
+                amrex::Abort("Invalid bc_lo");
+            }
+
+            // hi-side BCSs
+            if (bc_hi[idim] == INT_DIR) {
+                bcs[n].setHi(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
+            }
+            else if (bc_hi[idim] == FOEXTRAP) {
+                bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
+            }
+            else if (bc_hi[idim] == EXT_DIR) {
+                bcs[n].setHi(idim, BCType::ext_dir);  // external Dirichlet
+            }
+            else {
+                amrex::Abort("Invalid bc_hi");
+            }
+
+        }
+    }
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
@@ -377,7 +430,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
         Array<Real> stime;
         GetData(0, time, smf, stime);
 
-        MaestroPhysBC physbc;
+        MaestroPhysBCFunct physbc(geom[lev],bcs,BndryFunctBase(phifill));
         amrex::FillPatchSingleLevel(mf, time, smf, stime, 0, icomp, ncomp,
                                     geom[lev], physbc);
     }
@@ -388,12 +441,10 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
         GetData(lev-1, time, cmf, ctime);
         GetData(lev  , time, fmf, ftime);
 
-        MaestroPhysBC cphysbc, fphysbc;
-        Interpolater* mapper = &cell_cons_interp;
+        MaestroPhysBCFunct cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
+        MaestroPhysBCFunct fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
 
-        int lo_bc[] = {INT_DIR, INT_DIR, INT_DIR}; // periodic boundaryies
-        int hi_bc[] = {INT_DIR, INT_DIR, INT_DIR};
-        Array<BCRec> bcs(ncomp, BCRec(lo_bc, hi_bc));
+        Interpolater* mapper = &cell_cons_interp;
 
         amrex::FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
                                   0, icomp, ncomp, geom[lev-1], geom[lev],
@@ -417,13 +468,10 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp
         amrex::Abort("FillCoarsePatch: how did this happen?");
     }
 
-    MaestroPhysBC cphysbc, fphysbc;
-    Interpolater* mapper = &cell_cons_interp;
-    
-    int lo_bc[] = {INT_DIR, INT_DIR, INT_DIR}; // periodic boundaryies
-    int hi_bc[] = {INT_DIR, INT_DIR, INT_DIR};
-    Array<BCRec> bcs(ncomp, BCRec(lo_bc, hi_bc));
+    MaestroPhysBCFunct cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
+    MaestroPhysBCFunct fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
 
+    Interpolater* mapper = &cell_cons_interp;
     amrex::InterpFromCoarseLevel(mf, time, *cmf[0], 0, icomp, ncomp, geom[lev-1], geom[lev],
                                  cphysbc, fphysbc, refRatio(lev-1),
                                  mapper, bcs);

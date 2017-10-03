@@ -25,9 +25,9 @@ subroutine initdata(level, time, lo, hi, &
            x = prob_lo(1) + (dble(i)+0.5d0) * dx(1)
            
            if ( amrex_spacedim .eq. 2) then
-              r2 = ((x-0.125d0)**2 + (y-0.875d0)**2) / 0.0025d0
+              r2 = ((x-0.875d0)**2 + (y-0.5d0)**2) / 0.0025d0
               phi(i,j,k,1) = 1.d0 + exp(-r2)
-              r2 = ((x-0.875d0)**2 + (y-0.875d0)**2) / 0.0025d0
+              r2 = ((x-0.5d0)**2 + (y-0.875d0)**2) / 0.0025d0
               phi(i,j,k,2) = 1.d0 + exp(-r2)
            else
               r2 = ((x-0.125d0)**2 + (y-0.875d0)**2 + (z-0.5d0)**2) / 0.0025d0
