@@ -41,8 +41,8 @@ Maestro::Maestro ()
         bc_lo[0] = INT_DIR;
         bc_hi[0] = INT_DIR;
 
-        bc_lo[1] = EXT_DIR;
-        bc_hi[1] = EXT_DIR;
+        bc_lo[1] = INT_DIR;
+        bc_hi[1] = INT_DIR;
 
         if (AMREX_SPACEDIM == 3)
         {

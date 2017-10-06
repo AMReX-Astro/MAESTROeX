@@ -1,3 +1,8 @@
+
+! This file is automatically created by parse_maestro_params.py.  To update
+! or add runtime parameters, please edit _cpp_parameters and then run
+! mk_params.sh
+
 ! This module stores the runtime parameters and integer names for 
 ! indexing arrays.
 !
@@ -10,13 +15,12 @@ module meth_params_module
   use amrex_fort_module, only : rt => amrex_real
   implicit none
 
-  ! test variables
-  integer, save :: MYTEST_INT
-  real   , save :: MYTEST_REAL
+  ! variables in the module
+  integer, save :: NVAR_TEST
 
   ! Begin the declarations of the ParmParse parameters
 
-  @@f90_declarations@@
+  real(rt), save :: cfl
 
   ! End the declarations of the ParmParse parameters
 
@@ -31,7 +35,13 @@ contains
 
     type (amrex_parmparse) :: pp
 
-    @@set_maestro_params@@
+    cfl = 0.8d0;
+
+    call amrex_parmparse_build(pp, "maestro")
+    call pp%query("cfl", cfl)
+    call amrex_parmparse_destroy(pp)
+
+
 
   end subroutine ca_set_maestro_method_params
 
@@ -39,7 +49,8 @@ contains
   subroutine ca_finalize_meth_params() bind(C, name="ca_finalize_meth_params")
     implicit none
 
-    @@free_maestro_params@@
+
+
     
   end subroutine ca_finalize_meth_params
 

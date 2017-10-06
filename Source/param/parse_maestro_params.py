@@ -81,7 +81,7 @@ CWARNING = """
 // mk_params.sh\n
 """
 
-param_include_dir = "param_includes/"
+param_include_dir = "../param_includes/"
 
 
 class Param(object):
@@ -288,7 +288,7 @@ def write_meth_module(plist, meth_template):
     except:
         sys.exit("invalid template file")
 
-    try: mo = open("meth_params.F90", "w")
+    try: mo = open("../param_includes/meth_params.F90", "w")
     except:
         sys.exit("unable to open meth_params.F90 for writing")
 
