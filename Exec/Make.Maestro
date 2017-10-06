@@ -1,16 +1,141 @@
-AMREX_HOME ?= ../../../..
-MAESTRO_C_HOME  ?= ../../..
+AMREX_HOME     ?= /path/to/amrex
+MAESTRO_C_HOME ?= /path/to/MAESTRO_C
 
 TOP := $(MAESTRO_C_HOME)
 
+# default microphysics locations
+EOS_HOME     ?= $(TOP)/Microphysics/EOS
+NETWORK_HOME ?= $(TOP)/Microphysics/networks
+COND_HOME    ?= $(TOP)/Microphysics/conductivity
+
 EBASE := Maestro
+
+# EXTERN_CORE is simply a list of the directories we use in EOS,
+# Networks and Util this list will be searched for runtime parameters
+EXTERN_CORE ?=
+
+# need to put any build suffices before Make.defs
+#
+#
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
 
-Bdirs 	:= Source Source/Src_nd Source/Src_$(DIM)d \
-           Source/param_includes
+all: $(executable)
+	@echo SUCCESS
+
+# Maestro uses a coarse grained OMP approach
+DEFINES += -DCRSEGRNDOMP
+
+USE_MG = FALSE
+
+#------------------------------------------------------------------------------
+# Maestro directories
+#------------------------------------------------------------------------------
+
+Bdirs 	:= Source \
+           Source/Src_nd \
+           Source/Src_$(DIM)d \
+           Source/param_includes \
+           constants \
+           Util/model_parser
+
+# add / define any special physics we need
+#
+#
+
 Bpack	+= $(foreach dir, $(Bdirs), $(TOP)/$(dir)/Make.package)
 Blocs   += $(foreach dir, $(Bdirs), $(TOP)/$(dir))
+
+#------------------------------------------------------------------------------
+# AMReX
+#------------------------------------------------------------------------------
+
+# core AMReX directories -- note the Make.package for these adds these
+# directories into VPATH_LOCATIONS and INCLUDE_LOCATIONS for us, so we
+# don't need to do it here
+
+Pdirs 	:= Base Boundary AmrCore
+
+Bpack	+= $(foreach dir, $(Pdirs), $(AMREX_HOME)/Src/$(dir)/Make.package)
+
+INCLUDE_LOCATIONS += $(Blocs)
+VPATH_LOCATIONS   += $(Blocs)
+
+#------------------------------------------------------------------------------
+# microphysics 
+#------------------------------------------------------------------------------
+
+ifdef MICROPHYSICS_HOME
+   EOS_PATH := $(MICROPHYSICS_HOME)/EOS/$(strip $(EOS_DIR))
+   NETWORK_PATH := $(MICROPHYSICS_HOME)/networks/$(strip $(NETWORK_DIR))
+   COND_PATH := $(MICROPHYSICS_HOME)/conductivity/$(strip $(Conductivity_dir))
+endif
+
+# if the EOS / network / conductivity name exists in
+# MAESTRO_C/Microphysics, then use that version
+
+ifneq "$(wildcard $(EOS_HOME)/$(strip $(EOS_DIR)) )" ""
+   EOS_PATH := $(EOS_HOME)/$(strip $(EOS_DIR))
+endif
+
+ifneq "$(wildcard $(NETWORK_HOME)/$(strip $(NETWORK_DIR)) )" ""
+   NETWORK_PATH := $(NETWORK_HOME)/$(strip $(NETWORK_DIR))
+endif
+
+ifneq "$(wildcard $(COND_HOME)/$(strip $(CONDUCTIVITY_DIR)) )" ""
+   COND_PATH := $(COND_HOME)/$(strip $(CONDUCTIVITY_DIR))
+endif
+
+# Problems can specify the input file for general_null by setting
+# GENERAL_NET_INPUTS directly (full path) or just specifying the name
+# of the inputs file as NETWORK_INPUTS and let us sort it out
+ifndef GENERAL_NET_INPUTS
+   ifneq "$(wildcard $(NETWORK_INPUTS))" ""
+      GENERAL_NET_INPUTS := $(NETWORK_INPUTS)
+   else
+      GENERAL_NET_INPUTS := $(MAESTRO_C_HOME)/Microphysics/networks/general_null/$(NETWORK_INPUTS)
+   endif
+endif
+
+EXTERN_CORE += $(EOS_HOME)
+EXTERN_CORE += $(EOS_PATH)
+
+# the helmholtz EOS has an include file -- also add a target to link
+# the table into the problem directory.
+ifeq ($(findstring helmholtz, $(EOS_DIR)), helmholtz)
+   all: table
+endif
+
+table:
+	@if [ ! -f helm_table.dat ]; then echo Linking helm_table.dat; ln -s $(EOS_PATH)/helm_table.dat .;  fi
+
+EXTERN_CORE += $(NETWORK_HOME)
+EXTERN_CORE += $(NETWORK_PATH)
+
+# Note that this should be located after the include of the EOS and
+# Network includes since it has actions that depend on variables set
+# there.
+
+ifdef MICROPHYSICS_HOME
+  EXTERN_CORE += $(MICROPHYSICS_HOME)/EOS
+  EXTERN_CORE += $(MICROPHYSICS_HOME)/networks
+endif
+
+EXTERN_CORE += $(TOP)/Microphysics/conductivity
+EXTERN_CORE += $(COND_HOME)
+EXTERN_CORE += $(COND_PATH)
+
+Bpack += $(foreach dir, $(EXTERN_CORE), $(dir)/Make.package)
+Blocs += $(foreach dir, $(EXTERN_CORE), $(dir))
+
+
+#------------------------------------------------------------------------------
+# external libraries
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# include all of the necessary directories
+#------------------------------------------------------------------------------
 
 include $(Bpack)
 
@@ -20,13 +145,89 @@ F90EXE_sources += $(ca_F90EXE_sources)
 INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
 
-Pdirs 	:= Base Boundary AmrCore
-Ppack	+= $(foreach dir, $(Pdirs), $(AMREX_HOME)/Src/$(dir)/Make.package)
+include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
 
-include $(Ppack)
+#------------------------------------------------------------------------------
+# runtime parameters
+#------------------------------------------------------------------------------
 
-all: $(executable) 
-	@echo SUCCESS
+# runtime parameter support for extern/ routines
+f90EXE_sources += extern.f90
+
+EXTERN_TEMPLATE := $(TOP)/Source/extern_probin.template
+
+# these are for finding runtime parameters
+EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/constants $(TOP)/Util/model_parser
+ifdef MICROPHYSICS_HOME
+   EXTERN_SEARCH += $(MICROPHYSICS_HOME)/networks/
+endif
+
+EXTERN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(EXTERN_SEARCH))
+
+extern.f90: $(EXTERN_PARAMETERS) $(EXTERN_TEMPLATE)
+	$(AMREX_HOME)/Tools/F_scripts/write_probin.py \
+           -t $(EXTERN_TEMPLATE) -o extern.f90 -n extern \
+           --pa "$(EXTERN_PARAMETERS)"
+#------------------------------------------------------------------------------
+# build info
+#------------------------------------------------------------------------------
+
+# job_info support
+CEXE_headers += $(AMREX_HOME)/Tools/C_scripts/AMReX_buildInfo.H
+INCLUDE_LOCATIONS +=  $(AMREX_HOME)/Tools/C_scripts
+
+
+MNAMES := EOS=$(EOS_PATH) NETWORK=$(NETWORK_PATH)
+MNAMES += CONDUCTIVITY=$(COND_PATH)
+
+# we make AMReX_buildInfo.cpp as we make the .o file, so we can delete
+# it immediately.  this way if the build is interrupted, we are
+# guaranteed to remake it
+
+objForExecs += $(objEXETempDir)/AMReX_buildInfo.o
+
+.FORCE:
+.PHONE: .FORCE
+
+# set BUILD_GIT_NAME and BUILD_GIT_DIR if you are building in a
+# git-controlled dir not under MAESTRO_C/
+EXTRA_BUILD_INFO :=
+ifdef BUILD_GIT_NAME
+   EXTRA_BUILD_INFO := --build_git_name "$(BUILD_GIT_NAME)" \
+                       --build_git_dir "$(BUILD_GIT_DIR)"
+endif
+
+$(objEXETempDir)/AMReX_buildInfo.o: .FORCE
+	$(AMREX_HOME)/Tools/C_scripts/makebuildinfo_C.py \
+          --amrex_home "$(AMREX_HOME)" \
+          --COMP "$(COMP)" --COMP_VERSION "$(COMP_VERSION)" \
+          --CXX_comp_name "$(CXX)" --CXX_flags "$(CXXFLAGS) $(CPPFLAGS) $(includes)" \
+          --F_comp_name "$(F90)" --F_flags "$(F90FLAGS)" \
+          --link_flags "$(LDFLAGS)" --libraries "$(libraries)" \
+          --MODULES "$(MNAMES)" $(EXTRA_BUILD_INFO) \
+          --GIT "$(TOP) $(AMREX_HOME) $(MICROPHYSICS_HOME)"
+	$(SILENT) $(CCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $(CXXEXEFLAGS) AMReX_buildInfo.cpp -o $(objEXETempDir)/AMReX_buildInfo.o
+	$(SILENT) $(RM) AMReX_buildInfo.cpp
+
+
+#------------------------------------------------------------------------------
+# finish up
+#------------------------------------------------------------------------------
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.rules
 
+clean::
+	$(SILENT) $(RM) extern.f90
+	$(SILENT) $(RM) AMReX_buildInfo.cpp
+
+clean::
+	@if [ -L helm_table.dat ]; then rm -f helm_table.dat; fi
+
+
+# for debugging.  To see the value of a Makefile variable,
+# e.g. Fmlocs, simply do "make print-Fmlocs".  This will print out the
+# value.
+
+print-%::
+	@echo "$* is $($*)"
+	@$(RM) AMReX_buildInfo.cpp
