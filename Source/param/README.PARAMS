@@ -1,0 +1,25 @@
+In order to create variables that are accessible in C++ (via Header file) or in Fortran 
+(via module) you define them as follows.
+
+In _cpp_parameters create a list of variables you need to access in C++ and possibly Fortran
+
+In meth_params.template create a list of variables you need to access in Fortran that
+aren't already specified in _cpp_parameters.
+
+The "mk_params.sh" script calls:
+
+./parse_maestro_params.py -m meth_params.template ./_cpp_parameters
+
+This script reads in meth_params.template and _cpp_parameters to create:
+
+maestro_params.H   -- contains the static variables of Maestro class, 
+                      created from the user-defined list in _cpp_parameters
+maestro_defaults.H -- sets the default values of these static variables
+maestro_queries.H  -- does the parmparse query to override the default
+meth_params.F90    -- contains all variables marked with "need_in_Fortran" in 
+                      _cpp_parameters, and sets a number of other parameters 
+                      specific to the F90 routines
+
+During compile time, the make system calls write_probin.py and uses extern_probin.template
+to figure out what runtime parameters are needed based on the microphysics you have 
+chosen.  The script generates a module in the file extern.f90 in the build directory.
