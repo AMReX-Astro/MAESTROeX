@@ -12,6 +12,8 @@ extern "C"
 
     void ca_set_maestro_method_params();
 
+    void ca_get_num_spec(int* nspec);
+
     void initdata(const int& level, const amrex_real& time, 
                   const int* lo, const int* hi,
                   BL_FORT_FAB_ARG_3D(state),

@@ -3,6 +3,15 @@
 #include <Maestro.H>
 #include <maestro_defaults.H>
 
+int Maestro::NUM_STATE = -1;
+int Maestro::Rho       = -1;
+int Maestro::RhoH      = -1;
+int Maestro::FirstSpec = -1;
+int Maestro::NumSpec   = -1;
+int Maestro::Temp      = -1;
+int Maestro::Pi        = -1;
+
+
 // constructor - reads in parameters from inputs file
 //             - sizes multilevel arrays and data structures
 Maestro::Maestro ()
@@ -10,6 +19,9 @@ Maestro::Maestro ()
     ReadParameters();
 
     ca_set_maestro_method_params();
+
+// define variable mappings (Rho, RhoH, ..., NUM_STATE, etc.)
+    VariableSetup();
 
     // Geometry on all levels has been defined already.
 

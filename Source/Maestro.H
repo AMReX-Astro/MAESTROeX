@@ -42,6 +42,9 @@ public:
     // initializes multilevel data
     void InitData ();
 
+    // define variable mappings (Rho, RhoH, ..., NUM_STATE, etc.)
+    void VariableSetup();
+
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
     virtual void ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time, int ngrow) override;
@@ -129,16 +132,45 @@ private:
     amrex::Real t_old;
     amrex::Real dt;
 
+    static int NUM_STATE;
+    static int Rho, RhoH;
+    static int FirstSpec, NumSpec;
+    static int Temp, Pi;
+
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
     // to avoid a copy
     amrex::Array<std::unique_ptr<amrex::MultiFab> > phi_new;
     amrex::Array<std::unique_ptr<amrex::MultiFab> > phi_old;
 
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > sold;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > snew;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > uold;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > unew;
+
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > hgrhs;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > gamma1;
+
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > pi;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > gpi;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > dSdt;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > Source_old;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > Source_new;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > rho_omegadot2;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > rho_Hnuc2;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > rho_Hext;
+    amrex::Array<std::unique_ptr<amrex::MultiFab> > thermal2;
+
+
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary
     // condition types at the lo/hi walls in each direction
     Array<BCRec> bcs;
+
+    Array<BCRec> bcs_s;
+    Array<BCRec> bcs_u;
+
+
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
@@ -146,7 +178,10 @@ private:
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] and flux_reg[nlevs_max] are never actually 
     // used in the reflux operation
-    amrex::Array<std::unique_ptr<amrex::FluxRegister> > flux_reg; 
+    amrex::Array<std::unique_ptr<amrex::FluxRegister> > flux_reg;
+
+    amrex::Array<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
+    amrex::Array<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
     
     ////////////////
     // runtime parameters
