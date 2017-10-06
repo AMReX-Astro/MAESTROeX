@@ -1,5 +1,11 @@
-CEXE_sources += main.cpp Maestro.cpp MaestroPhysBCFunct.cpp
+CEXE_sources += main.cpp
+CEXE_sources += Maestro.cpp 
+CEXE_sources += MaestroDt.cpp 
+CEXE_sources += MaestroInit.cpp 
+CEXE_sources += MaestroPhysBCFunct.cpp
 
-CEXE_headers += Maestro.H MaestroPhysBCFunct.H
+CEXE_headers += Maestro.H
+CEXE_headers += MaestroPhysBCFunct.H
 
-ca_F90EXE_sources += meth_params.F90 bc_fill_nd.F90
+ca_F90EXE_sources += meth_params.F90
+ca_F90EXE_sources += bc_fill_nd.F90

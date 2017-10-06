@@ -10,8 +10,16 @@
 #endif
 
 #include <AMReX_AmrCore.H>
-#include <AMReX_FluxRegister.H>
 #include <AMReX_BCRec.H>
+#include <AMReX_FillPatchUtil.H>
+#include <AMReX_FluxRegister.H>
+#include <AMReX_MultiFabUtil.H>
+#include <AMReX_ParallelDescriptor.H>
+#include <AMReX_ParmParse.H>
+#include <AMReX_PlotFileUtil.H>
+
+#include <MaestroPhysBCFunct.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
