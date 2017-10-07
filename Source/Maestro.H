@@ -167,11 +167,6 @@ private:
     // condition types at the lo/hi walls in each direction
     Array<BCRec> bcs;
 
-    Array<BCRec> bcs_s;
-    Array<BCRec> bcs_u;
-
-
-
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
     // NOTE: the flux register associated with flux_reg[lev] is associated

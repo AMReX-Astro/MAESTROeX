@@ -44,7 +44,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 {
 
 
-    const int ncomp = NumSpec;
+    const int ncomp = 2;
     const int nghost = 0;
 
     phi_new[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
