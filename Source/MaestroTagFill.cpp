@@ -18,7 +18,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ngrow)
         // for that particular level
         // in subroutine state_error, you could use more elaborate tagging, such
         // as more advanced logical expressions, or gradients, etc.
-        ParmParse pp("adv");
+        ParmParse pp("maestro");
         int n = pp.countval("phierr");
         if (n > 0) {
             pp.getarr("phierr", phierr, 0, n);

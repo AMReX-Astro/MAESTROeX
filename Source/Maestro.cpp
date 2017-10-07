@@ -62,130 +62,115 @@ void
 Maestro::ReadParameters ()
 {
 
-    {
-        ParmParse pp;  // Traditionally, max_step and stop_time do not have prefix.
-        pp.query("max_step", max_step);
-        pp.query("stop_time", stop_time);
-    }
-
-    {
-        ParmParse pp("amr"); // Traditionally, these have prefix, amr.
-        pp.query("regrid_int", regrid_int);
-        pp.query("plot_file", plot_file);
-        pp.query("plot_int", plot_int);
-    }
-
-    {
-        ParmParse pp("maestro");
+    ParmParse pp("maestro");
 
 #include <maestro_queries.H>
 
-        // Get boundary conditions
-        Array<int> lo_bc(AMREX_SPACEDIM), hi_bc(AMREX_SPACEDIM);
-        pp.getarr("lo_bc",lo_bc,0,AMREX_SPACEDIM);
-        pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
+    // Get boundary conditions
+    Array<int> lo_bc(AMREX_SPACEDIM), hi_bc(AMREX_SPACEDIM);
+    pp.getarr("lo_bc",lo_bc,0,AMREX_SPACEDIM);
+    pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
     
-        // Check phys_bc against possible periodic geometry
-        // if periodic, must have internal BC marked.
+    // Check phys_bc against possible periodic geometry
+    // if periodic, must have internal BC marked.
+    //
+    if (Geometry::isAnyPeriodic())
+    {
         //
-        if (Geometry::isAnyPeriodic())
+        // Do idiot check.  Periodic means interior in those directions.
+        //
+        for (int dir = 0; dir<AMREX_SPACEDIM; dir++)
         {
-            //
-            // Do idiot check.  Periodic means interior in those directions.
-            //
-            for (int dir = 0; dir<AMREX_SPACEDIM; dir++)
+            if (Geometry::isPeriodic(dir))
             {
-                if (Geometry::isPeriodic(dir))
+                if (lo_bc[dir] != Interior)
                 {
-                    if (lo_bc[dir] != Interior)
-                    {
-                        std::cerr << "Maestro::ReadParameters:periodic in direction "
-                                  << dir << " but low BC is not Interior\n";
-                        amrex::Error();
-                    }
-                    if (hi_bc[dir] != Interior)
-                    {
-                        std::cerr << "Maestro::ReadParameters:periodic in direction "
-                                  << dir << " but high BC is not Interior\n";
-                        amrex::Error();
-                    }
-                }
-            }
-        }
-        else
-        {
-            //
-            // Do idiot check.  If not periodic, should be no interior.
-            //
-            for (int dir=0; dir<AMREX_SPACEDIM; dir++)
-            {
-                if (lo_bc[dir] == Interior)
-                {
-                    std::cerr << "Maestro::ReadParameters:interior bc in direction "
-                              << dir << " but not periodic\n";
+                    std::cerr << "Maestro::ReadParameters:periodic in direction "
+                              << dir << " but low BC is not Interior\n";
                     amrex::Error();
                 }
-                if (hi_bc[dir] == Interior)
+                if (hi_bc[dir] != Interior)
                 {
-                    std::cerr << "Maestro::ReadParameters:interior bc in direction "
-                              << dir << " but not periodic\n";
+                    std::cerr << "Maestro::ReadParameters:periodic in direction "
+                              << dir << " but high BC is not Interior\n";
                     amrex::Error();
                 }
             }
         }
+    }
+    else
+    {
+        //
+        // Do idiot check.  If not periodic, should be no interior.
+        //
+        for (int dir=0; dir<AMREX_SPACEDIM; dir++)
+        {
+            if (lo_bc[dir] == Interior)
+            {
+                std::cerr << "Maestro::ReadParameters:interior bc in direction "
+                          << dir << " but not periodic\n";
+                amrex::Error();
+            }
+            if (hi_bc[dir] == Interior)
+            {
+                std::cerr << "Maestro::ReadParameters:interior bc in direction "
+                          << dir << " but not periodic\n";
+                amrex::Error();
+            }
+        }
+    }
 
-        for (int n = 0; n < 2; ++n)
+    for (int n = 0; n < 2; ++n)
+    {
+        for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
         {
-            for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
-            {
             
-                // lo-side BCs
-                if (lo_bc[idim] == Interior) {
-                    bcs[n].setLo(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
-                }
-                else if (lo_bc[idim] == Inflow) {
-                    bcs[n].setLo(idim, BCType::ext_dir);  // external Dirichlet
-                }
-                else if (lo_bc[idim] == Outflow) {
-                    bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
-                }
-                else if (lo_bc[idim] == Symmetry) {
-                    bcs[n].setLo(idim, BCType::reflect_even);
-                }
-                else if (lo_bc[idim] == SlipWall) {
-                    bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
-                }
-                else if (lo_bc[idim] == NoSlipWall) {
-                    bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
-                }
-                else {
-                    amrex::Abort("Invalid lo_bc");
-                }
-
-                // hi-side BCSs
-                if (hi_bc[idim] == Interior) {
-                    bcs[n].setHi(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
-                }
-                else if (hi_bc[idim] == Inflow) {
-                    bcs[n].setHi(idim, BCType::ext_dir);  // external Dirichlet
-                }
-                else if (hi_bc[idim] == Outflow) {
-                    bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
-                }
-                else if (hi_bc[idim] == Symmetry) {
-                    bcs[n].setHi(idim, BCType::reflect_even);
-                }
-                else if (hi_bc[idim] == SlipWall) {
-                    bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
-                }
-                else if (hi_bc[idim] == NoSlipWall) {
-                    bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
-                }
-                else {
-                    amrex::Abort("Invalid hi_bc");
-                }
-
+            // lo-side BCs
+            if (lo_bc[idim] == Interior) {
+                bcs[n].setLo(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
             }
+            else if (lo_bc[idim] == Inflow) {
+                bcs[n].setLo(idim, BCType::ext_dir);  // external Dirichlet
+            }
+            else if (lo_bc[idim] == Outflow) {
+                bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
+            }
+            else if (lo_bc[idim] == Symmetry) {
+                bcs[n].setLo(idim, BCType::reflect_even);
+            }
+            else if (lo_bc[idim] == SlipWall) {
+                bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
+            }
+            else if (lo_bc[idim] == NoSlipWall) {
+                bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
+            }
+            else {
+                amrex::Abort("Invalid lo_bc");
+            }
+
+            // hi-side BCSs
+            if (hi_bc[idim] == Interior) {
+                bcs[n].setHi(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
+            }
+            else if (hi_bc[idim] == Inflow) {
+                bcs[n].setHi(idim, BCType::ext_dir);  // external Dirichlet
+            }
+            else if (hi_bc[idim] == Outflow) {
+                bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
+            }
+            else if (hi_bc[idim] == Symmetry) {
+                bcs[n].setHi(idim, BCType::reflect_even);
+            }
+            else if (hi_bc[idim] == SlipWall) {
+                bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
+            }
+            else if (hi_bc[idim] == NoSlipWall) {
+                bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
+            }
+            else {
+                amrex::Abort("Invalid hi_bc");
+            }
+
         }
     }
 }

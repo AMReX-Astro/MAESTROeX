@@ -183,17 +183,6 @@ private:
 
 #include <maestro_params.H>
 
-    // maximum number of steps and stop time
-    int max_step = std::numeric_limits<int>::max();
-    amrex::Real stop_time = std::numeric_limits<amrex::Real>::max();
-
-    // how often each level regrids the higher levels of refinement
-    // (after a level advances that many time steps)
-    int regrid_int = 2;
-
-    // plotfile prefix and frequency
-    std::string plot_file {"plt"};
-    int plot_int = -1;
 };
 
 #endif

@@ -10,6 +10,19 @@
 # category: testing
 #-----------------------------------------------------------------------------
 
+max_step                     int          1
+
+stop_time                    Real         1.e10
+
+# how often to regrid
+regrid_int                   int          2
+
+# root name of plot file
+plot_file                    string       "plt"
+
+# number of timesteps between plot files
+plot_int                     int          10
+
 # the effective Courant number to use---we will not allow the hydrodynamic
 # waves to cross more than this fraction of a zone over a single timestep
 cfl                          Real          0.8                y
