@@ -78,7 +78,7 @@ subroutine advect(time, lo, hi, &
      call bl_error("CFL violation. Use smaller adv.cfl.")
   end if
 
-  do comp = 1, 2
+  do comp = 1, 6
 
      ! call a function to compute flux
      call compute_flux_3d(lo, hi, dt, dx, &

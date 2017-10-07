@@ -38,17 +38,17 @@ subroutine state_error(tag,tag_lo,tag_hi, &
   integer          :: i, j, k
 
   ! Tag on regions of high phi
-  do       k = lo(3), hi(3)
-     do    j = lo(2), hi(2)
-        do i = lo(1), hi(1)
-           if (state(i,j,k,1) .ge. phierr) then
-              tag(i,j,k) = set
-           endif
-           if (state(i,j,k,2) .ge. phierr) then
-              tag(i,j,k) = set
-           endif
-        enddo
-     enddo
+  do k = lo(3), hi(3)
+  do j = lo(2), hi(2)
+  do i = lo(1), hi(1)
+     if (state(i,j,k,1) .ge. phierr) then
+        tag(i,j,k) = set
+     endif
+     if (state(i,j,k,6) .ge. phierr) then
+        tag(i,j,k) = set
+     endif
+  enddo
+  enddo
   enddo
 
 end subroutine state_error

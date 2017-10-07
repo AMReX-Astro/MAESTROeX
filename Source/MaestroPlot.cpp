@@ -14,7 +14,7 @@ Maestro::PlotFileMF () const
 {
     Array<const MultiFab*> r;
     for (int i = 0; i <= finest_level; ++i) {
-        r.push_back(phi_new[i].get());
+        r.push_back(snew[i].get());
     }
     return r;
 }
@@ -23,7 +23,7 @@ Maestro::PlotFileMF () const
 Array<std::string>
 Maestro::PlotFileVarNames () const
 {
-    return {"phi1", "phi2"};
+    return {"phi1", "phi2", "phi3", "phi4", "phi5", "phi6"};
 }
 
 // write plotfile to disk

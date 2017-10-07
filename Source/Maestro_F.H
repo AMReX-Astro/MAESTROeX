@@ -17,7 +17,8 @@ extern "C"
     void initdata(const int& level, const amrex_real& time, 
                   const int* lo, const int* hi,
                   BL_FORT_FAB_ARG_3D(state),
-                  const amrex_real* dx, const amrex_real* problo);
+                  const amrex_real* dx, const amrex_real* problo,
+                  const int& nvar);
 
     void get_face_velocity(const int& level, const amrex_real& time, 
                            AMREX_D_DECL(BL_FORT_FAB_ARG(xvel),

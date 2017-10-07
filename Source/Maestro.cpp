@@ -16,17 +16,20 @@ int Maestro::Pi        = -1;
 Maestro::Maestro ()
 {
 
-    const int ncomp = 2;
-    bcs.resize(ncomp);
+    // Geometry on all levels has been defined already.
 
+    // read in fortran90 parameters
     ca_set_maestro_method_params();
+
+    // ca_set_method_params(QRHO,...
+
+    // read in C++ parameters
+    ReadParameters();
 
     // define variable mappings (Rho, RhoH, ..., NUM_STATE, etc.)
     VariableSetup();
 
-    ReadParameters();
-
-    // Geometry on all levels has been defined already.
+    bcs.resize(NUM_STATE);
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
@@ -41,8 +44,8 @@ Maestro::Maestro ()
     // set this to a large number so change_max doesn't affect the first time step
     dt = 1.e100;
 
-    phi_new.resize(nlevs_max);
-    phi_old.resize(nlevs_max);
+    snew.resize(nlevs_max);
+    sold.resize(nlevs_max);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
@@ -120,7 +123,7 @@ Maestro::ReadParameters ()
         }
     }
 
-    for (int n = 0; n < 2; ++n)
+    for (int n = 0; n < NUM_STATE; ++n)
     {
         for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
         {
@@ -181,9 +184,9 @@ Maestro::AverageDown ()
 {
     for (int lev = finest_level-1; lev >= 0; --lev)
     {
-        amrex::average_down(*phi_new[lev+1], *phi_new[lev],
+        amrex::average_down(*snew[lev+1], *snew[lev],
                             geom[lev+1], geom[lev],
-                            0, phi_new[lev]->nComp(), refRatio(lev));
+                            0, snew[lev]->nComp(), refRatio(lev));
     }
 }
 
@@ -191,9 +194,9 @@ Maestro::AverageDown ()
 void
 Maestro::AverageDownTo (int crse_lev)
 {
-    amrex::average_down(*phi_new[crse_lev+1], *phi_new[crse_lev],
+    amrex::average_down(*snew[crse_lev+1], *snew[crse_lev],
                         geom[crse_lev+1], geom[crse_lev],
-                        0, phi_new[crse_lev]->nComp(), refRatio(crse_lev));
+                        0, snew[crse_lev]->nComp(), refRatio(crse_lev));
 }
 
 // compute the number of cells at a level
@@ -220,7 +223,7 @@ Maestro::CountCells (int lev)
 void
 Maestro::ClearLevel (int lev)
 {
-    phi_new[lev].reset(nullptr);
-    phi_old[lev].reset(nullptr);
+    snew[lev].reset(nullptr);
+    sold[lev].reset(nullptr);
     flux_reg[lev].reset(nullptr);
 }

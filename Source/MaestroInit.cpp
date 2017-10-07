@@ -42,26 +42,23 @@ Maestro::InitData ()
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)
 {
-
-
-    const int ncomp = 2;
     const int nghost = 0;
 
-    phi_new[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
-    phi_old[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
+    snew[lev].reset(new MultiFab(ba, dm, NUM_STATE, nghost));
+    sold[lev].reset(new MultiFab(ba, dm, NUM_STATE, nghost));
 
     t_new = time;
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, ncomp));
+        flux_reg[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NUM_STATE));
     }
 
     const Real* dx = geom[lev].CellSize();
     const Real* prob_lo = geom[lev].ProbLo();
     Real cur_time = t_new;
 
-    MultiFab& state = *phi_new[lev];
+    MultiFab& state = *snew[lev];
 
     for (MFIter mfi(state); mfi.isValid(); ++mfi)
     {
@@ -71,6 +68,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
         initdata(lev, cur_time, ARLIM_3D(lo), ARLIM_3D(hi),
                  BL_TO_FORTRAN_3D(state[mfi]), ZFILL(dx),
-                 ZFILL(prob_lo));
+                 ZFILL(prob_lo), NUM_STATE);
     }
 }

@@ -96,7 +96,7 @@ private:
     // this comes into play when a new level of refinement appears
     void FillCoarsePatch (int lev, amrex::Real time, amrex::MultiFab& mf, int icomp, int ncomp);
 
-    // utility to copy in data from phi_old and/or phi_new into another multifab
+    // utility to copy in data from sold and/or snew into another multifab
     void GetData (int lev, amrex::Real time, amrex::Array<amrex::MultiFab*>& data,
                   amrex::Array<amrex::Real>& datatime);
 
@@ -140,9 +140,6 @@ private:
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
     // to avoid a copy
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > phi_new;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > phi_old;
-
     amrex::Array<std::unique_ptr<amrex::MultiFab> > sold;
     amrex::Array<std::unique_ptr<amrex::MultiFab> > snew;
     amrex::Array<std::unique_ptr<amrex::MultiFab> > uold;

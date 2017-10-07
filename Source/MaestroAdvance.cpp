@@ -82,9 +82,9 @@ Maestro::AdvanceTimeStep (Real time)
             amrex::Print() << "BEGIN ADVANCE with " << CountCells(lev) << " cells" << std::endl;
         }
 
-        std::swap(phi_old[lev], phi_new[lev]);
+        std::swap(sold[lev], snew[lev]);
 
-        MultiFab& S_new = *phi_new[lev];
+        MultiFab& S_new = *snew[lev];
 
         const Real old_time = t_old;
         const Real new_time = t_new;
@@ -157,8 +157,8 @@ Maestro::AdvanceTimeStep (Real time)
 
         // increment or decrement the flux registers by area and time-weighted fluxes
         // Note that the fluxes have already been scaled by dt and area
-        // In this example we are solving phi_t = -div(+F)
-        // The fluxes contain, e.g., F_{i+1/2,j} = (phi*u)_{i+1/2,j}
+        // In this example we are solving s_t = -div(+F)
+        // The fluxes contain, e.g., F_{i+1/2,j} = (s*u)_{i+1/2,j}
         // Keep this in mind when considering the different sign convention for updating
         // the flux registers from the coarse or fine grid perspective
         // NOTE: the flux register associated with flux_reg[lev] is associated
@@ -198,7 +198,7 @@ Maestro::AdvanceTimeStep (Real time)
     {
         if (do_reflux) {
             // update lev based on coarse-fine flux mismatch
-            flux_reg[lev+1]->Reflux(*phi_new[lev], 1.0, 0, 0, phi_new[lev]->nComp(), geom[lev]);
+            flux_reg[lev+1]->Reflux(*snew[lev], 1.0, 0, 0, snew[lev]->nComp(), geom[lev]);
         }
 
         AverageDownTo(lev); // average lev+1 down to lev

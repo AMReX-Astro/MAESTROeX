@@ -33,7 +33,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ngrow)
     const Real* dx      = geom[lev].CellSize();
     const Real* prob_lo = geom[lev].ProbLo();
 
-    const MultiFab& state = *phi_new[lev];
+    const MultiFab& state = *snew[lev];
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -80,11 +80,11 @@ void
 Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 				 const DistributionMapping& dm)
 {
-    const int ncomp = phi_new[lev-1]->nComp();
-    const int nghost = phi_new[lev-1]->nGrow();
+    const int ncomp = snew[lev-1]->nComp();
+    const int nghost = snew[lev-1]->nGrow();
     
-    phi_new[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
-    phi_old[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
+    snew[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
+    sold[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
 
     t_new = time;
     t_old = time - 1.e200;
@@ -93,7 +93,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
         flux_reg[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, ncomp));
     }
 
-    FillCoarsePatch(lev, time, *phi_new[lev], 0, ncomp);
+    FillCoarsePatch(lev, time, *snew[lev], 0, ncomp);
 }
 
 // Remake an existing level using provided BoxArray and DistributionMapping and 
@@ -103,8 +103,8 @@ void
 Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 		      const DistributionMapping& dm)
 {
-    const int ncomp = phi_new[lev]->nComp();
-    const int nghost = phi_new[lev]->nGrow();
+    const int ncomp = snew[lev]->nComp();
+    const int nghost = snew[lev]->nGrow();
 
 #if __cplusplus >= 201402L
     auto new_state = std::make_unique<MultiFab>(ba, dm, ncomp, nghost);
@@ -116,8 +116,8 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 
     FillPatch(lev, time, *new_state, 0, ncomp);
 
-    std::swap(new_state, phi_new[lev]);
-    std::swap(old_state, phi_old[lev]);
+    std::swap(new_state, snew[lev]);
+    std::swap(old_state, sold[lev]);
 
     t_new = time;
     t_old = time - 1.e200;
@@ -187,7 +187,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp
                                  mapper, bcs);
 }
 
-// utility to copy in data from phi_old and/or phi_new into another multifab
+// utility to copy in data from sold and/or snew into another multifab
 void
 Maestro::GetData (int lev, Real time, Array<MultiFab*>& data, Array<Real>& datatime)
 {
@@ -198,18 +198,18 @@ Maestro::GetData (int lev, Real time, Array<MultiFab*>& data, Array<Real>& datat
 
     if (time > t_new - teps && time < t_new + teps)
     {
-        data.push_back(phi_new[lev].get());
+        data.push_back(snew[lev].get());
         datatime.push_back(t_new);
     }
     else if (time > t_old - teps && time < t_old + teps)
     {
-        data.push_back(phi_old[lev].get());
+        data.push_back(sold[lev].get());
         datatime.push_back(t_old);
     }
     else
     {
-        data.push_back(phi_old[lev].get());
-        data.push_back(phi_new[lev].get());
+        data.push_back(sold[lev].get());
+        data.push_back(snew[lev].get());
         datatime.push_back(t_old);
         datatime.push_back(t_new);
     }
