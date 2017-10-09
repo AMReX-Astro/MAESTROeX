@@ -44,6 +44,9 @@ public:
     // define variable mappings (Rho, RhoH, ..., NUM_STATE, etc.)
     void VariableSetup();
 
+    // set up BCRec definitions for BC types
+    void BCSetup();
+
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
     virtual void ErrorEst (int lev,
@@ -88,10 +91,11 @@ private:
     void ReadParameters ();
 
     // set covered coarse cells to be the average of overlying fine cells
-    void AverageDown ();
+    void AverageDown (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
 
     // more flexible version of AverageDown() that lets you average down across multiple levels
-    void AverageDownTo (int crse_lev);
+    void AverageDownTo (int crse_lev,
+                        amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
 
     // compute the number of cells at a level
     long CountCells (int lev);

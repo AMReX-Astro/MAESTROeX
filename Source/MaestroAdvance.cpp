@@ -202,7 +202,7 @@ Maestro::AdvanceTimeStep (Real time)
             flux_reg_s[lev+1]->Reflux(*snew[lev], 1.0, 0, 0, snew[lev]->nComp(), geom[lev]);
         }
 
-        AverageDownTo(lev); // average lev+1 down to lev
+        AverageDownTo(lev,snew); // average lev+1 down to lev
     }
 
 }
