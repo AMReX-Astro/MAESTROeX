@@ -82,20 +82,20 @@ void
 Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 				 const DistributionMapping& dm)
 {
-    const int ncomp = snew[lev-1]->nComp();
     const int nghost = snew[lev-1]->nGrow();
     
-    snew[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
-    sold[lev].reset(new MultiFab(ba, dm, ncomp, nghost));
+    snew[lev].reset(new MultiFab(ba, dm, NUM_STATE, nghost));
+    sold[lev].reset(new MultiFab(ba, dm, NUM_STATE, nghost));
 
     t_new = time;
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, ncomp));
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NUM_STATE));
+        flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
-    FillCoarsePatch(lev, time, *snew[lev], 0, ncomp);
+    FillCoarsePatch(lev, time, *snew[lev], 0, NUM_STATE, bcs_s);
 }
 
 // Remake an existing level using provided BoxArray and DistributionMapping and 
@@ -105,18 +105,17 @@ void
 Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 		      const DistributionMapping& dm)
 {
-    const int ncomp = snew[lev]->nComp();
     const int nghost = snew[lev]->nGrow();
 
 #if __cplusplus >= 201402L
-    auto new_state = std::make_unique<MultiFab>(ba, dm, ncomp, nghost);
-    auto old_state = std::make_unique<MultiFab>(ba, dm, ncomp, nghost);
+    auto new_state = std::make_unique<MultiFab>(ba, dm, NUM_STATE, nghost);
+    auto old_state = std::make_unique<MultiFab>(ba, dm, NUM_STATE, nghost);
 #else
-    std::unique_ptr<MultiFab> new_state(new MultiFab(ba, dm, ncomp, nghost));
-    std::unique_ptr<MultiFab> old_state(new MultiFab(ba, dm, ncomp, nghost));
+    std::unique_ptr<MultiFab> new_state(new MultiFab(ba, dm, NUM_STATE, nghost));
+    std::unique_ptr<MultiFab> old_state(new MultiFab(ba, dm, NUM_STATE, nghost));
 #endif
 
-    FillPatch(lev, time, *new_state, 0, ncomp);
+    FillPatch(lev, time, *new_state, 0, NUM_STATE, bcs_s);
 
     std::swap(new_state, snew[lev]);
     std::swap(old_state, sold[lev]);
@@ -125,7 +124,8 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, ncomp));
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NUM_STATE));
+        flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }    
 }
 
@@ -134,7 +134,8 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 // compute a new multifab by coping in phi from valid region and filling ghost cells
 // works for single level and 2-level cases (fill fine grid ghost by interpolating from coarse)
 void
-Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
+Maestro::FillPatch (int lev, Real time, MultiFab& mf, 
+                    int icomp, int ncomp, Vector<BCRec> bcs)
 {
     if (lev == 0)
     {
@@ -168,7 +169,8 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
 // fill an entire multifab by interpolating from the coarser level
 // this comes into play when a new level of refinement appears
 void
-Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
+Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, 
+                          int icomp, int ncomp, Vector<BCRec> bcs)
 {
     BL_ASSERT(lev > 0);
 

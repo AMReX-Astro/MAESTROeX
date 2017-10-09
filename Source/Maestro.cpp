@@ -30,7 +30,8 @@ Maestro::Maestro ()
     // define variable mappings (Rho, RhoH, ..., NUM_STATE, etc.)
     VariableSetup();
 
-    bcs.resize(NUM_STATE);
+    bcs_s.resize(NUM_STATE);
+    bcs_u.resize(AMREX_SPACEDIM);
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
@@ -53,7 +54,8 @@ Maestro::Maestro ()
     // NOTE: the flux register associated with flux_reg[lev] is associated
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] is never actually used in the reflux operation
-    flux_reg.resize(nlevs_max);
+    flux_reg_s.resize(nlevs_max);
+    flux_reg_u.resize(nlevs_max);
 }
 
 Maestro::~Maestro ()
@@ -124,52 +126,53 @@ Maestro::ReadParameters ()
         }
     }
 
+    // scalars
     for (int n = 0; n < NUM_STATE; ++n)
     {
         for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
         {
             
-            // lo-side BCs
+            // lo-side bcs
             if (lo_bc[idim] == Interior) {
-                bcs[n].setLo(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
+                bcs_s[n].setLo(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
             }
             else if (lo_bc[idim] == Inflow) {
-                bcs[n].setLo(idim, BCType::ext_dir);  // external Dirichlet
+                bcs_s[n].setLo(idim, BCType::ext_dir);  // external Dirichlet
             }
             else if (lo_bc[idim] == Outflow) {
-                bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
+                bcs_s[n].setLo(idim, BCType::foextrap); // first-order extrapolation
             }
             else if (lo_bc[idim] == Symmetry) {
-                bcs[n].setLo(idim, BCType::reflect_even);
+                bcs_s[n].setLo(idim, BCType::reflect_even);
             }
             else if (lo_bc[idim] == SlipWall) {
-                bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
+                bcs_s[n].setLo(idim, BCType::foextrap); // first-order extrapolation
             }
             else if (lo_bc[idim] == NoSlipWall) {
-                bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
+                bcs_s[n].setLo(idim, BCType::foextrap); // first-order extrapolation
             }
             else {
                 Abort("Invalid lo_bc");
             }
 
-            // hi-side BCSs
+            // hi-side bcs
             if (hi_bc[idim] == Interior) {
-                bcs[n].setHi(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
+                bcs_s[n].setHi(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
             }
             else if (hi_bc[idim] == Inflow) {
-                bcs[n].setHi(idim, BCType::ext_dir);  // external Dirichlet
+                bcs_s[n].setHi(idim, BCType::ext_dir);  // external Dirichlet
             }
             else if (hi_bc[idim] == Outflow) {
-                bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
+                bcs_s[n].setHi(idim, BCType::foextrap); // first-order extrapolation
             }
             else if (hi_bc[idim] == Symmetry) {
-                bcs[n].setHi(idim, BCType::reflect_even);
+                bcs_s[n].setHi(idim, BCType::reflect_even);
             }
             else if (hi_bc[idim] == SlipWall) {
-                bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
+                bcs_s[n].setHi(idim, BCType::foextrap); // first-order extrapolation
             }
             else if (hi_bc[idim] == NoSlipWall) {
-                bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
+                bcs_s[n].setHi(idim, BCType::foextrap); // first-order extrapolation
             }
             else {
                 Abort("Invalid hi_bc");
@@ -177,6 +180,59 @@ Maestro::ReadParameters ()
 
         }
     }
+
+    // velocity
+    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+    {
+            
+        // lo-side bcs
+        if (lo_bc[idim] == Interior) {
+            bcs_u[0].setLo(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
+        }
+        else if (lo_bc[idim] == Inflow) {
+            bcs_u[0].setLo(idim, BCType::ext_dir);  // external Dirichlet
+        }
+        else if (lo_bc[idim] == Outflow) {
+            bcs_u[0].setLo(idim, BCType::foextrap); // first-order extrapolation
+        }
+        else if (lo_bc[idim] == Symmetry) {
+            bcs_u[0].setLo(idim, BCType::reflect_even);
+        }
+        else if (lo_bc[idim] == SlipWall) {
+            bcs_u[0].setLo(idim, BCType::ext_dir); // first-order extrapolation
+        }
+        else if (lo_bc[idim] == NoSlipWall) {
+            bcs_u[0].setLo(idim, BCType::foextrap); // first-order extrapolation
+        }
+        else {
+            Abort("Invalid lo_bc");
+        }
+
+        // hi-side bcs
+        if (hi_bc[idim] == Interior) {
+            bcs_u[0].setHi(idim, BCType::int_dir);  // periodic uses "internal Dirichlet"
+        }
+        else if (hi_bc[idim] == Inflow) {
+            bcs_u[0].setHi(idim, BCType::ext_dir);  // external Dirichlet
+        }
+        else if (hi_bc[idim] == Outflow) {
+            bcs_u[0].setHi(idim, BCType::foextrap); // first-order extrapolation
+        }
+        else if (hi_bc[idim] == Symmetry) {
+            bcs_u[0].setHi(idim, BCType::reflect_even);
+        }
+        else if (hi_bc[idim] == SlipWall) {
+            bcs_u[0].setHi(idim, BCType::foextrap); // first-order extrapolation
+        }
+        else if (hi_bc[idim] == NoSlipWall) {
+            bcs_u[0].setHi(idim, BCType::foextrap); // first-order extrapolation
+        }
+        else {
+            Abort("Invalid hi_bc");
+        }
+    }
+    
+
 }
 
 // set covered coarse cells to be the average of overlying fine cells
@@ -226,5 +282,6 @@ Maestro::ClearLevel (int lev)
 {
     snew[lev].reset(nullptr);
     sold[lev].reset(nullptr);
-    flux_reg[lev].reset(nullptr);
+    flux_reg_s[lev].reset(nullptr);
+    flux_reg_u[lev].reset(nullptr);
 }

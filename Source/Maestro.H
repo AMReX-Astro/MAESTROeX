@@ -102,7 +102,8 @@ private:
                     amrex::Real time,
                     amrex::MultiFab& mf,
                     int icomp,
-                    int ncomp);
+                    int ncomp,
+                    amrex::Vector<amrex::BCRec> bcs);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
@@ -110,7 +111,8 @@ private:
                           amrex::Real time,
                           amrex::MultiFab& mf,
                           int icomp,
-                          int ncomp);
+                          int ncomp,
+                          amrex::Vector<amrex::BCRec> bcs);
 
     // utility to copy in data from sold and/or snew into another multifab
     void GetData (int lev,
@@ -179,7 +181,18 @@ private:
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary
     // condition types at the lo/hi walls in each direction
-    amrex::Vector<amrex::BCRec> bcs;
+    amrex::Vector<amrex::BCRec> bcs_s;
+    amrex::Vector<amrex::BCRec> bcs_u;
+
+    // this contains the base state for all scalar quantities
+    // stores as one long vector
+    amrex::Vector<amrex::Real> s0;
+
+    // this contains the base state for pressure
+    amrex::Vector<amrex::Real> p0;
+
+    // this contains the base state for velocity
+    amrex::Vector<amrex::Real> w0;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
@@ -187,15 +200,16 @@ private:
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] and flux_reg[nlevs_max] are never actually 
     // used in the reflux operation
-    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg;
-
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
     
     ////////////////
-    // runtime parameters
+    // runtime parameters - see maestro_params.H
 
 #include <maestro_params.H>
+
+    //
+    ////////////////
 
 };
 

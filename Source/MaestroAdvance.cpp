@@ -107,7 +107,7 @@ Maestro::AdvanceTimeStep (Real time)
 
         // State with ghost cells
         MultiFab Sborder(grids[lev], dmap[lev], S_new.nComp(), num_grow);
-        FillPatch(lev, time, Sborder, 0, Sborder.nComp());
+        FillPatch(lev, time, Sborder, 0, Sborder.nComp(), bcs_s);
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -162,21 +162,21 @@ Maestro::AdvanceTimeStep (Real time)
         // The fluxes contain, e.g., F_{i+1/2,j} = (s*u)_{i+1/2,j}
         // Keep this in mind when considering the different sign convention for updating
         // the flux registers from the coarse or fine grid perspective
-        // NOTE: the flux register associated with flux_reg[lev] is associated
+        // NOTE: the flux register associated with flux_reg_s[lev] is associated
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
         if (do_reflux) { 
             if (lev < finest_level)
             {
                 for (int i = 0; i < BL_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)   
-                    flux_reg[lev+1]->CrseInit(fluxes[i],i,0,0,fluxes[i].nComp(), -1.0);
+                    flux_reg_s[lev+1]->CrseInit(fluxes[i],i,0,0,fluxes[i].nComp(), -1.0);
                 }	
             }
             if (lev > 0)
             {
                 for (int i = 0; i < BL_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev) 
-                    flux_reg[lev]->FineAdd(fluxes[i],i,0,0,fluxes[i].nComp(), 1.0);
+                    flux_reg_s[lev]->FineAdd(fluxes[i],i,0,0,fluxes[i].nComp(), 1.0);
                 }
             }
         }
@@ -199,7 +199,7 @@ Maestro::AdvanceTimeStep (Real time)
     {
         if (do_reflux) {
             // update lev based on coarse-fine flux mismatch
-            flux_reg[lev+1]->Reflux(*snew[lev], 1.0, 0, 0, snew[lev]->nComp(), geom[lev]);
+            flux_reg_s[lev+1]->Reflux(*snew[lev], 1.0, 0, 0, snew[lev]->nComp(), geom[lev]);
         }
 
         AverageDownTo(lev); // average lev+1 down to lev
