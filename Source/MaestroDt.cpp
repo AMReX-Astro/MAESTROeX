@@ -22,16 +22,16 @@ Maestro::ComputeDt ()
     constexpr Real change_max = 1.1;
     if (dt_0 > change_max*dt)
     {
-        amrex::Print() << "Reducing time step to respect change_max" << std::endl;
+        Print() << "Reducing time step to respect change_max" << std::endl;
         dt_0 = change_max*dt;
     }
 
     // Limit dt's by the value of stop_time.
     const Real eps = 1.e-3*dt_0;
     if (t_new + dt_0 > stop_time - eps) {
-        amrex::Print() << "\nModifying time step to respect stop_time" << std::endl;
-        amrex::Print() << "Original dt = " << dt_0 << std::endl;
-        amrex::Print() << "New dt = " << stop_time-t_new << std::endl;
+        Print() << "\nModifying time step to respect stop_time" << std::endl;
+        Print() << "Original dt = " << dt_0 << std::endl;
+        Print() << "New dt = " << stop_time-t_new << std::endl;
         dt_0 = stop_time - t_new;
     }
 

@@ -141,8 +141,8 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
         GetData(0, time, smf, stime);
 
         MaestroPhysBCFunct physbc(geom[lev],bcs,BndryFunctBase(phifill));
-        amrex::FillPatchSingleLevel(mf, time, smf, stime, 0, icomp, ncomp,
-                                    geom[lev], physbc);
+        FillPatchSingleLevel(mf, time, smf, stime, 0, icomp, ncomp,
+                             geom[lev], physbc);
     }
     else
     {
@@ -156,10 +156,10 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
 
         Interpolater* mapper = &cell_cons_interp;
 
-        amrex::FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
-                                  0, icomp, ncomp, geom[lev-1], geom[lev],
-                                  cphysbc, fphysbc, refRatio(lev-1),
-                                  mapper, bcs);
+        FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
+                           0, icomp, ncomp, geom[lev-1], geom[lev],
+                           cphysbc, fphysbc, refRatio(lev-1),
+                           mapper, bcs);
     }
 }
 
@@ -175,16 +175,16 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp
     GetData(lev-1, time, cmf, ctime);
     
     if (cmf.size() != 1) {
-        amrex::Abort("FillCoarsePatch: how did this happen?");
+        Abort("FillCoarsePatch: how did this happen?");
     }
 
     MaestroPhysBCFunct cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
     MaestroPhysBCFunct fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
 
     Interpolater* mapper = &cell_cons_interp;
-    amrex::InterpFromCoarseLevel(mf, time, *cmf[0], 0, icomp, ncomp, geom[lev-1], geom[lev],
-                                 cphysbc, fphysbc, refRatio(lev-1),
-                                 mapper, bcs);
+    InterpFromCoarseLevel(mf, time, *cmf[0], 0, icomp, ncomp, geom[lev-1], geom[lev],
+                          cphysbc, fphysbc, refRatio(lev-1),
+                          mapper, bcs);
 }
 
 // utility to copy in data from sold and/or snew into another multifab

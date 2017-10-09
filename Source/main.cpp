@@ -11,7 +11,8 @@ using namespace amrex;
 
 int main(int argc, char* argv[])
 {
-    amrex::Initialize(argc,argv);
+    // in AMReX.cpp
+    Initialize(argc,argv);
 
     // timer for profiling
     BL_PROFILE_VAR("main()", pmain);
@@ -35,12 +36,13 @@ int main(int argc, char* argv[])
         // print wallclock time
         ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
         if (maestro.Verbose()) {
-            amrex::Print() << "\nTotal Time: " << end_total << '\n';
+            Print() << "\nTotal Time: " << end_total << '\n';
         }
     }
 
     // destroy timer for profiling
     BL_PROFILE_VAR_STOP(pmain);
 
-    amrex::Finalize();
+    // in AMReX.cpp
+    Finalize();
 }

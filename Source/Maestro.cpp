@@ -12,7 +12,7 @@ int Maestro::Temp      = -1;
 int Maestro::Pi        = -1;
 
 // constructor - reads in parameters from inputs file
-//             - sizes multilevel arrays and data structures
+//             - sizes multilevel vectors and data structures
 Maestro::Maestro ()
 {
 
@@ -90,13 +90,13 @@ Maestro::ReadParameters ()
                 {
                     std::cerr << "Maestro::ReadParameters:periodic in direction "
                               << dir << " but low BC is not Interior\n";
-                    amrex::Error();
+                    Error();
                 }
                 if (hi_bc[dir] != Interior)
                 {
                     std::cerr << "Maestro::ReadParameters:periodic in direction "
                               << dir << " but high BC is not Interior\n";
-                    amrex::Error();
+                    Error();
                 }
             }
         }
@@ -112,13 +112,13 @@ Maestro::ReadParameters ()
             {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
-                amrex::Error();
+                Error();
             }
             if (hi_bc[dir] == Interior)
             {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
-                amrex::Error();
+                Error();
             }
         }
     }
@@ -148,7 +148,7 @@ Maestro::ReadParameters ()
                 bcs[n].setLo(idim, BCType::foextrap); // first-order extrapolation
             }
             else {
-                amrex::Abort("Invalid lo_bc");
+                Abort("Invalid lo_bc");
             }
 
             // hi-side BCSs
@@ -171,7 +171,7 @@ Maestro::ReadParameters ()
                 bcs[n].setHi(idim, BCType::foextrap); // first-order extrapolation
             }
             else {
-                amrex::Abort("Invalid hi_bc");
+                Abort("Invalid hi_bc");
             }
 
         }
@@ -184,9 +184,9 @@ Maestro::AverageDown ()
 {
     for (int lev = finest_level-1; lev >= 0; --lev)
     {
-        amrex::average_down(*snew[lev+1], *snew[lev],
-                            geom[lev+1], geom[lev],
-                            0, snew[lev]->nComp(), refRatio(lev));
+        average_down(*snew[lev+1], *snew[lev],
+                     geom[lev+1], geom[lev],
+                     0, snew[lev]->nComp(), refRatio(lev));
     }
 }
 
@@ -194,9 +194,9 @@ Maestro::AverageDown ()
 void
 Maestro::AverageDownTo (int crse_lev)
 {
-    amrex::average_down(*snew[crse_lev+1], *snew[crse_lev],
-                        geom[crse_lev+1], geom[crse_lev],
-                        0, snew[crse_lev]->nComp(), refRatio(crse_lev));
+    average_down(*snew[crse_lev+1], *snew[crse_lev],
+                 geom[crse_lev+1], geom[crse_lev],
+                 0, snew[crse_lev]->nComp(), refRatio(crse_lev));
 }
 
 // compute the number of cells at a level

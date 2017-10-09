@@ -28,14 +28,14 @@ Maestro::Evolve ()
         // compute time step
         ComputeDt();
 
-        amrex::Print() << "\nTimestep " << istep << " starts with TIME = " << cur_time 
+        Print() << "\nTimestep " << istep << " starts with TIME = " << cur_time 
                        << " DT = " << dt << std::endl << std::endl;
 
         AdvanceTimeStep(cur_time);
 
         cur_time += dt;
 
-        amrex::Print() << "\nTimestep " << istep << " ends with TIME = " << cur_time 
+        Print() << "\nTimestep " << istep << " ends with TIME = " << cur_time 
                        << " DT = " << dt << std::endl;
 
         // wallclock time
@@ -44,12 +44,12 @@ Maestro::Evolve ()
         // print wallclock time
         ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
         if (Verbose()) {
-            amrex::Print() << "Time to advance time step: " << end_total << '\n';
+            Print() << "Time to advance time step: " << end_total << '\n';
         }
 
         if (plot_int > 0 && istep % plot_int == 0)
         {
-            amrex::Print() << "\nWriting plotfile " << istep << std::endl;
+            Print() << "\nWriting plotfile " << istep << std::endl;
             last_plot_file_step = istep;
             WritePlotFile(istep);
         }
@@ -59,7 +59,7 @@ Maestro::Evolve ()
     // write a final plotfile if we haven't already
     if (plot_int > 0 && istep > last_plot_file_step)
     {
-        amrex::Print() << "\nWriting plotfile " << istep-1 << std::endl;
+        Print() << "\nWriting plotfile " << istep-1 << std::endl;
         WritePlotFile(istep-1);
     }
 }
@@ -78,8 +78,8 @@ Maestro::AdvanceTimeStep (Real time)
 
         if (Verbose())
         {
-            amrex::Print() << "[Level " << lev << " step " << istep+1 << "] ";
-            amrex::Print() << "BEGIN ADVANCE with " << CountCells(lev) << " cells" << std::endl;
+            Print() << "[Level " << lev << " step " << istep+1 << "] ";
+            Print() << "BEGIN ADVANCE with " << CountCells(lev) << " cells" << std::endl;
         }
 
         std::swap(sold[lev], snew[lev]);
@@ -123,9 +123,9 @@ Maestro::AdvanceTimeStep (Real time)
 
                 // Allocate fabs for fluxes and Godunov velocities.
                 for (int i = 0; i < BL_SPACEDIM ; i++) {
-                    const Box& bxtmp = amrex::surroundingNodes(bx,i);
+                    const Box& bxtmp = surroundingNodes(bx,i);
                     flux[i].resize(bxtmp,S_new.nComp());
-                    uface[i].resize(amrex::grow(bxtmp,1),1);
+                    uface[i].resize(grow(bxtmp,1),1);
                 }
 
                 // compute velocities on faces (prescribed function of space and time)
@@ -182,15 +182,15 @@ Maestro::AdvanceTimeStep (Real time)
 
         if (Verbose())
         {
-            amrex::Print() << "[Level " << lev << " step " << istep+1 << "] ";
-            amrex::Print() << "END ADVANCE" << std::endl;
+            Print() << "[Level " << lev << " step " << istep+1 << "] ";
+            Print() << "END ADVANCE" << std::endl;
         }
 
     } // end loop over levels
 
     if (Verbose())
     {
-        amrex::Print() << "Synchronizing all levels" << std::endl;
+        Print() << "Synchronizing all levels" << std::endl;
     }
 
     // synchronize by refluxing and averagig down, starting from the finest_level-1/finest_level pair

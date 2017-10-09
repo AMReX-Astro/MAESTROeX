@@ -17,11 +17,10 @@
 #include <AMReX_ParallelDescriptor.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_PlotFileUtil.H>
+#include <AMReX_Tuple.H>
 
 #include <MaestroPhysBCFunct.H>
 #include <Maestro_F.H>
-
-using namespace amrex;
 
 class Maestro
     : public amrex::AmrCore
@@ -32,7 +31,7 @@ public:
     // public member functions
 
     // constructor - reads in parameters from inputs file
-    //             - sizes multilevel arrays and data structures
+    //             - sizes multilevel vectors and data structures
     Maestro ();
     virtual ~Maestro();
 
@@ -97,8 +96,8 @@ private:
     void FillCoarsePatch (int lev, amrex::Real time, amrex::MultiFab& mf, int icomp, int ncomp);
 
     // utility to copy in data from sold and/or snew into another multifab
-    void GetData (int lev, amrex::Real time, amrex::Array<amrex::MultiFab*>& data,
-                  amrex::Array<amrex::Real>& datatime);
+    void GetData (int lev, amrex::Real time, amrex::Vector<amrex::MultiFab*>& data,
+                  amrex::Vector<amrex::Real>& datatime);
 
     // advance solution at all levels for a single time step
     void AdvanceTimeStep (amrex::Real time);
@@ -113,10 +112,10 @@ private:
     std::string PlotFileName (int lev) const;
 
     // put together an array of multifabs for writing
-    amrex::Array<const amrex::MultiFab*> PlotFileMF () const;
+    amrex::Vector<const amrex::MultiFab*> PlotFileMF () const;
 
     // set plotfile variables names
-    amrex::Array<std::string> PlotFileVarNames () const;
+    amrex::Vector<std::string> PlotFileVarNames () const;
 
     // write plotfile to disk
     void WritePlotFile (int step) const;
@@ -140,29 +139,28 @@ private:
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
     // to avoid a copy
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > sold;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > snew;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > uold;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > unew;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > sold;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > snew;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > uold;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > unew;
 
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > hgrhs;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > gamma1;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > hgrhs;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > gamma1;
 
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > pi;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > gpi;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > dSdt;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > Source_old;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > Source_new;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > rho_omegadot2;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > rho_Hnuc2;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > rho_Hext;
-    amrex::Array<std::unique_ptr<amrex::MultiFab> > thermal2;
-
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > pi;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > gpi;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > dSdt;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > Source_old;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > Source_new;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_omegadot2;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hnuc2;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hext;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > thermal2;
 
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary
     // condition types at the lo/hi walls in each direction
-    Array<BCRec> bcs;
+    amrex::Vector<BCRec> bcs;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
@@ -170,10 +168,10 @@ private:
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] and flux_reg[nlevs_max] are never actually 
     // used in the reflux operation
-    amrex::Array<std::unique_ptr<amrex::FluxRegister> > flux_reg;
+    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg;
 
-    amrex::Array<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
-    amrex::Array<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
+    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
+    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
     
     ////////////////
     // runtime parameters

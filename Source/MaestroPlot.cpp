@@ -5,7 +5,7 @@
 std::string
 Maestro::PlotFileName (int lev) const
 {
-    return amrex::Concatenate(plot_file, lev, 5);
+    return Concatenate(plot_file, lev, 5);
 }
 
 // put together an array of multifabs for writing
@@ -35,9 +35,9 @@ Maestro::WritePlotFile (int step) const
     const auto& varnames = PlotFileVarNames();
 
     // WriteMultiLevelPlotfile expects an array of step numbers
-    amrex::Array<int> step_array;
+    Vector<int> step_array;
     step_array.resize(maxLevel()+1, step);
 
-    amrex::WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
-                                   Geom(), t_new, step_array, refRatio());
+    WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
+                            Geom(), t_new, step_array, refRatio());
 }
