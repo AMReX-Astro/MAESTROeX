@@ -1,16 +1,17 @@
 
 #include <MaestroPhysBCFunct.H>
-#include <AMReX_filcc_f.H>
+
+using namespace amrex;
 
 MaestroPhysBCFunct::MaestroPhysBCFunct (const Geometry& geom,
-                              const Array<BCRec>& bcr, 
+                              const Vector<BCRec>& bcr, 
                               const BndryFunctBase& func)
     : m_geom(geom), m_bcr(bcr), m_bc_func(func.clone())
 { }
 
 void
 MaestroPhysBCFunct::define (const Geometry& geom, 
-                            const Array<BCRec>& bcr,
+                            const Vector<BCRec>& bcr,
                             const BndryFunctBase& func)
 {
     m_geom = geom;

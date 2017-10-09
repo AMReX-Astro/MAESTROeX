@@ -1,6 +1,7 @@
 
 #include <Maestro.H>
 
+using namespace amrex;
 
 // advance solution to final time
 void

@@ -1,7 +1,8 @@
 
-
 #include <Maestro.H>
 #include <maestro_defaults.H>
+
+using namespace amrex;
 
 int Maestro::NUM_STATE = -1;
 int Maestro::Rho       = -1;

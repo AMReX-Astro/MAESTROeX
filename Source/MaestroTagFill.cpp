@@ -1,13 +1,15 @@
 
 #include <Maestro.H>
 
+using namespace amrex;
+
 // tag all cells for refinement
 // overrides the pure virtual function in AmrCore
 void
 Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ngrow)
 {
     static bool first = true;
-    static Array<Real> phierr;
+    static Vector<Real> phierr;
 
     // only do this during the first call to ErrorEst
     if (first)
@@ -39,7 +41,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ngrow)
 #pragma omp parallel
 #endif
     {
-        Array<int>  itags;
+        Vector<int>  itags;
 	
         for (MFIter mfi(state,true); mfi.isValid(); ++mfi)
         {
@@ -136,8 +138,8 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
 {
     if (lev == 0)
     {
-        Array<MultiFab*> smf;
-        Array<Real> stime;
+        Vector<MultiFab*> smf;
+        Vector<Real> stime;
         GetData(0, time, smf, stime);
 
         MaestroPhysBCFunct physbc(geom[lev],bcs,BndryFunctBase(phifill));
@@ -146,8 +148,8 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp)
     }
     else
     {
-        Array<MultiFab*> cmf, fmf;
-        Array<Real> ctime, ftime;
+        Vector<MultiFab*> cmf, fmf;
+        Vector<Real> ctime, ftime;
         GetData(lev-1, time, cmf, ctime);
         GetData(lev  , time, fmf, ftime);
 
@@ -170,8 +172,8 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp
 {
     BL_ASSERT(lev > 0);
 
-    Array<MultiFab*> cmf;
-    Array<Real> ctime;
+    Vector<MultiFab*> cmf;
+    Vector<Real> ctime;
     GetData(lev-1, time, cmf, ctime);
     
     if (cmf.size() != 1) {
@@ -189,7 +191,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, int icomp, int ncomp
 
 // utility to copy in data from sold and/or snew into another multifab
 void
-Maestro::GetData (int lev, Real time, Array<MultiFab*>& data, Array<Real>& datatime)
+Maestro::GetData (int lev, Real time, Vector<MultiFab*>& data, Vector<Real>& datatime)
 {
     data.clear();
     datatime.clear();

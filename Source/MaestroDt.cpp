@@ -1,13 +1,15 @@
 
 #include <Maestro.H>
 
+using namespace amrex;
+
 // a wrapper for ComputeDtLevel
 void
 Maestro::ComputeDt ()
 {
 
     // compute dt at each level from CFL considerations
-    Array<Real> dt_tmp(finest_level+1);
+    Vector<Real> dt_tmp(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         dt_tmp[lev] = ComputeDtLevel(lev);
     }

@@ -46,24 +46,33 @@ public:
 
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
-    virtual void ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time, int ngrow) override;
+    virtual void ErrorEst (int lev,
+                           amrex::TagBoxArray& tags,
+                           amrex::Real time,
+                           int ngrow) override;
 
     // Make a new level from scratch using provided BoxArray and DistributionMapping.
     // Only used during initialization.
     // overrides the pure virtual function in AmrCore
-    virtual void MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
+    virtual void MakeNewLevelFromScratch (int lev,
+                                          amrex::Real time,
+                                          const amrex::BoxArray& ba,
                                           const amrex::DistributionMapping& dm) override;
 
     // Make a new level using provided BoxArray and DistributionMapping and 
     // fill with interpolated coarse level data.
     // overrides the pure virtual function in AmrCore
-    virtual void MakeNewLevelFromCoarse (int lev, amrex::Real time, const amrex::BoxArray& ba,
+    virtual void MakeNewLevelFromCoarse (int lev,
+                                         amrex::Real time,
+                                         const amrex::BoxArray& ba,
                                          const amrex::DistributionMapping& dm) override;
 
     // Remake an existing level using provided BoxArray and DistributionMapping and 
     // fill with existing fine and coarse data.
     // overrides the pure virtual function in AmrCore
-    virtual void RemakeLevel (int lev, amrex::Real time, const amrex::BoxArray& ba,
+    virtual void RemakeLevel (int lev,
+                              amrex::Real time,
+                              const amrex::BoxArray& ba,
                               const amrex::DistributionMapping& dm) override;
 
     // Delete level data
@@ -89,14 +98,24 @@ private:
 
     // compute a new multifab by coping in phi from valid region and filling ghost cells
     // works for single level and 2-level cases (fill fine grid ghost by interpolating from coarse)
-    void FillPatch (int lev, amrex::Real time, amrex::MultiFab& mf, int icomp, int ncomp);
+    void FillPatch (int lev,
+                    amrex::Real time,
+                    amrex::MultiFab& mf,
+                    int icomp,
+                    int ncomp);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
-    void FillCoarsePatch (int lev, amrex::Real time, amrex::MultiFab& mf, int icomp, int ncomp);
+    void FillCoarsePatch (int lev,
+                          amrex::Real time,
+                          amrex::MultiFab& mf,
+                          int icomp,
+                          int ncomp);
 
     // utility to copy in data from sold and/or snew into another multifab
-    void GetData (int lev, amrex::Real time, amrex::Vector<amrex::MultiFab*>& data,
+    void GetData (int lev,
+                  amrex::Real time,
+                  amrex::Vector<amrex::MultiFab*>& data,
                   amrex::Vector<amrex::Real>& datatime);
 
     // advance solution at all levels for a single time step
@@ -106,7 +125,7 @@ private:
     void ComputeDt ();
 
     // compute dt at a level from CFL considerations
-    Real ComputeDtLevel (int lev) const;
+    amrex::Real ComputeDtLevel (int lev) const;
 
     // get plotfile name
     std::string PlotFileName (int lev) const;
@@ -160,7 +179,7 @@ private:
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary
     // condition types at the lo/hi walls in each direction
-    amrex::Vector<BCRec> bcs;
+    amrex::Vector<amrex::BCRec> bcs;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"

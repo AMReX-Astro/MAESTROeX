@@ -2,6 +2,8 @@
 
 #include <Maestro.H>
 
+using namespace amrex;
+
 // define variable mappings (Rho, RhoH, ..., NUM_STATE, etc.)
 void Maestro::VariableSetup ()
 {

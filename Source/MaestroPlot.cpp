@@ -1,6 +1,8 @@
 
 #include <Maestro.H>
 
+using namespace amrex;
+
 // get plotfile name
 std::string
 Maestro::PlotFileName (int lev) const
@@ -8,11 +10,11 @@ Maestro::PlotFileName (int lev) const
     return Concatenate(plot_file, lev, 5);
 }
 
-// put together an array of multifabs for writing
-Array<const MultiFab*>
+// put together a vector of multifabs for writing
+Vector<const MultiFab*>
 Maestro::PlotFileMF () const
 {
-    Array<const MultiFab*> r;
+    Vector<const MultiFab*> r;
     for (int i = 0; i <= finest_level; ++i) {
         r.push_back(snew[i].get());
     }
@@ -20,7 +22,7 @@ Maestro::PlotFileMF () const
 }
 
 // set plotfile variable names
-Array<std::string>
+Vector<std::string>
 Maestro::PlotFileVarNames () const
 {
     return {"phi1", "phi2", "phi3", "phi4", "phi5", "phi6"};
