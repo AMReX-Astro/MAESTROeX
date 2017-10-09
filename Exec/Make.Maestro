@@ -68,7 +68,7 @@ VPATH_LOCATIONS   += $(Blocs)
 ifdef MICROPHYSICS_HOME
    EOS_PATH := $(MICROPHYSICS_HOME)/EOS/$(strip $(EOS_DIR))
    NETWORK_PATH := $(MICROPHYSICS_HOME)/networks/$(strip $(NETWORK_DIR))
-   COND_PATH := $(MICROPHYSICS_HOME)/conductivity/$(strip $(Conductivity_dir))
+   COND_PATH := $(MICROPHYSICS_HOME)/conductivity/$(strip $(CONDUCTIVITY_DIR))
 endif
 
 # if the EOS / network / conductivity name exists in
