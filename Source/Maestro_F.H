@@ -12,11 +12,16 @@ extern "C"
 
     void ca_set_maestro_method_params();
 
+    // in Maestro_nd.f90
+    void ca_network_init();
+    void ca_network_finalize();
     void ca_get_num_spec(int* nspec);
+    void ca_get_spec_names(int* spec_names, int* ispec, int* len);
 
     void initdata(const int& level, const amrex_real& time, 
                   const int* lo, const int* hi,
-                  BL_FORT_FAB_ARG_3D(state),
+                  BL_FORT_FAB_ARG_3D(scal),
+                  BL_FORT_FAB_ARG_3D(vel),
                   const amrex_real* dx, const amrex_real* problo,
                   const int& nvar);
 

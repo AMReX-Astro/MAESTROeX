@@ -84,18 +84,18 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 {
     const int nghost = snew[lev-1]->nGrow();
     
-    snew[lev].reset(new MultiFab(ba, dm, NUM_STATE, nghost));
-    sold[lev].reset(new MultiFab(ba, dm, NUM_STATE, nghost));
+    snew[lev].reset(new MultiFab(ba, dm, NSCAL, nghost));
+    sold[lev].reset(new MultiFab(ba, dm, NSCAL, nghost));
 
     t_new = time;
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NUM_STATE));
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NSCAL));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
-    FillCoarsePatch(lev, time, *snew[lev], 0, NUM_STATE, bcs_s);
+    FillCoarsePatch(lev, time, *snew[lev], 0, NSCAL, bcs_s);
 }
 
 // Remake an existing level using provided BoxArray and DistributionMapping and 
@@ -108,14 +108,14 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     const int nghost = snew[lev]->nGrow();
 
 #if __cplusplus >= 201402L
-    auto new_state = std::make_unique<MultiFab>(ba, dm, NUM_STATE, nghost);
-    auto old_state = std::make_unique<MultiFab>(ba, dm, NUM_STATE, nghost);
+    auto new_state = std::make_unique<MultiFab>(ba, dm, NSCAL, nghost);
+    auto old_state = std::make_unique<MultiFab>(ba, dm, NSCAL, nghost);
 #else
-    std::unique_ptr<MultiFab> new_state(new MultiFab(ba, dm, NUM_STATE, nghost));
-    std::unique_ptr<MultiFab> old_state(new MultiFab(ba, dm, NUM_STATE, nghost));
+    std::unique_ptr<MultiFab> new_state(new MultiFab(ba, dm, NSCAL, nghost));
+    std::unique_ptr<MultiFab> old_state(new MultiFab(ba, dm, NSCAL, nghost));
 #endif
 
-    FillPatch(lev, time, *new_state, 0, NUM_STATE, bcs_s);
+    FillPatch(lev, time, *new_state, 0, NSCAL, bcs_s);
 
     std::swap(new_state, snew[lev]);
     std::swap(old_state, sold[lev]);
@@ -124,7 +124,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NUM_STATE));
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NSCAL));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }    
 }

@@ -41,7 +41,7 @@ public:
     // initializes multilevel data
     void InitData ();
 
-    // define variable mappings (Rho, RhoH, ..., NUM_STATE, etc.)
+    // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
     void VariableSetup();
 
     // set up BCRec definitions for BC types
@@ -156,7 +156,7 @@ private:
     amrex::Real t_old;
     amrex::Real dt;
 
-    static int NUM_STATE;
+    static int NSCAL;
     static int Rho, RhoH;
     static int FirstSpec, NumSpec;
     static int Temp, Pi;

@@ -25,7 +25,43 @@ Maestro::PlotFileMF () const
 Vector<std::string>
 Maestro::PlotFileVarNames () const
 {
-    return {"phi1", "phi2", "phi3", "phi4", "phi5", "phi6"};
+    Vector<std::string> names(NSCAL);
+
+    int cnt = 0;
+
+    names[cnt++] = "rho";
+    names[cnt++] = "rhoh";
+
+    for (int i = 0; i < NumSpec; i++)
+    {
+        int len = 20;
+        Array<int> int_spec_names(len);
+        //
+        // This call return the actual length of each string in "len"
+        //
+        ca_get_spec_names(int_spec_names.dataPtr(),&i,&len);
+        char* spec_name = new char[len+1];
+        for (int j = 0; j < len; j++)
+            spec_name[j] = int_spec_names[j];
+        spec_name[len] = '\0';
+        std::string spec_string = "X(";
+        spec_string += spec_name;
+        spec_string += ')';
+
+        names[cnt++] = spec_string;
+    }
+
+    names[cnt++] = "Pi";
+    names[cnt++] = "Temp";
+
+/*
+    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+        std::string x = "vel";
+        x += (120+i);
+        Print() << x << endl;
+    }
+*/
+    return names;
 }
 
 // write plotfile to disk

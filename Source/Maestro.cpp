@@ -4,7 +4,7 @@
 
 using namespace amrex;
 
-int Maestro::NUM_STATE = -1;
+int Maestro::NSCAL     = -1;
 int Maestro::Rho       = -1;
 int Maestro::RhoH      = -1;
 int Maestro::FirstSpec = -1;
@@ -28,7 +28,7 @@ Maestro::Maestro ()
     // read in C++ parameters
     ReadParameters();
 
-    // define variable mappings (Rho, RhoH, ..., NUM_STATE, etc.)
+    // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
     VariableSetup();
 
     // set up BCRec definitions for BC types
@@ -49,6 +49,8 @@ Maestro::Maestro ()
 
     snew.resize(nlevs_max);
     sold.resize(nlevs_max);
+    unew.resize(nlevs_max);
+    uold.resize(nlevs_max);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
@@ -111,6 +113,8 @@ Maestro::ClearLevel (int lev)
 {
     snew[lev].reset(nullptr);
     sold[lev].reset(nullptr);
+    unew[lev].reset(nullptr);
+    uold[lev].reset(nullptr);
     flux_reg_s[lev].reset(nullptr);
     flux_reg_u[lev].reset(nullptr);
 }

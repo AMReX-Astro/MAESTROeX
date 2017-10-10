@@ -1,21 +1,29 @@
 
 subroutine initdata(level, time, lo, hi, &
-                    phi, phi_lo, phi_hi, &
-                    dx, prob_lo, nvar) bind(C, name="initdata")
+                    scal, scal_lo, scal_hi, &
+                    vel, vel_lo, vel_hi, &
+                    dx, prob_lo, nscal) bind(C, name="initdata")
 
   use amrex_fort_module, only : amrex_spacedim
 
   implicit none
-  integer, intent(in) :: level, lo(3), hi(3), phi_lo(3), phi_hi(3)
+  integer, intent(in) :: level, lo(3), hi(3)
+  integer, intent(in) :: scal_lo(3), scal_hi(3)
+  integer, intent(in) :: vel_lo(3), vel_hi(3)
   double precision, intent(in) :: time
-  double precision, intent(inout) :: phi(phi_lo(1):phi_hi(1), &
-       &                                 phi_lo(2):phi_hi(2), &
-       &                                 phi_lo(3):phi_hi(3), 1:2)
+  double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
+       &                                  scal_lo(2):scal_hi(2), &
+       &                                  scal_lo(3):scal_hi(3), 1:nscal)
+  double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
+       &                                 vel_lo(2):vel_hi(2), &
+       &                                 vel_lo(3):vel_hi(3), 1:amrex_spacedim)
   double precision, intent(in) :: dx(3), prob_lo(3)
-  integer, intent(in) :: nvar
+  integer, intent(in) :: nscal
 
   integer          :: i,j,k
   double precision :: x,y,z,r2
+
+  vel = 0.d0
   
   !$omp parallel do private(i,j,k,x,y,z,r2) collapse(2)
   do k=lo(3),hi(3)
@@ -27,14 +35,14 @@ subroutine initdata(level, time, lo, hi, &
            
            if ( amrex_spacedim .eq. 2) then
               r2 = ((x-0.875d0)**2 + (y-0.5d0)**2) / 0.0025d0
-              phi(i,j,k,1:nvar-1) = 1.d0 + exp(-r2)
+              scal(i,j,k,1:nscal-1) = 1.d0 + exp(-r2)
               r2 = ((x-0.5d0)**2 + (y-0.875d0)**2) / 0.0025d0
-              phi(i,j,k,nvar) = 1.d0 + exp(-r2)
+              scal(i,j,k,nscal) = 1.d0 + exp(-r2)
            else
               r2 = ((x-0.875d0)**2 + (y-0.5d0)**2 + (z-0.5d0)**2) / 0.0025d0
-              phi(i,j,k,1:nvar-1) = 1.d0 + exp(-r2)
+              scal(i,j,k,1:nscal-1) = 1.d0 + exp(-r2)
               r2 = ((x-0.5d0)**2 + (y-0.875d0)**2 + (z-0.5d0)**2) / 0.0025d0
-              phi(i,j,k,nvar) = 1.d0 + exp(-r2)
+              scal(i,j,k,nscal) = 1.d0 + exp(-r2)
            end if
         end do
      end do
