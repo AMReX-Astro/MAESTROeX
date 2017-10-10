@@ -14,21 +14,45 @@ Maestro::PlotFileName (int lev) const
 Vector<const MultiFab*>
 Maestro::PlotFileMF () const
 {
-    Vector<const MultiFab*> r;
-    for (int i = 0; i <= finest_level; ++i) {
-        r.push_back(snew[i].get());
+    int nPlot = NSCAL + AMREX_SPACEDIM;
+
+    Vector<const MultiFab*> plot_mf;
+
+    Vector<MultiFab*> plot_mf_data(finest_level+1);
+
+    for (int i = 0; i <= finest_level; ++i)
+    {
+        plot_mf_data[i] = new MultiFab((*snew[i]).boxArray(),(*snew[i]).DistributionMap(),nPlot,0);
+
+        // copy velocity and scalars into plot_mf_data[i]
+        plot_mf_data[i]->copy((*unew[i]),0,0             ,AMREX_SPACEDIM);
+        plot_mf_data[i]->copy((*snew[i]),0,AMREX_SPACEDIM,NSCAL         );
+
+        // add plot_mf_data[i] to plot_mf
+        plot_mf.push_back(plot_mf_data[i]);
     }
-    return r;
+
+    return plot_mf;
+
 }
 
 // set plotfile variable names
 Vector<std::string>
 Maestro::PlotFileVarNames () const
 {
-    Vector<std::string> names(NSCAL);
+    int nPlot = NSCAL + AMREX_SPACEDIM;
+    Vector<std::string> names(nPlot);
 
     int cnt = 0;
 
+    // add velocities
+    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+        std::string x = "vel";
+        x += (120+i);
+        names[cnt++] = x;
+    }
+
+    // density and enthalpy
     names[cnt++] = "rho";
     names[cnt++] = "rhoh";
 
@@ -44,7 +68,7 @@ Maestro::PlotFileVarNames () const
         for (int j = 0; j < len; j++)
             spec_name[j] = int_spec_names[j];
         spec_name[len] = '\0';
-        std::string spec_string = "X(";
+        std::string spec_string = "rhoX(";
         spec_string += spec_name;
         spec_string += ')';
 
@@ -54,13 +78,6 @@ Maestro::PlotFileVarNames () const
     names[cnt++] = "Pi";
     names[cnt++] = "Temp";
 
-/*
-    for (int i=0; i<AMREX_SPACEDIM; ++i) {
-        std::string x = "vel";
-        x += (120+i);
-        Print() << x << endl;
-    }
-*/
     return names;
 }
 
