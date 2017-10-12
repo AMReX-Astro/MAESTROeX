@@ -18,6 +18,12 @@ extern "C"
     void ca_get_num_spec(int* nspec);
     void ca_get_spec_names(int* spec_names, int* ispec, int* len);
 
+    void ca_set_method_params(const int& Density,
+                              const int& Enthalpy,
+                              const int& FirstSpec,
+                              const int& Temperature,
+                              const int& Pressure);
+
     void initdata(const int& level, const amrex_real& time, 
                   const int* lo, const int* hi,
                   BL_FORT_FAB_ARG_3D(scal),

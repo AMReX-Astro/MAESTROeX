@@ -4,32 +4,35 @@
 
 using namespace amrex;
 
-int Maestro::NSCAL     = -1;
 int Maestro::Rho       = -1;
 int Maestro::RhoH      = -1;
 int Maestro::FirstSpec = -1;
 int Maestro::NumSpec   = -1;
 int Maestro::Temp      = -1;
 int Maestro::Pi        = -1;
+int Maestro::NSCAL     = -1;
 
 // constructor - reads in parameters from inputs file
 //             - sizes multilevel vectors and data structures
 Maestro::Maestro ()
 {
 
+    ///////
     // Geometry on all levels has been defined already.
+    ///////
 
-    // read in fortran90 parameters
-    ca_set_maestro_method_params();
-
-    // FIXME
-    // ca_set_method_params(QRHO,...
-
-    // read in C++ parameters
+    // read in C++ parameters in maestro_queries.H using ParmParse pp("maestro");
     ReadParameters();
 
-    // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
+    // read in F90 parameters in meth_params.F90
+    ca_set_maestro_method_params();
+
+    // define (Rho, RhoH, etc.)
+    // call ca_network_init
     VariableSetup();
+
+    // define additional module variables in meth_params.F90
+    ca_set_method_params(Rho,RhoH,FirstSpec,Temp,Pi);
 
     // set up BCRec definitions for BC types
     BCSetup();

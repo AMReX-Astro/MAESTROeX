@@ -16,7 +16,8 @@ module meth_params_module
   implicit none
 
   ! variables in the module
-  integer, save :: RHO, RHOH, RHOX, PRES, TEMP, NUM_STATE
+  integer, save :: RHO, RHOH, RHOX, TEMP, PRES, NUM_STATE
+  integer, save :: VELX, VELY, VELZ
 
   ! Begin the declarations of the ParmParse parameters
 

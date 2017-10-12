@@ -46,3 +46,72 @@ subroutine ca_get_spec_names(spec_names,ispec,len) &
   end do
 
 end subroutine ca_get_spec_names
+
+subroutine ca_set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure) &
+                                bind(C, name="ca_set_method_params")
+
+  use meth_params_module
+  use network, only : nspec
+  use eos_module, only: eos_init
+
+  implicit none
+
+  integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure
+
+  integer :: i
+  integer :: ioproc
+
+  !---------------------------------------------------------------------
+  ! conserved state components
+  !---------------------------------------------------------------------
+
+  RHO = Density
+  RHOH = Enthalpy
+  RHOX = FirstSpec
+  TEMP = Temperature
+  PRES = Pressure
+  NUM_STATE = nspec + 4
+
+  VELX = 1
+  VELY = 2
+  VELZ = 3
+
+  !---------------------------------------------------------------------
+  ! other initializations
+  !---------------------------------------------------------------------
+
+  ! This is a routine which links to the C++ ParallelDescriptor class
+
+  call bl_pd_is_ioproc(ioproc)
+
+  !---------------------------------------------------------------------
+  ! safety checks
+  !---------------------------------------------------------------------
+
+  ! if (small_dens <= 0.e0_rt) then
+  !    if (ioproc == 1) then
+  !       call bl_warning("Warning:: small_dens has not been set, defaulting to 1.e-200_rt.")
+  !    endif
+  !    small_dens = 1.e-200_rt
+  ! endif
+
+  ! if (small_temp <= 0.e0_rt) then
+  !    if (ioproc == 1) then
+  !       call bl_warning("Warning:: small_temp has not been set, defaulting to 1.e-200_rt.")
+  !    endif
+  !    small_temp = 1.e-200_rt
+  ! endif
+
+  ! if (small_pres <= 0.e0_rt) then
+  !    small_pres = 1.e-200_rt
+  ! endif
+
+  ! Note that the EOS may modify our choices because of its
+  ! internal limitations, so the small_dens and small_temp
+  ! may be modified coming back out of this routine.
+
+  ! FIXME
+  ! call eos_init(small_dens=small_dens, small_temp=small_temp)
+  call eos_init(small_dens=1.d0, small_temp=1.d0)
+
+end subroutine ca_set_method_params
