@@ -289,8 +289,11 @@ Maestro::BCSetup()
     } // end loop over directions
 }
 
-// Make a new level from scratch using provided BoxArray and DistributionMapping.
-// Only used during initialization.
+// During initialization of a simulation, Maestro::InitData() calls 
+// AmrCore::InitFromScratch(), which calls 
+// a MakeNewGrids() function that repeatedly calls this function to create
+// finer levels.  This function creates a new fine
+// level that did not exist before by interpolating from the coarser level
 // overrides the pure virtual function in AmrCore
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)

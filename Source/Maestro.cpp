@@ -28,7 +28,7 @@ Maestro::Maestro ()
     ca_set_maestro_method_params();
 
     // define (Rho, RhoH, etc.)
-    // call ca_network_init
+    // calls ca_network_init
     VariableSetup();
 
     // define additional module variables in meth_params.F90
@@ -69,55 +69,64 @@ Maestro::~Maestro ()
 
 }
 
-// set covered coarse cells to be the average of overlying fine cells
+// advance solution to final time
 void
-Maestro::AverageDown (Vector<std::unique_ptr<MultiFab> >& mf)
+Maestro::Evolve ()
 {
-    for (int lev = finest_level-1; lev >= 0; --lev)
+    Real cur_time = t_new;
+    int last_plot_file_step = 0;
+
+    for (istep = 1; istep <= max_step && cur_time < stop_time; ++istep)
     {
-        average_down(*mf[lev+1], *mf[lev],
-                     geom[lev+1], geom[lev],
-                     0, mf[lev]->nComp(), refRatio(lev));
+
+        if (regrid_int > 0)  // We may need to regrid
+        {
+            if ( (istep-1) % regrid_int == 0)
+            {
+                // regrid could add newly refine levels (if finest_level < max_level)
+                // so we save the previous finest level index
+                regrid(0, cur_time);
+            }
+        }
+    
+        // wallclock time
+        const Real strt_total = ParallelDescriptor::second();
+
+        // compute time step
+        ComputeDt();
+
+        Print() << "\nTimestep " << istep << " starts with TIME = " << cur_time 
+                       << " DT = " << dt << std::endl << std::endl;
+
+        AdvanceTimeStep(cur_time);
+
+        cur_time += dt;
+
+        Print() << "\nTimestep " << istep << " ends with TIME = " << cur_time 
+                       << " DT = " << dt << std::endl;
+
+        // wallclock time
+        Real end_total = ParallelDescriptor::second() - strt_total;
+	
+        // print wallclock time
+        ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
+        if (Verbose()) {
+            Print() << "Time to advance time step: " << end_total << '\n';
+        }
+
+        if (plot_int > 0 && istep % plot_int == 0)
+        {
+            Print() << "\nWriting plotfile " << istep << std::endl;
+            last_plot_file_step = istep;
+            WritePlotFile(istep);
+        }
+
     }
-}
 
-// more flexible version of AverageDown() that lets you average down across multiple levels
-void
-Maestro::AverageDownTo (int crse_lev, Vector<std::unique_ptr<MultiFab> >& mf)
-{
-    average_down(*mf[crse_lev+1], *mf[crse_lev],
-                 geom[crse_lev+1], geom[crse_lev],
-                 0, mf[crse_lev]->nComp(), refRatio(crse_lev));
-}
-
-// compute the number of cells at a level
-long
-Maestro::CountCells (int lev)
-{
-    const int N = grids[lev].size();
-
-    long cnt = 0;
-
-#ifdef _OPENMP
-#pragma omp parallel for reduction(+:cnt)
-#endif
-    for (int i = 0; i < N; ++i) {
-        cnt += grids[lev][i].numPts();
+    // write a final plotfile if we haven't already
+    if (plot_int > 0 && istep > last_plot_file_step)
+    {
+        Print() << "\nWriting plotfile " << istep-1 << std::endl;
+        WritePlotFile(istep-1);
     }
-
-    return cnt;
-}
-
-
-// Delete level data
-// overrides the pure virtual function in AmrCore
-void
-Maestro::ClearLevel (int lev)
-{
-    snew[lev].reset(nullptr);
-    sold[lev].reset(nullptr);
-    unew[lev].reset(nullptr);
-    uold[lev].reset(nullptr);
-    flux_reg_s[lev].reset(nullptr);
-    flux_reg_u[lev].reset(nullptr);
 }

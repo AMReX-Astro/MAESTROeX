@@ -35,17 +35,35 @@ public:
     Maestro ();
     virtual ~Maestro();
 
-    // advance solution to final time
-    void Evolve ();
-
-    // initializes multilevel data
-    void InitData ();
+    // read in some parameters from inputs file
+    void ReadParameters ();
 
     // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
     void VariableSetup();
 
     // set up BCRec definitions for BC types
     void BCSetup();
+
+    // initializes multilevel data
+    void InitData ();
+
+    // During initialization of a simulation, Maestro::InitData() calls 
+    // AmrCore::InitFromScratch(), which calls 
+    // a MakeNewGrids() function that repeatedly calls this function to create
+    // finer levels.  This function creates a new fine
+    // level that did not exist before by interpolating from the coarser level
+    // overrides the pure virtual function in AmrCore
+    virtual void MakeNewLevelFromScratch (int lev,
+                                          amrex::Real time,
+                                          const amrex::BoxArray& ba,
+                                          const amrex::DistributionMapping& dm) override;
+
+
+    // advance solution to final time
+    void Evolve ();
+
+    ////////////
+    // Regridding functions
 
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
@@ -54,54 +72,57 @@ public:
                            amrex::Real time,
                            int ngrow) override;
 
-    // Make a new level from scratch using provided BoxArray and DistributionMapping.
-    // Only used during initialization.
-    // overrides the pure virtual function in AmrCore
-    virtual void MakeNewLevelFromScratch (int lev,
-                                          amrex::Real time,
-                                          const amrex::BoxArray& ba,
-                                          const amrex::DistributionMapping& dm) override;
-
-    // Make a new level using provided BoxArray and DistributionMapping and 
-    // fill with interpolated coarse level data.
-    // overrides the pure virtual function in AmrCore
-    virtual void MakeNewLevelFromCoarse (int lev,
-                                         amrex::Real time,
-                                         const amrex::BoxArray& ba,
-                                         const amrex::DistributionMapping& dm) override;
-
-    // Remake an existing level using provided BoxArray and DistributionMapping and 
-    // fill with existing fine and coarse data.
+    // within a call to AmrCore::regrid, this function fills in data at a level
+    // that existed before, using pre-existing fine and interpolated coarse data
     // overrides the pure virtual function in AmrCore
     virtual void RemakeLevel (int lev,
                               amrex::Real time,
                               const amrex::BoxArray& ba,
                               const amrex::DistributionMapping& dm) override;
 
-    // Delete level data
+    // within a call to AmrCore::regrid, this function fills in data at a level
+    // that did NOT exist before, using interpolated coarse data
+    // overrides the pure virtual function in AmrCore
+    virtual void MakeNewLevelFromCoarse (int lev,
+                                         amrex::Real time,
+                                         const amrex::BoxArray& ba,
+                                         const amrex::DistributionMapping& dm) override;
+
+    // within a call to AmrCore::regrid, this function deletes all data
+    // at a level of refinement that is no longer needed
     // overrides the pure virtual function in AmrCore
     virtual void ClearLevel (int lev) override;
 
+    //
+    ////////////
+
 private:
 
-    ////////////////
-    // private member functions
+    /*
+      private member functions
+    */
 
-    // read in some parameters from inputs file
-    void ReadParameters ();
+    // advance solution at all levels for a single time step
+    void AdvanceTimeStep (amrex::Real time);
 
-    // set covered coarse cells to be the average of overlying fine cells
-    void AverageDown (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
+    ////////////
+    // Time step computation
 
-    // more flexible version of AverageDown() that lets you average down across multiple levels
-    void AverageDownTo (int crse_lev,
-                        amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
+    // a wrapper for ComputeDtLevel
+    void ComputeDt ();
 
-    // compute the number of cells at a level
-    long CountCells (int lev);
+    // compute dt at a level from CFL considerations
+    amrex::Real ComputeDtLevel (int lev) const;
+
+    //
+    ////////////
+
+    ////////////
+    // Functions that fill data in MultiFabs
 
     // compute a new multifab by coping in phi from valid region and filling ghost cells
-    // works for single level and 2-level cases (fill fine grid ghost by interpolating from coarse)
+    // works for single level and 2-level cases 
+    // (fill fine grid ghost by interpolating from coarse)
     void FillPatch (int lev,
                     amrex::Real time,
                     amrex::MultiFab& mf,
@@ -124,14 +145,19 @@ private:
                   amrex::Vector<amrex::MultiFab*>& data,
                   amrex::Vector<amrex::Real>& datatime);
 
-    // advance solution at all levels for a single time step
-    void AdvanceTimeStep (amrex::Real time);
+    // set covered coarse cells to be the average of overlying fine cells
+    void AverageDown (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
 
-    // a wrapper for ComputeDtLevel
-    void ComputeDt ();
+    // more flexible version of AverageDown() that lets you average 
+    // down across multiple levels
+    void AverageDownTo (int crse_lev,
+                        amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
 
-    // compute dt at a level from CFL considerations
-    amrex::Real ComputeDtLevel (int lev) const;
+    //
+    ////////////
+
+    ////////////
+    // PlotFile routines
 
     // get plotfile name
     std::string PlotFileName (int lev) const;
@@ -145,8 +171,15 @@ private:
     // write plotfile to disk
     void WritePlotFile (int step) const;
 
-    ////////////////
-    // private data members
+    //
+    ////////////
+
+    // compute the number of cells at a level
+    long CountCells (int lev);
+
+    /*
+      private data members
+    */
 
     // which step?
     int istep;
