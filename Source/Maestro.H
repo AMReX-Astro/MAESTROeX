@@ -201,15 +201,20 @@ private:
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > snew;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > uold;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > unew;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_cc_old;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_cc_new;
 
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > hgrhs;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > gamma1;
-
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > pi;
+    // these MultiFabs need to be regridded as well
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > gpi;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > dSdt;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > Source_old;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > Source_new;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_nodal;
+
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > normal;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > sponge;
+
+    // these are not persistent, in MAESTRO they are kept around for
+    // restarting into matching plotfiles only
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > pi;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_omegadot2;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hnuc2;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hext;
