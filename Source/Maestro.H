@@ -226,12 +226,14 @@ private:
     amrex::Vector<amrex::BCRec> bcs_s;
     amrex::Vector<amrex::BCRec> bcs_u;
 
-    // this contains the base state for all scalar quantities
+    // this contains the base state
     // stores as one long vector
-    amrex::Vector<amrex::Real> s0;
-
-    // this contains the base state for pressure
-    amrex::Vector<amrex::Real> p0;
+    amrex::Vector<amrex::Real> rho0_old;
+    amrex::Vector<amrex::Real> rho0_new;
+    amrex::Vector<amrex::Real> rhoh0_old;
+    amrex::Vector<amrex::Real> rhoh0_new;
+    amrex::Vector<amrex::Real> p0_old;
+    amrex::Vector<amrex::Real> p0_new;
 
     // this contains the base state for velocity
     amrex::Vector<amrex::Real> w0;

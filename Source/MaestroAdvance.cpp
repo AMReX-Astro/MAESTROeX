@@ -7,6 +7,60 @@ using namespace amrex;
 void
 Maestro::AdvanceTimeStep (Real time)
 {
+
+    // features to be added later:
+    // -delta_gamma1_term
+
+    // MultiFabs needed within the AdvanceTimeStep routine
+    Vector<std::unique_ptr<MultiFab> > rhohalf;
+    Vector<std::unique_ptr<MultiFab> > macrhs;
+    Vector<std::unique_ptr<MultiFab> > macphi;
+    Vector<std::unique_ptr<MultiFab> > S_nodal_old;
+    Vector<std::unique_ptr<MultiFab> > S_cc_nph;
+    Vector<std::unique_ptr<MultiFab> > thermal1;
+    Vector<std::unique_ptr<MultiFab> > s1;
+    Vector<std::unique_ptr<MultiFab> > s2;
+    Vector<std::unique_ptr<MultiFab> > s2star;
+    Vector<std::unique_ptr<MultiFab> > div_coeff_cart;
+    Vector<std::unique_ptr<MultiFab> > etarhoflux;
+    Vector<std::unique_ptr<MultiFab> > peosbar_cart;
+    Vector<std::unique_ptr<MultiFab> > delta_p_term;
+    Vector<std::unique_ptr<MultiFab> > Tcoeff;
+    Vector<std::unique_ptr<MultiFab> > hcoeff1;
+    Vector<std::unique_ptr<MultiFab> > Xkcoeff1;
+    Vector<std::unique_ptr<MultiFab> > pcoeff1;
+    Vector<std::unique_ptr<MultiFab> > hcoeff2;
+    Vector<std::unique_ptr<MultiFab> > Xkcoeff2;
+    Vector<std::unique_ptr<MultiFab> > pcoeff2;
+    Vector<std::unique_ptr<MultiFab> > scal_force;
+    Vector<std::unique_ptr<MultiFab> > delta_chi;
+
+    // face-centered
+    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > umac;
+    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > div_coeff_cart_edge;
+
+    // needed for spherical routines only
+    Vector<std::unique_ptr<MultiFab> > w0_force_cart;
+
+    // face-centered
+    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > w0mac;
+
+    Vector<Real> grav_cell_nph;
+    Vector<Real> grav_cell_new;
+    Vector<Real> rho0_nph;
+    Vector<Real> p0_nph;
+    Vector<Real> p0_minus_peosbar;
+    Vector<Real> peosbar;
+    Vector<Real> w0_force;
+    Vector<Real> Sbar;
+    Vector<Real> div_coeff_nph;
+    Vector<Real> gamma1bar_temp1;
+    Vector<Real> gamma1bar_temp2;
+    Vector<Real> w0_old;
+    Vector<Real> div_coeff_edge;
+    Vector<Real> rho0_predicted_edge;
+    Vector<Real> delta_chi_w0;
+
     constexpr int num_grow = 3;
 
     t_old = t_new;
