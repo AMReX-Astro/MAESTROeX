@@ -186,7 +186,7 @@ Maestro::AdvanceTimeStep (Real time)
         Print() << "Synchronizing all levels" << std::endl;
     }
 
-    // synchronize by refluxing and averagig down, starting from the finest_level-1/finest_level pair
+    // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
     for (int lev=finest_level-1; lev>=0; --lev)
     {
         if (do_reflux) {

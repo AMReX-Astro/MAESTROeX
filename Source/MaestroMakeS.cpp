@@ -30,8 +30,8 @@ Maestro::Make_S_cc (Vector<std::unique_ptr<MultiFab> >& S_cc)
             // the information in "abox". We will also pass "box",
             // which specifies our "work" region .
             make_S_cc_work(ARLIM_3D(box.loVect()),ARLIM_3D(box.hiVect()),
-                           fab.dataPtr(),
-                           ARLIM_3D(abox.loVect()),ARLIM_3D(abox.hiVect()));
+                           fab.dataPtr(), ARLIM_3D(abox.loVect()),ARLIM_3D(abox.hiVect()),
+                           S_cc_mf.nGrow(), fab.nComp());
         }
 
     }
