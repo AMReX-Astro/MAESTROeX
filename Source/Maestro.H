@@ -156,6 +156,10 @@ private:
     //
     ////////////
 
+    void Make_S_cc (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& S_cc);
+
+
+
     ////////////
     // PlotFile routines
 
@@ -215,10 +219,10 @@ private:
     // these are not persistent, in MAESTRO they are kept around for
     // restarting into matching plotfiles only
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > pi;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_omegadot2;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hnuc2;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_omegadot;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hnuc;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hext;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > thermal2;
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > thermal;
 
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary
