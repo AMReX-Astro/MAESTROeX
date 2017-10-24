@@ -102,8 +102,17 @@ private:
       private member functions
     */
 
+    // initial projection
+    void InitProj();
+
+    // divu iter
+    void DivuIter();
+
+    // init iter to initialize gradpi
+    void InitIter();
+
     // advance solution at all levels for a single time step
-    void AdvanceTimeStep (amrex::Real time);
+    void AdvanceTimeStep (amrex::Real time, bool is_initIter);
 
     ////////////
     // Time step computation

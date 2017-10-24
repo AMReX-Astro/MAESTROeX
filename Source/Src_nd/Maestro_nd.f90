@@ -70,7 +70,7 @@ subroutine ca_set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure)
   RHOX = FirstSpec
   TEMP = Temperature
   PRES = Pressure
-  NUM_STATE = nspec + 4
+  NSTATE = nspec + 4
 
   VELX = 1
   VELY = 2

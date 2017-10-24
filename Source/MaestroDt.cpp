@@ -83,7 +83,7 @@ Maestro::ComputeDtLevel (int lev) const
 
     ParallelDescriptor::ReduceRealMin(dt_est);
 
-    dt_est *= cfl;
+    dt_est *= cflfac;
 
     return dt_est;
 }

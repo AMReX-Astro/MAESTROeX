@@ -7,7 +7,7 @@ using namespace amrex;
 std::string
 Maestro::PlotFileName (int lev) const
 {
-    return Concatenate(plot_file, lev, 5);
+    return Concatenate(plot_base_name, lev, 5);
 }
 
 // put together a vector of multifabs for writing

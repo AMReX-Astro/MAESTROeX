@@ -16,12 +16,12 @@ module meth_params_module
   implicit none
 
   ! variables in the module
-  integer, save :: RHO, RHOH, RHOX, TEMP, PRES, NUM_STATE
+  integer, save :: RHO, RHOH, RHOX, PRES, TEMP, NSTATE
   integer, save :: VELX, VELY, VELZ
 
   ! Begin the declarations of the ParmParse parameters
 
-  real(rt), save :: cfl
+  real(rt), save :: cflfac
 
   ! End the declarations of the ParmParse parameters
 
@@ -36,10 +36,10 @@ contains
 
     type (amrex_parmparse) :: pp
 
-    cfl = 0.8d0;
+    cflfac = 0.8d0;
 
     call amrex_parmparse_build(pp, "maestro")
-    call pp%query("cfl", cfl)
+    call pp%query("cflfac", cflfac)
     call amrex_parmparse_destroy(pp)
 
 
