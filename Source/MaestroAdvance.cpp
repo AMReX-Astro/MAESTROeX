@@ -99,7 +99,7 @@ Maestro::AdvanceTimeStep (Real time, bool is_initIter)
 
         // State with ghost cells
         MultiFab Sborder(grids[lev], dmap[lev], S_new.nComp(), num_grow);
-        FillPatch(lev, time, Sborder, 0, Sborder.nComp(), bcs_s);
+        FillPatch(lev, time, Sborder, sold, snew, 0, Sborder.nComp(), bcs_s);
 
 #ifdef _OPENMP
 #pragma omp parallel

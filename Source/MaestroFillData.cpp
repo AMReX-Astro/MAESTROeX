@@ -8,13 +8,15 @@ using namespace amrex;
 // (fill fine grid ghost by interpolating from coarse)
 void
 Maestro::FillPatch (int lev, Real time, MultiFab& mf, 
+                    Vector<std::unique_ptr<MultiFab> >& mf_old,
+                    Vector<std::unique_ptr<MultiFab> >& mf_new,
                     int icomp, int ncomp, Vector<BCRec> bcs)
 {
     if (lev == 0)
     {
         Vector<MultiFab*> smf;
         Vector<Real> stime;
-        GetData(0, time, smf, stime, sold, snew);
+        GetData(0, time, smf, stime, mf_old, mf_new);
 
         MaestroPhysBCFunct physbc(geom[lev],bcs,BndryFunctBase(phifill));
         FillPatchSingleLevel(mf, time, smf, stime, 0, icomp, ncomp,
@@ -24,8 +26,8 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
     {
         Vector<MultiFab*> cmf, fmf;
         Vector<Real> ctime, ftime;
-        GetData(lev-1, time, cmf, ctime, sold, snew);
-        GetData(lev  , time, fmf, ftime, sold, snew);
+        GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
+        GetData(lev  , time, fmf, ftime, mf_old, mf_new);
 
         MaestroPhysBCFunct cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
         MaestroPhysBCFunct fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
@@ -42,7 +44,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
 // fill an entire multifab by interpolating from the coarser level
 // this comes into play when a new level of refinement appears
 void
-Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, 
+Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
                           Vector<std::unique_ptr<MultiFab> >& mf_old,
                           Vector<std::unique_ptr<MultiFab> >& mf_new,
                           int icomp, int ncomp, Vector<BCRec> bcs)
@@ -66,7 +68,12 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
                           mapper, bcs);
 }
 
-// utility to copy in data from sold and/or snew into another multifab
+// utility to copy in data from mf_old and/or mf_new into mf
+// if time=t_old we copy mf_old into mf
+// if time=t_new we copy mf_new into mf
+// otherwise copy copy in both mf_old and mf_new into mf and the fillpatch
+// routines know to interpolate in time.  However in MAESTRO since we don't
+// subcycle I don't think we need this capability
 void
 Maestro::GetData (int lev, Real time, 
                   Vector<MultiFab*>& mf, Vector<Real>& mftime,

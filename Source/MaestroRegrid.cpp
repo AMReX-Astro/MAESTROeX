@@ -92,7 +92,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     std::unique_ptr<MultiFab> old_state(new MultiFab(ba, dm, NSCAL, nghost));
 #endif
 
-    FillPatch(lev, time, *new_state, 0, NSCAL, bcs_s);
+    FillPatch(lev, time, *new_state, sold, snew, 0, NSCAL, bcs_s);
 
     std::swap(new_state, snew[lev]);
     std::swap(old_state, sold[lev]);
@@ -135,10 +135,15 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 void
 Maestro::ClearLevel (int lev)
 {
-    snew[lev].reset(nullptr);
     sold[lev].reset(nullptr);
-    unew[lev].reset(nullptr);
+    snew[lev].reset(nullptr);
     uold[lev].reset(nullptr);
+    unew[lev].reset(nullptr);
+    S_cc_old[lev].reset(nullptr);
+    S_cc_new[lev].reset(nullptr);
+    gpi[lev].reset(nullptr);
+    dSdt[lev].reset(nullptr);
+
     flux_reg_s[lev].reset(nullptr);
     flux_reg_u[lev].reset(nullptr);
 }

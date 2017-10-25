@@ -132,12 +132,10 @@ private:
     // compute a new multifab by coping in phi from valid region and filling ghost cells
     // works for single level and 2-level cases 
     // (fill fine grid ghost by interpolating from coarse)
-    void FillPatch (int lev,
-                    amrex::Real time,
-                    amrex::MultiFab& mf,
-                    int icomp,
-                    int ncomp,
-                    amrex::Vector<amrex::BCRec> bcs);
+    void FillPatch (int lev, amrex::Real time, amrex::MultiFab& mf,
+                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_old,
+                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_new,
+                    int icomp, int ncomp, amrex::Vector<amrex::BCRec> bcs);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
@@ -147,7 +145,12 @@ private:
                           int icomp, int ncomp,
                           amrex::Vector<amrex::BCRec> bcs);
 
-    // utility to copy in data from sold and/or snew into another multifab
+    // utility to copy in data from mf_old and/or mf_new into mf
+    // if time=t_old we copy mf_old into mf
+    // if time=t_new we copy mf_new into mf
+    // otherwise copy copy in both mf_old and mf_new into mf and the fillpatch
+    // routines know to interpolate in time.  However in MAESTRO since we don't
+    // subcycle I don't think we need this capability
     void GetData (int lev, amrex::Real time,
                   amrex::Vector<amrex::MultiFab*>& mf,
                   amrex::Vector<amrex::Real>& mftime,
