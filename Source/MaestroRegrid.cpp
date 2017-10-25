@@ -126,7 +126,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
-    FillCoarsePatch(lev, time, *snew[lev], 0, NSCAL, bcs_s);
+    FillCoarsePatch(lev, time, *snew[lev], sold, snew, 0, NSCAL, bcs_s);
 }
 
 // within a call to AmrCore::regrid, this function deletes all data

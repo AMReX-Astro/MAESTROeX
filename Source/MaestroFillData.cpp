@@ -14,7 +14,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
     {
         Vector<MultiFab*> smf;
         Vector<Real> stime;
-        GetData(0, time, smf, stime);
+        GetData(0, time, smf, stime, sold, snew);
 
         MaestroPhysBCFunct physbc(geom[lev],bcs,BndryFunctBase(phifill));
         FillPatchSingleLevel(mf, time, smf, stime, 0, icomp, ncomp,
@@ -24,8 +24,8 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
     {
         Vector<MultiFab*> cmf, fmf;
         Vector<Real> ctime, ftime;
-        GetData(lev-1, time, cmf, ctime);
-        GetData(lev  , time, fmf, ftime);
+        GetData(lev-1, time, cmf, ctime, sold, snew);
+        GetData(lev  , time, fmf, ftime, sold, snew);
 
         MaestroPhysBCFunct cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
         MaestroPhysBCFunct fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
@@ -43,13 +43,15 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
 // this comes into play when a new level of refinement appears
 void
 Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf, 
+                          Vector<std::unique_ptr<MultiFab> >& mf_old,
+                          Vector<std::unique_ptr<MultiFab> >& mf_new,
                           int icomp, int ncomp, Vector<BCRec> bcs)
 {
     BL_ASSERT(lev > 0);
 
     Vector<MultiFab*> cmf;
     Vector<Real> ctime;
-    GetData(lev-1, time, cmf, ctime);
+    GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
     
     if (cmf.size() != 1) {
         Abort("FillCoarsePatch: how did this happen?");
@@ -66,29 +68,32 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
 
 // utility to copy in data from sold and/or snew into another multifab
 void
-Maestro::GetData (int lev, Real time, Vector<MultiFab*>& data, Vector<Real>& datatime)
+Maestro::GetData (int lev, Real time, 
+                  Vector<MultiFab*>& mf, Vector<Real>& mftime,
+                  Vector<std::unique_ptr<MultiFab> >& mf_old,
+                  Vector<std::unique_ptr<MultiFab> >& mf_new)
 {
-    data.clear();
-    datatime.clear();
+    mf.clear();
+    mftime.clear();
 
     const Real teps = (t_new - t_old) * 1.e-3;
 
     if (time > t_new - teps && time < t_new + teps)
     {
-        data.push_back(snew[lev].get());
-        datatime.push_back(t_new);
+        mf.push_back(mf_new[lev].get());
+        mftime.push_back(t_new);
     }
     else if (time > t_old - teps && time < t_old + teps)
     {
-        data.push_back(sold[lev].get());
-        datatime.push_back(t_old);
+        mf.push_back(mf_old[lev].get());
+        mftime.push_back(t_old);
     }
     else
     {
-        data.push_back(sold[lev].get());
-        data.push_back(snew[lev].get());
-        datatime.push_back(t_old);
-        datatime.push_back(t_new);
+        mf.push_back(mf_old[lev].get());
+        mf.push_back(mf_new[lev].get());
+        mftime.push_back(t_old);
+        mftime.push_back(t_new);
     }
 }
 

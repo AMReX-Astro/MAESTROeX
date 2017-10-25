@@ -141,18 +141,18 @@ private:
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
-    void FillCoarsePatch (int lev,
-                          amrex::Real time,
-                          amrex::MultiFab& mf,
-                          int icomp,
-                          int ncomp,
+    void FillCoarsePatch (int lev, amrex::Real time, amrex::MultiFab& mf,
+                          amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_old,
+                          amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_new,
+                          int icomp, int ncomp,
                           amrex::Vector<amrex::BCRec> bcs);
 
     // utility to copy in data from sold and/or snew into another multifab
-    void GetData (int lev,
-                  amrex::Real time,
-                  amrex::Vector<amrex::MultiFab*>& data,
-                  amrex::Vector<amrex::Real>& datatime);
+    void GetData (int lev, amrex::Real time,
+                  amrex::Vector<amrex::MultiFab*>& mf,
+                  amrex::Vector<amrex::Real>& mftime,
+                  amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_old,
+                  amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_new);
 
     // set covered coarse cells to be the average of overlying fine cells
     void AverageDown (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
@@ -201,9 +201,7 @@ private:
     amrex::Real dt;
 
     static int NSCAL;
-    static int Rho, RhoH;
-    static int FirstSpec, NumSpec;
-    static int Temp, Pi;
+    static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
@@ -218,13 +216,14 @@ private:
     // these MultiFabs need to be regridded as well
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > gpi;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > dSdt;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_nodal;
 
+    // these are not persistent - after regridding these can be rebuilt
+    amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_nodal;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > normal;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > sponge;
 
-    // these are not persistent, in MAESTRO they are kept around for
-    // restarting into matching plotfiles only
+    // these are not persistent, in the original MAESTRO they are 
+    // kept around for restarting into matching plotfiles only
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > pi;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_omegadot;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hnuc;
