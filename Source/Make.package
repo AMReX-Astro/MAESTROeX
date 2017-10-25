@@ -4,7 +4,6 @@ CEXE_sources += MaestroAdvance.cpp
 CEXE_sources += MaestroDt.cpp 
 CEXE_sources += MaestroFillData.cpp
 CEXE_sources += MaestroInit.cpp 
-CEXE_sources += MaestroMakeS.cpp
 CEXE_sources += MaestroPhysBCFunct.cpp
 CEXE_sources += MaestroPlot.cpp
 CEXE_sources += MaestroRegrid.cpp
