@@ -1,5 +1,6 @@
 
-f90EXE_sources += Tagging_nd.f90
+f90EXE_sources += MakeS_nd.f90
 f90EXE_sources += Maestro_nd.f90
+f90EXE_sources += Regrid_nd.f90
 
 ca_F90EXE_sources += bc_fill_nd.F90

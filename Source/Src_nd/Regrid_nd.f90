@@ -30,7 +30,7 @@ subroutine state_error(tag,tag_lo,tag_hi, &
   integer          :: tag_lo(3),tag_hi(3)
   double precision :: state(state_lo(1):state_hi(1), &
                             state_lo(2):state_hi(2), &
-                            state_lo(3):state_hi(3), 1:2)
+                            state_lo(3):state_hi(3), 1:6)
   integer          :: tag(tag_lo(1):tag_hi(1),tag_lo(2):tag_hi(2),tag_lo(3):tag_hi(3))
   double precision :: problo(3),dx(3),time,phierr
   integer          :: set,clear
