@@ -19,9 +19,9 @@ extern "C"
     void ca_get_spec_names(int* spec_names, int* ispec, int* len);
 
     // in Make_S_nd.f90
-    void make_S_cc_work(const int* lo, const int* hi, Real* S_cc,
-                        const int* s_lo, const int* s_hi);
-
+    void make_S_cc_work(const int* lo, const int* hi, 
+                        Real* S_cc, const int* s_lo, const int* s_hi,
+                        const int& ng, const int& ncomp);
 
     void ca_set_method_params(const int& Density,
                               const int& Enthalpy,
