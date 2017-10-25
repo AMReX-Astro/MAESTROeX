@@ -38,25 +38,6 @@ plot_int                     int          10
 plot_base_name               string       "plt"
 
 #-----------------------------------------------------------------------------
-# category: algorithm initialization
-#-----------------------------------------------------------------------------
-
-# Number of initial pressure iterations.
-init_iter                     int            2
-
-# Number of initial divu iterations.
-init_divu_iter                int            2
-
-# which file to restart from.  -1 means do not restart
-restart                       int            -1
-
-# restart and add a level of refinement
-restart_into_finer            int            0
-
-# Do the initial projection.
-do_initial_projection         int            1
-
-#-----------------------------------------------------------------------------
 # category: synchronization
 #-----------------------------------------------------------------------------
 
