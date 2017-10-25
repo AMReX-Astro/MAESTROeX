@@ -58,7 +58,7 @@ extern "C"
                 AMREX_D_DECL(BL_FORT_FAB_ARG_3D(fx),
                              BL_FORT_FAB_ARG_3D(fy),
                              BL_FORT_FAB_ARG_3D(fz)),
-                const amrex_real* dx, const amrex_real& dt);
+                const amrex_real* dx, const amrex_real& dt, const int& ncomp);
 
     void phifill (BL_FORT_FAB_ARG_3D(state),
 		  const int* dlo, const int* dhi,

@@ -138,7 +138,7 @@ Maestro::AdvanceTimeStep (Real time, bool is_initIter)
                        AMREX_D_DECL(BL_TO_FORTRAN_3D(flux[0]), 
                                     BL_TO_FORTRAN_3D(flux[1]), 
                                     BL_TO_FORTRAN_3D(flux[2])), 
-                       dx, dt);
+                       dx, dt, S_new.nComp());
 
                 if (do_reflux) {
                     for (int i = 0; i < BL_SPACEDIM ; i++) {

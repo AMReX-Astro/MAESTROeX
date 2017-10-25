@@ -6,14 +6,14 @@ subroutine advect(time, lo, hi, &
      &            vy  , vy_lo, vy_hi, &
      &            flxx, fx_lo, fx_hi, &
      &            flxy, fy_lo, fy_hi, &
-     &            dx,dt) bind(C, name="advect")
+     &            dx,dt,ncomp) bind(C, name="advect")
   
   use mempool_module, only : bl_allocate, bl_deallocate
   use compute_flux_module, only : compute_flux_2d
 
   implicit none
 
-  integer, intent(in) :: lo(2), hi(2)
+  integer, intent(in) :: lo(2), hi(2), ncomp
   double precision, intent(in) :: dx(2), dt, time
   integer, intent(in) :: ui_lo(2), ui_hi(2)
   integer, intent(in) :: uo_lo(2), uo_hi(2)
@@ -21,12 +21,12 @@ subroutine advect(time, lo, hi, &
   integer, intent(in) :: vy_lo(2), vy_hi(2)
   integer, intent(in) :: fx_lo(2), fx_hi(2)
   integer, intent(in) :: fy_lo(2), fy_hi(2)
-  double precision, intent(in   ) :: uin (ui_lo(1):ui_hi(1),ui_lo(2):ui_hi(2),1:2)
-  double precision, intent(inout) :: uout(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2),1:2)
+  double precision, intent(in   ) :: uin (ui_lo(1):ui_hi(1),ui_lo(2):ui_hi(2),1:ncomp)
+  double precision, intent(inout) :: uout(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2),1:ncomp)
   double precision, intent(in   ) :: vx  (vx_lo(1):vx_hi(1),vx_lo(2):vx_hi(2))
   double precision, intent(in   ) :: vy  (vy_lo(1):vy_hi(1),vy_lo(2):vy_hi(2))
-  double precision, intent(  out) :: flxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),1:2)
-  double precision, intent(  out) :: flxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),1:2)
+  double precision, intent(  out) :: flxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),1:ncomp)
+  double precision, intent(  out) :: flxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),1:ncomp)
 
   integer :: i, j, comp
   integer :: glo(2), ghi(2)
@@ -64,7 +64,7 @@ subroutine advect(time, lo, hi, &
      call bl_error("CFL violation. Use smaller adv.cfl.")
   end if
 
-  do comp = 1, 6
+  do comp = 1, ncomp
 
      ! call a function to compute flux
      call compute_flux_2d(lo, hi, dt, dx, &
