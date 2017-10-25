@@ -5,7 +5,7 @@ using namespace amrex;
 
 // advance a single level for a single time step, updates flux registers
 void
-Maestro::AdvanceTimeStep (Real time, bool is_initIter)
+Maestro::AdvanceTimeStep (Real time)
 {
 
     // features to be added later:

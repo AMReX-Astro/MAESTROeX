@@ -12,7 +12,6 @@ module meth_params_module
 
   ! variables in the module
   integer, save :: RHO, RHOH, RHOX, PRES, TEMP, NSTATE
-  integer, save :: VELX, VELY, VELZ
 
   ! Begin the declarations of the ParmParse parameters
 

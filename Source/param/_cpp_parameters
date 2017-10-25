@@ -6,40 +6,26 @@
 
 @namespace: maestro Maestro static
 
-
 #-----------------------------------------------------------------------------
-# category: timestepping
+# category: testing
 #-----------------------------------------------------------------------------
 
-# simulation stop time
-stop_time                    Real         -1.0 
-
-# Maximum number of steps in the simulation.
 max_step                     int          1
 
-# CFL factor to use in the computation of the advection timestep constraint
-cflfac                       Real          0.8                y
-
-#-----------------------------------------------------------------------------
-# category: grid
-#-----------------------------------------------------------------------------
+stop_time                    Real         1.e10
 
 # how often to regrid
-regrid_int                   int          -1
+regrid_int                   int          2
 
-#-----------------------------------------------------------------------------
-# category: output
-#-----------------------------------------------------------------------------
+# root name of plot file
+plot_file                    string       "plt"
 
 # number of timesteps between plot files
 plot_int                     int          10
 
-# root name of plot file
-plot_base_name               string       "plt"
-
-#-----------------------------------------------------------------------------
-# category: synchronization
-#-----------------------------------------------------------------------------
+# the effective Courant number to use---we will not allow the hydrodynamic
+# waves to cross more than this fraction of a zone over a single timestep
+cfl                          Real          0.8                y
 
 # do we do the hyperbolic reflux at coarse-fine interfaces?
 do_reflux                    int           1

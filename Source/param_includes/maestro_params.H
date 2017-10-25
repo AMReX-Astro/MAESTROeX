@@ -3,10 +3,10 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-static amrex::Real stop_time;
 static int max_step;
-static amrex::Real cflfac;
+static amrex::Real stop_time;
 static int regrid_int;
+static std::string plot_file;
 static int plot_int;
-static std::string plot_base_name;
+static amrex::Real cfl;
 static int do_reflux;
