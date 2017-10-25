@@ -69,7 +69,7 @@ contains
 
 
 
-  subroutine eos(input, state, pt_index)
+  subroutine eos(input, state)
 
     !$acc routine seq
 
@@ -86,7 +86,6 @@ contains
 
     integer,      intent(in   ) :: input
     type (eos_t), intent(inout) :: state
-    integer,      intent(in   ), optional  :: pt_index(:)
 
     logical :: has_been_reset
 
