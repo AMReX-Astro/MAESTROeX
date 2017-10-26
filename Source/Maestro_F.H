@@ -49,7 +49,7 @@ extern "C"
                      const amrex_real* dx, const amrex_real* problo,
                      const amrex_real* time, const amrex_real* phierr);
 
-    void advect(const amrex_real& time, const int* lo, const int*hi,
+    void advect(const int* lo, const int*hi,
                 const BL_FORT_FAB_ARG_3D(statein),
                 BL_FORT_FAB_ARG_3D(stateout),
                 AMREX_D_DECL(const BL_FORT_FAB_ARG_3D(xvel),

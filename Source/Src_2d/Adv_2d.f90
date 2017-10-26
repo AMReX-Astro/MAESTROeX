@@ -1,5 +1,5 @@
 
-subroutine advect(time, lo, hi, &
+subroutine advect(lo, hi, &
      &            uin , ui_lo, ui_hi, &
      &            uout, uo_lo, uo_hi, &
      &            vx  , vx_lo, vx_hi, &
@@ -14,7 +14,7 @@ subroutine advect(time, lo, hi, &
   implicit none
 
   integer, intent(in) :: lo(2), hi(2), ncomp
-  double precision, intent(in) :: dx(2), dt, time
+  double precision, intent(in) :: dx(2), dt
   integer, intent(in) :: ui_lo(2), ui_hi(2)
   integer, intent(in) :: uo_lo(2), uo_hi(2)
   integer, intent(in) :: vx_lo(2), vx_hi(2)

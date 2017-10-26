@@ -129,7 +129,7 @@ Maestro::AdvanceTimeStep (Real time, bool is_initIter)
                                   dx, prob_lo);
 
                 // compute new state (stateout) and fluxes.
-                advect(time, bx.loVect(), bx.hiVect(),
+                advect(bx.loVect(), bx.hiVect(),
                        BL_TO_FORTRAN_3D(statein), 
                        BL_TO_FORTRAN_3D(stateout),
                        AMREX_D_DECL(BL_TO_FORTRAN_3D(uface[0]),
