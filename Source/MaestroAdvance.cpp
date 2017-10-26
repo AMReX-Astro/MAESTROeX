@@ -5,7 +5,7 @@ using namespace amrex;
 
 // advance a single level for a single time step, updates flux registers
 void
-Maestro::AdvanceTimeStep (Real time, bool is_initIter)
+Maestro::AdvanceTimeStep (bool is_initIter)
 {
 
     // features to be added later:
@@ -99,7 +99,7 @@ Maestro::AdvanceTimeStep (Real time, bool is_initIter)
 
         // State with ghost cells
         MultiFab Sborder(grids[lev], dmap[lev], S_new.nComp(), num_grow);
-        FillPatch(lev, time, Sborder, sold, snew, 0, Sborder.nComp(), bcs_s);
+        FillPatch(lev, t_old, Sborder, sold, snew, 0, Sborder.nComp(), bcs_s);
 
 #ifdef _OPENMP
 #pragma omp parallel

@@ -7,10 +7,9 @@ using namespace amrex;
 void
 Maestro::Evolve ()
 {
-    Real cur_time = t_new;
     int last_plot_file_step = 0;
 
-    for (istep = 1; istep <= max_step && cur_time < stop_time; ++istep)
+    for (istep = 1; istep <= max_step && t_new < stop_time; ++istep)
     {
 
         if (regrid_int > 0)  // We may need to regrid
@@ -19,7 +18,7 @@ Maestro::Evolve ()
             {
                 // regrid could add newly refine levels (if finest_level < max_level)
                 // so we save the previous finest level index
-                regrid(0, cur_time);
+                regrid(0, t_new);
             }
         }
     
@@ -29,14 +28,12 @@ Maestro::Evolve ()
         // compute time step
         ComputeDt();
 
-        Print() << "\nTimestep " << istep << " starts with TIME = " << cur_time 
+        Print() << "\nTimestep " << istep << " starts with TIME = " << t_new
                        << " DT = " << dt << std::endl << std::endl;
 
-        AdvanceTimeStep(cur_time,false);
+        AdvanceTimeStep(false);
 
-        cur_time += dt;
-
-        Print() << "\nTimestep " << istep << " ends with TIME = " << cur_time 
+        Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
                        << " DT = " << dt << std::endl;
 
         // wallclock time
