@@ -85,6 +85,9 @@ Maestro::PlotFileVarNames () const
 void
 Maestro::WritePlotFile (int step) const
 {
+    // wallclock time
+    const Real strt_total = ParallelDescriptor::second();
+
     const std::string& plotfilename = PlotFileName(step);
     const auto& mf = PlotFileMF();
     const auto& varnames = PlotFileVarNames();
@@ -95,4 +98,14 @@ Maestro::WritePlotFile (int step) const
 
     WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
                             Geom(), t_new, step_array, refRatio());
+
+    // wallclock time
+    Real end_total = ParallelDescriptor::second() - strt_total;
+	
+    // print wallclock time
+    ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
+    if (Verbose()) {
+        Print() << "Time to write plotfile: " << end_total << '\n';
+    }
+
 }

@@ -63,8 +63,11 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
     constexpr int num_grow = 3;
 
-    t_old = t_new;
-    t_new += dt;
+    // wallclock time
+    const Real strt_total = ParallelDescriptor::second();
+
+    Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
+            << " DT = " << dt << std::endl << std::endl;
 
     for (int lev=0; lev<=finest_level; ++lev) 
     {
@@ -75,13 +78,9 @@ Maestro::AdvanceTimeStep (bool is_initIter)
             Print() << "BEGIN ADVANCE with " << CountCells(lev) << " cells" << std::endl;
         }
 
-        std::swap(sold[lev], snew[lev]);
-
         MultiFab& S_new = *snew[lev];
 
-        const Real old_time = t_old;
-        const Real new_time = t_new;
-        const Real ctr_time = 0.5*(old_time+new_time);
+        const Real ctr_time = 0.5*(t_old+t_new);
 
         const Real* dx = geom[lev].CellSize();
         const Real* prob_lo = geom[lev].ProbLo();
@@ -195,6 +194,18 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         }
 
         AverageDownTo(lev,snew); // average lev+1 down to lev
+    }
+
+    Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
+            << " DT = " << dt << std::endl;
+
+    // wallclock time
+    Real end_total = ParallelDescriptor::second() - strt_total;
+	
+    // print wallclock time
+    ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
+    if (Verbose()) {
+        Print() << "Time to advance time step: " << end_total << '\n';
     }
 
 }

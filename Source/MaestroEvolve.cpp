@@ -12,39 +12,25 @@ Maestro::Evolve ()
     for (istep = 1; istep <= max_step && t_new < stop_time; ++istep)
     {
 
-        if (regrid_int > 0)  // We may need to regrid
-        {
-            if ( (istep-1) % regrid_int == 0)
-            {
-                // regrid could add newly refine levels (if finest_level < max_level)
-                // so we save the previous finest level index
-                regrid(0, t_new);
-            }
+        // check to see if we need to regrid, then regrid
+        Regrid(istep);
+
+        // move snew into sold by swapping pointers
+        for (int lev=0; lev<=finest_level; ++lev) {
+            std::swap(sold[lev], snew[lev]);
         }
-    
-        // wallclock time
-        const Real strt_total = ParallelDescriptor::second();
 
         // compute time step
         ComputeDt();
 
-        Print() << "\nTimestep " << istep << " starts with TIME = " << t_new
-                       << " DT = " << dt << std::endl << std::endl;
+        // reset t_old and t_new
+        t_old = t_new;
+        t_new += dt;
 
+        // advance the solution by dt
         AdvanceTimeStep(false);
 
-        Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
-                       << " DT = " << dt << std::endl;
-
-        // wallclock time
-        Real end_total = ParallelDescriptor::second() - strt_total;
-	
-        // print wallclock time
-        ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
-        if (Verbose()) {
-            Print() << "Time to advance time step: " << end_total << '\n';
-        }
-
+        // write a plotfile
         if (plot_int > 0 && istep % plot_int == 0)
         {
             Print() << "\nWriting plotfile " << istep << std::endl;

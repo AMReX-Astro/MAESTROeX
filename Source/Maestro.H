@@ -65,6 +65,11 @@ public:
     ////////////
     // Regridding functions
 
+    // check to see if we need to regrid, then regrid
+    void
+    Regrid (int& istep);
+
+
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
     virtual void ErrorEst (int lev,
