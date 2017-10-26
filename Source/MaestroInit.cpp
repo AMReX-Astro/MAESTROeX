@@ -300,8 +300,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 {
     const int nghost = 0;
 
-    snew[lev].reset(new MultiFab(ba, dm, NSCAL     , nghost));
-    sold[lev].reset(new MultiFab(ba, dm, NSCAL     , nghost));
+    snew[lev].reset(new MultiFab(ba, dm,          NSCAL, nghost));
+    sold[lev].reset(new MultiFab(ba, dm,          NSCAL, nghost));
     unew[lev].reset(new MultiFab(ba, dm, AMREX_SPACEDIM, nghost));
     uold[lev].reset(new MultiFab(ba, dm, AMREX_SPACEDIM, nghost));
 
