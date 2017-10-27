@@ -74,7 +74,7 @@ public:
     virtual void ErrorEst (int lev,
                            amrex::TagBoxArray& tags,
                            amrex::Real time,
-                           int ngrow) override;
+                           int ng) override;
 
     // within a call to AmrCore::regrid, this function fills in data at a level
     // that existed before, using pre-existing fine and interpolated coarse data

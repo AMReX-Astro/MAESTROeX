@@ -115,7 +115,7 @@ Maestro::BCSetup()
         }
     }
 
-    // velocity and scalars
+    // set up boundary conditions for velocity, scalars, S, gpi, and dSdt
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
     {
 
@@ -133,6 +133,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(idim, BCType::int_dir);
                 bcs_s[Pi  ].setLo(idim, BCType::int_dir);
                 bcs_S[0   ].setLo(idim, BCType::int_dir);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setLo(idim, BCType::int_dir);
+            }
+                bcs_d[0   ].setLo(idim, BCType::int_dir);
         }
         else if (lo_bc[idim] == Inflow) {
             // inflow
@@ -147,6 +151,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(idim, BCType::ext_dir);
                 bcs_s[Pi  ].setLo(idim, BCType::foextrap);
                 bcs_S[0   ].setLo(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setLo(idim, BCType::foextrap);
+            }
+                bcs_d[0   ].setLo(idim, BCType::foextrap);
         }
         else if (lo_bc[idim] == Outflow) {
             // outflow
@@ -161,6 +169,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(idim, BCType::foextrap);
                 bcs_s[Pi  ].setLo(idim, BCType::ext_dir);
                 bcs_S[0   ].setLo(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setLo(idim, BCType::foextrap);
+            }
+                bcs_d[0   ].setLo(idim, BCType::foextrap);
         }
         else if (lo_bc[idim] == Symmetry) {
             // symmetry
@@ -176,6 +188,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(idim, BCType::reflect_even);
                 bcs_s[Pi  ].setLo(idim, BCType::reflect_even);
                 bcs_S[0   ].setLo(idim, BCType::reflect_even);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setLo(idim, BCType::reflect_even);
+            }
+                bcs_d[0   ].setLo(idim, BCType::reflect_even);
         }
         else if (lo_bc[idim] == SlipWall) {
             // slip wall
@@ -191,6 +207,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(idim, BCType::foextrap);
                 bcs_s[Pi  ].setLo(idim, BCType::foextrap);
                 bcs_S[0   ].setLo(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setLo(idim, BCType::foextrap);
+            }
+                bcs_d[0   ].setLo(idim, BCType::foextrap);
         }
         else if (lo_bc[idim] == NoSlipWall) {
             // no-slip wall
@@ -205,6 +225,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(idim, BCType::foextrap);
                 bcs_s[Pi  ].setLo(idim, BCType::foextrap);
                 bcs_S[0   ].setLo(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setLo(idim, BCType::foextrap);
+            }
+                bcs_d[0   ].setLo(idim, BCType::foextrap);
         }
         else {
             Abort("Invalid lo_bc");
@@ -224,6 +248,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(idim, BCType::int_dir);
                 bcs_s[Pi  ].setHi(idim, BCType::int_dir);
                 bcs_S[0   ].setHi(idim, BCType::int_dir);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setHi(idim, BCType::int_dir);
+            }
+                bcs_d[0   ].setHi(idim, BCType::int_dir);
         }
         else if (hi_bc[idim] == Inflow) {
             // inflow
@@ -238,6 +266,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(idim, BCType::ext_dir);
                 bcs_s[Pi  ].setHi(idim, BCType::foextrap);
                 bcs_S[0   ].setHi(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setHi(idim, BCType::foextrap);
+            }
+                bcs_d[0   ].setHi(idim, BCType::foextrap);
         }
         else if (hi_bc[idim] == Outflow) {
             // outflow
@@ -252,6 +284,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(idim, BCType::foextrap);
                 bcs_s[Pi  ].setHi(idim, BCType::ext_dir);
                 bcs_S[0   ].setHi(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setHi(idim, BCType::foextrap);
+            }
+                bcs_d[0   ].setHi(idim, BCType::foextrap);
         }
         else if (hi_bc[idim] == Symmetry) {
             // symmetry
@@ -267,6 +303,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(idim, BCType::reflect_even);
                 bcs_s[Pi  ].setHi(idim, BCType::reflect_even);
                 bcs_S[0   ].setHi(idim, BCType::reflect_even);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setHi(idim, BCType::reflect_even);
+            }
+                bcs_d[0   ].setHi(idim, BCType::reflect_even);
         }
         else if (hi_bc[idim] == SlipWall) {
             // slip wall
@@ -282,6 +322,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(idim, BCType::foextrap);
                 bcs_s[Pi  ].setHi(idim, BCType::foextrap);
                 bcs_S[0   ].setHi(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setHi(idim, BCType::foextrap);
+            }
+                bcs_d[0   ].setHi(idim, BCType::foextrap);
         }
         else if (hi_bc[idim] == NoSlipWall) {
             // no-slip wall
@@ -296,6 +340,10 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(idim, BCType::foextrap);
                 bcs_s[Pi  ].setHi(idim, BCType::foextrap);
                 bcs_S[0   ].setHi(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_g[dim ].setHi(idim, BCType::foextrap);
+            }
+                bcs_d[0   ].setHi(idim, BCType::foextrap);
         }
         else {
             Abort("Invalid hi_bc");
@@ -313,14 +361,20 @@ Maestro::BCSetup()
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)
 {
-    const int nghost = 0;
+    const int ng_s = 0;
+    const int ng_u = 0;
+    const int ng_S = 0;
+    const int ng_g = 0;
+    const int ng_d = 0;
 
-    sold[lev]    .reset(new MultiFab(ba, dm,          NSCAL, nghost));
-    snew[lev]    .reset(new MultiFab(ba, dm,          NSCAL, nghost));
-    uold[lev]    .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, nghost));
-    unew[lev]    .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, nghost));
-    S_cc_old[lev].reset(new MultiFab(ba, dm,              1,      0));
-    S_cc_new[lev].reset(new MultiFab(ba, dm,              1,      0));
+    sold[lev]    .reset(new MultiFab(ba, dm,          NSCAL, ng_s));
+    snew[lev]    .reset(new MultiFab(ba, dm,          NSCAL, ng_s));
+    uold[lev]    .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, ng_u));
+    unew[lev]    .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, ng_u));
+    S_cc_old[lev].reset(new MultiFab(ba, dm,              1, ng_S));
+    S_cc_new[lev].reset(new MultiFab(ba, dm,              1, ng_S));
+    gpi[lev]     .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, ng_g));
+    dSdt[lev]    .reset(new MultiFab(ba, dm,              1, ng_d));
 
     t_new = time;
     t_old = time - 1.e200;

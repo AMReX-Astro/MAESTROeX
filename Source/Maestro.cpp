@@ -67,6 +67,8 @@ Maestro::Maestro ()
     unew    .resize(nlevs_max);
     S_cc_old.resize(nlevs_max);
     S_cc_new.resize(nlevs_max);
+    gpi     .resize(nlevs_max);
+    dSdt    .resize(nlevs_max);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"

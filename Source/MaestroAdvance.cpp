@@ -72,7 +72,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<Real> rho0_predicted_edge;
     Vector<Real> delta_chi_w0;
 
-    constexpr int nGrowS = 3;
+    constexpr int ng_s = 3;
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
@@ -83,26 +83,26 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     for (int lev=0; lev<=finest_level; ++lev) 
     {
         // cell-centered MultiFabs
-        rhohalf[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,      1));
-        macrhs[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,      0));
-        macphi[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,      1));
-        S_cc_nph[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,      0));
-        thermal1[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,      0));
-        s1[lev].reset            (new MultiFab(grids[lev], dmap[lev],   NSCAL, nGrowS));
-        s2[lev].reset            (new MultiFab(grids[lev], dmap[lev],   NSCAL, nGrowS));
-        s2star[lev].reset        (new MultiFab(grids[lev], dmap[lev],   NSCAL, nGrowS));
-        div_coeff_cart[lev].reset(new MultiFab(grids[lev], dmap[lev],       1,      1));
-        peosbar_cart[lev].reset  (new MultiFab(grids[lev], dmap[lev],       1,      0));
-        delta_p_term[lev].reset  (new MultiFab(grids[lev], dmap[lev],       1,      0));
-        Tcoeff[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,      1));
-        hcoeff1[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,      1));
-        Xkcoeff1[lev].reset      (new MultiFab(grids[lev], dmap[lev], NumSpec,      1));
-        pcoeff1[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,      1));
-        hcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,      1));
-        Xkcoeff2[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,      1));
-        pcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev], NumSpec,      1));
-        scal_force[lev].reset    (new MultiFab(grids[lev], dmap[lev],   NSCAL,      1));
-        delta_chi[lev].reset     (new MultiFab(grids[lev], dmap[lev],       1,      0));
+        rhohalf[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,    1));
+        macrhs[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        macphi[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,    1));
+        S_cc_nph[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        thermal1[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        s1[lev].reset            (new MultiFab(grids[lev], dmap[lev],   NSCAL, ng_s));
+        s2[lev].reset            (new MultiFab(grids[lev], dmap[lev],   NSCAL, ng_s));
+        s2star[lev].reset        (new MultiFab(grids[lev], dmap[lev],   NSCAL, ng_s));
+        div_coeff_cart[lev].reset(new MultiFab(grids[lev], dmap[lev],       1,    1));
+        peosbar_cart[lev].reset  (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        delta_p_term[lev].reset  (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        Tcoeff[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,    1));
+        hcoeff1[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,    1));
+        Xkcoeff1[lev].reset      (new MultiFab(grids[lev], dmap[lev], NumSpec,    1));
+        pcoeff1[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,    1));
+        hcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,    1));
+        Xkcoeff2[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    1));
+        pcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev], NumSpec,    1));
+        scal_force[lev].reset    (new MultiFab(grids[lev], dmap[lev],   NSCAL,    1));
+        delta_chi[lev].reset     (new MultiFab(grids[lev], dmap[lev],       1,    0));
 
         // nodal MultiFabs
         S_nodal_old[lev].reset(new MultiFab(convert(grids[lev],nodal_flag), dmap[lev], 1, 1));
@@ -160,7 +160,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         }
 
         // State with ghost cells
-        MultiFab Sborder(grids[lev], dmap[lev], S_new.nComp(), nGrowS);
+        MultiFab Sborder(grids[lev], dmap[lev], S_new.nComp(), ng_s);
         FillPatch(lev, t_old, Sborder, sold, snew, 0, Sborder.nComp(), bcs_s);
 
 #ifdef _OPENMP
