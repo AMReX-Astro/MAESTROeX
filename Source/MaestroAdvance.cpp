@@ -12,38 +12,43 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // -delta_gamma1_term
 
     // MultiFabs needed within the AdvanceTimeStep routine
-    Vector<std::unique_ptr<MultiFab> > rhohalf;
-    Vector<std::unique_ptr<MultiFab> > macrhs;
-    Vector<std::unique_ptr<MultiFab> > macphi;
-    Vector<std::unique_ptr<MultiFab> > S_nodal_old;
-    Vector<std::unique_ptr<MultiFab> > S_cc_nph;
-    Vector<std::unique_ptr<MultiFab> > thermal1;
-    Vector<std::unique_ptr<MultiFab> > s1;
-    Vector<std::unique_ptr<MultiFab> > s2;
-    Vector<std::unique_ptr<MultiFab> > s2star;
-    Vector<std::unique_ptr<MultiFab> > div_coeff_cart;
-    Vector<std::unique_ptr<MultiFab> > etarhoflux;
-    Vector<std::unique_ptr<MultiFab> > peosbar_cart;
-    Vector<std::unique_ptr<MultiFab> > delta_p_term;
-    Vector<std::unique_ptr<MultiFab> > Tcoeff;
-    Vector<std::unique_ptr<MultiFab> > hcoeff1;
-    Vector<std::unique_ptr<MultiFab> > Xkcoeff1;
-    Vector<std::unique_ptr<MultiFab> > pcoeff1;
-    Vector<std::unique_ptr<MultiFab> > hcoeff2;
-    Vector<std::unique_ptr<MultiFab> > Xkcoeff2;
-    Vector<std::unique_ptr<MultiFab> > pcoeff2;
-    Vector<std::unique_ptr<MultiFab> > scal_force;
-    Vector<std::unique_ptr<MultiFab> > delta_chi;
+    Vector<std::unique_ptr<MultiFab> >        rhohalf(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >         macrhs(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >         macphi(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >    S_nodal_old(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >       S_cc_nph(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >       thermal1(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >             s1(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >             s2(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >         s2star(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> > div_coeff_cart(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >     etarhoflux(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >   peosbar_cart(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >   delta_p_term(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >         Tcoeff(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >        hcoeff1(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >       Xkcoeff1(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >        pcoeff1(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >        hcoeff2(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >       Xkcoeff2(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >        pcoeff2(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >     scal_force(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >      delta_chi(finest_level+1);
 
     // face-centered
-    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > umac;
-    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > div_coeff_cart_edge;
+    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > >                umac(finest_level+1);
+    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > div_coeff_cart_edge(finest_level+1);
 
+    ////////////////////////
     // needed for spherical routines only
-    Vector<std::unique_ptr<MultiFab> > w0_force_cart;
+
+    Vector<std::unique_ptr<MultiFab> > w0_force_cart(finest_level+1);
 
     // face-centered
-    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > w0mac;
+    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > w0mac(finest_level+1);
+
+    // end spherical-only MultiFabs
+    ////////////////////////
 
     Vector<Real> grav_cell_nph;
     Vector<Real> grav_cell_new;
@@ -68,6 +73,12 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
+
+    for (int lev=0; lev<=finest_level; ++lev) 
+    {
+        rhohalf[lev].reset(new MultiFab(grids[lev], dmap[lev], 1, 1));
+    }
+
 
     for (int lev=0; lev<=finest_level; ++lev) 
     {
