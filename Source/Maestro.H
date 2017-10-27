@@ -66,8 +66,7 @@ public:
     // Regridding functions
 
     // check to see if we need to regrid, then regrid
-    void
-    Regrid (int& istep);
+    void Regrid ();
 
 
     // tag all cells for refinement
@@ -208,12 +207,19 @@ private:
     amrex::Real t_old;
     amrex::Real dt;
 
+    // these are defined in VariablSetup
     static int NSCAL;
     static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi;
+
+    static amrex::IntVect nodal_flag;
+    static amrex::IntVect nodal_flag_x;
+    static amrex::IntVect nodal_flag_y;
+    static amrex::IntVect nodal_flag_z;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
     // to avoid a copy
+    // these MultiFabs go through the regridding process
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > sold;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > snew;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > uold;
@@ -241,8 +247,11 @@ private:
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary
     // condition types at the lo/hi walls in each direction
-    amrex::Vector<amrex::BCRec> bcs_s;
-    amrex::Vector<amrex::BCRec> bcs_u;
+    amrex::Vector<amrex::BCRec> bcs_s;  // for sold/snew
+    amrex::Vector<amrex::BCRec> bcs_u;  // for uold/unew
+    amrex::Vector<amrex::BCRec> bcs_S;  // for S_cc_old/new
+    amrex::Vector<amrex::BCRec> bcs_g;  // for gpi
+    amrex::Vector<amrex::BCRec> bcs_d;  // for dSdt
 
     // this contains the base state
     // stores as one long vector

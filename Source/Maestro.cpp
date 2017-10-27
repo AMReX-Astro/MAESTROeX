@@ -12,6 +12,17 @@ int Maestro::Temp      = -1;
 int Maestro::Pi        = -1;
 int Maestro::NSCAL     = -1;
 
+#if (AMREX_SPACEDIM == 2)
+IntVect Maestro::nodal_flag(1,1);
+IntVect Maestro::nodal_flag_x(1,0);
+IntVect Maestro::nodal_flag_y(0,1);
+#elif (AMREX_SPACEDIM == 3)
+IntVect Maestro::nodal_flag(1,1,1);
+IntVect Maestro::nodal_flag_x(1,0,0);
+IntVect Maestro::nodal_flag_y(0,1,0);
+IntVect Maestro::nodal_flag_z(0,0,1);
+#endif
+
 // constructor - reads in parameters from inputs file
 //             - sizes multilevel vectors and data structures
 Maestro::Maestro ()
@@ -50,10 +61,12 @@ Maestro::Maestro ()
     // set this to a large number so change_max doesn't affect the first time step
     dt = 1.e100;
 
-    snew.resize(nlevs_max);
-    sold.resize(nlevs_max);
-    unew.resize(nlevs_max);
-    uold.resize(nlevs_max);
+    sold    .resize(nlevs_max);
+    snew    .resize(nlevs_max);
+    uold    .resize(nlevs_max);
+    unew    .resize(nlevs_max);
+    S_cc_old.resize(nlevs_max);
+    S_cc_new.resize(nlevs_max);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"

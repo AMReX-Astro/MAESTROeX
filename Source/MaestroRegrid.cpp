@@ -5,29 +5,24 @@ using namespace amrex;
 
 // check to see if we need to regrid, then regrid
 void
-Maestro::Regrid (int& istep)
+Maestro::Regrid ()
 {
-    if (regrid_int > 0)  // We may need to regrid
-    {
-        if ( (istep-1) % regrid_int == 0)  // if we have hit regrid_int
-        {
-            // wallclock time
-            const Real strt_total = ParallelDescriptor::second();
+    // wallclock time
+    const Real strt_total = ParallelDescriptor::second();
             
-            // regrid could add newly refine levels (if finest_level < max_level)
-            // so we save the previous finest level index
-            regrid(0, t_new);
+    // regrid could add newly refine levels (if finest_level < max_level)
+    // so we save the previous finest level index
+    regrid(0, t_new);
             
-            // wallclock time
-            Real end_total = ParallelDescriptor::second() - strt_total;
+    // wallclock time
+    Real end_total = ParallelDescriptor::second() - strt_total;
             
-            // print wallclock time
-            ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
-            if (Verbose()) {
-                Print() << "Time to regrid: " << end_total << '\n';
-            }
-        }
+    // print wallclock time
+    ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
+    if (Verbose()) {
+        Print() << "Time to regrid: " << end_total << '\n';
     }
+        
 }
 
 // tag all cells for refinement

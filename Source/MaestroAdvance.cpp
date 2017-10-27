@@ -15,14 +15,12 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<std::unique_ptr<MultiFab> >        rhohalf(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >         macrhs(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >         macphi(finest_level+1);
-    Vector<std::unique_ptr<MultiFab> >    S_nodal_old(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >       S_cc_nph(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >       thermal1(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >             s1(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >             s2(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >         s2star(finest_level+1);
     Vector<std::unique_ptr<MultiFab> > div_coeff_cart(finest_level+1);
-    Vector<std::unique_ptr<MultiFab> >     etarhoflux(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >   peosbar_cart(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >   delta_p_term(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >         Tcoeff(finest_level+1);
@@ -35,8 +33,16 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<std::unique_ptr<MultiFab> >     scal_force(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >      delta_chi(finest_level+1);
 
+    // face-centered in the dm-direction (planar only)
+    Vector<std::unique_ptr<MultiFab> >     etarhoflux(finest_level+1);
+
+    // nodal
+    Vector<std::unique_ptr<MultiFab> >    S_nodal_old(finest_level+1);
+
     // face-centered
     Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > >                umac(finest_level+1);
+    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > >               sedge(finest_level+1);
+    Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > >               sflux(finest_level+1);
     Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > > div_coeff_cart_edge(finest_level+1);
 
     ////////////////////////
@@ -66,7 +72,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<Real> rho0_predicted_edge;
     Vector<Real> delta_chi_w0;
 
-    constexpr int num_grow = 3;
+    constexpr int nGrowS = 3;
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
@@ -76,7 +82,53 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
     for (int lev=0; lev<=finest_level; ++lev) 
     {
-        rhohalf[lev].reset(new MultiFab(grids[lev], dmap[lev], 1, 1));
+        // cell-centered MultiFabs
+        rhohalf[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,      1));
+        macrhs[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,      0));
+        macphi[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,      1));
+        S_cc_nph[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,      0));
+        thermal1[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,      0));
+        s1[lev].reset            (new MultiFab(grids[lev], dmap[lev],   NSCAL, nGrowS));
+        s2[lev].reset            (new MultiFab(grids[lev], dmap[lev],   NSCAL, nGrowS));
+        s2star[lev].reset        (new MultiFab(grids[lev], dmap[lev],   NSCAL, nGrowS));
+        div_coeff_cart[lev].reset(new MultiFab(grids[lev], dmap[lev],       1,      1));
+        peosbar_cart[lev].reset  (new MultiFab(grids[lev], dmap[lev],       1,      0));
+        delta_p_term[lev].reset  (new MultiFab(grids[lev], dmap[lev],       1,      0));
+        Tcoeff[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,      1));
+        hcoeff1[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,      1));
+        Xkcoeff1[lev].reset      (new MultiFab(grids[lev], dmap[lev], NumSpec,      1));
+        pcoeff1[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,      1));
+        hcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,      1));
+        Xkcoeff2[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,      1));
+        pcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev], NumSpec,      1));
+        scal_force[lev].reset    (new MultiFab(grids[lev], dmap[lev],   NSCAL,      1));
+        delta_chi[lev].reset     (new MultiFab(grids[lev], dmap[lev],       1,      0));
+
+        // nodal MultiFabs
+        S_nodal_old[lev].reset(new MultiFab(convert(grids[lev],nodal_flag), dmap[lev], 1, 1));
+
+        // face-centered in the dm-direction (planar only)
+#if (AMREX_SPACEDIM == 2)
+        etarhoflux[lev].reset(new MultiFab(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1));
+#elif (AMREX_SPACEDIM == 3)
+        etarhoflux[lev].reset(new MultiFab(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1));
+#endif
+
+        // face-centered arrays of MultiFabs
+        umac[lev][0].reset               (new MultiFab(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1));
+        umac[lev][1].reset               (new MultiFab(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1));
+        sedge[lev][0].reset              (new MultiFab(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1));
+        sedge[lev][1].reset              (new MultiFab(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1));
+        sflux[lev][0].reset              (new MultiFab(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1));
+        sflux[lev][1].reset              (new MultiFab(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1));
+        div_coeff_cart_edge[lev][0].reset(new MultiFab(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1));
+        div_coeff_cart_edge[lev][1].reset(new MultiFab(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1));
+#if (AMREX_SPACEDIM == 3)
+        umac[lev][2].reset               (new MultiFab(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1));
+        sedge[lev][2].reset              (new MultiFab(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1));
+        sflux[lev][2].reset              (new MultiFab(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1));
+        div_coeff_cart_edge[lev][2].reset(new MultiFab(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1));
+#endif
     }
 
 
@@ -108,7 +160,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         }
 
         // State with ghost cells
-        MultiFab Sborder(grids[lev], dmap[lev], S_new.nComp(), num_grow);
+        MultiFab Sborder(grids[lev], dmap[lev], S_new.nComp(), nGrowS);
         FillPatch(lev, t_old, Sborder, sold, snew, 0, Sborder.nComp(), bcs_s);
 
 #ifdef _OPENMP

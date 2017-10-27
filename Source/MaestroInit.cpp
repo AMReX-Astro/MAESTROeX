@@ -62,6 +62,9 @@ Maestro::BCSetup()
     
     bcs_s.resize(NSCAL);
     bcs_u.resize(AMREX_SPACEDIM);
+    bcs_S.resize(1);
+    bcs_g.resize(AMREX_SPACEDIM);
+    bcs_d.resize(1);
 
     // Check phys_bc against possible periodic geometry
     // if periodic, must have internal BC marked.
@@ -119,8 +122,8 @@ Maestro::BCSetup()
         // lo-side bcs
         if (lo_bc[idim] == Interior) {
             // periodic uses "internal Dirichlet"
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setLo(idim, BCType::int_dir);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setLo(idim, BCType::int_dir);
             }
                 bcs_s[Rho ].setLo(idim, BCType::int_dir);  
                 bcs_s[RhoH].setLo(idim, BCType::int_dir);
@@ -129,11 +132,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setLo(idim, BCType::int_dir);
                 bcs_s[Pi  ].setLo(idim, BCType::int_dir);
+                bcs_S[0   ].setLo(idim, BCType::int_dir);
         }
         else if (lo_bc[idim] == Inflow) {
             // inflow
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setLo(idim, BCType::ext_dir);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setLo(idim, BCType::ext_dir);
             }
                 bcs_s[Rho ].setLo(idim, BCType::ext_dir);  
                 bcs_s[RhoH].setLo(idim, BCType::ext_dir);
@@ -142,11 +146,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setLo(idim, BCType::ext_dir);
                 bcs_s[Pi  ].setLo(idim, BCType::foextrap);
+                bcs_S[0   ].setLo(idim, BCType::foextrap);
         }
         else if (lo_bc[idim] == Outflow) {
             // outflow
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setLo(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setLo(idim, BCType::foextrap);
             }
                 bcs_s[Rho ].setLo(idim, BCType::foextrap);  
                 bcs_s[RhoH].setLo(idim, BCType::foextrap);
@@ -155,11 +160,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setLo(idim, BCType::foextrap);
                 bcs_s[Pi  ].setLo(idim, BCType::ext_dir);
+                bcs_S[0   ].setLo(idim, BCType::foextrap);
         }
         else if (lo_bc[idim] == Symmetry) {
             // symmetry
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setLo(idim, BCType::reflect_even);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setLo(idim, BCType::reflect_even);
             }
                 bcs_u[idim].setLo(idim, BCType::reflect_odd);
                 bcs_s[Rho ].setLo(idim, BCType::reflect_even);  
@@ -169,11 +175,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setLo(idim, BCType::reflect_even);
                 bcs_s[Pi  ].setLo(idim, BCType::reflect_even);
+                bcs_S[0   ].setLo(idim, BCType::reflect_even);
         }
         else if (lo_bc[idim] == SlipWall) {
             // slip wall
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setLo(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setLo(idim, BCType::foextrap);
             }
                 bcs_u[idim].setLo(idim, BCType::ext_dir);
                 bcs_s[Rho ].setLo(idim, BCType::foextrap);  
@@ -183,11 +190,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setLo(idim, BCType::foextrap);
                 bcs_s[Pi  ].setLo(idim, BCType::foextrap);
+                bcs_S[0   ].setLo(idim, BCType::foextrap);
         }
         else if (lo_bc[idim] == NoSlipWall) {
             // no-slip wall
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setLo(idim, BCType::ext_dir);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setLo(idim, BCType::ext_dir);
             }
                 bcs_s[Rho ].setLo(idim, BCType::foextrap);  
                 bcs_s[RhoH].setLo(idim, BCType::foextrap);
@@ -196,6 +204,7 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setLo(idim, BCType::foextrap);
                 bcs_s[Pi  ].setLo(idim, BCType::foextrap);
+                bcs_S[0   ].setLo(idim, BCType::foextrap);
         }
         else {
             Abort("Invalid lo_bc");
@@ -204,8 +213,8 @@ Maestro::BCSetup()
         // hi-side bcs
         if (hi_bc[idim] == Interior) {
             // periodic uses "internal Dirichlet"
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setHi(idim, BCType::int_dir);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setHi(idim, BCType::int_dir);
             }
                 bcs_s[Rho ].setHi(idim, BCType::int_dir);  
                 bcs_s[RhoH].setHi(idim, BCType::int_dir);
@@ -214,11 +223,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setHi(idim, BCType::int_dir);
                 bcs_s[Pi  ].setHi(idim, BCType::int_dir);
+                bcs_S[0   ].setHi(idim, BCType::int_dir);
         }
         else if (hi_bc[idim] == Inflow) {
             // inflow
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setHi(idim, BCType::ext_dir);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setHi(idim, BCType::ext_dir);
             }
                 bcs_s[Rho ].setHi(idim, BCType::ext_dir);  
                 bcs_s[RhoH].setHi(idim, BCType::ext_dir);
@@ -227,11 +237,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setHi(idim, BCType::ext_dir);
                 bcs_s[Pi  ].setHi(idim, BCType::foextrap);
+                bcs_S[0   ].setHi(idim, BCType::foextrap);
         }
         else if (hi_bc[idim] == Outflow) {
             // outflow
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setHi(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setHi(idim, BCType::foextrap);
             }
                 bcs_s[Rho ].setHi(idim, BCType::foextrap);  
                 bcs_s[RhoH].setHi(idim, BCType::foextrap);
@@ -240,11 +251,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setHi(idim, BCType::foextrap);
                 bcs_s[Pi  ].setHi(idim, BCType::ext_dir);
+                bcs_S[0   ].setHi(idim, BCType::foextrap);
         }
         else if (hi_bc[idim] == Symmetry) {
             // symmetry
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setHi(idim, BCType::reflect_even);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setHi(idim, BCType::reflect_even);
             }
                 bcs_u[idim].setHi(idim, BCType::reflect_odd);
                 bcs_s[Rho ].setHi(idim, BCType::reflect_even);  
@@ -254,11 +266,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setHi(idim, BCType::reflect_even);
                 bcs_s[Pi  ].setHi(idim, BCType::reflect_even);
+                bcs_S[0   ].setHi(idim, BCType::reflect_even);
         }
         else if (hi_bc[idim] == SlipWall) {
             // slip wall
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setHi(idim, BCType::foextrap);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setHi(idim, BCType::foextrap);
             }
                 bcs_u[idim].setHi(idim, BCType::ext_dir);
                 bcs_s[Rho ].setHi(idim, BCType::foextrap);  
@@ -268,11 +281,12 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setHi(idim, BCType::foextrap);
                 bcs_s[Pi  ].setHi(idim, BCType::foextrap);
+                bcs_S[0   ].setHi(idim, BCType::foextrap);
         }
         else if (hi_bc[idim] == NoSlipWall) {
             // no-slip wall
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setHi(idim, BCType::ext_dir);
+            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
+                bcs_u[dim ].setHi(idim, BCType::ext_dir);
             }
                 bcs_s[Rho ].setHi(idim, BCType::foextrap);  
                 bcs_s[RhoH].setHi(idim, BCType::foextrap);
@@ -281,6 +295,7 @@ Maestro::BCSetup()
             }
                 bcs_s[Temp].setHi(idim, BCType::foextrap);
                 bcs_s[Pi  ].setHi(idim, BCType::foextrap);
+                bcs_S[0   ].setHi(idim, BCType::foextrap);
         }
         else {
             Abort("Invalid hi_bc");
@@ -300,10 +315,12 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 {
     const int nghost = 0;
 
-    snew[lev].reset(new MultiFab(ba, dm,          NSCAL, nghost));
-    sold[lev].reset(new MultiFab(ba, dm,          NSCAL, nghost));
-    unew[lev].reset(new MultiFab(ba, dm, AMREX_SPACEDIM, nghost));
-    uold[lev].reset(new MultiFab(ba, dm, AMREX_SPACEDIM, nghost));
+    sold[lev]    .reset(new MultiFab(ba, dm,          NSCAL, nghost));
+    snew[lev]    .reset(new MultiFab(ba, dm,          NSCAL, nghost));
+    uold[lev]    .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, nghost));
+    unew[lev]    .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, nghost));
+    S_cc_old[lev].reset(new MultiFab(ba, dm,              1,      0));
+    S_cc_new[lev].reset(new MultiFab(ba, dm,              1,      0));
 
     t_new = time;
     t_old = time - 1.e200;
