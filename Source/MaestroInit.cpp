@@ -1,6 +1,7 @@
 
 
 #include <Maestro.H>
+#include <AMReX_FMultiGrid.H>
 
 using namespace amrex;
 
@@ -26,6 +27,19 @@ Maestro::ReadParameters ()
     ParmParse pp("maestro");
 
 #include <maestro_queries.H>
+
+    // read in boundary conditions
+    lo_bc.resize(AMREX_SPACEDIM);
+    hi_bc.resize(AMREX_SPACEDIM);
+    pp.getarr("lo_bc",lo_bc,0,AMREX_SPACEDIM);
+    pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
+
+    // read in tagging criteria
+    int n = pp.countval("phierr");
+    if (n > 0) {
+        pp.getarr("phierr", phierr, 0, n);
+    }
+
 
 }
 
@@ -54,12 +68,6 @@ void Maestro::VariableSetup ()
 void
 Maestro::BCSetup()
 {
-    // Get boundary conditions
-    ParmParse pp("maestro");
-    Array<int> lo_bc(AMREX_SPACEDIM), hi_bc(AMREX_SPACEDIM);
-    pp.getarr("lo_bc",lo_bc,0,AMREX_SPACEDIM);
-    pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
-    
     bcs_s.resize(NSCAL);
     bcs_u.resize(AMREX_SPACEDIM);
     bcs_S.resize(1);
@@ -115,241 +123,272 @@ Maestro::BCSetup()
         }
     }
 
-    // set up boundary conditions for velocity, scalars, S, gpi, and dSdt
-    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+    // set up boundary conditions for Fillpatch operations
+    for (int dir = 0; dir < AMREX_SPACEDIM; ++dir)
     {
 
         // lo-side bcs
-        if (lo_bc[idim] == Interior) {
+        if (lo_bc[dir] == Interior) {
             // periodic uses "internal Dirichlet"
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setLo(idim, BCType::int_dir);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setLo(dir, BCType::int_dir);
             }
-                bcs_s[Rho ].setLo(idim, BCType::int_dir);  
-                bcs_s[RhoH].setLo(idim, BCType::int_dir);
+                bcs_s[Rho ].setLo(dir, BCType::int_dir);  
+                bcs_s[RhoH].setLo(dir, BCType::int_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setLo(idim, BCType::int_dir);
+                bcs_s[comp].setLo(dir, BCType::int_dir);
             }
-                bcs_s[Temp].setLo(idim, BCType::int_dir);
-                bcs_s[Pi  ].setLo(idim, BCType::int_dir);
-                bcs_S[0   ].setLo(idim, BCType::int_dir);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setLo(idim, BCType::int_dir);
+                bcs_s[Temp].setLo(dir, BCType::int_dir);
+                bcs_s[Pi  ].setLo(dir, BCType::int_dir);
+                bcs_S[0   ].setLo(dir, BCType::int_dir);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setLo(dir, BCType::int_dir);
             }
-                bcs_d[0   ].setLo(idim, BCType::int_dir);
+                bcs_d[0   ].setLo(dir, BCType::int_dir);
         }
-        else if (lo_bc[idim] == Inflow) {
+        else if (lo_bc[dir] == Inflow) {
             // inflow
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setLo(idim, BCType::ext_dir);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setLo(idim, BCType::ext_dir);  
-                bcs_s[RhoH].setLo(idim, BCType::ext_dir);
+                bcs_s[Rho ].setLo(dir, BCType::ext_dir);  
+                bcs_s[RhoH].setLo(dir, BCType::ext_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setLo(idim, BCType::ext_dir);
+                bcs_s[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Temp].setLo(idim, BCType::ext_dir);
-                bcs_s[Pi  ].setLo(idim, BCType::foextrap);
-                bcs_S[0   ].setLo(idim, BCType::foextrap);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setLo(idim, BCType::foextrap);
+                bcs_s[Temp].setLo(dir, BCType::ext_dir);
+                bcs_s[Pi  ].setLo(dir, BCType::foextrap);
+                bcs_S[0   ].setLo(dir, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_d[0   ].setLo(idim, BCType::foextrap);
+                bcs_d[0   ].setLo(dir, BCType::foextrap);
         }
-        else if (lo_bc[idim] == Outflow) {
+        else if (lo_bc[dir] == Outflow) {
             // outflow
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setLo(idim, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_s[Rho ].setLo(idim, BCType::foextrap);  
-                bcs_s[RhoH].setLo(idim, BCType::foextrap);
+                bcs_s[Rho ].setLo(dir, BCType::foextrap);  
+                bcs_s[RhoH].setLo(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setLo(idim, BCType::foextrap);
+                bcs_s[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_s[Temp].setLo(idim, BCType::foextrap);
-                bcs_s[Pi  ].setLo(idim, BCType::ext_dir);
-                bcs_S[0   ].setLo(idim, BCType::foextrap);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setLo(idim, BCType::foextrap);
+                bcs_s[Temp].setLo(dir, BCType::foextrap);
+                bcs_s[Pi  ].setLo(dir, BCType::ext_dir);
+                bcs_S[0   ].setLo(dir, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_d[0   ].setLo(idim, BCType::foextrap);
+                bcs_d[0   ].setLo(dir, BCType::foextrap);
         }
-        else if (lo_bc[idim] == Symmetry) {
+        else if (lo_bc[dir] == Symmetry) {
             // symmetry
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setLo(idim, BCType::reflect_even);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setLo(dir, BCType::reflect_even);
             }
-                bcs_u[idim].setLo(idim, BCType::reflect_odd);
-                bcs_s[Rho ].setLo(idim, BCType::reflect_even);  
-                bcs_s[RhoH].setLo(idim, BCType::reflect_even);
+                bcs_u[dir].setLo(dir, BCType::reflect_odd);
+                bcs_s[Rho ].setLo(dir, BCType::reflect_even);  
+                bcs_s[RhoH].setLo(dir, BCType::reflect_even);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setLo(idim, BCType::reflect_even);
+                bcs_s[comp].setLo(dir, BCType::reflect_even);
             }
-                bcs_s[Temp].setLo(idim, BCType::reflect_even);
-                bcs_s[Pi  ].setLo(idim, BCType::reflect_even);
-                bcs_S[0   ].setLo(idim, BCType::reflect_even);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setLo(idim, BCType::reflect_even);
+                bcs_s[Temp].setLo(dir, BCType::reflect_even);
+                bcs_s[Pi  ].setLo(dir, BCType::reflect_even);
+                bcs_S[0   ].setLo(dir, BCType::reflect_even);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setLo(dir, BCType::reflect_even);
             }
-                bcs_d[0   ].setLo(idim, BCType::reflect_even);
+                bcs_d[0   ].setLo(dir, BCType::reflect_even);
         }
-        else if (lo_bc[idim] == SlipWall) {
+        else if (lo_bc[dir] == SlipWall) {
             // slip wall
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setLo(idim, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_u[idim].setLo(idim, BCType::ext_dir);
-                bcs_s[Rho ].setLo(idim, BCType::foextrap);  
-                bcs_s[RhoH].setLo(idim, BCType::foextrap);
+                bcs_u[dir].setLo(dir, BCType::ext_dir);
+                bcs_s[Rho ].setLo(dir, BCType::foextrap);  
+                bcs_s[RhoH].setLo(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setLo(idim, BCType::foextrap);
+                bcs_s[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_s[Temp].setLo(idim, BCType::foextrap);
-                bcs_s[Pi  ].setLo(idim, BCType::foextrap);
-                bcs_S[0   ].setLo(idim, BCType::foextrap);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setLo(idim, BCType::foextrap);
+                bcs_s[Temp].setLo(dir, BCType::foextrap);
+                bcs_s[Pi  ].setLo(dir, BCType::foextrap);
+                bcs_S[0   ].setLo(dir, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_d[0   ].setLo(idim, BCType::foextrap);
+                bcs_d[0   ].setLo(dir, BCType::foextrap);
         }
-        else if (lo_bc[idim] == NoSlipWall) {
+        else if (lo_bc[dir] == NoSlipWall) {
             // no-slip wall
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setLo(idim, BCType::ext_dir);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setLo(idim, BCType::foextrap);  
-                bcs_s[RhoH].setLo(idim, BCType::foextrap);
+                bcs_s[Rho ].setLo(dir, BCType::foextrap);  
+                bcs_s[RhoH].setLo(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setLo(idim, BCType::foextrap);
+                bcs_s[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_s[Temp].setLo(idim, BCType::foextrap);
-                bcs_s[Pi  ].setLo(idim, BCType::foextrap);
-                bcs_S[0   ].setLo(idim, BCType::foextrap);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setLo(idim, BCType::foextrap);
+                bcs_s[Temp].setLo(dir, BCType::foextrap);
+                bcs_s[Pi  ].setLo(dir, BCType::foextrap);
+                bcs_S[0   ].setLo(dir, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_d[0   ].setLo(idim, BCType::foextrap);
+                bcs_d[0   ].setLo(dir, BCType::foextrap);
         }
         else {
             Abort("Invalid lo_bc");
         }
 
         // hi-side bcs
-        if (hi_bc[idim] == Interior) {
+        if (hi_bc[dir] == Interior) {
             // periodic uses "internal Dirichlet"
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setHi(idim, BCType::int_dir);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setHi(dir, BCType::int_dir);
             }
-                bcs_s[Rho ].setHi(idim, BCType::int_dir);  
-                bcs_s[RhoH].setHi(idim, BCType::int_dir);
+                bcs_s[Rho ].setHi(dir, BCType::int_dir);  
+                bcs_s[RhoH].setHi(dir, BCType::int_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setHi(idim, BCType::int_dir);
+                bcs_s[comp].setHi(dir, BCType::int_dir);
             }
-                bcs_s[Temp].setHi(idim, BCType::int_dir);
-                bcs_s[Pi  ].setHi(idim, BCType::int_dir);
-                bcs_S[0   ].setHi(idim, BCType::int_dir);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setHi(idim, BCType::int_dir);
+                bcs_s[Temp].setHi(dir, BCType::int_dir);
+                bcs_s[Pi  ].setHi(dir, BCType::int_dir);
+                bcs_S[0   ].setHi(dir, BCType::int_dir);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setHi(dir, BCType::int_dir);
             }
-                bcs_d[0   ].setHi(idim, BCType::int_dir);
+                bcs_d[0   ].setHi(dir, BCType::int_dir);
         }
-        else if (hi_bc[idim] == Inflow) {
+        else if (hi_bc[dir] == Inflow) {
             // inflow
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setHi(idim, BCType::ext_dir);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setHi(idim, BCType::ext_dir);  
-                bcs_s[RhoH].setHi(idim, BCType::ext_dir);
+                bcs_s[Rho ].setHi(dir, BCType::ext_dir);  
+                bcs_s[RhoH].setHi(dir, BCType::ext_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setHi(idim, BCType::ext_dir);
+                bcs_s[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Temp].setHi(idim, BCType::ext_dir);
-                bcs_s[Pi  ].setHi(idim, BCType::foextrap);
-                bcs_S[0   ].setHi(idim, BCType::foextrap);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setHi(idim, BCType::foextrap);
+                bcs_s[Temp].setHi(dir, BCType::ext_dir);
+                bcs_s[Pi  ].setHi(dir, BCType::foextrap);
+                bcs_S[0   ].setHi(dir, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_d[0   ].setHi(idim, BCType::foextrap);
+                bcs_d[0   ].setHi(dir, BCType::foextrap);
         }
-        else if (hi_bc[idim] == Outflow) {
+        else if (hi_bc[dir] == Outflow) {
             // outflow
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setHi(idim, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_s[Rho ].setHi(idim, BCType::foextrap);  
-                bcs_s[RhoH].setHi(idim, BCType::foextrap);
+                bcs_s[Rho ].setHi(dir, BCType::foextrap);  
+                bcs_s[RhoH].setHi(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setHi(idim, BCType::foextrap);
+                bcs_s[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_s[Temp].setHi(idim, BCType::foextrap);
-                bcs_s[Pi  ].setHi(idim, BCType::ext_dir);
-                bcs_S[0   ].setHi(idim, BCType::foextrap);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setHi(idim, BCType::foextrap);
+                bcs_s[Temp].setHi(dir, BCType::foextrap);
+                bcs_s[Pi  ].setHi(dir, BCType::ext_dir);
+                bcs_S[0   ].setHi(dir, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_d[0   ].setHi(idim, BCType::foextrap);
+                bcs_d[0   ].setHi(dir, BCType::foextrap);
         }
-        else if (hi_bc[idim] == Symmetry) {
+        else if (hi_bc[dir] == Symmetry) {
             // symmetry
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setHi(idim, BCType::reflect_even);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setHi(dir, BCType::reflect_even);
             }
-                bcs_u[idim].setHi(idim, BCType::reflect_odd);
-                bcs_s[Rho ].setHi(idim, BCType::reflect_even);  
-                bcs_s[RhoH].setHi(idim, BCType::reflect_even);
+                bcs_u[dir].setHi(dir, BCType::reflect_odd);
+                bcs_s[Rho ].setHi(dir, BCType::reflect_even);  
+                bcs_s[RhoH].setHi(dir, BCType::reflect_even);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setHi(idim, BCType::reflect_even);
+                bcs_s[comp].setHi(dir, BCType::reflect_even);
             }
-                bcs_s[Temp].setHi(idim, BCType::reflect_even);
-                bcs_s[Pi  ].setHi(idim, BCType::reflect_even);
-                bcs_S[0   ].setHi(idim, BCType::reflect_even);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setHi(idim, BCType::reflect_even);
+                bcs_s[Temp].setHi(dir, BCType::reflect_even);
+                bcs_s[Pi  ].setHi(dir, BCType::reflect_even);
+                bcs_S[0   ].setHi(dir, BCType::reflect_even);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setHi(dir, BCType::reflect_even);
             }
-                bcs_d[0   ].setHi(idim, BCType::reflect_even);
+                bcs_d[0   ].setHi(dir, BCType::reflect_even);
         }
-        else if (hi_bc[idim] == SlipWall) {
+        else if (hi_bc[dir] == SlipWall) {
             // slip wall
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setHi(idim, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_u[idim].setHi(idim, BCType::ext_dir);
-                bcs_s[Rho ].setHi(idim, BCType::foextrap);  
-                bcs_s[RhoH].setHi(idim, BCType::foextrap);
+                bcs_u[dir].setHi(dir, BCType::ext_dir);
+                bcs_s[Rho ].setHi(dir, BCType::foextrap);  
+                bcs_s[RhoH].setHi(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setHi(idim, BCType::foextrap);
+                bcs_s[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_s[Temp].setHi(idim, BCType::foextrap);
-                bcs_s[Pi  ].setHi(idim, BCType::foextrap);
-                bcs_S[0   ].setHi(idim, BCType::foextrap);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setHi(idim, BCType::foextrap);
+                bcs_s[Temp].setHi(dir, BCType::foextrap);
+                bcs_s[Pi  ].setHi(dir, BCType::foextrap);
+                bcs_S[0   ].setHi(dir, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_d[0   ].setHi(idim, BCType::foextrap);
+                bcs_d[0   ].setHi(dir, BCType::foextrap);
         }
-        else if (hi_bc[idim] == NoSlipWall) {
+        else if (hi_bc[dir] == NoSlipWall) {
             // no-slip wall
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_u[dim ].setHi(idim, BCType::ext_dir);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_u[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setHi(idim, BCType::foextrap);  
-                bcs_s[RhoH].setHi(idim, BCType::foextrap);
+                bcs_s[Rho ].setHi(dir, BCType::foextrap);  
+                bcs_s[RhoH].setHi(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setHi(idim, BCType::foextrap);
+                bcs_s[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_s[Temp].setHi(idim, BCType::foextrap);
-                bcs_s[Pi  ].setHi(idim, BCType::foextrap);
-                bcs_S[0   ].setHi(idim, BCType::foextrap);
-            for (int dim=0; dim<AMREX_SPACEDIM; ++dim) {
-                bcs_g[dim ].setHi(idim, BCType::foextrap);
+                bcs_s[Temp].setHi(dir, BCType::foextrap);
+                bcs_s[Pi  ].setHi(dir, BCType::foextrap);
+                bcs_S[0   ].setHi(dir, BCType::foextrap);
+            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+                bcs_g[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_d[0   ].setHi(idim, BCType::foextrap);
+                bcs_d[0   ].setHi(dir, BCType::foextrap);
         }
         else {
             Abort("Invalid hi_bc");
         }
 
     } // end loop over directions
+
+    // set up boundary conditions for linear solves
+    // order is xlo, xhi, ylo, yhi, zlo, zhi
+    // MGT_BC_INT (Interior)
+    // MGT_BC_DIR (Dirichlet)
+    // MGT_BC_NEU (Neumann)
+    for ( int i = 0; i < BL_SPACEDIM; ++i ) {
+        if ( Geom()[0].isPeriodic(i) ) {
+            mg_bcs_p[i*2 + 0] = MGT_BC_INT;
+            mg_bcs_p[i*2 + 1] = MGT_BC_INT;
+            mg_bcs_h[i*2 + 0] = MGT_BC_INT;
+            mg_bcs_h[i*2 + 1] = MGT_BC_INT;
+        }
+        else {
+            mg_bcs_p[i*2 + 0] = lo_bc[i]==Outflow ? MGT_BC_DIR : MGT_BC_NEU;
+            mg_bcs_p[i*2 + 1] = hi_bc[i]==Outflow ? MGT_BC_DIR : MGT_BC_NEU;
+            mg_bcs_h[i*2 + 0] = lo_bc[i]==Inflow  ? MGT_BC_DIR : MGT_BC_NEU;
+            mg_bcs_h[i*2 + 1] = hi_bc[i]==Inflow  ? MGT_BC_DIR : MGT_BC_NEU;
+        }
+    }
+
+    // lo/hi_inflow is needed for linear solves
+    for (int dir=0; dir<AMREX_SPACEDIM; dir++) {
+        if (lo_bc[dir] == Inflow) {
+            lo_inflow[dir] = 1;
+        }
+        if (hi_bc[dir] == Inflow) {
+            hi_inflow[dir] = 1;
+        }
+    }
+
 }
 
 // During initialization of a simulation, Maestro::InitData() calls 

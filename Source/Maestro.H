@@ -174,7 +174,14 @@ private:
 
     void Make_S_cc (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& S_cc);
 
-    void NodalProj ();
+    void NodalProj (const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& phi,
+                    const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& vel,
+                    const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rhcc,
+                    const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rhnd,
+                    const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& beta0,
+                    int* bc,
+                    const amrex::Real& rel_tol,
+                    const amrex::Real& abs_tol);
 
     ////////////
     // PlotFile routines
@@ -246,6 +253,7 @@ private:
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hext;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > thermal;
 
+    // boundary condition objects needed for FillPatch routines
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary
     // condition types at the lo/hi walls in each direction
@@ -254,6 +262,12 @@ private:
     amrex::Vector<amrex::BCRec> bcs_S;  // for S_cc_old/new
     amrex::Vector<amrex::BCRec> bcs_g;  // for gpi
     amrex::Vector<amrex::BCRec> bcs_d;  // for dSdt
+
+    // boundary conditions objects needed for linear solves
+    int lo_inflow[AMREX_SPACEDIM];
+    int hi_inflow[AMREX_SPACEDIM];
+    int mg_bcs_p[2*AMREX_SPACEDIM];
+    int mg_bcs_h[2*AMREX_SPACEDIM];
 
     // this contains the base state
     // stores as one long vector
@@ -280,6 +294,11 @@ private:
     // runtime parameters - see maestro_params.H
 
 #include <maestro_params.H>
+
+    amrex::Vector<int> lo_bc;
+    amrex::Vector<int> hi_bc;
+
+    amrex::Vector<Real> phierr;
 
     //
     ////////////////

@@ -30,25 +30,6 @@ Maestro::Regrid ()
 void
 Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 {
-    static bool first = true;
-    static Vector<Real> phierr;
-
-    // only do this during the first call to ErrorEst
-    if (first)
-    {
-        first = false;
-        // read in an array of "phierr", which is the tagging threshold
-        // in this example, we tag values of "phi" which are greater than phierr
-        // for that particular level
-        // in subroutine state_error, you could use more elaborate tagging, such
-        // as more advanced logical expressions, or gradients, etc.
-        ParmParse pp("maestro");
-        int n = pp.countval("phierr");
-        if (n > 0) {
-            pp.getarr("phierr", phierr, 0, n);
-        }
-    }
-
     if (lev >= phierr.size()) return;
 
     const int clearval = TagBox::CLEAR;
