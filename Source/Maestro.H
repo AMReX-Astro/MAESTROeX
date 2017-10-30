@@ -174,6 +174,8 @@ private:
 
     void Make_S_cc (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& S_cc);
 
+    void NodalProj ();
+
     ////////////
     // PlotFile routines
 

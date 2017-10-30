@@ -54,7 +54,7 @@ Blocs   += $(foreach dir, $(Bdirs), $(TOP)/$(dir))
 # directories into VPATH_LOCATIONS and INCLUDE_LOCATIONS for us, so we
 # don't need to do it here
 
-Pdirs 	:= Base Boundary AmrCore
+Pdirs 	:= Base Boundary AmrCore LinearSolvers/C_CellMG
 
 Bpack	+= $(foreach dir, $(Pdirs), $(AMREX_HOME)/Src/$(dir)/Make.package)
 
@@ -145,6 +145,8 @@ F90EXE_sources += $(ca_F90EXE_sources)
 INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
 
+include $(AMREX_HOME)/Src/LinearSolvers/C_to_F_MG/Make.package 
+include $(AMREX_HOME)/Src/LinearSolvers/F_MG/FParallelMG.mak
 include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
 
 #------------------------------------------------------------------------------
