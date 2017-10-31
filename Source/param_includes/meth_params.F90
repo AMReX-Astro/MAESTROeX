@@ -22,6 +22,11 @@ module meth_params_module
   ! Begin the declarations of the ParmParse parameters
 
   real(rt), save :: cflfac
+  real(rt), save :: small_temp
+  real(rt), save :: small_dens
+  integer         , save :: use_tfromp
+  integer         , save :: use_eos_e_instead_of_h
+  integer         , save :: use_pprime_in_tfromp
 
   ! End the declarations of the ParmParse parameters
 
@@ -37,9 +42,19 @@ contains
     type (amrex_parmparse) :: pp
 
     cflfac = 0.8d0;
+    small_temp = 5.d6;
+    small_dens = 1.d-5;
+    use_tfromp = 0;
+    use_eos_e_instead_of_h = 0;
+    use_pprime_in_tfromp = 0;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("cflfac", cflfac)
+    call pp%query("small_temp", small_temp)
+    call pp%query("small_dens", small_dens)
+    call pp%query("use_tfromp", use_tfromp)
+    call pp%query("use_eos_e_instead_of_h", use_eos_e_instead_of_h)
+    call pp%query("use_pprime_in_tfromp", use_pprime_in_tfromp)
     call amrex_parmparse_destroy(pp)
 
 

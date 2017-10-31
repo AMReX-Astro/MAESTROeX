@@ -88,30 +88,24 @@ subroutine ca_set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure)
   ! safety checks
   !---------------------------------------------------------------------
 
-  ! if (small_dens <= 0.e0_rt) then
-  !    if (ioproc == 1) then
-  !       call bl_warning("Warning:: small_dens has not been set, defaulting to 1.e-200_rt.")
-  !    endif
-  !    small_dens = 1.e-200_rt
-  ! endif
+  if (small_dens <= 0.d0) then
+      if (ioproc == 1) then
+         call bl_warning("Warning:: small_dens has not been set, defaulting to 1.d-200.")
+      endif
+      small_dens = 1.d-200
+   endif
 
-  ! if (small_temp <= 0.e0_rt) then
-  !    if (ioproc == 1) then
-  !       call bl_warning("Warning:: small_temp has not been set, defaulting to 1.e-200_rt.")
-  !    endif
-  !    small_temp = 1.e-200_rt
-  ! endif
-
-  ! if (small_pres <= 0.e0_rt) then
-  !    small_pres = 1.e-200_rt
-  ! endif
+   if (small_temp <= 0.d0) then
+     if (ioproc == 1) then
+        call bl_warning("Warning:: small_temp has not been set, defaulting to 1.d-200.")
+      endif
+      small_temp = 1.d-200
+   endif
 
   ! Note that the EOS may modify our choices because of its
   ! internal limitations, so the small_dens and small_temp
   ! may be modified coming back out of this routine.
 
-  ! FIXME
-  ! call eos_init(small_dens=small_dens, small_temp=small_temp)
-  call eos_init(small_dens=1.d0, small_temp=1.d0)
+  call eos_init(small_dens, small_temp)
 
 end subroutine ca_set_method_params

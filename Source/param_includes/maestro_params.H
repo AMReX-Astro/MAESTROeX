@@ -10,3 +10,8 @@ static int regrid_int;
 static int plot_int;
 static std::string plot_base_name;
 static int do_reflux;
+static amrex::Real small_temp;
+static amrex::Real small_dens;
+static int use_tfromp;
+static int use_eos_e_instead_of_h;
+static int use_pprime_in_tfromp;
