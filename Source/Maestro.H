@@ -1,23 +1,17 @@
 #ifndef Maestro_H_
 #define Maestro_H_
 
-#include <string>
-#include <limits>
-#include <memory>
-
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
 #include <AMReX_AmrCore.H>
-#include <AMReX_BCRec.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
+#include <AMReX_FMultiGrid.H>
 #include <AMReX_MultiFabUtil.H>
-#include <AMReX_ParallelDescriptor.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_PlotFileUtil.H>
-#include <AMReX_Tuple.H>
 
 #include <MaestroPhysBCFunct.H>
 #include <Maestro_F.H>
@@ -253,6 +247,10 @@ private:
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hext;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > thermal;
 
+    // stores domain boundary conditions
+    amrex::Vector<int> lo_bc;
+    amrex::Vector<int> hi_bc;
+
     // boundary condition objects needed for FillPatch routines
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary
@@ -278,8 +276,16 @@ private:
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
 
+    // during initialization we fill these in by interpolating from
+    // the model file and then copy to the base_state   
+    amrex::Vector<amrex::Real> s0_init;
+    amrex::Vector<amrex::Real> p0_init;
+
     // this contains the base state for velocity
     amrex::Vector<amrex::Real> w0;
+
+    // tagging criteria
+    amrex::Vector<Real> phierr;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "nlevs_max+1"
@@ -294,11 +300,6 @@ private:
     // runtime parameters - see maestro_params.H
 
 #include <maestro_params.H>
-
-    amrex::Vector<int> lo_bc;
-    amrex::Vector<int> hi_bc;
-
-    amrex::Vector<Real> phierr;
 
     //
     ////////////////

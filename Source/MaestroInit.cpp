@@ -1,7 +1,5 @@
 
-
 #include <Maestro.H>
-#include <AMReX_FMultiGrid.H>
 
 using namespace amrex;
 
@@ -10,9 +8,44 @@ void
 Maestro::InitData ()
 {
     const Real time = 0.0;
+
+    // here we need to allocate and fill s0_init and p0_init
+    const Vector<Geometry>& geom = Geom();
+    const Box& domain = geom[max_level].Domain();
+    const int& nr_fine = domain.bigEnd()[AMREX_SPACEDIM-1] + 1;
+
+    s0_init  .resize( (max_level+1)*nr_fine*NSCAL );
+    p0_init  .resize( (max_level+1)*nr_fine );
+    rho0_old .resize( (max_level+1)*nr_fine );
+    rho0_new .resize( (max_level+1)*nr_fine );
+    rhoh0_old.resize( (max_level+1)*nr_fine );
+    rhoh0_new.resize( (max_level+1)*nr_fine );
+    p0_old   .resize( (max_level+1)*nr_fine );
+    p0_new   .resize( (max_level+1)*nr_fine );
+
+    // now we need to fill s0_init and p0_init for all levels
+    // FIXME
+
+
+
+    // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
+    // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(time);
+
+    // synchronize levels
     AverageDown(snew);
     AverageDown(unew);
+
+    // now fill in rho0, rhoh0, and p0
+    // FIXME
+
+
+
+    // free memory in s0_init and p0_init by swapping it
+    // with an empty vector that will go out of scope
+    Vector<Real> s0_swap, p0_swap;
+    std::swap(s0_swap,s0_init);
+    std::swap(p0_swap,p0_init);
 
     if (plot_int > 0) {
         WritePlotFile(0);
@@ -393,8 +426,8 @@ Maestro::BCSetup()
 
 // During initialization of a simulation, Maestro::InitData() calls 
 // AmrCore::InitFromScratch(), which calls 
-// a MakeNewGrids() function that repeatedly calls this function to create
-// finer levels.  This function creates a new fine
+// a MakeNewGrids() function that repeatedly calls this function to build 
+// and initialize finer levels.  This function creates a new fine
 // level that did not exist before by interpolating from the coarser level
 // overrides the pure virtual function in AmrCore
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
@@ -441,4 +474,11 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                  BL_TO_FORTRAN_3D(vel[mfi]), 
                  ZFILL(dx), ZFILL(prob_lo), NSCAL);
     }
+
+    // now we copy data from s0_init and p0_init into s0_new and p0_new
+
+
+
+
+
 }

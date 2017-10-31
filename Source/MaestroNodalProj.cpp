@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <AMReX_FMultiGrid.H>
 
 using namespace amrex;
 
@@ -16,7 +15,6 @@ Maestro::NodalProj (const Vector<std::unique_ptr<MultiFab> >& phi,
                     const Real& abs_tol)
 
 {
-
     const Vector<Geometry>& mg_geom = Geom();
     const Vector<BoxArray>& mg_ba = boxArray();
     const Vector<DistributionMapping>& mg_dm = DistributionMap();
@@ -41,6 +39,4 @@ Maestro::NodalProj (const Vector<std::unique_ptr<MultiFab> >& phi,
                              abs_tol,
                              &lo_inflow[0],
                              &hi_inflow[0]);
-
-
 }
