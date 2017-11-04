@@ -22,12 +22,12 @@ maestro_queries.H  -- does the parmparse query to override the default
                       we #include <maestro_queries.H> at the point in the code
                       where we want to parmparse these parameters
 meth_params.F90    -- contains all variables marked with "need_in_Fortran" in 
-                      _cpp_parameters, and sets a number of other parameters 
-                      specific to the F90 routines
-                      we call "set_maestro_method_params" at the point in the
-                      code where we want to parmparse these parameters into the
-                      fortran module, meth_params_module
-                      we "use meth_params_module" in fortran routines where we need them
+                      _cpp_parameters, and contains a number of other parameters 
+                      specific to the F90 routines.
+                      We call "read_method_params" to parmparse these parameters into the
+                      fortran module, meth_params_module.
+                      We call "set_method_params" to set the fortran-specific parameters.
+                      We "use meth_params_module" in fortran routines where we need them.
 
 During compile time, the make system calls write_probin.py and uses extern_probin.template
 to figure out what runtime parameters are needed based on the microphysics you have 

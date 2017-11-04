@@ -35,14 +35,16 @@ Maestro::Maestro ()
     // read in C++ parameters in maestro_queries.H using ParmParse pp("maestro");
     ReadParameters();
 
-    // read in F90 parameters in meth_params.F90
-    set_maestro_method_params();
+    // read in F90 parameters in meth_params.F90 that are defined
+    // in _cpp_parameters
+    read_method_params();
 
     // define (Rho, RhoH, etc.)
     // calls network_init
     VariableSetup();
 
-    // define additional module variables in meth_params.F90
+    // define additional module variables in meth_params.F90 that are defined
+    // at the top of meth_params.template
     set_method_params(Rho,RhoH,FirstSpec,Temp,Pi);
 
     // set up BCRec definitions for BC types

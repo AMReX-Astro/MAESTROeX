@@ -8,7 +8,7 @@
 !
 ! The Fortran-specific parameters are initialized in set_method_params(),
 ! and the ones that we are mirroring from C++ and obtaining through the
-! ParmParse module are initialized in set_maestro_method_params().
+! ParmParse module are initialized in read_method_params().
 
 module meth_params_module
 
@@ -35,7 +35,7 @@ module meth_params_module
 
 contains
 
-  subroutine set_maestro_method_params() bind(C, name="set_maestro_method_params")
+  subroutine read_method_params() bind(C, name="read_method_params")
 
     use amrex_parmparse_module, only: amrex_parmparse_build, amrex_parmparse_destroy, amrex_parmparse
 
@@ -69,7 +69,7 @@ contains
 
 
 
-  end subroutine set_maestro_method_params
+  end subroutine read_method_params
 
 
   subroutine finalize_meth_params() bind(C, name="finalize_meth_params")

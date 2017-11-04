@@ -8,25 +8,40 @@ extern "C"
 #endif
 
     // these are interfaces to fortran subroutines
+
+    //////////////////////
+    // in meth_params.F90
+
+    // read in shared C++/Fortran parameters from inputs file
+    void read_method_params();
+
+    // deallocate strings
     void finalize_meth_params();
 
-    void set_maestro_method_params();
+    //////////////////////
 
+    //////////////////////
     // in Maestro_nd.f90
+
     void maestro_network_init();
     void get_num_spec(int* nspec);
     void get_spec_names(int* spec_names, int* ispec, int* len);
 
-    // in Make_S_nd.f90
-    void make_S_cc_work(const int* lo, const int* hi, 
-                        Real* S_cc, const int* s_lo, const int* s_hi,
-                        const int& ng, const int& ncomp);
-
+    // set fortran-specific parameters in meth_params.F90
     void set_method_params(const int& Density,
                            const int& Enthalpy,
                            const int& FirstSpec,
                            const int& Temperature,
                            const int& Pressure);
+
+    //////////////////////
+
+    //////////////////////
+    // in Make_S_nd.f90
+    void make_S_cc_work(const int* lo, const int* hi, 
+                        Real* S_cc, const int* s_lo, const int* s_hi,
+                        const int& ng, const int& ncomp);
+    //////////////////////
 
     void initdata(const int& level, const amrex_real& time, 
                   const int* lo, const int* hi,
@@ -41,12 +56,17 @@ extern "C"
                                         BL_FORT_FAB_ARG(zvel)),
                            const amrex_real* dx, const amrex_real* problo);
 
+    //////////////////////
+    // in Regrid_nd.f90
+
     void state_error(int* tag, const int* tag_lo, const int* tag_hi,
                      const BL_FORT_FAB_ARG_3D(state),
                      const int* tagval, const int* clearval,
                      const int* lo, const int* hi,
                      const amrex_real* dx, const amrex_real* problo,
                      const amrex_real* time, const amrex_real* phierr);
+
+    //////////////////////
 
     void advect(const int* lo, const int*hi,
                 const BL_FORT_FAB_ARG_3D(statein),
@@ -59,10 +79,15 @@ extern "C"
                              BL_FORT_FAB_ARG_3D(fz)),
                 const amrex_real* dx, const amrex_real& dt, const int& ncomp);
 
+    //////////////////////
+    // in bc_fill_nd.F90
+
     void phifill (BL_FORT_FAB_ARG_3D(state),
 		  const int* dlo, const int* dhi,
 		  const amrex_real* dx, const amrex_real* glo, 
 		  const amrex_real* time, const int* bc);
+
+    //////////////////////
 
 #ifdef __cplusplus
 }

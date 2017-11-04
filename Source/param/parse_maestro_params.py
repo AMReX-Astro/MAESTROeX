@@ -163,7 +163,7 @@ class Param(object):
         return ostr
 
     def get_f90_default_string(self):
-        # this is the line that goes into set_maestro_method_params()
+        # this is the line that goes into read_method_params()
         # to set the default value of the variable
 
         ostr = ""
