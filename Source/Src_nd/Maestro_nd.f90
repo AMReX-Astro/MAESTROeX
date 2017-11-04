@@ -1,15 +1,15 @@
 
-subroutine ca_network_init() bind(C, name="ca_network_init")
+subroutine maestro_network_init() bind(C, name="maestro_network_init")
 
   use network, only: network_init
 
   call network_init()
 
-end subroutine ca_network_init
+end subroutine maestro_network_init
 
 
-subroutine ca_get_num_spec(nspec_out) &
-     bind(C, name="ca_get_num_spec")
+subroutine get_num_spec(nspec_out) &
+     bind(C, name="get_num_spec")
 
   use network, only: nspec
   use amrex_fort_module, only: rt => amrex_real
@@ -20,11 +20,11 @@ subroutine ca_get_num_spec(nspec_out) &
 
   nspec_out = nspec
 
-end subroutine ca_get_num_spec
+end subroutine get_num_spec
 
 
-subroutine ca_get_spec_names(spec_names,ispec,len) &
-     bind(C, name="ca_get_spec_names")
+subroutine get_spec_names(spec_names,ispec,len) &
+     bind(C, name="get_spec_names")
 
   use network, only: nspec, short_spec_names
   use amrex_fort_module, only: rt => amrex_real
@@ -44,10 +44,10 @@ subroutine ca_get_spec_names(spec_names,ispec,len) &
      spec_names(i) = ichar(short_spec_names(ispec+1)(i:i))
   end do
 
-end subroutine ca_get_spec_names
+end subroutine get_spec_names
 
-subroutine ca_set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure) &
-                                bind(C, name="ca_set_method_params")
+subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure) &
+                                bind(C, name="set_method_params")
 
   use model_parser_module
   use meth_params_module
@@ -108,6 +108,7 @@ subroutine ca_set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure)
 
   call eos_init(small_dens, small_temp)
 
-  call read_model_file(model_file)
+  ! FIXME need to move this?
+  ! call read_model_file(model_file)
 
-end subroutine ca_set_method_params
+end subroutine set_method_params

@@ -36,14 +36,14 @@ Maestro::Maestro ()
     ReadParameters();
 
     // read in F90 parameters in meth_params.F90
-    ca_set_maestro_method_params();
+    set_maestro_method_params();
 
     // define (Rho, RhoH, etc.)
-    // calls ca_network_init
+    // calls network_init
     VariableSetup();
 
     // define additional module variables in meth_params.F90
-    ca_set_method_params(Rho,RhoH,FirstSpec,Temp,Pi);
+    set_method_params(Rho,RhoH,FirstSpec,Temp,Pi);
 
     // set up BCRec definitions for BC types
     BCSetup();

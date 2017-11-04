@@ -139,9 +139,6 @@ Blocs += $(foreach dir, $(EXTERN_CORE), $(dir))
 
 include $(Bpack)
 
-f90EXE_sources += $(ca_f90EXE_sources)
-F90EXE_sources += $(ca_F90EXE_sources)
-
 INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
 

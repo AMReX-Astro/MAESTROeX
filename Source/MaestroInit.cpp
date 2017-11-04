@@ -85,7 +85,7 @@ void Maestro::VariableSetup ()
     RhoH = cnt++;
 
     FirstSpec = cnt;
-    ca_get_num_spec(&NumSpec);
+    get_num_spec(&NumSpec);
     cnt += NumSpec;
 
     Temp = cnt++;
@@ -93,7 +93,7 @@ void Maestro::VariableSetup ()
 
     NSCAL = cnt;
 
-    ca_network_init();
+    maestro_network_init();
 
 }
 

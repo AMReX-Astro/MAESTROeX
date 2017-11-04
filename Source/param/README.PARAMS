@@ -24,7 +24,7 @@ maestro_queries.H  -- does the parmparse query to override the default
 meth_params.F90    -- contains all variables marked with "need_in_Fortran" in 
                       _cpp_parameters, and sets a number of other parameters 
                       specific to the F90 routines
-                      we call "ca_set_maestro_method_params" at the point in the
+                      we call "set_maestro_method_params" at the point in the
                       code where we want to parmparse these parameters into the
                       fortran module, meth_params_module
                       we "use meth_params_module" in fortran routines where we need them

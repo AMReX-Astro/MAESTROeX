@@ -63,7 +63,7 @@ Maestro::PlotFileVarNames () const
         //
         // This call return the actual length of each string in "len"
         //
-        ca_get_spec_names(int_spec_names.dataPtr(),&i,&len);
+        get_spec_names(int_spec_names.dataPtr(),&i,&len);
         char* spec_name = new char[len+1];
         for (int j = 0; j < len; j++)
             spec_name[j] = int_spec_names[j];

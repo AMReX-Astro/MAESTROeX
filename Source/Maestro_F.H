@@ -8,26 +8,25 @@ extern "C"
 #endif
 
     // these are interfaces to fortran subroutines
-    void ca_finalize_meth_params();
+    void finalize_meth_params();
 
-    void ca_set_maestro_method_params();
+    void set_maestro_method_params();
 
     // in Maestro_nd.f90
-    void ca_network_init();
-    void ca_network_finalize();
-    void ca_get_num_spec(int* nspec);
-    void ca_get_spec_names(int* spec_names, int* ispec, int* len);
+    void maestro_network_init();
+    void get_num_spec(int* nspec);
+    void get_spec_names(int* spec_names, int* ispec, int* len);
 
     // in Make_S_nd.f90
     void make_S_cc_work(const int* lo, const int* hi, 
                         Real* S_cc, const int* s_lo, const int* s_hi,
                         const int& ng, const int& ncomp);
 
-    void ca_set_method_params(const int& Density,
-                              const int& Enthalpy,
-                              const int& FirstSpec,
-                              const int& Temperature,
-                              const int& Pressure);
+    void set_method_params(const int& Density,
+                           const int& Enthalpy,
+                           const int& FirstSpec,
+                           const int& Temperature,
+                           const int& Pressure);
 
     void initdata(const int& level, const amrex_real& time, 
                   const int* lo, const int* hi,
