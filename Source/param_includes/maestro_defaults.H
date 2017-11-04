@@ -3,6 +3,9 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
+std::string Maestro::model_file = "model.hse";
+int         Maestro::perturb_model = 0;
+int         Maestro::print_init_hse_diag = 0;
 amrex::Real Maestro::stop_time = -1.0;
 int         Maestro::max_step = 1;
 amrex::Real Maestro::cflfac = 0.8;

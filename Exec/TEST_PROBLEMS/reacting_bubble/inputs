@@ -1,3 +1,6 @@
+
+maestro.model_file = "model.hse.cool.coulomb"
+
 maestro.max_step  = 1000000
 maestro.stop_time = 2.0
 

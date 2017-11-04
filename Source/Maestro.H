@@ -33,10 +33,10 @@ public:
     void ReadParameters ();
 
     // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
-    void VariableSetup();
+    void VariableSetup ();
 
     // set up BCRec definitions for BC types
-    void BCSetup();
+    void BCSetup ();
 
     // initializes multilevel data
     void InitData ();

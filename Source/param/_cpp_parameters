@@ -6,6 +6,18 @@
 
 @namespace: maestro Maestro static
 
+#-----------------------------------------------------------------------------
+# category: problem initialization
+#-----------------------------------------------------------------------------
+
+# input model file
+model_file                  string         "model.hse"        y
+
+# Turn on a perturbation in the initial data.  Problem specific.
+perturb_model               int            0                  y
+
+# print out HSE diagnostics as a function of r for the initial model
+print_init_hse_diag         int            0                  y
 
 #-----------------------------------------------------------------------------
 # category: timestepping

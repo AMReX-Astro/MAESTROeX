@@ -21,6 +21,9 @@ module meth_params_module
 
   ! Begin the declarations of the ParmParse parameters
 
+  character (len=:), allocatable, save :: model_file
+  integer         , save :: perturb_model
+  integer         , save :: print_init_hse_diag
   real(rt), save :: cflfac
   real(rt), save :: small_temp
   real(rt), save :: small_dens
@@ -41,6 +44,10 @@ contains
 
     type (amrex_parmparse) :: pp
 
+    allocate(character(len=1)::model_file)
+    model_file = "model.hse";
+    perturb_model = 0;
+    print_init_hse_diag = 0;
     cflfac = 0.8d0;
     small_temp = 5.d6;
     small_dens = 1.d-5;
@@ -49,6 +56,9 @@ contains
     use_pprime_in_tfromp = 0;
 
     call amrex_parmparse_build(pp, "maestro")
+    call pp%query("model_file", model_file)
+    call pp%query("perturb_model", perturb_model)
+    call pp%query("print_init_hse_diag", print_init_hse_diag)
     call pp%query("cflfac", cflfac)
     call pp%query("small_temp", small_temp)
     call pp%query("small_dens", small_dens)
@@ -65,6 +75,9 @@ contains
   subroutine ca_finalize_meth_params() bind(C, name="ca_finalize_meth_params")
     implicit none
 
+    if (allocated(model_file)) then
+        deallocate(model_file)
+    end if
 
 
     

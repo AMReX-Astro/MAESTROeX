@@ -1,5 +1,4 @@
 
-
 subroutine ca_network_init() bind(C, name="ca_network_init")
 
   use network, only: network_init
@@ -50,6 +49,7 @@ end subroutine ca_get_spec_names
 subroutine ca_set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure) &
                                 bind(C, name="ca_set_method_params")
 
+  use model_parser_module
   use meth_params_module
   use network, only : nspec
   use eos_module, only: eos_init
@@ -107,5 +107,7 @@ subroutine ca_set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure)
   ! may be modified coming back out of this routine.
 
   call eos_init(small_dens, small_temp)
+
+  call read_model_file(model_file)
 
 end subroutine ca_set_method_params

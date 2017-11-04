@@ -3,6 +3,9 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
+pp.query("model_file", model_file);
+pp.query("perturb_model", perturb_model);
+pp.query("print_init_hse_diag", print_init_hse_diag);
 pp.query("stop_time", stop_time);
 pp.query("max_step", max_step);
 pp.query("cflfac", cflfac);

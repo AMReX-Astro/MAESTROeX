@@ -3,6 +3,9 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
+static std::string model_file;
+static int perturb_model;
+static int print_init_hse_diag;
 static amrex::Real stop_time;
 static int max_step;
 static amrex::Real cflfac;
