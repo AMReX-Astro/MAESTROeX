@@ -23,6 +23,9 @@ Maestro::InitData ()
     p0_old   .resize( (max_level+1)*nr_fine );
     p0_new   .resize( (max_level+1)*nr_fine );
 
+    // read in model file
+    maestro_read_model_file();
+
     // now we need to fill s0_init and p0_init for all levels
     // FIXME
 

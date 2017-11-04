@@ -108,7 +108,13 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure) &
 
   call eos_init(small_dens, small_temp)
 
-  ! FIXME need to move this?
-  ! call read_model_file(model_file)
-
 end subroutine set_method_params
+
+subroutine maestro_read_model_file() bind(C, name="maestro_read_model_file")
+
+  use model_parser_module
+  use meth_params_module, only: model_file
+
+  call read_model_file(model_file)
+
+end subroutine maestro_read_model_file

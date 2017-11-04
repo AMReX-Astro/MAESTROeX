@@ -34,6 +34,8 @@ extern "C"
                            const int& Temperature,
                            const int& Pressure);
 
+    void maestro_read_model_file ();
+
     //////////////////////
 
     //////////////////////
