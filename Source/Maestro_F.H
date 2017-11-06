@@ -33,8 +33,7 @@ extern "C"
                            const int& FirstSpec,
                            const int& Temperature,
                            const int& Pressure,
-                           const int& Nscal,
-                           const int& dm,
+                           const int& Nscalars,
                            const amrex::Real* problo,
                            const amrex::Real* probhi);
 

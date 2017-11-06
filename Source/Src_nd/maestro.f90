@@ -44,8 +44,8 @@ subroutine get_spec_names(spec_names,ispec,len) &
 
 end subroutine get_spec_names
 
-subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscal, &
-                             dm,geom_prob_lo,geom_prob_hi) &
+subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscalars, &
+                             geom_prob_lo,geom_prob_hi) &
                              bind(C, name="set_method_params")
 
   use amrex_fort_module, only: amrex_spacedim
@@ -55,8 +55,7 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
 
   implicit none
 
-  integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscal
-  integer, intent(in) :: dm
+  integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscalars
   double precision, intent(in) :: geom_prob_lo(:), geom_prob_hi(:)
   
 
@@ -67,16 +66,13 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   ! conserved state components
   !---------------------------------------------------------------------
 
-  RHO = Density
-  RHOH = Enthalpy
-  RHOX = FirstSpec
-  TEMP = Temperature
-  PRES = Pressure
-  NSTATE = Nscal
+  rho_comp  = Density
+  rhoh_comp = Enthalpy
+  spec_comp = FirstSpec
+  temp_comp = Temperature
+  pi_comp   = Pressure
 
-  VELX = 1
-  VELY = 2
-  VELZ = 3
+  nscal = Nscalars
 
   prob_lo(1:amrex_spacedim) = geom_prob_lo(1:amrex_spacedim)
   prob_hi(1:amrex_spacedim) = geom_prob_hi(1:amrex_spacedim)

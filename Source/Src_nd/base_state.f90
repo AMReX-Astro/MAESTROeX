@@ -29,10 +29,10 @@ contains
   subroutine init_base_state(s0_init,p0_init,nlevs,nr_fine) bind(C, name="init_base_state")
 
     use model_parser_module
-    use meth_params_module, only: NSTATE, model_file
+    use meth_params_module, only: nscal, model_file
 
     integer         , intent(in   ) :: nlevs, nr_fine
-    double precision, intent(in   ) :: s0_init(1:nlevs,0:nr_fine-1,1:NSTATE)
+    double precision, intent(in   ) :: s0_init(1:nlevs,0:nr_fine-1,1:nscal)
     double precision, intent(in   ) :: p0_init(1:nlevs,0:nr_fine-1)
 
     call read_model_file(model_file)
