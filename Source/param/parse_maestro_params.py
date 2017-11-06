@@ -16,7 +16,7 @@ from __future__ import print_function
 #   name: the name of the parameter.  This will be the same name as the
 #     variable in C++ unless a pair is specified as (name, cpp_name)
 #
-#   type: the C++ data type (int, Real, string)
+#   type: the C++ data type (int, Real, bool, string)
 #
 #   default: the default value.  If specified as a pair, (a, b), then
 #     the first value is the normal default and the second is for
@@ -138,6 +138,8 @@ class Param(object):
             tstr = "int         {}::{}".format(self.cpp_class, self.cpp_var_name)
         elif self.dtype == "Real":
             tstr = "amrex::Real {}::{}".format(self.cpp_class, self.cpp_var_name)
+        elif self.dtype == "bool":
+            tstr = "bool        {}::{}".format(self.cpp_class, self.cpp_var_name)
         elif self.dtype == "string":
             tstr = "std::string {}::{}".format(self.cpp_class, self.cpp_var_name)
         else:
@@ -190,6 +192,12 @@ class Param(object):
             else:
                 default += "d0"
 
+        if self.dtype == "bool":
+            if "true" in default:
+                default = default.replace("true", ".true.")
+            elif "false" in default:
+                default = default.replace("false", ".false.")
+
         name = self.f90_name
 
         # for a character, we need to allocate its length.  We allocate
@@ -238,9 +246,11 @@ class Param(object):
             static = "static"
 
         if self.dtype == "int":
-            tstr = "{} int {};\n".format(static, self.cpp_var_name)
+            tstr = "{} int         {};\n".format(static, self.cpp_var_name)
         elif self.dtype == "Real":
             tstr = "{} amrex::Real {};\n".format(static, self.cpp_var_name)
+        elif self.dtype == "bool":
+            tstr = "{} bool        {};\n".format(static, self.cpp_var_name)
         elif self.dtype == "string":
             tstr = "{} std::string {};\n".format(static, self.cpp_var_name)
         else:
@@ -265,11 +275,11 @@ class Param(object):
             return None
 
         if self.f90_dtype == "int":
-            tstr = "integer         , save :: {}\n".format(self.f90_name)
+            tstr = "integer                       , save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "Real":
-            tstr = "real(rt), save :: {}\n".format(self.f90_name)
-        elif self.f90_dtype == "logical":
-            tstr = "logical         , save :: {}\n".format(self.f90_name)
+            tstr = "real(rt)                      , save :: {}\n".format(self.f90_name)
+        elif self.f90_dtype == "bool":
+            tstr = "logical                       , save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "string":
             tstr = "character (len=:), allocatable, save :: {}\n".format(self.f90_name)
         else:

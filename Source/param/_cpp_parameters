@@ -1,3 +1,10 @@
+# This file contains the runtime parameters for all MAESTRO problems.
+# Before compiling, you need to parse this file by calling mk_params.sh, 
+# which calls_maestro_params.py, to create the source code in Source/param/
+
+# Problem-specific runtime parameters should be defined in a _parameters
+# file in the problem directory.
+
 # name   type   default   need in Fortran?   ifdef    fortran name    fortran type
 #
 # note, name can have two values, as (a, b).  a will be the name used
@@ -7,69 +14,636 @@
 @namespace: maestro Maestro static
 
 #-----------------------------------------------------------------------------
+# category: synchronization
+#-----------------------------------------------------------------------------
+
+# do we do the hyperbolic reflux at coarse-fine interfaces?
+do_reflux                           int         1
+
+
+#-----------------------------------------------------------------------------
+# category: general MAESTRO
+#-----------------------------------------------------------------------------
+
+# General verbosity
+verbose                             int         0
+
+# Verbosity of the knapscak processor-to-grid algorithm.
+the_knapsack_verbosity              bool        false
+
+# job name printed in output
+job_name                            string      ""
+
+# Call a parallel\_barrier before each of the simple timers we have coded
+# in advance.f90.  Might cause a very slight overall performance hit.
+barrier_timers                      bool        false            
+
+
+#-----------------------------------------------------------------------------
 # category: problem initialization
 #-----------------------------------------------------------------------------
 
 # input model file
-model_file                  string         "model.hse"        y
+model_file                          string      "model.hse"     y
 
 # Turn on a perturbation in the initial data.  Problem specific.
-perturb_model               int            0                  y
+perturb_model                       bool        false
 
 # print out HSE diagnostics as a function of r for the initial model
-print_init_hse_diag         int            0                  y
+print_init_hse_diag                 bool        false
+
 
 #-----------------------------------------------------------------------------
 # category: timestepping
 #-----------------------------------------------------------------------------
 
 # simulation stop time
-stop_time                    Real         -1.0 
+stop_time                           Real        -1.0 
 
 # Maximum number of steps in the simulation.
-max_step                     int          1
+max_step                            int         1
 
 # CFL factor to use in the computation of the advection timestep constraint
-cflfac                       Real          0.8                y
+cflfac                              Real              0.5
+
+# the multiplicative factor ($\le 1$) to reduce the initial timestep as
+# computed by the various timestep estimators
+init_shrink                         Real               1.0
+
+# the minimum allowed timestep -- we abort if dt drops below this value
+small_dt                            Real               1.e-10
+
+# The maximum scale factor that the time step is allowed to grow by per
+# time step.
+max_dt_growth                       Real               1.1
+
+# This is the maximum dt that is allowed
+max_dt                              Real               1.e33
+
+# Fix the time step.  If -1.0, then use the standard time step.
+fixed_dt                            Real               -1.0
+
+# If $T_{max}^n > T_{max}^{n-1}$
+# set the new dt =
+#   min[dt, dt*{\tt nuclear\_dt\_fac}*( $T_{max}^{n-1}$ / $(T_{max}^n-T_{max}^{n-1})$ ) ]
+# for example, {\tt nuclear\_dt\_fac} = 0.01 means don't let the max temp grow more
+# than approximately 1 percent
+# not checkpoint-compatible yet since it wouldn't be backwards compatible
+nuclear_dt_fac                      Real               -1.0
+
+# Use the soundspeed constraint when computing the first time step.
+use_soundspeed_firstdt              bool            false
+
+# Use the divu constraint when computing the first time step.
+use_divu_firstdt                    bool            false
 
 #-----------------------------------------------------------------------------
 # category: grid
 #-----------------------------------------------------------------------------
 
-# how often to regrid
-regrid_int                   int          -1
+# physical coordinates of lo-x corner of problem domain
+prob_lo_x                           Real               0.0
+
+# physical coordinates of lo-y corner of problem domain
+prob_lo_y                           Real               0.0
+
+# physical coordinates of lo-z corner of problem domain
+prob_lo_z                           Real               0.0
+
+# physical coordinates of hi-x corner of problem domain
+prob_hi_x                           Real               1.0
+
+# physical coordinates of hi-y corner of problem domain
+prob_hi_y                           Real               1.0
+
+# physical coordinates of hi-z corner of problem domain
+prob_hi_z                           Real               1.0
+
+# Fixed grid file.
+test_set                            string          ""
+
+# Set to 1 if you are doing a spherical problem.
+spherical_in                        int            0
+
+# set octant = T if you just want to model an octant of a sphere
+# (note: only takes effect for spherical geometry)
+octant                              bool            false
+
+# Set to 1 if using the 2D simplified (planar) model of an octant.
+do_2d_planar_octant                 int            0
+
+# dimensionality (valid values are 2 or 3)
+dm_in                               int            2
+
+# Total number of levels.  1 = single level.
+max_levs                            int            1
+
+# The largest grid size that will be created using make\_new\_grids.
+max_grid_size                       int            64
+
+# The largest grid size that will be created using make\_new\_grids for the
+# coarsest level.  Defaults to {\tt max\_grid\_size}.
+max_grid_size_1                     int            -1
+
+# The largest grid size that will be created using make\_new\_grids for
+# level 2 (the first refined level).  Defaults to {\tt max\_grid\_size}.
+max_grid_size_2                     int            -1
+
+# The largest grid size that will be created using make\_new\_grids for
+# level 3 (the second refined level) and beyond.  Defaults to {\tt max\_grid\_size}.
+max_grid_size_3                     int            -1
+
+# Change the max grid size on the base level on restart
+change_max_grid_size_1              bool            false
+
+# How often we regrid.
+regrid_int                          int            -1
+
+# the number of buffer zones surrounding a cell tagged for refinement.
+# note that this needs to be >= regrid\_int
+amr_buf_width                       int            -1
+
+# Refinement ratio for multilevel problems
+ref_ratio                           int            2
+
+# Number of cells for the base level in the x-direction
+n_cellx                             int            -1
+
+# Number of cells for the base level in the y-direction
+n_celly                             int            -1
+
+# Number of cells for the base level in the z-direction
+n_cellz                             int            -1
+
+# ratio of radial base state zones to Cartesian full state zones for
+# spherical geometry
+drdxfac                             int            1
+
+# When assigning processors for grids, this determines whether we use
+# the sfc algorithm or knapsack algorithm.  If the total number of grids
+# divided by the number of processors is greater than this number, use sfc.
+the_sfc_threshold                   int            5
+
+the_layout_verbosity                int            0
+
+# This prarmeter has no impact on single-level runs!
+#
+# 0: This uses either knapsack or sfc on each level.  Before boxes are
+#    distributed, MPI ranks are sorted according to the memory usage by
+#    all levels.  This is our traditional approach.
+# 1: This uses sfc on each level.  MPI ranks are sorted according to the
+#    memory usage by lower levels.
+the_ml_layout_strategy              int            0
+
+#  Number of boxassoc layouts we keep in memory to avoid having to
+# recompute the boxassoc, which is computationally expensive.
+the_copy_cache_max                  int            128
+
+# The minimum size on a side for a grid created using make\_new\_grids.
+minwidth                            int            8
+
+# grids must be an int multiple of this number, if possible
+blocking_factor                     int            8
+
+# parameter for cluster algorithm for making new grids in adaptive problems
+min_eff                             Real               0.9
+
+# dump out a file, named grids.out, containing the number of grids a each level.
+# A new line is added each time regrid is called.
+dump_grid_file                      bool            false
+
+# pass $T'$ into the tagging routines as the auxillary multifab instead
+# of the default $\rho H_\mathrm{nuc}$.
+use_tpert_in_tagging                bool            false
+
 
 #-----------------------------------------------------------------------------
 # category: output
 #-----------------------------------------------------------------------------
 
-# number of timesteps between plot files
-plot_int                     int          10
+# plot interval
+plot_int                            int            0
 
-# root name of plot file
-plot_base_name               string       "plt"
+# rather than use a plot interval, plot a file after the solution has
+# advanced past plot\_deltat in time
+plot_deltat                         Real               -1.0
+
+# Number of timesteps between writing a checkpoint file
+chk_int                             int            0
+
+# Turn on storing of enthalpy-based quantities in the plotfile
+# when we are running with {\tt use\_tfromp}
+plot_h_with_use_tfromp              bool            true
+
+# plot species and omegadot in plotfile
+plot_spec                           bool            true
+
+# plot omegadot in plotfile
+plot_omegadot                       bool            true
+
+# plot external heating (Hext) in plotfile
+plot_Hext                           bool            false
+
+# plot nuclear energy generation rate (Hnuc) in plotfile
+plot_Hnuc                           bool            true
+
+# plot $\etarho$ in plotfile
+plot_eta                            bool            false
+
+# plot tracers in plotfile
+plot_trac                           bool            false
+
+# plot w0\_x, w0\_y, w0\_z, divw0, rho0, rhoh0, h0, and p0 in plotfile
+plot_base                           bool            false
+
+# plot pi and grad(pi)
+plot_gpi                             bool            true
+
+# plot soundspeed
+plot_cs                              bool            false
+
+# prefix to use in plotfile file names
+plot_base_name                      string          "plt"
+
+# prefix to use in checkpoint file names
+check_base_name                     string          "chk"
+
+# If lUsingNFiles = true, use this many processors to write checkpoint
+# and plotfiles.  Fortran has the unfortunate feature of each processor
+# only being able to write out 1-2GB each without crashing.
+nOutFiles                           int            64
+
+# If true, use nOutFiles processors to write checkpoint and plotfiles.
+# Fortran has the unfortunate feature of each processor only being able
+# to write out 1-2GB each without crashing.
+lUsingNFiles                        bool            true
+
+# store the state data in single precision
+single_prec_plotfiles               bool            false
+
+# number of timesteps to buffer diagnostic output information before writing
+# (note: not implemented for all problems)
+diag_buf_size                       int            10
+
+# plot the adiabatic excess
+plot_ad_excess                      bool            false
+
+# create a field in the plotfile storing the processor number for each zone
+plot_processors                     bool            false
+
+# plot pi * div(U) -- this is a measure of conservation of energy
+plot_pidivu                         bool            false
+
+
+# names of specific variables to store in the mini plotfile
+mini_plot_var1                      string          ""
+mini_plot_var2                      string          ""
+mini_plot_var3                      string          ""
+mini_plot_var4                      string          ""
+mini_plot_var5                      string          ""
+mini_plot_var6                      string          ""
+mini_plot_var7                      string          ""
+mini_plot_var8                      string          ""
+mini_plot_var9                      string          ""
+
+# mini plot interval
+mini_plot_int                            int            -1
+
+# rather than use a mini plot interval, output a mini plotfile every
+# mini\_plot\_deltat in time
+mini_plot_deltat                         Real               -1.0
+
+# basename for the mini plotfiles
+mini_plot_base_name                      string          "miniplt"
 
 #-----------------------------------------------------------------------------
-# category: synchronization
+# category: algorithm initialization
 #-----------------------------------------------------------------------------
 
-# do we do the hyperbolic reflux at coarse-fine interfaces?
-do_reflux                    int           1
+# Number of initial pressure iterations.
+init_iter                           int            4
+
+# Number of initial divu iterations.
+init_divu_iter                      int            4
+
+# which file to restart from.  -1 means do not restart
+restart                             int            -1
+
+# restart and add a level of refinement
+restart_into_finer                  bool            false
+
+# Do the initial projection.
+do_initial_projection               bool            true
+
+
+#-----------------------------------------------------------------------------
+# category: linear solvers
+#-----------------------------------------------------------------------------
+
+# Verbsoity of the multigrid solver, but not the bottom solver.
+mg_verbose                          int            0
+
+# Verbosity of bottom solver
+cg_verbose                          int            0
+
+# Type of cycle used in the MAC multigrid -- 1 = F-cycle, 2 = W-cycle, 3 = V-cycle
+mg_cycle_type                       int            3
+
+# Type of cycle used in the nodal multigrid -- 1 = F-cycle, 2 = W-cycle, 3 = V-cycle
+hg_cycle_type                       int            3
+
+# valid values are $\ge$ 0
+hg_bottom_solver                    int            -1
+
+# valid values are $\ge$ 0
+mg_bottom_solver                    int            -1
+
+# if mg\_bottom\_solver == 4, then how many mg levels can the bottom solver mgt object have
+max_mg_bottom_nlevels               int            1000
+
+# number of smoothing iterations to do after the multigrid bottom solver
+mg_bottom_nu                        int            10
+
+# number of smoothing iterations to do going down the V-cycle
+mg_nu_1                             int            2
+
+# number of smoothing iterations to do going up the V-cycle
+mg_nu_2                             int            2
+
+# In hgproject, in 2D, use a 9 point Laplacian (true) or 5-point
+# Laplacian (false).  In 3D, use a 27 point Laplacian (true) or
+# 7-point Laplacian (false).
+hg_dense_stencil                    bool            true
+
+# use the hypre library
+use_hypre                           bool            false
+
+
+#-----------------------------------------------------------------------------
+# category: hydrodynamics
+#-----------------------------------------------------------------------------
+
+# Use sponging.
+do_sponge                           bool            false
+
+# Parameter for sponge.  Problem dependent.
+sponge_kappa                        Real               10.e0
+
+# Center of the inner sponge.
+sponge_center_density               Real               3.e6
+
+# The sponge begins at sponge\_center\_density * sponge\_start\_factor.
+sponge_start_factor                 Real               3.333e0
+
+# plot fdamp rather than sponge
+# assumes sponge has the form 1/(1+dt*{\tt sponge\_kappa}*fdamp)
+plot_sponge_fdamp                   bool            false
+
+
+# The density below which we modify the constraint to look like
+# the anelastic constraint, instead of the low Mach constraint.  This
+# prevents velocities from getting out of hand at the edge of the star.
+# Refer to Section \ref{Sec:Anelastic Cutoff}.
+anelastic_cutoff                    Real               3.e6
+
+# The density below which we keep the initial model constant.
+# Refer to Section \ref{Sec:Base Cutoff Density}
+base_cutoff_density                 Real               3.e6
+
+# The multiplicative factor (over base\_cutoff\_density) below which we
+# do zero out the buoyancy term in the momentum equation.
+buoyancy_cutoff_factor              Real               5.0
+
+# factor in front of the volume discrepancy term (0.0 = off)
+dpdt_factor                         Real               0.0
+
+# are we doing 1/r$^2$ gravity for plane-parallel
+do_planar_invsq_grav                bool            false
+
+# the point mass for planar 1/r$^2$ gravity
+planar_invsq_mass                   Real               0.0
+
+# turn on (true) or off (false) basestate evolution
+evolve_base_state                   bool            true
+
+# if true, don't call average to reset the base state at all, even during
+# initialization
+fix_base_state                      bool            false
+
+# force $\rho_0 = (\rho h)_0 = 0$, {\tt evolve\_base\_state = F}
+# and {\tt beta\_type} = 3
+do_smallscale                       bool            false
+
+# After the advective enthalpy update, recompute the enthalpy if we are
+# below the base cutoff density.
+do_eos_h_above_cutoff               bool            true
+
+# predict\_rhoh = 0; @@
+# predict\_rhohprime = 1; @@
+# predict\_h = 2; @@
+# predict\_T\_then\_rhohprime = 3; @@
+# predict\_T\_then\_h = 4; @@
+# predict\_hprime = 5; @@
+# predict\_Tprime\_then\_h = 6.
+enthalpy_pred_type                  int            1
+
+# Which quantities do we predict to the edges for computing the ($\rho X$)
+# edge states?  @@
+# {\tt species\_pred\_type} = 1 means predict $\rho^\prime$
+# and $X$ separately.  @@
+# {\tt species\_pred\_type} = 2 means predict the full ($\rho X$) itself. @@
+# {\tt species\_pred\_type} = 3 means predict $\rho$ and $X$ separately.
+species_pred_type                   int            1
+
+# turns on second order correction to delta gamma1 term
+use_delta_gamma1_term               bool            false
+
+# turn on the etarho term as described in flow chart
+use_etarho                          bool            true
+
+# order of slopes in piecewise linear Godunov algorithm.  Options are 0, 2, or 4.
+slope_order                         int            4
+
+# the gravitational acceleration (cm~s$^{-2}$) for plane-parallel geometry
+grav_const                          Real               -1.5e10
+
+# 0 = no ppm (piecewise linear slopes instead) @@
+# 1 = 1984 ppm @@
+# 2 = Hybrid Sekora/Colella and McCorquodale/Colella 2009/2010 ppm
+ppm_type                            int            1
+
+# 0 = use ppm instead for multi-d integrator @@
+# 1 = bilinear
+bds_type                            int            0
+
+# if 1, then perform parabolic reconstruction on the forces used in
+# the prediction and trace under the parabola to the interfaces the
+# amount that can reach the interface over dt
+ppm_trace_forces                    int            0
+
+
+# what type of coefficient to use inside the velocity divergence constraint. @@
+# {\tt beta\_type} = 1 uses $\beta_0$; @@
+# {\tt beta\_type} = 2 uses $\rho_0$ (anelastic); @@
+# {\tt beta\_type} = 3 uses 1 (small-scale combustion).
+beta_type                           int            1
+
+# how to represent gravity in the $\beta_0$ integration:
+# true = piecewise linear
+# false = piecewise constant
+use_linear_grav_in_beta             bool            false
+
+# rotational frequency used for computing centrifugal term in rotation problems.
+rotational_frequency                Real               0.0
+
+# latitude, in radians, for problems with rotation where the domain is
+# only a subset of a full star.
+co_latitude                         Real               0.0
+
+# radius used for computing centrifugal term in rotation problems
+rotation_radius                     Real               1.0e6
+
+# maximum mach number before the code aborts
+mach_max_abort                      Real               -1.0
+
+# freeze the temperature used in the reaction network to the initial
+# value.  This is useful for developing an initial convective field
+# to carry away the energy, while preventing the reactions from going
+# nonlinear.
+drive_initial_convection            bool            false
+
+# timestep beyond which we set {\tt drive\_initial\_convection} = F
+stop_initial_convection            int              -1
+
+# restart the simulation using a result from a {\tt drive\_initial\_convection} = T run
+# note that this uses the restart variable to specify which file to restart
+# from.  After reading in the velocity information from the restart file, the
+# time and timestep number are zeroed.
+restart_with_vel_field              bool            false
+
+
+# modify the momentum equation to have $(\beta_0/\rho) \nabla (\pi/\beta_0)$
+# instead of just $(1/\rho) \nabla (\pi)$
+use_alt_energy_fix                  bool            true
+
+
+#-----------------------------------------------------------------------------
+# category: thermal diffusion
+#-----------------------------------------------------------------------------
+
+# Use thermal diffusion.
+use_thermal_diffusion               bool            false
+
+# How to compute the explicit thermal diffusion term.  @@
+# 1 = in terms of $T$; @@
+# 2 = in terms of $\rho,p_0,X$.
+temp_diffusion_formulation          int            2
+
+# In the thermal diffusion solver, 1 = Crank-Nicholson; 2 = Backward Euler.
+thermal_diffusion_type              int            1
+
+# apply the conductivity limiting---if T, then we set the thermal coefficients
+# all to 0 for $\rho <$ {\tt buoyancy\_cutoff\_factor} * {\tt base\_cutoff\_density}
+limit_conductivity                  bool            false
+
+
+
+#-----------------------------------------------------------------------------
+# category: burning
+#-----------------------------------------------------------------------------
+
+# turn on (true) or off (false) burning
+do_burning                          bool            true
+
+# Name of the species to be used in burner threshold
+burner_threshold_species            string          ""
+
+# Mass fraction cutoff for burner\_threshold\_species  used in burner threshold
+burner_threshold_cutoff             Real               1.e-10
+
+# break a zone into subzones, call the burner in each subzone and
+# then average the result to the original cell
+do_subgrid_burning                  bool            false
+
+# mass fraction sum tolerance (if they don't sum to 1 within this tolerance,
+# we abort)
+reaction_sum_tol                    Real               1.e-10
 
 #-----------------------------------------------------------------------------
 # category: EOS
 #-----------------------------------------------------------------------------
 
-small_temp                   Real               5.e6         y
+small_temp                          Real               5.e6     y
 
-small_dens                   Real               1.e-5        y
+small_dens                          Real               1.e-5    y
 
 # When updating temperature, use $T=T(\rho,p_0,X) $ rather than
 # $T=T(\rho,h,X)$.
-use_tfromp                   int                0            y
+use_tfromp                          bool            false
 
 # In deriving the temperature from the $h$, first subtract off
 # $p_0/\rho$ to define $e$, and use that as the input to the EOS.
-use_eos_e_instead_of_h       int                0            y
+use_eos_e_instead_of_h              bool            false
 
-use_pprime_in_tfromp         int                0            y
+use_pprime_in_tfromp                 bool            false
+
+
+#-----------------------------------------------------------------------------
+# category: base state mapping
+#-----------------------------------------------------------------------------
+
+# The interpolation for filling a cell-centered multifab from a 1D bin-centered array. @@
+# 1 = piecewise constant; @@
+# 2 = piecewise linear; @@
+# 3 = quadratic
+s0_interp_type                      int            3
+
+# The interpolation for filling a cell-centered multifab from a 1D edge-centered array. @@
+# 1 = piecewise constant; @@
+# 2 = piecewise linear; @@
+# 3 = quadratic
+w0_interp_type                      int            2
+
+# The interpolation for filling an edge based multifab from a 1D bin-centered array. @@
+# 1 = Interpolate s0 to cell centers (with s0\_interp\_type), then average to edges; @@
+# 2 = Interpolate s0 to edges directly using linear interpolation; @@
+# 3 = Interpolate s0 to edges directly using quadratic interpolation.
+s0mac_interp_type                   int            1
+
+# The interpolation for putting w0 on edges.  We only compute the normal component. @@
+# 1 = Interpolate w0 to cell centers (with w0\_interp\_type), then average to edges; @@
+# 2 = Interpolate w0 to edges directly using linear interpolation; @@
+# 3 = Interpolate w0 to edges directly using quadratic interpolation; @@
+# 4 = Interpolate w0 to nodes using linear interpolation, then average to edges.
+w0mac_interp_type                   int            1
+
+
+#-----------------------------------------------------------------------------
+# category: particles
+#-----------------------------------------------------------------------------
+
+# call the particle initialization, advection, etc. routines.
+use_particles                       bool            false
+
+# store the velocity of the particle?
+store_particle_vels                 bool            false
+
+
+#-----------------------------------------------------------------------------
+# category: heating
+#-----------------------------------------------------------------------------
+
+# use analytic heating
+do_heating                          bool            false
+
+
+#-----------------------------------------------------------------------------
+# category: SDC
+#-----------------------------------------------------------------------------
+
+# how many SDC iteractions to take (requires the code be compiled with
+# {\tt SDC := t}
+sdc_iters                           int            1
+
+# recompute MAC velocity at the beginning of each SDC iter
+sdc_couple_mac_velocity             bool            false

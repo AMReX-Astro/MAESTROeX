@@ -22,14 +22,8 @@ module meth_params_module
   ! Begin the declarations of the ParmParse parameters
 
   character (len=:), allocatable, save :: model_file
-  integer         , save :: perturb_model
-  integer         , save :: print_init_hse_diag
-  real(rt), save :: cflfac
-  real(rt), save :: small_temp
-  real(rt), save :: small_dens
-  integer         , save :: use_tfromp
-  integer         , save :: use_eos_e_instead_of_h
-  integer         , save :: use_pprime_in_tfromp
+  real(rt)                      , save :: small_temp
+  real(rt)                      , save :: small_dens
 
   ! End the declarations of the ParmParse parameters
 
@@ -46,25 +40,13 @@ contains
 
     allocate(character(len=1)::model_file)
     model_file = "model.hse";
-    perturb_model = 0;
-    print_init_hse_diag = 0;
-    cflfac = 0.8d0;
     small_temp = 5.d6;
     small_dens = 1.d-5;
-    use_tfromp = 0;
-    use_eos_e_instead_of_h = 0;
-    use_pprime_in_tfromp = 0;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("model_file", model_file)
-    call pp%query("perturb_model", perturb_model)
-    call pp%query("print_init_hse_diag", print_init_hse_diag)
-    call pp%query("cflfac", cflfac)
     call pp%query("small_temp", small_temp)
     call pp%query("small_dens", small_dens)
-    call pp%query("use_tfromp", use_tfromp)
-    call pp%query("use_eos_e_instead_of_h", use_eos_e_instead_of_h)
-    call pp%query("use_pprime_in_tfromp", use_pprime_in_tfromp)
     call amrex_parmparse_destroy(pp)
 
 
