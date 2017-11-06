@@ -10,7 +10,8 @@ subroutine advect(time, lo, hi, &
      &            flxz, fz_lo, fz_hi, &
      &            dx,dt,ncomp) bind(C, name="advect")
   
-  use mempool_module, only : bl_allocate, bl_deallocate
+  use amrex_error_module
+  use mempool_module, only : amrex_allocate, amrex_deallocate
   use compute_flux_module, only : compute_flux_3d
 
   implicit none
@@ -48,24 +49,24 @@ subroutine advect(time, lo, hi, &
   ghi = hi + 1
 
   ! edge states
-  call bl_allocate(phix  ,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
-  call bl_allocate(phix_y,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
-  call bl_allocate(phix_z,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
-  call bl_allocate(phiy  ,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
-  call bl_allocate(phiy_x,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
-  call bl_allocate(phiy_z,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
-  call bl_allocate(phiz  ,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
-  call bl_allocate(phiz_x,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
-  call bl_allocate(phiz_y,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phix  ,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phix_y,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phix_z,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phiy  ,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phiy_x,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phiy_z,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phiz  ,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phiz_x,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
+  call amrex_allocate(phiz_y,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))
   ! slope
-  call bl_allocate(slope,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))  
+  call amrex_allocate(slope,glo(1), ghi(1), glo(2), ghi(2), glo(3), ghi(3))  
   
   ! We like to allocate these **pointers** here and then pass them to a function
   ! to remove their pointerness for performance, because normally pointers could
   ! be aliasing.  We need to use pointers instead of allocatable arrays because
-  ! we like to use AMReX's bl_allocate to allocate memeory instead of the intrinsic
-  ! allocate.  Bl_allocate is much faster than allocate inside OMP.  
-  ! Note that one MUST CALL BL_DEALLOCATE.
+  ! we like to use AMReX's amrex_allocate to allocate memeory instead of the intrinsic
+  ! allocate.  amrex_allocate is much faster than allocate inside OMP.  
+  ! Note that one MUST CALL AMREX_DEALLOCATE.
 
   ! check if CFL condition is violated.
   umax = maxval(abs(vx))
@@ -75,7 +76,7 @@ subroutine advect(time, lo, hi, &
        vmax*dt .ge. dx(2) .or. &
        wmax*dt .ge. dx(3) ) then
      print *, "umax = ", umax, ", vmax = ", vmax, ", wmax = ", wmax, ", dt = ", dt, ", dx = ", dx
-     call bl_error("CFL violation. Use smaller adv.cfl.")
+     call amrex_error("CFL violation. Use smaller adv.cfl.")
   end if
 
   do comp = 1, ncomp
@@ -131,15 +132,15 @@ subroutine advect(time, lo, hi, &
 
   end do
 
-  call bl_deallocate(phix  )
-  call bl_deallocate(phix_y)
-  call bl_deallocate(phix_z)
-  call bl_deallocate(phiy  )
-  call bl_deallocate(phiy_x)
-  call bl_deallocate(phiy_z)
-  call bl_deallocate(phiz  )
-  call bl_deallocate(phiz_x)
-  call bl_deallocate(phiz_y)
-  call bl_deallocate(slope)
+  call amrex_deallocate(phix  )
+  call amrex_deallocate(phix_y)
+  call amrex_deallocate(phix_z)
+  call amrex_deallocate(phiy  )
+  call amrex_deallocate(phiy_x)
+  call amrex_deallocate(phiy_z)
+  call amrex_deallocate(phiz  )
+  call amrex_deallocate(phiz_x)
+  call amrex_deallocate(phiz_y)
+  call amrex_deallocate(slope)
 
 end subroutine advect

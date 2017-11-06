@@ -56,7 +56,7 @@ contains
                     q, qlo, qhi, &
                     dq, dqlo, dqhi)
 
-    use mempool_module, only : bl_allocate, bl_deallocate
+    use mempool_module, only : amrex_allocate, amrex_deallocate
 
     integer, intent(in) :: lo(3), hi(3), qlo(3), qhi(3), dqlo(3), dqhi(3)
     double precision, intent(in ) ::  q( qlo(1): qhi(1), qlo(2): qhi(2), qlo(3): qhi(3))
@@ -65,20 +65,20 @@ contains
     ! Some compiler may not support 'contiguous'.  Remove it in that case.
     double precision, dimension(:,:), pointer, contiguous :: dsgn, dlim, df, dcen
 
-    call bl_allocate(dsgn, lo(1), hi(1), lo(2)-1, hi(2)+1)
-    call bl_allocate(dlim, lo(1), hi(1), lo(2)-1, hi(2)+1)
-    call bl_allocate(df  , lo(1), hi(1), lo(2)-1, hi(2)+1)
-    call bl_allocate(dcen, lo(1), hi(1), lo(2)-1, hi(2)+1)
+    call amrex_allocate(dsgn, lo(1), hi(1), lo(2)-1, hi(2)+1)
+    call amrex_allocate(dlim, lo(1), hi(1), lo(2)-1, hi(2)+1)
+    call amrex_allocate(df  , lo(1), hi(1), lo(2)-1, hi(2)+1)
+    call amrex_allocate(dcen, lo(1), hi(1), lo(2)-1, hi(2)+1)
 
     call slopey_doit(lo, hi, &
                      q, qlo, qhi, &
                      dq, dqlo, dqhi, &
                      dsgn, dlim, df, dcen, (/lo(1),lo(2)-1/), (/hi(1),hi(2)+1/))
 
-    call bl_deallocate(dsgn)
-    call bl_deallocate(dlim)
-    call bl_deallocate(df)
-    call bl_deallocate(dcen)
+    call amrex_deallocate(dsgn)
+    call amrex_deallocate(dlim)
+    call amrex_deallocate(df)
+    call amrex_deallocate(dcen)
 
   end subroutine slopey
 
@@ -134,7 +134,7 @@ contains
                     q, qlo, qhi, &
                     dq, dqlo, dqhi)
 
-    use mempool_module, only : bl_allocate, bl_deallocate
+    use mempool_module, only : amrex_allocate, amrex_deallocate
 
     integer, intent(in) :: lo(3), hi(3), qlo(3), qhi(3), dqlo(3), dqhi(3)
     double precision, intent(in ) ::  q( qlo(1): qhi(1), qlo(2): qhi(2), qlo(3): qhi(3))
@@ -143,10 +143,10 @@ contains
     ! Some compiler may not support 'contiguous'.  Remove it in that case.
     double precision, dimension(:,:,:), pointer, contiguous :: dsgn, dlim, df, dcen
 
-    call bl_allocate(dsgn, lo(1), hi(1), lo(2), hi(2), lo(3)-1, hi(3)+1)
-    call bl_allocate(dlim, lo(1), hi(1), lo(2), hi(2), lo(3)-1, hi(3)+1)
-    call bl_allocate(df  , lo(1), hi(1), lo(2), hi(2), lo(3)-1, hi(3)+1)
-    call bl_allocate(dcen, lo(1), hi(1), lo(2), hi(2), lo(3)-1, hi(3)+1)
+    call amrex_allocate(dsgn, lo(1), hi(1), lo(2), hi(2), lo(3)-1, hi(3)+1)
+    call amrex_allocate(dlim, lo(1), hi(1), lo(2), hi(2), lo(3)-1, hi(3)+1)
+    call amrex_allocate(df  , lo(1), hi(1), lo(2), hi(2), lo(3)-1, hi(3)+1)
+    call amrex_allocate(dcen, lo(1), hi(1), lo(2), hi(2), lo(3)-1, hi(3)+1)
 
     call slopez_doit(lo, hi, &
                      q, qlo, qhi, &
@@ -154,10 +154,10 @@ contains
                      dsgn, dlim, df, dcen, &
                      (/lo(1),lo(2),lo(3)-1/), (/hi(1),hi(2),hi(3)+1/))
 
-    call bl_deallocate(dsgn)
-    call bl_deallocate(dlim)
-    call bl_deallocate(df)
-    call bl_deallocate(dcen)
+    call amrex_deallocate(dsgn)
+    call amrex_deallocate(dlim)
+    call amrex_deallocate(df)
+    call amrex_deallocate(dcen)
 
   end subroutine slopez
 

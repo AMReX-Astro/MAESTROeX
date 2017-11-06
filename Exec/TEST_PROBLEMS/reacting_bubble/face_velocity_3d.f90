@@ -5,7 +5,7 @@ subroutine get_face_velocity(level, time, &
      vz, vz_l1, vz_l2, vz_l3, vz_h1, vz_h2, vz_h3, &
      dx, prob_lo) bind(C, name="get_face_velocity")
 
-  use mempool_module, only : bl_allocate, bl_deallocate
+  use mempool_module, only : amrex_allocate, amrex_deallocate
 
   implicit none
 
@@ -29,7 +29,7 @@ subroutine get_face_velocity(level, time, &
   phi(1) = max(vx_h1  , vy_h1+1)
   phi(2) = max(vx_h2+1, vy_h2  )
   
-  call bl_allocate(psi, plo(1), phi(1), plo(2), phi(2))
+  call amrex_allocate(psi, plo(1), phi(1), plo(2), phi(2))
 
   ! streamfunction psi
   do j = plo(2), phi(2)
@@ -64,6 +64,6 @@ subroutine get_face_velocity(level, time, &
 
   vz = 1.d0
 
-  call bl_deallocate(psi)
+  call amrex_deallocate(psi)
 
 end subroutine get_face_velocity

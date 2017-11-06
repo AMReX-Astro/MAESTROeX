@@ -8,7 +8,8 @@ subroutine advect(lo, hi, &
      &            flxy, fy_lo, fy_hi, &
      &            dx,dt,ncomp) bind(C, name="advect")
   
-  use mempool_module, only : bl_allocate, bl_deallocate
+  use amrex_error_module
+  use mempool_module, only : amrex_allocate, amrex_deallocate
   use compute_flux_module, only : compute_flux_2d
 
   implicit none
@@ -41,19 +42,19 @@ subroutine advect(lo, hi, &
   ghi = hi + 1
 
   ! edge states
-  call bl_allocate(phix_1d, glo(1), ghi(1), glo(2), ghi(2))
-  call bl_allocate(phiy_1d, glo(1), ghi(1), glo(2), ghi(2))
-  call bl_allocate(phix   , glo(1), ghi(1), glo(2), ghi(2))
-  call bl_allocate(phiy   , glo(1), ghi(1), glo(2), ghi(2))
+  call amrex_allocate(phix_1d, glo(1), ghi(1), glo(2), ghi(2))
+  call amrex_allocate(phiy_1d, glo(1), ghi(1), glo(2), ghi(2))
+  call amrex_allocate(phix   , glo(1), ghi(1), glo(2), ghi(2))
+  call amrex_allocate(phiy   , glo(1), ghi(1), glo(2), ghi(2))
   ! slope                                                 
-  call bl_allocate(slope  , glo(1), ghi(1), glo(2), ghi(2))
+  call amrex_allocate(slope  , glo(1), ghi(1), glo(2), ghi(2))
 
   ! We like to allocate these **pointers** here and then pass them to a function
   ! to remove their pointerness for performance, because normally pointers could
   ! be aliasing.  We need to use pointers instead of allocatable arrays because
-  ! we like to use AMReX's bl_allocate to allocate memeory instead of the intrinsic
-  ! allocate.  Bl_allocate is much faster than allocate inside OMP.  
-  ! Note that one MUST CALL BL_DEALLOCATE.
+  ! we like to use AMReX's amrex_allocate to allocate memeory instead of the intrinsic
+  ! allocate.  amrex_allocate is much faster than allocate inside OMP.  
+  ! Note that one MUST CALL AMREX_DEALLOCATE.
 
   ! check if CFL condition is violated.
   umax = maxval(abs(vx))
@@ -61,7 +62,7 @@ subroutine advect(lo, hi, &
   if ( umax*dt .ge. dx(1) .or. &
        vmax*dt .ge. dx(2) ) then
      print *, "umax = ", umax, ", vmax = ", vmax, ", dt = ", dt, ", dx = ", dx
-     call bl_error("CFL violation. Use smaller adv.cfl.")
+     call amrex_error("CFL violation. Use smaller adv.cfl.")
   end if
 
   do comp = 1, ncomp
@@ -98,10 +99,10 @@ subroutine advect(lo, hi, &
 
   end do
 
-  call bl_deallocate(phix_1d)
-  call bl_deallocate(phiy_1d)
-  call bl_deallocate(phix)
-  call bl_deallocate(phiy)
-  call bl_deallocate(slope)
+  call amrex_deallocate(phix_1d)
+  call amrex_deallocate(phiy_1d)
+  call amrex_deallocate(phix)
+  call amrex_deallocate(phiy)
+  call amrex_deallocate(slope)
 
 end subroutine advect

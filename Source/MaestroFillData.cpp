@@ -49,7 +49,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
                           Vector<std::unique_ptr<MultiFab> >& mf_new,
                           int icomp, int ncomp, Vector<BCRec> bcs)
 {
-    BL_ASSERT(lev > 0);
+    AMREX_ASSERT(lev > 0);
 
     Vector<MultiFab*> cmf;
     Vector<Real> ctime;

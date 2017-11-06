@@ -54,7 +54,7 @@ contains
                     q, qlo, qhi, &
                     dq, dqlo, dqhi)
 
-    use mempool_module, only : bl_allocate, bl_deallocate
+    use mempool_module, only : amrex_allocate, amrex_deallocate
 
     integer, intent(in) :: lo(2), hi(2), qlo(2), qhi(2), dqlo(2), dqhi(2)
     double precision, intent(in ) ::  q( qlo(1): qhi(1), qlo(2): qhi(2))
@@ -63,20 +63,20 @@ contains
     ! Some compiler may not support 'contiguous'.  Remove it in that case.
     double precision, dimension(:,:), pointer, contiguous :: dsgn, dlim, df, dcen
 
-    call bl_allocate(dsgn, lo(1), hi(1), lo(2)-1, hi(2)+1)
-    call bl_allocate(dlim, lo(1), hi(1), lo(2)-1, hi(2)+1)
-    call bl_allocate(df  , lo(1), hi(1), lo(2)-1, hi(2)+1)
-    call bl_allocate(dcen, lo(1), hi(1), lo(2)-1, hi(2)+1)
+    call amrex_allocate(dsgn, lo(1), hi(1), lo(2)-1, hi(2)+1)
+    call amrex_allocate(dlim, lo(1), hi(1), lo(2)-1, hi(2)+1)
+    call amrex_allocate(df  , lo(1), hi(1), lo(2)-1, hi(2)+1)
+    call amrex_allocate(dcen, lo(1), hi(1), lo(2)-1, hi(2)+1)
 
     call slopey_doit(lo, hi, &
                      q, qlo, qhi, &
                      dq, dqlo, dqhi, &
                      dsgn, dlim, df, dcen, (/lo(1),lo(2)-1/), (/hi(1),hi(2)+1/))
 
-    call bl_deallocate(dsgn)
-    call bl_deallocate(dlim)
-    call bl_deallocate(df)
-    call bl_deallocate(dcen)
+    call amrex_deallocate(dsgn)
+    call amrex_deallocate(dlim)
+    call amrex_deallocate(df)
+    call amrex_deallocate(dcen)
 
   end subroutine slopey
 
