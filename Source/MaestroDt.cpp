@@ -57,11 +57,11 @@ Maestro::ComputeDtLevel (int lev) const
 #pragma omp parallel reduction(min:dt_est)
 #endif
     {
-        FArrayBox uface[BL_SPACEDIM];
+        FArrayBox uface[AMREX_SPACEDIM];
 
         for (MFIter mfi(S_new, true); mfi.isValid(); ++mfi)
         {
-            for (int i = 0; i < BL_SPACEDIM ; i++) {
+            for (int i = 0; i < AMREX_SPACEDIM ; i++) {
                 const Box& bx = mfi.nodaltilebox(i);
                 uface[i].resize(bx,1);
             }
@@ -72,7 +72,7 @@ Maestro::ComputeDtLevel (int lev) const
                                            BL_TO_FORTRAN(uface[2])),
                               dx, prob_lo);
 
-            for (int i = 0; i < BL_SPACEDIM; ++i) {
+            for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                 Real umax = uface[i].norm(0);
                 if (umax > 1.e-100) {
                     dt_est = std::min(dt_est, dx[i] / umax);

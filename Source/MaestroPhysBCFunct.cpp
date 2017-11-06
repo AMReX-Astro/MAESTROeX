@@ -37,7 +37,7 @@ MaestroPhysBCFunct::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
 
     // create a grown domain box containing valid + periodic cells
     Box gdomain = amrex::convert(domain, mf.boxArray().ixType());
-    for (int i = 0; i < BL_SPACEDIM; ++i) {
+    for (int i = 0; i < AMREX_SPACEDIM; ++i) {
 	if (m_geom.isPeriodic(i)) {
 	    gdomain.grow(i, mf.nGrow());
 	}
@@ -61,8 +61,8 @@ MaestroPhysBCFunct::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
                 const int* fablo = bx.loVect();
                 const int* fabhi = bx.hiVect();
 
-                Real xlo[BL_SPACEDIM];
-                for (int i = 0; i < BL_SPACEDIM; i++) {
+                Real xlo[AMREX_SPACEDIM];
+                for (int i = 0; i < AMREX_SPACEDIM; i++) {
                     xlo[i] = problo[i] + dx[i]*(fablo[i]-dlo[i]);
                 }
 

@@ -45,10 +45,10 @@ extern "C"
     //////////////////////
 
     //////////////////////
-    // in Make_S_nd.f90
-    void make_S_cc_work(const int* lo, const int* hi, 
-                        Real* S_cc, const int* s_lo, const int* s_hi,
-                        const int& ng, const int& ncomp);
+    // in make_S.f90
+    void make_S_cc(const int* lo, const int* hi, 
+                   Real* S_cc, const int* s_lo, const int* s_hi,
+                   const int& ng, const int& ncomp);
     //////////////////////
 
     void initdata(const int& level, const amrex_real& time, 

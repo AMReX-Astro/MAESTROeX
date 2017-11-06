@@ -395,7 +395,7 @@ Maestro::BCSetup()
     // MGT_BC_INT (Interior)
     // MGT_BC_DIR (Dirichlet)
     // MGT_BC_NEU (Neumann)
-    for ( int i = 0; i < BL_SPACEDIM; ++i ) {
+    for ( int i = 0; i < AMREX_SPACEDIM; ++i ) {
         if ( Geom()[0].isPeriodic(i) ) {
             mg_bcs_p[i*2 + 0] = MGT_BC_INT;
             mg_bcs_p[i*2 + 1] = MGT_BC_INT;

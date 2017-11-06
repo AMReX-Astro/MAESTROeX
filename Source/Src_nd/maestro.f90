@@ -48,6 +48,7 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
                              dm,geom_prob_lo,geom_prob_hi) &
                              bind(C, name="set_method_params")
 
+  use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
   use meth_params_module
   use eos_module, only: eos_init
@@ -77,10 +78,8 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   VELY = 2
   VELZ = 3
 
-  dim = dm
-
-  prob_lo(1:dm) = geom_prob_lo(1:dm)
-  prob_hi(1:dm) = geom_prob_hi(1:dm)
+  prob_lo(1:amrex_spacedim) = geom_prob_lo(1:amrex_spacedim)
+  prob_hi(1:amrex_spacedim) = geom_prob_hi(1:amrex_spacedim)
 
   !---------------------------------------------------------------------
   ! other initializations

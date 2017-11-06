@@ -1,6 +1,5 @@
-subroutine make_S_cc_work(lo, hi, &
-                          S_cc, s_lo, s_hi, &
-                          ng, ncomp) bind (C,name="make_S_cc_work")
+subroutine make_S_cc(lo, hi,S_cc, s_lo, s_hi, &
+                     ng, ncomp) bind (C,name="make_S_cc")
 
   use eos_type_module
   use eos_module
@@ -34,4 +33,4 @@ subroutine make_S_cc_work(lo, hi, &
   enddo
   enddo
 
-end subroutine make_S_cc_work
+end subroutine make_S_cc

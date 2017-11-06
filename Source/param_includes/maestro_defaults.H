@@ -32,7 +32,6 @@ std::string Maestro::test_set = "";
 int         Maestro::spherical_in = 0;
 bool        Maestro::octant = false;
 int         Maestro::do_2d_planar_octant = 0;
-int         Maestro::dm_in = 2;
 int         Maestro::max_levs = 1;
 int         Maestro::max_grid_size = 64;
 int         Maestro::max_grid_size_1 = -1;

@@ -148,10 +148,10 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         const Real* dx = geom[lev].CellSize();
         const Real* prob_lo = geom[lev].ProbLo();
 
-        MultiFab fluxes[BL_SPACEDIM];
+        MultiFab fluxes[AMREX_SPACEDIM];
         if (do_reflux)
         {
-            for (int i = 0; i < BL_SPACEDIM; ++i)
+            for (int i = 0; i < AMREX_SPACEDIM; ++i)
             {
                 BoxArray ba = grids[lev];
                 ba.surroundingNodes(i);
@@ -167,7 +167,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 #pragma omp parallel
 #endif
         {
-            FArrayBox flux[BL_SPACEDIM], uface[BL_SPACEDIM];
+            FArrayBox flux[AMREX_SPACEDIM], uface[AMREX_SPACEDIM];
 
             for (MFIter mfi(S_new, true); mfi.isValid(); ++mfi)
             {
@@ -177,7 +177,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
                 FArrayBox& stateout      =   S_new[mfi];
 
                 // Allocate fabs for fluxes and Godunov velocities.
-                for (int i = 0; i < BL_SPACEDIM ; i++) {
+                for (int i = 0; i < AMREX_SPACEDIM ; i++) {
                     const Box& bxtmp = surroundingNodes(bx,i);
                     flux[i].resize(bxtmp,S_new.nComp());
                     uface[i].resize(grow(bxtmp,1),1);
@@ -203,7 +203,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
                        dx, dt, S_new.nComp());
 
                 if (do_reflux) {
-                    for (int i = 0; i < BL_SPACEDIM ; i++) {
+                    for (int i = 0; i < AMREX_SPACEDIM ; i++) {
                         fluxes[i][mfi].copy(flux[i],mfi.nodaltilebox(i));	  
                     }
                 }
@@ -221,14 +221,14 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         if (do_reflux) { 
             if (lev < finest_level)
             {
-                for (int i = 0; i < BL_SPACEDIM; ++i) {
+                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)   
                     flux_reg_s[lev+1]->CrseInit(fluxes[i],i,0,0,fluxes[i].nComp(), -1.0);
                 }	
             }
             if (lev > 0)
             {
-                for (int i = 0; i < BL_SPACEDIM; ++i) {
+                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev) 
                     flux_reg_s[lev]->FineAdd(fluxes[i],i,0,0,fluxes[i].nComp(), 1.0);
                 }

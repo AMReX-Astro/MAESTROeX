@@ -1,6 +1,6 @@
 f90EXE_sources += base_state.f90
-f90EXE_sources += MakeS_nd.f90
-f90EXE_sources += Maestro_nd.f90
-f90EXE_sources += Regrid_nd.f90
+f90EXE_sources += make_S.f90
+f90EXE_sources += maestro.f90
+f90EXE_sources += tagging.f90
 
 F90EXE_sources += bc_fill_nd.F90

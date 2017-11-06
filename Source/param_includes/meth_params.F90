@@ -20,8 +20,6 @@ module meth_params_module
   integer, save :: RHO, RHOH, RHOX, PRES, TEMP, NSTATE
   integer, save :: VELX, VELY, VELZ
 
-  integer :: dim
-
   double precision, allocatable, save, public :: prob_lo(:)
   double precision, allocatable, save, public :: prob_hi(:)
 

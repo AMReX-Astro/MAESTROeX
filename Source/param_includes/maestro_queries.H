@@ -32,7 +32,6 @@ pp.query("test_set", test_set);
 pp.query("spherical_in", spherical_in);
 pp.query("octant", octant);
 pp.query("do_2d_planar_octant", do_2d_planar_octant);
-pp.query("dm_in", dm_in);
 pp.query("max_levs", max_levs);
 pp.query("max_grid_size", max_grid_size);
 pp.query("max_grid_size_1", max_grid_size_1);

@@ -132,9 +132,6 @@ octant                              bool            false       y
 # Set to 1 if using the 2D simplified (planar) model of an octant.
 do_2d_planar_octant                 int            0
 
-# dimensionality (valid values are 2 or 3)
-dm_in                               int            2
-
 # Total number of levels.  1 = single level.
 max_levs                            int            1
 

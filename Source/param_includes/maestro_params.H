@@ -32,7 +32,6 @@ static std::string test_set;
 static int         spherical_in;
 static bool        octant;
 static int         do_2d_planar_octant;
-static int         dm_in;
 static int         max_levs;
 static int         max_grid_size;
 static int         max_grid_size_1;
