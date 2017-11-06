@@ -16,12 +16,24 @@ module meth_params_module
   implicit none
 
   ! variables in the module
+
   integer, save :: RHO, RHOH, RHOX, PRES, TEMP, NSTATE
   integer, save :: VELX, VELY, VELZ
+
+  integer :: dim
+
+  double precision, allocatable, save, public :: prob_lo(:)
+  double precision, allocatable, save, public :: prob_hi(:)
 
   ! Begin the declarations of the ParmParse parameters
 
   character (len=:), allocatable, save :: model_file
+  integer                       , save :: spherical_in
+  logical                       , save :: octant
+  real(rt)                      , save :: anelastic_cutoff
+  real(rt)                      , save :: base_cutoff_density
+  real(rt)                      , save :: rotational_frequency
+  real(rt)                      , save :: co_latitude
   real(rt)                      , save :: small_temp
   real(rt)                      , save :: small_dens
 
@@ -40,11 +52,23 @@ contains
 
     allocate(character(len=1)::model_file)
     model_file = "model.hse";
+    spherical_in = 0;
+    octant = .false.;
+    anelastic_cutoff = 3.d6;
+    base_cutoff_density = 3.d6;
+    rotational_frequency = 0.0d0;
+    co_latitude = 0.0d0;
     small_temp = 5.d6;
     small_dens = 1.d-5;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("model_file", model_file)
+    call pp%query("spherical_in", spherical_in)
+    call pp%query("octant", octant)
+    call pp%query("anelastic_cutoff", anelastic_cutoff)
+    call pp%query("base_cutoff_density", base_cutoff_density)
+    call pp%query("rotational_frequency", rotational_frequency)
+    call pp%query("co_latitude", co_latitude)
     call pp%query("small_temp", small_temp)
     call pp%query("small_dens", small_dens)
     call amrex_parmparse_destroy(pp)

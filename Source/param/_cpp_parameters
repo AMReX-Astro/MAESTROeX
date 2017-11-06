@@ -123,11 +123,11 @@ prob_hi_z                           Real               1.0
 test_set                            string          ""
 
 # Set to 1 if you are doing a spherical problem.
-spherical_in                        int            0
+spherical_in                        int            0    y
 
 # set octant = T if you just want to model an octant of a sphere
 # (note: only takes effect for spherical geometry)
-octant                              bool            false
+octant                              bool            false       y
 
 # Set to 1 if using the 2D simplified (planar) model of an octant.
 do_2d_planar_octant                 int            0
@@ -404,11 +404,11 @@ plot_sponge_fdamp                   bool            false
 # the anelastic constraint, instead of the low Mach constraint.  This
 # prevents velocities from getting out of hand at the edge of the star.
 # Refer to Section \ref{Sec:Anelastic Cutoff}.
-anelastic_cutoff                    Real               3.e6
+anelastic_cutoff                    Real               3.e6     y
 
 # The density below which we keep the initial model constant.
 # Refer to Section \ref{Sec:Base Cutoff Density}
-base_cutoff_density                 Real               3.e6
+base_cutoff_density                 Real               3.e6     y
 
 # The multiplicative factor (over base\_cutoff\_density) below which we
 # do zero out the buoyancy term in the momentum equation.
@@ -494,11 +494,11 @@ beta_type                           int            1
 use_linear_grav_in_beta             bool            false
 
 # rotational frequency used for computing centrifugal term in rotation problems.
-rotational_frequency                Real               0.0
+rotational_frequency                Real               0.0    y
 
 # latitude, in radians, for problems with rotation where the domain is
 # only a subset of a full star.
-co_latitude                         Real               0.0
+co_latitude                         Real               0.0      y
 
 # radius used for computing centrifugal term in rotation problems
 rotation_radius                     Real               1.0e6

@@ -12,7 +12,6 @@ subroutine get_num_spec(nspec_out) &
      bind(C, name="get_num_spec")
 
   use network, only: nspec
-  use amrex_fort_module, only: rt => amrex_real
 
   implicit none
 
@@ -27,7 +26,6 @@ subroutine get_spec_names(spec_names,ispec,len) &
      bind(C, name="get_spec_names")
 
   use network, only: nspec, short_spec_names
-  use amrex_fort_module, only: rt => amrex_real
 
   implicit none
 
@@ -46,8 +44,9 @@ subroutine get_spec_names(spec_names,ispec,len) &
 
 end subroutine get_spec_names
 
-subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscal) &
-                                bind(C, name="set_method_params")
+subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscal, &
+                             dm,geom_prob_lo,geom_prob_hi) &
+                             bind(C, name="set_method_params")
 
   use model_parser_module
   use meth_params_module
@@ -56,6 +55,9 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   implicit none
 
   integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscal
+  integer, intent(in) :: dm
+  double precision, intent(in) :: geom_prob_lo(:), geom_prob_hi(:)
+  
 
   integer :: i
   integer :: ioproc
@@ -74,6 +76,11 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   VELX = 1
   VELY = 2
   VELZ = 3
+
+  dim = dm
+
+  prob_lo(1:dm) = geom_prob_lo(1:dm)
+  prob_hi(1:dm) = geom_prob_hi(1:dm)
 
   !---------------------------------------------------------------------
   ! other initializations

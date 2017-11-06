@@ -33,7 +33,10 @@ extern "C"
                            const int& FirstSpec,
                            const int& Temperature,
                            const int& Pressure,
-                           const int& Nscal);
+                           const int& Nscal,
+                           const int& dm,
+                           const amrex::Real* problo,
+                           const amrex::Real* probhi);
 
     void init_base_state (const amrex::Real* s0_init, 
                           const amrex::Real* p0_init,

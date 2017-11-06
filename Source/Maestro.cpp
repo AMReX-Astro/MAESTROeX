@@ -45,7 +45,8 @@ Maestro::Maestro ()
 
     // define additional module variables in meth_params.F90 that are defined
     // at the top of meth_params.template
-    set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,NSCAL);
+    set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,NSCAL,
+                      AMREX_SPACEDIM,geom[0].ProbLo(),geom[0].ProbHi());
 
     // set up BCRec definitions for BC types
     BCSetup();

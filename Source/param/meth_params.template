@@ -11,8 +11,14 @@ module meth_params_module
   implicit none
 
   ! variables in the module
+
   integer, save :: RHO, RHOH, RHOX, PRES, TEMP, NSTATE
   integer, save :: VELX, VELY, VELZ
+
+  integer :: dim
+
+  double precision, allocatable, save, public :: prob_lo(:)
+  double precision, allocatable, save, public :: prob_hi(:)
 
   ! Begin the declarations of the ParmParse parameters
 

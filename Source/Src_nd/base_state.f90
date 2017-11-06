@@ -10,16 +10,15 @@
 
 module base_state_module
 
-  use bl_types, only: dp_t
   use network, only: nspec
   
   implicit none
 
-  real(dp_t), save :: base_cutoff_density_loc
-  real(dp_t), save :: rho_above_cutoff, rhoh_above_cutoff
-  real(dp_t), save :: spec_above_cutoff(nspec), p_above_cutoff
-  real(dp_t), save :: temp_above_cutoff
-  real(dp_t), save :: trac_above_cutoff(10) ! if ntrac=0 we'd have a problem if we used ntrac
+  double precision, save :: base_cutoff_density_loc
+  double precision, save :: rho_above_cutoff, rhoh_above_cutoff
+  double precision, save :: spec_above_cutoff(nspec), p_above_cutoff
+  double precision, save :: temp_above_cutoff
+  double precision, save :: trac_above_cutoff(10) ! if ntrac=0 we'd have a problem if we used ntrac
 
   private
 
