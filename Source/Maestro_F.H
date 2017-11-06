@@ -32,9 +32,12 @@ extern "C"
                            const int& Enthalpy,
                            const int& FirstSpec,
                            const int& Temperature,
-                           const int& Pressure);
+                           const int& Pressure,
+                           const int& Nscal);
 
-    void maestro_read_model_file ();
+    void init_base_state (const amrex::Real* s0_init, 
+                          const amrex::Real* p0_init,
+                          const int& nlevs, const int& nr_fine);
 
     //////////////////////
 

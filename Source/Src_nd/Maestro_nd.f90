@@ -46,17 +46,16 @@ subroutine get_spec_names(spec_names,ispec,len) &
 
 end subroutine get_spec_names
 
-subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure) &
+subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscal) &
                                 bind(C, name="set_method_params")
 
   use model_parser_module
   use meth_params_module
-  use network, only : nspec
   use eos_module, only: eos_init
 
   implicit none
 
-  integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure
+  integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscal
 
   integer :: i
   integer :: ioproc
@@ -70,7 +69,7 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure) &
   RHOX = FirstSpec
   TEMP = Temperature
   PRES = Pressure
-  NSTATE = nspec + 4
+  NSTATE = Nscal
 
   VELX = 1
   VELY = 2
@@ -110,11 +109,15 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure) &
 
 end subroutine set_method_params
 
-subroutine maestro_read_model_file() bind(C, name="maestro_read_model_file")
+subroutine init_base_state(s0_init,p0_init,nlevs,nr_fine) bind(C, name="init_base_state")
 
   use model_parser_module
-  use meth_params_module, only: model_file
+  use meth_params_module, only: NSTATE, model_file
+
+  integer         , intent(in   ) :: nlevs, nr_fine
+  double precision, intent(in   ) :: s0_init(1:nlevs,0:nr_fine-1,1:NSTATE)
+  double precision, intent(in   ) :: p0_init(1:nlevs,0:nr_fine-1)
 
   call read_model_file(model_file)
 
-end subroutine maestro_read_model_file
+end subroutine init_base_state

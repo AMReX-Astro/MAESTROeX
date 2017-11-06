@@ -23,13 +23,8 @@ Maestro::InitData ()
     p0_old   .resize( (max_level+1)*nr_fine );
     p0_new   .resize( (max_level+1)*nr_fine );
 
-    // read in model file
-    maestro_read_model_file();
-
-    // now we need to fill s0_init and p0_init for all levels
-    // FIXME
-
-
+    // read in model file and fill in s0_init and p0_init for all levels
+    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),max_level+1,nr_fine);
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
@@ -94,7 +89,7 @@ void Maestro::VariableSetup ()
     Temp = cnt++;
     Pi = cnt++;
 
-    NSCAL = cnt;
+    NSCAL = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
 
     maestro_network_init();
 
