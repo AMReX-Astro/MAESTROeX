@@ -257,9 +257,7 @@ private:
     // condition types at the lo/hi walls in each direction
     amrex::Vector<amrex::BCRec> bcs_s;  // for sold/snew
     amrex::Vector<amrex::BCRec> bcs_u;  // for uold/unew
-    amrex::Vector<amrex::BCRec> bcs_S;  // for S_cc_old/new
-    amrex::Vector<amrex::BCRec> bcs_g;  // for gpi
-    amrex::Vector<amrex::BCRec> bcs_d;  // for dSdt
+    amrex::Vector<amrex::BCRec> bcs_f;  // "first-order extrap" used for S_cc, gpi, dSdt
 
     // boundary conditions objects needed for linear solves
     int lo_inflow[AMREX_SPACEDIM];

@@ -119,14 +119,14 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     std::swap(unew_state, unew[lev]);
     std::swap(uold_state, uold[lev]);
 
-    FillPatch(lev, time, *S_cc_new_state, S_cc_old, S_cc_new, 0, 1, bcs_S);
+    FillPatch(lev, time, *S_cc_new_state, S_cc_old, S_cc_new, 0, 1, bcs_f);
     std::swap(S_cc_new_state, S_cc_new[lev]);
     std::swap(S_cc_old_state, S_cc_old[lev]);
 
-    FillPatch(lev, time, *gpi_state, gpi, gpi, 0, AMREX_SPACEDIM, bcs_g);
+    FillPatch(lev, time, *gpi_state, gpi, gpi, 0, AMREX_SPACEDIM, bcs_f);
     std::swap(gpi_state, gpi[lev]);
 
-    FillPatch(lev, time, *dSdt_state, dSdt, dSdt, 0, 1, bcs_d);
+    FillPatch(lev, time, *dSdt_state, dSdt, dSdt, 0, 1, bcs_f);
     std::swap(dSdt_state, dSdt[lev]);
 
     t_new = time;
@@ -170,9 +170,9 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 
     FillCoarsePatch(lev, time,     *snew[lev],     sold,     snew, 0,          NSCAL, bcs_s);
     FillCoarsePatch(lev, time,     *unew[lev],     uold,     unew, 0, AMREX_SPACEDIM, bcs_u);
-    FillCoarsePatch(lev, time, *S_cc_new[lev], S_cc_old, S_cc_new, 0,              1, bcs_S);
-    FillCoarsePatch(lev, time,      *gpi[lev],      gpi,      gpi, 0, AMREX_SPACEDIM, bcs_g);
-    FillCoarsePatch(lev, time,     *dSdt[lev],     dSdt,     dSdt, 0,              1, bcs_d);
+    FillCoarsePatch(lev, time, *S_cc_new[lev], S_cc_old, S_cc_new, 0,              1, bcs_f);
+    FillCoarsePatch(lev, time,      *gpi[lev],      gpi,      gpi, 0, AMREX_SPACEDIM, bcs_f);
+    FillCoarsePatch(lev, time,     *dSdt[lev],     dSdt,     dSdt, 0,              1, bcs_f);
 }
 
 // within a call to AmrCore::regrid, this function deletes all data
