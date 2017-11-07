@@ -56,9 +56,8 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   implicit none
 
   integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscalars
-  double precision, intent(in) :: geom_prob_lo(:), geom_prob_hi(:)
+  double precision, intent(in) :: geom_prob_lo(1:amrex_spacedim), geom_prob_hi(1:amrex_spacedim)
   
-
   integer :: i
   integer :: ioproc
 
@@ -73,6 +72,9 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   pi_comp   = Pressure
 
   nscal = Nscalars
+
+  allocate(prob_lo(amrex_spacedim))
+  allocate(prob_hi(amrex_spacedim))
 
   prob_lo(1:amrex_spacedim) = geom_prob_lo(1:amrex_spacedim)
   prob_hi(1:amrex_spacedim) = geom_prob_hi(1:amrex_spacedim)

@@ -26,7 +26,7 @@ module meth_params_module
   ! Begin the declarations of the ParmParse parameters
 
   character (len=:), allocatable, save :: model_file
-  integer                       , save :: spherical_in
+  integer                       , save :: spherical
   logical                       , save :: octant
   real(rt)                      , save :: anelastic_cutoff
   real(rt)                      , save :: base_cutoff_density
@@ -50,7 +50,7 @@ contains
 
     allocate(character(len=1)::model_file)
     model_file = "model.hse";
-    spherical_in = 0;
+    spherical = 0;
     octant = .false.;
     anelastic_cutoff = 3.d6;
     base_cutoff_density = 3.d6;
@@ -61,7 +61,7 @@ contains
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("model_file", model_file)
-    call pp%query("spherical_in", spherical_in)
+    call pp%query("spherical", spherical)
     call pp%query("octant", octant)
     call pp%query("anelastic_cutoff", anelastic_cutoff)
     call pp%query("base_cutoff_density", base_cutoff_density)

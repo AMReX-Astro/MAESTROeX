@@ -28,17 +28,6 @@ do_reflux                           int         1
 # General verbosity
 verbose                             int         0
 
-# Verbosity of the knapscak processor-to-grid algorithm.
-the_knapsack_verbosity              bool        false
-
-# job name printed in output
-job_name                            string      ""
-
-# Call a parallel\_barrier before each of the simple timers we have coded
-# in advance.f90.  Might cause a very slight overall performance hit.
-barrier_timers                      bool        false            
-
-
 #-----------------------------------------------------------------------------
 # category: problem initialization
 #-----------------------------------------------------------------------------
@@ -64,7 +53,7 @@ stop_time                           Real        -1.0
 max_step                            int         1
 
 # CFL factor to use in the computation of the advection timestep constraint
-cflfac                              Real              0.5
+cfl                                 Real              0.5
 
 # the multiplicative factor ($\le 1$) to reduce the initial timestep as
 # computed by the various timestep estimators
@@ -101,29 +90,8 @@ use_divu_firstdt                    bool            false
 # category: grid
 #-----------------------------------------------------------------------------
 
-# physical coordinates of lo-x corner of problem domain
-prob_lo_x                           Real               0.0
-
-# physical coordinates of lo-y corner of problem domain
-prob_lo_y                           Real               0.0
-
-# physical coordinates of lo-z corner of problem domain
-prob_lo_z                           Real               0.0
-
-# physical coordinates of hi-x corner of problem domain
-prob_hi_x                           Real               1.0
-
-# physical coordinates of hi-y corner of problem domain
-prob_hi_y                           Real               1.0
-
-# physical coordinates of hi-z corner of problem domain
-prob_hi_z                           Real               1.0
-
-# Fixed grid file.
-test_set                            string          ""
-
 # Set to 1 if you are doing a spherical problem.
-spherical_in                        int            0    y
+spherical                           int            0    y
 
 # set octant = T if you just want to model an octant of a sphere
 # (note: only takes effect for spherical geometry)
@@ -132,27 +100,6 @@ octant                              bool            false       y
 # Set to 1 if using the 2D simplified (planar) model of an octant.
 do_2d_planar_octant                 int            0
 
-# Total number of levels.  1 = single level.
-max_levs                            int            1
-
-# The largest grid size that will be created using make\_new\_grids.
-max_grid_size                       int            64
-
-# The largest grid size that will be created using make\_new\_grids for the
-# coarsest level.  Defaults to {\tt max\_grid\_size}.
-max_grid_size_1                     int            -1
-
-# The largest grid size that will be created using make\_new\_grids for
-# level 2 (the first refined level).  Defaults to {\tt max\_grid\_size}.
-max_grid_size_2                     int            -1
-
-# The largest grid size that will be created using make\_new\_grids for
-# level 3 (the second refined level) and beyond.  Defaults to {\tt max\_grid\_size}.
-max_grid_size_3                     int            -1
-
-# Change the max grid size on the base level on restart
-change_max_grid_size_1              bool            false
-
 # How often we regrid.
 regrid_int                          int            -1
 
@@ -160,54 +107,15 @@ regrid_int                          int            -1
 # note that this needs to be >= regrid\_int
 amr_buf_width                       int            -1
 
-# Refinement ratio for multilevel problems
-ref_ratio                           int            2
-
-# Number of cells for the base level in the x-direction
-n_cellx                             int            -1
-
-# Number of cells for the base level in the y-direction
-n_celly                             int            -1
-
-# Number of cells for the base level in the z-direction
-n_cellz                             int            -1
-
 # ratio of radial base state zones to Cartesian full state zones for
 # spherical geometry
 drdxfac                             int            1
 
-# When assigning processors for grids, this determines whether we use
-# the sfc algorithm or knapsack algorithm.  If the total number of grids
-# divided by the number of processors is greater than this number, use sfc.
-the_sfc_threshold                   int            5
-
-the_layout_verbosity                int            0
-
-# This prarmeter has no impact on single-level runs!
-#
-# 0: This uses either knapsack or sfc on each level.  Before boxes are
-#    distributed, MPI ranks are sorted according to the memory usage by
-#    all levels.  This is our traditional approach.
-# 1: This uses sfc on each level.  MPI ranks are sorted according to the
-#    memory usage by lower levels.
-the_ml_layout_strategy              int            0
-
-#  Number of boxassoc layouts we keep in memory to avoid having to
-# recompute the boxassoc, which is computationally expensive.
-the_copy_cache_max                  int            128
-
 # The minimum size on a side for a grid created using make\_new\_grids.
 minwidth                            int            8
 
-# grids must be an int multiple of this number, if possible
-blocking_factor                     int            8
-
 # parameter for cluster algorithm for making new grids in adaptive problems
 min_eff                             Real               0.9
-
-# dump out a file, named grids.out, containing the number of grids a each level.
-# A new line is added each time regrid is called.
-dump_grid_file                      bool            false
 
 # pass $T'$ into the tagging routines as the auxillary multifab instead
 # of the default $\rho H_\mathrm{nuc}$.
@@ -265,23 +173,6 @@ plot_base_name                      string          "plt"
 # prefix to use in checkpoint file names
 check_base_name                     string          "chk"
 
-# If lUsingNFiles = true, use this many processors to write checkpoint
-# and plotfiles.  Fortran has the unfortunate feature of each processor
-# only being able to write out 1-2GB each without crashing.
-nOutFiles                           int            64
-
-# If true, use nOutFiles processors to write checkpoint and plotfiles.
-# Fortran has the unfortunate feature of each processor only being able
-# to write out 1-2GB each without crashing.
-lUsingNFiles                        bool            true
-
-# store the state data in single precision
-single_prec_plotfiles               bool            false
-
-# number of timesteps to buffer diagnostic output information before writing
-# (note: not implemented for all problems)
-diag_buf_size                       int            10
-
 # plot the adiabatic excess
 plot_ad_excess                      bool            false
 
@@ -290,28 +181,6 @@ plot_processors                     bool            false
 
 # plot pi * div(U) -- this is a measure of conservation of energy
 plot_pidivu                         bool            false
-
-
-# names of specific variables to store in the mini plotfile
-mini_plot_var1                      string          ""
-mini_plot_var2                      string          ""
-mini_plot_var3                      string          ""
-mini_plot_var4                      string          ""
-mini_plot_var5                      string          ""
-mini_plot_var6                      string          ""
-mini_plot_var7                      string          ""
-mini_plot_var8                      string          ""
-mini_plot_var9                      string          ""
-
-# mini plot interval
-mini_plot_int                            int            -1
-
-# rather than use a mini plot interval, output a mini plotfile every
-# mini\_plot\_deltat in time
-mini_plot_deltat                         Real               -1.0
-
-# basename for the mini plotfiles
-mini_plot_base_name                      string          "miniplt"
 
 #-----------------------------------------------------------------------------
 # category: algorithm initialization
@@ -371,9 +240,6 @@ mg_nu_2                             int            2
 # Laplacian (false).  In 3D, use a 27 point Laplacian (true) or
 # 7-point Laplacian (false).
 hg_dense_stencil                    bool            true
-
-# use the hypre library
-use_hypre                           bool            false
 
 
 #-----------------------------------------------------------------------------
