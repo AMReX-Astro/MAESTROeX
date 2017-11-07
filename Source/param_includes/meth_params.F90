@@ -30,6 +30,7 @@ module meth_params_module
   logical                       , save :: octant
   real(rt)                      , save :: anelastic_cutoff
   real(rt)                      , save :: base_cutoff_density
+  real(rt)                      , save :: burning_cutoff_density
   real(rt)                      , save :: rotational_frequency
   real(rt)                      , save :: co_latitude
   real(rt)                      , save :: small_temp
@@ -54,6 +55,7 @@ contains
     octant = .false.;
     anelastic_cutoff = 3.d6;
     base_cutoff_density = 3.d6;
+    burning_cutoff_density = 3.d6;
     rotational_frequency = 0.0d0;
     co_latitude = 0.0d0;
     small_temp = 5.d6;
@@ -65,6 +67,7 @@ contains
     call pp%query("octant", octant)
     call pp%query("anelastic_cutoff", anelastic_cutoff)
     call pp%query("base_cutoff_density", base_cutoff_density)
+    call pp%query("burning_cutoff_density", burning_cutoff_density)
     call pp%query("rotational_frequency", rotational_frequency)
     call pp%query("co_latitude", co_latitude)
     call pp%query("small_temp", small_temp)

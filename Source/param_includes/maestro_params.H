@@ -69,6 +69,7 @@ static amrex::Real sponge_start_factor;
 static bool        plot_sponge_fdamp;
 static amrex::Real anelastic_cutoff;
 static amrex::Real base_cutoff_density;
+static amrex::Real burning_cutoff_density;
 static amrex::Real buoyancy_cutoff_factor;
 static amrex::Real dpdt_factor;
 static bool        do_planar_invsq_grav;

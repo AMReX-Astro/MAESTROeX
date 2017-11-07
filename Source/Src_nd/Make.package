@@ -1,4 +1,5 @@
 f90EXE_sources += base_state.f90
+f90EXE_sources += base_state_geometry.f90
 f90EXE_sources += make_S.f90
 f90EXE_sources += maestro.f90
 f90EXE_sources += tagging.f90
