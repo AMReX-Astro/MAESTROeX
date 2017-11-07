@@ -21,7 +21,7 @@ extern "C"
     //////////////////////
 
     //////////////////////
-    // in Maestro_nd.f90
+    // in maestro.f90
 
     void maestro_network_init();
     void get_num_spec(int* nspec);
@@ -39,9 +39,23 @@ extern "C"
 
     void init_base_state (const amrex::Real* s0_init, 
                           const amrex::Real* p0_init,
-                          const int& nlevs, const int& nr_fine);
+                          const int& nlevs, const int& domhi_fine);
 
     //////////////////////
+
+
+    //////////////////////
+    // in maestro.f90
+
+    void init_base_state_geometry(const int& nlevs,
+                                  const amrex::Real* dx_fine,
+                                  const int* ncell_fine);
+
+
+    void destroy_base_state_geometry();
+
+    //////////////////////
+
 
     //////////////////////
     // in make_S.f90
@@ -64,7 +78,7 @@ extern "C"
                            const amrex::Real* dx, const amrex::Real* problo);
 
     //////////////////////
-    // in Regrid_nd.f90
+    // in tagging.f90
 
     void state_error(int* tag, const int* tag_lo, const int* tag_hi,
                      const BL_FORT_FAB_ARG_3D(state),

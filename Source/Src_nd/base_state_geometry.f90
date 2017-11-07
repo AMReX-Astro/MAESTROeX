@@ -41,10 +41,12 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine init_base_state_geometry(nlevs,dx_fine)
+  subroutine init_base_state_geometry(nlevs,dx_fine,domhi_fine) &
+       bind(C, name="init_base_state_geometry")
 
     integer          , intent(in   ) :: nlevs
-    double precision , intent(in   ) :: dx_fine(1:amrex_spacedim)
+    double precision , intent(in   ) ::    dx_fine(1:amrex_spacedim)
+    integer          , intent(in   ) :: domhi_fine(1:amrex_spacedim)
 
     ! local
     integer :: n,i
@@ -76,7 +78,8 @@ contains
        allocate(r_edge_loc(nlevs,0:nr_fine))
        
        ! compute nr_fine and dr_fine
-       ! FIXME
+       dr_fine = dx_fine(amrex_spacedim)
+       nr_fine = domhi_fine(amrex_spacedim) + 1
 
        ! compute nr(:) and dr(:) assuming refinement ratio = 2
        nr(nlevs) = nr_fine
@@ -108,6 +111,7 @@ contains
        
        ! compute nr_fine and dr_fine
        ! FIXME
+       call amrex_error("base_state_geometry.f90: FIXME")
        
        ! compute nr(:) and dr(:)
        nr(1) = nr_fine
@@ -294,7 +298,7 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine destroy_base_state_geometry()
+  subroutine destroy_base_state_geometry() bind(C, name="destroy_base_state_geometry")
 
     if(radial_initialized) then
       deallocate(dr, nr, r_cc_loc, r_edge_loc)

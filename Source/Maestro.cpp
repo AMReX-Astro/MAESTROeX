@@ -48,6 +48,12 @@ Maestro::Maestro ()
     set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,NSCAL,
                       geom[0].ProbLo(),geom[0].ProbHi());
 
+    // 
+    Box fineBox = geom[max_level].Domain();
+    init_base_state_geometry(max_level+1, 
+                             geom[max_level].CellSize(),
+                             fineBox.hiVect());
+
     // set up BCRec definitions for BC types
     BCSetup();
 
@@ -84,5 +90,5 @@ Maestro::Maestro ()
 
 Maestro::~Maestro ()
 {
-
+    destroy_base_state_geometry();
 }
