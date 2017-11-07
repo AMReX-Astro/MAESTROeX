@@ -46,22 +46,22 @@ extern "C"
     //////////////////////
     // in make_S.f90
     void make_S_cc(const int* lo, const int* hi, 
-                   Real* S_cc, const int* s_lo, const int* s_hi,
+                   amrex::Real* S_cc, const int* s_lo, const int* s_hi,
                    const int& ng, const int& ncomp);
     //////////////////////
 
-    void initdata(const int& level, const amrex_real& time, 
+    void initdata(const int& level, const amrex::Real& time, 
                   const int* lo, const int* hi,
                   BL_FORT_FAB_ARG_3D(scal),
                   BL_FORT_FAB_ARG_3D(vel),
-                  const amrex_real* dx, const amrex_real* problo,
+                  const amrex::Real* dx, const amrex::Real* problo,
                   const int& nvar);
 
-    void get_face_velocity(const int& level, const amrex_real& time, 
+    void get_face_velocity(const int& level, const amrex::Real& time, 
                            AMREX_D_DECL(BL_FORT_FAB_ARG(xvel),
                                         BL_FORT_FAB_ARG(yvel),
                                         BL_FORT_FAB_ARG(zvel)),
-                           const amrex_real* dx, const amrex_real* problo);
+                           const amrex::Real* dx, const amrex::Real* problo);
 
     //////////////////////
     // in Regrid_nd.f90
@@ -70,8 +70,8 @@ extern "C"
                      const BL_FORT_FAB_ARG_3D(state),
                      const int* tagval, const int* clearval,
                      const int* lo, const int* hi,
-                     const amrex_real* dx, const amrex_real* problo,
-                     const amrex_real* time, const amrex_real* phierr);
+                     const amrex::Real* dx, const amrex::Real* problo,
+                     const amrex::Real* time, const amrex::Real* phierr);
 
     //////////////////////
 
@@ -84,15 +84,15 @@ extern "C"
                 AMREX_D_DECL(BL_FORT_FAB_ARG_3D(fx),
                              BL_FORT_FAB_ARG_3D(fy),
                              BL_FORT_FAB_ARG_3D(fz)),
-                const amrex_real* dx, const amrex_real& dt, const int& ncomp);
+                const amrex::Real* dx, const amrex::Real& dt, const int& ncomp);
 
     //////////////////////
     // in bc_fill_nd.F90
 
     void phifill (BL_FORT_FAB_ARG_3D(state),
 		  const int* dlo, const int* dhi,
-		  const amrex_real* dx, const amrex_real* glo, 
-		  const amrex_real* time, const int* bc);
+		  const amrex::Real* dx, const amrex::Real* glo, 
+		  const amrex::Real* time, const int* bc);
 
     //////////////////////
 
