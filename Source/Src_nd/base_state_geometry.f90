@@ -4,14 +4,14 @@
 ! zone (r_edge_loc) and the zone center (r_cc_loc).  As always, it is assumed that 
 ! the base state arrays begin with index 0, not 1.
 
-module base_state_geometry
+module base_state_geometry_module
 
   use bl_types
   use amrex_error_module
+  use amrex_constants_module
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: prob_lo, prob_hi, spherical, octant, &
-                                rotational_frequency, co_latitude
-  use amrex_constants_module
+                                anelastic_cutoff, base_cutoff_density, burning_cutoff_density
 
   implicit none
 
@@ -34,35 +34,23 @@ module base_state_geometry
   logical   , save :: cutoff_initialized = .false.
   logical   , save :: multilevel_initialized = .false.
 
-  ! for rotation
-  real(dp_t), save :: sin_theta, cos_theta, omega
-
-  private
-
-  public :: nlevs_radial, center, nr_fine, nr_irreg, dr_fine
-  public :: dr, r_cc_loc, r_edge_loc, nr
-  public :: numdisjointchunks, r_start_coord, r_end_coord
-
-  public :: anelastic_cutoff_coord
-  public :: base_cutoff_density_coord
-  public :: burning_cutoff_density_coord
-
-  public :: sin_theta, cos_theta, omega
-
-  ! subroutines
-  public :: init_center, init_radial, init_cutoff, &
-            compute_cutoff_coords, init_rotation, destroy_geometry
+  public :: init_base_state_geometry, compute_cutoff_coords, destroy_base_state_geometry
 
 contains
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine init_center()
+  subroutine init_base_state_geometry(nlevs,dx_fine)
 
-    if (.not. octant) then
-       center(1:amrex_spacedim) = HALF * (prob_lo(1:amrex_spacedim) + prob_hi(1:amrex_spacedim))
-    else
+    integer          , intent(in   ) :: nlevs
+    double precision , intent(in   ) :: dx_fine(1:amrex_spacedim)
+
+    ! local
+    integer :: n,i
+
+    ! compute center(:)
+    if (octant) then
        if (.not. (spherical == 1 .and. amrex_spacedim == 3 .and. &
                   prob_lo(1) == ZERO .and. &
                   prob_lo(2) == ZERO .and. &
@@ -70,38 +58,36 @@ contains
           call amrex_error("ERROR: octant requires spherical with prob_lo = 0.0")
        endif
        center(1:amrex_spacedim) = ZERO
+    else
+       center(1:amrex_spacedim) = HALF * (prob_lo(1:amrex_spacedim) + prob_hi(1:amrex_spacedim))
     endif
 
-  end subroutine init_center
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  subroutine init_radial(num_levs)
 
     ! computes dr, nr, r_cc_loc, r_edge_loc
 
-    integer          , intent(in   ) :: num_levs
-
-    ! local
-    integer :: n,i
-
     if (spherical .eq. 0) then
-       
-       allocate(dr(num_levs))
-       allocate(nr(num_levs))
 
-       allocate(  r_cc_loc(num_levs,0:nr_fine-1))
-       allocate(r_edge_loc(num_levs,0:nr_fine))
+       ! cartesian case
+
+       ! allocate space for dr, nr, r_cc_loc, r_edge_loc
+       allocate(dr(nlevs))
+       allocate(nr(nlevs))
+       allocate(  r_cc_loc(nlevs,0:nr_fine-1))
+       allocate(r_edge_loc(nlevs,0:nr_fine))
        
-       nr(num_levs) = nr_fine
-       dr(num_levs) = dr_fine
-       ! assuming refinement ratio of 2
-       do n=num_levs-1,1,-1
+       ! compute nr_fine and dr_fine
+       ! FIXME
+
+       ! compute nr(:) and dr(:) assuming refinement ratio = 2
+       nr(nlevs) = nr_fine
+       dr(nlevs) = dr_fine
+       do n=nlevs-1,1,-1
           nr(n) = nr(n+1)/2
           dr(n) = dr(n+1)*2.d0
        enddo
        
-       do n=1,num_levs
+       ! compute r_cc_loc, r_edge_loc
+       do n=1,nlevs
           do i = 0,nr(n)-1
              r_cc_loc(n,i) = prob_lo(amrex_spacedim) + (dble(i)+HALF)*dr(n)
           end do
@@ -112,12 +98,18 @@ contains
 
     else
 
+       ! spherical case
+
+       ! allocate space for dr, nr, r_cc_loc, r_edge_loc
        allocate(dr(1))
        allocate(nr(1))
-
        allocate(  r_cc_loc(1,0:nr_fine-1))
        allocate(r_edge_loc(1,0:nr_fine))
        
+       ! compute nr_fine and dr_fine
+       ! FIXME
+       
+       ! compute nr(:) and dr(:)
        nr(1) = nr_fine
        dr(1) = dr_fine
 
@@ -133,20 +125,10 @@ contains
 
     radial_initialized = .true.
 
-  end subroutine init_radial
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  subroutine init_cutoff(num_levs)
-
-    ! allocates the cutoff coordinate arrays
-
-    integer, intent(in)    :: num_levs
-
     if (spherical .eq. 0) then
-       allocate(      anelastic_cutoff_coord(num_levs))
-       allocate(   base_cutoff_density_coord(num_levs))
-       allocate(burning_cutoff_density_coord(num_levs))
+       allocate(      anelastic_cutoff_coord(nlevs))
+       allocate(   base_cutoff_density_coord(nlevs))
+       allocate(burning_cutoff_density_coord(nlevs))
     else
        allocate(      anelastic_cutoff_coord(1))
        allocate(   base_cutoff_density_coord(1))
@@ -155,13 +137,11 @@ contains
 
     cutoff_initialized = .true.
 
-  end subroutine init_cutoff
+  end subroutine init_base_state_geometry
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine compute_cutoff_coords(rho0)
-
-    use meth_params_module, only: anelastic_cutoff, base_cutoff_density, burning_cutoff_density
 
     real(kind=dp_t), intent(in   ) :: rho0(:,0:)
 
@@ -314,54 +294,22 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! rotation
-! 
-! co_latitude, rotation_radius, theta_in_rad, sin_theta and cos_theta
-! are only important when wanting to rotate a plane-parallel patch
-! which lives at an angle co_latitude from the rotation axis and at a
-! distance rotation_radius from center().  mk_vel_force should
-! calculate the rotational forcing terms for the points within the
-! patch.
-!
-! for spherical problems, the only important variable from
-! init_rotation() is omega, the angular frequency - mk_vel_force will
-! calculate the appropriate terms for a given coordinate
-!
-! NOTE: it is currently unclear how to handle BC's with a
-!       plane-parallel patch and it is not advisable to utilize
-!       rotation for such problems.
-!
-
-  subroutine init_rotation()
-
-    real(dp_t) :: theta_in_rad
-
-    theta_in_rad = M_PI * co_latitude / 180.d0
-    
-    sin_theta = sin(theta_in_rad)
-    cos_theta = cos(theta_in_rad)
-
-    omega = 2 * M_PI * rotational_frequency
-
-  end subroutine init_rotation
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  subroutine destroy_geometry()
+  subroutine destroy_base_state_geometry()
 
     if(radial_initialized) then
       deallocate(dr, nr, r_cc_loc, r_edge_loc)
     endif
     if(cutoff_initialized) then
-      deallocate(anelastic_cutoff_coord,base_cutoff_density_coord)
+      deallocate(anelastic_cutoff_coord)
+      deallocate(base_cutoff_density_coord)
       deallocate(burning_cutoff_density_coord)
     endif
     if(multilevel_initialized) then
       deallocate(numdisjointchunks,r_start_coord,r_end_coord)
     endif
 
-  end subroutine destroy_geometry
+  end subroutine destroy_base_state_geometry
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-end module base_state_geometry
+end module base_state_geometry_module

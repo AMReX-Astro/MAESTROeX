@@ -28,13 +28,13 @@ module meth_params_module
   character (len=:), allocatable, save :: model_file
   integer                       , save :: spherical
   logical                       , save :: octant
-  real(rt)                      , save :: anelastic_cutoff
-  real(rt)                      , save :: base_cutoff_density
-  real(rt)                      , save :: burning_cutoff_density
-  real(rt)                      , save :: rotational_frequency
-  real(rt)                      , save :: co_latitude
-  real(rt)                      , save :: small_temp
-  real(rt)                      , save :: small_dens
+  double precision              , save :: anelastic_cutoff
+  double precision              , save :: base_cutoff_density
+  double precision              , save :: burning_cutoff_density
+  double precision              , save :: rotational_frequency
+  double precision              , save :: co_latitude
+  double precision              , save :: small_temp
+  double precision              , save :: small_dens
 
   ! End the declarations of the ParmParse parameters
 
