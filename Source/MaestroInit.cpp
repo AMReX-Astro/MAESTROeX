@@ -10,7 +10,6 @@ Maestro::InitData ()
     const Real time = 0.0;
 
     // here we need to allocate and fill s0_init and p0_init
-    const Vector<Geometry>& geom = Geom();
     const Box& domain = geom[max_level].Domain();
     const int& nr_fine = domain.bigEnd()[AMREX_SPACEDIM-1] + 1;
 
@@ -24,7 +23,7 @@ Maestro::InitData ()
     p0_new   .resize( (max_level+1)*nr_fine );
 
     // read in model file and fill in s0_init and p0_init for all levels
-    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),max_level+1,nr_fine);
+    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),max_level+1);
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize

@@ -39,7 +39,7 @@ extern "C"
 
     void init_base_state (const amrex::Real* s0_init, 
                           const amrex::Real* p0_init,
-                          const int& nlevs, const int& domhi_fine);
+                          const int& nlevs);
 
     //////////////////////
 
