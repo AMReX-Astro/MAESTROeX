@@ -9,6 +9,7 @@ module base_state_geometry_module
   use bl_types
   use amrex_error_module
   use amrex_constants_module
+  use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: prob_lo, prob_hi, spherical, octant, &
                                 anelastic_cutoff, base_cutoff_density, burning_cutoff_density
@@ -41,15 +42,19 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine init_base_state_geometry(nlevs,dx_fine,domhi_fine) &
+  subroutine init_base_state_geometry(max_levs,dx_fine,domhi_fine) &
        bind(C, name="init_base_state_geometry")
 
-    integer          , intent(in   ) :: nlevs
+    integer          , intent(in   ) :: max_levs
     double precision , intent(in   ) ::    dx_fine(1:amrex_spacedim)
     integer          , intent(in   ) :: domhi_fine(1:amrex_spacedim)
 
     ! local
     integer :: n,i
+
+    if ( parallel_IOProcessor() ) then
+       print*,'Calling init_base_state_geometry()'
+    end if
 
     ! compute center(:)
     if (octant) then
@@ -72,25 +77,25 @@ contains
        ! cartesian case
 
        ! allocate space for dr, nr, r_cc_loc, r_edge_loc
-       allocate(dr(nlevs))
-       allocate(nr(nlevs))
-       allocate(  r_cc_loc(nlevs,0:nr_fine-1))
-       allocate(r_edge_loc(nlevs,0:nr_fine))
+       allocate(dr(max_levs))
+       allocate(nr(max_levs))
+       allocate(  r_cc_loc(max_levs,0:nr_fine-1))
+       allocate(r_edge_loc(max_levs,0:nr_fine))
        
        ! compute nr_fine and dr_fine
        dr_fine = dx_fine(amrex_spacedim)
        nr_fine = domhi_fine(amrex_spacedim) + 1
 
        ! compute nr(:) and dr(:) assuming refinement ratio = 2
-       nr(nlevs) = nr_fine
-       dr(nlevs) = dr_fine
-       do n=nlevs-1,1,-1
+       nr(max_levs) = nr_fine
+       dr(max_levs) = dr_fine
+       do n=max_levs-1,1,-1
           nr(n) = nr(n+1)/2
           dr(n) = dr(n+1)*2.d0
        enddo
        
        ! compute r_cc_loc, r_edge_loc
-       do n=1,nlevs
+       do n=1,max_levs
           do i = 0,nr(n)-1
              r_cc_loc(n,i) = prob_lo(amrex_spacedim) + (dble(i)+HALF)*dr(n)
           end do
@@ -130,9 +135,9 @@ contains
     radial_initialized = .true.
 
     if (spherical .eq. 0) then
-       allocate(      anelastic_cutoff_coord(nlevs))
-       allocate(   base_cutoff_density_coord(nlevs))
-       allocate(burning_cutoff_density_coord(nlevs))
+       allocate(      anelastic_cutoff_coord(max_levs))
+       allocate(   base_cutoff_density_coord(max_levs))
+       allocate(burning_cutoff_density_coord(max_levs))
     else
        allocate(      anelastic_cutoff_coord(1))
        allocate(   base_cutoff_density_coord(1))

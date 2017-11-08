@@ -48,6 +48,7 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
                              geom_prob_lo,geom_prob_hi) &
                              bind(C, name="set_method_params")
 
+  use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
   use meth_params_module
@@ -58,12 +59,15 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscalars
   double precision, intent(in) :: geom_prob_lo(1:amrex_spacedim), geom_prob_hi(1:amrex_spacedim)
   
-  integer :: i
   integer :: ioproc
 
   !---------------------------------------------------------------------
   ! conserved state components
   !---------------------------------------------------------------------
+
+  if (parallel_IOProcessor()) then
+     print*,'Calling set_method_params()'
+  end if
 
   rho_comp  = Density
   rhoh_comp = Enthalpy

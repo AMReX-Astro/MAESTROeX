@@ -7,6 +7,8 @@ using namespace amrex;
 void
 Maestro::Evolve ()
 {
+    Print() << "Calling Evolve()" << endl;
+
     int last_plot_file_step = 0;
 
     for (istep = 1; istep <= max_step && t_new < stop_time; ++istep)

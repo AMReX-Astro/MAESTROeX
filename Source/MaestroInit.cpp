@@ -7,6 +7,8 @@ using namespace amrex;
 void
 Maestro::InitData ()
 {
+    Print() << "Calling InitData()" << endl;
+
     const Real time = 0.0;
 
     // here we need to allocate and fill s0_init and p0_init
@@ -53,6 +55,7 @@ Maestro::InitData ()
 void
 Maestro::ReadParameters ()
 {
+    Print() << "Calling ReadParameters()" << endl;
 
     ParmParse pp("maestro");
 
@@ -76,6 +79,7 @@ Maestro::ReadParameters ()
 // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
 void Maestro::VariableSetup ()
 {
+    Print() << "Calling VariableSetup()" << endl;
 
     int cnt = 0;
     Rho = cnt++;
@@ -91,13 +95,14 @@ void Maestro::VariableSetup ()
     NSCAL = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
 
     maestro_network_init();
-
 }
 
 // set up BCRec definitions for BC types
 void
 Maestro::BCSetup()
 {
+    Print() << "Calling BCSetup()" << endl;
+
     bcs_s.resize(NSCAL);          // scalars
     bcs_u.resize(AMREX_SPACEDIM); // velocitiy
     bcs_f.resize(AMREX_SPACEDIM); // a vector of "first-order extrap"

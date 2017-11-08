@@ -27,6 +27,7 @@ IntVect Maestro::nodal_flag_z(0,0,1);
 //             - sizes multilevel vectors and data structures
 Maestro::Maestro ()
 {
+    Print() << "Calling Maestro constructor" << endl;
 
     ///////
     // Geometry on all levels has been defined already.
@@ -90,5 +91,7 @@ Maestro::Maestro ()
 
 Maestro::~Maestro ()
 {
+    Print() << "Calling Maestro destructor" << endl;
+
     destroy_base_state_geometry();
 }
