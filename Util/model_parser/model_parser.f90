@@ -48,7 +48,7 @@ module model_parser_module
 
   integer, parameter :: MAX_VARNAME_LENGTH=80
 
-  public :: read_model_file, close_model_file
+  public :: read_model_file, interpolate, close_model_file
 
 contains
 
@@ -237,6 +237,105 @@ contains
     return
 
   end function get_model_npts
+
+  function interpolate(r, ivar, interpolate_top)
+
+    ! use the module's array of model coordinates (model_r), and
+    ! variables (model_state), to find the value of model_var at point
+    ! r using linear interpolation.
+    !
+    ! Eventually, this should all be made a class.
+
+    real(kind=dp_t) :: interpolate
+    real(kind=dp_t), intent(in) :: r
+    integer, intent(in) :: ivar
+    logical, intent(in), optional :: interpolate_top
+
+    real(kind=dp_t) :: slope
+    real(kind=dp_t) :: minvar, maxvar
+
+    logical :: interp_top
+
+    integer :: i, id
+
+    if (present(interpolate_top)) then
+       interp_top = interpolate_top
+    else
+       interp_top = .false.
+    endif
+
+    ! find the location in the coordinate array where we want to interpolate
+    do i = 1, npts_model
+       if (model_r(i) >= r) exit
+    enddo
+    if (i > 1 .and. i < npts_model+1) then
+       if(abs(r-model_r(i-1)) < abs(r-model_r(i))) then
+          i = i-1
+       end if
+    end if
+    if (i == npts_model+1) then
+       i = npts_model
+    end if
+
+    id = i
+
+    if (id == 1) then
+
+       slope = (model_state(id+1,ivar) - model_state(id,ivar))/(model_r(id+1) - model_r(id))
+       interpolate = slope*(r - model_r(id)) + model_state(id,ivar)
+
+       ! safety check to make sure interpolate lies within the bounding points
+       minvar = min(model_state(id+1,ivar), model_state(id,ivar))
+       maxvar = max(model_state(id+1,ivar), model_state(id,ivar))
+       interpolate = max(interpolate,minvar)
+       interpolate = min(interpolate,maxvar)
+
+    else if (id == npts_model) then
+
+       slope = (model_state(id,ivar) - model_state(id-1,ivar))/(model_r(id) - model_r(id-1))
+       interpolate = slope*(r - model_r(id)) + model_state(id,ivar)
+
+       ! safety check to make sure interpolate lies within the bounding points
+       if (.not. interp_top) then
+          minvar = min(model_state(id,ivar),model_state(id-1,ivar))
+          maxvar = max(model_state(id,ivar),model_state(id-1,ivar))
+          interpolate = max(interpolate,minvar)
+          interpolate = min(interpolate,maxvar)
+       endif
+
+    else
+
+       if (r >= model_r(id)) then
+
+          ! we should not wind up in here
+
+          slope = (model_state(id+1,ivar) - model_state(id,ivar))/(model_r(id+1) - model_r(id))
+          interpolate = slope*(r - model_r(id)) + model_state(id,ivar)
+          
+          ! safety check to make sure interpolate lies within the bounding points
+          minvar = min(model_state(id+1,ivar),model_state(id,ivar))
+          maxvar = max(model_state(id+1,ivar),model_state(id,ivar))
+          interpolate = max(interpolate,minvar)
+          interpolate = min(interpolate,maxvar)
+          
+       else
+
+          slope = (model_state(id,ivar) - model_state(id-1,ivar))/(model_r(id) - model_r(id-1))
+          interpolate = slope*(r - model_r(id)) + model_state(id,ivar)
+          
+          ! safety check to make sure interpolate lies within the bounding points
+          minvar = min(model_state(id,ivar),model_state(id-1,ivar))
+          maxvar = max(model_state(id,ivar),model_state(id-1,ivar))
+          interpolate = max(interpolate,minvar)
+          interpolate = min(interpolate,maxvar)
+          
+       end if
+
+    end if
+
+    return
+
+  end function interpolate
 
   subroutine close_model_file
     

@@ -37,7 +37,8 @@ Bdirs 	:= Source \
            Source/Src_$(DIM)d \
            Source/param_includes \
            constants \
-           Util/model_parser
+           Util/model_parser \
+           Util/simple_log
 
 # add / define any special physics we need
 #

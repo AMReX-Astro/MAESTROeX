@@ -39,7 +39,7 @@ model_file                          string      "model.hse"     y
 perturb_model                       bool        false
 
 # print out HSE diagnostics as a function of r for the initial model
-print_init_hse_diag                 bool        false
+print_init_hse_diag                 bool        false          y
 
 
 #-----------------------------------------------------------------------------
@@ -98,7 +98,7 @@ spherical                           int            0    y
 octant                              bool            false       y
 
 # Set to 1 if using the 2D simplified (planar) model of an octant.
-do_2d_planar_octant                 int            0
+do_2d_planar_octant                 int            0    y
 
 # How often we regrid.
 regrid_int                          int            -1
@@ -284,10 +284,10 @@ buoyancy_cutoff_factor              Real               5.0
 dpdt_factor                         Real               0.0
 
 # are we doing 1/r$^2$ gravity for plane-parallel
-do_planar_invsq_grav                bool            false
+do_planar_invsq_grav                bool            false       y
 
 # the point mass for planar 1/r$^2$ gravity
-planar_invsq_mass                   Real               0.0
+planar_invsq_mass                   Real               0.0      y
 
 # turn on (true) or off (false) basestate evolution
 evolve_base_state                   bool            true
@@ -331,7 +331,7 @@ use_etarho                          bool            true
 slope_order                         int            4
 
 # the gravitational acceleration (cm~s$^{-2}$) for plane-parallel geometry
-grav_const                          Real               -1.5e10
+grav_const                          Real               -1.5e10    y
 
 # 0 = no ppm (piecewise linear slopes instead) @@
 # 1 = 1984 ppm @@

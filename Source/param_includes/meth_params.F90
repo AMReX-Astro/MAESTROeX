@@ -26,11 +26,16 @@ module meth_params_module
   ! Begin the declarations of the ParmParse parameters
 
   character (len=:), allocatable, save :: model_file
+  logical                       , save :: print_init_hse_diag
   integer                       , save :: spherical
   logical                       , save :: octant
+  integer                       , save :: do_2d_planar_octant
   double precision              , save :: anelastic_cutoff
   double precision              , save :: base_cutoff_density
   double precision              , save :: burning_cutoff_density
+  logical                       , save :: do_planar_invsq_grav
+  double precision              , save :: planar_invsq_mass
+  double precision              , save :: grav_const
   double precision              , save :: rotational_frequency
   double precision              , save :: co_latitude
   double precision              , save :: small_temp
@@ -51,11 +56,16 @@ contains
 
     allocate(character(len=1)::model_file)
     model_file = "model.hse";
+    print_init_hse_diag = .false.;
     spherical = 0;
     octant = .false.;
+    do_2d_planar_octant = 0;
     anelastic_cutoff = 3.d6;
     base_cutoff_density = 3.d6;
     burning_cutoff_density = 3.d6;
+    do_planar_invsq_grav = .false.;
+    planar_invsq_mass = 0.0d0;
+    grav_const = -1.5d10;
     rotational_frequency = 0.0d0;
     co_latitude = 0.0d0;
     small_temp = 5.d6;
@@ -63,11 +73,16 @@ contains
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("model_file", model_file)
+    call pp%query("print_init_hse_diag", print_init_hse_diag)
     call pp%query("spherical", spherical)
     call pp%query("octant", octant)
+    call pp%query("do_2d_planar_octant", do_2d_planar_octant)
     call pp%query("anelastic_cutoff", anelastic_cutoff)
     call pp%query("base_cutoff_density", base_cutoff_density)
     call pp%query("burning_cutoff_density", burning_cutoff_density)
+    call pp%query("do_planar_invsq_grav", do_planar_invsq_grav)
+    call pp%query("planar_invsq_mass", planar_invsq_mass)
+    call pp%query("grav_const", grav_const)
     call pp%query("rotational_frequency", rotational_frequency)
     call pp%query("co_latitude", co_latitude)
     call pp%query("small_temp", small_temp)
