@@ -2,30 +2,29 @@
 maestro.model_file = "model.hse.cool.coulomb"
 
 maestro.max_step  = 1000000
-maestro.stop_time = 2.0
+maestro.stop_time = 2.5
 
 # PROBLEM SIZE & GEOMETRY
-
 
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
-maestro.lo_bc = 2 2 2
-maestro.hi_bc = 2 2 2
-geometry.is_periodic =  0 0 0
+maestro.lo_bc = 0 4
+maestro.hi_bc = 0 2
+geometry.is_periodic =  1 0 0
 
-geometry.prob_lo     =  0.0  0.0  0.0 
-geometry.prob_hi     =  1.0  1.0  1.0
-amr.n_cell           =  64   64   64
+geometry.prob_lo     =  0.0    0.0
+geometry.prob_hi     =  2.16e8 3.6e8
+amr.n_cell           =  384 640
 
 # VERBOSITY
 amr.v              = 1       # verbosity in Amr
 
 # REFINEMENT
-amr.max_level       = 2       # maximum level number allowed
+amr.max_level       = 0       # maximum level number allowed
 amr.ref_ratio       = 2 2 2 2 # refinement ratio
 amr.blocking_factor = 8       # block factor in grid generation
-amr.max_grid_size   = 16
+amr.max_grid_size   = 64
 
 maestro.regrid_int      = 2       # how often to regrid
 
