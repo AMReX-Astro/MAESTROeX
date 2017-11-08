@@ -109,6 +109,6 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   ! internal limitations, so the small_dens and small_temp
   ! may be modified coming back out of this routine.
 
-  call eos_init(small_dens, small_temp)
+  call eos_init(small_temp, small_dens)
 
 end subroutine set_method_params
