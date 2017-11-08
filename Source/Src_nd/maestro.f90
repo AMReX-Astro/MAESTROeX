@@ -69,11 +69,11 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
      print*,'Calling set_method_params()'
   end if
 
-  rho_comp  = Density
-  rhoh_comp = Enthalpy
-  spec_comp = FirstSpec
-  temp_comp = Temperature
-  pi_comp   = Pressure
+  rho_comp  = Density+1
+  rhoh_comp = Enthalpy+1
+  spec_comp = FirstSpec+1
+  temp_comp = Temperature+1
+  pi_comp   = Pressure+1
 
   nscal = Nscalars
 

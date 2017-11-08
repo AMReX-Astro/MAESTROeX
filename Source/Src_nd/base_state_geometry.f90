@@ -75,16 +75,16 @@ contains
     if (spherical .eq. 0) then
 
        ! cartesian case
+       
+       ! compute nr_fine and dr_fine
+       dr_fine = dx_fine(amrex_spacedim)
+       nr_fine = domhi_fine(amrex_spacedim) + 1
 
        ! allocate space for dr, nr, r_cc_loc, r_edge_loc
        allocate(dr(max_levs))
        allocate(nr(max_levs))
        allocate(  r_cc_loc(max_levs,0:nr_fine-1))
        allocate(r_edge_loc(max_levs,0:nr_fine))
-       
-       ! compute nr_fine and dr_fine
-       dr_fine = dx_fine(amrex_spacedim)
-       nr_fine = domhi_fine(amrex_spacedim) + 1
 
        ! compute nr(:) and dr(:) assuming refinement ratio = 2
        nr(max_levs) = nr_fine
