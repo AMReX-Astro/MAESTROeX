@@ -445,10 +445,11 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
         const int* lo  = box.loVect();
         const int* hi  = box.hiVect();
 
-        initdata(lev, cur_time, ARLIM_3D(lo), ARLIM_3D(hi),
+        initdata(lev, max_level+1, cur_time, ARLIM_3D(lo), ARLIM_3D(hi),
                  BL_TO_FORTRAN_3D(scal[mfi]), 
                  BL_TO_FORTRAN_3D(vel[mfi]), 
-                 ZFILL(dx), ZFILL(prob_lo), NSCAL);
+                 s0_init.dataPtr(), p0_init.dataPtr(),
+                 ZFILL(dx));
     }
 
     // now we copy data from s0_init and p0_init into s0_new and p0_new

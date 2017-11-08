@@ -51,7 +51,8 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
-  use meth_params_module
+  use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp, &
+                                nscal, prob_lo, prob_hi, small_dens, small_temp
   use eos_module, only: eos_init
 
   implicit none

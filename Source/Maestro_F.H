@@ -64,12 +64,14 @@ extern "C"
                    const int& ng, const int& ncomp);
     //////////////////////
 
-    void initdata(const int& level, const amrex::Real& time, 
+    void initdata(const int& level, const int& max_levs,
+                  const amrex::Real& time, 
                   const int* lo, const int* hi,
                   BL_FORT_FAB_ARG_3D(scal),
                   BL_FORT_FAB_ARG_3D(vel),
-                  const amrex::Real* dx, const amrex::Real* problo,
-                  const int& nvar);
+                  const amrex::Real* s0_init, 
+                  const amrex::Real* p0_init,
+                  const amrex::Real* dx);
 
     void get_face_velocity(const int& level, const amrex::Real& time, 
                            AMREX_D_DECL(BL_FORT_FAB_ARG(xvel),

@@ -75,8 +75,8 @@ Maestro::PlotFileVarNames () const
         names[cnt++] = spec_string;
     }
 
-    names[cnt++] = "Pi";
     names[cnt++] = "Temp";
+    names[cnt++] = "Pi";
 
     return names;
 }
