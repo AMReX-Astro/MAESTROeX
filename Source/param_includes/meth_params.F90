@@ -26,7 +26,11 @@ module meth_params_module
   ! Begin the declarations of the ParmParse parameters
 
   character (len=:), allocatable, save :: model_file
+  logical                       , save :: perturb_model
   logical                       , save :: print_init_hse_diag
+  double precision              , save :: pert_temp_factor
+  double precision              , save :: pert_rad_factor
+  logical                       , save :: do_small_domain
   integer                       , save :: spherical
   logical                       , save :: octant
   integer                       , save :: do_2d_planar_octant
@@ -56,7 +60,11 @@ contains
 
     allocate(character(len=1)::model_file)
     model_file = "model.hse";
+    perturb_model = .false.;
     print_init_hse_diag = .false.;
+    pert_temp_factor = 1.0d0;
+    pert_rad_factor = 1.0d0;
+    do_small_domain = .false.;
     spherical = 0;
     octant = .false.;
     do_2d_planar_octant = 0;
@@ -73,7 +81,11 @@ contains
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("model_file", model_file)
+    call pp%query("perturb_model", perturb_model)
     call pp%query("print_init_hse_diag", print_init_hse_diag)
+    call pp%query("pert_temp_factor", pert_temp_factor)
+    call pp%query("pert_rad_factor", pert_rad_factor)
+    call pp%query("do_small_domain", do_small_domain)
     call pp%query("spherical", spherical)
     call pp%query("octant", octant)
     call pp%query("do_2d_planar_octant", do_2d_planar_octant)

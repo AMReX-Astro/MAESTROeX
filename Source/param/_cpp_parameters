@@ -36,11 +36,19 @@ verbose                             int         0
 model_file                          string      "model.hse"     y
 
 # Turn on a perturbation in the initial data.  Problem specific.
-perturb_model                       bool        false
+perturb_model                       bool        false           y
 
 # print out HSE diagnostics as a function of r for the initial model
 print_init_hse_diag                 bool        false          y
 
+# used for perturbing the initial temperature field
+pert_temp_factor                    Real               1.0      y
+
+# used for perturbing the initial temperature field
+pert_rad_factor                     Real               1.0      y
+
+# used for perturbing the initial temperature field
+do_small_domain                     bool              false     y
 
 #-----------------------------------------------------------------------------
 # category: timestepping
