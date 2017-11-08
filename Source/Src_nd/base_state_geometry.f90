@@ -31,16 +31,9 @@ module base_state_geometry_module
   integer   , allocatable, save :: base_cutoff_density_coord(:)
   integer   , allocatable, save :: burning_cutoff_density_coord(:)
 
-  logical   , save :: radial_initialized = .false.
-  logical   , save :: cutoff_initialized = .false.
-  logical   , save :: multilevel_initialized = .false.
-
   public :: init_base_state_geometry, compute_cutoff_coords, destroy_base_state_geometry
 
 contains
-
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine init_base_state_geometry(max_levs,dx_fine,domhi_fine) &
        bind(C, name="init_base_state_geometry")
@@ -132,8 +125,6 @@ contains
 
     end if
 
-    radial_initialized = .true.
-
     if (spherical .eq. 0) then
        allocate(      anelastic_cutoff_coord(max_levs))
        allocate(   base_cutoff_density_coord(max_levs))
@@ -143,8 +134,6 @@ contains
        allocate(   base_cutoff_density_coord(1))
        allocate(burning_cutoff_density_coord(1))
     end if
-
-    cutoff_initialized = .true.
 
   end subroutine init_base_state_geometry
 
@@ -305,17 +294,11 @@ contains
 
   subroutine destroy_base_state_geometry() bind(C, name="destroy_base_state_geometry")
 
-    if(radial_initialized) then
       deallocate(dr, nr, r_cc_loc, r_edge_loc)
-    endif
-    if(cutoff_initialized) then
       deallocate(anelastic_cutoff_coord)
       deallocate(base_cutoff_density_coord)
       deallocate(burning_cutoff_density_coord)
-    endif
-    if(multilevel_initialized) then
       deallocate(numdisjointchunks,r_start_coord,r_end_coord)
-    endif
 
   end subroutine destroy_base_state_geometry
 

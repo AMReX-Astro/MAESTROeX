@@ -12,8 +12,8 @@ Maestro::InitData ()
     const Real time = 0.0;
 
     // here we need to allocate and fill s0_init and p0_init
-    const Box& domain = geom[max_level].Domain();
-    const int& nr_fine = domain.bigEnd()[AMREX_SPACEDIM-1] + 1;
+    const Box& fineDomainBox = geom[max_level].Domain();
+    const int& nr_fine = fineDomainBox.bigEnd()[AMREX_SPACEDIM-1] + 1;
 
     s0_init  .resize( (max_level+1)*nr_fine*NSCAL );
     p0_init  .resize( (max_level+1)*nr_fine );

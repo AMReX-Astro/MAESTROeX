@@ -49,11 +49,22 @@ Maestro::Maestro ()
     set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,NSCAL,
                       geom[0].ProbLo(),geom[0].ProbHi());
 
-    // 
-    Box fineBox = geom[max_level].Domain();
+    // set nr_fine and dr
+/*
+    if (spherical == 1) {
+        // FIXME - set nr_fine
+        dr.resize(1);
+    }
+    else {
+        nr_fine = fineDomainBox.bigEnd()[AMREX_SPACEDIM-1] + 1;
+        dr.resize(max_level+1);
+    }
+*/
+
+    Box fineDomainBox = geom[max_level].Domain();
     init_base_state_geometry(max_level+1, 
                              geom[max_level].CellSize(),
-                             fineBox.hiVect());
+                             fineDomainBox.hiVect());
 
     // set up BCRec definitions for BC types
     BCSetup();

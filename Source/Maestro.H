@@ -177,6 +177,11 @@ private:
                     const amrex::Real& rel_tol,
                     const amrex::Real& abs_tol);
 
+
+    // compute the radial average of a quantitiy
+    void Average (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf,
+                  amrex::Vector<amrex::Real> phibar);
+
     ////////////
     // PlotFile routines
 
@@ -273,6 +278,9 @@ private:
     amrex::Vector<amrex::Real> rhoh0_new;
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
+
+    int nr_fine;
+    amrex::Vector<amrex::Real> dr;
 
     // during initialization we fill these in by interpolating from
     // the model file and then copy to the base_state   
