@@ -44,21 +44,19 @@ subroutine get_spec_names(spec_names,ispec,len) &
 
 end subroutine get_spec_names
 
-subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscalars, &
-                             geom_prob_lo,geom_prob_hi) &
+subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscalars) &
                              bind(C, name="set_method_params")
 
   use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp, &
-                                nscal, prob_lo, prob_hi, small_dens, small_temp
+                                nscal, small_dens, small_temp
   use eos_module, only: eos_init
 
   implicit none
 
   integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscalars
-  double precision, intent(in) :: geom_prob_lo(1:amrex_spacedim), geom_prob_hi(1:amrex_spacedim)
   
   integer :: ioproc
 
@@ -77,12 +75,6 @@ subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nsc
   pi_comp   = Pressure+1
 
   nscal = Nscalars
-
-  allocate(prob_lo(amrex_spacedim))
-  allocate(prob_hi(amrex_spacedim))
-
-  prob_lo(1:amrex_spacedim) = geom_prob_lo(1:amrex_spacedim)
-  prob_hi(1:amrex_spacedim) = geom_prob_hi(1:amrex_spacedim)
 
   !---------------------------------------------------------------------
   ! other initializations

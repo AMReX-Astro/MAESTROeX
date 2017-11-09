@@ -33,13 +33,12 @@ extern "C"
                            const int& FirstSpec,
                            const int& Temperature,
                            const int& Pressure,
-                           const int& Nscalars,
-                           const amrex::Real* problo,
-                           const amrex::Real* probhi);
+                           const int& Nscalars);
 
     void init_base_state (const amrex::Real* s0_init, 
                           const amrex::Real* p0_init,
-                          const int& nlevs);
+                          const int& nlevs,
+                          const amrex::Real* prob_lo);
 
     //////////////////////
 
@@ -49,7 +48,9 @@ extern "C"
 
     void init_base_state_geometry(const int& nlevs,
                                   const amrex::Real* dx_fine,
-                                  const int* ncell_fine);
+                                  const int* ncell_fine,
+                                  const amrex::Real* prob_lo,
+                                  const amrex::Real* prob_hi);
 
 
     void destroy_base_state_geometry();
@@ -71,7 +72,8 @@ extern "C"
                   BL_FORT_FAB_ARG_3D(vel),
                   const amrex::Real* s0_init, 
                   const amrex::Real* p0_init,
-                  const amrex::Real* dx);
+                  const amrex::Real* dx,
+                  const amrex::Real* prob_lo);
 
     void get_face_velocity(const int& level, const amrex::Real& time, 
                            AMREX_D_DECL(BL_FORT_FAB_ARG(xvel),

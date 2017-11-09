@@ -11,7 +11,7 @@ module base_state_geometry_module
   use amrex_constants_module
   use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
-  use meth_params_module, only: prob_lo, prob_hi, spherical, octant, &
+  use meth_params_module, only: spherical, octant, &
                                 anelastic_cutoff, base_cutoff_density, burning_cutoff_density
 
   implicit none
@@ -35,12 +35,14 @@ module base_state_geometry_module
 
 contains
 
-  subroutine init_base_state_geometry(max_levs,dx_fine,domhi_fine) &
+  subroutine init_base_state_geometry(max_levs,dx_fine,domhi_fine,prob_lo,prob_hi) &
        bind(C, name="init_base_state_geometry")
 
     integer          , intent(in   ) :: max_levs
-    double precision , intent(in   ) ::    dx_fine(1:amrex_spacedim)
-    integer          , intent(in   ) :: domhi_fine(1:amrex_spacedim)
+    double precision , intent(in   ) :: dx_fine(3)
+    integer          , intent(in   ) :: domhi_fine(3)
+    double precision , intent(in   ) :: prob_lo(3)
+    double precision , intent(in   ) :: prob_hi(3)
 
     ! local
     integer :: n,i

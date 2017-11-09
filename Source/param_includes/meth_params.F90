@@ -20,9 +20,6 @@ module meth_params_module
   integer, save :: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp
   integer, save :: nscal
 
-  double precision, allocatable, save, public :: prob_lo(:)
-  double precision, allocatable, save, public :: prob_hi(:)
-
   ! Begin the declarations of the ParmParse parameters
 
   character (len=:), allocatable, save :: model_file

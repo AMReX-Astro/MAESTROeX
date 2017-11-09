@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
         Maestro maestro;
 	
         // initialize AMR data
-        maestro.InitData();
+        maestro.Init();
 
         // advance solution to final time
         maestro.Evolve();

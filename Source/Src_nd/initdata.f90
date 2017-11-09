@@ -6,7 +6,7 @@ module initdata_module
   use network, only: nspec
   use amrex_fort_module, only : amrex_spacedim
   use base_state_geometry_module, only: nr_fine
-  use meth_params_module, only: nscal, prob_lo, rho_comp, rhoh_comp, temp_comp, spec_comp, &
+  use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, &
                                 perturb_model, pert_temp_factor, pert_rad_factor, do_small_domain
   
   implicit none
@@ -21,7 +21,7 @@ contains
                       scal, scal_lo, scal_hi, &
                       vel, vel_lo, vel_hi, &
                       s0_init, p0_init, &
-                      dx) bind(C, name="initdata")
+                      dx, prob_lo) bind(C, name="initdata")
     
     integer         , intent(in   ) :: level_cpp, max_levs, lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3)
@@ -35,7 +35,7 @@ contains
                                            vel_lo(3):vel_hi(3), 1:amrex_spacedim)
     double precision, intent(inout) :: s0_init(1:max_levs,0:nr_fine-1,1:nscal)
     double precision, intent(inout) :: p0_init(1:max_levs,0:nr_fine-1)
-    double precision, intent(in   ) :: dx(3)
+    double precision, intent(in   ) :: dx(3), prob_lo(3)
 
     integer          :: i,j,k,r,lev
     double precision :: x,y,z

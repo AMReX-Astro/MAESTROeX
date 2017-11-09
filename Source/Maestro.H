@@ -24,12 +24,16 @@ public:
     ////////////////
     // public member functions
 
-    // constructor - reads in parameters from inputs file
-    //             - sizes multilevel vectors and data structures
+    // constructor and destructor
     Maestro ();
     virtual ~Maestro();
 
-    // read in some parameters from inputs file
+    // read in C++ and F90 parameters
+    // define variable mappings
+    // more to come...
+    void Init ();
+
+    // read in C++ parameters from inputs file
     void ReadParameters ();
 
     // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
@@ -37,9 +41,6 @@ public:
 
     // set up BCRec definitions for BC types
     void BCSetup ();
-
-    // initializes multilevel data
-    void InitData ();
 
     // During initialization of a simulation, Maestro::InitData() calls 
     // AmrCore::InitFromScratch(), which calls 
@@ -280,7 +281,16 @@ private:
     amrex::Vector<amrex::Real> p0_new;
 
     int nr_fine;
+/*
+    amrex::Real center[AMREX_SPACEDIM];
+    int nlevs_radial;
+    int nr_irreg;
     amrex::Vector<amrex::Real> dr;
+    amrex::Vector<amrex::Real> r_cc_loc;
+    amrex::Vector<amrex::Real> r_edge_loc;
+    amrex::Vector<int> nr;
+    amrex::Vector<int> numdisjointchunks;
+*/
 
     // during initialization we fill these in by interpolating from
     // the model file and then copy to the base_state   

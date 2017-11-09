@@ -18,7 +18,7 @@
 
 module rotation_module
 
-  use meth_params_module, only: rotational_frequency, co_latitude, prob_lo
+  use meth_params_module, only: rotational_frequency, co_latitude
   use amrex_constants_module
 
   implicit none

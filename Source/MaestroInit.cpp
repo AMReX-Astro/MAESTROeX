@@ -3,18 +3,80 @@
 
 using namespace amrex;
 
-// initializes multilevel data
+// read in C++ and F90 parameters
+// define variable mappings
+// more to come...
 void
-Maestro::InitData ()
+Maestro::Init ()
 {
-    Print() << "Calling InitData()" << endl;
+    Print() << "Calling Init()" << endl;
 
-    const Real time = 0.0;
+    ///////
+    // Geometry on all levels has been defined already.
+    ///////
+
+    // read in C++ parameters in maestro_queries.H using ParmParse pp("maestro");
+    ReadParameters();
+
+    // read in F90 parameters in meth_params.F90 that are defined
+    // in _cpp_parameters
+    read_method_params();
+
+    // define (Rho, RhoH, etc.)
+    // calls network_init
+    VariableSetup();
+
+    // define additional module variables in meth_params.F90 that are defined
+    // at the top of meth_params.template
+    set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,NSCAL);
+
+    // set nr_fine
+    Box fineDomainBox = geom[max_level].Domain();
+    nr_fine = fineDomainBox.bigEnd()[AMREX_SPACEDIM-1] + 1;
+
+    init_base_state_geometry(max_level+1, 
+                             ZFILL(geom[max_level].CellSize()),
+                             ARLIM_3D(fineDomainBox.hiVect()),
+                             ZFILL(geom[0].ProbLo()),
+                             ZFILL(geom[0].ProbHi()));
+
+    // set up BCRec definitions for BC types
+    BCSetup();
+
+    // No valid BoxArray and DistributionMapping have been defined.
+    // But the arrays for them have been resized.
+
+    int nlevs_max = maxLevel() + 1;
+
+    istep = 0;
+
+    t_new = 0.0;
+    t_old = -1.e100;
+
+    // set this to a large number so change_max doesn't affect the first time step
+    dt = 1.e100;
+
+    sold    .resize(nlevs_max);
+    snew    .resize(nlevs_max);
+    uold    .resize(nlevs_max);
+    unew    .resize(nlevs_max);
+    S_cc_old.resize(nlevs_max);
+    S_cc_new.resize(nlevs_max);
+    gpi     .resize(nlevs_max);
+    dSdt    .resize(nlevs_max);
+
+    // stores fluxes at coarse-fine interface for synchronization
+    // this will be sized "nlevs_max+1"
+    // NOTE: the flux register associated with flux_reg[lev] is associated
+    // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
+    // therefore flux_reg[0] is never actually used in the reflux operation
+    flux_reg_s.resize(nlevs_max);
+    flux_reg_u.resize(nlevs_max);
+
+    t_new = 0.0;
+    t_old = -1.e200;
 
     // here we need to allocate and fill s0_init and p0_init
-    const Box& fineDomainBox = geom[max_level].Domain();
-    const int& nr_fine = fineDomainBox.bigEnd()[AMREX_SPACEDIM-1] + 1;
-
     s0_init  .resize( (max_level+1)*nr_fine*NSCAL );
     p0_init  .resize( (max_level+1)*nr_fine );
     rho0_old .resize( (max_level+1)*nr_fine );
@@ -25,11 +87,12 @@ Maestro::InitData ()
     p0_new   .resize( (max_level+1)*nr_fine );
 
     // read in model file and fill in s0_init and p0_init for all levels
-    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),max_level+1);
+    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),max_level+1,
+                    ZFILL(geom[0].ProbLo()));
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
-    InitFromScratch(time);
+    InitFromScratch(t_new);
 
     // synchronize levels
     AverageDown(snew);
@@ -424,16 +487,12 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     gpi[lev]     .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, ng_g));
     dSdt[lev]    .reset(new MultiFab(ba, dm,              1, ng_d));
 
-    t_new = time;
-    t_old = time - 1.e200;
-
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NSCAL));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
     const Real* dx = geom[lev].CellSize();
-    const Real* prob_lo = geom[lev].ProbLo();
     Real cur_time = t_new;
 
     MultiFab& scal = *snew[lev];
@@ -449,7 +508,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                  BL_TO_FORTRAN_3D(scal[mfi]), 
                  BL_TO_FORTRAN_3D(vel[mfi]), 
                  s0_init.dataPtr(), p0_init.dataPtr(),
-                 ZFILL(dx));
+                 ZFILL(dx),ZFILL(geom[lev].ProbLo()));
     }
 
     // now we copy data from s0_init and p0_init into s0_new and p0_new
