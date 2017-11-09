@@ -216,10 +216,11 @@ private:
     amrex::Real t_old;
     amrex::Real dt;
 
-    // these are defined in VariablSetup
+    // these are defined in VariableSetup
     static int NSCAL;
     static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi;
 
+    // these are defined in Maestro.cpp
     static amrex::IntVect nodal_flag;
     static amrex::IntVect nodal_flag_x;
     static amrex::IntVect nodal_flag_y;
@@ -313,11 +314,8 @@ private:
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
     
     ////////////////
-    // runtime parameters - see maestro_params.H
-
+    // class data members defined in _cpp_parameters
 #include <maestro_params.H>
-
-    //
     ////////////////
 
 };

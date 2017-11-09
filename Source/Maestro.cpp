@@ -1,9 +1,10 @@
 
 #include <Maestro.H>
-#include <maestro_defaults.H>
 
 using namespace amrex;
 
+// default values for class data members defined in _cpp_parameters
+#include <maestro_defaults.H>
 int Maestro::Rho       = -1;
 int Maestro::RhoH      = -1;
 int Maestro::FirstSpec = -1;
