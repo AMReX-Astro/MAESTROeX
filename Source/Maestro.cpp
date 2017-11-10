@@ -11,7 +11,7 @@ int Maestro::FirstSpec = -1;
 int Maestro::NumSpec   = -1;
 int Maestro::Temp      = -1;
 int Maestro::Pi        = -1;
-int Maestro::NSCAL     = -1;
+int Maestro::Nscal     = -1;
 
 #if (AMREX_SPACEDIM == 2)
 IntVect Maestro::nodal_flag(1,1);

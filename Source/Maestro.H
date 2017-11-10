@@ -217,7 +217,7 @@ private:
     amrex::Real dt;
 
     // these are defined in VariableSetup
-    static int NSCAL;
+    static int Nscal;
     static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi;
 
     // these are defined in Maestro.cpp
@@ -255,8 +255,9 @@ private:
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > thermal;
 
     // stores domain boundary conditions
+    // these muse be vectors (rather than arrays) so we can ParmParse them
     amrex::Vector<int> lo_bc;
-    amrex::Vector<int> hi_bc;
+    amrex::Vector<int> hi_bc;    
 
     // boundary condition objects needed for FillPatch routines
     // this is essentially an array (over components)
@@ -281,17 +282,20 @@ private:
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
 
-    int nr_fine;
-/*
-    amrex::Real center[AMREX_SPACEDIM];
+
+
     int nlevs_radial;
+    int nr_fine;
     int nr_irreg;
+
+    amrex::Real dr_fine;
+
+    amrex::Real center[AMREX_SPACEDIM];
+
     amrex::Vector<amrex::Real> dr;
     amrex::Vector<amrex::Real> r_cc_loc;
     amrex::Vector<amrex::Real> r_edge_loc;
     amrex::Vector<int> nr;
-    amrex::Vector<int> numdisjointchunks;
-*/
 
     // during initialization we fill these in by interpolating from
     // the model file and then copy to the base_state   

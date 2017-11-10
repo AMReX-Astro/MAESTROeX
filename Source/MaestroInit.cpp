@@ -28,7 +28,7 @@ Maestro::Init ()
 
     // define additional module variables in meth_params.F90 that are defined
     // at the top of meth_params.template
-    set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,NSCAL);
+    set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,Nscal);
 
     // set nr_fine
     Box fineDomainBox = geom[max_level].Domain();
@@ -77,7 +77,7 @@ Maestro::Init ()
     t_old = -1.e200;
 
     // here we need to allocate and fill s0_init and p0_init
-    s0_init  .resize( (max_level+1)*nr_fine*NSCAL );
+    s0_init  .resize( (max_level+1)*nr_fine*Nscal );
     p0_init  .resize( (max_level+1)*nr_fine );
     rho0_old .resize( (max_level+1)*nr_fine );
     rho0_new .resize( (max_level+1)*nr_fine );
@@ -139,7 +139,7 @@ Maestro::ReadParameters ()
 
 }
 
-// define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
+// define variable mappings (Rho, RhoH, ..., Nscal, etc.)
 void Maestro::VariableSetup ()
 {
     Print() << "Calling VariableSetup()" << endl;
@@ -155,7 +155,7 @@ void Maestro::VariableSetup ()
     Temp = cnt++;
     Pi = cnt++;
 
-    NSCAL = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
+    Nscal = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
 
     maestro_network_init();
 }
@@ -166,7 +166,7 @@ Maestro::BCSetup()
 {
     Print() << "Calling BCSetup()" << endl;
 
-    bcs_s.resize(NSCAL);          // scalars
+    bcs_s.resize(Nscal);          // scalars
     bcs_u.resize(AMREX_SPACEDIM); // velocitiy
     bcs_f.resize(AMREX_SPACEDIM); // a vector of "first-order extrap"
 
@@ -478,8 +478,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     const int ng_g = 0;
     const int ng_d = 0;
 
-    sold[lev]    .reset(new MultiFab(ba, dm,          NSCAL, ng_s));
-    snew[lev]    .reset(new MultiFab(ba, dm,          NSCAL, ng_s));
+    sold[lev]    .reset(new MultiFab(ba, dm,          Nscal, ng_s));
+    snew[lev]    .reset(new MultiFab(ba, dm,          Nscal, ng_s));
     uold[lev]    .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, ng_u));
     unew[lev]    .reset(new MultiFab(ba, dm, AMREX_SPACEDIM, ng_u));
     S_cc_old[lev].reset(new MultiFab(ba, dm,              1, ng_S));
@@ -488,7 +488,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     dSdt[lev]    .reset(new MultiFab(ba, dm,              1, ng_d));
 
     if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NSCAL));
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 

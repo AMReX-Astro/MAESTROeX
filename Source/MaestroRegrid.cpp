@@ -92,8 +92,8 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     const int ng_d = dSdt[lev]->nGrow();
 
 #if __cplusplus >= 201402L
-    auto snew_state     = std::make_unique<MultiFab>(ba, dm,          NSCAL, ng_s);
-    auto sold_state     = std::make_unique<MultiFab>(ba, dm,          NSCAL, ng_s);
+    auto snew_state     = std::make_unique<MultiFab>(ba, dm,          Nscal, ng_s);
+    auto sold_state     = std::make_unique<MultiFab>(ba, dm,          Nscal, ng_s);
     auto unew_state     = std::make_unique<MultiFab>(ba, dm, AMREX_SPACEDIM, ng_u);
     auto uold_state     = std::make_unique<MultiFab>(ba, dm, AMREX_SPACEDIM, ng_u);
     auto S_cc_new_state = std::make_unique<MultiFab>(ba, dm,              1, ng_S);
@@ -101,8 +101,8 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     auto gpi_state      = std::make_unique<MultiFab>(ba, dm, AMREX_SPACEDIM, ng_g);
     auto dSdt_state     = std::make_unique<MultiFab>(ba, dm,              1, ng_d);
 #else
-    std::unique_ptr<MultiFab> snew_state    (new MultiFab(ba, dm,          NSCAL, ng_s));
-    std::unique_ptr<MultiFab> sold_state    (new MultiFab(ba, dm,          NSCAL, ng_s));
+    std::unique_ptr<MultiFab> snew_state    (new MultiFab(ba, dm,          Nscal, ng_s));
+    std::unique_ptr<MultiFab> sold_state    (new MultiFab(ba, dm,          Nscal, ng_s));
     std::unique_ptr<MultiFab> unew_state    (new MultiFab(ba, dm, AMREX_SPACEDIM, ng_u));
     std::unique_ptr<MultiFab> uold_state    (new MultiFab(ba, dm, AMREX_SPACEDIM, ng_u));
     std::unique_ptr<MultiFab> S_cc_new_state(new MultiFab(ba, dm,              1, ng_S));
@@ -111,7 +111,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     std::unique_ptr<MultiFab> dSdt_state    (new MultiFab(ba, dm,              1, ng_d));
 #endif
 
-    FillPatch(lev, time, *snew_state, sold, snew, 0, NSCAL, bcs_s);
+    FillPatch(lev, time, *snew_state, sold, snew, 0, Nscal, bcs_s);
     std::swap(snew_state, snew[lev]);
     std::swap(sold_state, sold[lev]);
 
@@ -133,7 +133,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NSCAL));
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }    
 }
@@ -151,8 +151,8 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     const int ng_g =      gpi[lev-1]->nGrow();
     const int ng_d =     dSdt[lev-1]->nGrow();
     
-    snew[lev].reset    (new MultiFab(ba, dm,          NSCAL, ng_s));
-    sold[lev].reset    (new MultiFab(ba, dm,          NSCAL, ng_s));
+    snew[lev].reset    (new MultiFab(ba, dm,          Nscal, ng_s));
+    sold[lev].reset    (new MultiFab(ba, dm,          Nscal, ng_s));
     unew[lev].reset    (new MultiFab(ba, dm, AMREX_SPACEDIM, ng_u));
     uold[lev].reset    (new MultiFab(ba, dm, AMREX_SPACEDIM, ng_u));
     S_cc_new[lev].reset(new MultiFab(ba, dm,              1, ng_S));
@@ -164,11 +164,11 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, NSCAL));
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
-    FillCoarsePatch(lev, time,     *snew[lev],     sold,     snew, 0,          NSCAL, bcs_s);
+    FillCoarsePatch(lev, time,     *snew[lev],     sold,     snew, 0,          Nscal, bcs_s);
     FillCoarsePatch(lev, time,     *unew[lev],     uold,     unew, 0, AMREX_SPACEDIM, bcs_u);
     FillCoarsePatch(lev, time, *S_cc_new[lev], S_cc_old, S_cc_new, 0,              1, bcs_f);
     FillCoarsePatch(lev, time,      *gpi[lev],      gpi,      gpi, 0, AMREX_SPACEDIM, bcs_f);

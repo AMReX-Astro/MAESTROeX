@@ -17,15 +17,19 @@ module base_state_geometry_module
   implicit none
 
   integer   , save :: nlevs_radial
-  real(dp_t), save :: center(3)
-  integer   , save :: nr_fine, nr_irreg
+  integer   , save :: nr_fine
+  integer   , save :: nr_irreg
   real(dp_t), save :: dr_fine
+  real(dp_t), save :: center(3)
 
-  real(dp_t), allocatable, save :: dr(:), r_cc_loc(:,:), r_edge_loc(:,:)
+  real(dp_t), allocatable, save :: dr(:)
+  real(dp_t), allocatable, save :: r_cc_loc(:,:)
+  real(dp_t), allocatable, save :: r_edge_loc(:,:)
   integer   , allocatable, save :: nr(:)
 
   integer   , allocatable, save :: numdisjointchunks(:)
-  integer   , allocatable, save :: r_start_coord(:,:), r_end_coord(:,:)
+  integer   , allocatable, save :: r_start_coord(:,:)
+  integer   , allocatable, save :: r_end_coord(:,:)
 
   integer   , allocatable, save :: anelastic_cutoff_coord(:)
   integer   , allocatable, save :: base_cutoff_density_coord(:)

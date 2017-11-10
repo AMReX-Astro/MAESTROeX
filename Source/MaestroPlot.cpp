@@ -14,7 +14,7 @@ Maestro::PlotFileName (int lev) const
 Vector<const MultiFab*>
 Maestro::PlotFileMF () const
 {
-    int nPlot = NSCAL + AMREX_SPACEDIM;
+    int nPlot = Nscal + AMREX_SPACEDIM;
 
     Vector<const MultiFab*> plot_mf;
 
@@ -26,7 +26,7 @@ Maestro::PlotFileMF () const
 
         // copy velocity and scalars into plot_mf_data[i]
         plot_mf_data[i]->copy((*unew[i]),0,0             ,AMREX_SPACEDIM);
-        plot_mf_data[i]->copy((*snew[i]),0,AMREX_SPACEDIM,NSCAL         );
+        plot_mf_data[i]->copy((*snew[i]),0,AMREX_SPACEDIM,Nscal         );
 
         // add plot_mf_data[i] to plot_mf
         plot_mf.push_back(plot_mf_data[i]);
@@ -40,7 +40,7 @@ Maestro::PlotFileMF () const
 Vector<std::string>
 Maestro::PlotFileVarNames () const
 {
-    int nPlot = NSCAL + AMREX_SPACEDIM;
+    int nPlot = Nscal + AMREX_SPACEDIM;
     Vector<std::string> names(nPlot);
 
     int cnt = 0;

@@ -88,9 +88,9 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         macphi[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,    1));
         S_cc_nph[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
         thermal1[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
-        s1[lev].reset            (new MultiFab(grids[lev], dmap[lev],   NSCAL, ng_s));
-        s2[lev].reset            (new MultiFab(grids[lev], dmap[lev],   NSCAL, ng_s));
-        s2star[lev].reset        (new MultiFab(grids[lev], dmap[lev],   NSCAL, ng_s));
+        s1[lev].reset            (new MultiFab(grids[lev], dmap[lev],   Nscal, ng_s));
+        s2[lev].reset            (new MultiFab(grids[lev], dmap[lev],   Nscal, ng_s));
+        s2star[lev].reset        (new MultiFab(grids[lev], dmap[lev],   Nscal, ng_s));
         div_coeff_cart[lev].reset(new MultiFab(grids[lev], dmap[lev],       1,    1));
         peosbar_cart[lev].reset  (new MultiFab(grids[lev], dmap[lev],       1,    0));
         delta_p_term[lev].reset  (new MultiFab(grids[lev], dmap[lev],       1,    0));
@@ -101,7 +101,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         hcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev],       1,    1));
         Xkcoeff2[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    1));
         pcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev], NumSpec,    1));
-        scal_force[lev].reset    (new MultiFab(grids[lev], dmap[lev],   NSCAL,    1));
+        scal_force[lev].reset    (new MultiFab(grids[lev], dmap[lev],   Nscal,    1));
         delta_chi[lev].reset     (new MultiFab(grids[lev], dmap[lev],       1,    0));
 
         // nodal MultiFabs
