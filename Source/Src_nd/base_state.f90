@@ -35,8 +35,8 @@ contains
   subroutine init_base_state(s0_init,p0_init,max_levs,prob_lo) bind(C, name="init_base_state")
 
     integer         , intent(in   ) :: max_levs
-    double precision, intent(inout) :: s0_init(0:max_radial_level-1,0:nr_fine-1,1:nscal)
-    double precision, intent(inout) :: p0_init(0:max_radial_level-1,0:nr_fine-1)
+    double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
+    double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: prob_lo(3)
 
     ! local variables
@@ -69,7 +69,7 @@ contains
     dr_in = (model_r(npts_model) - model_r(1)) / dble(npts_model-1)
     rmax = model_r(npts_model)
 
-    do n=0,max_radial_level-1
+    do n=0,max_radial_level
 
        if ( parallel_IOProcessor() ) then
           write (*,887)
@@ -153,7 +153,6 @@ contains
              s0_init(n,r,rhoh_comp ) = d_ambient * eos_state%h
              s0_init(n,r,spec_comp:spec_comp+nspec-1) = d_ambient * xn_ambient(1:nspec)
              p0_init(n,r) = eos_state%p ! p_ambient !
-
              s0_init(n,r,temp_comp) = t_ambient
 
              ! keep track of the height where we drop below the cutoff density
@@ -237,6 +236,7 @@ contains
        endif
 
        ! initialize any inlet BC parameters
+       ! FIXME
        !    call set_inlet_bcs()
 
     end do ! end loop over levels

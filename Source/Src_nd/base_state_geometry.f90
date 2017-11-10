@@ -47,8 +47,8 @@ contains
     integer          , intent(in   ) :: max_radial_level_in
     integer          , intent(in   ) :: nr_fine_in
     double precision , intent(in   ) :: dr_fine_in
-    double precision , intent(inout) ::   r_cc_loc(0:max_radial_level-1,0:nr_fine_in-1)
-    double precision , intent(inout) :: r_edge_loc(0:max_radial_level-1,0:nr_fine_in  )
+    double precision , intent(inout) ::   r_cc_loc(0:max_radial_level_in,0:nr_fine_in-1)
+    double precision , intent(inout) :: r_edge_loc(0:max_radial_level_in,0:nr_fine_in  )
     double precision , intent(in   ) ::    dx_fine(0:amrex_spacedim-1)
     integer          , intent(in   ) :: domhi_fine(0:amrex_spacedim-1)
     double precision , intent(in   ) ::    prob_lo(0:amrex_spacedim-1)
@@ -81,9 +81,7 @@ contains
        center = 0.5d0*(prob_lo + prob_hi)
     endif
 
-
     ! computes dr, nr, r_cc_loc, r_edge_loc
-
     if (spherical .eq. 0) then
        ! cartesian case
        
@@ -100,7 +98,7 @@ contains
        enddo
        
        ! compute r_cc_loc, r_edge_loc
-       do n = 0,max_radial_level-1
+       do n = 0,max_radial_level
           do i = 0,nr(n)-1
              r_cc_loc(n,i) = prob_lo(amrex_spacedim-1) + (dble(i)+HALF)*dr(n)
           end do
