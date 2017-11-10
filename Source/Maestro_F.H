@@ -69,7 +69,7 @@ extern "C"
                    const int& ng, const int& ncomp);
     //////////////////////
 
-    void initdata(const int& level_cpp, const int& max_levs,
+    void initdata(const int& lev,
                   const amrex::Real& time, 
                   const int* lo, const int* hi,
                   BL_FORT_FAB_ARG_3D(scal),

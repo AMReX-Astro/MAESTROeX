@@ -5,7 +5,7 @@ module initdata_module
   use eos_module
   use network, only: nspec
   use amrex_fort_module, only : amrex_spacedim
-  use base_state_geometry_module, only: nr_fine
+  use base_state_geometry_module, only: nr_fine, finest_radial_level
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, &
                                 perturb_model, pert_temp_factor, pert_rad_factor, do_small_domain
   
@@ -17,13 +17,13 @@ module initdata_module
 
 contains
 
-  subroutine initdata(level_cpp, max_levs, time, lo, hi, &
+  subroutine initdata(lev, time, lo, hi, &
                       scal, scal_lo, scal_hi, &
                       vel, vel_lo, vel_hi, &
                       s0_init, p0_init, &
                       dx, prob_lo) bind(C, name="initdata")
     
-    integer         , intent(in   ) :: level_cpp, max_levs, lo(3), hi(3)
+    integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3)
     integer         , intent(in   ) :: vel_lo(3), vel_hi(3)
     double precision, intent(in   ) :: time
@@ -33,18 +33,15 @@ contains
     double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
                                            vel_lo(2):vel_hi(2), &
                                            vel_lo(3):vel_hi(3), 1:amrex_spacedim)
-    double precision, intent(inout) :: s0_init(1:max_levs,0:nr_fine-1,1:nscal)
-    double precision, intent(inout) :: p0_init(1:max_levs,0:nr_fine-1)
+    double precision, intent(inout) :: s0_init(0:finest_radial_level,0:nr_fine-1,1:nscal)
+    double precision, intent(inout) :: p0_init(0:finest_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3), prob_lo(3)
 
-    integer          :: i,j,k,r,lev
+    integer          :: i,j,k,r
     double precision :: x,y,z
 
     double precision :: dens_pert, rhoh_pert, temp_pert
     double precision :: rhoX_pert(nspec)
-
-    ! fortran uses 1-based level index here
-    lev = level_cpp+1
 
     ! set velocity to zero
     vel = 0.d0

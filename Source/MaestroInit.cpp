@@ -1,6 +1,6 @@
 
 #include <Maestro.H>
-
+#include <AMReX_VisMF.H>
 using namespace amrex;
 
 // read in C++ and F90 parameters
@@ -543,7 +543,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
         const int* lo  = box.loVect();
         const int* hi  = box.hiVect();
 
-        initdata(lev, max_level+1, cur_time, ARLIM_3D(lo), ARLIM_3D(hi),
+        initdata(lev, cur_time, ARLIM_3D(lo), ARLIM_3D(hi),
                  BL_TO_FORTRAN_3D(scal[mfi]), 
                  BL_TO_FORTRAN_3D(vel[mfi]), 
                  s0_init.dataPtr(), p0_init.dataPtr(),
