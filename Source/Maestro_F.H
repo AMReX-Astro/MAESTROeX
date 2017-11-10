@@ -46,9 +46,13 @@ extern "C"
     //////////////////////
     // in maestro.f90
 
-    void init_base_state_geometry(const int& nlevs,
+    void init_base_state_geometry(const int& max_radial_level_in,
+                                  const int& nr_fine_in,
+                                  const amrex::Real& dr_fine_in,
+                                  const amrex::Real* r_cc_loc,
+                                  const amrex::Real* r_edge_loc,
                                   const amrex::Real* dx_fine,
-                                  const int* ncell_fine,
+                                  const int* domhi_fine,
                                   const amrex::Real* prob_lo,
                                   const amrex::Real* prob_hi);
 

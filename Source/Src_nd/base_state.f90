@@ -22,7 +22,7 @@ module base_state_module
                                 do_2d_planar_octant, do_planar_invsq_grav, rho_comp, &
                                 rhoh_comp, spec_comp, temp_comp, grav_const, &
                                 planar_invsq_mass, print_init_hse_diag
-  use base_state_geometry_module, only: nr_fine, dr, nr
+  use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
   
   implicit none
 
@@ -35,8 +35,8 @@ contains
   subroutine init_base_state(s0_init,p0_init,max_levs,prob_lo) bind(C, name="init_base_state")
 
     integer         , intent(in   ) :: max_levs
-    double precision, intent(inout) :: s0_init(1:max_levs,0:nr_fine-1,1:nscal)
-    double precision, intent(inout) :: p0_init(1:max_levs,0:nr_fine-1)
+    double precision, intent(inout) :: s0_init(0:max_radial_level-1,0:nr_fine-1,1:nscal)
+    double precision, intent(inout) :: p0_init(0:max_radial_level-1,0:nr_fine-1)
     double precision, intent(in   ) :: prob_lo(3)
 
     ! local variables
@@ -69,7 +69,7 @@ contains
     dr_in = (model_r(npts_model) - model_r(1)) / dble(npts_model-1)
     rmax = model_r(npts_model)
 
-    do n=1,max_levs
+    do n=0,max_radial_level-1
 
        if ( parallel_IOProcessor() ) then
           write (*,887)

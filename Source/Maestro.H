@@ -282,20 +282,15 @@ private:
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
 
-
-
-    int nlevs_radial;
+    // information for the base state
+    // we also store these (except for the large arrays) 
+    // in base_state.f90 in a fortran module for convenience
+    int max_radial_level;
+    int finest_radial_level;
     int nr_fine;
-    int nr_irreg;
-
     amrex::Real dr_fine;
-
-    amrex::Real center[AMREX_SPACEDIM];
-
-    amrex::Vector<amrex::Real> dr;
     amrex::Vector<amrex::Real> r_cc_loc;
     amrex::Vector<amrex::Real> r_edge_loc;
-    amrex::Vector<int> nr;
 
     // during initialization we fill these in by interpolating from
     // the model file and then copy to the base_state   
@@ -309,10 +304,10 @@ private:
     amrex::Vector<Real> phierr;
 
     // stores fluxes at coarse-fine interface for synchronization
-    // this will be sized "nlevs_max+1"
+    // this will be sized "max_level+1"
     // NOTE: the flux register associated with flux_reg[lev] is associated
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-    // therefore flux_reg[0] and flux_reg[nlevs_max] are never actually 
+    // therefore flux_reg[0] and flux_reg[max_level] are never actually 
     // used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;

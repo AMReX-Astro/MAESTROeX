@@ -30,23 +30,62 @@ Maestro::Init ()
     // at the top of meth_params.template
     set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,Nscal);
 
-    // set nr_fine
-    Box fineDomainBox = geom[max_level].Domain();
-    nr_fine = fineDomainBox.bigEnd()[AMREX_SPACEDIM-1] + 1;
+    const Box domainBoxFine = geom[max_level].Domain();
+    const Real* dxFine = geom[max_level].CellSize();
+    const Real* probLo = geom[0].ProbLo();
+    const Real* probHi = geom[0].ProbHi();
 
-    init_base_state_geometry(max_level+1, 
-                             ZFILL(geom[max_level].CellSize()),
-                             ARLIM_3D(fineDomainBox.hiVect()),
-                             ZFILL(geom[0].ProbLo()),
-                             ZFILL(geom[0].ProbHi()));
+    if (spherical == 1) {
+
+        // compute max_radial_level
+        max_radial_level = 0;
+
+        // compute dr_fine
+        dr_fine = dxFine[0] / drdxfac;
+       
+        // compute nr_fine
+        double lenx, leny, lenz, max_dist;
+        if (octant) {
+            lenx = probHi[0] - probLo[0];
+            leny = probHi[1] - probLo[1];
+            lenz = probHi[2] - probLo[2];
+        }
+        else {
+            lenx = 0.5*(probHi[0] - probLo[0]);
+            leny = 0.5*(probHi[1] - probLo[1]);
+            lenz = 0.5*(probHi[2] - probLo[2]);
+        }       
+        max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
+        nr_fine = int(max_dist / dr_fine) + 1;
+    }
+    else {
+        // compute max_radial_level
+        max_radial_level = max_level;
+
+        // compute dr_fine
+        dr_fine = dxFine[AMREX_SPACEDIM-1];
+
+        // compute nr_fine
+        nr_fine = domainBoxFine.bigEnd()[AMREX_SPACEDIM-1] + 1;
+    }
+
+    // allocate r_cc_loc and r_edge_loc (we will them in init_base_state_geometry)
+    r_cc_loc  .resize((max_radial_level+1)* nr_fine   );
+    r_edge_loc.resize((max_radial_level+1)*(nr_fine+1));
+
+    init_base_state_geometry(max_radial_level,nr_fine,dr_fine,
+                             r_cc_loc.dataPtr(),
+                             r_edge_loc.dataPtr(),
+                             geom[max_level].CellSize(),
+                             domainBoxFine.hiVect(),
+                             geom[0].ProbLo(),
+                             geom[0].ProbHi());
 
     // set up BCRec definitions for BC types
     BCSetup();
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
-
-    int nlevs_max = maxLevel() + 1;
 
     istep = 0;
 
@@ -56,22 +95,22 @@ Maestro::Init ()
     // set this to a large number so change_max doesn't affect the first time step
     dt = 1.e100;
 
-    sold    .resize(nlevs_max);
-    snew    .resize(nlevs_max);
-    uold    .resize(nlevs_max);
-    unew    .resize(nlevs_max);
-    S_cc_old.resize(nlevs_max);
-    S_cc_new.resize(nlevs_max);
-    gpi     .resize(nlevs_max);
-    dSdt    .resize(nlevs_max);
+    sold    .resize(max_level+1);
+    snew    .resize(max_level+1);
+    uold    .resize(max_level+1);
+    unew    .resize(max_level+1);
+    S_cc_old.resize(max_level+1);
+    S_cc_new.resize(max_level+1);
+    gpi     .resize(max_level+1);
+    dSdt    .resize(max_level+1);
 
     // stores fluxes at coarse-fine interface for synchronization
-    // this will be sized "nlevs_max+1"
+    // this will be sized "max_level+1+1"
     // NOTE: the flux register associated with flux_reg[lev] is associated
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] is never actually used in the reflux operation
-    flux_reg_s.resize(nlevs_max);
-    flux_reg_u.resize(nlevs_max);
+    flux_reg_s.resize(max_level+1);
+    flux_reg_u.resize(max_level+1);
 
     t_new = 0.0;
     t_old = -1.e200;
