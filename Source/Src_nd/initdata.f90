@@ -6,7 +6,7 @@ module initdata_module
   use network, only: nspec
   use amrex_fort_module, only : amrex_spacedim
   use base_state_geometry_module, only: nr_fine, finest_radial_level
-  use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, &
+  use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
                                 perturb_model, pert_temp_factor, pert_rad_factor, do_small_domain
   
   implicit none
@@ -65,6 +65,9 @@ contains
              scal(i,j,k,temp_comp) = s0_init(lev,r,temp_comp)
              scal(i,j,k,spec_comp:spec_comp+nspec-1) = &
                   s0_init(lev,r,spec_comp:spec_comp+nspec-1)
+
+             ! initialize pi_comp to zero for now
+             scal(i,j,k,pi_comp) = 0.d0
 
           end do
        end do
