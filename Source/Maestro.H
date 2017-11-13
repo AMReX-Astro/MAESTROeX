@@ -254,9 +254,6 @@ private:
     // end MaestroPlot.cpp functions
     ////////////
 
-    // compute the number of cells at a level
-    long CountCells (int lev);
-
     /*
       private data members
     */

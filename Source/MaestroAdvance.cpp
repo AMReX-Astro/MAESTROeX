@@ -289,21 +289,3 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
 }
-
-// compute the number of cells at a level
-long
-Maestro::CountCells (int lev)
-{
-    const int N = grids[lev].size();
-
-    long cnt = 0;
-
-#ifdef _OPENMP
-#pragma omp parallel for reduction(+:cnt)
-#endif
-    for (int i = 0; i < N; ++i) {
-        cnt += grids[lev][i].numPts();
-    }
-
-    return cnt;
-}
