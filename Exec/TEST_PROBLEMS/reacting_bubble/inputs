@@ -2,7 +2,7 @@
 maestro.model_file = "model.hse.cool.coulomb"
 maestro.perturb_model = true
 
-maestro.max_step  = 1
+maestro.max_step  = 0
 maestro.stop_time = 2.5
 
 # PROBLEM SIZE & GEOMETRY

@@ -12,6 +12,7 @@ CEXE_sources += MaestroNodalProj.cpp
 CEXE_sources += MaestroPhysBCFunct.cpp
 CEXE_sources += MaestroPlot.cpp
 CEXE_sources += MaestroRegrid.cpp
+CEXE_sources += MaestroSetup.cpp
 
 CEXE_headers += Maestro.H
 CEXE_headers += MaestroPhysBCFunct.H

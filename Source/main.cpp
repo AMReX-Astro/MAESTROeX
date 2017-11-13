@@ -18,7 +18,18 @@ int main(int argc, char* argv[])
         // declare an Maestro object to manage multilevel data
         Maestro maestro;
 	
-        // initialize AMR data
+        // read in C++/F90 parameters
+        // define global C++/F90 variables and initialize network
+        // set up boundary conditions
+        // initialize base state geometry parameters
+        // set istep, t_new, t_old
+        // allocate MultiFabs and base state arrays
+        maestro.Setup();
+
+        // initialize multifab and base state data
+        // perform initial projection
+        // perform divu iters
+        // perform initial (pressure) iterations
         maestro.Init();
 
         // advance solution to final time

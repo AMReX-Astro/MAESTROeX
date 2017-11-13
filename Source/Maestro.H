@@ -28,10 +28,22 @@ public:
     Maestro ();
     virtual ~Maestro();
 
-    // read in C++ and F90 parameters
-    // define variable mappings
-    // more to come...
+    // read in C++/F90 parameters
+    // define global C++/F90 variables and initialize network
+    // set up boundary conditions
+    // initialize base state geometry parameters
+    // set istep, t_new, t_old
+    // allocate MultiFabs and base state arrays
+    void Setup ();
+
+    // initialize multifab and base state data
+    // perform initial projection
+    // perform divu iters
+    // perform initial (pressure) iterations
     void Init ();
+
+    // fill in multifab and base state data
+    void InitData ();
 
     // read in C++ parameters from inputs file
     void ReadParameters ();
