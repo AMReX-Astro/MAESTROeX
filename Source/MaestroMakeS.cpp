@@ -42,3 +42,7 @@ Maestro::Make_S_cc (Vector<std::unique_ptr<MultiFab> >& S_cc)
     }
 
 }
+
+void
+Maestro::Make_S_nodal ()
+{}

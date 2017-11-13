@@ -16,7 +16,11 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<std::unique_ptr<MultiFab> >         macrhs(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >         macphi(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >       S_cc_nph(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >   rho_omegadot(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >       thermal1(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >       thermal2(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >       rho_Hnuc(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >       rho_Hext(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >             s1(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >             s2(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >         s2star(finest_level+1);
@@ -32,12 +36,15 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<std::unique_ptr<MultiFab> >        pcoeff2(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >     scal_force(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >      delta_chi(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >         sponge(finest_level+1);
 
     // face-centered in the dm-direction (planar only)
     Vector<std::unique_ptr<MultiFab> >     etarhoflux(finest_level+1);
 
     // nodal
+    Vector<std::unique_ptr<MultiFab> >        S_nodal(finest_level+1);
     Vector<std::unique_ptr<MultiFab> >    S_nodal_old(finest_level+1);
+    Vector<std::unique_ptr<MultiFab> >             pi(finest_level+1);
 
     // face-centered
     Vector<std::array< std::unique_ptr<MultiFab>, AMREX_SPACEDIM > >                umac(finest_level+1);
@@ -87,7 +94,11 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         macrhs[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,    0));
         macphi[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,    1));
         S_cc_nph[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        rho_omegadot[lev].reset  (new MultiFab(grids[lev], dmap[lev], NumSpec,    0));
         thermal1[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        thermal2[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        rho_Hnuc[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        rho_Hext[lev].reset      (new MultiFab(grids[lev], dmap[lev],       1,    0));
         s1[lev].reset            (new MultiFab(grids[lev], dmap[lev],   Nscal, ng_s));
         s2[lev].reset            (new MultiFab(grids[lev], dmap[lev],   Nscal, ng_s));
         s2star[lev].reset        (new MultiFab(grids[lev], dmap[lev],   Nscal, ng_s));
@@ -103,9 +114,12 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         pcoeff2[lev].reset       (new MultiFab(grids[lev], dmap[lev], NumSpec,    1));
         scal_force[lev].reset    (new MultiFab(grids[lev], dmap[lev],   Nscal,    1));
         delta_chi[lev].reset     (new MultiFab(grids[lev], dmap[lev],       1,    0));
+        sponge[lev].reset        (new MultiFab(grids[lev], dmap[lev],       1,    0));
 
         // nodal MultiFabs
-        S_nodal_old[lev].reset(new MultiFab(convert(grids[lev],nodal_flag), dmap[lev], 1, 1));
+        S_nodal[lev]    .reset(new MultiFab(convert(grids[lev],nodal_flag), dmap[lev], 1, 0));
+        S_nodal_old[lev].reset(new MultiFab(convert(grids[lev],nodal_flag), dmap[lev], 1, 0));
+        pi[lev]         .reset(new MultiFab(convert(grids[lev],nodal_flag), dmap[lev], 1, 0));
 
         // face-centered in the dm-direction (planar only)
 #if (AMREX_SPACEDIM == 2)
@@ -130,6 +144,9 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         div_coeff_cart_edge[lev][2].reset(new MultiFab(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1));
 #endif
     }
+
+    // FIXME
+    // make the sponge for all levels
 
 
     for (int lev=0; lev<=finest_level; ++lev) 

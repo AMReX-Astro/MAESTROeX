@@ -17,16 +17,13 @@ Maestro::Init ()
     InitData();
 
     // initial projection
-
+    InitProj();
 
     // divu iters
-
-
+    DivuIter();
 
     // initial (pressure) iters
-
-
-
+    InitIter();
 }
 
 // fill in multifab and base state data
@@ -111,6 +108,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                  ZFILL(dx),ZFILL(geom[lev].ProbLo()));
     }
 
+    // FIXME
     // now we copy data from s0_init and p0_init into s0_new and p0_new
 
 
@@ -118,3 +116,15 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 
 }
+
+
+void Maestro::InitProj ()
+{}
+
+
+void Maestro::DivuIter ()
+{}
+
+
+void Maestro::InitIter ()
+{}

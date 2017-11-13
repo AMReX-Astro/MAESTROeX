@@ -21,8 +21,9 @@ class Maestro
 {
 public:
 
-    ////////////////
-    // public member functions
+    /*
+      public member functions
+    */
 
     // constructor and destructor
     Maestro ();
@@ -42,39 +43,21 @@ public:
     // perform initial (pressure) iterations
     void Init ();
 
-    // fill in multifab and base state data
-    void InitData ();
-
-    // read in C++ parameters from inputs file
-    void ReadParameters ();
-
-    // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
-    void VariableSetup ();
-
-    // set up BCRec definitions for BC types
-    void BCSetup ();
-
-    // During initialization of a simulation, Maestro::InitData() calls 
-    // AmrCore::InitFromScratch(), which calls 
-    // a MakeNewGrids() function that repeatedly calls this function to create
-    // finer levels.  This function creates a new fine
-    // level that did not exist before by interpolating from the coarser level
-    // overrides the pure virtual function in AmrCore
-    virtual void MakeNewLevelFromScratch (int lev,
-                                          amrex::Real time,
-                                          const amrex::BoxArray& ba,
-                                          const amrex::DistributionMapping& dm) override;
-
 
     // advance solution to final time
     void Evolve ();
 
+private:
+
+    /*
+      private member functions
+    */
+
     ////////////
-    // Regridding functions
+    // regridding functions
 
     // check to see if we need to regrid, then regrid
     void Regrid ();
-
 
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
@@ -104,14 +87,40 @@ public:
     // overrides the pure virtual function in AmrCore
     virtual void ClearLevel (int lev) override;
 
-    //
+    // end regridding functions
     ////////////
 
-private:
+    ////////////
+    // MaestroSetup.cpp functions
 
-    /*
-      private member functions
-    */
+    // read in C++ parameters from inputs file
+    void ReadParameters ();
+
+    // define variable mappings (Rho, RhoH, ..., NSCAL, etc.)
+    void VariableSetup ();
+
+    // set up BCRec definitions for BC types
+    void BCSetup ();
+
+    // end MaestroSetup.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroInit.cpp functions
+
+    // fill in multifab and base state data
+    void InitData ();
+
+    // During initialization of a simulation, Maestro::InitData() calls 
+    // AmrCore::InitFromScratch(), which calls 
+    // a MakeNewGrids() function that repeatedly calls this function to create
+    // finer levels.  This function creates a new fine
+    // level that did not exist before by interpolating from the coarser level
+    // overrides the pure virtual function in AmrCore
+    virtual void MakeNewLevelFromScratch (int lev,
+                                          amrex::Real time,
+                                          const amrex::BoxArray& ba,
+                                          const amrex::DistributionMapping& dm) override;
 
     // initial projection
     void InitProj();
@@ -122,8 +131,20 @@ private:
     // init iter to initialize gradpi
     void InitIter();
 
+    // end MaestroInit.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroAdvance.cpp functions
+
     // advance solution at all levels for a single time step
     void AdvanceTimeStep (bool is_initIter);
+
+    // end MaestroAdvance.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroDt.cpp functions
 
     ////////////
     // Time step computation
@@ -134,11 +155,11 @@ private:
     // compute dt at a level from CFL considerations
     amrex::Real ComputeDtLevel (int lev) const;
 
-    //
+    // end MaestroDt.cpp functions
     ////////////
 
     ////////////
-    // Functions that fill data in MultiFabs
+    // MaestroFillData.cpp functions
 
     // compute a new multifab by coping in phi from valid region and filling ghost cells
     // works for single level and 2-level cases 
@@ -176,10 +197,21 @@ private:
     void AverageDownTo (int crse_lev,
                         amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
 
-    //
+    // end MaestroFillData.cpp functions
     ////////////
 
+    ////////////
+    // MaestroMakeS.cpp functions
+
     void Make_S_cc (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& S_cc);
+
+    void Make_S_nodal ();
+
+    // end MaestroMakeS.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroNodalProj.cpp functions
 
     void NodalProj (const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& phi,
                     const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& vel,
@@ -191,12 +223,21 @@ private:
                     const amrex::Real& abs_tol);
 
 
+    // end MaestroNodalProj.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroAverage.cpp functions
+
     // compute the radial average of a quantitiy
     void Average (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf,
                   amrex::Vector<amrex::Real> phibar);
 
+    // end MaestroAverage.cpp functions
     ////////////
-    // PlotFile routines
+
+    ////////////
+    // MaestroPlot.cpp functions
 
     // get plotfile name
     std::string PlotFileName (int lev) const;
@@ -210,7 +251,7 @@ private:
     // write plotfile to disk
     void WritePlotFile (int step) const;
 
-    //
+    // end MaestroPlot.cpp functions
     ////////////
 
     // compute the number of cells at a level
@@ -240,8 +281,7 @@ private:
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
-    // to avoid a copy
-    // these MultiFabs go through the regridding process
+    // to avoid a copy.  These MultiFabs go through the regridding process
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > sold;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > snew;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > uold;
@@ -249,22 +289,13 @@ private:
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_cc_old;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_cc_new;
 
-    // these MultiFabs need to be regridded as well
+    // these MultiFabs are persistant and need to be regridded as well
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > gpi;
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > dSdt;
 
-    // these are not persistent - after regridding these can be rebuilt
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_nodal;
+    // we make this persistent in that we only have to rebuild and
+    // fill this after regridding
     amrex::Vector<std::unique_ptr<amrex::MultiFab> > normal;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > sponge;
-
-    // these are not persistent, in the original MAESTRO they are 
-    // kept around for restarting into matching plotfiles only
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > pi;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_omegadot;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hnuc;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > rho_Hext;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > thermal;
 
     // stores domain boundary conditions
     // these muse be vectors (rather than arrays) so we can ParmParse them
