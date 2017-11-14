@@ -119,7 +119,33 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 
 void Maestro::InitProj ()
-{}
+{
+
+    Vector<MultiFab>           S_cc(finest_level+1);
+    Vector<MultiFab>   rho_omegadot(finest_level+1);
+    Vector<MultiFab>        thermal(finest_level+1);
+    Vector<MultiFab>       rho_Hnuc(finest_level+1);
+    Vector<MultiFab>       rho_Hext(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) 
+    {
+        S_cc[lev].define        (grids[lev], dmap[lev],       1,    0);
+        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec,    0);
+        thermal[lev].define     (grids[lev], dmap[lev],       1,    0);
+        rho_Hnuc[lev].define    (grids[lev], dmap[lev],       1,    0);
+        rho_Hext[lev].define    (grids[lev], dmap[lev],       1,    0);
+
+        rho_omegadot[lev].setVal(0.);
+        thermal[lev].setVal(0.);
+        rho_Hnuc[lev].setVal(0.);
+        rho_Hext[lev].setVal(0.);
+    }
+
+    Make_S_cc(S_cc,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+
+    VisMF::Write(S_cc[0],"a_S_cc");
+
+}
 
 
 void Maestro::DivuIter ()

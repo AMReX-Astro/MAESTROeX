@@ -5,31 +5,31 @@ using namespace amrex;
 
 void
 Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
-                    Vector<MultiFab>& scal,
-                    Vector<MultiFab>& rho_omegadot,
-                    Vector<MultiFab>& rho_Hnuc,
-                    Vector<MultiFab>& rho_Hext,
-                    Vector<MultiFab>& thermal)
+                    const Vector<MultiFab>& scal,
+                    const Vector<MultiFab>& rho_omegadot,
+                    const Vector<MultiFab>& rho_Hnuc,
+                    const Vector<MultiFab>& rho_Hext,
+                    const Vector<MultiFab>& thermal)
 {
 
     for (int lev=0; lev<=finest_level; ++lev) 
     {
         MultiFab& S_cc_mf = S_cc[lev];
-        MultiFab& scal_mf = scal[lev];
-        MultiFab& rho_odot_mf = rho_omegadot[lev];
-        MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
-        MultiFab& rho_Hext_mf = rho_Hext[lev];
-        MultiFab& thermal_mf = thermal[lev];
+        const MultiFab& scal_mf = scal[lev];
+        const MultiFab& rho_odot_mf = rho_omegadot[lev];
+        const MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
+        const MultiFab& rho_Hext_mf = rho_Hext[lev];
+        const MultiFab& thermal_mf = thermal[lev];
 
         for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) // Loop over boxes
         {
             // get references to the FABs, each containing data and the valid+ghost box
             FArrayBox& S_cc_fab = S_cc_mf[mfi];
-            FArrayBox& scal_fab = scal_mf[mfi];
-            FArrayBox& rho_odot_fab = rho_odot_mf[mfi];
-            FArrayBox& rho_Hnuc_fab = rho_Hnuc_mf[mfi];
-            FArrayBox& rho_Hext_fab = rho_Hext_mf[mfi];
-            FArrayBox& thermal_fab = thermal_mf[mfi];
+            const FArrayBox& scal_fab = scal_mf[mfi];
+            const FArrayBox& rho_odot_fab = rho_odot_mf[mfi];
+            const FArrayBox& rho_Hnuc_fab = rho_Hnuc_mf[mfi];
+            const FArrayBox& rho_Hext_fab = rho_Hext_mf[mfi];
+            const FArrayBox& thermal_fab = thermal_mf[mfi];
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
@@ -79,16 +79,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
 }
 
-/*
+
 void
-Maestro::Make_S_nodal (Vector<<MultiFab>& S_cc,
+Maestro::Make_S_nodal (const Vector<MultiFab>& S_cc,
                        Vector<MultiFab>& S_nodal,
                        Real Sbar,
                        const Vector<Real>& div_coeff)
 {}
-*/
-
-void
-Maestro::Make_S_nodal ()
-{
-}

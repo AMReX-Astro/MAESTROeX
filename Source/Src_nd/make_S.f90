@@ -64,6 +64,8 @@ subroutine make_S_cc(lo, hi, &
           + sigma*xi_term &
           + pres_term/(eos_state%rho*eos_state%dpdr)
 
+     S_cc(i,j,k) = 1.23456789d0
+
   enddo
   enddo
   enddo

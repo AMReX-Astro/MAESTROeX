@@ -204,13 +204,16 @@ private:
     // MaestroMakeS.cpp functions
 
     void Make_S_cc (amrex::Vector<amrex::MultiFab>& S_cc,
-                    amrex::Vector<amrex::MultiFab>& scal,
-                    amrex::Vector<amrex::MultiFab>& rho_omegadot,
-                    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                    amrex::Vector<amrex::MultiFab>& rho_Hext,
-                    amrex::Vector<amrex::MultiFab>& thermal);
+                    const amrex::Vector<amrex::MultiFab>& scal,
+                    const amrex::Vector<amrex::MultiFab>& rho_omegadot,
+                    const amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+                    const amrex::Vector<amrex::MultiFab>& rho_Hext,
+                    const amrex::Vector<amrex::MultiFab>& thermal);
 
-    void Make_S_nodal ();
+    void Make_S_nodal (const amrex::Vector<amrex::MultiFab>& S_cc,
+                       amrex::Vector<amrex::MultiFab>& S_nodal,
+                       amrex::Real Sbar,
+                       const amrex::Vector<amrex::Real>& div_coeff);
 
     // end MaestroMakeS.cpp functions
     ////////////
@@ -346,7 +349,7 @@ private:
     amrex::Vector<amrex::Real> w0;
 
     // tagging criteria
-    amrex::Vector<Real> phierr;
+    amrex::Vector<amrex::Real> phierr;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+1"
