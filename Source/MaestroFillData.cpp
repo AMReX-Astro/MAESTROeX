@@ -8,8 +8,8 @@ using namespace amrex;
 // (fill fine grid ghost by interpolating from coarse)
 void
 Maestro::FillPatch (int lev, Real time, MultiFab& mf, 
-                    Vector<std::unique_ptr<MultiFab> >& mf_old,
-                    Vector<std::unique_ptr<MultiFab> >& mf_new,
+                    Vector<MultiFab>& mf_old,
+                    Vector<MultiFab>& mf_new,
                     int icomp, int ncomp, Vector<BCRec> bcs)
 {
     if (lev == 0)
@@ -45,8 +45,8 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
 // this comes into play when a new level of refinement appears
 void
 Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
-                          Vector<std::unique_ptr<MultiFab> >& mf_old,
-                          Vector<std::unique_ptr<MultiFab> >& mf_new,
+                          Vector<MultiFab>& mf_old,
+                          Vector<MultiFab>& mf_new,
                           int icomp, int ncomp, Vector<BCRec> bcs)
 {
     AMREX_ASSERT(lev > 0);
@@ -77,8 +77,8 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
 void
 Maestro::GetData (int lev, Real time, 
                   Vector<MultiFab*>& mf, Vector<Real>& mftime,
-                  Vector<std::unique_ptr<MultiFab> >& mf_old,
-                  Vector<std::unique_ptr<MultiFab> >& mf_new)
+                  Vector<MultiFab>& mf_old,
+                  Vector<MultiFab>& mf_new)
 {
     mf.clear();
     mftime.clear();
@@ -87,18 +87,18 @@ Maestro::GetData (int lev, Real time,
 
     if (time > t_new - teps && time < t_new + teps)
     {
-        mf.push_back(mf_new[lev].get());
+        mf.push_back(&mf_new[lev]);
         mftime.push_back(t_new);
     }
     else if (time > t_old - teps && time < t_old + teps)
     {
-        mf.push_back(mf_old[lev].get());
+        mf.push_back(&mf_old[lev]);
         mftime.push_back(t_old);
     }
     else
     {
-        mf.push_back(mf_old[lev].get());
-        mf.push_back(mf_new[lev].get());
+        mf.push_back(&mf_old[lev]);
+        mf.push_back(&mf_new[lev]);
         mftime.push_back(t_old);
         mftime.push_back(t_new);
     }
@@ -106,21 +106,21 @@ Maestro::GetData (int lev, Real time,
 
 // set covered coarse cells to be the average of overlying fine cells
 void
-Maestro::AverageDown (Vector<std::unique_ptr<MultiFab> >& mf)
+Maestro::AverageDown (Vector<MultiFab>& mf)
 {
     for (int lev = finest_level-1; lev >= 0; --lev)
     {
-        average_down(*mf[lev+1], *mf[lev],
+        average_down(mf[lev+1], mf[lev],
                      geom[lev+1], geom[lev],
-                     0, mf[lev]->nComp(), refRatio(lev));
+                     0, mf[lev].nComp(), refRatio(lev));
     }
 }
 
 // more flexible version of AverageDown() that lets you average down across multiple levels
 void
-Maestro::AverageDownTo (int crse_lev, Vector<std::unique_ptr<MultiFab> >& mf)
+Maestro::AverageDownTo (int crse_lev, Vector<MultiFab>& mf)
 {
-    average_down(*mf[crse_lev+1], *mf[crse_lev],
+    average_down(mf[crse_lev+1], mf[crse_lev],
                  geom[crse_lev+1], geom[crse_lev],
-                 0, mf[crse_lev]->nComp(), refRatio(crse_lev));
+                 0, mf[crse_lev].nComp(), refRatio(crse_lev));
 }

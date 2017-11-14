@@ -22,11 +22,11 @@ Maestro::PlotFileMF () const
 
     for (int i = 0; i <= finest_level; ++i)
     {
-        plot_mf_data[i] = new MultiFab((*snew[i]).boxArray(),(*snew[i]).DistributionMap(),nPlot,0);
+        plot_mf_data[i] = new MultiFab((snew[i]).boxArray(),(snew[i]).DistributionMap(),nPlot,0);
 
         // copy velocity and scalars into plot_mf_data[i]
-        plot_mf_data[i]->copy((*unew[i]),0,0             ,AMREX_SPACEDIM);
-        plot_mf_data[i]->copy((*snew[i]),0,AMREX_SPACEDIM,Nscal         );
+        plot_mf_data[i]->copy((unew[i]),0,0             ,AMREX_SPACEDIM);
+        plot_mf_data[i]->copy((snew[i]),0,AMREX_SPACEDIM,Nscal         );
 
         // add plot_mf_data[i] to plot_mf
         plot_mf.push_back(plot_mf_data[i]);

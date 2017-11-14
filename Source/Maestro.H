@@ -165,15 +165,15 @@ private:
     // works for single level and 2-level cases 
     // (fill fine grid ghost by interpolating from coarse)
     void FillPatch (int lev, amrex::Real time, amrex::MultiFab& mf,
-                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_old,
-                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_new,
+                    amrex::Vector<amrex::MultiFab>& mf_old,
+                    amrex::Vector<amrex::MultiFab>& mf_new,
                     int icomp, int ncomp, amrex::Vector<amrex::BCRec> bcs);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
     void FillCoarsePatch (int lev, amrex::Real time, amrex::MultiFab& mf,
-                          amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_old,
-                          amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_new,
+                          amrex::Vector<amrex::MultiFab>& mf_old,
+                          amrex::Vector<amrex::MultiFab>& mf_new,
                           int icomp, int ncomp,
                           amrex::Vector<amrex::BCRec> bcs);
 
@@ -186,16 +186,16 @@ private:
     void GetData (int lev, amrex::Real time,
                   amrex::Vector<amrex::MultiFab*>& mf,
                   amrex::Vector<amrex::Real>& mftime,
-                  amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_old,
-                  amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf_new);
+                  amrex::Vector<amrex::MultiFab>& mf_old,
+                  amrex::Vector<amrex::MultiFab>& mf_new);
 
     // set covered coarse cells to be the average of overlying fine cells
-    void AverageDown (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
+    void AverageDown (amrex::Vector<amrex::MultiFab>& mf);
 
     // more flexible version of AverageDown() that lets you average 
     // down across multiple levels
     void AverageDownTo (int crse_lev,
-                        amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf);
+                        amrex::Vector<amrex::MultiFab>& mf);
 
     // end MaestroFillData.cpp functions
     ////////////
@@ -203,12 +203,12 @@ private:
     ////////////
     // MaestroMakeS.cpp functions
 
-    void Make_S_cc (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& S_cc,
-                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& scal,
-                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rho_omegadot,
-                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rho_Hnuc,
-                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rho_Hext,
-                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& thermal);
+    void Make_S_cc (amrex::Vector<amrex::MultiFab>& S_cc,
+                    amrex::Vector<amrex::MultiFab>& scal,
+                    amrex::Vector<amrex::MultiFab>& rho_omegadot,
+                    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+                    amrex::Vector<amrex::MultiFab>& rho_Hext,
+                    amrex::Vector<amrex::MultiFab>& thermal);
 
     void Make_S_nodal ();
 
@@ -218,14 +218,14 @@ private:
     ////////////
     // MaestroNodalProj.cpp functions
 
-    void NodalProj (const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& phi,
-                    const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& vel,
-                    const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rhcc,
-                    const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rhnd,
-                    const amrex::Vector<std::unique_ptr<amrex::MultiFab> >& beta0,
+    void NodalProj (amrex::Vector<amrex::MultiFab>& phi,
+                    amrex::Vector<amrex::MultiFab>& vel,
+                    amrex::Vector<amrex::MultiFab>& rhcc,
+                    amrex::Vector<amrex::MultiFab>& rhnd,
+                    amrex::Vector<amrex::MultiFab>& beta0,
                     int* bc,
-                    const amrex::Real& rel_tol,
-                    const amrex::Real& abs_tol);
+                    amrex::Real rel_tol,
+                    amrex::Real abs_tol);
 
 
     // end MaestroNodalProj.cpp functions
@@ -235,7 +235,7 @@ private:
     // MaestroAverage.cpp functions
 
     // compute the radial average of a quantitiy
-    void Average (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& mf,
+    void Average (amrex::Vector<amrex::MultiFab>& mf,
                   amrex::Vector<amrex::Real> phibar);
 
     // end MaestroAverage.cpp functions
@@ -284,20 +284,20 @@ private:
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
     // to avoid a copy.  These MultiFabs go through the regridding process
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > sold;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > snew;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > uold;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > unew;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_cc_old;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > S_cc_new;
+    amrex::Vector<amrex::MultiFab> sold;
+    amrex::Vector<amrex::MultiFab> snew;
+    amrex::Vector<amrex::MultiFab> uold;
+    amrex::Vector<amrex::MultiFab> unew;
+    amrex::Vector<amrex::MultiFab> S_cc_old;
+    amrex::Vector<amrex::MultiFab> S_cc_new;
 
     // these MultiFabs are persistant and need to be regridded as well
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > gpi;
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > dSdt;
+    amrex::Vector<amrex::MultiFab> gpi;
+    amrex::Vector<amrex::MultiFab> dSdt;
 
     // we make this persistent in that we only have to rebuild and
     // fill this after regridding
-    amrex::Vector<std::unique_ptr<amrex::MultiFab> > normal;
+    amrex::Vector<amrex::MultiFab> normal;
 
     // stores domain boundary conditions
     // these muse be vectors (rather than arrays) so we can ParmParse them
@@ -354,8 +354,8 @@ private:
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] and flux_reg[max_level] are never actually 
     // used in the reflux operation
-    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
-    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
+    amrex::Vector<amrex::FluxRegister> flux_reg_s;
+    amrex::Vector<amrex::FluxRegister> flux_reg_u;
     
     ////////////////
     // class data members defined in _cpp_parameters

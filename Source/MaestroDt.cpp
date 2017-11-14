@@ -51,7 +51,7 @@ Maestro::ComputeDtLevel (int lev) const
     const Real* dx = geom[lev].CellSize();
     const Real* prob_lo = geom[lev].ProbLo();
     const Real cur_time = t_new;
-    const MultiFab& S_new = *snew[lev];
+    const MultiFab& S_new = snew[lev];
 
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_est)

@@ -5,14 +5,14 @@ using namespace amrex;
 
 
 void
-Maestro::NodalProj (const Vector<std::unique_ptr<MultiFab> >& phi,
-                    const Vector<std::unique_ptr<MultiFab> >& vel,
-                    const Vector<std::unique_ptr<MultiFab> >& rhcc,
-                    const Vector<std::unique_ptr<MultiFab> >& rhnd,
-                    const Vector<std::unique_ptr<MultiFab> >& beta0,
+Maestro::NodalProj (Vector<MultiFab>& phi,
+                    Vector<MultiFab>& vel,
+                    Vector<MultiFab>& rhcc,
+                    Vector<MultiFab>& rhnd,
+                    Vector<MultiFab>& beta0,
                     int* mg_bcs,
-                    const Real& rel_tol,
-                    const Real& abs_tol)
+                    Real rel_tol,
+                    Real abs_tol)
 
 {
     const Vector<Geometry>& mg_geom = Geom();

@@ -4,22 +4,22 @@
 using namespace amrex;
 
 void
-Maestro::Make_S_cc (Vector<std::unique_ptr<MultiFab> >& S_cc,
-                    Vector<std::unique_ptr<MultiFab> >& scal,
-                    Vector<std::unique_ptr<MultiFab> >& rho_omegadot,
-                    Vector<std::unique_ptr<MultiFab> >& rho_Hnuc,
-                    Vector<std::unique_ptr<MultiFab> >& rho_Hext,
-                    Vector<std::unique_ptr<MultiFab> >& thermal)
+Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
+                    Vector<MultiFab>& scal,
+                    Vector<MultiFab>& rho_omegadot,
+                    Vector<MultiFab>& rho_Hnuc,
+                    Vector<MultiFab>& rho_Hext,
+                    Vector<MultiFab>& thermal)
 {
 
     for (int lev=0; lev<=finest_level; ++lev) 
     {
-        MultiFab& S_cc_mf = *S_cc[lev];
-        MultiFab& scal_mf = *scal[lev];
-        MultiFab& rho_odot_mf = *rho_omegadot[lev];
-        MultiFab& rho_Hnuc_mf = *rho_Hnuc[lev];
-        MultiFab& rho_Hext_mf = *rho_Hext[lev];
-        MultiFab& thermal_mf = *thermal[lev];
+        MultiFab& S_cc_mf = S_cc[lev];
+        MultiFab& scal_mf = scal[lev];
+        MultiFab& rho_odot_mf = rho_omegadot[lev];
+        MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
+        MultiFab& rho_Hext_mf = rho_Hext[lev];
+        MultiFab& thermal_mf = thermal[lev];
 
         for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) // Loop over boxes
         {
@@ -79,6 +79,16 @@ Maestro::Make_S_cc (Vector<std::unique_ptr<MultiFab> >& S_cc,
 
 }
 
+/*
+void
+Maestro::Make_S_nodal (Vector<<MultiFab>& S_cc,
+                       Vector<MultiFab>& S_nodal,
+                       Real Sbar,
+                       const Vector<Real>& div_coeff)
+{}
+*/
+
 void
 Maestro::Make_S_nodal ()
-{}
+{
+}

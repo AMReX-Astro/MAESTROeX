@@ -7,7 +7,7 @@ using namespace amrex;
 // If we are in plane-parallel, the averaging is at constant height.  
 // If we are spherical, then the averaging is done at constant radius.  
 
-void Maestro::Average (Vector<std::unique_ptr<MultiFab> >& phi,
+void Maestro::Average (Vector<MultiFab>& phi,
                        Vector<Real> phibar)
 {
 

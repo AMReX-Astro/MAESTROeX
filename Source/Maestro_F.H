@@ -66,11 +66,11 @@ extern "C"
     // in make_S.f90
     void make_S_cc(const int* lo, const int* hi, 
                    amrex::Real* S_cc,  const int* s_lo, const int* s_hi, const int& nc_s,
-                   amrex::Real* scal,  const int* c_lo, const int* c_hi, const int& nc_c,
-                   amrex::Real* rodot, const int* r_lo, const int* r_hi, const int& nc_r,
-                   amrex::Real* rHnuc, const int* n_lo, const int* n_hi, const int& nc_n,
-                   amrex::Real* rHext, const int* e_lo, const int* e_hi, const int& nc_e,
-                   amrex::Real* therm, const int* t_lo, const int* t_hi, const int& nc_t);
+                   const amrex::Real* scal,  const int* c_lo, const int* c_hi, const int& nc_c,
+                   const amrex::Real* rodot, const int* r_lo, const int* r_hi, const int& nc_r,
+                   const amrex::Real* rHnuc, const int* n_lo, const int* n_hi, const int& nc_n,
+                   const amrex::Real* rHext, const int* e_lo, const int* e_hi, const int& nc_e,
+                   const amrex::Real* therm, const int* t_lo, const int* t_hi, const int& nc_t);
     //////////////////////
 
     void initdata(const int& lev,
