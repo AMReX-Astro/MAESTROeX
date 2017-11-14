@@ -203,7 +203,12 @@ private:
     ////////////
     // MaestroMakeS.cpp functions
 
-    void Make_S_cc (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& S_cc);
+    void Make_S_cc (amrex::Vector<std::unique_ptr<amrex::MultiFab> >& S_cc,
+                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& scal,
+                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rho_omegadot,
+                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rho_Hnuc,
+                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& rho_Hext,
+                    amrex::Vector<std::unique_ptr<amrex::MultiFab> >& thermal);
 
     void Make_S_nodal ();
 
