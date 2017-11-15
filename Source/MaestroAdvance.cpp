@@ -240,14 +240,14 @@ Maestro::AdvanceTimeStep (bool is_initIter)
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)   
-                    flux_reg_s[lev+1].CrseInit(fluxes[i],i,0,0,fluxes[i].nComp(), -1.0);
+                    flux_reg_s[lev+1]->CrseInit(fluxes[i],i,0,0,fluxes[i].nComp(), -1.0);
                 }	
             }
             if (lev > 0)
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev) 
-                    flux_reg_s[lev].FineAdd(fluxes[i],i,0,0,fluxes[i].nComp(), 1.0);
+                    flux_reg_s[lev]->FineAdd(fluxes[i],i,0,0,fluxes[i].nComp(), 1.0);
                 }
             }
         }
@@ -270,7 +270,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     {
         if (do_reflux) {
             // update lev based on coarse-fine flux mismatch
-            flux_reg_s[lev+1].Reflux(snew[lev], 1.0, 0, 0, snew[lev].nComp(), geom[lev]);
+            flux_reg_s[lev+1]->Reflux(snew[lev], 1.0, 0, 0, snew[lev].nComp(), geom[lev]);
         }
 
         AverageDownTo(lev,snew); // average lev+1 down to lev

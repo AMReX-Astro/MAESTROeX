@@ -85,8 +85,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     dSdt[lev]    .define(ba, dm,              1, ng_d);
 
     if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].define(ba, dm, refRatio(lev-1), lev, Nscal);
-        flux_reg_u[lev].define(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM);
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+        flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
     const Real* dx = geom[lev].CellSize();

@@ -122,8 +122,8 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].define(ba, dm, refRatio(lev-1), lev, Nscal);
-        flux_reg_u[lev].define(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM);
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+        flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }    
 }
 
@@ -153,8 +153,8 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].define(ba, dm, refRatio(lev-1), lev, Nscal);
-        flux_reg_u[lev].define(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM);
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+        flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
     FillCoarsePatch(lev, time,     snew[lev],     sold,     snew, 0,          Nscal, bcs_s);
@@ -183,8 +183,6 @@ Maestro::ClearLevel (int lev)
 
     dSdt[lev].clear();
 
-/* WQZ FIXME
     flux_reg_s[lev].reset(nullptr);
     flux_reg_u[lev].reset(nullptr);
-*/
 }

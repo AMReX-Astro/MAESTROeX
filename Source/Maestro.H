@@ -357,8 +357,8 @@ private:
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] and flux_reg[max_level] are never actually 
     // used in the reflux operation
-    amrex::Vector<amrex::FluxRegister> flux_reg_s;
-    amrex::Vector<amrex::FluxRegister> flux_reg_u;
+    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
+    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
     
     ////////////////
     // class data members defined in _cpp_parameters
