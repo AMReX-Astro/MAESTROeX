@@ -15,6 +15,7 @@ module base_state_module
   use eos_module
   use amrex_constants_module
   use simple_log_module
+  use inlet_bc_module
   use fundamental_constants_module, only: Gconst
   use amrex_fort_module, only: amrex_spacedim
   use network, only: nspec
@@ -236,8 +237,7 @@ contains
        endif
 
        ! initialize any inlet BC parameters
-       ! FIXME
-       !    call set_inlet_bcs()
+       call set_inlet_bcs()
 
     end do ! end loop over levels
 
