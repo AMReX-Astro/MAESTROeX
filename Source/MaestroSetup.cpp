@@ -96,6 +96,7 @@ Maestro::Setup ()
 
     // set this to a large number so change_max doesn't affect the first time step
     dt = 1.e100;
+    dtold = 1.e100;
 
     sold    .resize(max_level+1);
     snew    .resize(max_level+1);

@@ -39,7 +39,7 @@ Maestro::Evolve ()
         // write a plotfile
         if (plot_int > 0 && istep % plot_int == 0)
         {
-            Print() << "\nWriting plotfile " << istep << std::endl;
+            Print() << "\nWriting plotfile " << istep << endl;
             last_plot_file_step = istep;
             WritePlotFile(istep);
         }
@@ -49,7 +49,7 @@ Maestro::Evolve ()
     // write a final plotfile if we haven't already
     if (plot_int > 0 && istep > last_plot_file_step)
     {
-        Print() << "\nWriting plotfile " << istep-1 << std::endl;
+        Print() << "\nWriting plotfile " << istep-1 << endl;
         WritePlotFile(istep-1);
     }
 }

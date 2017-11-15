@@ -85,10 +85,16 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     const Real strt_total = ParallelDescriptor::second();
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
-            << " DT = " << dt << std::endl << std::endl;
+            << " DT = " << dt << endl << endl;
 
-    for (int lev=0; lev<=finest_level; ++lev) 
-    {
+    if (verbose > 0) {
+        Print() << "Cell Count:" << endl;
+        for (int lev=0; lev<=finest_level; ++lev) {
+            Print() << "Level " << lev << ", " << CountCells(lev) << " cells" << endl;
+        }
+    }
+
+    for (int lev=0; lev<=finest_level; ++lev) {
         // cell-centered MultiFabs
         rhohalf[lev].define       (grids[lev], dmap[lev],       1,    1);
         macrhs[lev].define        (grids[lev], dmap[lev],       1,    0);
@@ -149,21 +155,66 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // make the sponge for all levels
 
 
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 1 -- react the full state and then base state through dt/2
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 2 -- define average expansion at time n+1/2
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 3 -- construct the advective velocity
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 4 -- advect the base state and full state through dt
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 5 -- react the full state and then base state through dt/2
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 6 -- define a new average expansion rate at n+1/2
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 7 -- redo the construction of the advective velocity using the current w0
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 8 -- advect the base state and full state through dt
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 9 -- react the full state and then base state through dt/2
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 10 -- compute S^{n+1} for the final projection
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // STEP 11 -- update the velocity
+    //////////////////////////////////////////////////////////////////////////////
+
+
+        
+
+
     for (int lev=0; lev<=finest_level; ++lev) 
     {
 
-        if (verbose > 0)
-        {
-            Print() << "[Level " << lev << " step " << istep+1 << "] ";
-            Print() << "BEGIN ADVANCE with " << CountCells(lev) << " cells" << std::endl;
-        }
-
         MultiFab& S_new = snew[lev];
-
-        const Real ctr_time = 0.5*(t_old+t_new);
-
-        const Real* dx = geom[lev].CellSize();
-        const Real* prob_lo = geom[lev].ProbLo();
 
         MultiFab fluxes[AMREX_SPACEDIM];
         if (do_reflux)
@@ -176,56 +227,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
             }
         }
 
-        // State with ghost cells
-        MultiFab Sborder(grids[lev], dmap[lev], S_new.nComp(), ng_s);
-        FillPatch(lev, t_old, Sborder, sold, snew, 0, Sborder.nComp(), bcs_s);
-
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        {
-            FArrayBox flux[AMREX_SPACEDIM], uface[AMREX_SPACEDIM];
-
-            for (MFIter mfi(S_new, true); mfi.isValid(); ++mfi)
-            {
-                const Box& bx = mfi.tilebox();
-
-                const FArrayBox& statein = Sborder[mfi];
-                FArrayBox& stateout      =   S_new[mfi];
-
-                // Allocate fabs for fluxes and Godunov velocities.
-                for (int i = 0; i < AMREX_SPACEDIM ; i++) {
-                    const Box& bxtmp = surroundingNodes(bx,i);
-                    flux[i].resize(bxtmp,S_new.nComp());
-                    uface[i].resize(grow(bxtmp,1),1);
-                }
-
-                // compute velocities on faces (prescribed function of space and time)
-                get_face_velocity(lev, ctr_time,
-                                  AMREX_D_DECL(BL_TO_FORTRAN(uface[0]),
-                                               BL_TO_FORTRAN(uface[1]),
-                                               BL_TO_FORTRAN(uface[2])),
-                                  dx, prob_lo);
-
-                // compute new state (stateout) and fluxes.
-                advect(bx.loVect(), bx.hiVect(),
-                       BL_TO_FORTRAN_3D(statein), 
-                       BL_TO_FORTRAN_3D(stateout),
-                       AMREX_D_DECL(BL_TO_FORTRAN_3D(uface[0]),
-                                    BL_TO_FORTRAN_3D(uface[1]),
-                                    BL_TO_FORTRAN_3D(uface[2])),
-                       AMREX_D_DECL(BL_TO_FORTRAN_3D(flux[0]), 
-                                    BL_TO_FORTRAN_3D(flux[1]), 
-                                    BL_TO_FORTRAN_3D(flux[2])), 
-                       dx, dt, S_new.nComp());
-
-                if (do_reflux) {
-                    for (int i = 0; i < AMREX_SPACEDIM ; i++) {
-                        fluxes[i][mfi].copy(flux[i],mfi.nodaltilebox(i));	  
-                    }
-                }
-            }
-        }
+        // advection
 
         // increment or decrement the flux registers by area and time-weighted fluxes
         // Note that the fluxes have already been scaled by dt and area
@@ -252,11 +254,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
             }
         }
 
-        if (verbose > 0)
-        {
-            Print() << "[Level " << lev << " step " << istep+1 << "] ";
-            Print() << "END ADVANCE" << std::endl;
-        }
 
     } // end loop over levels
 
@@ -272,7 +269,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
-            << " DT = " << dt << std::endl;
+            << " DT = " << dt << endl;
 
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;
