@@ -54,7 +54,7 @@ private:
     */
 
     ////////////
-    // regridding functions
+    // regridding functions in MaestroRegrid.cpp
 
     // check to see if we need to regrid, then regrid
     void Regrid ();
@@ -144,10 +144,7 @@ private:
     ////////////
 
     ////////////
-    // MaestroDt.cpp functions
-
-    ////////////
-    // Time step computation
+    // Time step computation in MaestroDt.cpp
 
     // a wrapper for ComputeDtLevel
     void ComputeDt ();
@@ -265,16 +262,14 @@ private:
     /*
       private data members
     */
+    
+    ////////////////
+    // static data members defined in _cpp_parameters
+    // this file is in Source/param_includes/
+#include <maestro_params.H>
+    ////////////////
 
-    // which step?
-    int istep;
-
-    // keep track of old time, new time, and time step at each level
-    amrex::Real t_new;
-    amrex::Real t_old;
-    amrex::Real dt;
-
-    // these are defined in VariableSetup
+    // these are defined in VariableSetup()
     static int Nscal;
     static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi;
 
@@ -283,6 +278,14 @@ private:
     static amrex::IntVect nodal_flag_x;
     static amrex::IntVect nodal_flag_y;
     static amrex::IntVect nodal_flag_z;
+
+    // which step?
+    int istep;
+
+    // keep track of old time, new time, and time step at each level
+    amrex::Real t_new;
+    amrex::Real t_old;
+    amrex::Real dt;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
@@ -359,11 +362,6 @@ private:
     // used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
-    
-    ////////////////
-    // class data members defined in _cpp_parameters
-#include <maestro_params.H>
-    ////////////////
 
 };
 

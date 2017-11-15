@@ -3,8 +3,11 @@
 
 using namespace amrex;
 
-// default values for class data members defined in _cpp_parameters
+// default values for class data members listed in _cpp_parameters
+// that are declared in maestro_params.H
 #include <maestro_defaults.H>
+
+// default values are overridden in VariableSetup()
 int Maestro::Rho       = -1;
 int Maestro::RhoH      = -1;
 int Maestro::FirstSpec = -1;
@@ -13,6 +16,7 @@ int Maestro::Temp      = -1;
 int Maestro::Pi        = -1;
 int Maestro::Nscal     = -1;
 
+// helper IntVects used to define face/nodal MultiFabs
 #if (AMREX_SPACEDIM == 2)
 IntVect Maestro::nodal_flag(1,1);
 IntVect Maestro::nodal_flag_x(1,0);
