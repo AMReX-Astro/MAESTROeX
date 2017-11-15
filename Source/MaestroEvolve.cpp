@@ -24,6 +24,12 @@ Maestro::Evolve ()
             std::swap(    sold[lev],     snew[lev]);
             std::swap(    uold[lev],     unew[lev]);
             std::swap(S_cc_old[lev], S_cc_new[lev]);
+
+            std::swap( rho0_old, rho0_new);
+            std::swap(rhoh0_old,rhoh0_new);
+            std::swap(   p0_old,   p0_new);
+
+            std::swap(div_coeff_old,div_coeff_new);
         }
 
         // compute time step

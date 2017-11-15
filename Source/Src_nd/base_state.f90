@@ -33,11 +33,16 @@ module base_state_module
 
 contains
 
-  subroutine init_base_state(s0_init,p0_init,max_levs,prob_lo) bind(C, name="init_base_state")
+  subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar, &
+                             max_levs,prob_lo) bind(C, name="init_base_state")
 
     integer         , intent(in   ) :: max_levs
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) ::    rho0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) ::   rhoh0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) ::      p0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) :: tempbar(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: prob_lo(3)
 
     ! local variables
@@ -47,7 +52,7 @@ contains
     double precision :: temp_above_cutoff
 
     integer         :: n,r,comp
-    real(kind=dp_t) :: rloc,dr_in,rmax,starting_rad,mod_dr
+    real(kind=dp_t) :: rloc,model_dr,rmax,starting_rad,mod_dr
     real(kind=dp_t) :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
     real(kind=dp_t) :: sumX
 
@@ -63,11 +68,11 @@ contains
 
     base_cutoff_density_loc = 1.d99
 
-    ! only need to read in the initial model once -- model_parser_module
-    ! stores the model data
+    ! only need to read in the initial model once -- 
+    ! model_parser_module stores the model data
     call read_model_file(model_file)
 
-    dr_in = (model_r(npts_model) - model_r(1)) / dble(npts_model-1)
+    model_dr = (model_r(npts_model) - model_r(1)) / dble(npts_model-1)
     rmax = model_r(npts_model)
 
     do n=0,max_radial_level
@@ -81,14 +86,14 @@ contains
           endif
 
           call log('dr of MAESTRO base state =                            ', dr(n))
-          call log('dr of input file data =                               ', dr_in)
+          call log('dr of input file data =                               ', model_dr)
           call log(' ')
           call log('maximum radius (cell-centered) of input model =       ', rmax)
 
-          if (dr(n) .lt. dr_in) then
-             mod_dr = mod(dr_in,dr(n))
+          if (dr(n) .lt. model_dr) then
+             mod_dr = mod(model_dr,dr(n))
           else
-             mod_dr = mod(dr(n),dr_in)
+             mod_dr = mod(dr(n),model_dr)
           endif
 
           if (mod_dr .gt. TINY) then
@@ -178,6 +183,12 @@ contains
           end if
 
        end do
+
+       ! copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
+       rho0 = s0_init(:,:,rho_comp)
+       rhoh0 = s0_init(:,:,rhoh_comp)
+       tempbar = s0_init(:,:,temp_comp)
+       p0 = p0_init       
 
        ! check whether we are in HSE
 

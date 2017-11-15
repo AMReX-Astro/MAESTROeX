@@ -36,7 +36,8 @@ Maestro::InitData ()
     Print() << "Calling InitData()" << endl;
 
     // read in model file and fill in s0_init and p0_init for all levels
-    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),max_level+1,
+    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_new.dataPtr(),
+                    rhoh0_new.dataPtr(),p0_new.dataPtr(),tempbar.dataPtr(),max_level+1,
                     ZFILL(geom[0].ProbLo()));
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
@@ -46,11 +47,6 @@ Maestro::InitData ()
     // synchronize levels
     AverageDown(snew);
     AverageDown(unew);
-
-    // now fill in rho0, rhoh0, and p0
-    // FIXME
-
-
 
     // free memory in s0_init and p0_init by swapping it
     // with an empty vector that will go out of scope

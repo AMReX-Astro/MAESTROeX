@@ -336,6 +336,10 @@ private:
     amrex::Vector<amrex::Real> rhoh0_new;
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
+    amrex::Vector<amrex::Real> tempbar;
+    amrex::Vector<amrex::Real> tempbar_init;
+    amrex::Vector<amrex::Real> div_coeff_old;
+    amrex::Vector<amrex::Real> div_coeff_new;
 
     // information for the base state
     // we also store these (except for the large arrays) 

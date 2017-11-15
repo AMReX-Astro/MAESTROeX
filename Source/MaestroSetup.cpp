@@ -116,14 +116,18 @@ Maestro::Setup ()
     flux_reg_u.resize(max_level+1);
 
     // here we need to allocate and fill s0_init and p0_init
-    s0_init  .resize( (max_level+1)*nr_fine*Nscal );
-    p0_init  .resize( (max_level+1)*nr_fine );
-    rho0_old .resize( (max_level+1)*nr_fine );
-    rho0_new .resize( (max_level+1)*nr_fine );
-    rhoh0_old.resize( (max_level+1)*nr_fine );
-    rhoh0_new.resize( (max_level+1)*nr_fine );
-    p0_old   .resize( (max_level+1)*nr_fine );
-    p0_new   .resize( (max_level+1)*nr_fine );
+    s0_init      .resize( (max_level+1)*nr_fine*Nscal );
+    p0_init      .resize( (max_level+1)*nr_fine );
+    rho0_old     .resize( (max_level+1)*nr_fine );
+    rho0_new     .resize( (max_level+1)*nr_fine );
+    rhoh0_old    .resize( (max_level+1)*nr_fine );
+    rhoh0_new    .resize( (max_level+1)*nr_fine );
+    p0_old       .resize( (max_level+1)*nr_fine );
+    p0_new       .resize( (max_level+1)*nr_fine );
+    tempbar      .resize( (max_level+1)*nr_fine );
+    tempbar_init .resize( (max_level+1)*nr_fine );
+    div_coeff_old.resize( (max_level+1)*nr_fine );
+    div_coeff_new.resize( (max_level+1)*nr_fine );
 
 }
 
