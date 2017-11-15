@@ -19,7 +19,7 @@ Maestro::Regrid ()
             
     // print wallclock time
     ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
-    if (Verbose()) {
+    if (verbose > 0) {
         Print() << "Time to regrid: " << end_total << '\n';
     }
         

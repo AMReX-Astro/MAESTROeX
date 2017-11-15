@@ -19,6 +19,9 @@ Maestro::Init ()
     // initial projection
     InitProj();
 
+    // compute initial time step
+    FirstDt();
+
     // divu iters
     DivuIter();
 

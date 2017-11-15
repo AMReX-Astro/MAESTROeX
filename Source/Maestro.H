@@ -146,11 +146,14 @@ private:
     ////////////
     // Time step computation in MaestroDt.cpp
 
-    // a wrapper for ComputeDtLevel
-    void ComputeDt ();
+    // a wrapper for EstDtLevel
+    void EstDt ();
 
     // compute dt at a level from CFL considerations
-    amrex::Real ComputeDtLevel (int lev) const;
+    amrex::Real EstDtLevel (int lev) const;
+
+    // compute initial time step
+    void FirstDt ();
 
     // end MaestroDt.cpp functions
     ////////////
@@ -286,6 +289,7 @@ private:
     amrex::Real t_new;
     amrex::Real t_old;
     amrex::Real dt;
+    amrex::Real dtold;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new

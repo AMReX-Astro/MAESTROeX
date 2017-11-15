@@ -16,7 +16,7 @@ geometry.prob_hi     =  1.0  1.0  1.0
 amr.n_cell           =  64   64   64
 
 # VERBOSITY
-amr.v              = 1       # verbosity in Amr
+maestro.v              = 1       # verbosity
 
 # REFINEMENT
 amr.max_level       = 2       # maximum level number allowed

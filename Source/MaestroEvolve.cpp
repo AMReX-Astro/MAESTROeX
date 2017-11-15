@@ -27,7 +27,7 @@ Maestro::Evolve ()
         }
 
         // compute time step
-        ComputeDt();
+        EstDt();
 
         // reset t_old and t_new
         t_old = t_new;

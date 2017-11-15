@@ -24,10 +24,9 @@ Maestro::NodalProj (Vector<MultiFab>& phi,
     const bool have_rhcc = false;
     const int nc = 0;
     const int ncomp = 1;
-    const int verbose = 0;
 
     MGT_Solver mgt_solver(mg_geom, mg_bcs, mg_ba, mg_dm, nodal, hg_stencil, have_rhcc,
-                          nc, ncomp, verbose);
+                          nc, ncomp, mg_verbose);
 
     mgt_solver.set_nodal_coefficients(GetVecOfPtrs(beta0));
 

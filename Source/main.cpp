@@ -40,9 +40,7 @@ int main(int argc, char* argv[])
 	
         // print wallclock time
         ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
-        if (maestro.Verbose()) {
-            Print() << "\nTotal Time: " << end_total << '\n';
-        }
+        Print() << "\nTotal Time: " << end_total << '\n';
     }
 
     // destroy timer for profiling

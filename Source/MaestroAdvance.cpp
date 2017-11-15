@@ -152,7 +152,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     for (int lev=0; lev<=finest_level; ++lev) 
     {
 
-        if (Verbose())
+        if (verbose > 0)
         {
             Print() << "[Level " << lev << " step " << istep+1 << "] ";
             Print() << "BEGIN ADVANCE with " << CountCells(lev) << " cells" << std::endl;
@@ -252,18 +252,13 @@ Maestro::AdvanceTimeStep (bool is_initIter)
             }
         }
 
-        if (Verbose())
+        if (verbose > 0)
         {
             Print() << "[Level " << lev << " step " << istep+1 << "] ";
             Print() << "END ADVANCE" << std::endl;
         }
 
     } // end loop over levels
-
-    if (Verbose())
-    {
-        Print() << "Synchronizing all levels" << std::endl;
-    }
 
     // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
     for (int lev=finest_level-1; lev>=0; --lev)
@@ -284,7 +279,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 	
     // print wallclock time
     ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
-    if (Verbose()) {
+    if (verbose > 0) {
         Print() << "Time to advance time step: " << end_total << '\n';
     }
 
