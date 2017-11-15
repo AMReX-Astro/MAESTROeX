@@ -20,7 +20,6 @@ EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := ignition_simple
 
-Bpack   := ./Make.package
 Blocs   := . 
 
 include $(MAESTRO_C_HOME)/Exec/Make.Maestro

@@ -146,8 +146,6 @@ void Maestro::InitProj ()
 
     Make_S_cc(S_cc,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
 
-    VisMF::Write(S_cc[0],"a_S_cc");
-
 }
 
 

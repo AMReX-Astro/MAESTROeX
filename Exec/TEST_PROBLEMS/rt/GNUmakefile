@@ -23,7 +23,6 @@ NETWORK_DIR      := general_null
 # for the general_null network, we read in the species names, aion, and zion from this file
 GENERAL_NET_INPUTS := $(MAESTRO_C_HOME)/Microphysics/networks/$(NETWORK_DIR)/simple.net
 
-Bpack   := ./Make.package
 Blocs   := . 
 
 include $(MAESTRO_C_HOME)/Exec/Make.Maestro
