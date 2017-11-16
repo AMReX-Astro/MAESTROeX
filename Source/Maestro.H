@@ -328,8 +328,10 @@ private:
     int mg_bcs_p[2*AMREX_SPACEDIM];
     int mg_bcs_h[2*AMREX_SPACEDIM];
 
-    // this contains the base state
-    // stores as one long vector
+    // vectors store the multilevel 1D states as one very long array
+    // these are cell-centered
+    amrex::Vector<amrex::Real> s0_init;
+    amrex::Vector<amrex::Real> p0_init;
     amrex::Vector<amrex::Real> rho0_old;
     amrex::Vector<amrex::Real> rho0_new;
     amrex::Vector<amrex::Real> rhoh0_old;
@@ -340,6 +342,18 @@ private:
     amrex::Vector<amrex::Real> tempbar_init;
     amrex::Vector<amrex::Real> div_coeff_old;
     amrex::Vector<amrex::Real> div_coeff_new;
+    amrex::Vector<amrex::Real> gamma1bar;
+    amrex::Vector<amrex::Real> gamma1bar_init;
+    amrex::Vector<amrex::Real> etarho_cc;
+    amrex::Vector<amrex::Real> psi;
+    amrex::Vector<amrex::Real> grav_cell;
+    amrex::Vector<amrex::Real> r_cc_loc;
+
+    // vectors store the multilevel 1D states as one very long array
+    // these are edge-centered
+    amrex::Vector<amrex::Real> w0;
+    amrex::Vector<amrex::Real> etarho_ec;
+    amrex::Vector<amrex::Real> r_edge_loc;
 
     // information for the base state
     // we also store these (except for the large arrays) 
@@ -348,16 +362,6 @@ private:
     int finest_radial_level;
     int nr_fine;
     amrex::Real dr_fine;
-    amrex::Vector<amrex::Real> r_cc_loc;
-    amrex::Vector<amrex::Real> r_edge_loc;
-
-    // during initialization we fill these in by interpolating from
-    // the model file and then copy to the base_state   
-    amrex::Vector<amrex::Real> s0_init;
-    amrex::Vector<amrex::Real> p0_init;
-
-    // this contains the base state for velocity
-    amrex::Vector<amrex::Real> w0;
 
     // tagging criteria
     amrex::Vector<amrex::Real> phierr;

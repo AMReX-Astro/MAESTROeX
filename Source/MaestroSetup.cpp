@@ -74,9 +74,32 @@ Maestro::Setup ()
         nr_fine = domainBoxFine.bigEnd()[AMREX_SPACEDIM-1] + 1;
     }
 
-    // allocate r_cc_loc and r_edge_loc (we will them in init_base_state_geometry)
-    r_cc_loc  .resize((max_radial_level+1)* nr_fine   );
-    r_edge_loc.resize((max_radial_level+1)*(nr_fine+1));
+    // vectors store the multilevel 1D states as one very long array
+    // these are cell-centered
+    s0_init       .resize( (max_radial_level+1)*nr_fine*Nscal );
+    p0_init       .resize( (max_radial_level+1)*nr_fine );
+    rho0_old      .resize( (max_radial_level+1)*nr_fine );
+    rho0_new      .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_old     .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_new     .resize( (max_radial_level+1)*nr_fine );
+    p0_old        .resize( (max_radial_level+1)*nr_fine );
+    p0_new        .resize( (max_radial_level+1)*nr_fine );
+    tempbar       .resize( (max_radial_level+1)*nr_fine );
+    tempbar_init  .resize( (max_radial_level+1)*nr_fine );
+    div_coeff_old .resize( (max_radial_level+1)*nr_fine );
+    div_coeff_new .resize( (max_radial_level+1)*nr_fine );
+    gamma1bar     .resize( (max_radial_level+1)*nr_fine );
+    gamma1bar_init.resize( (max_radial_level+1)*nr_fine );
+    etarho_cc     .resize( (max_radial_level+1)*nr_fine );
+    psi           .resize( (max_radial_level+1)*nr_fine );
+    grav_cell     .resize( (max_radial_level+1)*nr_fine );
+    r_cc_loc      .resize( (max_radial_level+1)*nr_fine );
+
+    // vectors store the multilevel 1D states as one very long array
+    // these are edge-centered
+    w0        .resize( (max_radial_level+1)*(nr_fine+1) );
+    etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
+    r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
 
     init_base_state_geometry(max_radial_level,nr_fine,dr_fine,
                              r_cc_loc.dataPtr(),
@@ -114,20 +137,6 @@ Maestro::Setup ()
     // therefore flux_reg[0] is never actually used in the reflux operation
     flux_reg_s.resize(max_level+1);
     flux_reg_u.resize(max_level+1);
-
-    // here we need to allocate and fill s0_init and p0_init
-    s0_init      .resize( (max_level+1)*nr_fine*Nscal );
-    p0_init      .resize( (max_level+1)*nr_fine );
-    rho0_old     .resize( (max_level+1)*nr_fine );
-    rho0_new     .resize( (max_level+1)*nr_fine );
-    rhoh0_old    .resize( (max_level+1)*nr_fine );
-    rhoh0_new    .resize( (max_level+1)*nr_fine );
-    p0_old       .resize( (max_level+1)*nr_fine );
-    p0_new       .resize( (max_level+1)*nr_fine );
-    tempbar      .resize( (max_level+1)*nr_fine );
-    tempbar_init .resize( (max_level+1)*nr_fine );
-    div_coeff_old.resize( (max_level+1)*nr_fine );
-    div_coeff_new.resize( (max_level+1)*nr_fine );
 
 }
 
