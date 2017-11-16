@@ -364,7 +364,7 @@ private:
     amrex::Real dr_fine;
 
     // tagging criteria
-    amrex::Vector<amrex::Real> phierr;
+    amrex::Vector<amrex::Real> temperr;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+1"

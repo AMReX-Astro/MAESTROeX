@@ -157,9 +157,9 @@ Maestro::ReadParameters ()
     pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
 
     // read in tagging criteria
-    int n = pp.countval("phierr");
+    int n = pp.countval("temperr");
     if (n > 0) {
-        pp.getarr("phierr", phierr, 0, n);
+        pp.getarr("temperr", temperr, 0, n);
     }
 
 }

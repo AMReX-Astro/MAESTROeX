@@ -39,7 +39,7 @@ maestro.cfl         = 0.7    # cfl number for hyperbolic system
 maestro.do_reflux = 1
 
 # Tagging
-maestro.phierr = 1.01  1.1  1.5
+maestro.temperr = 6.5e8 6.5e8
 
 # PLOTFILES
 maestro.plot_file  = plt    # root name of plot file

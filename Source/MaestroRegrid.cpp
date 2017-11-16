@@ -30,7 +30,7 @@ Maestro::Regrid ()
 void
 Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 {
-    if (lev >= phierr.size()) return;
+    if (lev >= temperr.size()) return;
 
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
@@ -68,7 +68,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
                         BL_TO_FORTRAN_3D(state[mfi]),
                         &tagval, &clearval, 
                         ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()), 
-                        ZFILL(dx), ZFILL(prob_lo), &time, &phierr[lev]);
+                        ZFILL(dx), ZFILL(prob_lo), &time, &temperr[lev]);
             //
             // Now update the tags in the TagBox in the tilebox region
             // to be equal to itags
