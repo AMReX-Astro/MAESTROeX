@@ -245,6 +245,28 @@ private:
     ////////////
 
     ////////////
+    // MaestroReact.cpp functions
+
+    // compute heating term, rho_Hext, then
+    // react the state over dt_react and update rho_omegadot, rho_Hnuc
+    void React (const amrex::Vector<amrex::MultiFab>& s_in,
+                amrex::Vector<amrex::MultiFab>& s_out,
+                amrex::Vector<amrex::MultiFab>& rho_Hext,
+                amrex::Vector<amrex::MultiFab>& rho_omegadot,
+                amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+                const amrex::Vector<amrex::Real>& p0,
+                const amrex::Real dt_react);
+
+    // compute heating term, rho_Hext
+    void ComputeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext);
+
+    // end MaestroReact.cpp functions
+    ////////////
+
+    // end MaestroAverage.cpp functions
+    ////////////
+
+    ////////////
     // MaestroPlot.cpp functions
 
     // get plotfile name

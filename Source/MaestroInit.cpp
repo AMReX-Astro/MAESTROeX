@@ -68,20 +68,14 @@ Maestro::InitData ()
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)
 {
-    const int ng_s = 0;
-    const int ng_u = 0;
-    const int ng_S = 0;
-    const int ng_g = 0;
-    const int ng_d = 0;
-
-    sold[lev]    .define(ba, dm,          Nscal, ng_s);
-    snew[lev]    .define(ba, dm,          Nscal, ng_s);
-    uold[lev]    .define(ba, dm, AMREX_SPACEDIM, ng_u);
-    unew[lev]    .define(ba, dm, AMREX_SPACEDIM, ng_u);
-    S_cc_old[lev].define(ba, dm,              1, ng_S);
-    S_cc_new[lev].define(ba, dm,              1, ng_S);
-    gpi[lev]     .define(ba, dm, AMREX_SPACEDIM, ng_g);
-    dSdt[lev]    .define(ba, dm,              1, ng_d);
+    sold[lev]    .define(ba, dm,          Nscal, 0);
+    snew[lev]    .define(ba, dm,          Nscal, 0);
+    uold[lev]    .define(ba, dm, AMREX_SPACEDIM, 0);
+    unew[lev]    .define(ba, dm, AMREX_SPACEDIM, 0);
+    S_cc_old[lev].define(ba, dm,              1, 0);
+    S_cc_new[lev].define(ba, dm,              1, 0);
+    gpi[lev]     .define(ba, dm, AMREX_SPACEDIM, 0);
+    dSdt[lev]    .define(ba, dm,              1, 0);
 
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
@@ -126,19 +120,31 @@ void Maestro::InitProj ()
     Vector<MultiFab>       rho_Hnuc(finest_level+1);
     Vector<MultiFab>       rho_Hext(finest_level+1);
 
-    for (int lev=0; lev<=finest_level; ++lev) 
-    {
-        S_cc[lev].define        (grids[lev], dmap[lev],       1,    0);
-        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec,    0);
-        thermal[lev].define     (grids[lev], dmap[lev],       1,    0);
-        rho_Hnuc[lev].define    (grids[lev], dmap[lev],       1,    0);
-        rho_Hext[lev].define    (grids[lev], dmap[lev],       1,    0);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        S_cc[lev].define        (grids[lev], dmap[lev],       1, 0);
+        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        thermal[lev].define     (grids[lev], dmap[lev],       1, 0);
+        rho_Hnuc[lev].define    (grids[lev], dmap[lev],       1, 0);
+        rho_Hext[lev].define    (grids[lev], dmap[lev],       1, 0);
 
+        // during initial projection we ignore reaction terms
         rho_omegadot[lev].setVal(0.);
-        thermal[lev].setVal(0.);
         rho_Hnuc[lev].setVal(0.);
-        rho_Hext[lev].setVal(0.);
     }
+
+    ComputeHeating(rho_Hext);
+
+    if (use_thermal_diffusion) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            thermal[lev].setVal(0.);   // FIXME
+        }
+    }
+    else {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            thermal[lev].setVal(0.);
+        }
+    }
+
 
     Make_S_cc(S_cc,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
 

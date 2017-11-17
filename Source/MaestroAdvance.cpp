@@ -79,8 +79,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<Real> rho0_predicted_edge;
     Vector<Real> delta_chi_w0;
 
-    constexpr int ng_s = 3;
-
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
 
@@ -96,31 +94,31 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
     for (int lev=0; lev<=finest_level; ++lev) {
         // cell-centered MultiFabs
-        rhohalf[lev].define       (grids[lev], dmap[lev],       1,    1);
-        macrhs[lev].define        (grids[lev], dmap[lev],       1,    0);
-        macphi[lev].define        (grids[lev], dmap[lev],       1,    1);
-        S_cc_nph[lev].define      (grids[lev], dmap[lev],       1,    0);
-        rho_omegadot[lev].define  (grids[lev], dmap[lev], NumSpec,    0);
-        thermal1[lev].define      (grids[lev], dmap[lev],       1,    0);
-        thermal2[lev].define      (grids[lev], dmap[lev],       1,    0);
-        rho_Hnuc[lev].define      (grids[lev], dmap[lev],       1,    0);
-        rho_Hext[lev].define      (grids[lev], dmap[lev],       1,    0);
-        s1[lev].define            (grids[lev], dmap[lev],   Nscal, ng_s);
-        s2[lev].define            (grids[lev], dmap[lev],   Nscal, ng_s);
-        s2star[lev].define        (grids[lev], dmap[lev],   Nscal, ng_s);
-        div_coeff_cart[lev].define(grids[lev], dmap[lev],       1,    1);
-        peosbar_cart[lev].define  (grids[lev], dmap[lev],       1,    0);
-        delta_p_term[lev].define  (grids[lev], dmap[lev],       1,    0);
-        Tcoeff[lev].define        (grids[lev], dmap[lev],       1,    1);
-        hcoeff1[lev].define       (grids[lev], dmap[lev],       1,    1);
-        Xkcoeff1[lev].define      (grids[lev], dmap[lev], NumSpec,    1);
-        pcoeff1[lev].define       (grids[lev], dmap[lev],       1,    1);
-        hcoeff2[lev].define       (grids[lev], dmap[lev],       1,    1);
-        Xkcoeff2[lev].define      (grids[lev], dmap[lev],       1,    1);
-        pcoeff2[lev].define       (grids[lev], dmap[lev], NumSpec,    1);
-        scal_force[lev].define    (grids[lev], dmap[lev],   Nscal,    1);
-        delta_chi[lev].define     (grids[lev], dmap[lev],       1,    0);
-        sponge[lev].define        (grids[lev], dmap[lev],       1,    0);
+        rhohalf[lev].define       (grids[lev], dmap[lev],       1, 1);
+        macrhs[lev].define        (grids[lev], dmap[lev],       1, 0);
+        macphi[lev].define        (grids[lev], dmap[lev],       1, 1);
+        S_cc_nph[lev].define      (grids[lev], dmap[lev],       1, 0);
+        rho_omegadot[lev].define  (grids[lev], dmap[lev], NumSpec, 0);
+        thermal1[lev].define      (grids[lev], dmap[lev],       1, 0);
+        thermal2[lev].define      (grids[lev], dmap[lev],       1, 0);
+        rho_Hnuc[lev].define      (grids[lev], dmap[lev],       1, 0);
+        rho_Hext[lev].define      (grids[lev], dmap[lev],       1, 0);
+        s1[lev].define            (grids[lev], dmap[lev],   Nscal, 0);
+        s2[lev].define            (grids[lev], dmap[lev],   Nscal, 0);
+        s2star[lev].define        (grids[lev], dmap[lev],   Nscal, 0);
+        div_coeff_cart[lev].define(grids[lev], dmap[lev],       1, 1);
+        peosbar_cart[lev].define  (grids[lev], dmap[lev],       1, 0);
+        delta_p_term[lev].define  (grids[lev], dmap[lev],       1, 0);
+        Tcoeff[lev].define        (grids[lev], dmap[lev],       1, 1);
+        hcoeff1[lev].define       (grids[lev], dmap[lev],       1, 1);
+        Xkcoeff1[lev].define      (grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff1[lev].define       (grids[lev], dmap[lev],       1, 1);
+        hcoeff2[lev].define       (grids[lev], dmap[lev],       1, 1);
+        Xkcoeff2[lev].define      (grids[lev], dmap[lev],       1, 1);
+        pcoeff2[lev].define       (grids[lev], dmap[lev], NumSpec, 1);
+        scal_force[lev].define    (grids[lev], dmap[lev],   Nscal, 1);
+        delta_chi[lev].define     (grids[lev], dmap[lev],       1, 0);
+        sponge[lev].define        (grids[lev], dmap[lev],       1, 0);
 
         // nodal MultiFabs
         S_nodal[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);

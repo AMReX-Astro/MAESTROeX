@@ -133,21 +133,15 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 void
 Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 				 const DistributionMapping& dm)
-{
-    const int ng_s =     snew[lev-1].nGrow();
-    const int ng_u =     unew[lev-1].nGrow();
-    const int ng_S = S_cc_new[lev-1].nGrow();
-    const int ng_g =      gpi[lev-1].nGrow();
-    const int ng_d =     dSdt[lev-1].nGrow();
-    
-    snew[lev].define    (ba, dm,          Nscal, ng_s);
-    sold[lev].define    (ba, dm,          Nscal, ng_s);
-    unew[lev].define    (ba, dm, AMREX_SPACEDIM, ng_u);
-    uold[lev].define    (ba, dm, AMREX_SPACEDIM, ng_u);
-    S_cc_new[lev].define(ba, dm,              1, ng_S);
-    S_cc_old[lev].define(ba, dm,              1, ng_S);
-    gpi[lev].define     (ba, dm, AMREX_SPACEDIM, ng_g);
-    dSdt[lev].define    (ba, dm,              1, ng_d);
+{    
+    snew[lev].define    (ba, dm,          Nscal, 0);
+    sold[lev].define    (ba, dm,          Nscal, 0);
+    unew[lev].define    (ba, dm, AMREX_SPACEDIM, 0);
+    uold[lev].define    (ba, dm, AMREX_SPACEDIM, 0);
+    S_cc_new[lev].define(ba, dm,              1, 0);
+    S_cc_old[lev].define(ba, dm,              1, 0);
+    gpi[lev].define     (ba, dm, AMREX_SPACEDIM, 0);
+    dSdt[lev].define    (ba, dm,              1, 0);
 
     t_new = time;
     t_old = time - 1.e200;
