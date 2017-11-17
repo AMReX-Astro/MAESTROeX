@@ -89,6 +89,15 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in average.f90
+    void average(int lev, const int* lo, const int* hi,
+                 const amrex::Real* phi, const int* p_lo, const int* p_hi, 
+                 amrex::Real* phisum);
+
+    void divide_phisum_by_ncell(amrex::Real* phisum, int* ncell);
+    //////////////////////
+
+    //////////////////////
     // in initdata.f90
     void initdata(const int& lev,
                   const amrex::Real& time, 

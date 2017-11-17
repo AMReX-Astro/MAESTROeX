@@ -238,8 +238,9 @@ private:
     // MaestroAverage.cpp functions
 
     // compute the radial average of a quantitiy
-    void Average (amrex::Vector<amrex::MultiFab>& mf,
-                  amrex::Vector<amrex::Real> phibar);
+    void Average (const amrex::Vector<amrex::MultiFab>& mf,
+                  amrex::Vector<amrex::Real>& phibar,
+                  int comp);
 
     // end MaestroAverage.cpp functions
     ////////////
