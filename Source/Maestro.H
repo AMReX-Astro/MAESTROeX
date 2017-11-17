@@ -257,6 +257,14 @@ private:
                 const amrex::Vector<amrex::Real>& p0,
                 const amrex::Real dt_react);
 
+    void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
+                amrex::Vector<amrex::MultiFab>& s_out,
+                const amrex::Vector<amrex::MultiFab>& rho_Hext,
+                amrex::Vector<amrex::MultiFab>& rho_omegadot,
+                amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+                const amrex::Vector<amrex::Real>& p0,
+                const amrex::Real dt_react);
+
     // compute heating term, rho_Hext
     void ComputeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext);
 

@@ -78,6 +78,17 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in burner_loop.f90
+    void burner_loop(int lev, const int* lo, const int* hi, 
+                     const amrex::Real* s_in,  const int* i_lo, const int* i_hi, const int& nc_i,
+                     amrex::Real* s_out,  const int* o_lo, const int* o_hi, const int& nc_o,
+                     const amrex::Real* rho_Hext, const int* e_lo, const int* e_hi, const int& nc_e,
+                     amrex::Real* rho_odot, const int* r_lo, const int* r_hi, const int& nc_r,
+                     amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi, const int& nc_n,
+                     const amrex::Real* tempbar_init_in, amrex::Real dt_in);
+    //////////////////////
+
+    //////////////////////
     // in initdata.f90
     void initdata(const int& lev,
                   const amrex::Real& time, 

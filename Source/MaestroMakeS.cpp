@@ -14,6 +14,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     for (int lev=0; lev<=finest_level; ++lev) 
     {
+        // get references to the MultiFabs at level lev
         MultiFab& S_cc_mf = S_cc[lev];
         const MultiFab& scal_mf = scal[lev];
         const MultiFab& rho_odot_mf = rho_omegadot[lev];
@@ -21,7 +22,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         const MultiFab& rho_Hext_mf = rho_Hext[lev];
         const MultiFab& thermal_mf = thermal[lev];
 
-        for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) // Loop over boxes
+        // Loop over boxes
+        for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi )
         {
             // get references to the FABs, each containing data and the valid+ghost box
             FArrayBox& S_cc_fab = S_cc_mf[mfi];

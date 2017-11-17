@@ -384,7 +384,7 @@ mach_max_abort                      Real               -1.0
 # value.  This is useful for developing an initial convective field
 # to carry away the energy, while preventing the reactions from going
 # nonlinear.
-drive_initial_convection            bool            false
+drive_initial_convection            bool            false       y
 
 # timestep beyond which we set {\tt drive\_initial\_convection} = F
 stop_initial_convection            int              -1
@@ -430,10 +430,10 @@ limit_conductivity                  bool            false
 do_burning                          bool            true
 
 # Name of the species to be used in burner threshold
-burner_threshold_species            string          ""
+burner_threshold_species            string          ""          y
 
 # Mass fraction cutoff for burner\_threshold\_species  used in burner threshold
-burner_threshold_cutoff             Real               1.e-10
+burner_threshold_cutoff             Real               1.e-10  y
 
 # break a zone into subzones, call the burner in each subzone and
 # then average the result to the original cell
@@ -441,7 +441,7 @@ do_subgrid_burning                  bool            false
 
 # mass fraction sum tolerance (if they don't sum to 1 within this tolerance,
 # we abort)
-reaction_sum_tol                    Real               1.e-10
+reaction_sum_tol                    Real               1.e-10   y
 
 #-----------------------------------------------------------------------------
 # category: EOS

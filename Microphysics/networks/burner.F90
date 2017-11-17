@@ -31,32 +31,8 @@ contains
 
 
 
-  function ok_to_burn(state)
-
-    !$acc routine seq
-
-    use meth_params_module, only: react_T_min, react_T_max, react_rho_min, react_rho_max
-
-    implicit none
-
-    logical       :: ok_to_burn
-    type (burn_t) :: state
-
-    ok_to_burn = .true.
-
-    if (state % T < react_T_min .or. state % T > react_T_max .or. &
-        state % rho < react_rho_min .or. state % rho > react_rho_max) then
-
-       ok_to_burn = .false.
-
-    endif
-
-  end function ok_to_burn
-
-
-
 #ifndef SDC
-  subroutine burner(state_in, state_out, dt, time)
+  subroutine burner(state_in, state_out, dt)
 
     !$acc routine seq
 
@@ -64,7 +40,11 @@ contains
 
     type (burn_t), intent(inout) :: state_in
     type (burn_t), intent(inout) :: state_out
-    double precision, intent(in) :: dt, time
+    double precision, intent(in) :: dt
+
+    double precision :: time
+
+    time = 0.d0
 
     ! Make sure the network and burner have been initialized.
 
@@ -84,9 +64,7 @@ contains
 
     ! Do the burning.
 
-    if (ok_to_burn(state_in)) then
-       call actual_burner(state_in, state_out, dt, time)
-    endif
+    call actual_burner(state_in, state_out, dt, time)
 
   end subroutine burner
 #endif

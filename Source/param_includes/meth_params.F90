@@ -39,6 +39,10 @@ module meth_params_module
   double precision              , save :: grav_const
   double precision              , save :: rotational_frequency
   double precision              , save :: co_latitude
+  logical                       , save :: drive_initial_convection
+  character (len=:), allocatable, save :: burner_threshold_species
+  double precision              , save :: burner_threshold_cutoff
+  double precision              , save :: reaction_sum_tol
   double precision              , save :: small_temp
   double precision              , save :: small_dens
 
@@ -73,6 +77,11 @@ contains
     grav_const = -1.5d10;
     rotational_frequency = 0.0d0;
     co_latitude = 0.0d0;
+    drive_initial_convection = .false.;
+    allocate(character(len=1)::burner_threshold_species)
+    burner_threshold_species = "";
+    burner_threshold_cutoff = 1.d-10;
+    reaction_sum_tol = 1.d-10;
     small_temp = 5.d6;
     small_dens = 1.d-5;
 
@@ -94,6 +103,10 @@ contains
     call pp%query("grav_const", grav_const)
     call pp%query("rotational_frequency", rotational_frequency)
     call pp%query("co_latitude", co_latitude)
+    call pp%query("drive_initial_convection", drive_initial_convection)
+    call pp%query("burner_threshold_species", burner_threshold_species)
+    call pp%query("burner_threshold_cutoff", burner_threshold_cutoff)
+    call pp%query("reaction_sum_tol", reaction_sum_tol)
     call pp%query("small_temp", small_temp)
     call pp%query("small_dens", small_dens)
     call amrex_parmparse_destroy(pp)
@@ -108,6 +121,9 @@ contains
 
     if (allocated(model_file)) then
         deallocate(model_file)
+    end if
+    if (allocated(burner_threshold_species)) then
+        deallocate(burner_threshold_species)
     end if
 
 
