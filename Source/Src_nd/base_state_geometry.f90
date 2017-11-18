@@ -71,9 +71,7 @@ contains
     ! compute center(:)
     if (octant) then
        if (.not. (spherical == 1 .and. amrex_spacedim == 3 .and. &
-                  prob_lo(0) == ZERO .and. &
-                  prob_lo(1) == ZERO .and. &
-                  prob_lo(2) == ZERO)) then
+                  all(prob_lo(0:amrex_spacedim-1) == 0.d0) ) ) then
           call amrex_error("ERROR: octant requires spherical with prob_lo = 0.0")
        endif
        center = 0.d0
@@ -145,10 +143,7 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
-!! FIXME - needs to work for multilevel
-
-   subroutine compute_cutoff_coords(rho0)
+   subroutine compute_cutoff_coords(rho0) bind(C, name="compute_cutoff_coords") 
 
      double precision, intent(in   ) :: rho0(0:max_radial_level,0:nr_fine-1)
 

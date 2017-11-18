@@ -54,6 +54,34 @@ Maestro::InitData ()
     std::swap(s0_swap,s0_init);
     std::swap(p0_swap,p0_init);
 
+    if (fix_base_state) {
+        compute_cutoff_coords(rho0_new.dataPtr());
+        // FIXME call make_grav_cell(grav_cell,rho0_new)
+    }
+    else {
+        if (do_smallscale) {
+            // first compute cutoff coordinates using initial density profile
+            compute_cutoff_coords(rho0_new.dataPtr());
+            // set rho0_new = rhoh0_new = 0.
+            std::fill(rho0_new.begin(),  rho0_new.end(),  0.);
+            std::fill(rhoh0_new.begin(), rhoh0_new.end(), 0.);
+        }
+        else {
+            // set rho0 to be the average
+            Average(snew,rho0_new,Rho);
+            compute_cutoff_coords(rho0_new.dataPtr());
+
+            // compute p0 with HSE
+            // FIXME call make_grav_cell(grav_cell,rho0_new)
+            // call enforce_HSE(rho0_old,p0_old,grav_cell)
+            // call eos with r,p as input to recompute T,h
+            // call makeTHfromRhoP(sold,p0_old,the_bc_tower%bc_tower_array,mla,dx)
+
+            // set rhoh0 to be the average
+            Average(snew,rhoh0_new,RhoH);
+        }
+    }
+
     if (plot_int > 0) {
         WritePlotFile(0);
     }
@@ -100,14 +128,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                  s0_init.dataPtr(), p0_init.dataPtr(),
                  ZFILL(dx),ZFILL(geom[lev].ProbLo()));
     }
-
-    // FIXME
-    // now we copy data from s0_init and p0_init into s0_new and p0_new
-
-
-
-
-
 }
 
 

@@ -10,6 +10,8 @@ subroutine average(lev,lo,hi,phi,p_lo,p_hi,phisum) bind (C,name="average")
 
   integer :: j,k
 
+  double precision x
+
   if (amrex_spacedim .eq. 2) then
      do j=lo(2),hi(2)
         phisum(lev,j) = sum(phi(lo(1):hi(1),j,0))

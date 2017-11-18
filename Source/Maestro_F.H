@@ -48,7 +48,7 @@ extern "C"
 
 
     //////////////////////
-    // in maestro.f90
+    // in base_state_geometry.f90
 
     void init_base_state_geometry(const int& max_radial_level_in,
                                   const int& nr_fine_in,
@@ -59,6 +59,8 @@ extern "C"
                                   const int* domhi_fine,
                                   const amrex::Real* prob_lo,
                                   const amrex::Real* prob_hi);
+
+    void compute_cutoff_coords(const amrex::Real* rho0);
 
     void init_multilevel();
 
