@@ -50,8 +50,7 @@ contains
     double precision :: rhowdot(nspec)
     double precision :: rhoH
     double precision :: x_test
-
-    double precision :: sumX, full_start, full_end, loop_start, loop_end
+    double precision :: sumX
 
     type (burn_t)    :: state_in, state_out
     

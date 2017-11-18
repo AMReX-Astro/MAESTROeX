@@ -8,7 +8,7 @@ subroutine average(lev,lo,hi,phi,p_lo,p_hi,phisum) bind (C,name="average")
   double precision, intent (in   ) :: phi(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
   double precision, intent (inout) :: phisum(0:max_radial_level,0:nr_fine-1)
 
-  integer :: i,j,k
+  integer :: j,k
 
   if (amrex_spacedim .eq. 2) then
      do j=lo(2),hi(2)

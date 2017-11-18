@@ -394,6 +394,11 @@ private:
     int nr_fine;
     amrex::Real dr_fine;
 
+    // these provide information about the multilevel base state configuration
+    amrex::Vector<int> numdisjointchunks;
+    amrex::Vector<int> r_start_coord;
+    amrex::Vector<int> r_end_coord;
+
     // tagging criteria
     amrex::Vector<amrex::Real> temperr;
 

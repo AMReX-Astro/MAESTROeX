@@ -60,6 +60,7 @@ extern "C"
                                   const amrex::Real* prob_lo,
                                   const amrex::Real* prob_hi);
 
+    void init_multilevel();
 
     void destroy_base_state_geometry();
 

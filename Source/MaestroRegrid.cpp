@@ -14,6 +14,15 @@ Maestro::Regrid ()
     // so we save the previous finest level index
     regrid(0, t_new);
             
+    if (spherical == 0) {
+        finest_radial_level = finest_level;
+        // FIXME - need to set the fortran finest_radial_level as well
+        // we also need to redefine numdisjointchunks, r_start_coord, r_end_coord
+        // and "regrid" the base state rho0, rhoh0, tempbar
+        // call init_multilevel
+        // look at MAESTRO/Source/varden.f90:750-1060
+    }
+
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;
             
