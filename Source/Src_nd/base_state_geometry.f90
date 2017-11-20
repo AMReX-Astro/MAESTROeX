@@ -152,7 +152,6 @@ contains
      integer :: i,n,r,which_lev
      logical :: found
 
-
     ! compute the coordinates of the anelastic cutoff
     found = .false.
 
@@ -332,12 +331,12 @@ contains
   subroutine restrict_base(s0,is_cell_centered)! bind(C, name="restrict_base")
 
     double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1)
-    logical         , intent(in   ) :: is_cell_centered
+    integer         , intent(in   ) :: is_cell_centered
 
     ! local
     integer :: n, r, i
 
-    if (is_cell_centered) then
+    if (is_cell_centered .eq. 1) then
 
        do n=finest_radial_level,1,-1
           ! for level n, make the coarser cells underneath simply the average of the fine
@@ -368,13 +367,13 @@ contains
   subroutine fill_ghost_base(s0,is_cell_centered)! bind(C, name="fill_ghost_base")
 
     double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1)
-    logical         , intent(in   ) :: is_cell_centered
+    integer         , intent(in   ) :: is_cell_centered
 
     ! local
     integer          :: n,i,r_crse
     double precision :: del,dpls,dmin,slim,slope
 
-    if (is_cell_centered) then
+    if (is_cell_centered .eq. 1) then
 
        ! compute limited slopes at the coarse level and set 4 fine ghost cells 
        ! maintaining conservation

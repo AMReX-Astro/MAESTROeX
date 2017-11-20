@@ -171,8 +171,8 @@ contains
              enddo
           end do
 
-          call restrict_base(grav_cell,.true.)
-          call fill_ghost_base(grav_cell,.true.)  
+          call restrict_base(grav_cell,1)
+          call fill_ghost_base(grav_cell,1)  
 
        else
 

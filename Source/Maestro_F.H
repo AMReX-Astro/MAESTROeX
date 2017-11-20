@@ -64,9 +64,9 @@ extern "C"
 
     void init_multilevel(const int& finest_radial_level_in);
 
-//    void restrict_base(amrex::Real* s0, bool is_cell_centered);
+    void restrict_base(amrex::Real* s0, const int& is_cell_centered);
 
-//    void fill_ghost_base(amrex::Real* s0,bool is_cell_centered);
+    void fill_ghost_base(amrex::Real* s0, const int& is_cell_centered);
 
     void destroy_base_state_geometry();
 
