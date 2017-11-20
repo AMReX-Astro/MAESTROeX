@@ -273,12 +273,19 @@ private:
     ////////////
 
     ////////////
-    // MaestroGravity.cpp functions
+    // MaestroBaseState.cpp functions
 
     void MakeGravCC(amrex::Vector<amrex::Real>& grav,
                     const amrex::Vector<amrex::Real>& rho0);
 
-    // end MaestroGravity.cpp functions
+    void MakeDivCoeff(amrex::Vector<amrex::Real>& div_coeff,
+                      const amrex::Vector<amrex::Real>& rho0,
+                      const amrex::Vector<amrex::Real>& p0,
+                      const amrex::Vector<amrex::Real>& gamma1bar_in,
+                      const amrex::Vector<amrex::Real>& grav_cell_in);
+
+
+    // end MaestroBaseState.cpp functions
     ////////////
 
     ////////////

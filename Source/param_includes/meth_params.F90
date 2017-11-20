@@ -37,6 +37,8 @@ module meth_params_module
   logical                       , save :: do_planar_invsq_grav
   double precision              , save :: planar_invsq_mass
   double precision              , save :: grav_const
+  integer                       , save :: beta_type
+  logical                       , save :: use_linear_grav_in_beta
   double precision              , save :: rotational_frequency
   double precision              , save :: co_latitude
   logical                       , save :: drive_initial_convection
@@ -75,6 +77,8 @@ contains
     do_planar_invsq_grav = .false.;
     planar_invsq_mass = 0.0d0;
     grav_const = -1.5d10;
+    beta_type = 1;
+    use_linear_grav_in_beta = .false.;
     rotational_frequency = 0.0d0;
     co_latitude = 0.0d0;
     drive_initial_convection = .false.;
@@ -101,6 +105,8 @@ contains
     call pp%query("do_planar_invsq_grav", do_planar_invsq_grav)
     call pp%query("planar_invsq_mass", planar_invsq_mass)
     call pp%query("grav_const", grav_const)
+    call pp%query("beta_type", beta_type)
+    call pp%query("use_linear_grav_in_beta", use_linear_grav_in_beta)
     call pp%query("rotational_frequency", rotational_frequency)
     call pp%query("co_latitude", co_latitude)
     call pp%query("drive_initial_convection", drive_initial_convection)

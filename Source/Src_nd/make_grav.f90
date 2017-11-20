@@ -32,7 +32,7 @@
           ! gravitational acceleration.  The mass is assumed to be
           ! at the origin.  The mass in the computational domain
           ! does not contribute to the gravitational acceleration.
-          do n=0,finest_radial_level+1
+          do n=0,finest_radial_level
              do r = 0, nr(n)-1
                 grav_cell(n,r) = -Gconst*planar_invsq_mass / r_cc_loc(n,r)**2
              enddo
@@ -83,7 +83,7 @@
              
           enddo
 
-          do n=1,finest_radial_level+1
+          do n=1,finest_radial_level
              do i=1,numdisjointchunks(n)
 
                 if (r_start_coord(n,i) .eq. 0) then

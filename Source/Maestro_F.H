@@ -110,8 +110,17 @@ extern "C"
                         const amrex::Real* rho0,
                         const amrex::Real* r_cc_loc,
                         const amrex::Real* r_edge_loc);
+    //////////////////////
 
     //////////////////////
+    // in make_div_coeff.f90
+    void make_div_coeff(amrex::Real* div_coeff,
+                        const amrex::Real* rho0,
+                        const amrex::Real* p0,
+                        const amrex::Real* gamma1bar_in,
+                        const amrex::Real* grav_cell_in);
+    //////////////////////
+
 
     //////////////////////
     // in initdata.f90

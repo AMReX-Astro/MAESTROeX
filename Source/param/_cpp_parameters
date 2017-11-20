@@ -360,12 +360,12 @@ ppm_trace_forces                    int            0
 # {\tt beta\_type} = 1 uses $\beta_0$; @@
 # {\tt beta\_type} = 2 uses $\rho_0$ (anelastic); @@
 # {\tt beta\_type} = 3 uses 1 (small-scale combustion).
-beta_type                           int            1
+beta_type                           int            1    y
 
 # how to represent gravity in the $\beta_0$ integration:
 # true = piecewise linear
 # false = piecewise constant
-use_linear_grav_in_beta             bool            false
+use_linear_grav_in_beta             bool            false       y
 
 # rotational frequency used for computing centrifugal term in rotation problems.
 rotational_frequency                Real               0.0    y
