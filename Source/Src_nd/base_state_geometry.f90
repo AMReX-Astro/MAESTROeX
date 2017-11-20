@@ -325,7 +325,7 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine restrict_base(s0,is_cell_centered) bind(C, name="restrict_base")
+  subroutine restrict_base(s0,is_cell_centered)! bind(C, name="restrict_base")
 
     double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1)
     logical         , intent(in   ) :: is_cell_centered
@@ -361,7 +361,7 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine fill_ghost_base(s0,is_cell_centered) bind(C, name="fill_ghost_base")
+  subroutine fill_ghost_base(s0,is_cell_centered)! bind(C, name="fill_ghost_base")
 
     double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1)
     logical         , intent(in   ) :: is_cell_centered
