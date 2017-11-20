@@ -64,6 +64,10 @@ extern "C"
 
     void init_multilevel();
 
+    void restrict_base(amrex::Real* s0, bool is_cell_centered);
+
+    void fill_ghost_base(amrex::Real* s0,bool is_cell_centered);
+
     void destroy_base_state_geometry();
 
     //////////////////////

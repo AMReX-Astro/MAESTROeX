@@ -3,10 +3,11 @@
 
     use bl_constants_module
     use base_state_geometry_module, only: spherical, nr_fine, &
-         max_radial_level, nr, numdisjointchunks, & 
-         r_start_coord, r_end_coord, finest_radial_level
+                                          max_radial_level, nr, numdisjointchunks, & 
+                                          r_start_coord, r_end_coord, finest_radial_level, &
+                                          restrict_base, fill_ghost_base
     use meth_params_module, only: grav_const, base_cutoff_density, &
-         do_planar_invsq_grav, planar_invsq_mass, do_2d_planar_octant
+                                  do_planar_invsq_grav, planar_invsq_mass, do_2d_planar_octant
     use fundamental_constants_module, only: Gconst
 
     ! compute the base state gravitational acceleration at the cell
@@ -162,9 +163,8 @@
              enddo
           end do
 
-! FIXME - write these routines
-!          call restrict_base(grav_cell,.true.)
-!          call fill_ghost_base(grav_cell,.true.)  
+          call restrict_base(grav_cell,.true.)
+          call fill_ghost_base(grav_cell,.true.)  
 
        else
 
