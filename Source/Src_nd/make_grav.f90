@@ -1,14 +1,22 @@
+module make_grav_module
+
+  use bl_constants_module
+  use base_state_geometry_module, only: nr_fine, &
+                                        max_radial_level, nr, numdisjointchunks, & 
+                                        r_start_coord, r_end_coord, finest_radial_level, &
+                                        restrict_base, fill_ghost_base
+  use meth_params_module, only: spherical, grav_const, base_cutoff_density, &
+                                do_planar_invsq_grav, planar_invsq_mass, do_2d_planar_octant
+  use fundamental_constants_module, only: Gconst
+
+  implicit none
+
+  private
+
+contains
+
   subroutine make_grav_cell(grav_cell,rho0,r_cc_loc,r_edge_loc) &
        bind(C, name="make_grav_cell")
-
-    use bl_constants_module
-    use base_state_geometry_module, only: nr_fine, &
-                                          max_radial_level, nr, numdisjointchunks, & 
-                                          r_start_coord, r_end_coord, finest_radial_level, &
-                                          restrict_base, fill_ghost_base
-    use meth_params_module, only: spherical, grav_const, base_cutoff_density, &
-                                  do_planar_invsq_grav, planar_invsq_mass, do_2d_planar_octant
-    use fundamental_constants_module, only: Gconst
 
     ! compute the base state gravitational acceleration at the cell
     ! centers.  The base state uses 0-based indexing, so grav_cell 
@@ -220,3 +228,5 @@
     end if
 
   end subroutine make_grav_cell
+
+end module make_grav_module

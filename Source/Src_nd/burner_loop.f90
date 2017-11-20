@@ -11,10 +11,11 @@ module burner_loop_module
 
   implicit none
 
+  private
+
   integer, save :: ispec_threshold
   logical, save :: firstCall = .true.
 
-  public :: burner_loop
 
 contains
 

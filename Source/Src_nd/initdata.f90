@@ -13,8 +13,6 @@ module initdata_module
 
   private
 
-  public :: initdata
-
 contains
 
   subroutine initdata(lev, time, lo, hi, &

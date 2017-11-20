@@ -18,7 +18,6 @@ contains
     double precision, intent (inout) :: phisum(0:max_radial_level,0:nr_fine-1)
 
     integer :: j,k
-    double precision :: x
 
     if (amrex_spacedim .eq. 2) then
        do j=lo(2),hi(2)

@@ -23,9 +23,12 @@ module rotation_module
 
   implicit none
 
-  double precision, save :: sin_theta, cos_theta, omega
+  private
 
   public :: init_rotation
+
+  double precision, save :: sin_theta, cos_theta, omega
+ 
 
 contains
 

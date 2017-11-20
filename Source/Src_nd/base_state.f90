@@ -29,8 +29,6 @@ module base_state_module
 
   private
 
-  public :: init_base_state
-
 contains
 
   subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar, &

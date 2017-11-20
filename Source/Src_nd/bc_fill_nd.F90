@@ -5,8 +5,6 @@ module bc_fill_module
 
   implicit none
 
-  public
-
 contains
 
   subroutine phifill(phi,phi_lo,phi_hi,domlo,domhi,delta,xlo,time,bc) &
