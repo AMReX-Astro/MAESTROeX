@@ -10,38 +10,40 @@ module base_state_geometry_module
   use amrex_constants_module
   use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
-  use meth_params_module, only: spherical, octant, &
-                                anelastic_cutoff, base_cutoff_density, burning_cutoff_density
+  use meth_params_module, only: spherical, octant, anelastic_cutoff, base_cutoff_density, &
+                                burning_cutoff_density
 
   implicit none
 
-  integer         , save :: max_radial_level
-  integer         , save :: finest_radial_level
-  integer         , save :: nr_fine
-  double precision, save :: dr_fine
+  private
 
-  integer         , save :: nr_irreg
-  double precision, save :: center(0:amrex_spacedim-1)
+  public :: restrict_base, fill_ghost_base
 
-  double precision, allocatable, save :: dr(:)
-  integer   , allocatable, save :: nr(:)
+  integer         , save, public :: max_radial_level
+  integer         , save, public  :: finest_radial_level
+  integer         , save, public  :: nr_fine
+  double precision, save, public  :: dr_fine
 
-  integer   , allocatable, save :: numdisjointchunks(:)
-  integer   , allocatable, save :: r_start_coord(:,:)
-  integer   , allocatable, save :: r_end_coord(:,:)
+  integer         , save, public  :: nr_irreg
+  double precision, save, public  :: center(0:amrex_spacedim-1)
 
-  integer   , allocatable, save :: anelastic_cutoff_coord(:)
-  integer   , allocatable, save :: base_cutoff_density_coord(:)
-  integer   , allocatable, save :: burning_cutoff_density_coord(:)
+  double precision, allocatable, save, public  :: dr(:)
+  integer         , allocatable, save, public  :: nr(:)
 
-  public :: init_base_state_geometry, compute_cutoff_coords, destroy_base_state_geometry
+  integer         , allocatable, save, public  :: numdisjointchunks(:)
+  integer         , allocatable, save, public  :: r_start_coord(:,:)
+  integer         , allocatable, save, public  :: r_end_coord(:,:)
+
+  integer         , allocatable, save, public  :: anelastic_cutoff_coord(:)
+  integer         , allocatable, save, public  :: base_cutoff_density_coord(:)
+  integer         , allocatable, save, public  :: burning_cutoff_density_coord(:)
 
 contains
 
   subroutine init_base_state_geometry(max_radial_level_in,nr_fine_in,dr_fine_in, &
                                       r_cc_loc,r_edge_loc, &
                                       dx_fine,domhi_fine,prob_lo,prob_hi) &
-       bind(C, name="init_base_state_geometry")
+                                      bind(C, name="init_base_state_geometry")
 
     integer          , intent(in   ) :: max_radial_level_in
     integer          , intent(in   ) :: nr_fine_in

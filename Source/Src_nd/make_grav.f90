@@ -2,11 +2,11 @@
        bind(C, name="make_grav_cell")
 
     use bl_constants_module
-    use base_state_geometry_module, only: spherical, nr_fine, &
+    use base_state_geometry_module, only: nr_fine, &
                                           max_radial_level, nr, numdisjointchunks, & 
                                           r_start_coord, r_end_coord, finest_radial_level, &
                                           restrict_base, fill_ghost_base
-    use meth_params_module, only: grav_const, base_cutoff_density, &
+    use meth_params_module, only: spherical, grav_const, base_cutoff_density, &
                                   do_planar_invsq_grav, planar_invsq_mass, do_2d_planar_octant
     use fundamental_constants_module, only: Gconst
 
