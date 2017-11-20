@@ -25,8 +25,6 @@ contains
 
   subroutine get_num_spec(nspec_out) bind(C, name="get_num_spec")
 
-    implicit none
-
     integer, intent(out) :: nspec_out
 
     nspec_out = nspec
@@ -35,8 +33,6 @@ contains
 
 
   subroutine get_spec_names(spec_names,ispec,len) bind(C, name="get_spec_names")
-
-    implicit none
 
     integer, intent(in   ) :: ispec
     integer, intent(inout) :: len
@@ -55,8 +51,6 @@ contains
 
   subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscalars) &
        bind(C, name="set_method_params")
-
-    implicit none
 
     integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscalars
 

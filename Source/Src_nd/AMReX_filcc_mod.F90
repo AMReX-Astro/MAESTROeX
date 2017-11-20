@@ -84,8 +84,6 @@ contains
   subroutine amrex_fab_filcc (q, qlo, qhi, nq, domlo, domhi, dx, xlo, bc) &
        bind(c, name='amrex_fab_filcc')
 
-    implicit none
-
     integer, intent(in) :: qlo(3), qhi(3), nq
     integer, dimension(amrex_spacedim), intent(in) :: domlo, domhi
     real(amrex_real), intent(in) :: dx(amrex_spacedim), xlo(amrex_spacedim)
@@ -103,8 +101,6 @@ contains
 
 
   subroutine filccn(lo, hi, q, q_lo, q_hi, ncomp, domlo, domhi, dx, xlo, bc)
-
-    implicit none
 
     integer,          intent(in   ) :: lo(3), hi(3)
     integer,          intent(in   ) :: q_lo(3), q_hi(3)

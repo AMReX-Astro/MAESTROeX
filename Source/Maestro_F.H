@@ -62,7 +62,7 @@ extern "C"
 
     void compute_cutoff_coords(const amrex::Real* rho0);
 
-    void init_multilevel();
+    void init_multilevel(const int& finest_radial_level_in);
 
 //    void restrict_base(amrex::Real* s0, bool is_cell_centered);
 

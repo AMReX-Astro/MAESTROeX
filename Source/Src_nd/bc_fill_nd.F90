@@ -12,8 +12,6 @@ contains
 
     use amrex_fort_module, only: amrex_spacedim
 
-    implicit none
-
     integer      :: phi_lo(3),phi_hi(3)
     integer      :: bc(amrex_spacedim,2)
     integer      :: domlo(3), domhi(3)

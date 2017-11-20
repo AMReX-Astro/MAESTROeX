@@ -291,14 +291,18 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine init_multilevel() bind(C, name="init_multilevel")
+  subroutine init_multilevel(finest_radial_level_in) bind(C, name="init_multilevel")
     
     ! compute numdisjointchunks, r_start_coord, r_end_coord
     ! FIXME - right now there is one chunk at each level that spans the domain
     
+    integer, intent(in   ) :: finest_radial_level_in
+
     integer :: n
 
     call amrex_abort("init_multilevel does not work with AMR")
+
+    finest_radial_level = finest_radial_level_in
 
     if (allocated(numdisjointchunks)) then
        deallocate(numdisjointchunks)
