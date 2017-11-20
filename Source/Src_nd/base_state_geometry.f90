@@ -20,9 +20,9 @@ module base_state_geometry_module
   public :: restrict_base, fill_ghost_base
 
   integer         , save, public :: max_radial_level
-  integer         , save, public  :: finest_radial_level
-  integer         , save, public  :: nr_fine
-  double precision, save, public  :: dr_fine
+  integer         , save, public :: finest_radial_level
+  integer         , save, public :: nr_fine
+  double precision, save, public :: dr_fine
 
   integer         , save, public  :: nr_irreg
   double precision, save, public  :: center(0:amrex_spacedim-1)
@@ -327,7 +327,7 @@ contains
 
   subroutine restrict_base(s0,is_cell_centered) bind(C, name="restrict_base")
 
-    double precision, intent(inout) :: s0(:,0:)
+    double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1)
     logical         , intent(in   ) :: is_cell_centered
 
     ! local
@@ -363,7 +363,7 @@ contains
 
   subroutine fill_ghost_base(s0,is_cell_centered) bind(C, name="fill_ghost_base")
 
-    double precision, intent(inout) :: s0(:,0:)
+    double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1)
     logical         , intent(in   ) :: is_cell_centered
 
     ! local

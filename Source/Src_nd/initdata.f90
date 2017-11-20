@@ -5,7 +5,7 @@ module initdata_module
   use eos_module
   use network, only: nspec
   use amrex_fort_module, only : amrex_spacedim
-  use base_state_geometry_module, only: nr_fine, finest_radial_level
+  use base_state_geometry_module, only: nr_fine, max_radial_level
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
                                 perturb_model, pert_temp_factor, pert_rad_factor, do_small_domain
   
@@ -33,8 +33,8 @@ contains
     double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
                                            vel_lo(2):vel_hi(2), &
                                            vel_lo(3):vel_hi(3), 1:amrex_spacedim)
-    double precision, intent(inout) :: s0_init(0:finest_radial_level,0:nr_fine-1,1:nscal)
-    double precision, intent(inout) :: p0_init(0:finest_radial_level,0:nr_fine-1)
+    double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
+    double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3), prob_lo(3)
 
     integer          :: i,j,k,r

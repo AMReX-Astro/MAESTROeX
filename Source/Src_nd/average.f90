@@ -27,14 +27,14 @@ end subroutine average
 
 subroutine divide_phisum_by_ncell(phisum,ncell) bind (C,name="divide_phisum_by_ncell")
 
-  use base_state_geometry_module, only: max_radial_level, nr_fine
+  use base_state_geometry_module, only: max_radial_level, finest_radial_level, nr_fine
 
   double precision, intent(inout) :: phisum(0:max_radial_level,0:nr_fine-1)
   integer         , intent(in   ) ::  ncell(0:max_radial_level)
 
   integer :: n
 
-  do n=0,max_radial_level
+  do n=0,finest_radial_level
      phisum(:,n) = phisum(:,n) / ncell(n)
   end do
 
