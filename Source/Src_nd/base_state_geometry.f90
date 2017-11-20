@@ -302,22 +302,22 @@ contains
     if (allocated(numdisjointchunks)) then
        deallocate(numdisjointchunks)
     end if
-    allocate(numdisjointchunks(finest_radial_level+1))
+    allocate(numdisjointchunks(0:finest_radial_level))
 
     if (allocated(r_start_coord)) then
        deallocate(r_start_coord)
     end if
-    allocate(r_start_coord(finest_radial_level+1,1))
+    allocate(r_start_coord(0:finest_radial_level,1)) ! FIXME - for > 1 chunk case
 
     if (allocated(r_end_coord)) then
        deallocate(r_end_coord)
     end if
-    allocate(r_end_coord(finest_radial_level+1,1))
+    allocate(r_end_coord(0:finest_radial_level,1)) ! FIXME - for > 1 chunk case
 
     do n=0,finest_radial_level
        numdisjointchunks(n) = 1
-       r_start_coord(0,1) = 0
-       r_end_coord(0,1) = nr(n)
+       r_start_coord(n,1) = 0
+       r_end_coord(n,1) = nr(n)
     end do
 
   end subroutine init_multilevel

@@ -101,6 +101,15 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in make_grav.f90
+    void make_grav_cell(amrex::Real* grav_cell,
+                        const amrex::Real* rho0,
+                        const amrex::Real* r_cc_loc,
+                        const amrex::Real* r_edge_loc);
+
+    //////////////////////
+
+    //////////////////////
     // in initdata.f90
     void initdata(const int& lev,
                   const amrex::Real& time, 

@@ -63,21 +63,27 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // end spherical-only MultiFabs
     ////////////////////////
 
-    Vector<Real> grav_cell_nph;
-    Vector<Real> grav_cell_new;
-    Vector<Real> rho0_nph;
-    Vector<Real> p0_nph;
-    Vector<Real> p0_minus_peosbar;
-    Vector<Real> peosbar;
-    Vector<Real> w0_force;
-    Vector<Real> Sbar;
-    Vector<Real> div_coeff_nph;
-    Vector<Real> gamma1bar_temp1;
-    Vector<Real> gamma1bar_temp2;
-    Vector<Real> w0_old;
-    Vector<Real> div_coeff_edge;
-    Vector<Real> rho0_predicted_edge;
-    Vector<Real> delta_chi_w0;
+    // vectors store the multilevel 1D states as one very long array
+    // these are cell-centered
+    Vector<Real> grav_cell_nph      ( (max_radial_level+1)*nr_fine );
+    Vector<Real> grav_cell_new      ( (max_radial_level+1)*nr_fine );
+    Vector<Real> rho0_nph           ( (max_radial_level+1)*nr_fine );
+    Vector<Real> p0_nph             ( (max_radial_level+1)*nr_fine );
+    Vector<Real> p0_minus_peosbar   ( (max_radial_level+1)*nr_fine );
+    Vector<Real> peosbar            ( (max_radial_level+1)*nr_fine );
+    Vector<Real> w0_force           ( (max_radial_level+1)*nr_fine );
+    Vector<Real> Sbar               ( (max_radial_level+1)*nr_fine );
+    Vector<Real> div_coeff_nph      ( (max_radial_level+1)*nr_fine );
+    Vector<Real> gamma1bar_old      ( (max_radial_level+1)*nr_fine );
+    Vector<Real> gamma1bar_temp1    ( (max_radial_level+1)*nr_fine );
+    Vector<Real> gamma1bar_temp2    ( (max_radial_level+1)*nr_fine );
+    Vector<Real> delta_chi_w0       ( (max_radial_level+1)*nr_fine );
+
+    // vectors store the multilevel 1D states as one very long array
+    // these are edge-centered
+    Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
+    Vector<Real> div_coeff_edge     ( (max_radial_level+1)*(nr_fine+1) );
+    Vector<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();

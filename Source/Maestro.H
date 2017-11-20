@@ -272,7 +272,13 @@ private:
     // end MaestroReact.cpp functions
     ////////////
 
-    // end MaestroAverage.cpp functions
+    ////////////
+    // MaestroGravity.cpp functions
+
+    void MakeGravCC(amrex::Vector<amrex::Real>& grav,
+                    const amrex::Vector<amrex::Real>& rho0);
+
+    // end MaestroGravity.cpp functions
     ////////////
 
     ////////////
