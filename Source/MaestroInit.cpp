@@ -16,6 +16,28 @@ Maestro::Init ()
     // fill in multifab and base state data
     InitData();
 
+    // FIXME
+    // MakeNormal();
+
+    // FIXME
+    // InitSponge();
+
+    // make gravity
+    make_grav_cell(grav_cell.dataPtr(),
+                   rho0_new.dataPtr(),
+                   r_cc_loc.dataPtr(),
+                   r_edge_loc.dataPtr());
+
+    // FIXME
+    // MakeGamma1bar();
+
+    // compute beta0
+    make_div_coeff(div_coeff_new.dataPtr(),
+                   rho0_new.dataPtr(),
+                   p0_new.dataPtr(),
+                   gamma1bar.dataPtr(),
+                   grav_cell.dataPtr());
+
     // initial projection
     InitProj();
 
@@ -44,6 +66,10 @@ Maestro::InitData ()
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_new);
 
+    // set finest_radial_level in fortran
+    // compute numdisjointchunks, r_start_coord, r_end_coord
+    init_multilevel(finest_level);
+
     // synchronize levels
     AverageDown(snew);
     AverageDown(unew);
@@ -56,7 +82,10 @@ Maestro::InitData ()
 
     if (fix_base_state) {
         compute_cutoff_coords(rho0_new.dataPtr());
-        // FIXME call make_grav_cell(grav_cell,rho0_new)
+        make_grav_cell(grav_cell.dataPtr(),
+                   rho0_new.dataPtr(),
+                   r_cc_loc.dataPtr(),
+                   r_edge_loc.dataPtr());
     }
     else {
         if (do_smallscale) {
@@ -72,7 +101,12 @@ Maestro::InitData ()
             compute_cutoff_coords(rho0_new.dataPtr());
 
             // compute p0 with HSE
-            // FIXME call make_grav_cell(grav_cell,rho0_new)
+            make_grav_cell(grav_cell.dataPtr(),
+                           rho0_new.dataPtr(),
+                           r_cc_loc.dataPtr(),
+                           r_edge_loc.dataPtr());
+
+            // FIXME
             // call enforce_HSE(rho0_old,p0_old,grav_cell)
             // call eos with r,p as input to recompute T,h
             // call makeTHfromRhoP(sold,p0_old,the_bc_tower%bc_tower_array,mla,dx)

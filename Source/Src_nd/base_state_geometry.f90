@@ -299,9 +299,15 @@ contains
 
     integer :: n
 
-    call amrex_abort("init_multilevel does not work with AMR")
+    if (finest_radial_level_in .gt. 0 .and. spherical .eq. 0) then
+       call amrex_abort("init_multilevel does not work with AMR")
+    end if
 
-    finest_radial_level = finest_radial_level_in
+    if (spherical .eq. 1) then
+       finest_radial_level = 0
+    else
+       finest_radial_level = finest_radial_level_in
+    end if
 
     if (allocated(numdisjointchunks)) then
        deallocate(numdisjointchunks)
@@ -321,7 +327,7 @@ contains
     do n=0,finest_radial_level
        numdisjointchunks(n) = 1
        r_start_coord(n,1) = 0
-       r_end_coord(n,1) = nr(n)
+       r_end_coord(n,1) = nr(n)-1
     end do
 
   end subroutine init_multilevel

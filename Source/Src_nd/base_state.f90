@@ -62,7 +62,6 @@ contains
     type (eos_t) :: eos_state
 
 887 format(78('-'))
-888 format(a60,g18.10)
 
     base_cutoff_density_loc = 1.d99
 
