@@ -24,6 +24,44 @@ Maestro::Regrid ()
         // look at MAESTRO/Source/varden.f90:750-1060
     }
 
+    // FIXME
+    // MakeNormal();
+    
+    if (evolve_base_state) {
+        // force rho0 to be the average of rho - FIXME
+    }
+
+    // compute cutoff coordinates
+    compute_cutoff_coords(rho0_new.dataPtr());
+
+    // make gravity
+    make_grav_cell(grav_cell.dataPtr(),
+                   rho0_new.dataPtr(),
+                   r_cc_loc.dataPtr(),
+                   r_edge_loc.dataPtr());
+
+/* FIXME
+           ! enforce HSE
+           call enforce_HSE(rho0_old,p0_old,grav_cell)
+
+           if (use_tfromp) then
+              ! compute full state T = T(rho,p0,X)
+              call makeTfromRhoP(sold,p0_old,mla,the_bc_tower%bc_tower_array,dx)
+           else
+              ! compute full state T = T(rho,h,X)
+              call makeTfromRhoH(sold,p0_old,mla,the_bc_tower%bc_tower_array,dx)
+           end if
+
+           ! force tempbar to be the average of temp
+           call average(mla,sold,tempbar,dx,temp_comp)
+
+           ! gamma1bar needs to be recomputed
+           call make_gamma1bar(mla,sold,gamma1bar,p0_old,dx)
+
+           ! div_coeff_old needs to be recomputed
+           call make_div_coeff(div_coeff_old,rho0_old,p0_old,gamma1bar,grav_cell)
+*/
+
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;
             

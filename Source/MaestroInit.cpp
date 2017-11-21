@@ -35,7 +35,7 @@ Maestro::Init ()
     make_div_coeff(div_coeff_new.dataPtr(),
                    rho0_new.dataPtr(),
                    p0_new.dataPtr(),
-                   gamma1bar.dataPtr(),
+                   gamma1bar_new.dataPtr(),
                    grav_cell.dataPtr());
 
     // initial projection
@@ -81,6 +81,7 @@ Maestro::InitData ()
     std::swap(p0_swap,p0_init);
 
     if (fix_base_state) {
+        // compute cutoff coordinates
         compute_cutoff_coords(rho0_new.dataPtr());
         make_grav_cell(grav_cell.dataPtr(),
                    rho0_new.dataPtr(),

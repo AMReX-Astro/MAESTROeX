@@ -5,6 +5,7 @@ CEXE_sources += MaestroAverage.cpp
 CEXE_sources += MaestroDt.cpp 
 CEXE_sources += MaestroEvolve.cpp 
 CEXE_sources += MaestroFillData.cpp
+CEXE_sources += MaestroGamma.cpp
 CEXE_sources += MaestroInit.cpp
 CEXE_sources += MaestroMacProj.cpp
 CEXE_sources += MaestroMakeS.cpp
