@@ -135,10 +135,9 @@ private:
     ////////////
     // MaestroGamma.cpp functions
 
-    void MakeGamma1bar(amrex::Vector<amrex::MultiFab>& S_cc,
-                       const amrex::Vector<amrex::MultiFab>& scal,
-                       const amrex::Real* gamma1bar,
-                       const amrex::Real* p0);
+    void MakeGamma1bar(const amrex::Vector<amrex::MultiFab>& scal,
+                       amrex::Vector<amrex::Real>& gamma1bar,
+                       const amrex::Vector<amrex::Real>& p0);
 
     // end MaestroGamma.cpp functions
     ////////////

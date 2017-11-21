@@ -72,6 +72,13 @@ extern "C"
 
     //////////////////////
 
+    //////////////////////
+    // in make_gamma.F90
+    void make_gamma(const int& lev, const int* lo, const int* hi, 
+                    amrex::Real* gamma,  const int* g_lo, const int* g_hi, const int& nc_g,
+                    const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int& nc_s,
+                    const amrex::Real* p0);
+    //////////////////////
 
     //////////////////////
     // in make_S.f90

@@ -7,6 +7,8 @@ module make_S_module
 
   implicit none
 
+  private
+
   public :: make_S_cc
 
 contains

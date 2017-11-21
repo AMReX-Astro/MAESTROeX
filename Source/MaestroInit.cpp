@@ -29,7 +29,7 @@ Maestro::Init ()
                    r_edge_loc.dataPtr());
 
     // FIXME
-    // MakeGamma1bar();
+    MakeGamma1bar(snew,gamma1bar_new,p0_new);
 
     // compute beta0
     make_div_coeff(div_coeff_new.dataPtr(),

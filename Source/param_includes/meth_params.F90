@@ -47,6 +47,7 @@ module meth_params_module
   double precision              , save :: reaction_sum_tol
   double precision              , save :: small_temp
   double precision              , save :: small_dens
+  logical                       , save :: use_pprime_in_tfromp
 
   ! End the declarations of the ParmParse parameters
 
@@ -88,6 +89,7 @@ contains
     reaction_sum_tol = 1.d-10;
     small_temp = 5.d6;
     small_dens = 1.d-5;
+    use_pprime_in_tfromp = .false.;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("model_file", model_file)
@@ -115,6 +117,7 @@ contains
     call pp%query("reaction_sum_tol", reaction_sum_tol)
     call pp%query("small_temp", small_temp)
     call pp%query("small_dens", small_dens)
+    call pp%query("use_pprime_in_tfromp", use_pprime_in_tfromp)
     call amrex_parmparse_destroy(pp)
 
 
