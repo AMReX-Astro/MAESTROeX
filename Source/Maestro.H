@@ -191,7 +191,7 @@ private:
 
     void Make_NodalRHS (const amrex::Vector<amrex::MultiFab>& S_cc,
                         amrex::Vector<amrex::MultiFab>& nodalrhs,
-                        amrex::Real Sbar,
+                        const amrex::Vector<amrex::Real>& Sbar,
                         const amrex::Vector<amrex::Real>& div_coeff);
 
     // end MaestroMakeS.cpp functions

@@ -76,7 +76,8 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
 // subcycle I don't think we need this capability
 void
 Maestro::GetData (int lev, Real time, 
-                  Vector<MultiFab*>& mf, Vector<Real>& mftime,
+                  Vector<MultiFab*>& mf,
+                  Vector<Real>& mftime,
                   Vector<MultiFab>& mf_old,
                   Vector<MultiFab>& mf_new)
 {

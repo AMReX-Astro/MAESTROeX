@@ -89,6 +89,14 @@ extern "C"
                    const amrex::Real* rHnuc, const int* n_lo, const int* n_hi, const int& nc_n,
                    const amrex::Real* rHext, const int* e_lo, const int* e_hi, const int& nc_e,
                    const amrex::Real* therm, const int* t_lo, const int* t_hi, const int& nc_t);
+
+
+    void make_ccrhs(const int& lev, const int* lo, const int* hi, 
+                    amrex::Real* ccrhs,  const int* c_lo, const int* c_hi, const int& nc_c,
+                    const amrex::Real* S_cc,  const int* s_lo, const int* s_hi, const int& nc_s,
+                    const amrex::Real* Sbar, const amrex::Real* div_coeff);
+
+
     //////////////////////
 
     //////////////////////

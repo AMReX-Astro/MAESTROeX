@@ -6,10 +6,10 @@ f90EXE_sources += initdata.f90
 f90EXE_sources += inlet_bc.f90
 f90EXE_sources += make_div_coeff.f90
 f90EXE_sources += make_grav.f90
-f90EXE_sources += make_S.f90
 f90EXE_sources += maestro_init.f90
 f90EXE_sources += rotation.f90
 f90EXE_sources += tagging.f90
 
 F90EXE_sources += bc_fill_nd.F90
 F90EXE_sources += make_gamma.F90
+F90EXE_sources += make_S.F90

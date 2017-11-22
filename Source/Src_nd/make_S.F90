@@ -4,12 +4,13 @@ module make_S_module
   use eos_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp
+  use base_state_geometry_module, only:  max_radial_level, nr_fine
 
   implicit none
 
   private
 
-  public :: make_S_cc
+  public :: make_S_cc, make_ccrhs
 
 contains
 
@@ -79,5 +80,40 @@ contains
     enddo
 
   end subroutine make_S_cc
+
+  subroutine make_ccrhs(lev, lo, hi, &
+                        ccrhs, c_lo, c_hi, nc_c, &
+                        S_cc,  s_lo, s_hi, nc_s, &
+                        Sbar, div_coeff) bind (C,name="make_ccrhs")
+    
+    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: c_lo(3), c_hi(3), nc_c
+    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    double precision, intent (inout) :: ccrhs(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
+    double precision, intent (in   ) :: S_cc (c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+    double precision, intent (in   ) ::      Sbar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: div_coeff(0:max_radial_level,0:nr_fine-1)
+
+    integer i,j,k,r
+
+    ! loop over the data
+    do k = lo(3),hi(3)
+    do j = lo(2),hi(2)
+    do i = lo(1),hi(1)
+
+#if (AMREX_SPACEDIM == 1)
+       r = i
+#elif (AMREX_SPACEDIM == 2)
+       r = j
+#elif (AMREX_SPACEDIM == 3)
+       r = k
+#endif
+       ccrhs(i,j,k) = div_coeff(lev,r) * (S_cc(i,j,k) - Sbar(lev,r))
+
+    enddo
+    enddo
+    enddo
+
+  end subroutine make_ccrhs
 
 end module make_S_module

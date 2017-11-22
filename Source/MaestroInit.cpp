@@ -174,6 +174,10 @@ void Maestro::InitProj ()
     Vector<MultiFab>      thermal(finest_level+1);
     Vector<MultiFab>     rho_Hnuc(finest_level+1);
     Vector<MultiFab>     rho_Hext(finest_level+1);
+    // nodal
+    Vector<MultiFab>     nodalrhs(finest_level+1);
+
+    Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
 
     for (int lev=0; lev<=finest_level; ++lev) {
         S_cc[lev].define        (grids[lev], dmap[lev],       1, 0);
@@ -181,14 +185,18 @@ void Maestro::InitProj ()
         thermal[lev].define     (grids[lev], dmap[lev],       1, 0);
         rho_Hnuc[lev].define    (grids[lev], dmap[lev],       1, 0);
         rho_Hext[lev].define    (grids[lev], dmap[lev],       1, 0);
+        // nodal
+        nodalrhs[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
         // during initial projection we ignore reaction terms
         rho_omegadot[lev].setVal(0.);
         rho_Hnuc[lev].setVal(0.);
     }
 
+    // compute any external heating
     ComputeHeating(rho_Hext);
 
+    // compute thermal diffusion
     if (use_thermal_diffusion) {
         for (int lev=0; lev<=finest_level; ++lev) {
             thermal[lev].setVal(0.);   // FIXME
@@ -200,8 +208,18 @@ void Maestro::InitProj ()
         }
     }
 
-
+    // compute S at cell-centers
     Make_S_cc(S_cc,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+
+    // average S into Sbar
+    Average(S_cc,Sbar,0);
+
+    // make the nodal rhs for projection
+    Make_NodalRHS(S_cc,nodalrhs,Sbar,div_coeff_new);
+
+
+
+
 
 }
 

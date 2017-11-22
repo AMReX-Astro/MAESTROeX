@@ -83,6 +83,60 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 void
 Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
                         Vector<MultiFab>& nodalrhs,
-                        Real Sbar,
+                        const Vector<Real>& Sbar,
                         const Vector<Real>& div_coeff)
-{}
+{
+
+    Vector<MultiFab> ccrhs(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        // build ccrhs
+        ccrhs[lev].define(grids[lev], dmap[lev], 1, 1);
+
+        // fill ccrhs
+        // get references to the MultiFabs at level lev
+        MultiFab& ccrhs_mf = ccrhs[lev];
+        const MultiFab& S_cc_mf = S_cc[lev];
+
+        // Loop over boxes
+        for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
+            // get references to the FABs, each containing data and the valid+ghost box
+            FArrayBox& ccrhs_fab = ccrhs_mf[mfi];
+            const FArrayBox& S_cc_fab = S_cc_mf[mfi];
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+
+            // Get the index space of the valid+ghost region for each FAB
+            // Note each of these boxes may contain ghost cells, and thus are
+            // larger than or equal to mfi.validbox().
+            const Box& ccrhs_box = ccrhs_fab.box();
+            const Box& S_cc_box = S_cc_fab.box();
+
+            // We can now pass the information to a Fortran routine,
+            // e.g. S_cc_fab.dataPtr() gives a double*, which is reshaped into
+            // a multi-dimensional array with dimensions specified by
+            // the information in "S_cc_box". We will also pass "box",
+            // which specifies our "work" region .
+            make_ccrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                       ccrhs_fab.dataPtr(),
+                       ARLIM_3D(ccrhs_box.loVect()), ARLIM_3D(ccrhs_box.hiVect()),
+                       ccrhs_fab.nComp(),
+                       S_cc_fab.dataPtr(),
+                       ARLIM_3D(S_cc_box.loVect()), ARLIM_3D(S_cc_box.hiVect()),
+                       S_cc_fab.nComp(),
+                       Sbar.dataPtr(), div_coeff.dataPtr());
+        }
+    }
+
+    // fill ghost cells using first-order extrapolation
+    for (int lev=0; lev<=finest_level; ++lev) {
+        FillPatch(lev, t_old, ccrhs[lev], ccrhs, ccrhs, 0, 1, bcs_f);
+    }
+
+    // make_nodalrhs
+
+
+
+
+}
