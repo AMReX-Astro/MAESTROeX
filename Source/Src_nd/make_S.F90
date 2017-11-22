@@ -16,20 +16,20 @@ module make_S_module
 contains
 
   subroutine make_S_cc(lo, hi, &
-                       S_cc,  s_lo, s_hi, nc_s, &
+                       S_cc,  s_lo, s_hi, &
                        scal,  c_lo, c_hi, nc_c, &
                        rodot, r_lo, r_hi, nc_r, &
-                       rHnuc, n_lo, n_hi, nc_n, &
-                       rHext, e_lo, e_hi, nc_e, &
-                       therm, t_lo, t_hi, nc_t) bind (C,name="make_S_cc")
+                       rHnuc, n_lo, n_hi, &
+                       rHext, e_lo, e_hi, &
+                       therm, t_lo, t_hi) bind (C,name="make_S_cc")
     
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3), nc_c
     integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
-    integer         , intent (in   ) :: n_lo(3), n_hi(3), nc_n
-    integer         , intent (in   ) :: e_lo(3), e_hi(3), nc_e
-    integer         , intent (in   ) :: t_lo(3), t_hi(3), nc_t
+    integer         , intent (in   ) :: n_lo(3), n_hi(3)
+    integer         , intent (in   ) :: e_lo(3), e_hi(3)
+    integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (inout) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) :: scal (c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3),nc_c)
     double precision, intent (in   ) :: rodot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
@@ -83,13 +83,13 @@ contains
   end subroutine make_S_cc
 
   subroutine make_ccrhs(lev, lo, hi, &
-                        ccrhs, c_lo, c_hi, nc_c, &
-                        S_cc,  s_lo, s_hi, nc_s, &
+                        ccrhs, c_lo, c_hi, &
+                        S_cc,  s_lo, s_hi, &
                         Sbar, div_coeff) bind (C,name="make_ccrhs")
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
-    integer         , intent (in   ) :: c_lo(3), c_hi(3), nc_c
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: c_lo(3), c_hi(3)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
     double precision, intent (inout) :: ccrhs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) ::      Sbar(0:max_radial_level,0:nr_fine-1)
@@ -118,12 +118,12 @@ contains
   end subroutine make_ccrhs
 
   subroutine make_nodalrhs(lev, lo, hi, &
-                           nodalrhs, n_lo, n_hi, nc_n, &
-                           ccrhs,    c_lo, c_hi, nc_c) bind (C,name="make_nodalrhs")
+                           nodalrhs, n_lo, n_hi, &
+                           ccrhs,    c_lo, c_hi) bind (C,name="make_nodalrhs")
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
-    integer         , intent (in   ) :: n_lo(3), n_hi(3), nc_n
-    integer         , intent (in   ) :: c_lo(3), c_hi(3), nc_c
+    integer         , intent (in   ) :: n_lo(3), n_hi(3)
+    integer         , intent (in   ) :: c_lo(3), c_hi(3)
     double precision, intent (inout) :: nodalrhs(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) ::    ccrhs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
 
@@ -134,13 +134,6 @@ contains
     koff = 0
     if (amrex_spacedim .ge. 2) joff=1
     if (amrex_spacedim .ge. 3) koff=1
-
-    print*,'hack'
-    print*,lo
-    print*,hi
-    print*,n_lo
-    print*,n_hi
-!    stop
 
     ! loop over the data
     do k = lo(3),hi(3)+koff

@@ -52,7 +52,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             make_S_cc(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                       S_cc_fab.dataPtr(),
                       ARLIM_3D(S_cc_box.loVect()), ARLIM_3D(S_cc_box.hiVect()),
-                      S_cc_fab.nComp(),
                       scal_fab.dataPtr(),
                       ARLIM_3D(scal_box.loVect()), ARLIM_3D(scal_box.hiVect()),
                       scal_fab.nComp(),
@@ -61,13 +60,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                       rho_odot_fab.nComp(),
                       rho_Hnuc_fab.dataPtr(),
                       ARLIM_3D(rho_Hnuc_box.loVect()), ARLIM_3D(rho_Hnuc_box.hiVect()),
-                      rho_Hnuc_fab.nComp(),
                       rho_Hext_fab.dataPtr(),
                       ARLIM_3D(rho_Hext_box.loVect()), ARLIM_3D(rho_Hext_box.hiVect()),
-                      rho_Hext_fab.nComp(),
                       thermal_fab.dataPtr(),
-                      ARLIM_3D(thermal_box.loVect()), ARLIM_3D(thermal_box.hiVect()),
-                      thermal_fab.nComp());
+                      ARLIM_3D(thermal_box.loVect()), ARLIM_3D(thermal_box.hiVect()));
         }
 
     }
@@ -121,10 +117,8 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
             make_ccrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                        ccrhs_fab.dataPtr(),
                        ARLIM_3D(ccrhs_box.loVect()), ARLIM_3D(ccrhs_box.hiVect()),
-                       ccrhs_fab.nComp(),
                        S_cc_fab.dataPtr(),
                        ARLIM_3D(S_cc_box.loVect()), ARLIM_3D(S_cc_box.hiVect()),
-                       S_cc_fab.nComp(),
                        Sbar.dataPtr(), div_coeff.dataPtr());
         }
     }
@@ -164,10 +158,8 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
             make_nodalrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                           nodalrhs_fab.dataPtr(),
                           ARLIM_3D(nodalrhs_box.loVect()), ARLIM_3D(nodalrhs_box.hiVect()),
-                          nodalrhs_fab.nComp(),
                           ccrhs_fab.dataPtr(),
-                          ARLIM_3D(ccrhs_box.loVect()), ARLIM_3D(ccrhs_box.hiVect()),
-                          ccrhs_fab.nComp());
+                          ARLIM_3D(ccrhs_box.loVect()), ARLIM_3D(ccrhs_box.hiVect()));
         }
     }
 }

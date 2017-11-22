@@ -75,7 +75,7 @@ extern "C"
     //////////////////////
     // in make_gamma.F90
     void make_gamma(const int& lev, const int* lo, const int* hi, 
-                    amrex::Real* gamma,  const int* g_lo, const int* g_hi, const int& nc_g,
+                    amrex::Real* gamma,  const int* g_lo, const int* g_hi,
                     const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int& nc_s,
                     const amrex::Real* p0);
     //////////////////////
@@ -83,23 +83,23 @@ extern "C"
     //////////////////////
     // in make_S.f90
     void make_S_cc(const int* lo, const int* hi, 
-                   amrex::Real* S_cc,  const int* s_lo, const int* s_hi, const int& nc_s,
+                   amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
                    const amrex::Real* scal,  const int* c_lo, const int* c_hi, const int& nc_c,
                    const amrex::Real* rodot, const int* r_lo, const int* r_hi, const int& nc_r,
-                   const amrex::Real* rHnuc, const int* n_lo, const int* n_hi, const int& nc_n,
-                   const amrex::Real* rHext, const int* e_lo, const int* e_hi, const int& nc_e,
-                   const amrex::Real* therm, const int* t_lo, const int* t_hi, const int& nc_t);
+                   const amrex::Real* rHnuc, const int* n_lo, const int* n_hi,
+                   const amrex::Real* rHext, const int* e_lo, const int* e_hi,
+                   const amrex::Real* therm, const int* t_lo, const int* t_hi);
 
 
     void make_ccrhs(const int& lev, const int* lo, const int* hi, 
-                    amrex::Real* ccrhs,  const int* c_lo, const int* c_hi, const int& nc_c,
-                    const amrex::Real* S_cc,  const int* s_lo, const int* s_hi, const int& nc_s,
+                    amrex::Real* ccrhs,  const int* c_lo, const int* c_hi,
+                    const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
                     const amrex::Real* Sbar, const amrex::Real* div_coeff);
 
 
     void make_nodalrhs(const int& lev, const int* lo, const int* hi, 
-                       amrex::Real* nodalrhs,  const int* n_lo, const int* n_hi, const int& nc_n,
-                       const amrex::Real* ccrhs,  const int* c_lo, const int* c_hi, const int& nc_c);
+                       amrex::Real* nodalrhs,  const int* n_lo, const int* n_hi,
+                       const amrex::Real* ccrhs,  const int* c_lo, const int* c_hi);
 
     //////////////////////
 
@@ -108,9 +108,9 @@ extern "C"
     void burner_loop(const int& lev, const int* lo, const int* hi, 
                      const amrex::Real* s_in,  const int* i_lo, const int* i_hi, const int& nc_i,
                      amrex::Real* s_out,  const int* o_lo, const int* o_hi, const int& nc_o,
-                     const amrex::Real* rho_Hext, const int* e_lo, const int* e_hi, const int& nc_e,
+                     const amrex::Real* rho_Hext, const int* e_lo, const int* e_hi,
                      amrex::Real* rho_odot, const int* r_lo, const int* r_hi, const int& nc_r,
-                     amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi, const int& nc_n,
+                     amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                      const amrex::Real* tempbar_init_in, const amrex::Real& dt_in);
     //////////////////////
 

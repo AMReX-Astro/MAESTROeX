@@ -22,17 +22,17 @@ contains
   subroutine burner_loop(lev, lo, hi, &
                          s_in,     i_lo, i_hi, nc_i, &
                          s_out,    o_lo, o_hi, nc_o, &
-                         rho_Hext, e_lo, e_hi, nc_e, &
+                         rho_Hext, e_lo, e_hi, &
                          rho_odot, r_lo, r_hi, nc_r, &
-                         rho_Hnuc, n_lo, n_hi, nc_n, &
+                         rho_Hnuc, n_lo, n_hi, &
                          tempbar_init_in, dt_in) bind (C,name="burner_loop")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
     integer         , intent (in   ) :: o_lo(3), o_hi(3), nc_o
-    integer         , intent (in   ) :: e_lo(3), e_hi(3), nc_e
+    integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
-    integer         , intent (in   ) :: n_lo(3), n_hi(3), nc_n
+    integer         , intent (in   ) :: n_lo(3), n_hi(3)
     double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
     double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))

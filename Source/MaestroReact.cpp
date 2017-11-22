@@ -142,13 +142,11 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                         s_out_fab.nComp(),
                         rho_Hext_fab.dataPtr(),
                         ARLIM_3D(rho_Hext_box.loVect()), ARLIM_3D(rho_Hext_box.hiVect()),
-                        rho_Hext_fab.nComp(),
                         rho_omegadot_fab.dataPtr(),
                         ARLIM_3D(rho_omegadot_box.loVect()), ARLIM_3D(rho_omegadot_box.hiVect()),
                         rho_omegadot_fab.nComp(),
                         rho_Hnuc_fab.dataPtr(),
                         ARLIM_3D(rho_Hnuc_box.loVect()), ARLIM_3D(rho_Hnuc_box.hiVect()),
-                        rho_Hnuc_fab.nComp(),
                         tempbar_init.dataPtr(), dt);
 
 

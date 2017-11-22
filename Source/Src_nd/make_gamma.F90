@@ -19,12 +19,12 @@ module make_gamma_module
 contains
 
   subroutine make_gamma(lev, lo, hi, &
-                        gamma, g_lo, g_hi, nc_g, &
+                        gamma, g_lo, g_hi, &
                         scal,  s_lo, s_hi, nc_s, &
                         p0) bind(C,name="make_gamma")
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
-    integer         , intent (in   ) :: g_lo(3), g_hi(3), nc_g
+    integer         , intent (in   ) :: g_lo(3), g_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
     double precision, intent (inout) :: gamma(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
     double precision, intent (in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
