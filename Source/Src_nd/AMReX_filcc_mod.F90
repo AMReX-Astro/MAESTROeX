@@ -28,9 +28,9 @@ contains
     do i = qlo(4), qhi(4)
        bc(:,1) = bclo(:,i)
        bc(:,2) = bchi(:,i)
-#if (AMREX_SPACEDIM == 3)
+#if (BL_SPACEDIM == 3)
        call filcc(q(:,:,:,i),qlo(1),qlo(2),qlo(3),qhi(1),qhi(2),qhi(3),domlo,domhi,dx,xlo,bc)
-#elif (AMREX_SPACEDIM == 2)
+#elif (BL_SPACEDIM == 2)
        call filcc(q(:,:,:,i),qlo(1),qlo(2),       qhi(1),qhi(2),       domlo,domhi,dx,xlo,bc)
 #else
        call filcc(q(:,:,:,i),qlo(1),              qhi(1),              domlo,domhi,dx,xlo,bc)
@@ -38,7 +38,7 @@ contains
     end do
   end subroutine amrex_filcc_n
 
-#if (AMREX_SPACEDIM == 3)
+#if (BL_SPACEDIM == 3)
 
   subroutine amrex_filcc_1(q,qlo1,qlo2,qlo3,qhi1,qhi2,qhi3,domlo,domhi,dx,xlo,bc)
     integer, intent(in) :: qlo1,qlo2,qlo3,qhi1,qhi2,qhi3,domlo(amrex_spacedim),domhi(amrex_spacedim)
@@ -48,7 +48,7 @@ contains
     call filcc(q,qlo1,qlo2,qlo3,qhi1,qhi2,qhi3,domlo,domhi,dx,xlo,bc)
   end subroutine amrex_filcc_1
 
-#elif (AMREX_SPACEDIM == 2)
+#elif (BL_SPACEDIM == 2)
 
   subroutine amrex_filcc_1(q,qlo1,qlo2,qhi1,qhi2,domlo,domhi,dx,xlo,bc)
     integer, intent(in) :: qlo1,qlo2,qhi1,qhi2,domlo(amrex_spacedim),domhi(amrex_spacedim)
@@ -84,6 +84,8 @@ contains
   subroutine amrex_fab_filcc (q, qlo, qhi, nq, domlo, domhi, dx, xlo, bc) &
        bind(c, name='amrex_fab_filcc')
 
+    implicit none
+
     integer, intent(in) :: qlo(3), qhi(3), nq
     integer, dimension(amrex_spacedim), intent(in) :: domlo, domhi
     real(amrex_real), intent(in) :: dx(amrex_spacedim), xlo(amrex_spacedim)
@@ -101,6 +103,8 @@ contains
 
 
   subroutine filccn(lo, hi, q, q_lo, q_hi, ncomp, domlo, domhi, dx, xlo, bc)
+
+    implicit none
 
     integer,          intent(in   ) :: lo(3), hi(3)
     integer,          intent(in   ) :: q_lo(3), q_hi(3)

@@ -10,10 +10,8 @@ contains
   subroutine phifill(phi,phi_lo,phi_hi,domlo,domhi,dx,gridlo,time,bc) &
        bind(C, name="phifill")
 
-    use amrex_fort_module, only: amrex_spacedim
-
     integer      :: phi_lo(3),phi_hi(3)
-    integer      :: bc(amrex_spacedim,2)
+    integer      :: bc(AMREX_SPACEDIM,2)
     integer      :: domlo(3), domhi(3)
     double precision :: dx(3), gridlo(3), time
     double precision :: phi(phi_lo(1):phi_hi(1),phi_lo(2):phi_hi(2),phi_lo(3):phi_hi(3))

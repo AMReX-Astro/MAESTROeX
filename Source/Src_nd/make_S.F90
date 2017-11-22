@@ -2,7 +2,6 @@ module make_S_module
 
   use eos_type_module
   use eos_module
-  use amrex_fort_module, only: amrex_spacedim
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp
   use base_state_geometry_module, only:  max_radial_level, nr_fine
@@ -132,8 +131,8 @@ contains
 
     joff = 0
     koff = 0
-    if (amrex_spacedim .ge. 2) joff=1
-    if (amrex_spacedim .ge. 3) koff=1
+    if (AMREX_SPACEDIM .ge. 2) joff=1
+    if (AMREX_SPACEDIM .ge. 3) koff=1
 
     ! loop over the data
     do k = lo(3),hi(3)+koff

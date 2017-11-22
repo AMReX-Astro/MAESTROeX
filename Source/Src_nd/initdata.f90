@@ -27,10 +27,10 @@ contains
     double precision, intent(in   ) :: time
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
                                             scal_lo(2):scal_hi(2), &
-                                            scal_lo(3):scal_hi(3), 1:nscal)
+                                            scal_lo(3):scal_hi(3), 1:nc_s)
     double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
                                            vel_lo(2):vel_hi(2), &
-                                           vel_lo(3):vel_hi(3), 1:amrex_spacedim)
+                                           vel_lo(3):vel_hi(3), 1:nc_v)
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3), prob_lo(3)

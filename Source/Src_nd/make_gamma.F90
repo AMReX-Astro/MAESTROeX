@@ -5,7 +5,6 @@ module make_gamma_module
 
   use eos_type_module
   use eos_module
-  use amrex_fort_module, only: amrex_spacedim
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, pi_comp, use_pprime_in_tfromp
   use base_state_geometry_module, only: max_radial_level, nr_fine

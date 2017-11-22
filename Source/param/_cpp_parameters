@@ -457,7 +457,7 @@ use_tfromp                          bool            false
 
 # In deriving the temperature from the $h$, first subtract off
 # $p_0/\rho$ to define $e$, and use that as the input to the EOS.
-use_eos_e_instead_of_h              bool            false
+use_eos_e_instead_of_h              bool            false    y
 
 use_pprime_in_tfromp                 bool            false      y
 
