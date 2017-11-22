@@ -71,8 +71,8 @@ Maestro::InitData ()
     init_multilevel(finest_level);
 
     // synchronize levels
-    AverageDown(snew);
-    AverageDown(unew);
+    AverageDown(snew,0,Nscal);
+    AverageDown(unew,0,AMREX_SPACEDIM);
 
     // free memory in s0_init and p0_init by swapping it
     // with an empty vector that will go out of scope

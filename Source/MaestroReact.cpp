@@ -71,10 +71,10 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
 
     // average fine data onto coarser cells
-    AverageDown(s_out);
-    AverageDown(rho_Hext);
-    AverageDown(rho_omegadot);
-    AverageDown(rho_Hnuc);
+    AverageDown(s_out,0,Nscal);
+    AverageDown(rho_Hext,0,1);
+    AverageDown(rho_omegadot,0,NumSpec);
+    AverageDown(rho_Hnuc,0,1);
 
 /* FIXME
       ! now update temperature

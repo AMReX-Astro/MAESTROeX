@@ -39,7 +39,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 
     for (int lev=finest_level-1; lev>=0; --lev)
     {
-        AverageDownTo(lev,gamma1); // average lev+1 down to lev
+        AverageDownTo(lev,gamma1,0,1); // average lev+1 down to lev
     }
 
     // call average to create gamma1bar

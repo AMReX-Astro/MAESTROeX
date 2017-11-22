@@ -269,7 +269,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
             flux_reg_s[lev+1]->Reflux(snew[lev], 1.0, 0, 0, snew[lev].nComp(), geom[lev]);
         }
 
-        AverageDownTo(lev,snew); // average lev+1 down to lev
+        AverageDownTo(lev,snew,0,Nscal); // average lev+1 down to lev
     }
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new

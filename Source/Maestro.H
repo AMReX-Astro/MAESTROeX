@@ -122,12 +122,16 @@ private:
                   amrex::Vector<amrex::MultiFab>& mf_new);
 
     // set covered coarse cells to be the average of overlying fine cells
-    void AverageDown (amrex::Vector<amrex::MultiFab>& mf);
+    void AverageDown (amrex::Vector<amrex::MultiFab>& mf,
+                      int comp,
+                      int ncomp);
 
     // more flexible version of AverageDown() that lets you average 
     // down across multiple levels
     void AverageDownTo (int crse_lev,
-                        amrex::Vector<amrex::MultiFab>& mf);
+                        amrex::Vector<amrex::MultiFab>& mf,
+                        int comp,
+                        int ncomp);
 
     // end MaestroFillData.cpp functions
     ////////////

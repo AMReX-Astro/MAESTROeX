@@ -108,21 +108,26 @@ Maestro::GetData (int lev, Real time,
 
 // set covered coarse cells to be the average of overlying fine cells
 void
-Maestro::AverageDown (Vector<MultiFab>& mf)
+Maestro::AverageDown (Vector<MultiFab>& mf,
+                      int comp,
+                      int ncomp)
 {
     for (int lev = finest_level-1; lev >= 0; --lev)
     {
         average_down(mf[lev+1], mf[lev],
                      geom[lev+1], geom[lev],
-                     0, mf[lev].nComp(), refRatio(lev));
+                     comp, ncomp, refRatio(lev));
     }
 }
 
 // more flexible version of AverageDown() that lets you average down across multiple levels
 void
-Maestro::AverageDownTo (int crse_lev, Vector<MultiFab>& mf)
+Maestro::AverageDownTo (int crse_lev,
+                        Vector<MultiFab>& mf,
+                        int comp,
+                        int ncomp)
 {
     average_down(mf[crse_lev+1], mf[crse_lev],
                  geom[crse_lev+1], geom[crse_lev],
-                 0, mf[crse_lev].nComp(), refRatio(crse_lev));
+                 comp, ncomp, refRatio(crse_lev));
 }
