@@ -300,6 +300,12 @@ private:
     ////////////
 
     ////////////
+    // MaestroRhoHT.cpp functions
+    void MakeTfromRhoH (amrex::Vector<amrex::MultiFab>& scal,
+                        const amrex::Vector<amrex::Real>& p0);
+    ////////////
+
+    ////////////
     // MaestroSetup.cpp functions
 
     // read in C++ parameters from inputs file
