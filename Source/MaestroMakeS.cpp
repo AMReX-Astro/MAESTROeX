@@ -81,8 +81,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
 
 void
-Maestro::Make_S_nodal (const Vector<MultiFab>& S_cc,
-                       Vector<MultiFab>& S_nodal,
-                       Real Sbar,
-                       const Vector<Real>& div_coeff)
+Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
+                        Vector<MultiFab>& nodalrhs,
+                        Real Sbar,
+                        const Vector<Real>& div_coeff)
 {}

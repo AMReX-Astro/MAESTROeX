@@ -42,9 +42,9 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<MultiFab>     etarhoflux(finest_level+1);
 
     // nodal
-    Vector<MultiFab>        S_nodal(finest_level+1);
-    Vector<MultiFab>    S_nodal_old(finest_level+1);
-    Vector<MultiFab>             pi(finest_level+1);
+    Vector<MultiFab>     nodalrhs(finest_level+1);
+    Vector<MultiFab> nodalrhs_old(finest_level+1);
+    Vector<MultiFab>           pi(finest_level+1);
 
     // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > >                umac(finest_level+1);
@@ -127,9 +127,9 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         sponge[lev].define        (grids[lev], dmap[lev],       1, 0);
 
         // nodal MultiFabs
-        S_nodal[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
-        S_nodal_old[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
-        pi[lev].define         (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        nodalrhs[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        nodalrhs_old[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        pi[lev].define          (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
         // face-centered in the dm-direction (planar only)
 #if (AMREX_SPACEDIM == 2)

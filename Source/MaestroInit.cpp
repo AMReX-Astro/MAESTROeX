@@ -28,7 +28,7 @@ Maestro::Init ()
                    r_cc_loc.dataPtr(),
                    r_edge_loc.dataPtr());
 
-    // FIXME
+    // compute gamma1bar
     MakeGamma1bar(snew,gamma1bar_new,p0_new);
 
     // compute beta0
@@ -169,11 +169,11 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 void Maestro::InitProj ()
 {
 
-    Vector<MultiFab>           S_cc(finest_level+1);
-    Vector<MultiFab>   rho_omegadot(finest_level+1);
-    Vector<MultiFab>        thermal(finest_level+1);
-    Vector<MultiFab>       rho_Hnuc(finest_level+1);
-    Vector<MultiFab>       rho_Hext(finest_level+1);
+    Vector<MultiFab>         S_cc(finest_level+1);
+    Vector<MultiFab> rho_omegadot(finest_level+1);
+    Vector<MultiFab>      thermal(finest_level+1);
+    Vector<MultiFab>     rho_Hnuc(finest_level+1);
+    Vector<MultiFab>     rho_Hext(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         S_cc[lev].define        (grids[lev], dmap[lev],       1, 0);
