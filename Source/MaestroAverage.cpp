@@ -42,22 +42,16 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
             for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
             {
-                // get references to the FABs, each containing data and the valid+ghost box
-                const FArrayBox& phi_fab = phi_mf[mfi];
 
                 // Get the index space of the valid region
                 const Box& validBox = mfi.validbox();
-                const int* validLo = validBox.loVect();
-                const int* validHi = validBox.hiVect();
 
-                // Get the index space of the valid+ghost region for each FAB
-                // Note each of these boxes may contain ghost cells, and thus are
-                // larger than or equal to mfi.validbox().
-                const Box& phi_box = phi_fab.box();
-
-                average(lev, ARLIM_3D(validLo), ARLIM_3D(validHi),
-                        phi_fab.dataPtr(comp),
-                        ARLIM_3D(phi_box.loVect()), ARLIM_3D(phi_box.hiVect()),
+                // call fortran subroutine
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // lo/hi coordinates (including ghost cells), and/or the # of components
+                // We will also pass "validBox", which specifies the "valid" region.
+                average(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                        BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
                         phisum.dataPtr());
             }
         }

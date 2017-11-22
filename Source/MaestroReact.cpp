@@ -97,70 +97,35 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      const Vector<Real>& p0,
                      const Real dt_in) {
 
-    // get references to the MultiFabs at level lev
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        const MultiFab& s_in_mf = s_in[lev];
-        MultiFab& s_out_mf = s_out[lev];
-        const MultiFab& rho_Hext_mf = rho_Hext[lev];
-        MultiFab& rho_omegadot_mf = rho_omegadot[lev];
-        MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
+        // get references to the MultiFabs at level lev
+        const MultiFab&         s_in_mf =         s_in[lev];
+              MultiFab&        s_out_mf =        s_out[lev];
+        const MultiFab&     rho_Hext_mf =     rho_Hext[lev];
+              MultiFab& rho_omegadot_mf = rho_omegadot[lev];
+              MultiFab&     rho_Hnuc_mf =     rho_Hnuc[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(s_in_mf); mfi.isValid(); ++mfi ) {
 
-            // get references to the FABs, each containing data and the valid+ghost box
-            const FArrayBox& s_in_fab = s_in_mf[mfi];
-            FArrayBox& s_out_fab = s_out_mf[mfi];
-            const FArrayBox& rho_Hext_fab = rho_Hext_mf[mfi];
-            FArrayBox& rho_omegadot_fab = rho_omegadot_mf[mfi];
-            FArrayBox& rho_Hnuc_fab = rho_Hnuc_mf[mfi];
-
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
-            const int* validLo = validBox.loVect();
-            const int* validHi = validBox.hiVect();
 
-            // Get the index space of the valid+ghost region for each FAB
-            // Note each of these boxes may contain ghost cells, and thus are
-            // larger than or equal to mfi.validbox().
-            const Box & s_in_box = s_in_fab.box();
-            const Box & s_out_box = s_out_fab.box();
-            const Box & rho_Hext_box = rho_Hext_fab.box();
-            const Box & rho_omegadot_box = rho_omegadot_fab.box();
-            const Box & rho_Hnuc_box = rho_Hnuc_fab.box();
-
-            // We can now pass the information to a Fortran routine,
-            // e.g. s_in_fab.dataPtr() gives a double*, which is reshaped into
-            // a multi-dimensional array with dimensions specified by
-            // the information in "s_in_box". We will also pass "box",
-            // which specifies our "work" region .
-            burner_loop(lev,ARLIM_3D(validLo), ARLIM_3D(validHi),
-                        s_in_fab.dataPtr(),
-                        ARLIM_3D(s_in_box.loVect()), ARLIM_3D(s_in_box.hiVect()),
-                        s_in_fab.nComp(),
-                        s_out_fab.dataPtr(),
-                        ARLIM_3D(s_out_box.loVect()), ARLIM_3D(s_out_box.hiVect()),
-                        s_out_fab.nComp(),
-                        rho_Hext_fab.dataPtr(),
-                        ARLIM_3D(rho_Hext_box.loVect()), ARLIM_3D(rho_Hext_box.hiVect()),
-                        rho_omegadot_fab.dataPtr(),
-                        ARLIM_3D(rho_omegadot_box.loVect()), ARLIM_3D(rho_omegadot_box.hiVect()),
-                        rho_omegadot_fab.nComp(),
-                        rho_Hnuc_fab.dataPtr(),
-                        ARLIM_3D(rho_Hnuc_box.loVect()), ARLIM_3D(rho_Hnuc_box.hiVect()),
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            burner_loop(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                        BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+                        BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+                        BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+                        BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+                        BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
                         tempbar_init.dataPtr(), dt);
 
-
-
         }
-
-
     }
-
-
-
-
 }
 
 // compute heating term, rho_Hext
