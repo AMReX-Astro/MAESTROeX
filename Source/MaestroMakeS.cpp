@@ -21,7 +21,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         const MultiFab& rho_Hext_mf = rho_Hext[lev];
         const MultiFab& thermal_mf = thermal[lev];
 
-        // Loop over boxes
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
             // get references to the FABs, each containing data and the valid+ghost box
             FArrayBox& S_cc_fab = S_cc_mf[mfi];
@@ -98,7 +98,7 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
         MultiFab& ccrhs_mf = ccrhs[lev];
         const MultiFab& S_cc_mf = S_cc[lev];
 
-        // Loop over boxes
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
             // get references to the FABs, each containing data and the valid+ghost box
             FArrayBox& ccrhs_fab = ccrhs_mf[mfi];
@@ -135,8 +135,39 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
     }
 
     // make_nodalrhs
+    for (int lev=0; lev<=finest_level; ++lev) {
 
+        // get references to the MultiFabs at level lev
+        MultiFab& nodalrhs_mf = nodalrhs[lev];
+        const MultiFab& ccrhs_mf = ccrhs[lev];
 
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(ccrhs_mf); mfi.isValid(); ++mfi ) {
+            // get references to the FABs, each containing data and the valid+ghost box
+            FArrayBox& nodalrhs_fab = nodalrhs_mf[mfi];
+            const FArrayBox& ccrhs_fab = ccrhs_mf[mfi];
 
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
 
+            // Get the index space of the valid+ghost region for each FAB
+            // Note each of these boxes may contain ghost cells, and thus are
+            // larger than or equal to mfi.validbox().
+            const Box& nodalrhs_box = nodalrhs_fab.box();
+            const Box& ccrhs_box = ccrhs_fab.box();
+
+            // We can now pass the information to a Fortran routine,
+            // e.g. ccrhs_fab.dataPtr() gives a double*, which is reshaped into
+            // a multi-dimensional array with dimensions specified by
+            // the information in "ccrhs_box". We will also pass "box",
+            // which specifies our "work" region .
+            make_nodalrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                          nodalrhs_fab.dataPtr(),
+                          ARLIM_3D(nodalrhs_box.loVect()), ARLIM_3D(nodalrhs_box.hiVect()),
+                          nodalrhs_fab.nComp(),
+                          ccrhs_fab.dataPtr(),
+                          ARLIM_3D(ccrhs_box.loVect()), ARLIM_3D(ccrhs_box.hiVect()),
+                          ccrhs_fab.nComp());
+        }
+    }
 }

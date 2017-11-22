@@ -106,7 +106,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
         MultiFab& rho_omegadot_mf = rho_omegadot[lev];
         MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
 
-        // loop over boxes
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(s_in_mf); mfi.isValid(); ++mfi ) {
 
             // get references to the FABs, each containing data and the valid+ghost box

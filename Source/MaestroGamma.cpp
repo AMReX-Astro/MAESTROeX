@@ -19,7 +19,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
         MultiFab& gamma1_mf = gamma1[lev];
         const MultiFab& scal_mf = scal[lev];
         
-        // Loop over boxes
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(gamma1_mf); mfi.isValid(); ++mfi ) {
             FArrayBox& gamma1_fab = gamma1_mf[mfi];
             const FArrayBox& scal_fab = scal_mf[mfi];

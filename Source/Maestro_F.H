@@ -97,6 +97,10 @@ extern "C"
                     const amrex::Real* Sbar, const amrex::Real* div_coeff);
 
 
+    void make_nodalrhs(const int& lev, const int* lo, const int* hi, 
+                       amrex::Real* nodalrhs,  const int* n_lo, const int* n_hi, const int& nc_n,
+                       const amrex::Real* ccrhs,  const int* c_lo, const int* c_hi, const int& nc_c);
+
     //////////////////////
 
     //////////////////////

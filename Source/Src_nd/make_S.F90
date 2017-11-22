@@ -2,6 +2,7 @@ module make_S_module
 
   use eos_type_module
   use eos_module
+  use amrex_fort_module, only: amrex_spacedim
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp
   use base_state_geometry_module, only:  max_radial_level, nr_fine
@@ -89,8 +90,8 @@ contains
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3), nc_c
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent (inout) :: ccrhs(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
-    double precision, intent (in   ) :: S_cc (c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+    double precision, intent (inout) :: ccrhs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+    double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) ::      Sbar(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: div_coeff(0:max_radial_level,0:nr_fine-1)
 
@@ -115,5 +116,53 @@ contains
     enddo
 
   end subroutine make_ccrhs
+
+  subroutine make_nodalrhs(lev, lo, hi, &
+                           nodalrhs, n_lo, n_hi, nc_n, &
+                           ccrhs,    c_lo, c_hi, nc_c) bind (C,name="make_nodalrhs")
+    
+    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: n_lo(3), n_hi(3), nc_n
+    integer         , intent (in   ) :: c_lo(3), c_hi(3), nc_c
+    double precision, intent (inout) :: nodalrhs(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
+    double precision, intent (in   ) ::    ccrhs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+
+    integer i,j,k
+    integer joff,koff
+
+    joff = 0
+    koff = 0
+    if (amrex_spacedim .ge. 2) joff=1
+    if (amrex_spacedim .ge. 3) koff=1
+
+    print*,'hack'
+    print*,lo
+    print*,hi
+    print*,n_lo
+    print*,n_hi
+!    stop
+
+    ! loop over the data
+    do k = lo(3),hi(3)+koff
+    do j = lo(2),hi(2)+joff
+    do i = lo(1),hi(1)+1
+
+#if (AMREX_SPACEDIM == 1)
+       nodalrhs(i,j,k) = 0.5d0 * ( ccrhs(i,j,k) + ccrhs(i-1,j,k) )
+#elif (AMREX_SPACEDIM == 2)
+       nodalrhs(i,j,k) = 0.25d0 * ( ccrhs(i,j  ,k) + ccrhs(i-1,j  ,k) &
+                                  + ccrhs(i,j-1,k) + ccrhs(i-1,j-1,k) )
+#elif (AMREX_SPACEDIM == 3)
+       nodalrhs(i,j,k) = 0.125d0 * ( ccrhs(i,j  ,k-1) + ccrhs(i-1,j  ,k-1) &
+                                   + ccrhs(i,j-1,k-1) + ccrhs(i-1,j-1,k-1) &
+                                   + ccrhs(i,j  ,k  ) + ccrhs(i-1,j  ,k  ) &
+                                   + ccrhs(i,j-1,k  ) + ccrhs(i-1,j-1,k  ) )
+#endif
+
+    enddo
+    enddo
+    enddo
+
+  end subroutine make_nodalrhs
 
 end module make_S_module

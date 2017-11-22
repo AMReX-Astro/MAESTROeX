@@ -49,6 +49,8 @@ MaestroPhysBCFunct::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for (MFIter mfi(mf); mfi.isValid(); ++mfi)
         {
             FArrayBox& dest = mf[mfi];

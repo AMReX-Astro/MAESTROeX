@@ -93,7 +93,8 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 #endif
     {
         Vector<int>  itags;
-	
+
+	// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for (MFIter mfi(state,true); mfi.isValid(); ++mfi)
         {
             const Box& tilebox  = mfi.tilebox();

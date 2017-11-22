@@ -39,7 +39,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             // get references to the MultiFabs at level lev
             const MultiFab& phi_mf = phi[lev];
 
-            // Loop over boxes
+            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
             for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
             {
                 // get references to the FABs, each containing data and the valid+ghost box
