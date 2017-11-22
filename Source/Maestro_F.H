@@ -146,8 +146,8 @@ extern "C"
     void initdata(const int& lev,
                   const amrex::Real& time, 
                   const int* lo, const int* hi,
-                  BL_FORT_FAB_ARG_3D(scal),
-                  BL_FORT_FAB_ARG_3D(vel),
+                  const amrex::Real* scal, const int* scal_lo, const int* scal_hi, const int* nc_s,
+                  const amrex::Real* vel, const int* vel_lo, const int* vel_hi, const int* nc_v,
                   const amrex::Real* s0_init, 
                   const amrex::Real* p0_init,
                   const amrex::Real* dx,
@@ -157,7 +157,7 @@ extern "C"
     //////////////////////
     // in tagging.f90
     void state_error(int* tag, const int* tag_lo, const int* tag_hi,
-                     const BL_FORT_FAB_ARG_3D(state),
+                     const amrex::Real* state, const int* state_lo, const int* state_hi,
                      const int* tagval, const int* clearval,
                      const int* lo, const int* hi,
                      const amrex::Real* dx, const amrex::Real* problo,
@@ -167,9 +167,9 @@ extern "C"
     //////////////////////
     // in bc_fill_nd.F90
 
-    void phifill (BL_FORT_FAB_ARG_3D(state),
-		  const int* dlo, const int* dhi,
-		  const amrex::Real* dx, const amrex::Real* glo, 
+    void phifill (amrex::Real* phi, const int* phi_lo, const int* phi_hi,
+		  const int* domlo, const int* domhi,
+		  const amrex::Real* dx, const amrex::Real* gridlo, 
 		  const amrex::Real* time, const int* bc);
 
     //////////////////////

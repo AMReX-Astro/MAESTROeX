@@ -33,6 +33,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+            const int* validLo = validBox.loVect();
+            const int* validHi = validBox.hiVect();
 
             // Get the index space of the valid+ghost region for each FAB
             // Note each of these boxes may contain ghost cells, and thus are
@@ -49,7 +51,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             // a multi-dimensional array with dimensions specified by
             // the information in "S_cc_box". We will also pass "box",
             // which specifies our "work" region .
-            make_S_cc(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_S_cc(ARLIM_3D(validLo), ARLIM_3D(validHi),
                       S_cc_fab.dataPtr(),
                       ARLIM_3D(S_cc_box.loVect()), ARLIM_3D(S_cc_box.hiVect()),
                       scal_fab.dataPtr(),
@@ -102,6 +104,8 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+            const int* validLo = validBox.loVect();
+            const int* validHi = validBox.hiVect();
 
             // Get the index space of the valid+ghost region for each FAB
             // Note each of these boxes may contain ghost cells, and thus are
@@ -114,7 +118,7 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
             // a multi-dimensional array with dimensions specified by
             // the information in "S_cc_box". We will also pass "box",
             // which specifies our "work" region .
-            make_ccrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_ccrhs(lev, ARLIM_3D(validLo), ARLIM_3D(validHi),
                        ccrhs_fab.dataPtr(),
                        ARLIM_3D(ccrhs_box.loVect()), ARLIM_3D(ccrhs_box.hiVect()),
                        S_cc_fab.dataPtr(),
@@ -143,6 +147,8 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+            const int* validLo = validBox.loVect();
+            const int* validHi = validBox.hiVect();
 
             // Get the index space of the valid+ghost region for each FAB
             // Note each of these boxes may contain ghost cells, and thus are
@@ -155,7 +161,7 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
             // a multi-dimensional array with dimensions specified by
             // the information in "ccrhs_box". We will also pass "box",
             // which specifies our "work" region .
-            make_nodalrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_nodalrhs(lev, ARLIM_3D(validLo), ARLIM_3D(validHi),
                           nodalrhs_fab.dataPtr(),
                           ARLIM_3D(nodalrhs_box.loVect()), ARLIM_3D(nodalrhs_box.hiVect()),
                           ccrhs_fab.dataPtr(),

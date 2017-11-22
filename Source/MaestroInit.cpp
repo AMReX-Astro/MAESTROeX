@@ -151,6 +151,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     MultiFab& scal = snew[lev];
     MultiFab& vel = unew[lev];
 
+    // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
     for (MFIter mfi(scal); mfi.isValid(); ++mfi)
     {
         const Box& box = mfi.validbox();
@@ -158,8 +159,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
         const int* hi  = box.hiVect();
 
         initdata(lev, cur_time, ARLIM_3D(lo), ARLIM_3D(hi),
-                 BL_TO_FORTRAN_3D(scal[mfi]), 
-                 BL_TO_FORTRAN_3D(vel[mfi]), 
+                 BL_TO_FORTRAN_FAB(scal[mfi]), 
+                 BL_TO_FORTRAN_FAB(vel[mfi]), 
                  s0_init.dataPtr(), p0_init.dataPtr(),
                  ZFILL(dx),ZFILL(geom[lev].ProbLo()));
     }

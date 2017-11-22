@@ -118,6 +118,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+            const int* validLo = validBox.loVect();
+            const int* validHi = validBox.hiVect();
 
             // Get the index space of the valid+ghost region for each FAB
             // Note each of these boxes may contain ghost cells, and thus are
@@ -133,7 +135,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             // a multi-dimensional array with dimensions specified by
             // the information in "s_in_box". We will also pass "box",
             // which specifies our "work" region .
-            burner_loop(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            burner_loop(lev,ARLIM_3D(validLo), ARLIM_3D(validHi),
                         s_in_fab.dataPtr(),
                         ARLIM_3D(s_in_box.loVect()), ARLIM_3D(s_in_box.hiVect()),
                         s_in_fab.nComp(),

@@ -7,7 +7,7 @@ module bc_fill_module
 
 contains
 
-  subroutine phifill(phi,phi_lo,phi_hi,domlo,domhi,delta,xlo,time,bc) &
+  subroutine phifill(phi,phi_lo,phi_hi,domlo,domhi,dx,gridlo,time,bc) &
        bind(C, name="phifill")
 
     use amrex_fort_module, only: amrex_spacedim
@@ -15,15 +15,15 @@ contains
     integer      :: phi_lo(3),phi_hi(3)
     integer      :: bc(amrex_spacedim,2)
     integer      :: domlo(3), domhi(3)
-    double precision :: delta(3), xlo(3), time
+    double precision :: dx(3), gridlo(3), time
     double precision :: phi(phi_lo(1):phi_hi(1),phi_lo(2):phi_hi(2),phi_lo(3):phi_hi(3))
 
 #if (AMREX_SPACEDIM == 1)
-       call filcc(phi,phi_lo(1),phi_hi(1),domlo,domhi,delta,xlo,bc)
+       call filcc(phi,phi_lo(1),phi_hi(1),domlo,domhi,dx,gridlo,bc)
 #elif (AMREX_SPACEDIM == 2)
-       call filcc(phi,phi_lo(1),phi_lo(2),phi_hi(1),phi_hi(2),domlo,domhi,delta,xlo,bc)
+       call filcc(phi,phi_lo(1),phi_lo(2),phi_hi(1),phi_hi(2),domlo,domhi,dx,gridlo,bc)
 #else
-       call filcc(phi,phi_lo(1),phi_lo(2),phi_lo(3),phi_hi(1),phi_hi(2),phi_hi(3),domlo,domhi,delta,xlo,bc)
+       call filcc(phi,phi_lo(1),phi_lo(2),phi_lo(3),phi_hi(1),phi_hi(2),phi_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
 
   end subroutine phifill

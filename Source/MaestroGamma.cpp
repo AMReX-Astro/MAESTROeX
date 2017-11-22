@@ -26,6 +26,8 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+            const int* validLo = validBox.loVect();
+            const int* validHi = validBox.hiVect();
 
             // Get the index space of the valid+ghost region for each FAB
             // Note each of these boxes may contain ghost cells, and thus are
@@ -38,7 +40,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
             // a multi-dimensional array with dimensions specified by
             // the information in "gamma1_box". We will also pass "box",
             // which specifies our "work" region .
-            make_gamma(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_gamma(lev, ARLIM_3D(validLo), ARLIM_3D(validHi),
                        gamma1_fab.dataPtr(),
                        ARLIM_3D(gamma1_box.loVect()), ARLIM_3D(gamma1_box.hiVect()),
                        scal_fab.dataPtr(),

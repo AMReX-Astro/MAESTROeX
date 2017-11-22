@@ -47,13 +47,15 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
                 // Get the index space of the valid region
                 const Box& validBox = mfi.validbox();
+                const int* validLo = validBox.loVect();
+                const int* validHi = validBox.hiVect();
 
                 // Get the index space of the valid+ghost region for each FAB
                 // Note each of these boxes may contain ghost cells, and thus are
                 // larger than or equal to mfi.validbox().
                 const Box& phi_box = phi_fab.box();
 
-                average(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                average(lev, ARLIM_3D(validLo), ARLIM_3D(validHi),
                         phi_fab.dataPtr(comp),
                         ARLIM_3D(phi_box.loVect()), ARLIM_3D(phi_box.hiVect()),
                         phisum.dataPtr());

@@ -16,14 +16,14 @@ module initdata_module
 contains
 
   subroutine initdata(lev, time, lo, hi, &
-                      scal, scal_lo, scal_hi, &
-                      vel, vel_lo, vel_hi, &
+                      scal, scal_lo, scal_hi, nc_s, &
+                      vel, vel_lo, vel_hi, nc_v, &
                       s0_init, p0_init, &
                       dx, prob_lo) bind(C, name="initdata")
     
     integer         , intent(in   ) :: lev, lo(3), hi(3)
-    integer         , intent(in   ) :: scal_lo(3), scal_hi(3)
-    integer         , intent(in   ) :: vel_lo(3), vel_hi(3)
+    integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
+    integer         , intent(in   ) :: vel_lo(3), vel_hi(3), nc_v
     double precision, intent(in   ) :: time
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
                                             scal_lo(2):scal_hi(2), &
