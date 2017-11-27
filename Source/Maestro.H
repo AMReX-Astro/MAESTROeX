@@ -96,17 +96,22 @@ private:
     // compute a new multifab by coping in phi from valid region and filling ghost cells
     // works for single level and 2-level cases 
     // (fill fine grid ghost by interpolating from coarse)
+    // scomp of the source component
+    // dcomp is the destination component AND the bc component
     void FillPatch (int lev, amrex::Real time, amrex::MultiFab& mf,
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
-                    int icomp, int ncomp, amrex::Vector<amrex::BCRec> bcs);
+                    int scomp, int dcomp, int ncomp,
+                    amrex::Vector<amrex::BCRec> bcs);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
+    // scomp of the source component
+    // dcomp is the destination component AND the bc component
     void FillCoarsePatch (int lev, amrex::Real time, amrex::MultiFab& mf,
                           amrex::Vector<amrex::MultiFab>& mf_old,
                           amrex::Vector<amrex::MultiFab>& mf_new,
-                          int icomp, int ncomp,
+                          int scomp, int dcomp, int ncomp,
                           amrex::Vector<amrex::BCRec> bcs);
 
     // utility to copy in data from mf_old and/or mf_new into mf
@@ -134,6 +139,18 @@ private:
                         int ncomp);
 
     // end MaestroFillData.cpp functions
+    ////////////
+
+    ////////////////////////
+    // MaestroFill3dData.cpp functions
+    
+    void Put1dArrayOnCart (const amrex::Vector<amrex::Real>& s0,
+                           amrex::Vector<amrex::MultiFab*>& s0_cart,
+                           int bc_comp,
+                           bool is_intput_edge_centered,
+                           bool is_output_a_vector);
+
+    // end MaestroFill3dData.cpp functions
     ////////////
 
     ////////////
@@ -388,6 +405,8 @@ private:
     // condition types at the lo/hi walls in each direction
     amrex::Vector<amrex::BCRec> bcs_s;  // for sold/snew
     amrex::Vector<amrex::BCRec> bcs_u;  // for uold/unew
+    amrex::Vector<amrex::BCRec> bcs_h;  // for rhoh
+    amrex::Vector<amrex::BCRec> bcs_t;  // for temperature
     amrex::Vector<amrex::BCRec> bcs_f;  // "first-order extrap" used for S_cc, gpi, dSdt
 
     // boundary conditions objects needed for linear solves

@@ -40,7 +40,7 @@ Maestro::NodalProj (int proj_type,
     Vector<MultiFab> unew_ghost(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         unew_ghost[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-        FillPatch(lev, t_new, unew_ghost[lev], unew, unew, 0, AMREX_SPACEDIM, bcs_u);
+        FillPatch(lev, t_new, unew_ghost[lev], unew, unew, 0, 0, AMREX_SPACEDIM, bcs_u);
     }
 
 

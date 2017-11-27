@@ -6,11 +6,14 @@ using namespace amrex;
 // compute a new multifab by coping in phi from valid region and filling ghost cells
 // works for single level and 2-level cases
 // (fill fine grid ghost by interpolating from coarse)
+// scomp of the source component
+// dcomp is the destination component AND the bc component
 void
 Maestro::FillPatch (int lev, Real time, MultiFab& mf, 
                     Vector<MultiFab>& mf_old,
                     Vector<MultiFab>& mf_new,
-                    int icomp, int ncomp, Vector<BCRec> bcs)
+                    int scomp, int dcomp, int ncomp,
+                    Vector<BCRec> bcs)
 {
     if (lev == 0)
     {
@@ -19,7 +22,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         GetData(0, time, smf, stime, mf_old, mf_new);
 
         MaestroPhysBCFunct physbc(geom[lev],bcs,BndryFunctBase(phifill));
-        FillPatchSingleLevel(mf, time, smf, stime, 0, icomp, ncomp,
+        FillPatchSingleLevel(mf, time, smf, stime, scomp, dcomp, ncomp,
                              geom[lev], physbc);
     }
     else
@@ -35,7 +38,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         Interpolater* mapper = &cell_cons_interp;
 
         FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
-                           0, icomp, ncomp, geom[lev-1], geom[lev],
+                           scomp, dcomp, ncomp, geom[lev-1], geom[lev],
                            cphysbc, fphysbc, refRatio(lev-1),
                            mapper, bcs);
     }
@@ -43,11 +46,14 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
 
 // fill an entire multifab by interpolating from the coarser level
 // this comes into play when a new level of refinement appears
+// scomp of the source component
+// dcomp is the destination component AND the bc component
 void
 Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
                           Vector<MultiFab>& mf_old,
                           Vector<MultiFab>& mf_new,
-                          int icomp, int ncomp, Vector<BCRec> bcs)
+                          int scomp, int dcomp, int ncomp,
+                          Vector<BCRec> bcs)
 {
     AMREX_ASSERT(lev > 0);
 
@@ -63,7 +69,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
     MaestroPhysBCFunct fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
 
     Interpolater* mapper = &cell_cons_interp;
-    InterpFromCoarseLevel(mf, time, *cmf[0], 0, icomp, ncomp, geom[lev-1], geom[lev],
+    InterpFromCoarseLevel(mf, time, *cmf[0], scomp, dcomp, ncomp, geom[lev-1], geom[lev],
                           cphysbc, fphysbc, refRatio(lev-1),
                           mapper, bcs);
 }

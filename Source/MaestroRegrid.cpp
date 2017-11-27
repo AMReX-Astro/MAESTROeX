@@ -153,22 +153,22 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     MultiFab gpi_state     (ba, dm, AMREX_SPACEDIM, ng_g);
     MultiFab dSdt_state    (ba, dm,              1, ng_d);
 
-    FillPatch(lev, time, snew_state, sold, snew, 0, Nscal, bcs_s);
+    FillPatch(lev, time, snew_state, sold, snew, 0, 0, Nscal, bcs_s);
     std::swap(snew_state, snew[lev]);
     std::swap(sold_state, sold[lev]);
 
-    FillPatch(lev, time, unew_state, uold, unew, 0, AMREX_SPACEDIM, bcs_u);
+    FillPatch(lev, time, unew_state, uold, unew, 0, 0, AMREX_SPACEDIM, bcs_u);
     std::swap(unew_state, unew[lev]);
     std::swap(uold_state, uold[lev]);
 
-    FillPatch(lev, time, S_cc_new_state, S_cc_old, S_cc_new, 0, 1, bcs_f);
+    FillPatch(lev, time, S_cc_new_state, S_cc_old, S_cc_new, 0, 0, 1, bcs_f);
     std::swap(S_cc_new_state, S_cc_new[lev]);
     std::swap(S_cc_old_state, S_cc_old[lev]);
 
-    FillPatch(lev, time, gpi_state, gpi, gpi, 0, AMREX_SPACEDIM, bcs_f);
+    FillPatch(lev, time, gpi_state, gpi, gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
     std::swap(gpi_state, gpi[lev]);
 
-    FillPatch(lev, time, dSdt_state, dSdt, dSdt, 0, 1, bcs_f);
+    FillPatch(lev, time, dSdt_state, dSdt, dSdt, 0, 0, 1, bcs_f);
     std::swap(dSdt_state, dSdt[lev]);
 
     t_new = time;
@@ -204,11 +204,11 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
-    FillCoarsePatch(lev, time,     snew[lev],     sold,     snew, 0,          Nscal, bcs_s);
-    FillCoarsePatch(lev, time,     unew[lev],     uold,     unew, 0, AMREX_SPACEDIM, bcs_u);
-    FillCoarsePatch(lev, time, S_cc_new[lev], S_cc_old, S_cc_new, 0,              1, bcs_f);
-    FillCoarsePatch(lev, time,      gpi[lev],      gpi,      gpi, 0, AMREX_SPACEDIM, bcs_f);
-    FillCoarsePatch(lev, time,     dSdt[lev],     dSdt,     dSdt, 0,              1, bcs_f);
+    FillCoarsePatch(lev, time,     snew[lev],     sold,     snew, 0, 0,          Nscal, bcs_s);
+    FillCoarsePatch(lev, time,     unew[lev],     uold,     unew, 0, 0, AMREX_SPACEDIM, bcs_u);
+    FillCoarsePatch(lev, time, S_cc_new[lev], S_cc_old, S_cc_new, 0, 0,              1, bcs_f);
+    FillCoarsePatch(lev, time,      gpi[lev],      gpi,      gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
+    FillCoarsePatch(lev, time,     dSdt[lev],     dSdt,     dSdt, 0, 0,              1, bcs_f);
 }
 
 // within a call to AmrCore::regrid, this function deletes all data

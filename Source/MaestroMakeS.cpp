@@ -89,7 +89,7 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
 
     // fill ghost cells using first-order extrapolation
     for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, t_old, ccrhs[lev], ccrhs, ccrhs, 0, 1, bcs_f);
+        FillPatch(lev, t_old, ccrhs[lev], ccrhs, ccrhs, 0, 0, 1, bcs_f);
     }
 
     // make_nodalrhs

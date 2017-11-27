@@ -4,8 +4,8 @@
 using namespace amrex;
 
 MaestroPhysBCFunct::MaestroPhysBCFunct (const Geometry& geom,
-                              const Vector<BCRec>& bcr, 
-                              const BndryFunctBase& func)
+                                        const Vector<BCRec>& bcr, 
+                                        const BndryFunctBase& func)
     : m_geom(geom), m_bcr(bcr), m_bc_func(func.clone())
 { }
 
