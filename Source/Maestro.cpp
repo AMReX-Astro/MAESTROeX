@@ -16,6 +16,11 @@ int Maestro::Temp      = -1;
 int Maestro::Pi        = -1;
 int Maestro::Nscal     = -1;
 
+int Maestro::initial_projection_comp = 1;
+int Maestro::divu_iters_comp         = 2;
+int Maestro::pressure_iters_comp     = 3;
+int Maestro::regular_timestep_comp   = 4;
+
 // helper IntVects used to define face/nodal MultiFabs
 #if (AMREX_SPACEDIM == 2)
 IntVect Maestro::nodal_flag(1,1);

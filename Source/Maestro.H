@@ -27,7 +27,7 @@ public:
 
     // constructor and destructor
     Maestro ();
-    virtual ~Maestro();
+    virtual ~Maestro ();
 
     // in MaestroSetup.cpp
     // read in C++/F90 parameters
@@ -139,9 +139,9 @@ private:
     ////////////
     // MaestroGamma.cpp functions
 
-    void MakeGamma1bar(const amrex::Vector<amrex::MultiFab>& scal,
-                       amrex::Vector<amrex::Real>& gamma1bar,
-                       const amrex::Vector<amrex::Real>& p0);
+    void MakeGamma1bar (const amrex::Vector<amrex::MultiFab>& scal,
+                        amrex::Vector<amrex::Real>& gamma1bar,
+                        const amrex::Vector<amrex::Real>& p0);
 
     // end MaestroGamma.cpp functions
     ////////////
@@ -164,13 +164,13 @@ private:
                                           const amrex::DistributionMapping& dm) override;
 
     // initial projection
-    void InitProj();
+    void InitProj ();
 
     // divu iter
-    void DivuIter();
+    void DivuIter ();
 
     // init iter to initialize gradpi
-    void InitIter();
+    void InitIter ();
 
     // end MaestroInit.cpp functions
     ////////////
@@ -178,7 +178,7 @@ private:
     ////////////
     // MaestroMacProj.cpp functions
 
-    void MacProj();
+    void MacProj ();
 
     // end MaestroMacProj.cpp functions
     ////////////
@@ -204,15 +204,17 @@ private:
     ////////////
     // MaestroNodalProj.cpp functions
 
-    void NodalProj (amrex::Vector<amrex::MultiFab>& phi,
-                    amrex::Vector<amrex::MultiFab>& vel,
-                    amrex::Vector<amrex::MultiFab>& rhcc,
-                    amrex::Vector<amrex::MultiFab>& rhnd,
-                    amrex::Vector<amrex::MultiFab>& beta0,
-                    int* bc,
-                    amrex::Real rel_tol,
-                    amrex::Real abs_tol);
+    // perform a nodal projection
+    void NodalProj (int proj_type,
+                    amrex::Vector<amrex::MultiFab>& rhohalf);
 
+    // modify unew depending on proj_type
+    // initial_projection_comp: leave unew alone
+    // divu_iters_comp:         leave unew alone
+    // pressure_iters_comp:     unew = (unew-uold)/dt
+    // regular_timestep_comp:   unew = unew + dt*gpi/rhohalf
+    void CreateUVecForProjection (int proj_type,
+                                  amrex::Vector<amrex::MultiFab>& rhohalf);
 
     // end MaestroNodalProj.cpp functions
     ////////////
@@ -331,8 +333,14 @@ private:
     ////////////////
 
     // these are defined in VariableSetup()
-    static int Nscal;
-    static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi;
+    static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi, Nscal;
+
+    // these are defined in Maestro.cpp
+    // these represent the four types of nodal projections
+    static int initial_projection_comp;
+    static int divu_iters_comp;
+    static int pressure_iters_comp;
+    static int regular_timestep_comp;
 
     // these are defined in Maestro.cpp
     static amrex::IntVect nodal_flag;

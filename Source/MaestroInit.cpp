@@ -179,23 +179,28 @@ void Maestro::InitProj ()
     Vector<MultiFab>      thermal(finest_level+1);
     Vector<MultiFab>     rho_Hnuc(finest_level+1);
     Vector<MultiFab>     rho_Hext(finest_level+1);
+    Vector<MultiFab>      rhohalf(finest_level+1);
     // nodal
     Vector<MultiFab>     nodalrhs(finest_level+1);
 
     Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        S_cc[lev].define        (grids[lev], dmap[lev],       1, 0);
+        S_cc        [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
-        thermal[lev].define     (grids[lev], dmap[lev],       1, 0);
-        rho_Hnuc[lev].define    (grids[lev], dmap[lev],       1, 0);
-        rho_Hext[lev].define    (grids[lev], dmap[lev],       1, 0);
+        thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf     [lev].define(grids[lev], dmap[lev],       1, 0);
         // nodal
         nodalrhs[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
         // during initial projection we ignore reaction terms
         rho_omegadot[lev].setVal(0.);
         rho_Hnuc[lev].setVal(0.);
+
+        // initial projection does not use density weighting
+        rhohalf[lev].setVal(1.);
     }
 
     // compute any external heating
@@ -222,8 +227,8 @@ void Maestro::InitProj ()
     // make the nodal rhs for projection
     Make_NodalRHS(S_cc,nodalrhs,Sbar,div_coeff_new);
 
-
-
+    // perform a nodal projection
+    NodalProj(initial_projection_comp,rhohalf);
 
 
 }

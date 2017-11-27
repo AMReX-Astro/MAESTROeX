@@ -4,38 +4,65 @@
 using namespace amrex;
 
 
+// perform a nodal projection
 void
-Maestro::NodalProj (Vector<MultiFab>& phi,
-                    Vector<MultiFab>& vel,
-                    Vector<MultiFab>& rhcc,
-                    Vector<MultiFab>& rhnd,
-                    Vector<MultiFab>& beta0,
-                    int* mg_bcs,
-                    Real rel_tol,
-                    Real abs_tol)
-
+Maestro::NodalProj (int proj_type,
+                    Vector<MultiFab>& rhohalf)
 {
-    const Vector<Geometry>& mg_geom = Geom();
-    const Vector<BoxArray>& mg_ba = boxArray();
-    const Vector<DistributionMapping>& mg_dm = DistributionMap();
+    // modify unew depending on proj_type
+    CreateUVecForProjection(proj_type,rhohalf);
 
-    const bool nodal = true;
-    const int hg_stencil = ND_CROSS_STENCIL;
-    const bool have_rhcc = false;
-    const int nc = 0;
-    const int ncomp = 1;
+    // create a unew with a filled ghost cell
+    Vector<MultiFab> unew_ghost(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        unew_ghost[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        FillPatch(lev, t_new, unew_ghost[lev], unew, unew, 0, AMREX_SPACEDIM, bcs_u);
+    }
 
-    MGT_Solver mgt_solver(mg_geom, mg_bcs, mg_ba, mg_dm, nodal, hg_stencil, have_rhcc,
-                          nc, ncomp, mg_verbose);
 
-    mgt_solver.set_nodal_coefficients(GetVecOfPtrs(beta0));
 
-    mgt_solver.nodal_project(GetVecOfPtrs(phi),
-                             GetVecOfPtrs(vel),
-                             GetVecOfPtrs(rhcc),
-                             GetVecOfPtrs(rhnd),
-                             rel_tol,
-                             abs_tol,
-                             &lo_inflow[0],
-                             &hi_inflow[0]);
+}
+
+
+// modify unew depending on proj_type
+// initial_projection_comp: leave unew alone
+// divu_iters_comp:         leave unew alone
+// pressure_iters_comp:     unew = (unew-uold)/dt
+// regular_timestep_comp:   unew = unew + dt*gpi/rhohalf
+void
+Maestro::CreateUVecForProjection (int proj_type,
+                                  Vector<MultiFab>& rhohalf) {
+
+    if (proj_type == initial_projection_comp) {
+        // leave unew alone
+    }
+    else if (proj_type == divu_iters_comp) {
+        // leave unew alone
+    }
+    else if (proj_type == pressure_iters_comp) {
+        // unew = (unew-uold)/dt
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Saxpy(unew[lev],-1.0,uold[lev],0,0,AMREX_SPACEDIM,0);
+            unew[lev].mult(1/dt);
+        }
+
+    }
+    else if (proj_type == regular_timestep_comp) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+                // gpi = gpi/rhohalf
+                MultiFab::Divide(gpi[lev],rhohalf[lev],0,dir,1,0);
+            }
+            // unew = unew + dt*gpi/rhohalf
+            MultiFab::Saxpy(unew[lev],dt,gpi[lev],0,0,AMREX_SPACEDIM,0);
+            for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+                // revert gpi
+                MultiFab::Multiply(gpi[lev],rhohalf[lev],0,dir,1,0);
+            }
+        }
+    }
+    else {
+        amrex::Abort("MaestroNodalProj: invalid proj_type");
+    }
+
 }
