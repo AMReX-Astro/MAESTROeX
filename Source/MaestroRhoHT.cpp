@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void
-Maestro::MakeTfromRhoH (Vector<MultiFab>& scal,
-                        const Vector<Real>& p0)
+Maestro::TfromRhoH (Vector<MultiFab>& scal,
+                    const Vector<Real>& p0)
 {
 
     for (int lev=0; lev<=finest_level; ++lev) {

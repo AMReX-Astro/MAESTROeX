@@ -17,10 +17,11 @@ Maestro::Init ()
     InitData();
 
     // FIXME
-    // MakeNormal();
-
-    // FIXME
-    // InitSponge();
+/*
+    if (spherical == 1) {
+        MakeNormal();
+    }
+*/
 
     // make gravity
     make_grav_cell(grav_cell.dataPtr(),
@@ -131,14 +132,17 @@ Maestro::InitData ()
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)
 {
-    sold[lev]    .define(ba, dm,          Nscal, 0);
-    snew[lev]    .define(ba, dm,          Nscal, 0);
-    uold[lev]    .define(ba, dm, AMREX_SPACEDIM, 0);
-    unew[lev]    .define(ba, dm, AMREX_SPACEDIM, 0);
+    sold    [lev].define(ba, dm,          Nscal, 0);
+    snew    [lev].define(ba, dm,          Nscal, 0);
+    uold    [lev].define(ba, dm, AMREX_SPACEDIM, 0);
+    unew    [lev].define(ba, dm, AMREX_SPACEDIM, 0);
     S_cc_old[lev].define(ba, dm,              1, 0);
     S_cc_new[lev].define(ba, dm,              1, 0);
-    gpi[lev]     .define(ba, dm, AMREX_SPACEDIM, 0);
-    dSdt[lev]    .define(ba, dm,              1, 0);
+    gpi     [lev].define(ba, dm, AMREX_SPACEDIM, 0);
+    dSdt    [lev].define(ba, dm,              1, 0);
+    if (spherical == 1) {
+        normal[lev].define(ba, dm, 1, 1);
+    }
 
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));

@@ -301,8 +301,8 @@ private:
 
     ////////////
     // MaestroRhoHT.cpp functions
-    void MakeTfromRhoH (amrex::Vector<amrex::MultiFab>& scal,
-                        const amrex::Vector<amrex::Real>& p0);
+    void TfromRhoH (amrex::Vector<amrex::MultiFab>& scal,
+                    const amrex::Vector<amrex::Real>& p0);
     ////////////
 
     ////////////
@@ -363,6 +363,7 @@ private:
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
 
+    // spherical only - 
     // we make this persistent in that we only have to rebuild and
     // fill this after regridding
     amrex::Vector<amrex::MultiFab> normal;

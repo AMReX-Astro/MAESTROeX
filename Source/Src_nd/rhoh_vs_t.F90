@@ -15,7 +15,7 @@ module rhoh_vs_t_module
 
 contains
 
-  subroutine makeTfromRhoH(lev,lo,hi,state,s_lo,s_hi,nc_s,p0)
+  subroutine makeTfromRhoH(lev,lo,hi,state,s_lo,s_hi,nc_s,p0) bind(C,name="makeTfromRhoH")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s

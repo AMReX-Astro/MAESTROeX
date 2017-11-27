@@ -156,7 +156,14 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // FIXME
-    // make the sponge for all levels
+/*
+    if (do_sponge) {
+        // make the sponge for all levels
+        // call init_sponge
+        // call MakeSponge
+    }
+*/
+
 
 
     //////////////////////////////////////////////////////////////////////////////
