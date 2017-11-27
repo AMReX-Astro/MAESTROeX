@@ -191,7 +191,7 @@ void Maestro::InitProj ()
         thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rhohalf     [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
         // nodal
         nodalrhs[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
@@ -228,7 +228,7 @@ void Maestro::InitProj ()
     Make_NodalRHS(S_cc,nodalrhs,Sbar,div_coeff_new);
 
     // perform a nodal projection
-    NodalProj(initial_projection_comp,rhohalf);
+    NodalProj(initial_projection_comp,nodalrhs,rhohalf);
 
 
 }

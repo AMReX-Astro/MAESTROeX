@@ -206,6 +206,7 @@ private:
 
     // perform a nodal projection
     void NodalProj (int proj_type,
+                    amrex::Vector<amrex::MultiFab>& nodalrhs,
                     amrex::Vector<amrex::MultiFab>& rhohalf);
 
     // modify unew depending on proj_type
@@ -213,8 +214,8 @@ private:
     // divu_iters_comp:         leave unew alone
     // pressure_iters_comp:     unew = (unew-uold)/dt
     // regular_timestep_comp:   unew = unew + dt*gpi/rhohalf
-    void CreateUVecForProjection (int proj_type,
-                                  amrex::Vector<amrex::MultiFab>& rhohalf);
+    void CreateUvecForProj (int proj_type,
+                            amrex::Vector<amrex::MultiFab>& rhohalf);
 
     // end MaestroNodalProj.cpp functions
     ////////////
