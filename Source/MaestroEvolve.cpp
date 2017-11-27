@@ -29,7 +29,7 @@ Maestro::Evolve ()
             std::swap(rhoh0_old,rhoh0_new);
             std::swap(   p0_old,   p0_new);
 
-            std::swap(div_coeff_old,div_coeff_new);
+            std::swap(beta0_old,beta0_new);
         }
 
         // compute time step

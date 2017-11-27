@@ -86,8 +86,8 @@ Maestro::Setup ()
     p0_new        .resize( (max_radial_level+1)*nr_fine );
     tempbar       .resize( (max_radial_level+1)*nr_fine );
     tempbar_init  .resize( (max_radial_level+1)*nr_fine );
-    div_coeff_old .resize( (max_radial_level+1)*nr_fine );
-    div_coeff_new .resize( (max_radial_level+1)*nr_fine );
+    beta0_old     .resize( (max_radial_level+1)*nr_fine );
+    beta0_new     .resize( (max_radial_level+1)*nr_fine );
     gamma1bar_new .resize( (max_radial_level+1)*nr_fine );
     gamma1bar_init.resize( (max_radial_level+1)*nr_fine );
     etarho_cc     .resize( (max_radial_level+1)*nr_fine );

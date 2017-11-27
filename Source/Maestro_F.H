@@ -104,7 +104,7 @@ extern "C"
                           amrex::Real* ccrhs, const int* c_lo, const int* c_hi,
                     const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
                     const amrex::Real* Sbar,
-                    const amrex::Real* div_coeff);
+                    const amrex::Real* beta0);
 
 
     void make_nodalrhs(const int& lev, const int* lo, const int* hi, 
@@ -136,19 +136,19 @@ extern "C"
 
     //////////////////////
     // in make_grav.f90
-    void make_grav_cell(amrex::Real* grav_cell,
+    void make_grav_cell(      amrex::Real* grav_cell,
                         const amrex::Real* rho0,
                         const amrex::Real* r_cc_loc,
                         const amrex::Real* r_edge_loc);
     //////////////////////
 
     //////////////////////
-    // in make_div_coeff.f90
-    void make_div_coeff(amrex::Real* div_coeff,
-                        const amrex::Real* rho0,
-                        const amrex::Real* p0,
-                        const amrex::Real* gamma1bar_in,
-                        const amrex::Real* grav_cell_in);
+    // in make_beta0.f90
+    void make_beta0(      amrex::Real* beta0,
+                    const amrex::Real* rho0,
+                    const amrex::Real* p0,
+                    const amrex::Real* gamma1bar_in,
+                    const amrex::Real* grav_cell_in);
     //////////////////////
 
 

@@ -84,15 +84,15 @@ contains
   subroutine make_ccrhs(lev, lo, hi, &
                         ccrhs, c_lo, c_hi, &
                         S_cc,  s_lo, s_hi, &
-                        Sbar, div_coeff) bind (C,name="make_ccrhs")
+                        Sbar, beta0) bind (C,name="make_ccrhs")
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
     double precision, intent (inout) :: ccrhs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
-    double precision, intent (in   ) ::      Sbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: div_coeff(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: Sbar (0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
 
     integer i,j,k,r
 
@@ -108,7 +108,7 @@ contains
 #elif (AMREX_SPACEDIM == 3)
        r = k
 #endif
-       ccrhs(i,j,k) = div_coeff(lev,r) * (S_cc(i,j,k) - Sbar(lev,r))
+       ccrhs(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r))
 
     enddo
     enddo

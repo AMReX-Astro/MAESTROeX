@@ -196,7 +196,7 @@ private:
     void Make_NodalRHS (const amrex::Vector<amrex::MultiFab>& S_cc,
                         amrex::Vector<amrex::MultiFab>& nodalrhs,
                         const amrex::Vector<amrex::Real>& Sbar,
-                        const amrex::Vector<amrex::Real>& div_coeff);
+                        const amrex::Vector<amrex::Real>& beta0);
 
     // end MaestroMakeS.cpp functions
     ////////////
@@ -408,8 +408,8 @@ private:
     amrex::Vector<amrex::Real> p0_new;
     amrex::Vector<amrex::Real> tempbar;
     amrex::Vector<amrex::Real> tempbar_init;
-    amrex::Vector<amrex::Real> div_coeff_old;
-    amrex::Vector<amrex::Real> div_coeff_new;
+    amrex::Vector<amrex::Real> beta0_old;
+    amrex::Vector<amrex::Real> beta0_new;
     amrex::Vector<amrex::Real> gamma1bar_new;
     amrex::Vector<amrex::Real> gamma1bar_init;
     amrex::Vector<amrex::Real> etarho_cc;

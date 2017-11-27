@@ -62,8 +62,8 @@ Maestro::Regrid ()
            ! gamma1bar needs to be recomputed
            call make_gamma1bar(mla,sold,gamma1bar,p0_old,dx)
 
-           ! div_coeff_old needs to be recomputed
-           call make_div_coeff(div_coeff_old,rho0_old,p0_old,gamma1bar,grav_cell)
+           ! beta0_old needs to be recomputed
+           call make_beta0(beta0_old,rho0_old,p0_old,gamma1bar,grav_cell)
 */
 
     // wallclock time

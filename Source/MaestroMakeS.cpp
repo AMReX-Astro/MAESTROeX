@@ -55,7 +55,7 @@ void
 Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
                         Vector<MultiFab>& nodalrhs,
                         const Vector<Real>& Sbar,
-                        const Vector<Real>& div_coeff)
+                        const Vector<Real>& beta0)
 {
 
     Vector<MultiFab> ccrhs(finest_level+1);
@@ -83,7 +83,7 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
             make_ccrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                        BL_TO_FORTRAN_3D(ccrhs_mf[mfi]),
                        BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-                       Sbar.dataPtr(), div_coeff.dataPtr());
+                       Sbar.dataPtr(), beta0.dataPtr());
         }
     }
 

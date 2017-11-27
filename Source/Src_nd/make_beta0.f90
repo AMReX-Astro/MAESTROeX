@@ -1,19 +1,19 @@
-module make_div_coeff_module
+module make_beta0_module
 
     use amrex_constants_module
     use base_state_geometry_module, only: nr_fine, dr, anelastic_cutoff_coord, &
                                           r_start_coord, r_end_coord, &
                                           nr, numdisjointchunks, finest_radial_level, &
                                           max_radial_level, restrict_base, fill_ghost_base
-    use meth_params_module, only: beta_type, use_linear_grav_in_beta
+    use meth_params_module, only: beta0_type, use_linear_grav_in_beta0
 
     implicit none
 
  contains
 
- subroutine make_div_coeff(div_coeff,rho0,p0,gamma1bar_in,grav_cell_in) bind(C, name="make_div_coeff")
+ subroutine make_beta0(beta0,rho0,p0,gamma1bar_in,grav_cell_in) bind(C, name="make_beta0")
 
-    double precision, intent(  out) :: div_coeff   (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(  out) :: beta0       (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0        (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: p0          (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: gamma1bar_in(0:max_radial_level,0:nr_fine-1)
@@ -31,9 +31,9 @@ module make_div_coeff_module
 
     allocate(beta0_edge(0:finest_radial_level,0:nr_fine))
 
-    div_coeff = 0.d0
+    beta0 = 0.d0
 
-    if (beta_type .eq. 1) then
+    if (beta0_type .eq. 1) then
 
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        ! Compute beta0 on the edges and average to the center      
@@ -121,7 +121,7 @@ module make_div_coeff_module
                       
                    else 
 
-                      if ( use_linear_grav_in_beta ) then
+                      if ( use_linear_grav_in_beta0 ) then
                          
                          ! also do piecewise linear reconstruction of
                          ! gravity -- not documented in publication yet.
@@ -166,12 +166,12 @@ module make_div_coeff_module
                    endif
 
                    beta0_edge(n,r+1) = beta0_edge(n,r) * exp(-integral)
-                   div_coeff(n,r) = HALF*(beta0_edge(n,r) + beta0_edge(n,r+1))
+                   beta0(n,r) = HALF*(beta0_edge(n,r) + beta0_edge(n,r+1))
 
                 else ! r >= anelastic_cutoff
 
-                   div_coeff(n,r) = div_coeff(n,r-1) * (rho0(n,r)/rho0(n,r-1))
-                   beta0_edge(n,r+1) = 2.d0*div_coeff(n,r) - beta0_edge(n,r)
+                   beta0(n,r) = beta0(n,r-1) * (rho0(n,r)/rho0(n,r-1))
+                   beta0_edge(n,r+1) = 2.d0*beta0(n,r) - beta0_edge(n,r)
                 endif
 
              end do
@@ -190,30 +190,30 @@ module make_div_coeff_module
                    ! Offset the centered beta on level i above this point so the total 
                    ! integral is consistent
                    do r=r_end_coord(n,j)/refrat+1,nr(i)
-                      div_coeff(i,r) = div_coeff(i,r) + offset
+                      beta0(i,r) = beta0(i,r) + offset
                    end do
 
                    ! Redo the anelastic cutoff part
                    do r=anelastic_cutoff_coord(i),nr(i)
                       if (rho0(i,r-1) /= ZERO) then
-                         div_coeff(i,r) = div_coeff(i,r-1) * (rho0(i,r)/rho0(i,r-1))
+                         beta0(i,r) = beta0(i,r-1) * (rho0(i,r)/rho0(i,r-1))
                       endif
                    end do
 
                    ! This next piece of coded is needed for the case when the anelastic 
-                   ! cutoff coordinate lives on level n.  We first average div_coeff from 
+                   ! cutoff coordinate lives on level n.  We first average beta0 from 
                    ! level i+1 to level i in the region between the anelastic cutoff and 
-                   ! the top of grid n.  Then recompute div_coeff at level i above the top 
+                   ! the top of grid n.  Then recompute beta0 at level i above the top 
                    ! of grid n.
                    if (r_end_coord(n,j) .ge. anelastic_cutoff_coord(n)) then
 
                       do r=anelastic_cutoff_coord(i),(r_end_coord(n,j)+1)/refrat-1
-                         div_coeff(i,r) = HALF*(div_coeff(i+1,2*r)+div_coeff(i+1,2*r+1))
+                         beta0(i,r) = HALF*(beta0(i+1,2*r)+beta0(i+1,2*r+1))
                       end do
 
                       do r=(r_end_coord(n,j)+1)/refrat,nr(i)
                          if (rho0(i,r-1) /= ZERO) then
-                            div_coeff(i,r) = div_coeff(i,r-1) * (rho0(i,r)/rho0(i,r-1))
+                            beta0(i,r) = beta0(i,r-1) * (rho0(i,r)/rho0(i,r-1))
                          endif
                       end do
 
@@ -227,50 +227,50 @@ module make_div_coeff_module
 
        end do ! end loop over levels
 
-       ! zero the div_coeff where there is no corresponding full state array
+       ! zero the beta0 where there is no corresponding full state array
        do n=1,finest_radial_level
           do j=1,numdisjointchunks(n)
              if (j .eq. numdisjointchunks(n)) then
                 do r=r_end_coord(n,j)+1,nr(n)-1
-                   div_coeff(n,r) = ZERO
+                   beta0(n,r) = ZERO
                 end do
              else
                 do r=r_end_coord(n,j)+1,r_start_coord(n,j+1)-1
-                   div_coeff(n,r) = ZERO
+                   beta0(n,r) = ZERO
                 end do
              end if
           end do
        end do
 
-    else if (beta_type .eq. 2) then
+    else if (beta0_type .eq. 2) then
 
        ! beta_0 = rho_0
        do n=0,finest_radial_level
           do j=1,numdisjointchunks(n)
              do r=r_start_coord(n,j),r_end_coord(n,j)
-                div_coeff(n,r) = rho0(n,r)
+                beta0(n,r) = rho0(n,r)
              end do
           end do
        end do
 
-    else if (beta_type .eq. 3) then
+    else if (beta0_type .eq. 3) then
 
        ! beta_0 = 1.d0
        do n=0,finest_radial_level
           do j=1,numdisjointchunks(n)
              do r=r_start_coord(n,j),r_end_coord(n,j)
-                div_coeff = 1.d0
+                beta0 = 1.d0
              end do
           end do
        end do
 
     end if
 
-    call restrict_base(div_coeff,1)
-    call fill_ghost_base(div_coeff,1)
+    call restrict_base(beta0,1)
+    call fill_ghost_base(beta0,1)
 
     deallocate(beta0_edge)
 
-  end subroutine make_div_coeff
+  end subroutine make_beta0
 
-end module make_div_coeff_module
+end module make_beta0_module

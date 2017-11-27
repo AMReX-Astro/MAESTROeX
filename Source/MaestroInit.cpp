@@ -33,11 +33,11 @@ Maestro::Init ()
     MakeGamma1bar(snew,gamma1bar_new,p0_new);
 
     // compute beta0
-    make_div_coeff(div_coeff_new.dataPtr(),
-                   rho0_new.dataPtr(),
-                   p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(),
-                   grav_cell.dataPtr());
+    make_beta0(beta0_new.dataPtr(),
+               rho0_new.dataPtr(),
+               p0_new.dataPtr(),
+               gamma1bar_new.dataPtr(),
+               grav_cell.dataPtr());
 
     // initial projection
     InitProj();
@@ -225,7 +225,7 @@ void Maestro::InitProj ()
     Average(S_cc,Sbar,0);
 
     // make the nodal rhs for projection
-    Make_NodalRHS(S_cc,nodalrhs,Sbar,div_coeff_new);
+    Make_NodalRHS(S_cc,nodalrhs,Sbar,beta0_new);
 
     // perform a nodal projection
     NodalProj(initial_projection_comp,nodalrhs,rhohalf);
