@@ -28,13 +28,23 @@ Maestro::NodalProj (int proj_type,
     CreateUvecForProj(proj_type,rhohalf);
 
     // convert beta_0 to multi-D MultiFab with 1 ghost cell
-
+    Vector<MultiFab> beta0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        beta0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+    }
+    Put1dArrayOnCart(beta0_new,beta0_cart,bcs_f,0,0);
 
     // convert unew to beta_0*unew in valid region
-    
+    for (int lev=0; lev<=finest_level; ++lev) {
+        for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+            MultiFab::Multiply(unew[lev],beta0_cart[lev],0,dir,1,0);
+        }
+    }
 
     // convert rhohalf to rhohalf/beta_0 in valid+ghost region
-
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Divide(rhohalf[lev],beta0_cart[lev],0,0,1,1);
+    }
 
     // create a unew with a filled ghost cell
     Vector<MultiFab> unew_ghost(finest_level+1);
@@ -44,7 +54,7 @@ Maestro::NodalProj (int proj_type,
     }
 
 
-    // create RHS = div((beta_0/rho)*unew) - (beta_0/rho)*S
+    // create RHS = beta_0*(S-Sbar) - div(beta_0*unew)
 
 
 
@@ -54,17 +64,24 @@ Maestro::NodalProj (int proj_type,
 
 
     // convert beta_0*unew back to unew
-
-
+    for (int lev=0; lev<=finest_level; ++lev) {
+        for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+            MultiFab::Divide(unew[lev],beta0_cart[lev],0,dir,1,0);
+        }
+    }
 
     // convert (rhohalf/beta_0) back to rhohalf
-
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Multiply(rhohalf[lev],beta0_cart[lev],0,0,1,1);
+    }
 
     // make grad phi
 
 
 
     // update velocity
+
+
 
 
 }

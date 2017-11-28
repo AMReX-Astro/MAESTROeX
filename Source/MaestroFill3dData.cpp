@@ -13,7 +13,6 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
                            int is_input_edge_centered,
                            int is_output_a_vector)
 {
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -44,6 +43,4 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
     for (int lev=0; lev<=finest_level; ++lev) {
         FillPatch(lev, t_new, s0_cart[lev], s0_cart, s0_cart, 0, 0, ncomp, bcs);
     }
-
-
 }
