@@ -135,6 +135,15 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in fill_3d_data.f90
+    void put_1d_array_on_cart(const int& lev, const int* lo, const int* hi,
+                              amrex::Real* s0_cart,
+                              const int* s0_cart_lo, const int* s0_cart_hi, const int* nc_s,
+                              const amrex::Real* s0, const int& is_input_edge_centered,
+                              const int& is_output_a_vector);
+    //////////////////////
+
+    //////////////////////
     // in make_grav.f90
     void make_grav_cell(      amrex::Real* grav_cell,
                         const amrex::Real* rho0,

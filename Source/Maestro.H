@@ -145,10 +145,10 @@ private:
     // MaestroFill3dData.cpp functions
     
     void Put1dArrayOnCart (const amrex::Vector<amrex::Real>& s0,
-                           amrex::Vector<amrex::MultiFab*>& s0_cart,
-                           int bc_comp,
-                           bool is_intput_edge_centered,
-                           bool is_output_a_vector);
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           amrex::Vector<amrex::BCRec>& bcs,
+                           int is_input_edge_centered,
+                           int is_output_a_vector);
 
     // end MaestroFill3dData.cpp functions
     ////////////

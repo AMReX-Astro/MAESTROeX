@@ -95,7 +95,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      Vector<MultiFab>& rho_omegadot,
                      Vector<MultiFab>& rho_Hnuc,
                      const Vector<Real>& p0,
-                     const Real dt_in) {
+                     const Real dt_in)
+{
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
