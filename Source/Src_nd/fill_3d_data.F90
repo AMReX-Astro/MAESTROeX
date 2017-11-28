@@ -29,13 +29,13 @@ contains
     ! zero s0_cart, then fill in the non-zero values
     s0_cart = 0.d0
 
-    if (is_input_edge_centered .eq. 1) then
+    if (is_output_a_vector .eq. 1) then
+       outcomp = AMREX_SPACEDIM
+    else
+       outcomp = 1
+    end if
 
-       if (is_output_a_vector .eq. 1) then
-          outcomp = AMREX_SPACEDIM
-       else
-          outcomp = 1
-       end if
+    if (is_input_edge_centered .eq. 1) then
 
        do k = lo(3),hi(3)
        do j = lo(2),hi(2)
@@ -55,12 +55,6 @@ contains
        end do
 
     else
-
-       if (is_output_a_vector .eq. 1) then
-          outcomp = AMREX_SPACEDIM
-       else
-          outcomp = 1
-       end if
 
        do k = lo(3),hi(3)
        do j = lo(2),hi(2)
