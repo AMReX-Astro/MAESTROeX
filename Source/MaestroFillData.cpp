@@ -21,7 +21,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         Vector<Real> stime;
         GetData(0, time, smf, stime, mf_old, mf_new);
 
-        MaestroPhysBCFunct physbc(geom[lev],bcs,BndryFunctBase(phifill));
+        PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFunctBase(phifill));
         FillPatchSingleLevel(mf, time, smf, stime, scomp, dcomp, ncomp,
                              geom[lev], physbc);
     }
@@ -32,8 +32,8 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
         GetData(lev  , time, fmf, ftime, mf_old, mf_new);
 
-        MaestroPhysBCFunct cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
-        MaestroPhysBCFunct fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
+        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
+        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
 
         Interpolater* mapper = &cell_cons_interp;
 
@@ -65,8 +65,8 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
         Abort("FillCoarsePatch: how did this happen?");
     }
 
-    MaestroPhysBCFunct cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
-    MaestroPhysBCFunct fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
+    PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
+    PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
 
     Interpolater* mapper = &cell_cons_interp;
     InterpFromCoarseLevel(mf, time, *cmf[0], scomp, dcomp, ncomp, geom[lev-1], geom[lev],

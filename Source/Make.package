@@ -11,14 +11,14 @@ CEXE_sources += MaestroInit.cpp
 CEXE_sources += MaestroMacProj.cpp
 CEXE_sources += MaestroMakeS.cpp
 CEXE_sources += MaestroNodalProj.cpp
-CEXE_sources += MaestroPhysBCFunct.cpp
 CEXE_sources += MaestroPlot.cpp
 CEXE_sources += MaestroReact.cpp
 CEXE_sources += MaestroRegrid.cpp
 CEXE_sources += MaestroRhoHT.cpp
 CEXE_sources += MaestroSetup.cpp
+CEXE_sources += PhysBCFunctMaestro.cpp
 
 CEXE_headers += Maestro.H
-CEXE_headers += MaestroPhysBCFunct.H
+CEXE_headers += PhysBCFunctMaestro.H
 
 CEXE_headers += Maestro_F.H

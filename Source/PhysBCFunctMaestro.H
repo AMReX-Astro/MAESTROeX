@@ -1,16 +1,16 @@
-#ifndef MaestroPhysBCFunct_H_
-#define MaestroPhysBCFunct_H_
+#ifndef PhysBCFunctMaestro_H_
+#define PhysBCFunctMaestro_H_
 
 #include <AMReX_PhysBCFunct.H>
 
-class MaestroPhysBCFunct
+class PhysBCFunctMaestro
     : public amrex::PhysBCFunctBase
 {
 public:
-    MaestroPhysBCFunct () {}
-    virtual ~MaestroPhysBCFunct () {}
+    PhysBCFunctMaestro () {}
+    virtual ~PhysBCFunctMaestro () {}
 
-    MaestroPhysBCFunct (const amrex::Geometry& geom,
+    PhysBCFunctMaestro (const amrex::Geometry& geom,
                         const amrex::Vector<amrex::BCRec>& bcr,
                         const amrex::BndryFunctBase& func);
 

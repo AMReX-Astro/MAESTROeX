@@ -13,7 +13,7 @@
 #include <AMReX_ParmParse.H>
 #include <AMReX_PlotFileUtil.H>
 
-#include <MaestroPhysBCFunct.H>
+#include <PhysBCFunctMaestro.H>
 #include <Maestro_F.H>
 
 class Maestro

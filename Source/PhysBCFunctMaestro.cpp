@@ -1,16 +1,16 @@
 
-#include <MaestroPhysBCFunct.H>
+#include <PhysBCFunctMaestro.H>
 
 using namespace amrex;
 
-MaestroPhysBCFunct::MaestroPhysBCFunct (const Geometry& geom,
+PhysBCFunctMaestro::PhysBCFunctMaestro (const Geometry& geom,
                                         const Vector<BCRec>& bcr, 
                                         const BndryFunctBase& func)
     : m_geom(geom), m_bcr(bcr), m_bc_func(func.clone())
 { }
 
 void
-MaestroPhysBCFunct::define (const Geometry& geom, 
+PhysBCFunctMaestro::define (const Geometry& geom, 
                             const Vector<BCRec>& bcr,
                             const BndryFunctBase& func)
 {
@@ -20,9 +20,9 @@ MaestroPhysBCFunct::define (const Geometry& geom,
 }
 
 void
-MaestroPhysBCFunct::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
+PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
 {
-    BL_PROFILE("MaestroPhysBCFunct::FillBoundary");
+    BL_PROFILE("PhysBCFunctMaestro::FillBoundary");
 
     if (mf.nGrow() == 0) return;
     
