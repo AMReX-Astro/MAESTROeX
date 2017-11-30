@@ -16,6 +16,7 @@ Maestro::EstDt ()
 
         // get references to the MultiFabs at level lev
         MultiFab& u_mf = unew[lev];
+        MultiFab& s_mf = snew[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(u_mf); mfi.isValid(); ++mfi ) {
@@ -26,12 +27,19 @@ Maestro::EstDt ()
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
 
+            const Real* dx = geom[lev].CellSize();
+
+            // FIXME - call estdt instead
+
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-
-
+            firstdt(dt_grid,umax_grid,
+                    ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                    ZFILL(dx),
+                    BL_TO_FORTRAN_FAB(s_mf[mfi]),
+                    BL_TO_FORTRAN_FAB(u_mf[mfi]));
 
             dt = std::min(dt,dt_grid);
             umax = std::max(umax,umax_grid);
@@ -73,6 +81,11 @@ Maestro::EstDt ()
                 Print() << "max_dt limits the new dt = " << max_dt << endl;
             }
         }
+
+        if (dt < small_dt) {
+            amrex::Abort("EstDt: dt < small_dt");
+        }
+
     }
     else {
 
@@ -102,6 +115,7 @@ Maestro::FirstDt ()
 
         // get references to the MultiFabs at level lev
         MultiFab& u_mf = unew[lev];
+        MultiFab& s_mf = snew[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(u_mf); mfi.isValid(); ++mfi ) {
@@ -112,12 +126,17 @@ Maestro::FirstDt ()
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
 
+            const Real* dx = geom[lev].CellSize();
+
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-
-
+            firstdt(dt_grid,umax_grid,
+                    ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                    ZFILL(dx),
+                    BL_TO_FORTRAN_FAB(s_mf[mfi]),
+                    BL_TO_FORTRAN_FAB(u_mf[mfi]));
 
             dt = std::min(dt,dt_grid);
             umax = std::max(umax,umax_grid);
@@ -153,6 +172,10 @@ Maestro::FirstDt ()
             if (verbose > 0) {
                 Print() << "max_dt limits the new dt = " << max_dt << endl;
             }
+        }
+
+        if (dt < small_dt) {
+            amrex::Abort("FirstDt: dt < small_dt");
         }
 
     }

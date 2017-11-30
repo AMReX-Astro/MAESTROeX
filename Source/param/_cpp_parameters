@@ -26,7 +26,7 @@ do_reflux                           int         1
 #-----------------------------------------------------------------------------
 
 # General verbosity
-verbose                             int         0
+verbose                             int         1
 
 #-----------------------------------------------------------------------------
 # category: problem initialization
@@ -61,7 +61,7 @@ stop_time                           Real        -1.0
 max_step                            int         1
 
 # CFL factor to use in the computation of the advection timestep constraint
-cfl                                 Real              0.5
+cfl                                 Real              0.5        y
 
 # the multiplicative factor ($\le 1$) to reduce the initial timestep as
 # computed by the various timestep estimators
@@ -89,7 +89,7 @@ fixed_dt                            Real               -1.0
 nuclear_dt_fac                      Real               -1.0
 
 # Use the soundspeed constraint when computing the first time step.
-use_soundspeed_firstdt              bool            false
+use_soundspeed_firstdt              bool            false     y
 
 # Use the divu constraint when computing the first time step.
 use_divu_firstdt                    bool            false

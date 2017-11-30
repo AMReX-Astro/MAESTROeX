@@ -11,6 +11,7 @@ f90EXE_sources += rotation.f90
 f90EXE_sources += tagging.f90
 
 F90EXE_sources += bc_fill_nd.F90
+F90EXE_sources += compute_dt.F90
 F90EXE_sources += fill_3d_data.F90
 F90EXE_sources += make_gamma.F90
 F90EXE_sources += make_S.F90

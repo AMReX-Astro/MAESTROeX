@@ -10,8 +10,6 @@ module make_S_module
 
   private
 
-  public :: make_S_cc, make_ccrhs
-
 contains
 
   subroutine make_S_cc(lo, hi, &

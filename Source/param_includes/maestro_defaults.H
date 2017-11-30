@@ -4,7 +4,7 @@
 // mk_params.sh
 
 int         Maestro::do_reflux = 1;
-int         Maestro::verbose = 0;
+int         Maestro::verbose = 1;
 std::string Maestro::model_file = "model.hse";
 bool        Maestro::perturb_model = false;
 bool        Maestro::print_init_hse_diag = false;
