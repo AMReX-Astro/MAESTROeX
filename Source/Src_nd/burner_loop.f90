@@ -66,7 +66,7 @@ contains
 
        rho = s_in(i,j,k,rho_comp)
        do n = 1, nspec
-          x_in(i) = s_in(i,j,k,n+spec_comp-1) / rho
+          x_in(n) = s_in(i,j,k,n+spec_comp-1) / rho
        enddo
 
        if (drive_initial_convection) then
@@ -128,7 +128,7 @@ contains
        
        ! update the species
        do n = 1, nspec
-          s_out(i,j,k,n+spec_comp-1) = x_out(i) * rho
+          s_out(i,j,k,n+spec_comp-1) = x_out(n) * rho
        enddo
                
        ! store the energy generation and species create quantities

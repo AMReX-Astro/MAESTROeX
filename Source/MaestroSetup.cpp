@@ -183,6 +183,7 @@ void Maestro::VariableSetup ()
     Nscal = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
 
     maestro_network_init();
+    burner_init();
 }
 
 // set up BCRec definitions for BC types

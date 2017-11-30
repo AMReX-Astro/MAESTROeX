@@ -54,6 +54,11 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in burner.F90
+    void burner_init();
+    //////////////////////
+
+    //////////////////////
     // in burner_loop.f90
     void burner_loop(const int& lev, const int* lo, const int* hi, 
                      const amrex::Real* s_in,     const int* i_lo, const int* i_hi, const int* nc_i,

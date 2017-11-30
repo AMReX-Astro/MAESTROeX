@@ -16,12 +16,10 @@ Maestro::Init ()
     // fill in multifab and base state data
     InitData();
 
-    // FIXME
-/*
     if (spherical == 1) {
-        MakeNormal();
+        // FIXME
+        // MakeNormal();
     }
-*/
 
     // make gravity
     make_grav_cell(grav_cell.dataPtr(),
@@ -235,7 +233,35 @@ void Maestro::InitProj ()
 
 
 void Maestro::DivuIter ()
-{}
+{
+
+    Vector<MultiFab>        stemp(finest_level+1);
+    Vector<MultiFab>     rho_Hext(finest_level+1);
+    Vector<MultiFab> rho_omegadot(finest_level+1);
+    Vector<MultiFab>     rho_Hnuc(finest_level+1);
+    Vector<MultiFab>      thermal(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        stemp       [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
+        thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
+    }
+
+    React(snew,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,dt);
+
+    if (use_thermal_diffusion) {
+        amrex::Abort("DivuIter: use_thermal_diffusion not implemented yet");
+    }
+    else {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            thermal[lev].setVal(0.);
+        }        
+    }
+
+
+}
 
 
 void Maestro::InitIter ()
