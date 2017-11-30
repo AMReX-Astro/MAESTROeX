@@ -14,6 +14,8 @@ module meth_params_module
 
   integer, save :: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp
   integer, save :: nscal
+  double precision, save :: rel_eps
+
 
   ! Begin the declarations of the ParmParse parameters
 

@@ -32,8 +32,14 @@ Maestro::Evolve ()
             std::swap(beta0_old,beta0_new);
         }
 
+        dtold = dt;
+
         // compute time step
-        EstDt();
+        // if this is the first time step we already have a dt from either FirstDt()
+        // or EstDt called during the divu_iters
+        if (istep > 1) {
+            EstDt();
+        }
 
         // reset t_old and t_new
         t_old = t_new;

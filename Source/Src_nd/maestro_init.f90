@@ -6,7 +6,7 @@ module maestro_init_module
   use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp, &
-                                nscal, small_dens, small_temp
+                                nscal, small_dens, small_temp, rel_eps
   use eos_module, only: eos_init
 
   implicit none
@@ -105,5 +105,13 @@ contains
     call eos_init(small_temp, small_dens)
 
   end subroutine set_method_params
+
+  subroutine set_rel_eps(rel_eps_in) bind(C,name="set_rel_eps")
+
+    double precision, intent(in) :: rel_eps_in
+
+    rel_eps = rel_eps_in
+
+  end subroutine set_rel_eps
 
 end module maestro_init_module

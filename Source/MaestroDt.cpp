@@ -8,22 +8,46 @@ void
 Maestro::EstDt ()
 {
 
-    // initial timestepping is handled in FirstDt
-    if (istep == 1) return;
+    dt = 1.e99;
+        
+    Real umax = 0.;
 
-    if (fixed_dt == -1.0) {
+    for (int lev = 0; lev <= finest_level; ++lev) {
 
-        // compute dt at each level from CFL considerations
-        Vector<Real> dt_tmp(finest_level+1);
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            dt_tmp[lev] = EstDtLevel(lev);
+        // get references to the MultiFabs at level lev
+        MultiFab& u_mf = unew[lev];
+
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(u_mf); mfi.isValid(); ++mfi ) {
+
+            Real dt_grid = 1.e99;
+            Real umax_grid = 0.;
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+
+
+
+            dt = std::min(dt,dt_grid);
+            umax = std::max(umax,umax_grid);
         }
+    }
 
-        // select the smallest time step over all levels
-        dt = dt_tmp[0];
-        for (int lev = 1; lev <= finest_level; ++lev) {
-            dt = std::min(dt, dt_tmp[lev]);
-        }
+    // find the smallest dt over all processors
+    ParallelDescriptor::ReduceRealMin(dt);
+
+    // find the largest umax over all processors
+    ParallelDescriptor::ReduceRealMax(umax);
+
+    // set rel_eps in fortran module
+    set_rel_eps(umax*1.e-8);        
+
+    if (fixed_dt == -1.) {
 
         if (verbose > 0) {
             Print() << "Call to EstDt at beginning of step" << istep << endl;
@@ -52,6 +76,7 @@ Maestro::EstDt ()
     }
     else {
 
+        // fixed dt
         dt = fixed_dt;
         if (verbose > 0) {
             Print() << "Setting fixed dt = " << dt << endl;
@@ -59,27 +84,93 @@ Maestro::EstDt ()
 
     }
 
-    // Limit dt's by the value of stop_time.
+    // limit dt by stop_time
     if (t_new + dt > stop_time) {
         dt = stop_time - t_new;
         Print() << "Stop time limits dt = " << dt << endl;
     }
 }
 
-// compute dt at a level from CFL considerations
-Real
-Maestro::EstDtLevel (int lev) const
-{
-    BL_PROFILE("Maestro::EstTimeStep()");
-
-    // FIXME
-    return fixed_dt;
-
-}
-
 void
 Maestro::FirstDt ()
 {
-    // FIXME
+    dt = 1.e99;
+        
+    Real umax = 0.;
 
+    for (int lev = 0; lev <= finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        MultiFab& u_mf = unew[lev];
+
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(u_mf); mfi.isValid(); ++mfi ) {
+
+            Real dt_grid = 1.e99;
+            Real umax_grid = 0.;
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+
+
+
+            dt = std::min(dt,dt_grid);
+            umax = std::max(umax,umax_grid);
+        }
+    }
+
+    // find the smallest dt over all processors
+    ParallelDescriptor::ReduceRealMin(dt);
+
+    // find the largest umax over all processors
+    ParallelDescriptor::ReduceRealMax(umax);
+
+    // set rel_eps in fortran module
+    set_rel_eps(umax*1.e-8);    
+
+    if (fixed_dt == -1.) {
+   
+        // use dt obtained with FirstDt
+        if (verbose > 0) {
+            Print() << "Call to FirstDt gives dt = " << dt << endl;
+        }
+
+        if (init_shrink != 1.0) {
+            dt *= init_shrink;
+            if (verbose > 0) {
+                Print() << "Multiplying dt by init_shrink gives dt = " << dt << endl;
+            }
+        }
+
+        // limit dt by max_dt
+        if (dt > max_dt) {
+            dt = max_dt;
+            if (verbose > 0) {
+                Print() << "max_dt limits the new dt = " << max_dt << endl;
+            }
+        }
+
+    }
+    else {
+
+        // fixed dt
+        dt = fixed_dt;
+        if (verbose > 0) {
+            Print() << "Setting fixed dt = " << dt << endl;
+        }
+
+    }
+
+    // limit dt by stop_time
+    if (t_new + dt > stop_time) {
+        dt = stop_time - t_new;
+        if (verbose > 0) {
+            Print() << "Stop time limits dt = " << dt << endl;
+        }
+    }
 }

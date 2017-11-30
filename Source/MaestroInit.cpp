@@ -239,4 +239,6 @@ void Maestro::DivuIter ()
 
 
 void Maestro::InitIter ()
-{}
+{
+    dtold = dt;
+}

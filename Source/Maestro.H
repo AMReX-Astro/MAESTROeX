@@ -78,11 +78,8 @@ private:
     ////////////
     // Time step computation in MaestroDt.cpp
 
-    // a wrapper for EstDtLevel
+    // compute the time step
     void EstDt ();
-
-    // compute dt at a level from CFL considerations
-    amrex::Real EstDtLevel (int lev) const;
 
     // compute initial time step
     void FirstDt ();

@@ -28,12 +28,14 @@ extern "C"
     void get_spec_names(int* spec_names, int* ispec, int* len);
 
     // set fortran-specific parameters in meth_params.F90
-    void set_method_params(const int& Density,
-                           const int& Enthalpy,
-                           const int& FirstSpec,
-                           const int& Temperature,
-                           const int& Pressure,
-                           const int& Nscalars);
+    void set_method_params (const int& Density,
+                            const int& Enthalpy,
+                            const int& FirstSpec,
+                            const int& Temperature,
+                            const int& Pressure,
+                            const int& Nscalars);
+
+    void set_rel_eps (const amrex::Real& rel_eps_in);
 
     void init_base_state (const amrex::Real* s0_init, 
                           const amrex::Real* p0_init,
