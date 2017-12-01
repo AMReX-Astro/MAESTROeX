@@ -249,7 +249,7 @@ void Maestro::DivuIter ()
         thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
     }
 
-    React(snew,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,dt);
+    React(snew,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
 
     if (use_thermal_diffusion) {
         amrex::Abort("DivuIter: use_thermal_diffusion not implemented yet");
