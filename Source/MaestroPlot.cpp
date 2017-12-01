@@ -12,12 +12,19 @@ Maestro::PlotFileName (int lev) const
 
 // put together a vector of multifabs for writing
 Vector<const MultiFab*>
-Maestro::PlotFileMF () const
+Maestro::PlotFileMF (Vector<MultiFab>& p0_cart,
+                     Vector<MultiFab>& rho0_cart) const
 {
-    int nPlot = Nscal + AMREX_SPACEDIM;
 
+    // velocities (AMREX_SPACEDIM)
+    // rho, rhoh, rhoX, Temp, Pi (Nscal)
+    // rho0, p0 (2)
+    int nPlot = AMREX_SPACEDIM + Nscal + 2;
+
+    // temporary MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
 
+    // plotfile data gets copied into here
     Vector<MultiFab*> plot_mf_data(finest_level+1);
 
     for (int i = 0; i <= finest_level; ++i)
@@ -25,8 +32,15 @@ Maestro::PlotFileMF () const
         plot_mf_data[i] = new MultiFab((snew[i]).boxArray(),(snew[i]).DistributionMap(),nPlot,0);
 
         // copy velocity and scalars into plot_mf_data[i]
-        plot_mf_data[i]->copy((unew[i]),0,0             ,AMREX_SPACEDIM);
-        plot_mf_data[i]->copy((snew[i]),0,AMREX_SPACEDIM,Nscal         );
+        int dest_comp = 0;
+        plot_mf_data[i]->copy((unew[i]),     0,dest_comp,AMREX_SPACEDIM);
+        dest_comp += AMREX_SPACEDIM;
+        plot_mf_data[i]->copy((snew[i]),     0,dest_comp,Nscal);
+        dest_comp += Nscal;
+        plot_mf_data[i]->copy((rho0_cart[i]),0,dest_comp,1);
+        dest_comp += 1;
+        plot_mf_data[i]->copy((p0_cart[i]),  0,dest_comp,1);
+        dest_comp += 1;
 
         // add plot_mf_data[i] to plot_mf
         plot_mf.push_back(plot_mf_data[i]);
@@ -40,7 +54,11 @@ Maestro::PlotFileMF () const
 Vector<std::string>
 Maestro::PlotFileVarNames () const
 {
-    int nPlot = Nscal + AMREX_SPACEDIM;
+
+    // velocities (AMREX_SPACEDIM)
+    // rho, rhoh, rhoX, Temp, Pi (Nscal)
+    // rho0, p0 (2)
+    int nPlot = Nscal + AMREX_SPACEDIM + 2;
     Vector<std::string> names(nPlot);
 
     int cnt = 0;
@@ -78,18 +96,36 @@ Maestro::PlotFileVarNames () const
     names[cnt++] = "Temp";
     names[cnt++] = "Pi";
 
+    names[cnt++] = "rho0";
+    names[cnt++] = "p0";
+
     return names;
 }
 
 // write plotfile to disk
 void
-Maestro::WritePlotFile (int step) const
+Maestro::WritePlotFile (int step)
 {
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
 
     const std::string& plotfilename = PlotFileName(step);
-    const auto& mf = PlotFileMF();
+
+    // convert p0 to multi-D MultiFab
+    Vector<MultiFab> p0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+    }
+    Put1dArrayOnCart(p0_new,p0_cart,bcs_f,0,0);
+
+    // convert rho0 to multi-D MultiFab
+    Vector<MultiFab> rho0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+    }
+    Put1dArrayOnCart(rho0_new,rho0_cart,bcs_f,0,0);
+
+    const auto& mf = PlotFileMF(p0_cart,rho0_cart);
     const auto& varnames = PlotFileVarNames();
 
     // WriteMultiLevelPlotfile expects an array of step numbers

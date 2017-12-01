@@ -241,13 +241,14 @@ private:
     std::string PlotFileName (int lev) const;
 
     // put together an array of multifabs for writing
-    amrex::Vector<const amrex::MultiFab*> PlotFileMF () const;
+    amrex::Vector<const amrex::MultiFab*> PlotFileMF (amrex::Vector<amrex::MultiFab>& p0_cart,
+                                                      amrex::Vector<amrex::MultiFab>& rho0_cart) const;
 
     // set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames () const;
 
     // write plotfile to disk
-    void WritePlotFile (int step) const;
+    void WritePlotFile (int step);
 
     // end MaestroPlot.cpp functions
     ////////////
