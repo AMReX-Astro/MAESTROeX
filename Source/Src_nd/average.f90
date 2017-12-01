@@ -21,11 +21,11 @@ contains
 
     if (amrex_spacedim .eq. 2) then
        do j=lo(2),hi(2)
-          phisum(lev,j) = sum(phi(lo(1):hi(1),j,0))
+          phisum(lev,j) = phisum(lev,j) + sum(phi(lo(1):hi(1),j,0))
        end do
     else if (amrex_spacedim .eq. 3) then
        do k=lo(3),hi(3)
-          phisum(lev,k) = sum(phi(lo(1):hi(1),lo(2):hi(2),k))
+          phisum(lev,k) = phisum(lev,k) + sum(phi(lo(1):hi(1),lo(2):hi(2),k))
        end do
     end if
 
