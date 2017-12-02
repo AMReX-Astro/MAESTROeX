@@ -83,9 +83,9 @@ Maestro::InitData ()
         // compute cutoff coordinates
         compute_cutoff_coords(rho0_new.dataPtr());
         make_grav_cell(grav_cell.dataPtr(),
-                   rho0_new.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+                       rho0_new.dataPtr(),
+                       r_cc_loc.dataPtr(),
+                       r_edge_loc.dataPtr());
     }
     else {
         if (do_smallscale) {

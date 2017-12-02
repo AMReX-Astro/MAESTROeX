@@ -40,7 +40,7 @@ contains
     integer :: n
 
     do n=0,finest_radial_level
-       phisum(:,n) = phisum(:,n) / ncell(n)
+       phisum(n,:) = phisum(n,:) / ncell(n)
     end do
 
   end subroutine divide_phisum_by_ncell
