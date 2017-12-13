@@ -65,9 +65,13 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
     }
 
+// average lev+1 down to lev
     for (int lev=finest_level-1; lev>=0; --lev)
     {
-        AverageDownTo(lev,scal,Temp,1); // average lev+1 down to lev
+        AverageDownTo(lev,scal,Temp,1); 
+        if (updateRhoH == 1) {
+            AverageDownTo(lev,scal,RhoH,1);
+        }
     }
 
 }
