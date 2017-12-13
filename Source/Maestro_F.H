@@ -153,6 +153,10 @@ extern "C"
                         const amrex::Real* rho0,
                         const amrex::Real* r_cc_loc,
                         const amrex::Real* r_edge_loc);
+
+    void make_grav_edge(      amrex::Real* grav_edge,
+                        const amrex::Real* rho0,
+                        const amrex::Real* r_edge_loc);
     //////////////////////
 
     //////////////////////

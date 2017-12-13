@@ -229,4 +229,134 @@ contains
 
   end subroutine make_grav_cell
 
+  subroutine make_grav_edge(grav_edge,rho0,r_edge_loc) &
+       bind(C, name="make_grav_edge")
+
+    ! compute the base state gravity at the cell edges
+    ! grav_edge(0) is the gravitational acceleration at the left edge of zone 0).
+    ! The base state uses 0-based indexing, so grav_edge does too.
+
+    double precision, intent(  out) ::  grav_edge(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) ::       rho0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine  )
+
+    ! Local variables
+    integer                      :: r, n, i
+    real(kind=dp_t)              :: mencl
+    real(kind=dp_t), allocatable :: m(:,:)
+        
+    if (spherical .eq. 0) then
+
+       if (do_planar_invsq_grav)  then       
+
+          ! we are doing a plane-parallel geometry with a 1/r**2
+          ! gravitational acceleration.  The mass is assumed to be
+          ! at the origin.  The mass in the computational domain
+          ! does not contribute to the gravitational acceleration.
+          do n=0,finest_radial_level
+             do r = 0, nr(n)-1
+                grav_edge(n,r) = -Gconst*planar_invsq_mass / r_edge_loc(n,r)**2
+             enddo
+          enddo
+
+       else if (do_2d_planar_octant .eq. 1) then
+
+          ! compute gravity as in spherical geometry
+
+          allocate(m(0:finest_radial_level,0:nr_fine))
+
+          grav_edge(0,0) = zero 
+          m(0,0) = ZERO
+
+          do r=1,nr(0)-1
+
+             ! only add to the enclosed mass if the density is 
+             ! > base_cutoff_density
+             if (rho0(0,r-1) > base_cutoff_density) then
+                m(0,r) = m(0,r-1) + FOUR3RD*M_PI * &
+                     (r_edge_loc(0,r) - r_edge_loc(0,r-1)) * &
+                     (r_edge_loc(0,r)**2 + &
+                     r_edge_loc(0,r)*r_edge_loc(0,r-1) + &
+                     r_edge_loc(0,r-1)**2) * rho0(0,r-1)
+             else
+                m(0,r) = m(0,r-1)
+             endif
+
+             grav_edge(0,r) = -Gconst * m(0,r) / r_edge_loc(0,r)**2
+
+          end do
+
+          do n=1,finest_radial_level
+             do i=1,numdisjointchunks(n)
+
+                if (r_start_coord(n,i) .eq. 0) then
+
+                   m(n,0) = ZERO
+
+                else 
+
+                   m(n,r_start_coord(n,i)) = m(n-1,r_start_coord(n,i)/2.d0)
+                   grav_edge(n,r_start_coord(n,i)) = grav_edge(n-1,r_start_coord(n,i)/2.d0)
+
+                end if
+
+                do r=r_start_coord(n,i)+1,r_end_coord(n,i)+1
+
+                   ! only add to the enclosed mass if the density is 
+                   ! > base_cutoff_density
+                   if (rho0(n,r-1) > base_cutoff_density) then
+                      m(n,r) = m(n,r-1) + FOUR3RD*M_PI * &
+                           (r_edge_loc(n,r) - r_edge_loc(n,r-1)) * &
+                           (r_edge_loc(n,r)**2 + &
+                           r_edge_loc(n,r)*r_edge_loc(n,r-1) + &
+                           r_edge_loc(n,r-1)**2) * rho0(n,r-1)
+                   else
+                      m(n,r) = m(n,r-1)
+                   endif
+
+                   grav_edge(n,r) = -Gconst * m(n,r) / r_edge_loc(n,r)**2
+
+                end do
+             enddo
+          end do
+
+          deallocate(m)
+
+
+          call restrict_base(grav_edge,0)
+          call fill_ghost_base(grav_edge,0)
+
+       
+       else
+          
+          ! constant gravity
+          grav_edge = grav_const
+
+       endif
+
+    else
+       
+       grav_edge(0,0) = zero 
+       mencl = ZERO
+
+       do r=1,nr_fine-1
+
+          ! only add to the enclosed mass if the density is 
+          ! > base_cutoff_density
+          if (rho0(0,r-1) > base_cutoff_density) then
+             mencl = mencl + FOUR3RD*M_PI * &
+                  (r_edge_loc(0,r) - r_edge_loc(0,r-1)) * &
+                  (r_edge_loc(0,r)**2 + &
+                   r_edge_loc(0,r)*r_edge_loc(0,r-1) + &
+                   r_edge_loc(0,r-1)**2) * rho0(0,r-1)
+          endif
+          
+          grav_edge(0,r) = -Gconst * mencl / r_edge_loc(0,r)**2
+
+       end do
+       
+    end if
+    
+  end subroutine make_grav_edge
+
 end module make_grav_module
