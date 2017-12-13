@@ -102,14 +102,17 @@ Maestro::InitData ()
             Average(snew,rho0_new,Rho);
             compute_cutoff_coords(rho0_new.dataPtr());
 
-            // compute p0 with HSE
+            // compute gravity
             make_grav_cell(grav_cell.dataPtr(),
                            rho0_new.dataPtr(),
                            r_cc_loc.dataPtr(),
                            r_edge_loc.dataPtr());
 
-            // FIXME
-            // call enforce_HSE(rho0_old,p0_old,grav_cell)
+            // compute p0 with HSE
+            enforce_HSE(rho0_new.dataPtr(),
+                        p0_new.dataPtr(),
+                        grav_cell.dataPtr(),
+                        r_edge_loc.dataPtr());
 
             // call eos with r,p as input to recompute T,h
             TfromRhoP(snew,p0_new,1);

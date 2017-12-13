@@ -2,6 +2,7 @@ f90EXE_sources += average.f90
 f90EXE_sources += base_state.f90
 f90EXE_sources += base_state_geometry.f90
 f90EXE_sources += burner_loop.f90
+f90EXE_sources += enforce_HSE.f90
 f90EXE_sources += initdata.f90
 f90EXE_sources += inlet_bc.f90
 f90EXE_sources += make_beta0.f90

@@ -70,14 +70,20 @@ extern "C"
                      const amrex::Real& dt_in);
     //////////////////////
 
-
-
     //////////////////////
     // in compute_dt.F90
     void firstdt(amrex::Real& dt, amrex::Real& umax, const int* lo, const int* hi, 
                  const amrex::Real* dx,
                  const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
                  const amrex::Real* u,     const int* u_lo, const int* u_hi, const int* nc_u);
+    //////////////////////
+
+    //////////////////////
+    // in enforce_HSE.f90
+    void enforce_HSE(const amrex::Real* rho0,
+                           amrex::Real* p0,
+                     const amrex::Real* grav_cell,
+                     const amrex::Real* r_edge_loc);
     //////////////////////
 
     //////////////////////

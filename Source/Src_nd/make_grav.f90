@@ -13,6 +13,8 @@ module make_grav_module
 
   private
 
+  public :: make_grav_cell, make_grav_edge
+
 contains
 
   subroutine make_grav_cell(grav_cell,rho0,r_cc_loc,r_edge_loc) &
