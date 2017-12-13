@@ -18,8 +18,9 @@ Maestro::PlotFileMF (Vector<MultiFab>& p0_cart,
 
     // velocities (AMREX_SPACEDIM)
     // rho, rhoh, rhoX, Temp, Pi (Nscal)
+    // X (NumSpec)
     // rho0, p0 (2)
-    int nPlot = AMREX_SPACEDIM + Nscal + 2;
+    int nPlot = AMREX_SPACEDIM + Nscal + NumSpec + 2;
 
     // temporary MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
@@ -37,6 +38,13 @@ Maestro::PlotFileMF (Vector<MultiFab>& p0_cart,
         dest_comp += AMREX_SPACEDIM;
         plot_mf_data[i]->copy((snew[i]),     0,dest_comp,Nscal);
         dest_comp += Nscal;
+
+        plot_mf_data[i]->copy((snew[i]),FirstSpec,dest_comp,NumSpec);
+        for (int comp=0; comp<NumSpec; ++comp) {
+            MultiFab::Divide(*plot_mf_data[i],snew[i],Rho,dest_comp+comp,1,0);
+        }
+        dest_comp += NumSpec;
+
         plot_mf_data[i]->copy((rho0_cart[i]),0,dest_comp,1);
         dest_comp += 1;
         plot_mf_data[i]->copy((p0_cart[i]),  0,dest_comp,1);
@@ -57,8 +65,9 @@ Maestro::PlotFileVarNames () const
 
     // velocities (AMREX_SPACEDIM)
     // rho, rhoh, rhoX, Temp, Pi (Nscal)
+    // X (NumSpec)
     // rho0, p0 (2)
-    int nPlot = Nscal + AMREX_SPACEDIM + 2;
+    int nPlot = AMREX_SPACEDIM + Nscal + NumSpec + 2;
     Vector<std::string> names(nPlot);
 
     int cnt = 0;
@@ -95,6 +104,25 @@ Maestro::PlotFileVarNames () const
 
     names[cnt++] = "Temp";
     names[cnt++] = "Pi";
+
+    for (int i = 0; i < NumSpec; i++)
+    {
+        int len = 20;
+        Array<int> int_spec_names(len);
+        //
+        // This call return the actual length of each string in "len"
+        //
+        get_spec_names(int_spec_names.dataPtr(),&i,&len);
+        char* spec_name = new char[len+1];
+        for (int j = 0; j < len; j++)
+            spec_name[j] = int_spec_names[j];
+        spec_name[len] = '\0';
+        std::string spec_string = "X(";
+        spec_string += spec_name;
+        spec_string += ')';
+
+        names[cnt++] = spec_string;
+    }
 
     names[cnt++] = "rho0";
     names[cnt++] = "p0";
