@@ -117,7 +117,7 @@ Maestro::InitData ()
     }
 
     if (plot_int > 0) {
-        Print() << "\nWriting plotfile after initialization" << endl;
+        Print() << "\nWriting plotfile 0 after initialization" << endl;
         WritePlotFile(0);
     }
 }

@@ -126,9 +126,9 @@ contains
        eos_state%rho   = state(i,j,k,rho_comp)
        eos_state%T     = state(i,j,k,temp_comp)
        if (use_pprime_in_tfromp) then
-          eos_state%p     = p0(lev,k) + state(i,j,k,pi_comp)
+          eos_state%p     = p0(lev,r) + state(i,j,k,pi_comp)
        else
-          eos_state%p     = p0(lev,k)
+          eos_state%p     = p0(lev,r)
        endif
 
        eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
