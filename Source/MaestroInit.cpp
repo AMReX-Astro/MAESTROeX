@@ -16,6 +16,8 @@ Maestro::Init ()
     // fill in multifab and base state data
     InitData();
 
+    VisMF::Write(snew[0],"a_snew");
+
     if (spherical == 1) {
         // FIXME
         // MakeNormal();
@@ -108,8 +110,9 @@ Maestro::InitData ()
 
             // FIXME
             // call enforce_HSE(rho0_old,p0_old,grav_cell)
+
             // call eos with r,p as input to recompute T,h
-            // call makeTHfromRhoP(sold,p0_old,the_bc_tower%bc_tower_array,mla,dx)
+            TfromRhoP(snew,p0_new,1);
 
             // set rhoh0 to be the average
             Average(snew,rhoh0_new,RhoH);

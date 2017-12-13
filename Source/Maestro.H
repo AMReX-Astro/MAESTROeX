@@ -323,7 +323,8 @@ private:
                     const amrex::Vector<amrex::Real>& p0);
 
     void TfromRhoP (amrex::Vector<amrex::MultiFab>& scal,
-                    const amrex::Vector<amrex::Real>& p0);
+                    const amrex::Vector<amrex::Real>& p0,
+                    int updateRhoH = 0);
     ////////////
 
     ////////////

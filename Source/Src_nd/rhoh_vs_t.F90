@@ -97,12 +97,14 @@ contains
 
   end subroutine makeTfromRhoH
 
-  subroutine makeTfromRhoP(lev,lo,hi,state,s_lo,s_hi,nc_s,p0) bind(C,name="makeTfromRhoP")
+  subroutine makeTfromRhoP(lev,lo,hi,state,s_lo,s_hi,nc_s,p0,updateRhoH) &
+       bind(C,name="makeTfromRhoP")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
     double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
+    integer         , intent (in   ) :: updateRhoH
 
     ! Local variables
     integer :: i, j, k, r
@@ -138,6 +140,10 @@ contains
        call eos(eos_input_rp, eos_state, pt_index)
              
        state(i,j,k,temp_comp) = eos_state%T
+
+       if (updateRhoH .eq. 1) then
+          state(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
+       end if
        
     enddo
     enddo

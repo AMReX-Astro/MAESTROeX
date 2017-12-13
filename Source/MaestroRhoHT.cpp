@@ -39,7 +39,8 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
 void
 Maestro::TfromRhoP (Vector<MultiFab>& scal,
-                    const Vector<Real>& p0)
+                    const Vector<Real>& p0,
+                    int updateRhoH)
 {
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -59,7 +60,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // We will also pass "validBox", which specifies the "valid" region.
             makeTfromRhoP(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                           BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                          p0.dataPtr());
+                          p0.dataPtr(),updateRhoH);
         }
 
     }
