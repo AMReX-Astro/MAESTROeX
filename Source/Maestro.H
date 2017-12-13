@@ -242,7 +242,7 @@ private:
 
     // put together an array of multifabs for writing
     amrex::Vector<const amrex::MultiFab*> PlotFileMF (amrex::Vector<amrex::MultiFab>& p0_cart,
-                                                      amrex::Vector<amrex::MultiFab>& rho0_cart) const;
+                                                      amrex::Vector<amrex::MultiFab>& rho0_cart);
 
     // set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames () const;
