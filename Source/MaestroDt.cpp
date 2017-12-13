@@ -83,7 +83,7 @@ Maestro::EstDt ()
         }
 
         if (dt < small_dt) {
-            amrex::Abort("EstDt: dt < small_dt");
+            Abort("EstDt: dt < small_dt");
         }
 
     }
@@ -175,7 +175,7 @@ Maestro::FirstDt ()
         }
 
         if (dt < small_dt) {
-            amrex::Abort("FirstDt: dt < small_dt");
+            Abort("FirstDt: dt < small_dt");
         }
 
     }

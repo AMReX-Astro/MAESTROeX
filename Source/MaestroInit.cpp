@@ -40,16 +40,25 @@ Maestro::Init ()
                grav_cell.dataPtr());
 
     // initial projection
-    InitProj();
+    if (do_initial_projection) {
+        Print() << "Doing initial projection" << endl;
+        InitProj();
+    }
 
     // compute initial time step
     FirstDt();
 
     // divu iters
-    DivuIter();
+    for (int i=1; i<=init_divu_iter; ++i) {
+        Print() << "Doing initial divu iteration #" << i << endl;
+        DivuIter();
+    }
 
     // initial (pressure) iters
-    InitIter();
+    for (int i=1; i<= init_iter; ++i) {
+        Print() << "Doing initial pressure iteration #" << i << endl;
+        InitIter();
+    }
 }
 
 // fill in multifab and base state data
@@ -200,22 +209,19 @@ void Maestro::InitProj ()
         // nodal
         nodalrhs[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
-        // during initial projection we ignore reaction terms
+        // we don't have a legit timestep yet, so we set rho_omegadot,
+        // rho_Hnuc, and rho_Hext to 0 
         rho_omegadot[lev].setVal(0.);
         rho_Hnuc[lev].setVal(0.);
+        rho_Hext[lev].setVal(0.);
 
         // initial projection does not use density weighting
         rhohalf[lev].setVal(1.);
     }
 
-    // compute any external heating
-    ComputeHeating(rho_Hext);
-
     // compute thermal diffusion
     if (use_thermal_diffusion) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            thermal[lev].setVal(0.);   // FIXME
-        }
+        Abort("InitProj: use_thermal_diffusion not implemented");
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -234,7 +240,6 @@ void Maestro::InitProj ()
 
     // perform a nodal projection
     NodalProj(initial_projection_comp,nodalrhs,rhohalf);
-
 
 }
 
@@ -258,8 +263,10 @@ void Maestro::DivuIter ()
 
     React(snew,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
 
+    VisMF::Write(rho_omegadot[0],"a_rod");
+
     if (use_thermal_diffusion) {
-        amrex::Abort("DivuIter: use_thermal_diffusion not implemented yet");
+        Abort("DivuIter: use_thermal_diffusion not implemented");
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {

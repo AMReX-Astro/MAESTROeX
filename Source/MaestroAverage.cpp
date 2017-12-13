@@ -68,7 +68,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     }
     else {
         // spherical case
-        amrex::Abort("Average does not work for spherical yet.");
+        Abort("Average does not work for spherical yet.");
     }
 
 
