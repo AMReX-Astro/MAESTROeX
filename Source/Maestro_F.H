@@ -196,6 +196,9 @@ extern "C"
                         amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
                         const amrex::Real* p0);
 
+    void makeTfromRhoP (const int& lev, const int* lo, const int* hi, 
+                        amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
+                        const amrex::Real* p0);
     //////////////////////
 
     //////////////////////
