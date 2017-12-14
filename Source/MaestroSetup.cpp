@@ -138,6 +138,14 @@ Maestro::Setup ()
     flux_reg_s.resize(max_level+1);
     flux_reg_u.resize(max_level+1);
 
+    // number of ghost cells needed for hyperbolic step
+    if (ppm_type == 2 || bds_type == 1) {
+        ng_s = 4;
+    }
+    else {
+        ng_s = 3;
+    }
+
 }
 
 // read in some parameters from inputs file

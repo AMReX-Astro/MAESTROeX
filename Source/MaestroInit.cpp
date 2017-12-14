@@ -16,8 +16,6 @@ Maestro::Init ()
     // fill in multifab and base state data
     InitData();
 
-    VisMF::Write(snew[0],"a_snew");
-
     if (spherical == 1) {
         // FIXME
         // MakeNormal();
@@ -261,8 +259,6 @@ void Maestro::DivuIter ()
     }
 
     React(snew,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
-
-    VisMF::Write(rho_omegadot[0],"a_rod");
 
     if (use_thermal_diffusion) {
         Abort("DivuIter: use_thermal_diffusion not implemented");

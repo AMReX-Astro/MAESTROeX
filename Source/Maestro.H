@@ -65,6 +65,11 @@ private:
     ////////////
 
     ////////////
+    // MaestroAdvection.cpp functions
+    void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+    ////////////
+
+    ////////////
     // MaestroAverage.cpp functions
 
     // compute the radial average of a quantitiy
@@ -381,6 +386,9 @@ private:
     amrex::Real t_old;
     amrex::Real dt;
     amrex::Real dtold;
+
+    // number of ghost cells needed for hyperbolic step
+    int ng_s;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
