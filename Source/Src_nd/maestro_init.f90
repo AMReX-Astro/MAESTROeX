@@ -6,7 +6,7 @@ module maestro_init_module
   use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp, &
-                                nscal, small_dens, small_temp, rel_eps
+                                nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
   use eos_module, only: eos_init
 
   implicit none
@@ -16,7 +16,6 @@ module maestro_init_module
 contains
 
   subroutine maestro_network_init() bind(C, name="maestro_network_init")
-
 
     call network_init()
 
@@ -49,10 +48,13 @@ contains
 
   end subroutine get_spec_names
 
-  subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature,Pressure,Nscalars) &
-       bind(C, name="set_method_params")
+  subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature, &
+                               Pressure,Nscalars,prob_lo_in,prob_hi_in) &
+                               bind(C, name="set_method_params")
 
-    integer, intent(in) :: Density, Enthalpy, FirstSpec, Temperature, Pressure, Nscalars
+    integer         , intent(in) :: Density, Enthalpy, FirstSpec, Temperature
+    integer         , intent(in) :: Pressure, Nscalars
+    double precision, intent(in) :: prob_lo_in(3), prob_hi_in(3)
 
     integer :: ioproc
 
@@ -71,6 +73,9 @@ contains
     pi_comp   = Pressure+1
 
     nscal = Nscalars
+
+    prob_lo(1:3) = prob_lo_in(1:3)
+    prob_hi(1:3) = prob_hi_in(1:3)
 
     !---------------------------------------------------------------------
     ! other initializations

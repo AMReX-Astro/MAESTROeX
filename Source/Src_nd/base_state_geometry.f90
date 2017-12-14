@@ -11,7 +11,7 @@ module base_state_geometry_module
   use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, octant, anelastic_cutoff, base_cutoff_density, &
-                                burning_cutoff_density
+                                burning_cutoff_density, prob_lo, prob_hi
 
   implicit none
 
@@ -25,7 +25,7 @@ module base_state_geometry_module
   double precision, save, public :: dr_fine
 
   integer         , save, public  :: nr_irreg
-  double precision, save, public  :: center(0:amrex_spacedim-1)
+  double precision, save, public  :: center(3)
 
   double precision, allocatable, save, public  :: dr(:)
   integer         , allocatable, save, public  :: nr(:)
@@ -42,7 +42,7 @@ contains
 
   subroutine init_base_state_geometry(max_radial_level_in,nr_fine_in,dr_fine_in, &
                                       r_cc_loc,r_edge_loc, &
-                                      dx_fine,domhi_fine,prob_lo,prob_hi) &
+                                      dx_fine,domhi_fine) &
                                       bind(C, name="init_base_state_geometry")
 
     integer          , intent(in   ) :: max_radial_level_in
@@ -52,8 +52,6 @@ contains
     double precision , intent(inout) :: r_edge_loc(0:max_radial_level_in,0:nr_fine_in  )
     double precision , intent(in   ) ::    dx_fine(0:amrex_spacedim-1)
     integer          , intent(in   ) :: domhi_fine(0:amrex_spacedim-1)
-    double precision , intent(in   ) ::    prob_lo(0:amrex_spacedim-1)
-    double precision , intent(in   ) ::    prob_hi(0:amrex_spacedim-1)
 
     ! local
     integer :: n,i,domhi
@@ -72,7 +70,7 @@ contains
     ! compute center(:)
     if (octant) then
        if (.not. (spherical == 1 .and. amrex_spacedim == 3 .and. &
-                  all(prob_lo(0:amrex_spacedim-1) == 0.d0) ) ) then
+                  all(prob_lo(1:amrex_spacedim) == 0.d0) ) ) then
           call amrex_error("ERROR: octant requires spherical with prob_lo = 0.0")
        endif
        center = 0.d0

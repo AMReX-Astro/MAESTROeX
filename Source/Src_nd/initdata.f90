@@ -7,7 +7,8 @@ module initdata_module
   use amrex_fort_module, only : amrex_spacedim
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
-                                perturb_model, pert_temp_factor, pert_rad_factor, do_small_domain
+                                perturb_model, pert_temp_factor, pert_rad_factor,&
+                                do_small_domain, prob_lo
   
   implicit none
 
@@ -19,7 +20,7 @@ contains
                       scal, scal_lo, scal_hi, nc_s, &
                       vel, vel_lo, vel_hi, nc_v, &
                       s0_init, p0_init, &
-                      dx, prob_lo) bind(C, name="initdata")
+                      dx) bind(C, name="initdata")
     
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
@@ -33,7 +34,7 @@ contains
                                            vel_lo(3):vel_hi(3), 1:nc_v)
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: dx(3), prob_lo(3)
+    double precision, intent(in   ) :: dx(3)
 
     integer          :: i,j,k,r
     double precision :: x,y,z

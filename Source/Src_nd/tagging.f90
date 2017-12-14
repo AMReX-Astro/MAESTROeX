@@ -21,7 +21,6 @@ contains
 ! ::: clear       => integer value to untag cell
 ! ::: lo,hi       => work region we are allowed to change
 ! ::: dx          => cell size
-! ::: problo      => phys loc of lower left corner of prob domain
 ! ::: time        => problem evolution time
 ! ::: level       => refinement level of this array
 ! ::: -----------------------------------------------------------
@@ -30,7 +29,7 @@ contains
                          state,state_lo,state_hi, &
                          set,clear,&
                          lo,hi,&
-                         dx,problo,time,temperr) bind(C, name="state_error")
+                         dx,time,temperr) bind(C, name="state_error")
 
     integer          :: lo(3),hi(3)
     integer          :: state_lo(3),state_hi(3)
@@ -39,7 +38,7 @@ contains
                               state_lo(2):state_hi(2), &
                               state_lo(3):state_hi(3), 1:nscal)
     integer          :: tag(tag_lo(1):tag_hi(1),tag_lo(2):tag_hi(2),tag_lo(3):tag_hi(3))
-    double precision :: problo(3),dx(3),time,temperr
+    double precision :: dx(3),time,temperr
     integer          :: set,clear
 
     integer          :: i, j, k

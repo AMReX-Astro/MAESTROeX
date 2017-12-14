@@ -27,9 +27,7 @@ extern "C"
                                   const amrex::Real* r_cc_loc,
                                   const amrex::Real* r_edge_loc,
                                   const amrex::Real* dx_fine,
-                                  const int* domhi_fine,
-                                  const amrex::Real* prob_lo,
-                                  const amrex::Real* prob_hi);
+                                  const int* domhi_fine);
 
     void compute_cutoff_coords(const amrex::Real* rho0);
 
@@ -104,8 +102,7 @@ extern "C"
                   const amrex::Real* vel,  const int* vel_lo,  const int* vel_hi,  const int* nc_v,
                   const amrex::Real* s0_init, 
                   const amrex::Real* p0_init,
-                  const amrex::Real* dx,
-                  const amrex::Real* prob_lo);
+                  const amrex::Real* dx);
     //////////////////////
 
     //////////////////////
@@ -121,7 +118,9 @@ extern "C"
                             const int& FirstSpec,
                             const int& Temperature,
                             const int& Pressure,
-                            const int& Nscalars);
+                            const int& Nscalars,
+                            const amrex::Real* prob_lo_in,
+                            const amrex::Real* prob_hi_in);
 
     void set_rel_eps (const amrex::Real& rel_eps_in);
 
@@ -131,8 +130,7 @@ extern "C"
                           const amrex::Real* rhoh0,
                           const amrex::Real* p0,
                           const amrex::Real* tempbar,
-                          const int& nlevs,
-                          const amrex::Real* prob_lo);
+                          const int& nlevs);
 
     //////////////////////
 
@@ -213,8 +211,11 @@ extern "C"
 
     //////////////////////
     // in sponge.F90
-    void init_sponge(const amrex::Real* rho0,
-                     const amrex::Real* prob_lo);
+    void init_sponge(const amrex::Real* rho0);
+
+    void mk_sponge (const int* lo, const int* hi, 
+                    amrex::Real* sponge,  const int* s_lo, const int* s_hi,
+                    const amrex::Real* dx, const amrex::Real* time);
     //////////////////////
 
 
@@ -224,7 +225,7 @@ extern "C"
                      const amrex::Real* state, const int* state_lo, const int* state_hi,
                      const int* tagval, const int* clearval,
                      const int* lo, const int* hi,
-                     const amrex::Real* dx, const amrex::Real* problo,
+                     const amrex::Real* dx,
                      const amrex::Real* time, const amrex::Real* temperr);
     //////////////////////
 

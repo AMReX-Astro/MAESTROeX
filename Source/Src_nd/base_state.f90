@@ -22,7 +22,7 @@ module base_state_module
   use meth_params_module, only: nscal, model_file, spherical, base_cutoff_density, &
                                 do_2d_planar_octant, do_planar_invsq_grav, rho_comp, &
                                 rhoh_comp, spec_comp, temp_comp, grav_const, &
-                                planar_invsq_mass, print_init_hse_diag
+                                planar_invsq_mass, print_init_hse_diag, prob_lo
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
   
   implicit none
@@ -32,7 +32,7 @@ module base_state_module
 contains
 
   subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar, &
-                             max_levs,prob_lo) bind(C, name="init_base_state")
+                             max_levs) bind(C, name="init_base_state")
 
     integer         , intent(in   ) :: max_levs
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
@@ -41,7 +41,6 @@ contains
     double precision, intent(inout) ::   rhoh0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(inout) ::      p0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(inout) :: tempbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: prob_lo(3)
 
     ! local variables
     double precision :: base_cutoff_density_loc

@@ -28,17 +28,19 @@ Maestro::Setup ()
     // calls network_init
     VariableSetup();
 
+    const Real* probLo = geom[0].ProbLo();
+    const Real* probHi = geom[0].ProbHi();
+
     // define additional module variables in meth_params.F90 that are defined
     // at the top of meth_params.template
-    set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,Nscal);
+    set_method_params(Rho,RhoH,FirstSpec,Temp,Pi,Nscal,
+                      ZFILL(probLo),ZFILL(probHi));
 
     // set up BCRec definitions for BC types
     BCSetup();
 
     const Box domainBoxFine = geom[max_level].Domain();
     const Real* dxFine = geom[max_level].CellSize();
-    const Real* probLo = geom[0].ProbLo();
-    const Real* probHi = geom[0].ProbHi();
 
     if (spherical == 1) {
 
@@ -105,9 +107,7 @@ Maestro::Setup ()
                              r_cc_loc.dataPtr(),
                              r_edge_loc.dataPtr(),
                              geom[max_level].CellSize(),
-                             domainBoxFine.hiVect(),
-                             geom[0].ProbLo(),
-                             geom[0].ProbHi());
+                             domainBoxFine.hiVect());
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.

@@ -69,8 +69,7 @@ Maestro::InitData ()
 
     // read in model file and fill in s0_init and p0_init for all levels
     init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_new.dataPtr(),
-                    rhoh0_new.dataPtr(),p0_new.dataPtr(),tempbar.dataPtr(),max_level+1,
-                    ZFILL(geom[0].ProbLo()));
+                    rhoh0_new.dataPtr(),p0_new.dataPtr(),tempbar.dataPtr(),max_level+1);
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
@@ -180,7 +179,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                  BL_TO_FORTRAN_FAB(scal[mfi]), 
                  BL_TO_FORTRAN_FAB(vel[mfi]), 
                  s0_init.dataPtr(), p0_init.dataPtr(),
-                 ZFILL(dx),ZFILL(geom[lev].ProbLo()));
+                 ZFILL(dx));
     }
 }
 
