@@ -155,16 +155,11 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 #endif
     }
 
-    // FIXME
-/*
     if (do_sponge) {
         // make the sponge for all levels
-        // call init_sponge
-        // call MakeSponge
+        init_sponge(rho0_old.dataPtr());
+        MakeSponge(sponge);
     }
-*/
-
-
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 1 -- react the full state and then base state through dt/2

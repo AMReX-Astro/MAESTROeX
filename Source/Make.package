@@ -16,6 +16,7 @@ CEXE_sources += MaestroReact.cpp
 CEXE_sources += MaestroRegrid.cpp
 CEXE_sources += MaestroRhoHT.cpp
 CEXE_sources += MaestroSetup.cpp
+CEXE_sources += MaestroSponge.cpp
 CEXE_sources += PhysBCFunctMaestro.cpp
 
 CEXE_headers += Maestro.H

@@ -215,7 +215,7 @@ extern "C"
 
     void mk_sponge (const int* lo, const int* hi, 
                     amrex::Real* sponge,  const int* s_lo, const int* s_hi,
-                    const amrex::Real* dx, const amrex::Real* time);
+                    const amrex::Real* dx, const amrex::Real& dt);
     //////////////////////
 
 

@@ -28,7 +28,7 @@ module sponge_module
 
 contains
 
- subroutine init_sponge(rho0)
+ subroutine init_sponge(rho0) bind(C, name="init_sponge")
 
     ! The sponge has a HALF * ( 1 - cos( (r - r_sp)/L)) profile, where
     ! the width, L, is r_tp - r_sp.
@@ -113,7 +113,7 @@ contains
           r = prob_lo(1) + (dble(i)+HALF)*dx(1)
 #elif (AMREX_SPACEDIM == 2)
        do j=lo(2),hi(2)
-          r = prob_lo(2) + (dble(2)+HALF)*dx(2)
+          r = prob_lo(2) + (dble(j)+HALF)*dx(2)
 #else
        do k = lo(3),hi(3)
           r = prob_lo(3) + (dble(k)+HALF)*dx(3)

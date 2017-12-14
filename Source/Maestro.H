@@ -342,6 +342,11 @@ private:
     // end MaestroSetup.cpp functions
     ////////////
 
+    ////////////
+    // MaestroSponge.cpp functions
+    void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
+    ////////////
+
     /*
       private data members
     */
