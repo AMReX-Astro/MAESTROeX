@@ -212,6 +212,13 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in sponge.F90
+    void init_sponge(const amrex::Real* rho0,
+                     const amrex::Real* prob_lo);
+    //////////////////////
+
+
+    //////////////////////
     // in tagging.f90
     void state_error(int* tag, const int* tag_lo, const int* tag_hi,
                      const amrex::Real* state, const int* state_lo, const int* state_hi,

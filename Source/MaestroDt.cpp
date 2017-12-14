@@ -57,7 +57,7 @@ Maestro::EstDt ()
 
     if (fixed_dt == -1.) {
 
-        if (verbose > 0) {
+        if (maestro_verbose > 0) {
             Print() << "Call to EstDt at beginning of step" << istep << endl;
             Print() << "gives dt = " << dt << endl;
         }
@@ -70,14 +70,14 @@ Maestro::EstDt ()
         if (dt > max_dt_growth*dtold)
         {
             dt = max_dt_growth*dtold;
-            if (verbose > 0) {
+            if (maestro_verbose > 0) {
                 Print() << "dt_growth factor limits the new dt = " << dt << endl;
             }
         }
 
         if (dt > max_dt) {
             dt = max_dt;
-            if (verbose > 0) {
+            if (maestro_verbose > 0) {
                 Print() << "max_dt limits the new dt = " << max_dt << endl;
             }
         }
@@ -91,7 +91,7 @@ Maestro::EstDt ()
 
         // fixed dt
         dt = fixed_dt;
-        if (verbose > 0) {
+        if (maestro_verbose > 0) {
             Print() << "Setting fixed dt = " << dt << endl;
         }
 
@@ -155,13 +155,13 @@ Maestro::FirstDt ()
     if (fixed_dt == -1.) {
    
         // use dt obtained with FirstDt
-        if (verbose > 0) {
+        if (maestro_verbose > 0) {
             Print() << "Call to FirstDt gives dt = " << dt << endl;
         }
 
         if (init_shrink != 1.0) {
             dt *= init_shrink;
-            if (verbose > 0) {
+            if (maestro_verbose > 0) {
                 Print() << "Multiplying dt by init_shrink gives dt = " << dt << endl;
             }
         }
@@ -169,7 +169,7 @@ Maestro::FirstDt ()
         // limit dt by max_dt
         if (dt > max_dt) {
             dt = max_dt;
-            if (verbose > 0) {
+            if (maestro_verbose > 0) {
                 Print() << "max_dt limits the new dt = " << max_dt << endl;
             }
         }
@@ -183,7 +183,7 @@ Maestro::FirstDt ()
 
         // fixed dt
         dt = fixed_dt;
-        if (verbose > 0) {
+        if (maestro_verbose > 0) {
             Print() << "Setting fixed dt = " << dt << endl;
         }
 
@@ -192,7 +192,7 @@ Maestro::FirstDt ()
     // limit dt by stop_time
     if (t_new + dt > stop_time) {
         dt = stop_time - t_new;
-        if (verbose > 0) {
+        if (maestro_verbose > 0) {
             Print() << "Stop time limits dt = " << dt << endl;
         }
     }

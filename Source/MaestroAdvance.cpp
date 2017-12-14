@@ -91,7 +91,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << endl << endl;
 
-    if (verbose > 0) {
+    if (maestro_verbose > 0) {
         Print() << "Cell Count:" << endl;
         for (int lev=0; lev<=finest_level; ++lev) {
             Print() << "Level " << lev << ", " << CountCells(lev) << " cells" << endl;
@@ -287,7 +287,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 	
     // print wallclock time
     ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
-    if (verbose > 0) {
+    if (maestro_verbose > 0) {
         Print() << "Time to advance time step: " << end_total << '\n';
     }
 

@@ -24,6 +24,7 @@ module meth_params_module
 
   ! Begin the declarations of the ParmParse parameters
 
+  integer                       , save :: maestro_verbose
   character (len=:), allocatable, save :: model_file
   logical                       , save :: perturb_model
   logical                       , save :: print_init_hse_diag
@@ -35,6 +36,10 @@ module meth_params_module
   integer                       , save :: spherical
   logical                       , save :: octant
   integer                       , save :: do_2d_planar_octant
+  integer                       , save :: drdxfac
+  double precision              , save :: sponge_kappa
+  double precision              , save :: sponge_center_density
+  double precision              , save :: sponge_start_factor
   double precision              , save :: anelastic_cutoff
   double precision              , save :: base_cutoff_density
   double precision              , save :: burning_cutoff_density
@@ -67,6 +72,7 @@ contains
 
     type (amrex_parmparse) :: pp
 
+    maestro_verbose = 1;
     allocate(character(len=1)::model_file)
     model_file = "model.hse";
     perturb_model = .false.;
@@ -79,6 +85,10 @@ contains
     spherical = 0;
     octant = .false.;
     do_2d_planar_octant = 0;
+    drdxfac = 1;
+    sponge_kappa = 10.d0;
+    sponge_center_density = 3.d6;
+    sponge_start_factor = 3.333d0;
     anelastic_cutoff = 3.d6;
     base_cutoff_density = 3.d6;
     burning_cutoff_density = 3.d6;
@@ -100,6 +110,7 @@ contains
     use_pprime_in_tfromp = .false.;
 
     call amrex_parmparse_build(pp, "maestro")
+    call pp%query("maestro_verbose", maestro_verbose)
     call pp%query("model_file", model_file)
     call pp%query("perturb_model", perturb_model)
     call pp%query("print_init_hse_diag", print_init_hse_diag)
@@ -111,6 +122,10 @@ contains
     call pp%query("spherical", spherical)
     call pp%query("octant", octant)
     call pp%query("do_2d_planar_octant", do_2d_planar_octant)
+    call pp%query("drdxfac", drdxfac)
+    call pp%query("sponge_kappa", sponge_kappa)
+    call pp%query("sponge_center_density", sponge_center_density)
+    call pp%query("sponge_start_factor", sponge_start_factor)
     call pp%query("anelastic_cutoff", anelastic_cutoff)
     call pp%query("base_cutoff_density", base_cutoff_density)
     call pp%query("burning_cutoff_density", burning_cutoff_density)

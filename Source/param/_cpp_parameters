@@ -26,7 +26,7 @@ do_reflux                           int         1
 #-----------------------------------------------------------------------------
 
 # General verbosity
-verbose                             int         1
+maestro_verbose                     int         1       y
 
 #-----------------------------------------------------------------------------
 # category: problem initialization
@@ -117,7 +117,7 @@ amr_buf_width                       int            -1
 
 # ratio of radial base state zones to Cartesian full state zones for
 # spherical geometry
-drdxfac                             int            1
+drdxfac                             int            1    y
 
 # The minimum size on a side for a grid created using make\_new\_grids.
 minwidth                            int            8
@@ -258,13 +258,13 @@ hg_dense_stencil                    bool            true
 do_sponge                           bool            false
 
 # Parameter for sponge.  Problem dependent.
-sponge_kappa                        Real               10.e0
+sponge_kappa                        Real               10.e0            y
 
 # Center of the inner sponge.
-sponge_center_density               Real               3.e6
+sponge_center_density               Real               3.e6             y
 
 # The sponge begins at sponge\_center\_density * sponge\_start\_factor.
-sponge_start_factor                 Real               3.333e0
+sponge_start_factor                 Real               3.333e0          y
 
 # plot fdamp rather than sponge
 # assumes sponge has the form 1/(1+dt*{\tt sponge\_kappa}*fdamp)

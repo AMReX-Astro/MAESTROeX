@@ -4,7 +4,7 @@
 // mk_params.sh
 
 static int         do_reflux;
-static int         verbose;
+static int         maestro_verbose;
 static std::string model_file;
 static bool        perturb_model;
 static bool        print_init_hse_diag;
