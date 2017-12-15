@@ -140,10 +140,10 @@ Maestro::Setup ()
 
     // number of ghost cells needed for hyperbolic step
     if (ppm_type == 2 || bds_type == 1) {
-        ng_s = 4;
+        ng_adv = 4;
     }
     else {
-        ng_s = 3;
+        ng_adv = 3;
     }
 
 }

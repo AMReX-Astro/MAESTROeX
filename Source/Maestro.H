@@ -144,6 +144,11 @@ private:
     ////////////
 
     ////////////////////////
+    // MaestroFillUmacGhost.cpp functions
+    void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+    ////////////////////////
+
+    ////////////////////////
     // MaestroFill3dData.cpp functions
     
     void Put1dArrayOnCart (const amrex::Vector<amrex::Real>& s0,
@@ -388,7 +393,7 @@ private:
     amrex::Real dtold;
 
     // number of ghost cells needed for hyperbolic step
-    int ng_s;
+    int ng_adv;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new

@@ -85,6 +85,17 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in fill_umac_ghost.f90
+    void fill_umac_ghost(const int* lo, const int* hi,
+                         amrex::Real* umac, const int* umac_lo, const int* umac_hi,
+                         amrex::Real* vmac, const int* vmac_lo, const int* vmac_hi,
+#if (AMREX_SPACEDIM == 3)
+                         amrex::Real* wmac, const int* wmac_lo, const int* wmac_hi,
+#endif
+                         const int* lo_bc, const int* hi_bc);
+    //////////////////////
+
+    //////////////////////
     // in fill_3d_data.f90
     void put_1d_array_on_cart(const int& lev, const int* lo, const int* hi,
                               amrex::Real* s0_cart,
