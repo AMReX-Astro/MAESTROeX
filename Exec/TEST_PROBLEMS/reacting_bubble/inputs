@@ -31,7 +31,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.temperr = 6.5e8 6.5e8
 
 # TIME STEPPING
-maestro.max_step  = 0
+maestro.max_step  = 1
 maestro.stop_time = 2.5
 maestro.fixed_dt  = 1.e-4
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
