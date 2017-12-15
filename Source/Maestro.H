@@ -250,14 +250,22 @@ private:
     std::string PlotFileName (int lev) const;
 
     // put together an array of multifabs for writing
-    amrex::Vector<const amrex::MultiFab*> PlotFileMF (amrex::Vector<amrex::MultiFab>& p0_cart,
-                                                      amrex::Vector<amrex::MultiFab>& rho0_cart);
+    amrex::Vector<const amrex::MultiFab*> PlotFileMF (const amrex::Vector<amrex::MultiFab>& p0_cart,
+                                                      const amrex::Vector<amrex::MultiFab>& rho0_cart,
+                                                      const amrex::Vector<amrex::MultiFab>& u_in,
+                                                            amrex::Vector<amrex::MultiFab>& s_in,
+                                                      const amrex::Vector<amrex::Real>& p0_in);
 
     // set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames () const;
 
     // write plotfile to disk
-    void WritePlotFile (int step);
+    void WritePlotFile (const int step,
+                        const amrex::Real dt_in,
+                        const amrex::Vector<amrex::Real>& rho0_in,
+                        const amrex::Vector<amrex::Real>& p0_in,
+                        const amrex::Vector<amrex::MultiFab>& u_in,
+                              amrex::Vector<amrex::MultiFab>& s_in);
 
     // end MaestroPlot.cpp functions
     ////////////
@@ -448,7 +456,7 @@ private:
     amrex::Vector<amrex::Real> tempbar_init;
     amrex::Vector<amrex::Real> beta0_old;
     amrex::Vector<amrex::Real> beta0_new;
-    amrex::Vector<amrex::Real> gamma1bar_new;
+    amrex::Vector<amrex::Real> gamma1bar;
     amrex::Vector<amrex::Real> gamma1bar_init;
     amrex::Vector<amrex::Real> etarho_cc;
     amrex::Vector<amrex::Real> psi;

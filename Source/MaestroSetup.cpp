@@ -90,7 +90,7 @@ Maestro::Setup ()
     tempbar_init  .resize( (max_radial_level+1)*nr_fine );
     beta0_old     .resize( (max_radial_level+1)*nr_fine );
     beta0_new     .resize( (max_radial_level+1)*nr_fine );
-    gamma1bar_new .resize( (max_radial_level+1)*nr_fine );
+    gamma1bar     .resize( (max_radial_level+1)*nr_fine );
     gamma1bar_init.resize( (max_radial_level+1)*nr_fine );
     etarho_cc     .resize( (max_radial_level+1)*nr_fine );
     psi           .resize( (max_radial_level+1)*nr_fine );
@@ -115,7 +115,7 @@ Maestro::Setup ()
     istep = 0;
 
     t_new = 0.0;
-    t_old = -1.e100;
+    t_old = 0.0;
 
     // set this to a large number so change_max doesn't affect the first time step
     dt = 1.e100;

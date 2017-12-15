@@ -92,12 +92,12 @@ Maestro::GetData (int lev, Real time,
 
     const Real teps = (t_new - t_old) * 1.e-3;
 
-    if (time > t_new - teps && time < t_new + teps)
+    if (time >= t_new - teps && time <= t_new + teps)
     {
         mf.push_back(&mf_new[lev]);
         mftime.push_back(t_new);
     }
-    else if (time > t_old - teps && time < t_old + teps)
+    else if (time >= t_old - teps && time <= t_old + teps)
     {
         mf.push_back(&mf_old[lev]);
         mftime.push_back(t_old);

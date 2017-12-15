@@ -23,18 +23,18 @@ Maestro::Init ()
 
     // make gravity
     make_grav_cell(grav_cell.dataPtr(),
-                   rho0_new.dataPtr(),
+                   rho0_old.dataPtr(),
                    r_cc_loc.dataPtr(),
                    r_edge_loc.dataPtr());
 
     // compute gamma1bar
-    MakeGamma1bar(snew,gamma1bar_new,p0_new);
+    MakeGamma1bar(sold,gamma1bar,p0_old);
 
     // compute beta0
-    make_beta0(beta0_new.dataPtr(),
-               rho0_new.dataPtr(),
-               p0_new.dataPtr(),
-               gamma1bar_new.dataPtr(),
+    make_beta0(beta0_old.dataPtr(),
+               rho0_old.dataPtr(),
+               p0_old.dataPtr(),
+               gamma1bar.dataPtr(),
                grav_cell.dataPtr());
 
     // initial projection
@@ -52,6 +52,8 @@ Maestro::Init ()
         DivuIter();
     }
 
+
+
     // initial (pressure) iters
     for (int i=1; i<= init_iter; ++i) {
         Print() << "Doing initial pressure iteration #" << i << endl;
@@ -66,20 +68,20 @@ Maestro::InitData ()
     Print() << "Calling InitData()" << endl;
 
     // read in model file and fill in s0_init and p0_init for all levels
-    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_new.dataPtr(),
-                    rhoh0_new.dataPtr(),p0_new.dataPtr(),tempbar.dataPtr(),max_level+1);
+    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
+                    rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),max_level+1);
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
-    InitFromScratch(t_new);
+    InitFromScratch(t_old);
 
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(finest_level);
 
     // synchronize levels
-    AverageDown(snew,0,Nscal);
-    AverageDown(unew,0,AMREX_SPACEDIM);
+    AverageDown(sold,0,Nscal);
+    AverageDown(uold,0,AMREX_SPACEDIM);
 
     // free memory in s0_init and p0_init by swapping it
     // with an empty vector that will go out of scope
@@ -89,48 +91,48 @@ Maestro::InitData ()
 
     if (fix_base_state) {
         // compute cutoff coordinates
-        compute_cutoff_coords(rho0_new.dataPtr());
+        compute_cutoff_coords(rho0_old.dataPtr());
         make_grav_cell(grav_cell.dataPtr(),
-                       rho0_new.dataPtr(),
+                       rho0_old.dataPtr(),
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
     }
     else {
         if (do_smallscale) {
             // first compute cutoff coordinates using initial density profile
-            compute_cutoff_coords(rho0_new.dataPtr());
-            // set rho0_new = rhoh0_new = 0.
-            std::fill(rho0_new.begin(),  rho0_new.end(),  0.);
-            std::fill(rhoh0_new.begin(), rhoh0_new.end(), 0.);
+            compute_cutoff_coords(rho0_old.dataPtr());
+            // set rho0_old = rhoh0_old = 0.
+            std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
+            std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
         }
         else {
             // set rho0 to be the average
-            Average(snew,rho0_new,Rho);
-            compute_cutoff_coords(rho0_new.dataPtr());
+            Average(sold,rho0_old,Rho);
+            compute_cutoff_coords(rho0_old.dataPtr());
 
             // compute gravity
             make_grav_cell(grav_cell.dataPtr(),
-                           rho0_new.dataPtr(),
+                           rho0_old.dataPtr(),
                            r_cc_loc.dataPtr(),
                            r_edge_loc.dataPtr());
 
             // compute p0 with HSE
-            enforce_HSE(rho0_new.dataPtr(),
-                        p0_new.dataPtr(),
+            enforce_HSE(rho0_old.dataPtr(),
+                        p0_old.dataPtr(),
                         grav_cell.dataPtr(),
                         r_edge_loc.dataPtr());
 
             // call eos with r,p as input to recompute T,h
-            TfromRhoP(snew,p0_new,1);
+            TfromRhoP(sold,p0_old,1);
 
             // set rhoh0 to be the average
-            Average(snew,rhoh0_new,RhoH);
+            Average(sold,rhoh0_old,RhoH);
         }
     }
 
     if (plot_int > 0) {
         Print() << "\nWriting plotfile 0 after initialization" << endl;
-        WritePlotFile(0);
+        WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
     }
 }
 
@@ -161,10 +163,9 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     }
 
     const Real* dx = geom[lev].CellSize();
-    Real cur_time = t_new;
 
-    MultiFab& scal = snew[lev];
-    MultiFab& vel = unew[lev];
+    MultiFab& scal = sold[lev];
+    MultiFab& vel = uold[lev];
 
     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
     for (MFIter mfi(scal); mfi.isValid(); ++mfi)
@@ -173,7 +174,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
         const int* lo  = box.loVect();
         const int* hi  = box.hiVect();
 
-        initdata(lev, cur_time, ARLIM_3D(lo), ARLIM_3D(hi),
+        initdata(lev, t_old, ARLIM_3D(lo), ARLIM_3D(hi),
                  BL_TO_FORTRAN_FAB(scal[mfi]), 
                  BL_TO_FORTRAN_FAB(vel[mfi]), 
                  s0_init.dataPtr(), p0_init.dataPtr(),
@@ -185,7 +186,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 void Maestro::InitProj ()
 {
 
-    Vector<MultiFab>         S_cc(finest_level+1);
     Vector<MultiFab> rho_omegadot(finest_level+1);
     Vector<MultiFab>      thermal(finest_level+1);
     Vector<MultiFab>     rho_Hnuc(finest_level+1);
@@ -197,7 +197,6 @@ void Maestro::InitProj ()
     Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        S_cc        [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
         thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
@@ -227,13 +226,13 @@ void Maestro::InitProj ()
     }
 
     // compute S at cell-centers
-    Make_S_cc(S_cc,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+    Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
 
     // average S into Sbar
-    Average(S_cc,Sbar,0);
+    Average(S_cc_old,Sbar,0);
 
     // make the nodal rhs for projection
-    Make_NodalRHS(S_cc,nodalrhs,Sbar,beta0_new);
+    Make_NodalRHS(S_cc_old,nodalrhs,Sbar,beta0_old);
 
     // perform a nodal projection
     NodalProj(initial_projection_comp,nodalrhs,rhohalf);
@@ -258,7 +257,7 @@ void Maestro::DivuIter ()
         thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
     }
 
-    React(snew,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
 
     if (use_thermal_diffusion) {
         Abort("DivuIter: use_thermal_diffusion not implemented");
