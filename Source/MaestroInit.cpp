@@ -52,7 +52,10 @@ Maestro::Init ()
         DivuIter();
     }
 
-
+    // copy S_cc_old into S_cc_new for the pressure iterations
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Copy(S_cc_new[lev],S_cc_old[lev],0,0,1,0);
+    }
 
     // initial (pressure) iters
     for (int i=1; i<= init_iter; ++i) {

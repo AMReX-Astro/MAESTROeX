@@ -12,34 +12,35 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // -delta_gamma1_term
 
     // MultiFabs needed within the AdvanceTimeStep routine
-    Vector<MultiFab>      rhohalf(finest_level+1);
-    Vector<MultiFab>       macrhs(finest_level+1);
-    Vector<MultiFab>       macphi(finest_level+1);
-    Vector<MultiFab>     S_cc_nph(finest_level+1);
-    Vector<MultiFab> rho_omegadot(finest_level+1);
-    Vector<MultiFab>     thermal1(finest_level+1);
-    Vector<MultiFab>     thermal2(finest_level+1);
-    Vector<MultiFab>     rho_Hnuc(finest_level+1);
-    Vector<MultiFab>     rho_Hext(finest_level+1);
-    Vector<MultiFab>           s1(finest_level+1);
-    Vector<MultiFab>           s2(finest_level+1);
-    Vector<MultiFab>       s2star(finest_level+1);
-    Vector<MultiFab>   beta0_cart(finest_level+1);
-    Vector<MultiFab> peosbar_cart(finest_level+1);
-    Vector<MultiFab> delta_p_term(finest_level+1);
-    Vector<MultiFab>       Tcoeff(finest_level+1);
-    Vector<MultiFab>      hcoeff1(finest_level+1);
-    Vector<MultiFab>     Xkcoeff1(finest_level+1);
-    Vector<MultiFab>      pcoeff1(finest_level+1);
-    Vector<MultiFab>      hcoeff2(finest_level+1);
-    Vector<MultiFab>     Xkcoeff2(finest_level+1);
-    Vector<MultiFab>      pcoeff2(finest_level+1);
-    Vector<MultiFab>   scal_force(finest_level+1);
-    Vector<MultiFab>    delta_chi(finest_level+1);
-    Vector<MultiFab>       sponge(finest_level+1);
+    Vector<MultiFab>           rhohalf(finest_level+1);
+    Vector<MultiFab>            macrhs(finest_level+1);
+    Vector<MultiFab>            macphi(finest_level+1);
+    Vector<MultiFab>          S_cc_nph(finest_level+1);
+    Vector<MultiFab>      rho_omegadot(finest_level+1);
+    Vector<MultiFab>          thermal1(finest_level+1);
+    Vector<MultiFab>          thermal2(finest_level+1);
+    Vector<MultiFab>          rho_Hnuc(finest_level+1);
+    Vector<MultiFab>          rho_Hext(finest_level+1);
+    Vector<MultiFab>                s1(finest_level+1);
+    Vector<MultiFab>                s2(finest_level+1);
+    Vector<MultiFab>            s2star(finest_level+1);
+    Vector<MultiFab>        beta0_cart(finest_level+1);
+    Vector<MultiFab>      peosbar_cart(finest_level+1);
+    Vector<MultiFab>      delta_p_term(finest_level+1);
+    Vector<MultiFab>            Tcoeff(finest_level+1);
+    Vector<MultiFab>           hcoeff1(finest_level+1);
+    Vector<MultiFab>          Xkcoeff1(finest_level+1);
+    Vector<MultiFab>           pcoeff1(finest_level+1);
+    Vector<MultiFab>           hcoeff2(finest_level+1);
+    Vector<MultiFab>          Xkcoeff2(finest_level+1);
+    Vector<MultiFab>           pcoeff2(finest_level+1);
+    Vector<MultiFab>        scal_force(finest_level+1);
+    Vector<MultiFab>         delta_chi(finest_level+1);
+    Vector<MultiFab>            sponge(finest_level+1);
+    Vector<MultiFab> delta_gamma1_term(finest_level+1);
 
     // face-centered in the dm-direction (planar only)
-    Vector<MultiFab>     etarhoflux(finest_level+1);
+    Vector<MultiFab> etarhoflux(finest_level+1);
 
     // nodal
     Vector<MultiFab>     nodalrhs(finest_level+1);
@@ -98,31 +99,32 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
     for (int lev=0; lev<=finest_level; ++lev) {
         // cell-centered MultiFabs
-        rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
-        macrhs      [lev].define(grids[lev], dmap[lev],       1, 0);
-        macphi      [lev].define(grids[lev], dmap[lev],       1, 1);
-        S_cc_nph    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
-        thermal1    [lev].define(grids[lev], dmap[lev],       1, 0);
-        thermal2    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
-        s1          [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-        s2          [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-        s2star      [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-        beta0_cart  [lev].define(grids[lev], dmap[lev],       1, 1);
-        peosbar_cart[lev].define(grids[lev], dmap[lev],       1, 0);
-        delta_p_term[lev].define(grids[lev], dmap[lev],       1, 0);
-        Tcoeff      [lev].define(grids[lev], dmap[lev],       1, 1);
-        hcoeff1     [lev].define(grids[lev], dmap[lev],       1, 1);
-        Xkcoeff1    [lev].define(grids[lev], dmap[lev], NumSpec, 1);
-        pcoeff1     [lev].define(grids[lev], dmap[lev],       1, 1);
-        hcoeff2     [lev].define(grids[lev], dmap[lev],       1, 1);
-        Xkcoeff2    [lev].define(grids[lev], dmap[lev],       1, 1);
-        pcoeff2     [lev].define(grids[lev], dmap[lev], NumSpec, 1);
-        scal_force  [lev].define(grids[lev], dmap[lev],   Nscal, 1);
-        delta_chi   [lev].define(grids[lev], dmap[lev],       1, 0);
-        sponge      [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf          [lev].define(grids[lev], dmap[lev],       1, 1);
+        macrhs           [lev].define(grids[lev], dmap[lev],       1, 0);
+        macphi           [lev].define(grids[lev], dmap[lev],       1, 1);
+        S_cc_nph         [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_omegadot     [lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        thermal1         [lev].define(grids[lev], dmap[lev],       1, 0);
+        thermal2         [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_Hnuc         [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_Hext         [lev].define(grids[lev], dmap[lev],       1, 0);
+        s1               [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        s2               [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        s2star           [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        beta0_cart       [lev].define(grids[lev], dmap[lev],       1, 1);
+        peosbar_cart     [lev].define(grids[lev], dmap[lev],       1, 0);
+        delta_p_term     [lev].define(grids[lev], dmap[lev],       1, 0);
+        Tcoeff           [lev].define(grids[lev], dmap[lev],       1, 1);
+        hcoeff1          [lev].define(grids[lev], dmap[lev],       1, 1);
+        Xkcoeff1         [lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff1          [lev].define(grids[lev], dmap[lev],       1, 1);
+        hcoeff2          [lev].define(grids[lev], dmap[lev],       1, 1);
+        Xkcoeff2         [lev].define(grids[lev], dmap[lev],       1, 1);
+        pcoeff2          [lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        scal_force       [lev].define(grids[lev], dmap[lev],   Nscal, 1);
+        delta_chi        [lev].define(grids[lev], dmap[lev],       1, 0);
+        sponge           [lev].define(grids[lev], dmap[lev],       1, 0);
+        delta_gamma1_term[lev].define(grids[lev], dmap[lev],       1, 0);
 
         // nodal MultiFabs
         nodalrhs[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
@@ -153,8 +155,44 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 #endif
     }
 
+#if (AMREX_SPACEDIM == 3)
+    if (spherical == 1) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            w0_force_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+            w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+            w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+            w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+        }
+    }
+#endif
+
+    // initialize MultiFabs and Vectors to ZERO
+    for (int lev=0; lev<=finest_level; ++lev) {
+        delta_p_term     [lev].setVal(0.);
+        delta_gamma1_term[lev].setVal(0.);
+        delta_chi        [lev].setVal(0.);
+        macphi           [lev].setVal(0.);
+        thermal1         [lev].setVal(0.);
+        thermal2         [lev].setVal(0.);
+        etarhoflux       [lev].setVal(0.);
+    }
+    std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
+    std::fill(w0_force        .begin(), w0_force        .end(), 0.);
+    std::fill(Sbar            .begin(), Sbar            .end(), 0.);
+
+#if (AMREX_SPACEDIM == 3)
+    if (spherical == 1) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            w0_force_cart[lev].setVal(0.);
+            for (int d=0; d<AMREX_SPACEDIM; ++d) {
+                w0mac[lev][d].setVal(0.);
+            }
+        }
+    }
+#endif
+
+    // make the sponge for all levels
     if (do_sponge) {
-        // make the sponge for all levels
         init_sponge(rho0_old.dataPtr());
         MakeSponge(sponge);
     }
@@ -166,6 +204,24 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- define average expansion at time n+1/2
     //////////////////////////////////////////////////////////////////////////////
+
+    if (t_old == 0.0) {
+        // this is either a pressure iteration or the first time step
+        // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::LinComb(S_cc_nph[lev],0.5,S_cc_old[lev],0,0.5,S_cc_new[lev],0,0,1,0);
+        }
+    }
+    else {
+        // set S_cc_nph = S_cc_old + (dt/2) * dSdt
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::LinComb(S_cc_nph[lev],1.0,S_cc_old[lev],0,0.5*dt,dSdt[lev],0,0,1,0);
+        }
+    }
+
+    if (dpdt_factor > 0.0) {
+        Abort("MaestroAdvance.cpp: dpdt_factor not implemented");
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 3 -- construct the advective velocity
