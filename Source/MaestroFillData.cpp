@@ -79,7 +79,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
 // if time=t_new we copy mf_new into mf
 // otherwise copy copy in both mf_old and mf_new into mf and the fillpatch
 // routines know to interpolate in time.  However in MAESTRO since we don't
-// subcycle I don't think we need this capability
+// subcycle I'm not sure if we need this capability?
 void
 Maestro::GetData (int lev, Real time, 
                   Vector<MultiFab*>& mf,
@@ -136,4 +136,37 @@ Maestro::AverageDownTo (int crse_lev,
     average_down(mf[crse_lev+1], mf[crse_lev],
                  geom[crse_lev+1], geom[crse_lev],
                  comp, ncomp, refRatio(crse_lev));
+}
+
+
+// fill in ONE ghost cell for all components of a face-centered (MAC) velocity
+// field behind physical boundaries.  Does not modify the velocities on the boundary
+void
+Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
+{
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab& sold_mf = sold[lev];  // need a cell-centered MF for the MFIter        
+        MultiFab& umacx_mf = umac[lev][0];
+        MultiFab& umacy_mf = umac[lev][1];
+#if (AMREX_SPACEDIM == 3)
+        MultiFab& umacz_mf = umac[lev][2];
+#endif
+
+        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid (cell-centered) region
+            const Box& validBox = mfi.validbox();
+            const Box& domainBox = geom[lev].Domain();
+
+            fill_umac_ghost(ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
+                            ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                            BL_TO_FORTRAN_3D(umacx_mf[mfi]),
+                            BL_TO_FORTRAN_3D(umacy_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+                            BL_TO_FORTRAN_3D(umacz_mf[mfi]),
+#endif
+                            lo_bc.dataPtr(),hi_bc.data());
+
+        }
+    }
 }

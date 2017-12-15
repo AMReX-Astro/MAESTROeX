@@ -86,7 +86,8 @@ extern "C"
 
     //////////////////////
     // in fill_umac_ghost.f90
-    void fill_umac_ghost(const int* lo, const int* hi,
+    void fill_umac_ghost(const int* domlo, const int* domhi,
+                         const int* lo, const int* hi,
                          amrex::Real* umac, const int* umac_lo, const int* umac_hi,
                          amrex::Real* vmac, const int* vmac_lo, const int* vmac_hi,
 #if (AMREX_SPACEDIM == 3)

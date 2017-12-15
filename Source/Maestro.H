@@ -121,7 +121,7 @@ private:
     // if time=t_new we copy mf_new into mf
     // otherwise copy copy in both mf_old and mf_new into mf and the fillpatch
     // routines know to interpolate in time.  However in MAESTRO since we don't
-    // subcycle I don't think we need this capability
+    // subcycle I'm not sure if we need this capability?
     void GetData (int lev, amrex::Real time,
                   amrex::Vector<amrex::MultiFab*>& mf,
                   amrex::Vector<amrex::Real>& mftime,
@@ -140,13 +140,12 @@ private:
                         int comp,
                         int ncomp);
 
+    // fill in ONE ghost cell for all components of a face-centered (MAC) velocity
+    // field behind physical boundaries.  Does not modify the velocities on the boundary
+    void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+
     // end MaestroFillData.cpp functions
     ////////////
-
-    ////////////////////////
-    // MaestroFillUmacGhost.cpp functions
-    void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
-    ////////////////////////
 
     ////////////////////////
     // MaestroFill3dData.cpp functions
