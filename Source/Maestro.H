@@ -460,7 +460,8 @@ private:
     amrex::Vector<amrex::Real> gamma1bar_init;
     amrex::Vector<amrex::Real> etarho_cc;
     amrex::Vector<amrex::Real> psi;
-    amrex::Vector<amrex::Real> grav_cell;
+    amrex::Vector<amrex::Real> grav_cell_old;
+    amrex::Vector<amrex::Real> grav_cell_new;
     amrex::Vector<amrex::Real> r_cc_loc;
 
     // vectors store the multilevel 1D states as one very long array

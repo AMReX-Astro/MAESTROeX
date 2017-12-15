@@ -94,7 +94,8 @@ Maestro::Setup ()
     gamma1bar_init.resize( (max_radial_level+1)*nr_fine );
     etarho_cc     .resize( (max_radial_level+1)*nr_fine );
     psi           .resize( (max_radial_level+1)*nr_fine );
-    grav_cell     .resize( (max_radial_level+1)*nr_fine );
+    grav_cell_old .resize( (max_radial_level+1)*nr_fine );
+    grav_cell_new .resize( (max_radial_level+1)*nr_fine );
     r_cc_loc      .resize( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array

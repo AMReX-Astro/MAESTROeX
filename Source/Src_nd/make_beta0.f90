@@ -11,13 +11,13 @@ module make_beta0_module
 
  contains
 
- subroutine make_beta0(beta0,rho0,p0,gamma1bar_in,grav_cell_in) bind(C, name="make_beta0")
+ subroutine make_beta0(beta0,rho0,p0,gamma1bar_in,grav_cell) bind(C, name="make_beta0")
 
     double precision, intent(  out) :: beta0       (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0        (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: p0          (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: gamma1bar_in(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: grav_cell_in(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: grav_cell   (0:max_radial_level,0:nr_fine-1)
 
     ! local
     integer :: r, n, i, refrat, j
@@ -117,7 +117,7 @@ module make_beta0_module
                         (p0(n,r) - HALF*nu*dr(n))) .le. ZERO) then
                       
                       ! just do piecewise constant integration
-                      integral = abs(grav_cell_in(n,r))*rho0(n,r)*dr(n)/(p0(n,r)*gamma1bar_in(n,r))
+                      integral = abs(grav_cell(n,r))*rho0(n,r)*dr(n)/(p0(n,r)*gamma1bar_in(n,r))
                       
                    else 
 
@@ -125,9 +125,9 @@ module make_beta0_module
                          
                          ! also do piecewise linear reconstruction of
                          ! gravity -- not documented in publication yet.
-                         del   = HALF* (grav_cell_in(n,r+1) - grav_cell_in(n,r-1))/dr(n)
-                         dpls  = TWO * (grav_cell_in(n,r+1) - grav_cell_in(n,r  ))/dr(n)
-                         dmin  = TWO * (grav_cell_in(n,r  ) - grav_cell_in(n,r-1))/dr(n)
+                         del   = HALF* (grav_cell(n,r+1) - grav_cell(n,r-1))/dr(n)
+                         dpls  = TWO * (grav_cell(n,r+1) - grav_cell(n,r  ))/dr(n)
+                         dmin  = TWO * (grav_cell(n,r  ) - grav_cell(n,r-1))/dr(n)
                          slim  = min(abs(dpls), abs(dmin))
                          slim  = merge(slim, zero, dpls*dmin.gt.ZERO)
                          sflag = sign(ONE,del)
@@ -135,10 +135,10 @@ module make_beta0_module
                          
                          denom = nu*gamma1bar_in(n,r) - mu*p0(n,r) 
                          coeff1 = (lambda*gamma1bar_in(n,r) - mu*rho0(n,r)) * &
-                              (kappa *gamma1bar_in(n,r) + mu*abs(grav_cell_in(n,r))) / &
+                              (kappa *gamma1bar_in(n,r) + mu*abs(grav_cell(n,r))) / &
                               (mu*mu*denom)
                          coeff2 = (lambda*p0(n,r) - nu*rho0(n,r))* &
-                              (-kappa*p0(n,r) - nu*abs(grav_cell_in(n,r))) / &
+                              (-kappa*p0(n,r) - nu*abs(grav_cell(n,r))) / &
                               (nu*nu*denom)
                          coeff3 = kappa*lambda / (mu*nu)
                          
@@ -156,7 +156,7 @@ module make_beta0_module
                          coeff1 = lambda*gamma1bar_in(n,r)/mu - rho0(n,r)
                          coeff2 = lambda*p0(n,r)/nu - rho0(n,r)
 
-                         integral = (abs(grav_cell_in(n,r))/denom)* &
+                         integral = (abs(grav_cell(n,r))/denom)* &
                               (coeff1*log( (gamma1bar_in(n,r) + HALF*mu*dr(n))/ &
                                            (gamma1bar_in(n,r) - HALF*mu*dr(n))) - &
                                coeff2*log( (p0(n,r) + HALF*nu*dr(n))/ &

@@ -22,7 +22,7 @@ Maestro::Init ()
     }
 
     // make gravity
-    make_grav_cell(grav_cell.dataPtr(),
+    make_grav_cell(grav_cell_old.dataPtr(),
                    rho0_old.dataPtr(),
                    r_cc_loc.dataPtr(),
                    r_edge_loc.dataPtr());
@@ -35,7 +35,7 @@ Maestro::Init ()
                rho0_old.dataPtr(),
                p0_old.dataPtr(),
                gamma1bar.dataPtr(),
-               grav_cell.dataPtr());
+               grav_cell_old.dataPtr());
 
     // initial projection
     if (do_initial_projection) {
@@ -92,7 +92,7 @@ Maestro::InitData ()
     if (fix_base_state) {
         // compute cutoff coordinates
         compute_cutoff_coords(rho0_old.dataPtr());
-        make_grav_cell(grav_cell.dataPtr(),
+        make_grav_cell(grav_cell_old.dataPtr(),
                        rho0_old.dataPtr(),
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
@@ -111,7 +111,7 @@ Maestro::InitData ()
             compute_cutoff_coords(rho0_old.dataPtr());
 
             // compute gravity
-            make_grav_cell(grav_cell.dataPtr(),
+            make_grav_cell(grav_cell_old.dataPtr(),
                            rho0_old.dataPtr(),
                            r_cc_loc.dataPtr(),
                            r_edge_loc.dataPtr());
@@ -119,7 +119,7 @@ Maestro::InitData ()
             // compute p0 with HSE
             enforce_HSE(rho0_old.dataPtr(),
                         p0_old.dataPtr(),
-                        grav_cell.dataPtr(),
+                        grav_cell_old.dataPtr(),
                         r_edge_loc.dataPtr());
 
             // call eos with r,p as input to recompute T,h

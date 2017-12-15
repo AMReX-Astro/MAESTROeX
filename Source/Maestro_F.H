@@ -152,7 +152,7 @@ extern "C"
                     const amrex::Real* rho0,
                     const amrex::Real* p0,
                     const amrex::Real* gamma1bar_in,
-                    const amrex::Real* grav_cell_in);
+                    const amrex::Real* grav_cell);
     //////////////////////
 
     //////////////////////

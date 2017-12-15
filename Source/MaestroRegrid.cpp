@@ -39,7 +39,7 @@ Maestro::Regrid ()
     compute_cutoff_coords(rho0_new.dataPtr());
 
     // make gravity
-    make_grav_cell(grav_cell.dataPtr(),
+    make_grav_cell(grav_cell_new.dataPtr(),
                    rho0_new.dataPtr(),
                    r_cc_loc.dataPtr(),
                    r_edge_loc.dataPtr());
