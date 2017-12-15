@@ -123,7 +123,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                         BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
                         BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
                         BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                        tempbar_init.dataPtr(), dt);
+                        tempbar_init.dataPtr(), dt_in);
 
         }
     }
