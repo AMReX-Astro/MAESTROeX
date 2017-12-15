@@ -28,13 +28,13 @@ Maestro::Init ()
                    r_edge_loc.dataPtr());
 
     // compute gamma1bar
-    MakeGamma1bar(sold,gamma1bar,p0_old);
+    MakeGamma1bar(sold,gamma1bar_old,p0_old);
 
     // compute beta0
     make_beta0(beta0_old.dataPtr(),
                rho0_old.dataPtr(),
                p0_old.dataPtr(),
-               gamma1bar.dataPtr(),
+               gamma1bar_old.dataPtr(),
                grav_cell_old.dataPtr());
 
     // initial projection

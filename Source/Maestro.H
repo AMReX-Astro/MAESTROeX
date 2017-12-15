@@ -456,8 +456,8 @@ private:
     amrex::Vector<amrex::Real> tempbar_init;
     amrex::Vector<amrex::Real> beta0_old;
     amrex::Vector<amrex::Real> beta0_new;
-    amrex::Vector<amrex::Real> gamma1bar;
-    amrex::Vector<amrex::Real> gamma1bar_init;
+    amrex::Vector<amrex::Real> gamma1bar_old;
+    amrex::Vector<amrex::Real> gamma1bar_new;
     amrex::Vector<amrex::Real> etarho_cc;
     amrex::Vector<amrex::Real> psi;
     amrex::Vector<amrex::Real> grav_cell_old;

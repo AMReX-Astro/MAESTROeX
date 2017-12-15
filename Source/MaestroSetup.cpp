@@ -78,25 +78,25 @@ Maestro::Setup ()
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    s0_init       .resize( (max_radial_level+1)*nr_fine*Nscal );
-    p0_init       .resize( (max_radial_level+1)*nr_fine );
-    rho0_old      .resize( (max_radial_level+1)*nr_fine );
-    rho0_new      .resize( (max_radial_level+1)*nr_fine );
-    rhoh0_old     .resize( (max_radial_level+1)*nr_fine );
-    rhoh0_new     .resize( (max_radial_level+1)*nr_fine );
-    p0_old        .resize( (max_radial_level+1)*nr_fine );
-    p0_new        .resize( (max_radial_level+1)*nr_fine );
-    tempbar       .resize( (max_radial_level+1)*nr_fine );
-    tempbar_init  .resize( (max_radial_level+1)*nr_fine );
-    beta0_old     .resize( (max_radial_level+1)*nr_fine );
-    beta0_new     .resize( (max_radial_level+1)*nr_fine );
-    gamma1bar     .resize( (max_radial_level+1)*nr_fine );
-    gamma1bar_init.resize( (max_radial_level+1)*nr_fine );
-    etarho_cc     .resize( (max_radial_level+1)*nr_fine );
-    psi           .resize( (max_radial_level+1)*nr_fine );
-    grav_cell_old .resize( (max_radial_level+1)*nr_fine );
-    grav_cell_new .resize( (max_radial_level+1)*nr_fine );
-    r_cc_loc      .resize( (max_radial_level+1)*nr_fine );
+    s0_init      .resize( (max_radial_level+1)*nr_fine*Nscal );
+    p0_init      .resize( (max_radial_level+1)*nr_fine );
+    rho0_old     .resize( (max_radial_level+1)*nr_fine );
+    rho0_new     .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_old    .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_new    .resize( (max_radial_level+1)*nr_fine );
+    p0_old       .resize( (max_radial_level+1)*nr_fine );
+    p0_new       .resize( (max_radial_level+1)*nr_fine );
+    tempbar      .resize( (max_radial_level+1)*nr_fine );
+    tempbar_init .resize( (max_radial_level+1)*nr_fine );
+    beta0_old    .resize( (max_radial_level+1)*nr_fine );
+    beta0_new    .resize( (max_radial_level+1)*nr_fine );
+    gamma1bar_old.resize( (max_radial_level+1)*nr_fine );
+    gamma1bar_new.resize( (max_radial_level+1)*nr_fine );
+    etarho_cc    .resize( (max_radial_level+1)*nr_fine );
+    psi          .resize( (max_radial_level+1)*nr_fine );
+    grav_cell_old.resize( (max_radial_level+1)*nr_fine );
+    grav_cell_new.resize( (max_radial_level+1)*nr_fine );
+    r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered

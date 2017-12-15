@@ -11,13 +11,13 @@ module make_beta0_module
 
  contains
 
- subroutine make_beta0(beta0,rho0,p0,gamma1bar_in,grav_cell) bind(C, name="make_beta0")
+ subroutine make_beta0(beta0,rho0,p0,gamma1bar,grav_cell) bind(C, name="make_beta0")
 
-    double precision, intent(  out) :: beta0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rho0        (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: p0          (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar_in(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: grav_cell   (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(  out) :: beta0    (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: rho0     (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: grav_cell(0:max_radial_level,0:nr_fine-1)
 
     ! local
     integer :: r, n, i, refrat, j
@@ -82,7 +82,7 @@ module make_beta0_module
                    else
 
                       ! piecewise linear reconstruction of rho0,
-                      ! gamma1bar_in, and p0 -- see paper III, appendix C
+                      ! gamma1bar, and p0 -- see paper III, appendix C
                       del    = HALF* (rho0(n,r+1) - rho0(n,r-1))/dr(n)
                       dpls   = TWO * (rho0(n,r+1) - rho0(n,r  ))/dr(n)
                       dmin   = TWO * (rho0(n,r  ) - rho0(n,r-1))/dr(n)
@@ -91,9 +91,9 @@ module make_beta0_module
                       sflag  = sign(ONE,del)
                       lambda = sflag*min(slim,abs(del))
                       
-                      del   = HALF* (gamma1bar_in(n,r+1) - gamma1bar_in(n,r-1))/dr(n)
-                      dpls  = TWO * (gamma1bar_in(n,r+1) - gamma1bar_in(n,r  ))/dr(n)
-                      dmin  = TWO * (gamma1bar_in(n,r  ) - gamma1bar_in(n,r-1))/dr(n)
+                      del   = HALF* (gamma1bar(n,r+1) - gamma1bar(n,r-1))/dr(n)
+                      dpls  = TWO * (gamma1bar(n,r+1) - gamma1bar(n,r  ))/dr(n)
+                      dmin  = TWO * (gamma1bar(n,r  ) - gamma1bar(n,r-1))/dr(n)
                       slim  = min(abs(dpls), abs(dmin))
                       slim  = merge(slim, zero, dpls*dmin.gt.ZERO)
                       sflag = sign(ONE,del)
@@ -110,14 +110,14 @@ module make_beta0_module
                    end if
 
                    if (nu .eq. ZERO .or. mu .eq. ZERO .or. &
-                        (nu*gamma1bar_in(n,r) - mu*p0(n,r)) .eq. ZERO .or. &
-                        ((gamma1bar_in(n,r) + HALF*mu*dr(n))/ &
-                        (gamma1bar_in(n,r) - HALF*mu*dr(n))) .le. ZERO .or. &
+                        (nu*gamma1bar(n,r) - mu*p0(n,r)) .eq. ZERO .or. &
+                        ((gamma1bar(n,r) + HALF*mu*dr(n))/ &
+                        (gamma1bar(n,r) - HALF*mu*dr(n))) .le. ZERO .or. &
                         ((p0(n,r) + HALF*nu*dr(n))/ &
                         (p0(n,r) - HALF*nu*dr(n))) .le. ZERO) then
                       
                       ! just do piecewise constant integration
-                      integral = abs(grav_cell(n,r))*rho0(n,r)*dr(n)/(p0(n,r)*gamma1bar_in(n,r))
+                      integral = abs(grav_cell(n,r))*rho0(n,r)*dr(n)/(p0(n,r)*gamma1bar(n,r))
                       
                    else 
 
@@ -133,9 +133,9 @@ module make_beta0_module
                          sflag = sign(ONE,del)
                          kappa = sflag*min(slim,abs(del))
                          
-                         denom = nu*gamma1bar_in(n,r) - mu*p0(n,r) 
-                         coeff1 = (lambda*gamma1bar_in(n,r) - mu*rho0(n,r)) * &
-                              (kappa *gamma1bar_in(n,r) + mu*abs(grav_cell(n,r))) / &
+                         denom = nu*gamma1bar(n,r) - mu*p0(n,r) 
+                         coeff1 = (lambda*gamma1bar(n,r) - mu*rho0(n,r)) * &
+                              (kappa *gamma1bar(n,r) + mu*abs(grav_cell(n,r))) / &
                               (mu*mu*denom)
                          coeff2 = (lambda*p0(n,r) - nu*rho0(n,r))* &
                               (-kappa*p0(n,r) - nu*abs(grav_cell(n,r))) / &
@@ -143,8 +143,8 @@ module make_beta0_module
                          coeff3 = kappa*lambda / (mu*nu)
                          
                          integral =  &
-                              coeff1*log( (gamma1bar_in(n,r) + HALF*mu*dr(n))/ &
-                                          (gamma1bar_in(n,r) - HALF*mu*dr(n)) ) + &
+                              coeff1*log( (gamma1bar(n,r) + HALF*mu*dr(n))/ &
+                                          (gamma1bar(n,r) - HALF*mu*dr(n)) ) + &
                               coeff2*log( (p0(n,r) + HALF*nu*dr(n))/ &
                                           (p0(n,r) - HALF*nu*dr(n)) ) - &
                               coeff3*dr(n)
@@ -152,13 +152,13 @@ module make_beta0_module
                       else
 
                          ! paper III, equation C2
-                         denom = nu*gamma1bar_in(n,r) - mu*p0(n,r)
-                         coeff1 = lambda*gamma1bar_in(n,r)/mu - rho0(n,r)
+                         denom = nu*gamma1bar(n,r) - mu*p0(n,r)
+                         coeff1 = lambda*gamma1bar(n,r)/mu - rho0(n,r)
                          coeff2 = lambda*p0(n,r)/nu - rho0(n,r)
 
                          integral = (abs(grav_cell(n,r))/denom)* &
-                              (coeff1*log( (gamma1bar_in(n,r) + HALF*mu*dr(n))/ &
-                                           (gamma1bar_in(n,r) - HALF*mu*dr(n))) - &
+                              (coeff1*log( (gamma1bar(n,r) + HALF*mu*dr(n))/ &
+                                           (gamma1bar(n,r) - HALF*mu*dr(n))) - &
                                coeff2*log( (p0(n,r) + HALF*nu*dr(n))/ &
                                            (p0(n,r) - HALF*nu*dr(n))) )
 

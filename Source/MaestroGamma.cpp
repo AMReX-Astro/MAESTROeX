@@ -5,7 +5,7 @@ using namespace amrex;
 
 void
 Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
-                        Vector<Real>& gamma1bar_out,
+                        Vector<Real>& gamma1bar,
                         const Vector<Real>& p0)
 {
     Vector<MultiFab> gamma1(finest_level+1);
@@ -43,5 +43,5 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
     }
 
     // call average to create gamma1bar
-    Average(gamma1,gamma1bar_out,0);
+    Average(gamma1,gamma1bar,0);
 }

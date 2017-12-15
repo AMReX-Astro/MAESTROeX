@@ -151,7 +151,7 @@ extern "C"
     void make_beta0(      amrex::Real* beta0,
                     const amrex::Real* rho0,
                     const amrex::Real* p0,
-                    const amrex::Real* gamma1bar_in,
+                    const amrex::Real* gamma1bar,
                     const amrex::Real* grav_cell);
     //////////////////////
 

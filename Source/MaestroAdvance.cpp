@@ -73,7 +73,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<Real> w0_force        ( (max_radial_level+1)*nr_fine );
     Vector<Real> Sbar            ( (max_radial_level+1)*nr_fine );
     Vector<Real> beta0_nph       ( (max_radial_level+1)*nr_fine );
-    Vector<Real> gamma1bar_old   ( (max_radial_level+1)*nr_fine );
     Vector<Real> gamma1bar_temp1 ( (max_radial_level+1)*nr_fine );
     Vector<Real> gamma1bar_temp2 ( (max_radial_level+1)*nr_fine );
     Vector<Real> delta_chi_w0    ( (max_radial_level+1)*nr_fine );
