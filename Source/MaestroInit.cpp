@@ -231,8 +231,10 @@ void Maestro::InitProj ()
     // compute S at cell-centers
     Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
 
-    // average S into Sbar
-    Average(S_cc_old,Sbar,0);
+    if (evolve_base_state) {
+        // average S into Sbar
+        Average(S_cc_old,Sbar,0);
+    }
 
     // make the nodal rhs for projection
     Make_NodalRHS(S_cc_old,nodalrhs,Sbar,beta0_old);
@@ -270,6 +272,9 @@ void Maestro::DivuIter ()
             thermal[lev].setVal(0.);
         }        
     }
+
+    // compute S at cell-centers
+    Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
 
 
 }

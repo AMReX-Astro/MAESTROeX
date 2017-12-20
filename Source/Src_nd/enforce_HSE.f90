@@ -21,10 +21,10 @@ contains
     double precision, intent(in   ) ::  grav_cell(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine  )
 
-    integer         :: n,l,i,r
-    real(kind=dp_t) :: temp,offset
-    real(kind=dp_t) :: grav_edge(0:max_radial_level,0:nr_fine-1)
-    real(kind=dp_t) ::    p0_old(0:max_radial_level,0:nr_fine-1)
+    integer          :: n,l,i,r
+    double precision :: temp,offset
+    double precision :: grav_edge(0:max_radial_level,0:nr_fine-1)
+    double precision ::    p0_old(0:max_radial_level,0:nr_fine-1)
 
     offset = 0.d0
 

@@ -289,7 +289,7 @@ burning_cutoff_density              Real               3.e6     y
 buoyancy_cutoff_factor              Real               5.0
 
 # factor in front of the volume discrepancy term (0.0 = off)
-dpdt_factor                         Real               0.0
+dpdt_factor                         Real               0.0      y
 
 # are we doing 1/r$^2$ gravity for plane-parallel
 do_planar_invsq_grav                bool            false       y
