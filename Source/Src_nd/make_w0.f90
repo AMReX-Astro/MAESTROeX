@@ -313,8 +313,8 @@ contains
 
     double precision :: gamma1bar_p0_avg, volume_discrepancy, dpdr
     double precision :: dt_avg, w0_avg, div_avg
-    double precision :: w0_old_cen(0:finest_radial_level,0:nr_fine-1)
-    double precision :: w0_new_cen(0:finest_radial_level,0:nr_fine-1)
+    double precision :: w0_old_cen(0:finest_radial_level,0:nr(finest_radial_level)-1)
+    double precision :: w0_new_cen(0:finest_radial_level,0:nr(finest_radial_level)-1)
 
 
     ! The planar 1/r**2 gravity constraint equation is solved 
@@ -325,22 +325,22 @@ contains
     
 
     ! 1) allocate the finely-gridded temporary basestate arrays
-    allocate(                w0_fine(0:nr_fine))
-    allocate(             w0bar_fine(0:nr_fine))
-    allocate(           deltaw0_fine(0:nr_fine))
-    allocate(            p0_old_fine(0:nr_fine-1))
-    allocate(            p0_new_fine(0:nr_fine-1))
-    allocate(            p0_nph_fine(0:nr_fine-1))
-    allocate(          rho0_old_fine(0:nr_fine-1))
-    allocate(          rho0_new_fine(0:nr_fine-1))
-    allocate(          rho0_nph_fine(0:nr_fine-1))
-    allocate(     gamma1bar_old_fine(0:nr_fine-1))
-    allocate(     gamma1bar_new_fine(0:nr_fine-1))
-    allocate(     gamma1bar_nph_fine(0:nr_fine-1))
-    allocate(p0_minus_pthermbar_fine(0:nr_fine-1))
-    allocate(         etarho_cc_fine(0:nr_fine-1))
-    allocate(           Sbar_in_fine(0:nr_fine-1))
-    allocate(         grav_edge_fine(0:nr_fine))
+    allocate(                w0_fine(0:nr(finest_radial_level)))
+    allocate(             w0bar_fine(0:nr(finest_radial_level)))
+    allocate(           deltaw0_fine(0:nr(finest_radial_level)))
+    allocate(            p0_old_fine(0:nr(finest_radial_level)-1))
+    allocate(            p0_new_fine(0:nr(finest_radial_level)-1))
+    allocate(            p0_nph_fine(0:nr(finest_radial_level)-1))
+    allocate(          rho0_old_fine(0:nr(finest_radial_level)-1))
+    allocate(          rho0_new_fine(0:nr(finest_radial_level)-1))
+    allocate(          rho0_nph_fine(0:nr(finest_radial_level)-1))
+    allocate(     gamma1bar_old_fine(0:nr(finest_radial_level)-1))
+    allocate(     gamma1bar_new_fine(0:nr(finest_radial_level)-1))
+    allocate(     gamma1bar_nph_fine(0:nr(finest_radial_level)-1))
+    allocate(p0_minus_pthermbar_fine(0:nr(finest_radial_level)-1))
+    allocate(         etarho_cc_fine(0:nr(finest_radial_level)-1))
+    allocate(           Sbar_in_fine(0:nr(finest_radial_level)-1))
+    allocate(         grav_edge_fine(0:nr(finest_radial_level)))
 
 
     ! 2) copy the data into the temp, uniformly-gridded basestate arrays.
@@ -355,7 +355,7 @@ contains
     call prolong_base_to_uniform(Sbar_in,Sbar_in_fine)
 
     ! create time-centered base-state quantities
-    do r=0,nr_fine-1
+    do r=0,nr(finest_radial_level)-1
        p0_nph_fine(r)        = HALF*(p0_old_fine(r)        + p0_new_fine(r))
        rho0_nph_fine(r)      = HALF*(rho0_old_fine(r)      + rho0_new_fine(r))
        gamma1bar_nph_fine(r) = HALF*(gamma1bar_old_fine(r) + gamma1bar_new_fine(r))       
@@ -368,7 +368,7 @@ contains
     ! lower boundary condition
     w0bar_fine(0) = ZERO
 
-    do r = 1, nr_fine
+    do r=1,nr(finest_radial_level)
        gamma1bar_p0_avg = gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1)
 
        if (r-1 .lt. base_cutoff_density_coord(finest_radial_level)) then
@@ -396,11 +396,11 @@ contains
     ! B_j (dw_0)_{j-1/2} + 
     ! C_j (dw_0)_{j+1/2} = F_j
 
-    allocate(A(0:nr_fine))
-    allocate(B(0:nr_fine))
-    allocate(C(0:nr_fine))
-    allocate(u(0:nr_fine))
-    allocate(F(0:nr_fine))
+    allocate(A(0:nr(finest_radial_level)))
+    allocate(B(0:nr(finest_radial_level)))
+    allocate(C(0:nr(finest_radial_level)))
+    allocate(u(0:nr(finest_radial_level)))
+    allocate(F(0:nr(finest_radial_level)))
 
     A   = ZERO
     B   = ZERO
@@ -445,7 +445,7 @@ contains
        deltaw0_fine(r) = u(r)
     end do
 
-    do r=base_cutoff_density_coord(finest_radial_level)+2,nr_fine
+    do r=base_cutoff_density_coord(finest_radial_level)+2,nr(finest_radial_level)
        deltaw0_fine(r) = deltaw0_fine(base_cutoff_density_coord(finest_radial_level)+1)
     end do
 

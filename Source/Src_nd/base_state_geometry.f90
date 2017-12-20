@@ -19,10 +19,16 @@ module base_state_geometry_module
 
   public :: restrict_base, fill_ghost_base
 
+  ! note that for spherical problems the base state only has one level of refiment,
+  ! for for spherical, max_radial_level = finest_radial_level = 0
+  ! for planar, max_radial_level is the index of the finest possible radial level
+  ! finest_radial_level is the current finest level index, which may be less than
+  ! max_radial_level depending on the refinement criteria
+
   integer         , save, public :: max_radial_level
   integer         , save, public :: finest_radial_level
-  integer         , save, public :: nr_fine
-  double precision, save, public :: dr_fine
+  integer         , save, public :: nr_fine   ! number of zones associated with *max_radial_level*
+  double precision, save, public :: dr_fine   ! base state grid spacing associated with *max_radial_level*
 
   integer         , save, public  :: nr_irreg
   double precision, save, public  :: center(3)
@@ -77,18 +83,20 @@ contains
     else
        center = 0.5d0*(prob_lo + prob_hi)
     endif
+       
+    ! allocate space for dr, nr
+    allocate(dr(0:max_radial_level))
+    allocate(nr(0:max_radial_level))
+
+    ! compute nr(:) and dr(:)
+    nr(max_radial_level) = nr_fine
+    dr(max_radial_level) = dr_fine
 
     ! computes dr, nr, r_cc_loc, r_edge_loc
     if (spherical .eq. 0) then
        ! cartesian case
-       
-       ! allocate space for dr, nr
-       allocate(dr(0:max_radial_level))
-       allocate(nr(0:max_radial_level))
 
        ! compute nr(:) and dr(:) assuming refinement ratio = 2
-       nr(max_radial_level) = nr_fine
-       dr(max_radial_level) = dr_fine
        do n=max_radial_level-1,0,-1
           nr(n) = nr(n+1)/2
           dr(n) = dr(n+1)*2.d0
@@ -107,14 +115,6 @@ contains
     else
 
        ! spherical case
-
-       ! allocate space for dr, nr
-       allocate(dr(0:0))
-       allocate(nr(0:0))
-       
-       ! compute nr(:) and dr(:)
-       nr(0) = nr_fine
-       dr(0) = dr_fine
 
        ! compute r_cc_loc, r_edge_loc
        do i=0,nr_fine-1
@@ -298,7 +298,7 @@ contains
     integer :: n
 
     if (finest_radial_level_in .gt. 0 .and. spherical .eq. 0) then
-       call amrex_abort("init_multilevel does not work with AMR")
+       call amrex_abort("base_state_geomtry: init_multilevel not written yet for planar")
     end if
 
     if (spherical .eq. 1) then
@@ -322,11 +322,17 @@ contains
     end if
     allocate(r_end_coord(0:finest_radial_level,1)) ! FIXME - for > 1 chunk case
 
-    do n=0,finest_radial_level
-       numdisjointchunks(n) = 1
-       r_start_coord(n,1) = 0
-       r_end_coord(n,1) = nr(n)-1
-    end do
+    if (spherical .eq. 1) then
+
+       do n=0,finest_radial_level
+          numdisjointchunks(n) = 1
+          r_start_coord(n,1) = 0
+          r_end_coord(n,1) = nr(n)-1
+       end do
+
+    else
+
+    end if
 
   end subroutine init_multilevel
 
