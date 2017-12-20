@@ -248,11 +248,26 @@ void Maestro::InitProj ()
 void Maestro::DivuIter ()
 {
 
-    Vector<MultiFab>        stemp(finest_level+1);
-    Vector<MultiFab>     rho_Hext(finest_level+1);
+    Vector<MultiFab> stemp       (finest_level+1);
+    Vector<MultiFab> rho_Hext    (finest_level+1);
     Vector<MultiFab> rho_omegadot(finest_level+1);
-    Vector<MultiFab>     rho_Hnuc(finest_level+1);
-    Vector<MultiFab>      thermal(finest_level+1);
+    Vector<MultiFab> rho_Hnuc    (finest_level+1);
+    Vector<MultiFab> thermal     (finest_level+1);
+
+    Vector<Real> Sbar                ( (max_radial_level+1)*nr_fine );
+    Vector<Real> w0_force            ( (max_radial_level+1)*nr_fine );
+    Vector<Real> delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
+    Vector<Real> p0_minus_peosbar    ( (max_radial_level+1)*nr_fine );
+    Vector<Real> delta_chi_w0        ( (max_radial_level+1)*nr_fine );
+
+    std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
+    std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
+    std::fill(w0_force.begin(),             w0_force.end(),             0.);
+    std::fill(psi.begin(),                  psi.end(),                  0.);
+    std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
+    std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
+    std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
+
 
     for (int lev=0; lev<=finest_level; ++lev) {
         stemp       [lev].define(grids[lev], dmap[lev],   Nscal, 0);
@@ -275,6 +290,18 @@ void Maestro::DivuIter ()
 
     // compute S at cell-centers
     Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+
+    if (evolve_base_state) {
+        Average(S_cc_old,Sbar,0);
+
+        make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr() ,Sbar.dataPtr(),
+                rho0_old.dataPtr(), rho0_new.dataPtr(), p0_old.dataPtr(), 
+                p0_new.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_new.dataPtr(),
+                p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
+                etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+                r_edge_loc.dataPtr(), dt, dt, 0);
+    }
+
 
 
 }

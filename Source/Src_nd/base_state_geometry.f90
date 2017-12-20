@@ -322,8 +322,9 @@ contains
     end if
     allocate(r_end_coord(0:finest_radial_level,1)) ! FIXME - for > 1 chunk case
 
-    if (spherical .eq. 1) then
+    if (spherical .eq. 0) then
 
+       ! FIXME - needs lots of work
        do n=0,finest_radial_level
           numdisjointchunks(n) = 1
           r_start_coord(n,1) = 0
@@ -331,7 +332,11 @@ contains
        end do
 
     else
-
+       
+       numdisjointchunks(0) = 1
+       r_start_coord(n,1) = 0
+       r_end_coord(n,1) = nr(n)-1
+       
     end if
 
   end subroutine init_multilevel

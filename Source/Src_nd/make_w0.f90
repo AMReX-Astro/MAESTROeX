@@ -27,30 +27,31 @@ contains
 
   subroutine make_w0(w0,w0_old,w0_force,Sbar_in, &
                      rho0_old,rho0_new,p0_old,p0_new, &
-                     gamma1bar_old,gamma1bar_new,p0_minus_pthermbar, &
-                     psi,etarho_ec,etarho_cc,r_cc_loc,r_edge_loc, &
-                     dt,dtold,delta_chi_w0,is_predictor)
+                     gamma1bar_old,gamma1bar_new,p0_minus_peosbar, &
+                     psi,etarho_ec,etarho_cc,delta_chi_w0, &
+                     r_cc_loc,r_edge_loc, &
+                     dt,dtold,is_predictor) bind(C, name="make_w0")
 
 
-    double precision, intent(  out) ::                 w0(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::             w0_old(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::                psi(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::          etarho_ec(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::          etarho_cc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) ::           w0_force(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::           rho0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::           rho0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::             p0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::             p0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::      gamma1bar_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::      gamma1bar_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: p0_minus_pthermbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::            Sbar_in(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) ::       delta_chi_w0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::           r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::         r_edge_loc(0:max_radial_level,0:nr_fine  )
+    double precision, intent(inout) ::               w0(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) ::           w0_old(0:max_radial_level,0:nr_fine  )
+    double precision, intent(inout) ::         w0_force(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::          Sbar_in(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::         rho0_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::         rho0_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::           p0_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::           p0_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    gamma1bar_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    gamma1bar_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: p0_minus_peosbar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::              psi(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::        etarho_ec(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) ::        etarho_cc(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) ::     delta_chi_w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::         r_cc_loc(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::       r_edge_loc(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) :: dt,dtold
-    logical        , intent(in   ) :: is_predictor
+    integer         , intent(in   ) :: is_predictor
 
     integer         :: r,n
     double precision :: max_w0
@@ -64,14 +65,13 @@ contains
           call make_w0_planar_var_g(w0,w0_old,Sbar_in, &
                                     rho0_old,rho0_new,p0_old,p0_new, &
                                     gamma1bar_old,gamma1bar_new, &
-                                    p0_minus_pthermbar, &
+                                    p0_minus_peosbar, &
                                     etarho_cc,w0_force, &
-                                    dt,dtold,delta_chi_w0,r_cc_loc,r_edge_loc, &
-                                    is_predictor)
+                                    dt,dtold,r_cc_loc,r_edge_loc)
        else
           call make_w0_planar(w0,w0_old,Sbar_in, &
                               p0_old,p0_new,gamma1bar_old,gamma1bar_new, &
-                              p0_minus_pthermbar,psi,w0_force, &
+                              p0_minus_peosbar,psi,w0_force, &
                               dt,dtold,delta_chi_w0,is_predictor)
        endif
 
@@ -82,10 +82,9 @@ contains
                               rho0_old(0,:),rho0_new(0,:), &
                               p0_old(0,:),p0_new(0,:), &
                               gamma1bar_old(0,:),gamma1bar_new(0,:), &
-                              p0_minus_pthermbar(0,:), &
+                              p0_minus_peosbar(0,:), &
                               etarho_ec(0,:),etarho_cc(0,:),w0_force(0,:), &
-                              r_cc_loc,r_edge_loc,dt,dtold, &
-                              is_predictor)
+                              r_cc_loc,r_edge_loc,dt,dtold)
 
     end if
 
@@ -108,27 +107,27 @@ contains
 
 
   subroutine make_w0_planar(w0,w0_old,Sbar_in,p0_old,p0_new, &
-                            gamma1bar_old,gamma1bar_new,p0_minus_pthermbar, &
+                            gamma1bar_old,gamma1bar_new,p0_minus_peosbar, &
                             psi,w0_force,dt,dtold,delta_chi_w0,is_predictor)
 
-    double precision, intent(  out) ::                 w0(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::             w0_old(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::            Sbar_in(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::             p0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::             p0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::      gamma1bar_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::      gamma1bar_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: p0_minus_pthermbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::                psi(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(  out) ::           w0_force(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) ::       delta_chi_w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(  out) ::               w0(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) ::           w0_old(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) ::          Sbar_in(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::           p0_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::           p0_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    gamma1bar_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    gamma1bar_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: p0_minus_peosbar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::              psi(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(  out) ::         w0_force(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) ::     delta_chi_w0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dt,dtold
-    logical        , intent(in   ) :: is_predictor
+    integer         , intent(in   ) :: is_predictor
 
     ! Local variables
-    integer         :: r, n, i, j, refrat, nlevs
-    double precision :: w0_old_cen(size(w0,dim=1),0:nr_fine-1)
-    double precision :: w0_new_cen(size(w0,dim=1),0:nr_fine-1)
+    integer         :: r, n, i, j, refrat
+    double precision :: w0_old_cen(0:max_radial_level,0:nr_fine-1)
+    double precision :: w0_new_cen(0:max_radial_level,0:nr_fine-1)
     double precision :: w0_avg, div_avg, dt_avg, gamma1bar_p0_avg
     double precision :: offset
 
@@ -137,7 +136,7 @@ contains
     !
     ! Compute w0 at level 1 only
     ! Initialize new w0 at bottom of coarse base array to zero.
-    ! do n=2,nlevs
+    ! do n=1,finest_radial_level
     !   Compute w0 on edges at level n
     !   Obtain the starting value of w0 from the coarser grid
     !   if n>1, compare the difference between w0 at top of level n to the 
@@ -149,16 +148,14 @@ contains
     ! end do
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    nlevs = size(w0,dim=1)
-
     w0 = ZERO
     
     ! Compute w0 on edges at level n
-    do n=1,nlevs
+    do n=0,finest_radial_level
 
        do j=1,numdisjointchunks(n)
           
-          if (n .eq. 1) then
+          if (n .eq. 0) then
              ! Initialize new w0 at bottom of coarse base array to zero.
              w0(0,0) = ZERO
           else
@@ -173,12 +170,12 @@ contains
 
              if (r .lt. base_cutoff_density_coord(n)) then
 
-                if (is_predictor) then
+                if (is_predictor .eq. 1) then
                    delta_chi_w0(n,r-1) = dpdt_factor * &
-                        p0_minus_pthermbar(n,r-1) / (gamma1bar_old(n,r-1)*p0_old(n,r-1)*dt)
+                        p0_minus_peosbar(n,r-1) / (gamma1bar_old(n,r-1)*p0_old(n,r-1)*dt)
                 else
                    delta_chi_w0(n,r-1) = delta_chi_w0(n,r-1) + dpdt_factor * &
-                        p0_minus_pthermbar(n,r-1) / (gamma1bar_new(n,r-1)*p0_new(n,r-1)*dt)
+                        p0_minus_peosbar(n,r-1) / (gamma1bar_new(n,r-1)*p0_new(n,r-1)*dt)
                 end if
 
              else
@@ -222,7 +219,7 @@ contains
     end do
 
        ! zero w0 where there is no corresponding full state array
-       do n=2,nlevs
+       do n=1,finest_radial_level
           do j=1,numdisjointchunks(n)
              if (j .eq. numdisjointchunks(n)) then
                 do r=r_end_coord(n,j)+2,nr(n)
@@ -239,7 +236,7 @@ contains
     call restrict_base(w0,0)
     call fill_ghost_base(w0,0)
 
-    do n=1,nlevs
+    do n=0,finest_radial_level
        do j=1,numdisjointchunks(n)
 
           ! Compute the forcing term in the base state velocity
@@ -266,28 +263,25 @@ contains
   subroutine make_w0_planar_var_g(w0,w0_old,Sbar_in, &
                                   rho0_old,rho0_new,p0_old,p0_new, &
                                   gamma1bar_old,gamma1bar_new, &
-                                  p0_minus_pthermbar, &
+                                  p0_minus_peosbar, &
                                   etarho_cc,w0_force, &
-                                  dt,dtold,delta_chi_w0,r_cc_loc,r_edge_loc, &
-                                  is_predictor)
+                                  dt,dtold,r_cc_loc,r_edge_loc)
 
-    double precision, intent(  out) ::                 w0(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::             w0_old(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::            Sbar_in(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::           rho0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::           rho0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::             p0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::             p0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::      gamma1bar_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::      gamma1bar_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: p0_minus_pthermbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::          etarho_cc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(  out) ::           w0_force(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) ::       delta_chi_w0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::           r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::         r_edge_loc(0:max_radial_level,0:nr_fine  )
+    double precision, intent(  out) ::               w0(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) ::           w0_old(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) ::          Sbar_in(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::         rho0_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::         rho0_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::           p0_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::           p0_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    gamma1bar_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    gamma1bar_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: p0_minus_peosbar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::        etarho_cc(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(  out) ::         w0_force(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::         r_cc_loc(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::       r_edge_loc(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) :: dt,dtold
-    logical        , intent(in   ) :: is_predictor
 
     ! local variables
     double precision, allocatable :: w0_fine(:)
@@ -302,7 +296,7 @@ contains
     double precision, allocatable :: gamma1bar_old_fine(:)
     double precision, allocatable :: gamma1bar_new_fine(:)
     double precision, allocatable :: gamma1bar_nph_fine(:)
-    double precision, allocatable :: p0_minus_pthermbar_fine(:)
+    double precision, allocatable :: p0_minus_peosbar_fine(:)
     double precision, allocatable :: etarho_cc_fine(:)
     double precision, allocatable :: Sbar_in_fine(:)
     double precision, allocatable :: grav_edge_fine(:)
@@ -325,22 +319,22 @@ contains
     
 
     ! 1) allocate the finely-gridded temporary basestate arrays
-    allocate(                w0_fine(0:nr(finest_radial_level)))
-    allocate(             w0bar_fine(0:nr(finest_radial_level)))
-    allocate(           deltaw0_fine(0:nr(finest_radial_level)))
-    allocate(            p0_old_fine(0:nr(finest_radial_level)-1))
-    allocate(            p0_new_fine(0:nr(finest_radial_level)-1))
-    allocate(            p0_nph_fine(0:nr(finest_radial_level)-1))
-    allocate(          rho0_old_fine(0:nr(finest_radial_level)-1))
-    allocate(          rho0_new_fine(0:nr(finest_radial_level)-1))
-    allocate(          rho0_nph_fine(0:nr(finest_radial_level)-1))
-    allocate(     gamma1bar_old_fine(0:nr(finest_radial_level)-1))
-    allocate(     gamma1bar_new_fine(0:nr(finest_radial_level)-1))
-    allocate(     gamma1bar_nph_fine(0:nr(finest_radial_level)-1))
-    allocate(p0_minus_pthermbar_fine(0:nr(finest_radial_level)-1))
-    allocate(         etarho_cc_fine(0:nr(finest_radial_level)-1))
-    allocate(           Sbar_in_fine(0:nr(finest_radial_level)-1))
-    allocate(         grav_edge_fine(0:nr(finest_radial_level)))
+    allocate(              w0_fine(0:nr(finest_radial_level)))
+    allocate(           w0bar_fine(0:nr(finest_radial_level)))
+    allocate(         deltaw0_fine(0:nr(finest_radial_level)))
+    allocate(          p0_old_fine(0:nr(finest_radial_level)-1))
+    allocate(          p0_new_fine(0:nr(finest_radial_level)-1))
+    allocate(          p0_nph_fine(0:nr(finest_radial_level)-1))
+    allocate(        rho0_old_fine(0:nr(finest_radial_level)-1))
+    allocate(        rho0_new_fine(0:nr(finest_radial_level)-1))
+    allocate(        rho0_nph_fine(0:nr(finest_radial_level)-1))
+    allocate(   gamma1bar_old_fine(0:nr(finest_radial_level)-1))
+    allocate(   gamma1bar_new_fine(0:nr(finest_radial_level)-1))
+    allocate(   gamma1bar_nph_fine(0:nr(finest_radial_level)-1))
+    allocate(p0_minus_peosbar_fine(0:nr(finest_radial_level)-1))
+    allocate(       etarho_cc_fine(0:nr(finest_radial_level)-1))
+    allocate(         Sbar_in_fine(0:nr(finest_radial_level)-1))
+    allocate(       grav_edge_fine(0:nr(finest_radial_level)))
 
 
     ! 2) copy the data into the temp, uniformly-gridded basestate arrays.
@@ -350,7 +344,7 @@ contains
     call prolong_base_to_uniform(rho0_new,rho0_new_fine)
     call prolong_base_to_uniform(gamma1bar_old,gamma1bar_old_fine)
     call prolong_base_to_uniform(gamma1bar_new,gamma1bar_new_fine)
-    call prolong_base_to_uniform(p0_minus_pthermbar,p0_minus_pthermbar_fine)
+    call prolong_base_to_uniform(p0_minus_peosbar,p0_minus_peosbar_fine)
     call prolong_base_to_uniform(etarho_cc,etarho_cc_fine)
     call prolong_base_to_uniform(Sbar_in,Sbar_in_fine)
 
@@ -372,7 +366,7 @@ contains
        gamma1bar_p0_avg = gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1)
 
        if (r-1 .lt. base_cutoff_density_coord(finest_radial_level)) then
-          volume_discrepancy = dpdt_factor * p0_minus_pthermbar_fine(r-1)/dt
+          volume_discrepancy = dpdt_factor * p0_minus_peosbar_fine(r-1)/dt
        else
           volume_discrepancy = ZERO
        end if
@@ -507,28 +501,26 @@ contains
   subroutine make_w0_spherical(w0,w0_old,Sbar_in, &
                                rho0_old,rho0_new,p0_old,p0_new, &
                                gamma1bar_old,gamma1bar_new, &
-                               p0_minus_pthermbar, &
+                               p0_minus_peosbar, &
                                etarho_ec,etarho_cc,w0_force, &
-                               r_cc_loc,r_edge_loc,dt,dtold, &
-                               is_predictor)
+                               r_cc_loc,r_edge_loc,dt,dtold)
 
-    double precision, intent(  out) ::                 w0(0:nr_fine  )
-    double precision, intent(in   ) ::             w0_old(0:nr_fine  )
-    double precision, intent(in   ) ::            Sbar_in(0:nr_fine-1)
-    double precision, intent(in   ) ::           rho0_old(0:nr_fine-1)
-    double precision, intent(in   ) ::           rho0_new(0:nr_fine-1)
-    double precision, intent(in   ) ::             p0_old(0:nr_fine-1)
-    double precision, intent(in   ) ::             p0_new(0:nr_fine-1)
-    double precision, intent(in   ) ::      gamma1bar_old(0:nr_fine-1)
-    double precision, intent(in   ) ::      gamma1bar_new(0:nr_fine-1)
-    double precision, intent(in   ) :: p0_minus_pthermbar(0:nr_fine-1)
-    double precision, intent(in   ) ::          etarho_ec(0:nr_fine  )
-    double precision, intent(in   ) ::          etarho_cc(0:nr_fine-1)
-    double precision, intent(  out) ::           w0_force(0:nr_fine-1)
-    double precision, intent(in   ) ::           r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::         r_edge_loc(0:max_radial_level,0:nr_fine  )
+    double precision, intent(  out) ::               w0(0:nr_fine  )
+    double precision, intent(in   ) ::           w0_old(0:nr_fine  )
+    double precision, intent(in   ) ::          Sbar_in(0:nr_fine-1)
+    double precision, intent(in   ) ::         rho0_old(0:nr_fine-1)
+    double precision, intent(in   ) ::         rho0_new(0:nr_fine-1)
+    double precision, intent(in   ) ::           p0_old(0:nr_fine-1)
+    double precision, intent(in   ) ::           p0_new(0:nr_fine-1)
+    double precision, intent(in   ) ::    gamma1bar_old(0:nr_fine-1)
+    double precision, intent(in   ) ::    gamma1bar_new(0:nr_fine-1)
+    double precision, intent(in   ) :: p0_minus_peosbar(0:nr_fine-1)
+    double precision, intent(in   ) ::        etarho_ec(0:nr_fine  )
+    double precision, intent(in   ) ::        etarho_cc(0:nr_fine-1)
+    double precision, intent(  out) ::         w0_force(0:nr_fine-1)
+    double precision, intent(in   ) ::         r_cc_loc(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::       r_edge_loc(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) :: dt,dtold
-    logical,         intent(in   ) :: is_predictor
 
     ! Local variables
     integer                    :: r
@@ -565,7 +557,7 @@ contains
     do r=1,nr_fine
 
        if (rho0_old(r-1) .gt. base_cutoff_density) then
-          volume_discrepancy = dpdt_factor * p0_minus_pthermbar(r-1)/dt
+          volume_discrepancy = dpdt_factor * p0_minus_peosbar(r-1)/dt
        else
           volume_discrepancy = ZERO
        endif
