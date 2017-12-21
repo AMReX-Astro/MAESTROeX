@@ -6,6 +6,7 @@ using namespace amrex;
 void
 Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
+                       const Vector<Real>& w0_force,
                        int is_final_update,
                        int do_add_utilde_force)
 {
@@ -41,6 +42,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                            BL_TO_FORTRAN_3D(wedge_mf[mfi]),
 #endif
                            w0.dataPtr(),
+                           w0_force.dataPtr(),
                            rho0_old.dataPtr(),
                            grav_cell_old.dataPtr(),
                            is_final_update,

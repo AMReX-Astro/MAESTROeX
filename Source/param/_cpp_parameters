@@ -286,7 +286,7 @@ burning_cutoff_density              Real               3.e6     y
 
 # The multiplicative factor (over base\_cutoff\_density) below which we
 # do zero out the buoyancy term in the momentum equation.
-buoyancy_cutoff_factor              Real               5.0
+buoyancy_cutoff_factor              Real               5.0      y
 
 # factor in front of the volume discrepancy term (0.0 = off)
 dpdt_factor                         Real               0.0      y

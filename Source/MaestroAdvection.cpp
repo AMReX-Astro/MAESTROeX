@@ -40,7 +40,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
     }
 
     // MakeUtrans();
-    FillUmacGhost(umac);
+    FillUmacGhost(utrans);
 
     
     // create a MultiFab to hold the velocity forcing
@@ -49,8 +49,9 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
         vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
     }
 
-
-    // MakeVelForce();
+    int is_final_update = 0;
+    int do_add_utilde_force = 1;
+//    MakeVelForce(vel_force,utran,w0_force,is_final_update,do_add_utilde_force);
 
     // add w0 to trans velocities
 

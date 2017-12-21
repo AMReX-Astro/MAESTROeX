@@ -211,6 +211,7 @@ extern "C"
                         const amrex::Real* wedge, const int* w_lo, const int* w_hi,
 #endif
                         const amrex::Real* w0,
+                        const amrex::Real* w0_force,
                         const amrex::Real* rho0,
                         const amrex::Real* grav,
                         const int& is_final_update,

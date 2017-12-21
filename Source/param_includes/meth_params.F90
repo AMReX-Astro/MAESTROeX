@@ -44,6 +44,7 @@ module meth_params_module
   double precision              , save :: anelastic_cutoff
   double precision              , save :: base_cutoff_density
   double precision              , save :: burning_cutoff_density
+  double precision              , save :: buoyancy_cutoff_factor
   double precision              , save :: dpdt_factor
   logical                       , save :: do_planar_invsq_grav
   double precision              , save :: planar_invsq_mass
@@ -94,6 +95,7 @@ contains
     anelastic_cutoff = 3.d6;
     base_cutoff_density = 3.d6;
     burning_cutoff_density = 3.d6;
+    buoyancy_cutoff_factor = 5.0d0;
     dpdt_factor = 0.0d0;
     do_planar_invsq_grav = .false.;
     planar_invsq_mass = 0.0d0;
@@ -132,6 +134,7 @@ contains
     call pp%query("anelastic_cutoff", anelastic_cutoff)
     call pp%query("base_cutoff_density", base_cutoff_density)
     call pp%query("burning_cutoff_density", burning_cutoff_density)
+    call pp%query("buoyancy_cutoff_factor", buoyancy_cutoff_factor)
     call pp%query("dpdt_factor", dpdt_factor)
     call pp%query("do_planar_invsq_grav", do_planar_invsq_grav)
     call pp%query("planar_invsq_mass", planar_invsq_mass)
