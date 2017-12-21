@@ -206,6 +206,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "<<< STEP 1 : react state >>>" << endl;
     }
 
+    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- define average expansion at time n+1/2
     //////////////////////////////////////////////////////////////////////////////
@@ -229,7 +231,21 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     if (dpdt_factor > 0.0) {
+        // compute p0_minus_peosbar and delta_p_term
         Abort("MaestroAdvance.cpp: dpdt_factor not implemented");
+    }
+
+    if (evolve_base_state) {
+
+        // compute Sbar = average(S_cc_nph)
+
+        // call make_w0
+
+        if (spherical == 1) {
+            // call make_w0mac
+            // make w0_force_cart
+        }
+
     }
 
     //////////////////////////////////////////////////////////////////////////////
