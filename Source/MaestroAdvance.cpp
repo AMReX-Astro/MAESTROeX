@@ -317,7 +317,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s2[lev],Temp,Temp,1,0);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,0);
     }
 
     if (maestro_verbose >= 1) {
@@ -339,20 +339,17 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // correct the base state density by "averaging"
 
 
+    //  update grav_cell_new
+
+
     // base state pressure update
     if (evolve_base_state) {
 
-    }
-    else {
-        p0_new = p0_old;
     }
 
     // base state enthalpy update
     if (evolve_base_state) {
 
-    }
-    else {
-        rhoh0_new = rhoh0_old;
     }
 
     if (maestro_verbose >= 1) {
@@ -426,6 +423,40 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         }
     }
 
+    // compute S at cell-centers
+    Make_S_cc(S_cc_new,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+
+    // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::LinComb(S_cc_nph[lev],0.5,S_cc_old[lev],0,0.5,S_cc_new[lev],0,0,1,0);
+    }
+
+    // compute p0_minus_peosbar = p0_new - peosbar (for making w0)
+    // and delta_p_term = peos_new - peosbar_cart (for RHS of projection)
+    if (dpdt_factor > 0.) {
+
+    }
+
+    if (evolve_base_state) {
+
+        // compute Sbar = average(S_cc_nph)
+        Average(S_cc_nph,Sbar,0);
+
+        // compute w0, w0_force, and delta_chi_w0
+        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
+                rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
+                gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
+                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
+                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),dt,dtold,0);
+
+        if (spherical == 1) {
+            // put w0 on Cartesian edges
+
+            // put w0_force on Cartesian cells
+
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 7 -- redo the construction of the advective velocity using the current w0
     //////////////////////////////////////////////////////////////////////////////
@@ -434,12 +465,68 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "<<< STEP 7 : create MAC velocities >>>" << endl;
     }
 
+    // compute unprojected MAC velocities
+    AdvancePremac(umac);
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the base state and full state through dt
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 8 : advect base >>>" << endl;
+    }
+
+    // advect the base state density
+    if (evolve_base_state) {
+
+    }
+
+    // copy temperature from s1 into s2 for seeding eos calls
+    // temperature will be overwritten later after enthalpy advance
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,0);
+    }
+
+    if (maestro_verbose >= 1) {
+        Print() << "            :  density_advance >>>" << endl;
+        Print() << "            :   tracer_advance >>>" << endl;
+    }
+
+    // set etarhoflux to zero
+    for (int lev=0; lev<=finest_level; ++lev) {
+        etarhoflux[lev].setVal(0.);
+    }
+
+    // advect rhoX, rho, and tracers
+
+
+    // compute the new etarho
+
+
+    // correct the base state density by "averaging"
+
+
+    // update grav_cell_new, rho0_nph, grav_cell_nph
+
+
+    // base state pressure update
+    if (evolve_base_state) {
+
+    }
+    else {
+        p0_new = p0_old;
+    }
+
+    // base state enthalpy update
+    if (evolve_base_state) {
+
+    }
+    else {
+        rhoh0_new = rhoh0_old;
+    }
+
+    if (maestro_verbose >= 1) {
+        Print() << "            : enthalpy_advance >>>" << endl;
     }
 
     //////////////////////////////////////////////////////////////////////////////
