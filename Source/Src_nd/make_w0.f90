@@ -88,7 +88,7 @@ contains
 
     end if
 
-    if (maestro_verbose .ge. 1) then
+    if (maestro_verbose .ge. 2) then
        do n=0,finest_radial_level
           max_w0 = zero
           do r=r_start_coord(n,1),r_end_coord(n,1)+1
