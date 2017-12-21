@@ -159,6 +159,14 @@ private:
     // end MaestroFill3dData.cpp functions
     ////////////
 
+    ////////////////////////
+    // MaestroForce.cpp functions
+    void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+                       int is_final_update,
+                       int do_add_utilde_force);
+    ////////////////////////
+
     ////////////
     // MaestroGamma.cpp functions
 
@@ -190,7 +198,7 @@ private:
     void InitProj ();
 
     // divu iter
-    void DivuIter ();
+    void DivuIter (int istep_divu_iter);
 
     // init iter to initialize gradpi
     void InitIter ();

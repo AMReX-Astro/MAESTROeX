@@ -200,6 +200,24 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in make_vel_force.f90
+    void make_vel_force(const int& lev, const int* lo, const int* hi,
+                        amrex::Real* vel_force, const int* f_lo, const int* f_hi, const int* nc_f,
+                        const amrex::Real* gpi, const int* g_lo, const int* g_hi, const int* nc_g,
+                        const amrex::Real* rho, const int* r_lo, const int* r_hi,
+                        const amrex::Real* uedge, const int* u_lo, const int* u_hi,
+                        const amrex::Real* vedge, const int* v_lo, const int* v_hi,
+#if (AMREX_SPACEDIM == 3)
+                        const amrex::Real* wedge, const int* w_lo, const int* w_hi,
+#endif
+                        const amrex::Real* w0,
+                        const amrex::Real* rho0,
+                        const amrex::Real* grav,
+                        const int& is_final_update,
+                        const int& do_add_utilde_force);
+    //////////////////////
+
+    //////////////////////
     // in make_w0.f90
     void make_w0(amrex::Real* w0, const amrex::Real* w0_old,
                  const amrex::Real* w0_force, const amrex::Real* Sbar_in, 

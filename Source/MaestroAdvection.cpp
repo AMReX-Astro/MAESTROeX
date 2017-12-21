@@ -8,7 +8,6 @@ void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 {
 
-
     // create a uold with filled ghost cells
     Vector<MultiFab> uold_ghost(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -29,8 +28,8 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Add(ufull[lev],uold_ghost[lev],0,0,AMREX_SPACEDIM,ng_adv);
     }
-    
-    // create utrans
+
+    // create a face-centered MultiFab to hold utrans
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
@@ -42,6 +41,14 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 
     // MakeUtrans();
     FillUmacGhost(umac);
+
+    
+    // create a MultiFab to hold the velocity forcing
+    Vector<MultiFab> vel_force(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+    }
+
 
     // MakeVelForce();
 

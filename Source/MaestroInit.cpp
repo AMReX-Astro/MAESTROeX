@@ -49,7 +49,7 @@ Maestro::Init ()
     // divu iters
     for (int i=1; i<=init_divu_iter; ++i) {
         Print() << "Doing initial divu iteration #" << i << endl;
-        DivuIter();
+        DivuIter(i);
     }
 
     // copy S_cc_old into S_cc_new for the pressure iterations
@@ -206,7 +206,7 @@ void Maestro::InitProj ()
         rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
         rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
         // nodal
-        nodalrhs[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        nodalrhs[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
         // we don't have a legit timestep yet, so we set rho_omegadot,
         // rho_Hnuc, and rho_Hext to 0 
@@ -239,13 +239,16 @@ void Maestro::InitProj ()
     // make the nodal rhs for projection
     Make_NodalRHS(S_cc_old,nodalrhs,Sbar,beta0_old);
 
+    // define epsilon for initial projection
+    //
+
     // perform a nodal projection
     NodalProj(initial_projection_comp,nodalrhs,rhohalf);
 
 }
 
 
-void Maestro::DivuIter ()
+void Maestro::DivuIter (int istep_divu_iter)
 {
 
     Vector<MultiFab> stemp       (finest_level+1);
@@ -253,10 +256,12 @@ void Maestro::DivuIter ()
     Vector<MultiFab> rho_omegadot(finest_level+1);
     Vector<MultiFab> rho_Hnuc    (finest_level+1);
     Vector<MultiFab> thermal     (finest_level+1);
+    Vector<MultiFab> rhohalf     (finest_level+1);
+    // nodal
+    Vector<MultiFab>     nodalrhs(finest_level+1);
 
     Vector<Real> Sbar                ( (max_radial_level+1)*nr_fine );
     Vector<Real> w0_force            ( (max_radial_level+1)*nr_fine );
-    Vector<Real> delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
     Vector<Real> p0_minus_peosbar    ( (max_radial_level+1)*nr_fine );
     Vector<Real> delta_chi_w0        ( (max_radial_level+1)*nr_fine );
 
@@ -265,7 +270,6 @@ void Maestro::DivuIter ()
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
     std::fill(psi.begin(),                  psi.end(),                  0.);
     std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
-    std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
     std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
 
 
@@ -275,6 +279,12 @@ void Maestro::DivuIter ()
         rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
         thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
+        // nodal
+        nodalrhs[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+
+        // divu_iters do not use density weighting
+        rhohalf[lev].setVal(1.);
     }
 
     React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
@@ -302,6 +312,16 @@ void Maestro::DivuIter ()
                 r_edge_loc.dataPtr(), dt, dt, 0);
     }
 
+    Make_NodalRHS(S_cc_old,nodalrhs,Sbar,beta0_old);
+
+    // define epsilon for divu_iters
+    //
+
+    // perform a nodal projection
+    //
+
+    // compute new dt
+
 
 
 }
@@ -310,4 +330,7 @@ void Maestro::DivuIter ()
 void Maestro::InitIter ()
 {
     dtold = dt;
+
+    // advance the solution by dt
+    AdvanceTimeStep(true);
 }
