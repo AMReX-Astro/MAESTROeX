@@ -247,7 +247,8 @@ private:
     // regular_timestep_comp:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
     // sig contains rhohalf if proj_type == regular_timestep_comp
     void CreateUvecForProj (int proj_type,
-                            amrex::Vector<amrex::MultiFab>& Vproj);
+                            amrex::Vector<amrex::MultiFab>& Vproj,
+                            const amrex::Vector<amrex::MultiFab>& sig);
 
     // end MaestroNodalProj.cpp functions
     ////////////
@@ -262,7 +263,7 @@ private:
     amrex::Vector<const amrex::MultiFab*> PlotFileMF (const amrex::Vector<amrex::MultiFab>& p0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& rho0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& u_in,
-                                                            amrex::Vector<amrex::MultiFab>& s_in,
+                                                      amrex::Vector<amrex::MultiFab>& s_in,
                                                       const amrex::Vector<amrex::Real>& p0_in);
 
     // set plotfile variables names
@@ -274,7 +275,7 @@ private:
                         const amrex::Vector<amrex::Real>& rho0_in,
                         const amrex::Vector<amrex::Real>& p0_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
-                              amrex::Vector<amrex::MultiFab>& s_in);
+                        amrex::Vector<amrex::MultiFab>& s_in);
 
     // end MaestroPlot.cpp functions
     ////////////
