@@ -225,10 +225,10 @@ private:
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal);
 
-    void Make_NodalRHS (const amrex::Vector<amrex::MultiFab>& S_cc,
-                        amrex::Vector<amrex::MultiFab>& nodalrhs,
-                        const amrex::Vector<amrex::Real>& Sbar,
-                        const amrex::Vector<amrex::Real>& beta0);
+    void MakeCCRHSforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
+                                const amrex::Vector<amrex::MultiFab>& S_cc,
+                                const amrex::Vector<amrex::Real>& Sbar,
+                                const amrex::Vector<amrex::Real>& beta0);
 
     // end MaestroMakeS.cpp functions
     ////////////
@@ -238,16 +238,16 @@ private:
 
     // perform a nodal projection
     void NodalProj (int proj_type,
-                    amrex::Vector<amrex::MultiFab>& nodalrhs,
-                    amrex::Vector<amrex::MultiFab>& rhohalf);
+                    amrex::Vector<amrex::MultiFab>& rhcc);
 
-    // modify unew depending on proj_type
-    // initial_projection_comp: leave unew alone
-    // divu_iters_comp:         leave unew alone
-    // pressure_iters_comp:     unew = (unew-uold)/dt
-    // regular_timestep_comp:   unew = unew + dt*gpi/rhohalf
+    // fill in Vproj
+    // initial_projection_comp: Utilde^0                        -- uold
+    // divu_iters_comp:         Utilde^0                        -- uold
+    // pressure_iters_comp:     (Utilde^n+1,* - Utilde^n)/dt    -- (unew-uold)/dt
+    // regular_timestep_comp:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
+    // sig contains rhohalf if proj_type == regular_timestep_comp
     void CreateUvecForProj (int proj_type,
-                            amrex::Vector<amrex::MultiFab>& rhohalf);
+                            amrex::Vector<amrex::MultiFab>& Vproj);
 
     // end MaestroNodalProj.cpp functions
     ////////////

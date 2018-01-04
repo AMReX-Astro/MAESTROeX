@@ -194,8 +194,7 @@ void Maestro::InitProj ()
     Vector<MultiFab>     rho_Hnuc(finest_level+1);
     Vector<MultiFab>     rho_Hext(finest_level+1);
     Vector<MultiFab>      rhohalf(finest_level+1);
-    // nodal
-    Vector<MultiFab>     nodalrhs(finest_level+1);
+    Vector<MultiFab>         rhcc(finest_level+1);
 
     Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
 
@@ -205,8 +204,7 @@ void Maestro::InitProj ()
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
         rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
-        // nodal
-        nodalrhs[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        rhcc        [lev].define(grids[lev], dmap[lev],       1, 1);
 
         // we don't have a legit timestep yet, so we set rho_omegadot,
         // rho_Hnuc, and rho_Hext to 0 
@@ -237,13 +235,13 @@ void Maestro::InitProj ()
     }
 
     // make the nodal rhs for projection
-    Make_NodalRHS(S_cc_old,nodalrhs,Sbar,beta0_old);
+    MakeCCRHSforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
 
     // define epsilon for initial projection
     //
 
     // perform a nodal projection
-    NodalProj(initial_projection_comp,nodalrhs,rhohalf);
+    NodalProj(initial_projection_comp,rhcc);
 
 }
 
@@ -257,8 +255,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<MultiFab> rho_Hnuc    (finest_level+1);
     Vector<MultiFab> thermal     (finest_level+1);
     Vector<MultiFab> rhohalf     (finest_level+1);
-    // nodal
-    Vector<MultiFab>     nodalrhs(finest_level+1);
+    Vector<MultiFab> rhcc        (finest_level+1);
 
     Vector<Real> Sbar                ( (max_radial_level+1)*nr_fine );
     Vector<Real> w0_force            ( (max_radial_level+1)*nr_fine );
@@ -280,8 +277,7 @@ void Maestro::DivuIter (int istep_divu_iter)
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
         thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
         rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
-        // nodal
-        nodalrhs[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        rhcc        [lev].define(grids[lev], dmap[lev],       1, 0);
 
         // divu_iters do not use density weighting
         rhohalf[lev].setVal(1.);
@@ -312,7 +308,7 @@ void Maestro::DivuIter (int istep_divu_iter)
                 r_edge_loc.dataPtr(), dt, dt, 0);
     }
 
-    Make_NodalRHS(S_cc_old,nodalrhs,Sbar,beta0_old);
+    MakeCCRHSforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
 
     // define epsilon for divu_iters
     //

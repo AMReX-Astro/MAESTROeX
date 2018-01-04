@@ -52,22 +52,16 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
 
 void
-Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
-                        Vector<MultiFab>& nodalrhs,
-                        const Vector<Real>& Sbar,
-                        const Vector<Real>& beta0)
+Maestro::MakeCCRHSforNodalProj (Vector<MultiFab>& rhcc,
+                                const Vector<MultiFab>& S_cc,
+                                const Vector<Real>& Sbar,
+                                const Vector<Real>& beta0)
 {
-
-    Vector<MultiFab> ccrhs(finest_level+1);
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // build ccrhs
-        ccrhs[lev].define(grids[lev], dmap[lev], 1, 1);
-
-        // fill ccrhs
+        // fill rhcc
         // get references to the MultiFabs at level lev
-              MultiFab& ccrhs_mf = ccrhs[lev];
+              MultiFab& rhcc_mf = rhcc[lev];
         const MultiFab& S_cc_mf = S_cc[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -80,8 +74,8 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            make_ccrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                       BL_TO_FORTRAN_3D(ccrhs_mf[mfi]),
+            make_rhcc(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                       BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
                        BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
                        Sbar.dataPtr(), beta0.dataPtr());
         }
@@ -89,29 +83,6 @@ Maestro::Make_NodalRHS (const Vector<MultiFab>& S_cc,
 
     // fill ghost cells using first-order extrapolation
     for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, t_old, ccrhs[lev], ccrhs, ccrhs, 0, 0, 1, bcs_f);
-    }
-
-    // make_nodalrhs
-    for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-              MultiFab& nodalrhs_mf = nodalrhs[lev];
-        const MultiFab& ccrhs_mf = ccrhs[lev];
-
-        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(ccrhs_mf); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            make_nodalrhs(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                          BL_TO_FORTRAN_3D(nodalrhs_mf[mfi]),
-                          BL_TO_FORTRAN_3D(ccrhs_mf[mfi]));
-        }
+        FillPatch(lev, t_old, rhcc[lev], rhcc, rhcc, 0, 0, 1, bcs_f);
     }
 }

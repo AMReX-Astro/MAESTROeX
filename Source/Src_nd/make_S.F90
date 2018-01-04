@@ -79,15 +79,15 @@ contains
 
   end subroutine make_S_cc
 
-  subroutine make_ccrhs(lev, lo, hi, &
-                        ccrhs, c_lo, c_hi, &
-                        S_cc,  s_lo, s_hi, &
-                        Sbar, beta0) bind (C,name="make_ccrhs")
+  subroutine make_rhcc(lev, lo, hi, &
+                       rhcc, c_lo, c_hi, &
+                       S_cc,  s_lo, s_hi, &
+                       Sbar, beta0) bind (C,name="make_rhcc")
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
-    double precision, intent (inout) :: ccrhs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+    double precision, intent (inout) :: rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) :: Sbar (0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
@@ -106,53 +106,12 @@ contains
 #elif (AMREX_SPACEDIM == 3)
        r = k
 #endif
-       ccrhs(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r))
+       rhcc(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r))
 
     enddo
     enddo
     enddo
 
-  end subroutine make_ccrhs
-
-  subroutine make_nodalrhs(lev, lo, hi, &
-                           nodalrhs, n_lo, n_hi, &
-                           ccrhs,    c_lo, c_hi) bind (C,name="make_nodalrhs")
-    
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
-    integer         , intent (in   ) :: n_lo(3), n_hi(3)
-    integer         , intent (in   ) :: c_lo(3), c_hi(3)
-    double precision, intent (inout) :: nodalrhs(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
-    double precision, intent (in   ) ::    ccrhs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
-
-    integer i,j,k
-    integer joff,koff
-
-    joff = 0
-    koff = 0
-    if (AMREX_SPACEDIM .ge. 2) joff=1
-    if (AMREX_SPACEDIM .ge. 3) koff=1
-
-    ! loop over the data
-    do k = lo(3),hi(3)+koff
-    do j = lo(2),hi(2)+joff
-    do i = lo(1),hi(1)+1
-
-#if (AMREX_SPACEDIM == 1)
-       nodalrhs(i,j,k) = 0.5d0 * ( ccrhs(i,j,k) + ccrhs(i-1,j,k) )
-#elif (AMREX_SPACEDIM == 2)
-       nodalrhs(i,j,k) = 0.25d0 * ( ccrhs(i,j  ,k) + ccrhs(i-1,j  ,k) &
-                                  + ccrhs(i,j-1,k) + ccrhs(i-1,j-1,k) )
-#elif (AMREX_SPACEDIM == 3)
-       nodalrhs(i,j,k) = 0.125d0 * ( ccrhs(i,j  ,k-1) + ccrhs(i-1,j  ,k-1) &
-                                   + ccrhs(i,j-1,k-1) + ccrhs(i-1,j-1,k-1) &
-                                   + ccrhs(i,j  ,k  ) + ccrhs(i-1,j  ,k  ) &
-                                   + ccrhs(i,j-1,k  ) + ccrhs(i-1,j-1,k  ) )
-#endif
-
-    enddo
-    enddo
-    enddo
-
-  end subroutine make_nodalrhs
+  end subroutine make_rhcc
 
 end module make_S_module

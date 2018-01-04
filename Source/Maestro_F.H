@@ -186,12 +186,11 @@ extern "C"
                    const amrex::Real* therm, const int* t_lo, const int* t_hi);
 
 
-    void make_ccrhs(const int& lev, const int* lo, const int* hi, 
-                          amrex::Real* ccrhs, const int* c_lo, const int* c_hi,
-                    const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
-                    const amrex::Real* Sbar,
-                    const amrex::Real* beta0);
-
+    void make_rhcc(const int& lev, const int* lo, const int* hi, 
+                         amrex::Real* ccrhs, const int* c_lo, const int* c_hi,
+                   const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
+                   const amrex::Real* Sbar,
+                   const amrex::Real* beta0);
 
     void make_nodalrhs(const int& lev, const int* lo, const int* hi, 
                        amrex::Real* nodalrhs,  const int* n_lo, const int* n_hi,
