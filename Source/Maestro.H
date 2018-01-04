@@ -250,6 +250,15 @@ private:
                             amrex::Vector<amrex::MultiFab>& Vproj,
                             const amrex::Vector<amrex::MultiFab>& sig);
 
+    void doNodalProj (int proj_type,
+                      amrex::Vector<amrex::MultiFab>& Vproj,
+                      amrex::Vector<amrex::MultiFab>& phi,
+                      amrex::Vector<amrex::MultiFab>& sig,
+                      amrex::Vector<amrex::MultiFab>& rhcc,
+                      amrex::Real rel_tol, amrex::Real abs_tol);
+
+    void set_boundary_velocity(amrex::Vector<amrex::MultiFab>& vel);
+
     // end MaestroNodalProj.cpp functions
     ////////////
 

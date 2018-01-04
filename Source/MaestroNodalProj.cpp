@@ -1,6 +1,9 @@
 
 #include <Maestro.H>
 
+#include <AMReX_MLMG.H>
+#include <AMReX_MLNodeLaplacian.H>
+
 using namespace amrex;
 
 
@@ -95,7 +98,7 @@ Maestro::NodalProj (int proj_type,
     // plus div (beta0*Vproj) on nodes
     // fix up the boundary condition ghost cells for Vproj
     // solve for phi
-
+    
 
     // make grad phi
 
@@ -185,4 +188,182 @@ Maestro::CreateUvecForProj (int proj_type,
     for (int lev=0; lev<=finest_level; ++lev) {
         FillPatch(lev, time, Vproj[lev], Vproj, Vproj, 0, 0, AMREX_SPACEDIM, bcs_u);
     }
+}
+
+
+
+void
+Maestro::doNodalProj (int proj_type,
+                      Vector<MultiFab>& Vproj,
+                      Vector<MultiFab>& phi,
+                      Vector<MultiFab>& sig,
+                      Vector<MultiFab>& rhcc,
+                      Real rel_tol, Real abs_tol)
+{
+    BL_PROFILE("Projection:::doMLMGNodalProjection()");
+
+    BL_ASSERT(Vproj[0].nGrow() == 1);
+    BL_ASSERT(Vproj[0].nComp() == AMREX_SPACEDIM);
+    AMREX_ALWAYS_ASSERT(Vproj[0].boxArray().ixType().cellCentered());
+
+    BL_ASSERT(phi[0].nGrow() == 1);
+    BL_ASSERT(phi[0].nComp() == 1);
+    AMREX_ALWAYS_ASSERT(phi[0].boxArray().ixType().nodeCentered());
+
+    BL_ASSERT(sig[0].nGrow() == 1);
+    BL_ASSERT(sig[0].nComp() == 1);
+    AMREX_ALWAYS_ASSERT(sig[0].boxArray().ixType().cellCentered());
+
+    BL_ASSERT(rhcc[0].nGrow() == 1);
+    BL_ASSERT(rhcc[0].nComp() == 1);
+    AMREX_ALWAYS_ASSERT(rhcc[0].boxArray().ixType().cellCentered());
+
+    set_boundary_velocity(Vproj);
+
+    std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
+    std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
+    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+    {
+        if (Geometry::isPeriodic(idim))
+        {
+            mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
+        }
+        else
+        {
+            if (lo_bc[idim] == Outflow) {
+                mlmg_lobc[idim] = LinOpBCType::Dirichlet;
+            } else if (lo_bc[idim] == Inflow) {
+                mlmg_lobc[idim] = LinOpBCType::inflow;
+            } else {
+                mlmg_lobc[idim] = LinOpBCType::Neumann;
+            }
+
+            if (hi_bc[idim] == Outflow) {
+                mlmg_hibc[idim] = LinOpBCType::Dirichlet;
+            } else if (hi_bc[idim] == Inflow) {
+                mlmg_hibc[idim] = LinOpBCType::inflow;
+            } else {
+                mlmg_hibc[idim] = LinOpBCType::Neumann;
+            }
+        }
+    }
+
+    LPInfo info;
+    info.setAgglomeration(true);
+    info.setConsolidation(true);
+    info.setMetricTerm(false);
+
+    MLNodeLaplacian mlndlap(geom, grids, dmap, info);
+    mlndlap.setGaussSeidel(true);
+    mlndlap.setHarmonicAverage(false);
+
+    mlndlap.setDomainBC(mlmg_lobc, mlmg_hibc);
+  
+    for (int ilev = 0; ilev <= finest_level; ++ilev) {
+        mlndlap.setSigma(ilev, sig[ilev]);
+    }
+
+    Vector<MultiFab> rhs(finest_level+1);
+    for (int ilev = 0; ilev <= finest_level; ++ilev)
+    {
+        const auto& ba = amrex::convert(grids[ilev], IntVect::TheNodeVector());
+        rhs[ilev].define(ba, dmap[ilev], 1, 0);
+    }
+
+        // define a nodal rhs and set it to zero (everything we want is in rhcc)
+    Vector<MultiFab> rhnd(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        rhnd[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        rhnd[lev].setVal(0.);
+    }
+
+    mlndlap.compRHS(amrex::GetVecOfPtrs(rhs),
+                    amrex::GetVecOfPtrs(Vproj),
+                    amrex::GetVecOfConstPtrs(rhnd),
+                    amrex::GetVecOfPtrs(rhcc));
+
+    MLMG mlmg(mlndlap);
+    mlmg.setMaxFmgIter(0);
+    mlmg.setVerbose(0);
+
+    Real mlmg_err = mlmg.solve(amrex::GetVecOfPtrs(phi),
+                               amrex::GetVecOfConstPtrs(rhs),
+                               rel_tol, abs_tol);
+
+    // FIXME - update velocity, not Vproj
+    // mlndlap.updateVelocity(Vproj, amrex::GetVecOfConstPtrs(phi));
+
+}
+
+
+void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
+{
+    // 1) At non-inflow faces, the normal component of velocity will be completely zero'd 
+    // 2) If a face is an inflow face, then the normal velocity at corners just outside inflow faces 
+    //                                will be zero'd outside of Neumann boundaries 
+    //                                (slipWall, noSlipWall, Symmetry) 
+    //                                BUT will retain non-zero values at periodic corners
+
+    for (int lev=0; lev <= finest_level; lev++) {
+        const BoxArray& grids_lev = grids[lev];
+        const Box& domainBox = geom[lev].Domain();
+
+        for (int idir=0; idir<BL_SPACEDIM; idir++) {
+            if (lo_bc[idir] != Inflow && hi_bc[idir] != Inflow) {
+                vel[lev].setBndry(0.0, idir, 1);
+            }
+            else {
+                for (MFIter mfi(vel[lev]); mfi.isValid(); ++mfi) {
+                    int i = mfi.index();
+                    FArrayBox& v_fab = (vel[lev])[mfi];
+
+                    const Box& reg = grids_lev[i];
+                    const Box& bxg1 = amrex::grow(reg, 1);
+
+                    BoxList bxlist(reg);
+
+                    if (lo_bc[idir] == Inflow && reg.smallEnd(idir) == domainBox.smallEnd(idir)) {
+                        Box bx; // bx is the region we *protect* from zero'ing
+
+                        bx = amrex::adjCellLo(reg, idir);
+
+                        for (int odir = 0; odir < BL_SPACEDIM; odir++) {
+                            if (odir != idir) {
+                                if (geom[lev].isPeriodic(odir)) bx.grow(odir,1);
+                                if (reg.bigEnd  (odir) != domainBox.bigEnd  (odir) ) bx.growHi(odir,1);
+                                if (reg.smallEnd(odir) != domainBox.smallEnd(odir) ) bx.growLo(odir,1);
+                            }
+                        }
+                        bxlist.push_back(bx);
+                    }
+
+                    if (hi_bc[idir] == Inflow && reg.bigEnd(idir) == domainBox.bigEnd(idir)) {
+                        Box bx; // bx is the region we *protect* from zero'ing
+
+                        bx = amrex::adjCellHi(reg, idir);
+
+                        for (int odir = 0; odir < BL_SPACEDIM; odir++) {
+                            if (odir != idir) {
+                                if (geom[lev].isPeriodic(odir)) bx.grow(odir,1);
+                                if (reg.bigEnd  (odir) != domainBox.bigEnd  (odir) ) bx.growHi(odir,1);
+                                if (reg.smallEnd(odir) != domainBox.smallEnd(odir) ) bx.growLo(odir,1);
+                            }
+                        }
+
+                        bxlist.push_back(bx);
+                    }
+
+                    BoxList bxlist2 = amrex::complementIn(bxg1, bxlist); 
+ 
+                    for (BoxList::iterator it=bxlist2.begin(); it != bxlist2.end(); ++it) {
+                        Box ovlp = *it & v_fab.box();
+                        if (ovlp.ok()) {
+                            v_fab.setVal(0.0, ovlp, idir, 1);
+                        }
+                    }
+
+                } // end loop over grids
+            } // end if/else logic for inflow
+        } // end loop over direction
+    } // end loop over levels
 }
