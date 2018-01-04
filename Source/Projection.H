@@ -33,26 +33,11 @@ public:
 
     ~Projection ();
 
-    void install_anelastic_coefficient (int                        level,
-                                        amrex::Real                **anel_coeff);
-
     //
     // The initial velocity projection in post_init.
     // This function ensures that the velocities are nondivergent.
     //
-    void initialVelocityProject (
-                                 amrex::Real divu_time,
-                                 int  have_divu);
-
-    //
-    // Multiply/divide a amrex::MultiFab by anel_coeff.
-    //
-    void AnelCoeffMult (int       level,
-                        amrex::MultiFab& mf,
-                        int       comp);
-    void AnelCoeffDiv (int       level,
-                       amrex::MultiFab& mf,
-                       int       comp);
+    void initialVelocityProject (amrex::Real divu_time);
 
     void put_divu_in_cc_rhs (amrex::MultiFab&       rhs,
                              int             level,
@@ -72,85 +57,6 @@ protected:
     static void Initialize ();
 
     static void Finalize ();
-
-    //
-    // Convert U from an Accleration like quantity to a velocity
-    // Unew = Uold + alpha*Unew
-    //
-    void UnConvertUnew (amrex::MultiFab&       Uold,
-                        amrex::Real            alpha,
-                        amrex::MultiFab&       Unew, 
-                        const amrex::BoxArray& grids );
-    //
-    // Convert U from an Accleration like quantity to a velocity
-    // Unew = Uold + alpha*Unew
-    //
-    void UnConvertUnew (amrex::FArrayBox& Uold,
-                        amrex::Real       alpha,
-                        amrex::FArrayBox& Unew,
-                        const amrex::Box& grd);
-    //
-    // Convert U to an Accleration like quantity
-    // Unew = (Unew - Uold)/alpha
-    //
-    void ConvertUnew (amrex::MultiFab&       Unew,
-                      amrex::MultiFab&       Uold,
-                      amrex::Real            alpha,
-                      const amrex::BoxArray& grids );
-    //
-    // Convert U to an Accleration like quantity.
-    // Unew = (Unew - Uold)/alpha
-    //
-    void ConvertUnew (amrex::FArrayBox& Unew,
-                      amrex::FArrayBox& Uold,
-                      amrex::Real       alpha,
-                      const amrex::Box& grd);
-    //
-    // Update a quantity U using the formula
-    // Unew = Unew + alpha*Uold
-    //
-    void UpdateArg1 (amrex::MultiFab&       Unew,
-                     amrex::Real            alpha,
-                     amrex::MultiFab&       Uold,
-                     int             nvar,
-                     const amrex::BoxArray& grids,
-                     int ngrow);
-    //
-    // Update a quantity U using the formula
-    // Unew = Unew + alpha*Uold
-    //
-    void UpdateArg1 (amrex::FArrayBox& Unew,
-                     amrex::Real       alpha,
-                     amrex::FArrayBox& Uold,
-                     int        nvar,
-                     const amrex::Box& grd,
-                     int        ngrow);
-    //
-    // Add phi to P.
-    //
-    void AddPhi (amrex::MultiFab&       p,
-                 amrex::MultiFab&       phi);
-    //
-    // Convert phi into p^n+1/2.
-    //
-    void incrPress (int  level,
-                    amrex::Real dt);
-    //
-    // This function scales variables at the start of a projection.
-    //
-    void scaleVar (int             which_call,
-                   amrex::MultiFab*       sig,
-                   int             sig_nghosts,
-                   amrex::MultiFab*       vel,
-                   int             level);
-    //
-    // This function rescales variables at the end of a projection.
-    //
-    void rescaleVar (int             which_call,
-                     amrex::MultiFab*       sig,
-                     int             sig_nghosts,
-                     amrex::MultiFab*       vel,
-                     int             level);
 
     void set_outflow_bcs (int        which_call,
                           const amrex::Vector<amrex::MultiFab*>& phi,
@@ -217,16 +123,13 @@ protected:
     void doMLMGNodalProjection(const amrex::Vector<amrex::MultiFab*>& vel, 
                                const amrex::Vector<amrex::MultiFab*>& phi,
                                const amrex::Vector<amrex::MultiFab*>& sig,
-                               const amrex::Vector<amrex::MultiFab*>& rhs_cc,
+                               const amrex::Vector<amrex::MultiFab*>& rhcc,
                                const amrex::Vector<amrex::MultiFab*>& rhnd, 
                                amrex::Real rel_tol, amrex::Real abs_tol,
-                               amrex::MultiFab* sync_resid_crse=nullptr,
-                               amrex::MultiFab* sync_resid_fine=nullptr,
                                bool doing_initial_velproj=false);
     
     // set velocity in ghost cells to zero except for inflow
-    void set_boundary_velocity(int c_lev, int nlevel, const amrex::Vector<amrex::MultiFab*>& vel, 
-                               bool doing_initial_velproj, bool inflowCorner);
+    void set_boundary_velocity(const amrex::Vector<amrex::MultiFab*>& vel);
 
 };
 #endif
