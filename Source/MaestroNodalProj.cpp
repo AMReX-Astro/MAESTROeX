@@ -15,10 +15,14 @@ using namespace amrex;
 // to solve for phi we use div sigma grad phi = div(beta*Vproj) - beta0*(S-Sbar)
 // where sigma = beta0 or beta0/rho depending on proj_type
 // then solve for Utilde, pi, and grad(pi) based on proj_type.
+// rhcc should enter as beta0*(S-Sbar) so we need to multiply by -1 before
+// the projection (done below)
 void
 Maestro::NodalProj (int proj_type,
                     Vector<MultiFab>& rhcc)
 {
+    AMREX_ASSERT(rhcc[0].nGrow() == 1);
+
     if ( !(proj_type == initial_projection_comp ||
            proj_type == divu_iters_comp ||
            proj_type == pressure_iters_comp ||
@@ -39,7 +43,7 @@ Maestro::NodalProj (int proj_type,
     // regular_timestep_comp:   rho^n+1/2 -- (rhoold+rhonew)/2
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
         for (int lev=0; lev<=finest_level; ++lev) {
-            sig[lev].setVal(1.);
+            sig[lev].setVal(1.,1);
         }
     }
     else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
@@ -101,18 +105,22 @@ Maestro::NodalProj (int proj_type,
         MultiFab::Multiply(sig[lev],beta0_cart[lev],0,0,1,1);
     }
 
-    // create a unew with a filled ghost cell
-    Vector<MultiFab> unew_ghost(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        unew_ghost[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-        FillPatch(lev, t_new, unew_ghost[lev], unew, unew, 0, 0, AMREX_SPACEDIM, bcs_u);
-    }
+    /* fixme
+    if (OutFlowBC::HasOutFlowBC(phys_bc))
+       set_outflow_bcs(INITIAL_VEL,phi,vel,
+                       amrex::GetVecOfPtrs(rhcc),
+                       amrex::GetVecOfPtrs(sig),
+                       0,finest_level); 
+    */
 
-    // Assemble the nodal RHS as the sum of the cell-centered RHS averaged to nodes 
-    // plus div (beta0*Vproj) on nodes
-    // fix up the boundary condition ghost cells for Vproj
-    // solve for phi
+    // Set velocity in ghost cells to zero except for inflow
+    // fixme
     set_boundary_velocity(Vproj);
+
+    // 
+    for (int lev=0; lev<=finest_level; ++lev) {
+        rhcc[lev].mult(-1.0,0,1,1);
+    }
 
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
@@ -163,11 +171,11 @@ Maestro::NodalProj (int proj_type,
         rhnd[lev].setVal(0.);
     }
 
-    // rhs is nodal and will contain the complete right-hand-side (rhnd + rhcc)
-    Vector<MultiFab> rhs(finest_level+1);
+    // rhstotal is nodal and will contain the complete right-hand-side (rhnd + rhcc)
+    Vector<MultiFab> rhstotal(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        rhs[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        rhstotal[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
     }
 
     // phi is nodal and will contain the solution (need 1 ghost cell)
@@ -177,25 +185,29 @@ Maestro::NodalProj (int proj_type,
         phi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 1);
     }
 
-    mlndlap.compRHS(amrex::GetVecOfPtrs(rhs),
+    // Assemble the nodal RHS as the sum of the cell-centered RHS averaged to nodes 
+    // plus div (beta0*Vproj) on nodes
+    mlndlap.compRHS(amrex::GetVecOfPtrs(rhstotal),
                     amrex::GetVecOfPtrs(Vproj),
                     amrex::GetVecOfConstPtrs(rhnd),
                     amrex::GetVecOfPtrs(rhcc));
 
     MLMG mlmg(mlndlap);
     mlmg.setMaxFmgIter(0);
-    mlmg.setVerbose(0);
+    mlmg.setVerbose(10);
 
     Real rel_tol = 1.e-10;
     Real abs_tol = 1.e-16;
 
+    // solve for phi
+    Print() << "Calling nodal solver" << endl;
     Real mlmg_err = mlmg.solve(amrex::GetVecOfPtrs(phi),
-                               amrex::GetVecOfConstPtrs(rhs),
+                               amrex::GetVecOfConstPtrs(rhstotal),
                                rel_tol, abs_tol);
-
+    Print() << "Done calling nodal solver" << endl;
 
     // compute a cell-centered grad(phi) from nodal phi
-
+    // fixme need to write a routine for this
 
 
     // convert beta0*Vproj back to Vproj
@@ -214,7 +226,8 @@ Maestro::NodalProj (int proj_type,
         MultiFab::Divide(sig[lev],beta0_cart[lev],0,0,1,1);
     }
   
-    // reset sig in the MLNodeLaplacian object
+    // reset sig in the MLNodeLaplacian object so the call to updateVelocity
+    // works properly
     for (int ilev = 0; ilev <= finest_level; ++ilev) {
         mlndlap.setSigma(ilev, sig[ilev]);
     }
@@ -251,14 +264,24 @@ Maestro::NodalProj (int proj_type,
         }
     }
 
-
-
-
     // update pi and grad(pi)
     // initial_projection_comp: pi = 0         grad(pi) = 0
     // divu_iters_comp:         pi = 0         grad(pi) = 0
     // pressure_iters_comp:     pi = pi + phi  grad(pi) = grad(pi) + grad(phi)
     // regular_timestep_comp:   pi = phi/dt    grad(pi) = grad(phi)/dt
+    if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        sold[lev].setVal(0.); // fixme only want to set Pi component to zero
+        gpi[lev].setVal(0.);
+    }
+    }
+    else if (proj_type == pressure_iters_comp) {
+        // fixme
+    }
+    else if (proj_type == regular_timestep_comp) {
+        // fixme
+    }
 
 
 
@@ -398,3 +421,234 @@ void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
         } // end loop over direction
     } // end loop over levels
 }
+
+/*
+void Maestro::set_outflow_bcs (int        which_call,
+                               const Vector<MultiFab*>& phi,
+                               const Vector<MultiFab*>& Vel_in,
+                               const Vector<MultiFab*>& Divu_in,
+                               const Vector<MultiFab*>& Sig_in,
+                               int        c_lev,
+                               int        f_lev)
+{
+    BL_ASSERT((which_call == INITIAL_VEL  ) || 
+              (which_call == INITIAL_PRESS) || 
+              (which_call == LEVEL_PROJ   ) );
+
+    if (which_call != LEVEL_PROJ)
+      BL_ASSERT(c_lev == 0);
+
+    if (verbose)
+      amrex::Print() << "...setting outflow bcs for the nodal projection ... " << '\n';
+
+    bool        hasOutFlow;
+    Orientation outFaces[2*BL_SPACEDIM];
+    Orientation outFacesAtThisLevel[maxlev][2*BL_SPACEDIM];
+
+    int fine_level[2*BL_SPACEDIM];
+
+    int numOutFlowFacesAtAllLevels;
+    int numOutFlowFaces[maxlev];
+    OutFlowBC::GetOutFlowFaces(hasOutFlow,outFaces,phys_bc,numOutFlowFacesAtAllLevels);
+
+    //
+    // Get 2-wide cc box, state_strip, along interior of top. 
+    // Get 1-wide nc box, phi_strip  , along top.
+    //
+    const int ccStripWidth = 2;
+
+    //
+    // Determine the finest level such that the entire outflow face is covered
+    // by boxes at this level (skip if doesnt touch, and bomb if only partially
+    // covered).
+    //
+    Box state_strip[maxlev][2*BL_SPACEDIM];
+
+    int icount[maxlev];
+    for (int i=0; i < maxlev; i++) icount[i] = 0;
+
+    //
+    // This loop is only to define the number of outflow faces at each level.
+    //
+    Box temp_state_strip;
+    for (int iface = 0; iface < numOutFlowFacesAtAllLevels; iface++) 
+    {
+      const int outDir    = outFaces[iface].coordDir();
+
+      fine_level[iface] = -1;
+      for (int lev = f_lev; lev >= c_lev; lev--)
+      {
+        Box domain = parent->Geom(lev).Domain();
+
+        if (outFaces[iface].faceDir() == Orientation::high)
+        {
+            temp_state_strip = amrex::adjCellHi(domain,outDir,ccStripWidth);
+            temp_state_strip.shift(outDir,-ccStripWidth);
+        }
+        else
+        {
+            temp_state_strip = amrex::adjCellLo(domain,outDir,ccStripWidth);
+            temp_state_strip.shift(outDir,ccStripWidth);
+        }
+        // Grow the box by one tangentially in order to get velocity bc's.
+        for (int dir = 0; dir < BL_SPACEDIM; dir++) 
+          if (dir != outDir) temp_state_strip.grow(dir,1);
+
+        const BoxArray& Lgrids               = parent->getLevel(lev).boxArray();
+        const Box&      valid_state_strip    = temp_state_strip & domain;
+        const BoxArray  uncovered_outflow_ba = amrex::complementIn(valid_state_strip,Lgrids);
+
+        BL_ASSERT( !(uncovered_outflow_ba.size() &&
+                     amrex::intersect(Lgrids,valid_state_strip).size()) );
+
+        if ( !(uncovered_outflow_ba.size()) && fine_level[iface] == -1) {
+            int ii = icount[lev];
+            outFacesAtThisLevel[lev][ii] = outFaces[iface];
+            state_strip[lev][ii] = temp_state_strip;
+            fine_level[iface] = lev;
+            icount[lev]++;
+        }
+      }
+    }
+
+    for (int lev = f_lev; lev >= c_lev; lev--) {
+      numOutFlowFaces[lev] = icount[lev];
+    }
+
+    NavierStokesBase* ns0 = dynamic_cast<NavierStokesBase*>(LevelData[c_lev]);
+    BL_ASSERT(!(ns0 == 0));
+   
+    int Divu_Type, Divu;
+    Real gravity = 0;
+
+    if (which_call == INITIAL_VEL)
+    {
+      gravity = 0;
+      if (!LevelData[c_lev]->isStateVariable("divu", Divu_Type, Divu))
+        amrex::Error("Projection::set_outflow_bcs: No divu.");
+    }
+
+    if (which_call == INITIAL_PRESS || which_call == LEVEL_PROJ)
+    {
+      gravity = ns0->getGravity();
+      if (!LevelData[c_lev]->isStateVariable("divu", Divu_Type, Divu) &&
+          (gravity == 0) )
+        amrex::Error("Projection::set_outflow_bcs: No divu or gravity.");
+    }
+
+    for (int lev = c_lev; lev <= f_lev; lev++) 
+    {
+      if (numOutFlowFaces[lev] > 0) 
+        set_outflow_bcs_at_level (which_call,lev,c_lev,
+                                  state_strip[lev],
+                                  outFacesAtThisLevel[lev],
+                                  numOutFlowFaces[lev],
+                                  phi,
+                                  Vel_in[lev],
+                                  Divu_in[lev],
+                                  Sig_in[lev],
+                                  gravity);
+                                  
+    }
+
+}
+
+void Maestro::set_outflow_bcs_at_level (int          which_call,
+                                        int          lev,
+                                        int          c_lev,
+                                        Box*         state_strip,
+                                        Orientation* outFacesAtThisLevel,
+                                        int          numOutFlowFaces,
+                                        const Vector<MultiFab*>&  phi, 
+                                        MultiFab*    Vel_in,
+                                        MultiFab*    Divu_in,
+                                        MultiFab*    Sig_in,
+                                        Real         gravity)
+{
+    BL_ASSERT(dynamic_cast<NavierStokesBase*>(LevelData[lev]) != nullptr);
+
+    Box domain = parent->Geom(lev).Domain();
+
+    const int ncStripWidth = 1;
+
+    FArrayBox  rho[2*BL_SPACEDIM];
+    FArrayBox dsdt[2*BL_SPACEDIM];
+    FArrayBox dudt[1][2*BL_SPACEDIM];
+    FArrayBox phi_fine_strip[2*BL_SPACEDIM];
+
+    const int ngrow = 1;
+
+    for (int iface = 0; iface < numOutFlowFaces; iface++)
+    {
+        dsdt[iface].resize(state_strip[iface],1);
+        dudt[0][iface].resize(state_strip[iface],BL_SPACEDIM);
+
+        rho[iface].resize(state_strip[iface],1);
+
+        (*Sig_in).copyTo(rho[iface],0,0,1,ngrow);
+
+        Box phi_strip = 
+            amrex::surroundingNodes(amrex::bdryNode(domain,
+                                                      outFacesAtThisLevel[iface],
+                                                      ncStripWidth));
+        phi_fine_strip[iface].resize(phi_strip,1);
+        phi_fine_strip[iface].setVal(0.);
+    }
+
+    ProjOutFlowBC projBC;
+    if (which_call == INITIAL_PRESS) 
+    {
+
+        const int*      lo_bc = phys_bc->lo();
+        const int*      hi_bc = phys_bc->hi();
+        projBC.computeRhoG(rho,phi_fine_strip,
+                           parent->Geom(lev),
+                           outFacesAtThisLevel,numOutFlowFaces,gravity,
+                           lo_bc,hi_bc);
+    }
+    else
+    {
+        Vel_in->FillBoundary();
+
+	for (int iface = 0; iface < numOutFlowFaces; iface++) 
+	    (*Vel_in).copyTo(dudt[0][iface],0,0,BL_SPACEDIM,1);
+
+        // since we have divu
+        for (int iface = 0; iface < numOutFlowFaces; iface++) 
+            (*Divu_in).copyTo(dsdt[iface],0,0,1,1);
+
+        const int*      lo_bc = phys_bc->lo();
+        const int*      hi_bc = phys_bc->hi();
+        projBC.computeBC(dudt, dsdt, rho, phi_fine_strip,
+                         parent->Geom(lev),
+                         outFacesAtThisLevel,
+                         numOutFlowFaces, lo_bc, hi_bc, gravity);
+    }
+
+    for (int i = 0; i < 2*BL_SPACEDIM; i++)
+    {
+        rho[i].clear();
+        dsdt[i].clear();
+        dudt[0][i].clear();
+    }
+
+    for ( int iface = 0; iface < numOutFlowFaces; iface++)
+    {
+        BoxArray phi_fine_strip_ba(phi_fine_strip[iface].box());
+        DistributionMapping dm {phi_fine_strip_ba};
+        MultiFab phi_fine_strip_mf(phi_fine_strip_ba,dm,1,0);
+
+        for (MFIter mfi(phi_fine_strip_mf); mfi.isValid(); ++mfi) {
+            phi_fine_strip_mf[mfi].copy(phi_fine_strip[iface]);
+        }
+
+        phi[lev]->copy(phi_fine_strip_mf);
+    }
+
+    if (lev > c_lev) 
+    {
+        putDown(phi, phi_fine_strip, c_lev, lev, outFacesAtThisLevel,
+                numOutFlowFaces, ncStripWidth);
+    }
+}
+*/

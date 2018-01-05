@@ -3,6 +3,7 @@
 
 using namespace amrex;
 
+// compute S at cell-centers
 void
 Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& scal,
@@ -51,6 +52,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 }
 
 
+// compute rhcc = beta0*(S_cc-Sbar)
 void
 Maestro::MakeCCRHSforNodalProj (Vector<MultiFab>& rhcc,
                                 const Vector<MultiFab>& S_cc,

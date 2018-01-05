@@ -237,9 +237,6 @@ void Maestro::InitProj ()
     // make the nodal rhs for projection
     MakeCCRHSforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
 
-    // define epsilon for initial projection
-    // fixme
-
     // perform a nodal projection
     NodalProj(initial_projection_comp,rhcc);
 
