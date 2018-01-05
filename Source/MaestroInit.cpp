@@ -16,6 +16,11 @@ Maestro::Init ()
     // fill in multifab and base state data
     InitData();
 
+    if (plot_int > 0) {
+        Print() << "\nWriting plotfile 9999999 after InitData" << endl;
+        WritePlotFile(9999999,t_old,rho0_old,p0_old,uold,sold);
+    }
+
     if (spherical == 1) {
         // FIXME
         // MakeNormal();
@@ -41,15 +46,31 @@ Maestro::Init ()
     if (do_initial_projection) {
         Print() << "Doing initial projection" << endl;
         InitProj();
+
+        if (plot_int > 0) {
+            Print() << "\nWriting plotfile 9999998 after InitProj" << endl;
+            WritePlotFile(9999998,t_old,rho0_old,p0_old,uold,sold);
+        }
     }
 
     // compute initial time step
     FirstDt();
 
     // divu iters
-    for (int i=1; i<=init_divu_iter; ++i) {
-        Print() << "Doing initial divu iteration #" << i << endl;
-        DivuIter(i);
+    if (init_divu_iter > 0) {
+        for (int i=1; i<=init_divu_iter; ++i) {
+            Print() << "Doing initial divu iteration #" << i << endl;
+            DivuIter(i);
+
+            // compute new dt
+            // fixme
+            //
+            //
+        }
+        if (plot_int > 0) {
+            Print() << "\nWriting plotfile 9999997 after final DivuIter" << endl;
+            WritePlotFile(9999997,t_old,rho0_old,p0_old,uold,sold);
+        }
     }
 
     // copy S_cc_old into S_cc_new for the pressure iterations
@@ -61,6 +82,11 @@ Maestro::Init ()
     for (int i=1; i<= init_iter; ++i) {
         Print() << "Doing initial pressure iteration #" << i << endl;
         InitIter();
+    }
+
+    if (plot_int > 0) {
+        Print() << "\nWriting plotfile 0 after all initialization" << endl;
+        WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
     }
 }
 
@@ -131,11 +157,6 @@ Maestro::InitData ()
             // set rhoh0 to be the average
             Average(sold,rhoh0_old,RhoH);
         }
-    }
-
-    if (plot_int > 0) {
-        Print() << "\nWriting plotfile 0 after initialization" << endl;
-        WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
     }
 }
 
@@ -234,8 +255,8 @@ void Maestro::InitProj ()
         Average(S_cc_old,Sbar,0);
     }
 
-    // make the nodal rhs for projection
-    MakeCCRHSforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
+    // make the nodal rhs for projection beta0*(S-Sbar)
+    MakeRHCCforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
 
     // perform a nodal projection
     NodalProj(initial_projection_comp,rhcc);
@@ -274,7 +295,7 @@ void Maestro::DivuIter (int istep_divu_iter)
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
         thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
         rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
-        rhcc        [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhcc        [lev].define(grids[lev], dmap[lev],       1, 1);
 
         // divu_iters do not use density weighting
         rhohalf[lev].setVal(1.);
@@ -305,18 +326,11 @@ void Maestro::DivuIter (int istep_divu_iter)
                 r_edge_loc.dataPtr(), dt, dt, 0);
     }
 
-    MakeCCRHSforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
-
-    // define epsilon for divu_iters
-    //
+    // make the nodal rhs for projection beta0*(S-Sbar)
+    MakeRHCCforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
 
     // perform a nodal projection
-    //
-
-    // compute new dt
-
-
-
+    NodalProj(divu_iters_comp,rhcc);
 }
 
 

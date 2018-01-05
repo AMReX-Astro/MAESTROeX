@@ -218,6 +218,7 @@ private:
     ////////////
     // MaestroMakeS.cpp functions
 
+    // compute S at cell-centers
     void Make_S_cc (amrex::Vector<amrex::MultiFab>& S_cc,
                     const amrex::Vector<amrex::MultiFab>& scal,
                     const amrex::Vector<amrex::MultiFab>& rho_omegadot,
@@ -225,10 +226,11 @@ private:
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal);
 
-    void MakeCCRHSforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
-                                const amrex::Vector<amrex::MultiFab>& S_cc,
-                                const amrex::Vector<amrex::Real>& Sbar,
-                                const amrex::Vector<amrex::Real>& beta0);
+    // compute rhcc = beta0*(S_cc-Sbar)
+    void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
+                               const amrex::Vector<amrex::MultiFab>& S_cc,
+                               const amrex::Vector<amrex::Real>& Sbar,
+                               const amrex::Vector<amrex::Real>& beta0);
 
     // end MaestroMakeS.cpp functions
     ////////////

@@ -54,10 +54,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
 // compute rhcc = beta0*(S_cc-Sbar)
 void
-Maestro::MakeCCRHSforNodalProj (Vector<MultiFab>& rhcc,
-                                const Vector<MultiFab>& S_cc,
-                                const Vector<Real>& Sbar,
-                                const Vector<Real>& beta0)
+Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
+                               const Vector<MultiFab>& S_cc,
+                               const Vector<Real>& Sbar,
+                               const Vector<Real>& beta0)
 {
     for (int lev=0; lev<=finest_level; ++lev) {
 

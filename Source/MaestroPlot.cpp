@@ -57,7 +57,7 @@ Maestro::WritePlotFile (const int step,
 std::string
 Maestro::PlotFileName (int lev) const
 {
-    return Concatenate(plot_base_name, lev, 5);
+    return Concatenate(plot_base_name, lev, 7);
 }
 
 // put together a vector of multifabs for writing
