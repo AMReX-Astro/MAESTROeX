@@ -9,16 +9,24 @@ using namespace amrex;
 
 // Perform a nodal projection.
 // Given a cell-centered velocity field Vproj (assembled in CreateUvecForProj),
-// Vproj can decomposed into Vproj = Utilde + (1/sig) grad phi,
+// Vproj can decomposed into Vproj = Utilde + sig grad phi,
 // where Utilde satisfies the constraint div(beta0*Utilde) = beta0*(S-Sbar)
 // Depending on proj_type we use different values of Vproj, sig, and beta0
-// to solve for phi we use div (beta0/sig) grad phi = div(beta*Vproj) - beta0*(S-Sbar)
+// to solve for phi we use div sigma grad phi = div(beta*Vproj) - beta0*(S-Sbar)
+// where sigma = beta0 or beta0/rho depending on proj_type
 // then solve for Utilde, pi, and grad(pi) based on proj_type.
 void
 Maestro::NodalProj (int proj_type,
                     Vector<MultiFab>& rhcc)
 {
-    // build a multifab "sig" div (1/sig) grad phi = RHS with 1 ghost cell
+    if ( !(proj_type == initial_projection_comp ||
+           proj_type == divu_iters_comp ||
+           proj_type == pressure_iters_comp ||
+           proj_type == regular_timestep_comp) ) {
+        amrex::Abort("Maestro::NodalProj - invalid proj_type");
+    }
+
+    // build a multifab sig with 1 ghost cell
     Vector<MultiFab> sig(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         sig[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -34,7 +42,7 @@ Maestro::NodalProj (int proj_type,
             sig[lev].setVal(1.);
         }
     }
-    else {
+    else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
         for (int lev=0; lev<=finest_level; ++lev) {
             FillPatch(lev, 0.5*(t_old+t_new), sig[lev], sold, snew, 0, 0, 1, bcs_s);
         }
@@ -51,6 +59,7 @@ Maestro::NodalProj (int proj_type,
     // divu_iters_comp:         Utilde^0                        -- uold
     // pressure_iters_comp:     (Utilde^n+1,* - Utilde^n)/dt    -- (unew-uold)/dt
     // regular_timestep_comp:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
+    // note sig is only used for regular_timestep_comp, and currently holds rhohalf
     CreateUvecForProj(proj_type,Vproj,sig);
 
     // build a multifab to store a Cartesian version of beta0 with 1 ghost cell
@@ -75,16 +84,21 @@ Maestro::NodalProj (int proj_type,
         Put1dArrayOnCart(beta0_nph,beta0_cart,bcs_f,0,0);
     }
 
-    // convert Vproj to beta0*Vproj in valid region
+    // convert Vproj to beta0*Vproj
     for (int lev=0; lev<=finest_level; ++lev) {
         for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
             MultiFab::Multiply(Vproj[lev],beta0_cart[lev],0,dir,1,1);
         }
     }
 
-    // divide sig by beta0
+    // invert sig then multiply by beta0 so sig now holds:
+    // initial_projection_comp: beta0
+    // divu_iters_comp:         beta0
+    // pressure_iters_comp:     beta0/rho
+    // regular_timestep_comp:   beta0/rho
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Divide(sig[lev],beta0_cart[lev],0,0,1,1);
+        sig[lev].invert(1.0,1);
+        MultiFab::Multiply(sig[lev],beta0_cart[lev],0,0,1,1);
     }
 
     // create a unew with a filled ghost cell
@@ -98,22 +112,144 @@ Maestro::NodalProj (int proj_type,
     // plus div (beta0*Vproj) on nodes
     // fix up the boundary condition ghost cells for Vproj
     // solve for phi
-    
+    set_boundary_velocity(Vproj);
 
-    // make grad phi
+    std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
+    std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
+    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+    {
+        if (Geometry::isPeriodic(idim)) {
+            mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
+        }
+        else {
+            if (lo_bc[idim] == Outflow) {
+                mlmg_lobc[idim] = LinOpBCType::Dirichlet;
+            } else if (lo_bc[idim] == Inflow) {
+                mlmg_lobc[idim] = LinOpBCType::inflow;
+            } else {
+                mlmg_lobc[idim] = LinOpBCType::Neumann;
+            }
 
+            if (hi_bc[idim] == Outflow) {
+                mlmg_hibc[idim] = LinOpBCType::Dirichlet;
+            } else if (hi_bc[idim] == Inflow) {
+                mlmg_hibc[idim] = LinOpBCType::inflow;
+            } else {
+                mlmg_hibc[idim] = LinOpBCType::Neumann;
+            }
+        }
+    }
 
+    LPInfo info;
+    info.setAgglomeration(true);
+    info.setConsolidation(true);
+    info.setMetricTerm(false);
 
-    // convert sig/beta0 back to sig
+    MLNodeLaplacian mlndlap(geom, grids, dmap, info);
+    mlndlap.setGaussSeidel(true);
+    mlndlap.setHarmonicAverage(false);
+
+    mlndlap.setDomainBC(mlmg_lobc, mlmg_hibc);
+  
+    // set sig in the MLNodeLaplacian object
+    for (int ilev = 0; ilev <= finest_level; ++ilev) {
+        mlndlap.setSigma(ilev, sig[ilev]);
+    }
+
+    // define a nodal rhs and set it to zero (everything we want is in rhcc)
+    Vector<MultiFab> rhnd(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Multiply(sig[lev],beta0_cart[lev],0,0,1,1);
+        rhnd[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+        rhnd[lev].setVal(0.);
+    }
+
+    // rhs is nodal and will contain the complete right-hand-side (rhnd + rhcc)
+    Vector<MultiFab> rhs(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev)
+    {
+        rhs[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
+    }
+
+    // phi is nodal and will contain the solution (need 1 ghost cell)
+    Vector<MultiFab> phi(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev)
+    {
+        phi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 1);
+    }
+
+    mlndlap.compRHS(amrex::GetVecOfPtrs(rhs),
+                    amrex::GetVecOfPtrs(Vproj),
+                    amrex::GetVecOfConstPtrs(rhnd),
+                    amrex::GetVecOfPtrs(rhcc));
+
+    MLMG mlmg(mlndlap);
+    mlmg.setMaxFmgIter(0);
+    mlmg.setVerbose(0);
+
+    Real rel_tol = 1.e-10;
+    Real abs_tol = 1.e-16;
+
+    Real mlmg_err = mlmg.solve(amrex::GetVecOfPtrs(phi),
+                               amrex::GetVecOfConstPtrs(rhs),
+                               rel_tol, abs_tol);
+
+
+    // compute a cell-centered grad(phi) from nodal phi
+
+
+
+    // convert beta0*Vproj back to Vproj
+    for (int lev=0; lev<=finest_level; ++lev) {
+        for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+            MultiFab::Divide(Vproj[lev],beta0_cart[lev],0,dir,1,1);
+        }
+    }
+
+    // divide sig by beta0 so it now holds
+    // initial_projection_comp: 1
+    // divu_iters_comp:         1
+    // pressure_iters_comp:     1/rho
+    // regular_timestep_comp:   1/rho
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Divide(sig[lev],beta0_cart[lev],0,0,1,1);
+    }
+  
+    // reset sig in the MLNodeLaplacian object
+    for (int ilev = 0; ilev <= finest_level; ++ilev) {
+        mlndlap.setSigma(ilev, sig[ilev]);
     }
 
     // update velocity
-    // initial_projection_comp: Utilde^0   = V - (1/sig)*grad(phi)
-    // divu_iters_comp:         Utilde^0   = V - (1/sig)*grad(phi)
-    // pressure_iters_comp:     Utilde^n+1 = Utilde^n + dt(V-(1/sig)*grad(phi))
-    // regular_timestep_comp:   Utilde^n+1 = V - (1/sig)*grad(phi)
+    // initial_projection_comp: Utilde^0   = V - sig*grad(phi)
+    // divu_iters_comp:         Utilde^0   = V - sig*grad(phi)
+    // pressure_iters_comp:     Utilde^n+1 = Utilde^n + dt(V-sig*grad(phi))
+    // regular_timestep_comp:   Utilde^n+1 = V - sig*grad(phi)
+    if (proj_type == initial_projection_comp || 
+        proj_type == divu_iters_comp) {
+        // Vproj = Vproj - (1/sig)*grad(phi)
+        mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(uold[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
+        }
+    }
+    else if (proj_type == pressure_iters_comp) {
+        // Vproj = Vproj - (1/sig)*grad(phi)
+        mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(unew[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
+            // multiply by dt
+            unew[lev].mult(dt);
+            MultiFab::Add(unew[lev],uold[lev],0,0,AMREX_SPACEDIM,0);
+        }
+
+    }
+    else if (proj_type == regular_timestep_comp) {
+        // Vproj = Vproj - (1/sig)*grad(phi)
+        mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(unew[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
+        }
+    }
 
 
 
@@ -134,7 +270,7 @@ Maestro::NodalProj (int proj_type,
 // divu_iters_comp:         Utilde^0                        -- uold
 // pressure_iters_comp:     (Utilde^n+1,* - Utilde^n)/dt    -- (unew-uold)/dt
 // regular_timestep_comp:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
-// sig contains rhohalf if proj_type == regular_timestep_comp
+    // note sig is only used for regular_timestep_comp, and currently holds rhohalf
 void
 Maestro::CreateUvecForProj (int proj_type,
                             Vector<MultiFab>& Vproj,
@@ -188,111 +324,6 @@ Maestro::CreateUvecForProj (int proj_type,
     for (int lev=0; lev<=finest_level; ++lev) {
         FillPatch(lev, time, Vproj[lev], Vproj, Vproj, 0, 0, AMREX_SPACEDIM, bcs_u);
     }
-}
-
-
-
-void
-Maestro::doNodalProj (int proj_type,
-                      Vector<MultiFab>& Vproj,
-                      Vector<MultiFab>& phi,
-                      Vector<MultiFab>& sig,
-                      Vector<MultiFab>& rhcc,
-                      Real rel_tol, Real abs_tol)
-{
-    BL_PROFILE("Projection:::doMLMGNodalProjection()");
-
-    BL_ASSERT(Vproj[0].nGrow() == 1);
-    BL_ASSERT(Vproj[0].nComp() == AMREX_SPACEDIM);
-    AMREX_ALWAYS_ASSERT(Vproj[0].boxArray().ixType().cellCentered());
-
-    BL_ASSERT(phi[0].nGrow() == 1);
-    BL_ASSERT(phi[0].nComp() == 1);
-    AMREX_ALWAYS_ASSERT(phi[0].boxArray().ixType().nodeCentered());
-
-    BL_ASSERT(sig[0].nGrow() == 1);
-    BL_ASSERT(sig[0].nComp() == 1);
-    AMREX_ALWAYS_ASSERT(sig[0].boxArray().ixType().cellCentered());
-
-    BL_ASSERT(rhcc[0].nGrow() == 1);
-    BL_ASSERT(rhcc[0].nComp() == 1);
-    AMREX_ALWAYS_ASSERT(rhcc[0].boxArray().ixType().cellCentered());
-
-    set_boundary_velocity(Vproj);
-
-    std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
-    std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
-    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
-    {
-        if (Geometry::isPeriodic(idim))
-        {
-            mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
-        }
-        else
-        {
-            if (lo_bc[idim] == Outflow) {
-                mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-            } else if (lo_bc[idim] == Inflow) {
-                mlmg_lobc[idim] = LinOpBCType::inflow;
-            } else {
-                mlmg_lobc[idim] = LinOpBCType::Neumann;
-            }
-
-            if (hi_bc[idim] == Outflow) {
-                mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } else if (hi_bc[idim] == Inflow) {
-                mlmg_hibc[idim] = LinOpBCType::inflow;
-            } else {
-                mlmg_hibc[idim] = LinOpBCType::Neumann;
-            }
-        }
-    }
-
-    LPInfo info;
-    info.setAgglomeration(true);
-    info.setConsolidation(true);
-    info.setMetricTerm(false);
-
-    MLNodeLaplacian mlndlap(geom, grids, dmap, info);
-    mlndlap.setGaussSeidel(true);
-    mlndlap.setHarmonicAverage(false);
-
-    mlndlap.setDomainBC(mlmg_lobc, mlmg_hibc);
-  
-    for (int ilev = 0; ilev <= finest_level; ++ilev) {
-        mlndlap.setSigma(ilev, sig[ilev]);
-    }
-
-    Vector<MultiFab> rhs(finest_level+1);
-    for (int ilev = 0; ilev <= finest_level; ++ilev)
-    {
-        const auto& ba = amrex::convert(grids[ilev], IntVect::TheNodeVector());
-        rhs[ilev].define(ba, dmap[ilev], 1, 0);
-    }
-
-        // define a nodal rhs and set it to zero (everything we want is in rhcc)
-    Vector<MultiFab> rhnd(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        rhnd[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
-        rhnd[lev].setVal(0.);
-    }
-
-    mlndlap.compRHS(amrex::GetVecOfPtrs(rhs),
-                    amrex::GetVecOfPtrs(Vproj),
-                    amrex::GetVecOfConstPtrs(rhnd),
-                    amrex::GetVecOfPtrs(rhcc));
-
-    MLMG mlmg(mlndlap);
-    mlmg.setMaxFmgIter(0);
-    mlmg.setVerbose(0);
-
-    Real mlmg_err = mlmg.solve(amrex::GetVecOfPtrs(phi),
-                               amrex::GetVecOfConstPtrs(rhs),
-                               rel_tol, abs_tol);
-
-    // FIXME - update velocity, not Vproj
-    // mlndlap.updateVelocity(Vproj, amrex::GetVecOfConstPtrs(phi));
-
 }
 
 
