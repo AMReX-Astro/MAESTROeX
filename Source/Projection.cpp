@@ -612,15 +612,12 @@ void Projection::doMLMGNodalProjection (const Vector<MultiFab*>& vel,
     BL_ASSERT(sig[c_lev]->nGrow() == 1);
     BL_ASSERT(sig[f_lev]->nGrow() == 1);
     
-    BL_ASSERT(sig[c_lev]->nComp() == 1);
-    BL_ASSERT(sig[f_lev]->nComp() == 1);
-    
     if (rhcc[c_lev]) {
-        AMREX_ALWAYS_ASSERT(rhcc[c_lev]->boxArray().ixType().cellCentered());
         BL_ASSERT(rhcc[c_lev]->nGrow() == 1);
         BL_ASSERT(rhcc[f_lev]->nGrow() == 1);
     }
 
+    // Set velocity in ghost cells to zero except for inflow
     set_boundary_velocity(vel);
 
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
