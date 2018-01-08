@@ -105,16 +105,38 @@ Maestro::NodalProj (int proj_type,
         MultiFab::Multiply(sig[lev],beta0_cart[lev],0,0,1,1);
     }
 
-    /* fixme
+
+/*
+  set_outflow_bcs() modifies boundary conditions on phi at outflow.
+  Typically these are homogeneous Dirichlet but in some cases you need
+  to modify this.  First, if div(u) is "large enough" at outflow you need
+  to modify the boundary conditions.  This often happens in combustion
+  flame systems (PeleLM),  Second if you have hydrostatic effects
+  due to gravity you need to modify the boundary conditions.  This happens
+  in IAMR_type runs with strong gravity.  MAESTRO
+  requires neither of these since we do not run problems with strong
+  div(u) at outflow, and our pi (pressure) does not need to capture
+  stratification since we have put this pressure in perturbational form
+  by adding (rho-rho0)*g to the RHS of the velocity equation.
+*/
+/*
     if (OutFlowBC::HasOutFlowBC(phys_bc))
        set_outflow_bcs(INITIAL_VEL,phi,vel,
                        amrex::GetVecOfPtrs(rhcc),
                        amrex::GetVecOfPtrs(sig),
                        0,finest_level); 
-    */
+*/
 
-    // Set velocity in ghost cells to zero except for inflow
-    // fixme
+/*
+  set_boundary_velocity() is a simplified version of the function in IAMR/Projection.cpp
+  basically this sets velocity in ghost cells to zero except at inflow
+  right now, the nodal solver expects ghost cells to be filled this way
+  in slightly more detail
+  1) At non-inflow faces, the normal component of velocity will be completely zero'd 
+  2) If a face is an inflow face, then the normal velocity at corners just outside inflow faces 
+     will be zero'd outside of Neumann boundaries (slipWall, noSlipWall, Symmetry) 
+     BUT will retain non-zero values at periodic corners
+*/
     set_boundary_velocity(Vproj);
 
     // 
