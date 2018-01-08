@@ -41,6 +41,7 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 		           # to satisfy CFL condition.
 
 # ALGORITHMIC OPTIONS
+maestro.evolve_base_state = false
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 1
 maestro.init_iter             = 0
