@@ -26,6 +26,9 @@ all: $(executable)
 # Maestro uses a coarse grained OMP approach
 DEFINES += -DCRSEGRNDOMP
 
+# Maestro needs to compute additional thermodynamic derivatives in the EOS
+DEFINES += -DEXTRA_THERMO
+
 USE_MG = FALSE
 
 #------------------------------------------------------------------------------
