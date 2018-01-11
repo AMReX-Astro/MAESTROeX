@@ -206,6 +206,7 @@ Maestro::NodalProj (int proj_type,
     for (int lev = 0; lev <= finest_level; ++lev)
     {
         phi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 1);
+        phi[lev].setVal(0.);
     }
 
     // Assemble the nodal RHS as the sum of the cell-centered RHS averaged to nodes 
@@ -334,7 +335,7 @@ Maestro::NodalProj (int proj_type,
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        sold[lev].setVal(0.); // fixme only want to set Pi component to zero
+        sold[lev].setVal(0.,Pi,1,0); // fixme only want to set Pi component to zero
         gpi[lev].setVal(0.);
     }
     }
