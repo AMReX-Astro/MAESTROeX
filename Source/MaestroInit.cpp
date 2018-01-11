@@ -330,7 +330,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     MakeRHCCforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
 
     // perform a nodal projection
-    NodalProj(divu_iters_comp,rhcc);
+    NodalProj(divu_iters_comp,rhcc,istep_divu_iter);
 }
 
 

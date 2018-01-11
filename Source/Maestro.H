@@ -240,7 +240,8 @@ private:
 
     // perform a nodal projection
     void NodalProj (int proj_type,
-                    amrex::Vector<amrex::MultiFab>& rhcc);
+                    amrex::Vector<amrex::MultiFab>& rhcc,
+                    int istep_divu_iter=0);
 
     // fill in Vproj
     // initial_projection_comp: Utilde^0                        -- uold
@@ -397,6 +398,30 @@ private:
     static int divu_iters_comp;
     static int pressure_iters_comp;
     static int regular_timestep_comp;
+
+    
+    //////////////////////////////////
+    // these are defined in Maestro.cpp
+    // solver tolerance parameters
+    //////////////////////////////////
+    // tolerances for the initial projection
+    static Real eps_init_proj_cart;
+    static Real eps_init_proj_sph;
+    // tolerances for the divu iterations
+    static Real eps_divu_cart;
+    static Real eps_divu_sph;
+    static Real divu_iter_factor;
+    static Real divu_level_factor;
+    // tolerances for the MAC projection
+    static Real eps_mac;
+    static Real eps_mac_max;
+    static Real mac_level_factor;
+    static Real eps_mac_bottom;
+    // tolerances for the nodal projection
+    static Real eps_hg;
+    static Real eps_hg_max;
+    static Real hg_level_factor;
+    static Real eps_hg_bottom;
 
     // these are defined in Maestro.cpp
     static amrex::IntVect nodal_flag;

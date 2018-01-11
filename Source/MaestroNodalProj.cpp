@@ -19,7 +19,8 @@ using namespace amrex;
 // the projection (done below)
 void
 Maestro::NodalProj (int proj_type,
-                    Vector<MultiFab>& rhcc)
+                    Vector<MultiFab>& rhcc,
+                    int istep_divu_iter)
 {
     AMREX_ASSERT(rhcc[0].nGrow() == 1);
 
@@ -218,8 +219,47 @@ Maestro::NodalProj (int proj_type,
     mlmg.setMaxFmgIter(0);
     mlmg.setVerbose(10);
 
-    Real rel_tol = 1.e-10;
-    Real abs_tol = 1.e-16;
+    Real abs_tol = -1.; // disable absolute tolerance
+    Real rel_tol;
+
+    // logic for choosing multigrid tolerance
+    // parameters are defined in Maestro.cpp
+    // we change the tolerance depending on what part of the algorithm we
+    // are in, and other factors including planar vs. spherical, the number
+    // of AMR levels, etc.
+    if (proj_type == initial_projection_comp) {
+        rel_tol = (spherical==1) ? eps_init_proj_sph : eps_init_proj_cart;
+    }
+    else if (proj_type == divu_iters_comp) {
+        if (spherical == 1) {
+            if (istep_divu_iter == init_divu_iter) {
+                rel_tol = eps_divu_sph;
+            }
+            else if (istep_divu_iter == init_divu_iter-1) {
+                rel_tol = eps_divu_sph*divu_iter_factor;
+            }
+            else if (istep_divu_iter <= init_divu_iter-2) {
+                rel_tol = eps_divu_sph*pow(divu_iter_factor,2);
+            }
+        }
+        else {
+            if (istep_divu_iter == init_divu_iter) {
+                rel_tol = std::min(eps_divu_cart*pow(divu_level_factor,finest_radial_level), 
+                                   eps_divu_cart*pow(divu_level_factor,2));
+            }
+            else if (istep_divu_iter == init_divu_iter-1) {
+                rel_tol = std::min(eps_divu_cart*divu_iter_factor*pow(divu_level_factor,finest_radial_level),
+                                   eps_divu_cart*divu_iter_factor*pow(divu_level_factor,2));
+            }
+            else if (istep_divu_iter <= init_divu_iter-2) {
+                rel_tol = std::min(eps_divu_cart*pow(divu_iter_factor,2)*pow(divu_level_factor,finest_radial_level),
+                                   eps_divu_cart*pow(divu_iter_factor,2)*pow(divu_level_factor,2));
+            }
+        }
+    }
+    else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
+        rel_tol = std::min( eps_hg_max, eps_hg*pow(hg_level_factor,finest_level) );
+    }
 
     // solve for phi
     Print() << "Calling nodal solver" << endl;
