@@ -18,10 +18,10 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         MultiFab& vel_force_mf = vel_force[lev];
         const MultiFab& gpi_mf = gpi[lev];
         const MultiFab& rho_mf = rho[lev];
-        const MultiFab& uedge_mf = uedge[0][lev];
-        const MultiFab& vedge_mf = uedge[1][lev];
+        const MultiFab& uedge_mf = uedge[lev][0];
+        const MultiFab& vedge_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
-        const MultiFab& wedge_mf = uedge[2][lev];
+        const MultiFab& wedge_mf = uedge[lev][2];
 #endif
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
