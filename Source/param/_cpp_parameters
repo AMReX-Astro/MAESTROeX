@@ -92,7 +92,7 @@ nuclear_dt_fac                      Real               -1.0
 use_soundspeed_firstdt              bool            false     y
 
 # Use the divu constraint when computing the first time step.
-use_divu_firstdt                    bool            false
+use_divu_firstdt                    bool            false       y
 
 #-----------------------------------------------------------------------------
 # category: grid

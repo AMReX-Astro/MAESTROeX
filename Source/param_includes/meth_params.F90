@@ -34,6 +34,7 @@ module meth_params_module
   logical                       , save :: do_small_domain
   double precision              , save :: cfl
   logical                       , save :: use_soundspeed_firstdt
+  logical                       , save :: use_divu_firstdt
   integer                       , save :: spherical
   logical                       , save :: octant
   integer                       , save :: do_2d_planar_octant
@@ -85,6 +86,7 @@ contains
     do_small_domain = .false.;
     cfl = 0.5d0;
     use_soundspeed_firstdt = .false.;
+    use_divu_firstdt = .false.;
     spherical = 0;
     octant = .false.;
     do_2d_planar_octant = 0;
@@ -124,6 +126,7 @@ contains
     call pp%query("do_small_domain", do_small_domain)
     call pp%query("cfl", cfl)
     call pp%query("use_soundspeed_firstdt", use_soundspeed_firstdt)
+    call pp%query("use_divu_firstdt", use_divu_firstdt)
     call pp%query("spherical", spherical)
     call pp%query("octant", octant)
     call pp%query("do_2d_planar_octant", do_2d_planar_octant)

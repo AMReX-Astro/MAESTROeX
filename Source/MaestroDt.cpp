@@ -7,7 +7,6 @@ using namespace amrex;
 void
 Maestro::EstDt ()
 {
-
     dt = 1.e99;
         
     Real umax = 0.;
@@ -15,11 +14,11 @@ Maestro::EstDt ()
     for (int lev = 0; lev <= finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        MultiFab& u_mf = unew[lev];
-        MultiFab& s_mf = snew[lev];
+        MultiFab& uold_mf = uold[lev];
+        MultiFab& sold_mf = sold[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(u_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(uold_mf); mfi.isValid(); ++mfi ) {
 
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
@@ -35,11 +34,13 @@ Maestro::EstDt ()
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
+/*
             firstdt(dt_grid,umax_grid,
                     ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                     ZFILL(dx),
-                    BL_TO_FORTRAN_FAB(s_mf[mfi]),
-                    BL_TO_FORTRAN_FAB(u_mf[mfi]));
+                    BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+                    BL_TO_FORTRAN_FAB(uold_mf[mfi]));
+*/
 
             dt = std::min(dt,dt_grid);
             umax = std::max(umax,umax_grid);
@@ -107,6 +108,34 @@ Maestro::EstDt ()
 void
 Maestro::FirstDt ()
 {
+
+    // allocate a dummy w0_force and set equal to zero
+    Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
+
+    // build a dummy umac and set equal to zero
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > umac_dummy(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+        umac_dummy[lev][0].setVal(0.);
+        umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+        umac_dummy[lev][1].setVal(0.);
+#if (AMREX_SPACEDIM == 3)
+        umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+        umac_dummy[lev][2].setVal(0.);
+#endif
+    }
+
+    // build and compute vel_force
+    Vector<MultiFab> vel_force(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+    }
+
+    int do_add_utilde_force = 0;
+    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,w0_force_dummy,do_add_utilde_force);
+    
+
     dt = 1.e99;
         
     Real umax = 0.;
@@ -114,11 +143,13 @@ Maestro::FirstDt ()
     for (int lev = 0; lev <= finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        MultiFab& u_mf = unew[lev];
-        MultiFab& s_mf = snew[lev];
+        MultiFab& uold_mf = uold[lev];
+        MultiFab& sold_mf = sold[lev];
+        MultiFab& vel_force_mf = vel_force[lev];
+        MultiFab& S_cc_old_mf = S_cc_old[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(u_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(uold_mf); mfi.isValid(); ++mfi ) {
 
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
@@ -132,11 +163,15 @@ Maestro::FirstDt ()
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            firstdt(dt_grid,umax_grid,
+            firstdt(lev,dt_grid,umax_grid,
                     ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                     ZFILL(dx),
-                    BL_TO_FORTRAN_FAB(s_mf[mfi]),
-                    BL_TO_FORTRAN_FAB(u_mf[mfi]));
+                    BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+                    BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+                    BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+                    BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+                    p0_old.dataPtr(),
+                    gamma1bar_old.dataPtr());
 
             dt = std::min(dt,dt_grid);
             umax = std::max(umax,umax_grid);
