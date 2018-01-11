@@ -163,8 +163,10 @@ private:
     // MaestroForce.cpp functions
     void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+                       const amrex::Vector<amrex::MultiFab>& rho,
+                       const amrex::Vector<amrex::Real>& rho0,
+                       const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
-                       int is_final_update,
                        int do_add_utilde_force);
     ////////////////////////
 

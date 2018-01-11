@@ -19,7 +19,7 @@ contains
                             wedge, w_lo, w_hi, &
 #endif
                             w0,w0_force,rho0,grav, &
-                            is_final_update, do_add_utilde_force) &
+                            do_add_utilde_force) &
                             bind(C, name="make_vel_force")
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
@@ -43,7 +43,7 @@ contains
     double precision, intent (in   ) :: w0_force(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) ::     rho0(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) ::     grav(0:max_radial_level,0:nr_fine-1)
-    integer         , intent (in   ) :: is_final_update, do_add_utilde_force
+    integer         , intent (in   ) :: do_add_utilde_force
 
     ! local
     integer :: i,j,k,r

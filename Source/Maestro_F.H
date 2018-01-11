@@ -213,7 +213,6 @@ extern "C"
                         const amrex::Real* w0_force,
                         const amrex::Real* rho0,
                         const amrex::Real* grav,
-                        const int& is_final_update,
                         const int& do_add_utilde_force);
     //////////////////////
 
