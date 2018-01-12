@@ -127,7 +127,9 @@ contains
     ! force constraints
     if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
     if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
+#if (AMREX_SPACEDIM == 3)
     if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+#endif
     
     ! divU constraint
     if (use_divu_firstdt) then
