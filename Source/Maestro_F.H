@@ -77,7 +77,8 @@ extern "C"
                const amrex::Real* u,     const int* u_lo, const int* u_hi, const int* nc_u,
                const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
                const amrex::Real* divu,  const int* d_lo, const int* d_hi,
-               const amrex::Real* p0, const amrex::Real* gamma1bar);
+               const amrex::Real* dSdt,  const int* t_lo, const int* t_hi,
+               const amrex::Real* w0, const amrex::Real* p0, const amrex::Real* gamma1bar);
 
     void firstdt(const int& lev, amrex::Real& dt, amrex::Real& umax,
                  const int* lo, const int* hi, 

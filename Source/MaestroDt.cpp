@@ -45,6 +45,7 @@ Maestro::EstDt ()
         MultiFab& sold_mf = sold[lev];
         MultiFab& vel_force_mf = vel_force[lev];
         MultiFab& S_cc_old_mf = S_cc_old[lev];
+        MultiFab& dSdt_mf = dSdt[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(uold_mf); mfi.isValid(); ++mfi ) {
@@ -68,6 +69,8 @@ Maestro::EstDt ()
                   BL_TO_FORTRAN_FAB(uold_mf[mfi]),
                   BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
                   BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+                  BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
+                  w0.dataPtr(),
                   p0_old.dataPtr(),
                   gamma1bar_old.dataPtr());
 
