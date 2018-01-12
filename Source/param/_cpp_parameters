@@ -521,3 +521,28 @@ sdc_iters                           int            1
 
 # recompute MAC velocity at the beginning of each SDC iter
 sdc_couple_mac_velocity             bool            false
+
+
+
+#-----------------------------------------------------------------------------
+# category: solver tolerances
+#-----------------------------------------------------------------------------
+
+# tolerances for the initial projection
+eps_init_proj_cart                  Real       1.e-12
+eps_init_proj_sph                   Real       1.e-10
+# tolerances for the divu iterations
+eps_divu_cart                       Real       1.e-12
+eps_divu_sph                        Real       1.e-10
+divu_iter_factor                    Real       100.
+divu_level_factor                   Real       10.
+# tolerances for the MAC projection
+eps_mac                             Real       1.e-10
+eps_mac_max                         Real       1.e-8
+mac_level_factor                    Real       10.
+eps_mac_bottom                      Real       1.e-3
+# tolerances for the nodal projection
+eps_hg                              Real       1.e-12
+eps_hg_max                          Real       1.e-10
+hg_level_factor                     Real       10.
+eps_hg_bottom                       Real       1.e-4
