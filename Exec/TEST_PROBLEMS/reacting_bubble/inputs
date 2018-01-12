@@ -31,10 +31,9 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.temperr = 6.5e8 6.5e8
 
 # TIME STEPPING
-maestro.max_step  = 1
+maestro.max_step  = 0
 maestro.stop_time = 2.5
-maestro.fixed_dt  = 1.e-4
-maestro.cfl       = 0.7    # cfl number for hyperbolic system
+maestro.cfl       = 0.9    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
 		           # the 3D test, but need to use 0.7 in 2D
