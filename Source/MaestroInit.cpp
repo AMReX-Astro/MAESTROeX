@@ -331,8 +331,38 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     // perform a nodal projection
     NodalProj(divu_iters_comp,rhcc,istep_divu_iter);
-}
 
+    Real dt_hold = dt;
+
+    // compute new time step
+    EstDt();
+
+    if (verbose > 0) {
+        Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
+                << " gives dt = " << dt << endl;
+    }
+    
+    dt *= init_shrink;
+    if (verbose > 0) {
+        Print() << "Multiplying dt by init_shrink; dt = " << dt << endl;
+    }
+    
+    if (dt > dt_hold) {
+        if (verbose > 0) {
+            Print() << "Ignoring this new dt since it's larger than the previous dt = "
+                    << dt_hold << endl;
+        }
+        dt = std::min(dt_hold,dt);
+    }
+
+    if (fixed_dt != -1.0) {
+        // fixed dt
+        dt = fixed_dt;
+        if (maestro_verbose > 0) {
+            Print() << "Setting fixed dt = " << dt << endl;
+        }
+    }
+}
 
 void Maestro::InitIter ()
 {
