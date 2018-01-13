@@ -21,10 +21,8 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
         ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
     }
 
-    // put w0 on a Cartesian grid and fill ghost cells
+    // create ufull = uold + w0
     Put1dArrayOnCart(w0,ufull,bcs_u,1,1);
-
-    // add uold to w0
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Add(ufull[lev],uold_ghost[lev],0,0,AMREX_SPACEDIM,ng_adv);
     }
@@ -57,5 +55,17 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 
     // VelPred();
 
+
+}
+
+void
+Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
+                     const Vector<MultiFab>& ufill,
+                     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans)
+{
+
+
+
+    // fill ghost cells
 
 }

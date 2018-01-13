@@ -67,6 +67,10 @@ private:
     ////////////
     // MaestroAdvection.cpp functions
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+
+    void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
+                     const amrex::Vector<amrex::MultiFab>& ufull,
+                     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans);
     ////////////
 
     ////////////

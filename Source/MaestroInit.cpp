@@ -26,6 +26,10 @@ Maestro::Init ()
         // MakeNormal();
     }
 
+    if (do_sponge) {
+        init_sponge(rho0_old.dataPtr());
+    }
+
     // make gravity
     make_grav_cell(grav_cell_old.dataPtr(),
                    rho0_old.dataPtr(),
