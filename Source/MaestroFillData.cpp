@@ -104,7 +104,6 @@ Maestro::GetData (int lev, Real time,
     }
     else
     {
-        Abort("Maestro::GetData we don't subcycle in time so should we be here?");
         mf.push_back(&mf_old[lev]);
         mf.push_back(&mf_new[lev]);
         mftime.push_back(t_old);

@@ -23,15 +23,49 @@ Maestro::Evolve ()
         // if this is the first time step we already have a dt from either FirstDt()
         // or EstDt called during the divu_iters
         if (istep > 1) {
+
             EstDt();
+
+            if (verbose > 0) {
+                Print() << "Call to estdt at beginning of step " << istep
+                        << " gives dt =" << dt << endl;
+            }
+
+            // fixme - add nuclear_dt_scalefac timestep limiter
+
+            if (dt > max_dt_growth*dtold) {
+                dt = max_dt_growth*dtold;
+                if (verbose > 0) {
+                    Print() << "dt_growth factor limits the new dt = " << dt << endl;
+                }
+            }
+
+            if (dt > max_dt) {
+                if (verbose > 0) {
+                    Print() << "max_dt limits the new dt = " << max_dt << endl;
+                }
+                dt = max_dt;
+            }
+
+            if (fixed_dt != -1.) {
+                dt = fixed_dt;
+                if (maestro_verbose > 0) {
+                    Print() << "Setting fixed dt = " << dt;
+                }
+            }
+
+            if (stop_time >= 0. && t_old+dt > stop_time) {
+                dt = std::min(dt,stop_time-t_old);
+                Print() << "Stop time limits dt = " << dt << endl;
+            }
         }
 
-        // reset t_old and t_new
-        t_old = t_new;
-        t_new += dt;
+        t_new = t_old + dt;
 
         // advance the solution by dt
         AdvanceTimeStep(false);
+
+        t_old = t_new;
 
         // write a plotfile
         if (plot_int > 0 && (istep % plot_int == 0 || istep == max_step) )

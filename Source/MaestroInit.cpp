@@ -56,22 +56,25 @@ Maestro::Init ()
     // compute initial time step
     FirstDt();
 
-    // divu iters
+    // divu iters - also update dt at end of each divu_iter
     if (init_divu_iter > 0) {
         for (int i=1; i<=init_divu_iter; ++i) {
             Print() << "Doing initial divu iteration #" << i << endl;
             DivuIter(i);
-
-            // compute new dt
-            // fixme
-            //
-            //
         }
+
         if (plot_int > 0) {
             Print() << "\nWriting plotfile 9999997 after final DivuIter" << endl;
             WritePlotFile(9999997,t_old,rho0_old,p0_old,uold,sold);
         }
     }
+
+    if (stop_time >= 0. && t_old+dt > stop_time) {
+        dt = std::min(dt,stop_time-t_old);
+        Print() << "Stop time limits dt = " << dt << endl;
+    }
+
+    dtold = dt;
 
     // copy S_cc_old into S_cc_new for the pressure iterations
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -337,18 +340,18 @@ void Maestro::DivuIter (int istep_divu_iter)
     // compute new time step
     EstDt();
 
-    if (verbose > 0) {
+    if (maestro_verbose > 0) {
         Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
                 << " gives dt = " << dt << endl;
     }
     
     dt *= init_shrink;
-    if (verbose > 0) {
+    if (maestro_verbose > 0) {
         Print() << "Multiplying dt by init_shrink; dt = " << dt << endl;
     }
     
     if (dt > dt_hold) {
-        if (verbose > 0) {
+        if (maestro_verbose > 0) {
             Print() << "Ignoring this new dt since it's larger than the previous dt = "
                     << dt_hold << endl;
         }
@@ -366,7 +369,6 @@ void Maestro::DivuIter (int istep_divu_iter)
 
 void Maestro::InitIter ()
 {
-    dtold = dt;
 
     // advance the solution by dt
     AdvanceTimeStep(true);
