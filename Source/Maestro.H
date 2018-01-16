@@ -457,12 +457,6 @@ private:
     amrex::Vector<amrex::BCRec> bcs_t;  // for temperature
     amrex::Vector<amrex::BCRec> bcs_f;  // "first-order extrap" used for S_cc, gpi, dSdt
 
-    // boundary conditions objects needed for linear solves
-    int lo_inflow[AMREX_SPACEDIM];
-    int hi_inflow[AMREX_SPACEDIM];
-    int mg_bcs_p[2*AMREX_SPACEDIM];
-    int mg_bcs_h[2*AMREX_SPACEDIM];
-
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     amrex::Vector<amrex::Real> s0_init;

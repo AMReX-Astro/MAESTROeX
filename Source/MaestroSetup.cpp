@@ -492,34 +492,4 @@ Maestro::BCSetup()
 
     } // end loop over directions
 
-    // set up boundary conditions for linear solves
-    // order is xlo, xhi, ylo, yhi, zlo, zhi
-    // MGT_BC_INT (Interior)
-    // MGT_BC_DIR (Dirichlet)
-    // MGT_BC_NEU (Neumann)
-    for ( int i = 0; i < AMREX_SPACEDIM; ++i ) {
-        if ( Geom()[0].isPeriodic(i) ) {
-            mg_bcs_p[i*2 + 0] = MGT_BC_INT;
-            mg_bcs_p[i*2 + 1] = MGT_BC_INT;
-            mg_bcs_h[i*2 + 0] = MGT_BC_INT;
-            mg_bcs_h[i*2 + 1] = MGT_BC_INT;
-        }
-        else {
-            mg_bcs_p[i*2 + 0] = lo_bc[i]==Outflow ? MGT_BC_DIR : MGT_BC_NEU;
-            mg_bcs_p[i*2 + 1] = hi_bc[i]==Outflow ? MGT_BC_DIR : MGT_BC_NEU;
-            mg_bcs_h[i*2 + 0] = lo_bc[i]==Inflow  ? MGT_BC_DIR : MGT_BC_NEU;
-            mg_bcs_h[i*2 + 1] = hi_bc[i]==Inflow  ? MGT_BC_DIR : MGT_BC_NEU;
-        }
-    }
-
-    // lo/hi_inflow is needed for linear solves
-    for (int dir=0; dir<AMREX_SPACEDIM; dir++) {
-        if (lo_bc[dir] == Inflow) {
-            lo_inflow[dir] = 1;
-        }
-        if (hi_bc[dir] == Inflow) {
-            hi_inflow[dir] = 1;
-        }
-    }
-
 }
