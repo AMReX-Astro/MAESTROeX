@@ -343,9 +343,9 @@ contains
           
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
-                denom = divU(i,j,k) - u(i,j,k,3)*gradp0/(gamma1bar(k)*p0(lev,k))
+                denom = divU(i,j,k) - u(i,j,k,3)*gradp0/(gamma1bar(lev,k)*p0(lev,k))
                 if (denom > 0.d0) then
-                   dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/s(i,j,k,rho_comp))/denom)
+                   dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
                 endif
              enddo
           enddo

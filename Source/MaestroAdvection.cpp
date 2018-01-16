@@ -63,7 +63,62 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                      const Vector<MultiFab>& ufull,
                      Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans)
 {
+    for (int lev=0; lev<=finest_level; ++lev) {
 
+        // get references to the MultiFabs at level lev
+        const MultiFab& sold_mf    = sold[lev]; // only used for the MFIter since it's cell-centered
+        const MultiFab& utilde_mf  = utilde[lev];
+        const MultiFab& ufull_mf   = ufull[lev];
+        MultiFab& utrans_mf        = utrans[lev][0];
+#if (AMREX_SPACEDIM >= 2)
+        MultiFab& vtrans_mf        = utrans[lev][1];
+#if (AMREX_SPACEDIM == 3)
+        MultiFab& wtrans_mf        = utrans[lev][2];
+#endif
+#endif
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+            const Real* dx = geom[lev].CellSize();
+
+            const FArrayBox& utilde_fab  = utilde_mf[mfi];
+            const FArrayBox& ufull_fab   = ufull_mf[mfi];
+            FArrayBox& utrans_fab = utrans_mf[mfi];
+#if (AMREX_SPACEDIM >= 2)
+            FArrayBox& vtrans_fab = vtrans_mf[mfi];
+#if (AMREX_SPACEDIM == 3)
+            FArrayBox& wtrans_fab = wtrans_mf[mfi];
+#endif
+#endif
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+#if (AMREX_SPACEDIM == 1)
+            mkutrans_1d(
+#elif (AMREX_SPACEDIM == 2)
+            mkutrans_2d(
+#elif (AMREX_SPACEDIM == 3)
+            mkutrans_3d(
+#endif
+                        lev, validBox.loVect(), validBox.hiVect(),
+                        utilde_fab.dataPtr(), utilde_fab.loVect(), utilde_fab.hiVect(), utilde_fab.nCompPtr(),
+                        utilde_mf.nGrow(),
+                        ufull_fab.dataPtr(), ufull_fab.loVect(), ufull_fab.hiVect(), ufull_fab.nCompPtr(),
+                        utrans_fab.dataPtr(), utrans_fab.loVect(), utrans_fab.hiVect(),
+#if (AMREX_SPACEDIM >= 2)
+                        vtrans_fab.dataPtr(), vtrans_fab.loVect(), vtrans_fab.hiVect(),
+#if (AMREX_SPACEDIM == 3)
+                        wtrans_fab.dataPtr(), wtrans_fab.loVect(), wtrans_fab.hiVect(),
+#endif
+#endif
+                        w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+        }
+    }
 
 
     // fill ghost cells

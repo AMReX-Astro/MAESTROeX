@@ -255,6 +255,32 @@ extern "C"
 
     //////////////////////
 
+
+    //////////////////////
+    // in mkutrans.F90
+#if (AMREX_SPACEDIM == 1)
+    void mkutrans_1d(
+#elif (AMREX_SPACEDIM == 2)
+    void mkutrans_2d(
+#elif (AMREX_SPACEDIM == 3)
+    void mkutrans_3d(
+#endif
+                      const int& lev, const int* lo, const int* hi,
+                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut,
+                      const int& ng_ut,
+                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf,
+                      amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
+#if (AMREX_SPACEDIM >= 2)
+                      amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
+#if (AMREX_SPACEDIM == 3)
+                      amrex::Real* wtrans, const int* uw_lo, const int* uw_hi,
+#endif
+#endif
+                      const amrex::Real* w0, const amrex::Real* dx, const amrex::Real& dt,
+                      const int* adv_bc, const int* phys_bc);
+
+    //////////////////////
+
     //////////////////////
     // in rhoh_vs_t.F90
     void makeTfromRhoH (const int& lev, const int* lo, const int* hi, 

@@ -6,6 +6,7 @@ module mkutrans_module
   use amrex_constants_module
   use slope_module
   use meth_params_module, only: rel_eps
+  use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
 
@@ -13,17 +14,23 @@ module mkutrans_module
 
 contains
 
-  subroutine mkutrans_1d(utilde,ng_u,ufull,ng_uf,utrans,ng_ut,w0, &
-                         lo,hi,dx,dt,adv_bc,phys_bc)
+#if (AMREX_SPACEDIM == 1)
+  subroutine mkutrans_1d(lev, lo, hi, &
+                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+                         ufull,  uf_lo, uf_hi, nc_uf, &
+                         utrans, uu_lo, uu_hi, &
+                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_1d")
 
-    integer         , intent(in   ) :: lo(:),hi(:),ng_u,ng_uf,ng_ut
-    double precision, intent(in   ) :: utilde(lo(1)-ng_u :,:)
-    double precision, intent(in   ) ::  ufull(lo(1)-ng_uf:,:)
-    double precision, intent(inout) :: utrans(lo(1)-ng_ut:)
-    double precision, intent(in   ) :: w0(0:)    
-    double precision, intent(in   ) :: dt,dx(:)
-    integer         , intent(in   ) :: adv_bc(:,:,:)
-    integer         , intent(in   ) :: phys_bc(:,:)
+    integer         , intent(in   ) :: lev, lo(1), hi(1)
+    integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut, ng_ut
+    integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
+    integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
+    double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
+    double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),nc_uf)
+    double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1))
+    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: dx(1), dt
+    integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
     
     double precision :: slopex(lo(1)-1:hi(1)+1,1)
 
@@ -45,7 +52,7 @@ contains
     
     hx = dx(1)
     
-    call slopex_1d(utilde(:,1:),slopex,lo,hi,ng_u,1,adv_bc(:,:,1:))
+    call slopex_1d(utilde(:,1:1),slopex,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
 
     !******************************************************************
     ! create utrans
@@ -92,28 +99,37 @@ contains
     do i=is,ie+1
        ! solve Riemann problem using full velocity
        uavg = HALF*(ulx(i)+urx(i))
-       test = ((ulx(i)+w0(i) .le. ZERO .and. urx(i)+w0(i) .ge. ZERO) .or. &
-               (abs(ulx(i)+urx(i)+TWO*w0(i)) .lt. rel_eps))
-       utrans(i) = merge(ulx(i),urx(i),uavg+w0(i) .gt. ZERO)
+       test = ((ulx(i)+w0(lev,i) .le. ZERO .and. urx(i)+w0(lev,i) .ge. ZERO) .or. &
+               (abs(ulx(i)+urx(i)+TWO*w0(lev,i)) .lt. rel_eps))
+       utrans(i) = merge(ulx(i),urx(i),uavg+w0(lev,i) .gt. ZERO)
        utrans(i) = merge(ZERO,utrans(i),test)
     end do
 
     deallocate(ulx,urx)
 
   end subroutine mkutrans_1d
+#endif
 
-  subroutine mkutrans_2d(utilde,ng_u,ufull,ng_uf,utrans,vtrans,ng_ut,w0, &
-                         lo,hi,dx,dt,adv_bc,phys_bc)
+#if (AMREX_SPACEDIM == 2)
+  subroutine mkutrans_2d(lev, lo, hi, &
+                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+                         ufull,  uf_lo, uf_hi, nc_uf, &
+                         utrans, uu_lo, uu_hi, &
+                         vtrans, uv_lo, uv_hi, &
+                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
 
-    integer         , intent(in   ) :: lo(:),hi(:),ng_u,ng_uf,ng_ut
-    double precision, intent(in   ) :: utilde(lo(1)-ng_u :,lo(2)-ng_u :,:)
-    double precision, intent(in   ) ::  ufull(lo(1)-ng_uf:,lo(2)-ng_uf:,:)
-    double precision, intent(inout) :: utrans(lo(1)-ng_ut:,lo(2)-ng_ut:)
-    double precision, intent(inout) :: vtrans(lo(1)-ng_ut:,lo(2)-ng_ut:)
-    double precision, intent(in   ) :: w0(0:)    
-    double precision, intent(in   ) :: dt,dx(:)
-    integer         , intent(in   ) :: adv_bc(:,:,:)
-    integer         , intent(in   ) :: phys_bc(:,:)
+    integer         , intent(in   ) :: lev, lo(2), hi(2)
+    integer         , intent(in   ) :: ut_lo(2), ut_hi(2), nc_ut, ng_ut
+    integer         , intent(in   ) :: uf_lo(2), uf_hi(2), nc_uf
+    integer         , intent(in   ) :: uu_lo(2), uu_hi(2)
+    integer         , intent(in   ) :: uv_lo(2), uv_hi(2)
+    double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),nc_ut)
+    double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),nc_uf)
+    double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2))
+    double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2))
+    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: dx(2), dt
+    integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
     
     double precision :: slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1)
     double precision :: slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1)
@@ -143,8 +159,8 @@ contains
     hx = dx(1)
     hy = dx(2)
     
-    call slopex_2d(utilde(:,:,1:),slopex,lo,hi,ng_u,1,adv_bc(:,:,1:))
-    call slopey_2d(utilde(:,:,2:),slopey,lo,hi,ng_u,1,adv_bc(:,:,2:))
+    call slopex_2d(utilde(:,:,1:1),slopex,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+    call slopey_2d(utilde(:,:,2:2),slopey,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
 
     !******************************************************************
     ! create utrans
@@ -249,9 +265,9 @@ contains
        do i=is,ie
           ! solve Riemann problem using full velocity
           uavg = HALF*(vly(i,j)+vry(i,j))
-          test = ((vly(i,j)+w0(j) .le. ZERO .and. vry(i,j)+w0(j) .ge. ZERO) .or. &
-               (abs(vly(i,j)+vry(i,j)+TWO*w0(j)) .lt. rel_eps))
-          vtrans(i,j) = merge(vly(i,j),vry(i,j),uavg+w0(j) .gt. ZERO)
+          test = ((vly(i,j)+w0(lev,j) .le. ZERO .and. vry(i,j)+w0(lev,j) .ge. ZERO) .or. &
+               (abs(vly(i,j)+vry(i,j)+TWO*w0(lev,j)) .lt. rel_eps))
+          vtrans(i,j) = merge(vly(i,j),vry(i,j),uavg+w0(lev,j) .gt. ZERO)
           vtrans(i,j) = merge(ZERO,vtrans(i,j),test)
        enddo
     enddo
@@ -259,20 +275,31 @@ contains
     deallocate(ulx,urx,vly,vry)
 
   end subroutine mkutrans_2d
-  
-  subroutine mkutrans_3d(utilde,ng_u,ufull,ng_uf,utrans,vtrans,wtrans,ng_ut, &
-                         w0,lo,hi,dx,dt,adv_bc,phys_bc)
+#endif
 
-    integer         , intent(in)    :: lo(:),hi(:),ng_u,ng_uf,ng_ut
-    double precision, intent(in   ) :: utilde(lo(1)-ng_u :,lo(2)-ng_u :,lo(3)-ng_u :,:)
-    double precision, intent(in   ) ::  ufull(lo(1)-ng_uf:,lo(2)-ng_uf:,lo(3)-ng_uf:,:)
-    double precision, intent(inout) :: utrans(lo(1)-ng_ut:,lo(2)-ng_ut:,lo(3)-ng_ut:)
-    double precision, intent(inout) :: vtrans(lo(1)-ng_ut:,lo(2)-ng_ut:,lo(3)-ng_ut:)
-    double precision, intent(inout) :: wtrans(lo(1)-ng_ut:,lo(2)-ng_ut:,lo(3)-ng_ut:)
-    double precision, intent(in   ) :: w0(0:)
-    double precision, intent(in   ) :: dt,dx(:)
-    integer         , intent(in   ) :: adv_bc(:,:,:)
-    integer         , intent(in   ) :: phys_bc(:,:)
+#if (AMREX_SPACEDIM == 3)
+  subroutine mkutrans_3d(lev, lo, hi, &
+                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+                         ufull,  uf_lo, uf_hi, nc_uf, &
+                         utrans, uu_lo, uu_hi, &
+                         vtrans, uv_lo, uv_hi, &
+                         wtrans, uw_lo, uw_hi, &
+                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
+
+    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut, ng_ut
+    integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
+    integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
+    integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
+    integer         , intent(in   ) :: uw_lo(3), uw_hi(3)
+    double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
+    double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
+    double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
+    double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2),uv_lo(3):uv_hi(3))
+    double precision, intent(inout) :: wtrans(uw_lo(1):uw_hi(1),uw_lo(2):uw_hi(2),uw_lo(3):uw_hi(3))
+    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: dx(3), dt
+    integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
     
     double precision, allocatable :: slopex(:,:,:,:)
     double precision, allocatable :: slopey(:,:,:,:)
@@ -306,10 +333,10 @@ contains
     hz = dx(3)
     
     do k = lo(3)-1,hi(3)+1
-       call slopex_2d(utilde(:,:,k,1:),slopex(:,:,k,:),lo,hi,ng_u,1,adv_bc(:,:,1:))
-       call slopey_2d(utilde(:,:,k,2:),slopey(:,:,k,:),lo,hi,ng_u,1,adv_bc(:,:,2:))
+       call slopex_2d(utilde(:,:,k,1:1),slopex(:,:,k,:),lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+       call slopey_2d(utilde(:,:,k,2:2),slopey(:,:,k,:),lo,hi,ng_ut,1,adv_bc(:,:,2:2))
     end do
-    call slopez_3d(utilde(:,:,:,3:),slopez,lo,hi,ng_u,1,adv_bc(:,:,3:))
+    call slopez_3d(utilde(:,:,:,3:3),slopez,lo,hi,ng_ut,1,adv_bc(:,:,3:3))
     
     !******************************************************************
     ! create utrans
@@ -504,9 +531,9 @@ contains
           do i=is,ie
              ! solve Riemann problem using full velocity
              uavg = HALF*(wlz(i,j,k)+wrz(i,j,k))
-             test = ((wlz(i,j,k)+w0(k).le.ZERO .and. wrz(i,j,k)+w0(k).ge.ZERO) .or. &
-                  (abs(wlz(i,j,k)+wrz(i,j,k)+TWO*w0(k)) .lt. rel_eps))
-             wtrans(i,j,k) = merge(wlz(i,j,k),wrz(i,j,k),uavg+w0(k) .gt. ZERO)
+             test = ((wlz(i,j,k)+w0(lev,k).le.ZERO .and. wrz(i,j,k)+w0(lev,k).ge.ZERO) .or. &
+                  (abs(wlz(i,j,k)+wrz(i,j,k)+TWO*w0(lev,k)) .lt. rel_eps))
+             wtrans(i,j,k) = merge(wlz(i,j,k),wrz(i,j,k),uavg+w0(lev,k) .gt. ZERO)
              wtrans(i,j,k) = merge(ZERO,wtrans(i,j,k),test)
           enddo
        enddo
@@ -515,5 +542,6 @@ contains
     deallocate(wlz,wrz)
 
   end subroutine mkutrans_3d
+#endif
   
 end module mkutrans_module
