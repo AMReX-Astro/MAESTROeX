@@ -60,7 +60,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 
 void
 Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
-                     const Vector<MultiFab>& ufill,
+                     const Vector<MultiFab>& ufull,
                      Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans)
 {
 

@@ -336,7 +336,7 @@ use_delta_gamma1_term               bool            false
 use_etarho                          bool            true
 
 # order of slopes in piecewise linear Godunov algorithm.  Options are 0, 2, or 4.
-slope_order                         int            4
+slope_order                         int            4              y
 
 # the gravitational acceleration (cm~s$^{-2}$) for plane-parallel geometry
 grav_const                          Real               -1.5e10    y
