@@ -164,7 +164,7 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 #if (AMREX_SPACEDIM == 3)
                             BL_TO_FORTRAN_3D(umacz_mf[mfi]),
 #endif
-                            lo_bc.dataPtr(),hi_bc.data());
+                            phys_bc.dataPtr());
 
         }
     }

@@ -444,8 +444,7 @@ private:
 
     // stores domain boundary conditions
     // these muse be vectors (rather than arrays) so we can ParmParse them
-    amrex::Vector<int> lo_bc;
-    amrex::Vector<int> hi_bc;    
+    amrex::Vector<int> phys_bc;
 
     // boundary condition objects needed for FillPatch routines
     // this is essentially an array (over components)

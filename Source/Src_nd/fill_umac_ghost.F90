@@ -15,7 +15,7 @@ contains
 #if (AMREX_SPACEDIM == 3)
                              wmac, wmac_lo, wmac_hi, &
 #endif
-                             lo_bc, hi_bc) bind(C, name="fill_umac_ghost")
+                             phys_bc) bind(C, name="fill_umac_ghost")
 
     
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
@@ -33,11 +33,11 @@ contains
                                             wmac_lo(2):wmac_hi(2), &
                                             wmac_lo(3):wmac_hi(3))
 #endif
-    integer         , intent(in   ) :: lo_bc(AMREX_SPACEDIM), hi_bc(AMREX_SPACEDIM)
+    integer         , intent(in   ) :: phys_bc(2,AMREX_SPACEDIM)
 
     ! lo x-faces
     if (lo(1) .eq. domlo(1)) then
-       select case (lo_bc(1))
+       select case (phys_bc(1,1))
        case (Inflow)
           umac(lo(1)-1,:,:) = umac(lo(1),:,:)
           vmac(lo(1)-1,:,:) = 0.d0
@@ -70,7 +70,7 @@ contains
 
     ! hi x-faces
     if (hi(1) .eq. domhi(1)) then
-       select case (hi_bc(1))
+       select case (phys_bc(1,2))
        case (Inflow)
           umac(hi(1)+2,:,:) = umac(hi(1)+1,:,:)
           vmac(hi(1)+1,:,:) = 0.d0
@@ -103,7 +103,7 @@ contains
 
     ! lo y-faces
     if (lo(2) .eq. domlo(2)) then
-       select case (lo_bc(2))
+       select case (phys_bc(2,1))
        case (Inflow)
           umac(:,lo(2)-1,:) = 0.d0
           vmac(:,lo(2)-1,:) = vmac(:,lo(2),:)
@@ -136,7 +136,7 @@ contains
 
     ! hi y-faces
     if (hi(2) .eq. domhi(2)) then
-       select case (hi_bc(2))
+       select case (phys_bc(2,2))
        case (Inflow)
           umac(:,hi(2)+1,:) = 0.d0
           vmac(:,hi(2)+2,:) = vmac(:,hi(2)+1,:)
@@ -171,7 +171,7 @@ contains
 
     ! lo z-faces
     if (lo(3) .eq. domlo(3)) then
-       select case (lo_bc(3))
+       select case (phys_bc(3,1))
        case (Inflow)
           umac(:,:,lo(3)-1) = 0.d0
           vmac(:,:,lo(3)-1) = 0.d0
@@ -196,7 +196,7 @@ contains
 
     ! hi z-faces
     if (hi(3) .eq. domhi(3)) then
-       select case (hi_bc(3))
+       select case (phys_bc(3,2))
        case (Inflow)
           umac(:,:,hi(3)+1) = 0.d0
           vmac(:,:,hi(3)+1) = 0.d0

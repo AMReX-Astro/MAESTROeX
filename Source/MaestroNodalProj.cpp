@@ -150,17 +150,17 @@ Maestro::NodalProj (int proj_type,
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         }
         else {
-            if (lo_bc[idim] == Outflow) {
+            if (phys_bc[idim] == Outflow) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-            } else if (lo_bc[idim] == Inflow) {
+            } else if (phys_bc[idim] == Inflow) {
                 mlmg_lobc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
 
-            if (hi_bc[idim] == Outflow) {
+            if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } else if (hi_bc[idim] == Inflow) {
+            } else if (phys_bc[AMREX_SPACEDIM+idim] == Inflow) {
                 mlmg_hibc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
@@ -423,7 +423,7 @@ void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
         const Box& domainBox = geom[lev].Domain();
 
         for (int idir=0; idir<BL_SPACEDIM; idir++) {
-            if (lo_bc[idir] != Inflow && hi_bc[idir] != Inflow) {
+            if (phys_bc[idir] != Inflow && phys_bc[AMREX_SPACEDIM+idir] != Inflow) {
                 vel[lev].setBndry(0.0, idir, 1);
             }
             else {
@@ -436,7 +436,7 @@ void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
 
                     BoxList bxlist(reg);
 
-                    if (lo_bc[idir] == Inflow && reg.smallEnd(idir) == domainBox.smallEnd(idir)) {
+                    if (phys_bc[idir] == Inflow && reg.smallEnd(idir) == domainBox.smallEnd(idir)) {
                         Box bx; // bx is the region we *protect* from zero'ing
 
                         bx = amrex::adjCellLo(reg, idir);
@@ -451,7 +451,7 @@ void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
                         bxlist.push_back(bx);
                     }
 
-                    if (hi_bc[idir] == Inflow && reg.bigEnd(idir) == domainBox.bigEnd(idir)) {
+                    if (phys_bc[AMREX_SPACEDIM+idir] == Inflow && reg.bigEnd(idir) == domainBox.bigEnd(idir)) {
                         Box bx; // bx is the region we *protect* from zero'ing
 
                         bx = amrex::adjCellHi(reg, idir);

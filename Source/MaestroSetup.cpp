@@ -160,10 +160,19 @@ Maestro::ReadParameters ()
 #include <maestro_queries.H>
 
     // read in boundary conditions
-    lo_bc.resize(AMREX_SPACEDIM);
-    hi_bc.resize(AMREX_SPACEDIM);
+    Vector<int> lo_bc(AMREX_SPACEDIM);
+    Vector<int> hi_bc(AMREX_SPACEDIM);
     pp.getarr("lo_bc",lo_bc,0,AMREX_SPACEDIM);
     pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
+
+    // storey boundary conditions in a single array
+    // order shall be 
+    // LO_X, LO_Y, (LO_Z), HI_X, HI_Y, (HI_Z)
+    phys_bc.resize(2*AMREX_SPACEDIM);
+    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+        phys_bc[i]                = lo_bc[i];
+        phys_bc[i+AMREX_SPACEDIM] = hi_bc[i];
+    }
 
     // read in tagging criteria
     int n = pp.countval("temperr");
@@ -219,13 +228,13 @@ Maestro::BCSetup()
         {
             if (Geometry::isPeriodic(dir))
             {
-                if (lo_bc[dir] != Interior)
+                if (phys_bc[dir] != Interior)
                 {
                     std::cerr << "Maestro::ReadParameters:periodic in direction "
                               << dir << " but low BC is not Interior\n";
                     Error();
                 }
-                if (hi_bc[dir] != Interior)
+                if (phys_bc[AMREX_SPACEDIM+dir] != Interior)
                 {
                     std::cerr << "Maestro::ReadParameters:periodic in direction "
                               << dir << " but high BC is not Interior\n";
@@ -241,13 +250,13 @@ Maestro::BCSetup()
         //
         for (int dir=0; dir<AMREX_SPACEDIM; dir++)
         {
-            if (lo_bc[dir] == Interior)
+            if (phys_bc[dir] == Interior)
             {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
                 Error();
             }
-            if (hi_bc[dir] == Interior)
+            if (phys_bc[AMREX_SPACEDIM+dir] == Interior)
             {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
@@ -261,7 +270,7 @@ Maestro::BCSetup()
     {
 
         // lo-side bcs
-        if (lo_bc[dir] == Interior) {
+        if (phys_bc[dir] == Interior) {
             // periodic uses "internal Dirichlet"
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::int_dir);
@@ -279,7 +288,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setLo(dir, BCType::int_dir);
             }
         }
-        else if (lo_bc[dir] == Inflow) {
+        else if (phys_bc[dir] == Inflow) {
             // inflow
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
@@ -297,7 +306,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         }
-        else if (lo_bc[dir] == Outflow) {
+        else if (phys_bc[dir] == Outflow) {
             // outflow
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::foextrap);
@@ -315,7 +324,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         }
-        else if (lo_bc[dir] == Symmetry) {
+        else if (phys_bc[dir] == Symmetry) {
             // symmetry
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::reflect_even);
@@ -334,7 +343,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setLo(dir, BCType::reflect_even);
             }
         }
-        else if (lo_bc[dir] == SlipWall) {
+        else if (phys_bc[dir] == SlipWall) {
             // slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::foextrap);
@@ -353,7 +362,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         }
-        else if (lo_bc[dir] == NoSlipWall) {
+        else if (phys_bc[dir] == NoSlipWall) {
             // no-slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
@@ -376,7 +385,7 @@ Maestro::BCSetup()
         }
 
         // hi-side bcs
-        if (hi_bc[dir] == Interior) {
+        if (phys_bc[AMREX_SPACEDIM+dir] == Interior) {
             // periodic uses "internal Dirichlet"
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::int_dir);
@@ -394,7 +403,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setHi(dir, BCType::int_dir);
             }
         }
-        else if (hi_bc[dir] == Inflow) {
+        else if (phys_bc[AMREX_SPACEDIM+dir] == Inflow) {
             // inflow
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);
@@ -412,7 +421,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
         }
-        else if (hi_bc[dir] == Outflow) {
+        else if (phys_bc[AMREX_SPACEDIM+dir] == Outflow) {
             // outflow
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::foextrap);
@@ -430,7 +439,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
         }
-        else if (hi_bc[dir] == Symmetry) {
+        else if (phys_bc[AMREX_SPACEDIM+dir] == Symmetry) {
             // symmetry
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::reflect_even);
@@ -449,7 +458,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setHi(dir, BCType::reflect_even);
             }
         }
-        else if (hi_bc[dir] == SlipWall) {
+        else if (phys_bc[AMREX_SPACEDIM+dir] == SlipWall) {
             // slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::foextrap);
@@ -468,7 +477,7 @@ Maestro::BCSetup()
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
         }
-        else if (hi_bc[dir] == NoSlipWall) {
+        else if (phys_bc[AMREX_SPACEDIM+dir] == NoSlipWall) {
             // no-slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);

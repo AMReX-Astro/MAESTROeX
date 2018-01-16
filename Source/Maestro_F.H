@@ -107,7 +107,7 @@ extern "C"
 #if (AMREX_SPACEDIM == 3)
                          amrex::Real* wmac, const int* wmac_lo, const int* wmac_hi,
 #endif
-                         const int* lo_bc, const int* hi_bc);
+                         const int* phys_bc);
     //////////////////////
 
     //////////////////////
