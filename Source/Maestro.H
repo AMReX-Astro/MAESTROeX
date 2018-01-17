@@ -72,6 +72,12 @@ private:
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
                      amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans);
+
+    void VelPred (const amrex::Vector<amrex::MultiFab>& utilde,
+                  const amrex::Vector<amrex::MultiFab>& ufull,
+                  const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
+                  amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                  const amrex::Vector<amrex::MultiFab>& force);
     ////////////
 
     ////////////

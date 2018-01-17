@@ -265,7 +265,6 @@ extern "C"
 
     //////////////////////
 
-
     //////////////////////
     // in mkutrans.F90
 #if (AMREX_SPACEDIM == 1)
@@ -276,8 +275,7 @@ extern "C"
     void mkutrans_3d(
 #endif
                       const int& lev, const int* lo, const int* hi,
-                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut,
-                      const int& ng_ut,
+                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, const int& ng_ut,
                       const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf,
                       amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
 #if (AMREX_SPACEDIM >= 2)
@@ -320,6 +318,38 @@ extern "C"
                      const int* lo, const int* hi,
                      const amrex::Real* dx,
                      const amrex::Real* time, const amrex::Real* temperr);
+    //////////////////////
+
+    //////////////////////
+    // in velpred.F90
+#if (AMREX_SPACEDIM == 1)
+    void velpred_1d(
+#elif (AMREX_SPACEDIM == 2)
+    void velpred_2d(
+#elif (AMREX_SPACEDIM == 3)
+    void velpred_3d(
+#endif
+                      const int& lev, const int* lo, const int* hi,
+                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, const int& ng_ut,
+                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf,
+#if (AMREX_SPACEDIM >= 2)
+                      const amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
+                      const amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
+#if (AMREX_SPACEDIM == 3)
+                      const amrex::Real* wtrans, const int* uw_lo, const int* uw_hi,
+#endif
+#endif
+                      amrex::Real* umac, const int* mu_lo, const int* mu_hi,
+#if (AMREX_SPACEDIM >= 2)
+                      amrex::Real* vmac, const int* mv_lo, const int* mv_hi,
+#if (AMREX_SPACEDIM == 3)
+                      amrex::Real* wmac, const int* mw_lo, const int* mw_hi,
+#endif
+#endif
+                      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
+                      const amrex::Real* w0, const amrex::Real* dx, const amrex::Real& dt,
+                      const int* adv_bc, const int* phys_bc);
+
     //////////////////////
 
 #ifdef __cplusplus

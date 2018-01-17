@@ -434,15 +434,16 @@ contains
 
 #if (AMREX_SPACEDIM == 3)
   subroutine velpred_3d(lev, lo, hi, &
-                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                         ufull,  uf_lo, uf_hi, nc_uf, &
-                         utrans, uu_lo, uu_hi, &
-                         vtrans, uv_lo, uv_hi, &
-                         wtrans, uw_lo, uw_hi, &
-                         umac,   mu_lo, mu_hi, &
-                         vmac,   mv_lo, mv_hi, &
-                         wmac,   mw_lo, mw_hi, &
-                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_3d")
+                        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+                        ufull,  uf_lo, uf_hi, nc_uf, &
+                        utrans, uu_lo, uu_hi, &
+                        vtrans, uv_lo, uv_hi, &
+                        wtrans, uw_lo, uw_hi, &
+                        umac,   mu_lo, mu_hi, &
+                        vmac,   mv_lo, mv_hi, &
+                        wmac,   mw_lo, mw_hi, &
+                        force,   f_lo,  f_hi, nc_f, &
+                        w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_3d")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut, ng_ut
@@ -453,6 +454,7 @@ contains
     integer         , intent(in   ) :: mu_lo(3), mu_hi(3)
     integer         , intent(in   ) :: mv_lo(3), mv_hi(3)
     integer         , intent(in   ) :: mw_lo(3), mw_hi(3)
+    integer         , intent(in   ) ::  f_lo(3),  f_hi(3), nc_f
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
@@ -461,6 +463,7 @@ contains
     double precision, intent(inout) :: umac  (mu_lo(1):mu_hi(1),mu_lo(2):mu_hi(2),mu_lo(3):mu_hi(3))
     double precision, intent(inout) :: vmac  (mv_lo(1):mv_hi(1),mv_lo(2):mv_hi(2),mv_lo(3):mv_hi(3))
     double precision, intent(inout) :: wmac  (mw_lo(1):mw_hi(1),mw_lo(2):mw_hi(2),mw_lo(3):mw_hi(3))
+    double precision, intent(in   ) :: force ( f_lo(1): f_hi(1), f_lo(2): f_hi(2), f_lo(3): f_hi(3),nc_f)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3), dt
     integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
@@ -1394,8 +1397,6 @@ contains
           enddo
        enddo
     enddo
-
-    end if
 
     deallocate(ulz,urz,wimhxy,wimhyx)
 
