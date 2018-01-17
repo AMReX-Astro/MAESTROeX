@@ -28,7 +28,7 @@ contains
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1))
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(1), dt
     integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
     
@@ -127,7 +127,7 @@ contains
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2))
     double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2))
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(2), dt
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
     
@@ -297,7 +297,7 @@ contains
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
     double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2),uv_lo(3):uv_hi(3))
     double precision, intent(inout) :: wtrans(uw_lo(1):uw_hi(1),uw_lo(2):uw_hi(2),uw_lo(3):uw_hi(3))
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3), dt
     integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
     
