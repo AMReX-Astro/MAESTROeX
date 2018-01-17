@@ -37,7 +37,6 @@ USE_MG = FALSE
 
 Bdirs 	:= Source \
            Source/Src_nd \
-           Source/Src_$(DIM)d \
            Source/param_includes \
            constants \
            Util/model_parser \
