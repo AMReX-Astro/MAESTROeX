@@ -161,6 +161,9 @@ private:
                            int is_input_edge_centered,
                            int is_output_a_vector);
 
+    void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+                const amrex::Real& mult);
+
     // end MaestroFill3dData.cpp functions
     ////////////
 

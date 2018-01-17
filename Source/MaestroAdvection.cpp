@@ -51,10 +51,9 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,w0_force,do_add_utilde_force);
 
     // add w0 to trans velocities
+    Addw0 (utrans,1.);
 
     // VelPred();
-
-
 }
 
 void

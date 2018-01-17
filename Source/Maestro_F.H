@@ -117,6 +117,16 @@ extern "C"
                               const int* s0_cart_lo, const int* s0_cart_hi, const int* nc_s,
                               const amrex::Real* s0, const int& is_input_edge_centered,
                               const int& is_output_a_vector);
+
+    void addw0(const int& lev, const int* lo, const int* hi,
+               amrex::Real* uedge, const int* u_lo, const int* u_hi,
+#if (AMREX_SPACEDIM >= 2)
+               amrex::Real* vedge, const int* v_lo, const int* v_hi,
+#if (AMREX_SPACEDIM == 3)
+               amrex::Real* wedge, const int* w_lo, const int* w_hi,
+#endif
+#endif
+               const amrex::Real* w0, const amrex::Real& mult);
     //////////////////////
 
     //////////////////////
