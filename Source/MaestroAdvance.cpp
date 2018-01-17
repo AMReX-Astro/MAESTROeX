@@ -270,7 +270,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac);
+    AdvancePremac(umac,w0_force);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -461,7 +461,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac);
+    AdvancePremac(umac,w0_force);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the base state and full state through dt

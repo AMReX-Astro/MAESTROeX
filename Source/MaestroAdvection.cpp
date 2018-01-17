@@ -5,14 +5,15 @@ using namespace amrex;
 
 // compute unprojected mac velocities
 void
-Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
+Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                        const Vector<Real>& w0_force)
 {
 
     // create a uold with filled ghost cells
-    Vector<MultiFab> uold_ghost(finest_level+1);
+    Vector<MultiFab> utilde(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        uold_ghost[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-        FillPatch(lev, t_new, uold_ghost[lev], uold, uold, 0, 0, AMREX_SPACEDIM, bcs_u);
+        utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
+        FillPatch(lev, t_new, utilde[lev], uold, uold, 0, 0, AMREX_SPACEDIM, bcs_u);
     }
 
     // create a MultiFab to hold uold + w0
@@ -24,7 +25,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
     // create ufull = uold + w0
     Put1dArrayOnCart(w0,ufull,bcs_u,1,1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Add(ufull[lev],uold_ghost[lev],0,0,AMREX_SPACEDIM,ng_adv);
+        MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
     }
 
     // create a face-centered MultiFab to hold utrans
@@ -37,9 +38,8 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 #endif
     }
 
-    // MakeUtrans();
-    FillUmacGhost(utrans);
-
+    // create utrans
+    MakeUtrans(utilde,ufull,utrans);
     
     // create a MultiFab to hold the velocity forcing
     Vector<MultiFab> vel_force(finest_level+1);
@@ -47,9 +47,8 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
         vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
     }
 
-    int is_final_update = 0;
     int do_add_utilde_force = 1;
-//    MakeVelForce(vel_force,utran,w0_force,is_final_update,do_add_utilde_force);
+    MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,w0_force,do_add_utilde_force);
 
     // add w0 to trans velocities
 
@@ -117,10 +116,21 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #endif
 #endif
                         w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+
+        } // end MFIter loop
+    } // end loop over levels
+    
+    // fill peroidic ghost cells
+    for (int lev=0; lev<=finest_level; ++lev) {
+        for (int d=0; d<AMREX_SPACEDIM; ++d) {
+            utrans[lev][d].FillBoundary(geom[lev].periodicity());
         }
     }
 
+    // fill ghost cells behind physical boundaries
+    FillUmacGhost(utrans);
 
-    // fill ghost cells
-
+    // FIXME need to add edge_restriction and create_umac_grown
+    //
+    //
 }
