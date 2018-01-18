@@ -243,10 +243,6 @@ private:
                               const amrex::Vector<amrex::MultiFab>& macrhs,
                               const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
 
-    
-    void MakeMacCoeffs(amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& face_bcoeff,
-                       const amrex::Vector<amrex::MultiFab>& rho);
-
     // end MaestroMacProj.cpp functions
     ////////////
 

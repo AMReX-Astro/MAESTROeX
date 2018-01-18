@@ -11,7 +11,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // features to be added later:
     // -delta_gamma1_term
 
-    // MultiFabs needed within the AdvanceTimeStep routine
+    // cell-centered MultiFabs needed within the AdvanceTimeStep routine
     Vector<MultiFab>      rhohalf(finest_level+1);
     Vector<MultiFab>       macrhs(finest_level+1);
     Vector<MultiFab>       macphi(finest_level+1);
@@ -53,8 +53,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     ////////////////////////
     // needed for spherical routines only
 
+    // cell-centered
     Vector<MultiFab> w0_force_cart(finest_level+1);
-
     // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
@@ -125,27 +125,23 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         pi[lev].define          (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
         // face-centered in the dm-direction (planar only)
-#if (AMREX_SPACEDIM == 2)
-        etarhoflux[lev].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#elif (AMREX_SPACEDIM == 3)
-        etarhoflux[lev].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-#endif
+        AMREX_D_TERM(etarhoflux[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+                     etarhoflux[lev].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+                     etarhoflux[lev].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
         // face-centered arrays of MultiFabs
-        umac           [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-        umac           [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-        sedge          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
-        sedge          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
-        sflux          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
-        sflux          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
-        beta0_cart_edge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-        beta0_cart_edge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#if (AMREX_SPACEDIM == 3)
-        umac           [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-        sedge          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
-        sflux          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
-        beta0_cart_edge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-#endif
+        AMREX_D_TERM(umac           [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+                     umac           [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+                     umac           [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
+        AMREX_D_TERM(sedge          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+                     sedge          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+                     sedge          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+        AMREX_D_TERM(sflux          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+                     sflux          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+                     sflux          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+        AMREX_D_TERM(beta0_cart_edge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+                     beta0_cart_edge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+                     beta0_cart_edge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
     }
 
 #if (AMREX_SPACEDIM == 3)

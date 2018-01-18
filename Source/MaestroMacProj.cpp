@@ -45,17 +45,36 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         FillPatch(lev, rho_time, rho[lev], sold, snew, Rho, Rho, 1, bcs_s);
     }
 
-    // set face-centered B coefficients to 1/rho by averaging neighboring
-    // cell-centered values of rho
-//    MakeMacCoeffs(face_bcoeff,rho);
-    //
+    // coefficients for solver
+    Vector<MultiFab> acoef(finest_level+1);
+    Vector<MultiFab> bcoef(finest_level+1);
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > face_bcoef(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        acoef[lev].define(grids[lev], dmap[lev], 1, 0);
+        bcoef[lev].define(grids[lev], dmap[lev], 1, 1);
+        AMREX_D_TERM(face_bcoef[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+                     face_bcoef[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+                     face_bcoef[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
 
-    // multiply face-centered B coefficients by beta0 so they contain beta0/rho
-    // MultFacesByBeta0();
-    //
+    }
 
     // set cell-centered A coefficient to zero
     //
+    //
+
+    // set face-centered B coefficients to 1/rho
+    // first set the cell-centered B coefficients to 1/rho
+    // the average to faces
+//    FIXME    
+    for (int lev=0; lev<=finest_level; ++lev) {
+        amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
+                                                        &face_bcoef[lev][1],
+                                                        &face_bcoef[lev][2])},
+                                            bcoef[lev], geom[lev]);
+    }
+
+    // multiply face-centered B coefficients by beta0 so they contain beta0/rho
+    // MultFacesByBeta0();
     //
 
     // solve -div B grad phi = RHS
@@ -102,11 +121,5 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 {
 
 
-
-}
-
-void Maestro::MakeMacCoeffs(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& bcoeff,
-                            const Vector<MultiFab>& rho)
-{
 
 }
