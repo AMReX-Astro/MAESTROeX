@@ -43,7 +43,7 @@ maestro.cfl       = 0.9    # cfl number for hyperbolic system
 maestro.evolve_base_state = false
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 1
-maestro.init_iter             = 0
+maestro.init_iter             = 1
 maestro.do_reflux             = 1 # do we do the hyperbolic reflux
 
 # PLOTFILES
