@@ -229,8 +229,7 @@ private:
     void MacProj (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                   amrex::Vector<amrex::MultiFab>& macphi,
                   const amrex::Vector<amrex::MultiFab>& macrhs,
-                  const amrex::Vector<amrex::Real>& beta0,
-                  const amrex::Vector<amrex::Real>& beta0_edge);
+                  const amrex::Vector<amrex::Real>& beta0);
 
     // end MaestroMacProj.cpp functions
     ////////////

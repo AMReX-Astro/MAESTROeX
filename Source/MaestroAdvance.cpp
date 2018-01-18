@@ -78,7 +78,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
-    Vector<Real> beta0_edge         ( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
 
     // wallclock time
@@ -276,11 +275,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // compute RHS for MAC projection
     MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_old);
 
-    // compute beta0 on edges
-//    cell_to_edge(beta0_old,beta0_edge);
-
     // MAC projection
-    MacProj(umac,macphi,macrhs,beta0_old,beta0_edge);
+    MacProj(umac,macphi,macrhs,beta0_old);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the base state and full state through dt

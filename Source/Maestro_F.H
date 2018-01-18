@@ -33,10 +33,6 @@ extern "C"
 
     void init_multilevel(const int& finest_radial_level_in);
 
-    void restrict_base(amrex::Real* s0, const int& is_cell_centered);
-
-    void fill_ghost_base(amrex::Real* s0, const int& is_cell_centered);
-
     void destroy_base_state_geometry();
 
     //////////////////////
@@ -66,6 +62,12 @@ extern "C"
                            amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                      const amrex::Real* tempbar_init_in,
                      const amrex::Real& dt_in);
+    //////////////////////
+
+    //////////////////////
+    // in cell_to_edge.f90
+    void cell_to_edge(const amrex::Real* s0_cell, amrex::Real* s0_edge);
+
     //////////////////////
 
     //////////////////////
