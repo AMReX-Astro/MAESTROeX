@@ -229,16 +229,23 @@ private:
     void MacProj (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                   amrex::Vector<amrex::MultiFab>& macphi,
                   const amrex::Vector<amrex::MultiFab>& macrhs,
-                  const amrex::Vector<amrex::Real>& beta0);
+                  const amrex::Vector<amrex::Real>& beta0,
+                  const bool& is_predictor);
 
-    void MultUmacByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                          const amrex::Vector<Real>& beta0,
-                          const amrex::Vector<Real>& beta0_edge,
-                          const int& mult_or_div);
+    // multiply (or divide) face-data by beta0
+    void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                           const amrex::Vector<Real>& beta0,
+                           const amrex::Vector<Real>& beta0_edge,
+                           const int& mult_or_div);
 
+    // compute the RHS for the solve, RHS = macrhs - div(beta0*umac)
     void ComputeMACSolverRHS (amrex::Vector<amrex::MultiFab>& solverrhs,
                               const amrex::Vector<amrex::MultiFab>& macrhs,
                               const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+
+    
+    void MakeMacCoeffs(amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& face_bcoeff,
+                       const amrex::Vector<amrex::MultiFab>& rho);
 
     // end MaestroMacProj.cpp functions
     ////////////

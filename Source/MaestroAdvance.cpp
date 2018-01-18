@@ -276,7 +276,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_old);
 
     // MAC projection
-    MacProj(umac,macphi,macrhs,beta0_old);
+    MacProj(umac,macphi,macrhs,beta0_old,true);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the base state and full state through dt
