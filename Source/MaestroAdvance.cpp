@@ -42,8 +42,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<MultiFab> etarhoflux(finest_level+1);
 
     // nodal
-    Vector<MultiFab>     nodalrhs(finest_level+1);
-    Vector<MultiFab> nodalrhs_old(finest_level+1);
     Vector<MultiFab>           pi(finest_level+1);
 
     // face-centered
@@ -125,8 +123,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         sponge      [lev].define(grids[lev], dmap[lev],       1, 0);
 
         // nodal MultiFabs
-        nodalrhs[lev].define    (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
-        nodalrhs_old[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
         pi[lev].define          (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
         // face-centered in the dm-direction (planar only)
@@ -277,11 +273,14 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         macphi   [lev].setVal(0.);
     }
 
-
     // compute RHS for MAC projection
+    MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_old);
+
+    // compute beta0 on edges
+//    cell_to_edge(beta0_old,beta0_edge);
 
     // MAC projection
-
+    MacProj(umac,macphi,macrhs,beta0_old,beta0_edge);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the base state and full state through dt
