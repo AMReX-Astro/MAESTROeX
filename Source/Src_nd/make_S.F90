@@ -1,9 +1,10 @@
 module make_S_module
 
+  use amrex_error_module
   use eos_type_module
   use eos_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, dpdt_factor
   use base_state_geometry_module, only:  max_radial_level, nr_fine
 
   implicit none
@@ -79,10 +80,10 @@ contains
 
   end subroutine make_S_cc
 
-  subroutine make_rhcc(lev, lo, hi, &
-                       rhcc, c_lo, c_hi, &
-                       S_cc,  s_lo, s_hi, &
-                       Sbar, beta0) bind (C,name="make_rhcc")
+  subroutine make_rhcc_for_nodalproj(lev, lo, hi, &
+                                     rhcc, c_lo, c_hi, &
+                                     S_cc,  s_lo, s_hi, &
+                                     Sbar, beta0) bind (C,name="make_rhcc_for_nodalproj")
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
@@ -112,6 +113,45 @@ contains
     enddo
     enddo
 
-  end subroutine make_rhcc
+  end subroutine make_rhcc_for_nodalproj
+
+  subroutine make_rhcc_for_macproj(lev, lo, hi, &
+                                   rhcc, c_lo, c_hi, &
+                                   S_cc,  s_lo, s_hi, &
+                                   Sbar, beta0) bind (C,name="make_rhcc_for_macproj")
+    
+    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: c_lo(3), c_hi(3)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    double precision, intent (inout) :: rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+    double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
+    double precision, intent (in   ) :: Sbar (0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
+
+    integer i,j,k,r
+
+    ! loop over the data
+    do k = lo(3),hi(3)
+    do j = lo(2),hi(2)
+    do i = lo(1),hi(1)
+
+#if (AMREX_SPACEDIM == 1)
+       r = i
+#elif (AMREX_SPACEDIM == 2)
+       r = j
+#elif (AMREX_SPACEDIM == 3)
+       r = k
+#endif
+       rhcc(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r))
+
+    enddo
+    enddo
+    enddo
+
+    if (dpdt_factor .gt. 0.0d0) then
+       call amrex_abort("make_rhcc_for_macproj: dpdt_factor not implemented - refer to MAESTRO make_macrhs.f90")
+    end if
+
+  end subroutine make_rhcc_for_macproj
 
 end module make_S_module

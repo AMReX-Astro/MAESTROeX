@@ -201,6 +201,8 @@ extern "C"
 
     //////////////////////
     // in make_S.f90
+
+    // compute S from constraint div(u) = S
     void make_S_cc(const int* lo, const int* hi, 
                          amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
                    const amrex::Real* scal,  const int* c_lo, const int* c_hi, const int* nc_c,
@@ -209,16 +211,19 @@ extern "C"
                    const amrex::Real* rHext, const int* e_lo, const int* e_hi,
                    const amrex::Real* therm, const int* t_lo, const int* t_hi);
 
+    // rhcc = beta0 * (S - Sbar)
+    void make_rhcc_for_nodalproj(const int& lev, const int* lo, const int* hi, 
+                                 amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
+                                 const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
+                                 const amrex::Real* Sbar,
+                                 const amrex::Real* beta0);
 
-    void make_rhcc(const int& lev, const int* lo, const int* hi, 
-                         amrex::Real* ccrhs, const int* c_lo, const int* c_hi,
-                   const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
-                   const amrex::Real* Sbar,
-                   const amrex::Real* beta0);
-
-    void make_nodalrhs(const int& lev, const int* lo, const int* hi, 
-                       amrex::Real* nodalrhs,  const int* n_lo, const int* n_hi,
-                       const amrex::Real* ccrhs,  const int* c_lo, const int* c_hi);
+    // rhcc = beta0 * (S - Sbar) + beta0 * delta_chi
+    void make_rhcc_for_macproj(const int& lev, const int* lo, const int* hi, 
+                               amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
+                               const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
+                               const amrex::Real* Sbar,
+                               const amrex::Real* beta0);
 
     //////////////////////
 
