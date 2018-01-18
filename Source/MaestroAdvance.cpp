@@ -130,15 +130,15 @@ Maestro::AdvanceTimeStep (bool is_initIter)
                      etarhoflux[lev].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
         // face-centered arrays of MultiFabs
-        AMREX_D_TERM(umac           [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
-                     umac           [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
-                     umac           [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
-        AMREX_D_TERM(sedge          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-                     sedge          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-                     sedge          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
-        AMREX_D_TERM(sflux          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-                     sflux          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-                     sflux          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+        AMREX_D_TERM(umac           [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1,     1);,
+                     umac           [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1,     1);,
+                     umac           [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1,     1););
+        AMREX_D_TERM(sedge          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], Nscal, 0);,
+                     sedge          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], Nscal, 0);,
+                     sedge          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0););
+        AMREX_D_TERM(sflux          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], Nscal, 0);,
+                     sflux          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], Nscal, 0);,
+                     sflux          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0););
         AMREX_D_TERM(beta0_cart_edge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
                      beta0_cart_edge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
                      beta0_cart_edge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
@@ -317,32 +317,50 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // advect rhoX, rho, and tracers
+//    DensityAdvance();
 
+    if (evolve_base_state && use_etarho) {
+        // compute the new etarho
+        //
+        //
 
-    // compute the new etarho
+        // correct the base state density by "averaging"
+        //
+        //
+    }
 
-
-    // correct the base state density by "averaging"
-
-
-    //  update grav_cell_new
-
+    // update grav_cell_new
+    if (evolve_base_state) {
+        make_grav_cell(grav_cell_new.dataPtr(),
+                       rho0_new.dataPtr(),
+                       r_cc_loc.dataPtr(),
+                       r_edge_loc.dataPtr());
+    }
+    else {
+        grav_cell_new = grav_cell_old;
+    }
 
     // base state pressure update
     if (evolve_base_state) {
 
+    }
+    else {
+        p0_new = p0_old;
     }
 
     // base state enthalpy update
     if (evolve_base_state) {
 
     }
+    else {
+        rhoh0_new = rhoh0_old;
+    }
 
     if (maestro_verbose >= 1) {
         Print() << "            : enthalpy_advance >>>" << endl;
     }
 
-
+//    EnthalpyAdvance();
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -353,8 +371,33 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     if (use_thermal_diffusion) {
+//        ThermalConduct();
+    }
+
+    // pass temperature through for seeding the temperature update eos call
+    // pi goes along for the ride
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,0);
+        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,0);
+    }
+
+    // now update temperature
+    if (use_tfromp) {
+//        TfromRhoP(s2,p0_new);
+    }
+    else {
+//        TfromRhoH();
+    }
+
+
+    if (use_thermal_diffusion) {
+        // make a copy of s2star since these are needed to compute
+        // coefficients in the call to thermal_conduct_full_alg
+
 
     }
+    
+
 
     // pass temperature through for seeding the temperature update eos call
     // pi just goes along for the ride too
