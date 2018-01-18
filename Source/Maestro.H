@@ -231,6 +231,15 @@ private:
                   const amrex::Vector<amrex::MultiFab>& macrhs,
                   const amrex::Vector<amrex::Real>& beta0);
 
+    void MultUmacByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                          const amrex::Vector<Real>& beta0,
+                          const amrex::Vector<Real>& beta0_edge,
+                          const int& mult_or_div);
+
+    void ComputeMACSolverRHS (amrex::Vector<amrex::MultiFab>& solverrhs,
+                              const amrex::Vector<amrex::MultiFab>& macrhs,
+                              const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+
     // end MaestroMacProj.cpp functions
     ////////////
 
