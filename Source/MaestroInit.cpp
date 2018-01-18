@@ -217,22 +217,22 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 void Maestro::InitProj ()
 {
 
-    Vector<MultiFab> rho_omegadot(finest_level+1);
-    Vector<MultiFab>      thermal(finest_level+1);
-    Vector<MultiFab>     rho_Hnuc(finest_level+1);
-    Vector<MultiFab>     rho_Hext(finest_level+1);
-    Vector<MultiFab>      rhohalf(finest_level+1);
-    Vector<MultiFab>         rhcc(finest_level+1);
+    Vector<MultiFab>       rho_omegadot(finest_level+1);
+    Vector<MultiFab>            thermal(finest_level+1);
+    Vector<MultiFab>           rho_Hnuc(finest_level+1);
+    Vector<MultiFab>           rho_Hext(finest_level+1);
+    Vector<MultiFab>            rhohalf(finest_level+1);
+    Vector<MultiFab> rhcc_for_nodalproj(finest_level+1);
 
     Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
-        thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
-        rhcc        [lev].define(grids[lev], dmap[lev],       1, 1);
+        rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
+        rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],       1, 1);
 
         // we don't have a legit timestep yet, so we set rho_omegadot,
         // rho_Hnuc, and rho_Hext to 0 
@@ -263,10 +263,10 @@ void Maestro::InitProj ()
     }
 
     // make the nodal rhs for projection beta0*(S-Sbar)
-    MakeRHCCforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old);
 
     // perform a nodal projection
-    NodalProj(initial_projection_comp,rhcc);
+    NodalProj(initial_projection_comp,rhcc_for_nodalproj);
 
 }
 
@@ -274,13 +274,13 @@ void Maestro::InitProj ()
 void Maestro::DivuIter (int istep_divu_iter)
 {
 
-    Vector<MultiFab> stemp       (finest_level+1);
-    Vector<MultiFab> rho_Hext    (finest_level+1);
-    Vector<MultiFab> rho_omegadot(finest_level+1);
-    Vector<MultiFab> rho_Hnuc    (finest_level+1);
-    Vector<MultiFab> thermal     (finest_level+1);
-    Vector<MultiFab> rhohalf     (finest_level+1);
-    Vector<MultiFab> rhcc        (finest_level+1);
+    Vector<MultiFab> stemp             (finest_level+1);
+    Vector<MultiFab> rho_Hext          (finest_level+1);
+    Vector<MultiFab> rho_omegadot      (finest_level+1);
+    Vector<MultiFab> rho_Hnuc          (finest_level+1);
+    Vector<MultiFab> thermal           (finest_level+1);
+    Vector<MultiFab> rhohalf           (finest_level+1);
+    Vector<MultiFab> rhcc_for_nodalproj(finest_level+1);
 
     Vector<Real> Sbar                ( (max_radial_level+1)*nr_fine );
     Vector<Real> w0_force            ( (max_radial_level+1)*nr_fine );
@@ -296,13 +296,13 @@ void Maestro::DivuIter (int istep_divu_iter)
 
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        stemp       [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-        rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
-        rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
-        thermal     [lev].define(grids[lev], dmap[lev],       1, 0);
-        rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
-        rhcc        [lev].define(grids[lev], dmap[lev],       1, 1);
+        stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+        thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
+        rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],       1, 1);
 
         // divu_iters do not use density weighting
         rhohalf[lev].setVal(1.);
@@ -334,10 +334,10 @@ void Maestro::DivuIter (int istep_divu_iter)
     }
 
     // make the nodal rhs for projection beta0*(S-Sbar)
-    MakeRHCCforNodalProj(rhcc,S_cc_old,Sbar,beta0_old);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old);
 
     // perform a nodal projection
-    NodalProj(divu_iters_comp,rhcc,istep_divu_iter);
+    NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
 
     Real dt_hold = dt;
 

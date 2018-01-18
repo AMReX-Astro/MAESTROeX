@@ -44,13 +44,11 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     }
 
-    for (int lev=finest_level-1; lev>=0; --lev)
-    {
+    for (int lev=finest_level-1; lev>=0; --lev) {
         AverageDownTo(lev,S_cc,0,1); // average lev+1 down to lev
     }
 
 }
-
 
 // compute rhcc = beta0*(S_cc-Sbar)
 void
@@ -86,5 +84,38 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
     // fill ghost cells using first-order extrapolation
     for (int lev=0; lev<=finest_level; ++lev) {
         FillPatch(lev, t_old, rhcc[lev], rhcc, rhcc, 0, 0, 1, bcs_f);
+    }
+}
+
+
+// compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
+void
+Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
+                             const Vector<MultiFab>& S_cc,
+                             const Vector<Real>& Sbar,
+                             const Vector<Real>& beta0)
+{
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // fill rhcc
+        // get references to the MultiFabs at level lev
+              MultiFab& rhcc_mf = rhcc[lev];
+        const MultiFab& S_cc_mf = S_cc[lev];
+
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            make_rhcc_for_macproj(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                                  BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
+                                  BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
+                                  Sbar.dataPtr(), beta0.dataPtr());
+        }
     }
 }

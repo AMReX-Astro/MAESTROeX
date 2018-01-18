@@ -248,6 +248,12 @@ private:
                                const amrex::Vector<amrex::Real>& Sbar,
                                const amrex::Vector<amrex::Real>& beta0);
 
+    // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
+    void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
+                             const amrex::Vector<amrex::MultiFab>& S_cc,
+                             const amrex::Vector<amrex::Real>& Sbar,
+                             const amrex::Vector<amrex::Real>& beta0);
+
     // end MaestroMakeS.cpp functions
     ////////////
 

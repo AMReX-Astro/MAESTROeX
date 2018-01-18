@@ -15,7 +15,7 @@ using namespace amrex;
 // to solve for phi we use div sigma grad phi = div(beta*Vproj) - beta0*(S-Sbar)
 // where sigma = beta0 or beta0/rho depending on proj_type
 // then solve for Utilde, pi, and grad(pi) based on proj_type.
-// rhcc should enter as beta0*(S-Sbar) so we need to multiply by -1 before
+// rhcc should enter as beta0*(S-Sbar) so we need to multiply by -1 in this routine
 // the projection (done below)
 void
 Maestro::NodalProj (int proj_type,
