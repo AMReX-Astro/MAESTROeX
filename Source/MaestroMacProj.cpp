@@ -67,7 +67,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // first set the cell-centered B coefficients to 1/rho
     for (int lev=0; lev<=finest_level; ++lev) {
         bcoef[lev].setVal(1.);
-        bcoef[lev].divide(rho[lev],0,0,1);
+        MultiFab::Divide(bcoef[lev],rho[lev],0,0,1,1);
     }
 
     // average bcoef to faces
@@ -111,13 +111,13 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 }
 
 // multiply (or divide) face-data by beta0
-void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge,
                                 const Vector<Real>& beta0,
                                 const Vector<Real>& beta0_edge,
                                 const int& mult_or_div)
 {
 
-
+// write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
 
 
 
