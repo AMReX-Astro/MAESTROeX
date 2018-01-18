@@ -59,13 +59,18 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // set cell-centered A coefficient to zero
-    //
-    //
+    for (int lev=0; lev<=finest_level; ++lev) {
+        acoef[lev].setVal(0.);
+    }
 
     // set face-centered B coefficients to 1/rho
     // first set the cell-centered B coefficients to 1/rho
-    // the average to faces
-//    FIXME    
+    for (int lev=0; lev<=finest_level; ++lev) {
+        bcoef[lev].setVal(1.);
+        bcoef[lev].divide(rho[lev],0,0,1);
+    }
+
+    // average bcoef to faces
     for (int lev=0; lev<=finest_level; ++lev) {
         amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
                                                         &face_bcoef[lev][1],
@@ -74,7 +79,11 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // multiply face-centered B coefficients by beta0 so they contain beta0/rho
-    // MultFacesByBeta0();
+    mult_or_div = 1;
+    MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+
+    // set up the solver
+    //
     //
 
     // solve -div B grad phi = RHS
