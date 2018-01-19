@@ -64,7 +64,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const MultiFab& sold_mf    = sold[lev]; // only used for the MFIter since it's cell-centered
         const MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
               MultiFab& utrans_mf  = utrans[lev][0];
@@ -144,7 +143,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const MultiFab& sold_mf    = sold[lev]; // only used for the MFIter since it's cell-centered
         const MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
               MultiFab& umac_mf    = umac[lev][0];

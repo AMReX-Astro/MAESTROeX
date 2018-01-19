@@ -91,6 +91,16 @@ private:
     // end MaestroAverage.cpp functions
     ////////////
 
+    ////////////////////////
+    // MaestroDensityAdvance.cpp functions
+    void DensityAdvance (bool is_predictor,
+                         amrex::Vector<amrex::MultiFab>& scalold,
+                         amrex::Vector<amrex::MultiFab>& scalnew,
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                         amrex::Vector<amrex::MultiFab>& scal_force);
+    ////////////////////////
+
     ////////////
     // Time step computation in MaestroDt.cpp
 
@@ -182,6 +192,13 @@ private:
                        const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
                        int do_add_utilde_force);
+
+    void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
+                         const amrex::Vector<amrex::Real>& s0,
+                         const amrex::Vector<amrex::Real>& s0_edge,
+                         int comp,
+                         const amrex::Vector<amrex::BCRec> bcs,
+                         int fullform);
     ////////////////////////
 
     ////////////
@@ -435,6 +452,13 @@ private:
     static int divu_iters_comp;
     static int pressure_iters_comp;
     static int regular_timestep_comp;
+
+    // these are defined in Maestro.cpp
+    // density and enthalpy edge state prediction
+    static int predict_rhoprime_and_X, predict_rhoX, predict_rho_and_X;
+    static int predict_rhoh, predict_rhohprime, predict_h;
+    static int predict_T_then_rhohprime, predict_T_then_h;
+    static int predict_hprime, predict_Tprime_then_h;
 
     // these are defined in Maestro.cpp
     static amrex::IntVect nodal_flag;

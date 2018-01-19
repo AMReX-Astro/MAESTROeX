@@ -59,3 +59,15 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     }
 
 }
+
+
+void
+Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
+                         const Vector<Real>& s0,
+                         const Vector<Real>& s0_edge,
+                         int comp,
+                         const Vector<BCRec> bcs,
+                         int fullform)
+{
+
+}

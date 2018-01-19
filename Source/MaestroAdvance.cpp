@@ -54,8 +54,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // needed for spherical routines only
 
     // cell-centered
-    Vector<MultiFab> w0_force_cart(finest_level+1);
-    // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
     // end spherical-only MultiFabs
