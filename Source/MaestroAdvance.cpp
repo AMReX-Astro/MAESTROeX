@@ -272,7 +272,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_old);
 
     // MAC projection
-    MacProj(umac,macphi,macrhs,beta0_old,true);
+    bool is_predictor = true;
+    MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the base state and full state through dt
@@ -335,6 +336,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
                        rho0_new.dataPtr(),
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
+
     }
     else {
         grav_cell_new = grav_cell_old;
@@ -383,12 +385,11 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
     // now update temperature
     if (use_tfromp) {
-//        TfromRhoP(s2,p0_new);
+        TfromRhoP(s2,p0_new,0);
     }
     else {
-//        TfromRhoH();
+        TfromRhoH(s2,p0_new);
     }
-
 
     if (use_thermal_diffusion) {
         // make a copy of s2star since these are needed to compute
@@ -396,17 +397,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
 
     }
-    
-
-
-    // pass temperature through for seeding the temperature update eos call
-    // pi just goes along for the ride too
-    for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s2[lev],Temp,Temp,1,0);
-        MultiFab::Copy(s2[lev],s2[lev],Pi  ,Pi  ,1,0);
-    }
-
-
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 5 -- react the full state and then base state through dt/2
@@ -430,6 +420,10 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         gamma1bar_new = gamma1bar_old;
     }
 
+    for(int i=0; i<beta0_nph.size(); ++i) {
+        beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 6 -- define a new average expansion rate at n+1/2
     //////////////////////////////////////////////////////////////////////////////
@@ -440,7 +434,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
-
+        compute_cutoff_coords(rho0_old.dataPtr());
     }
 
     if (use_thermal_diffusion) {
@@ -497,6 +491,14 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // compute unprojected MAC velocities
     AdvancePremac(umac,w0_force);
 
+
+    // compute RHS for MAC projection
+    MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_nph);
+
+    // MAC projection
+    is_predictor = false;
+    MacProj(umac,macphi,macrhs,beta0_nph,false);
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the base state and full state through dt
     //////////////////////////////////////////////////////////////////////////////
@@ -527,23 +529,44 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // advect rhoX, rho, and tracers
+//    DensityAdvance();
 
+    if (evolve_base_state && use_etarho) {
+        // compute the new etarho
+        //
+        //
 
-    // compute the new etarho
-
-
-    // correct the base state density by "averaging"
+        // correct the base state density by "averaging"
+        //
+        //
+    }
 
 
     // update grav_cell_new, rho0_nph, grav_cell_nph
+    if (evolve_base_state) {
+        make_grav_cell(grav_cell_new.dataPtr(),
+                       rho0_new.dataPtr(),
+                       r_cc_loc.dataPtr(),
+                       r_edge_loc.dataPtr());
 
+        for(int i=0; i<beta0_nph.size(); ++i) {
+            rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
+        }
+
+        make_grav_cell(grav_cell_nph.dataPtr(),
+                       rho0_nph.dataPtr(),
+                       r_cc_loc.dataPtr(),
+                       r_edge_loc.dataPtr());
+
+    }
+    else {
+        rho0_nph = rho0_old;
+        grav_cell_nph = grav_cell_old;
+    }
 
     // base state pressure update
     if (evolve_base_state) {
 
-    }
-    else {
-        p0_new = p0_old;
     }
 
     // base state enthalpy update
@@ -558,12 +581,33 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "            : enthalpy_advance >>>" << endl;
     }
 
+//    EnthalpyAdvance();
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 8a: thermal conduct >>>" << endl;
+    }
+
+    if (use_thermal_diffusion) {
+//        ThermalConduct();
+    }
+
+    // pass temperature through for seeding the temperature update eos call
+    // pi goes along for the ride
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,0);
+        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,0);
+    }
+
+    // now update temperature
+    if (use_tfromp) {
+        TfromRhoP(s2,p0_new,0);
+    }
+    else {
+        TfromRhoH(s2,p0_new);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -595,6 +639,21 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "<<< STEP 10: make new S >>>" << endl;
     }
 
+    if (use_thermal_diffusion) {
+
+    }
+
+    Make_S_cc(S_cc_new,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal2);
+
+    if (evolve_base_state) {
+        Average(S_cc_new,Sbar,0);
+    }
+
+    // define dSdt = (S_cc_new - S_cc_old) / dt
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::LinComb(dSdt[lev],-1./dt,S_cc_old[lev],0,1./dt,S_cc_new[lev],0,0,1,0);
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 11 -- update the velocity
     //////////////////////////////////////////////////////////////////////////////
@@ -603,9 +662,41 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "<<< STEP 11: update and project new velocity >>>" << endl;
     }
 
-        
+    // Define rho at half time using the new rho from Step 8
+    for (int lev=0; lev<=finest_level; ++lev) {
+        FillPatch(lev, 0.5*(t_old+t_new), rhohalf[lev], sold, snew, Rho, Rho, 1, bcs_s);
+    }
+       
+    // VelocityAdvance();
 
 
+    if (evolve_base_state && is_initIter) {
+        // throw away w0 by setting w0 = w0_old
+        w0 = w0_old;
+    }
+
+    // Project the new velocity field
+    if (is_initIter) {
+
+    }
+    else {
+
+    }
+
+    Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
+            << " DT = " << dt << endl;
+
+    // wallclock time
+    Real end_total = ParallelDescriptor::second() - strt_total;
+	
+    // print wallclock time
+    ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
+    if (maestro_verbose > 0) {
+        Print() << "Time to advance time step: " << end_total << '\n';
+    }
+
+#if 0
+// old code from a tutorial on advection with AMR
     for (int lev=0; lev<=finest_level; ++lev) 
     {
 
@@ -662,17 +753,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
         AverageDownTo(lev,snew,0,Nscal); // average lev+1 down to lev
     }
-
-    Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
-            << " DT = " << dt << endl;
-
-    // wallclock time
-    Real end_total = ParallelDescriptor::second() - strt_total;
-	
-    // print wallclock time
-    ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
-    if (maestro_verbose > 0) {
-        Print() << "Time to advance time step: " << end_total << '\n';
-    }
+#endif
 
 }
