@@ -130,6 +130,7 @@ Maestro::Setup ()
     S_cc_new.resize(max_level+1);
     gpi     .resize(max_level+1);
     dSdt    .resize(max_level+1);
+    pi      .resize(max_level+1);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+1+1"

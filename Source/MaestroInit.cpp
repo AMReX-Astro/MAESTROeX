@@ -184,6 +184,18 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     S_cc_new[lev].define(ba, dm,              1, 0);
     gpi     [lev].define(ba, dm, AMREX_SPACEDIM, 0);
     dSdt    [lev].define(ba, dm,              1, 0);
+    pi      [lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
+
+    sold    [lev].setVal(0.);
+    snew    [lev].setVal(0.);
+    uold    [lev].setVal(0.);
+    unew    [lev].setVal(0.);
+    S_cc_old[lev].setVal(0.);
+    S_cc_new[lev].setVal(0.);
+    gpi     [lev].setVal(0.);
+    dSdt    [lev].setVal(0.);
+    pi      [lev].setVal(0.);    
+
     if (spherical == 1) {
         normal[lev].define(ba, dm, 1, 1);
     }

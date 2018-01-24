@@ -491,6 +491,7 @@ private:
     // these MultiFabs are persistant and need to be regridded as well
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
+    amrex::Vector<amrex::MultiFab> pi;   // nodal
 
     // spherical only - 
     // we make this persistent in that we only have to rebuild and

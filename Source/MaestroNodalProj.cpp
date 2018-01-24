@@ -330,11 +330,10 @@ Maestro::NodalProj (int proj_type,
     // pressure_iters_comp:     pi = pi + phi  grad(pi) = grad(pi) + grad(phi)
     // regular_timestep_comp:   pi = phi/dt    grad(pi) = grad(phi)/dt
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        sold[lev].setVal(0.,Pi,1,0); // fixme only want to set Pi component to zero
-        gpi[lev].setVal(0.);
-    }
+        for (int lev=0; lev<=finest_level; ++lev) {
+            pi[lev].setVal(0.);
+            gpi[lev].setVal(0.);
+        }
     }
     else if (proj_type == pressure_iters_comp) {
         // fixme
@@ -342,6 +341,17 @@ Maestro::NodalProj (int proj_type,
     else if (proj_type == regular_timestep_comp) {
         // fixme
     }
+
+    // average pi from nodes to cell-centers and store in the Pi component of s
+    if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            sold[lev].setVal(0.,Pi,1,0);
+        }
+    } else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
+        // fixme need a new routine
+    }
+
+
 
 
 

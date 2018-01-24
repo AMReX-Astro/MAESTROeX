@@ -41,9 +41,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // face-centered in the dm-direction (planar only)
     Vector<MultiFab> etarhoflux(finest_level+1);
 
-    // nodal
-    Vector<MultiFab>           pi(finest_level+1);
-
     // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > >            umac(finest_level+1);
     Vector<std::array< MultiFab, AMREX_SPACEDIM > >           sedge(finest_level+1);
@@ -54,7 +51,11 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // needed for spherical routines only
 
     // cell-centered
+    Vector<MultiFab> w0_force_cart(finest_level+1);
+
+    // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+
 
     // end spherical-only MultiFabs
     ////////////////////////
@@ -118,9 +119,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         scal_force  [lev].define(grids[lev], dmap[lev],   Nscal, 1);
         delta_chi   [lev].define(grids[lev], dmap[lev],       1, 0);
         sponge      [lev].define(grids[lev], dmap[lev],       1, 0);
-
-        // nodal MultiFabs
-        pi[lev].define          (convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
 
         // face-centered in the dm-direction (planar only)
         AMREX_D_TERM(etarhoflux[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
