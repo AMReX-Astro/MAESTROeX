@@ -297,6 +297,32 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in mac_solver.F90
+    void mac_solver_rhs(const int& lev, const int* lo, const int* hi,
+			amrex::Real* newrhs, const int* nrhs_lo, const int* nrhs_hi, 
+			const amrex::Real* oldrhs, const int* orhs_lo, const int* orhs_hi,
+                        const amrex::Real* uedge, const int* u_lo, const int* u_hi, 
+#if (AMREX_SPACEDIM >= 2)
+                        const amrex::Real* vedge, const int* v_lo, const int* v_hi, 
+#if (AMREX_SPACEDIM == 3)
+			const amrex::Real* wedge, const int* w_lo, const int* w_hi, 
+#endif
+#endif
+			const amrex::Real* dx);
+
+    void mult_beta0(const int& lev, const int* lo, const int* hi, 
+               amrex::Real* uedge, const int* u_lo, const int* u_hi,
+#if (AMREX_SPACEDIM >= 2)
+               amrex::Real* vedge, const int* v_lo, const int* v_hi,
+#if (AMREX_SPACEDIM == 3)
+               amrex::Real* wedge, const int* w_lo, const int* w_hi,
+#endif
+	       const amrex::Real* beta0_edge,
+#endif
+               const amrex::Real* beta0, const int& mult_or_div);
+    //////////////////////
+
+    //////////////////////
     // in rhoh_vs_t.F90
     void makeTfromRhoH (const int& lev, const int* lo, const int* hi, 
                         amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,

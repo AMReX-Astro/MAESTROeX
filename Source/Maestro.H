@@ -9,6 +9,8 @@
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
 #include <AMReX_FMultiGrid.H>
+#include <AMReX_MLABecLaplacian.H>
+#include <AMReX_MLMG.H>
 #include <AMReX_MultiFabUtil.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_PlotFileUtil.H>
@@ -259,6 +261,9 @@ private:
     void ComputeMACSolverRHS (amrex::Vector<amrex::MultiFab>& solverrhs,
                               const amrex::Vector<amrex::MultiFab>& macrhs,
                               const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+
+    // set boundaries for LABecLaplacian to solve -div(B grad) phi = RHS
+    void SetMacSolverBCs(amrex::MLABecLaplacian& mlabec);
 
     // end MaestroMacProj.cpp functions
     ////////////

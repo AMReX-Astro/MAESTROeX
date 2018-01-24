@@ -20,6 +20,7 @@ F90EXE_sources += fill_umac_ghost.F90
 F90EXE_sources += make_gamma.F90
 F90EXE_sources += make_S.F90
 F90EXE_sources += make_vel_force.F90
+F90EXE_sources += mac_solver.F90
 F90EXE_sources += mkutrans.F90
 F90EXE_sources += rhoh_vs_t.F90
 F90EXE_sources += slope.F90
