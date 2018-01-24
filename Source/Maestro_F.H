@@ -92,6 +92,16 @@ extern "C"
                  const amrex::Real* p0, const amrex::Real* gamma1bar);
     //////////////////////
 
+
+    //////////////////////
+    // in compute_grad_phi.F90
+    void compute_grad_phi(const int* lo, const int* hi,
+                          const amrex::Real* phi,  const int* p_lo, const int* p_hi,
+                                amrex::Real* gphi, const int* g_lo, const int* g_hi, const int* nc_g,
+                          const amrex::Real* dx);
+    //////////////////////
+
+
     //////////////////////
     // in enforce_HSE.f90
     void enforce_HSE(const amrex::Real* rho0,

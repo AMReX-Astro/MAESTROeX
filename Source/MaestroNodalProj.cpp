@@ -266,10 +266,6 @@ Maestro::NodalProj (int proj_type,
                                rel_tol, abs_tol);
     Print() << "Done calling nodal solver" << endl;
 
-    // compute a cell-centered grad(phi) from nodal phi
-    // fixme need to write a routine for this
-
-
     // convert beta0*Vproj back to Vproj
     for (int lev=0; lev<=finest_level; ++lev) {
         for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
@@ -293,36 +289,44 @@ Maestro::NodalProj (int proj_type,
     }
 
     // update velocity
-    // initial_projection_comp: Utilde^0   = V - sig*grad(phi)
-    // divu_iters_comp:         Utilde^0   = V - sig*grad(phi)
-    // pressure_iters_comp:     Utilde^n+1 = Utilde^n + dt(V-sig*grad(phi))
-    // regular_timestep_comp:   Utilde^n+1 = V - sig*grad(phi)
+    // initial_projection_comp: Utilde^0   = Vproj - sig*grad(phi)
+    // divu_iters_comp:         Utilde^0   = Vproj - sig*grad(phi)
+    // pressure_iters_comp:     Utilde^n+1 = Utilde^n + dt(Vproj-sig*grad(phi))
+    // regular_timestep_comp:   Utilde^n+1 = Vproj - sig*grad(phi)
     if (proj_type == initial_projection_comp || 
         proj_type == divu_iters_comp) {
-        // Vproj = Vproj - (1/sig)*grad(phi)
+        // Vproj = Vproj - sig*grad(phi)
         mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
+        // Utilde^0   = Vproj - sig*grad(phi)
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Copy(uold[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
         }
     }
     else if (proj_type == pressure_iters_comp) {
-        // Vproj = Vproj - (1/sig)*grad(phi)
+        // Vproj = Vproj - sig*grad(phi)
         mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
+        // Utilde^n+1 = Utilde^n + dt(V-sig*grad(phi))
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Copy(unew[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
-            // multiply by dt
             unew[lev].mult(dt);
             MultiFab::Add(unew[lev],uold[lev],0,0,AMREX_SPACEDIM,0);
         }
-
     }
     else if (proj_type == regular_timestep_comp) {
-        // Vproj = Vproj - (1/sig)*grad(phi)
+        // Vproj = Vproj - sig*grad(phi)
         mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
+        // Utilde^n+1 = Vproj - sig*grad(phi)
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Copy(unew[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
         }
     }
+
+    // compute a cell-centered grad(phi) from nodal phi
+    Vector<MultiFab> gphi(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        gphi[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
+    }
+    ComputeGradPhi(phi,gphi);
 
     // update pi and grad(pi)
     // initial_projection_comp: pi = 0         grad(pi) = 0
@@ -336,10 +340,18 @@ Maestro::NodalProj (int proj_type,
         }
     }
     else if (proj_type == pressure_iters_comp) {
-        // fixme
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Add(pi[lev] ,phi[lev] ,0,0,1             ,0);
+            MultiFab::Add(gpi[lev],gphi[lev],0,0,AMREX_SPACEDIM,0);
+        }
     }
     else if (proj_type == regular_timestep_comp) {
-        // fixme
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(pi[lev] ,phi[lev] ,0,0,1             ,0);
+            MultiFab::Copy(gpi[lev],gphi[lev],0,0,AMREX_SPACEDIM,0);
+            pi[lev].mult(1./dt);
+            gpi[lev].mult(1./dt);
+        }
     }
 
     // average pi from nodes to cell-centers and store in the Pi component of s
@@ -349,13 +361,10 @@ Maestro::NodalProj (int proj_type,
         }
     } else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
         // fixme need a new routine
+        //
+        //
+        Abort("Need to write AveragePiToCC");
     }
-
-
-
-
-
-
 }
 
 // fill in Vproj
@@ -490,4 +499,32 @@ void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
             } // end if/else logic for inflow
         } // end loop over direction
     } // end loop over levels
+}
+
+// given a nodal phi, compute grad(phi) at cell centers
+void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
+                             Vector<MultiFab>& gphi)
+{
+    Abort("Finish writing ComputeGradPhi");
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        const MultiFab& phi_mf = phi[lev];
+              MultiFab& gphi_mf = gphi[lev];
+
+        for ( MFIter mfi(gphi_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+            const Real* dx = geom[lev].CellSize();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            compute_grad_phi(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                             BL_TO_FORTRAN_3D(phi_mf[mfi]),
+                             BL_TO_FORTRAN_FAB(gphi_mf[mfi]),
+                             dx);
+        }
+    }
 }

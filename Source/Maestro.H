@@ -309,6 +309,10 @@ private:
 
     void set_boundary_velocity(amrex::Vector<amrex::MultiFab>& vel);
 
+    // given a nodal phi, compute grad(phi) at cell centers
+    void ComputeGradPhi(amrex::Vector<amrex::MultiFab>& phi,
+                        amrex::Vector<amrex::MultiFab>& gphi);
+
     // end MaestroNodalProj.cpp functions
     ////////////
 
