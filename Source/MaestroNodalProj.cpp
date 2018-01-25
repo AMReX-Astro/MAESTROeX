@@ -353,18 +353,6 @@ Maestro::NodalProj (int proj_type,
             gpi[lev].mult(1./dt);
         }
     }
-
-    // average pi from nodes to cell-centers and store in the Pi component of s
-    if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            sold[lev].setVal(0.,Pi,1,0);
-        }
-    } else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
-        // fixme need a new routine
-        //
-        //
-        Abort("Need to write AveragePiToCC");
-    }
 }
 
 // fill in Vproj

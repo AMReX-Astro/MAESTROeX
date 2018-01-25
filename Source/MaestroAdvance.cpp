@@ -679,6 +679,16 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
     }
 
+    // call nodal projection
+    //
+    //
+
+    // average pi from nodes to cell-centers and store in the Pi component of snew
+    //
+    //
+
+
+
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
             << " DT = " << dt << endl;
 
