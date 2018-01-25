@@ -92,6 +92,16 @@ extern "C"
                  const amrex::Real* p0, const amrex::Real* gamma1bar);
     //////////////////////
 
+
+    //////////////////////
+    // in compute_grad_phi.F90
+    void compute_grad_phi(const int* lo, const int* hi,
+                          const amrex::Real* phi,  const int* p_lo, const int* p_hi,
+                                amrex::Real* gphi, const int* g_lo, const int* g_hi, const int* nc_g,
+                          const amrex::Real* dx);
+    //////////////////////
+
+
     //////////////////////
     // in enforce_HSE.f90
     void enforce_HSE(const amrex::Real* rho0,
@@ -226,6 +236,27 @@ extern "C"
                                const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
                                const amrex::Real* Sbar,
                                const amrex::Real* beta0);
+
+    //////////////////////
+
+
+    //////////////////////
+    // in make_scal_force.F90
+
+    void modify_scal_force(const int& lev, const int* lo, const int* hi,
+                           amrex::Real* force, const int* f_lo, const int* f_hi,
+                           const amrex::Real* scal,  const int* s_lo, const int* s_hi,
+                           const amrex::Real* umac,  const int* u_lo, const int* u_hi,
+#if (AMREX_SPACEDIM >= 2)
+                           const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
+#if (AMREX_SPACEDIM == 3)
+                           const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
+#endif
+#endif
+                           const amrex::Real* s0, const amrex::Real* s0_edge, const amrex::Real* w0,
+                           const amrex::Real* dx, const int& do_fullform);
+                           
+                           
 
     //////////////////////
 

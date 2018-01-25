@@ -93,6 +93,17 @@ private:
     // end MaestroAverage.cpp functions
     ////////////
 
+    ////////////
+    // MaestroConvert.cpp functions
+    void PutInPertForm();
+
+    void ConvertRhoXToX(amrex::Vector<amrex::MultiFab>& scal,
+                        bool flag);
+
+    void ConvertRhoHToH(amrex::Vector<amrex::MultiFab>& scal,
+                        bool flag);
+    ////////////
+
     ////////////////////////
     // MaestroDensityAdvance.cpp functions
     void DensityAdvance (bool is_predictor,
@@ -100,7 +111,8 @@ private:
                          amrex::Vector<amrex::MultiFab>& scalnew,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-                         amrex::Vector<amrex::MultiFab>& scal_force);
+                         amrex::Vector<amrex::MultiFab>& scal_force,
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
     ////////////////////////
 
     ////////////
@@ -196,6 +208,7 @@ private:
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<amrex::Real>& s0,
                          const amrex::Vector<amrex::Real>& s0_edge,
                          int comp,
@@ -313,6 +326,10 @@ private:
                             const amrex::Vector<amrex::MultiFab>& sig);
 
     void set_boundary_velocity(amrex::Vector<amrex::MultiFab>& vel);
+
+    // given a nodal phi, compute grad(phi) at cell centers
+    void ComputeGradPhi(amrex::Vector<amrex::MultiFab>& phi,
+                        amrex::Vector<amrex::MultiFab>& gphi);
 
     // end MaestroNodalProj.cpp functions
     ////////////
@@ -496,6 +513,7 @@ private:
     // these MultiFabs are persistant and need to be regridded as well
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
+    amrex::Vector<amrex::MultiFab> pi;   // nodal
 
     // spherical only - 
     // we make this persistent in that we only have to rebuild and
