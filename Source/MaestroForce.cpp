@@ -51,12 +51,13 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         }
     }
 
+    // average fine data onto coarser cells
+    AverageDown(vel_force,0,AMREX_SPACEDIM);
 
-
-    for (int lev=finest_level-1; lev>=0; --lev)
-    {
-        AverageDownTo(lev,vel_force,0,AMREX_SPACEDIM); // average lev+1 down to lev
+    for (int lev=0; lev<=finest_level; ++lev) {
+        FillPatch(lev, t_old, vel_force[lev], vel_force, vel_force, 0, 0, AMREX_SPACEDIM, bcs_u);
     }
+
 
 }
 
