@@ -4,7 +4,29 @@
 using namespace amrex;
 
 void
-Maestro::PutInPertForm() {
+Maestro::PutInPertForm(Vector<MultiFab>& scal, 
+		       const Vector<Real>& s0, 
+		       const int& comp, 
+		       bool flag) {
+    // place 1d array onto a cartesian grid
+    Vector<MultiFab> s0_cart(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	s0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+    }
+    
+    // s0 is not edge centered
+    // note that bcs parameter is not used
+    Put1dArrayOnCart(s0,s0_cart,0,0);
+
+    if (flag) {
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    MultiFab::Subtract(scal[lev],s0_cart[lev],0,comp,1,0);
+	}
+    } else {
+        for (int lev = 0; lev <= finest_level; ++lev) {
+	    MultiFab::Add(scal[lev],s0_cart[lev],0,comp,1,0);
+	}
+    }
 
 }
 

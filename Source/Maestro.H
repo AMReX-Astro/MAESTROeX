@@ -95,7 +95,10 @@ private:
 
     ////////////
     // MaestroConvert.cpp functions
-    void PutInPertForm();
+    void PutInPertForm(amrex::Vector<amrex::MultiFab>& scal, 
+		       const amrex::Vector<amrex::Real>& s0, 
+		       const int& comp, 
+		       bool flag);
 
     void ConvertRhoXToX(amrex::Vector<amrex::MultiFab>& scal,
                         bool flag);
