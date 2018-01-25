@@ -97,9 +97,11 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             // We will also pass "validBox", which specifies the "valid" region.
 
             // be careful to pass in "comp+1" here since fortran uses 1-based indexing for components
-            modify_scal_force(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()), comp+1,
-                              BL_TO_FORTRAN_FAB(scal_force_mf[mfi]),
-                              BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+            modify_scal_force(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                              scal_force_mf[mfi].dataPtr(comp), 
+                              ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
+                              sold_mf[mfi].dataPtr(comp), 
+                              ARLIM_3D(sold_mf[mfi].loVect()), ARLIM_3D(sold_mf[mfi].hiVect()),
                               BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
                               BL_TO_FORTRAN_3D(vmac_mf[mfi]),

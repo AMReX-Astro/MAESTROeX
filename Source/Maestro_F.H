@@ -243,9 +243,9 @@ extern "C"
     //////////////////////
     // in make_scal_force.F90
 
-    void modify_scal_force(const int& lev, const int* lo, const int* hi, const int& comp,
-                           amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
-                           const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
+    void modify_scal_force(const int& lev, const int* lo, const int* hi,
+                           amrex::Real* force, const int* f_lo, const int* f_hi,
+                           const amrex::Real* scal,  const int* s_lo, const int* s_hi,
                            const amrex::Real* umac,  const int* u_lo, const int* u_hi,
 #if (AMREX_SPACEDIM >= 2)
                            const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
