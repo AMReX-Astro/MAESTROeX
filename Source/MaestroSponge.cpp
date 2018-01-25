@@ -29,9 +29,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 
     }
 
-    for (int lev=finest_level-1; lev>=0; --lev)
-    {
-        AverageDownTo(lev,sponge,0,1); // average lev+1 down to lev
-    }
+    // average fine data onto coarser cells
+    AverageDown(sponge,0,1);
 
 }

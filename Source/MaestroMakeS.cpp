@@ -44,9 +44,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     }
 
-    for (int lev=finest_level-1; lev>=0; --lev) {
-        AverageDownTo(lev,S_cc,0,1); // average lev+1 down to lev
-    }
+    // average fine data onto coarser cells
+    AverageDown(S_cc,0,1);
 
 }
 

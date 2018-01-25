@@ -750,15 +750,14 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     } // end loop over levels
 
     // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
-    for (int lev=finest_level-1; lev>=0; --lev)
-    {
+    for (int lev=finest_level-1; lev>=0; --lev) {
         if (do_reflux) {
             // update lev based on coarse-fine flux mismatch
             flux_reg_s[lev+1]->Reflux(snew[lev], 1.0, 0, 0, snew[lev].nComp(), geom[lev]);
         }
-
-        AverageDownTo(lev,snew,0,Nscal); // average lev+1 down to lev
     }
+    // average fine data onto coarser cells
+    AverageDown(snew,0,Nscal);
 #endif
 
 }
