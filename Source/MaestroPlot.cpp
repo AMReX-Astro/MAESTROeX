@@ -22,14 +22,14 @@ Maestro::WritePlotFile (const int step,
     for (int lev=0; lev<=finest_level; ++lev) {
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(p0_in,p0_cart,bcs_f,0,0);
+    Put1dArrayOnCart(p0_in,p0_cart,0,0,bcs_f);
 
     // convert rho0 to multi-D MultiFab
     Vector<MultiFab> rho0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(rho0_in,rho0_cart,bcs_f,0,0);
+    Put1dArrayOnCart(rho0_in,rho0_cart,0,0,bcs_f);
 
     const auto& mf = PlotFileMF(p0_cart,rho0_cart,u_in,s_in,p0_in);
     const auto& varnames = PlotFileVarNames();

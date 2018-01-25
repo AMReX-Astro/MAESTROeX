@@ -23,7 +23,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // create ufull = uold + w0
-    Put1dArrayOnCart(w0,ufull,bcs_u,1,1);
+    Put1dArrayOnCart(w0,ufull,1,1,bcs_u);
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
     }

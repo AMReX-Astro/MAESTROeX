@@ -187,9 +187,9 @@ private:
     
     void Put1dArrayOnCart (const amrex::Vector<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
-                           amrex::Vector<amrex::BCRec>& bcs,
                            int is_input_edge_centered,
-                           int is_output_a_vector);
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>());
 
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                 const amrex::Real& mult);

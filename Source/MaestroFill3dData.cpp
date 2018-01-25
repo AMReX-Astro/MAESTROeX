@@ -9,10 +9,15 @@ using namespace amrex;
 void
 Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
                            Vector<MultiFab>& s0_cart,
-                           Vector<BCRec>& bcs,
                            int is_input_edge_centered,
-                           int is_output_a_vector)
+                           int is_output_a_vector,
+                           const Vector<BCRec>& bcs)
 {
+    int ng = s0_cart[0].nGrow();
+    if (ng > 0 && bcs.size() == 0) {
+	Abort("Put1dArrayOnCart with ghost cells requires bcs input");
+    }
+    
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -40,8 +45,10 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
     AverageDown(s0_cart,0,ncomp);
 
     // fill ghost cells using first-order extrapolation
-    for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, t_new, s0_cart[lev], s0_cart, s0_cart, 0, 0, ncomp, bcs);
+    if (ng > 0) {
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    FillPatch(lev, t_new, s0_cart[lev], s0_cart, s0_cart, 0, 0, ncomp, bcs);
+	}
     }
 }
 
