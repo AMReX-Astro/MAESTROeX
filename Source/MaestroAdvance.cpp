@@ -314,7 +314,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // advect rhoX, rho, and tracers
-//    DensityAdvance();
+    DensityAdvance(true,s1,s2,sedge,sflux,scal_force,umac);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
@@ -525,7 +525,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // advect rhoX, rho, and tracers
-//    DensityAdvance();
+    DensityAdvance(false,s1,s2,sedge,sflux,scal_force,umac);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho

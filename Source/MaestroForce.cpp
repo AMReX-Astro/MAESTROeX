@@ -63,11 +63,64 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
 void
 Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
+                         const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                          const Vector<Real>& s0,
                          const Vector<Real>& s0_edge,
                          int comp,
                          const Vector<BCRec> bcs,
                          int fullform)
 {
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        MultiFab& scal_force_mf = scal_force[lev];
+        const MultiFab& sold_mf = sold[lev];
+        const MultiFab& umac_mf = umac[lev][0];
+#if (AMREX_SPACEDIM >= 2)
+        const MultiFab& vmac_mf = umac[lev][1];
+#if (AMREX_SPACEDIM == 3)
+        const MultiFab& wmac_mf = umac[lev][2];
+#endif
+#endif
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(scal_force_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+            const Real* dx = geom[lev].CellSize();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+
+            // be careful to pass in "comp+1" here since fortran uses 1-based indexing for components
+            modify_scal_force(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()), comp+1,
+                              BL_TO_FORTRAN_FAB(scal_force_mf[mfi]),
+                              BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+                              BL_TO_FORTRAN_3D(umac_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+                              BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+                              BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+#endif
+                              s0.dataPtr(), s0_edge.dataPtr(), w0.dataPtr(),
+                              dx, fullform);
+        }
+
+
+    }
+
+
+    // average fine data onto coarser cells
+    AverageDown(scal_force,comp,1);
+
+    // fill ghost cells
+    for (int lev=0; lev<=finest_level; ++lev) {
+        FillPatch(lev, t_old, scal_force[lev], scal_force, scal_force, comp, comp, 1, bcs_f);
+    }
 
 }

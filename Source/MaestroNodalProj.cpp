@@ -493,8 +493,6 @@ void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
 void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
                              Vector<MultiFab>& gphi)
 {
-    Abort("Finish writing ComputeGradPhi");
-
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& phi_mf = phi[lev];
               MultiFab& gphi_mf = gphi[lev];

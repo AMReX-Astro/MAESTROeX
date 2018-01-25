@@ -215,7 +215,7 @@ Maestro::BCSetup()
     bcs_u.resize(AMREX_SPACEDIM); // velocitiy
     bcs_h.resize(1);              // rhoh
     bcs_t.resize(1);              // temperature
-    bcs_f.resize(AMREX_SPACEDIM); // a vector of "first-order extrap"
+    bcs_f.resize(Nscal);          // a vector of "first-order extrap"
 
     // Check phys_bc against possible periodic geometry
     // if periodic, must have internal BC marked.
@@ -285,7 +285,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(dir, BCType::int_dir);
                 bcs_t[0   ].setLo(dir, BCType::int_dir);
                 bcs_s[Pi  ].setLo(dir, BCType::int_dir);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::int_dir);
             }
         }
@@ -303,7 +303,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(dir, BCType::ext_dir);
                 bcs_t[0   ].setLo(dir, BCType::ext_dir);
                 bcs_s[Pi  ].setLo(dir, BCType::foextrap);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         }
@@ -321,7 +321,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(dir, BCType::foextrap);
                 bcs_t[0   ].setLo(dir, BCType::foextrap);
                 bcs_s[Pi  ].setLo(dir, BCType::ext_dir);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         }
@@ -340,7 +340,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(dir, BCType::reflect_even);
                 bcs_t[0   ].setLo(dir, BCType::reflect_even);
                 bcs_s[Pi  ].setLo(dir, BCType::reflect_even);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::reflect_even);
             }
         }
@@ -359,7 +359,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(dir, BCType::foextrap);
                 bcs_t[0   ].setLo(dir, BCType::foextrap);
                 bcs_s[Pi  ].setLo(dir, BCType::foextrap);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         }
@@ -377,7 +377,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setLo(dir, BCType::foextrap);
                 bcs_t[0   ].setLo(dir, BCType::foextrap);
                 bcs_s[Pi  ].setLo(dir, BCType::foextrap);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         }
@@ -400,7 +400,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(dir, BCType::int_dir);
                 bcs_t[0   ].setHi(dir, BCType::int_dir);
                 bcs_s[Pi  ].setHi(dir, BCType::int_dir);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::int_dir);
             }
         }
@@ -418,7 +418,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(dir, BCType::ext_dir);
                 bcs_t[0   ].setHi(dir, BCType::ext_dir);
                 bcs_s[Pi  ].setHi(dir, BCType::foextrap);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
         }
@@ -436,7 +436,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(dir, BCType::foextrap);
                 bcs_t[0   ].setHi(dir, BCType::foextrap);
                 bcs_s[Pi  ].setHi(dir, BCType::ext_dir);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
         }
@@ -455,7 +455,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(dir, BCType::reflect_even);
                 bcs_t[0   ].setHi(dir, BCType::reflect_even);
                 bcs_s[Pi  ].setHi(dir, BCType::reflect_even);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::reflect_even);
             }
         }
@@ -474,7 +474,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(dir, BCType::foextrap);
                 bcs_t[0   ].setHi(dir, BCType::foextrap);
                 bcs_s[Pi  ].setHi(dir, BCType::foextrap);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
         }
@@ -492,7 +492,7 @@ Maestro::BCSetup()
                 bcs_s[Temp].setHi(dir, BCType::foextrap);
                 bcs_t[0   ].setHi(dir, BCType::foextrap);
                 bcs_s[Pi  ].setHi(dir, BCType::foextrap);
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
         }

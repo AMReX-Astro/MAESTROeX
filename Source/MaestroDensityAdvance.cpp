@@ -9,7 +9,8 @@ Maestro::DensityAdvance (bool is_predictor,
                          Vector<MultiFab>& scalnew,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-                         Vector<MultiFab>& scal_force)
+                         Vector<MultiFab>& scal_force,
+                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 {
     Vector<Real> rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
@@ -23,8 +24,6 @@ Maestro::DensityAdvance (bool is_predictor,
         cell_to_edge(rho0_old.dataPtr(),rho0_edge_old.dataPtr());
         cell_to_edge(rho0_new.dataPtr(),rho0_edge_new.dataPtr());
     }
-
-
 
     //////////////////////////////////
     // Create source terms at time n
@@ -45,16 +44,14 @@ Maestro::DensityAdvance (bool is_predictor,
     if (species_pred_type == predict_rhoprime_and_X) {
         // rho' souce term
         // this is needed for pred_rhoprime_and_X
-
+        ModifyScalForce(scal_force,umac,rho0_old,rho0_edge_old,Rho,bcs_s,0);
 
     }
-
     else if (species_pred_type == predict_rho_and_X) {
         // rho source term
+        ModifyScalForce(scal_force,umac,rho0_old,rho0_edge_old,Rho,bcs_s,1);
 
     }
-
-
 
     // ** species source term **
 

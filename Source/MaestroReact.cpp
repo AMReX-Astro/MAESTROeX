@@ -69,24 +69,19 @@ Maestro::React (const Vector<MultiFab>& s_in,
         }
     }
 
-
     // average fine data onto coarser cells
     AverageDown(s_out,0,Nscal);
     AverageDown(rho_Hext,0,1);
     AverageDown(rho_omegadot,0,NumSpec);
     AverageDown(rho_Hnuc,0,1);
 
-/* FIXME
-      ! now update temperature
-      if (use_tfromp) then
-         call makeTfromRhoP(snew,p0,mla,the_bc_level,dx)
-      else
-         call makeTfromRhoH(snew,p0,mla,the_bc_level,dx)
-      endif
-*/
-
-
-
+    // now update temperature
+    if (use_tfromp) {
+        TfromRhoP(snew,p0);
+    }
+    else {
+        TfromRhoH(snew,p0);
+    }
 }
 
 void Maestro::Burner(const Vector<MultiFab>& s_in,

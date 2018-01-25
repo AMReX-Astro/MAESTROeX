@@ -98,7 +98,8 @@ private:
                          amrex::Vector<amrex::MultiFab>& scalnew,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-                         amrex::Vector<amrex::MultiFab>& scal_force);
+                         amrex::Vector<amrex::MultiFab>& scal_force,
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
     ////////////////////////
 
     ////////////
@@ -194,6 +195,7 @@ private:
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<amrex::Real>& s0,
                          const amrex::Vector<amrex::Real>& s0_edge,
                          int comp,
