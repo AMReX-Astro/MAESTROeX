@@ -9,15 +9,15 @@ module slope_module
 
 contains
 
-  subroutine slopex_1d(s,slx,lo,hi,ng,nvar,bc)
+  subroutine slopex_1d(s,slx,domlo,domhi,lo,hi,ng,nvar,adv_bc)
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
-    integer         , intent(in   ) :: lo(:),hi(:),ng,nvar
+    integer         , intent(in   ) :: domlo(:),domhi(:),lo(:),hi(:),ng,nvar
     double precision, intent(in   ) ::   s(lo(1)-ng:,:)
     double precision, intent(  out) :: slx(lo(1)- 1:,:) 
-    integer         , intent(in)    :: bc(:,:,:)
+    integer         , intent(in)    :: adv_bc(:,:,:)
 
     ! Local variables
     integer :: is,ie
@@ -48,8 +48,8 @@ contains
              slx(i,comp)= sflag*min(slim,abs(del))
           enddo
 
-          if (bc(1,1,comp) .eq. EXT_DIR  .or. bc(1,1,comp) .eq. HOEXTRAP) then
-
+          if (lo(1) .eq. domlo(1)) then
+          if (adv_bc(1,1,comp) .eq. EXT_DIR  .or. adv_bc(1,1,comp) .eq. HOEXTRAP) then
              slx(is-1,comp) = zero
              del = (s(is+1,comp)+three*s(is,comp)- &
                   four*s(is-1,comp) ) * third
@@ -59,11 +59,11 @@ contains
              slim = merge(slim, zero, dpls*dmin.gt.ZERO)
              sflag = sign(one,del)
              slx(is,comp)= sflag*min(slim,abs(del))
-
+          endif
           endif
 
-          if (bc(1,2,comp) .eq. EXT_DIR  .or. bc(1,2,comp) .eq. HOEXTRAP) then
-
+          if (hi(1) .eq. domhi(1)) then
+          if (adv_bc(1,2,comp) .eq. EXT_DIR  .or. adv_bc(1,2,comp) .eq. HOEXTRAP) then
              slx(ie+1,comp) = zero
              del = -(s(ie-1,comp)+three*s(ie,comp)- &
                   four*s(ie+1,comp) ) * third
@@ -73,8 +73,9 @@ contains
              slim = merge(slim, zero, dpls*dmin.gt.ZERO)
              sflag = sign(one,del)
              slx(ie,comp)= sflag*min(slim,abs(del))
-
           endif
+          endif
+
        enddo
 
     else 
@@ -99,10 +100,9 @@ contains
              slx(i,comp) = dxscr(i,flag)*min(abs(ds),dxscr(i,lim))
           enddo
 
-          if (bc(1,1,comp) .eq. EXT_DIR  .or. bc(1,1,comp) .eq. HOEXTRAP) then
-
+          if (lo(1) .eq. domlo(1)) then
+          if (adv_bc(1,1,comp) .eq. EXT_DIR  .or. adv_bc(1,1,comp) .eq. HOEXTRAP) then
              slx(is-1,comp) = zero
-
              del = -sixteen/fifteen*s(is-1,comp) + half*s(is,comp) + &
                   two3rd*s(is+1,comp) - tenth*s(is+2,comp)
              dmin = two*(s(is  ,comp)-s(is-1,comp))
@@ -117,13 +117,12 @@ contains
              ds = two * two3rd * dxscr(is+1,cen) - &
                   sixth * (dxscr(is+2,fromm) + dxscr(is,fromm))
              slx(is+1,comp) = dxscr(is+1,flag)*min(abs(ds),dxscr(is+1,lim))
-
+          endif
           endif
 
-          if (bc(1,2,comp) .eq. EXT_DIR  .or. bc(1,2,comp) .eq. HOEXTRAP) then
-
+          if (hi(1) .eq. domhi(1)) then
+          if (adv_bc(1,2,comp) .eq. EXT_DIR  .or. adv_bc(1,2,comp) .eq. HOEXTRAP) then
              slx(ie+1,comp) = zero
-
              del = -( -sixteen/fifteen*s(ie+1,comp) + half*s(ie,comp) +  &
                   two3rd*s(ie-1,comp) - tenth*s(ie-2,comp) )
              dmin = two*(s(ie  ,comp)-s(ie-1,comp))
@@ -138,23 +137,24 @@ contains
              ds = two * two3rd * dxscr(ie-1,cen) - &
                   sixth * (dxscr(ie-2,fromm) + dxscr(ie,fromm))
              slx(ie-1,comp) = dxscr(ie-1,flag)*min(abs(ds),dxscr(ie-1,lim))
-
           endif
+          endif
+
        enddo
 
     endif
 
   end subroutine slopex_1d
 
-  subroutine slopex_2d(s,slx,lo,hi,ng,nvar,bc)
+  subroutine slopex_2d(s,slx,domlo,domhi,lo,hi,ng,nvar,adv_bc)
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
-    integer         , intent(in   ) :: lo(:),hi(:),ng,nvar
+    integer         , intent(in   ) :: domlo(:),domhi(:),lo(:),hi(:),ng,nvar
     double precision, intent(in   ) ::   s(lo(1)-ng:, lo(2)-ng:,:)
     double precision, intent(  out) :: slx(lo(1)- 1:, lo(2)- 1:,:) 
-    integer         , intent(in)    :: bc(:,:,:)
+    integer         , intent(in)    :: adv_bc(:,:,:)
 
     ! Local variables
     integer :: is,js,ie,je
@@ -188,8 +188,8 @@ contains
                 slx(i,j,comp)= sflag*min(slim,abs(del))
              enddo
 
-             if (bc(1,1,comp) .eq. EXT_DIR  .or. bc(1,1,comp) .eq. HOEXTRAP) then
-
+             if (lo(1) .eq. domlo(1)) then
+             if (adv_bc(1,1,comp) .eq. EXT_DIR  .or. adv_bc(1,1,comp) .eq. HOEXTRAP) then
                 slx(is-1,j,comp) = zero
                 del = (s(is+1,j,comp)+three*s(is,j,comp)- &
                      four*s(is-1,j,comp) ) * third
@@ -199,11 +199,11 @@ contains
                 slim = merge(slim, zero, dpls*dmin.gt.ZERO)
                 sflag = sign(one,del)
                 slx(is,j,comp)= sflag*min(slim,abs(del))
-
+             endif
              endif
 
-             if (bc(1,2,comp) .eq. EXT_DIR  .or. bc(1,2,comp) .eq. HOEXTRAP) then
-
+             if (hi(1) .eq. domhi(1)) then
+             if (adv_bc(1,2,comp) .eq. EXT_DIR  .or. adv_bc(1,2,comp) .eq. HOEXTRAP) then
                 slx(ie+1,j,comp) = zero
                 del = -(s(ie-1,j,comp)+three*s(ie,j,comp)- &
                      four*s(ie+1,j,comp) ) * third
@@ -213,8 +213,9 @@ contains
                 slim = merge(slim, zero, dpls*dmin.gt.ZERO)
                 sflag = sign(one,del)
                 slx(ie,j,comp)= sflag*min(slim,abs(del))
-
              endif
+             endif
+
           enddo
        enddo
 
@@ -241,10 +242,9 @@ contains
                 slx(i,j,comp) = dxscr(i,flag)*min(abs(ds),dxscr(i,lim))
              enddo
 
-             if (bc(1,1,comp) .eq. EXT_DIR  .or. bc(1,1,comp) .eq. HOEXTRAP) then
-
+             if (lo(1) .eq. domlo(1)) then
+             if (adv_bc(1,1,comp) .eq. EXT_DIR  .or. adv_bc(1,1,comp) .eq. HOEXTRAP) then
                 slx(is-1,j,comp) = zero
-
                 del = -sixteen/fifteen*s(is-1,j,comp) + half*s(is,j,comp) + &
                      two3rd*s(is+1,j,comp) - tenth*s(is+2,j,comp)
                 dmin = two*(s(is  ,j,comp)-s(is-1,j,comp))
@@ -259,13 +259,12 @@ contains
                 ds = two * two3rd * dxscr(is+1,cen) - &
                      sixth * (dxscr(is+2,fromm) + dxscr(is,fromm))
                 slx(is+1,j,comp) = dxscr(is+1,flag)*min(abs(ds),dxscr(is+1,lim))
-
+             endif
              endif
 
-             if (bc(1,2,comp) .eq. EXT_DIR  .or. bc(1,2,comp) .eq. HOEXTRAP) then
-
+             if (hi(1) .eq. domhi(1)) then
+             if (adv_bc(1,2,comp) .eq. EXT_DIR  .or. adv_bc(1,2,comp) .eq. HOEXTRAP) then
                 slx(ie+1,j,comp) = zero
-
                 del = -( -sixteen/fifteen*s(ie+1,j,comp) + half*s(ie,j,comp) +  &
                      two3rd*s(ie-1,j,comp) - tenth*s(ie-2,j,comp) )
                 dmin = two*(s(ie  ,j,comp)-s(ie-1,j,comp))
@@ -280,8 +279,9 @@ contains
                 ds = two * two3rd * dxscr(ie-1,cen) - &
                      sixth * (dxscr(ie-2,fromm) + dxscr(ie,fromm))
                 slx(ie-1,j,comp) = dxscr(ie-1,flag)*min(abs(ds),dxscr(ie-1,lim))
-
              endif
+             endif
+
           enddo
        enddo
 
@@ -289,13 +289,13 @@ contains
 
   end subroutine slopex_2d
 
-  subroutine slopey_2d(s,sly,lo,hi,ng,nvar,bc)
+  subroutine slopey_2d(s,sly,domlo,domhi,lo,hi,ng,nvar,adv_bc)
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
-    integer         , intent(in)  :: lo(:),hi(:),ng,nvar
-    integer         , intent(in)  :: bc(:,:,:)
+    integer         , intent(in)  :: domlo(:),domhi(:),lo(:),hi(:),ng,nvar
+    integer         , intent(in)  :: adv_bc(:,:,:)
     double precision, intent( in) ::   s(lo(1)-ng:,lo(2)-ng:,:)
     double precision, intent(out) :: sly(lo(1)- 1:,lo(2)- 1:,:)
 
@@ -334,8 +334,8 @@ contains
              enddo
           enddo
 
-          if (bc(2,1,comp) .eq. EXT_DIR .or. bc(2,1,comp) .eq. HOEXTRAP) then
-
+          if (lo(2) .eq. domlo(2)) then
+          if (adv_bc(2,1,comp) .eq. EXT_DIR .or. adv_bc(2,1,comp) .eq. HOEXTRAP) then
              do i = is-1,ie+1 
                 sly(i,js-1,comp) = zero
                 del = (s(i,js+1,comp)+three*s(i,js,comp)- &
@@ -347,11 +347,11 @@ contains
                 sflag = sign(one,del)
                 sly(i,js,comp)= sflag*min(slim,abs(del))
              enddo
-
+          endif
           endif
 
-          if (bc(2,2,comp) .eq. EXT_DIR .or. bc(2,2,comp) .eq. HOEXTRAP) then
-
+          if (hi(2) .eq. domhi(2)) then
+          if (adv_bc(2,2,comp) .eq. EXT_DIR .or. adv_bc(2,2,comp) .eq. HOEXTRAP) then
              do i = is-1, ie+1 
                 sly(i,je+1,comp) = zero
                 del = -(s(i,je-1,comp)+three*s(i,je,comp)- &
@@ -363,8 +363,9 @@ contains
                 sflag = sign(one,del)
                 sly(i,je,comp)= sflag*min(slim,abs(del))
              enddo
-
           endif
+          endif
+
        enddo
 
     else 
@@ -388,8 +389,8 @@ contains
                 sly(i,j,comp) = dyscr(j,flag)*min(abs(ds),dyscr(j,lim))
              enddo
 
-             if (bc(2,1,comp) .eq. EXT_DIR .or. bc(2,1,comp) .eq. HOEXTRAP) then
-
+             if (lo(2) .eq. domlo(2)) then
+             if (adv_bc(2,1,comp) .eq. EXT_DIR .or. adv_bc(2,1,comp) .eq. HOEXTRAP) then
                 sly(i,js-1,comp) = zero
                 del = -sixteen/fifteen*s(i,js-1,comp) +  half*s(i,js ,comp) +  &
                      two3rd*s(i,js+1,comp) - tenth*s(i,js+2,comp)
@@ -405,11 +406,11 @@ contains
                 ds = two * two3rd * dyscr(js+1,cen) - &
                      sixth * (dyscr(js+2,fromm) + dyscr(js,fromm))
                 sly(i,js+1,comp) = dyscr(js+1,flag)*min(abs(ds),dyscr(js+1,lim))
-
+             endif
              endif
 
-             if (bc(2,2,comp) .eq. EXT_DIR .or. bc(2,2,comp) .eq. HOEXTRAP) then
-
+             if (hi(2) .eq. domhi(2)) then
+             if (adv_bc(2,2,comp) .eq. EXT_DIR .or. adv_bc(2,2,comp) .eq. HOEXTRAP) then
                 sly(i,je+1,comp) = zero
                 del = -( -sixteen/fifteen*s(i,je+1,comp) +  half*s(i,je  ,comp) + &
                      two3rd*s(i,je-1,comp) - tenth*s(i,je-2,comp) )
@@ -425,7 +426,7 @@ contains
                 ds = two * two3rd * dyscr(je-1,cen) -  &
                      sixth * (dyscr(je-2,fromm) + dyscr(je,fromm))
                 sly(i,je-1,comp) = dyscr(je-1,flag)*min(abs(ds),dyscr(je-1,lim))
-
+             endif
              endif
 
           enddo
@@ -435,13 +436,13 @@ contains
 
   end subroutine slopey_2d
 
-  subroutine slopez_3d(s,slz,lo,hi,ng,nvar,bc)
+  subroutine slopez_3d(s,slz,domlo,domhi,lo,hi,ng,nvar,adv_bc)
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
-    integer         , intent(in)  :: lo(:),hi(:),ng,nvar
-    integer         , intent(in)  :: bc(:,:,:)
+    integer         , intent(in)  :: domlo(:),domhi(:),lo(:),hi(:),ng,nvar
+    integer         , intent(in)  :: adv_bc(:,:,:)
     double precision, intent( in) ::   s(lo(1)-ng:,lo(2)-ng:,lo(3)-ng:,:)
     double precision, intent(out) :: slz(lo(1)- 1:,lo(2)- 1:,lo(3)- 1:,:)
 
@@ -482,7 +483,8 @@ contains
              enddo
           enddo
 
-          if (bc(3,1,comp) .eq. EXT_DIR .or. bc(3,1,comp) .eq. HOEXTRAP) then
+          if (lo(3) .eq. domlo(3)) then
+          if (adv_bc(3,1,comp) .eq. EXT_DIR .or. adv_bc(3,1,comp) .eq. HOEXTRAP) then
              do j = js-1,je+1 
                 do i = is-1,ie+1 
                    slz(i,j,ks-1,comp) = zero
@@ -496,11 +498,11 @@ contains
                    slz(i,j,ks,comp)= sflag*min(slim,abs(del))
                 enddo
              enddo
-
+          endif
           endif
 
-          if (bc(3,2,comp) .eq. EXT_DIR .or. bc(3,2,comp) .eq. HOEXTRAP) then
-
+          if (hi(3) .eq. domhi(3)) then
+          if (adv_bc(3,2,comp) .eq. EXT_DIR .or. adv_bc(3,2,comp) .eq. HOEXTRAP) then
              do j = js-1, je+1 
                 do i = is-1, ie+1 
                    slz(i,j,ke+1,comp) = zero
@@ -514,8 +516,9 @@ contains
                    slz(i,j,ke,comp)= sflag*min(slim,abs(del))
                 enddo
              enddo
-
           endif
+          endif
+
        enddo
 
     else 
@@ -540,8 +543,8 @@ contains
                    slz(i,j,k,comp) = dzscr(k,flag)*min(abs(ds),dzscr(k,lim))
                 enddo
 
-                if (bc(3,1,comp) .eq. EXT_DIR .or. bc(3,1,comp) .eq. HOEXTRAP) then
-
+                if (lo(3) .eq. domlo(3)) then
+                if (adv_bc(3,1,comp) .eq. EXT_DIR .or. adv_bc(3,1,comp) .eq. HOEXTRAP) then
                    slz(i,j,ks-1,comp) = zero
                    del = -sixteen/fifteen*s(i,j,ks-1,comp) +  half*s(i,j,ks ,comp) +  &
                         two3rd*s(i,j,ks+1,comp) - tenth*s(i,j,ks+2,comp)
@@ -557,11 +560,11 @@ contains
                    ds = two * two3rd * dzscr(ks+1,cen) - &
                         sixth * (dzscr(ks+2,fromm) + dzscr(ks,fromm))
                    slz(i,j,ks+1,comp) = dzscr(ks+1,flag)*min(abs(ds),dzscr(ks+1,lim))
-
+                endif
                 endif
 
-                if (bc(3,2,comp) .eq. EXT_DIR .or. bc(3,2,comp) .eq. HOEXTRAP) then
-
+                if (hi(3) .eq. domhi(3)) then
+                if (adv_bc(3,2,comp) .eq. EXT_DIR .or. adv_bc(3,2,comp) .eq. HOEXTRAP) then
                    slz(i,j,ke+1,comp) = zero
                    del = -( -sixteen/fifteen*s(i,j,ke+1,comp) +  half*s(i,j,ke  ,comp) + &
                         two3rd*s(i,j,ke-1,comp) - tenth*s(i,j,ke-2,comp) )
@@ -577,8 +580,9 @@ contains
                    ds = two * two3rd * dzscr(ke-1,cen) -  &
                         sixth * (dzscr(ke-2,fromm) + dzscr(ke,fromm))
                    slz(i,j,ke-1,comp) = dzscr(ke-1,flag)*min(abs(ds),dzscr(ke-1,lim))
-
                 endif
+                endif
+
              enddo
           enddo
        enddo

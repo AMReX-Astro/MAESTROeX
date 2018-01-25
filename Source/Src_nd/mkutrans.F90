@@ -52,7 +52,7 @@ contains
     
     hx = dx(1)
     
-    call slopex_1d(utilde(:,1:1),slopex,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+    call slopex_1d(utilde(:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
 
     !******************************************************************
     ! create utrans
@@ -163,8 +163,8 @@ contains
     hx = dx(1)
     hy = dx(2)
     
-    call slopex_2d(utilde(:,:,1:1),slopex,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-    call slopey_2d(utilde(:,:,2:2),slopey,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
+    call slopex_2d(utilde(:,:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+    call slopey_2d(utilde(:,:,2:2),slopey,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
 
     !******************************************************************
     ! create utrans
@@ -345,10 +345,10 @@ contains
     hz = dx(3)
     
     do k = lo(3)-1,hi(3)+1
-       call slopex_2d(utilde(:,:,k,1:1),slopex(:,:,k,:),lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-       call slopey_2d(utilde(:,:,k,2:2),slopey(:,:,k,:),lo,hi,ng_ut,1,adv_bc(:,:,2:2))
+       call slopex_2d(utilde(:,:,k,1:1),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+       call slopey_2d(utilde(:,:,k,2:2),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
     end do
-    call slopez_3d(utilde(:,:,:,3:3),slopez,lo,hi,ng_ut,1,adv_bc(:,:,3:3))
+    call slopez_3d(utilde(:,:,:,3:3),slopez,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,3:3))
     
     !******************************************************************
     ! create utrans

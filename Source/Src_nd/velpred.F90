@@ -61,7 +61,7 @@ contains
 
     hx = dx(1)
 
-    call slopex_1d(utilde,slopex,lo,hi,ng_u,1,adv_bc)
+    call slopex_1d(utilde,slopex,domlo,domhi,lo,hi,ng_u,1,adv_bc)
 
     !******************************************************************
     ! Create umac 
@@ -194,8 +194,8 @@ contains
     hx = dx(1)
     hy = dx(2)
 
-    call slopex_2d(utilde,slopex,lo,hi,ng_ut,2,adv_bc)
-    call slopey_2d(utilde,slopey,lo,hi,ng_ut,2,adv_bc)
+    call slopex_2d(utilde,slopex,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
+    call slopey_2d(utilde,slopey,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
        
     !******************************************************************
     ! Create u_{\i-\half\e_x}^x, etc.
@@ -413,6 +413,7 @@ contains
                (abs(vmacl(i,j)+vmacr(i,j)+TWO*w0(lev,j)) .lt. rel_eps))
           vmac(i,j) = merge(vmacl(i,j),vmacr(i,j),uavg+w0(lev,j) .gt. ZERO)
           vmac(i,j) = merge(ZERO,vmac(i,j),test)
+
        enddo
     enddo
 
@@ -555,10 +556,10 @@ contains
     hz = dx(3)
 
     do k = lo(3)-1,hi(3)+1
-       call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),lo,hi,ng_ut,3,adv_bc)
-       call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),lo,hi,ng_ut,3,adv_bc)
+       call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
+       call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
     end do
-    call slopez_3d(utilde,slopez,lo,hi,ng_ut,3,adv_bc)
+    call slopez_3d(utilde,slopez,domlo,domhi,lo,hi,ng_ut,3,adv_bc)
 
     !******************************************************************
     ! Create u_{\i-\half\e_x}^x, etc.
