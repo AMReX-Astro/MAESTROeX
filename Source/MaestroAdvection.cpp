@@ -79,6 +79,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+            const Box& domainBox = geom[lev].Domain();
             const Real* dx = geom[lev].CellSize();
 
             const FArrayBox& utilde_fab  = utilde_mf[mfi];
@@ -102,7 +103,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #elif (AMREX_SPACEDIM == 3)
             mkutrans_3d(
 #endif
-                        lev, validBox.loVect(), validBox.hiVect(),
+                        lev, domainBox.loVect(), domainBox.hiVect(),
+                        validBox.loVect(), validBox.hiVect(),
                         utilde_fab.dataPtr(), utilde_fab.loVect(), utilde_fab.hiVect(), utilde_fab.nCompPtr(),
                         utilde_mf.nGrow(),
                         ufull_fab.dataPtr(), ufull_fab.loVect(), ufull_fab.hiVect(), ufull_fab.nCompPtr(),
@@ -162,6 +164,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+            const Box& domainBox = geom[lev].Domain();
             const Real* dx = geom[lev].CellSize();
 
             const FArrayBox& utilde_fab = utilde_mf[mfi];
@@ -189,7 +192,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #elif (AMREX_SPACEDIM == 3)
             velpred_3d(
 #endif
-                        lev, validBox.loVect(), validBox.hiVect(),
+                        lev, domainBox.loVect(), domainBox.hiVect(),
+                        validBox.loVect(), validBox.hiVect(),
                         utilde_fab.dataPtr(), utilde_fab.loVect(), utilde_fab.hiVect(), utilde_fab.nCompPtr(),
                         utilde_mf.nGrow(),
                         ufull_fab.dataPtr(), ufull_fab.loVect(), ufull_fab.hiVect(), ufull_fab.nCompPtr(),

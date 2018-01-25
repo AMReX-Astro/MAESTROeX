@@ -15,13 +15,13 @@ module mkutrans_module
 contains
 
 #if (AMREX_SPACEDIM == 1)
-  subroutine mkutrans_1d(lev, lo, hi, &
+  subroutine mkutrans_1d(lev, domlo, domhi, lo, hi, &
                          utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
                          ufull,  uf_lo, uf_hi, nc_uf, &
                          utrans, uu_lo, uu_hi, &
                          w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_1d")
 
-    integer         , intent(in   ) :: lev, lo(1), hi(1)
+    integer         , intent(in   ) :: lev, domlo(1), domhi(1), lo(1), hi(1)
     integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut, ng_ut
     integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
     integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
@@ -65,36 +65,40 @@ contains
     end do
 
     ! impose lo i side bc's
-    select case(phys_bc(1,1))
-    case (Inflow)
-       ulx(is) = utilde(is-1,1)
-       urx(is) = utilde(is-1,1)
-    case (SlipWall, NoSlipWall, Symmetry)
-       ulx(is) = ZERO
-       urx(is) = ZERO
-    case (Outflow)
-       ulx(is) = min(urx(is),ZERO)
-       urx(is) = ulx(is)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_1d: invalid boundary type phys_bc(1,1)")
-    end select
+    if (lo(1) .eq. domlo(1)) then
+       select case(phys_bc(1,1))
+       case (Inflow)
+          ulx(is) = utilde(is-1,1)
+          urx(is) = utilde(is-1,1)
+       case (SlipWall, NoSlipWall, Symmetry)
+          ulx(is) = ZERO
+          urx(is) = ZERO
+       case (Outflow)
+          ulx(is) = min(urx(is),ZERO)
+          urx(is) = ulx(is)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_1d: invalid boundary type phys_bc(1,1)")
+       end select
+    end if
 
     ! impose hi i side bc's    
-    select case(phys_bc(1,2))
-    case (Inflow)
-       ulx(ie+1) = utilde(ie+1,1)
-       urx(ie+1) = utilde(ie+1,1)
-    case (SlipWall, NoSlipWall, Symmetry)
-       ulx(ie+1) = ZERO
-       urx(ie+1) = ZERO
-    case (Outflow)
-       ulx(ie+1) = max(ulx(ie+1),ZERO)
-       urx(ie+1) = ulx(ie+1)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_1d: invalid boundary type phys_bc(1,2)")
-    end select
+    if (hi(1) .eq. domhi(1)) then
+       select case(phys_bc(1,2))
+       case (Inflow)
+          ulx(ie+1) = utilde(ie+1,1)
+          urx(ie+1) = utilde(ie+1,1)
+       case (SlipWall, NoSlipWall, Symmetry)
+          ulx(ie+1) = ZERO
+          urx(ie+1) = ZERO
+       case (Outflow)
+          ulx(ie+1) = max(ulx(ie+1),ZERO)
+          urx(ie+1) = ulx(ie+1)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_1d: invalid boundary type phys_bc(1,2)")
+       end select
+    end if
 
     do i=is,ie+1
        ! solve Riemann problem using full velocity
@@ -111,14 +115,14 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 2)
-  subroutine mkutrans_2d(lev, lo, hi, &
+  subroutine mkutrans_2d(lev, domlo, domhi, lo, hi, &
                          utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
                          ufull,  uf_lo, uf_hi, nc_uf, &
                          utrans, uu_lo, uu_hi, &
                          vtrans, uv_lo, uv_hi, &
                          w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
 
-    integer         , intent(in   ) :: lev, lo(2), hi(2)
+    integer         , intent(in   ) :: lev, domlo(2), domhi(2), lo(2), hi(2)
     integer         , intent(in   ) :: ut_lo(2), ut_hi(2), nc_ut, ng_ut
     integer         , intent(in   ) :: uf_lo(2), uf_hi(2), nc_uf
     integer         , intent(in   ) :: uu_lo(2), uu_hi(2)
@@ -173,38 +177,42 @@ contains
           urx(i,j) = utilde(i  ,j,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,1)))*slopex(i  ,j,1)
        end do
     end do
-
+    
     ! impose lo i side bc's
-    select case(phys_bc(1,1))
-    case (Inflow)
-       ulx(is,js:je) = utilde(is-1,js:je,1)
-       urx(is,js:je) = utilde(is-1,js:je,1)
-    case (SlipWall, NoSlipWall, Symmetry)
-       ulx(is,js:je) = ZERO
-       urx(is,js:je) = ZERO
-    case (Outflow)
-       ulx(is,js:je) = min(urx(is,js:je),ZERO)
-       urx(is,js:je) = ulx(is,js:je)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_2d: invalid boundary type phys_bc(1,1)")
-    end select
+    if (lo(1) .eq. domlo(1)) then
+       select case(phys_bc(1,1))
+       case (Inflow)
+          ulx(is,js:je) = utilde(is-1,js:je,1)
+          urx(is,js:je) = utilde(is-1,js:je,1)
+       case (SlipWall, NoSlipWall, Symmetry)
+          ulx(is,js:je) = ZERO
+          urx(is,js:je) = ZERO
+       case (Outflow)
+          ulx(is,js:je) = min(urx(is,js:je),ZERO)
+          urx(is,js:je) = ulx(is,js:je)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_2d: invalid boundary type phys_bc(1,1)")
+       end select
+    end if
 
-    ! impose hi i side bc's    
-    select case(phys_bc(1,2))
-    case (Inflow)
-       ulx(ie+1,js:je) = utilde(ie+1,js:je,1)
-       urx(ie+1,js:je) = utilde(ie+1,js:je,1)
-    case (SlipWall, NoSlipWall, Symmetry)
-       ulx(ie+1,js:je) = ZERO
-       urx(ie+1,js:je) = ZERO
-    case (Outflow)
-       ulx(ie+1,js:je) = max(ulx(ie+1,js:je),ZERO)
-       urx(ie+1,js:je) = ulx(ie+1,js:je)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_2d: invalid boundary type phys_bc(1,2)")
-    end select
+    ! impose hi i side bc's  
+    if (hi(1) .eq. domhi(1)) then  
+       select case(phys_bc(1,2))
+       case (Inflow)
+          ulx(ie+1,js:je) = utilde(ie+1,js:je,1)
+          urx(ie+1,js:je) = utilde(ie+1,js:je,1)
+       case (SlipWall, NoSlipWall, Symmetry)
+          ulx(ie+1,js:je) = ZERO
+          urx(ie+1,js:je) = ZERO
+       case (Outflow)
+          ulx(ie+1,js:je) = max(ulx(ie+1,js:je),ZERO)
+          urx(ie+1,js:je) = ulx(ie+1,js:je)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_2d: invalid boundary type phys_bc(1,2)")
+       end select
+    end if
 
     do j=js,je
        do i=is,ie+1
@@ -230,36 +238,40 @@ contains
     end do
 
     ! impose lo side bc's
-    select case(phys_bc(2,1))
-    case (Inflow)
-       vly(is:ie,js) = utilde(is:ie,js-1,2)
-       vry(is:ie,js) = utilde(is:ie,js-1,2)
-    case (SlipWall, NoSlipWall, Symmetry)
-       vly(is:ie,js) = ZERO
-       vry(is:ie,js) = ZERO
-    case (Outflow)
-       vly(is:ie,js) = min(vry(is:ie,js),ZERO)
-       vry(is:ie,js) = vly(is:ie,js)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_2d: invalid boundary type phys_bc(2,1)")
-    end select
+    if (lo(2) .eq. domlo(2)) then
+       select case(phys_bc(2,1))
+       case (Inflow)
+          vly(is:ie,js) = utilde(is:ie,js-1,2)
+          vry(is:ie,js) = utilde(is:ie,js-1,2)
+       case (SlipWall, NoSlipWall, Symmetry)
+          vly(is:ie,js) = ZERO
+          vry(is:ie,js) = ZERO
+       case (Outflow)
+          vly(is:ie,js) = min(vry(is:ie,js),ZERO)
+          vry(is:ie,js) = vly(is:ie,js)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_2d: invalid boundary type phys_bc(2,1)")
+       end select
+    end if
 
     ! impose hi side bc's
-    select case(phys_bc(2,2))
-    case (Inflow)
-       vly(is:ie,je+1) = utilde(is:ie,je+1,2)
-       vry(is:ie,je+1) = utilde(is:ie,je+1,2)
-    case (SlipWall, NoSlipWall, Symmetry)
-       vly(is:ie,je+1) = ZERO
-       vry(is:ie,je+1) = ZERO
-    case (Outflow)
-       vly(is:ie,je+1) = max(vly(is:ie,je+1),ZERO)
-       vry(is:ie,je+1) = vly(is:ie,je+1)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_2d: invalid boundary type phys_bc(2,2)")
-    end select
+    if (hi(2) .eq. domhi(2)) then
+       select case(phys_bc(2,2))
+       case (Inflow)
+          vly(is:ie,je+1) = utilde(is:ie,je+1,2)
+          vry(is:ie,je+1) = utilde(is:ie,je+1,2)
+       case (SlipWall, NoSlipWall, Symmetry)
+          vly(is:ie,je+1) = ZERO
+          vry(is:ie,je+1) = ZERO
+       case (Outflow)
+          vly(is:ie,je+1) = max(vly(is:ie,je+1),ZERO)
+          vry(is:ie,je+1) = vly(is:ie,je+1)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_2d: invalid boundary type phys_bc(2,2)")
+       end select
+    end if
 
     do j=js,je+1
        do i=is,ie
@@ -278,7 +290,7 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 3)
-  subroutine mkutrans_3d(lev, lo, hi, &
+  subroutine mkutrans_3d(lev, domlo, domhi, lo, hi, &
                          utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
                          ufull,  uf_lo, uf_hi, nc_uf, &
                          utrans, uu_lo, uu_hi, &
@@ -286,7 +298,7 @@ contains
                          wtrans, uw_lo, uw_hi, &
                          w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut, ng_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
@@ -357,38 +369,42 @@ contains
        end do
     end do
     deallocate(slopex)
-
+    
     ! impose lo side bc's
-    select case(phys_bc(1,1))
-    case (Inflow)
-       ulx(is,js:je,ks:ke) = utilde(is-1,js:je,ks:ke,1)
-       urx(is,js:je,ks:ke) = utilde(is-1,js:je,ks:ke,1)
-    case (SlipWall, NoSlipWall, Symmetry)
-       ulx(is,js:je,ks:ke) = ZERO
-       urx(is,js:je,ks:ke) = ZERO
-    case (Outflow)
-       ulx(is,js:je,ks:ke) = min(urx(is,js:je,ks:ke),ZERO)
-       urx(is,js:je,ks:ke) = ulx(is,js:je,ks:ke)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_3d: invalid boundary type phys_bc(1,1)")
-    end select
+    if (lo(1) .eq. domlo(1)) then
+       select case(phys_bc(1,1))
+       case (Inflow)
+          ulx(is,js:je,ks:ke) = utilde(is-1,js:je,ks:ke,1)
+          urx(is,js:je,ks:ke) = utilde(is-1,js:je,ks:ke,1)
+       case (SlipWall, NoSlipWall, Symmetry)
+          ulx(is,js:je,ks:ke) = ZERO
+          urx(is,js:je,ks:ke) = ZERO
+       case (Outflow)
+          ulx(is,js:je,ks:ke) = min(urx(is,js:je,ks:ke),ZERO)
+          urx(is,js:je,ks:ke) = ulx(is,js:je,ks:ke)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_3d: invalid boundary type phys_bc(1,1)")
+       end select
+    end if
 
     ! impose hi side bc's
-    select case(phys_bc(1,2))
-    case (Inflow)
-       ulx(ie+1,js:je,ks:ke) = utilde(ie+1,js:je,ks:ke,1)
-       urx(ie+1,js:je,ks:ke) = utilde(ie+1,js:je,ks:ke,1)
-    case (SlipWall, NoSlipWall, Symmetry)
-       ulx(ie+1,js:je,ks:ke) = ZERO
-       urx(ie+1,js:je,ks:ke) = ZERO
-    case (Outflow)
-       ulx(ie+1,js:je,ks:ke) = max(ulx(ie+1,js:je,ks:ke),ZERO)
-       urx(ie+1,js:je,ks:ke) = ulx(ie+1,js:je,ks:ke)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_3d: invalid boundary type phys_bc(1,2)")
-    end select
+    if (hi(1) .eq. domhi(1)) then  
+       select case(phys_bc(1,2))
+       case (Inflow)
+          ulx(ie+1,js:je,ks:ke) = utilde(ie+1,js:je,ks:ke,1)
+          urx(ie+1,js:je,ks:ke) = utilde(ie+1,js:je,ks:ke,1)
+       case (SlipWall, NoSlipWall, Symmetry)
+          ulx(ie+1,js:je,ks:ke) = ZERO
+          urx(ie+1,js:je,ks:ke) = ZERO
+       case (Outflow)
+          ulx(ie+1,js:je,ks:ke) = max(ulx(ie+1,js:je,ks:ke),ZERO)
+          urx(ie+1,js:je,ks:ke) = ulx(ie+1,js:je,ks:ke)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_3d: invalid boundary type phys_bc(1,2)")
+       end select
+    end if
 
     do k=ks,ke
        do j=js,je
@@ -425,38 +441,42 @@ contains
     enddo
 
     deallocate(slopey)
-
+    
     ! impose lo side bc's
-    select case(phys_bc(2,1))
-    case (Inflow)
-       vly(is:ie,js,ks:ke) = utilde(is:ie,js-1,ks:ke,2)
-       vry(is:ie,js,ks:ke) = utilde(is:ie,js-1,ks:ke,2)
-    case (SlipWall, NoSlipWall, Symmetry)
-       vly(is:ie,js,ks:ke) = ZERO
-       vry(is:ie,js,ks:ke) = ZERO
-    case (Outflow)
-       vly(is:ie,js,ks:ke) = min(vry(is:ie,js,ks:ke),ZERO)
-       vry(is:ie,js,ks:ke) = vly(is:ie,js,ks:ke)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_3d: invalid boundary type phys_bc(2,1)")
-    end select
+    if (lo(2) .eq. domlo(2)) then
+       select case(phys_bc(2,1))
+       case (Inflow)
+          vly(is:ie,js,ks:ke) = utilde(is:ie,js-1,ks:ke,2)
+          vry(is:ie,js,ks:ke) = utilde(is:ie,js-1,ks:ke,2)
+       case (SlipWall, NoSlipWall, Symmetry)
+          vly(is:ie,js,ks:ke) = ZERO
+          vry(is:ie,js,ks:ke) = ZERO
+       case (Outflow)
+          vly(is:ie,js,ks:ke) = min(vry(is:ie,js,ks:ke),ZERO)
+          vry(is:ie,js,ks:ke) = vly(is:ie,js,ks:ke)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_3d: invalid boundary type phys_bc(2,1)")
+       end select
+    end if
 
     ! impose hi side bc's
-    select case(phys_bc(2,2))
-    case (Inflow)
-       vly(is:ie,je+1,ks:ke) = utilde(is:ie,je+1,ks:ke,2)
-       vry(is:ie,je+1,ks:ke) = utilde(is:ie,je+1,ks:ke,2)
-    case (SlipWall, NoSlipWall, Symmetry)
-       vly(is:ie,je+1,ks:ke) = ZERO
-       vry(is:ie,je+1,ks:ke) = ZERO
-    case (Outflow)
-       vly(is:ie,je+1,ks:ke) = max(vly(is:ie,je+1,ks:ke),ZERO)
-       vry(is:ie,je+1,ks:ke) = vly(is:ie,je+1,ks:ke)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_3d: invalid boundary type phys_bc(2,2)")
-    end select
+    if (hi(2) .eq. domhi(2)) then
+       select case(phys_bc(2,2))
+       case (Inflow)
+          vly(is:ie,je+1,ks:ke) = utilde(is:ie,je+1,ks:ke,2)
+          vry(is:ie,je+1,ks:ke) = utilde(is:ie,je+1,ks:ke,2)
+       case (SlipWall, NoSlipWall, Symmetry)
+          vly(is:ie,je+1,ks:ke) = ZERO
+          vry(is:ie,je+1,ks:ke) = ZERO
+       case (Outflow)
+          vly(is:ie,je+1,ks:ke) = max(vly(is:ie,je+1,ks:ke),ZERO)
+          vry(is:ie,je+1,ks:ke) = vly(is:ie,je+1,ks:ke)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_3d: invalid boundary type phys_bc(2,2)")
+       end select
+    end if
     
     do k=ks,ke
        do j=js,je+1
@@ -495,36 +515,40 @@ contains
     deallocate(slopez)
     
     ! impose lo side bc's
-    select case(phys_bc(3,1))
-    case (Inflow)
-       wlz(is:ie,js:je,ks) = utilde(is:ie,js:je,ks-1,3)
-       wrz(is:ie,js:je,ks) = utilde(is:ie,js:je,ks-1,3)
-    case (SlipWall, NoSlipWall, Symmetry)
-       wlz(is:ie,js:je,ks) = ZERO
-       wrz(is:ie,js:je,ks) = ZERO
-    case (Outflow)
-       wlz(is:ie,js:je,ks) = min(wrz(is:ie,js:je,ks),ZERO)
-       wrz(is:ie,js:je,ks) = wlz(is:ie,js:je,ks)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_3d: invalid boundary type phys_bc(3,1)")
-    end select
+    if (lo(3) .eq. domlo(3)) then
+       select case(phys_bc(3,1))
+       case (Inflow)
+          wlz(is:ie,js:je,ks) = utilde(is:ie,js:je,ks-1,3)
+          wrz(is:ie,js:je,ks) = utilde(is:ie,js:je,ks-1,3)
+       case (SlipWall, NoSlipWall, Symmetry)
+          wlz(is:ie,js:je,ks) = ZERO
+          wrz(is:ie,js:je,ks) = ZERO
+       case (Outflow)
+          wlz(is:ie,js:je,ks) = min(wrz(is:ie,js:je,ks),ZERO)
+          wrz(is:ie,js:je,ks) = wlz(is:ie,js:je,ks)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_3d: invalid boundary type phys_bc(3,1)")
+       end select
+    end if
 
     ! impose hi side bc's
-    select case(phys_bc(3,2))
-    case (Inflow)
-       wlz(is:ie,js:je,ke+1) = utilde(is:ie,js:je,ke+1,3)
-       wrz(is:ie,js:je,ke+1) = utilde(is:ie,js:je,ke+1,3)
-    case (SlipWall, NoSlipWall, Symmetry)
-       wlz(is:ie,js:je,ke+1) = ZERO
-       wrz(is:ie,js:je,ke+1) = ZERO
-    case (Outflow)
-       wlz(is:ie,js:je,ke+1) = max(wlz(is:ie,js:je,ke+1),ZERO)
-       wrz(is:ie,js:je,ke+1) = wlz(is:ie,js:je,ke+1)
-    case (Interior) 
-    case  default
-       call bl_error("mkutrans_3d: invalid boundary type phys_bc(3,2)")
-    end select
+    if (hi(3) .eq. domhi(3)) then
+       select case(phys_bc(3,2))
+       case (Inflow)
+          wlz(is:ie,js:je,ke+1) = utilde(is:ie,js:je,ke+1,3)
+          wrz(is:ie,js:je,ke+1) = utilde(is:ie,js:je,ke+1,3)
+       case (SlipWall, NoSlipWall, Symmetry)
+          wlz(is:ie,js:je,ke+1) = ZERO
+          wrz(is:ie,js:je,ke+1) = ZERO
+       case (Outflow)
+          wlz(is:ie,js:je,ke+1) = max(wlz(is:ie,js:je,ke+1),ZERO)
+          wrz(is:ie,js:je,ke+1) = wlz(is:ie,js:je,ke+1)
+       case (Interior) 
+       case  default
+          call bl_error("mkutrans_3d: invalid boundary type phys_bc(3,2)")
+       end select
+    end if
     
     do k=ks,ke+1
        do j=js,je

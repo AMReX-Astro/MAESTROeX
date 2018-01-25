@@ -18,14 +18,14 @@ module velpred_module
 contains
 
 #if (AMREX_SPACEDIM == 1)
-  subroutine velpred_1d(lev, lo, hi, &
+  subroutine velpred_1d(lev, domlo, domhi, lo, hi, &
                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
                         ufull,  uf_lo, uf_hi, nc_uf, &
                         umac,   uu_lo, uu_hi, &
                         force,   f_lo,  f_hi, nc_f, &
                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_1d")
 
-    integer         , intent(in   ) :: lev, lo(1), hi(1)
+    integer         , intent(in   ) :: lev, domlo(1), domhi(1), lo(1), hi(1)
     integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut, ng_ut
     integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
     integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
@@ -86,6 +86,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     select case(phys_bc(1,1))
     case (Inflow)
        umac(is) = utilde(is-1,1)
@@ -97,8 +98,10 @@ contains
     case  default
        call bl_error("velpred_1d: invalid boundary type phys_bc(1,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     select case(phys_bc(1,2))
     case (Inflow)
        umac(ie+1) = utilde(ie+1,1)
@@ -110,6 +113,7 @@ contains
     case  default
        call bl_error("velpred_1d: invalid boundary type phys_bc(1,2)")
     end select
+    end if
 
     deallocate(umacl,umacr)
 
@@ -117,7 +121,7 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 2)
-  subroutine velpred_2d(lev, lo, hi, &
+  subroutine velpred_2d(lev, domlo, domhi, lo, hi, &
                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
                         ufull,  uf_lo, uf_hi, nc_uf, &
                         utrans, uu_lo, uu_hi, &
@@ -127,7 +131,7 @@ contains
                         force,   f_lo,  f_hi, nc_f, &
                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_2d")
 
-    integer         , intent(in   ) :: lev, lo(2), hi(2)
+    integer         , intent(in   ) :: lev, domlo(2), domhi(2), lo(2), hi(2)
     integer         , intent(in   ) :: ut_lo(2), ut_hi(2), nc_ut, ng_ut
     integer         , intent(in   ) :: uf_lo(2), uf_hi(2), nc_uf
     integer         , intent(in   ) :: uu_lo(2), uu_hi(2)
@@ -211,6 +215,7 @@ contains
     end do
     
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     select case(phys_bc(1,1))
     case (Inflow)
        ulx(is,js-1:je+1,1:2) = utilde(is-1,js-1:je+1,1:2)
@@ -229,8 +234,10 @@ contains
     case  default
        call bl_error("velpred_2d: invalid boundary type phys_bc(1,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     select case(phys_bc(1,2))
     case (Inflow)
        ulx(ie+1,js-1:je+1,1:2) = utilde(ie+1,js-1:je+1,1:2)
@@ -249,6 +256,7 @@ contains
     case  default
        call bl_error("velpred_2d: invalid boundary type phys_bc(1,2)")
     end select
+    end if
 
     do j=js-1,je+1
        do i=is,ie+1
@@ -275,6 +283,7 @@ contains
     end do
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     select case(phys_bc(2,1))
     case (Inflow)
        uly(is-1:ie+1,js,1:2) = utilde(is-1:ie+1,js-1,1:2)
@@ -293,8 +302,10 @@ contains
     case  default
        call bl_error("velpred_2d: invalid boundary type phys_bc(2,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     select case(phys_bc(2,2))
     case (Inflow)
        uly(is-1:ie+1,je+1,1:2) = utilde(is-1:ie+1,je+1,1:2)
@@ -313,6 +324,7 @@ contains
     case  default
        call bl_error("velpred_2d: invalid boundary type phys_bc(2,2)")
     end select
+    end if
 
     do j=js,je+1
        do i=is-1,ie+1
@@ -352,6 +364,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     select case(phys_bc(1,1))
     case (Inflow)
        umac(is,js:je) = utilde(is-1,js:je,1)
@@ -363,8 +376,10 @@ contains
     case  default
        call bl_error("velpred_2d: invalid boundary type phys_bc(1,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     select case(phys_bc(1,2))
     case (Inflow)
        umac(ie+1,js:je) = utilde(ie+1,js:je,1)
@@ -376,6 +391,7 @@ contains
     case  default
        call bl_error("velpred_2d: invalid boundary type phys_bc(1,2)")
     end select
+    end if
 
 
     do j=js,je+1
@@ -402,6 +418,7 @@ contains
 
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     select case(phys_bc(2,1))
     case (Inflow)
        vmac(is:ie,js) = utilde(is:ie,js-1,2)
@@ -413,8 +430,10 @@ contains
     case  default
        call bl_error("velpred_2d: invalid boundary type phys_bc(2,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     select case(phys_bc(2,2))
     case (Inflow)
        vmac(is:ie,je+1) = utilde(is:ie,je+1,2)
@@ -426,6 +445,7 @@ contains
     case  default
        call bl_error("velpred_2d: invalid boundary type phys_bc(2,2)")
     end select
+    end if
 
     deallocate(ulx,urx,uimhx,uly,ury,uimhy,umacl,umacr,vmacl,vmacr)
 
@@ -433,7 +453,7 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 3)
-  subroutine velpred_3d(lev, lo, hi, &
+  subroutine velpred_3d(lev, domlo, domhi, lo, hi, &
                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
                         ufull,  uf_lo, uf_hi, nc_uf, &
                         utrans, uu_lo, uu_hi, &
@@ -445,7 +465,7 @@ contains
                         force,   f_lo,  f_hi, nc_f, &
                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_3d")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut, ng_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
@@ -572,6 +592,7 @@ contains
     deallocate(slopex)
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     select case(phys_bc(1,1))
     case (Inflow)
        ulx(is,js-1:je+1,ks-1:ke+1,1:3) = utilde(is-1,js-1:je+1,ks-1:ke+1,1:3)
@@ -591,8 +612,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     select case(phys_bc(1,2))
     case (Inflow)
        ulx(ie+1,js-1:je+1,ks-1:ke+1,1:3) = utilde(ie+1,js-1:je+1,ks-1:ke+1,1:)
@@ -612,6 +635,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,2)")
     end select
+    end if
 
     allocate(uimhx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
 
@@ -661,6 +685,7 @@ contains
     deallocate(slopey)
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     select case(phys_bc(2,1))
     case (Inflow)
        uly(is-1:ie+1,js,ks-1:ke+1,1:3) = utilde(is-1:ie+1,js-1,ks-1:ke+1,1:3)
@@ -680,8 +705,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     select case(phys_bc(2,2))
     case (Inflow)
        uly(is-1:ie+1,je+1,ks-1:ke+1,1:3) = utilde(is-1:ie+1,je+1,ks-1:ke+1,1:3)
@@ -701,6 +728,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,2)")
     end select
+    end if
 
     allocate(uimhy(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1,3))
 
@@ -749,6 +777,7 @@ contains
     deallocate(slopez)
 
     ! impose lo side bc's
+    if (lo(3) .eq. domlo(3)) then
     select case(phys_bc(3,1))
     case (Inflow)
        ulz(is-1:ie+1,js-1:je+1,ks,1:3) = utilde(is-1:ie+1,js-1:je+1,ks-1,1:3)
@@ -768,8 +797,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(3) .eq. domhi(3)) then
     select case(phys_bc(3,2))
     case (Inflow)
        ulz(is-1:ie+1,js-1:je+1,ke+1,1:3) = utilde(is-1:ie+1,js-1:je+1,ke+1,1:3)
@@ -789,6 +820,7 @@ contains
     case default
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,2)")
     end select
+    end if
 
     allocate(uimhz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1,3))
 
@@ -835,6 +867,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     select case(phys_bc(2,1))
     case (Inflow)
        ulyz(is-1:ie+1,js,ks:ke) = utilde(is-1:ie+1,js-1,ks:ke,1)
@@ -848,8 +881,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     select case(phys_bc(2,2))
     case (Inflow)
        ulyz(is-1:ie+1,je+1,ks:ke) = utilde(is-1:ie+1,je+1,ks:ke,1)
@@ -863,6 +898,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,2)")
     end select
+    end if
 
     do k=ks,ke
        do j=js,je+1
@@ -899,6 +935,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(3) .eq. domlo(3)) then
     select case(phys_bc(3,1))
     case (Inflow)
        ulzy(is-1:ie+1,js:je,ks) = utilde(is-1:ie+1,js:je,ks-1,1)
@@ -912,8 +949,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(3) .eq. domhi(3)) then
     select case(phys_bc(3,2))
     case (Inflow)
        ulzy(is-1:ie+1,js:je,ke+1) = utilde(is-1:ie+1,js:je,ke+1,1)
@@ -927,6 +966,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,2)")
     end select
+    end if
 
     do k=ks,ke+1
        do j=js,je
@@ -964,6 +1004,7 @@ contains
     deallocate(uimhz)
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     select case(phys_bc(1,1))
     case (Inflow)
        vlxz(is,js-1:je+1,ks:ke) = utilde(is-1,js-1:je+1,ks:ke,2)
@@ -977,8 +1018,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     select case(phys_bc(1,2))
     case (Inflow)
        vlxz(ie+1,js-1:je+1,ks:ke) = utilde(ie+1,js-1:je+1,ks:ke,2)
@@ -992,6 +1035,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,2)")
     end select
+    end if
 
     allocate(vimhxz(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)))
 
@@ -1030,6 +1074,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(3) .eq. domlo(3)) then
     select case(phys_bc(3,1))
     case (Inflow)
        vlzx(is:ie,js-1:je+1,ks) = utilde(is:ie,js-1:je+1,ks-1,2)
@@ -1043,8 +1088,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(3) .eq. domhi(3)) then
     select case(phys_bc(3,2))
     case (Inflow)
        vlzx(is:ie,js-1:je+1,ke+1) = utilde(is:ie,js-1:je+1,ke+1,2)
@@ -1058,6 +1105,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,2)")
     end select
+    end if
 
     do k=ks,ke+1
        do j=js-1,je+1
@@ -1095,6 +1143,7 @@ contains
     deallocate(uimhy)
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     select case(phys_bc(1,1))
     case (Inflow)
        wlxy(is,js:je,ks-1:ke+1) = utilde(is-1,js:je,ks-1:ke+1,3)
@@ -1108,8 +1157,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     select case(phys_bc(1,2))
     case (Inflow)
        wlxy(ie+1,js:je,ks-1:ke+1) = utilde(ie+1,js:je,ks-1:ke+1,3)
@@ -1123,6 +1174,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,2)")
     end select
+    end if
 
     allocate(wimhxy(lo(1):hi(1)+1,lo(2):hi(2),lo(3)-1:hi(3)+1))
 
@@ -1162,6 +1214,7 @@ contains
     deallocate(uimhx)
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     select case(phys_bc(2,1))
     case (Inflow)
        wlyx(is:ie,js,ks-1:ke+1) = utilde(is:ie,js-1,ks-1:ke+1,3)
@@ -1175,8 +1228,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     select case(phys_bc(2,2))
     case (Inflow)
        wlyx(is:ie,je+1,ks-1:ke+1) = utilde(is:ie,je+1,ks-1:ke+1,3)
@@ -1190,6 +1245,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,2)")
     end select
+    end if
 
     allocate(wimhyx(lo(1):hi(1),lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
 
@@ -1255,6 +1311,7 @@ contains
     deallocate(ulx,urx,uimhyz,uimhzy)
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     select case(phys_bc(1,1))
     case (Inflow)
        umac(is,js:je,ks:ke) = utilde(is-1,js:je,ks:ke,1)
@@ -1266,8 +1323,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     select case(phys_bc(1,2))
     case (Inflow)
        umac(ie+1,js:je,ks:ke) = utilde(ie+1,js:je,ks:ke,1)
@@ -1279,6 +1338,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,2)")
     end select
+    end if
 
     deallocate(umacl,umacr)
 
@@ -1327,6 +1387,7 @@ contains
     deallocate(uly,ury,vimhxz,vimhzx)
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     select case(phys_bc(2,1))
     case (Inflow)
        vmac(is:ie,js,ks:ke) = utilde(is:ie,js-1,ks:ke,2)
@@ -1338,8 +1399,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,1)")
     end select
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     select case(phys_bc(2,2))
     case (Inflow)
        vmac(is:ie,je+1,ks:ke) = utilde(is:ie,je+1,ks:ke,2)
@@ -1351,6 +1414,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,2)")
     end select
+    end if
 
     deallocate(vmacl,vmacr)
 
@@ -1401,6 +1465,7 @@ contains
     deallocate(ulz,urz,wimhxy,wimhyx)
 
     ! impose hi side bc's
+    if (lo(3) .eq. domlo(3)) then
     select case(phys_bc(3,1))
     case (Inflow)
        wmac(is:ie,js:je,ks) = utilde(is:ie,js:je,ks-1,3)
@@ -1412,8 +1477,10 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,1)")
     end select
+    end if
 
     ! impose lo side bc's
+    if (hi(3) .eq. domhi(3)) then
     select case(phys_bc(3,2))
     case (Inflow)
        wmac(is:ie,js:je,ke+1) = utilde(is:ie,js:je,ke+1,3)
@@ -1425,6 +1492,7 @@ contains
     case  default
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,2)")
     end select
+    end if
 
     deallocate(wmacl,wmacr)
 

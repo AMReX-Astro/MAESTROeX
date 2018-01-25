@@ -312,7 +312,8 @@ extern "C"
 #elif (AMREX_SPACEDIM == 3)
     void mkutrans_3d(
 #endif
-                      const int& lev, const int* lo, const int* hi,
+                      const int& lev, const int* domlo, const int* domhi,
+                      const int* lo, const int* hi,
                       const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, const int& ng_ut,
                       const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf,
                       amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
@@ -393,7 +394,8 @@ extern "C"
 #elif (AMREX_SPACEDIM == 3)
     void velpred_3d(
 #endif
-                      const int& lev, const int* lo, const int* hi,
+                      const int& lev, const int* domlo, const int* domhi,
+                      const int* lo, const int* hi,
                       const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, const int& ng_ut,
                       const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf,
 #if (AMREX_SPACEDIM >= 2)
