@@ -61,4 +61,33 @@ Maestro::DensityAdvance (bool is_predictor,
     // for predict_rhoX, we are predicting (rho X)
     // as a conservative equation, and there is no force.
 
+
+    /////////////////////////////////////////////////////////////////
+    // Add w0 to MAC velocities (trans velocities already have w0).
+    /////////////////////////////////////////////////////////////////
+
+    Addw0(umac,1.);
+    
+    /////////////////////////////////////////////////////////////////
+    // Create the edge states of (rho X)' or X and rho'
+    /////////////////////////////////////////////////////////////////
+
+    if ((species_pred_type == predict_rhoprime_and_X) ||
+        (species_pred_type == predict_rho_and_X)) {
+
+        // we are predicting X to the edges, so convert the scalar
+        // data to those quantities
+
+        // convert (rho X) --> X in sold 
+        // call convert_rhoX_to_X(sold,.true.,mla,the_bc_level)
+        }
+
+    if (species_pred_type == predict_rhoprime_and_X) {
+        // convert rho -> rho' in sold
+        //   . this is needed for predict_rhoprime_and_X
+        // call put_in_pert_form(mla,sold,rho0_old,dx,rho_comp,foextrap_comp,.true.,the_bc_level)
+    }
+
+
+
 }

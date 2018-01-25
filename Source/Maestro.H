@@ -91,6 +91,17 @@ private:
     // end MaestroAverage.cpp functions
     ////////////
 
+    ////////////
+    // MaestroConvert.cpp functions
+    void PutInPertForm();
+
+    void ConvertRhoXToX(amrex::Vector<amrex::MultiFab>& scal,
+                        bool flag);
+
+    void ConvertRhoHToH(amrex::Vector<amrex::MultiFab>& scal,
+                        bool flag);
+    ////////////
+
     ////////////////////////
     // MaestroDensityAdvance.cpp functions
     void DensityAdvance (bool is_predictor,
