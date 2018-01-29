@@ -213,8 +213,6 @@ Maestro::BCSetup()
 
     bcs_s.resize(Nscal);          // scalars
     bcs_u.resize(AMREX_SPACEDIM); // velocitiy
-    bcs_h.resize(1);              // rhoh
-    bcs_t.resize(1);              // temperature
     bcs_f.resize(Nscal);          // a vector of "first-order extrap"
 
     // Check phys_bc against possible periodic geometry
@@ -278,12 +276,10 @@ Maestro::BCSetup()
             }
                 bcs_s[Rho ].setLo(dir, BCType::int_dir);  
                 bcs_s[RhoH].setLo(dir, BCType::int_dir);
-                bcs_h[0   ].setLo(dir, BCType::int_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::int_dir);
             }
                 bcs_s[Temp].setLo(dir, BCType::int_dir);
-                bcs_t[0   ].setLo(dir, BCType::int_dir);
                 bcs_s[Pi  ].setLo(dir, BCType::int_dir);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::int_dir);
@@ -296,12 +292,10 @@ Maestro::BCSetup()
             }
                 bcs_s[Rho ].setLo(dir, BCType::ext_dir);  
                 bcs_s[RhoH].setLo(dir, BCType::ext_dir);
-                bcs_h[0   ].setLo(dir, BCType::ext_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::ext_dir);
             }
                 bcs_s[Temp].setLo(dir, BCType::ext_dir);
-                bcs_t[0   ].setLo(dir, BCType::ext_dir);
                 bcs_s[Pi  ].setLo(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
@@ -314,12 +308,10 @@ Maestro::BCSetup()
             }
                 bcs_s[Rho ].setLo(dir, BCType::foextrap);  
                 bcs_s[RhoH].setLo(dir, BCType::foextrap);
-                bcs_h[0   ].setLo(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::foextrap);
             }
                 bcs_s[Temp].setLo(dir, BCType::foextrap);
-                bcs_t[0   ].setLo(dir, BCType::foextrap);
                 bcs_s[Pi  ].setLo(dir, BCType::ext_dir);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
@@ -333,12 +325,10 @@ Maestro::BCSetup()
                 bcs_u[dir ].setLo(dir, BCType::reflect_odd);
                 bcs_s[Rho ].setLo(dir, BCType::reflect_even);  
                 bcs_s[RhoH].setLo(dir, BCType::reflect_even);
-                bcs_h[0   ].setLo(dir, BCType::reflect_even);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::reflect_even);
             }
                 bcs_s[Temp].setLo(dir, BCType::reflect_even);
-                bcs_t[0   ].setLo(dir, BCType::reflect_even);
                 bcs_s[Pi  ].setLo(dir, BCType::reflect_even);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::reflect_even);
@@ -352,12 +342,10 @@ Maestro::BCSetup()
                 bcs_u[dir ].setLo(dir, BCType::ext_dir);
                 bcs_s[Rho ].setLo(dir, BCType::hoextrap);  
                 bcs_s[RhoH].setLo(dir, BCType::hoextrap);
-                bcs_h[0   ].setLo(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::hoextrap);
             }
                 bcs_s[Temp].setLo(dir, BCType::hoextrap);
-                bcs_t[0   ].setLo(dir, BCType::hoextrap);
                 bcs_s[Pi  ].setLo(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
@@ -370,12 +358,10 @@ Maestro::BCSetup()
             }
                 bcs_s[Rho ].setLo(dir, BCType::hoextrap);  
                 bcs_s[RhoH].setLo(dir, BCType::hoextrap);
-                bcs_h[0   ].setLo(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::hoextrap);
             }
                 bcs_s[Temp].setLo(dir, BCType::hoextrap);
-                bcs_t[0   ].setLo(dir, BCType::hoextrap);
                 bcs_s[Pi  ].setLo(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
@@ -393,12 +379,10 @@ Maestro::BCSetup()
             }
                 bcs_s[Rho ].setHi(dir, BCType::int_dir);  
                 bcs_s[RhoH].setHi(dir, BCType::int_dir);
-                bcs_h[0   ].setHi(dir, BCType::int_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::int_dir);
             }
                 bcs_s[Temp].setHi(dir, BCType::int_dir);
-                bcs_t[0   ].setHi(dir, BCType::int_dir);
                 bcs_s[Pi  ].setHi(dir, BCType::int_dir);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::int_dir);
@@ -411,12 +395,10 @@ Maestro::BCSetup()
             }
                 bcs_s[Rho ].setHi(dir, BCType::ext_dir);  
                 bcs_s[RhoH].setHi(dir, BCType::ext_dir);
-                bcs_h[0   ].setHi(dir, BCType::ext_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::ext_dir);
             }
                 bcs_s[Temp].setHi(dir, BCType::ext_dir);
-                bcs_t[0   ].setHi(dir, BCType::ext_dir);
                 bcs_s[Pi  ].setHi(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
@@ -429,12 +411,10 @@ Maestro::BCSetup()
             }
                 bcs_s[Rho ].setHi(dir, BCType::foextrap);  
                 bcs_s[RhoH].setHi(dir, BCType::foextrap);
-                bcs_h[0   ].setHi(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::foextrap);
             }
                 bcs_s[Temp].setHi(dir, BCType::foextrap);
-                bcs_t[0   ].setHi(dir, BCType::foextrap);
                 bcs_s[Pi  ].setHi(dir, BCType::ext_dir);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
@@ -448,12 +428,10 @@ Maestro::BCSetup()
                 bcs_u[dir].setHi(dir, BCType::reflect_odd);
                 bcs_s[Rho ].setHi(dir, BCType::reflect_even);  
                 bcs_s[RhoH].setHi(dir, BCType::reflect_even);
-                bcs_h[0   ].setHi(dir, BCType::reflect_even);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::reflect_even);
             }
                 bcs_s[Temp].setHi(dir, BCType::reflect_even);
-                bcs_t[0   ].setHi(dir, BCType::reflect_even);
                 bcs_s[Pi  ].setHi(dir, BCType::reflect_even);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::reflect_even);
@@ -467,12 +445,10 @@ Maestro::BCSetup()
                 bcs_u[dir].setHi(dir, BCType::ext_dir);
                 bcs_s[Rho ].setHi(dir, BCType::hoextrap);  
                 bcs_s[RhoH].setHi(dir, BCType::hoextrap);
-                bcs_h[0   ].setHi(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::hoextrap);
             }
                 bcs_s[Temp].setHi(dir, BCType::hoextrap);
-                bcs_t[0   ].setHi(dir, BCType::hoextrap);
                 bcs_s[Pi  ].setHi(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
@@ -485,12 +461,10 @@ Maestro::BCSetup()
             }
                 bcs_s[Rho ].setHi(dir, BCType::hoextrap);  
                 bcs_s[RhoH].setHi(dir, BCType::hoextrap);
-                bcs_h[0   ].setHi(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::hoextrap);
             }
                 bcs_s[Temp].setHi(dir, BCType::hoextrap);
-                bcs_t[0   ].setHi(dir, BCType::hoextrap);
                 bcs_s[Pi  ].setHi(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);

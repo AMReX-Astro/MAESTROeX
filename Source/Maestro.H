@@ -538,8 +538,6 @@ private:
     // condition types at the lo/hi walls in each direction
     amrex::Vector<amrex::BCRec> bcs_s;  // for sold/snew
     amrex::Vector<amrex::BCRec> bcs_u;  // for uold/unew
-    amrex::Vector<amrex::BCRec> bcs_h;  // for rhoh
-    amrex::Vector<amrex::BCRec> bcs_t;  // for temperature
     amrex::Vector<amrex::BCRec> bcs_f;  // "first-order extrap" used for S_cc, gpi, dSdt
 
     // vectors store the multilevel 1D states as one very long array
