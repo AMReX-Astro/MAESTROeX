@@ -347,17 +347,17 @@ Maestro::BCSetup()
         else if (phys_bc[dir] == SlipWall) {
             // slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setLo(dir, BCType::foextrap);
+                bcs_u[comp].setLo(dir, BCType::hoextrap);
             }
                 bcs_u[dir ].setLo(dir, BCType::ext_dir);
-                bcs_s[Rho ].setLo(dir, BCType::foextrap);  
-                bcs_s[RhoH].setLo(dir, BCType::foextrap);
-                bcs_h[0   ].setLo(dir, BCType::foextrap);
+                bcs_s[Rho ].setLo(dir, BCType::hoextrap);  
+                bcs_s[RhoH].setLo(dir, BCType::hoextrap);
+                bcs_h[0   ].setLo(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setLo(dir, BCType::foextrap);
+                bcs_s[comp].setLo(dir, BCType::hoextrap);
             }
-                bcs_s[Temp].setLo(dir, BCType::foextrap);
-                bcs_t[0   ].setLo(dir, BCType::foextrap);
+                bcs_s[Temp].setLo(dir, BCType::hoextrap);
+                bcs_t[0   ].setLo(dir, BCType::hoextrap);
                 bcs_s[Pi  ].setLo(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
@@ -368,14 +368,14 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setLo(dir, BCType::foextrap);  
-                bcs_s[RhoH].setLo(dir, BCType::foextrap);
-                bcs_h[0   ].setLo(dir, BCType::foextrap);
+                bcs_s[Rho ].setLo(dir, BCType::hoextrap);  
+                bcs_s[RhoH].setLo(dir, BCType::hoextrap);
+                bcs_h[0   ].setLo(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setLo(dir, BCType::foextrap);
+                bcs_s[comp].setLo(dir, BCType::hoextrap);
             }
-                bcs_s[Temp].setLo(dir, BCType::foextrap);
-                bcs_t[0   ].setLo(dir, BCType::foextrap);
+                bcs_s[Temp].setLo(dir, BCType::hoextrap);
+                bcs_t[0   ].setLo(dir, BCType::hoextrap);
                 bcs_s[Pi  ].setLo(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
@@ -462,17 +462,17 @@ Maestro::BCSetup()
         else if (phys_bc[AMREX_SPACEDIM+dir] == SlipWall) {
             // slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
-                bcs_u[comp].setHi(dir, BCType::foextrap);
+                bcs_u[comp].setHi(dir, BCType::hoextrap);
             }
                 bcs_u[dir].setHi(dir, BCType::ext_dir);
-                bcs_s[Rho ].setHi(dir, BCType::foextrap);  
-                bcs_s[RhoH].setHi(dir, BCType::foextrap);
-                bcs_h[0   ].setHi(dir, BCType::foextrap);
+                bcs_s[Rho ].setHi(dir, BCType::hoextrap);  
+                bcs_s[RhoH].setHi(dir, BCType::hoextrap);
+                bcs_h[0   ].setHi(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setHi(dir, BCType::foextrap);
+                bcs_s[comp].setHi(dir, BCType::hoextrap);
             }
-                bcs_s[Temp].setHi(dir, BCType::foextrap);
-                bcs_t[0   ].setHi(dir, BCType::foextrap);
+                bcs_s[Temp].setHi(dir, BCType::hoextrap);
+                bcs_t[0   ].setHi(dir, BCType::hoextrap);
                 bcs_s[Pi  ].setHi(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
@@ -483,14 +483,14 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setHi(dir, BCType::foextrap);  
-                bcs_s[RhoH].setHi(dir, BCType::foextrap);
-                bcs_h[0   ].setHi(dir, BCType::foextrap);
+                bcs_s[Rho ].setHi(dir, BCType::hoextrap);  
+                bcs_s[RhoH].setHi(dir, BCType::hoextrap);
+                bcs_h[0   ].setHi(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
-                bcs_s[comp].setHi(dir, BCType::foextrap);
+                bcs_s[comp].setHi(dir, BCType::hoextrap);
             }
-                bcs_s[Temp].setHi(dir, BCType::foextrap);
-                bcs_t[0   ].setHi(dir, BCType::foextrap);
+                bcs_s[Temp].setHi(dir, BCType::hoextrap);
+                bcs_t[0   ].setHi(dir, BCType::hoextrap);
                 bcs_s[Pi  ].setHi(dir, BCType::foextrap);
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
