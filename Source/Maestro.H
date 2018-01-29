@@ -279,6 +279,10 @@ private:
                               const amrex::Vector<amrex::MultiFab>& macrhs,
                               const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
 
+    // Average bcoefs at faces using inverse of rho
+    void AvgFaceBcoeffsInv(amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM > >& facebcoef,
+			   const amrex::Vector<amrex::MultiFab>& rhocc);
+
     // set boundaries for LABecLaplacian to solve -div(B grad) phi = RHS
     void SetMacSolverBCs(amrex::MLABecLaplacian& mlabec);
 

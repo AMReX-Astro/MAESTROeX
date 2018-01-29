@@ -42,7 +42,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
     Real rho_time = is_predictor ? t_old : 0.5*(t_old+t_new);
     for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, rho_time, rho[lev], sold, snew, Rho, 0, 1, Rho, bcs_s);
+        FillPatch(lev, rho_time, rho[lev], snew, sold, Rho, 0, 1, Rho, bcs_s);
     }
 
     // coefficients for solver
@@ -55,7 +55,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         AMREX_D_TERM(face_bcoef[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
                      face_bcoef[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
                      face_bcoef[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
-
     }
 
     // set cell-centered A coefficient to zero
@@ -63,24 +62,26 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         acoef[lev].setVal(0.);
     }
 
-    // set face-centered B coefficients to 1/rho
-    // first set the cell-centered B coefficients to 1/rho
-    for (int lev=0; lev<=finest_level; ++lev) {
-        bcoef[lev].setVal(1.);
-        MultiFab::Divide(bcoef[lev],rho[lev],0,0,1,1);
-    }
+    // average face-centered B coefficients to 1/rho
+    AvgFaceBcoeffsInv(face_bcoef,rho);
+    // for (int lev=0; lev<=finest_level; ++lev) {
+    //     amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
+    //                                                     &face_bcoef[lev][1],
+    //                                                     &face_bcoef[lev][2])},
+    //                                         rho[lev], geom[lev]);
+    // }
 
-    // average bcoef to faces
-    for (int lev=0; lev<=finest_level; ++lev) {
-        amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
-                                                        &face_bcoef[lev][1],
-                                                        &face_bcoef[lev][2])},
-                                            bcoef[lev], geom[lev]);
-    }
+    // DEBUG
+    VisMF::Write(face_bcoef[0][0],"a_facebcoefx");
+    VisMF::Write(face_bcoef[0][1],"a_facebcoefy");
+    ///////////////////////////////////////////////
 
     // multiply face-centered B coefficients by beta0 so they contain beta0/rho
     mult_or_div = 1;
     MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+
+    VisMF::Write(face_bcoef[0][0],"a_facebcoef1");
+    VisMF::Write(face_bcoef[0][1],"a_facebcoef2");
 
     // 
     // Set up implicit solve using MLABecLaplacian class
@@ -102,6 +103,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     mlabec.setScalars(0.0, 1.0);
 
     for (int lev = 0; lev <= finest_level; ++lev) {
+	mlabec.setACoeffs(lev, acoef[lev]);
 	mlabec.setBCoeffs(lev, amrex::GetArrOfConstPtrs(face_bcoef[lev]));
     }
 
@@ -133,6 +135,12 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     mac_mlmg.solve(GetVecOfPtrs(macphi), GetVecOfConstPtrs(solverrhs), mac_tol_rel, mac_tol_abs);
 
+    // DEBUG
+    // Write out macphi
+    VisMF::Write(macphi[0],"a_macphi");
+    Abort();
+    ////////////////////////////////////////////////////
+    
     // update velocity, beta0 * Utilde = beta0 * Utilde^* - B grad phi
     //
     // Note: must solve linear system first before computing grad phi
@@ -176,11 +184,11 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     for (int lev = 0; lev <= finest_level; ++lev) 
     {
 	// get references to the MultiFabs at level lev
-	MultiFab& uedge_mf = edge[lev][0];
+	MultiFab& xedge_mf = edge[lev][0];
 #if (AMREX_SPACEDIM >= 2)
-	MultiFab& vedge_mf = edge[lev][1];
+	MultiFab& yedge_mf = edge[lev][1];
 #if (AMREX_SPACEDIM == 3)
-	MultiFab& wedge_mf = edge[lev][2];
+	MultiFab& zedge_mf = edge[lev][2];
 #endif
 #endif
 
@@ -195,11 +203,11 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 
 	    // call fortran subroutine
 	    mult_beta0(lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
-		       BL_TO_FORTRAN_3D(uedge_mf[mfi]), 
+		       BL_TO_FORTRAN_3D(xedge_mf[mfi]), 
 #if (AMREX_SPACEDIM >= 2)
-		       BL_TO_FORTRAN_3D(vedge_mf[mfi]),
+		       BL_TO_FORTRAN_3D(yedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-		       BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+		       BL_TO_FORTRAN_3D(zedge_mf[mfi]),
 #endif
 		       beta0_edge.dataPtr(),
 #endif
@@ -232,10 +240,10 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 #endif
 
 	// Must use cell-centered MultiFab boxes for MIter
-	MultiFab& sold_mf = sold[lev];
+	MultiFab& macphi_mf = sold[lev];
 
 	// loop over boxes
-	for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi) {
+	for ( MFIter mfi(macphi_mf); mfi.isValid(); ++mfi) {
 
 	    // Get the index space of valid region
 	    const Box& validBox = mfi.validbox();
@@ -261,6 +269,48 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 
 }
 
+// Average bcoefs at faces using inverse of rho
+void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& facebcoef,
+				 const Vector<MultiFab>& rhocc)
+{
+
+    // write an MFIter loop 
+    for (int lev = 0; lev <= finest_level; ++lev) 
+    {
+	// get references to the MultiFabs at level lev
+	MultiFab& xbcoef_mf = facebcoef[lev][0];
+#if (AMREX_SPACEDIM >= 2)
+	MultiFab& ybcoef_mf = facebcoef[lev][1];
+#if (AMREX_SPACEDIM == 3)
+	MultiFab& zbcoef_mf = facebcoef[lev][2];
+#endif
+#endif
+
+	// Must get cell-centered MultiFab boxes for MIter
+	const MultiFab& rhocc_mf = rhocc[lev];
+
+	// loop over boxes
+	for ( MFIter mfi(rhocc_mf); mfi.isValid(); ++mfi) {
+
+	    // Get the index space of valid region
+	    const Box& validBox = mfi.validbox();
+
+	    // call fortran subroutine
+	    mac_bcoef_face(lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
+			   BL_TO_FORTRAN_3D(xbcoef_mf[mfi]), 
+#if (AMREX_SPACEDIM >= 2)
+			   BL_TO_FORTRAN_3D(ybcoef_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			   BL_TO_FORTRAN_3D(zbcoef_mf[mfi]),
+#endif
+#endif
+			   BL_TO_FORTRAN_3D(rhocc_mf[mfi]));
+
+	}
+    }
+    
+
+}
 
 // Set boundaries for MAC velocities
 void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec) 

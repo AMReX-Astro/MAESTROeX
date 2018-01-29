@@ -352,6 +352,16 @@ extern "C"
 	       const amrex::Real* beta0_edge,
 #endif
                const amrex::Real* beta0, const int& mult_or_div);
+
+    void mac_bcoef_face(const int& lev, const int* lo, const int* hi,
+			amrex::Real* xface, const int* x_lo, const int* x_hi,
+#if (AMREX_SPACEDIM >= 2)
+			amrex::Real* yface, const int* y_lo, const int* y_hi, 
+#if (AMREX_SPACEDIM == 3)
+			amrex::Real* zface, const int* z_lo, const int* z_hi,
+#endif
+#endif
+			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
     //////////////////////
 
     //////////////////////

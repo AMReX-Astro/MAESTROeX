@@ -46,7 +46,7 @@ contains
     do j = lo(2),hi(2)
     do i = lo(1),hi(1)
        newrhs(i,j,k) = oldrhs(i,j,k) & 
-                                     - ((uedge(i+1,j,k)-uedge(i,j,k))/dx(1) & 
+                                     - ( (uedge(i+1,j,k)-uedge(i,j,k))/dx(1) & 
 #if (AMREX_SPACEDIM >= 2)
                                         + (vedge(i,j+1,k)-vedge(i,j,k))/dx(2) & 
 #if (AMREX_SPACEDIM == 3)
@@ -54,6 +54,7 @@ contains
 #endif
 #endif
                                         )
+
     end do
     end do
     end do
@@ -198,5 +199,68 @@ contains
     end if
 
   end subroutine mult_beta0
+
+  subroutine mac_bcoef_face(lev, lo, hi, &
+                   xface, x_lo, x_hi, &
+#if (AMREX_SPACEDIM >= 2)
+                   yface, y_lo, y_hi, &
+#if (AMREX_SPACEDIM == 3)
+                   zface, z_lo, z_hi, &
+#endif
+#endif
+                   rhocc, r_lo, r_hi) bind(C, name="mac_bcoef_face")
+    
+    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: x_lo(3), x_hi(3)
+    double precision, intent(inout) :: xface(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
+#if (AMREX_SPACEDIM >= 2)
+    integer         , intent(in   ) :: y_lo(3), y_hi(3)
+    double precision, intent(inout) :: yface(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
+#if (AMREX_SPACEDIM == 3)
+    integer         , intent(in   ) :: z_lo(3), z_hi(3)
+    double precision, intent(inout) :: zface(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
+#endif
+#endif
+    integer         , intent(in   ) :: r_lo(3), r_hi(3)
+    double precision, intent(in   ) :: rhocc(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
+
+    ! local
+    integer i,j,k
+
+    do k = lo(3),hi(3)
+    do j = lo(2),hi(2)
+    do i = lo(1),hi(1)+1
+       xface(i,j,k) = 2.0/(rhocc(i,j,k) + rhocc(i-1,j,k))
+    end do
+    end do
+    end do
+
+#if (AMREX_SPACEDIM >= 2)        
+    do k = lo(3),hi(3)
+    do j = lo(2),hi(2)+1
+    do i = lo(1),hi(1)
+       yface(i,j,k) = 2.0/(rhocc(i,j,k) + rhocc(i,j-1,k))
+       if ( j==lo(2) ) then
+          ! print *,"hack_y: ", i,j,rhocc(i,j,k),rhocc(i,j-1,k)
+          yface(i,j,k) = 1.0/(rhocc(i,j,k))
+       elseif ( j==hi(2)+1 ) then
+          yface(i,j,k) = 1.0/(rhocc(i,j-1,k))
+       end if
+    end do
+    end do
+    end do
+
+#if (AMREX_SPACEDIM == 3)
+    do k = lo(3),hi(3)+1
+    do j = lo(2),hi(2)
+    do i = lo(1),hi(1)
+       zface(i,j,k) = 2.0/(rhocc(i,j,k) + rhocc(i,j,k-1))
+    end do
+    end do
+    end do
+#endif
+#endif
+
+  end subroutine mac_bcoef_face
 
 end module mac_solver_module

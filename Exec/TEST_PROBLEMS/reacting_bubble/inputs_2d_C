@@ -11,8 +11,8 @@ geometry.prob_hi     =  2.16e8 3.6e8
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
-maestro.lo_bc = 0 4
-maestro.hi_bc = 0 2
+maestro.lo_bc = 0 2
+maestro.hi_bc = 0 4
 geometry.is_periodic =  1 0 0
 
 # VERBOSITY
