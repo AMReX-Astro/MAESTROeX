@@ -240,15 +240,10 @@ contains
     do j = lo(2),hi(2)+1
     do i = lo(1),hi(1)
        yface(i,j,k) = 2.0/(rhocc(i,j,k) + rhocc(i,j-1,k))
-       if ( j==lo(2) ) then
-          ! print *,"hack_y: ", i,j,rhocc(i,j,k),rhocc(i,j-1,k)
-          yface(i,j,k) = 1.0/(rhocc(i,j,k))
-       elseif ( j==hi(2)+1 ) then
-          yface(i,j,k) = 1.0/(rhocc(i,j-1,k))
-       end if
     end do
     end do
     end do
+
 
 #if (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)+1
