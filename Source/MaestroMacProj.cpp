@@ -326,7 +326,8 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
         if (bcs_u[0].lo(idim) == BCType::int_dir) {
             mlmg_lobc[idim] = LinOpBCType::Periodic;
         } 
-	else if (bcs_u[0].lo(idim) == BCType::foextrap) {
+	else if (bcs_u[0].lo(idim) == BCType::foextrap ||
+		 bcs_u[0].lo(idim) == BCType::hoextrap) {
 	    mlmg_lobc[idim] = LinOpBCType::Neumann;
 	} 
 	else if (bcs_u[0].lo(idim) == BCType::ext_dir) {
@@ -340,7 +341,8 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
         if (bcs_u[0].hi(idim) == BCType::int_dir) {
             mlmg_hibc[idim] = LinOpBCType::Periodic;
         } 
-	else if (bcs_u[0].hi(idim) == BCType::foextrap) {
+	else if (bcs_u[0].hi(idim) == BCType::foextrap ||
+		 bcs_u[0].hi(idim) == BCType::hoextrap) {
 	    mlmg_hibc[idim] = LinOpBCType::Neumann;
 	} 
 	else if (bcs_u[0].hi(idim) == BCType::ext_dir) {
