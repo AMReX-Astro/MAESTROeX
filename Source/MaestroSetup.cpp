@@ -115,7 +115,7 @@ Maestro::Setup ()
 
     istep = 0;
 
-    t_new = 0.0;
+    t_new = 1.e99;
     t_old = 0.0;
 
     // set this to a large number so change_max doesn't affect the first time step

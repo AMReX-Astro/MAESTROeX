@@ -58,9 +58,9 @@ Maestro::Evolve ()
                 dt = std::min(dt,stop_time-t_old);
                 Print() << "Stop time limits dt = " << dt << endl;
             }
-        }
 
-        t_new = t_old + dt;
+            t_new = t_old + dt;
+        }
 
         // advance the solution by dt
         AdvanceTimeStep(false);

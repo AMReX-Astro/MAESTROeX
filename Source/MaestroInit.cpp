@@ -79,6 +79,7 @@ Maestro::Init ()
     }
 
     dtold = dt;
+    t_new = t_old + dt;
 
     // copy S_cc_old into S_cc_new for the pressure iterations
     for (int lev=0; lev<=finest_level; ++lev) {
