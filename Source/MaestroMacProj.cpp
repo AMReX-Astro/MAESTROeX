@@ -42,16 +42,14 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
     Real rho_time = is_predictor ? t_old : 0.5*(t_old+t_new);
     for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, rho_time, rho[lev], snew, sold, Rho, 0, 1, Rho, bcs_s);
+        FillPatch(lev, rho_time, rho[lev], sold, snew, Rho, 0, 1, Rho, bcs_s);
     }
 
     // coefficients for solver
     Vector<MultiFab> acoef(finest_level+1);
-    Vector<MultiFab> bcoef(finest_level+1);
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > face_bcoef(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         acoef[lev].define(grids[lev], dmap[lev], 1, 0);
-        bcoef[lev].define(grids[lev], dmap[lev], 1, 1);
         AMREX_D_TERM(face_bcoef[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
                      face_bcoef[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
                      face_bcoef[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
@@ -62,26 +60,27 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         acoef[lev].setVal(0.);
     }
 
-    // average face-centered B coefficients to 1/rho
-    AvgFaceBcoeffsInv(face_bcoef,rho);
-    // for (int lev=0; lev<=finest_level; ++lev) {
-    //     amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
-    //                                                     &face_bcoef[lev][1],
-    //                                                     &face_bcoef[lev][2])},
-    //                                         rho[lev], geom[lev]);
-    // }
+    // average face-centered Bcoefficients to 1/rho in 
+    // AvgFaceBcoeffsInv(face_bcoef,rho);
 
-    // DEBUG
-    VisMF::Write(face_bcoef[0][0],"a_facebcoefx");
-    VisMF::Write(face_bcoef[0][1],"a_facebcoefy");
-    ///////////////////////////////////////////////
+    // OR 1) average face-centered B coefficients to rho
+    for (int lev=0; lev<=finest_level; ++lev) {
+        amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
+                                                        &face_bcoef[lev][1],
+                                                        &face_bcoef[lev][2])},
+                                            rho[lev], geom[lev]);
+    }
+
+    // AND 2) invert B coefficients to 1/rho
+    for (int lev=0; lev<=finest_level; ++lev) {
+	for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+	    face_bcoef[lev][idim].invert(1.0,0,1);
+	}
+    }
 
     // multiply face-centered B coefficients by beta0 so they contain beta0/rho
     mult_or_div = 1;
     MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
-
-    VisMF::Write(face_bcoef[0][0],"a_facebcoef1");
-    VisMF::Write(face_bcoef[0][1],"a_facebcoef2");
 
     // 
     // Set up implicit solve using MLABecLaplacian class
@@ -135,17 +134,12 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     mac_mlmg.solve(GetVecOfPtrs(macphi), GetVecOfConstPtrs(solverrhs), mac_tol_rel, mac_tol_abs);
 
-    // DEBUG
-    // Write out macphi
-    VisMF::Write(macphi[0],"a_macphi");
-    Abort();
-    ////////////////////////////////////////////////////
-    
     // update velocity, beta0 * Utilde = beta0 * Utilde^* - B grad phi
     //
     // Note: must solve linear system first before computing grad phi
     auto& gradphi_flux = mac_gradphi;
     for (int lev = 0; lev <= finest_level; ++lev) {
+	// fluxes computed are -grad phi
 	mac_mlmg.getFluxes({amrex::GetArrOfPtrs(gradphi_flux[lev])});
     }
 
@@ -153,7 +147,8 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     {
 	for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
 	    MultiFab::Multiply(gradphi_flux[lev][idim], face_bcoef[lev][idim], 0, 0, 1, 0);
-	    MultiFab::Subtract(umac[lev][idim], gradphi_flux[lev][idim], 0, 0, 1, 0);
+	    // add -grad phi
+	    MultiFab::Add(umac[lev][idim], gradphi_flux[lev][idim], 0, 0, 1, 0);
 	}
     }
     
