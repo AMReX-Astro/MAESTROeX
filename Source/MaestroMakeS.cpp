@@ -82,7 +82,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 
     // fill ghost cells using first-order extrapolation
     for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, t_old, rhcc[lev], rhcc, rhcc, 0, 0, 1, bcs_f);
+        FillPatch(lev, t_old, rhcc[lev], rhcc, rhcc, 0, 0, 1, 0, bcs_f);
     }
 }
 

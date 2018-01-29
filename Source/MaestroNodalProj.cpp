@@ -49,7 +49,7 @@ Maestro::NodalProj (int proj_type,
     }
     else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
         for (int lev=0; lev<=finest_level; ++lev) {
-            FillPatch(lev, 0.5*(t_old+t_new), sig[lev], sold, snew, 0, 0, 1, bcs_s);
+            FillPatch(lev, 0.5*(t_old+t_new), sig[lev], sold, snew, Rho, 0, 1, Rho, bcs_s);
         }
     }
 
@@ -79,14 +79,14 @@ Maestro::NodalProj (int proj_type,
     // pressure_iters_comp:     (beta0_old+beta0_new)/2
     // regular_timestep_comp:   (beta0_old+beta0_new)/2
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
-        Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f);
+        Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
     }
     else {
         Vector<Real> beta0_nph( (max_radial_level+1)*nr_fine );
         for(int i=0; i<beta0_nph.size(); ++i) {
             beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
         }
-        Put1dArrayOnCart(beta0_nph,beta0_cart,0,0,bcs_f);
+        Put1dArrayOnCart(beta0_nph,beta0_cart,0,0,bcs_f,0);
     }
 
     // convert Vproj to beta0*Vproj
@@ -412,7 +412,7 @@ Maestro::CreateUvecForProj (int proj_type,
 
     // fill ghost cells
     for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, time, Vproj[lev], Vproj, Vproj, 0, 0, AMREX_SPACEDIM, bcs_u);
+        FillPatch(lev, time, Vproj[lev], Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
     }
 }
 

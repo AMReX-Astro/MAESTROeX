@@ -141,8 +141,8 @@ private:
     void FillPatch (int lev, amrex::Real time, amrex::MultiFab& mf,
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
-                    int scomp, int dcomp, int ncomp,
-                    amrex::Vector<amrex::BCRec> bcs);
+                    int scomp, int dcomp, int ncomp, int sbccomp,
+                    amrex::Vector<amrex::BCRec> bcs_in);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
@@ -192,7 +192,8 @@ private:
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
-                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>());
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);
 
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                 const amrex::Real& mult);

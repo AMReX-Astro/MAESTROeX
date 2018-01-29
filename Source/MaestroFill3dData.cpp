@@ -11,7 +11,8 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
-                           const Vector<BCRec>& bcs)
+                           const Vector<BCRec>& bcs,
+                           int sbccomp)
 {
     int ng = s0_cart[0].nGrow();
     if (ng > 0 && bcs.size() == 0) {
@@ -47,7 +48,7 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
     // fill ghost cells using first-order extrapolation
     if (ng > 0) {
 	for (int lev=0; lev<=finest_level; ++lev) {
-	    FillPatch(lev, t_new, s0_cart[lev], s0_cart, s0_cart, 0, 0, ncomp, bcs);
+	    FillPatch(lev, t_new, s0_cart[lev], s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs);
 	}
     }
 }

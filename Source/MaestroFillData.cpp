@@ -12,9 +12,12 @@ void
 Maestro::FillPatch (int lev, Real time, MultiFab& mf, 
                     Vector<MultiFab>& mf_old,
                     Vector<MultiFab>& mf_new,
-                    int scomp, int dcomp, int ncomp,
-                    Vector<BCRec> bcs)
+                    int scomp, int dcomp, int ncomp, int sbccomp,
+                    Vector<BCRec> bcs_in)
 {
+
+    Vector<BCRec> bcs{bcs_in.begin()+sbccomp,bcs_in.begin()+sbccomp+ncomp};
+
     if (lev == 0)
     {
         Vector<MultiFab*> smf;

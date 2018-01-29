@@ -46,6 +46,8 @@ PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
     for (int comp=dcomp; comp<dcomp+ncomp; ++comp)
     {
 
+        int bccomp = comp-dcomp;
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -69,7 +71,7 @@ PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
                 }
 
                 (*m_bc_func)(dest.dataPtr(comp), fablo, fabhi, dlo, dhi,
-                             dx, xlo, &time, m_bcr[comp].vect());
+                             dx, xlo, &time, m_bcr[bccomp].vect());
             }
         }
     }
