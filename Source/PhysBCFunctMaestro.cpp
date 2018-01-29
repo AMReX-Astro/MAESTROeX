@@ -43,7 +43,7 @@ PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
 	}
     }
 
-    for (int comp=dcomp; comp<dcomp+ncomp-1; ++comp)
+    for (int comp=dcomp; comp<dcomp+ncomp; ++comp)
     {
 
 #ifdef _OPENMP
