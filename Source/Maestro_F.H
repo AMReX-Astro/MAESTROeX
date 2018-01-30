@@ -202,6 +202,40 @@ extern "C"
                     const amrex::Real* grav_cell);
     //////////////////////
 
+
+    //////////////////////
+    // in make_edge_scal.F90
+#if (AMREX_SPACEDIM == 1)
+    void make_edge_scal_1d(
+#elif (AMREX_SPACEDIM == 2)
+    void make_edge_scal_2d(
+#elif (AMREX_SPACEDIM == 3)
+    void make_edge_scal_3d(
+#endif
+                      const int* domlo, const int* domhi,
+                      const int* lo, const int* hi,
+                      const amrex::Real* s,      const int* s_lo, const int* s_hi, const int* nc_s, const int& ng_s,
+                            amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x,
+#if (AMREX_SPACEDIM >= 2)
+                            amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y,
+#if (AMREX_SPACEDIM == 3)
+                            amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z,
+#endif
+#endif
+                      const amrex::Real* umac,   const int* u_lo, const int* u_hi,
+#if (AMREX_SPACEDIM >= 2)
+                      const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
+#if (AMREX_SPACEDIM == 3)
+                      const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
+#endif
+#endif
+                      const amrex::Real* force,  const int* f_lo, const int* f_hi, const int* nc_f,
+                      const amrex::Real* dx, const amrex::Real& dt, const int& is_vel,
+                      const int* adv_bc, const int& nbccomp, const int& comp, const int& bccomp,
+                      const int& is_conservative);
+
+    //////////////////////
+
     //////////////////////
     // in make_gamma.F90
     void make_gamma(const int& lev, const int* lo, const int* hi, 
@@ -419,8 +453,8 @@ extern "C"
                       const int* lo, const int* hi,
                       const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, const int& ng_ut,
                       const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf,
-#if (AMREX_SPACEDIM >= 2)
                       const amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
+#if (AMREX_SPACEDIM >= 2)
                       const amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
 #if (AMREX_SPACEDIM == 3)
                       const amrex::Real* wtrans, const int* uw_lo, const int* uw_hi,

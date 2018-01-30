@@ -227,54 +227,48 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
 }
 
-
-/*
-
 void
 Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& force,
-                       int is_vel,
-                       const Vector<BCRec>& bcs,
-                       int comp,
-                       int bccomp,
-                       int is_conservative)
+                       const Vector<MultiFab>& force,
+                       int is_vel, const Vector<BCRec>& bcs,
+                       int nbccomp, int comp, int bccomp, int is_conservative)
 {
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const MultiFab& utilde_mf  = utilde[lev];
-        const MultiFab& ufull_mf   = ufull[lev];
-              MultiFab& umac_mf    = umac[lev][0];
+        const MultiFab& scal_mf   = sold[lev];
+              MultiFab& sedgex_mf = sedge[lev][0];
+        const MultiFab& umac_mf   = umac[lev][0];
 #if (AMREX_SPACEDIM >= 2)
-        const MultiFab& utrans_mf  = utrans[lev][0];
-        const MultiFab& vtrans_mf  = utrans[lev][1];
-              MultiFab& vmac_mf    = umac[lev][1];
+              MultiFab& sedgey_mf = sedge[lev][1];
+        const MultiFab& vmac_mf   = umac[lev][1];
+
 #if (AMREX_SPACEDIM == 3)
-        const MultiFab& wtrans_mf  = utrans[lev][2];
-              MultiFab& wmac_mf    = umac[lev][2];
+              MultiFab& sedgez_mf = sedge[lev][2];
+        const MultiFab& wmac_mf   = umac[lev][2];
+
 #endif
 #endif
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
             const Box& domainBox = geom[lev].Domain();
             const Real* dx = geom[lev].CellSize();
 
-            const FArrayBox& utilde_fab = utilde_mf[mfi];
-            const FArrayBox& ufull_fab  = ufull_mf[mfi];
-                  FArrayBox& umac_fab   = umac_mf[mfi];
+            const FArrayBox& scal_fab   = scal_mf[mfi];
+                  FArrayBox& sedgex_fab = sedgex_mf[mfi];
+            const FArrayBox& umac_fab   = umac_mf[mfi];
 #if (AMREX_SPACEDIM >= 2)
-            const FArrayBox& utrans_fab = utrans_mf[mfi];
-            const FArrayBox& vtrans_fab = vtrans_mf[mfi];
-                  FArrayBox& vmac_fab   = vmac_mf[mfi];
+                  FArrayBox& sedgey_fab = sedgey_mf[mfi];
+            const FArrayBox& vmac_fab   = vmac_mf[mfi];
 #if (AMREX_SPACEDIM == 3)
-            const FArrayBox& wtrans_fab = wtrans_mf[mfi];
-                  FArrayBox& wmac_fab   = wmac_mf[mfi];
+                  FArrayBox& sedgez_fab = sedgez_mf[mfi];
+            const FArrayBox& wmac_fab   = wmac_mf[mfi];
 #endif
 #endif
             const FArrayBox& force_fab = force_mf[mfi];
@@ -284,22 +278,20 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 #if (AMREX_SPACEDIM == 1)
-            velpred_1d(
+            make_edge_scal_1d(
 #elif (AMREX_SPACEDIM == 2)
-            velpred_2d(
+            make_edge_scal_2d(
 #elif (AMREX_SPACEDIM == 3)
-            velpred_3d(
+            make_edge_scal_3d(
 #endif
-                        lev, domainBox.loVect(), domainBox.hiVect(),
+                        domainBox.loVect(), domainBox.hiVect(),
                         validBox.loVect(), validBox.hiVect(),
-                        utilde_fab.dataPtr(), utilde_fab.loVect(), utilde_fab.hiVect(), utilde_fab.nCompPtr(),
-                        utilde_mf.nGrow(),
-                        ufull_fab.dataPtr(), ufull_fab.loVect(), ufull_fab.hiVect(), ufull_fab.nCompPtr(),
+                        scal_fab.dataPtr(), scal_fab.loVect(), scal_fab.hiVect(), scal_fab.nCompPtr(), scal_mf.nGrow(),
+                        sedgex_fab.dataPtr(), sedgex_fab.loVect(), sedgex_fab.hiVect(), sedgex_fab.nCompPtr(),
 #if (AMREX_SPACEDIM >= 2)
-                        utrans_fab.dataPtr(), utrans_fab.loVect(), utrans_fab.hiVect(),
-                        vtrans_fab.dataPtr(), vtrans_fab.loVect(), vtrans_fab.hiVect(),
+                        sedgey_fab.dataPtr(), sedgey_fab.loVect(), sedgey_fab.hiVect(), sedgey_fab.nCompPtr(),
 #if (AMREX_SPACEDIM == 3)
-                        wtrans_fab.dataPtr(), wtrans_fab.loVect(), wtrans_fab.hiVect(),
+                        sedgez_fab.dataPtr(), sedgez_fab.loVect(), sedgez_fab.hiVect(), sedgez_fab.nCompPtr(),
 #endif
 #endif
                         umac_fab.dataPtr(), umac_fab.loVect(), umac_fab.hiVect(),
@@ -310,7 +302,8 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 #endif
 #endif
                         force_fab.dataPtr(), force_fab.loVect(), force_fab.hiVect(), force_fab.nCompPtr(),
-                        w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+                        dx, dt, is_vel, bcs_u[0].data(),
+                        nbccomp, comp, bccomp, is_conservative);
 
 
 
@@ -324,5 +317,3 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     //
 
 }
-
-*/

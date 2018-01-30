@@ -29,7 +29,7 @@ contains
                                umac,   u_lo, u_hi, &
                                force,  f_lo, f_hi, nc_f, &
                                dx, dt, is_vel, adv_bc, nbccomp, &
-                               comp, bccomp, is_conservative)
+                               comp, bccomp, is_conservative) bind(C,name="make_edge_scal_1d")
 
     integer         , intent(in   ) :: domlo(1), domhi(1), lo(1), hi(1)
     integer         , intent(in   ) :: s_lo(1), s_hi(1), nc_s, ng_s
@@ -158,7 +158,7 @@ contains
                                vmac,   v_lo, v_hi, &
                                force,  f_lo, f_hi, nc_f, &
                                dx, dt, is_vel, adv_bc, nbccomp, &
-                               comp, bccomp, is_conservative)
+                               comp, bccomp, is_conservative) bind(C,name="make_edge_scal_2d")
 
     integer         , intent(in   ) :: domlo(2), domhi(2), lo(2), hi(2)
     integer         , intent(in   ) :: s_lo(2), s_hi(2), nc_s, ng_s
@@ -512,7 +512,7 @@ contains
                                wmac,   w_lo, w_hi, &
                                force,  f_lo, f_hi, nc_f, &
                                dx, dt, is_vel, adv_bc, nbccomp, &
-                               comp, bccomp, is_conservative)
+                               comp, bccomp, is_conservative) bind(C,name="make_edge_scal_3d")
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s, ng_s
