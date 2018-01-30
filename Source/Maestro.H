@@ -95,17 +95,27 @@ private:
 
     ////////////
     // MaestroConvert.cpp functions
-    void PutInPertForm(amrex::Vector<amrex::MultiFab>& scal, 
-		       const amrex::Vector<amrex::Real>& s0, 
-		       const int& comp, 
-		       bool flag);
-
-    void ConvertRhoXToX(amrex::Vector<amrex::MultiFab>& scal,
+    void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal, 
+                        const amrex::Vector<amrex::Real>& s0, 
+                        const int& comp, 
                         bool flag);
 
-    void ConvertRhoHToH(amrex::Vector<amrex::MultiFab>& scal,
-                        bool flag);
+    void ConvertRhoXToX (amrex::Vector<amrex::MultiFab>& scal,
+                         bool flag);
+
+    void ConvertRhoHToH (amrex::Vector<amrex::MultiFab>& scal,
+                         bool flag);
     ////////////
+
+    ////////////////////////
+    // MaestroDebug.cpp functions
+    void PrintCC   (const amrex::Vector<amrex::MultiFab>& CC);
+    void PrintEdge (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
+                    int dir);
+    void PrintNodal(const amrex::Vector<amrex::MultiFab>& NODAL);
+    ////////////////////////
+
+
 
     ////////////////////////
     // MaestroDensityAdvance.cpp functions
