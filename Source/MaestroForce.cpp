@@ -34,7 +34,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            make_vel_force(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_vel_force(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                            BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
                            BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
                            BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
@@ -47,7 +47,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                            w0_force.dataPtr(),
                            rho0.dataPtr(),
                            grav_cell.dataPtr(),
-                           do_add_utilde_force);
+                           &do_add_utilde_force);
         }
     }
 
@@ -100,7 +100,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             // We will also pass "validBox", which specifies the "valid" region.
 
             // be careful to pass in "comp+1" here since fortran uses 1-based indexing for components
-            modify_scal_force(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            modify_scal_force(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                               scal_force_mf[mfi].dataPtr(comp), 
                               ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
                               sold_mf[mfi].dataPtr(comp), 
@@ -113,7 +113,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #endif
 #endif
                               s0.dataPtr(), s0_edge.dataPtr(), w0.dataPtr(),
-                              dx, fullform);
+                              dx, &fullform);
         }
 
 

@@ -103,7 +103,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #elif (AMREX_SPACEDIM == 3)
             mkutrans_3d(
 #endif
-                        lev, domainBox.loVect(), domainBox.hiVect(),
+                        &lev, domainBox.loVect(), domainBox.hiVect(),
                         validBox.loVect(), validBox.hiVect(),
                         utilde_fab.dataPtr(), utilde_fab.loVect(), utilde_fab.hiVect(), utilde_fab.nCompPtr(),
                         utilde_mf.nGrow(),
@@ -115,7 +115,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         wtrans_fab.dataPtr(), wtrans_fab.loVect(), wtrans_fab.hiVect(),
 #endif
 #endif
-                        w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+                        w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
 
         } // end MFIter loop
     } // end loop over levels
@@ -192,7 +192,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #elif (AMREX_SPACEDIM == 3)
             velpred_3d(
 #endif
-                        lev, domainBox.loVect(), domainBox.hiVect(),
+                        &lev, domainBox.loVect(), domainBox.hiVect(),
                         validBox.loVect(), validBox.hiVect(),
                         utilde_fab.dataPtr(), utilde_fab.loVect(), utilde_fab.hiVect(), utilde_fab.nCompPtr(),
                         utilde_mf.nGrow(),
@@ -212,7 +212,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #endif
 #endif
                         force_fab.dataPtr(), force_fab.loVect(), force_fab.hiVect(), force_fab.nCompPtr(),
-                        w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+                        w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
 
 
 
@@ -302,8 +302,8 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 #endif
 #endif
                         force_fab.dataPtr(), force_fab.loVect(), force_fab.hiVect(), force_fab.nCompPtr(),
-                        dx, dt, is_vel, bcs_u[0].data(),
-                        nbccomp, comp, bccomp, is_conservative);
+                        dx, &dt, &is_vel, bcs_u[0].data(),
+                        &nbccomp, &comp, &bccomp, &is_conservative);
 
 
 

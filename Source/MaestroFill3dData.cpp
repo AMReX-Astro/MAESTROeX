@@ -34,9 +34,9 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            put_1d_array_on_cart(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            put_1d_array_on_cart(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                                  BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-                                 s0.dataPtr(), is_input_edge_centered, is_output_a_vector);
+                                 s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
         }
     }
 
@@ -81,7 +81,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            addw0(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            addw0(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                   BL_TO_FORTRAN_3D(uedge_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
                   BL_TO_FORTRAN_3D(vedge_mf[mfi]),
@@ -89,7 +89,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                   BL_TO_FORTRAN_3D(wedge_mf[mfi]),
 #endif
 #endif
-                  w0.dataPtr(),mult);
+                  w0.dataPtr(),&mult);
         }
     }
 

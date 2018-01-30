@@ -104,9 +104,11 @@ Maestro::InitData ()
 {
     Print() << "Calling InitData()" << endl;
 
+    int nlevs = max_level+1;
+
     // read in model file and fill in s0_init and p0_init for all levels
     init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-                    rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),max_level+1);
+                    rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),&nlevs);
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
@@ -114,7 +116,7 @@ Maestro::InitData ()
 
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(finest_level);
+    init_multilevel(&finest_level);
 
     // synchronize levels
     AverageDown(sold,0,Nscal);
@@ -218,7 +220,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
         const int* lo  = box.loVect();
         const int* hi  = box.hiVect();
 
-        initdata(lev, t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+        initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
                  BL_TO_FORTRAN_FAB(scal[mfi]), 
                  BL_TO_FORTRAN_FAB(vel[mfi]), 
                  s0_init.dataPtr(), p0_init.dataPtr(),
@@ -338,12 +340,13 @@ void Maestro::DivuIter (int istep_divu_iter)
     if (evolve_base_state) {
         Average(S_cc_old,Sbar,0);
 
+        int is_predictor = 0;
         make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr() ,Sbar.dataPtr(),
                 rho0_old.dataPtr(), rho0_new.dataPtr(), p0_old.dataPtr(), 
                 p0_new.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_new.dataPtr(),
                 p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
                 etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-                r_edge_loc.dataPtr(), dt, dt, 0);
+                r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
     }
 
     // make the nodal rhs for projection beta0*(S-Sbar)

@@ -112,13 +112,13 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            burner_loop(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            burner_loop(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                         BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
                         BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
                         BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
                         BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
                         BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                        tempbar_init.dataPtr(), dt_in);
+                        tempbar_init.dataPtr(), &dt_in);
 
         }
     }

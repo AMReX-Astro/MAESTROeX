@@ -32,7 +32,8 @@ contains
                                comp, bccomp, is_conservative) bind(C,name="make_edge_scal_1d")
 
     integer         , intent(in   ) :: domlo(1), domhi(1), lo(1), hi(1)
-    integer         , intent(in   ) :: s_lo(1), s_hi(1), nc_s, ng_s
+    integer         , intent(in   ) :: s_lo(1), s_hi(1), nc_s
+    integer, value,   intent(in   ) :: ng_s
     integer         , intent(in   ) :: x_lo(1), x_hi(1), nc_x
     integer         , intent(in   ) :: u_lo(1), u_hi(1)
     integer         , intent(in   ) :: f_lo(1), f_hi(1), nc_f
@@ -161,7 +162,8 @@ contains
                                comp, bccomp, is_conservative) bind(C,name="make_edge_scal_2d")
 
     integer         , intent(in   ) :: domlo(2), domhi(2), lo(2), hi(2)
-    integer         , intent(in   ) :: s_lo(2), s_hi(2), nc_s, ng_s
+    integer         , intent(in   ) :: s_lo(2), s_hi(2), nc_s
+    integer, value,   intent(in   ) :: ng_s
     integer         , intent(in   ) :: x_lo(2), x_hi(2), nc_x
     integer         , intent(in   ) :: y_lo(2), y_hi(2), nc_y
     integer         , intent(in   ) :: u_lo(2), u_hi(2)
@@ -515,7 +517,8 @@ contains
                                comp, bccomp, is_conservative) bind(C,name="make_edge_scal_3d")
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
-    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s, ng_s
+    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
+    integer, value,   intent(in   ) :: ng_s
     integer         , intent(in   ) :: x_lo(3), x_hi(3), nc_x
     integer         , intent(in   ) :: y_lo(3), y_hi(3), nc_y
     integer         , intent(in   ) :: z_lo(3), z_hi(3), nc_z

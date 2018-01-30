@@ -79,6 +79,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
 
+    int is_predictor;
+
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
 
@@ -227,11 +229,12 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         w0_old = w0;
 
         // compute w0, w0_force, and delta_chi_w0
+        is_predictor = 1;
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
                 psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),dt,dtold,1);
+                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
         if (spherical == 1) {
             // put w0 on Cartesian edges
@@ -268,7 +271,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_old);
 
     // MAC projection
-    bool is_predictor = true;
+    is_predictor = 1;
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////
@@ -462,11 +465,12 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Average(S_cc_nph,Sbar,0);
 
         // compute w0, w0_force, and delta_chi_w0
+        is_predictor = 0;
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
                 psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),dt,dtold,0);
+                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
         if (spherical == 1) {
             // put w0 on Cartesian edges
@@ -492,8 +496,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_nph);
 
     // MAC projection
-    is_predictor = false;
-    MacProj(umac,macphi,macrhs,beta0_nph,false);
+    is_predictor = 0;
+    MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the base state and full state through dt

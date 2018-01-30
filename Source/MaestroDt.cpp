@@ -62,7 +62,7 @@ Maestro::EstDt ()
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            estdt(lev,dt_grid,umax_grid,
+            estdt(&lev,&dt_grid,&umax_grid,
                   ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                   ZFILL(dx),
                   BL_TO_FORTRAN_FAB(sold_mf[mfi]),
@@ -127,7 +127,8 @@ Maestro::EstDt ()
     }
 
     // set rel_eps in fortran module
-    set_rel_eps(umax*1.e-8);    
+    umax *= 1.e-8;
+    set_rel_eps(&umax);
 }
 
 
@@ -189,7 +190,7 @@ Maestro::FirstDt ()
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            firstdt(lev,dt_grid,umax_grid,
+            firstdt(&lev,&dt_grid,&umax_grid,
                     ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                     ZFILL(dx),
                     BL_TO_FORTRAN_FAB(sold_mf[mfi]),
@@ -252,5 +253,6 @@ Maestro::FirstDt ()
     }
 
     // set rel_eps in fortran module
-    set_rel_eps(umax*1.e-8);    
+    umax *= 1.e-8;
+    set_rel_eps(&umax);
 }

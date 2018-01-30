@@ -22,7 +22,8 @@ contains
                          w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_1d")
 
     integer         , intent(in   ) :: lev, domlo(1), domhi(1), lo(1), hi(1)
-    integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut, ng_ut
+    integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut
+    integer, value  , intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
     integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
@@ -123,7 +124,8 @@ contains
                          w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
 
     integer         , intent(in   ) :: lev, domlo(2), domhi(2), lo(2), hi(2)
-    integer         , intent(in   ) :: ut_lo(2), ut_hi(2), nc_ut, ng_ut
+    integer         , intent(in   ) :: ut_lo(2), ut_hi(2), nc_ut
+    integer, value  , intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(2), uf_hi(2), nc_uf
     integer         , intent(in   ) :: uu_lo(2), uu_hi(2)
     integer         , intent(in   ) :: uv_lo(2), uv_hi(2)
@@ -299,7 +301,8 @@ contains
                          w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
 
     integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
-    integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut, ng_ut
+    integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut
+    integer, value  , intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)

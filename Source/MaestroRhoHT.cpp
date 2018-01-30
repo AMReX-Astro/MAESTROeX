@@ -23,7 +23,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            makeTfromRhoH(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            makeTfromRhoH(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                           BL_TO_FORTRAN_FAB(scal_mf[mfi]),
                           p0.dataPtr());
         }
@@ -55,9 +55,9 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            makeTfromRhoP(lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            makeTfromRhoP(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                           BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                          p0.dataPtr(),updateRhoH);
+                          p0.dataPtr(),&updateRhoH);
         }
 
     }

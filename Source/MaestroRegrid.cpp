@@ -16,7 +16,7 @@ Maestro::Regrid ()
             
     if (spherical == 0) {
         finest_radial_level = finest_level;
-        init_multilevel(finest_level);
+        init_multilevel(&finest_level);
         // FIXME
         // we also need to redefine numdisjointchunks, r_start_coord, r_end_coord
         // and "regrid" the base state rho0, rhoh0, tempbar

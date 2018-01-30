@@ -24,7 +24,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             mk_sponge(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                      BL_TO_FORTRAN_3D(sponge_mf[mfi]),ZFILL(dx),dt);
+                      BL_TO_FORTRAN_3D(sponge_mf[mfi]),ZFILL(dx),&dt);
         }
 
     }

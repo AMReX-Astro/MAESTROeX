@@ -50,7 +50,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
-                average(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                average(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                         BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
                         phisum.dataPtr());
             }

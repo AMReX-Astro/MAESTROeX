@@ -13,7 +13,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   Vector<MultiFab>& macphi,
                   const Vector<MultiFab>& macrhs,
                   const Vector<Real>& beta0,
-                  const bool& is_predictor)
+                  const int& is_predictor)
 {
     // this will hold solver RHS = macrhs - div(beta0*umac)
     Vector<MultiFab> solverrhs(finest_level+1);
@@ -40,7 +40,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     for (int lev=0; lev<=finest_level; ++lev) {
         rho[lev].define(grids[lev], dmap[lev], 1, 1);
     }
-    Real rho_time = is_predictor ? t_old : 0.5*(t_old+t_new);
+    Real rho_time = (is_predictor == 1) ? t_old : 0.5*(t_old+t_new);
     for (int lev=0; lev<=finest_level; ++lev) {
         FillPatch(lev, rho_time, rho[lev], sold, snew, Rho, 0, 1, Rho, bcs_s);
     }
@@ -197,7 +197,7 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 	    const Box& validBox = mfi.validbox();
 
 	    // call fortran subroutine
-	    mult_beta0(lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
+	    mult_beta0(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
 		       BL_TO_FORTRAN_3D(xedge_mf[mfi]), 
 #if (AMREX_SPACEDIM >= 2)
 		       BL_TO_FORTRAN_3D(yedge_mf[mfi]),
@@ -206,7 +206,7 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #endif
 		       beta0_edge.dataPtr(),
 #endif
-		       beta0.dataPtr(), mult_or_div);
+		       beta0.dataPtr(), &mult_or_div);
 
 	}
     }
@@ -245,7 +245,7 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 	    const Real* dx = geom[lev].CellSize();
 
 	    // call fortran subroutine
-	    mac_solver_rhs(lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
+	    mac_solver_rhs(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
 			   BL_TO_FORTRAN_3D(solverrhs_mf[mfi]), 
 			   BL_TO_FORTRAN_3D(macrhs_mf[mfi]), 
 			   BL_TO_FORTRAN_3D(uedge_mf[mfi]), 
@@ -291,7 +291,7 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 	    const Box& validBox = mfi.validbox();
 
 	    // call fortran subroutine
-	    mac_bcoef_face(lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
+	    mac_bcoef_face(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
 			   BL_TO_FORTRAN_3D(xbcoef_mf[mfi]), 
 #if (AMREX_SPACEDIM >= 2)
 			   BL_TO_FORTRAN_3D(ybcoef_mf[mfi]),

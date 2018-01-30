@@ -281,7 +281,7 @@ private:
                   amrex::Vector<amrex::MultiFab>& macphi,
                   const amrex::Vector<amrex::MultiFab>& macrhs,
                   const amrex::Vector<amrex::Real>& beta0,
-                  const bool& is_predictor);
+                  const int& is_predictor);
 
     // multiply (or divide) face-data by beta0
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,

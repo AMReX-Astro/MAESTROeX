@@ -73,7 +73,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            make_rhcc_for_nodalproj(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_rhcc_for_nodalproj(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                                     BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
                                     BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
                                     Sbar.dataPtr(), beta0.dataPtr());
@@ -111,7 +111,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            make_rhcc_for_macproj(lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_rhcc_for_macproj(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                                   BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
                                   BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
                                   Sbar.dataPtr(), beta0.dataPtr());
