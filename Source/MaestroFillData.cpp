@@ -13,7 +13,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
                     Vector<MultiFab>& mf_old,
                     Vector<MultiFab>& mf_new,
                     int scomp, int dcomp, int ncomp, int sbccomp,
-                    Vector<BCRec> bcs_in)
+                    const Vector<BCRec>& bcs_in)
 {
 
     Vector<BCRec> bcs{bcs_in.begin()+sbccomp,bcs_in.begin()+sbccomp+ncomp};
@@ -56,7 +56,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
                           Vector<MultiFab>& mf_old,
                           Vector<MultiFab>& mf_new,
                           int scomp, int dcomp, int ncomp,
-                          Vector<BCRec> bcs)
+                          const Vector<BCRec>& bcs)
 {
     AMREX_ASSERT(lev > 0);
 

@@ -142,7 +142,7 @@ private:
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
                     int scomp, int dcomp, int ncomp, int sbccomp,
-                    amrex::Vector<amrex::BCRec> bcs_in);
+                    const amrex::Vector<amrex::BCRec>& bcs_in);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
@@ -152,7 +152,7 @@ private:
                           amrex::Vector<amrex::MultiFab>& mf_old,
                           amrex::Vector<amrex::MultiFab>& mf_new,
                           int scomp, int dcomp, int ncomp,
-                          amrex::Vector<amrex::BCRec> bcs);
+                          const amrex::Vector<amrex::BCRec>& bcs);
 
     // utility to copy in data from mf_old and/or mf_new into mf
     // if time=t_old we copy mf_old into mf
@@ -216,7 +216,7 @@ private:
                          const amrex::Vector<amrex::Real>& s0,
                          const amrex::Vector<amrex::Real>& s0_edge,
                          int comp,
-                         const amrex::Vector<amrex::BCRec> bcs,
+                         const amrex::Vector<amrex::BCRec>& bcs,
                          int fullform);
     ////////////////////////
 
