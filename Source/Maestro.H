@@ -109,10 +109,9 @@ private:
 
     ////////////////////////
     // MaestroDebug.cpp functions
-    void PrintCC   (const amrex::Vector<amrex::MultiFab>& CC);
+    void PrintMF   (const amrex::Vector<amrex::MultiFab>& CC);
     void PrintEdge (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir);
-    void PrintNodal(const amrex::Vector<amrex::MultiFab>& NODAL);
     ////////////////////////
 
 

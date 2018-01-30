@@ -95,17 +95,13 @@ extern "C"
 
     //////////////////////
     // in debug.F90
-    void print_cc(const int& lev, const int* lo, const int* hi, 
+    void print_mf(const int& lev, const int* lo, const int* hi, 
                   const amrex::Real* mf,
-                  const int* m_lo, const int* m_hi, const int* nc_m, const int& ng_m);
+                  const int* m_lo, const int* m_hi, const int* nc_m);
 
-    void print_edge(const int& lev, const int& dir, const int* lo, const int* hi, 
+    void print_edge(const int& lev, const int* lo, const int* hi, 
                     const amrex::Real* mf,
-                    const int* m_lo, const int* m_hi, const int* nc_m, const int& ng_m);
-
-    void print_nodal(const int& lev, const int* lo, const int* hi, 
-                     const amrex::Real* mf,
-                     const int* m_lo, const int* m_hi, const int* nc_m, const int& ng_m);
+                    const int* m_lo, const int* m_hi, const int* nc_m);
     //////////////////////
 
     //////////////////////
