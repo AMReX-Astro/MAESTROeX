@@ -82,16 +82,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             const Box& domainBox = geom[lev].Domain();
             const Real* dx = geom[lev].CellSize();
 
-            const FArrayBox& utilde_fab  = utilde_mf[mfi];
-            const FArrayBox& ufull_fab   = ufull_mf[mfi];
-            FArrayBox& utrans_fab = utrans_mf[mfi];
-#if (AMREX_SPACEDIM >= 2)
-            FArrayBox& vtrans_fab = vtrans_mf[mfi];
-#if (AMREX_SPACEDIM == 3)
-            FArrayBox& wtrans_fab = wtrans_mf[mfi];
-#endif
-#endif
-
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
@@ -105,14 +95,13 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #endif
                         &lev, domainBox.loVect(), domainBox.hiVect(),
                         validBox.loVect(), validBox.hiVect(),
-                        utilde_fab.dataPtr(), utilde_fab.loVect(), utilde_fab.hiVect(), utilde_fab.nCompPtr(),
-                        utilde_mf.nGrow(),
-                        ufull_fab.dataPtr(), ufull_fab.loVect(), ufull_fab.hiVect(), ufull_fab.nCompPtr(),
-                        utrans_fab.dataPtr(), utrans_fab.loVect(), utrans_fab.hiVect(),
+                        BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_FAB(ufull_mf[mfi]),
+                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                        vtrans_fab.dataPtr(), vtrans_fab.loVect(), vtrans_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                        wtrans_fab.dataPtr(), wtrans_fab.loVect(), wtrans_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
 #endif
 #endif
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
@@ -167,20 +156,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             const Box& domainBox = geom[lev].Domain();
             const Real* dx = geom[lev].CellSize();
 
-            const FArrayBox& utilde_fab = utilde_mf[mfi];
-            const FArrayBox& ufull_fab  = ufull_mf[mfi];
-                  FArrayBox& umac_fab   = umac_mf[mfi];
-#if (AMREX_SPACEDIM >= 2)
-            const FArrayBox& utrans_fab = utrans_mf[mfi];
-            const FArrayBox& vtrans_fab = vtrans_mf[mfi];
-                  FArrayBox& vmac_fab   = vmac_mf[mfi];
-#if (AMREX_SPACEDIM == 3)
-            const FArrayBox& wtrans_fab = wtrans_mf[mfi];
-                  FArrayBox& wmac_fab   = wmac_mf[mfi];
-#endif
-#endif
-            const FArrayBox& force_fab = force_mf[mfi];
-
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
@@ -194,30 +169,24 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #endif
                         &lev, domainBox.loVect(), domainBox.hiVect(),
                         validBox.loVect(), validBox.hiVect(),
-                        utilde_fab.dataPtr(), utilde_fab.loVect(), utilde_fab.hiVect(), utilde_fab.nCompPtr(),
-                        utilde_mf.nGrow(),
-                        ufull_fab.dataPtr(), ufull_fab.loVect(), ufull_fab.hiVect(), ufull_fab.nCompPtr(),
+                        BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_FAB(ufull_mf[mfi]),
+                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                        utrans_fab.dataPtr(), utrans_fab.loVect(), utrans_fab.hiVect(),
-                        vtrans_fab.dataPtr(), vtrans_fab.loVect(), vtrans_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                        wtrans_fab.dataPtr(), wtrans_fab.loVect(), wtrans_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
 #endif
 #endif
-                        umac_fab.dataPtr(), umac_fab.loVect(), umac_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                        vmac_fab.dataPtr(), vmac_fab.loVect(), vmac_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                        wmac_fab.dataPtr(), wmac_fab.loVect(), wmac_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
-                        force_fab.dataPtr(), force_fab.loVect(), force_fab.hiVect(), force_fab.nCompPtr(),
+                        BL_TO_FORTRAN_FAB(force_mf[mfi]),
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
-
-
-
-
-
         } // end MFIter loop
     } // end loop over levels
 
@@ -260,19 +229,6 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             const Box& domainBox = geom[lev].Domain();
             const Real* dx = geom[lev].CellSize();
 
-            const FArrayBox& scal_fab   = scal_mf[mfi];
-                  FArrayBox& sedgex_fab = sedgex_mf[mfi];
-            const FArrayBox& umac_fab   = umac_mf[mfi];
-#if (AMREX_SPACEDIM >= 2)
-                  FArrayBox& sedgey_fab = sedgey_mf[mfi];
-            const FArrayBox& vmac_fab   = vmac_mf[mfi];
-#if (AMREX_SPACEDIM == 3)
-                  FArrayBox& sedgez_fab = sedgez_mf[mfi];
-            const FArrayBox& wmac_fab   = wmac_mf[mfi];
-#endif
-#endif
-            const FArrayBox& force_fab = force_mf[mfi];
-
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
@@ -286,22 +242,22 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 #endif
                         domainBox.loVect(), domainBox.hiVect(),
                         validBox.loVect(), validBox.hiVect(),
-                        scal_fab.dataPtr(), scal_fab.loVect(), scal_fab.hiVect(), scal_fab.nCompPtr(), scal_mf.nGrow(),
-                        sedgex_fab.dataPtr(), sedgex_fab.loVect(), sedgex_fab.hiVect(), sedgex_fab.nCompPtr(),
+                        BL_TO_FORTRAN_FAB(scal_mf[mfi]), scal_mf.nGrow(),
+                        BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                        sedgey_fab.dataPtr(), sedgey_fab.loVect(), sedgey_fab.hiVect(), sedgey_fab.nCompPtr(),
+                        BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                        sedgez_fab.dataPtr(), sedgez_fab.loVect(), sedgez_fab.hiVect(), sedgez_fab.nCompPtr(),
+                        BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
 #endif
 #endif
-                        umac_fab.dataPtr(), umac_fab.loVect(), umac_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                        vmac_fab.dataPtr(), vmac_fab.loVect(), vmac_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                        wmac_fab.dataPtr(), wmac_fab.loVect(), wmac_fab.hiVect(),
+                        BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
-                        force_fab.dataPtr(), force_fab.loVect(), force_fab.hiVect(), force_fab.nCompPtr(),
+                        BL_TO_FORTRAN_FAB(force_mf[mfi]),
                         dx, &dt, &is_vel, bcs_u[0].data(),
                         &nbccomp, &comp, &bccomp, &is_conservative);
 
