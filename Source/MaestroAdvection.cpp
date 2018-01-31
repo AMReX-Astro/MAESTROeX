@@ -200,8 +200,8 @@ void
 Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                        const Vector<MultiFab>& force,
-                       int is_vel, const Vector<BCRec>& bcs,
-                       int nbccomp, int comp, int bccomp, int is_conservative)
+                       int is_vel, const Vector<BCRec>& bcs, int nbccomp, 
+                       int start_scomp, int start_bccomp, int num_comp, int is_conservative)
 {
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -229,42 +229,42 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             const Box& domainBox = geom[lev].Domain();
             const Real* dx = geom[lev].CellSize();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
+
+                int bccomp = start_bccomp + scomp - start_scomp;
+
+                // call fortran subroutine
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // lo/hi coordinates (including ghost cells), and/or the # of components
+                // We will also pass "validBox", which specifies the "valid" region.
 #if (AMREX_SPACEDIM == 1)
-            make_edge_scal_1d(
+                make_edge_scal_1d(
 #elif (AMREX_SPACEDIM == 2)
-            make_edge_scal_2d(
+                make_edge_scal_2d(
 #elif (AMREX_SPACEDIM == 3)
-            make_edge_scal_3d(
+                make_edge_scal_3d(
 #endif
-                        domainBox.loVect(), domainBox.hiVect(),
-                        validBox.loVect(), validBox.hiVect(),
-                        BL_TO_FORTRAN_FAB(scal_mf[mfi]), scal_mf.nGrow(),
-                        BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+                    domainBox.loVect(), domainBox.hiVect(),
+                    validBox.loVect(), validBox.hiVect(),
+                    BL_TO_FORTRAN_FAB(scal_mf[mfi]), scal_mf.nGrow(),
+                    BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                        BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+                    BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                        BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+                    BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
 #endif
 #endif
-                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
+                    BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+                    BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                        BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                    BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
-                        BL_TO_FORTRAN_FAB(force_mf[mfi]),
-                        dx, &dt, &is_vel, bcs_u[0].data(),
-                        &nbccomp, &comp, &bccomp, &is_conservative);
-
-
-
-
-
+                    BL_TO_FORTRAN_FAB(force_mf[mfi]),
+                    dx, &dt, &is_vel, bcs_u[0].data(),
+                    &nbccomp, &scomp, &bccomp, &is_conservative);
+            } // end loop over components 
         } // end MFIter loop
     } // end loop over levels
 
