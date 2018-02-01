@@ -7,6 +7,7 @@ CEXE_sources += MaestroConvert.cpp
 CEXE_sources += MaestroDebug.cpp
 CEXE_sources += MaestroDensityAdvance.cpp
 CEXE_sources += MaestroDt.cpp 
+CEXE_sources += MaestroEnthalpyAdvance.cpp
 CEXE_sources += MaestroEvolve.cpp 
 CEXE_sources += MaestroFillData.cpp
 CEXE_sources += MaestroFill3dData.cpp

@@ -122,8 +122,6 @@ private:
                     int dir);
     ////////////////////////
 
-
-
     ////////////////////////
     // MaestroDensityAdvance.cpp functions
     void DensityAdvance (bool is_predictor,
@@ -145,6 +143,18 @@ private:
     void FirstDt ();
 
     // end MaestroDt.cpp functions
+    ////////////////////////
+
+
+    ////////////////////////
+    // MaestroEnthalpyAdvance.cpp functions
+    void EnthalpyAdvance (bool is_predictor,
+                          amrex::Vector<amrex::MultiFab>& scalold,
+                          amrex::Vector<amrex::MultiFab>& scalnew,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                          amrex::Vector<amrex::MultiFab>& scal_force,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
     ////////////////////////
 
     ////////////////////////
