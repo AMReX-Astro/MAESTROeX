@@ -41,9 +41,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         rho[lev].define(grids[lev], dmap[lev], 1, 1);
     }
     Real rho_time = (is_predictor == 1) ? t_old : 0.5*(t_old+t_new);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, rho_time, rho[lev], sold, snew, Rho, 0, 1, Rho, bcs_s);
-    }
+    FillPatch(rho_time, rho, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
     // coefficients for solver
     Vector<MultiFab> acoef(finest_level+1);

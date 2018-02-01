@@ -3,6 +3,20 @@
 
 using namespace amrex;
 
+// call FillPatch for all levels
+void
+Maestro::FillPatch (Real time, 
+                    Vector<MultiFab>& mf, 
+                    Vector<MultiFab>& mf_old,
+                    Vector<MultiFab>& mf_new,
+                    int scomp, int dcomp, int ncomp, int sbccomp,
+                    const Vector<BCRec>& bcs_in)
+{
+    for (int lev=0; lev<=finest_level; ++lev) {
+        FillPatch(lev, time, mf[lev], mf_old, mf_new, scomp, dcomp, ncomp, sbccomp, bcs_in);
+    }
+}
+
 // compute a new multifab by coping in phi from valid region and filling ghost cells
 // works for single level and 2-level cases
 // (fill fine grid ghost by interpolating from coarse)

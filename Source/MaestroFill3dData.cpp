@@ -47,9 +47,7 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 
     // fill ghost cells using first-order extrapolation
     if (ng > 0) {
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    FillPatch(lev, t_new, s0_cart[lev], s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs);
-	}
+        FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs);
     }
 }
 

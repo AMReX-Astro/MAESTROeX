@@ -149,12 +149,21 @@ private:
     ////////////////////////
     // MaestroFillData.cpp functions
 
+    // call FillPatch for all levels
+    void FillPatch (amrex::Real time,
+                    amrex::Vector<amrex::MultiFab>& mf,
+                    amrex::Vector<amrex::MultiFab>& mf_old,
+                    amrex::Vector<amrex::MultiFab>& mf_new,
+                    int scomp, int dcomp, int ncomp, int sbccomp,
+                    const amrex::Vector<amrex::BCRec>& bcs_in);
+
     // compute a new multifab by coping in phi from valid region and filling ghost cells
     // works for single level and 2-level cases 
     // (fill fine grid ghost by interpolating from coarse)
     // scomp of the source component
     // dcomp is the destination component AND the bc component
-    void FillPatch (int lev, amrex::Real time, amrex::MultiFab& mf,
+    void FillPatch (int lev, amrex::Real time,
+                    amrex::MultiFab& mf,
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
                     int scomp, int dcomp, int ncomp, int sbccomp,

@@ -13,8 +13,9 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     Vector<MultiFab> utilde(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-        FillPatch(lev, t_new, utilde[lev], uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
     }
+
+    FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 
     // create a MultiFab to hold uold + w0
     Vector<MultiFab>      ufull(finest_level+1);

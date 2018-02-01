@@ -663,9 +663,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // Define rho at half time using the new rho from Step 8
-    for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, 0.5*(t_old+t_new), rhohalf[lev], sold, snew, Rho, 0, 1, Rho, bcs_s);
-    }
+    FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
        
     // VelocityAdvance();
 

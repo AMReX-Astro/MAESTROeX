@@ -48,9 +48,7 @@ Maestro::NodalProj (int proj_type,
         }
     }
     else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            FillPatch(lev, 0.5*(t_old+t_new), sig[lev], sold, snew, Rho, 0, 1, Rho, bcs_s);
-        }
+        FillPatch(0.5*(t_old+t_new), sig, sold, snew, Rho, 0, 1, Rho, bcs_s);
     }
 
     // build a multifab Vproj (the quantity that will be projected) with 1 ghost cell
@@ -411,9 +409,7 @@ Maestro::CreateUvecForProj (int proj_type,
     }
 
     // fill ghost cells
-    for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, time, Vproj[lev], Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
-    }
+    FillPatch(time, Vproj, Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 }
 
 

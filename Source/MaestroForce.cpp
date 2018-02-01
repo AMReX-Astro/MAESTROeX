@@ -56,10 +56,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
     // note - we need to reconsider the bcs type here
     // it matches fortran MAESTRO but is that correct?
-    for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, t_old, vel_force[lev], vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
-    }
-
+    FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 
 }
 
@@ -124,8 +121,6 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     AverageDown(scal_force,comp,1);
 
     // fill ghost cells
-    for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, t_old, scal_force[lev], scal_force, scal_force, comp, comp, 1, 0, bcs_f);
-    }
+    FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
 
 }
