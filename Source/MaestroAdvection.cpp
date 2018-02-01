@@ -8,15 +8,6 @@ void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<Real>& w0_force)
 {
-
-    // create a uold with filled ghost cells
-    Vector<MultiFab> utilde(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-    }
-
-    FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
-
     // create a MultiFab to hold uold + w0
     Vector<MultiFab>      ufull(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -26,7 +17,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // create ufull = uold + w0
     Put1dArrayOnCart(w0,ufull,1,1,bcs_u,0);
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
+        MultiFab::Add(ufull[lev],uold[lev],0,0,AMREX_SPACEDIM,ng_adv);
     }
 
     // create a face-centered MultiFab to hold utrans
@@ -40,7 +31,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // create utrans
-    MakeUtrans(utilde,ufull,utrans);
+    MakeUtrans(uold,ufull,utrans);
     
     // create a MultiFab to hold the velocity forcing
     Vector<MultiFab> vel_force(finest_level+1);
@@ -52,9 +43,9 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,w0_force,do_add_utilde_force);
 
     // add w0 to trans velocities
-    Addw0 (utrans,1.);
+    Addw0(utrans,1.);
 
-    VelPred(utilde,ufull,utrans,umac,vel_force);
+    VelPred(uold,ufull,utrans,umac,vel_force);
 }
 
 void
