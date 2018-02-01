@@ -197,16 +197,17 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 }
 
 void
-Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                       const Vector<MultiFab>& force,
-                       int is_vel, const Vector<BCRec>& bcs, int nbccomp, 
-                       int start_scomp, int start_bccomp, int num_comp, int is_conservative)
+    Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
+			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			   const Vector<MultiFab>& force,
+			   int is_vel, const Vector<BCRec>& bcs, int nbccomp, 
+			   int start_scomp, int start_bccomp, int num_comp, int is_conservative)
 {
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf   = sold[lev];
+        const MultiFab& scal_mf   = state[lev];
               MultiFab& sedgex_mf = sedge[lev][0];
         const MultiFab& umac_mf   = umac[lev][0];
 #if (AMREX_SPACEDIM >= 2)
@@ -229,7 +230,8 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             const Box& domainBox = geom[lev].Domain();
             const Real* dx = geom[lev].CellSize();
 
-            for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
+	    // Be careful to pass in comp+1 for fortran indexing
+            for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
 
                 int bccomp = start_bccomp + scomp - start_scomp;
 
@@ -262,7 +264,7 @@ Maestro::MakeEdgeScal (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 #endif
 #endif
                     BL_TO_FORTRAN_FAB(force_mf[mfi]),
-                    dx, &dt, &is_vel, bcs_u[0].data(),
+                    dx, &dt, &is_vel, bcs[0].data(),
                     &nbccomp, &scomp, &bccomp, &is_conservative);
             } // end loop over components 
         } // end MFIter loop

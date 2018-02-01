@@ -78,16 +78,55 @@ Maestro::DensityAdvance (bool is_predictor,
         // we are predicting X to the edges, so convert the scalar
         // data to those quantities
 
-        // convert (rho X) --> X in sold 
-        // call convert_rhoX_to_X(sold,.true.,mla,the_bc_level)
-        }
-
-    if (species_pred_type == predict_rhoprime_and_X) {
-        // convert rho -> rho' in sold
-        //   . this is needed for predict_rhoprime_and_X
-        // call put_in_pert_form(mla,sold,rho0_old,dx,rho_comp,foextrap_comp,.true.,the_bc_level)
+        // convert (rho X) --> X in scalold 
+	ConvertRhoXToX(scalold,true);
     }
 
+    if (species_pred_type == predict_rhoprime_and_X) {
+        // convert rho -> rho' in scalold
+        //   . this is needed for predict_rhoprime_and_X
+	PutInPertForm(scalold, rho0_old, Rho, true);
+    }
+
+    // predict species at the edges -- note, either X or (rho X) will be
+    // predicted here, depending on species_pred_type
+
+    int is_vel = 0; // false
+    if (species_pred_type == predict_rhoprime_and_X) {
+
+	// we are predicting X to the edges, using the advective form of
+	// the prediction
+	// call make_edge_scal(sold,sedge,umac,scal_force, &
+	//                     dx,dt,is_vel,the_bc_level, &
+	//                     spec_comp,dm+spec_comp,nspec,.false.,mla)
+	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,0);
+    }
+    
+    // predict rho or rho' at the edges (depending on species_pred_type)
+    if (species_pred_type == predict_rhoprime_and_X) {
+	// call make_edge_scal(sold,sedge,umac,scal_force, &
+	//                     dx,dt,is_vel,the_bc_level, &
+	//                     rho_comp,dm+rho_comp,1,.false.,mla)
+	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,Rho,Rho,1,0);
+    }
+
+    if (species_pred_type == predict_rhoprime_and_X) {
+	// convert rho' -> rho in scalold 
+	PutInPertForm(scalold, rho0_old, Rho, false);
+    }
+
+    if ((species_pred_type == predict_rhoprime_and_X) ||
+        (species_pred_type == predict_rho_and_X)) {
+	// convert X --> (rho X) in scalold 
+	ConvertRhoXToX(scalold,false);
+    }
+
+
+    /////////////////////////////////////////////////////////////////
+    // Subtract w0 from MAC velocities.
+    /////////////////////////////////////////////////////////////////
+
+    Addw0(umac,-1.);
 
 
 }

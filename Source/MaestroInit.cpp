@@ -179,10 +179,10 @@ Maestro::InitData ()
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)
 {
-    sold    [lev].define(ba, dm,          Nscal, 0);
-    snew    [lev].define(ba, dm,          Nscal, 0);
-    uold    [lev].define(ba, dm, AMREX_SPACEDIM, 0);
-    unew    [lev].define(ba, dm, AMREX_SPACEDIM, 0);
+    sold    [lev].define(ba, dm,          Nscal, 3);
+    snew    [lev].define(ba, dm,          Nscal, 3);
+    uold    [lev].define(ba, dm, AMREX_SPACEDIM, 3);
+    unew    [lev].define(ba, dm, AMREX_SPACEDIM, 3);
     S_cc_old[lev].define(ba, dm,              1, 0);
     S_cc_new[lev].define(ba, dm,              1, 0);
     gpi     [lev].define(ba, dm, AMREX_SPACEDIM, 0);

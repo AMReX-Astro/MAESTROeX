@@ -81,7 +81,8 @@ private:
                   amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                   const amrex::Vector<amrex::MultiFab>& force);
 
-    void MakeEdgeScal (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+    void MakeEdgeScal (const amrex::Vector<amrex::MultiFab>& state,
+		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<amrex::MultiFab>& force,
                        int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp, 

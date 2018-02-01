@@ -60,7 +60,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         acoef[lev].setVal(0.);
     }
 
-    // average face-centered Bcoefficients to 1/rho in 
+    // average face-centered Bcoefficients to 1/rho 
     // AvgFaceBcoeffsInv(face_bcoef,rho);
 
     // OR 1) average face-centered B coefficients to rho

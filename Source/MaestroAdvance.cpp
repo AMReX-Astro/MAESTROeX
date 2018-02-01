@@ -105,9 +105,9 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         thermal2    [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
-        s1          [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-        s2          [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-        s2star      [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        s1          [lev].define(grids[lev], dmap[lev],   Nscal, 3);
+        s2          [lev].define(grids[lev], dmap[lev],   Nscal, 3);
+        s2star      [lev].define(grids[lev], dmap[lev],   Nscal, 3);
         beta0_cart  [lev].define(grids[lev], dmap[lev],       1, 1);
         peosbar_cart[lev].define(grids[lev], dmap[lev],       1, 0);
         delta_p_term[lev].define(grids[lev], dmap[lev],       1, 0);
