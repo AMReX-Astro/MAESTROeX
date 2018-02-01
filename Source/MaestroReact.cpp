@@ -69,8 +69,11 @@ Maestro::React (const Vector<MultiFab>& s_in,
         }
     }
 
-    // average fine data onto coarser cells
+    // average down and fill ghost cells
     AverageDown(s_out,0,Nscal);
+    FillPatch(t_old,s_out,s_out,s_out,0,0,Nscal,0,bcs_s);
+
+    // average down (no ghost cells)
     AverageDown(rho_Hext,0,1);
     AverageDown(rho_omegadot,0,NumSpec);
     AverageDown(rho_Hnuc,0,1);

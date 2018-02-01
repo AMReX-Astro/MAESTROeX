@@ -30,8 +30,9 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
     }
 
-    // average fine data onto coarser cells
+    // average down and fill ghost cells
     AverageDown(scal,Temp,1);
+    FillPatch(t_old,scal,scal,scal,Temp,Temp,1,Temp,bcs_s);
 }
 
 void
@@ -62,10 +63,15 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
     }
 
-    // average fine data onto coarser cells
-    AverageDown(scal,Temp,1); 
+
+    // average down and fill ghost cells (Temperature)
+    AverageDown(scal,Temp,1);
+    FillPatch(t_old,scal,scal,scal,Temp,Temp,1,Temp,bcs_s);
+
+    // average down and fill ghost cells (Enthalpy)
     if (updateRhoH == 1) {
         AverageDown(scal,RhoH,1);
+        FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,RhoH,bcs_s);
     }
 
 }

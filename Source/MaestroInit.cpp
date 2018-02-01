@@ -118,9 +118,11 @@ Maestro::InitData ()
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(&finest_level);
 
-    // synchronize levels
+    // average down data and fill ghost cells
     AverageDown(sold,0,Nscal);
+    FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
     AverageDown(uold,0,AMREX_SPACEDIM);
+    FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u);
 
     // free memory in s0_init and p0_init by swapping it
     // with an empty vector that will go out of scope

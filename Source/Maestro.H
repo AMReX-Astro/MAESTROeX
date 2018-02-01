@@ -104,7 +104,8 @@ private:
     // MaestroConvert.cpp functions
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal, 
                         const amrex::Vector<amrex::Real>& s0, 
-                        const int& comp, 
+                        int comp, int bccomp,
+                        const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
 
     void ConvertRhoXToX (amrex::Vector<amrex::MultiFab>& scal,
@@ -154,7 +155,7 @@ private:
                     amrex::Vector<amrex::MultiFab>& mf,
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
-                    int scomp, int dcomp, int ncomp, int sbccomp,
+                    int srccomp, int destcomp, int ncomp, int startbccomp,
                     const amrex::Vector<amrex::BCRec>& bcs_in);
 
     // compute a new multifab by coping in phi from valid region and filling ghost cells
@@ -166,7 +167,7 @@ private:
                     amrex::MultiFab& mf,
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
-                    int scomp, int dcomp, int ncomp, int sbccomp,
+                    int srccomp, int destcomp, int ncomp, int startbccomp,
                     const amrex::Vector<amrex::BCRec>& bcs_in);
 
     // fill an entire multifab by interpolating from the coarser level
@@ -176,7 +177,7 @@ private:
     void FillCoarsePatch (int lev, amrex::Real time, amrex::MultiFab& mf,
                           amrex::Vector<amrex::MultiFab>& mf_old,
                           amrex::Vector<amrex::MultiFab>& mf_new,
-                          int scomp, int dcomp, int ncomp,
+                          int srccomp, int destcomp, int ncomp,
                           const amrex::Vector<amrex::BCRec>& bcs);
 
     // utility to copy in data from mf_old and/or mf_new into mf

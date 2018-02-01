@@ -6,8 +6,10 @@ using namespace amrex;
 void
 Maestro::PutInPertForm(Vector<MultiFab>& scal, 
 		       const Vector<Real>& s0, 
-		       const int& comp, 
-		       bool flag) {
+		       int comp, int bccomp, 
+                       const Vector<BCRec>& bcs,
+                       bool flag)
+{
     // place 1d array onto a cartesian grid
     Vector<MultiFab> s0_cart(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -27,6 +29,9 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
 	    MultiFab::Add(scal[lev],s0_cart[lev],0,comp,1,0);
 	}
     }
+
+    AverageDown(scal,comp,1);
+    FillPatch(t_old,scal,scal,scal,comp,comp,1,bccomp,bcs);
 
 }
 
@@ -49,8 +54,17 @@ Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
         }
     }
 
-    // average down data
+    // average down data and fill ghost cells
     AverageDown(scal,FirstSpec,NumSpec);
+    if (flag) {
+        FillPatch(t_old,scal,scal,scal,FirstSpec,FirstSpec,NumSpec,0,bcs_f);
+    }
+    else {
+        FillPatch(t_old,scal,scal,scal,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_s);
+    }
+
+
+    
 }
 
 void
@@ -68,6 +82,12 @@ Maestro::ConvertRhoHToH(Vector<MultiFab>& scal,
         }
     }
 
-    // average down data
+    // average down data and fill ghost cells
     AverageDown(scal,RhoH,1);
+    if (flag) {
+        FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,0,bcs_f);
+    }
+    else {
+        FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,RhoH,bcs_s);
+    }
 }

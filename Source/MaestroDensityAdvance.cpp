@@ -85,7 +85,7 @@ Maestro::DensityAdvance (bool is_predictor,
     if (species_pred_type == predict_rhoprime_and_X) {
         // convert rho -> rho' in scalold
         //   . this is needed for predict_rhoprime_and_X
-	PutInPertForm(scalold, rho0_old, Rho, true);
+	PutInPertForm(scalold, rho0_old, Rho, 0, bcs_f, true);
     }
 
     // predict species at the edges -- note, either X or (rho X) will be
@@ -112,7 +112,7 @@ Maestro::DensityAdvance (bool is_predictor,
 
     if (species_pred_type == predict_rhoprime_and_X) {
 	// convert rho' -> rho in scalold 
-	PutInPertForm(scalold, rho0_old, Rho, false);
+	PutInPertForm(scalold, rho0_old, Rho, Rho, bcs_s, false);
     }
 
     if ((species_pred_type == predict_rhoprime_and_X) ||

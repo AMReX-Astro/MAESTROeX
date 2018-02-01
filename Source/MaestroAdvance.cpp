@@ -192,6 +192,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
             MultiFab::LinComb(S_cc_nph[lev],1.0,S_cc_old[lev],0,0.5*dt,dSdt[lev],0,0,1,0);
         }
     }
+    AverageDown(S_cc_nph,0,1);
 
     // compute p0_minus_peosbar = p0_old - peosbar (for making w0) and
     // compute delta_p_term = peos_old - peosbar_cart (for RHS of projections)
@@ -452,6 +453,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::LinComb(S_cc_nph[lev],0.5,S_cc_old[lev],0,0.5,S_cc_new[lev],0,0,1,0);
     }
+    AverageDown(S_cc_nph,0,1);
 
     // compute p0_minus_peosbar = p0_new - peosbar (for making w0)
     // and delta_p_term = peos_new - peosbar_cart (for RHS of projection)
