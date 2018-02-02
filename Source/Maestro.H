@@ -154,7 +154,6 @@ private:
     // end MaestroDt.cpp functions
     ////////////////////////
 
-
     ////////////////////////
     // MaestroEnthalpyAdvance.cpp functions
     void EnthalpyAdvance (int which_step,
@@ -514,6 +513,17 @@ private:
     // MaestroSponge.cpp functions
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
     ////////////
+
+
+    ////////////////////////
+    // MaestroVelocityAdvance.cpp functions
+    void VelocityAdvance (const amrex::Vector<amrex::MultiFab>& rhohalf,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                          const amrex::Vector<amrex::Real>& w0_force,
+                          const amrex::Vector<amrex::Real>& rho0_nph,
+                          const amrex::Vector<amrex::Real>& grav_cell_nph);
+    ////////////////////////
+
 
     /*
       private data members
