@@ -114,8 +114,7 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_rhohprime) {
         // convert (rho h)' -> (rho h)
-
-
+        PutInPertForm(scalold, rhoh0_old, RhoH, RhoH, bcs_s, false);
     }
 
     if (enthalpy_pred_type == predict_hprime) {
@@ -189,7 +188,13 @@ Maestro::EnthalpyAdvance (int which_step,
         scal_force[lev].setVal(0.,RhoH,1,1);
     }
 
-    MakeRhoHForce(scal_force,2,thermal,umac,1);
+    MakeRhoHForce(scal_force,0,thermal,umac,0);
 
+    if (spherical == 1) {
+    }
 
+    /*
+    call update_scal(mla,rhoh_comp,rhoh_comp,sold,snew,sflux,scal_force, &
+                     p0_new,p0_new_cart,dx,dt,the_bc_level)
+    */
 }
