@@ -163,7 +163,8 @@ private:
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                           amrex::Vector<amrex::MultiFab>& scal_force,
-                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                          const amrex::Vector<amrex::MultiFab>& thermal);
     ////////////////////////
 
     ////////////////////////

@@ -368,7 +368,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "            : enthalpy_advance >>>" << endl;
     }
 
-//    EnthalpyAdvance();
+    EnthalpyAdvance(true,s1,s2,sedge,sflux,scal_force,umac,thermal1);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -589,7 +589,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "            : enthalpy_advance >>>" << endl;
     }
 
-//    EnthalpyAdvance();
+    EnthalpyAdvance(false,s1,s2,sedge,sflux,scal_force,umac,thermal1);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)

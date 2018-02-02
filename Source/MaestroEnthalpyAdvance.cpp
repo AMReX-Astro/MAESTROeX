@@ -10,7 +10,8 @@ Maestro::EnthalpyAdvance (bool is_predictor,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
                           Vector<MultiFab>& scal_force,
-                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
+                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                          const Vector<MultiFab>& thermal)
 {
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
@@ -44,9 +45,9 @@ Maestro::EnthalpyAdvance (bool is_predictor,
     // compute forcing terms    
     if (enthalpy_pred_type == predict_rhohprime) {
         // make force for (rho h)'
-        Abort("MaestroEnthalpyAdavnce FIXME rhoh' force");
+        MakeRhoHForce(scal_force,1,thermal,umac,1);
 
-
+        ModifyScalForce(scal_force,umac,rhoh0_old,rhoh0_edge_old,RhoH,bcs_s,0);
 
     }
     else if (enthalpy_pred_type == predict_h ||
@@ -63,10 +64,9 @@ Maestro::EnthalpyAdvance (bool is_predictor,
              enthalpy_pred_type == predict_T_then_h ||
              enthalpy_pred_type == predict_Tprime_then_h) {
         // make force for temperature
-        Abort("MaestroEnthalpyAdavnce forcing");
+        Abort("MaestroEnthalpyAdvance forcing");
     }
     
-
     //////////////////////////////////
     // Add w0 to MAC velocities
     //////////////////////////////////
