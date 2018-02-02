@@ -323,40 +323,40 @@ void
 	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
 	    // lo/hi coordinates (including ghost cells), and/or the # of components
 	    // We will also pass "validBox", which specifies the "valid" region.
-// #if (AMREX_SPACEDIM == 1)
-// 	    make_rhoX_flux_1d(
-// #elif (AMREX_SPACEDIM == 2)
-// 	    make_rhoX_flux_2d(
-// #elif (AMREX_SPACEDIM == 3)
-//             make_rhoX_flux_3d(
-// #endif
-// 			      domainBox.loVect(), domainBox.hiVect(),
-// 			      validBox.loVect(), validBox.hiVect(),
-// 			      BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-// #if (AMREX_SPACEDIM >= 2)
-// 			      BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-// #if (AMREX_SPACEDIM == 3)
-// 			      BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-// #endif
-// #endif
-// 			      BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-// #if (AMREX_SPACEDIM >= 2)
-// 			      BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-// #if (AMREX_SPACEDIM == 3)
-// 			      BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-// #endif
-// #endif
-// 			      BL_TO_FORTRAN_3D(umac_mf[mfi]),
-// #if (AMREX_SPACEDIM >= 2)
-// 			      BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-// #if (AMREX_SPACEDIM == 3)
-// 			      BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-// #endif
-// #endif
-// 			      r0_old.dataPtr(), r0_edge_old.dataPtr(), 
-// 			      r0_new.dataPtr(), r0_edge_new.dataPtr(),
-// 			      w0.dataPtr(), 
-// 			      &startcomp, &endcomp);
+#if (AMREX_SPACEDIM == 1)
+	    make_rhoX_flux_1d(
+#elif (AMREX_SPACEDIM == 2)
+	    make_rhoX_flux_2d(
+#elif (AMREX_SPACEDIM == 3)
+            make_rhoX_flux_3d(
+#endif
+			      &lev, domainBox.loVect(), domainBox.hiVect(),
+			      validBox.loVect(), validBox.hiVect(),
+			      BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			      BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			      BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+#endif
+#endif
+			      BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			      BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			      BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+#endif
+#endif
+			      BL_TO_FORTRAN_3D(umac_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			      BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			      BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+#endif
+			      r0_old.dataPtr(), r0_edge_old.dataPtr(), 
+			      r0_new.dataPtr(), r0_edge_new.dataPtr(),
+			      w0.dataPtr(), 
+			      &startcomp, &endcomp);
 	    
 	} // end MFIter loop
     } // end loop over levels

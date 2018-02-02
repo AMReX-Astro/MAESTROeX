@@ -316,10 +316,11 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     for (int lev=0; lev<=finest_level; ++lev) {
         etarhoflux[lev].setVal(0.);
     }
-    // set sedge to zero
+    // set sedge and sflux to zero
     for (int lev=0; lev<=finest_level; ++lev) {
 	for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
 	    sedge[lev][idim].setVal(0.);
+	    sflux[lev][idim].setVal(0.);
 	}
     }
 

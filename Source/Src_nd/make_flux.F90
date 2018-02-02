@@ -40,7 +40,7 @@ module make_flux_module
 contains
   
 #if (AMREX_SPACEDIM == 1)
-  subroutine make_rhoX_flux_1d(domlo, domhi, lo, hi, &
+  subroutine make_rhoX_flux_1d(lev, domlo, domhi, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
                                  sedgex, x_lo, x_hi, nc_x, &
                                  umac,   u_lo, u_hi, &
@@ -49,6 +49,7 @@ contains
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_1d")
 
+    integer         , intent(in   ) :: lev
     integer         , intent(in   ) :: domlo(1), domhi(1), lo(1), hi(1)
     integer         , intent(in   ) :: fx_lo(1), fx_hi(1), nc_fx
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),nc_fx)
@@ -57,9 +58,9 @@ contains
     integer         , intent(in   ) :: u_lo(1), u_hi(1)
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1) 
-    double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: rho0_edge_old(0:max_radial_levl,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
-    double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: startcomp, endcomp
 
@@ -73,24 +74,11 @@ contains
        ! create x-fluxes
        do i = lo(1),hi(1)+1
 
-          if (species_pred_type == predict_rhoprime_and_X) then
              ! edge states are rho' and X.  To make the (rho X) flux,
              ! we need the edge state of rho0
-             rho0_edge = HALF*(rho0_edge_old(i)+rho0_edge_new(i))
+             rho0_edge = HALF*(rho0_edge_old(lev,i)+rho0_edge_new(lev,i))
              sfluxx(i,comp) = &
-                  (umac(i)+w0(i))*(rho0_edge+sedgex(i,rho_comp))*sedgex(i,comp)
-          
-          else if (species_pred_type == predict_rhoX) then
-             ! edge states are (rho X)
-             sfluxx(i,comp) = &
-                  (umac(i)+w0(i))*sedgex(i,comp)             
-             
-          else if (species_pred_type == predict_rho_and_X) then
-             ! edge states are rho and X
-             sfluxx(i,comp) = &
-                  (umac(i)+w0(i))*sedgex(i,rho_comp)*sedgex(i,comp)
-          endif
-          
+                  (umac(i)+w0(lev,i))*(rho0_edge+sedgex(i,1))*sedgex(i,comp)
        end do
     end do ! end comp loop
 
@@ -98,7 +86,7 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 2)
-  subroutine make_rhoX_flux_2d(domlo, domhi, lo, hi, &
+  subroutine make_rhoX_flux_2d(lev, domlo, domhi, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
                                  sfluxy, fy_lo, fy_hi, nc_fy, &
                                  sedgex, x_lo, x_hi, nc_x, &
@@ -110,6 +98,7 @@ contains
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_2d")
 
+    integer         , intent(in   ) :: lev
     integer         , intent(in   ) :: domlo(2), domhi(2), lo(2), hi(2)
     integer         , intent(in   ) :: fx_lo(2), fx_hi(2), nc_fx
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),nc_fx)
@@ -124,9 +113,9 @@ contains
     integer         , intent(in   ) :: v_lo(2), v_hi(2)
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1) 
-    double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
-    double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: startcomp, endcomp
 
@@ -137,6 +126,29 @@ contains
 
     do comp = startcomp, endcomp 
 
+       ! create x-fluxes
+       do j=lo(2),hi(2)
+          rho0_edge = HALF*(rho0_old(lev,j)+rho0_new(lev,j))
+          do i=lo(1),hi(1)+1
+
+                ! edge states are rho' and X.  To make the (rho X) flux,
+                ! we need the edge state of rho0
+                sfluxx(i,j,comp) = umac(i,j)* &
+                     (rho0_edge+sedgex(i,j,1))*sedgex(i,j,comp)
+          end do
+       end do
+             
+       ! create y-fluxes
+       do j = lo(2),hi(2)+1
+          rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
+          do i = lo(1),hi(1)
+
+                ! edge states are rho' and X.  To make the (rho X) flux,
+                ! we need the edge state of rho0
+                sfluxy(i,j,comp) = &
+                     (vmac(i,j)+w0(lev,j))*(rho0_edge+sedgey(i,j,1))*sedgey(i,j,comp)
+          end do
+       end do
     end do
 
   end subroutine make_rhoX_flux_2d
@@ -144,7 +156,7 @@ contains
 
 
 #if (AMREX_SPACEDIM == 3)
-  subroutine make_rhoX_flux_3d(domlo, domhi, lo, hi, &
+  subroutine make_rhoX_flux_3d(lev, domlo, domhi, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
                                  sfluxy, fy_lo, fy_hi, nc_fy, &
                                  sfluxz, fz_lo, fz_hi, nc_fz, &
@@ -159,6 +171,7 @@ contains
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_3d")
 
+    integer         , intent(in   ) :: lev
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3),nc_fx)
@@ -179,9 +192,9 @@ contains
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
-    double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: startcomp, endcomp
 
@@ -191,6 +204,51 @@ contains
     double precision :: rho0_edge
     
     do comp = startcomp, endcomp 
+       ! create x-fluxes and y-fluxes
+
+       !$OMP PARALLEL PRIVATE(i,j,k,rho0_edge)
+       !$OMP DO 
+       do k=lo(3),hi(3)
+          rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
+
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)+1
+
+                   ! edge states are rho' and X.  To make the (rho X)
+                   ! flux, we need the edge state of rho0
+                   sfluxx(i,j,k,comp) = &
+                        umac(i,j,k)*(rho0_edge+sedgex(i,j,k,1))*sedgex(i,j,k,comp)
+             end do
+          end do
+          
+          do j=lo(2),hi(2)+1
+             do i=lo(1),hi(1)
+
+                   ! edge states are rho' and X.  To make the (rho X)
+                   ! flux, we need the edge state of rho0
+                   sfluxy(i,j,k,comp) = &
+                        vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,1))*sedgey(i,j,k,comp)
+             end do
+          end do
+       end do
+       !$OMP END DO NOWAIT
+
+       ! create z-fluxes
+       !$OMP DO
+       do k=lo(3),hi(3)+1
+          rho0_edge = HALF*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k))
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
+
+                   ! edge states are rho' and X.  To make the (rho X)
+                   ! flux, we need the edge state of rho0
+                   sfluxz(i,j,k,comp) = (wmac(i,j,k)+w0(lev,k))* &
+                     (rho0_edge+sedgez(i,j,k,1))*sedgez(i,j,k,comp)
+             end do
+          end do
+       end do
+       !$OMP END DO
+       !$OMP END PARALLEL
 
     end do
 

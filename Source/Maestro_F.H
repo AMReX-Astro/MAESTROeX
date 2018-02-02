@@ -245,20 +245,20 @@ extern "C"
 #elif (AMREX_SPACEDIM == 3)
     void make_rhoX_flux_3d(
 #endif
-			   const int* domlo, const int* domhi,
+			   const int* lev, const int* domlo, const int* domhi,
 			   const int* lo, const int* hi,
-			   amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, 
+			   amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, const int* nc_fx, 
 #if (AMREX_SPACEDIM >= 2)
-			   amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi,
+			   amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi, const int* nc_fy, 
 #if (AMREX_SPACEDIM == 3)
-			   amrex::Real* sfluxz, const int* fz_lo, const int* fz_hi,
+			   amrex::Real* sfluxz, const int* fz_lo, const int* fz_hi, const int* nc_fz, 
 #endif
 #endif
-			   amrex::Real* sedgex, const int* x_lo, const int* x_hi, 
+			   amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x, 
 #if (AMREX_SPACEDIM >= 2)
-			   amrex::Real* sedgey, const int* y_lo, const int* y_hi,
+			   amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y, 
 #if (AMREX_SPACEDIM == 3)
-			   amrex::Real* sedgez, const int* z_lo, const int* z_hi,
+			   amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z, 
 #endif
 #endif
 			   const amrex::Real* umac,   const int* u_lo, const int* u_hi,
