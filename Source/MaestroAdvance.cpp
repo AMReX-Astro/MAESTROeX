@@ -316,6 +316,12 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     for (int lev=0; lev<=finest_level; ++lev) {
         etarhoflux[lev].setVal(0.);
     }
+    // set sedge to zero
+    for (int lev=0; lev<=finest_level; ++lev) {
+	for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+	    sedge[lev][idim].setVal(0.);
+	}
+    }
 
     // advect rhoX, rho, and tracers
     DensityAdvance(true,s1,s2,sedge,sflux,scal_force,umac);
