@@ -49,6 +49,7 @@ module meth_params_module
   double precision              , save :: dpdt_factor
   logical                       , save :: do_planar_invsq_grav
   double precision              , save :: planar_invsq_mass
+  integer                       , save :: enthalpy_pred_type
   integer                       , save :: slope_order
   double precision              , save :: grav_const
   integer                       , save :: beta0_type
@@ -102,6 +103,7 @@ contains
     dpdt_factor = 0.0d0;
     do_planar_invsq_grav = .false.;
     planar_invsq_mass = 0.0d0;
+    enthalpy_pred_type = 1;
     slope_order = 4;
     grav_const = -1.5d10;
     beta0_type = 1;
@@ -143,6 +145,7 @@ contains
     call pp%query("dpdt_factor", dpdt_factor)
     call pp%query("do_planar_invsq_grav", do_planar_invsq_grav)
     call pp%query("planar_invsq_mass", planar_invsq_mass)
+    call pp%query("enthalpy_pred_type", enthalpy_pred_type)
     call pp%query("slope_order", slope_order)
     call pp%query("grav_const", grav_const)
     call pp%query("beta0_type", beta0_type)

@@ -95,8 +95,6 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-
-            // be careful to pass in "comp+1" here since fortran uses 1-based indexing for components
             modify_scal_force(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                               scal_force_mf[mfi].dataPtr(comp), 
                               ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
@@ -112,10 +110,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                               s0.dataPtr(), s0_edge.dataPtr(), w0.dataPtr(),
                               dx, &fullform);
         }
-
-
     }
-
 
     // average fine data onto coarser cells
     AverageDown(scal_force,comp,1);
@@ -123,4 +118,88 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     // fill ghost cells
     FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
 
+}
+
+void
+Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
+                       int is_prediction,
+                       const Vector<MultiFab>& thermal,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                       int add_thermal)
+
+{
+    // if we are doing the prediction, then it only makes sense to be in
+    // this routine if the quantity we are predicting is rhoh', h, or rhoh
+    if (is_prediction == 1 && !(enthalpy_pred_type == predict_rhohprime ||
+                                enthalpy_pred_type == predict_h ||
+                                enthalpy_pred_type == predict_rhoh) ) {
+        Abort("ERROR: should only call mkrhohforce when predicting rhoh', h, or rhoh");
+    }
+
+    Vector<Real> rho0( (max_radial_level+1)*nr_fine );
+    Vector<Real>   p0( (max_radial_level+1)*nr_fine );
+    Vector<Real> grav( (max_radial_level+1)*nr_fine );
+
+    if (is_prediction == 1) {
+        rho0 = rho0_old;
+          p0 =   p0_old;
+    }
+    else {
+        for(int i=0; i<rho0.size(); ++i) {
+            rho0[i] = 0.5*(rho0_old[i]+rho0_new[i]);
+              p0[i] = 0.5*(  p0_old[i]+  p0_new[i]);
+        }
+    }
+
+    if (spherical == 1) {
+    }
+
+    make_grav_cell(grav.dataPtr(),
+                   rho0.dataPtr(),
+                   r_cc_loc.dataPtr(),
+                   r_edge_loc.dataPtr());
+
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        MultiFab& scal_force_mf = scal_force[lev];
+#if (AMREX_SPACEDIM == 1)
+        const MultiFab& umac_mf = umac[lev][0];
+#elif (AMREX_SPACEDIM == 2)
+        const MultiFab& vmac_mf = umac[lev][1];
+#elif (AMREX_SPACEDIM == 3)
+        const MultiFab& wmac_mf = umac[lev][2];
+#endif
+        const MultiFab& thermal_mf = thermal[lev];
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(scal_force_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            mkrhohforce(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                        scal_force_mf[mfi].dataPtr(RhoH), 
+                        ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
+#if (AMREX_SPACEDIM == 1)
+                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
+#elif (AMREX_SPACEDIM == 2)
+                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#elif (AMREX_SPACEDIM == 3)
+                        BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+                        BL_TO_FORTRAN_3D(thermal_mf[mfi]),
+                        p0.dataPtr(), rho0.dataPtr(), grav.dataPtr(), psi.dataPtr(),
+                        &is_prediction, &add_thermal);
+        }
+    }
+
+    // average down and fill ghost cells
+    AverageDown(scal_force,RhoH,1);
+    FillPatch(t_old,scal_force,scal_force,scal_force,RhoH,RhoH,1,0,bcs_f);
 }

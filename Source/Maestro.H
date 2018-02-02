@@ -254,6 +254,12 @@ private:
                          int comp,
                          const amrex::Vector<amrex::BCRec>& bcs,
                          int fullform);
+
+    void MakeRhoHForce (amrex::Vector<amrex::MultiFab>& scal_force,
+                        int is_prediction,
+                        const amrex::Vector<amrex::MultiFab>& thermal,
+                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                        int add_thermal);
     ////////////////////////
 
     ////////////

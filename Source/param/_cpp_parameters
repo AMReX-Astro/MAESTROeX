@@ -319,7 +319,7 @@ do_eos_h_above_cutoff               bool            true
 # predict\_T\_then\_h = 4; @@
 # predict\_hprime = 5; @@
 # predict\_Tprime\_then\_h = 6.
-enthalpy_pred_type                  int            1
+enthalpy_pred_type                  int            1            y
 
 # Which quantities do we predict to the edges for computing the ($\rho X$)
 # edge states?  @@

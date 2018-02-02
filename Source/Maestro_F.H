@@ -300,9 +300,19 @@ extern "C"
 #endif
                            const amrex::Real* s0, const amrex::Real* s0_edge, const amrex::Real* w0,
                            const amrex::Real* dx, const int* do_fullform);
-                           
-                           
 
+    void mkrhohforce(const int* lev, const int* lo, const int* hi,
+                     amrex::Real* rhoh_force, const int* f_lo, const int* f_hi,
+#if (AMREX_SPACEDIM == 1)
+                     const amrex::Real* umac,  const int* u_lo, const int* u_hi,
+#elif (AMREX_SPACEDIM == 2)
+                     const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
+#elif (AMREX_SPACEDIM == 3)
+                     const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
+#endif
+                     const amrex::Real* thermal, const int* t_lo, const int* t_hi,
+                     const amrex::Real* p0, const amrex::Real* rho0, const amrex::Real* grav,
+                     const amrex::Real* psi, const int* is_prediction, const int* add_thermal);
     //////////////////////
 
     //////////////////////
