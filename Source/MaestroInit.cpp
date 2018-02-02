@@ -279,7 +279,7 @@ void Maestro::InitProj ()
         Average(S_cc_old,Sbar,0);
     }
 
-    // make the nodal rhs for projection beta0*(S-Sbar)
+    // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old);
 
     // perform a nodal projection
@@ -351,7 +351,7 @@ void Maestro::DivuIter (int istep_divu_iter)
                 r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
     }
 
-    // make the nodal rhs for projection beta0*(S-Sbar)
+    // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old);
 
     // perform a nodal projection

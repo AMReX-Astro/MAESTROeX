@@ -351,7 +351,7 @@ private:
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal);
 
-    // compute rhcc = beta0*(S_cc-Sbar)
+    // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
                                const amrex::Vector<amrex::MultiFab>& S_cc,
                                const amrex::Vector<amrex::Real>& Sbar,
@@ -584,6 +584,11 @@ private:
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
     amrex::Vector<amrex::MultiFab> pi;   // nodal
+
+    // this only needs to persist leading into the initial pressure iters
+    // since we project (beta0^nph S^1 - beta0 S^0) / dt
+    // during a regular time step we overwrite this
+    amrex::Vector<amrex::MultiFab> rhcc_for_nodalproj;
 
     // spherical only - 
     // we make this persistent in that we only have to rebuild and

@@ -268,7 +268,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         macphi   [lev].setVal(0.);
     }
 
-    // compute RHS for MAC projection
+    // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_old);
 
     // MAC projection
@@ -500,7 +500,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     AdvancePremac(umac,w0_force);
 
 
-    // compute RHS for MAC projection
+    // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_nph);
 
     // MAC projection
