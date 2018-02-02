@@ -135,11 +135,6 @@ Maestro::NodalProj (int proj_type,
 */
     set_boundary_velocity(Vproj);
 
-    // 
-    for (int lev=0; lev<=finest_level; ++lev) {
-        rhcc[lev].mult(-1.0,0,1,1);
-    }
-
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
@@ -204,12 +199,20 @@ Maestro::NodalProj (int proj_type,
         phi[lev].setVal(0.);
     }
 
+    for (int lev=0; lev<=finest_level; ++lev) {
+        rhcc[lev].mult(-1.0,0,1,1);
+    }
+
     // Assemble the nodal RHS as the sum of the cell-centered RHS averaged to nodes 
     // plus div (beta0*Vproj) on nodes
     mlndlap.compRHS(amrex::GetVecOfPtrs(rhstotal),
                     amrex::GetVecOfPtrs(Vproj),
                     amrex::GetVecOfConstPtrs(rhnd),
                     amrex::GetVecOfPtrs(rhcc));
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        rhcc[lev].mult(-1.0,0,1,1);
+    }
 
     MLMG mlmg(mlndlap);
     mlmg.setMaxFmgIter(0);

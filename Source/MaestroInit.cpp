@@ -191,6 +191,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     dSdt    [lev].define(ba, dm,              1, 0);
     pi      [lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
 
+    rhcc_for_nodalproj[lev].define(ba, dm, 1, 1);
+
     sold    [lev].setVal(0.);
     snew    [lev].setVal(0.);
     uold    [lev].setVal(0.);
@@ -199,7 +201,9 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     S_cc_new[lev].setVal(0.);
     gpi     [lev].setVal(0.);
     dSdt    [lev].setVal(0.);
-    pi      [lev].setVal(0.);    
+    pi      [lev].setVal(0.);   
+
+    rhcc_for_nodalproj[lev].setVal(0.);
 
     if (spherical == 1) {
         normal[lev].define(ba, dm, 1, 1);
@@ -239,7 +243,6 @@ void Maestro::InitProj ()
     Vector<MultiFab>           rho_Hnuc(finest_level+1);
     Vector<MultiFab>           rho_Hext(finest_level+1);
     Vector<MultiFab>            rhohalf(finest_level+1);
-    Vector<MultiFab> rhcc_for_nodalproj(finest_level+1);
 
     Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
 
@@ -249,7 +252,6 @@ void Maestro::InitProj ()
         rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
         rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
-        rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],       1, 1);
 
         // we don't have a legit timestep yet, so we set rho_omegadot,
         // rho_Hnuc, and rho_Hext to 0 
@@ -284,7 +286,6 @@ void Maestro::InitProj ()
 
     // perform a nodal projection
     NodalProj(initial_projection_comp,rhcc_for_nodalproj);
-
 }
 
 
@@ -297,7 +298,6 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<MultiFab> rho_Hnuc          (finest_level+1);
     Vector<MultiFab> thermal           (finest_level+1);
     Vector<MultiFab> rhohalf           (finest_level+1);
-    Vector<MultiFab> rhcc_for_nodalproj(finest_level+1);
 
     Vector<Real> Sbar                ( (max_radial_level+1)*nr_fine );
     Vector<Real> w0_force            ( (max_radial_level+1)*nr_fine );
@@ -319,7 +319,6 @@ void Maestro::DivuIter (int istep_divu_iter)
         rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
         thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
         rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
-        rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],       1, 1);
 
         // divu_iters do not use density weighting
         rhohalf[lev].setVal(1.);

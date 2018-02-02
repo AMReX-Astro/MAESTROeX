@@ -681,17 +681,43 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         w0 = w0_old;
     }
 
+    int proj_type;
+
     // Project the new velocity field
     if (is_initIter) {
+
+        proj_type = pressure_iters_comp;
+
+        // rhcc_for_nodalproj needs to contain
+        // (beta0^nph S^1 - beta0^n S^0 ) / dt
+
+        Vector<MultiFab> rhcc_for_nodalproj_old(finest_level+1);
+        for (int lev=0; lev<=finest_level; ++lev) {
+            rhcc_for_nodalproj_old[lev].define(grids[lev], dmap[lev], 1, 1);
+            MultiFab::Copy(rhcc_for_nodalproj_old[lev], rhcc_for_nodalproj[lev], 0, 0, 1, 1);
+        }
+
+        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph);
+        
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Subtract(rhcc_for_nodalproj[lev], rhcc_for_nodalproj_old[lev], 0, 0, 1, 1);
+            rhcc_for_nodalproj[lev].mult(1./dt,0,1,1);
+        }
 
     }
     else {
 
+        proj_type = regular_timestep_comp;
+
+        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph);
+
+        if (dpdt_factor > 0.) {
+
+        }
     }
 
     // call nodal projection
-    //
-    //
+    NodalProj(proj_type,rhcc_for_nodalproj);
 
     // average pi from nodes to cell-centers and store in the Pi component of snew
     //
