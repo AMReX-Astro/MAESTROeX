@@ -222,8 +222,8 @@ contains
     js = lo(2)
     je = hi(2)
 
-    call slopex_2d(s(:,:,comp:),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
-    call slopey_2d(s(:,:,comp:),slopey,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+    call slopex_2d(s(:,:,comp:comp),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
+    call slopey_2d(s(:,:,comp:comp),slopey,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
 
     dt2 = HALF*dt
     dt4 = dt/4.0d0

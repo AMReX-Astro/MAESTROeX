@@ -12,6 +12,7 @@ Maestro::DensityAdvance (bool is_predictor,
                          Vector<MultiFab>& scal_force,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 {
+    
     Vector<Real> rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
 
@@ -101,7 +102,7 @@ Maestro::DensityAdvance (bool is_predictor,
 	//                     spec_comp,dm+spec_comp,nspec,.false.,mla)
 	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,0);
     }
-    
+   
     // predict rho or rho' at the edges (depending on species_pred_type)
     if (species_pred_type == predict_rhoprime_and_X) {
 	// call make_edge_scal(sold,sedge,umac,scal_force, &
@@ -109,7 +110,7 @@ Maestro::DensityAdvance (bool is_predictor,
 	//                     rho_comp,dm+rho_comp,1,.false.,mla)
 	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,Rho,Rho,1,0);
     }
-
+    
     if (species_pred_type == predict_rhoprime_and_X) {
 	// convert rho' -> rho in scalold 
 	PutInPertForm(scalold, rho0_old, Rho, Rho, bcs_s, false);
@@ -121,12 +122,87 @@ Maestro::DensityAdvance (bool is_predictor,
 	ConvertRhoXToX(scalold,false);
     }
 
-
+ 
     /////////////////////////////////////////////////////////////////
     // Subtract w0 from MAC velocities.
     /////////////////////////////////////////////////////////////////
 
     Addw0(umac,-1.);
 
+
+    /////////////////////////////////////////////////////////////////
+    // Compute fluxes
+    /////////////////////////////////////////////////////////////////
+
+    if (is_predictor == 1) {
+	
+	// compute species fluxes
+	// call mk_rhoX_flux(mla,sflux,etarhoflux,sold,sedge,umac,w0,w0mac, &
+        //                  rho0_old,rho0_edge_old,rho0mac_old, &
+        //                  rho0_old,rho0_edge_old,rho0mac_old, &
+        //                  rho0_predicted_edge,spec_comp,spec_comp+nspec-1)
+	MakeRhoXFlux(scalold, sflux, sedge, umac,
+		     rho0_old,rho0_edge_old, 
+		     rho0_old,rho0_edge_old,
+		     FirstSpec,NumSpec);
+
+    } else if (is_predictor == 2) {
+	// compute species fluxes
+	// call mk_rhoX_flux(mla,sflux,etarhoflux,sold,sedge,umac,w0,w0mac, &
+	//                   rho0_old,rho0_edge_old,rho0mac_old, &
+	//                   rho0_new,rho0_edge_new,rho0mac_new, &
+	//                   rho0_predicted_edge,spec_comp,spec_comp+nspec-1)
+	MakeRhoXFlux(scalold, sflux, sedge, umac,
+		     rho0_old,rho0_edge_old, 
+		     rho0_new,rho0_edge_new,
+		     FirstSpec,NumSpec);
+    }
+
+    //**************************************************************************
+    //     1) Set force for (rho X)_i at time n+1/2 = 0.
+    //     2) Update (rho X)_i with conservative differencing.
+    //     3) Define density as the sum of the (rho X)_i
+    //     4) Update tracer with conservative differencing as well.
+    //**************************************************************************
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+	scal_force[lev].setVal(0.);
+    }
+
+    // p0 only used in rhoh update so we just pass in a dummy version
+    // call update_scal(mla,spec_comp,spec_comp+nspec-1,sold,snew,sflux,scal_force, &
+    //                  p0_dummy,p0_dummy_cart,dx,dt,the_bc_level)
+    
+
+    // if (verbose >= 1) {
+    // 	Real smin, smax;
+    // 	for (int lev=0; lev<=finest_level; ++lev) {
+    // 	    // if (parallel_IOProcessor()) Print() << lev << endl;
+
+    // 	    for (int comp = FirstSpec; comp < FirstSpec+NumSpec; ++comp) {
+    // 		MultiFab::Divide(snew[lev],snew[lev],Rho,comp,1,0);
+             
+    // 		smin = snew[lev].min(comp); 
+    // 		smax = snew[lev].max(comp);
+             
+    //          // if (parallel_IOProcessor()) 
+    // 	     // 	 Print() << "Last species: " << smin << " " << smax << endl;
+
+    // 		MultiFab::Multiply(snew[lev],snew[lev],Rho,comp,1,0);
+    // 	    }
+	    
+    // 	    smin = snew[lev].min(Rho); 
+    // 	    smax = snew[lev].max(Rho);
+          
+    // 	    // if (parallel_IOProcessor()) 
+    // 	    // 	Print() << "Rho: " << smin << " " << smax << endl;
+    // 	}
+    // }
+
+
+// Print() << "... Level "<< i1 << " update:" << endl;
+// Print() << "... new min/max : density           " << endl;
+// 2002 format('... new min/max : ',a16,2x,e17.10,2x,e17.10)
+// 2003 format('... new min/max : tracer            ',e17.10,2x,e17.10)
 
 }

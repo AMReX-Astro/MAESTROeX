@@ -87,6 +87,15 @@ private:
                        const amrex::Vector<amrex::MultiFab>& force,
                        int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp, 
                        int start_scomp, int start_bccomp, int num_comp, int is_conservative);
+    void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
+		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux, 
+		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+		       const amrex::Vector<amrex::Real>& r0_old,
+		       const amrex::Vector<amrex::Real>& r0_edge_old,
+		       const amrex::Vector<amrex::Real>& r0_new,
+		       const amrex::Vector<amrex::Real>& r0_edge_new,
+		       int start_comp, int num_comp);
     ////////////
 
     ////////////
