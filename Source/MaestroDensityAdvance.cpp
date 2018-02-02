@@ -4,7 +4,7 @@
 using namespace amrex;
 
 void
-Maestro::DensityAdvance (bool is_predictor,
+Maestro::DensityAdvance (int which_step,
                          Vector<MultiFab>& scalold,
                          Vector<MultiFab>& scalnew,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
@@ -134,7 +134,7 @@ Maestro::DensityAdvance (bool is_predictor,
     // Compute fluxes
     /////////////////////////////////////////////////////////////////
 
-    if (is_predictor == 1) {
+    if (which_step == 1) {
 	
 	// compute species fluxes
 	// call mk_rhoX_flux(mla,sflux,etarhoflux,sold,sedge,umac,w0,w0mac, &
@@ -146,7 +146,7 @@ Maestro::DensityAdvance (bool is_predictor,
 		     rho0_old,rho0_edge_old,
 		     FirstSpec,NumSpec);
 
-    } else if (is_predictor == 2) {
+    } else if (which_step == 2) {
 	// compute species fluxes
 	// call mk_rhoX_flux(mla,sflux,etarhoflux,sold,sedge,umac,w0,w0mac, &
 	//                   rho0_old,rho0_edge_old,rho0mac_old, &

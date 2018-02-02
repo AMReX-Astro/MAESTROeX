@@ -4,7 +4,7 @@
 using namespace amrex;
 
 void
-Maestro::EnthalpyAdvance (bool is_predictor,
+Maestro::EnthalpyAdvance (int which_step,
                           Vector<MultiFab>& scalold,
                           Vector<MultiFab>& scalnew,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
@@ -39,7 +39,7 @@ Maestro::EnthalpyAdvance (bool is_predictor,
     //////////////////////////////////
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        scal_force[lev].setVal(0.);
+        scal_force[lev].setVal(0.,RhoH,1,1);
     }
 
     // compute forcing terms    
@@ -111,6 +111,85 @@ Maestro::EnthalpyAdvance (bool is_predictor,
         // use the advective form of the prediction
         MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,0);
     }
+
+    if (enthalpy_pred_type == predict_rhohprime) {
+        // convert (rho h)' -> (rho h)
+
+
+    }
+
+    if (enthalpy_pred_type == predict_hprime) {
+        // convert h' -> h
+        Abort("MaestroEnthalpyAdavnce predict_hprime");
+    }
+
+    if (enthalpy_pred_type == predict_Tprime_then_h) {
+        // convert T' -> T
+        Abort("MaestroEnthalpyAdavnce predict_Tprime_then_h");
+    }
+
+    if (enthalpy_pred_type == predict_h ||
+        enthalpy_pred_type == predict_hprime) {
+        // convert (rho h) -> h
+        ConvertRhoHToH(sold,false);
+    }
+
+    // Compute enthalpy edge states if we were predicting temperature.  This
+    // needs to be done after the state was returned to the full state.
+    if ( (enthalpy_pred_type == predict_T_then_rhohprime) ||
+         (enthalpy_pred_type == predict_T_then_h        ) ||
+         (enthalpy_pred_type == predict_Tprime_then_h) ) {
+        Abort("MaestroEnthalpyAdavnce need makeHfromRhoT_edge");
+    }
+   
+    //////////////////////////////////
+    // Subtract w0 from MAC velocities
+    //////////////////////////////////
+
+    Addw0(umac,-1.);
+   
+    //////////////////////////////////
+    // Compute fluxes
+    //////////////////////////////////
+
+    // for which_step .eq. 1, we pass in only the old base state quantities
+    // for which_step .eq. 2, we pass in the old and new for averaging within mkflux
+    if (which_step == 1) {
+
+        if (spherical == 1) {
+        }
+
+        // compute enthalpy fluxes
+        /*
+        call mk_rhoh_flux(mla,sflux,sold,sedge,umac,w0,w0mac, &
+                          rho0_old,rho0_edge_old,rho0mac_old, &
+                          rho0_old,rho0_edge_old,rho0mac_old, &
+                          rhoh0_old,rhoh0_edge_old,rhoh0mac_old, &
+                          rhoh0_old,rhoh0_edge_old,rhoh0mac_old, &
+                          h0mac_old,h0mac_old)
+        */
+    }
+    else if (which_step == 2) {
+
+        if (spherical == 1) {
+        }
+
+        // compute enthalpy fluxes
+        /*
+        call mk_rhoh_flux(mla,sflux,sold,sedge,umac,w0,w0mac, &
+                          rho0_old,rho0_edge_old,rho0mac_old, &
+                          rho0_new,rho0_edge_new,rho0mac_new, &
+                          rhoh0_old,rhoh0_edge_old,rhoh0mac_old, &
+                          rhoh0_new,rhoh0_edge_new,rhoh0mac_new, &
+                          h0mac_old,h0mac_new)
+        */
+    }
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        scal_force[lev].setVal(0.,RhoH,1,1);
+    }
+
+    MakeRhoHForce(scal_force,2,thermal,umac,1);
 
 
 }

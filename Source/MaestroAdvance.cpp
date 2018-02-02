@@ -324,7 +324,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(true,s1,s2,sedge,sflux,scal_force,umac);
+    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,umac);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
@@ -368,7 +368,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "            : enthalpy_advance >>>" << endl;
     }
 
-    EnthalpyAdvance(true,s1,s2,sedge,sflux,scal_force,umac,thermal1);
+    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,thermal1);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -537,7 +537,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(false,s1,s2,sedge,sflux,scal_force,umac);
+    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,umac);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
@@ -589,7 +589,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
         Print() << "            : enthalpy_advance >>>" << endl;
     }
 
-    EnthalpyAdvance(false,s1,s2,sedge,sflux,scal_force,umac,thermal1);
+    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,thermal1);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)

@@ -133,7 +133,7 @@ private:
 
     ////////////////////////
     // MaestroDensityAdvance.cpp functions
-    void DensityAdvance (bool is_predictor,
+    void DensityAdvance (int which_step,
                          amrex::Vector<amrex::MultiFab>& scalold,
                          amrex::Vector<amrex::MultiFab>& scalnew,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
@@ -157,7 +157,7 @@ private:
 
     ////////////////////////
     // MaestroEnthalpyAdvance.cpp functions
-    void EnthalpyAdvance (bool is_predictor,
+    void EnthalpyAdvance (int which_step,
                           amrex::Vector<amrex::MultiFab>& scalold,
                           amrex::Vector<amrex::MultiFab>& scalnew,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
