@@ -30,7 +30,6 @@
 module make_flux_module
 
   use amrex_constants_module
-  use meth_params_module, only: rel_eps
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
@@ -40,7 +39,7 @@ module make_flux_module
 contains
   
 #if (AMREX_SPACEDIM == 1)
-  subroutine make_rhoX_flux_1d(lev, domlo, domhi, lo, hi, &
+  subroutine make_rhoX_flux_1d(lev, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
                                  sedgex, x_lo, x_hi, nc_x, &
                                  umac,   u_lo, u_hi, &
@@ -49,8 +48,7 @@ contains
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_1d")
 
-    integer         , intent(in   ) :: lev
-    integer         , intent(in   ) :: domlo(1), domhi(1), lo(1), hi(1)
+    integer         , intent(in   ) :: lev, lo(1), hi(1)
     integer         , intent(in   ) :: fx_lo(1), fx_hi(1), nc_fx
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),nc_fx)
     integer         , intent(in   ) :: x_lo(1), x_hi(1), nc_x
@@ -86,7 +84,7 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 2)
-  subroutine make_rhoX_flux_2d(lev, domlo, domhi, lo, hi, &
+  subroutine make_rhoX_flux_2d(lev, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
                                  sfluxy, fy_lo, fy_hi, nc_fy, &
                                  sedgex, x_lo, x_hi, nc_x, &
@@ -98,8 +96,7 @@ contains
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_2d")
 
-    integer         , intent(in   ) :: lev
-    integer         , intent(in   ) :: domlo(2), domhi(2), lo(2), hi(2)
+    integer         , intent(in   ) :: lev, lo(2), hi(2)
     integer         , intent(in   ) :: fx_lo(2), fx_hi(2), nc_fx
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),nc_fx)
     integer         , intent(in   ) :: fy_lo(2), fy_hi(2), nc_fy
@@ -156,7 +153,7 @@ contains
 
 
 #if (AMREX_SPACEDIM == 3)
-  subroutine make_rhoX_flux_3d(lev, domlo, domhi, lo, hi, &
+  subroutine make_rhoX_flux_3d(lev, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
                                  sfluxy, fy_lo, fy_hi, nc_fy, &
                                  sfluxz, fz_lo, fz_hi, nc_fz, &
@@ -171,8 +168,7 @@ contains
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_3d")
 
-    integer         , intent(in   ) :: lev
-    integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
+    integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3),nc_fx)
     integer         , intent(in   ) :: fy_lo(3), fy_hi(3), nc_fy

@@ -245,8 +245,7 @@ extern "C"
 #elif (AMREX_SPACEDIM == 3)
     void make_rhoX_flux_3d(
 #endif
-			   const int* lev, const int* domlo, const int* domhi,
-			   const int* lo, const int* hi,
+			   const int* lev, const int* lo, const int* hi,
 			   amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, const int* nc_fx, 
 #if (AMREX_SPACEDIM >= 2)
 			   amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi, const int* nc_fy, 
@@ -487,6 +486,31 @@ extern "C"
                      const int* lo, const int* hi,
                      const amrex::Real* dx,
                      const amrex::Real* time, const amrex::Real* temperr);
+    //////////////////////
+
+    //////////////////////
+    // in update_scal.F90
+#if (AMREX_SPACEDIM == 1)
+    void update_rhoX_1d(
+#elif (AMREX_SPACEDIM == 2)
+    void update_rhoX_2d(
+#elif (AMREX_SPACEDIM == 3)
+    void update_rhoX_3d(
+#endif
+			const int* lo, const int* hi,
+			const amrex::Real* sold, const int* so_lo, const int* so_hi, const int* nc_so,
+			      amrex::Real* snew, const int* sn_lo, const int* sn_hi, const int* nc_sn,
+			const amrex::Real* sfluxx, const int* x_lo, const int* x_hi, const int* nc_x, 
+#if (AMREX_SPACEDIM >= 2)
+			const amrex::Real* sfluxy, const int* y_lo, const int* y_hi, const int* nc_y, 
+#if (AMREX_SPACEDIM == 3)
+			const amrex::Real* sfluxz, const int* z_lo, const int* z_hi, const int* nc_z, 
+#endif
+#endif
+			const amrex::Real* force,  const int* f_lo, const int* f_hi, const int* nc_f,
+			const amrex::Real* dx, const amrex::Real* dt,
+			const int* startcomp, const int* endcomp);
+
     //////////////////////
 
     //////////////////////

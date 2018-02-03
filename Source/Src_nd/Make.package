@@ -30,4 +30,5 @@ F90EXE_sources += mkutrans.F90
 F90EXE_sources += rhoh_vs_t.F90
 F90EXE_sources += slope.F90
 F90EXE_sources += sponge.F90
+F90EXE_sources += update_scal.F90
 F90EXE_sources += velpred.F90

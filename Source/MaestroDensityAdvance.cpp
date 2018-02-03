@@ -137,10 +137,6 @@ Maestro::DensityAdvance (int which_step,
     if (which_step == 1) {
 	
 	// compute species fluxes
-	// call mk_rhoX_flux(mla,sflux,etarhoflux,sold,sedge,umac,w0,w0mac, &
-        //                  rho0_old,rho0_edge_old,rho0mac_old, &
-        //                  rho0_old,rho0_edge_old,rho0mac_old, &
-        //                  rho0_predicted_edge,spec_comp,spec_comp+nspec-1)
 	MakeRhoXFlux(scalold, sflux, sedge, umac,
 		     rho0_old,rho0_edge_old, 
 		     rho0_old,rho0_edge_old,
@@ -148,10 +144,6 @@ Maestro::DensityAdvance (int which_step,
 	
     } else if (which_step == 2) {
 	// compute species fluxes
-	// call mk_rhoX_flux(mla,sflux,etarhoflux,sold,sedge,umac,w0,w0mac, &
-	//                   rho0_old,rho0_edge_old,rho0mac_old, &
-	//                   rho0_new,rho0_edge_new,rho0mac_new, &
-	//                   rho0_predicted_edge,spec_comp,spec_comp+nspec-1)
 	MakeRhoXFlux(scalold, sflux, sedge, umac,
 		     rho0_old,rho0_edge_old, 
 		     rho0_new,rho0_edge_new,
@@ -172,8 +164,9 @@ Maestro::DensityAdvance (int which_step,
     // p0 only used in rhoh update so we just pass in a dummy version
     // call update_scal(mla,spec_comp,spec_comp+nspec-1,sold,snew,sflux,scal_force, &
     //                  p0_dummy,p0_dummy_cart,dx,dt,the_bc_level)
+    // UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec,NumSpec);
     
-
+    
     // if (verbose >= 1) {
     // 	Real smin, smax;
     // 	for (int lev=0; lev<=finest_level; ++lev) {
