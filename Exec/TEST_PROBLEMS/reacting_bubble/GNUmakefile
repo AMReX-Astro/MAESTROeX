@@ -1,11 +1,13 @@
-PRECISION  = DOUBLE
-PROFILE    = FALSE
 DEBUG      = TRUE
 DIM        = 2
 COMP	   = gnu
 USE_MPI    = TRUE
 USE_OMP    = FALSE
 USE_REACT  = TRUE
+
+TINY_PROFILE = FALSE
+PROFILE      = FALSE # TRUE overrides TINY_PROFILE
+
 
 # define the location of the MAESTRO_C home directory
 MAESTRO_C_HOME  := ../../..

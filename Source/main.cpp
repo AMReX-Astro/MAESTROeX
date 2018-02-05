@@ -5,11 +5,12 @@ using namespace amrex;
 
 int main(int argc, char* argv[])
 {
+
     // in AMReX.cpp
     Initialize(argc,argv);
 
     // timer for profiling
-    BL_PROFILE_VAR("main()", pmain);
+    BL_PROFILE_VAR("main()", main);
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
@@ -43,8 +44,9 @@ int main(int argc, char* argv[])
         Print() << "\nTotal Time: " << end_total << '\n';
     }
 
+
     // destroy timer for profiling
-    BL_PROFILE_VAR_STOP(pmain);
+    BL_PROFILE_VAR_STOP(main);
 
     // in AMReX.cpp
     Finalize();

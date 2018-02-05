@@ -22,6 +22,9 @@ Maestro::NodalProj (int proj_type,
                     Vector<MultiFab>& rhcc,
                     int istep_divu_iter)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::NodalProj()",NodalProj);
+
     AMREX_ASSERT(rhcc[0].nGrow() == 1);
 
     if ( !(proj_type == initial_projection_comp ||
@@ -124,7 +127,8 @@ Maestro::NodalProj (int proj_type,
 */
 
 /*
-  set_boundary_velocity() is a simplified version of the function in IAMR/Projection.cpp
+  SetBoundaryVelocity() is a simplified version of the function 
+  set_boundary_velocity() in IAMR/Projection.cpp
   basically this sets velocity in ghost cells to zero except at inflow
   right now, the nodal solver expects ghost cells to be filled this way
   in slightly more detail
@@ -133,7 +137,7 @@ Maestro::NodalProj (int proj_type,
      will be zero'd outside of Neumann boundaries (slipWall, noSlipWall, Symmetry) 
      BUT will retain non-zero values at periodic corners
 */
-    set_boundary_velocity(Vproj);
+    SetBoundaryVelocity(Vproj);
 
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
@@ -354,6 +358,9 @@ Maestro::NodalProj (int proj_type,
             gpi[lev].mult(1./dt);
         }
     }
+
+    // destroy timer for profiling
+    BL_PROFILE_VAR_STOP(NodalProj);
 }
 
 // fill in Vproj
@@ -365,7 +372,10 @@ Maestro::NodalProj (int proj_type,
 void
 Maestro::CreateUvecForProj (int proj_type,
                             Vector<MultiFab>& Vproj,
-                            const Vector<MultiFab>& sig) {
+                            const Vector<MultiFab>& sig)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::CreateUvecForProj()",CreateUvecForProj);
 
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
         // Vproj = uold
@@ -413,11 +423,17 @@ Maestro::CreateUvecForProj (int proj_type,
 
     // fill ghost cells
     FillPatch(time, Vproj, Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+
+    // destroy timer for profiling
+    BL_PROFILE_VAR_STOP(CreateUvecForProj);
 }
 
 
-void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
+void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::SetBoundaryVelocity()",SetBoundaryVelocity);
+
     // 1) At non-inflow faces, the normal component of velocity will be completely zero'd 
     // 2) If a face is an inflow face, then the normal velocity at corners just outside inflow faces 
     //                                will be zero'd outside of Neumann boundaries 
@@ -486,12 +502,18 @@ void Maestro::set_boundary_velocity(Vector<MultiFab>& vel)
             } // end if/else logic for inflow
         } // end loop over direction
     } // end loop over levels
+
+    // destroy timer for profiling
+    BL_PROFILE_VAR_STOP(SetBoundaryVelocity);
 }
 
 // given a nodal phi, compute grad(phi) at cell centers
 void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
                              Vector<MultiFab>& gphi)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ComputeGradPhi()",ComputeGradPhi);
+
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& phi_mf = phi[lev];
               MultiFab& gphi_mf = gphi[lev];
@@ -512,4 +534,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
                              dx);
         }
     }
+
+    // destroy timer for profiling
+    BL_PROFILE_VAR_STOP(ComputeGradPhi);
 }
