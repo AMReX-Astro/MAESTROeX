@@ -35,6 +35,8 @@ contains
     double precision :: divterm 
     double precision :: delta, frac, sumX
     logical          :: has_negative_species
+    ! from MAESTRO parameters file
+    double precision :: base_cutoff_density = 3.d6
 
     do comp = startcomp, endcomp
        do i=lo(1),hi(1)
@@ -43,7 +45,8 @@ contains
        end do
     enddo
 
-    snew(:,rho_comp) = sold(:,rho_comp)
+    ! update density
+    snew(:,1) = sold(:,1)
        
     do i = lo(1), hi(1)
 
@@ -56,11 +59,11 @@ contains
        enddo
 
        ! enforce a density floor
-       if (snew(i,rho_comp) .lt. 0.5d0*base_cutoff_density) then
+       if (snew(i,1) .lt. HALF*base_cutoff_density) then
           do comp = startcomp, endcomp
-             snew(i,comp) = snew(i,comp) * 0.5d0*base_cutoff_density/snew(i,1)
+             snew(i,comp) = snew(i,comp) * HALF*base_cutoff_density/snew(i,1)
           end do
-          snew(i,1) = 0.5d0*base_cutoff_density
+          snew(i,1) = HALF*base_cutoff_density
        end if
 
        ! do not allow the species to leave here negative.
@@ -118,8 +121,67 @@ contains
     double precision :: divterm 
     double precision :: delta, frac, sumX
     logical          :: has_negative_species
+    ! from MAESTRO parameters file
+    double precision :: base_cutoff_density = 3.d6
 
-    
+    do comp = startcomp, endcomp
+       do j=lo(2),hi(2)
+          do i=lo(1),hi(1)
+             
+             divterm = (sfluxx(i+1,j,comp) - sfluxx(i,j,comp))/dx(1) &
+                     + (sfluxy(i,j+1,comp) - sfluxy(i,j,comp))/dx(2)
+             snew(i,j,comp) = sold(i,j,comp) + dt*(-divterm + force(i,j,comp))
+             
+          end do
+       end do
+    enddo
+
+    ! update density
+    snew(:,:,1) = sold(:,:,1)
+           
+    do j = lo(2), hi(2)
+       do i = lo(1), hi(1)
+
+          has_negative_species = .false.
+          
+          ! define the update to rho as the sum of the updates to (rho X)_i  
+          do comp = startcomp, endcomp
+             snew(i,j,1) = snew(i,j,1) + (snew(i,j,comp)-sold(i,j,comp))
+             if (snew(i,j,comp) .lt. ZERO) has_negative_species = .true.
+          enddo
+
+          ! enforce a density floor
+          if (snew(i,j,1) .lt. HALF*base_cutoff_density) then
+             do comp = startcomp, endcomp
+                snew(i,j,comp) = snew(i,j,comp) * &
+                     HALF*base_cutoff_density/snew(i,j,1)
+             end do
+             snew(i,j,1) = HALF*base_cutoff_density
+          end if
+
+          ! do not allow the species to leave here negative.
+          if (has_negative_species) then
+             do comp = startcomp, endcomp
+                if (snew(i,j,comp) .lt. ZERO) then
+                   delta = -snew(i,j,comp)
+                   sumX = ZERO 
+                   do comp2 = startcomp, endcomp
+                      if (comp2 .ne. comp .and. snew(i,j,comp2) .ge. ZERO) then
+                         sumX = sumX + snew(i,j,comp2)
+                      end if
+                   enddo
+                   do comp2 = startcomp, endcomp
+                      if (comp2 .ne. comp .and. snew(i,j,comp2) .ge. ZERO) then
+                         frac = snew(i,j,comp2) / sumX
+                         snew(i,j,comp2) = snew(i,j,comp2) - frac * delta
+                      end if
+                   enddo
+                   snew(i,j,comp) = ZERO
+                end if
+             end do
+          end if
+       enddo
+    enddo
 
   end subroutine update_rhoX_2d
 #endif
@@ -157,8 +219,80 @@ contains
     double precision :: divterm
     double precision :: delta, frac, sumX
     logical          :: has_negative_species
+    ! from MAESTRO parameters file
+    double precision :: base_cutoff_density = 3.d6
     
+    !$OMP PARALLEL PRIVATE(i,j,k,divterm,comp) 
+    do comp = startcomp, endcomp
+       !$OMP DO
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+                
+                divterm = (sfluxx(i+1,j,k,comp) - sfluxx(i,j,k,comp))/dx(1) &
+                        + (sfluxy(i,j+1,k,comp) - sfluxy(i,j,k,comp))/dx(2) &
+                        + (sfluxz(i,j,k+1,comp) - sfluxz(i,j,k,comp))/dx(3)
+                snew(i,j,k,comp) = sold(i,j,k,comp) + dt * (-divterm + force(i,j,k,comp))
+                
+             enddo
+          enddo
+       enddo
+       !$OMP END DO NOWAIT
+    end do
+    !$OMP END PARALLEL
     
+    ! update density
+    snew(:,:,:,1) = sold(:,:,:,1)
+
+    !$OMP PARALLEL DO PRIVATE(i,j,k,has_negative_species,comp,delta,sumX,comp2,frac)       
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+
+             has_negative_species = .false.
+
+             ! define the update to rho as the sum of the updates to (rho X)_i
+             do comp = startcomp, endcomp
+                snew(i,j,k,1) = snew(i,j,k,1) &
+                     + (snew(i,j,k,comp)-sold(i,j,k,comp))
+                if (snew(i,j,k,comp) .lt. ZERO) has_negative_species = .true.
+             enddo
+
+             ! enforce a density floor
+             if (snew(i,j,k,1) .lt. HALF*base_cutoff_density) then
+                do comp = startcomp, endcomp
+                   snew(i,j,k,comp) = snew(i,j,k,comp) * &
+                        HALF*base_cutoff_density/snew(i,j,k,1)
+                end do
+                snew(i,j,k,1) = HALF*base_cutoff_density
+             end if
+
+             ! do not allow the species to leave here negative.
+             if (has_negative_species) then
+                do comp = startcomp, endcomp
+                   if (snew(i,j,k,comp) .lt. ZERO) then
+                      delta = -snew(i,j,k,comp)
+                      sumX = ZERO 
+                      do comp2 = startcomp, endcomp
+                         if (comp2 .ne. comp .and. snew(i,j,k,comp2) .ge. ZERO) then
+                            sumX = sumX + snew(i,j,k,comp2)
+                         end if
+                      enddo
+                      do comp2 = startcomp, endcomp
+                         if (comp2 .ne. comp .and. snew(i,j,k,comp2) .ge. ZERO) then
+                            frac = snew(i,j,k,comp2) / sumX
+                            snew(i,j,k,comp2) = snew(i,j,k,comp2) - frac * delta
+                         end if
+                      enddo
+                      snew(i,j,k,comp) = ZERO
+                   end if
+                end do
+             end if         
+          enddo
+       enddo
+    enddo
+    !$OMP END PARALLEL DO
+
   end subroutine update_rhoX_3d
 #endif
 

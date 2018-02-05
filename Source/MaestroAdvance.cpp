@@ -323,6 +323,10 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 	    sflux[lev][idim].setVal(0.);
 	}
     }
+    // copy states from s1 into s2 to debug output
+    for (int lev=0; lev<=finest_level; ++lev) {
+	MultiFab::Copy(s2[lev],s1[lev],1,1,Nscal-1,0);
+    }
 
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,umac);

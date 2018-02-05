@@ -135,7 +135,7 @@ Maestro::DensityAdvance (int which_step,
     /////////////////////////////////////////////////////////////////
 
     if (which_step == 1) {
-	
+  
 	// compute species fluxes
 	MakeRhoXFlux(scalold, sflux, sedge, umac,
 		     rho0_old,rho0_edge_old, 
@@ -143,6 +143,7 @@ Maestro::DensityAdvance (int which_step,
 		     FirstSpec,NumSpec);
 	
     } else if (which_step == 2) {
+
 	// compute species fluxes
 	MakeRhoXFlux(scalold, sflux, sedge, umac,
 		     rho0_old,rho0_edge_old, 
@@ -164,13 +165,12 @@ Maestro::DensityAdvance (int which_step,
     // p0 only used in rhoh update so we just pass in a dummy version
     // call update_scal(mla,spec_comp,spec_comp+nspec-1,sold,snew,sflux,scal_force, &
     //                  p0_dummy,p0_dummy_cart,dx,dt,the_bc_level)
-    // UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec,NumSpec);
-    
+    UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec,NumSpec);
     
     // if (verbose >= 1) {
     // 	Real smin, smax;
     // 	for (int lev=0; lev<=finest_level; ++lev) {
-    // 	    // if (parallel_IOProcessor()) Print() << lev << endl;
+    // 	    // Print() << "Level " << lev << endl;
 
     // 	    for (int comp = FirstSpec; comp < FirstSpec+NumSpec; ++comp) {
     // 		MultiFab::Divide(snew[lev],snew[lev],Rho,comp,1,0);
@@ -178,8 +178,7 @@ Maestro::DensityAdvance (int which_step,
     // 		smin = snew[lev].min(comp); 
     // 		smax = snew[lev].max(comp);
              
-    //          // if (parallel_IOProcessor()) 
-    // 	     // 	 Print() << "Last species: " << smin << " " << smax << endl;
+    //          Print() << "Last species: " << smin << " " << smax << endl;
 
     // 		MultiFab::Multiply(snew[lev],snew[lev],Rho,comp,1,0);
     // 	    }
@@ -187,15 +186,14 @@ Maestro::DensityAdvance (int which_step,
     // 	    smin = snew[lev].min(Rho); 
     // 	    smax = snew[lev].max(Rho);
           
-    // 	    // if (parallel_IOProcessor()) 
-    // 	    // 	Print() << "Rho: " << smin << " " << smax << endl;
+    // 	    Print() << "Rho: " << smin << " " << smax << endl;
     // 	}
     // }
 
 
-// Print() << "... Level "<< i1 << " update:" << endl;
-// Print() << "... new min/max : density           " << endl;
-// 2002 format('... new min/max : ',a16,2x,e17.10,2x,e17.10)
-// 2003 format('... new min/max : tracer            ',e17.10,2x,e17.10)
+// Print() << "... Level 0 update:" << endl;
+// Print() << "... new min/max : density           " << smin[0] << "    " << smax[0] << endl;
+// Print() << "... new min/max : " << endl;
+// Print() << "... new min/max : tracer            " << endl;
 
 }

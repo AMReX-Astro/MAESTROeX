@@ -397,12 +397,12 @@ void
             const Box& validBox = mfi.validbox();
             const Real* dx = geom[lev].CellSize();
 
-	    if (startcomp == RhoH) 
+	    if (startcomp == RhoH+1) 
 	    {   // Enthalpy update
 
 	    
 	    }
-	    else if (startcomp == FirstSpec) 
+	    else if (startcomp == FirstSpec+1) 
 	    {   // RhoX update
 
                 // call fortran subroutine
