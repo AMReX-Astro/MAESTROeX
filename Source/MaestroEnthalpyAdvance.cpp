@@ -53,12 +53,12 @@ Maestro::EnthalpyAdvance (int which_step,
     else if (enthalpy_pred_type == predict_h ||
              enthalpy_pred_type == predict_rhoh) {
         // make force for h by calling mkrhohforce then dividing by rho
-        Abort("MaestroEnthalpyAdavnce forcing");
+        Abort("MaestroEnthalpyAdvance forcing");
     }
     else if (enthalpy_pred_type == predict_hprime) {
         // first compute h0_old
         // make force for hprime
-        Abort("MaestroEnthalpyAdavnce forcing");
+        Abort("MaestroEnthalpyAdvance forcing");
     }
     else if (enthalpy_pred_type == predict_T_then_rhohprime ||
              enthalpy_pred_type == predict_T_then_h ||
@@ -84,12 +84,12 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_hprime) {
         // convert h -> h'
-        Abort("MaestroEnthalpyAdavnce predict_hprime");
+        Abort("MaestroEnthalpyAdvance predict_hprime");
     }
 
     if (enthalpy_pred_type == predict_Tprime_then_h) {
         // convert T -> T'
-        Abort("MaestroEnthalpyAdavnce predict_Tprime_then_h");
+        Abort("MaestroEnthalpyAdvance predict_Tprime_then_h");
     }
     
     // predict either T, h, or (rho h)' at the edges
@@ -159,14 +159,9 @@ Maestro::EnthalpyAdvance (int which_step,
         }
 
         // compute enthalpy fluxes
-        /*
-        call mk_rhoh_flux(mla,sflux,sold,sedge,umac,w0,w0mac, &
-                          rho0_old,rho0_edge_old,rho0mac_old, &
-                          rho0_old,rho0_edge_old,rho0mac_old, &
-                          rhoh0_old,rhoh0_edge_old,rhoh0mac_old, &
-                          rhoh0_old,rhoh0_edge_old,rhoh0mac_old, &
-                          h0mac_old,h0mac_old)
-        */
+	MakeRhoHFlux(scalold, sflux, sedge, umac,
+		     rho0_old,rho0_edge_old,rho0_old,rho0_edge_old,
+		     rhoh0_old,rhoh0_edge_old,rhoh0_old,rhoh0_edge_old);
     }
     else if (which_step == 2) {
 
@@ -174,14 +169,9 @@ Maestro::EnthalpyAdvance (int which_step,
         }
 
         // compute enthalpy fluxes
-        /*
-        call mk_rhoh_flux(mla,sflux,sold,sedge,umac,w0,w0mac, &
-                          rho0_old,rho0_edge_old,rho0mac_old, &
-                          rho0_new,rho0_edge_new,rho0mac_new, &
-                          rhoh0_old,rhoh0_edge_old,rhoh0mac_old, &
-                          rhoh0_new,rhoh0_edge_new,rhoh0mac_new, &
-                          h0mac_old,h0mac_new)
-        */
+	MakeRhoHFlux(scalold, sflux, sedge, umac,
+		     rho0_old,rho0_edge_old,rho0_new,rho0_edge_new,
+		     rhoh0_old,rhoh0_edge_old,rhoh0_new,rhoh0_edge_new);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {

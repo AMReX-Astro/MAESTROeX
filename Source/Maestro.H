@@ -98,6 +98,19 @@ private:
 		       const amrex::Vector<amrex::Real>& r0_edge_new,
 		       int start_comp, int num_comp);
 
+    void MakeRhoHFlux (const amrex::Vector<amrex::MultiFab>& state,
+		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux, 
+		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+		       const amrex::Vector<amrex::Real>& r0_old,
+		       const amrex::Vector<amrex::Real>& r0_edge_old,
+		       const amrex::Vector<amrex::Real>& r0_new,
+		       const amrex::Vector<amrex::Real>& r0_edge_new,
+		       const amrex::Vector<amrex::Real>& rh0_old,
+		       const amrex::Vector<amrex::Real>& rh0_edge_old,
+		       const amrex::Vector<amrex::Real>& rh0_new,
+		       const amrex::Vector<amrex::Real>& rh0_edge_new);
+
     void UpdateScal (const amrex::Vector<amrex::MultiFab>& stateold,
 		     amrex::Vector<amrex::MultiFab>& statenew,
 		     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
