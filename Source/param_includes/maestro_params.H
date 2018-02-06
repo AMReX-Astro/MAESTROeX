@@ -51,7 +51,7 @@ static bool        plot_processors;
 static bool        plot_pidivu;
 static int         init_iter;
 static int         init_divu_iter;
-static int         restart;
+static std::string restart_file;
 static bool        restart_into_finer;
 static bool        do_initial_projection;
 static int         mg_verbose;

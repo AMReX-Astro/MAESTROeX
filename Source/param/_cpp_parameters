@@ -200,8 +200,8 @@ init_iter                           int            4
 # Number of initial divu iterations.
 init_divu_iter                      int            4
 
-# which file to restart from.  -1 means do not restart
-restart                             int            -1
+# Which file to restart from.  Empty string means do not restart
+restart_file                        string          ""
 
 # restart and add a level of refinement
 restart_into_finer                  bool            false

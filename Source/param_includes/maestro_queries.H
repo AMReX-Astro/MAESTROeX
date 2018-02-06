@@ -51,7 +51,7 @@ pp.query("plot_processors", plot_processors);
 pp.query("plot_pidivu", plot_pidivu);
 pp.query("init_iter", init_iter);
 pp.query("init_divu_iter", init_divu_iter);
-pp.query("restart", restart);
+pp.query("restart_file", restart_file);
 pp.query("restart_into_finer", restart_into_finer);
 pp.query("do_initial_projection", do_initial_projection);
 pp.query("mg_verbose", mg_verbose);

@@ -132,8 +132,9 @@ private:
 
     ////////////
     // MaestroCheckpoint.cpp functions
-    void WriteCheckPoint();
-    void WriteCheckPointHeader(const std::string& name);
+    void WriteCheckPoint (int step);
+    int ReadCheckPoint ();
+    void GotoNextLine (std::istream& is);
     ////////////
 
     ////////////
