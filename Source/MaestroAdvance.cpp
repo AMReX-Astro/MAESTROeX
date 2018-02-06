@@ -79,6 +79,21 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
 
+    // make sure C++ is as efficient as possible with memory usage
+    grav_cell_nph      .shrink_to_fit();
+    rho0_nph           .shrink_to_fit();
+    p0_nph             .shrink_to_fit();
+    p0_minus_peosbar   .shrink_to_fit();
+    peosbar            .shrink_to_fit();
+    w0_force           .shrink_to_fit();
+    Sbar               .shrink_to_fit();
+    beta0_nph          .shrink_to_fit();
+    gamma1bar_temp1    .shrink_to_fit();
+    gamma1bar_temp2    .shrink_to_fit();
+    delta_chi_w0       .shrink_to_fit();
+    w0_old             .shrink_to_fit();
+    rho0_predicted_edge.shrink_to_fit();
+
     int is_predictor;
 
     // wallclock time

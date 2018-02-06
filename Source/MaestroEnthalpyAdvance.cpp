@@ -20,6 +20,10 @@ Maestro::EnthalpyAdvance (int which_step,
     Vector<Real>  rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rhoh0_edge_old( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rhoh0_edge_new( (max_radial_level+1)*(nr_fine+1) );
+     rho0_edge_old.shrink_to_fit();
+     rho0_edge_new.shrink_to_fit();
+    rhoh0_edge_old.shrink_to_fit();
+    rhoh0_edge_new.shrink_to_fit();
 
     if (spherical == 0) {
         cell_to_edge( rho0_old.dataPtr(), rho0_edge_old.dataPtr());

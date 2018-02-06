@@ -24,6 +24,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // we also need beta0 at edges
     // allocate AND compute it here
     Vector<Real> beta0_edge( (max_radial_level+1)*(nr_fine+1) );
+    beta0_edge.shrink_to_fit();
     cell_to_edge(beta0.dataPtr(),beta0_edge.dataPtr());
 
     // convert Utilde^* to beta0*Utilde^*

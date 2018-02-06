@@ -84,6 +84,7 @@ Maestro::NodalProj (int proj_type,
     }
     else {
         Vector<Real> beta0_nph( (max_radial_level+1)*nr_fine );
+        beta0_nph.shrink_to_fit();
         for(int i=0; i<beta0_nph.size(); ++i) {
             beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
         }

@@ -104,6 +104,30 @@ Maestro::Setup ()
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
 
+    // make sure C++ is as efficient as possible with memory usage
+    s0_init      .shrink_to_fit();
+    p0_init      .shrink_to_fit();
+    rho0_old     .shrink_to_fit();
+    rho0_new     .shrink_to_fit();
+    rhoh0_old    .shrink_to_fit();
+    rhoh0_new    .shrink_to_fit();
+    p0_old       .shrink_to_fit();
+    p0_new       .shrink_to_fit();
+    tempbar      .shrink_to_fit();
+    tempbar_init .shrink_to_fit();
+    beta0_old    .shrink_to_fit();
+    beta0_new    .shrink_to_fit();
+    gamma1bar_old.shrink_to_fit();
+    gamma1bar_new.shrink_to_fit();
+    etarho_cc    .shrink_to_fit();
+    psi          .shrink_to_fit();
+    grav_cell_old.shrink_to_fit();
+    grav_cell_new.shrink_to_fit();
+    r_cc_loc     .shrink_to_fit();
+    w0           .shrink_to_fit();
+    etarho_ec    .shrink_to_fit();
+    r_edge_loc   .shrink_to_fit();
+
     init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
                              r_cc_loc.dataPtr(),
                              r_edge_loc.dataPtr(),
@@ -122,15 +146,15 @@ Maestro::Setup ()
     dt = 1.e100;
     dtold = 1.e100;
 
-    sold    .resize(max_level+1);
-    snew    .resize(max_level+1);
-    uold    .resize(max_level+1);
-    unew    .resize(max_level+1);
-    S_cc_old.resize(max_level+1);
-    S_cc_new.resize(max_level+1);
-    gpi     .resize(max_level+1);
-    dSdt    .resize(max_level+1);
-    pi      .resize(max_level+1);
+    sold              .resize(max_level+1);
+    snew              .resize(max_level+1);
+    uold              .resize(max_level+1);
+    unew              .resize(max_level+1);
+    S_cc_old          .resize(max_level+1);
+    S_cc_new          .resize(max_level+1);
+    gpi               .resize(max_level+1);
+    dSdt              .resize(max_level+1);
+    pi                .resize(max_level+1);
     rhcc_for_nodalproj.resize(max_level+1);
 
     // stores fluxes at coarse-fine interface for synchronization

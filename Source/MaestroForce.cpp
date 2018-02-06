@@ -139,6 +139,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     Vector<Real> rho0( (max_radial_level+1)*nr_fine );
     Vector<Real>   p0( (max_radial_level+1)*nr_fine );
     Vector<Real> grav( (max_radial_level+1)*nr_fine );
+    rho0.shrink_to_fit();
+      p0.shrink_to_fit();
+    grav.shrink_to_fit();
 
     if (is_prediction == 1) {
         rho0 = rho0_old;

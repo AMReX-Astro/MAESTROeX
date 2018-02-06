@@ -243,6 +243,7 @@ void Maestro::InitProj ()
     Vector<MultiFab>            rhohalf(finest_level+1);
 
     Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
+    Sbar.shrink_to_fit();
 
     for (int lev=0; lev<=finest_level; ++lev) {
         rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
@@ -301,6 +302,10 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<Real> w0_force            ( (max_radial_level+1)*nr_fine );
     Vector<Real> p0_minus_peosbar    ( (max_radial_level+1)*nr_fine );
     Vector<Real> delta_chi_w0        ( (max_radial_level+1)*nr_fine );
+    Sbar            .shrink_to_fit();
+    w0_force        .shrink_to_fit();
+    p0_minus_peosbar.shrink_to_fit();
+    delta_chi_w0    .shrink_to_fit();
 
     std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);

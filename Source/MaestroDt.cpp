@@ -10,6 +10,7 @@ Maestro::EstDt ()
 
     // allocate a dummy w0_force and set equal to zero
     Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
     // build a dummy umac and set equal to zero
@@ -139,6 +140,7 @@ Maestro::FirstDt ()
 
     // allocate a dummy w0_force and set equal to zero
     Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
     // build a dummy umac and set equal to zero
