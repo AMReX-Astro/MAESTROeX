@@ -112,7 +112,6 @@ extern "C"
                           const amrex::Real* dx);
     //////////////////////
 
-
     //////////////////////
     // in enforce_HSE.f90
     void enforce_HSE(const amrex::Real* rho0,
@@ -325,6 +324,14 @@ extern "C"
     void make_grav_edge(      amrex::Real* grav_edge,
                         const amrex::Real* rho0,
                         const amrex::Real* r_edge_loc);
+    //////////////////////
+
+
+    //////////////////////
+    // in make_pi_cc.F90
+    void make_pi_cc(const int* lo, const int* hi,
+                    const amrex::Real* pi,  const int* p_lo, const int* p_hi,
+                    amrex::Real* pi_cc,     const int* c_lo, const int* c_hi);
     //////////////////////
 
     //////////////////////

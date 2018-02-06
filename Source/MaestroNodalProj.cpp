@@ -539,3 +539,35 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
     // destroy timer for profiling
     BL_PROFILE_VAR_STOP(ComputeGradPhi);
 }
+
+
+
+// average nodal pi to cell-centers and put in the Pi component of snew
+void Maestro::MakePiCC()
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakePiCC()",MakePiCC);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        const MultiFab& pi_mf = pi[lev];
+              MultiFab& snew_mf = snew[lev];
+
+        for ( MFIter mfi(snew_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+            FArrayBox& snew_fab = snew_mf[mfi];
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            make_pi_cc(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                       BL_TO_FORTRAN_3D(pi_mf[mfi]),
+                       snew_fab.dataPtr(Pi), ARLIM_3D(snew_fab.loVect()), ARLIM_3D(snew_fab.hiVect()));
+        }
+    }
+
+    // destroy timer for profiling
+    BL_PROFILE_VAR_STOP(MakePiCC);
+}

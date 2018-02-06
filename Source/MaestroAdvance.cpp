@@ -741,10 +741,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     NodalProj(proj_type,rhcc_for_nodalproj);
 
     // average pi from nodes to cell-centers and store in the Pi component of snew
-    //
-    //
-
-
+    MakePiCC();
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
             << " DT = " << dt << endl;

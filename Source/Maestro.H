@@ -417,6 +417,9 @@ private:
     void ComputeGradPhi(amrex::Vector<amrex::MultiFab>& phi,
                         amrex::Vector<amrex::MultiFab>& gphi);
 
+    // average nodal pi to cell-centers and put in the Pi component of snew
+    void MakePiCC();
+
     // end MaestroNodalProj.cpp functions
     ////////////
 
