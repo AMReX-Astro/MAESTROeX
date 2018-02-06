@@ -3,6 +3,7 @@ CEXE_sources += Maestro.cpp
 CEXE_sources += MaestroAdvance.cpp
 CEXE_sources += MaestroAdvection.cpp
 CEXE_sources += MaestroAverage.cpp
+CEXE_sources += MaestroCheckpoint.cpp
 CEXE_sources += MaestroConvert.cpp
 CEXE_sources += MaestroDebug.cpp
 CEXE_sources += MaestroDensityAdvance.cpp

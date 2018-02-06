@@ -131,6 +131,12 @@ private:
     ////////////
 
     ////////////
+    // MaestroCheckpoint.cpp functions
+    void WriteCheckPoint();
+    void WriteCheckPointHeader(const std::string& name);
+    ////////////
+
+    ////////////
     // MaestroConvert.cpp functions
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal, 
                         const amrex::Vector<amrex::Real>& s0, 
@@ -437,6 +443,8 @@ private:
                         const amrex::Vector<amrex::Real>& p0_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in);
+
+    void WriteJobInfo (const std::string& dir) const;
 
     // end MaestroPlot.cpp functions
     ////////////
