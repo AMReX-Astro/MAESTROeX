@@ -514,7 +514,7 @@ void
 			       BL_TO_FORTRAN_FAB(force_mf[mfi]),
 			       p0, 
 			       dx, &dt,
-			       NumSpec);
+			       &NumSpec);
 
 	    }
 	    else if (startcomp == FirstSpec+1) 

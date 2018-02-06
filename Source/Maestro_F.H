@@ -564,7 +564,7 @@ extern "C"
 			const amrex::Real* force,  const int* f_lo, const int* f_hi, const int* nc_f,
 			const amrex::Real* p0_new, 
 			const amrex::Real* dx, const amrex::Real* dt,
-			const int& nspec);
+			const int* nspec);
     //////////////////////
 
     //////////////////////

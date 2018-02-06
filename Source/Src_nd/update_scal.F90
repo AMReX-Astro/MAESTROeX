@@ -316,7 +316,7 @@ contains
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),nc_f)
     double precision, intent(in   ) :: p0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(1), dt
-    integer, value  , intent(in   ) :: nspec  
+    integer         , intent(in   ) :: nspec  
 
     ! Local variables
     integer          :: i
@@ -377,7 +377,7 @@ contains
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),nc_f)
     double precision, intent(in   ) :: p0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(2), dt
-    integer, value  , intent(in   ) :: nspec  
+    integer         , intent(in   ) :: nspec  
 
     ! Local variables
     integer          :: i, j
@@ -449,7 +449,7 @@ contains
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: p0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3), dt
-    integer, value  , intent(in   ) :: nspec
+    integer         , intent(in   ) :: nspec
 
     ! Local variables
     integer          :: i, j, k

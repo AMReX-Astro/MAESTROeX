@@ -35,7 +35,7 @@ Maestro::EnthalpyAdvance (int which_step,
     if (enthalpy_pred_type == predict_h ||
         enthalpy_pred_type == predict_hprime) {
         // convert (rho h) -> h
-        ConvertRhoHToH(sold,true);
+        ConvertRhoHToH(scalold,true);
     }
 
     //////////////////////////////////
@@ -134,7 +134,7 @@ Maestro::EnthalpyAdvance (int which_step,
     if (enthalpy_pred_type == predict_h ||
         enthalpy_pred_type == predict_hprime) {
         // convert (rho h) -> h
-        ConvertRhoHToH(sold,false);
+        ConvertRhoHToH(scalold,false);
     }
 
     // Compute enthalpy edge states if we were predicting temperature.  This
