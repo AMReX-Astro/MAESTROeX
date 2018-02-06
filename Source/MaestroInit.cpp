@@ -104,11 +104,9 @@ Maestro::InitData ()
 {
     Print() << "Calling InitData()" << endl;
 
-    int nlevs = max_level+1;
-
     // read in model file and fill in s0_init and p0_init for all levels
     init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-                    rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),&nlevs);
+                    rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr());
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize

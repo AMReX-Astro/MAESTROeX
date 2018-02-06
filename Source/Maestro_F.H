@@ -188,8 +188,7 @@ extern "C"
                           const amrex::Real* rho0,
                           const amrex::Real* rhoh0,
                           const amrex::Real* p0,
-                          const amrex::Real* tempbar,
-                          const int* nlevs);
+                          const amrex::Real* tempbar);
 
     //////////////////////
 

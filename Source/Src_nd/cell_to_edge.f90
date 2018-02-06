@@ -21,13 +21,11 @@ contains
     
     ! local
     double precision :: s0min,s0max,tmp
-    integer          ::  n,r,i,nlevs
+    integer          ::  n,r,i
 
     if (spherical .eq. 1) then
        call amrex_error('calling cell_to_edge with spherical .eq. 1')
     end if
-
-    nlevs = size(s0_cell,dim=1)
 
     do n=0,finest_radial_level
        do i=1,numdisjointchunks(n)

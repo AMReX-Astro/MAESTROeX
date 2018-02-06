@@ -31,10 +31,9 @@ module base_state_module
 
 contains
 
-  subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar, &
-                             max_levs) bind(C, name="init_base_state")
+  subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar) &
+       bind(C, name="init_base_state")
 
-    integer         , intent(in   ) :: max_levs
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(inout) ::    rho0(0:max_radial_level,0:nr_fine-1)
