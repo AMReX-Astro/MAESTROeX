@@ -366,6 +366,95 @@ void
 }
 
 void
+    Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
+			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux, 
+			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			   const Vector<Real>& r0_old,
+			   const Vector<Real>& r0_edge_old,
+			   const Vector<Real>& r0_new,
+			   const Vector<Real>& r0_edge_new,
+			   const Vector<Real>& rh0_old,
+			   const Vector<Real>& rh0_edge_old,
+			   const Vector<Real>& rh0_new,
+			   const Vector<Real>& rh0_edge_new)
+{
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        const MultiFab& scal_mf   = state[lev];
+              MultiFab& sedgex_mf = sedge[lev][0];
+	      MultiFab& sfluxx_mf = sflux[lev][0];
+        const MultiFab& umac_mf   = umac[lev][0];
+#if (AMREX_SPACEDIM >= 2)
+              MultiFab& sedgey_mf = sedge[lev][1];
+	      MultiFab& sfluxy_mf = sflux[lev][1];
+        const MultiFab& vmac_mf   = umac[lev][1];
+
+#if (AMREX_SPACEDIM == 3)
+              MultiFab& sedgez_mf = sedge[lev][2];
+	      MultiFab& sfluxz_mf = sflux[lev][2];
+        const MultiFab& wmac_mf   = umac[lev][2];
+
+#endif
+#endif
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+
+	    // call fortran subroutine
+	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+	    // lo/hi coordinates (including ghost cells), and/or the # of components
+	    // We will also pass "validBox", which specifies the "valid" region.
+#if (AMREX_SPACEDIM == 1)
+	    make_rhoh_flux_1d(
+#elif (AMREX_SPACEDIM == 2)
+	    make_rhoh_flux_2d(
+#elif (AMREX_SPACEDIM == 3)
+            make_rhoh_flux_3d(
+#endif
+			      &lev, validBox.loVect(), validBox.hiVect(),
+			      BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			      BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			      BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+#endif
+#endif
+			      BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			      BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			      BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+#endif
+#endif
+			      BL_TO_FORTRAN_3D(umac_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			      BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			      BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+#endif
+			      r0_old.dataPtr(), r0_edge_old.dataPtr(), 
+			      r0_new.dataPtr(), r0_edge_new.dataPtr(),
+			      rh0_old.dataPtr(), rh0_edge_old.dataPtr(), 
+			      rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
+			      w0.dataPtr());
+	    
+	} // end MFIter loop
+    } // end loop over levels
+
+    // FIXME need to add edge_restriction
+    //
+    //
+
+}
+
+void
     Maestro::UpdateScal (const Vector<MultiFab>& stateold,
 			 Vector<MultiFab>& statenew,
 			 const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,

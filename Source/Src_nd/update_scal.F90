@@ -2,6 +2,7 @@
 module update_scal_module
 
   use amrex_constants_module
+  use meth_params_module, only: base_cutoff_density
 
   implicit none
 
@@ -35,8 +36,6 @@ contains
     double precision :: divterm 
     double precision :: delta, frac, sumX
     logical          :: has_negative_species
-    ! from MAESTRO parameters file
-    double precision :: base_cutoff_density = 3.d6
 
     do comp = startcomp, endcomp
        do i=lo(1),hi(1)
@@ -121,8 +120,6 @@ contains
     double precision :: divterm 
     double precision :: delta, frac, sumX
     logical          :: has_negative_species
-    ! from MAESTRO parameters file
-    double precision :: base_cutoff_density = 3.d6
 
     do comp = startcomp, endcomp
        do j=lo(2),hi(2)
@@ -219,8 +216,6 @@ contains
     double precision :: divterm
     double precision :: delta, frac, sumX
     logical          :: has_negative_species
-    ! from MAESTRO parameters file
-    double precision :: base_cutoff_density = 3.d6
     
     !$OMP PARALLEL PRIVATE(i,j,k,divterm,comp) 
     do comp = startcomp, endcomp

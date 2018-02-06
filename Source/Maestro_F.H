@@ -271,6 +271,40 @@ extern "C"
 			   const amrex::Real* w0, 
 			   const int* startcomp, const int* endcomp);
 
+#if (AMREX_SPACEDIM == 1)
+    void make_rhoh_flux_1d(
+#elif (AMREX_SPACEDIM == 2)
+    void make_rhoh_flux_2d(
+#elif (AMREX_SPACEDIM == 3)
+    void make_rhoh_flux_3d(
+#endif
+			   const int* lev, const int* lo, const int* hi,
+			   amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, const int* nc_fx, 
+#if (AMREX_SPACEDIM >= 2)
+			   amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi, const int* nc_fy, 
+#if (AMREX_SPACEDIM == 3)
+			   amrex::Real* sfluxz, const int* fz_lo, const int* fz_hi, const int* nc_fz, 
+#endif
+#endif
+			   amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x, 
+#if (AMREX_SPACEDIM >= 2)
+			   amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y, 
+#if (AMREX_SPACEDIM == 3)
+			   amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z, 
+#endif
+#endif
+			   const amrex::Real* umac,   const int* u_lo, const int* u_hi,
+#if (AMREX_SPACEDIM >= 2)
+			   const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
+#if (AMREX_SPACEDIM == 3)
+			   const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
+#endif
+#endif
+			   const amrex::Real* rho0_old, const amrex::Real* rho0_edge_old,
+			   const amrex::Real* rho0_new, const amrex::Real* rho0_edge_new,
+			   const amrex::Real* rhoh0_old, const amrex::Real* rhoh0_edge_old,
+			   const amrex::Real* rhoh0_new, const amrex::Real* rhoh0_edge_new,
+			   const amrex::Real* w0);
     //////////////////////
 
     //////////////////////
