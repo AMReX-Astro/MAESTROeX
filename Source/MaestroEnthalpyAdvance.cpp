@@ -187,8 +187,5 @@ Maestro::EnthalpyAdvance (int which_step,
     if (spherical == 1) {
     }
 
-    /*
-    call update_scal(mla,rhoh_comp,rhoh_comp,sold,snew,sflux,scal_force, &
-                     p0_new,p0_new_cart,dx,dt,the_bc_level)
-    */
+    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new.dataPtr());
 }

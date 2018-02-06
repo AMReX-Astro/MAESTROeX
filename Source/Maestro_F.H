@@ -544,6 +544,27 @@ extern "C"
 			const amrex::Real* dx, const amrex::Real* dt,
 			const int* startcomp, const int* endcomp);
 
+#if (AMREX_SPACEDIM == 1)
+    void update_rhoh_1d(
+#elif (AMREX_SPACEDIM == 2)
+    void update_rhoh_2d(
+#elif (AMREX_SPACEDIM == 3)
+    void update_rhoh_3d(
+#endif
+			const int* lev, const int* lo, const int* hi,
+			const amrex::Real* sold, const int* so_lo, const int* so_hi, const int* nc_so,
+			      amrex::Real* snew, const int* sn_lo, const int* sn_hi, const int* nc_sn,
+			const amrex::Real* sfluxx, const int* x_lo, const int* x_hi, const int* nc_x, 
+#if (AMREX_SPACEDIM >= 2)
+			const amrex::Real* sfluxy, const int* y_lo, const int* y_hi, const int* nc_y, 
+#if (AMREX_SPACEDIM == 3)
+			const amrex::Real* sfluxz, const int* z_lo, const int* z_hi, const int* nc_z, 
+#endif
+#endif
+			const amrex::Real* force,  const int* f_lo, const int* f_hi, const int* nc_f,
+			const amrex::Real* p0_new, 
+			const amrex::Real* dx, const amrex::Real* dt,
+			const int& nspec);
     //////////////////////
 
     //////////////////////

@@ -459,7 +459,8 @@ void
 			 Vector<MultiFab>& statenew,
 			 const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
 			 const Vector<MultiFab>& force, 
-			 int start_comp, int num_comp)
+			 int start_comp, int num_comp, 
+			 const Real* p0)
 {
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
@@ -488,8 +489,33 @@ void
 
 	    if (startcomp == RhoH+1) 
 	    {   // Enthalpy update
+		
+                // call fortran subroutine
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // lo/hi coordinates (including ghost cells), and/or the # of components
+                // We will also pass "validBox", which specifies the "valid" region.
+#if (AMREX_SPACEDIM == 1)
+                update_rhoh_1d(
+#elif (AMREX_SPACEDIM == 2)
+                update_rhoh_2d(
+#elif (AMREX_SPACEDIM == 3)
+                update_rhoh_3d(
+#endif
+			       &lev, validBox.loVect(), validBox.hiVect(),
+			       BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
+			       BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
+			       BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			       BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			       BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+#endif
+#endif
+			       BL_TO_FORTRAN_FAB(force_mf[mfi]),
+			       p0, 
+			       dx, &dt,
+			       NumSpec);
 
-	    
 	    }
 	    else if (startcomp == FirstSpec+1) 
 	    {   // RhoX update
@@ -518,10 +544,10 @@ void
                     BL_TO_FORTRAN_FAB(force_mf[mfi]),
                     dx, &dt,
                     &startcomp, &endcomp);
-            } // end if
+            } 
 	    else {
 		Abort("Invalid scalar in UpdateScal().");
-	    }
+	    } // end if
         } // end MFIter loop
     } // end loop over levels
 

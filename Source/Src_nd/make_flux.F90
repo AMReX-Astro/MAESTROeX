@@ -31,15 +31,12 @@ module make_flux_module
 
   use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
-  use meth_params_module, only: enthalpy_pred_type
+  use meth_params_module, only: rho_comp, rhoh_comp, enthalpy_pred_type
 
   implicit none
 
   private
   
-    integer, parameter :: rho_comp  = 1
-    integer, parameter :: rhoh_comp = 2
-
     integer, parameter :: predict_rhoh             = 0;
     integer, parameter :: predict_rhohprime        = 1;
     integer, parameter :: predict_h                = 2;

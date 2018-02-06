@@ -115,7 +115,8 @@ private:
 		     amrex::Vector<amrex::MultiFab>& statenew,
 		     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
 		     const amrex::Vector<amrex::MultiFab>& force, 
-		     int start_scomp, int num_comp);
+		     int start_scomp, int num_comp, 
+		     const amrex::Real* p0 = NULL);
     ////////////
 
     ////////////

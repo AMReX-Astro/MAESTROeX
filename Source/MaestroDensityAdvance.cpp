@@ -164,10 +164,8 @@ Maestro::DensityAdvance (int which_step,
 	scal_force[lev].setVal(0.);
     }
 
-    // p0 only used in rhoh update so we just pass in a dummy version
-    // call update_scal(mla,spec_comp,spec_comp+nspec-1,sold,snew,sflux,scal_force, &
-    //                  p0_dummy,p0_dummy_cart,dx,dt,the_bc_level)
-    UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec,NumSpec);
+    // p0 only used in rhoh update so it's an optional parameter
+    UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec);
     
     // if (verbose >= 1) {
     // 	Real smin, smax;
