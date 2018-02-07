@@ -277,21 +277,14 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                 for (MFIter mfi(crse_src); mfi.isValid(); ++mfi) {
                     const int  nComp = 1;
                     const Box& box   = crse_src[mfi].box();
-                    IntVect xxx = refRatio(lev-1);
-                    const int* rat = xxx.getVect();
-//                    const int* rat   = refRatio(lev-1).getVect();
-/*
+                    IntVect rr = refRatio(lev-1);
+                    const int* rat = rr.getVect();
                     // For edge-based data, fill fine values with piecewise-constant interp of coarse data.
                     // Operate only on faces that overlap--ie, only fill the fine faces that make up each
                     // coarse face, leave the in-between faces alone.
-                    FORT_PC_CF_EDGE_INTERP(box.loVect(), box.hiVect(), &nComp, rat, &n,
-                                           crse_src[mfi].dataPtr(),
-                                           ARLIM(crse_src[mfi].loVect()),
-                                           ARLIM(crse_src[mfi].hiVect()),
-                                           fine_src[mfi].dataPtr(),
-                                           ARLIM(fine_src[mfi].loVect()),
-                                           ARLIM(fine_src[mfi].hiVect()));
-*/
+                    PC_EDGE_INTERP(box.loVect(), box.hiVect(), &nComp, rat, &dir,
+                                   BL_TO_FORTRAN_FAB(crse_src[mfi]),
+                                   BL_TO_FORTRAN_FAB(fine_src[mfi]));
                 }
                 crse_src.clear();
                 //
@@ -311,18 +304,13 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                 for (MFIter mfi(fine_src); mfi.isValid(); ++mfi) {
                     const int  nComp = 1;
                     const Box& fbox  = fine_src[mfi].box();
-                    IntVect xxx = refRatio(lev-1);
-                    const int* rat = xxx.getVect();
-//                    const int* rat   = refRatio(lev-1).getVect();
-/*
+                    IntVect rr = refRatio(lev-1);
+                    const int* rat = rr.getVect();
                     // Do linear in dir, pc transverse to dir, leave alone the fine values
                     // lining up with coarse edges--assume these have been set to hold the 
                     // values you want to interpolate to the rest.
-                    FORT_EDGE_INTERP(fbox.loVect(), fbox.hiVect(), &nComp, rat, &n,
-                                     fine_src[mfi].dataPtr(),
-                                     ARLIM(fine_src[mfi].loVect()),
-                                     ARLIM(fine_src[mfi].hiVect()));
-*/
+                    EDGE_INTERP(fbox.loVect(), fbox.hiVect(), &nComp, rat, &dir,
+                                BL_TO_FORTRAN_FAB(fine_src[mfi]));
                 }
 
                 // make a copy of the original fine uedge but with no ghost cells

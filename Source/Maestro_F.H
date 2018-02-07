@@ -130,6 +130,15 @@ extern "C"
                          amrex::Real* wmac, const int* wmac_lo, const int* wmac_hi,
 #endif
                          const int* phys_bc);
+
+    void PC_EDGE_INTERP(const int* flo, const int* fhi,
+                        const int* nc, const int* ratio, const int* dir,
+                        amrex::Real* crse, const int* c_lo, const int* c_hi, const int* nc_c,
+                        amrex::Real* fine, const int* f_lo, const int* f_hi, const int* nc_f);
+
+    void EDGE_INTERP(const int* flo, const int* fhi,
+                     const int* nc, const int* ratio, const int* dir,
+                     amrex::Real* fine, const int* f_lo, const int* f_hi, const int* nc_f);
     //////////////////////
 
     //////////////////////
