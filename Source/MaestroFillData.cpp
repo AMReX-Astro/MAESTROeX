@@ -187,3 +187,170 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
         }
     }
 }
+
+
+void
+Maestro::create_umac_grown (const std::array< MultiFab, AMREX_SPACEDIM> umac_c,
+                                  std::array< MultiFab, AMREX_SPACEDIM> umac_f,
+                            BoxArray fine_grids,
+                            Geometry fine_geom,
+                            int fine_level,
+                            int nGrow,
+                            IntVect cf_refRatio)
+{
+    if (fine_level > 0) {
+
+        // create a BoxArray whose boxes include only the cell-centered ghost cells 
+        // associated with the fine grids
+        BoxList f_bndry_bl = amrex::GetBndryCells(fine_grids,nGrow);
+        BoxArray f_bndry_ba(f_bndry_bl);
+        f_bndry_bl.clear();
+
+        // create a coarsened version of the fine ghost cell BoxArray
+        BoxArray c_bndry_ba = f_bndry_ba;
+        c_bndry_ba.coarsen(cf_refRatio);
+
+        // recreate the fine ghost cell BoxArray so it overlaps perfectly
+        // with the coarse ghost cell BoxArray
+        // (if there was an odd number of fine ghost cells previously this
+        // makes the coarse and fine BoxArrays cover the same physical locations)
+        f_bndry_ba = c_bndry_ba;
+        f_bndry_ba.refine(cf_refRatio);
+
+        for (int dir = 0; dir < BL_SPACEDIM; ++dir) {
+            // crse_src & fine_src must have same parallel distribution.
+            // We'll use the KnapSack distribution for the fine_src_ba.
+            // Since fine_src_ba should contain more points, this'll lead
+            // to a better distribution.
+            BoxArray crse_src_ba(c_bndry_ba);
+            BoxArray fine_src_ba(f_bndry_ba);
+
+            // grow BoxArrays nodally
+            crse_src_ba.surroundingNodes(dir);
+            fine_src_ba.surroundingNodes(dir);
+
+            // number of boxes and weights used for KnapSack distribution
+            const int N = fine_src_ba.size();
+            std::vector<long> wgts(dir);
+
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+            // set weights equal to number of points in the box
+            for (int i = 0; i < N; i++) {
+                wgts[i] = fine_src_ba[i].numPts();
+            }
+
+            // This DM won't be put into the cache.
+            DistributionMapping dm;
+            dm.KnapSackProcessorMap(wgts,ParallelDescriptor::NProcs());
+
+            // allocate coarse and fine umac in the boundary region
+            MultiFab crse_src;
+            MultiFab fine_src;
+
+            crse_src.define(crse_src_ba, dm, 1, 0);
+            fine_src.define(fine_src_ba, dm, 1, 0);
+
+            crse_src.setVal(1.e200);
+            fine_src.setVal(1.e200);
+
+            // We want to fill crse_src from umac_c
+	    crse_src.copy(umac_c[dir],0,0,1,1,0);
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+            for (MFIter mfi(crse_src); mfi.isValid(); ++mfi) {
+                const int  nComp = 1;
+                const Box& box   = crse_src[mfi].box();
+                const int* rat   = cf_refRatio.getVect();
+/*
+                // For edge-based data, fill fine values with piecewise-constant interp of coarse data.
+                // Operate only on faces that overlap--ie, only fill the fine faces that make up each
+                // coarse face, leave the in-between faces alone.
+                FORT_PC_CF_EDGE_INTERP(box.loVect(), box.hiVect(), &nComp, rat, &n,
+                                       crse_src[mfi].dataPtr(),
+                                       ARLIM(crse_src[mfi].loVect()),
+                                       ARLIM(crse_src[mfi].hiVect()),
+                                       fine_src[mfi].dataPtr(),
+                                       ARLIM(fine_src[mfi].loVect()),
+                                       ARLIM(fine_src[mfi].hiVect()));
+*/
+            }
+            crse_src.clear();
+            //
+            // Replace pc-interpd fine data with preferred u_mac data at
+            // this level u_mac valid only on surrounding faces of valid
+            // region - this op will not fill grow region.
+            //
+            fine_src.copy(umac_f[dir]);
+            //
+            // Interpolate unfilled grow cells using best data from
+            // surrounding faces of valid region, and pc-interpd data
+            // on fine edges overlaying coarse edges.
+            //
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+            for (MFIter mfi(fine_src); mfi.isValid(); ++mfi) {
+                const int  nComp = 1;
+                const Box& fbox  = fine_src[mfi].box();
+                const int* rat   = cf_refRatio.getVect();
+/*
+                // Do linear in dir, pc transverse to dir, leave alone the fine values
+                // lining up with coarse edges--assume these have been set to hold the 
+                // values you want to interpolate to the rest.
+                FORT_EDGE_INTERP(fbox.loVect(), fbox.hiVect(), &nComp, rat, &n,
+                                 fine_src[mfi].dataPtr(),
+                                 ARLIM(fine_src[mfi].loVect()),
+                                 ARLIM(fine_src[mfi].hiVect()));
+*/
+            }
+
+            // make a copy of the original umac_f but with no ghost cells
+	    MultiFab umac_f_save(umac_f[dir].boxArray(),umac_f[dir].DistributionMap(), 1,0);
+	    umac_f_save.copy(umac_f[dir]);
+
+            // copy in the grown data into umac_f
+	    umac_f[dir].copy(fine_src,0,0,1,0,nGrow);
+
+            // copy the original valid region back into umac
+            // to we don't change the values on the C-F interface
+	    umac_f[dir].copy(umac_f_save);
+        }
+    }   
+
+    //
+    // Now we set the boundary data
+    // FillBoundary fills grow cells that overlap valid regions.
+    // HOEXTRAPTOCC fills outside of domain cells.
+    //
+    const Real* xlo = fine_geom.ProbLo(); //these aren't actually used by the FORT method
+    const Real* dx  = fine_geom.CellSize();
+
+    for (int dir = 0; dir < BL_SPACEDIM; ++dir)
+    {
+        Box dm = fine_geom.Domain();
+        dm.surroundingNodes(dir);
+        const int*  lo  = dm.loVect();
+        const int*  hi  = dm.hiVect();
+
+	// call FillBoundary to make sure that fine/fine grow cells are valid
+	// before FORT_HOEXTRAPTOCC is called 
+	umac_f[dir].FillBoundary(fine_geom.periodicity());
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(umac_f[dir]); mfi.isValid(); ++mfi)
+        {
+            FArrayBox& fab = umac_f[dir][mfi];
+            const int* dlo = fab.loVect();
+            const int* dhi = fab.hiVect();
+/*
+            FORT_HOEXTRAPTOCC(fab.dataPtr(),ARLIM(dlo),ARLIM(dhi),lo,hi,dx,xlo);
+*/
+        }
+    }
+}
