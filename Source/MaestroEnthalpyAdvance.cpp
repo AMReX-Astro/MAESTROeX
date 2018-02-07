@@ -51,7 +51,7 @@ Maestro::EnthalpyAdvance (int which_step,
         // make force for (rho h)'
         MakeRhoHForce(scal_force,1,thermal,umac,1);
 
-        ModifyScalForce(scal_force,umac,rhoh0_old,rhoh0_edge_old,RhoH,bcs_s,0);
+        ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,RhoH,bcs_s,0);
 
     }
     else if (enthalpy_pred_type == predict_h ||
@@ -83,7 +83,7 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_rhohprime) {
         // convert (rho h) -> (rho h)'
-        PutInPertForm(scalold, rhoh0_old, RhoH, 0, bcs_f, true);
+        PutInPertForm(scalold, rhoh0_old, RhoH, 0, bcs_s, true);
     }
 
     if (enthalpy_pred_type == predict_hprime) {
@@ -109,7 +109,7 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_rhoh) {
         // use the conservative form of the prediction
-        Abort("MaestroEnthalpyAdavnce predict_rhoh");
+        Abort("MaestroEnthalpyAdvance predict_rhoh");
     }
     else {
         // use the advective form of the prediction
@@ -142,7 +142,7 @@ Maestro::EnthalpyAdvance (int which_step,
     if ( (enthalpy_pred_type == predict_T_then_rhohprime) ||
          (enthalpy_pred_type == predict_T_then_h        ) ||
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
-        Abort("MaestroEnthalpyAdavnce need makeHfromRhoT_edge");
+        Abort("MaestroEnthalpyAdvance need makeHfromRhoT_edge");
     }
    
     //////////////////////////////////

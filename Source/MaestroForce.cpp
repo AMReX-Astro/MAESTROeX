@@ -63,6 +63,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
 void
 Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
+			 const Vector<MultiFab>& state, 
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                          const Vector<Real>& s0,
                          const Vector<Real>& s0_edge,
@@ -75,7 +76,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_force_mf = scal_force[lev];
-        const MultiFab& sold_mf = sold[lev];
+        const MultiFab& state_mf = state[lev];
         const MultiFab& umac_mf = umac[lev][0];
 #if (AMREX_SPACEDIM >= 2)
         const MultiFab& vmac_mf = umac[lev][1];
@@ -98,8 +99,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             modify_scal_force(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                               scal_force_mf[mfi].dataPtr(comp), 
                               ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
-                              sold_mf[mfi].dataPtr(comp), 
-                              ARLIM_3D(sold_mf[mfi].loVect()), ARLIM_3D(sold_mf[mfi].hiVect()),
+                              state_mf[mfi].dataPtr(comp), 
+                              ARLIM_3D(state_mf[mfi].loVect()), ARLIM_3D(state_mf[mfi].hiVect()),
                               BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
                               BL_TO_FORTRAN_3D(vmac_mf[mfi]),

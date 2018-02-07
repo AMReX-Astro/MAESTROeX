@@ -47,12 +47,12 @@ Maestro::DensityAdvance (int which_step,
     if (species_pred_type == predict_rhoprime_and_X) {
         // rho' souce term
         // this is needed for pred_rhoprime_and_X
-        ModifyScalForce(scal_force,umac,rho0_old,rho0_edge_old,Rho,bcs_s,0);
+        ModifyScalForce(scal_force,scalold,umac,rho0_old,rho0_edge_old,Rho,bcs_s,0);
 
     }
     else if (species_pred_type == predict_rho_and_X) {
         // rho source term
-        ModifyScalForce(scal_force,umac,rho0_old,rho0_edge_old,Rho,bcs_s,1);
+        ModifyScalForce(scal_force,scalold,umac,rho0_old,rho0_edge_old,Rho,bcs_s,1);
 
     }
 

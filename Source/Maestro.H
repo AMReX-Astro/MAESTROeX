@@ -285,6 +285,7 @@ private:
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
+			 const amrex::Vector<amrex::MultiFab>& state,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<amrex::Real>& s0,
                          const amrex::Vector<amrex::Real>& s0_edge,
