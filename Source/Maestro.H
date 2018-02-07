@@ -244,12 +244,8 @@ private:
                       int comp,
                       int ncomp);
 
-    // more flexible version of AverageDown() that lets you average 
-    // down across multiple levels
-    void AverageDownTo (int crse_lev,
-                        amrex::Vector<amrex::MultiFab>& mf,
-                        int comp,
-                        int ncomp);
+    // set covered faces to be the average of overlying fine faces
+    void AverageDownFaces (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge);
 
     // fill in ONE ghost cell for all components of a face-centered (MAC) velocity
     // field behind physical boundaries.  Does not modify the velocities on the boundary

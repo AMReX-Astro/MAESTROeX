@@ -135,24 +135,30 @@ Maestro::AverageDown (Vector<MultiFab>& mf,
                       int comp,
                       int ncomp)
 {
-    for (int lev = finest_level-1; lev >= 0; --lev)
-    {
+    for (int lev = finest_level-1; lev >= 0; --lev) {
         average_down(mf[lev+1], mf[lev],
                      geom[lev+1], geom[lev],
                      comp, ncomp, refRatio(lev));
     }
 }
 
-// more flexible version of AverageDown() that lets you average down across multiple levels
+// set covered faces to be the average of overlying fine faces
 void
-Maestro::AverageDownTo (int crse_lev,
-                        Vector<MultiFab>& mf,
-                        int comp,
-                        int ncomp)
+Maestro::AverageDownFaces (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge)
 {
-    average_down(mf[crse_lev+1], mf[crse_lev],
-                 geom[crse_lev+1], geom[crse_lev],
-                 comp, ncomp, refRatio(crse_lev));
+    for (int lev = finest_level-1; lev >= 0; --lev) {
+
+        Vector<const MultiFab*> edge_f(AMREX_SPACEDIM);
+        Vector<      MultiFab*> edge_c(AMREX_SPACEDIM);
+        
+        for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+            edge_f[dir] = &(edge[lev+1][dir]);
+            edge_c[dir] = &(edge[lev  ][dir]);
+        }
+
+        average_down_faces(edge_f, edge_c, refRatio(lev));
+    }
+
 }
 
 
