@@ -253,15 +253,11 @@ private:
 
     // fill in ONE ghost cell for all components of a face-centered (MAC) velocity
     // field behind physical boundaries.  Does not modify the velocities on the boundary
-    void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+    void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                        int level=-1);
 
-    void create_umac_grown(const std::array< amrex::MultiFab, AMREX_SPACEDIM> umac_c,
-                                 std::array< amrex::MultiFab, AMREX_SPACEDIM> umac_f,
-                           amrex::BoxArray fine_grids,
-                           amrex::Geometry fine_geom,
-                           int fine_level,
-                           int nGrow,
-                           amrex::IntVect cf_refRatio);
+    // fill in all ghost cells for an edge-based MAC velocity field
+    void FillPatchUedge(amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge);
 
     // end MaestroFillData.cpp functions
     ////////////
