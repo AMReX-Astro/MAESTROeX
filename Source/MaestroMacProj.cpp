@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <AMReX_VisMF.H>
 
 using namespace amrex;
 
@@ -106,15 +107,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // solve -div B grad phi = RHS
-    //
-    // create grad_phi
-    Vector< std::array<MultiFab,AMREX_SPACEDIM> > mac_gradphi(finest_level+1);
-    for (int lev = 0; lev <= finest_level; ++lev) 
-    {
-	AMREX_D_TERM(mac_gradphi[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-		     mac_gradphi[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-		     mac_gradphi[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
-    }
 
     // build an MLMG solver
     MLMG mac_mlmg(mlabec);
@@ -131,23 +123,28 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     const Real mac_tol_abs = -1.e-10;
     const Real mac_tol_rel = std::min(eps_mac*pow(mac_level_factor,finest_level), eps_mac_max);
 
+    // solve for phi
     mac_mlmg.solve(GetVecOfPtrs(macphi), GetVecOfConstPtrs(solverrhs), mac_tol_rel, mac_tol_abs);
 
     // update velocity, beta0 * Utilde = beta0 * Utilde^* - B grad phi
-    //
-    // Note: must solve linear system first before computing grad phi
-    auto& gradphi_flux = mac_gradphi;
+
+    // storage for "-B grad_phi"
+    Vector< std::array<MultiFab,AMREX_SPACEDIM> > mac_fluxes(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-	// fluxes computed are -grad phi
-	mac_mlmg.getFluxes({amrex::GetArrOfPtrs(gradphi_flux[lev])});
+	AMREX_D_TERM(mac_fluxes[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+		     mac_fluxes[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+		     mac_fluxes[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
     }
 
-    for (int lev = 0; lev <= finest_level; ++lev) 
-    {
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	// fluxes computed are "-B grad phi"
+	mac_mlmg.getFluxes({amrex::GetArrOfPtrs(mac_fluxes[lev])});
+    }
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
 	for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
-	    MultiFab::Multiply(gradphi_flux[lev][idim], face_bcoef[lev][idim], 0, 0, 1, 0);
-	    // add -grad phi
-	    MultiFab::Add(umac[lev][idim], gradphi_flux[lev][idim], 0, 0, 1, 0);
+	    // add -B grad phi to beta0*Utilde
+	    MultiFab::Add(umac[lev][idim], mac_fluxes[lev][idim], 0, 0, 1, 0);
 	}
     }
     
@@ -233,11 +230,8 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 #endif
 #endif
 
-	// Must use cell-centered MultiFab boxes for MIter
-	MultiFab& macphi_mf = sold[lev];
-
 	// loop over boxes
-	for ( MFIter mfi(macphi_mf); mfi.isValid(); ++mfi) {
+	for ( MFIter mfi(solverrhs_mf); mfi.isValid(); ++mfi) {
 
 	    // Get the index space of valid region
 	    const Box& validBox = mfi.validbox();
