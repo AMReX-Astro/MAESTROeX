@@ -74,6 +74,13 @@ Maestro::Evolve ()
             WritePlotFile(istep,t_new,rho0_new,p0_new,unew,snew);
         }
 
+        // write a checkpoint file
+        if (chk_int > 0 && (istep % chk_int == 0 || istep == max_step) )
+        {
+            Print() << "\nWriting checkpoint" << istep << endl;
+            WriteCheckPoint(istep);
+        }
+
         // move new state into old state by swapping pointers
         for (int lev=0; lev<=finest_level; ++lev) {
             std::swap(    sold[lev],     snew[lev]);

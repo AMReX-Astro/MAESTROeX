@@ -181,6 +181,7 @@ extern "C"
                             const amrex::Real* prob_hi_in);
 
     void set_rel_eps (const amrex::Real* rel_eps_in);
+    void get_rel_eps (const amrex::Real* rel_eps_in);
 
     void init_base_state (const amrex::Real* s0_init, 
                           const amrex::Real* p0_init,

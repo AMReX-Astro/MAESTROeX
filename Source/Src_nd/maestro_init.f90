@@ -119,4 +119,12 @@ contains
 
   end subroutine set_rel_eps
 
+  subroutine get_rel_eps(rel_eps_in) bind(C,name="get_rel_eps")
+
+    double precision, intent(inout) :: rel_eps_in
+
+    rel_eps_in = rel_eps
+
+  end subroutine get_rel_eps
+
 end module maestro_init_module

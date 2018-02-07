@@ -66,6 +66,11 @@ Maestro::WriteCheckPoint (int step) {
        // write out t_new
        HeaderFile << t_new << "\n";
 
+       // write out rel_eps
+       Real rel_eps;
+       get_rel_eps(&rel_eps);
+       HeaderFile << rel_eps << "\n";
+
        // write the BoxArray at each level
        for (int lev = 0; lev <= finest_level; ++lev) {
            boxArray(lev).writeOn(HeaderFile);
@@ -77,8 +82,66 @@ Maestro::WriteCheckPoint (int step) {
    for (int lev = 0; lev <= finest_level; ++lev) {
        VisMF::Write(snew[lev],
                     amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "snew"));
+       VisMF::Write(unew[lev],
+                    amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "unew"));
+       VisMF::Write(gpi[lev],
+                    amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "gpi"));
+       VisMF::Write(dSdt[lev],
+                    amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "dSdt"));
+       VisMF::Write(S_cc_new[lev],
+                    amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "S_cc_new"));
    }
 
+   // write out the cell-centered base state
+   if (ParallelDescriptor::IOProcessor()) {
+
+       std::string BaseCCFileName(checkpointname + "/BaseCC");
+       std::ofstream BaseCCFile(BaseCCFileName.c_str(), std::ofstream::out   |
+				                        std::ofstream::trunc |
+				                        std::ofstream::binary);
+       if( ! BaseCCFile.good()) {
+           amrex::FileOpenFailed(BaseCCFileName);
+       }
+
+       BaseCCFile.precision(17);
+
+       VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+       BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+
+       for (int i=0; i<rho0_new.size(); ++i) {
+           BaseCCFile << rho0_new[i] << " "
+                      << p0_new[i] << " "
+                      << gamma1bar_new[i] << " " 
+                      << rhoh0_new[i] << " "
+                      << beta0_new[i] << " " 
+                      << psi[i] << " "
+                      << tempbar[i] << " "
+                      << etarho_cc[i] << " "
+                      << tempbar_init[i] << "\n";
+       }
+   }
+
+   // write out the face-centered base state
+   if (ParallelDescriptor::IOProcessor()) {
+
+       std::string BaseFCFileName(checkpointname + "/BaseFC");
+       std::ofstream BaseFCFile(BaseFCFileName.c_str(), std::ofstream::out   |
+				                        std::ofstream::trunc |
+				                        std::ofstream::binary);
+       if( ! BaseFCFile.good()) {
+           amrex::FileOpenFailed(BaseFCFileName);
+       }
+
+       BaseFCFile.precision(17);
+
+       VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+       BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+
+       for (int i=0; i<w0.size(); ++i) {
+           BaseFCFile << w0[i] << " "
+                      << etarho_ec[i] << "\n";
+       }
+   }
 }
 
 int
@@ -118,6 +181,12 @@ Maestro::ReadCheckPoint ()
     // read in t_new
     is >> t_new;
     GotoNextLine(is);
+
+    // read in rel_eps
+    Real rel_eps;
+    is >> rel_eps;
+    GotoNextLine(is);
+    set_rel_eps(&rel_eps);    
 
     for (int lev = 0; lev <= finest_level; ++lev) {
 
@@ -159,7 +228,50 @@ Maestro::ReadCheckPoint ()
     // read in the MultiFab data
     for (int lev = 0; lev <= finest_level; ++lev) {
         VisMF::Read(snew[lev],
-                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "phi"));
+                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "snew"));
+        VisMF::Read(unew[lev],
+                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "unew"));
+        VisMF::Read(gpi[lev],
+                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "gpi"));
+        VisMF::Read(dSdt[lev],
+                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "dSdt"));
+        VisMF::Read(S_cc_new[lev],
+                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "S_cc_new"));
+    }
+
+    // read in cell-centered base state
+    for (int i=0; i<(max_radial_level+1)*nr_fine; ++i) {
+        std::getline(is, line);
+        std::istringstream lis(line);
+        lis >> word;
+        rho0_new[i] = std::stod(word);
+        lis >> word;
+        p0_new[i] = std::stod(word);
+        lis >> word;
+        gamma1bar_new[i] = std::stod(word);
+        lis >> word;
+        rhoh0_new[i] = std::stod(word);
+        lis >> word;
+        beta0_new[i] = std::stod(word);
+        lis >> word;
+        psi[i] = std::stod(word);
+        lis >> word;
+        tempbar[i] = std::stod(word);
+        lis >> word;
+        etarho_cc[i] = std::stod(word);
+        lis >> word;
+        tempbar_init[i] = std::stod(word);
+    }
+
+
+    // read in face-centered base state
+    for (int i=0; i<(max_radial_level+1)*nr_fine+1; ++i) {
+        std::getline(is, line);
+        std::istringstream lis(line);
+        lis >> word;
+        w0[i] = std::stod(word);
+        lis >> word;
+        etarho_ec[i] = std::stod(word);
     }
 
     return step;
