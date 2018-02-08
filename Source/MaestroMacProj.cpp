@@ -120,7 +120,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     const Real eps_mac = 1.e-10;
     const Real eps_mac_max = 1.e-8;
     const Real mac_level_factor = 10.0;
-    const Real mac_tol_abs = -1.e-10;
+    const Real mac_tol_abs = -1.e0;
     const Real mac_tol_rel = std::min(eps_mac*pow(mac_level_factor,finest_level), eps_mac_max);
 
     // solve for phi

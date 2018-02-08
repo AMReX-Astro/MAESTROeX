@@ -585,6 +585,30 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in update_velocity.F90
+    void update_velocity(const int* lev, const int* lo, const int* hi,
+			 const amrex::Real* uold, const int* uo_lo, const int* uo_hi,
+			       amrex::Real* unew, const int* un_lo, const int* un_hi,
+			 const amrex::Real* umac, const int* u_lo, const int* u_hi, 
+#if (AMREX_SPACEDIM >= 2)
+			 const amrex::Real* vmac, const int* v_lo, const int* v_hi, 
+#if (AMREX_SPACEDIM == 3)
+			 const amrex::Real* wmac, const int* w_lo, const int* w_hi, 
+#endif
+#endif
+			 const amrex::Real* uedgex, const int* x_lo, const int* x_hi, 
+#if (AMREX_SPACEDIM >= 2)
+			 const amrex::Real* uedgey, const int* y_lo, const int* y_hi, 
+#if (AMREX_SPACEDIM == 3)
+			 const amrex::Real* uedgez, const int* z_lo, const int* z_hi, 
+#endif
+#endif
+			 const amrex::Real* force, const int* f_lo, const int* f_hi, 
+			 const amrex::Real* sponge, const int* s_lo, const int* s_hi, 
+			 const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt);
+    //////////////////////
+
+    //////////////////////
     // in velpred.F90
 #if (AMREX_SPACEDIM == 1)
     void velpred_1d(

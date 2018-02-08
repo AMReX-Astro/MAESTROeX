@@ -340,8 +340,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     }
     // set enthalpy & pi to zero in s2 to debug output
     for (int lev=0; lev<=finest_level; ++lev) {
-	s2[lev].setVal(0., RhoH, 1);
-	s2[lev].setVal(0., Pi, 1);
+    	s2[lev].setVal(0., RhoH, 1);
+    	s2[lev].setVal(0., Pi, 1);
     }
 
     // advect rhoX, rho, and tracers
@@ -424,7 +424,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 
 
     }
-
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 5 -- react the full state and then base state through dt/2
     //////////////////////////////////////////////////////////////////////////////
@@ -694,7 +694,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // Define rho at half time using the new rho from Step 8
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
        
-    // VelocityAdvance();
+    VelocityAdvance(rhohalf, umac, w0_force, rho0_nph, grav_cell_nph, sponge);
 
 
     if (evolve_base_state && is_initIter) {

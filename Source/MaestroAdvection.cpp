@@ -557,4 +557,66 @@ void
 
 }
 
+void
+    Maestro::UpdateVel ( const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			 const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
+			 const Vector<MultiFab>& force,
+			 const Vector<MultiFab>& sponge)
+{
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        const MultiFab& uold_mf = uold[lev];
+	      MultiFab& unew_mf = unew[lev];
+	const MultiFab& umac_mf   = umac[lev][0];
+        const MultiFab& uedgex_mf = uedge[lev][0];
+#if (AMREX_SPACEDIM >= 2)
+	const MultiFab& vmac_mf   = umac[lev][1];
+        const MultiFab& uedgey_mf = uedge[lev][1];
+#if (AMREX_SPACEDIM == 3)
+	const MultiFab& wmac_mf   = umac[lev][2];
+        const MultiFab& uedgez_mf = uedge[lev][2];
+#endif
+#endif
+        const MultiFab& force_mf = force[lev];
+	const MultiFab& sponge_mf = sponge[lev];
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(force_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+            const Real* dx = geom[lev].CellSize();
+
+	    update_velocity( &lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			     BL_TO_FORTRAN_3D(uold_mf[mfi]),
+			     BL_TO_FORTRAN_3D(unew_mf[mfi]),
+			     BL_TO_FORTRAN_3D(umac_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			     BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			     BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+#endif
+			     BL_TO_FORTRAN_3D(uedgex_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			     BL_TO_FORTRAN_3D(uedgey_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			     BL_TO_FORTRAN_3D(uedgez_mf[mfi]),
+#endif
+#endif
+			     BL_TO_FORTRAN_3D(force_mf[mfi]),
+			     BL_TO_FORTRAN_3D(sponge_mf[mfi]),
+			     w0.dataPtr(), 
+			     dx, &dt);
+
+        } // end MFIter loop
+    } // end loop over levels
+
+    // FIXME need to add edge_restriction
+    //
+    //
+
+}
 

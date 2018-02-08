@@ -117,6 +117,11 @@ private:
 		     const amrex::Vector<amrex::MultiFab>& force, 
 		     int start_scomp, int num_comp, 
 		     const amrex::Real* p0 = NULL);
+
+    void UpdateVel (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+		    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+		    const amrex::Vector<amrex::MultiFab>& force,
+		    const amrex::Vector<amrex::MultiFab>& sponge);
     ////////////
 
     ////////////
@@ -555,7 +560,8 @@ private:
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                           const amrex::Vector<amrex::Real>& w0_force,
                           const amrex::Vector<amrex::Real>& rho0_nph,
-                          const amrex::Vector<amrex::Real>& grav_cell_nph);
+                          const amrex::Vector<amrex::Real>& grav_cell_nph,
+			  const amrex::Vector<amrex::MultiFab>& sponge);
     ////////////////////////
 
 

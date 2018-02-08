@@ -8,7 +8,8 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                           const Vector<Real>& w0_force,
                           const Vector<Real>& rho0_nph,
-                          const Vector<Real>& grav_cell_nph)
+                          const Vector<Real>& grav_cell_nph, 
+			  const Vector<MultiFab>& sponge)
 {
 
     Vector<MultiFab> vel_force(finest_level+1);
@@ -60,5 +61,6 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     call update_velocity(uold,unew,umac,uedge,force,w0,w0mac, &
                          dx,dt,sponge,mla,the_bc_level)
     */
+    UpdateVel(umac, uedge, vel_force, sponge);
 
 }
