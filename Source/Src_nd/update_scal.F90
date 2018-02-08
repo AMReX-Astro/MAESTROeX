@@ -390,7 +390,7 @@ contains
     do j=lo(2),hi(2)
        do i=lo(1),hi(1)
           
-          divterm = (sfluxx(i+1,j,rhoh_comp) - sfluxx(i,j,rho_comp))/dx(1) &
+          divterm = (sfluxx(i+1,j,rhoh_comp) - sfluxx(i,j,rhoh_comp))/dx(1) &
                + (sfluxy(i,j+1,rhoh_comp) - sfluxy(i,j,rhoh_comp))/dx(2)
           snew(i,j,rhoh_comp) = sold(i,j,rhoh_comp) + dt*(-divterm + force(i,j,rhoh_comp))
              
