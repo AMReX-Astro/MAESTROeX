@@ -80,10 +80,10 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(snew,p0);
+        TfromRhoP(s_out,p0);
     }
     else {
-        TfromRhoH(snew,p0);
+        TfromRhoH(s_out,p0);
     }
 }
 
