@@ -2,7 +2,8 @@
 module update_scal_module
 
   use amrex_constants_module
-  use meth_params_module
+  use meth_params_module, only: rho_comp, rhoh_comp,spec_comp, temp_comp, & 
+                                  do_eos_h_above_cutoff, base_cutoff_density
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use eos_module                  
   use eos_type_module
@@ -330,7 +331,7 @@ contains
        snew(i,rhoh_comp) = sold(i,rhoh_comp) + dt*(-divterm + force(i,rhoh_comp))
     end do
 
-    ! if (do_eos_h_above_cutoff) then
+    if (do_eos_h_above_cutoff) then
        do i = lo(1), hi(1)
           if (snew(i,rho_comp) .le. base_cutoff_density) then
 
@@ -348,7 +349,7 @@ contains
              
           end if
        enddo
-    ! end if
+    end if
 
   end subroutine update_rhoh_1d
 #endif
@@ -396,7 +397,7 @@ contains
        end do
     end do
 
-    ! if (do_eos_h_above_cutoff) then
+    if (do_eos_h_above_cutoff) then
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
              
@@ -416,7 +417,7 @@ contains
              
           enddo
        enddo
-    ! end if
+    end if
 
   end subroutine update_rhoh_2d
 #endif
@@ -473,7 +474,7 @@ contains
     enddo
     !$OMP END PARALLEL
     
-    ! if ( do_eos_h_above_cutoff ) then
+    if ( do_eos_h_above_cutoff ) then
        !$OMP PARALLEL DO PRIVATE(i,j,k,eos_state,pt_index)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
@@ -499,7 +500,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-    ! end if
+    end if
 
   end subroutine update_rhoh_3d
 #endif

@@ -310,7 +310,7 @@ do_smallscale                       bool            false
 
 # After the advective enthalpy update, recompute the enthalpy if we are
 # below the base cutoff density.
-do_eos_h_above_cutoff               bool            true
+do_eos_h_above_cutoff               bool            true	y
 
 # predict\_rhoh = 0; @@
 # predict\_rhohprime = 1; @@
