@@ -360,6 +360,14 @@ Maestro::NodalProj (int proj_type,
         }
     }
 
+    // average fine data onto coarser cells
+    AverageDown(unew,0,AMREX_SPACEDIM);
+    AverageDown(gpi,0,AMREX_SPACEDIM);
+
+    // fill ghost cells
+    FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+
+
     // destroy timer for profiling
     BL_PROFILE_VAR_STOP(NodalProj);
 }
