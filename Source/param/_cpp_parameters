@@ -255,7 +255,7 @@ hg_dense_stencil                    bool            true
 #-----------------------------------------------------------------------------
 
 # Use sponging.
-do_sponge                           bool            false
+do_sponge                           bool            false	y
 
 # Parameter for sponge.  Problem dependent.
 sponge_kappa                        Real               10.e0            y

@@ -173,14 +173,14 @@ Maestro::DensityAdvance (int which_step,
     // 	    // Print() << "Level " << lev << endl;
 
     // 	    for (int comp = FirstSpec; comp < FirstSpec+NumSpec; ++comp) {
-    // 		MultiFab::Divide(snew[lev],snew[lev],Rho,comp,1,0);
+    // 		MultiFab::Divide(snew[lev],snew[lev],Rho,comp,1,3);
              
     // 		smin = snew[lev].min(comp); 
     // 		smax = snew[lev].max(comp);
              
     //          Print() << "Last species: " << smin << " " << smax << endl;
 
-    // 		MultiFab::Multiply(snew[lev],snew[lev],Rho,comp,1,0);
+    // 		MultiFab::Multiply(snew[lev],snew[lev],Rho,comp,1,3);
     // 	    }
 	    
     // 	    smin = snew[lev].min(Rho); 

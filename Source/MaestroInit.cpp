@@ -404,6 +404,6 @@ void Maestro::InitIter ()
 
     // copy pi from snew to sold
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1,0);
+        MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1, 3);
     }
 }

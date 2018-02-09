@@ -207,6 +207,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
             MultiFab::LinComb(S_cc_nph[lev],1.0,S_cc_old[lev],0,0.5*dt,dSdt[lev],0,0,1,0);
         }
     }
+    // no ghost cells for S_cc_nph
     AverageDown(S_cc_nph,0,1);
 
     // compute p0_minus_peosbar = p0_old - peosbar (for making w0) and
@@ -319,7 +320,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,0);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1, 3);
     }
 
     if (maestro_verbose >= 1) {
@@ -337,11 +338,6 @@ Maestro::AdvanceTimeStep (bool is_initIter)
 	    sedge[lev][idim].setVal(0.);
 	    sflux[lev][idim].setVal(0.);
 	}
-    }
-    // set enthalpy & pi to zero in s2 to debug output
-    for (int lev=0; lev<=finest_level; ++lev) {
-    	s2[lev].setVal(0., RhoH, 1);
-    	s2[lev].setVal(0., Pi, 1);
     }
 
     // advect rhoX, rho, and tracers
@@ -406,8 +402,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // pass temperature through for seeding the temperature update eos call
     // pi goes along for the ride
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,0);
-        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,0);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1, 3);
+        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1, 3);
     }
 
     // now update temperature
@@ -544,7 +540,7 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,0);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1, 3);
     }
 
     if (maestro_verbose >= 1) {
@@ -627,8 +623,8 @@ Maestro::AdvanceTimeStep (bool is_initIter)
     // pass temperature through for seeding the temperature update eos call
     // pi goes along for the ride
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,0);
-        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,0);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1, 3);
+        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1, 3);
     }
 
     // now update temperature

@@ -2,7 +2,7 @@ module update_vel_module
 
   use amrex_constants_module
   use base_state_geometry_module, only:  max_radial_level, nr_fine
-  use meth_params_module
+  use meth_params_module, only: do_sponge
 
   implicit none
 
@@ -133,7 +133,7 @@ contains
 #endif
 
        ! Add the sponge
-       !if (do_sponge) unew(i,j,k,:) = unew(i,j,k,:) * sponge(i,j,k)
+       if (do_sponge) unew(i,j,k,:) = unew(i,j,k,:) * sponge(i,j,k)
 
     end do
     end do

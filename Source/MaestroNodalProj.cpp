@@ -431,6 +431,7 @@ Maestro::CreateUvecForProj (int proj_type,
     }
 
     // fill ghost cells
+    AverageDown(Vproj,0,AMREX_SPACEDIM);
     FillPatch(time, Vproj, Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 
     // destroy timer for profiling
