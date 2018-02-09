@@ -487,7 +487,7 @@ void
             const Box& validBox = mfi.validbox();
             const Real* dx = geom[lev].CellSize();
 
-	    if (startcomp == RhoH+1) 
+	    if (start_comp == RhoH) 
 	    {   // Enthalpy update
 		
                 // call fortran subroutine
@@ -517,7 +517,7 @@ void
 			       &NumSpec);
 
 	    }
-	    else if (startcomp == FirstSpec+1) 
+	    else if (start_comp == FirstSpec) 
 	    {   // RhoX update
 
                 // call fortran subroutine
@@ -548,13 +548,21 @@ void
 	    else {
 		Abort("Invalid scalar in UpdateScal().");
 	    } // end if
-        } // end MFIter loop
+	} // end MFIter loop
     } // end loop over levels
 
-    // FIXME need to add edge_restriction
-    //
-    //
 
+    // average fine data onto coarser cells
+    AverageDown(statenew,start_comp,num_comp);
+
+    // fill ghost cells
+    FillPatch(t_old, statenew, statenew, statenew, start_comp, start_comp, num_comp, start_comp, bcs_s);
+
+    // do the same for density if we updated the species
+    if (start_comp == FirstSpec) {
+	AverageDown(statenew,Rho,1);
+	FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
+    }
 }
 
 void
@@ -614,9 +622,12 @@ void
         } // end MFIter loop
     } // end loop over levels
 
-    // FIXME need to add edge_restriction
-    //
-    //
+    
+    // average fine data onto coarser cells
+    AverageDown(unew,0,AMREX_SPACEDIM);
+
+    // fill ghost cells
+    FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 
 }
 
