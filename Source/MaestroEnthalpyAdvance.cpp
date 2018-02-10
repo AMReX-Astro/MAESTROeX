@@ -83,7 +83,7 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_rhohprime) {
         // convert (rho h) -> (rho h)'
-        PutInPertForm(scalold, rhoh0_old, RhoH, 0, bcs_s, true);
+        PutInPertForm(scalold, rhoh0_old, RhoH, 0, bcs_f, true);
     }
 
     if (enthalpy_pred_type == predict_hprime) {
