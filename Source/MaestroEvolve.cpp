@@ -68,14 +68,14 @@ Maestro::Evolve ()
         t_old = t_new;
 
         // write a plotfile
-        if (plot_int > 0 && (istep % plot_int == 0 || istep == max_step) )
+        if (plot_int > 0 && (istep % plot_int == 0 || std::fmod(t_new, plot_deltat) < dt) )
         {
             Print() << "\nWriting plotfile " << istep << endl;
             WritePlotFile(istep,t_new,rho0_new,p0_new,unew,snew);
         }
 
         // write a checkpoint file
-        if (chk_int > 0 && (istep % chk_int == 0 || istep == max_step) )
+        if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time) )
         {
             Print() << "\nWriting checkpoint" << istep << endl;
             WriteCheckPoint(istep);

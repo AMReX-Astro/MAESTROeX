@@ -54,7 +54,7 @@ maestro.sponge_kappa = 10.e0
 # PLOTFILES
 maestro.plot_file  = plt    # root name of plot file
 maestro.plot_int   = 10      # number of timesteps between plot files
-#maestro.plot_deltat = 0.5d0
+maestro.plot_deltat = 0.5d0
 
 # CHECKPOINT
 maestro.check_base_name = chk
