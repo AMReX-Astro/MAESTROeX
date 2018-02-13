@@ -16,6 +16,9 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   const Vector<Real>& beta0,
                   const int& is_predictor)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MacProj()",MacProj);
+
     // this will hold solver RHS = macrhs - div(beta0*umac)
     Vector<MultiFab> solverrhs(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -170,6 +173,8 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                                 const Vector<Real>& beta0_edge,
                                 const int& mult_or_div)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MultFacesByBeta0()",MultFacesByBeta0);
 
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
     for (int lev = 0; lev <= finest_level; ++lev) 
@@ -215,6 +220,8 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
                                    const Vector<MultiFab>& macrhs,
                                    const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ComputeMACSolverRHS()",ComputeMACSolverRHS);
 
     // Note that umac = beta0*mac
     for (int lev = 0; lev <= finest_level; ++lev) 
@@ -261,6 +268,8 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& facebcoef,
 				 const Vector<MultiFab>& rhocc)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()",AvgFaceBcoeffsInv);
 
     // write an MFIter loop 
     for (int lev = 0; lev <= finest_level; ++lev) 
@@ -303,6 +312,8 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 // Set boundaries for MAC velocities
 void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec) 
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::SetMacSolverBCs()",SetMacSolverBCs);
 
     // build array of boundary conditions needed by MLABecLaplacian
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;

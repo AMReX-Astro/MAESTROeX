@@ -11,6 +11,8 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           const Vector<Real>& grav_cell_nph, 
 			  const Vector<MultiFab>& sponge)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::VelocityAdvance()",VelocityAdvance);
 
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {

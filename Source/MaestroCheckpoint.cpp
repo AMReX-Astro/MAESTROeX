@@ -20,6 +20,9 @@ Maestro::WriteCheckPoint (int step) {
     // chk00010/Level_1/
     // etc.                these subdirectories will hold the MultiFab data at each level of refinement
 
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::WriteCheckPoint()",WriteCheckPoint);
+
     // checkpoint file name, e.g., chk00010
     const std::string& checkpointname = amrex::Concatenate(check_base_name,step);
 
@@ -150,6 +153,8 @@ Maestro::WriteCheckPoint (int step) {
 int
 Maestro::ReadCheckPoint ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ReadCheckPoint()",ReadCheckPoint);
 
     amrex::Print() << "Restart from checkpoint " << restart_file << "\n";
 
@@ -307,6 +312,9 @@ Maestro::ReadCheckPoint ()
 void
 Maestro::GotoNextLine (std::istream& is)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::GotoNextLine()",GotoNextLine);
+
     constexpr std::streamsize bl_ignore_max { 100000 };
     is.ignore(bl_ignore_max, '\n');
 }

@@ -7,6 +7,8 @@ void
 Maestro::TfromRhoH (Vector<MultiFab>& scal,
                     const Vector<Real>& p0)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::TfromRhoH()",TfromRhoH);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -40,6 +42,8 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
                     const Vector<Real>& p0,
                     int updateRhoH)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::TfromRhoP()",TfromRhoP);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

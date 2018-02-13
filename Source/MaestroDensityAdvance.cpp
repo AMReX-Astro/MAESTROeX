@@ -12,6 +12,8 @@ Maestro::DensityAdvance (int which_step,
                          Vector<MultiFab>& scal_force,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::DensityAdvance()",DensityAdvance);
     
     Vector<Real> rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );

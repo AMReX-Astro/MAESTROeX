@@ -10,6 +10,9 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
                        const Vector<BCRec>& bcs,
                        bool flag)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PutInPertForm()",PutInPertForm);
+
     // place 1d array onto a cartesian grid
     Vector<MultiFab> s0_cart(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -39,6 +42,9 @@ void
 Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
                         bool flag)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ConvertRhoXToX()",ConvertRhoXToX);
+
     if (flag) {
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
@@ -71,6 +77,9 @@ void
 Maestro::ConvertRhoHToH(Vector<MultiFab>& scal,
                         bool flag)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ConvertRhoHToH()",ConvertRhoHToH);
+
     if (flag) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Divide(scal[lev],scal[lev],Rho,RhoH,1,0);

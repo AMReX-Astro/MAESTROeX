@@ -14,6 +14,8 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 const Vector<Real>& p0,
                 const Real dt_in)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::React()",React);
 
     // external heating
     if (do_heating) {
@@ -95,6 +97,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      const Vector<Real>& p0,
                      const Real dt_in)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Burner()",Burner);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -129,8 +133,11 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
 // compute heating term, rho_Hext
 void
-Maestro::ComputeHeating (Vector<MultiFab>& rho_Hext) {
-
+Maestro::ComputeHeating (Vector<MultiFab>& rho_Hext) 
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ComputeHeating()",ComputeHeating);
+   
     // FIXME
     for (int lev=0; lev<=finest_level; ++lev) {
         rho_Hext[lev].setVal(0.);

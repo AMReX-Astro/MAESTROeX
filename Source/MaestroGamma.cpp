@@ -8,6 +8,9 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
                         Vector<Real>& gamma1bar,
                         const Vector<Real>& p0)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeGamma1bar()",MakeGamma1bar);
+
     Vector<MultiFab> gamma1(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {

@@ -13,6 +13,9 @@ Maestro::WritePlotFile (const int step,
                         const Vector<MultiFab>& u_in,
                               Vector<MultiFab>& s_in)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
+
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
 
@@ -71,6 +74,8 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
                            Vector<MultiFab>& s_in,
                      const Vector<Real>& p0_in)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
 
     // velocities (AMREX_SPACEDIM)
     // rho, rhoh, rhoX, tfromp, tfromh, Pi (Nscal+1)
@@ -173,6 +178,8 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
 Vector<std::string>
 Maestro::PlotFileVarNames () const
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PlotFileVarNames()",PlotFileVarNames);
 
     // velocities (AMREX_SPACEDIM)
     // rho, rhoh, rhoX, tfromp, tfromh, Pi (Nscal+1)
@@ -244,6 +251,9 @@ Maestro::PlotFileVarNames () const
 void
 Maestro::WriteJobInfo (const std::string& dir) const
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::WriteJobInfo()",WriteJobInfo);
+
     if (ParallelDescriptor::IOProcessor())
     {
 	// job_info file with details about the run

@@ -22,7 +22,8 @@ PhysBCFunctMaestro::define (const Geometry& geom,
 void
 PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
 {
-    BL_PROFILE("PhysBCFunctMaestro::FillBoundary");
+    // timer for profiling
+    BL_PROFILE_VAR("PhysBCFunctMaestro::FillBoundary",PhysBC_FillBoundary);
 
     if (mf.nGrow() == 0) return;
     

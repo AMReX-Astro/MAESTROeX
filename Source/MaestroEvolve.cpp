@@ -7,9 +7,12 @@ using namespace amrex;
 void
 Maestro::Evolve ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Evolve()",Evolve);
+
     Print() << "Calling Evolve()" << endl;
 
-    for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
+    for (istep = 1; istep <= max_step && t_new < stop_time; ++istep)
     {
 
         // check to see if we need to regrid, then regrid

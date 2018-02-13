@@ -11,6 +11,9 @@ using namespace amrex;
 void
 Maestro::Setup ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Setup()",Setup);
+
     Print() << "Calling Setup()" << endl;
 
     ///////
@@ -179,6 +182,9 @@ Maestro::Setup ()
 void
 Maestro::ReadParameters ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ReadParameters()",ReadParameters);
+
     Print() << "Calling ReadParameters()" << endl;
 
     ParmParse pp("maestro");
@@ -211,6 +217,9 @@ Maestro::ReadParameters ()
 // define variable mappings (Rho, RhoH, ..., Nscal, etc.)
 void Maestro::VariableSetup ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::VariableSetup()",VariableSetup);
+
     Print() << "Calling VariableSetup()" << endl;
 
     int cnt = 0;
@@ -234,6 +243,9 @@ void Maestro::VariableSetup ()
 void
 Maestro::BCSetup()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::BCSetup()",BCSetup);
+
     Print() << "Calling BCSetup()" << endl;
 
     bcs_s.resize(Nscal);          // scalars

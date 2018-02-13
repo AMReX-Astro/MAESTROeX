@@ -8,6 +8,9 @@ using namespace amrex;
 void
 Maestro::PrintMF (const Vector<MultiFab>& CC)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PrintMF()",PrintMF);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -44,6 +47,9 @@ void
 Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PrintEdge()",PrintEdge);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev

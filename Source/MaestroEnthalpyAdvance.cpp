@@ -13,6 +13,9 @@ Maestro::EnthalpyAdvance (int which_step,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                           const Vector<MultiFab>& thermal)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
+
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.

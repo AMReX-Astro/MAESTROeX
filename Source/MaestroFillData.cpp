@@ -12,6 +12,9 @@ Maestro::FillPatch (Real time,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
                     const Vector<BCRec>& bcs_in)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::FillPatch()",FillPatch);
+
     for (int lev=0; lev<=finest_level; ++lev) {
         FillPatch(lev, time, mf[lev], mf_old, mf_new, srccomp, destcomp, ncomp, 
                   startbccomp, bcs_in);
@@ -73,6 +76,9 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
                           int srccomp, int destcomp, int ncomp,
                           const Vector<BCRec>& bcs)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::FillCoarsePatch()",FillCoarsePatch);
+
     AMREX_ASSERT(lev > 0);
 
     Vector<MultiFab*> cmf;
@@ -105,6 +111,9 @@ Maestro::GetData (int lev, Real time,
                   Vector<MultiFab>& mf_old,
                   Vector<MultiFab>& mf_new)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::GetData()",GetData);
+
     mf.clear();
     mftime.clear();
 
@@ -135,6 +144,9 @@ Maestro::AverageDown (Vector<MultiFab>& mf,
                       int comp,
                       int ncomp)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::AverageDown()",AverageDown);
+
     for (int lev = finest_level-1; lev >= 0; --lev) {
         average_down(mf[lev+1], mf[lev],
                      geom[lev+1], geom[lev],
@@ -146,6 +158,9 @@ Maestro::AverageDown (Vector<MultiFab>& mf,
 void
 Maestro::AverageDownFaces (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::AverageDownFaces()",AverageDownFaces);
+
     for (int lev = finest_level-1; lev >= 0; --lev) {
 
         Vector<const MultiFab*> edge_f(AMREX_SPACEDIM);
@@ -168,6 +183,9 @@ void
 Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         int level)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::FillUmacGhost()",FillUmacGhost);
+
     int start_lev;
     int end_lev;
     if (level == -1) {
@@ -210,6 +228,9 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 void
 Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::FillPatchUedge()",FillPatchUedge);
+
     // in IAMR and original MAESTRO this routine was called "create_umac_grown"
 
     int nGrow = uedge[0][0].nGrow();

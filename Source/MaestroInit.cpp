@@ -11,6 +11,9 @@ using namespace amrex;
 void
 Maestro::Init ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Init()",Init);
+
     Print() << "Calling Init()" << endl;
 
     if (restart_file == "") {
@@ -145,6 +148,9 @@ Maestro::Init ()
 void
 Maestro::InitData ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::InitData()",InitData);
+
     Print() << "Calling InitData()" << endl;
 
     // read in model file and fill in s0_init and p0_init for all levels
@@ -222,6 +228,9 @@ Maestro::InitData ()
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				       const DistributionMapping& dm)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeNewLevelFromScratch()",MakeNewLevelFromScratch);
+
     sold    [lev].define(ba, dm,          Nscal, 3);
     snew    [lev].define(ba, dm,          Nscal, 3);
     uold    [lev].define(ba, dm, AMREX_SPACEDIM, 3);
@@ -273,6 +282,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 void Maestro::InitProj ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::InitProj()",InitProj);
 
     Vector<MultiFab>       rho_omegadot(finest_level+1);
     Vector<MultiFab>            thermal(finest_level+1);
@@ -328,6 +339,8 @@ void Maestro::InitProj ()
 
 void Maestro::DivuIter (int istep_divu_iter)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::DivuIter()",DivuIter);
 
     Vector<MultiFab> stemp             (finest_level+1);
     Vector<MultiFab> rho_Hext          (finest_level+1);
@@ -431,6 +444,8 @@ void Maestro::DivuIter (int istep_divu_iter)
 
 void Maestro::InitIter ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::InitIter()",InitIter);
 
     // advance the solution by dt
     AdvanceTimeStep(true);

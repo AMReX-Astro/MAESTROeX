@@ -5,8 +5,10 @@ using namespace amrex;
 
 // advance a single level for a single time step, updates flux registers
 void
-Maestro::AdvanceTimeStep (bool is_initIter)
-{
+Maestro::AdvanceTimeStep (bool is_initIter) {
+
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::AdvanceTimeStep()",AdvanceTimeStep);
 
     // features to be added later:
     // -delta_gamma1_term

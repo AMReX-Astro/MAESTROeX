@@ -14,6 +14,9 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
                            const Vector<BCRec>& bcs,
                            int sbccomp)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()",Put1dArrayOnCart);
+
     int ng = s0_cart[0].nGrow();
     if (ng > 0 && bcs.size() == 0) {
 	Abort("Put1dArrayOnCart with ghost cells requires bcs input");
@@ -56,6 +59,9 @@ void
 Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                 const Real& mult)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -112,5 +118,8 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 void
 Maestro::MakeNormal ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeNormal()",MakeNormal);
+    
     Abort("Need to write Maestro::MakeNormal()");
 }

@@ -8,6 +8,8 @@ void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<Real>& w0_force)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
 
     // create a uold with filled ghost cells
     Vector<MultiFab> utilde(finest_level+1);
@@ -62,6 +64,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                      const Vector<MultiFab>& ufull,
                      Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeUtrans()",MakeUtrans);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -132,6 +137,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   const Vector<MultiFab>& force)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::VelPred()",VelPred);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -205,6 +213,9 @@ void
 			   int is_vel, const Vector<BCRec>& bcs, int nbccomp, 
 			   int start_scomp, int start_bccomp, int num_comp, int is_conservative)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeEdgeScal()",MakeEdgeScal);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -288,6 +299,9 @@ void
 			   const Vector<Real>& r0_edge_new,
 			   int start_comp, int num_comp)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeRhoXFlux()",MakeRhoXFlux);
+
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
     const int endcomp = startcomp + num_comp;
@@ -379,6 +393,8 @@ void
 			   const Vector<Real>& rh0_new,
 			   const Vector<Real>& rh0_edge_new)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeRhoHFlux()",MakeRhoHFlux);
     
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -462,6 +478,9 @@ void
 			 int start_comp, int num_comp, 
 			 const Real* p0)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::UpdateScal()",UpdateScal);
+
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
     const int endcomp = startcomp + num_comp;
@@ -571,6 +590,8 @@ void
 			 const Vector<MultiFab>& force,
 			 const Vector<MultiFab>& sponge)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
     
     for (int lev=0; lev<=finest_level; ++lev) {
 

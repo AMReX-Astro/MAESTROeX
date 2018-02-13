@@ -11,6 +11,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                        Vector<Real>& phibar,
                        int comp)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Average()",Average);
 
     if (spherical == 0) {
 

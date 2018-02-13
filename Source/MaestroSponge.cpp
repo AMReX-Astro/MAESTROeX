@@ -6,6 +6,8 @@ using namespace amrex;
 void
 Maestro::MakeSponge (Vector<MultiFab>& sponge)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeSponge()",MakeSponge);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

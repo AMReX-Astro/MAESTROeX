@@ -7,6 +7,9 @@ using namespace amrex;
 void
 Maestro::Regrid ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Regrid()",Regrid);
+
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
             
@@ -79,6 +82,9 @@ Maestro::Regrid ()
 void
 Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ErrorEst()",ErrorEst);
+
     if (lev >= temperr.size()) return;
 
     const int clearval = TagBox::CLEAR;
@@ -134,6 +140,9 @@ void
 Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 		      const DistributionMapping& dm)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::RemakeLevel()",RemakeLevel);
+
     const int ng_s = snew[lev].nGrow();
     const int ng_u = unew[lev].nGrow();
     const int ng_S = S_cc_new[lev].nGrow();
@@ -183,6 +192,9 @@ void
 Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 				 const DistributionMapping& dm)
 {    
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeNewLevelFromCoarse()",MakeNewLevelFromCoarse);
+
     snew[lev].define    (ba, dm,          Nscal, 0);
     sold[lev].define    (ba, dm,          Nscal, 0);
     unew[lev].define    (ba, dm, AMREX_SPACEDIM, 0);
@@ -213,6 +225,9 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 void
 Maestro::ClearLevel (int lev)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ClearLevel()",ClearLevel);
+
     sold[lev].clear();
     snew[lev].clear();
 

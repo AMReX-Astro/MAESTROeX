@@ -12,6 +12,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& rho_Hext,
                     const Vector<MultiFab>& thermal)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Make_S_cc()",Make_S_cc);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -56,6 +58,9 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
                                const Vector<Real>& Sbar,
                                const Vector<Real>& beta0)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeRHCCforNodalProj()",MakeRHCCforNodalProj);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // fill rhcc
@@ -93,6 +98,9 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const Vector<Real>& Sbar,
                              const Vector<Real>& beta0)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()",MakeRHCCforMacProj);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // fill rhcc

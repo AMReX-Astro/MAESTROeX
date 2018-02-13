@@ -6,6 +6,9 @@ using namespace amrex;
 void
 Maestro::EstDt ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::EstDt()",EstDt);
+
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
@@ -136,6 +139,9 @@ Maestro::EstDt ()
 void
 Maestro::FirstDt ()
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::FirstDt()",FirstDt);
+
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero

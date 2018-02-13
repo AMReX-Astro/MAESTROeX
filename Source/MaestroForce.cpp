@@ -12,6 +12,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<Real>& w0_force,
                        int do_add_utilde_force)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeVelForce()",MakeVelForce);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -71,6 +74,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                          const Vector<BCRec>& bcs,
                          int fullform)
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ModifyScalForce()",ModifyScalForce);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -129,6 +134,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                        int add_thermal)
 
 {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeRhoHForce()",MakeRhoHForce);
+
     // if we are doing the prediction, then it only makes sense to be in
     // this routine if the quantity we are predicting is rhoh', h, or rhoh
     if (is_prediction == 1 && !(enthalpy_pred_type == predict_rhohprime ||

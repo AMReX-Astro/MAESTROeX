@@ -367,9 +367,6 @@ Maestro::NodalProj (int proj_type,
     // fill ghost cells
     FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 
-
-    // destroy timer for profiling
-    BL_PROFILE_VAR_STOP(NodalProj);
 }
 
 // fill in Vproj
@@ -434,8 +431,6 @@ Maestro::CreateUvecForProj (int proj_type,
     AverageDown(Vproj,0,AMREX_SPACEDIM);
     FillPatch(time, Vproj, Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 
-    // destroy timer for profiling
-    BL_PROFILE_VAR_STOP(CreateUvecForProj);
 }
 
 
@@ -513,8 +508,6 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
         } // end loop over direction
     } // end loop over levels
 
-    // destroy timer for profiling
-    BL_PROFILE_VAR_STOP(SetBoundaryVelocity);
 }
 
 // given a nodal phi, compute grad(phi) at cell centers
@@ -545,8 +538,6 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
         }
     }
 
-    // destroy timer for profiling
-    BL_PROFILE_VAR_STOP(ComputeGradPhi);
 }
 
 
@@ -577,6 +568,4 @@ void Maestro::MakePiCC()
         }
     }
 
-    // destroy timer for profiling
-    BL_PROFILE_VAR_STOP(MakePiCC);
 }
