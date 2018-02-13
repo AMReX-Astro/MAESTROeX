@@ -9,7 +9,7 @@ Maestro::Evolve ()
 {
     Print() << "Calling Evolve()" << endl;
 
-    for (istep = 1; istep <= max_step && t_new < stop_time; ++istep)
+    for (istep = start_step; istep <= max_step && t_new < stop_time; ++istep)
     {
 
         // check to see if we need to regrid, then regrid

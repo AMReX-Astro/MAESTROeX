@@ -107,3 +107,10 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
     //
 
 }
+
+
+void
+Maestro::MakeNormal ()
+{
+    Abort("Need to write Maestro::MakeNormal()");
+}

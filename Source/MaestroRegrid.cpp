@@ -24,12 +24,9 @@ Maestro::Regrid ()
         // look at MAESTRO/Source/varden.f90:750-1060
     }
 
-    // FIXME
-/*
     if (spherical == 1) {
         MakeNormal();
     }
-*/
     
     if (evolve_base_state) {
         // force rho0 to be the average of rho - FIXME

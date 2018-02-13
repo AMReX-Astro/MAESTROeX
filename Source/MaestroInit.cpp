@@ -13,17 +13,51 @@ Maestro::Init ()
 {
     Print() << "Calling Init()" << endl;
 
-    // fill in multifab and base state data
-    InitData();
+    if (restart_file == "") {
 
-    if (plot_int > 0) {
-        Print() << "\nWriting plotfile 9999999 after InitData" << endl;
-        WritePlotFile(9999999,t_old,rho0_old,p0_old,uold,sold);
+        start_step = 1;
+
+        // fill in multifab and base state data
+        InitData();
+
+        if (plot_int > 0) {
+            Print() << "\nWriting plotfile 9999999 after InitData" << endl;
+            WritePlotFile(9999999,t_old,rho0_old,p0_old,uold,sold);
+        }
+    }
+    else {
+        Print() << "Initializing from checkpoint " << restart_file << endl;
+
+        // read in checkpoint file
+        // this builds (defines) and fills the following MultiFabs:
+        //
+        // snew, unew, gpi, dSdt, S_cc_new
+        //
+        // and also fills in the 1D arrays:
+        //
+        // rho0_new, p0_new, gamma1bar_new, rhoh0_new, beta0_new, psi, tempbar, etarho_cc, tempbar_init
+        ReadCheckPoint();
+        
+        // build (define) the following MultiFabs (that weren't read in from checkpoint):
+        // snew, unew, S_cc_new, rhcc_for_nodalproj, normal, pi
+        for (int lev=0; lev<=finest_level; ++lev) {
+            snew              [lev].define(grids[lev], dmap[lev],          Nscal, 3);
+            unew              [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 3);
+            S_cc_new          [lev].define(grids[lev], dmap[lev],              1, 0);
+            rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],              1, 1);
+            if (spherical == 1) {
+                normal[lev].define(grids[lev], dmap[lev], 1, 1);
+            }
+            pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
+
+            // set finest_radial_level in fortran
+            // compute numdisjointchunks, r_start_coord, r_end_coord
+            init_multilevel(&finest_level);
+        }
     }
 
     if (spherical == 1) {
-        // FIXME
-        // MakeNormal();
+        MakeNormal();
     }
 
     if (do_sponge) {
@@ -36,70 +70,73 @@ Maestro::Init ()
                    r_cc_loc.dataPtr(),
                    r_edge_loc.dataPtr());
 
-    // compute gamma1bar
-    MakeGamma1bar(sold,gamma1bar_old,p0_old);
+    if (restart_file == "") {
 
-    // compute beta0
-    make_beta0(beta0_old.dataPtr(),
-               rho0_old.dataPtr(),
-               p0_old.dataPtr(),
-               gamma1bar_old.dataPtr(),
-               grav_cell_old.dataPtr());
+        // compute gamma1bar
+        MakeGamma1bar(sold,gamma1bar_old,p0_old);
 
-    // initial projection
-    if (do_initial_projection) {
-        Print() << "Doing initial projection" << endl;
-        InitProj();
+        // compute beta0
+        make_beta0(beta0_old.dataPtr(),
+                   rho0_old.dataPtr(),
+                   p0_old.dataPtr(),
+                   gamma1bar_old.dataPtr(),
+                   grav_cell_old.dataPtr());
+
+        // initial projection
+        if (do_initial_projection) {
+            Print() << "Doing initial projection" << endl;
+            InitProj();
+
+            if (plot_int > 0) {
+                Print() << "\nWriting plotfile 9999998 after InitProj" << endl;
+                WritePlotFile(9999998,t_old,rho0_old,p0_old,uold,sold);
+            }
+        }
+
+        // compute initial time step
+        FirstDt();
+
+        // divu iters - also update dt at end of each divu_iter
+        if (init_divu_iter > 0) {
+            for (int i=1; i<=init_divu_iter; ++i) {
+                Print() << "Doing initial divu iteration #" << i << endl;
+                DivuIter(i);
+            }
+
+            if (plot_int > 0) {
+                Print() << "\nWriting plotfile 9999997 after final DivuIter" << endl;
+                WritePlotFile(9999997,t_old,rho0_old,p0_old,uold,sold);
+            }
+        }
+
+        if (stop_time >= 0. && t_old+dt > stop_time) {
+            dt = std::min(dt,stop_time-t_old);
+            Print() << "Stop time limits dt = " << dt << endl;
+        }
+
+        dtold = dt;
+        t_new = t_old + dt;
+
+        // copy S_cc_old into S_cc_new for the pressure iterations
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(S_cc_new[lev],S_cc_old[lev],0,0,1,0);
+        }
+
+        // initial (pressure) iters
+        for (int i=1; i<= init_iter; ++i) {
+            Print() << "Doing initial pressure iteration #" << i << endl;
+            InitIter();
+        }
 
         if (plot_int > 0) {
-            Print() << "\nWriting plotfile 9999998 after InitProj" << endl;
-            WritePlotFile(9999998,t_old,rho0_old,p0_old,uold,sold);
-        }
-    }
-
-    // compute initial time step
-    FirstDt();
-
-    // divu iters - also update dt at end of each divu_iter
-    if (init_divu_iter > 0) {
-        for (int i=1; i<=init_divu_iter; ++i) {
-            Print() << "Doing initial divu iteration #" << i << endl;
-            DivuIter(i);
+            Print() << "\nWriting plotfile 0 after all initialization" << endl;
+            WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
         }
 
-        if (plot_int > 0) {
-            Print() << "\nWriting plotfile 9999997 after final DivuIter" << endl;
-            WritePlotFile(9999997,t_old,rho0_old,p0_old,uold,sold);
+        if (chk_int > 0) {
+            Print() << "\nWriting checkpoint 0 after all initialization" << endl;
+            WriteCheckPoint(0);
         }
-    }
-
-    if (stop_time >= 0. && t_old+dt > stop_time) {
-        dt = std::min(dt,stop_time-t_old);
-        Print() << "Stop time limits dt = " << dt << endl;
-    }
-
-    dtold = dt;
-    t_new = t_old + dt;
-
-    // copy S_cc_old into S_cc_new for the pressure iterations
-    for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(S_cc_new[lev],S_cc_old[lev],0,0,1,0);
-    }
-
-    // initial (pressure) iters
-    for (int i=1; i<= init_iter; ++i) {
-        Print() << "Doing initial pressure iteration #" << i << endl;
-        InitIter();
-    }
-
-    if (plot_int > 0) {
-        Print() << "\nWriting plotfile 0 after all initialization" << endl;
-        WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
-    }
-
-    if (chk_int > 0) {
-        Print() << "\nWriting checkpoint 0 after all initialization" << endl;
-        WriteCheckPoint(0);
     }
 }
 
@@ -210,11 +247,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
     if (spherical == 1) {
         normal[lev].define(ba, dm, 1, 1);
-    }
-
-    if (lev > 0 && do_reflux) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
-        flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
     const Real* dx = geom[lev].CellSize();

@@ -54,6 +54,9 @@ Maestro::WriteCheckPoint (int step) {
        // write out title line
        HeaderFile << "Checkpoint file for MAESTRO\n";
 
+       // write out the time step number
+       HeaderFile << step << "\n";
+
        // write out finest_level
        HeaderFile << finest_level << "\n";
 
@@ -150,27 +153,31 @@ Maestro::ReadCheckPoint ()
 
     amrex::Print() << "Restart from checkpoint " << restart_file << "\n";
 
-    // Header
-    std::string File(restart_file + "/Header");
-
     VisMF::IO_Buffer io_buffer(VisMF::GetIOBufferSize());
 
+    std::string line, word;
+    int step;
+
+    // Header
+    {
+    std::string File(restart_file + "/Header");
     Vector<char> fileCharPtr;
     ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
     std::string fileCharPtrString(fileCharPtr.dataPtr());
     std::istringstream is(fileCharPtrString, std::istringstream::in);
 
-    std::string line, word;
-
     // read in title line
     std::getline(is, line);
+
+    // read in time step number
+    is >> start_step;
+    GotoNextLine(is);
 
     // read in finest_level
     is >> finest_level;
     GotoNextLine(is);
 
     // read in step
-    int step;
     is >> step;
     GotoNextLine(is);
 
@@ -202,7 +209,7 @@ Maestro::ReadCheckPoint ()
         SetBoxArray(lev, ba);
         SetDistributionMap(lev, dm);
 
-        // build MultiFab and FluxRegister data
+        // build MultiFab data
         sold    [lev].define(ba, dm,          Nscal, 3);
         snew    [lev].define(ba, dm,          Nscal, 3);
         uold    [lev].define(ba, dm, AMREX_SPACEDIM, 3);
@@ -218,26 +225,31 @@ Maestro::ReadCheckPoint ()
         if (spherical == 1) {
             normal[lev].define(ba, dm, 1, 1);
         }
-
-        if (lev > 0 && do_reflux) {
-            flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
-            flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
-        }
+    }
     }
 
-    // read in the MultiFab data
+    // read in the MultiFab data - put it in the "old" MultiFabs
     for (int lev = 0; lev <= finest_level; ++lev) {
-        VisMF::Read(snew[lev],
+        VisMF::Read(sold[lev],
                     amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "snew"));
-        VisMF::Read(unew[lev],
+        VisMF::Read(uold[lev],
                     amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "unew"));
         VisMF::Read(gpi[lev],
                     amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "gpi"));
         VisMF::Read(dSdt[lev],
                     amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "dSdt"));
-        VisMF::Read(S_cc_new[lev],
+        VisMF::Read(S_cc_old[lev],
                     amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "S_cc_new"));
     }
+
+
+    // BaseCC
+    {
+    std::string File(restart_file + "/BaseCC");
+    Vector<char> fileCharPtr;
+    ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
+    std::string fileCharPtrString(fileCharPtr.dataPtr());
+    std::istringstream is(fileCharPtrString, std::istringstream::in);
 
     // read in cell-centered base state
     for (int i=0; i<(max_radial_level+1)*nr_fine; ++i) {
@@ -262,6 +274,17 @@ Maestro::ReadCheckPoint ()
         lis >> word;
         tempbar_init[i] = std::stod(word);
     }
+    }
+
+
+
+    // BaseFC
+    {
+    std::string File(restart_file + "/BaseFC");
+    Vector<char> fileCharPtr;
+    ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
+    std::string fileCharPtrString(fileCharPtr.dataPtr());
+    std::istringstream is(fileCharPtrString, std::istringstream::in);
 
 
     // read in face-centered base state
@@ -272,6 +295,7 @@ Maestro::ReadCheckPoint ()
         w0[i] = std::stod(word);
         lis >> word;
         etarho_ec[i] = std::stod(word);
+    }
     }
 
     return step;

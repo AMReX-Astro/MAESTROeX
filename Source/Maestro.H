@@ -276,6 +276,8 @@ private:
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                 const amrex::Real& mult);
 
+    void MakeNormal ();
+
     // end MaestroFill3dData.cpp functions
     ////////////
 
@@ -600,6 +602,7 @@ private:
 
     // which step?
     int istep;
+    int start_step;
 
     // keep track of old time, new time, and time step at each level
     amrex::Real t_new;
