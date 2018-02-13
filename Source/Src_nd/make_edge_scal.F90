@@ -108,6 +108,7 @@ contains
     enddo
  
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
        sedgex(is,comp) = s(is-1,comp)
     else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
@@ -125,8 +126,10 @@ contains
     else
        call bl_error("make_edge_scal_1d: invalid boundary type adv_bc(1,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1) then
     if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
        sedgex(ie+1,comp) = s(ie+1,comp)
     else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
@@ -143,6 +146,7 @@ contains
     else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_1d: invalid boundary type adv_bc(1,2)")
+    end if
     end if
 
     deallocate(sedgelx,sedgerx)
@@ -245,6 +249,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
        slx(is,js-1:je+1) = s(is-1,js-1:je+1,comp)
        srx(is,js-1:je+1) = s(is-1,js-1:je+1,comp)
@@ -263,8 +268,10 @@ contains
     else
        call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
        slx(ie+1,js-1:je+1) = s(ie+1,js-1:je+1,comp)
        srx(ie+1,js-1:je+1) = s(ie+1,js-1:je+1,comp)
@@ -282,6 +289,7 @@ contains
     else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(1,2)")
+    end if
     end if
 
     do j=js-1,je+1
@@ -303,6 +311,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
        sly(is-1:ie+1,js) = s(is-1:ie+1,js-1,comp)
        sry(is-1:ie+1,js) = s(is-1:ie+1,js-1,comp)
@@ -321,8 +330,10 @@ contains
     else
        call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
        sly(is-1:ie+1,je+1) = s(is-1:ie+1,je+1,comp)
        sry(is-1:ie+1,je+1) = s(is-1:ie+1,je+1,comp)
@@ -340,6 +351,7 @@ contains
     else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
+    end if
     end if
 
     do j=js,je+1
@@ -389,6 +401,7 @@ contains
     enddo
  
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
        sedgex(is,js:je,comp) = s(is-1,js:je,comp)
     else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
@@ -406,8 +419,10 @@ contains
     else
        call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
        sedgex(ie+1,js:je,comp) = s(ie+1,js:je,comp)
     else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
@@ -424,6 +439,7 @@ contains
     else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(1,2)")
+    end if
     end if
 
     ! loop over appropriate y-faces
@@ -460,6 +476,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
        sedgey(is:ie,js,comp) = s(is:ie,js-1,comp)
     else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
@@ -477,8 +494,10 @@ contains
     else
        call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
        sedgey(is:ie,je+1,comp) = s(is:ie,je+1,comp)
     else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
@@ -495,6 +514,7 @@ contains
     else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
+    end if
     end if
 
     deallocate(slx,srx,sly,sry,simhx,simhy,sedgelx,sedgerx,sedgely,sedgery)
@@ -620,6 +640,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
        slx(is,js-1:je+1,ks-1:ke+1) = s(is-1,js-1:je+1,ks-1:ke+1,comp)
        srx(is,js-1:je+1,ks-1:ke+1) = s(is-1,js-1:je+1,ks-1:ke+1,comp)
@@ -638,8 +659,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
        slx(ie+1,js-1:je+1,ks-1:ke+1) = s(ie+1,js-1:je+1,ks-1:ke+1,comp)
        srx(ie+1,js-1:je+1,ks-1:ke+1) = s(ie+1,js-1:je+1,ks-1:ke+1,comp)
@@ -657,6 +680,7 @@ contains
     else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+    end if
     end if
 
     do k=ks-1,ke+1
@@ -689,6 +713,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
        sly(is-1:ie+1,js,ks-1:ke+1) = s(is-1:ie+1,js-1,ks-1:ke+1,comp)
        sry(is-1:ie+1,js,ks-1:ke+1) = s(is-1:ie+1,js-1,ks-1:ke+1,comp)
@@ -707,8 +732,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
        sly(is-1:ie+1,je+1,ks-1:ke+1) = s(is-1:ie+1,je+1,ks-1:ke+1,comp)
        sry(is-1:ie+1,je+1,ks-1:ke+1) = s(is-1:ie+1,je+1,ks-1:ke+1,comp)
@@ -726,6 +753,7 @@ contains
     else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+    end if
     end if
 
     do k=ks-1,ke+1
@@ -760,6 +788,7 @@ contains
     deallocate(slopex,slopey,slopez)
 
     ! impose lo side bc's
+    if (lo(3) .eq. domlo(3)) then
     if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
        slz(is-1:ie+1,js-1:je+1,ks) = s(is-1:ie+1,js-1:je+1,ks,comp)
        srz(is-1:ie+1,js-1:je+1,ks) = s(is-1:ie+1,js-1:je+1,ks,comp)
@@ -778,8 +807,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(3) .eq. domhi(3)) then
     if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
        slz(is-1:ie+1,js-1:je+1,ke+1) = s(is-1:ie+1,js-1:je+1,ke+1,comp)
        srz(is-1:ie+1,js-1:je+1,ke+1) = s(is-1:ie+1,js-1:je+1,ke+1,comp)
@@ -797,6 +828,7 @@ contains
     else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+    end if
     end if
 
     do k=ks,ke+1
@@ -850,6 +882,7 @@ contains
     end if
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
        slxy(is,js:je,ks-1:ke+1) = s(is-1,js:je,ks-1:ke+1,comp)
        srxy(is,js:je,ks-1:ke+1) = s(is-1,js:je,ks-1:ke+1,comp)
@@ -868,8 +901,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
        slxy(ie+1,js:je,ks-1:ke+1) = s(ie+1,js:je,ks-1:ke+1,comp)
        srxy(ie+1,js:je,ks-1:ke+1) = s(ie+1,js:je,ks-1:ke+1,comp)
@@ -887,6 +922,7 @@ contains
     else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+    end if
     end if
 
     do k=ks-1,ke+1
@@ -943,6 +979,7 @@ contains
     end if
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
        slxz(is,js-1:je+1,ks:ke) = s(is-1,js-1:je+1,ks:ke,comp)
        srxz(is,js-1:je+1,ks:ke) = s(is-1,js-1:je+1,ks:ke,comp)
@@ -961,8 +998,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
        slxz(ie+1,js-1:je+1,ks:ke) = s(ie+1,js-1:je+1,ks:ke,comp)
        srxz(ie+1,js-1:je+1,ks:ke) = s(ie+1,js-1:je+1,ks:ke,comp)
@@ -980,6 +1019,7 @@ contains
     else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+    end if
     end if
 
     do k=ks,ke
@@ -1036,6 +1076,7 @@ contains
     end if
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
        slyx(is:ie,js,ks-1:ke+1) = s(is:ie,js-1,ks-1:ke+1,comp)
        sryx(is:ie,js,ks-1:ke+1) = s(is:ie,js-1,ks-1:ke+1,comp)
@@ -1054,8 +1095,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
        slyx(is:ie,je+1,ks-1:ke+1) = s(is:ie,je+1,ks-1:ke+1,comp)
        sryx(is:ie,je+1,ks-1:ke+1) = s(is:ie,je+1,ks-1:ke+1,comp)
@@ -1073,6 +1116,7 @@ contains
     else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+    end if
     end if
 
     do k=ks-1,ke+1
@@ -1131,6 +1175,7 @@ contains
     deallocate(simhz)
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
        slyz(is-1:ie+1,js,ks:ke) = s(is-1:ie+1,js-1,ks:ke,comp)
        sryz(is-1:ie+1,js,ks:ke) = s(is-1:ie+1,js-1,ks:ke,comp)
@@ -1149,8 +1194,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
        slyz(is-1:ie+1,je+1,ks:ke) = s(is-1:ie+1,je+1,ks:ke,comp)
        sryz(is-1:ie+1,je+1,ks:ke) = s(is-1:ie+1,je+1,ks:ke,comp)
@@ -1168,6 +1215,7 @@ contains
     else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+    end if
     end if
 
     do k=ks,ke
@@ -1226,6 +1274,7 @@ contains
     deallocate(simhx)
 
     ! impose lo side bc's
+    if (lo(3) .eq. domlo(3)) then
     if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
        slzx(is:ie,js-1:je+1,ks) = s(is:ie,js-1:je+1,ks-1,comp)
        srzx(is:ie,js-1:je+1,ks) = s(is:ie,js-1:je+1,ks-1,comp)
@@ -1244,8 +1293,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(3) .eq. domhi(3)) then
     if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
        slzx(is:ie,js-1:je+1,ke+1) = s(is:ie,js-1:je+1,ke+1,comp)
        srzx(is:ie,js-1:je+1,ke+1) = s(is:ie,js-1:je+1,ke+1,comp)
@@ -1263,6 +1314,7 @@ contains
     else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+    end if
     end if
 
     do k=ks,ke+1
@@ -1321,6 +1373,7 @@ contains
     deallocate(simhy)
 
     ! impose lo side bc's
+    if (lo(3) .eq. domlo(3)) then
     if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
        slzy(is-1:ie+1,js:je,ks) = s(is-1:ie+1,js:je,ks-1,comp)
        srzy(is-1:ie+1,js:je,ks) = s(is-1:ie+1,js:je,ks-1,comp)
@@ -1339,8 +1392,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(3) .eq. domhi(3)) then
     if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
        slzy(is-1:ie+1,js:je,ke+1) = s(is-1:ie+1,js:je,ke+1,comp)
        srzy(is-1:ie+1,js:je,ke+1) = s(is-1:ie+1,js:je,ke+1,comp)
@@ -1358,6 +1413,7 @@ contains
     else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+    end if
     end if
 
     do k=ks,ke+1
@@ -1451,6 +1507,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(1) .eq. domlo(1)) then
     if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
        sedgex(is,js:je,ks:ke,comp) = s(is-1,js:je,ks:ke,comp)
     else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
@@ -1468,8 +1525,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(1) .eq. domhi(1)) then
     if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
        sedgex(ie+1,js:je,ks:ke,comp) = s(ie+1,js:je,ks:ke,comp)
     else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
@@ -1486,6 +1545,7 @@ contains
     else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+    end if
     end if
 
     deallocate(sedgelx,sedgerx)
@@ -1561,6 +1621,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(2) .eq. domlo(2)) then
     if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
        sedgey(is:ie,js,ks:ke,comp) = s(is:ie,js-1,ks:ke,comp)
     else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
@@ -1578,8 +1639,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(2) .eq. domhi(2)) then
     if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
        sedgey(is:ie,je+1,ks:ke,comp) = s(is:ie,je+1,ks:ke,comp)
     else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
@@ -1596,6 +1659,7 @@ contains
     else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+    end if
     end if
 
     deallocate(sedgely,sedgery)
@@ -1671,6 +1735,7 @@ contains
     enddo
 
     ! impose lo side bc's
+    if (lo(3) .eq. domlo(3)) then
     if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
        sedgez(is:ie,js:je,ks,comp) = s(is:ie,js:je,ks-1,comp)
     else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
@@ -1688,8 +1753,10 @@ contains
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
     end if
+    end if
 
     ! impose hi side bc's
+    if (hi(3) .eq. domhi(3)) then
     if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
        sedgez(is:ie,js:je,ke+1,comp) = s(is:ie,js:je,ke+1,comp)
     else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
@@ -1706,6 +1773,7 @@ contains
     else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
     else
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+    end if
     end if
 
     deallocate(sedgelz,sedgerz)

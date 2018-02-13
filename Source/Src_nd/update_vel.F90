@@ -11,26 +11,26 @@ module update_vel_module
 contains
 
   subroutine update_velocity(lev, lo, hi, &
-                                  uold, uo_lo, uo_hi, &
-                                  unew, un_lo, un_hi, &
-                                  umac,  u_lo, u_hi, &
+                               uold, uo_lo, uo_hi, &
+                               unew, un_lo, un_hi, &
+                               umac,  u_lo, u_hi, &
 #if (AMREX_SPACEDIM >= 2)
-                                  vmac,  v_lo, v_hi, &
+                               vmac,  v_lo, v_hi, &
 #if (AMREX_SPACEDIM == 3)
-                                  wmac,  w_lo, w_hi, &
+                               wmac,  w_lo, w_hi, &
 #endif
 #endif
-                                  uedgex, x_lo, x_hi, &
+                               uedgex, x_lo, x_hi, &
 #if (AMREX_SPACEDIM >= 2)
-                                  uedgey, y_lo, y_hi, &
+                               uedgey, y_lo, y_hi, &
 #if (AMREX_SPACEDIM == 3)
-                                  uedgez, z_lo, z_hi, &
+                               uedgez, z_lo, z_hi, &
 #endif
 #endif
-                                  force,  f_lo, f_hi, &
-                                  sponge, s_lo, s_hi, & 
-                                  w0, dx, dt) &
-                                  bind(C,name="update_velocity")
+                               force,  f_lo, f_hi, &
+                               sponge, s_lo, s_hi, & 
+                               w0, dx, dt) &
+                               bind(C,name="update_velocity")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: uo_lo(3), uo_hi(3)
