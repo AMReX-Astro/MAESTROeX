@@ -37,7 +37,7 @@ Maestro::Init ()
         //
         // rho0_new, p0_new, gamma1bar_new, rhoh0_new, beta0_new, psi, tempbar, etarho_cc, tempbar_init
         ReadCheckPoint();
-        
+
         // build (define) the following MultiFabs (that weren't read in from checkpoint):
         // snew, unew, S_cc_new, rhcc_for_nodalproj, normal, pi
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -49,11 +49,12 @@ Maestro::Init ()
                 normal[lev].define(grids[lev], dmap[lev], 1, 1);
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
-
-            // set finest_radial_level in fortran
-            // compute numdisjointchunks, r_start_coord, r_end_coord
-            init_multilevel(&finest_level);
         }
+
+        // set finest_radial_level in fortran
+        // compute numdisjointchunks, r_start_coord, r_end_coord
+        init_multilevel(&finest_level);
+        compute_cutoff_coords(rho0_old.dataPtr());
     }
 
     if (spherical == 1) {

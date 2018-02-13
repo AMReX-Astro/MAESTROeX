@@ -172,6 +172,7 @@ Maestro::ReadCheckPoint ()
     // read in time step number
     is >> start_step;
     GotoNextLine(is);
+    ++start_step;
 
     // read in finest_level
     is >> finest_level;
@@ -185,8 +186,8 @@ Maestro::ReadCheckPoint ()
     is >> dt;
     GotoNextLine(is);
 
-    // read in t_new
-    is >> t_new;
+    // read in time
+    is >> t_old;
     GotoNextLine(is);
 
     // read in rel_eps
@@ -256,15 +257,15 @@ Maestro::ReadCheckPoint ()
         std::getline(is, line);
         std::istringstream lis(line);
         lis >> word;
-        rho0_new[i] = std::stod(word);
+        rho0_old[i] = std::stod(word);
         lis >> word;
-        p0_new[i] = std::stod(word);
+        p0_old[i] = std::stod(word);
         lis >> word;
-        gamma1bar_new[i] = std::stod(word);
+        gamma1bar_old[i] = std::stod(word);
         lis >> word;
-        rhoh0_new[i] = std::stod(word);
+        rhoh0_old[i] = std::stod(word);
         lis >> word;
-        beta0_new[i] = std::stod(word);
+        beta0_old[i] = std::stod(word);
         lis >> word;
         psi[i] = std::stod(word);
         lis >> word;
