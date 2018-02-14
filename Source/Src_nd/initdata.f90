@@ -186,8 +186,8 @@ contains
 
     t0 = s0_init(temp_comp)
 
-    x0 = 3.6d7
-    y0 = 3.6d7
+    x0 = 1.35d7
+    y0 = 1.35d7
     z0 = 8.5d7
 
     r0 = sqrt( (x-x0)**2 + (y-y0)**2 + (z-z0)**2 ) / 2.5d6
