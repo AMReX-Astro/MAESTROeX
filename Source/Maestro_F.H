@@ -261,6 +261,7 @@ extern "C"
 			   amrex::Real* sfluxz, const int* fz_lo, const int* fz_hi, const int* nc_fz, 
 #endif
 #endif
+			   amrex::Real* etarhoflux, const int* eta_lo, const int* eta_hi,
 			   amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x, 
 #if (AMREX_SPACEDIM >= 2)
 			   amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y, 
@@ -277,7 +278,7 @@ extern "C"
 #endif
 			   const amrex::Real* rho0_old, const amrex::Real* rho0_edge_old,
 			   const amrex::Real* rho0_new, const amrex::Real* rho0_edge_new,
-			   const amrex::Real* w0, 
+			   const amrex::Real* rh0_predicted_edge, const amrex::Real* w0, 
 			   const int* startcomp, const int* endcomp);
 
 #if (AMREX_SPACEDIM == 1)

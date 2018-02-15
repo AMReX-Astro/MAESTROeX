@@ -395,7 +395,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     if (evolve_base_state) {
         Average(S_cc_old,Sbar,0);
 
-        int is_predictor = 0;
+        int is_predictor = 1;
         make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr() ,Sbar.dataPtr(),
                 rho0_old.dataPtr(), rho0_new.dataPtr(), p0_old.dataPtr(), 
                 p0_new.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_new.dataPtr(),

@@ -303,7 +303,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // advect the base state density
     if (evolve_base_state) {
+	// call advect_base_dens(w0,rho0_old,rho0_new,rho0_predicted_edge,dt)
 
+	compute_cutoff_coords(rho0_new.dataPtr());
     }
     else {
         rho0_new = rho0_old;
@@ -343,16 +345,24 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,umac);
+    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,rho0_predicted_edge);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
         //
-        //
+        if (spherical == 0) {
+	    // call make_etarho_planar(etarho_ec,etarho_cc,etarhoflux,mla)
+
+	} else {
+	    // call make_etarho_spherical(s1,s2,umac,w0mac,rho0_old,rho0_new,dx,normal, &
+            //                          etarho_ec,etarho_cc,mla,the_bc_tower%bc_tower_array)
+
+	}
 
         // correct the base state density by "averaging"
-        //
-        //
+	Average(s2, rho0_new, Rho);
+	compute_cutoff_coords(rho0_new.dataPtr());
+
     }
 
     // update grav_cell_new
@@ -369,7 +379,37 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // base state pressure update
     if (evolve_base_state) {
+	// set new p0 through HSE
+	p0_new = p0_old;
 
+	// call enforce_HSE(rho0_new,p0_new,grav_cell_new)
+
+
+	// make psi
+	if (spherical == 0) { 
+	    // call make_psi_planar(etarho_cc,psi)
+
+	} else {
+	    // compute p0_nph
+	    for (int i=0; i<p0_nph.size(); ++i) {
+		p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	    }
+
+	    // compute gamma1bar^{(1)} and store it in gamma1bar_temp1
+	    MakeGamma1bar(s1, gamma1bar_temp1, p0_old);
+
+	    // compute gamma1bar^{(2),*} and store it in gamma1bar_temp2
+	    MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
+
+	    // compute gamma1bar^{nph,*} and store it in gamma1bar_temp2
+	    for(int i=0; i<gamma1bar_temp2.size(); ++i) {
+		gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
+	    }
+
+	    // make time-centered psi
+	    //call make_psi_spherical(psi,w0,gamma1bar_temp2,p0_nph,Sbar)
+
+	}
     }
     else {
         p0_new = p0_old;
@@ -377,6 +417,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // base state enthalpy update
     if (evolve_base_state) {
+	// compute rhoh0_old by "averaging"
+	Average(s1, rhoh0_old, RhoH);
+
+	// call advect_base_enthalpy(w0,rho0_old,rhoh0_old,rhoh0_new,rho0_predicted_edge,psi,dt)
 
     }
     else {
@@ -434,7 +478,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
 
     if (evolve_base_state) {
-        //compute beta0 and gamma1bar
+        // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
         make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
                    gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
@@ -536,7 +580,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // advect the base state density
     if (evolve_base_state) {
+	// call advect_base_dens(w0,rho0_old,rho0_new,rho0_predicted_edge,dt)
 
+	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
     // copy temperature from s1 into s2 for seeding eos calls
@@ -556,16 +602,24 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,umac);
+    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,rho0_predicted_edge);
 
     if (evolve_base_state && use_etarho) {
+
         // compute the new etarho
-        //
-        //
+        if (spherical == 0) {
+	    // call make_etarho_planar(etarho_ec,etarho_cc,etarhoflux,mla)
+
+	} else {
+	    // call make_etarho_spherical(s1,s2,umac,w0mac,rho0_old,rho0_new,dx,normal, &
+            //                          etarho_ec,etarho_cc,mla,the_bc_tower%bc_tower_array)
+
+	}
 
         // correct the base state density by "averaging"
-        //
-        //
+        // call average(mla,s2,rho0_new,dx,rho_comp)
+	Average(s2, rho0_new, Rho);
+	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
 
@@ -593,15 +647,39 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // base state pressure update
     if (evolve_base_state) {
+	// set new p0 through HSE
+	p0_new = p0_old;
+       
+	// call enforce_HSE(rho0_new,p0_new,grav_cell_new)
 
+
+	for (int i=0; i<p0_nph.size(); ++i) {
+	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	}
+
+	// make psi
+	if (spherical == 0) {
+	    // call make_psi_planar(etarho_cc,psi)
+
+	} else {
+	    // compute gamma1bar^{(2)} and store it in gamma1bar_temp2
+	    MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
+
+	    // compute gamma1bar^{nph} and store it in gamma1bar_temp2
+	    for (int i=0; i<gamma1bar_temp2.size(); ++i) {
+		gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
+	    }
+
+	    // call make_psi_spherical(psi,w0,gamma1bar_temp2,p0_nph,Sbar)
+
+	}
     }
 
     // base state enthalpy update
     if (evolve_base_state) {
+	// call advect_base_enthalpy(w0,rho0_old,rhoh0_old,rhoh0_new, &
+        //                          rho0_predicted_edge,psi,dt)
 
-    }
-    else {
-        rhoh0_new = rhoh0_old;
     }
 
     if (maestro_verbose >= 1) {
@@ -672,7 +750,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     Make_S_cc(S_cc_new,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal2);
 
-    if (evolve_base_state) {
+    if (evolve_base_state == 1) {
         Average(S_cc_new,Sbar,0);
     }
 

@@ -298,7 +298,7 @@ do_planar_invsq_grav                bool            false       y
 planar_invsq_mass                   Real               0.0      y
 
 # turn on (true) or off (false) basestate evolution
-evolve_base_state                   bool            true
+evolve_base_state                   bool            true	y
 
 # if true, don't call average to reset the base state at all, even during
 # initialization
@@ -327,7 +327,7 @@ enthalpy_pred_type                  int            1            y
 # and $X$ separately.  @@
 # {\tt species\_pred\_type} = 2 means predict the full ($\rho X$) itself. @@
 # {\tt species\_pred\_type} = 3 means predict $\rho$ and $X$ separately.
-species_pred_type                   int            1
+species_pred_type                   int            1		y
 
 # turns on second order correction to delta gamma1 term
 use_delta_gamma1_term               bool            false

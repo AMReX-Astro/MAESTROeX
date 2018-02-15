@@ -291,12 +291,14 @@ void
 void
     Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux, 
+			   Vector<MultiFab>& etarhoflux, 
 			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 			   const Vector<Real>& r0_old,
 			   const Vector<Real>& r0_edge_old,
 			   const Vector<Real>& r0_new,
 			   const Vector<Real>& r0_edge_new,
+			   const Vector<Real>& r0_predicted_edge, 
 			   int start_comp, int num_comp)
 {
     // timer for profiling
@@ -309,19 +311,20 @@ void
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf   = state[lev];
-              MultiFab& sedgex_mf = sedge[lev][0];
-	      MultiFab& sfluxx_mf = sflux[lev][0];
-        const MultiFab& umac_mf   = umac[lev][0];
+        const MultiFab& scal_mf        = state[lev];
+              MultiFab& sedgex_mf      = sedge[lev][0];
+	      MultiFab& sfluxx_mf      = sflux[lev][0];
+	      MultiFab& etarhoflux_mf = etarhoflux[lev];
+        const MultiFab& umac_mf        = umac[lev][0];
 #if (AMREX_SPACEDIM >= 2)
-              MultiFab& sedgey_mf = sedge[lev][1];
-	      MultiFab& sfluxy_mf = sflux[lev][1];
-        const MultiFab& vmac_mf   = umac[lev][1];
+              MultiFab& sedgey_mf      = sedge[lev][1];
+	      MultiFab& sfluxy_mf      = sflux[lev][1];
+        const MultiFab& vmac_mf        = umac[lev][1];
 
 #if (AMREX_SPACEDIM == 3)
-              MultiFab& sedgez_mf = sedge[lev][2];
-	      MultiFab& sfluxz_mf = sflux[lev][2];
-        const MultiFab& wmac_mf   = umac[lev][2];
+              MultiFab& sedgez_mf      = sedge[lev][2];
+	      MultiFab& sfluxz_mf      = sflux[lev][2];
+        const MultiFab& wmac_mf        = umac[lev][2];
 
 #endif
 #endif
@@ -351,6 +354,7 @@ void
 			      BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 #endif
 #endif
+			      BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
 			      BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
 			      BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
@@ -367,6 +371,7 @@ void
 #endif
 			      r0_old.dataPtr(), r0_edge_old.dataPtr(), 
 			      r0_new.dataPtr(), r0_edge_new.dataPtr(),
+			      r0_predicted_edge.dataPtr(),
 			      w0.dataPtr(), 
 			      &startcomp, &endcomp);
 	    

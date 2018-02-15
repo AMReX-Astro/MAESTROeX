@@ -32,7 +32,8 @@ Maestro::Regrid ()
     }
     
     if (evolve_base_state) {
-        // force rho0 to be the average of rho - FIXME
+        // force rho0 to be the average of rho
+	Average(sold,rho0_old,Rho);
     }
 
     // compute cutoff coordinates

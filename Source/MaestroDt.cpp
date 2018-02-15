@@ -29,6 +29,30 @@ Maestro::EstDt ()
 #endif
     }
 
+    // face-centered
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+
+    if (spherical == 1) {
+	// initialize
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+	    w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+#if (AMREX_SPACEDIM == 3)
+	    w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+#endif
+	}
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+		w0mac[lev][idim].setVal(0.);
+	    }
+	}
+
+	if (evolve_base_state) {
+
+	}
+    }
+
     // build and compute vel_force
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {

@@ -31,7 +31,8 @@ module make_flux_module
 
   use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
-  use meth_params_module, only: rho_comp, rhoh_comp, enthalpy_pred_type
+  use meth_params_module, only: rho_comp, rhoh_comp, enthalpy_pred_type, species_pred_type, &
+                                  evolve_base_state
 
   implicit none
 
@@ -50,16 +51,20 @@ contains
 #if (AMREX_SPACEDIM == 1)
   subroutine make_rhoX_flux_1d(lev, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
+                                 etarhoflux, eta_lo, eta_hi, nc_eta, &
                                  sedgex, x_lo, x_hi, nc_x, &
                                  umac,   u_lo, u_hi, &
                                  rho0_old, rho0_edge_old, &
                                  rho0_new, rho0_edge_new, &
+                                 rho0_predicted_edge, &
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_1d")
 
     integer         , intent(in   ) :: lev, lo(1), hi(1)
     integer         , intent(in   ) :: fx_lo(1), fx_hi(1), nc_fx
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),nc_fx)
+    integer         , intent(in   ) :: eta_lo(1), eta_hi(1) 
+    double precision, intent(inout) :: etarhoflux(eta_lo(1):eta_hi(1))
     integer         , intent(in   ) :: x_lo(1), x_hi(1), nc_x
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),nc_x)
     integer         , intent(in   ) :: u_lo(1), u_hi(1)
@@ -68,6 +73,7 @@ contains
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_levl,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: startcomp, endcomp
 
@@ -86,6 +92,14 @@ contains
              rho0_edge = HALF*(rho0_edge_old(lev,i)+rho0_edge_new(lev,i))
              sfluxx(i,comp) = &
                   (umac(i)+w0(lev,i))*(rho0_edge+sedgex(i,rho_comp))*sedgex(i,comp)
+
+             if (evolve_base_state) then
+                etarhoflux(i) = etarhoflux(i) + sfluxx(i,comp)
+             
+                if ( comp.eq.endcomp) then
+                   etarhoflux(i) = etarhoflux(i) - w0(lev,i)*rho0_predicted_edge(lev,i)
+                end if
+             endif
        end do
     end do ! end comp loop
 
@@ -96,12 +110,14 @@ contains
   subroutine make_rhoX_flux_2d(lev, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
                                  sfluxy, fy_lo, fy_hi, nc_fy, &
+                                 etarhoflux, eta_lo, eta_hi, &
                                  sedgex, x_lo, x_hi, nc_x, &
                                  sedgey, y_lo, y_hi, nc_y, &
                                  umac,   u_lo, u_hi, &
                                  vmac,   v_lo, v_hi, &
                                  rho0_old, rho0_edge_old, &
                                  rho0_new, rho0_edge_new, &
+                                 rho0_predicted_edge, &
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_2d")
 
@@ -110,6 +126,8 @@ contains
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),nc_fx)
     integer         , intent(in   ) :: fy_lo(2), fy_hi(2), nc_fy
     double precision, intent(inout) :: sfluxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),nc_fy)
+    integer         , intent(in   ) :: eta_lo(2), eta_hi(2)
+    double precision, intent(inout) :: etarhoflux(eta_lo(1):eta_hi(1),eta_lo(2):eta_hi(2))
     integer         , intent(in   ) :: x_lo(2), x_hi(2), nc_x
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),nc_x)
     integer         , intent(in   ) :: y_lo(2), y_hi(2), nc_y
@@ -122,6 +140,7 @@ contains
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: startcomp, endcomp
 
@@ -153,6 +172,14 @@ contains
                 ! we need the edge state of rho0
                 sfluxy(i,j,comp) = &
                      (vmac(i,j)+w0(lev,j))*(rho0_edge+sedgey(i,j,rho_comp))*sedgey(i,j,comp)
+
+                if (evolve_base_state) then
+                   etarhoflux(i,j) = etarhoflux(i,j) + sfluxy(i,j,comp)
+
+                if ( comp.eq.endcomp) then
+                   etarhoflux(i,j) = etarhoflux(i,j) - w0(lev,j)*rho0_predicted_edge(lev,j)
+                end if
+             endif  ! evolve_base_state
           end do
        end do
     end do
@@ -166,6 +193,7 @@ contains
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
                                  sfluxy, fy_lo, fy_hi, nc_fy, &
                                  sfluxz, fz_lo, fz_hi, nc_fz, &
+                                 etarhoflux, eta_lo, eta_hi, &
                                  sedgex, x_lo, x_hi, nc_x, &
                                  sedgey, y_lo, y_hi, nc_y, &
                                  sedgez, z_lo, z_hi, nc_z, &
@@ -174,6 +202,7 @@ contains
                                  wmac,   w_lo, w_hi, &
                                  rho0_old, rho0_edge_old, &
                                  rho0_new, rho0_edge_new, &
+                                 rho0_predicted_edge, &
                                  w0, & 
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_3d")
 
@@ -184,6 +213,8 @@ contains
     double precision, intent(inout) :: sfluxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),fy_lo(3):fy_hi(3),nc_fy)
     integer         , intent(in   ) :: fz_lo(3), fz_hi(3), nc_fz
     double precision, intent(inout) :: sfluxz(fz_lo(1):fz_hi(1),fz_lo(2):fz_hi(2),fz_lo(3):fz_hi(3),nc_fz)
+    integer         , intent(in   ) :: eta_lo(3), eta_hi(3)
+    double precision, intent(inout) :: etarhoflux(eta_lo(1):eta_hi(1),eta_lo(2):eta_hi(2),eta_lo(3):eta_hi(3))
     integer         , intent(in   ) :: x_lo(3), x_hi(3), nc_x
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
     integer         , intent(in   ) :: y_lo(3), y_hi(3), nc_y
@@ -200,6 +231,7 @@ contains
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: startcomp, endcomp
 
@@ -249,6 +281,14 @@ contains
                    ! flux, we need the edge state of rho0
                    sfluxz(i,j,k,comp) = (wmac(i,j,k)+w0(lev,k))* &
                      (rho0_edge+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp)
+
+                   if (evolve_base_state) then
+                      etarhoflux(i,j,k) = etarhoflux(i,j,k) + sfluxz(i,j,k,comp)
+                   
+                   if ( comp.eq.endcomp) then
+                      etarhoflux(i,j,k) = etarhoflux(i,j,k) - w0(lev,k)*rho0_predicted_edge(lev,k)
+                   end if
+                endif ! evolve_base_state
              end do
           end do
        end do

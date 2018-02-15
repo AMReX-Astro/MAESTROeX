@@ -97,6 +97,7 @@ Maestro::NodalProj (int proj_type,
             MultiFab::Multiply(Vproj[lev],beta0_cart[lev],0,dir,1,1);
         }
     }
+    //if (proj_type == divu_iters_comp) PrintMF(beta0_cart);
 
     // invert sig then multiply by beta0 so sig now holds:
     // initial_projection_comp: beta0
@@ -264,6 +265,7 @@ Maestro::NodalProj (int proj_type,
     else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
         rel_tol = std::min( eps_hg_max, eps_hg*pow(hg_level_factor,finest_level) );
     }
+ 
 
     // solve for phi
     Print() << "Calling nodal solver" << endl;

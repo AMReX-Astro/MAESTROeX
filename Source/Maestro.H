@@ -90,12 +90,14 @@ private:
 
     void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux, 
+		       amrex::Vector<amrex::MultiFab>& etarhoflux,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		       const amrex::Vector<amrex::Real>& r0_old,
 		       const amrex::Vector<amrex::Real>& r0_edge_old,
 		       const amrex::Vector<amrex::Real>& r0_new,
 		       const amrex::Vector<amrex::Real>& r0_edge_new,
+		       const amrex::Vector<amrex::Real>& r0_predicted_edge,
 		       int start_comp, int num_comp);
 
     void MakeRhoHFlux (const amrex::Vector<amrex::MultiFab>& state,
@@ -172,7 +174,9 @@ private:
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                          amrex::Vector<amrex::MultiFab>& scal_force,
-                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+			 amrex::Vector<amrex::MultiFab>& etarhoflux,
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac, 
+			 const amrex::Vector<amrex::Real>& rho0_predicted_edge);
     ////////////////////////
 
     ////////////

@@ -10,7 +10,9 @@ Maestro::DensityAdvance (int which_step,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
                          Vector<MultiFab>& scal_force,
-                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
+			 Vector<MultiFab>& etarhoflux,
+                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac, 
+			 const Vector<Real>& rho0_predicted_edge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DensityAdvance()",DensityAdvance);
@@ -141,17 +143,19 @@ Maestro::DensityAdvance (int which_step,
     if (which_step == 1) {
   
 	// compute species fluxes
-	MakeRhoXFlux(scalold, sflux, sedge, umac,
+	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac,
 		     rho0_old,rho0_edge_old, 
 		     rho0_old,rho0_edge_old,
+		     rho0_predicted_edge,
 		     FirstSpec,NumSpec);
 	
     } else if (which_step == 2) {
 
 	// compute species fluxes
-	MakeRhoXFlux(scalold, sflux, sedge, umac,
+	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac,
 		     rho0_old,rho0_edge_old, 
 		     rho0_new,rho0_edge_new,
+		     rho0_predicted_edge,
 		     FirstSpec,NumSpec);
     }
 
