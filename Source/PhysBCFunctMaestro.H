@@ -21,7 +21,7 @@ public:
     virtual void FillBoundary (amrex::MultiFab& mf,
                                int dcomp,
                                int ncomp,
-                               Real time) override;
+                               amrex::Real time) override;
 
     using PhysBCFunctBase::FillBoundary;
 

@@ -357,8 +357,8 @@ private:
 
     // multiply (or divide) face-data by beta0
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
-                           const amrex::Vector<Real>& beta0,
-                           const amrex::Vector<Real>& beta0_edge,
+                           const amrex::Vector<amrex::Real>& beta0,
+                           const amrex::Vector<amrex::Real>& beta0_edge,
                            const int& mult_or_div);
 
     // compute the RHS for the solve, RHS = macrhs - div(beta0*umac)
