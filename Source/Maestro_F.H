@@ -346,6 +346,20 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in make_psi.F90
+    void make_psi_planar(const amrex::Real* etarho_cc,
+			       amrex::Real* psi);
+
+    void make_psi_spherical(amrex::Real* psi,
+			    const amrex::Real* w0,
+			    const amrex::Real* gamma1bar, 
+			    const amrex::Real* p0_avg,
+			    const amrex::Real* Sbar_in,
+			    const amrex::Real* r_cc_loc,
+			    const amrex::Real* r_edge_loc);
+    //////////////////////
+
+    //////////////////////
     // in make_S.f90
 
     // compute S from constraint div(u) = S

@@ -382,12 +382,14 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// set new p0 through HSE
 	p0_new = p0_old;
 
-	// call enforce_HSE(rho0_new,p0_new,grav_cell_new)
-
+	enforce_HSE(rho0_new.dataPtr(),
+		    p0_new.dataPtr(),
+		    grav_cell_new.dataPtr(),
+		    r_edge_loc.dataPtr());
 
 	// make psi
 	if (spherical == 0) { 
-	    // call make_psi_planar(etarho_cc,psi)
+	    make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
 
 	} else {
 	    // compute p0_nph
@@ -407,7 +409,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	    }
 
 	    // make time-centered psi
-	    //call make_psi_spherical(psi,w0,gamma1bar_temp2,p0_nph,Sbar)
+	    make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
+			       gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
+			       Sbar.dataPtr(),
+			       r_cc_loc.dataPtr(),
+			       r_edge_loc.dataPtr());
 
 	}
     }
@@ -650,8 +656,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// set new p0 through HSE
 	p0_new = p0_old;
        
-	// call enforce_HSE(rho0_new,p0_new,grav_cell_new)
-
+	enforce_HSE(rho0_new.dataPtr(),
+		    p0_new.dataPtr(),
+		    grav_cell_new.dataPtr(),
+		    r_edge_loc.dataPtr());
 
 	for (int i=0; i<p0_nph.size(); ++i) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
@@ -659,7 +667,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	// make psi
 	if (spherical == 0) {
-	    // call make_psi_planar(etarho_cc,psi)
+	    make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
 
 	} else {
 	    // compute gamma1bar^{(2)} and store it in gamma1bar_temp2
@@ -670,8 +678,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
 	    }
 
-	    // call make_psi_spherical(psi,w0,gamma1bar_temp2,p0_nph,Sbar)
-
+	    make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
+			       gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
+			       Sbar.dataPtr(),
+			       r_cc_loc.dataPtr(),
+			       r_edge_loc.dataPtr());
 	}
     }
 
