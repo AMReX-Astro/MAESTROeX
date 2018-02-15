@@ -23,7 +23,7 @@ contains
 
     integer          :: n,l,i,r
     double precision :: temp,offset
-    double precision :: grav_edge(0:max_radial_level,0:nr_fine-1)
+    double precision :: grav_edge(0:max_radial_level,0:nr_fine  )
     double precision ::    p0_old(0:max_radial_level,0:nr_fine-1)
 
     offset = 0.d0
