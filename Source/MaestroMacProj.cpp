@@ -321,35 +321,28 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
 
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) 
     {
-	// lo-side BCs
-        if (bcs_u[0].lo(idim) == BCType::int_dir) {
-            mlmg_lobc[idim] = LinOpBCType::Periodic;
-        } 
-	else if (bcs_u[0].lo(idim) == BCType::foextrap ||
-		 bcs_u[0].lo(idim) == BCType::hoextrap) {
-	    mlmg_lobc[idim] = LinOpBCType::Neumann;
-	} 
-	else if (bcs_u[0].lo(idim) == BCType::ext_dir) {
-	    mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-	}
-	else {
-	    amrex::Abort("Invalid mlmg_lobc");
+	if (Geometry::isPeriodic(idim)) {
+            mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         }
+        else {
+	    // lo-side BCs
+            if (phys_bc[idim] == Outflow) {
+                mlmg_lobc[idim] = LinOpBCType::Dirichlet;
+            } else if (phys_bc[idim] == Inflow) {
+                mlmg_lobc[idim] = LinOpBCType::inflow;
+            } else {
+                mlmg_lobc[idim] = LinOpBCType::Neumann;
+            }
 
-	// hi-side BCs
-        if (bcs_u[0].hi(idim) == BCType::int_dir) {
-            mlmg_hibc[idim] = LinOpBCType::Periodic;
-        } 
-	else if (bcs_u[0].hi(idim) == BCType::foextrap ||
-		 bcs_u[0].hi(idim) == BCType::hoextrap) {
-	    mlmg_hibc[idim] = LinOpBCType::Neumann;
-	} 
-	else if (bcs_u[0].hi(idim) == BCType::ext_dir) {
-	    mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-        }
-	else {
-	    amrex::Abort("Invalid mlmg_hibc");
-        }
+	    // hi-side BCs
+            if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
+                mlmg_hibc[idim] = LinOpBCType::Dirichlet;
+            } else if (phys_bc[AMREX_SPACEDIM+idim] == Inflow) {
+                mlmg_hibc[idim] = LinOpBCType::inflow;
+            } else {
+                mlmg_hibc[idim] = LinOpBCType::Neumann;
+            }
+        }	
     }
 
     mlabec.setDomainBC(mlmg_lobc,mlmg_hibc);
