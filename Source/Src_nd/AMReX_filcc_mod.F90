@@ -146,7 +146,13 @@ contains
 
           if (bc(1,1,n) .eq. EXT_DIR) then
 
-             ! Do nothing.
+             do k = lo(3), hi(3)
+                do j = lo(2), hi(2)
+                   do i = imin, imax
+                      q(i,j,k,n) = 0.
+                   end do
+                end do
+             end do
 
           else if (bc(1,1,n) .eq. FOEXTRAP) then
              
@@ -208,7 +214,13 @@ contains
 
           if (bc(1,2,n) .eq. EXT_DIR) then
 
-             ! Do nothing.
+             do k = lo(3), hi(3)
+                do j = lo(2), hi(2)
+                   do i = imin, imax
+                      q(i,j,k,n) = 0.
+                   end do
+                end do
+             end do
 
           else if (bc(1,2,n) .eq. FOEXTRAP) then
 
@@ -273,7 +285,13 @@ contains
 
           if (bc(2,1,n) .eq. EXT_DIR) then
 
-             ! Do nothing.
+             do k = lo(3), hi(3)
+                do j = jmin, jmax
+                   do i = lo(1), hi(1)
+                      q(i,j,k,n) = 0.
+                   end do
+                end do
+             end do
 
           else if (bc(2,1,n) .eq. FOEXTRAP) then
 
@@ -335,7 +353,13 @@ contains
 
           if (bc(2,2,n) .eq. EXT_DIR) then
 
-             ! Do nothing.
+             do k = lo(3), hi(3)
+                do j = jmin, jmax
+                   do i = lo(1), hi(1)
+                      q(i,j,k,n) = 0.
+                   end do
+                end do
+             end do
 
           else if (bc(2,2,n) .eq. FOEXTRAP) then
 
@@ -398,11 +422,18 @@ contains
 
        if (lo(3) < klo) then
           kmin = lo(3)
+
           kmax = min(hi(3),klo-1)
 
           if (bc(3,1,n) .eq. EXT_DIR) then
 
-             ! Do nothing.
+             do k = kmin, kmax
+                do j = lo(2), hi(2)
+                   do i = lo(1), hi(1)
+                      q(i,j,k,n) = 0.
+                   end do
+                end do
+             end do
              
           else if (bc(3,1,n) .eq. FOEXTRAP) then
              
@@ -427,6 +458,7 @@ contains
                             q(i,j,k,n) = eighth * (15*q(i,j,klo,n) - 10*q(i,j,klo+1,n) + 3*q(i,j,klo+2,n))
                          else
                             q(i,j,k,n) = half * (3*q(i,j,klo,n) - q(i,j,klo+1,n))
+
                          end if
                       end if
 
@@ -464,7 +496,13 @@ contains
 
           if (bc(3,2,n) .eq. EXT_DIR) then
 
-             ! Do nothing.
+             do k = kmin, kmax
+                do j = lo(2), hi(2)
+                   do i = lo(1), hi(1)
+                      q(i,j,k,n) = 0.
+                   end do
+                end do
+             end do
              
           else if (bc(3,2,n) .eq. FOEXTRAP) then
              
