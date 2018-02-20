@@ -221,8 +221,9 @@ Maestro::NodalProj (int proj_type,
     }
 
     MLMG mlmg(mlndlap);
-    mlmg.setMaxFmgIter(0);
-    mlmg.setVerbose(10);
+    mlmg.setVerbose(mg_verbose);
+    mlmg.setCGVerbose(cg_verbose);
+    mlmg.setBottomMaxIter(1000);
 
     Real abs_tol = -1.; // disable absolute tolerance
     Real rel_tol;

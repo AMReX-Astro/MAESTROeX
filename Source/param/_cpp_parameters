@@ -215,7 +215,7 @@ do_initial_projection               bool            true
 #-----------------------------------------------------------------------------
 
 # Verbsoity of the multigrid solver, but not the bottom solver.
-mg_verbose                          int            0
+mg_verbose                          int            1
 
 # Verbosity of bottom solver
 cg_verbose                          int            0
