@@ -117,7 +117,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // set solver parameters
     mac_mlmg.setVerbose(mg_verbose);
     mac_mlmg.setCGVerbose(cg_verbose);
-    mac_mlmg.setMaxIter(1000);
+    mac_mlmg.setBottomMaxIter(1000);
 
     // tolerance parameters taken from original MAESTRO fortran code
     const Real eps_mac = 1.e-10;

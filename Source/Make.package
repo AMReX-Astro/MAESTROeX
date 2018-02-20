@@ -16,6 +16,7 @@ CEXE_sources += MaestroForce.cpp
 CEXE_sources += MaestroGamma.cpp
 CEXE_sources += MaestroInit.cpp
 CEXE_sources += MaestroMacProj.cpp
+CEXE_sources += MaestroMakeEta.cpp
 CEXE_sources += MaestroMakeS.cpp
 CEXE_sources += MaestroNodalProj.cpp
 CEXE_sources += MaestroPlot.cpp

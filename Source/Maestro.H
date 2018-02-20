@@ -381,6 +381,13 @@ private:
     ////////////
 
     ////////////
+    // MaestroMakeEta.cpp functions
+    void MakeEtarho (amrex::Vector<amrex::Real>& etarho_edge,
+		     amrex::Vector<amrex::Real>& etarho_cell,
+		     const amrex::Vector<amrex::MultiFab>& etarho_flux);
+    ////////////
+
+    ////////////
     // MaestroMakeS.cpp functions
 
     // compute S at cell-centers

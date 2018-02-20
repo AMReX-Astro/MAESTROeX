@@ -245,6 +245,17 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in make_eta.F90
+    void make_etarho_planar(amrex::Real* etarho_ec, amrex::Real* etarho_cc, 
+			    const amrex::Real* etarhosum, const amrex::Real* ncell);
+
+    void sum_etarho(const int* lev, const int* domlo, const int* domhi,
+		    const int* lo,  const int *hi,
+		    const amrex::Real* etarhoflux, const int* x_lo, const int* x_hi,
+                    amrex::Real* etarhosum, amrex::Real* ncell);
+    //////////////////////
+
+    //////////////////////
     // in make_flux.F90
 #if (AMREX_SPACEDIM == 1)
     void make_rhoX_flux_1d(
