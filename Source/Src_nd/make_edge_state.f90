@@ -10,10 +10,6 @@ module make_edge_state_module
                                             finest_radial_level, r_start_coord, r_end_coord
 
   implicit none
-
-  private
-
-  public :: make_edge_state_1d
   
 contains
 

@@ -10,6 +10,27 @@ extern "C"
     // these are interfaces to fortran subroutines
 
     //////////////////////
+    // in advect_base.F90
+    void advect_base_dens(const amrex::Real* w0,
+			  const amrex::Real* rho0_old,
+			        amrex::Real* rho0_new,
+			        amrex::Real* rho0_predicted_edge,
+			  const amrex::Real* dt, 
+			  const amrex::Real* r_cc_loc, 
+			  const amrex::Real* r_edge_loc);
+
+    void advect_base_enthalpy(const amrex::Real* w0,
+			      const amrex::Real* rho0_old,
+			      const amrex::Real* rhoh0_old,
+			            amrex::Real* rhoh0_new,
+			      const amrex::Real* rho0_predicted_edge,
+			      const amrex::Real* psi,
+			      const amrex::Real* dt, 
+			      const amrex::Real* r_cc_loc, 
+			      const amrex::Real* r_edge_loc);
+    //////////////////////
+
+    //////////////////////
     // in average.f90
     void average(const int* lev, const int* lo, const int* hi,
                  const amrex::Real* phi, const int* p_lo, const int* p_hi, 

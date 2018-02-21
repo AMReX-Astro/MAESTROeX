@@ -303,7 +303,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // advect the base state density
     if (evolve_base_state) {
-	// call advect_base_dens(w0,rho0_old,rho0_new,rho0_predicted_edge,dt)
+	advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
+			 rho0_predicted_edge.dataPtr(), &dt,
+			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
 
 	compute_cutoff_coords(rho0_new.dataPtr());
     }
@@ -419,8 +421,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// compute rhoh0_old by "averaging"
 	Average(s1, rhoh0_old, RhoH);
 
-	// call advect_base_enthalpy(w0,rho0_old,rhoh0_old,rhoh0_new,rho0_predicted_edge,psi,dt)
-
+	advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(), 
+			     rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
+			     rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
+			     r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
     else {
         rhoh0_new = rhoh0_old;
@@ -579,7 +583,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // advect the base state density
     if (evolve_base_state) {
-	// call advect_base_dens(w0,rho0_old,rho0_new,rho0_predicted_edge,dt)
+	advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
+			 rho0_predicted_edge.dataPtr(), &dt,
+			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
 
 	compute_cutoff_coords(rho0_new.dataPtr());
     }
@@ -675,9 +681,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // base state enthalpy update
     if (evolve_base_state) {
-	// call advect_base_enthalpy(w0,rho0_old,rhoh0_old,rhoh0_new, &
-        //                          rho0_predicted_edge,psi,dt)
-
+	advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(), 
+			     rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
+			     rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
+			     r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
 
     if (maestro_verbose >= 1) {
