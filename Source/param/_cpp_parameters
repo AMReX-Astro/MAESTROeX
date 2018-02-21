@@ -344,7 +344,7 @@ grav_const                          Real               -1.5e10    y
 # 0 = no ppm (piecewise linear slopes instead) @@
 # 1 = 1984 ppm @@
 # 2 = Hybrid Sekora/Colella and McCorquodale/Colella 2009/2010 ppm
-ppm_type                            int            1
+ppm_type                            int            1 	       y
 
 # 0 = use ppm instead for multi-d integrator @@
 # 1 = bilinear
