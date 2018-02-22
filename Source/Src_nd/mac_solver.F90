@@ -99,7 +99,7 @@ contains
        j = lo(2)
        k = lo(3)
        do i = lo(1),hi(1)+1
-          uedge(i,j,k) = uedge(i,j,k) * beta0(lev,j)
+          uedge(i,j,k) = uedge(i,j,k) * beta0(lev,i)
        end do
     
 #elif (AMREX_SPACEDIM == 2)
@@ -122,7 +122,7 @@ contains
        do k = lo(3),hi(3)
        do j = lo(2),hi(2)
        do i = lo(1),hi(1)+1
-          uedge(i,j,k) = uedge(i,j,k) * beta0(lev,j)
+          uedge(i,j,k) = uedge(i,j,k) * beta0(lev,k)
        end do
        end do
        end do
@@ -130,7 +130,7 @@ contains
        do k = lo(3),hi(3)
        do j = lo(2),hi(2)+1
        do i = lo(1),hi(1)
-          vedge(i,j,k) = vedge(i,j,k) * beta0_edge(lev,j)
+          vedge(i,j,k) = vedge(i,j,k) * beta0(lev,k)
        end do
        end do
        end do
@@ -138,20 +138,20 @@ contains
        do k = lo(3),hi(3)+1
        do j = lo(2),hi(2)
        do i = lo(1),hi(1)
-          wedge(i,j,k) = wedge(i,j,k) * beta0(lev,j)
+          wedge(i,j,k) = wedge(i,j,k) * beta0_edge(lev,k)
        end do
        end do
        end do
 #endif
 
-    elseif (mult_or_div .eq. 0) then 
+    else if (mult_or_div .eq. 0) then 
 
    ! Divide
 #if (AMREX_SPACEDIM == 1)
        j = lo(2)
        k = lo(3)
        do i = lo(1),hi(1)+1
-          uedge(i,j,k) = uedge(i,j,k) / beta0(lev,j)
+          uedge(i,j,k) = uedge(i,j,k) / beta0(lev,i)
        end do
     
 #elif (AMREX_SPACEDIM == 2)
@@ -174,7 +174,7 @@ contains
        do k = lo(3),hi(3)
        do j = lo(2),hi(2)
        do i = lo(1),hi(1)+1
-          uedge(i,j,k) = uedge(i,j,k) / beta0(lev,j)
+          uedge(i,j,k) = uedge(i,j,k) / beta0(lev,k)
        end do
        end do
        end do
@@ -182,7 +182,7 @@ contains
        do k = lo(3),hi(3)
        do j = lo(2),hi(2)+1
        do i = lo(1),hi(1)
-          vedge(i,j,k) = vedge(i,j,k) / beta0_edge(lev,j)
+          vedge(i,j,k) = vedge(i,j,k) / beta0(lev,k)
        end do
        end do
        end do
@@ -190,7 +190,7 @@ contains
        do k = lo(3),hi(3)+1
        do j = lo(2),hi(2)
        do i = lo(1),hi(1)
-          wedge(i,j,k) = wedge(i,j,k) / beta0(lev,j)
+          wedge(i,j,k) = wedge(i,j,k) / beta0_edge(lev,k)
        end do
        end do
        end do
