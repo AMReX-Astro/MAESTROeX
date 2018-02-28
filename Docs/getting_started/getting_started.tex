@@ -32,7 +32,7 @@ paper~3.
   \begin{verbatim}
 git pull
   \end{verbatim}
-  in the {\tt MAESTRO/} directory.
+  in the {\tt MAESTROeX/} directory.
 
 \item {\em Get a copy of \microphysics}.
 
@@ -97,7 +97,7 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
 \item {\em Setup the problem's {\tt GNUmakefile}}.
 
   In \maestroex, each problem lives under one of three sub-directories
-  of {\tt MAESTRO/Exec}: {\tt SCIENCE/}, {\tt TEST\_PROBLEMS/}, or
+  of {\tt MAESTROeX/Exec}: {\tt SCIENCE/}, {\tt TEST\_PROBLEMS/}, or
   {\tt UNIT\_TESTS/}.  This problem sub-directory will contain any
   problem-specific files as well as the {\tt GNUmakefile} that
   specifies how to build the executable.  Note: we rely on features of
@@ -105,48 +105,64 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
   in \S~\ref{sec:adding_problems}.  Here we will configure for a
   serial build.
 
-  Change directory to {\tt
-    MAESTRO/Exec/TEST\_PROBLEMS/reacting\_bubble/}.  We only need to
-  worry about the options at the very top of the {\tt GNUmakefile} for
-  now.  These should be set as follows:
+  Change directory to 
+  {\tt MAESTROeX/Exec/TEST\_PROBLEMS/reacting\_bubble/}.
+  We only need to worry about the options at the very top of the 
+  {\tt GNUmakefile} for now.  These should be set as follows:
   \begin{itemize}
-  \item {\tt NDEBUG := t}
 
-    This option determines whether we compile with support for
-    debugging (usually also enabling some runtime checks).  Setting
-    {\tt NDEBUG := t} turns off debugging.
+  \item {\tt DEBUG := TRUE}
 
-  \item {\tt MPI := }
+    This option determines whether we compile with support for 
+    less-optimized code with debugging runtime checks.  Setting 
+    {\tt DEBUG := FALSE} turns off debugging.
+
+  \item {\tt DIM := 2}
+
+    The dimensionality of the problem must be specified at compile-time.
+
+  \item {\tt COMP := gnu}
+
+    This option specifies the gnu compiler suite (g++/gfortran).  
+    We will use {\tt gnu}, which is the preferred compiler suite for \maestroex.
+    Specifying this compiler will automatically pull in the compiler
+    settings as specified in {\tt AMREX\_HOME/Tools/GNUMake/Make.defs}.
+    (Alternate compiler choices include 
+    {\tt intel}, {\tt cray}, and {\tt pgi}.
+
+  \item {\tt USE\_MPI := TRUE}
 
     This determines whether we are doing a parallel build, using the
-    Message Passing Interface (MPI) library.  For now, we leave this
-    option empty, disabling MPI.  This will build \maestroex\ in serial
+    Message Passing Interface (MPI) library.  If you set this option
+    to {\tt FALSE}, you will disable MPI
+    and will build \maestroex\ in serial
     mode, so no MPI library needs to be present on the host system.
 
-  \item {\tt OMP := }
+  \item {\tt USE\_OMP := FALSE}
 
     This determines whether we are using OpenMP to do parallelism
     within a shared memory node.  OpenMP is used together with MPI,
     with MPI distributing the grids across the processors and within a
     shared-memory node, OpenMP allows many cores to operate on the
-    same grid.  For now, we leave this option empty, disabling OpenMP.
+    same grid.  For now, we leave this option as {\tt FALSE}, disabling OpenMP.
 
-  \item {\tt SDC := }
+  \item {\tt USE\_REACT := TRUE}
 
-    This option determines whether we want to use the alternate SDC
-    (Spectral Deferred Corrections) source for \maestroex\ (see Chapter
-    \ref{ch:sdc}).  This is experimental, and this option not present
-    in all problems.  We leave this blank so we compile the default
-    \maestroex\ source.
+    Some test problems in \maestroex\ do not use reactions, so there is an
+    option to disable the compilation of reaction-specific source code.
 
-  \item {\tt COMP := gfortran}
+  \item {\tt TINY\_PROFILE := FALSE}
 
-    This option specifies the Fortran compiler.  We will use {\tt
-      gfortran}, which is the preferred compiler for \maestroex.
-    Specifying this compiler will automatically pull in the compiler
-    settings as specified in {\tt AMREX\_HOME/Tools/F\_mk/}.
-    (Alternate compiler choices include {\tt Intel}, {\tt PGI}, {\tt
-      PathScale}, {\tt Cray}.)
+    Profiling tool that generates a text file with profiling information.
+    Refer to the \amrex\ User's Guide at 
+    \url{https://amrex-codes.github.io/amrex/}
+
+  \item {\tt PROFILE := FALSE}
+
+    More advanced profiling tool that generates a text file with profiling 
+    information, or data files that can be interpreted with a special build of 
+    {\tt amrvis}.  Selecting {\tt TRUE} overrides the {\tt TINY\_PROFILE} setting.
+    Refer to the \amrex\ User's Guide at \url{https://amrex-codes.github.io/amrex/}
 
   \end{itemize}
 
@@ -155,9 +171,9 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
 
   Type {\tt make}.  The build system will first find the dependencies
   amongst all the source files and then build the executable.  When
-  finished, the executable will have a name like {\tt
-    main.Linux.gfortran.exe}, where the specific parts of the name
-  depend on the compilers and OS used.
+  finished, the executable will have a name like
+  {\tt Maestro2d.gnu.DEBUG.MPI.ex}, where the specific parts of the name
+  depend on the options used in {\tt GNUmakefile}.
 
   Note, at the end of the build process, a link will be made in the
   current directory to the data table needed for the equation of state
@@ -166,12 +182,12 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
 
 \item {\em Run!}
 
-  Each problem requires an input file.  The inputs file (a Fortran
-  namelist) consists of lines of the form {\em parameter = value},
+  Each problem requires an input file.  The inputs file
+  consists of lines of the form {\em parameter = value},
   where {\em parameter} is one of the many runtime parameters
   \maestroex\ knows, and {\em value} overrides the default value for
   that parameter.  For the {\tt reacting\_bubble} problem, we will use
-  the inputs file {\tt inputs\_2d}.  An overview of some of the more
+  the inputs file {\tt inputs\_2d\_C}.  An overview of some of the more
   common runtime parameters is given in
   \S~\ref{sec:gettingstarted:runtime}, and a full list of all
   \maestroex\ runtime parameters and their default values is given in
@@ -179,12 +195,16 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
 
   \maestroex\ is run simply as:
   \begin{verbatim}
- ./main.Linux.Intel.exe inputs_2d
+  ./Maestro2d.gnu.DEBUG.MPI.ex inputs_2d_C
+  \end{verbatim}
+  or to run in parallel on a local workstation:
+  \begin{verbatim}
+  mpiexec -n 4 ./Maestro2d.gnu.DEBUG.MPI.ex inputs_2d_C
   \end{verbatim}
   We can also override the default value of any runtime parameter by
-  specifying it on the commandline as
+  specifying it on the commandline as, e.g.,
   \begin{verbatim}
- ./main.Linux.Intel.exe inputs_2d --parameter value
+  ./Maestro2d.gnu.DEBUG.MPI.ex inputs_2d_C maestro.max_step=0 amr.n_cell=192 320
   \end{verbatim}
 
   As the code runs, a lot of information will pass through the screen.
@@ -201,15 +221,15 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
   by default) with integral or extrema information (like maximum Mach
   number) from each timestep.
 
-  By default, the plotfiles will be named {\tt plt}{\em nnnnn}, where
-  the number {\em nnnnn} is the timestep number when the file was
-  outputted.  Similarly, the checkpoints are named {\tt chk}{\em
-    nnnnn}.  \amrex\ plotfiles and checkpoints are actually
+  By default, the plotfiles will be named {\tt plt}{\em nnnnnnn}, where
+  the number {\em nnnnnnn} is the timestep number when the file was
+  outputted.  Similarly, the checkpoints are named
+  {\tt chk}{\em nnnnnnn}.  \amrex\ plotfiles and checkpoints are actually
   directories, with the data stored in sub-directories grouped by
   refinement level.  Details of the simulation (build information,
   number of processors used, output date, output directory, runtime
   parameter values, ...)  are stored in the plaintext {\tt job\_info}
-  file in each plotfile directory.
+  file in each plotfile and checkpoint directory.
 
   {\bf Note: unless otherwise specified all quantities in
     \maestroex\ are assumed to be in CGS units.}
@@ -252,6 +272,10 @@ separately from the \maestroex\ distribution.
 \begin{verbatim}
 git clone https://github.com/AMReX-Codes/Amrvis.git
 \end{verbatim}
+Also, to build a 3D version of \amrvis\ you need to obtain volpack using:
+\begin{verbatim}
+git clone https://ccse.lbl.gov/pub/Downloads/volpack.git
+\end{verbatim}
 \amrvis\ is built in the C++ \amrex\ framework (instead of the Fortran 
 \amrex\ framework that \maestroex\ uses).  The build systems are similar,
 but differ in a few ways.  
@@ -265,12 +289,11 @@ related development packages (e.g.\ {\tt libXpm-devel}).
 Further details on the C++ \amrex\ build system used by \amrvis\
 can be found in the \amrex\ documentation.
 
-
 \subsection{{\tt AmrPostprocessing} scripts}
 
 Several useful analysis scripts (written in Fortran 90) can be found
-in {\tt AmrPostprocessing/F\_Src/} (distributed separately
-from \maestroex).  The {\tt GNUmakefile} there needs to be edited to
+in {\tt amrex/Tools/Postprocessing/F_Src/}.
+The {\tt GNUmakefile} there needs to be edited to
 indicate which of the tools to build.  For example, to extract the
 density along a line from the center of a plotfile, {\tt plt00200}, in
 the $y$-direction:
@@ -322,7 +345,7 @@ directly with {\sf GNUplot}, for example.
 \section{`Standard' Test Problems}
 
 Different problems in \maestroex\ are contained in one of three
-sub-directories under {\tt MAESTRO/Exec}: ({\tt SCIENCE/}, {\tt
+sub-directories under {\tt MAESTROeX/Exec}: ({\tt SCIENCE/}, {\tt
 TEST\_PROBLEMS/}, or {\tt UNIT\_TESTS/}).  The {\tt GNUmakefile} in each
 problem directory lists the components of {\tt MAESTRO} that are used
 to build the executable.  {\tt TEST\_PROBLEMS/} contains simple
