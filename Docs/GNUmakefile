@@ -1,6 +1,6 @@
 EPStoPDF = epstopdf
 
-ALL: MaestroUsersGuide.pdf 
+ALL: MAESTROeXUsersGuide.pdf 
 
 eps_source = $(wildcard *.eps) \
              $(wildcard lo_density/*.eps) \
@@ -50,16 +50,15 @@ section_sources = maestro_doc.bib \
                   MESA/instructions.tex
 
 
-MaestroUsersGuide.pdf: MaestroUsersGuide.tex maestrosymbols.tex $(pdf_source) $(section_sources) $(pdf_source)
-	pdflatex MaestroUsersGuide.tex < /dev/null
-	bibtex MaestroUsersGuide
-	pdflatex MaestroUsersGuide.tex < /dev/null
-#	makeindex -s mystyle.ist MaestroUsersGuide < /dev/null
-	makeindex MaestroUsersGuide < /dev/null
-	pdflatex MaestroUsersGuide.tex < /dev/null
-	pdflatex MaestroUsersGuide.tex < /dev/null
+MAESTROeXUsersGuide.pdf: MAESTROeXUsersGuide.tex maestrosymbols.tex $(pdf_source) $(section_sources) $(pdf_source)
+	pdflatex MAESTROeXUsersGuide.tex < /dev/null
+	bibtex MAESTROeXUsersGuide
+	pdflatex MAESTROeXUsersGuide.tex < /dev/null
+	makeindex MAESTROeXUsersGuide < /dev/null
+	pdflatex MAESTROeXUsersGuide.tex < /dev/null
+	pdflatex MAESTROeXUsersGuide.tex < /dev/null
 
-pdf:	MaestroUsersGuide.pdf 
+pdf:	MAESTROeXUsersGuide.pdf 
 
 
 %.pdf: %.eps
@@ -67,12 +66,12 @@ pdf:	MaestroUsersGuide.pdf
 
 
 clean:
-	$(RM) $(pdf_source) MaestroUsersGuide.dvi 
-	$(RM) MaestroUsersGuide.blg MaestroUsersGuide.log 
-	$(RM) MaestroUsersGuide.toc MaestroUsersGuide.lof
-	$(RM) MaestroUsersGuide.idx  MaestroUsersGuide.ind  
-	$(RM) MaestroUsersGuide.ilg  MaestroUsersGuide.lot
-	$(RM) MaestroUsersGuide.aux MaestroUsersGuide.ps MaestroUsersGuide.bbl
+	$(RM) $(pdf_source) MAESTROeXUsersGuide.dvi 
+	$(RM) MAESTROeXUsersGuide.blg MAESTROeXUsersGuide.log 
+	$(RM) MAESTROeXUsersGuide.toc MAESTROeXUsersGuide.lof
+	$(RM) MAESTROeXUsersGuide.idx  MAESTROeXUsersGuide.ind  
+	$(RM) MAESTROeXUsersGuide.ilg  MAESTROeXUsersGuide.lot
+	$(RM) MAESTROeXUsersGuide.aux MAESTROeXUsersGuide.ps MAESTROeXUsersGuide.bbl
 	$(RM) *~
 
 .PHONY: clean
