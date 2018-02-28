@@ -1,0 +1,281 @@
+These notes are somewhat dated because they pertain only to {\sf MESA} version 
+4088. In my experience, version 4088 is 
+very easy to install and follows the same steps as outlined above. When using 
+the scripts in 
+{\sf AstroDev/MESA/networks/scripts}, make sure the proper list of modules to 
+compile (lines containing {\tt do\_one ....}) is used. Those lists are 
+version dependant.
+
+Once {\sf MESA} was installed and working properly on a local machine (e.g.\ 
+Bender), I tried installing it on Hopper, which is a Cray XE6 machine. On 
+Bender, which is an Intel(R) Xeon(R) X5650 machine, the compiler was 
+{\tt gcc} version 4.7.0, on Hopper I tried compiling {\sf MESA} with the 
+Cray Compiler using version 8.0.5. The module that was loaded to enable this 
+was {\tt PrgEnv-cray}.
+
+There are several steps needed to compile {\sf MAESTRO} with {\sf MESA} on 
+Hopper:
+\begin{enumerate}
+\item Download the {\tt MESA} source code (Section \ref{sec:setupmesa}) and 
+be sure to use the correct version: {\tt svn co -r 4088 ...}
+\item Edit the {\tt makefile\_header} in the {\tt utils} directory
+\item Edit the {\tt build\_and\_test} script in the {\tt utils} directory
+\item Edit the {\tt chem\_lib.f} file in the {\tt chem} directory
+\item Edit the {\tt mtx} makefile
+\item Edit the makefiles in {\tt screen}, {\tt utils}, {\tt num} and 
+{\tt interp\_1d}
+\item Edit the {\tt install} script in the main {\sf MESA} directory
+\item Edit the {\tt BoxLib/Tools/F\_mk/GMakedefs.mak} makefile
+\item Edit the {\tt BoxLib/Tools/F\_mk/comps/Linux\_cray.mak} file
+\item Install {\sf MESA}
+\item Compile {\sf MAESTRO}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{{\tt makefile\_header}}
+In following the setup outlined in this document, I changed the compilers, 
+used the source version of {\tt LAPACK} and {\tt BLAS}, turned off 
+{\tt PGPLOT} and turned off the {\tt SE} formatting library. I also added the 
+appropriate compiler flags. The results of what I changed are shown below:
+\begin{lstlisting}[language=make,mathescape=false]
+  # Cray C-compiler
+  CC = cc
+
+  # Cray Fortran-Compiler
+  FC = ftn
+
+  # if you need special flags for the compiler, define them here:
+  SPECIAL_FC_FLAGS = -h mpi0 -target=linux -emf
+  # -h mpi0 disables mpi optimization
+  # -target=linux specifies the build machine as linux based
+  # -emf: the m flag says create NAME.mod files, the f flag says
+  #        convert those to name.mod files
+
+  # must explicity define all compilation flags
+  FCbasic = $(SPECIAL_FC_FLAGS)
+  FCimpno = -eI
+  FCchecks =
+  FCwarn = -m 3
+  FCfixed = -f fixed -N 132
+  FCfixed72 = -f fixed -N 72
+  FCfree = -f free
+  FCopt = -O 1
+  FCdebug = -g -O0 -R bps
+  FCstatic =
+
+  FC_fixed_preprocess = -eZ
+  FC_free_preprocess = -eZ
+
+  # Cray compilers have omp ON by default
+  FCopenmp =
+  # to disable omp:
+  #FCopenmp = -h noomp 
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{{\tt build\_and\_test} script}
+
+The {\tt build\_and\_test} script in the {\tt utils} directory is 
+responsible for compiling the main module directory as well as compiling 
+and running the test directory. We want to turn off the compiling and 
+running of the test directory to ensure that {\sf MESA} compiles successfully 
+(it failed to install otherwise). A portion of the {\tt build\_and\_test} 
+script looks like this:
+\begin{lstlisting}[language=bash,mathescape=false]
+  cd make
+  make
+  check_okay
+  cd ../test
+  ./mk
+  check_okay
+  if [ -x test_quietly ]
+  then
+          ./test_quietly
+          check_okay
+  fi
+  ./ck >& diff.txt
+\end{lstlisting}
+we wish to change it to this:
+\begin{lstlisting}[language=bash,mathescape=false]
+  cd make
+  make
+  check_okay
+  #cd ../test
+  #./mk
+  check_okay
+  if [ -x test_quietly ]
+  then
+  #        ./test_quietly
+          check_okay
+  fi
+  #./ck >& diff.txt
+\end{lstlisting}
+This disables the compiling and running of the test directory.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{{\tt chem\_lib.f} Source File}
+
+Open the {\tt chem\_lib.f} file located in {\tt chem/public}. In the 
+{\tt generate\_nuclide\_set} subroutine, the implied do loop must be removed 
+and replaced with an actual do loop. For an unknown reason, the implied do 
+loop was causing a Segmentation Fault on Hopper with the Cray compiler. The 
+implied do loop:
+\begin{lstlisting}[language=fortran,mathescape=false]
+  set = [(nuclide_set(names(i), i), i=1, size(names))]
+\end{lstlisting}
+should be changed to an explicit do loop:
+\begin{lstlisting}[language=fortran,mathescape=false]
+  do i=1, size(names)
+     set(i) = nuclide_set(names(i), i)
+  enddo
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{{\tt mtx} makefile}
+
+In the {\tt mtx/make/makefile}, there are a few compiler flags that were hard 
+coded in. There is a {\tt -w} flag in five places and a {\tt -fno-common} 
+flag in one place. The {\tt -w} flag instances look like this:
+\begin{lstlisting}[language=make,mathescape=false]
+  %.o: $(MODULE_DIR)/lapack_src/%.f
+  	$(COMPILE_XTRA) -w $<
+
+  # must turn off optimization for dlamch or can get infinite loop!!!
+  dlamch.o: $(MODULE_DIR)/blas_src/dlamch.f
+  	$(COMPILE_XTRA_NO_OPT) -w $<
+\end{lstlisting}
+The {\tt -w} should be deleted. There are three more instances immediately 
+after these lines. The {\tt -fno-common} flag appears here:
+\begin{lstlisting}[language=make,mathescape=false]
+  KLU_C = $(CC) -O3 -fno-common -fexceptions
+  KLU_I = -I$(KLU_DIR)
+\end{lstlisting}
+All three of the manually added flags ({\tt -O3}, {\tt -fno-common} and 
+{\tt -fexceptions}) should be deleted from the {\tt KLU\_C} line.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{makefiles in {\tt screen}, {\tt num}, {\tt utils} and 
+{\tt interp\_1d}}
+
+When creating the library for these four modules, there is a {\tt LIB\_DEFS} 
+variable in the makefile that holds the {\tt *\_def.o} file, e.g.\ 
+{\tt utils\_def.o} or {\tt num\_def.o}. This file is never loaded into the 
+library as seen below for the {\tt utils} directory. Certain modules have a 
+{\tt *\_def.f} file with both definitions and declarations of data that will 
+be needed at runtime, so they must be included in the library. Other modules 
+have a {\tt *\_def.f} file that contains only definitions and no data 
+declarations and therefor only needs to be included at compile time. The Cray 
+compiler on Hopper for whatever reason complained that there were undefined 
+references to certain {\tt *\_def.o} files. The undefined references only 
+occurred for modules whose {\tt *\_def.f} file did not need to be included in 
+the library. The fix was to manually include the {\tt *\_def.o} file in the 
+library for all of the necessary module directories. The {\tt utils} directory 
+is shown here:
+\begin{lstlisting}[language=make,mathescape=false]
+  LIB = libutils.a
+  LIB_DEFS = utils_def.o
+  LIB_OBJS = $(UTILS_ISNAN).o utils_nan.o utils_dict.o utils_lib.o
+
+  $(LIB) : $(LIB_DEFS) $(LIB_OBJS)
+  	$(LIB_TOOL) $(LIB) $(LIB_OBJS)
+\end{lstlisting}
+To include the {\tt LIB\_DEFS} file, change the above code to the following:
+\begin{lstlisting}[language=make,mathescape=false]
+  LIB = libutils.a
+  LIB_DEFS = utils_def.o
+  LIB_OBJS = $(UTILS_ISNAN).o utils_nan.o utils_dict.o utils_lib.o
+
+  $(LIB) : $(LIB_DEFS) $(LIB_OBJS)
+  	$(LIB_TOOL) $(LIB) $(LIB_DEFS) $(LIB_OBJS)
+\end{lstlisting}
+This must be done for each makefile in the following directories: 
+{\tt screen/make}, {\tt num/make}, {\tt utils/make} and {\tt interp\_1d/make}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{{\tt install} script}
+
+Certain modules that are unneccessary for use with {\sf MAESTRO} do not need 
+to be installed (and also cause some sort of installation error). In the 
+main {\sf MESA} directory, edit the {\tt install} script and comment out 
+the following four lines: {\tt do\_one sample}, {\tt do\_one star}, 
+{\tt do\_one adipls} and {\tt do\_one astero}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{{\sf BoxLib Linux\_cray.mak} file}
+
+Two flags used in the compilation of {\sf MESA} with the Cray compiler are 
+important; the {\tt -e m} or {\tt -em} flag and the {\tt -e f} or {\tt -ef} 
+flag. The {\tt -em} flag tells the compiler to create {\tt .mod} files of the 
+form {\tt NAME.mod}. The {\tt -e f} flag, which must be used with the 
+{\tt -em} flag, instead outputs {\tt .mod} files of the form {\tt name.mod}. 
+This is important for {\sf MESA} because the {\tt export} scripts copy the 
+various libraries and {\tt .mod} files to the correct directories. The 
+{\tt export} script in the {\tt const} directory for example looks like this:
+\begin{lstlisting}[language=bash,mathescape=false]
+  cp make/const_lib.mod ../include
+  cp make/const_def.mod ../include
+
+  cp make/libconst.a ../lib
+  cd ../lib
+  ranlib libconst.a
+\end{lstlisting}
+If the {\tt -ef} flag is not enabled, the {\tt .mod} file will be 
+{\tt CONST\_LIB.mod} and will not get copied to the {\tt include} directory 
+(the library is unaffected). The default for {\sf MAESTRO} is to not use 
+the {\tt -ef} flag, but it does use the {\tt -em} flag. To make {\sf MAESTRO} 
+and {\sf MESA} compatible, I added the {\tt -ef} flag to the 
+{\tt Linux\_cray.mak} file located in {\tt BoxLib/Tools/F\_mk/comps}. I also 
+added a few more debugging flags:
+\begin{lstlisting}[language=make,mathescape=false]
+  FFLAGS   += -J $(mdir) -I $(mdir) -emf
+  F90FLAGS += -J $(mdir) -I $(mdir) -emf
+
+  ifdef NDEBUG
+    FFLAGS   += -O 1
+    F90FLAGS += -O 1
+    CFLAGS   += -O 1
+  else
+    FFLAGS   += -g -O0 -R bps
+    F90FLAGS += -g -O0 -R bps
+    CFLAGS   += -g -O0 -h bounds
+  endif 
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{{\sf BoxLib GMakedefs.mak} makefile}
+
+In {\sf MAESTRO}, {\tt .mod} files are located in the {\tt \$(tdir)/m} 
+directory, where {\tt tdir = t/\$(suf)} and {\tt \$(suf)} was in this case 
+{\tt Linux.Cray}. This means the {\sf MAESTRO} routines are expecting to find 
+module files with the name {\tt t/Linux.Cray/m/network.mod}. The addition of 
+the {\tt -ef} flag affects the entire name of the module so the Cray compiler 
+was creating files with the name {\tt t/linux.cray/m/network.mod}. To solve 
+this, I modified what {\tt tdir} is defined to be when using the Cray compiler. 
+This was done in the {\tt BoxLib/Tools/F\_mk/GMakedefs.mak} makefile by using 
+a simple if statement:
+\begin{lstlisting}[language=make,mathescape=false]
+  ifeq ($(COMP), Cray)
+    tdir = t/$(shell echo $(suf) | tr A-Z a-z)
+  else
+    tdir = t/$(suf)
+  endif
+  odir = $(tdir)/o
+  mdir = $(tdir)/m
+\end{lstlisting}
+The shell command {\tt echo \$(suf) | tr A-Z a-z} has the effect of converting 
+{\tt \$(suf)} to lowercase.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Install {\sf MESA} and Compile {\sf MAESTRO}}
+
+At this point the {\tt install} script in the top {\sf MESA} directory can be 
+executed to install {\sf MESA}. This will compile the source code, generate 
+the libraries and copy the necessary files to the correct directories. Once, 
+{\sf MESA} is installed, {\sf MAESTRO} can be compiled and linked such that 
+it can use {\sf MESA}'s EOS and/or network. Make sure the makefile variable 
+{\tt COMP} is set to {\tt Cray} in the {\sf MAESTRO} problem directory 
+so the Cray compiler is used.
+
+

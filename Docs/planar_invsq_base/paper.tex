@@ -1,0 +1,30 @@
+\documentclass[11pt]{article} 
+
+\tolerance=600
+
+\usepackage{amsmath,color,longtable,epsfig}
+\newcommand{\planeinvsqfigpath}{.}
+
+% Margins
+\usepackage[lmargin=0.5in,rmargin=1.5in,tmargin=1.0in,bmargin=1.0in]{geometry}
+
+\input ../maestrosymbols
+
+\setlength{\marginparwidth}{1.0in}
+\newcommand{\MarginPar}[1]{\marginpar{%
+\vskip-\baselineskip %raise the marginpar a bit
+\raggedright\tiny\sffamily
+\hrule\smallskip{\color{red}#1}\par\smallskip\hrule}}
+
+\title{Planar $1/r^2$-gravity Base State}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\cleardoublepage
+
+
+\input basestate
+
+\end{document}

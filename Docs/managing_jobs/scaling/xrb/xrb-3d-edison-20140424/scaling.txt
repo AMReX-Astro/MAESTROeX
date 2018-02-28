@@ -1,0 +1,21 @@
+
+192 32**3 grids
+
+#        MPI     threads   advection         MAC       nodal   reactions        misc       total
+        192           1    1.427700    0.881914    0.525430    2.574910    0.946509    5.237420
+        192           6    0.321532    0.390720    0.336536    0.444665    0.199306    1.520610
+        192          12    0.224186    0.416296    0.343581    0.215473    0.096437    1.246650
+
+
+24 64**3 grids
+
+#        MPI     threads   advection         MAC       nodal   reactions        misc       total
+         24           1    8.674480    2.919640    1.503510   17.511500    1.690240   32.268400
+         24           6    1.411980    0.708055    0.941983    3.327760    0.529951    6.887380
+         24          12    0.812276    0.345716    0.804566    1.606060    0.423807    3.958360
+
+
+# Edison runs on 04/24/2014 this was with Cray 8.2.6 compilers, the 12
+# cm XRB 3-d job.  The averages were done with the scaling_avgs.sh
+# script, but note that it was however many steps finished in the
+# queue window.

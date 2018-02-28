@@ -1,0 +1,56 @@
+------------ Some Notes for Running Maestro on Intrepid ------------
+                    CMM: 02/06/09
+    More information can be found at:
+      http://www.astro.sunysb.edu/cmalone/xrb_paper_stuff/intrepid/
+--------------------------------------------------------------------
+
+With the current makefile, the code should build correctly as long as
+MPI=t.
+
+Currently, the best place to run a job is from the /gpfs1/user_name/
+directory.  The compute nodes do not have access to the /scratch
+directory and therefore executables can not be run from there.
+
+Each node on Intrepid contains 4 cores and 2 GB of memory.  There are
+3 modes within which to run the code on a BG/P system: 1) SMP mode, 2)
+DUAL node mode, and 3) VN (Virutal Node) mode.  In SMP mode, each node
+is treated as a single task which has access to the full 2 GB of
+memory and which can spawn 4 threads.  DUAL node mode treats each node
+as having 2 tasks, each with 1 GB of memory and 2 threads.  VN mode
+treats each node as having 4 tasks, each with 512 MB of memory and a
+single thread.
+
+NOTE that our code does not currently have directives for spawning
+threads and as such VN mode would be best suited to our problems as
+long as they can fit within the 512 MB memory restriction.
+
+Nodes are grouped together into partitions on a BG system.  On
+Intrepid, the smallest partition has 64 nodes (256 cores, total).  All
+larger partitions are multiples of 2 of this smaller partition,
+i.e. 128, 256, 512, etc nodes.  Partitions can not be combined and the
+smallest parition which contains the number of requested nodes will be
+used.  For example, if the user wants to run a 384 node job, a 512
+node partition will be selected and the user will still be charged for
+the 128 nodes that are sitting idle during the job.
+
+Intrepid has 2 main queues for running jobs, a debug queue called
+"prod-devel" and a production queue called "prod".  The debug queue
+has a maximum runtime of 1 hour.  The production queue has a minimum
+partition size of 512 nodes.  There are other queue types available,
+but I think they are for runs that have requested a particular block
+of time directly from ANL.
+
+Submitting a job is done via the following command:
+
+ qsub -t <time> -n <num_nodes> -q <queue_name> [more options] \
+      <name_of_executable> [executable's args.]
+
+where <time> is the requested number of MINUTES of wallclock time or
+in a colon separated format HH:MM:SS, <num_nodes> is the number of
+nodes, and <queue_name> is the name of the queue to run the job in.
+There are many [more options] but an important one is the "--mode
+<mode_type>" option; <mode_type> can be either "dual" or "vn".
+Omitting this option defaults to SMP mode.
+
+Monitoring jobs can be done via the "qstat" command.  Monitoring
+account allocation/usage can be done using the "cbank" command.

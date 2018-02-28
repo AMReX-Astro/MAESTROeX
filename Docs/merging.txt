@@ -1,0 +1,36 @@
+Development on Maestro is done on the "development" branch in the git
+repo.  Nightly regression testing runs on this branch.
+
+On the first workday of each month, we merge Maestro "development" ->
+"master", and tag it as "YY.MM", using the year and month.  This same
+tag is applied across all of the BoxLib astro codes and BoxLib itself,
+allowing one to put each code on the same tag to get a version of the
+ecosystem that was tested together.
+
+Note: a few days before the merge day, we stop pushing to
+"development", except for bug fixes, to allow us the time to get the
+test suite passing.
+
+The procedure (from Weiqun) for doing the merge is:
+
+-- Do 'git pull' in both master and development branches.  (Use `git
+   checkout xxx` to change to branch xxx.
+
+-- In master branch, do `git merge development`.  Fix any conflicts if
+   there are any.  (There should not be any conflicts unless a commit
+   is checked into master directly without going through development.)
+
+-- In master branch, commit new release notes summarizing changes
+   since last major release.
+
+-- git tag -m "BoxLib YY.MM" YY.MM
+
+-- git push
+
+-- git push --tags
+
+-- git checkout development
+
+-- git merge master
+
+-- git push

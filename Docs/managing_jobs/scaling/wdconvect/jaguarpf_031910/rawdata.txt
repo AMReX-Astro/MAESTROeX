@@ -1,0 +1,160 @@
+Scaling numbers for a single-level 768^3 MAESTRO wdconvect run on jaguarpf.
+jaguarpf has a dual-hex socket architecture, i.e., 12 cores share 16GB of memory.
+.mpi   -> pure MPI
+.omp6  -> hybrid MPI/OpenMP with 6 threads
+.omp12 -> hybrid MPI/OpenMP with 12 threads
+The number appending the output file is the total number of cores.
+For each problem, max_grid_size is chosen such that there is exactly
+1 MPI process assigned to each grid.
+
+--------------------------------------------------------------------------
+
+output.mpi.1728: Time to advance timestep:  42.964218139648438  seconds
+output.mpi.1728: Time to advance timestep:  41.755702018737793  seconds
+output.mpi.1728: Time to advance timestep:  40.982357025146484  seconds
+output.mpi.1728: Time to advance timestep:  38.447799921035767  seconds
+output.mpi.1728: Time to advance timestep:  38.319149971008301  seconds
+output.mpi.1728: Time to advance timestep:  39.205374956130981  seconds
+output.mpi.1728: Time to advance timestep:  39.725049018859863  seconds
+output.mpi.1728: Time to advance timestep:  38.997945070266724  seconds
+output.mpi.1728: Time to advance timestep:  38.812638998031616  seconds
+output.mpi.1728: Time to advance timestep:  39.267542839050293  seconds
+output.mpi.1728: Time to advance timestep:  40.334251165390015  seconds
+
+output.mpi.4096: Time to advance timestep:  22.854247093200684  seconds
+output.mpi.4096: Time to advance timestep:  22.176784038543701  seconds
+output.mpi.4096: Time to advance timestep:  21.810320138931274  seconds
+output.mpi.4096: Time to advance timestep:  20.517259836196899  seconds
+output.mpi.4096: Time to advance timestep:  20.283089160919189  seconds
+output.mpi.4096: Time to advance timestep:  21.374221801757813  seconds
+output.mpi.4096: Time to advance timestep:  21.256411075592041  seconds
+output.mpi.4096: Time to advance timestep:  20.239681005477905  seconds
+output.mpi.4096: Time to advance timestep:  20.695585012435913  seconds
+output.mpi.4096: Time to advance timestep:  20.781080961227417  seconds
+output.mpi.4096: Time to advance timestep:  21.507474184036255  seconds
+
+output.mpi.13824: Time to advance timestep:  22.727224111557007  seconds
+output.mpi.13824: Time to advance timestep:  16.341847896575928  seconds
+output.mpi.13824: Time to advance timestep:  16.626076936721802  seconds
+output.mpi.13824: Time to advance timestep:  15.143413066864014  seconds
+output.mpi.13824: Time to advance timestep:  16.85316801071167  seconds
+output.mpi.13824: Time to advance timestep:  15.738945007324219  seconds
+output.mpi.13824: Time to advance timestep:  18.055393934249878  seconds
+output.mpi.13824: Time to advance timestep:  15.357346057891846  seconds
+output.mpi.13824: Time to advance timestep:  15.397696971893311  seconds
+output.mpi.13824: Time to advance timestep:  15.650712966918945  seconds
+output.mpi.13824: Time to advance timestep:  17.334319829940796  seconds
+
+output.mpi.32768: Time to advance timestep:  32.594840049743652  seconds
+output.mpi.32768: Time to advance timestep:  28.918507099151611  seconds
+output.mpi.32768: Time to advance timestep:  30.182451009750366  seconds
+output.mpi.32768: Time to advance timestep:  30.201053142547607  seconds
+output.mpi.32768: Time to advance timestep:  31.369792938232422  seconds
+output.mpi.32768: Time to advance timestep:  30.511024951934814  seconds
+output.mpi.32768: Time to advance timestep:  28.5747971534729  seconds
+output.mpi.32768: Time to advance timestep:  30.755839109420776  seconds
+output.mpi.32768: Time to advance timestep:  31.299271821975708  seconds
+output.mpi.32768: Time to advance timestep:  30.40641713142395  seconds
+output.mpi.32768: Time to advance timestep:  30.286777973175049  seconds
+
+--------------------------------------------------------------------------
+
+output.omp6.1296: Time to advance timestep:  64.855381965637207  seconds
+output.omp6.1296: Time to advance timestep:  62.780212879180908  seconds
+output.omp6.1296: Time to advance timestep:  61.362637996673584  seconds
+output.omp6.1296: Time to advance timestep:  58.743199110031128  seconds
+output.omp6.1296: Time to advance timestep:  58.953930139541626  seconds
+output.omp6.1296: Time to advance timestep:  59.664959907531738  seconds
+output.omp6.1296: Time to advance timestep:  60.146723985671997  seconds
+output.omp6.1296: Time to advance timestep:  59.273276090621948  seconds
+output.omp6.1296: Time to advance timestep:  59.284449100494385  seconds
+output.omp6.1296: Time to advance timestep:  59.667011976242065  seconds
+output.omp6.1296: Time to advance timestep:  60.724740982055664  seconds
+
+output.omp6.3072: Time to advance timestep:  28.714646100997925  seconds
+output.omp6.3072: Time to advance timestep:  27.760125160217285  seconds
+output.omp6.3072: Time to advance timestep:  27.276262044906616  seconds
+output.omp6.3072: Time to advance timestep:  26.423195123672485  seconds
+output.omp6.3072: Time to advance timestep:  26.032953023910522  seconds
+output.omp6.3072: Time to advance timestep:  26.416691064834595  seconds
+output.omp6.3072: Time to advance timestep:  26.57229208946228  seconds
+output.omp6.3072: Time to advance timestep:  26.126133918762207  seconds
+output.omp6.3072: Time to advance timestep:  26.956371068954468  seconds
+output.omp6.3072: Time to advance timestep:  26.309035062789917  seconds
+output.omp6.3072: Time to advance timestep:  26.809926986694336  seconds
+
+output.omp6.10368: Time to advance timestep:  10.615310907363892  seconds
+output.omp6.10368: Time to advance timestep:  10.182027816772461  seconds
+output.omp6.10368: Time to advance timestep:  10.105936050415039  seconds
+output.omp6.10368: Time to advance timestep:  9.4545249938964844  seconds
+output.omp6.10368: Time to advance timestep:  9.4458801746368408  seconds
+output.omp6.10368: Time to advance timestep:  9.9145770072937012  seconds
+output.omp6.10368: Time to advance timestep:  9.9654879570007324  seconds
+output.omp6.10368: Time to advance timestep:  9.7775111198425293  seconds
+output.omp6.10368: Time to advance timestep:  9.7529819011688232  seconds
+output.omp6.10368: Time to advance timestep:  9.8521568775177002  seconds
+output.omp6.10368: Time to advance timestep:  10.220388889312744  seconds
+
+output.omp6.24576: Time to advance timestep:  7.2739260196685791  seconds
+output.omp6.24576: Time to advance timestep:  5.971062183380127  seconds
+output.omp6.24576: Time to advance timestep:  7.1527931690216064  seconds
+output.omp6.24576: Time to advance timestep:  5.6178419589996338  seconds
+output.omp6.24576: Time to advance timestep:  5.6149129867553711  seconds
+output.omp6.24576: Time to advance timestep:  6.2541580200195312  seconds
+output.omp6.24576: Time to advance timestep:  6.3272459506988525  seconds
+output.omp6.24576: Time to advance timestep:  6.3124830722808838  seconds
+output.omp6.24576: Time to advance timestep:  8.1372909545898437  seconds
+output.omp6.24576: Time to advance timestep:  7.2659099102020264  seconds
+output.omp6.24576: Time to advance timestep:  6.2687039375305176  seconds
+
+--------------------------------------------------------------------------
+
+output.omp12.2592: Time to advance timestep:  53.10792088508606  seconds
+output.omp12.2592: Time to advance timestep:  55.514533996582031  seconds
+output.omp12.2592: Time to advance timestep:  57.909028053283691  seconds
+output.omp12.2592: Time to advance timestep:  59.925053119659424  seconds
+output.omp12.2592: Time to advance timestep:  50.191648006439209  seconds
+output.omp12.2592: Time to advance timestep:  60.10607385635376  seconds
+output.omp12.2592: Time to advance timestep:  59.803651809692383  seconds
+output.omp12.2592: Time to advance timestep:  51.172790050506592  seconds
+output.omp12.2592: Time to advance timestep:  61.883435964584351  seconds
+output.omp12.2592: Time to advance timestep:  61.525187969207764  seconds
+output.omp12.2592: Time to advance timestep:  55.052227020263672  seconds
+
+output.omp12.6144: Time to advance timestep:  24.29511284828186  seconds
+output.omp12.6144: Time to advance timestep:  22.937733173370361  seconds
+output.omp12.6144: Time to advance timestep:  22.91632604598999  seconds
+output.omp12.6144: Time to advance timestep:  21.972862958908081  seconds
+output.omp12.6144: Time to advance timestep:  21.953429937362671  seconds
+output.omp12.6144: Time to advance timestep:  22.284746885299683  seconds
+output.omp12.6144: Time to advance timestep:  23.880774974822998  seconds
+output.omp12.6144: Time to advance timestep:  22.045892000198364  seconds
+output.omp12.6144: Time to advance timestep:  22.050572156906128  seconds
+output.omp12.6144: Time to advance timestep:  22.20822811126709  seconds
+output.omp12.6144: Time to advance timestep:  22.644552946090698  seconds
+
+output.omp12.20736: Time to advance timestep:  8.7579050064086914  seconds
+output.omp12.20736: Time to advance timestep:  8.5264999866485596  seconds
+output.omp12.20736: Time to advance timestep:  8.4574189186096191  seconds
+output.omp12.20736: Time to advance timestep:  8.1595330238342285  seconds
+output.omp12.20736: Time to advance timestep:  8.1146399974822998  seconds
+output.omp12.20736: Time to advance timestep:  8.3180160522460937  seconds
+output.omp12.20736: Time to advance timestep:  8.5684430599212646  seconds
+output.omp12.20736: Time to advance timestep:  8.1208090782165527  seconds
+output.omp12.20736: Time to advance timestep:  8.1837470531463623  seconds
+output.omp12.20736: Time to advance timestep:  8.2970750331878662  seconds
+output.omp12.20736: Time to advance timestep:  8.472912073135376  seconds
+
+output.omp12.49152: Time to advance timestep:  5.2611119747161865  seconds
+output.omp12.49152: Time to advance timestep:  4.990807056427002  seconds
+output.omp12.49152: Time to advance timestep:  4.9656980037689209  seconds
+output.omp12.49152: Time to advance timestep:  4.8698809146881104  seconds
+output.omp12.49152: Time to advance timestep:  4.7351188659667969  seconds
+output.omp12.49152: Time to advance timestep:  4.7806332111358643  seconds
+output.omp12.49152: Time to advance timestep:  5.0767290592193604  seconds
+output.omp12.49152: Time to advance timestep:  4.83548903465271  seconds
+output.omp12.49152: Time to advance timestep:  4.7419989109039307  seconds
+output.omp12.49152: Time to advance timestep:  4.8844950199127197  seconds
+output.omp12.49152: Time to advance timestep:  5.3284389972686768  seconds
+
+--------------------------------------------------------------------------

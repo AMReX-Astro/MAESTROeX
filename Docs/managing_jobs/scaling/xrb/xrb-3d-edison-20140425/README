@@ -1,0 +1,25 @@
+2014-04-25
+
+A 3-d XRB on a uniform 384 x 384 x 768 grid run on Edison with the
+Cray 8.2.6 compilers.
+
+Three different domain decompositions were used:
+
+64^3 grids:  6 x  6 x 12 = 432 grids
+48^3 grids:  8 x  8 x 16 = 1024 grids
+32^3 grids: 12 x 12 x 24 = 3456 grids
+
+Three different modes of running were done:
+
+MPI: one grid per MPI task, 24 MPI tasks per Edison node)
+
+OMP6: 6 OpenMP threads per MPI task, 4 MPI tasks per Edison node,
+      2 MPI tasks per NUMA node
+
+OMP12: 12 OpenMP threads per MPI task, 2 MPI tasks per Edison node,
+       1 MPI task per NUMA node.
+
+All scripts also used the "-ss" 
+
+We ran for 20 minutes or 100 steps, which ever came first.  Results are
+averaged across all output using the scaling_avgs.sh script

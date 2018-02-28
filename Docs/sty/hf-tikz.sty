@@ -1,0 +1,477 @@
+%%
+%% This is file `hf-tikz.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% hf-tikz.dtx  (with options: `package')
+%% * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+%% * hf-tikz --- A simple way to highlight formulas and formula parts.
+%% *
+%% * E-mail: claudio dot fiandrino at gmail dot com
+%% *
+%% * Released under the LaTeX Project Public License v1.3c or later
+%% *
+%% * See http://www.latex-project.org/lppl.txt
+%% * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{hf-tikz}[2013/01/13 v0.3 A simple way to highlight formulas and formula parts.]
+
+
+
+\RequirePackage{tikz}
+\usetikzlibrary{shadings}
+\RequirePackage{xparse}
+\RequirePackage{etoolbox}
+\AtEndDocument{%
+\let\oldpgfsyspdfmark\pgfsyspdfmark
+\def\pgfsyspdfmark#1#2#3{%
+  \expandafter\let\expandafter\tmp\csname pgf@sys@pdf@mark@pos@#1\endcsname
+  \oldpgfsyspdfmark{#1}{#2}{#3}%
+  \expandafter\ifx\csname pgf@sys@pdf@mark@pos@#1\endcsname\tmp\else
+  \let\oldsavepointas\savepointas
+  \def\savepointas##1##2{%
+    \immediate\write\@auxout{hf-TikZ Warning: Mark '##1' changed. Rerun to get mark in right position.}%
+  }
+  \fi
+}}
+%% Colors
+
+\definecolor{fancybrown}{RGB}{255,216,197}
+\definecolor{fancyviolet}{RGB}{197,122,197}
+
+\newcommand{\fcol}{fancybrown}
+\newcommand{\bcol}{fancyviolet}
+
+%% Package option
+
+\newbool{fill}
+\booltrue{fill}
+\DeclareOption{nofill}{\boolfalse{fill}}
+
+\DeclareOption{customcolors}{
+\def\hfsetfillcolor#1{\renewcommand{\fcol}{#1}}
+\def\hfsetbordercolor#1{\renewcommand{\bcol}{#1}}
+\pgfkeys{/tikz/.cd,
+  set fill color/.code={\renewcommand{\fcol}{#1}},
+  set border color/.code={\renewcommand{\bcol}{#1}}
+ }
+}
+
+\newbool{shade}
+\boolfalse{shade}
+\DeclareOption{shade}{\booltrue{shade}}
+
+\newbool{beamer}
+\boolfalse{beamer}
+\DeclareOption{beamer}{\booltrue{beamer}}
+
+\newbool{norndcorners}
+\boolfalse{norndcorners}
+\DeclareOption{norndcorners}{\booltrue{norndcorners}}
+
+\newbool{markings}
+\boolfalse{markings}
+\DeclareOption{markings}{\booltrue{markings}}
+
+\ProcessOptions
+\pgfkeys{/tikz/.cd,%
+      not use rounded corners/.is choice,%
+      not use rounded corners/true/.style={rounded corners=0pt},%
+      not use rounded corners/false/.style={rounded corners},%
+}%
+
+\tikzset{disable rounded corners/.estyle={%
+      not use rounded corners=#1,%
+      },%
+      disable rounded corners/.default=false,%
+}%
+
+
+\ifbool{fill}{%
+ \pgfkeys{/tikz/.cd,%
+      left offset/.initial=-0.1,
+      right offset/.initial=0.1,
+      above offset/.initial=0.35,
+      below offset/.initial=-0.18,
+ }
+}{
+ \pgfkeys{/tikz/.cd,%
+      left offset/.initial=-0.075,
+      right offset/.initial=0.075,
+      above offset/.initial=0.35,
+      below offset/.initial=-0.18,
+ }
+}
+
+\pgfkeys{/tikz/.cd,%
+      left offset/.get=\leftoff,
+      left offset/.store in=\leftoff,
+      right offset/.get=\rightoff,
+      right offset/.store in=\rightoff,
+      above offset/.get=\aboveoff,
+      above offset/.store in=\aboveoff,
+      below offset/.get=\belowoff,
+      below offset/.store in=\belowoff,
+      below right offset/.initial={\rightoff,\belowoff},
+      below right offset/.get=\belowrightoff,
+      below right offset/.store in=\belowrightoff,
+      above left offset/.initial={\leftoff,\aboveoff},
+      above left offset/.get=\aboveleftoff,
+      above left offset/.store in=\aboveleftoff,
+}%
+\ifbool{markings}{
+  \usetikzlibrary{decorations.markings}
+  \newif\ifshowmarkers
+  \pgfkeys{/tikz/show markers/.is if=showmarkers}
+  \pgfkeys{/tikz/show markers=false}
+
+  \pgfkeys{/tikz/.cd,%
+      marker color/.initial=blue,
+      marker color/.get=\colmarker,
+      marker color/.store in=\colmarker,
+      marker size/.initial=1pt,
+      marker size/.get=\sizemarker,
+      marker size/.store in=\sizemarker,
+  }
+
+  \tikzset{
+   mark at/.style={
+     decoration={
+        markings,
+        mark=
+         at position #1
+         with
+         {
+           \coordinate (marker point-\pgfkeysvalueof{/pgf/decoration/mark info/sequence number}) at (0pt,0pt);
+           \coordinate (marker unit vector-\pgfkeysvalueof{/pgf/decoration/mark info/sequence number}) at (1,0pt);
+           \coordinate (marker orthogonal unit vector-\pgfkeysvalueof{/pgf/decoration/mark info/sequence number}) at (0pt,1);
+           \ifshowmarkers% conditional to make them appear just when invoked
+             \draw[draw=none,fill=\colmarker,radius=\sizemarker] (0,0) circle ;
+           \else
+             \relax
+           \fi
+         }
+     },
+     postaction=decorate
+   },
+   use marker id/.style={
+     shift=(marker point-#1),
+     x=(marker unit vector-#1),
+     y=(marker orthogonal unit vector-#1)
+   },
+   use marker id/.default=1,
+  }
+}
+%% Settings
+
+\ifbool{beamer}{%true
+ \newcounter{jumping}
+ \resetcounteronoverlays{jumping}
+
+ \def\jump@setbb#1#2#3{%
+   \@ifundefined{jump@#1@maxbb}{%
+     \expandafter\gdef\csname jump@#1@maxbb\endcsname{#3}%
+   }{%
+     \csname jump@#1@maxbb\endcsname
+     \pgf@xa=\pgf@x
+     \pgf@ya=\pgf@y
+     #3
+     \pgfmathsetlength\pgf@x{max(\pgf@x,\pgf@xa)}%
+     \pgfmathsetlength\pgf@y{max(\pgf@y,\pgf@ya)}%
+     \expandafter\xdef\csname jump@#1@maxbb\endcsname{\noexpand\pgfpoint{\the\pgf@x}{\the\pgf@y}}%
+   }
+   \@ifundefined{jump@#1@minbb}{%
+     \expandafter\gdef\csname jump@#1@minbb\endcsname{#2}%
+   }{%
+     \csname jump@#1@minbb\endcsname
+     \pgf@xa=\pgf@x
+     \pgf@ya=\pgf@y
+     #2
+     \pgfmathsetlength\pgf@x{min(\pgf@x,\pgf@xa)}%
+     \pgfmathsetlength\pgf@y{min(\pgf@y,\pgf@ya)}%
+     \expandafter\xdef\csname jump@#1@minbb\endcsname{\noexpand\pgfpoint{\the\pgf@x}{\the\pgf@y}}%
+   }
+ }
+
+ \tikzset{%
+   remember picture with id/.style={%
+     remember picture,
+     overlay,
+     save picture id=#1,
+   },
+   save picture id/.code={%
+     \edef\pgf@temp{#1}%
+     \immediate\write\pgfutil@auxout{%
+       \noexpand\savepointas{\pgf@temp}{\pgfpictureid}}%
+   },
+   if picture id/.code args={#1#2#3}{%
+     \@ifundefined{save@pt@#1}{%
+       \pgfkeysalso{#3}%
+     }{
+       \pgfkeysalso{#2}%
+     }
+   },
+   onslide/.code args={<#1>#2}{%
+     \only<#1>{\pgfkeysalso{#2}}%
+   },
+   alt/.code args={<#1>#2#3}{%
+     \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}}%
+   },
+   stop jumping/.style={
+     execute at end picture={%
+       \stepcounter{jumping}%
+       \immediate\write\pgfutil@auxout{%
+         \noexpand\jump@setbb{\the\value{jumping}}{\noexpand\pgfpoint{\the\pgf@picminx}{\the\pgf@picminy}}{\noexpand\pgfpoint{\the\pgf@picmaxx}{\the\pgf@picmaxy}}
+       },
+       \csname jump@\the\value{jumping}@maxbb\endcsname
+       \path (\the\pgf@x,\the\pgf@y);
+       \csname jump@\the\value{jumping}@minbb\endcsname
+       \path (\the\pgf@x,\the\pgf@y);
+     },
+   }
+ }
+}{% false
+ \tikzset{%
+   remember picture with id/.style={%
+     remember picture,
+     overlay,
+     save picture id=#1,
+   },
+   save picture id/.code={%
+     \edef\pgf@temp{#1}%
+     \immediate\write\pgfutil@auxout{%
+       \noexpand\savepointas{\pgf@temp}{\pgfpictureid}}%
+   },
+   if picture id/.code args={#1#2#3}{%
+     \@ifundefined{save@pt@#1}{%
+       \pgfkeysalso{#3}%
+     }{
+       \pgfkeysalso{#2}%
+     }
+   }
+ }
+}
+
+\def\savepointas#1#2{%
+  \expandafter\gdef\csname save@pt@#1\endcsname{#2}%
+}
+
+\def\tmk@labeldef#1,#2\@nil{%
+  \def\tmk@label{#1}%
+  \def\tmk@def{#2}%
+}
+
+\tikzdeclarecoordinatesystem{pic}{%
+  \pgfutil@in@,{#1}%
+  \ifpgfutil@in@%
+    \tmk@labeldef#1\@nil
+  \else
+    \tmk@labeldef#1,(0pt,0pt)\@nil
+  \fi
+  \@ifundefined{save@pt@\tmk@label}{%
+    \tikz@scan@one@point\pgfutil@firstofone\tmk@def
+  }{%
+  \pgfsys@getposition{\csname save@pt@\tmk@label\endcsname}\save@orig@pic%
+  \pgfsys@getposition{\pgfpictureid}\save@this@pic%
+  \pgf@process{\pgfpointorigin\save@this@pic}%
+  \pgf@xa=\pgf@x
+  \pgf@ya=\pgf@y
+  \pgf@process{\pgfpointorigin\save@orig@pic}%
+  \advance\pgf@x by -\pgf@xa
+  \advance\pgf@y by -\pgf@ya
+  }%
+}
+\ifbool{norndcorners}{%true-norndcorners
+  \ifbool{beamer}{%true-beamer
+   \ifbool{fill}{%true-fill
+  \ifbool{shade}{%true-shade
+   \NewDocumentCommand{\tikzmarkin}{r<> o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+   \IfNoValueTF{#2}{%true-val
+      \only<#1>{\tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,fill=\fcol,draw=\bcol]
+      (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+      ;}
+     }{%false-val
+      \only<#1>{\tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,fill=\fcol,draw=\bcol,#2]
+      (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+      ;}}
+     }
+  }{%false-shade
+   \NewDocumentCommand{\tikzmarkin}{r<> o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+    \IfNoValueTF{#2}{%true-val
+      \only<#1>{\tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,fill=\fcol,draw=\bcol]
+      (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+      ;}
+     }{%false-val
+      \only<#1>{\tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,fill=\fcol,draw=\bcol,#2]
+      (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+      ;}}
+     }
+  }
+   }{%false-fill
+  \NewDocumentCommand{\tikzmarkin}{r<> o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+    \IfNoValueTF{#2}{%true-val
+      \only<#1>{\tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,draw=\bcol]
+      (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+      ;}
+     }{%false-val
+      \only<#1>{\tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,draw=\bcol,#2]
+      (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+      ;}}
+     }
+  }
+  }{%false-beamer
+   \ifbool{fill}{%true-fill
+  \ifbool{shade}{%true-shade
+   \NewDocumentCommand{\tikzmarkin}{o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+   \IfNoValueTF{#1}{%true-val
+      \tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,fill=\fcol,draw=\bcol]
+      (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+      ;
+   }{%false-val
+   \tikz[remember picture,overlay]
+   \draw[line width=1pt,rectangle,fill=\fcol,draw=\bcol,#1]
+   (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+   ;}}
+  }{%false-shade
+   \NewDocumentCommand{\tikzmarkin}{o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+   \IfNoValueTF{#1}{%true-val
+      \tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,fill=\fcol,draw=\bcol]
+      (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+      ;
+   }{%false-val
+   \tikz[remember picture,overlay]
+   \draw[line width=1pt,rectangle,fill=\fcol,draw=\bcol,#1]
+   (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+   ;}}
+  }
+   }{%false-fill
+    \NewDocumentCommand{\tikzmarkin}{o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+   \IfNoValueTF{#1}{%true-val
+      \tikz[remember picture,overlay]
+      \draw[line width=1pt,rectangle,draw=\bcol]
+      (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+      ;
+   }{%false-val
+   \tikz[remember picture,overlay]
+   \draw[line width=1pt,rectangle,draw=\bcol,#1]
+   (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+   ;}}
+   }
+  }
+}{%false-norndcorners
+\ifbool{beamer}{%true-beamer
+ \ifbool{fill}{%true-fill
+\ifbool{shade}{%true-shade
+ \NewDocumentCommand{\tikzmarkin}{r<> o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+ \IfNoValueTF{#2}{%true-val
+    \only<#1>{\tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,fill=\fcol,draw=\bcol]
+    (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+    ;}
+   }{%false-val
+    \only<#1>{\tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,fill=\fcol,draw=\bcol,#2]
+    (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+    ;}}
+   }
+}{%false-shade
+ \NewDocumentCommand{\tikzmarkin}{r<> o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+   \IfNoValueTF{#2}{%true-val
+    \only<#1>{\tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,fill=\fcol,draw=\bcol]
+    (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+    ;}
+   }{%false-val
+    \only<#1>{\tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,fill=\fcol,draw=\bcol,#2]
+    (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+    ;}}
+   }
+}
+ }{%false-fill
+\NewDocumentCommand{\tikzmarkin}{r<> o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+ \IfNoValueTF{#2}{%true-val
+    \only<#1>{\tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,draw=\bcol]
+    (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+    ;}
+   }{%false-val
+    \only<#1>{\tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,draw=\bcol,#2]
+    (pic cs:#3) ++(#4) rectangle (#5) node [anchor=base] (#3){}
+    ;}}
+  }
+ }
+}{%false-beamer
+ \ifbool{fill}{%true-fill
+\ifbool{shade}{%true-shade
+ \NewDocumentCommand{\tikzmarkin}{o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+ \IfNoValueTF{#1}{%true-val
+    \tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,fill=\fcol,draw=\bcol]
+    (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+    ;
+ }{%false-val
+ \tikz[remember picture,overlay]
+ \draw[line width=1pt,rectangle,disable rounded corners,fill=\fcol,draw=\bcol,#1]
+ (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+ ;}}
+}{%false-shade
+ \NewDocumentCommand{\tikzmarkin}{o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+ \IfNoValueTF{#1}{%true-val
+    \tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,fill=\fcol,draw=\bcol]
+    (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+    ;
+ }{%false-val
+ \tikz[remember picture,overlay]
+ \draw[line width=1pt,rectangle,disable rounded corners,fill=\fcol,draw=\bcol,#1]
+ (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+ ;}}
+}
+ }{%false-fill
+\NewDocumentCommand{\tikzmarkin}{o m D(){\belowrightoff} D(){\aboveleftoff}}{%
+ \IfNoValueTF{#1}{%true-val
+    \tikz[remember picture,overlay]
+    \draw[line width=1pt,rectangle,disable rounded corners,draw=\bcol]
+    (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+    ;
+ }{%false-val
+ \tikz[remember picture,overlay]
+ \draw[line width=1pt,rectangle,disable rounded corners,draw=\bcol,#1]
+ (pic cs:#2) ++(#3) rectangle (#4) node [anchor=base] (#2){}
+ ;}}
+ }
+}
+}
+
+\newcommand\tikzmarkend[2][]{%
+\tikz[remember picture with id=#2] #1;}
+%% 
+%% Copyright (C) 2012 by Claudio Fiandrino <claudio.fiandrino@gmail.com>
+%% 
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License (LPPL), either
+%% version 1.3c of this license or (at your option) any later
+%% version.  The latest version of this license is in the file:
+%% 
+%% http://www.latex-project.org/lppl.txt
+%% 
+%% This work is "maintained" (as per LPPL maintenance status) by
+%% Claudio Fiandrino.
+%% 
+%% This work consists of the file  hf-tikz.dtx
+%% and the derived files           hf-tikz.ins and
+%%                                 hf-tikz.pdf
+%%                                 hf-tikz.sty.
+%%
+%% End of file `hf-tikz.sty'.

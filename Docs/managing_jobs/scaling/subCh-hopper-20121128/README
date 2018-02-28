@@ -1,0 +1,14 @@
+A hopper scaling study using sub_chandra problem (the default problem
+from the subchandra paper).  This is 2 levels.
+
+6 OMP thread cases run with:
+
+aprun -n 256 -N 4 -d 6 -S 1 -ss ./main.Linux.Cray.mpi.omp.exe inputs_3d.256.5dr.eq.dx_2levs.hot ${restartString}
+
+
+24 OMP thread cases run with:
+
+aprun -n 128 -N 1 -d 24 ./main.Linux.Cray.mpi.omp.exe inputs_3d.256.5dr.eq.dx_2levs.hot ${restartString}
+
+
+

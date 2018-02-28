@@ -1,0 +1,3 @@
+scripts for running the 384 x 384 x 768 study (titan-48-*.run) and the
+768**3 study (titan-768-*.run), all assuming a 48^3 grid size in the
+domain decomposition.

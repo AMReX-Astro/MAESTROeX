@@ -1,0 +1,38 @@
+\documentclass[11pt]{article} 
+
+\tolerance=600
+
+\usepackage{amsmath,color,epsfig,epsf}
+
+% Margins
+\usepackage[lmargin=0.5in,rmargin=0.5in,tmargin=0.75in,bmargin=0.75in]{geometry}
+
+\newcommand{\networksfigpath}{.}
+
+\input ../maestrosymbols
+
+\title{Networks}
+
+\setlength{\marginparwidth}{0.75in}
+\newcommand{\MarginPar}[1]{\marginpar{%
+\vskip-\baselineskip %raise the marginpar a bit
+\raggedright\tiny\sffamily
+\hrule\smallskip{\color{red}#1}\par\smallskip\hrule}}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\clearpage
+
+\input networks
+
+%\addcontentsline{toc}{section}{References}
+%\bibliographystyle{plain}
+%\bibliography{../maestro_doc}
+
+
+
+\end{document}
+

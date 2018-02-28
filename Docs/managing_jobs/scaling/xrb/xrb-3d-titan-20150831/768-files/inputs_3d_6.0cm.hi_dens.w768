@@ -1,0 +1,133 @@
+&PROBIN
+
+ !----------------------------------------------------------------------------
+ ! problem setup
+ !----------------------------------------------------------------------------
+ model_file = "toy_xrb.hi_dens.hse.tanh.delta_12.000cm.dx_6.000cm.CNO"
+
+ spherical_in = 0
+
+ grav_const = -2.45e14
+
+ ! temperature perturbation
+ perturb_model = T
+ xrb_pert_size = 50
+ xrb_pert_factor = 1.0d-5
+ xrb_pert_type = 1
+ xrb_pert_height = 1475.0d0
+
+ ! velocity perturbation
+ apply_vel_field    = T
+ velpert_scale      = 1.0d2
+ velpert_amplitude  = 1.0d5
+ velpert_height_loc = 1460.0
+ velpert_steep      = 12.0d0
+
+
+ !----------------------------------------------------------------------------
+ ! gridding
+ !----------------------------------------------------------------------------
+ test_set = "grd_3d_xrb_wide_w768.48"
+
+ dm_in = 3
+
+ prob_lo_x = 0.0d0
+ prob_lo_y = 0.0d0
+ prob_lo_z = 0.0d0
+
+ prob_hi_x = 4608.0d0
+ prob_hi_y = 4608.0d0
+ prob_hi_z = 4608.0d0
+
+ bcx_lo = -1
+ bcx_hi = -1
+ bcy_lo = -1
+ bcy_hi = -1
+ bcz_lo = 14
+ bcz_hi = 12
+
+
+ !----------------------------------------------------------------------------
+ ! timestepping
+ !----------------------------------------------------------------------------
+ max_step  = 100
+
+ stop_time = 2.5
+
+ cflfac = 0.8
+
+ init_shrink = 0.1
+ max_dt_growth = 1.1
+
+ use_soundspeed_firstdt = F
+ use_divu_firstdt = F
+
+
+ !----------------------------------------------------------------------------
+ ! outputting
+ !----------------------------------------------------------------------------
+ plot_int  = -1
+ plot_deltat = 1.e-4
+ chk_int   = 2500
+
+ plot_base = F
+ plot_h_with_use_tfromp = T
+ plot_cs = T
+ plot_ad_excess = T
+
+ single_prec_plotfiles = T
+ 
+
+ !----------------------------------------------------------------------------
+ ! core Maestro algorithm
+ !----------------------------------------------------------------------------
+ ppm_type = 1
+
+ species_pred_type = 3
+ enthalpy_pred_type = 4
+
+ ! initial projections
+ do_initial_projection = T
+ init_divu_iter = 3
+ init_iter = 3
+
+ use_tfromp = F
+ dpdt_factor = 0.0d0
+
+ base_cutoff_density = 1.d3
+ anelastic_cutoff = 1.d3
+
+ do_sponge = T
+ sponge_start_factor = 25
+
+ verbose = 1
+
+ use_alt_energy_fix = T
+
+ !----------------------------------------------------------------------------
+ ! diffusion
+ !----------------------------------------------------------------------------
+ use_thermal_diffusion = F
+ limit_conductivity = T
+
+
+ !----------------------------------------------------------------------------
+ ! projections / MG
+ !----------------------------------------------------------------------------
+ mg_bottom_solver = 4
+ hg_bottom_solver = 4
+ max_mg_bottom_nlevels = 4
+
+ mg_verbose = 0
+ cg_verbose = 0
+
+
+ !----------------------------------------------------------------------------
+ ! microphysics
+ !----------------------------------------------------------------------------
+ burner_threshold_species = "H1"
+ 
+ use_eos_coulomb = T
+
+
+/

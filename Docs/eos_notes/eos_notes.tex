@@ -1,0 +1,215 @@
+\section{EOS Calls}
+
+\subsection{Initialization}
+
+\subsection{{\tt advance\_timestep}}
+
+\begin{description}
+\item[Step 1.] {\em Define the average expansion at time $t^\nph$ and the new $w_0.$}\\ \\
+if \runparam{dpdt\_factor} $>$ 0 then
+%
+\begin{itemize}
+\item In {\tt makePfromRhoH}, we compute a thermodynamic $p^n$ for the volume discrepancy 
+term using $(\rho,h,X)^n$.
+\end{itemize}
+end if
+\item[Step 2.] {\em Construct the provisional edge-based advective velocity, $\uadvone.$}
+\item[Step 3.] {\em React the full state and base state through the first time interval 
+of $\dt/2.$}
+\begin{itemize}
+\item In {\tt react\_state} $\rightarrow$ {\tt burner}, we compute $c_p$ and $\xi_k$ 
+for inputs to {\tt VODE} using $(\rho,T,X)^n$.
+\item In {\tt react\_state}, we compute $T^{(1)}$ using $(\rho,h,X)^{(1)}$ 
+(if \runparam{use\_tfromp} {\tt = F}) or $(\rho,X)^{(1)}$ and $p_0^n$ (if {\tt use\_tfromp = T})
+\end{itemize}
+if \runparam{evolve\_base\_state} {\tt = T} then
+\begin{itemize}
+\item In {\tt make\_gamma}, we compute $\Gamma_1$ using $(\rho,X)^{(1)}$ and $p_0^n$.
+\end{itemize}
+end if
+\item[Step 4.] {\em Advect the base state, then the full state, through a time interval 
+of $\dt.$}\\ \\
+if \runparam{use\_thermal\_diffusion} {\tt = T} then
+\begin{itemize}
+\item In {\tt advance} before {\tt make\_explicit\_thermal}, we compute the coefficients for 
+$\nabla\cdot(\kth/c_p)\nabla h + \cdots$ using $(\rho,T,X)^{(1)}$.
+\item In {\tt enthalpy\_advance} $\rightarrow$ {\tt update\_scal}, we compute $h$ above
+the \runparam{base\_cutoff\_density} using $(\rho,X)^{(2),*}$ and $p_0^{n+1,*}$.
+\item In {\tt thermal\_conduct}, we compute $T^{(2),*}$ using $(\rho,h,X)^{(2),*}$
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{(2),*}$ and $p_0^{n+1,*}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+else
+\begin{itemize}
+\item In {\tt enthalpy\_advance} $\rightarrow$ {\tt update\_scal}, we compute $h$ above
+the \runparam{base\_cutoff\_density} using $(\rho,X)^{(2),*}$ and $p_0^{n+1,*}$.
+\item In {\tt enthalpy\_advance}, we compute $T^{(2),*}$ using $(\rho,h,X)^{(2),*}$
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{(2),*}$ and $p_0^{n+1,*}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+end if
+\item[Step 5.] {\em React the full state through a second time interval of $\dt/2.$}
+\begin{itemize}
+\item In {\tt react\_state} $\rightarrow$ {\tt burner}, we compute $c_p$ and $\xi_k$ 
+for inputs to {\tt VODE} using $(\rho,T,X)^{(2),*}$.
+\item In {\tt react\_state}, we compute $T^{n+1,*}$ using $(\rho,h,X)^{n+1,*}$ 
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{n+1,*}$ and $p_0^{n+1,*}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+if {\tt evolve\_base\_state} then
+\begin{itemize}
+\item In {\tt make\_gamma}, we compute $\Gamma_1$ using $(\rho,X)^{n+1,*}$ and $p_0^{n+1,*}$.
+\end{itemize}
+end if
+\item[Step 6.] {\em Define a new average expansion rate at time $t^\nph.$}\\ \\
+if \runparam{use\_thermal\_diffusion} then
+\begin{itemize}
+\item In {\tt advance} before {\tt make\_explicit\_thermal}, we compute the coefficients for 
+$\nabla\cdot(\kth/c_p)\nabla h + \cdots$ using $(\rho,T,X)^{n+1,*}$.
+\end{itemize}
+end if
+\begin{itemize}
+\item In {\tt make\_S}, we compute thermodynamic variables using $(\rho,T,X)^{n+1,*}$.
+\end{itemize}
+if \runparam{dpdt\_factor} $>$ 0 then
+\begin{itemize}
+\item In {\tt makePfromRhoH}, we compute a thermodynamic $p^{n+1,*}$ for the volume 
+discrepancy term using $(\rho,h,X)^{n+1,*}$.
+\end{itemize}
+end if
+\item[Step 7.] {\em Construct the final edge-based advective velocity, $\uadvtwo.$}
+\item[Step 8.] {\em Advect the base state, then the full state, through a time interval 
+of $\dt.$}\\ \\
+if \runparam{use\_thermal\_diffusion} = T then
+\begin{itemize}
+\item In {\tt enthalpy\_advance} $\rightarrow$ {\tt update\_scal}, we compute $h$ above
+the \runparam{base\_cutoff\_density} using $(\rho,X)^{(2)}$ and $p_0^{n+1}$.
+\item In {\tt advance} before {\tt thermal\_conduct}, we compute the coefficients for 
+$\nabla\cdot(\kth/c_p)\nabla h + \cdots$ using $(\rho,T,X)^{(2),*}$.
+\item In {\tt thermal\_conduct}, we compute $T^{(2)}$ using $(\rho,h,X)^{(2)}$
+(if \runparam{use\_tfromp} {\tt = F}) or $(\rho,X)^{(2)}$ and $p_0^{n+1}$ (if {\tt use\_tfromp} {\tt = T}).
+\end{itemize}
+else
+\begin{itemize}
+\item In {\tt enthalpy\_advance} $\rightarrow$ {\tt update\_scal}, we compute $h$ above
+the {\tt base\_cutoff\_density} using $(\rho,X)^{(2)}$ and $p_0^{n+1}$.
+\item In {\tt enthalpy\_advance}, we compute $T^{(2)}$ using $(\rho,h,X)^{(2)}$
+(if {\tt use\_tfromp} {\tt = F}) or $(\rho,X)^{(2)}$ and $p_0^{n+1}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+end if
+\item[Step 9.] {\em React the full state and base state through a second time interval 
+of $\dt/2.$}
+\begin{itemize}
+\item In {\tt react\_state} $\rightarrow$ {\tt burner}, we compute $c_p$ and $\xi_k$ 
+for inputs to {\tt VODE} using $(\rho,T,X)^{(2)}$.
+\item In {\tt react\_state}, we compute $T^{n+1}$ using $(\rho,h,X)^{n+1}$ 
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{n+1}$ and $p_0^{n+1}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+if \runparam{evolve\_base\_state} {\tt = T} then
+\begin{itemize}
+\item In {\tt make\_gamma}, we compute $\Gamma_1$ using $(\rho,X)^{n+1}$ and $p_0^{n+1}$.
+\end{itemize}
+end if
+\item[Step 10.] {\em Compute $S^{n+1}$ for the final projection.}\\ \\
+if {\tt make\_explicit\_thermal} then
+\begin{itemize}
+\item In {\tt advance} before {\tt make\_explicit\_thermal}, we compute the coefficients for 
+$\nabla\cdot(\kth/c_p)\nabla h + \cdots$ using $(\rho,T,X)^{n+1}$.
+\end{itemize}
+end if
+\begin{itemize}
+\item In {\tt make\_S}, we compute thermodynamic variables using $(\rho,T,X)^{n+1}$.
+\end{itemize}
+\item[Step 11.] {\em Update the velocity.}\\ \\
+if \runparam{dpdt\_factor} $>$ 0 then
+\begin{itemize}
+\item In {\tt makePfromRhoH}, we compute a thermodynamic $p^{n+1}$ for the volume 
+discrepancy term using $(\rho,h,X)^{n+1}$.
+\end{itemize}
+end if
+\item[Step 12.] {\em Compute a new $\dt.$}
+\end{description}
+
+\subsection{{\tt make\_plotfile}}
+
+\section{Temperature Usage}
+
+\subsection{{\tt advance\_timestep}}
+\begin{description}
+\item[Step 1.] {\em Define the average expansion at time $t^\nph$ and the new $w_0.$}
+\item[Step 2.] {\em Construct the provisional edge-based advective velocity, $\uadvone.$}
+\item[Step 3.] {\em React the full state and base state through the first time interval 
+of $\dt/2.$}
+\begin{itemize}
+\item In {\tt react\_state} $\rightarrow$ {\tt burner}, we compute $c_p$ and $\xi_k$ 
+for inputs to {\tt VODE} using $(\rho,T,X)^n$.
+\item In {\tt react\_state}, we compute $T^{(1)}$ using $(\rho,h,X)^{(1)}$ 
+(if \runparam{use\_tfromp} {\tt = F}) or $(\rho,X)^{(1)}$ and $p_0^n$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+\item[Step 4.] {\em Advect the base state, then the full state, through a time interval 
+of $\dt.$}\\ \\
+if \runparam{use\_thermal\_diffusion} {\tt = T} then
+\begin{itemize}
+\item In {\tt advance} before {\tt make\_explicit\_thermal}, we compute the coefficients for 
+$\nabla\cdot(\kth/c_p)\nabla h + \cdots$ using $(\rho,T,X)^{(1)}$.
+\item In {\tt thermal\_conduct}, we compute $T^{(2),*}$ using $(\rho,h,X)^{(2),*}$
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{(2),*}$ and $p_0^{n+1,*}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+else
+\begin{itemize}
+\item In {\tt enthalpy\_advance}, we compute $T^{(2),*}$ using $(\rho,h,X)^{(2),*}$
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{(2),*}$ and $p_0^{n+1,*}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+end if
+\item[Step 5.] {\em React the full state through a second time interval of $\dt/2.$}
+\begin{itemize}
+\item In {\tt react\_state} $\rightarrow$ {\tt burner}, we compute $c_p$ and $\xi_k$ 
+for inputs to {\tt VODE} using $(\rho,T,X)^{(2),*}$.
+\item In {\tt react\_state}, we compute $T^{n+1,*}$ using $(\rho,h,X)^{n+1,*}$ 
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{n+1,*}$ and $p_0^{n+1,*}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+\item[Step 6.] {\em Define a new average expansion rate at time $t^\nph.$}\\ \\
+if \runparam{use\_thermal\_diffusion} {\tt = T} then
+\begin{itemize}
+\item In {\tt advance} before {\tt make\_explicit\_thermal}, we compute the coefficients for 
+$\nabla\cdot(\kth/c_p)\nabla h + \cdots$ using $(\rho,T,X)^{n+1,*}$.
+\end{itemize}
+end if
+\begin{itemize}
+\item In {\tt make\_S}, we compute thermodynamic variables using $(\rho,T,X)^{n+1,*}$.
+\end{itemize}
+\item[Step 7.] {\em Construct the final edge-based advective velocity, $\uadvtwo.$}
+\item[Step 8.] {\em Advect the base state, then the full state, through a time interval 
+of $\dt.$}\\ \\
+if {\tt use\_thermal\_diffusion = T} then
+%
+\begin{itemize}
+\item In {\tt advance} before {\tt thermal\_conduct}, we compute the coefficients for 
+$\nabla\cdot(\kth/c_p)\nabla h + \cdots$ using $(\rho,T,X)^{(2),*}$.
+\item In {\tt thermal\_conduct}, we compute $T^{(2)}$ using $(\rho,h,X)^{(2)}$
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{(2)}$ and $p_0^{n+1}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+else
+\begin{itemize}
+\item In {\tt enthalpy\_advance}, we compute $T^{(2)}$ using $(\rho,h,X)^{(2)}$
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{(2)}$ and $p_0^{n+1}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+end if
+\item[Step 9.] {\em React the full state and base state through a second time interval 
+of $\dt/2.$}
+\begin{itemize}
+\item In {\tt react\_state} $\rightarrow$ {\tt burner}, we compute $c_p$ and $\xi_k$ 
+for inputs to {\tt VODE} using $(\rho,T,X)^{(2)}$.
+\item In {\tt react\_state}, we compute $T^{n+1}$ using $(\rho,h,X)^{n+1}$ 
+(if {\tt use\_tfromp = F}) or $(\rho,X)^{n+1}$ and $p_0^{n+1}$ (if {\tt use\_tfromp = T}).
+\end{itemize}
+\item[Step 10.] {\em Compute $S^{n+1}$ for the final projection.}\\ \\
+if {\tt make\_explicit\_thermal} then
+\begin{itemize}
+\item In {\tt advance} before {\tt make\_explicit\_thermal}, we compute the coefficients for 
+$\nabla\cdot(\kth/c_p)\nabla h + \cdots$ using $(\rho,T,X)^{n+1}$.
+\end{itemize}
+end if
+\begin{itemize}
+\item In {\tt make\_S}, we compute thermodynamic variables using $(\rho,T,X)^{n+1}$.
+\end{itemize}
+\item[Step 11.] {\em Update the velocity.}
+\item[Step 12.] {\em Compute a new $\dt.$}
+\end{description}

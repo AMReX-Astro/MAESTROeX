@@ -1,0 +1,45 @@
+2014-06-17
+ 
+3-d XRB run from MAESTRO_Exec/SCIENCE/xrb_mixed/mz/production/3d/6cm-wide/
+
+This is 384x384x768 zones.
+ 
+We can do 32^3, 48^3, or 64^3 grids.
+
+Titan nodes have 16 cores, but 8 FPUs, so it may be better to run with
+8 codes -- the -j 1 option to aprun ensure that it is one core per FPU.
+
+Run for 100 steps or 30 minutes.  Last 10 steps are averaged.  Output is from ./scaling_avgs.sh
+
+
+64^3 aprun config:
+
+64-OMP4-PE8   aprun -n 432 -N 2 -d 4 -j 1 
+64-OMP4-PE16  aprun -n 432 -N 4 -d 4 -j 2 
+64-OMP8-PE8   aprun -n 432 -N 1 -d 8 -j 1 
+64-OMP8-PE16  aprun -n 432 -N 2 -d 8 -j 2 
+64-OMP16-PE16 aprun -n 432 -N 1 -d 16 -j 2
+
+
+48^3 aprun config:
+
+48-OMP4-PE8:   aprun -n 1024 -N 2 -d 4 -j 1 
+48-OMP4-PE16:  aprun -n 1024 -N 4 -d 4 -j 2 
+48-OMP8-PE8:   aprun -n 1024 -N 1 -d 8 -j 1 
+48-OMP8-PE16:  aprun -n 1024 -N 2 -d 8 -j 2 
+48-OMP16-PE16: aprun -n 1024 -N 1 -d 16 -j 2 
+
+
+32^3 aprun config:
+
+32-OMP4-PE8:   aprun -n 3456 -N 2 -d 4 -j 1 
+32-OMP4-PE16:  aprun -n 3456 -N 4 -d 4 -j 2 
+32-OMP8-PE8:   aprun -n 3456 -N 1 -d 8 -j 1 
+32-OMP8-PE16:  aprun -n 3456 -N 2 -d 8 -j 2 
+
+
+
+
+
+
+

@@ -1,0 +1,379 @@
+\documentclass[11pt]{book}    % add ``openany'' option to remove blank pages
+
+\tolerance=600
+
+% longtable package used to split tables across pages
+\usepackage{longtable}
+
+% PDF-aware landscape package, used for rotating tables (including the
+% longtable)
+\usepackage{pdflscape}
+
+
+% include figures
+\usepackage{epsfig}
+%\usepackage{epsf}
+
+% AMS symbols
+\usepackage{amsmath,amssymb}
+
+% Palatino font (and math symbols) -- looks nicer than the standard
+% LaTeX font
+\usepackage{mathpazo}
+
+% chapter title styles
+%\usepackage[Glenn]{fncychap}
+%\ChNameVar{\bfseries\Large}
+
+\usepackage[Sonny]{fncychap}
+\ChNameVar{\LARGE}
+\ChTitleVar{\LARGE\sl}
+
+% part page style
+% see http://tex.stackexchange.com/questions/6609/problems-with-part-labels-using-titlesec
+\usepackage{titlesec}
+
+\titleformat{\part}[display]
+   {\Huge\filcenter}
+   {{\partname{}} \thepart}
+   {0em}
+   {\hrule}
+
+
+% hyperlinks -- load after fncychap
+\usepackage{hyperref}
+
+
+% color package
+\usepackage[usenames]{color}
+
+% table coloring
+\usepackage{colortbl}
+\definecolor{tableShade}{rgb}{0.945,0.961,0.980}
+
+
+% special colors and definitions for framing source code listings
+\usepackage{listings}
+
+\definecolor{AntiqueWhite3}{rgb}{0.804,0.753,0.69}
+\definecolor{DarkerAntiqueWhite3}{rgb}{0.659,0.635,0.612}
+\definecolor{orange}{rgb}{1.0,0.65,0.0}
+
+\lstset{%
+  keywordstyle=\color{blue}\ttfamily,%
+  commentstyle=\itshape\color[gray]{0.5},%
+  mathescape=true,%
+  basicstyle=\small\ttfamily,%
+  %frameround=fttt,%
+  frameround=ffff,%
+  %frame=shadowbox,%
+  frame=single,%
+  rulesepcolor=\color{DarkerAntiqueWhite3},%
+  backgroundcolor=\color{AntiqueWhite3},%
+  emph={load,add_slice,save}, emphstyle=\color{blue},%
+  emph={[2]In}, emphstyle=[2]\color{yellow},%
+  emph={[3]Out}, emphstyle=[3]\color{orange},%
+  xleftmargin=1em,
+  xrightmargin=1em,
+  mathescape=false}
+
+
+% Margins
+\usepackage[top=1.0in,bottom=1.0in,inner=0.85in,outer=0.85in]{geometry}
+
+% macros for standard maestro quantities
+\input maestrosymbols
+
+\setlength{\marginparwidth}{0.8in}
+\newcommand{\MarginPar}[1]{\marginpar{%
+\vskip-\baselineskip %raise the marginpar a bit
+\raggedright\tiny\sffamily
+\hrule\smallskip{\color{red}#1}\par\smallskip\hrule}}
+
+
+% custom hrule for title page
+\newcommand{\HRule}{\rule{\linewidth}{0.125mm}}
+
+
+
+
+% spacing in the table of contents
+\usepackage[titles]{tocloft}
+
+\setlength{\cftbeforechapskip}{2ex}
+\setlength{\cftbeforesecskip}{0.25ex}
+
+% short table of contents
+\usepackage{shorttoc}
+
+
+% don't put a header on blank pages, see
+% http://www.latex-community.org/forum/viewtopic.php?f=4&p=51559
+% change ``plain'' to ``empty'' to eliminate the page number
+\makeatletter
+\renewcommand*\cleardoublepage{\clearpage\if@twoside
+\ifodd\c@page\else
+\hbox{}
+\thispagestyle{empty}
+\newpage
+\if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\makeatother
+
+
+% don't make the chapter/section headings uppercase.  See the fancyhdr
+% documentation (section 9)
+\usepackage{fancyhdr}
+\renewcommand{\chaptermark}[1]{%
+ \markboth{\chaptername
+\ \thechapter.\ #1}{}}
+
+\renewcommand{\sectionmark}[1]{\markright{\thesection---#1}}
+
+
+% skip a bit of space between paragraphs, to enhance readability
+\usepackage{parskip}
+
+
+
+% figure paths
+
+\newcommand{\figpath}{./initial_models}
+\newcommand{\lodensfigpath}{./lo_density}
+\newcommand{\flowfigpath}{./flowchart}
+\newcommand{\sdcfigpath}{./SDC}
+\newcommand{\radbasefigpath}{./radial_base}
+\newcommand{\sphericalfigpath}{./spherical_basestate}
+\newcommand{\archfigpath}{./architecture}
+\newcommand{\unitfigpath}{./unit_tests}
+\newcommand{\rotfigpath}{./rotation}
+\newcommand{\visfigpath}{./visualization}
+\newcommand{\planeinvsqfigpath}{./planar_invsq_base}
+\newcommand{\pertfigpath}{./pert_notes}
+\newcommand{\gsfigpath}{./getting_started}
+\newcommand{\mgfigpath}{./mg}
+\newcommand{\mesafigpath}{./MESA}
+
+
+% index
+\usepackage{makeidx}
+\makeindex
+
+% arrows between items in a list 
+% (see http://tex.stackexchange.com/questions/159595/how-can-i-draw-an-arrow-linking-two-items-in-a-list)
+\usepackage{tikz}
+\usepackage{xparse}
+\usetikzlibrary{tikzmark,decorations.pathreplacing,calc,decorations.markings}
+
+\definecolor{colori}{RGB}{166,35,41}
+\definecolor{colorii}{RGB}{248,219,162}
+
+\NewDocumentCommand\MyArrow{O{0pt}mmmO{out=150,in=210}}
+{%
+\begin{tikzpicture}[overlay, remember picture]
+  \draw [->,thick,line width=4pt,#4]
+    ( $ ({pic cs:#3}|-{pic cs:#2}) + (-#1,1.3ex) $ ) to[#5]  
+    ( $ (pic cs:#3) + (-#1,0) $ );
+\end{tikzpicture}%
+}
+
+
+%-----------------------------------------------------------------------------
+\begin{document}
+
+\frontmatter
+
+
+\begin{titlepage}
+
+\begin{center}
+
+\ \\[2 in]
+%{\Huge \sf MAESTRO} \\[0.25in]
+{\sf \Huge MAESTRO} \\[0.25in]
+
+
+\begin{minipage}{5.5in}
+\HRule\\[2mm]
+\centering
+{\Large \em An adaptive low-Mach number hydrodynamics code\\ for stratified astrophysical flows}
+
+
+\HRule
+\end{minipage}
+
+\ \\[1 in]
+{\sf \huge User's Guide}
+
+\ \\[1 in]
+{developed at \\[5mm] Center for Computational Sciences and Engineering / \\ Lawrence Berkeley National Laboratory \\[3mm]
+  {\em \&}  \\[3mm]
+        Stony Brook University}
+
+\vfill
+
+{\large \today}
+
+\end{center}
+
+\end{titlepage}
+
+
+\shorttoc{Chapter Listing}{0}
+
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+\clearpage
+
+\listoffigures
+\addcontentsline{toc}{chapter}{list of figures}
+
+\clearpage
+
+\listoftables
+\addcontentsline{toc}{chapter}{list of tables}
+
+
+\clearpage
+
+\chapter*{Preface}
+\chaptermark{Preface}
+\addcontentsline{toc}{chapter}{preface}
+\input preface/preface
+
+\clearpage
+
+\chapter*{Getting Help}
+\chaptermark{Getting Help}
+\addcontentsline{toc}{chapter}{getting help}
+
+Support for \maestro\ is available through the {\tt maestro-help@googlegroups.com}
+mailing list.  To subscribe to the list or read through the 
+archives, visit \\[3mm] 
+\url{https://groups.google.com/forum/#!forum/maestro-help} \\[3mm]
+%
+Questions can be sent to \\[3mm]
+\href{mailto:maestro-help@googlegroups.com}{maestro-help@googlegroups.com} 
+
+
+\clearpage
+
+\mainmatter
+
+
+%-----------------------------------------------------------------------------
+\part{Overview of the \maestro\ Algorithm}
+
+\chapter{Introduction}
+\input introduction/introduction
+
+\chapter{Equation Set and Algorithm Flowchart}
+\label{ch:flowchart}
+\input flowchart/flowchart
+
+%-----------------------------------------------------------------------------
+\part{Using \maestro}
+
+\chapter{Getting Started}
+\input getting_started/getting_started
+
+\chapter{Unit Tests}
+\input unit_tests/unit_tests
+
+\chapter{Architecture}
+\input architecture/architecture
+
+\chapter{Runtime Parameters}
+\label{ch:runtimeparameters}
+\input runtime_parameters/param_intro
+\input runtime_parameters/runtime_parameters
+
+\chapter{Initial Models}
+\input initial_models/initial_models
+
+\chapter{Visualization}
+\input visualization/visualization
+
+\chapter{Analysis Routines}
+\input analysis/analysis
+
+\chapter{Build System}
+\input makefiles/makefiles
+
+\chapter{Compilers and Managing Jobs}
+\input managing_jobs/managingjobs
+
+\chapter{FAQ}
+\input FAQ/faq
+
+%-----------------------------------------------------------------------------
+\part{\maestro\ Technical Details}
+
+\chapter{Notes on the Low Density Parameters in \maestro}
+\input lo_density/lo_density
+
+\chapter{Notes on the Volume Discrepancy Term}
+\input volume_discrepancy/volume_discrepancy
+
+\chapter{EOS and Temperature Notes}
+\input eos_notes/eos_notes
+
+\chapter{Networks}
+\input networks/networks
+
+\chapter{MESA Microphysics}
+\input MESA/instructions
+
+\chapter{Notes on $\etarho$}
+\input eta_notes/eta
+
+\chapter{Notes on Prediction Types}
+\input pert_notes/pert
+
+\chapter{Notes on SDC}
+\label{ch:sdc}
+\input SDC/sdc
+
+\chapter{Notes on Advection}
+\input Godunov_notes/Godunov
+
+\chapter{Multigrid}
+\input mg/mg
+
+\chapter{Rotation}
+\input rotation/rotation
+
+\chapter{Radial Base State}
+\input radial_base/radial_base
+
+\chapter{Spherical Expansion}
+\input spherical_basestate/basestate
+
+\chapter{Planar $1/r^2$ Gravity Basestate}
+\input planar_invsq_base/basestate
+
+\chapter{Thermodynamic Relations and Stability}
+\input thermo_notes/thermo_notes
+
+\chapter{Notes on $\beta_0$}
+\input beta0/beta0
+
+\chapter{Notes on Enthalpy}
+\input enthalpy/enthalpy
+
+\backmatter
+
+%-----------------------------------------------------------------------------
+\part{References and Index}
+
+\renewcommand\bibname{References}
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{plain}
+\bibliography{maestro_doc}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+
+\end{document}

@@ -1,0 +1,55 @@
+The Maestro webpages are stored on the orphan github branch gh-pages,
+which will then automatically show up as:
+
+http://boxlib-codes.github.io/MAESTRO/
+
+
+To create this branch initially we follow
+https://help.github.com/articles/creating-project-pages-manually/
+
+
+1. create a fresh clone:
+
+   git clone ssh://git@github.com/BoxLib-Codes/MAESTRO.git
+
+
+2. create a gh-pages branch
+
+   git checkout --orphan gh-pages
+   git rm -rf .
+   rm '.gitignore'
+
+
+3. create initial content
+
+   echo "My Page" > index.html
+   git add index.html
+   git commit -a -m "First pages commit"
+   git push origin gh-pages
+
+
+4. the page shows up then
+
+
+Working on this later, with a local clone, see:
+http://stackoverflow.com/questions/4750520/git-branch-gh-pages
+
+A. git symbolic-ref HEAD refs/heads/gh-pages
+   rm .git/index
+   git clean -fdx
+
+B. git pull
+   git checkout gh-pages
+
+C. edit index.html, etc. and do
+
+   git commit .
+   git push origin gh-pages
+
+
+To get back to your normal Maestro, do
+
+git checkout master
+
+
+

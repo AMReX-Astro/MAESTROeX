@@ -1,0 +1,5 @@
+getting the figure right:
+
+in OpenOffice, export to PDF
+
+open in acroread, print to a file, but select "choose paper source by PDF page size" and "fit to printable area".  Save with .eps extension.

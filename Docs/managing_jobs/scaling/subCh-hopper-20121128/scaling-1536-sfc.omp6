@@ -1,0 +1,2322 @@
+/var/spool/torque/mom_priv/jobs/2505745.sdb.SC: line 18: ./process.nersc: not found
+ MPI initialized with  256  MPI processes
+ MPI initialized with  6  threads
+ PROBINIT max time   =  4.81479167938232422E-2
+ PROBINIT total time =  6.20961189270019531E-2
+ ************************************************************************
+ WARNING: regrid_int > 0 but amr_buf_width < regrid_int
+          setting amr_buf_width = regrid_int
+ ************************************************************************
+ Initializing helmeos...
+                                                            
+------------------------------------------------------------------------------
+ reading initial model
+ 2560 points found in the initial model file
+ 7  variables found in the initial model file
+------------------------------------------------------------------------------
+ model file mapping (spherical base state)
+      dr of MAESTRO base state =                               292968.7500    
+      dr of input file data =                                  292968.7500    
+  
+      maximum radius (cell-centered) of input model =          749853515.6    
+  
+ setting r_cutoff to  1804
+  
+ Maximum HSE Error =  4.00983451100751842E-9
+    (after putting initial model into base state arrays, and
+     for density < base_cutoff_density)
+------------------------------------------------------------------------------
+  
+ number of MPI processes =  256
+ number of threads       =  6
+  
+ number of dimensions    =  3
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1351
+    maximum zones   =  3*512
+  
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  20380672
+ Number of valid + ghost cells at level 2,  28680637
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+------------------------------------------------------------------------------
+ physical cutoff densities:
+          low density cutoff (for mapping the model) =         10000.00000    
+          buoyancy cutoff density                           
+              (for zeroing rho - rho_0, centrifugal term) =    20000.00000    
+          anelastic cutoff =                                   60000.00000    
+          sponge start density =                               120000.0000    
+                                                            
+ thermodynamics cutoffs:
+          EOS temperature floor =                              5000000.000    
+          EOS density floor =                                 0.1000000000E-04
+------------------------------------------------------------------------------
+  
+------------------------------------------------------------------------------
+ DOING THE INITIAL VELOCITY PROJECTION
+------------------------------------------------------------------------------
+  
+ PROJ_TYPE IN HGPROJECT: 1
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.3226202981E+06   0.2591547678E+06
+... y-velocity before projection -0.3047381525E+06   0.2871320884E+06
+... z-velocity before projection -0.2853237625E+06   0.2823165870E+06
+ 
+ doing hgproject with tolerance, eps =  1.00000000000000004E-10
+F90mg: Initial rhs                  =   297787.62    
+F90mg: Initial residual (resid0)    =   297787.62    
+F90mg: Final Iter.  15 resid/resid0 =  0.29928226E-10
+
+... x-velocity  after projection -0.3228091526E+06   0.2578988105E+06
+... y-velocity  after projection -0.3051385314E+06   0.2880776449E+06
+... z-velocity  after projection -0.2891568055E+06   0.2854131198E+06
+ 
+ Call to firstdt for level 1 gives dt_lev = 4.38559459850203486E-3
+ Multiplying dt_lev by init_shrink; dt_lev = 4.3855945985020353E-4
+ Call to firstdt for level 2 gives dt_lev = 2.19272108008256071E-3
+ Multiplying dt_lev by init_shrink; dt_lev = 2.19272108008256077E-4
+ Minimum firstdt over all levels = 2.19272108008256077E-4
+ 
+  
+------------------------------------------------------------------------------
+ DOING 3 INITIAL DIVU ITERATIONS
+------------------------------------------------------------------------------
+  
+ ... max CFL of w0:  4.63477185297886038E-4
+ 
+ PROJ_TYPE IN HGPROJECT: 2
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.3228091526E+06   0.2578988105E+06
+... y-velocity before projection -0.3051385314E+06   0.2880776449E+06
+... z-velocity before projection -0.2891568055E+06   0.2854131198E+06
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999955E-7
+F90mg: Initial rhs                  =   35522163.    
+F90mg: Initial residual (resid0)    =   35522163.    
+F90mg: Final Iter.   9 resid/resid0 =  0.32233163E-06
+
+... x-velocity  after projection -0.4209278617E+09   0.2777174349E+08
+... y-velocity  after projection -0.4209298347E+09   0.2777870742E+08
+... z-velocity  after projection -0.4209301030E+09   0.2780071589E+08
+ 
+ Call to estdt at end of istep_divu_iter = 1
+ gives dt = 2.43253830381745615E-3
+ Multiplying dt by init_shrink; dt = 2.4325383038174562E-4
+ Ignoring this new dt since it's larger than the previous dt = 2.19272108008256077E-4
+ 
+ ... max CFL of w0:  4.63477185297886038E-4
+ 
+ PROJ_TYPE IN HGPROJECT: 2
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.4209278617E+09   0.2777174349E+08
+... y-velocity before projection -0.4209298347E+09   0.2777870742E+08
+... z-velocity before projection -0.4209301030E+09   0.2780071589E+08
+ 
+ doing hgproject with tolerance, eps =  1.00000000000000002E-8
+F90mg: Initial rhs                  =   5522158.7    
+F90mg: Initial residual (resid0)    =   5522158.7    
+F90mg: Final Iter.  13 resid/resid0 =  0.57324009E-08
+
+... x-velocity  after projection -0.4209489844E+09   0.2996325522E+08
+... y-velocity  after projection -0.4209508932E+09   0.2994887097E+08
+... z-velocity  after projection -0.4209510682E+09   0.3001250181E+08
+ 
+ Call to estdt at end of istep_divu_iter = 2
+ gives dt = 2.43241732598673812E-3
+ Multiplying dt by init_shrink; dt = 2.43241732598673834E-4
+ Ignoring this new dt since it's larger than the previous dt = 2.19272108008256077E-4
+ 
+ ... max CFL of w0:  4.63477185297886038E-4
+ 
+ PROJ_TYPE IN HGPROJECT: 2
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.4209489844E+09   0.2996325522E+08
+... y-velocity before projection -0.4209508932E+09   0.2994887097E+08
+... z-velocity before projection -0.4209510682E+09   0.3001250181E+08
+ 
+ doing hgproject with tolerance, eps =  1.00000000000000004E-10
+F90mg: Initial rhs                  =   2136685.1    
+F90mg: Initial residual (resid0)    =   2136685.1    
+F90mg: Final Iter.  17 resid/resid0 =  0.63131969E-10
+
+... x-velocity  after projection -0.4209490486E+09   0.3056719839E+08
+... y-velocity  after projection -0.4209509571E+09   0.3055281344E+08
+... z-velocity  after projection -0.4209511320E+09   0.3061644444E+08
+ 
+ Call to estdt at end of istep_divu_iter = 3
+ gives dt = 2.43241695770582238E-3
+ Multiplying dt by init_shrink; dt = 2.43241695770582259E-4
+ Ignoring this new dt since it's larger than the previous dt = 2.19272108008256077E-4
+ 
+ 
+------------------------------------------------------------------------------
+ DOING 1 INITIAL PRESSURE ITERATIONS
+------------------------------------------------------------------------------
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1351
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  20380672
+ Number of valid + ghost cells at level 2,  28680637
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 2.19272108008256077E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  4.63477185297886038E-4
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.2532464563E+08   0.2530027213E+08   0.2535516356E+08
+... level / min : MAC vels    1  -0.4202003285E+09  -0.4202022517E+09  -0.4202024310E+09
+... level / max : MAC vels    2   0.3056650517E+08   0.3055211998E+08   0.3061576741E+08
+... level / min : MAC vels    2  -0.4209489436E+09  -0.4209508521E+09  -0.4209510269E+09
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.58204352E+08
+F90mg: Initial rhs                  =   58204352.    
+F90mg: Initial residual (resid0)    =   58204352.    
+F90mg: Final Iter.   8 resid/resid0 =  0.68387928E-10
+
+ Solve Time =  2.3120272159576416
+... level / max : MAC vels    1  -0.4193433285E+09  -0.4192830214E+09  -0.4192663842E+09
+... level / min : MAC vels    1   0.3348036869E+08   0.3348432496E+08   0.3351274776E+08
+... level / max : MAC vels    2  -0.4195647421E+09  -0.4195042135E+09  -0.4194875090E+09
+... level / min : MAC vels    2   0.4619932753E+08   0.4621568742E+08   0.4625435726E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9850201625E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999996E-10   0.1000600424E-09
+... new min/max : iron-56            0.9999999982E-10   0.1000013676E-09
+... new min/max : density            0.9898755687E+04   0.4566152150E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9002961917E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999964E-10   0.1000647618E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042708E-09
+... new min/max : density            0.9898755688E+04   0.4567010475E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281851291E+21   0.2240311812E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281807843E+21   0.2240920505E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  2.03356779344553298E-4
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.2530196967E+08   0.2527759576E+08   0.2533248736E+08
+... level / min : MAC vels    1  -0.4205769656E+09  -0.4205788888E+09  -0.4205790681E+09
+... level / max : MAC vels    2   0.3054372477E+08   0.3052933963E+08   0.3059298719E+08
+... level / min : MAC vels    2  -0.4213248724E+09  -0.4213267809E+09  -0.4213269557E+09
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.27670253E+08
+F90mg: Initial rhs                  =   27670253.    
+F90mg: Initial residual (resid0)    =   27670253.    
+F90mg: Final Iter.   9 resid/resid0 =  0.22556366E-09
+
+ Solve Time =  2.6278691291809082
+... level / max : MAC vels    1  -0.2240459897E+09  -0.2239042198E+09  -0.2238868945E+09
+... level / min : MAC vels    1   0.1780308941E+08   0.1780834298E+08   0.1783372355E+08
+... level / max : MAC vels    2  -0.2240633134E+09  -0.2239215459E+09  -0.2239042219E+09
+... level / min : MAC vels    2   0.2361432903E+08   0.2363193438E+08   0.2366691896E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9941955947E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999996E-10   0.1000600421E-09
+... new min/max : iron-56            0.9999999982E-10   0.1000013677E-09
+... new min/max : density            0.9898755481E+04   0.4566151625E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9514220650E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999964E-10   0.1000647618E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042708E-09
+... new min/max : density            0.9898755695E+04   0.4567009951E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281869900E+21   0.2240311439E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281846681E+21   0.2240920133E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.4099136430E+09   0.2025698069E+08
+... new min/max : y-velocity       -0.4099155626E+09   0.2021554572E+08
+... new min/max : z-velocity       -0.4099157430E+09   0.2019227286E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.4117234744E+09   0.3050249331E+08
+... new min/max : y-velocity       -0.4117253557E+09   0.3048810682E+08
+... new min/max : z-velocity       -0.4117255286E+09   0.3055172071E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 3
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.4117234744E+09   0.3050249331E+08
+... y-velocity before projection -0.4117253557E+09   0.3048810682E+08
+... z-velocity before projection -0.4117255286E+09   0.3055172071E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =  0.16232746E+12
+F90mg: Initial residual (resid0)    =  0.16232746E+12
+F90mg: Final Iter.  16 resid/resid0 =  0.62339340E-10
+
+... x-velocity  after projection -0.2949050103E+08   0.1497765081E+08
+... y-velocity  after projection -0.2926935078E+08   0.1492242354E+08
+... z-velocity  after projection -0.2924840690E+08   0.1491934846E+08
+ 
+ Timing summary:
+    Advection       :  17.183395147323608  seconds
+    MAC   Projection:  6.7325279712677002  seconds
+    Nodal Projection:  6.0398659706115723  seconds
+    Reactions       :  3.4928653240203857  seconds
+    Misc            :  0.76295804977416992  seconds
+  
+ Time to advance timestep:  34.1889328956604  seconds
+ 
+FAB byte spread across MPI nodes: [  178075728 -   253908064 [avg:   217421960]]
+ 
+ Writing state to checkpoint file subCh_hot_baserun_chk00000/State
+ Writing state to checkpoint file subCh_hot_baserun_chk00000/dSdt
+ Writing state to checkpoint file subCh_hot_baserun_chk00000/Source_old
+ Writing state to checkpoint file subCh_hot_baserun_chk00000/Source_new
+ Writing state to checkpoint file subCh_hot_baserun_chk00000/rho_omegadot2
+ Writing state to checkpoint file subCh_hot_baserun_chk00000/rho_Hnuc2
+ Writing state to checkpoint file subCh_hot_baserun_chk00000/Pressure
+ Time to write checkpoint:  15.078003168106079  seconds
+ 
+ Writing 1D data to subCh_hot_baserun_chk00000
+ Writing cell-centered 1D data to subCh_hot_baserun_chk00000/model_cc_00000
+ Writing edge-centered 1D data to subCh_hot_baserun_chk00000/model_ec_00000
+ 
+ Writing state to plotfile subCh_hot_baserun_plt00000
+ Time to write plotfile:  6.0828990936279297  seconds
+ 
+ Writing 1D data to subCh_hot_baserun_plt00000
+ Writing cell-centered 1D data to subCh_hot_baserun_plt00000/model_cc_00000
+ Writing edge-centered 1D data to subCh_hot_baserun_plt00000/model_ec_00000
+ 
+ 
+ BEGIN MAIN EVOLUTION LOOP WITH dt = 2.19272108008256077E-4
+ 
+ MEMORY STATS AT START OF TIMESTEP  1
+  
+    multifab:      2305953140     2305953140             34             34
+         fab:         7283872       10451252             68            238
+    boxarray:           90134          90134             62             62
+      layout:               0              0              1              1
+    boxassoc:            1964           6088             40             40
+     fgassoc:         4181376        4181376              3              3
+   syncassoc:              63            193              5              5
+   copyassoc:             317           2441             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.2028542861E+08   0.2024390798E+08   0.2022047881E+08
+... level / min : old vels    1  -0.4191233648E+09  -0.4191252958E+09  -0.4191254762E+09
+... level / max : old vels    2   0.3056719839E+08   0.3055281344E+08   0.3061644444E+08
+... level / min : old vels    2  -0.4209490486E+09  -0.4209509571E+09  -0.4209511320E+09
+ Calling regrid
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1263
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  20134400
+ Number of valid + ghost cells at level 2,  28130693
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 2.19272108008256077E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  2.20688947239352953E-4
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1347906826E+09   0.1348807505E+09   0.1348878558E+09
+... level / min : MAC vels    1  -0.2299898222E+09  -0.2298802722E+09  -0.2298699183E+09
+... level / max : MAC vels    2   0.1702741435E+08   0.1701652373E+08   0.1707479557E+08
+... level / min : MAC vels    2  -0.2299991606E+09  -0.2298896138E+09  -0.2298792601E+09
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.25351027E+08
+F90mg: Initial rhs                  =   25351027.    
+F90mg: Initial residual (resid0)    =   25351027.    
+F90mg: Final Iter.   8 resid/resid0 =  0.17257573E-09
+
+ Solve Time =  2.0527801513671875
+... level / max : MAC vels    1  -0.2225077535E+09  -0.2223624383E+09  -0.2223450147E+09
+... level / min : MAC vels    1   0.1765485905E+08   0.1766095585E+08   0.1768552005E+08
+... level / max : MAC vels    2  -0.2226238567E+09  -0.2224788695E+09  -0.2224612842E+09
+... level / min : MAC vels    2   0.2413403845E+08   0.2416390814E+08   0.2418893076E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955301119E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950625E-10   0.1000600421E-09
+... new min/max : iron-56            0.9999950625E-10   0.1000013677E-09
+... new min/max : density            0.9898755695E+04   0.4566151675E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803904397E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999964E-10   0.1000647618E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042708E-09
+... new min/max : density            0.9898755695E+04   0.4567010002E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281870101E+21   0.2240311475E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281846679E+21   0.2240920169E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  2.18253867682905437E-4
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1347895234E+09   0.1348795913E+09   0.1348866966E+09
+... level / min : MAC vels    1  -0.2299921274E+09  -0.2298825775E+09  -0.2298722235E+09
+... level / max : MAC vels    2   0.1702689948E+08   0.1701600887E+08   0.1707428070E+08
+... level / min : MAC vels    2  -0.2300014659E+09  -0.2298919191E+09  -0.2298815654E+09
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.25350979E+08
+F90mg: Initial rhs                  =   25350979.    
+F90mg: Initial residual (resid0)    =   25350979.    
+F90mg: Final Iter.   6 resid/resid0 =  0.84354597E-09
+
+ Solve Time =  1.472987174987793
+... level / max : MAC vels    1  -0.2224817703E+09  -0.2223365900E+09  -0.2223193276E+09
+... level / min : MAC vels    1   0.1765437962E+08   0.1766017976E+08   0.1768502462E+08
+... level / max : MAC vels    2  -0.2225549155E+09  -0.2224100959E+09  -0.2223926564E+09
+... level / min : MAC vels    2   0.2413149454E+08   0.2416115064E+08   0.2418650977E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955258968E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950625E-10   0.1000600421E-09
+... new min/max : iron-56            0.9999950625E-10   0.1000013677E-09
+... new min/max : density            0.9898755695E+04   0.4566151671E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803669887E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999964E-10   0.1000647618E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042708E-09
+... new min/max : density            0.9898755695E+04   0.4567009997E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281870064E+21   0.2240311471E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281846810E+21   0.2240920166E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.3738711045E+08   0.7771772288E+07
+... new min/max : y-velocity       -0.3717557014E+08   0.7694328993E+07
+... new min/max : z-velocity       -0.3715529034E+08   0.7688313270E+07
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.3821257987E+08   0.9460943728E+07
+... new min/max : y-velocity       -0.3799667298E+08   0.9390256261E+07
+... new min/max : z-velocity       -0.3797622603E+08   0.9385423148E+07
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.3821257987E+08   0.9460943728E+07
+... y-velocity before projection -0.3799667298E+08   0.9390256261E+07
+... z-velocity before projection -0.3797622603E+08   0.9385423148E+07
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   35300213.    
+F90mg: Initial residual (resid0)    =   35300213.    
+F90mg: Final Iter.  16 resid/resid0 =  0.51160508E-10
+
+... x-velocity  after projection -0.2909153061E+08   0.1461181128E+08
+... y-velocity  after projection -0.2887122607E+08   0.1455777083E+08
+... z-velocity  after projection -0.2885041234E+08   0.1455534820E+08
+ 
+ Timing summary:
+    Advection       :  18.216334819793701  seconds
+    MAC   Projection:  5.2355997562408447  seconds
+    Nodal Projection:  6.8265681266784668  seconds
+    Reactions       :  3.4900872707366943  seconds
+    Misc            :  1.067084789276123  seconds
+  
+ Time to advance timestep:  34.815218210220337  seconds
+ 
+FAB byte spread across MPI nodes: [  178277840 -   245381312 [avg:   215371109]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  1
+  
+    multifab:      2286464684     2286464684             34             34
+         fab:         7308960       10119052             68            221
+    boxarray:           79277          79277             62             62
+      layout:               0              0              2              2
+    boxassoc:            2058           5844             40             40
+     fgassoc:         4129920        4129920              3              3
+   syncassoc:              66            182              5              5
+   copyassoc:             338           1924             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2860547852E+08   0.1297175402E+08
+... min/max : y-velocity       -0.2839050680E+08   0.1289768488E+08
+... min/max : z-velocity       -0.2837016236E+08   0.1289524521E+08
+... min/max : gpix              -0.7571395459E+17   0.6016882354E+17
+... min/max : gpiy              -0.7597207836E+17   0.6018270651E+17
+... min/max : gpiz              -0.7597385495E+17   0.6018270488E+17
+ 
+At level   2
+... min/max : x-velocity       -0.2909153061E+08   0.1461181128E+08
+... min/max : y-velocity       -0.2887122607E+08   0.1455777083E+08
+... min/max : z-velocity       -0.2885041234E+08   0.1455534820E+08
+... min/max : gpix              -0.1058035018E+18   0.8515699656E+17
+... min/max : gpiy              -0.1058135884E+18   0.8513445906E+17
+... min/max : gpiz              -0.1058144262E+18   0.8516882341E+17
+ 
+STEP =      1  TIME = 2.1927210801E-04  DT = 2.1927210801E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  2
+  
+    multifab:      2286464684     2286464684             34             34
+         fab:         7308960       10119052             68            221
+    boxarray:           79277          79277             62             62
+      layout:               0              0              2              2
+    boxassoc:            2058           5844             40             40
+     fgassoc:         4129920        4129920              3              3
+   syncassoc:              66            182              5              5
+   copyassoc:             338           1924             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1297175402E+08   0.1289768488E+08   0.1289524521E+08
+... level / min : old vels    1  -0.2860547852E+08  -0.2839050680E+08  -0.2837016236E+08
+... level / max : old vels    2   0.1461181128E+08   0.1455777083E+08   0.1455534820E+08
+... level / min : old vels    2  -0.2909153061E+08  -0.2887122607E+08  -0.2885041234E+08
+ 
+ Call to estdt at beginning of step 2
+ gives dt = 7.84639273732734783E-4
+ dt_growth factor limits the new dt = 2.41199318809081693E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1263
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  20134400
+ Number of valid + ghost cells at level 2,  28130693
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 2.41199318809081693E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  3.74093047581993343E-4
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1922657150E+09   0.1933946960E+09   0.1934298455E+09
+... level / min : MAC vels    1  -0.1105722571E+08  -0.1120644287E+08  -0.1130344816E+08
+... level / max : MAC vels    2   0.1941956236E+09   0.1953030414E+09   0.1953394847E+09
+... level / min : MAC vels    2  -0.1264122474E+08  -0.1272078740E+08  -0.1281349029E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.50714475E+08
+F90mg: Initial rhs                  =   50714475.    
+F90mg: Initial residual (resid0)    =   50714475.    
+F90mg: Final Iter.   8 resid/resid0 =  0.20362713E-09
+
+ Solve Time =  2.0503120422363281
+... level / max : MAC vels    1  -0.1669022596E+08  -0.1669108196E+08  -0.1668312054E+08
+... level / min : MAC vels    1   0.1919138230E+09   0.1930172647E+09   0.1930434185E+09
+... level / max : MAC vels    2  -0.2446595645E+08  -0.2443961399E+08  -0.2470946773E+08
+... level / min : MAC vels    2   0.1930560160E+09   0.1941663156E+09   0.1941927140E+09
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9992796388E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950626E-10   0.1001948968E-09
+... new min/max : iron-56            0.9999950626E-10   0.1000013666E-09
+... new min/max : density            0.9898615737E+04   0.4566151083E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9971401240E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999975E-10   0.1002317861E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042541E-09
+... new min/max : density            0.9898304688E+04   0.4567009412E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281876897E+21   0.2240311054E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281859843E+21   0.2240919750E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  4.50379367966997386E-5
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1924575797E+09   0.1935865606E+09   0.1936217101E+09
+... level / min : MAC vels    1  -0.1107693850E+08  -0.1119949744E+08  -0.1129649687E+08
+... level / max : MAC vels    2   0.1943895165E+09   0.1954969343E+09   0.1955333776E+09
+... level / min : MAC vels    2  -0.1263589438E+08  -0.1271545834E+08  -0.1280816026E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.12004514E+08
+F90mg: Initial rhs                  =   12004514.    
+F90mg: Initial residual (resid0)    =   12004514.    
+F90mg: Final Iter.   9 resid/resid0 =  0.57149662E-09
+
+ Solve Time =  2.2707970142364502
+... level / max : MAC vels    1  -0.2995529047E+08  -0.2973941323E+08  -0.2972044692E+08
+... level / min : MAC vels    1   0.1393026415E+08   0.1388538184E+08   0.1388446657E+08
+... level / max : MAC vels    2  -0.2995931403E+08  -0.2974344786E+08  -0.2972448410E+08
+... level / min : MAC vels    2   0.1443409517E+08   0.1439406980E+08   0.1439183733E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955261299E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950628E-10   0.1001949047E-09
+... new min/max : iron-56            0.9999950628E-10   0.1000013677E-09
+... new min/max : density            0.9898755587E+04   0.4566151654E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803679720E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999976E-10   0.1002318490E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042707E-09
+... new min/max : density            0.9898755478E+04   0.4567009981E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281867122E+21   0.2240311460E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281840790E+21   0.2240920154E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.2090930229E+08   0.3913740322E+09
+... new min/max : y-velocity       -0.2104698712E+08   0.3918382581E+09
+... new min/max : z-velocity       -0.2103454676E+08   0.3918819026E+09
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.2702763722E+08   0.3926991668E+09
+... new min/max : y-velocity       -0.2700380345E+08   0.3932407187E+09
+... new min/max : z-velocity       -0.2702226523E+08   0.3932859933E+09
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.2702763722E+08   0.3926991668E+09
+... y-velocity before projection -0.2700380345E+08   0.3932407187E+09
+... z-velocity before projection -0.2702226523E+08   0.3932859933E+09
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   5079678.2    
+F90mg: Initial residual (resid0)    =   5079678.2    
+F90mg: Final Iter.  17 resid/resid0 =  0.45511391E-10
+
+... x-velocity  after projection -0.2834320707E+08   0.1414606537E+08
+... y-velocity  after projection -0.2812504290E+08   0.1409429245E+08
+... z-velocity  after projection -0.2810452124E+08   0.1409214967E+08
+ 
+ Timing summary:
+    Advection       :  16.703495979309082  seconds
+    MAC   Projection:  5.8242499828338623  seconds
+    Nodal Projection:  6.6736640930175781  seconds
+    Reactions       :  3.4870729446411133  seconds
+    Misc            :  1.0661678314208984  seconds
+  
+ Time to advance timestep:  33.730330944061279  seconds
+ 
+FAB byte spread across MPI nodes: [  178277840 -   245381312 [avg:   215371109]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  2
+  
+    multifab:      2286464684     2286464684             34             34
+         fab:         7308960       10119052             68            221
+    boxarray:           79277          79277             62             62
+      layout:               0              0              2              2
+    boxassoc:            2058           5844             40             40
+     fgassoc:         4129920        4129920              3              3
+   syncassoc:              66            182              5              5
+   copyassoc:             338           1924             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2787723290E+08   0.1264202210E+08
+... min/max : y-velocity       -0.2766428057E+08   0.1257576169E+08
+... min/max : z-velocity       -0.2764421576E+08   0.1257363002E+08
+... min/max : gpix              -0.3763950619E+16   0.3613735398E+16
+... min/max : gpiy              -0.3544264000E+16   0.3947514141E+16
+... min/max : gpiz              -0.3544336405E+16   0.3947514933E+16
+ 
+At level   2
+... min/max : x-velocity       -0.2834320707E+08   0.1414606537E+08
+... min/max : y-velocity       -0.2812504290E+08   0.1409429245E+08
+... min/max : z-velocity       -0.2810452124E+08   0.1409214967E+08
+... min/max : gpix              -0.7986124721E+16   0.7202602433E+16
+... min/max : gpiy              -0.7985801833E+16   0.7202749589E+16
+... min/max : gpiz              -0.7985620612E+16   0.7202681139E+16
+ 
+STEP =      2  TIME = 4.6047142682E-04  DT = 2.4119931881E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  3
+  
+    multifab:      2286464684     2286464684             34             34
+         fab:         7308960       10119052             68            221
+    boxarray:           79277          79277             62             62
+      layout:               0              0              2              2
+    boxassoc:            2058           5844             40             40
+     fgassoc:         4129920        4129920              3              3
+   syncassoc:              66            182              5              5
+   copyassoc:             338           1924             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1264202210E+08   0.1257576169E+08   0.1257363002E+08
+... level / min : old vels    1  -0.2787723290E+08  -0.2766428057E+08  -0.2764421576E+08
+... level / max : old vels    2   0.1414606537E+08   0.1409429245E+08   0.1409214967E+08
+... level / min : old vels    2  -0.2834320707E+08  -0.2812504290E+08  -0.2810452124E+08
+ Calling regrid
+ 
+ Call to estdt at beginning of step 3
+ gives dt = 7.86652858322251999E-3
+ dt_growth factor limits the new dt = 2.65319250689989897E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1494
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  19953152
+ Number of valid + ghost cells at level 2,  28546514
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 2.65319250689989897E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  7.25039437908893434E-6
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1679727374E+08   0.1674330273E+08   0.1674182913E+08
+... level / min : MAC vels    1  -0.2191639115E+08  -0.2169275718E+08  -0.2167178430E+08
+... level / max : MAC vels    2   0.1819168798E+08   0.1814752401E+08   0.1814554082E+08
+... level / min : MAC vels    2  -0.2205656675E+08  -0.2183288559E+08  -0.2181189195E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.27466412E+07
+F90mg: Initial rhs                  =   2746641.2    
+F90mg: Initial residual (resid0)    =   2746641.2    
+F90mg: Final Iter.   9 resid/resid0 =  0.28999054E-09
+
+ Solve Time =  2.6845951080322266
+... level / max : MAC vels    1  -0.2801466320E+08  -0.2779762076E+08  -0.2777726607E+08
+... level / min : MAC vels    1   0.1276935349E+08   0.1268940146E+08   0.1268543119E+08
+... level / max : MAC vels    2  -0.2802031460E+08  -0.2780327765E+08  -0.2778292299E+08
+... level / min : MAC vels    2   0.1319872227E+08   0.1315087216E+08   0.1314881427E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955263534E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950631E-10   0.1003446765E-09
+... new min/max : iron-56            0.9999950631E-10   0.1000013677E-09
+... new min/max : density            0.9898755660E+04   0.4566151644E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803695498E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999989E-10   0.1004156435E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042704E-09
+... new min/max : density            0.9898755613E+04   0.4567009970E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281864116E+21   0.2240311452E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281834682E+21   0.2240920147E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  7.69750284922016001E-6
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1679708704E+08   0.1674311603E+08   0.1674164243E+08
+... level / min : MAC vels    1  -0.2191665312E+08  -0.2169301915E+08  -0.2167204627E+08
+... level / max : MAC vels    2   0.1819150003E+08   0.1814733459E+08   0.1814535140E+08
+... level / min : MAC vels    2  -0.2205683014E+08  -0.2183314899E+08  -0.2181215535E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.27466412E+07
+F90mg: Initial rhs                  =   2746641.2    
+F90mg: Initial residual (resid0)    =   2746641.2    
+F90mg: Final Iter.   6 resid/resid0 =  0.30306640E-09
+
+ Solve Time =  1.7674019336700439
+... level / max : MAC vels    1  -0.2801460552E+08  -0.2779756390E+08  -0.2777720752E+08
+... level / min : MAC vels    1   0.1276933015E+08   0.1268937790E+08   0.1268540760E+08
+... level / max : MAC vels    2  -0.2802025694E+08  -0.2780322082E+08  -0.2778286447E+08
+... level / min : MAC vels    2   0.1319866791E+08   0.1315081949E+08   0.1314876148E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955263535E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950631E-10   0.1003446765E-09
+... new min/max : iron-56            0.9999950631E-10   0.1000013677E-09
+... new min/max : density            0.9898755660E+04   0.4566151643E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803695499E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999989E-10   0.1004156435E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042704E-09
+... new min/max : density            0.9898755613E+04   0.4567009970E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281864116E+21   0.2240311452E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281834682E+21   0.2240920147E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.1515296153E+08   0.2019454857E+08
+... new min/max : y-velocity       -0.1493543012E+08   0.2016947344E+08
+... new min/max : z-velocity       -0.1491503614E+08   0.2016941646E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.1532225144E+08   0.2165844188E+08
+... new min/max : y-velocity       -0.1509956865E+08   0.2163845636E+08
+... new min/max : z-velocity       -0.1507871330E+08   0.2163953930E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.1532225144E+08   0.2165844188E+08
+... y-velocity before projection -0.1509956865E+08   0.2163845636E+08
+... z-velocity before projection -0.1507871330E+08   0.2163953930E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   1641026.5    
+F90mg: Initial residual (resid0)    =   1641026.5    
+F90mg: Final Iter.  17 resid/resid0 =  0.83023498E-10
+
+... x-velocity  after projection -0.2799329832E+08   0.1388225820E+08
+... y-velocity  after projection -0.2777628517E+08   0.1383120447E+08
+... z-velocity  after projection -0.2775591481E+08   0.1382907445E+08
+ 
+ Timing summary:
+    Advection       :  18.066936254501343  seconds
+    MAC   Projection:  6.3436312675476074  seconds
+    Nodal Projection:  7.0263528823852539  seconds
+    Reactions       :  3.5534148216247559  seconds
+    Misc            :  1.0762231349945068  seconds
+  
+ Time to advance timestep:  36.046590805053711  seconds
+ 
+FAB byte spread across MPI nodes: [  176194224 -   242691168 [avg:   217008305]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  3
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           79874          79874             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             337           1767             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2753332101E+08   0.1248754679E+08
+... min/max : y-velocity       -0.2732148274E+08   0.1242148228E+08
+... min/max : z-velocity       -0.2730156528E+08   0.1241937401E+08
+... min/max : gpix              -0.7970649181E+15   0.7330723877E+15
+... min/max : gpiy              -0.5808921957E+15   0.1108453544E+16
+... min/max : gpiz              -0.5809067670E+15   0.1108449215E+16
+ 
+At level   2
+... min/max : x-velocity       -0.2799329832E+08   0.1388225820E+08
+... min/max : y-velocity       -0.2777628517E+08   0.1383120447E+08
+... min/max : z-velocity       -0.2775591481E+08   0.1382907445E+08
+... min/max : gpix              -0.2073603675E+16   0.2107759839E+16
+... min/max : gpiy              -0.2073495144E+16   0.2107871053E+16
+... min/max : gpiz              -0.2073533578E+16   0.2107858220E+16
+ 
+STEP =      3  TIME = 7.2579067751E-04  DT = 2.6531925069E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  4
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           79874          79874             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             337           1767             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1248754679E+08   0.1242148228E+08   0.1241937401E+08
+... level / min : old vels    1  -0.2753332101E+08  -0.2732148274E+08  -0.2730156528E+08
+... level / max : old vels    2   0.1388225820E+08   0.1383120447E+08   0.1382907445E+08
+... level / min : old vels    2  -0.2799329832E+08  -0.2777628517E+08  -0.2775591481E+08
+ 
+ Call to estdt at beginning of step 4
+ gives dt = 3.06750495919120916E-2
+ dt_growth factor limits the new dt = 2.91851175758988887E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1494
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  19953152
+ Number of valid + ghost cells at level 2,  28546514
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 2.91851175758988887E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  8.46722166281399954E-6
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1280263406E+08   0.1274956286E+08   0.1274797201E+08
+... level / min : MAC vels    1  -0.2790512263E+08  -0.2768521541E+08  -0.2766461382E+08
+... level / max : MAC vels    2   0.1406899599E+08   0.1401733759E+08   0.1401518520E+08
+... level / min : MAC vels    2  -0.2807428292E+08  -0.2785431691E+08  -0.2783369389E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24745783E+07
+F90mg: Initial rhs                  =   2474578.3    
+F90mg: Initial residual (resid0)    =   2474578.3    
+F90mg: Final Iter.   8 resid/resid0 =  0.25352206E-09
+
+ Solve Time =  2.3889269828796387
+... level / max : MAC vels    1  -0.2773948187E+08  -0.2752242760E+08  -0.2750251536E+08
+... level / min : MAC vels    1   0.1260813354E+08   0.1252871314E+08   0.1252635946E+08
+... level / max : MAC vels    2  -0.2774525791E+08  -0.2752820863E+08  -0.2750829707E+08
+... level / min : MAC vels    2   0.1305971460E+08   0.1301766081E+08   0.1301639288E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955266107E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950635E-10   0.1005097995E-09
+... new min/max : iron-56            0.9999950635E-10   0.1000013677E-09
+... new min/max : density            0.9898755682E+04   0.4566151632E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803716394E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999993E-10   0.1006178150E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042702E-09
+... new min/max : density            0.9898755566E+04   0.4567009958E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281860883E+21   0.2240311444E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281828111E+21   0.2240920138E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  9.10206314877505145E-6
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1280239836E+08   0.1274932715E+08   0.1274773631E+08
+... level / min : MAC vels    1  -0.2790545336E+08  -0.2768554614E+08  -0.2766494456E+08
+... level / max : MAC vels    2   0.1406875869E+08   0.1401710030E+08   0.1401494790E+08
+... level / min : MAC vels    2  -0.2807461545E+08  -0.2785464943E+08  -0.2783402641E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24745657E+07
+F90mg: Initial rhs                  =   2474565.7    
+F90mg: Initial residual (resid0)    =   2474565.7    
+F90mg: Final Iter.   6 resid/resid0 =  0.19768205E-09
+
+ Solve Time =  1.8000421524047852
+... level / max : MAC vels    1  -0.2773942247E+08  -0.2752236892E+08  -0.2750245427E+08
+... level / min : MAC vels    1   0.1260810528E+08   0.1252868881E+08   0.1252632757E+08
+... level / max : MAC vels    2  -0.2774519858E+08  -0.2752815002E+08  -0.2750823604E+08
+... level / min : MAC vels    2   0.1305969135E+08   0.1301765147E+08   0.1301637396E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955266107E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950635E-10   0.1005097995E-09
+... new min/max : iron-56            0.9999950635E-10   0.1000013677E-09
+... new min/max : density            0.9898755682E+04   0.4566151631E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803716395E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999993E-10   0.1006178150E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042702E-09
+... new min/max : density            0.9898755567E+04   0.4567009958E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281860884E+21   0.2240311444E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281828112E+21   0.2240920138E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.2683213564E+08   0.1252169244E+08
+... new min/max : y-velocity       -0.2662133268E+08   0.1246003000E+08
+... new min/max : z-velocity       -0.2660157027E+08   0.1245795428E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.2727700383E+08   0.1380685997E+08
+... new min/max : y-velocity       -0.2706104426E+08   0.1375624447E+08
+... new min/max : z-velocity       -0.2704082036E+08   0.1375413871E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.2727700383E+08   0.1380685997E+08
+... y-velocity before projection -0.2706104426E+08   0.1375624447E+08
+... z-velocity before projection -0.2704082036E+08   0.1375413871E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   793416.81    
+F90mg: Initial residual (resid0)    =   793416.81    
+F90mg: Final Iter.  18 resid/resid0 =  0.30553184E-10
+
+... x-velocity  after projection -0.2761795980E+08   0.1362559995E+08
+... y-velocity  after projection -0.2740217693E+08   0.1357498775E+08
+... z-velocity  after projection -0.2738196767E+08   0.1357286323E+08
+ 
+ Timing summary:
+    Advection       :  17.666868209838867  seconds
+    MAC   Projection:  5.8636231422424316  seconds
+    Nodal Projection:  7.1038782596588135  seconds
+    Reactions       :  3.5505077838897705  seconds
+    Misc            :  1.0795509815216064  seconds
+  
+ Time to advance timestep:  35.246910095214844  seconds
+ 
+FAB byte spread across MPI nodes: [  176194224 -   242691168 [avg:   217008305]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  4
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           79874          79874             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             337           1767             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2716439984E+08   0.1232272985E+08
+... min/max : y-velocity       -0.2695375294E+08   0.1225758590E+08
+... min/max : z-velocity       -0.2693399240E+08   0.1225549404E+08
+... min/max : gpix              -0.2542387213E+15   0.2236757427E+15
+... min/max : gpiy              -0.2394045628E+15   0.4148755976E+15
+... min/max : gpiz              -0.2393954383E+15   0.4148732556E+15
+ 
+At level   2
+... min/max : x-velocity       -0.2761795980E+08   0.1362559995E+08
+... min/max : y-velocity       -0.2740217693E+08   0.1357498775E+08
+... min/max : z-velocity       -0.2738196767E+08   0.1357286323E+08
+... min/max : gpix              -0.8333876104E+15   0.8671768241E+15
+... min/max : gpiy              -0.8332851313E+15   0.8673406605E+15
+... min/max : gpiz              -0.8332771772E+15   0.8673509276E+15
+ 
+STEP =      4  TIME = 1.0176418533E-03  DT = 2.9185117576E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  5
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           79874          79874             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             337           1767             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1232272985E+08   0.1225758590E+08   0.1225549404E+08
+... level / min : old vels    1  -0.2716439984E+08  -0.2695375294E+08  -0.2693399240E+08
+... level / max : old vels    2   0.1362559995E+08   0.1357498775E+08   0.1357286323E+08
+... level / min : old vels    2  -0.2761795980E+08  -0.2740217693E+08  -0.2738196767E+08
+ Calling regrid
+ 
+ Call to estdt at beginning of step 5
+ gives dt = 3.7139896748342463E-2
+ dt_growth factor limits the new dt = 3.21036293334887814E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1494
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  19953152
+ Number of valid + ghost cells at level 2,  28546514
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 3.21036293334887814E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  1.00122338362200913E-5
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1254466249E+08   0.1249209857E+08   0.1249050576E+08
+... level / min : MAC vels    1  -0.2772638842E+08  -0.2750751979E+08  -0.2748706242E+08
+... level / max : MAC vels    2   0.1373145867E+08   0.1368018981E+08   0.1367803100E+08
+... level / min : MAC vels    2  -0.2789454535E+08  -0.2767561211E+08  -0.2765513301E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24601794E+07
+F90mg: Initial rhs                  =   2460179.4    
+F90mg: Initial residual (resid0)    =   2460179.4    
+F90mg: Final Iter.   8 resid/resid0 =  0.24378090E-09
+
+ Solve Time =  2.3951380252838135
+... level / max : MAC vels    1  -0.2736408695E+08  -0.2714794050E+08  -0.2712793658E+08
+... level / min : MAC vels    1   0.1243305386E+08   0.1235988812E+08   0.1235913506E+08
+... level / max : MAC vels    2  -0.2736985672E+08  -0.2715371509E+08  -0.2713371147E+08
+... level / min : MAC vels    2   0.1291709510E+08   0.1287546279E+08   0.1287435547E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955268936E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950639E-10   0.1006914787E-09
+... new min/max : iron-56            0.9999950639E-10   0.1000013677E-09
+... new min/max : density            0.9898755541E+04   0.4566151618E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803740663E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999990E-10   0.1008402072E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042700E-09
+... new min/max : density            0.9898754649E+04   0.4567009945E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281857423E+21   0.2240311434E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281821077E+21   0.2240920129E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  1.0742784450803753E-5
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1254441590E+08   0.1249185199E+08   0.1249025917E+08
+... level / min : MAC vels    1  -0.2772673443E+08  -0.2750786579E+08  -0.2748740843E+08
+... level / max : MAC vels    2   0.1373121042E+08   0.1367994155E+08   0.1367778274E+08
+... level / min : MAC vels    2  -0.2789489322E+08  -0.2767595998E+08  -0.2765548088E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24601662E+07
+F90mg: Initial rhs                  =   2460166.2    
+F90mg: Initial residual (resid0)    =   2460166.2    
+F90mg: Final Iter.   6 resid/resid0 =  0.19466352E-09
+
+ Solve Time =  1.7960579395294189
+... level / max : MAC vels    1  -0.2736402764E+08  -0.2714787625E+08  -0.2712787216E+08
+... level / min : MAC vels    1   0.1243302746E+08   0.1235986573E+08   0.1235911435E+08
+... level / max : MAC vels    2  -0.2736979755E+08  -0.2715365098E+08  -0.2713364719E+08
+... level / min : MAC vels    2   0.1291708307E+08   0.1287545204E+08   0.1287434630E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955268936E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950639E-10   0.1006914787E-09
+... new min/max : iron-56            0.9999950639E-10   0.1000013677E-09
+... new min/max : density            0.9898755535E+04   0.4566151618E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803740665E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999990E-10   0.1008402072E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042700E-09
+... new min/max : density            0.9898754607E+04   0.4567009945E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281857423E+21   0.2240311434E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281821078E+21   0.2240920129E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.2676067884E+08   0.1215434192E+08
+... new min/max : y-velocity       -0.2655129534E+08   0.1209036277E+08
+... new min/max : z-velocity       -0.2653170132E+08   0.1208828889E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.2720721414E+08   0.1336025830E+08
+... new min/max : y-velocity       -0.2699273549E+08   0.1330979719E+08
+... new min/max : z-velocity       -0.2697269716E+08   0.1330768019E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.2720721414E+08   0.1336025830E+08
+... y-velocity before projection -0.2699273549E+08   0.1330979719E+08
+... z-velocity before projection -0.2697269716E+08   0.1330768019E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   450772.44    
+F90mg: Initial residual (resid0)    =   450772.44    
+F90mg: Final Iter.  18 resid/resid0 =  0.33543311E-10
+
+... x-velocity  after projection -0.2721157218E+08   0.1336577576E+08
+... y-velocity  after projection -0.2699714251E+08   0.1331543279E+08
+... z-velocity  after projection -0.2697710917E+08   0.1331331505E+08
+ 
+ Timing summary:
+    Advection       :  17.8696129322052  seconds
+    MAC   Projection:  6.0884890556335449  seconds
+    Nodal Projection:  7.2540411949157715  seconds
+    Reactions       :  3.5442588329315186  seconds
+    Misc            :  1.075413703918457  seconds
+  
+ Time to advance timestep:  35.815386772155762  seconds
+ 
+FAB byte spread across MPI nodes: [  176194224 -   242691168 [avg:   217008305]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  5
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           77912          77912             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             352           1720             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2676494021E+08   0.1214315197E+08
+... min/max : y-velocity       -0.2655560408E+08   0.1207926495E+08
+... min/max : z-velocity       -0.2653601492E+08   0.1207719095E+08
+... min/max : gpix              -0.1033812681E+15   0.9010630091E+14
+... min/max : gpiy              -0.1247935898E+15   0.1945605517E+15
+... min/max : gpiz              -0.1247889229E+15   0.1945591773E+15
+ 
+At level   2
+... min/max : x-velocity       -0.2721157218E+08   0.1336577576E+08
+... min/max : y-velocity       -0.2699714251E+08   0.1331543279E+08
+... min/max : z-velocity       -0.2697710917E+08   0.1331331505E+08
+... min/max : gpix              -0.3888688139E+15   0.4150280398E+15
+... min/max : gpiy              -0.3887696669E+15   0.4151917854E+15
+... min/max : gpiz              -0.3887599725E+15   0.4152036772E+15
+ 
+STEP =      5  TIME = 1.3386781466E-03  DT = 3.2103629333E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  6
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           77912          77912             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             352           1720             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1214315197E+08   0.1207926495E+08   0.1207719095E+08
+... level / min : old vels    1  -0.2676494021E+08  -0.2655560408E+08  -0.2653601492E+08
+... level / max : old vels    2   0.1336577576E+08   0.1331543279E+08   0.1331331505E+08
+... level / min : old vels    2  -0.2721157218E+08  -0.2699714251E+08  -0.2697710917E+08
+ 
+ Call to estdt at beginning of step 6
+ gives dt = 3.76956550162406076E-2
+ dt_growth factor limits the new dt = 3.53139922668376633E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1494
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  19953152
+ Number of valid + ghost cells at level 2,  28546514
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 3.53139922668376633E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  1.18170173540936621E-5
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1236747419E+08   0.1231545533E+08   0.1231386944E+08
+... level / min : MAC vels    1  -0.2735204387E+08  -0.2713424725E+08  -0.2711394192E+08
+... level / max : MAC vels    2   0.1348552948E+08   0.1343440225E+08   0.1343224705E+08
+... level / min : MAC vels    2  -0.2751817161E+08  -0.2730030424E+08  -0.2727997690E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24499061E+07
+F90mg: Initial rhs                  =   2449906.1    
+F90mg: Initial residual (resid0)    =   2449906.1    
+F90mg: Final Iter.   8 resid/resid0 =  0.23959215E-09
+
+ Solve Time =  2.3980920314788818
+... level / max : MAC vels    1  -0.2696020686E+08  -0.2674566692E+08  -0.2672568902E+08
+... level / min : MAC vels    1   0.1224616685E+08   0.1217858398E+08   0.1217787144E+08
+... level / max : MAC vels    2  -0.2696590583E+08  -0.2675137048E+08  -0.2673139269E+08
+... level / min : MAC vels    2   0.1275003772E+08   0.1270876400E+08   0.1270771212E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955272059E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950643E-10   0.1008913789E-09
+... new min/max : iron-56            0.9999950643E-10   0.1000013677E-09
+... new min/max : density            0.9898753115E+04   0.4566151604E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803768054E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999987E-10   0.1010848395E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042699E-09
+... new min/max : density            0.9898745278E+04   0.4567009930E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281853726E+21   0.2240311424E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281813564E+21   0.2240920119E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  1.26587715091612273E-5
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1236721590E+08   0.1231519705E+08   0.1231361115E+08
+... level / min : MAC vels    1  -0.2735240630E+08  -0.2713460969E+08  -0.2711430435E+08
+... level / max : MAC vels    2   0.1348526948E+08   0.1343414220E+08   0.1343198700E+08
+... level / min : MAC vels    2  -0.2751853599E+08  -0.2730066863E+08  -0.2728034128E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24498923E+07
+F90mg: Initial rhs                  =   2449892.3    
+F90mg: Initial residual (resid0)    =   2449892.3    
+F90mg: Final Iter.   6 resid/resid0 =  0.23636822E-09
+
+ Solve Time =  1.7743570804595947
+... level / max : MAC vels    1  -0.2696013922E+08  -0.2674560173E+08  -0.2672562508E+08
+... level / min : MAC vels    1   0.1224613999E+08   0.1217855954E+08   0.1217784756E+08
+... level / max : MAC vels    2  -0.2696583835E+08  -0.2675130544E+08  -0.2673132890E+08
+... level / min : MAC vels    2   0.1275002531E+08   0.1270875125E+08   0.1270769990E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955272059E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950643E-10   0.1008913789E-09
+... new min/max : iron-56            0.9999950643E-10   0.1000013677E-09
+... new min/max : density            0.9898753027E+04   0.4566151603E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803768056E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999987E-10   0.1010848395E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042699E-09
+... new min/max : density            0.9898745172E+04   0.4567009930E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281853727E+21   0.2240311424E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281813565E+21   0.2240920118E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.2634137923E+08   0.1195330815E+08
+... new min/max : y-velocity       -0.2613346280E+08   0.1189083478E+08
+... new min/max : z-velocity       -0.2611406842E+08   0.1188877970E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.2678076210E+08   0.1309127358E+08
+... new min/max : y-velocity       -0.2656776703E+08   0.1304110716E+08
+... new min/max : z-velocity       -0.2654792010E+08   0.1303899766E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.2678076210E+08   0.1309127358E+08
+... y-velocity before projection -0.2656776703E+08   0.1304110716E+08
+... z-velocity before projection -0.2654792010E+08   0.1303899766E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   296716.50    
+F90mg: Initial residual (resid0)    =   296716.50    
+F90mg: Final Iter.  18 resid/resid0 =  0.32857275E-10
+
+... x-velocity  after projection -0.2677208840E+08   0.1309806205E+08
+... y-velocity  after projection -0.2655914812E+08   0.1304795104E+08
+... z-velocity  after projection -0.2653930688E+08   0.1304584201E+08
+ 
+ Timing summary:
+    Advection       :  17.592629909515381  seconds
+    MAC   Projection:  5.8490457534790039  seconds
+    Nodal Projection:  6.9725239276885986  seconds
+    Reactions       :  3.5518913269042969  seconds
+    Misc            :  1.0641787052154541  seconds
+  
+ Time to advance timestep:  35.014754056930542  seconds
+ 
+FAB byte spread across MPI nodes: [  176194224 -   242691168 [avg:   217008305]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  6
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           77912          77912             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             352           1720             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2633297359E+08   0.1194809959E+08
+... min/max : y-velocity       -0.2612510911E+08   0.1188568178E+08
+... min/max : z-velocity       -0.2610572016E+08   0.1188362733E+08
+... min/max : gpix              -0.4887852619E+14   0.4468361738E+14
+... min/max : gpiy              -0.7523081189E+14   0.1061076521E+15
+... min/max : gpiz              -0.7522516583E+14   0.1061071628E+15
+ 
+At level   2
+... min/max : x-velocity       -0.2677208840E+08   0.1309806205E+08
+... min/max : y-velocity       -0.2655914812E+08   0.1304795104E+08
+... min/max : z-velocity       -0.2653930688E+08   0.1304584201E+08
+... min/max : gpix              -0.2087949761E+15   0.2248645647E+15
+... min/max : gpiy              -0.2141777941E+15   0.2249977760E+15
+... min/max : gpiz              -0.2086877548E+15   0.2250272867E+15
+ 
+STEP =      6  TIME = 1.6918180693E-03  DT = 3.5313992267E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  7
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           77912          77912             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             352           1720             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1194809959E+08   0.1188568178E+08   0.1188362733E+08
+... level / min : old vels    1  -0.2633297359E+08  -0.2612510911E+08  -0.2610572016E+08
+... level / max : old vels    2   0.1309806205E+08   0.1304795104E+08   0.1304584201E+08
+... level / min : old vels    2  -0.2677208840E+08  -0.2655914812E+08  -0.2653930688E+08
+ Calling regrid
+ 
+ Call to estdt at beginning of step 7
+ gives dt = 3.83156697348786268E-2
+ dt_growth factor limits the new dt = 3.88453914935214318E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1494
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  19953152
+ Number of valid + ghost cells at level 2,  28546514
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 3.88453914935214318E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  1.39245898503998257E-5
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1217850256E+08   0.1212707660E+08   0.1212549881E+08
+... level / min : MAC vels    1  -0.2694063367E+08  -0.2672402031E+08  -0.2670388119E+08
+... level / max : MAC vels    2   0.1323367536E+08   0.1318273695E+08   0.1318058769E+08
+... level / min : MAC vels    2  -0.2710452861E+08  -0.2688783790E+08  -0.2686767646E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24446863E+07
+F90mg: Initial rhs                  =   2444686.3    
+F90mg: Initial residual (resid0)    =   2444686.3    
+F90mg: Final Iter.   8 resid/resid0 =  0.24260614E-09
+
+ Solve Time =  2.4291720390319824
+... level / max : MAC vels    1  -0.2652428202E+08  -0.2631136644E+08  -0.2629149103E+08
+... level / min : MAC vels    1   0.1204508328E+08   0.1198490790E+08   0.1198424820E+08
+... level / max : MAC vels    2  -0.2652985562E+08  -0.2631694438E+08  -0.2629706895E+08
+... level / min : MAC vels    2   0.1255212125E+08   0.1251284070E+08   0.1251163070E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955275483E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950647E-10   0.1011113332E-09
+... new min/max : iron-56            0.9999950647E-10   0.1000013677E-09
+... new min/max : density            0.9898744162E+04   0.4566151587E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803798493E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999983E-10   0.1013539359E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042699E-09
+... new min/max : density            0.9898708998E+04   0.4567009914E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281849786E+21   0.2240311412E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281805549E+21   0.2240920107E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  1.48888123170104763E-5
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1217823359E+08   0.1212680763E+08   0.1212522985E+08
+... level / min : MAC vels    1  -0.2694101110E+08  -0.2672439774E+08  -0.2670425862E+08
+... level / max : MAC vels    2   0.1323340460E+08   0.1318246614E+08   0.1318031688E+08
+... level / min : MAC vels    2  -0.2710490807E+08  -0.2688821735E+08  -0.2686805592E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24446719E+07
+F90mg: Initial rhs                  =   2444671.9    
+F90mg: Initial residual (resid0)    =   2444671.9    
+F90mg: Final Iter.   6 resid/resid0 =  0.34687393E-09
+
+ Solve Time =  1.7819538116455078
+... level / max : MAC vels    1  -0.2652421879E+08  -0.2631129864E+08  -0.2629142084E+08
+... level / min : MAC vels    1   0.1204505777E+08   0.1198488642E+08   0.1198422616E+08
+... level / max : MAC vels    2  -0.2652979258E+08  -0.2631687676E+08  -0.2629699893E+08
+... level / min : MAC vels    2   0.1255210758E+08   0.1251282807E+08   0.1251161696E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955275483E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950647E-10   0.1011113332E-09
+... new min/max : iron-56            0.9999950647E-10   0.1000013677E-09
+... new min/max : density            0.9898744062E+04   0.4566151587E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803798495E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999983E-10   0.1013539359E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042699E-09
+... new min/max : density            0.9898708518E+04   0.4567009914E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281849787E+21   0.2240311412E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281805550E+21   0.2240920107E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.2587714686E+08   0.1174242818E+08
+... new min/max : y-velocity       -0.2567080858E+08   0.1168162941E+08
+... new min/max : z-velocity       -0.2565161720E+08   0.1167959557E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.2630843423E+08   0.1281595148E+08
+... new min/max : y-velocity       -0.2609706707E+08   0.1276610449E+08
+... new min/max : z-velocity       -0.2607742863E+08   0.1276400590E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.2630843423E+08   0.1281595148E+08
+... y-velocity before projection -0.2609706707E+08   0.1276610449E+08
+... z-velocity before projection -0.2607742863E+08   0.1276400590E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   228080.56    
+F90mg: Initial residual (resid0)    =   228080.56    
+F90mg: Final Iter.  17 resid/resid0 =  0.96246522E-10
+
+... x-velocity  after projection -0.2629759648E+08   0.1281912798E+08
+... y-velocity  after projection -0.2608629520E+08   0.1276933093E+08
+... z-velocity  after projection -0.2606666358E+08   0.1276723282E+08
+ 
+ Timing summary:
+    Advection       :  17.872367858886719  seconds
+    MAC   Projection:  6.1140768527984619  seconds
+    Nodal Projection:  7.025331974029541  seconds
+    Reactions       :  3.5463747978210449  seconds
+    Misc            :  1.0653829574584961  seconds
+  
+ Time to advance timestep:  35.605859041213989  seconds
+ 
+FAB byte spread across MPI nodes: [  176194224 -   242691168 [avg:   217008305]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  7
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           76789          76789             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             370           1604             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2586664367E+08   0.1173694692E+08
+... min/max : y-velocity       -0.2566036782E+08   0.1167615191E+08
+... min/max : z-velocity       -0.2564118294E+08   0.1167411879E+08
+... min/max : gpix              -0.2571800016E+14   0.2593716513E+14
+... min/max : gpiy              -0.4838651696E+14   0.6446082929E+14
+... min/max : gpiz              -0.4838012506E+14   0.6446131176E+14
+ 
+At level   2
+... min/max : x-velocity       -0.2629759648E+08   0.1281912798E+08
+... min/max : y-velocity       -0.2608629520E+08   0.1276933093E+08
+... min/max : z-velocity       -0.2606666358E+08   0.1276723282E+08
+... min/max : gpix              -0.1271621641E+15   0.1309793071E+15
+... min/max : gpiy              -0.1365570783E+15   0.1311201591E+15
+... min/max : gpiz              -0.1271266206E+15   0.1311395843E+15
+ 
+STEP =      7  TIME = 2.0802719842E-03  DT = 3.8845391494E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  8
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           76789          76789             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             370           1604             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1173694692E+08   0.1167615191E+08   0.1167411879E+08
+... level / min : old vels    1  -0.2586664367E+08  -0.2566036782E+08  -0.2564118294E+08
+... level / max : old vels    2   0.1281912798E+08   0.1276933093E+08   0.1276723282E+08
+... level / min : old vels    2  -0.2629759648E+08  -0.2608629520E+08  -0.2606666358E+08
+ 
+ Call to estdt at beginning of step 8
+ gives dt = 3.90083456682845248E-2
+ dt_growth factor limits the new dt = 4.27299306428735809E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1494
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  19953152
+ Number of valid + ghost cells at level 2,  28546514
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 4.27299306428735809E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  1.63776163819869642E-5
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1197418124E+08   0.1192339993E+08   0.1192183128E+08
+... level / min : MAC vels    1  -0.2649578540E+08  -0.2628048034E+08  -0.2626052297E+08
+... level / max : MAC vels    2   0.1297021007E+08   0.1291953633E+08   0.1291739498E+08
+... level / min : MAC vels    2  -0.2665726395E+08  -0.2644187446E+08  -0.2642189447E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24423458E+07
+F90mg: Initial rhs                  =   2442345.8    
+F90mg: Initial residual (resid0)    =   2442345.8    
+F90mg: Final Iter.   8 resid/resid0 =  0.24571648E-09
+
+ Solve Time =  2.4196090698242187
+... level / max : MAC vels    1  -0.2605404184E+08  -0.2584274745E+08  -0.2582299689E+08
+... level / min : MAC vels    1   0.1182810711E+08   0.1177392282E+08   0.1177328928E+08
+... level / max : MAC vels    2  -0.2605947457E+08  -0.2584818416E+08  -0.2582843348E+08
+... level / min : MAC vels    2   0.1233060043E+08   0.1229196163E+08   0.1229074434E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955279277E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950652E-10   0.1013533601E-09
+... new min/max : iron-56            0.9999950652E-10   0.1000013678E-09
+... new min/max : density            0.9898733819E+04   0.4566151569E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803832164E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999979E-10   0.1016499425E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042698E-09
+... new min/max : density            0.9898660364E+04   0.4567009896E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281845601E+21   0.2240311399E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281797046E+21   0.2240920094E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  1.74749012322699905E-5
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1197390299E+08   0.1192312167E+08   0.1192155303E+08
+... level / min : MAC vels    1  -0.2649617587E+08  -0.2628087081E+08  -0.2626091344E+08
+... level / max : MAC vels    2   0.1296992994E+08   0.1291925615E+08   0.1291711480E+08
+... level / min : MAC vels    2  -0.2665765651E+08  -0.2644226702E+08  -0.2642228703E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24423309E+07
+F90mg: Initial rhs                  =   2442330.9    
+F90mg: Initial residual (resid0)    =   2442330.9    
+F90mg: Final Iter.   6 resid/resid0 =  0.19524147E-09
+
+ Solve Time =  1.8176369667053223
+... level / max : MAC vels    1  -0.2605397097E+08  -0.2584267974E+08  -0.2582292842E+08
+... level / min : MAC vels    1   0.1182808197E+08   0.1177389591E+08   0.1177326503E+08
+... level / max : MAC vels    2  -0.2605940390E+08  -0.2584811666E+08  -0.2582836522E+08
+... level / min : MAC vels    2   0.1233058578E+08   0.1229194075E+08   0.1229072799E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955279277E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950652E-10   0.1013533601E-09
+... new min/max : iron-56            0.9999950652E-10   0.1000013678E-09
+... new min/max : density            0.9898733707E+04   0.4566151569E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803832166E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999979E-10   0.1016499425E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042698E-09
+... new min/max : density            0.9898659813E+04   0.4567009896E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281845602E+21   0.2240311399E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281797048E+21   0.2240920094E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.2537654085E+08   0.1151525302E+08
+... new min/max : y-velocity       -0.2517193813E+08   0.1145620665E+08
+... new min/max : z-velocity       -0.2515296800E+08   0.1145419596E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.2579912619E+08   0.1252649969E+08
+... new min/max : y-velocity       -0.2558954882E+08   0.1247705747E+08
+... new min/max : z-velocity       -0.2557013755E+08   0.1247497216E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.2579912619E+08   0.1252649969E+08
+... y-velocity before projection -0.2558954882E+08   0.1247705747E+08
+... z-velocity before projection -0.2557013755E+08   0.1247497216E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   180851.83    
+F90mg: Initial residual (resid0)    =   180851.83    
+F90mg: Final Iter.  17 resid/resid0 =  0.83090031E-10
+
+... x-velocity  after projection -0.2578623687E+08   0.1252667895E+08
+... y-velocity  after projection -0.2557673878E+08   0.1247729319E+08
+... z-velocity  after projection -0.2555733569E+08   0.1247520846E+08
+ 
+ Timing summary:
+    Advection       :  17.638568878173828  seconds
+    MAC   Projection:  5.9200329780578613  seconds
+    Nodal Projection:  6.7798240184783936  seconds
+    Reactions       :  3.5546040534973145  seconds
+    Misc            :  1.0522098541259766  seconds
+  
+ Time to advance timestep:  34.927953004837036  seconds
+ 
+FAB byte spread across MPI nodes: [  176194224 -   242691168 [avg:   217008305]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  8
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           76789          76789             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             370           1604             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2536404880E+08   0.1150903658E+08
+... min/max : y-velocity       -0.2515952126E+08   0.1144999325E+08
+... min/max : z-velocity       -0.2514055891E+08   0.1144798340E+08
+... min/max : gpix              -0.1665741631E+14   0.1687487305E+14
+... min/max : gpiy              -0.3283109178E+14   0.4236222181E+14
+... min/max : gpiz              -0.3282410216E+14   0.4236348739E+14
+ 
+At level   2
+... min/max : x-velocity       -0.2578623687E+08   0.1252667895E+08
+... min/max : y-velocity       -0.2557673878E+08   0.1247729319E+08
+... min/max : z-velocity       -0.2555733569E+08   0.1247520846E+08
+... min/max : gpix              -0.8431761234E+14   0.8021448780E+14
+... min/max : gpiy              -0.9080471814E+14   0.8024776772E+14
+... min/max : gpiz              -0.8604120865E+14   0.8026406645E+14
+ 
+STEP =      8  TIME = 2.5075712906E-03  DT = 4.2729930643E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  9
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           76789          76789             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             370           1604             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1150903658E+08   0.1144999325E+08   0.1144798340E+08
+... level / min : old vels    1  -0.2536404880E+08  -0.2515952126E+08  -0.2514055891E+08
+... level / max : old vels    2   0.1252667895E+08   0.1247729319E+08   0.1247520846E+08
+... level / min : old vels    2  -0.2578623687E+08  -0.2557673878E+08  -0.2555733569E+08
+ Calling regrid
+ 
+ Call to estdt at beginning of step 9
+ gives dt = 3.97833904536784924E-2
+ dt_growth factor limits the new dt = 4.70029237071609423E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1494
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  19953152
+ Number of valid + ghost cells at level 2,  28546514
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 4.70029237071609423E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  1.92222921066335151E-5
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1175377144E+08   0.1170368961E+08   0.1170213122E+08
+... level / min : MAC vels    1  -0.2601584876E+08  -0.2580199040E+08  -0.2578223166E+08
+... level / max : MAC vels    2   0.1269314022E+08   0.1264282849E+08   0.1264069730E+08
+... level / min : MAC vels    2  -0.2617471778E+08  -0.2596076745E+08  -0.2594098576E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24415277E+07
+F90mg: Initial rhs                  =   2441527.7    
+F90mg: Initial residual (resid0)    =   2441527.7    
+F90mg: Final Iter.   8 resid/resid0 =  0.24644599E-09
+
+ Solve Time =  2.4049618244171143
+... level / max : MAC vels    1  -0.2554737661E+08  -0.2533772281E+08  -0.2531824246E+08
+... level / min : MAC vels    1   0.1159567351E+08   0.1154538726E+08   0.1154473768E+08
+... level / max : MAC vels    2  -0.2555267310E+08  -0.2534302283E+08  -0.2532354244E+08
+... level / min : MAC vels    2   0.1208483178E+08   0.1203433218E+08   0.1203323761E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955283492E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950658E-10   0.1016196828E-09
+... new min/max : iron-56            0.9999950658E-10   0.1000013678E-09
+... new min/max : density            0.9898716776E+04   0.4566151549E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803869180E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999974E-10   0.1019755505E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042697E-09
+... new min/max : density            0.9898599819E+04   0.4567009876E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281841173E+21   0.2240311385E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281788044E+21   0.2240920080E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  2.04610783579160109E-5
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1175348586E+08   0.1170340403E+08   0.1170184564E+08
+... level / min : MAC vels    1  -0.2601624952E+08  -0.2580239116E+08  -0.2578263242E+08
+... level / max : MAC vels    2   0.1269285271E+08   0.1264254092E+08   0.1264040974E+08
+... level / min : MAC vels    2  -0.2617512068E+08  -0.2596117035E+08  -0.2594138866E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24415124E+07
+F90mg: Initial rhs                  =   2441512.4    
+F90mg: Initial residual (resid0)    =   2441512.4    
+F90mg: Final Iter.   6 resid/resid0 =  0.18711829E-09
+
+ Solve Time =  1.7459380626678467
+... level / max : MAC vels    1  -0.2554730170E+08  -0.2533765267E+08  -0.2531817344E+08
+... level / min : MAC vels    1   0.1159564643E+08   0.1154536256E+08   0.1154471371E+08
+... level / max : MAC vels    2  -0.2555259842E+08  -0.2534295292E+08  -0.2532347365E+08
+... level / min : MAC vels    2   0.1208481148E+08   0.1203431028E+08   0.1203321608E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955283492E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950658E-10   0.1016196828E-09
+... new min/max : iron-56            0.9999950658E-10   0.1000013678E-09
+... new min/max : density            0.9898716650E+04   0.4566151548E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803869182E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999974E-10   0.1019755505E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042697E-09
+... new min/max : density            0.9898599201E+04   0.4567009875E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281841173E+21   0.2240311385E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281788045E+21   0.2240920080E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.2483824944E+08   0.1127085265E+08
+... new min/max : y-velocity       -0.2463555487E+08   0.1121368209E+08
+... new min/max : z-velocity       -0.2461682565E+08   0.1121169659E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.2525151499E+08   0.1222134876E+08
+... new min/max : y-velocity       -0.2504390469E+08   0.1217242312E+08
+... new min/max : z-velocity       -0.2502474073E+08   0.1217035389E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.2525151499E+08   0.1222134876E+08
+... y-velocity before projection -0.2504390469E+08   0.1217242312E+08
+... z-velocity before projection -0.2502474073E+08   0.1217035389E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   149730.02    
+F90mg: Initial residual (resid0)    =   149730.02    
+F90mg: Final Iter.  17 resid/resid0 =  0.70567014E-10
+
+... x-velocity  after projection -0.2523623978E+08   0.1221898645E+08
+... y-velocity  after projection -0.2502872485E+08   0.1217011577E+08
+... z-velocity  after projection -0.2500957071E+08   0.1216804720E+08
+ 
+ Timing summary:
+    Advection       :  17.911243200302124  seconds
+    MAC   Projection:  6.0466551780700684  seconds
+    Nodal Projection:  6.8989198207855225  seconds
+    Reactions       :  3.5524528026580811  seconds
+    Misc            :  1.0668399333953857  seconds
+  
+ Time to advance timestep:  35.452672958374023  seconds
+ 
+FAB byte spread across MPI nodes: [  176194224 -   242691168 [avg:   217008305]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  9
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           74827          74827             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             338           1543             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2482344395E+08   0.1126367820E+08
+... min/max : y-velocity       -0.2462083985E+08   0.1120651112E+08
+... min/max : z-velocity       -0.2460211992E+08   0.1120452662E+08
+... min/max : gpix              -0.1231693593E+14   0.1630199183E+14
+... min/max : gpiy              -0.2324230091E+14   0.2951214793E+14
+... min/max : gpiz              -0.2323486907E+14   0.2951397949E+14
+ 
+At level   2
+... min/max : x-velocity       -0.2523623978E+08   0.1221898645E+08
+... min/max : y-velocity       -0.2502872485E+08   0.1217011577E+08
+... min/max : z-velocity       -0.2500957071E+08   0.1216804720E+08
+... min/max : gpix              -0.5763778404E+14   0.5396284134E+14
+... min/max : gpiy              -0.6236734088E+14   0.5710975625E+14
+... min/max : gpiz              -0.6090041423E+14   0.5401823299E+14
+ 
+STEP =      9  TIME = 2.9776005277E-03  DT = 4.7002923707E-04
+ 
+ MEMORY STATS AT START OF TIMESTEP  10
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           74827          74827             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             338           1543             25             25
+   fluxassoc:               0              0              0              0
+ 
+... level / max : old vels    1   0.1126367820E+08   0.1120651112E+08   0.1120452662E+08
+... level / min : old vels    1  -0.2482344395E+08  -0.2462083985E+08  -0.2460211992E+08
+... level / max : old vels    2   0.1221898645E+08   0.1217011577E+08   0.1216804720E+08
+... level / min : old vels    2  -0.2523623978E+08  -0.2502872485E+08  -0.2500957071E+08
+ 
+ Call to estdt at beginning of step 10
+ gives dt = 4.06520648533732001E-2
+ dt_growth factor limits the new dt = 5.17032160778770457E-4
+ 
+inner sponge: r_sp      , r_tp      :   0.489990234375E+09    0.518115234375E+09
+outer sponge: r_sp_outer, r_tp_outer:   0.518115234375E+09    0.523974609375E+09
+ 
+ level:  1
+    number of boxes =  512
+    maximum zones   =  3*256
+ level:  2
+    number of boxes =  1494
+    maximum zones   =  3*512
+ Number of valid cells at level         1,  16777216
+ Number of valid + ghost cells at level 1,  21952000
+ Number of valid cells at level         2,  19953152
+ Number of valid + ghost cells at level 2,  28546514
+ 
+ <<< STEP  1 : react state     
+ <<< CALLING advance_timestep with dt = 5.17032160778770457E-4
+ <<< STEP  2 : make w0 >>> 
+ ... max CFL of w0:  2.25070630320163467E-5
+ 
+ <<< STEP  3 : create MAC velocities>>> 
+ 
+... level / max : MAC vels    1   0.1151541073E+08   0.1146642770E+08   0.1146490439E+08
+... level / min : MAC vels    1  -0.2549903869E+08  -0.2528678011E+08  -0.2526723831E+08
+... level / max : MAC vels    2   0.1240097903E+08   0.1235113048E+08   0.1234901205E+08
+... level / min : MAC vels    2  -0.2565509423E+08  -0.2544273566E+08  -0.2542317057E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24414833E+07
+F90mg: Initial rhs                  =   2441483.3    
+F90mg: Initial residual (resid0)    =   2441483.3    
+F90mg: Final Iter.   8 resid/resid0 =  0.24957866E-09
+
+ Solve Time =  2.3634791374206543
+... level / max : MAC vels    1  -0.2500243979E+08  -0.2479471603E+08  -0.2477565335E+08
+... level / min : MAC vels    1   0.1134537791E+08   0.1129909495E+08   0.1129846311E+08
+... level / max : MAC vels    2  -0.2500760907E+08  -0.2479988847E+08  -0.2478082583E+08
+... level / min : MAC vels    2   0.1182230702E+08   0.1177272909E+08   0.1177163883E+08
+ 
+ <<< STEP  4 : advect base        
+             :  density_advance >>> 
+             :   tracer_advance >>> 
+... Level 1 update:
+... new min/max : helium-4           0.9955288160E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950664E-10   0.1019127502E-09
+... new min/max : iron-56            0.9999950664E-10   0.1000013678E-09
+... new min/max : density            0.9898695605E+04   0.4566151526E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803909838E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999969E-10   0.1023337256E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042697E-09
+... new min/max : density            0.9898520778E+04   0.4567009853E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>> 
+... Level 1 update:
+... new min/max : rho * H            0.1281836500E+21   0.2240311369E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281778543E+21   0.2240920064E+26
+ 
+ <<< STEP  5 : react state     
+ <<< STEP  6 : make new S and new w0 >>> 
+ ... max CFL of w0:  2.38952907191730468E-5
+ 
+ <<< STEP  7 : create MAC velocities >>> 
+ 
+... level / max : MAC vels    1   0.1151511979E+08   0.1146613677E+08   0.1146461346E+08
+... level / min : MAC vels    1  -0.2549944698E+08  -0.2528718839E+08  -0.2526764659E+08
+... level / max : MAC vels    2   0.1240068612E+08   0.1235083750E+08   0.1234871908E+08
+... level / min : MAC vels    2  -0.2565550469E+08  -0.2544314612E+08  -0.2542358103E+08
+ 
+... before mac_projection: max of [div (coeff * UMAC) - RHS)] 0.24414677E+07
+F90mg: Initial rhs                  =   2441467.7    
+F90mg: Initial residual (resid0)    =   2441467.7    
+F90mg: Final Iter.   6 resid/resid0 =  0.19572292E-09
+
+ Solve Time =  1.7036151885986328
+... level / max : MAC vels    1  -0.2500236982E+08  -0.2479464376E+08  -0.2477558265E+08
+... level / min : MAC vels    1   0.1134534739E+08   0.1129906851E+08   0.1129843934E+08
+... level / max : MAC vels    2  -0.2500753936E+08  -0.2479981646E+08  -0.2478075538E+08
+... level / min : MAC vels    2   0.1182227773E+08   0.1177270343E+08   0.1177161523E+08
+ 
+ <<< STEP  8 : advect base   
+             :  density_advance >>>
+             :   tracer_advance >>>
+... Level 1 update:
+... new min/max : helium-4           0.9955288161E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999950664E-10   0.1019127502E-09
+... new min/max : iron-56            0.9999950664E-10   0.1000013678E-09
+... new min/max : density            0.9898695470E+04   0.4566151526E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+... Level 2 update:
+... new min/max : helium-4           0.9803909840E-10   0.9999999997E+00
+... new min/max : carbon-12          0.1000000000E-09   0.9999999997E+00
+... new min/max : oxygen-16          0.9999999969E-10   0.1023337256E-09
+... new min/max : iron-56            0.9999999964E-10   0.1000042697E-09
+... new min/max : density            0.9898520183E+04   0.4567009853E+08
+... new min/max : tracer             0.0000000000E+00   0.0000000000E+00
+             : enthalpy_advance >>>
+... Level 1 update:
+... new min/max : rho * H            0.1281836501E+21   0.2240311369E+26
+... Level 2 update:
+... new min/max : rho * H            0.1281778545E+21   0.2240920064E+26
+ 
+ <<< STEP  9 : react state 
+ <<< STEP 10 : make new S >>>
+ <<< STEP 11 : update and project new velocity >>>
+... Level 1 update:
+... new min/max : x-velocity       -0.2426072989E+08   0.1100856335E+08
+... new min/max : y-velocity       -0.2406013235E+08   0.1095339008E+08
+... new min/max : z-velocity       -0.2404166518E+08   0.1095143192E+08
+ 
+... Level 2 update:
+... new min/max : x-velocity       -0.2466403781E+08   0.1189941469E+08
+... new min/max : y-velocity       -0.2445858845E+08   0.1185111808E+08
+... new min/max : z-velocity       -0.2443969343E+08   0.1184920377E+08
+ 
+ PROJ_TYPE IN HGPROJECT: 4
+ PROJ_TYPE IN HGPROJECT: ND_DENSE_STENCIL
+... x-velocity before projection -0.2466403781E+08   0.1189941469E+08
+... y-velocity before projection -0.2445858845E+08   0.1185111808E+08
+... z-velocity before projection -0.2443969343E+08   0.1184920377E+08
+ 
+ doing hgproject with tolerance, eps =  9.99999999999999907E-11
+F90mg: Initial rhs                  =   129655.83    
+F90mg: Initial residual (resid0)    =   129655.83    
+F90mg: Final Iter.  17 resid/resid0 =  0.58822778E-10
+
+... x-velocity  after projection -0.2464597237E+08   0.1189472811E+08
+... y-velocity  after projection -0.2444063763E+08   0.1184648201E+08
+... z-velocity  after projection -0.2442175436E+08   0.1184454625E+08
+ 
+ Timing summary:
+    Advection       :  17.663428068161011  seconds
+    MAC   Projection:  5.7295780181884766  seconds
+    Nodal Projection:  6.7859632968902588  seconds
+    Reactions       :  3.5432670116424561  seconds
+    Misc            :  1.6308228969573975  seconds
+  
+ Time to advance timestep:  35.337198972702026  seconds
+ 
+FAB byte spread across MPI nodes: [  176194224 -   242691168 [avg:   217008305]]
+ 
+ MEMORY STATS AT END OF TIMESTEP  10
+  
+    multifab:      2314940792     2314940792             34             34
+         fab:         7287268       10259308             68            255
+    boxarray:           74827          74827             62             62
+      layout:               0              0              2              2
+    boxassoc:            1766           6145             40             40
+     fgassoc:         4116096        4116096              3              3
+   syncassoc:              54            203              5              5
+   copyassoc:             338           1543             25             25
+   fluxassoc:               0              0              0              0
+ 
+At level   1
+... min/max : x-velocity       -0.2424321821E+08   0.1100020764E+08
+... min/max : y-velocity       -0.2404272936E+08   0.1094504286E+08
+... min/max : z-velocity       -0.2402427327E+08   0.1094308590E+08
+... min/max : gpix              -0.1104146226E+14   0.1595508960E+14
+... min/max : gpiy              -0.1701445169E+14   0.2149691092E+14
+... min/max : gpiz              -0.1700674416E+14   0.2149904888E+14
+ 
+At level   2
+... min/max : x-velocity       -0.2464597237E+08   0.1189472811E+08
+... min/max : y-velocity       -0.2444063763E+08   0.1184648201E+08
+... min/max : z-velocity       -0.2442175436E+08   0.1184454625E+08
+... min/max : gpix              -0.4300092791E+14   0.3872977293E+14
+... min/max : gpiy              -0.4392294775E+14   0.4200253337E+14
+... min/max : gpiz              -0.4411856733E+14   0.3881369827E+14
+ 
+STEP =     10  TIME = 3.4946326885E-03  DT = 5.1703216078E-04
+ 
+ Writing state to checkpoint file subCh_hot_baserun_chk00010/State
+ Writing state to checkpoint file subCh_hot_baserun_chk00010/dSdt
+ Writing state to checkpoint file subCh_hot_baserun_chk00010/Source_old
+ Writing state to checkpoint file subCh_hot_baserun_chk00010/Source_new
+ Writing state to checkpoint file subCh_hot_baserun_chk00010/rho_omegadot2
+ Writing state to checkpoint file subCh_hot_baserun_chk00010/rho_Hnuc2
+ Writing state to checkpoint file subCh_hot_baserun_chk00010/Pressure
+ Time to write checkpoint:  18.42794394493103  seconds
+ 
+ Writing 1D data to subCh_hot_baserun_chk00010
+ Writing cell-centered 1D data to subCh_hot_baserun_chk00010/model_cc_00010
+ Writing edge-centered 1D data to subCh_hot_baserun_chk00010/model_ec_00010
+ 
+ MEMORY STATS AT END OF PROGRAM
+  
+    multifab:               0              0              0              0
+         fab:               0              0              0              0
+    boxarray:               0              0              0              0
+      layout:               0              0              0              0
+    boxassoc:               0              0              0              0
+     fgassoc:               0              0              0              0
+   syncassoc:               0              0              0              0
+   copyassoc:               0              0              0              0
+   fluxassoc:               0              0              0              0
+  
+ Run Time =  515.64898800849915
+Application 13740836 resources: utime ~790386s, stime ~648s Rss ~341772 inblocks ~7083759 outblocks ~43874185
+kill: 10763: no such process
+
+ + --------------------------------------------------------------------------
+ +        Job name: scaling-1536-sfc
+ +          Job Id: 2505745.sdb
+ +          System: hopper
+ +     Queued Time: Wed Nov 28 11:07:18 2012
+ +      Start Time: Wed Nov 28 12:28:23 2012
+ + Completion Time: Wed Nov 28 12:37:20 2012
+ +            User: zingale
+ +        MOM Host: nid04218
+ +           Queue: debug
+ +  Req. Resources: other=QSUBPID:6438:hopper10,walltime=00:30:00
+ +  Used Resources: cput=00:00:01,mem=10356kb,vmem=69208kb,walltime=00:08:57
+ +     Acct String: m1400
+ +   PBS_O_WORKDIR: /scratch/scratchdirs/zingale/scaling/1536_256_6_sfc
+ +     Submit Args: hopper.run
+ + --------------------------------------------------------------------------
+

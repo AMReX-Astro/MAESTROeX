@@ -1,0 +1,28 @@
+# 2015-08-31 Maestro xrb_mixed scaling test on titan using the Cray 8.4.0.223 compilers.
+#
+# MAESTRO      git hash: 023077a016a25b53ae5b8992a0c093d9a98c890d
+# BoxLib       git hash: b1e9fe52d747b582c18de532c9dae23034dd05ba
+# AstroDev     git hash: 126cdfc4baa552b9cb2f18d90cf02c54440c88b9
+#
+# all runs used 48^3 boxes
+#
+# these numbers were generated with scaling_avgs.py -- the python parser, using 
+# only the LAST 10 TIMESTEPS from 100 step runs.
+#
+#
+# for the 384^3 run, we had 1024 boxes
+#
+#         MPI    threads  advection        MAC      nodal  reactions       misc      total  total +/-  width
+          512          1 19.322470   4.717825   3.249470  36.735590   9.754455  64.093762   0.444917    384
+         1024          1 13.971492   2.572711   1.713088  18.787260  13.752557  32.928985   0.251773    384
+         1024          4  3.646692   1.111889   1.206159   4.822719   3.640527   9.921564   0.307551    384
+         1024          8  1.993291   0.741167   1.033498   2.503387   1.989680   5.908297   0.403702    384
+         1024         16  1.458467   1.415860   1.406286   1.299598   1.110087   5.480010   0.595743    384
+#
+#         MPI    threads  advection        MAC      nodal  reactions       misc      total  total +/-  width
+         2048          1 20.290336   5.603317   3.917785  37.622513  12.519083  66.792403   0.911391    768
+         4096          1 14.645440   3.629209   2.482290  18.816026  13.771213  35.519840   0.430018    768
+         4096          4  3.867155   1.781645   1.845932   4.810560   3.658522  11.448449   0.240902    768
+         4096          8  2.227916   1.421730   1.597187   2.509584   1.998650   7.428955   0.491185    768
+         4096         16  1.638045   2.262006   2.036176   1.313045   1.120054   7.134162   0.858572    768
+
