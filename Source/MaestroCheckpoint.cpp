@@ -148,6 +148,8 @@ Maestro::WriteCheckPoint (int step) {
                       << etarho_ec[i] << "\n";
        }
    }
+
+   WriteJobInfo(checkpointname);
 }
 
 int
