@@ -1,6 +1,6 @@
 
 
-In this chapter we give an overview of \maestro, including some of the
+In this chapter we give an overview of \maestroex, including some of the
 standard problems, how to run the code, some basic runtime parameters,
 and how to look at the output.
 
@@ -11,22 +11,22 @@ and how to look at the output.
 
 Here we will run the standard {\tt reacting\_bubble} problem (three
 reacting bubbles in a plane-parallel stratified atmosphere) on a
-single processor\footnote{In earlier versions of \maestro\ this
+single processor\footnote{In earlier versions of \maestroex\ this
 problem was called {\tt test2}}.  This test problem was shown in
 paper~3.
 
 \begin{enumerate}
 
-\item {\em Get a copy of \maestro}.
+\item {\em Get a copy of \maestroex}.
 
-  If you don't already have a copy of \maestro, you can obtain one
+  If you don't already have a copy of \maestroex, you can obtain one
   from the project's {\sf github} page:
-  \url{https://github.com/AMReX-Astro/MAESTRO}\, .  There are several
+  \url{https://github.com/AMReX-Astro/MAESTROeX}\, .  There are several
   options: you can fork it directly on {\sf github} (recommended if
   you intend to develop the code) or clone it using {\tt git} from the
   project page.
 
-  \maestro\ is under active development, so you will want to keep in
+  \maestroex\ is under active development, so you will want to keep in
   sync with the changes by periodically pulling from the repository.
   Simply type
   \begin{verbatim}
@@ -36,7 +36,7 @@ git pull
 
 \item {\em Get a copy of \microphysics}.
 
-  \maestro\ and its compressible counterpart \castro\ share a
+  \maestroex\ and its compressible counterpart \castro\ share a
   common-set of microphysics solvers (nuclear reaction networks and
   equations of state).  These are kept in a separate repo.
   \microphysics\ is also available on github and can be obtained 
@@ -53,9 +53,9 @@ git pull
 .
 \item {\em Get a copy of \amrex}.
 
-  \maestro\ requires the \amrex\ library to manage the grids and
+  \maestroex\ requires the \amrex\ library to manage the grids and
   parallelization.  We also rely on the build system in \amrex\ to
-  build a \maestro\ executable.  \amrex\ is also available on github
+  build a \maestroex\ executable.  \amrex\ is also available on github
   and can be obtained via:
   \begin{verbatim}
 git clone https://github.com/AMReX-Codes/amrex.git
@@ -70,7 +70,7 @@ git pull
 
 \item {\em Setup your shell environment}.
 
-  \maestro\ needs to know where to find \amrex, by specifying the
+  \maestroex\ needs to know where to find \amrex, by specifying the
   {\tt AMREX\_HOME} environment variable, and where
   to find \microphysics, bt specifying the {\tt
   MICROPHYSICS\_HOME} environment variable.
@@ -96,7 +96,7 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
 
 \item {\em Setup the problem's {\tt GNUmakefile}}.
 
-  In \maestro, each problem lives under one of three sub-directories
+  In \maestroex, each problem lives under one of three sub-directories
   of {\tt MAESTRO/Exec}: {\tt SCIENCE/}, {\tt TEST\_PROBLEMS/}, or
   {\tt UNIT\_TESTS/}.  This problem sub-directory will contain any
   problem-specific files as well as the {\tt GNUmakefile} that
@@ -120,7 +120,7 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
 
     This determines whether we are doing a parallel build, using the
     Message Passing Interface (MPI) library.  For now, we leave this
-    option empty, disabling MPI.  This will build \maestro\ in serial
+    option empty, disabling MPI.  This will build \maestroex\ in serial
     mode, so no MPI library needs to be present on the host system.
 
   \item {\tt OMP := }
@@ -134,15 +134,15 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
   \item {\tt SDC := }
 
     This option determines whether we want to use the alternate SDC
-    (Spectral Deferred Corrections) source for \maestro\ (see Chapter
+    (Spectral Deferred Corrections) source for \maestroex\ (see Chapter
     \ref{ch:sdc}).  This is experimental, and this option not present
     in all problems.  We leave this blank so we compile the default
-    \maestro\ source.
+    \maestroex\ source.
 
   \item {\tt COMP := gfortran}
 
     This option specifies the Fortran compiler.  We will use {\tt
-      gfortran}, which is the preferred compiler for \maestro.
+      gfortran}, which is the preferred compiler for \maestroex.
     Specifying this compiler will automatically pull in the compiler
     settings as specified in {\tt AMREX\_HOME/Tools/F\_mk/}.
     (Alternate compiler choices include {\tt Intel}, {\tt PGI}, {\tt
@@ -169,15 +169,15 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
   Each problem requires an input file.  The inputs file (a Fortran
   namelist) consists of lines of the form {\em parameter = value},
   where {\em parameter} is one of the many runtime parameters
-  \maestro\ knows, and {\em value} overrides the default value for
+  \maestroex\ knows, and {\em value} overrides the default value for
   that parameter.  For the {\tt reacting\_bubble} problem, we will use
   the inputs file {\tt inputs\_2d}.  An overview of some of the more
   common runtime parameters is given in
   \S~\ref{sec:gettingstarted:runtime}, and a full list of all
-  \maestro\ runtime parameters and their default values is given in
+  \maestroex\ runtime parameters and their default values is given in
   Chapter~\ref{ch:runtimeparameters}.
 
-  \maestro\ is run simply as:
+  \maestroex\ is run simply as:
   \begin{verbatim}
  ./main.Linux.Intel.exe inputs_2d
   \end{verbatim}
@@ -189,7 +189,7 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
 
   As the code runs, a lot of information will pass through the screen.
   For each timestep, each of the steps 1 through 12 shown in the
-  \maestro\ flowchart (Chapter~\ref{ch:flowchart}) will be shown along
+  \maestroex\ flowchart (Chapter~\ref{ch:flowchart}) will be shown along
   with diagnostic information about the solution.  Upon completion
   some memory usage information is printed.
 
@@ -212,7 +212,7 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
   file in each plotfile directory.
 
   {\bf Note: unless otherwise specified all quantities in
-    \maestro\ are assumed to be in CGS units.}
+    \maestroex\ are assumed to be in CGS units.}
 
   Visualization of results is described in the next section.
 
@@ -225,7 +225,7 @@ setenv MICROPHYSICS_HOME /path/to/Microphysics/
 Visualization and analysis are done on the plotfiles.  A number of
 in-house and externally developed tools can work with \amrex-formatted
 plotfiles\footnote{The plotfiles are in the same format as those made
-  by the \boxlib\ library upon which \maestro\ was previously based.}.
+  by the \boxlib\ library upon which \maestroex\ was previously based.}.
 An example plot of the {\tt reacting\_bubble} problem run above is
 shown in Figure~\ref{fig:gettingstarted:test2}.
 
@@ -246,14 +246,14 @@ the {\tt AmrPostprocessing} tools.}
 2- and 3D datasets which can plot slices through 3D datasets as well
 as volume-renderings.  It can also very easily extract 1D lines
 through the dataset along any coordinate direction.  It is distributed
-separately from the \maestro\ distribution.
+separately from the \maestroex\ distribution.
 
 \amrvis\ can be obtained via git from github as:
 \begin{verbatim}
 git clone https://github.com/AMReX-Codes/Amrvis.git
 \end{verbatim}
 \amrvis\ is built in the C++ \amrex\ framework (instead of the Fortran 
-\amrex\ framework that \maestro\ uses).  The build systems are similar,
+\amrex\ framework that \maestroex\ uses).  The build systems are similar,
 but differ in a few ways.  
 
 \amrvis\ uses the {\tt Motif} library for defining the GUI.  On a Linux 
@@ -270,7 +270,7 @@ can be found in the \amrex\ documentation.
 
 Several useful analysis scripts (written in Fortran 90) can be found
 in {\tt AmrPostprocessing/F\_Src/} (distributed separately
-from \maestro).  The {\tt GNUmakefile} there needs to be edited to
+from \maestroex).  The {\tt GNUmakefile} there needs to be edited to
 indicate which of the tools to build.  For example, to extract the
 density along a line from the center of a plotfile, {\tt plt00200}, in
 the $y$-direction:
@@ -302,14 +302,14 @@ Once \visit\ is installed, you can open a \amrex\ plotfile by pointing
 
 \subsection{\yt}
 
-\yt\ (version 3.0 and later) can natively read the \maestro\ plotfiles.  See
+\yt\ (version 3.0 and later) can natively read the \maestroex\ plotfiles.  See
 the \yt\ documentation or \S~\ref{sec:vis:yt}.
 
 
 
 \subsection{Diagnostic Files}
 
-By default, \maestro\ outputs global diagnostics each timestep into a
+By default, \maestroex\ outputs global diagnostics each timestep into a
 file called {\tt maestro\_diag.out}.  This includes the maximum Mach
 number, peak temperature, and peak nuclear energy generation rate.
 Individual problems can provide their own \code{diag.f90} file to
@@ -321,13 +321,13 @@ directly with {\sf GNUplot}, for example.
 
 \section{`Standard' Test Problems}
 
-Different problems in \maestro\ are contained in one of three
+Different problems in \maestroex\ are contained in one of three
 sub-directories under {\tt MAESTRO/Exec}: ({\tt SCIENCE/}, {\tt
 TEST\_PROBLEMS/}, or {\tt UNIT\_TESTS/}).  The {\tt GNUmakefile} in each
 problem directory lists the components of {\tt MAESTRO} that are used
 to build the executable.  {\tt TEST\_PROBLEMS/} contains simple
-problems that were used in the development of \maestro.  Many
-of these were featured in the papers describing the \maestro\ algorithm.
+problems that were used in the development of \maestroex.  Many
+of these were featured in the papers describing the \maestroex\ algorithm.
 
 Some of the test problems available are:
 \begin{itemize}
@@ -340,7 +340,7 @@ than the surrounding atmosphere.  This uses the {\tt multigamma} EOS.
 
 A simple pure-incompressible shear layer problem.  This is the example
 problem used in \cite{bellcolellaglaz}.  This is useful to see how to
-use \maestro\ as an incompressible solver.
+use \maestroex\ as an incompressible solver.
 
 \item {\tt reacting\_bubble} \\[-3mm]
 
@@ -397,7 +397,7 @@ anticipated that more will be made available with time.
    conditions are used to allow for an inflow velocity to be set to
    keep the laminar flame stationary.
 
-   In this mode, \maestro\ behaves like the code described
+   In this mode, \maestroex\ behaves like the code described
    in \cite{SNe}, which was used for models of Rayleigh-Taylor
    unstable flames~\cite{SNld,SNrt,SNrt3d}.
 
@@ -449,7 +449,7 @@ include:
 \noindent Parameters affecting output and restart include:
 \begin{itemize}
 
-\item \runparam{restart} tells \maestro\ to restart from a checkpoint.  The
+\item \runparam{restart} tells \maestroex\ to restart from a checkpoint.  The
       value of this parameter should be the file number to restart from.
       For example, to restart from the checkpoint file {\tt chk00010},
       you would set {\tt restart = 10}.
@@ -580,9 +580,9 @@ ${\tt n\_cellx} \cdot 2^{({\tt max\_levels} -1)}$.
 
 \section{Development Model}
 
-When you clone \maestro\ from github, you will be on the {\tt master}
-branch of the repo.  New changes to \maestro\ are first introduced
-into the {\tt development} branch in the \maestro\ git repository.
+When you clone \maestroex\ from github, you will be on the {\tt master}
+branch of the repo.  New changes to \maestroex\ are first introduced
+into the {\tt development} branch in the \maestroex\ git repository.
 Nightly regression tests are run on {\tt development} to ensure that
 our answers don't change.  Around the first work day of each month, we
 merge from {\tt development} $\rightarrow$ {\tt master} (assuming
@@ -590,7 +590,7 @@ tests pass) and tag the state of the code with a date-based tag {\tt
   YY-MM}.  We do this on all the other repos in the \amrex-ecosystem,
 including {\tt amrex/}, {\tt Microphysics/}, and {\tt Castro/}.  
 
-If you want to contribute to \maestro's development, issue a pull-request
+If you want to contribute to \maestroex's development, issue a pull-request
 through github onto the {\tt development} branch.
 
 
@@ -612,7 +612,7 @@ the {\tt GMake.MPI} file in the \amrex\ build files.  See
 OpenMP can be used to parallelize on shared-memory machines (i.e.\
 within a node).  OpenMP support is accomplished through the compiler.
 Setting {\tt OMP := t} in the {\tt GNUmakefile} will enable the proper
-compiler flags to build with OpenMP.  Note: not all \maestro\ modules 
+compiler flags to build with OpenMP.  Note: not all \maestroex\ modules 
 have OpenMP support.  Microphysics routines need to be written in a
 threadsafe manner.  This can be tested via the {\tt test\_react} unit
 test (see ~\S~\ref{chapter:unit_tests}).

@@ -1,7 +1,7 @@
 AMREX_HOME     ?= /path/to/amrex
-MAESTRO_C_HOME ?= /path/to/MAESTRO_C
+MAESTROEX_HOME ?= /path/to/MAESTROEX
 
-TOP := $(MAESTRO_C_HOME)
+TOP := $(MAESTROEX_HOME)
 
 # default microphysics locations
 EOS_HOME     ?= $(TOP)/Microphysics/EOS
@@ -75,7 +75,7 @@ ifdef MICROPHYSICS_HOME
 endif
 
 # if the EOS / network / conductivity name exists in
-# MAESTRO_C/Microphysics, then use that version
+# MAESTROEX/Microphysics, then use that version
 
 ifneq "$(wildcard $(EOS_HOME)/$(strip $(EOS_DIR)) )" ""
    EOS_PATH := $(EOS_HOME)/$(strip $(EOS_DIR))
@@ -96,7 +96,7 @@ ifndef GENERAL_NET_INPUTS
    ifneq "$(wildcard $(NETWORK_INPUTS))" ""
       GENERAL_NET_INPUTS := $(NETWORK_INPUTS)
    else
-      GENERAL_NET_INPUTS := $(MAESTRO_C_HOME)/Microphysics/networks/general_null/$(NETWORK_INPUTS)
+      GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/general_null/$(NETWORK_INPUTS)
    endif
 endif
 
@@ -192,7 +192,7 @@ objForExecs += $(objEXETempDir)/AMReX_buildInfo.o
 .PHONE: .FORCE
 
 # set BUILD_GIT_NAME and BUILD_GIT_DIR if you are building in a
-# git-controlled dir not under MAESTRO_C/
+# git-controlled dir not under MAESTROEX/
 EXTRA_BUILD_INFO :=
 ifdef BUILD_GIT_NAME
    EXTRA_BUILD_INFO := --build_git_name "$(BUILD_GIT_NAME)" \

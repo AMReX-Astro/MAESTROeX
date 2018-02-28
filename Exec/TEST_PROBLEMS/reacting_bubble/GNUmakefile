@@ -9,11 +9,11 @@ TINY_PROFILE = FALSE
 PROFILE      = FALSE # TRUE overrides TINY_PROFILE
 
 
-# define the location of the MAESTRO_C home directory
-MAESTRO_C_HOME  := ../../..
+# define the location of the MAESTROEX home directory
+MAESTROEX_HOME  := ../../..
 
 # Set the EOS, conductivity, and network directories
-# We first check if these exist in $(MAESTRO_C_HOME)/Microphysics/(EOS/conductivity/networks)
+# We first check if these exist in $(MAESTROEX_HOME)/Microphysics/(EOS/conductivity/networks)
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
@@ -21,4 +21,4 @@ NETWORK_DIR      := ignition_simple
 
 Blocs   := . 
 
-include $(MAESTRO_C_HOME)/Exec/Make.Maestro
+include $(MAESTROEX_HOME)/Exec/Make.Maestro
