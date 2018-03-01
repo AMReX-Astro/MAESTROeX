@@ -1,6 +1,7 @@
 module average_module
 
-  use base_state_geometry_module, only: max_radial_level, finest_radial_level, nr_fine
+  use base_state_geometry_module, only: max_radial_level, finest_radial_level, nr_fine, &
+                                           restrict_base, fill_ghost_base
   use amrex_fort_module, only: amrex_spacedim
 
   implicit none
@@ -19,7 +20,9 @@ contains
 
     integer :: j,k
 
-    if (amrex_spacedim .eq. 2) then
+    if (amrex_spacedim .eq. 1) then
+       phisum(lev,:) = sum(phi(lo(1):hi(1),0,0));
+    else if (amrex_spacedim .eq. 2) then
        do j=lo(2),hi(2)
           phisum(lev,j) = phisum(lev,j) + sum(phi(lo(1):hi(1),j,0))
        end do
@@ -39,9 +42,12 @@ contains
 
     integer :: n
 
-    do n=0,finest_radial_level
+    do n=0,max_radial_level
        phisum(n,:) = phisum(n,:) / ncell(n)
     end do
+
+    call restrict_base(phisum,1)
+    call fill_ghost_base(phisum,1)
 
   end subroutine divide_phisum_by_ncell
 

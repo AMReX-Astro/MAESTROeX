@@ -15,10 +15,10 @@ contains
 
   subroutine make_edge_state_1d(s,sedge,w0,force,dt)
 
-    double precision, intent(in   ) ::     s(0:,0:)
-    double precision, intent(inout) :: sedge(0:,0:)
-    double precision, intent(in   ) ::    w0(0:,0:)
-    double precision, intent(in   ) :: force(0:,0:)
+    double precision, intent(in   ) ::     s(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) :: sedge(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) ::    w0(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) :: force(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dt
 
     if (spherical .eq. 1) then
@@ -31,10 +31,10 @@ contains
 
   subroutine make_edge_state_1d_sphr(s,sedge,w0,force,dt)
 
-    double precision, intent(in   ) ::     s(0:,0:)
-    double precision, intent(inout) :: sedge(0:,0:)
-    double precision, intent(in   ) ::    w0(0:,0:)
-    double precision, intent(in   ) :: force(0:,0:)
+    double precision, intent(in   ) ::     s(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) :: sedge(0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) ::    w0(0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: force(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dt
 
     double precision :: dmin,dpls,ds,del,slim,sflag,ubardth,dth,savg,u
@@ -335,10 +335,10 @@ contains
 
    subroutine make_edge_state_1d_planar(s,sedge,w0,force,dt)
      
-     double precision, intent(in   ) ::     s(0:,0:)
-     double precision, intent(inout) :: sedge(0:,0:)
-     double precision, intent(in   ) ::    w0(0:,0:)
-     double precision, intent(in   ) :: force(0:,0:)
+     double precision, intent(in   ) ::     s(0:max_radial_level,0:nr_fine-1)
+     double precision, intent(inout) :: sedge(0:max_radial_level,0:nr_fine)
+     double precision, intent(in   ) ::    w0(0:max_radial_level,0:nr_fine)
+     double precision, intent(in   ) :: force(0:max_radial_level,0:nr_fine-1)
      double precision, intent(in   ) :: dt
      
      double precision :: dmin,dpls,ds,del,slim,sflag,ubardth,dth,dtdr,savg,u
@@ -765,7 +765,7 @@ contains
 
            ! if we are not at the coarsest level, copy in the sedgel and sedger states 
            ! from the next coarser level at the c-f interface
-           if (n .ne. 1) then
+           if (n .ne. 0) then
               sedgel(n,lo) = sedgel(n-1,lo/2)
               sedger(n,hi+1) = sedger(n-1,(hi+1)/2)
            end if

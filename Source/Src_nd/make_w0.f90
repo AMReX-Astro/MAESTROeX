@@ -151,7 +151,7 @@ contains
     w0 = ZERO
     
     ! Compute w0 on edges at level n
-    do n=0,finest_radial_level
+    do n=0,max_radial_level
 
        do j=1,numdisjointchunks(n)
           
@@ -188,7 +188,7 @@ contains
 
           end do
 
-          if (n .gt. 1) then
+          if (n .gt. 0) then
 
              ! Compare the difference between w0 at top of level n to
              ! the corresponding point on level n-1
@@ -219,7 +219,7 @@ contains
     end do
 
        ! zero w0 where there is no corresponding full state array
-       do n=1,finest_radial_level
+       do n=1,max_radial_level
           do j=1,numdisjointchunks(n)
              if (j .eq. numdisjointchunks(n)) then
                 do r=r_end_coord(n,j)+2,nr(n)
@@ -236,7 +236,7 @@ contains
     call restrict_base(w0,0)
     call fill_ghost_base(w0,0)
 
-    do n=0,finest_radial_level
+    do n=0,max_radial_level
        do j=1,numdisjointchunks(n)
 
           ! Compute the forcing term in the base state velocity
