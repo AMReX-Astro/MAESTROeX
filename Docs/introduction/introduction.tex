@@ -1,7 +1,7 @@
-\section{History of \maestro}
+\section{History of \maestroex}
 
-\maestro\ describes the evolution of low Mach number flows that are in
-hydrostatic equilibrium.  The idea for \maestro\ grew out of our
+\maestroex\ describes the evolution of low Mach number flows that are in
+hydrostatic equilibrium.  The idea for \maestroex\ grew out of our
 success in applying low Mach number combustion methods developed for
 terrestrial flames~\cite{DayBell00} to small-scale astrophysical
 flames (including Landau-Darrieus instability~\cite{SNld},
@@ -14,14 +14,14 @@ J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, \& M. Zingale
 2004, JCP, 195, 2, 677 (henceforth BDRWZ)
 \end{itemize}
 
-\noindent \maestro\ was developed initially for modeling the convecting
+\noindent \maestroex\ was developed initially for modeling the convecting
 phase in a white dwarf preceding the ignition of a Type Ia supernovae.
 As such, we needed to incorporate the compressibility effects due to
 large-scale stratification in the star.  The method closest in spirit
-to \maestro\ is the pseudo-incompressible method of
+to \maestroex\ is the pseudo-incompressible method of
 Durran~\cite{durran}, developed for terrestrial atmospheric flows
 (assuming an ideal gas).  Part of the complexity of the equations in
-\maestro\ stems from the need to descibe a general equation of state.
+\maestroex\ stems from the need to descibe a general equation of state.
 Additionally, since reactions can significantly alter the hydrostatic
 structure of a star, we incorporated extensions that capture the
 expansion of the background state~\cite{almgren:2000}.  The low Mach
@@ -64,7 +64,7 @@ below.
   ApJ, 728, 118 (henceforth ``the XRB paper'')
 
 
-  This introduces the thermal diffusion portion of the \maestro\ algorithm.
+  This introduces the thermal diffusion portion of the \maestroex\ algorithm.
 
 \item {\em The Convective Phase Preceding Type Ia Supernovae,}
   M. Zingale, A. S. Almgren, J. B. Bell, C. M. Malone, A. Nonaka, \& S. E. Woosley 2011, ApJ,
@@ -101,8 +101,8 @@ below.
 } A.~M.~Jacobs, M.~Zingale, A.~Nonaka, A.~S.~Almgren, \& J.~B.~Bell
   2015, submitted to ApJ
 
-  This has an appendix that shows some test problems for the new energy 
-  formulation in \maestro.
+  This has an appendix that shows some test problems for the alternate energy 
+  formulation in \maestroex.
 
 \end{itemize}
 
@@ -187,7 +187,7 @@ equilibrium), differentiating pressure along particle paths gives:
 \end{equation}
 where $\gamma$ is the ratio of specific heats and $H$ is the source.
 
-\maestro\ is based on this method, generalizing this constraint to an
+\maestroex\ is based on this method, generalizing this constraint to an
 arbitrary equation of state and allowing for the time-variation of the
 base state.
 
@@ -201,7 +201,7 @@ manifests itself as either a change to the buoyancy term or by
 changing $\nabla \pi$ to $\beta_0 \nabla (\pi/\beta_0)$.  Furthermore,
 \cite{VLBWZ:2013} showed that the new formulation better captures the
 vertical propagation of gravity waves.  As of
-Dec.\ 2013, this new formulation is the default in \maestro.
+Dec.\ 2013, this new formulation is the default in \maestroex.
 
 \section{Projection Methods 101}
 
@@ -296,10 +296,10 @@ sure that they satisfy the divergence constraint.  These advective
 velocities are used to construct the fluxes through the interfaces to
 advance the solution to the new time.  The second/final projection
 operates on the cell-centered velocities at the new time, again
-enforcing the divergence constraint.  The \maestro\ algorithm performs
+enforcing the divergence constraint.  The \maestroex\ algorithm performs
 both of these projections.
 
-The \maestro\ algorithm builds upon these ideas, using a different
+The \maestroex\ algorithm builds upon these ideas, using a different
 velocity constraint equation that captures the compressibility
 due to local sources and large-scale stratification.
 
@@ -310,7 +310,7 @@ due to local sources and large-scale stratification.
 
 \section{Notation}
 
-Throughout the papers describing \maestro, we've largely kept our
+Throughout the papers describing \maestroex, we've largely kept our
 notation consistent.  Table~\ref{table:sym} defines the
 frequently-used quantities and provides their units.  Additionally,
 for any quantity $\phi$, we denote the average of $\phi$ over a layer

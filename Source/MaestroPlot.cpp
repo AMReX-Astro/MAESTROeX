@@ -264,12 +264,12 @@ Maestro::WriteJobInfo (const std::string& dir) const
 //        std::string OtherLine = std::string(78, '-') + "\n";
 //        std::string SkipSpace = std::string(8, ' ') + "\n";
 
-	FullPathJobInfoFile += "/maestro_job_info";
+	FullPathJobInfoFile += "/job_info";
 	jobInfoFile.open(FullPathJobInfoFile.c_str(), std::ios::out);
 
 	// job information
 	jobInfoFile << PrettyLine;
-	jobInfoFile << " MAESTRO Job Information\n";
+	jobInfoFile << " MAESTROeX Job Information\n";
 	jobInfoFile << PrettyLine;
 
 	jobInfoFile << "number of MPI processes: " << ParallelDescriptor::NProcs() << "\n";
@@ -315,7 +315,7 @@ Maestro::WriteJobInfo (const std::string& dir) const
 	const char* githash2 = buildInfoGetGitHash(2);
 	const char* githash3 = buildInfoGetGitHash(3);
 	if (strlen(githash1) > 0) {
-	  jobInfoFile << "MAESTRO git describe: " << githash1 << "\n";
+	  jobInfoFile << "MAESTROeX git describe: " << githash1 << "\n";
 	}
 	if (strlen(githash2) > 0) {
 	  jobInfoFile << "AMReX git describe: " << githash2 << "\n";

@@ -24,7 +24,7 @@ Maestro::WriteCheckPoint (int step) {
     BL_PROFILE_VAR("Maestro::WriteCheckPoint()",WriteCheckPoint);
 
     // checkpoint file name, e.g., chk00010
-    const std::string& checkpointname = amrex::Concatenate(check_base_name,step);
+    const std::string& checkpointname = amrex::Concatenate(check_base_name,step,7);
 
     amrex::Print() << "Writing checkpoint " << checkpointname << "\n";
 
@@ -148,6 +148,8 @@ Maestro::WriteCheckPoint (int step) {
                       << etarho_ec[i] << "\n";
        }
    }
+
+   WriteJobInfo(checkpointname);
 }
 
 int

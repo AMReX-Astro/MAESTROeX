@@ -1,6 +1,6 @@
-The equation set and solution procedure used by \maestro\ has evolved
+The equation set and solution procedure used by \maestroex\ has evolved
 over time.  In this chapter, we outline the algorithm currently
-implemented in the code.  The latest published reference for \maestro
+implemented in the code.  The latest published reference for \maestroex
 is the multilevel paper \cite{multilevel}.  In this description, we
 make frequent reference to paper~I \cite{lowMach},
 paper~II \cite{lowMach2}, paper~III \cite{lowMach3}, and
@@ -13,9 +13,9 @@ paper~IV \cite{lowMach4}.
 % Equations Summary
 %-----------------------------------------------------------------------------
 
-\section{Summary of the \maestro\ Equation Set}
+\section{Summary of the \maestroex\ Equation Set}
 
-Here we summarize the equations solved by \maestro.  We refer the reader
+Here we summarize the equations solved by \maestroex.  We refer the reader
 to papers~I through IV and the multilevel paper for the derivation
 and motivation of the equation set.  (Note: this `traditional' algorithm
 uses Strang-splitting for the reactions.  An alternate implementation, using
@@ -163,7 +163,7 @@ formulation, yielding:
    -\frac{\rho^\prime}{\rho} |g| \er
 \label{eq:flow:newmomentum}
 \end{equation}
-This is the form that we enforce in \maestro, and the choice is controlled
+This is the form that we enforce in \maestroex, and the choice is controlled
 by \runparam{use\_alt\_energy\_fix}.
 
 We decompose the full velocity field into a base state velocity,
@@ -1136,7 +1136,7 @@ the background hydrostatic pressure takes the form:
 \begin{equation}
 \nablab \cdotb \Ub + \frac{1}{\Gamma_1 p_0} \frac{Dp_0}{Dt} = S \enskip .
 \end{equation}
-The default \maestro\ algorithm replaces $\Gamma_1$ with $\gammabar$,
+The default \maestroex\ algorithm replaces $\Gamma_1$ with $\gammabar$,
 allowing us to write this as a divergence constraint.  In paper~III,
 we explored the effects of localized variations in $\Gamma_1$ by
 writing $\Gamma_1 = \gammabar + \delta \Gamma_1$.  This gives us:
@@ -1201,13 +1201,13 @@ Eq.~\ref{eq:flow:dw0dr_planar}), and
 This constraint is not in a form that can be projected.  To solve this
 form, we need to use a lagged $\Ubt$ in the righthand side.
 
-This change comes into \maestro\ in a variety of steps, summarized here.
+This change comes into \maestroex\ in a variety of steps, summarized here.
 To enable this portion of the algorithm, set \runparam{use\_delta\_gamma1\_term} {\tt = T}.
 
 \begin{itemize}
 
 \item In {\bf Step 3}, we are doing the ``predictor'' portion of the 
-\maestro\ algorithm, getting the MAC velocity that satisfies the constraint, 
+\maestroex\ algorithm, getting the MAC velocity that satisfies the constraint, 
 so we do not try to incorporate the $\delta \Gamma_1$ effect.  We set
 all the $\delta \Gamma_1$ terms in
 Eq.~\ref{eq:constraint_with_delta_gamma} to zero.
@@ -1352,7 +1352,7 @@ which is numerically implemented as a diffusion equation for $h^{(2)}$.
 \begin{figure}[tb]
 \centering
 \includegraphics[scale=0.65]{\flowfigpath/flowchart}
-\caption[Graphical flowchart of \maestro]
+\caption[Graphical flowchart of \maestroex]
   {\label{Fig:flowchart} A flowchart of the algorithm.  The
   thermodynamic state variables, base state variables, and local velocity are
   indicated in each step.  Red text indicates that quantity was
