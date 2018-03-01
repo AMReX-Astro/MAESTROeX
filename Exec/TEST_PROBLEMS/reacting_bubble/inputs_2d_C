@@ -3,6 +3,8 @@
 maestro.model_file = "model.hse.cool.coulomb"
 maestro.perturb_model = true
 
+maestro.ppm_type = 0
+
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0
 geometry.prob_hi     =  2.16e8 3.6e8
@@ -40,7 +42,7 @@ maestro.cfl       = 0.9    # cfl number for hyperbolic system
 		           # to satisfy CFL condition.
 
 # ALGORITHMIC OPTIONS
-maestro.evolve_base_state = false
+maestro.evolve_base_state = true
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 1
 maestro.init_iter             = 1
