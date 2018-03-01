@@ -13,10 +13,15 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
 
     // Local variables
-    Vector<Real> etarhosum( nr_fine*(max_radial_level+1) );
-    Vector<Real> ncell( nr_fine*(max_radial_level+1) );
+    Vector<Real> etarhosum( (nr_fine+1)*(max_radial_level+1) );
+    Vector<Real> ncell( (nr_fine+1)*(max_radial_level+1) );
     etarhosum.shrink_to_fit();
     ncell.shrink_to_fit();
+
+    for (int i=0; i<(nr_fine+1)*(max_radial_level+1); ++i) {
+	etarhosum[i] = 0.0;
+	ncell[i] = 0.0;
+    }
 
     if (spherical == 0) {
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -42,7 +47,7 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
 			   etarhosum.dataPtr(), ncell.dataPtr());
 	    }	    
 	}
-	
+
 	make_etarho_planar(etarho_edge.dataPtr(), etarho_cell.dataPtr(), 
 			   etarhosum.dataPtr(), ncell.dataPtr());
 
