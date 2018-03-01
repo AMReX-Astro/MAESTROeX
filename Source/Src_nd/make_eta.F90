@@ -33,7 +33,7 @@ contains
   subroutine make_etarho_planar(etarho_ec, etarho_cc, &
                                   etarhosum, ncell) bind(C, name="make_etarho_planar")
 
-    double precision, intent(  out) :: etarho_ec(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(  out) :: etarho_ec(0:max_radial_level,0:nr_fine)
     double precision, intent(  out) :: etarho_cc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: etarhosum(0:nr_fine,0:max_radial_level)
     double precision, intent(in   ) :: ncell(0:nr_fine,0:max_radial_level)
@@ -87,7 +87,6 @@ contains
 
     ! local
     integer :: i,j,k
-    integer :: r, r_hi
     logical :: top_edge
 
 #if (AMREX_SPACEDIM == 2) 
