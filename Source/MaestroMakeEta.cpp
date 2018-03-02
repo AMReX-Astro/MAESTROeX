@@ -13,7 +13,7 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
 
     // Local variables
-    Vector<Real> etarhosum( (nr_fine+1)*(max_radial_level+1) );
+    Vector<Real> etarhosum( (nr_fine+1)*(max_radial_level+1) ); 
     Vector<Real> ncell( (nr_fine+1)*(max_radial_level+1) );
     etarhosum.shrink_to_fit();
     ncell.shrink_to_fit();
@@ -46,7 +46,10 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
 			   BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
 			   etarhosum.dataPtr(), ncell.dataPtr());
 	    }	    
+
 	}
+
+	ParallelDescriptor::ReduceRealSum(etarhosum.dataPtr(),(nr_fine+1)*(max_radial_level+1));
 
 	make_etarho_planar(etarho_edge.dataPtr(), etarho_cell.dataPtr(), 
 			   etarhosum.dataPtr(), ncell.dataPtr());
