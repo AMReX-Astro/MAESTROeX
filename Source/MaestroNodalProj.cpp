@@ -183,14 +183,8 @@ Maestro::NodalProj (int proj_type,
         mlndlap.setSigma(ilev, sig[ilev]);
     }
 
-    // define a nodal rhs and set it to zero (everything we want is in rhcc)
-    Vector<MultiFab> rhnd(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        rhnd[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);
-        rhnd[lev].setVal(0.);
-    }
-
-    // rhstotal is nodal and will contain the complete right-hand-side (rhnd + rhcc)
+    // rhstotal is nodal and will contain the complete right-hand-side
+    // rhtotal = div(Vproj) + rhcc (rhcc is averaged to nodes)
     Vector<MultiFab> rhstotal(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev)
     {
@@ -205,17 +199,21 @@ Maestro::NodalProj (int proj_type,
         phi[lev].setVal(0.);
     }
 
+    // multiply rhcc = beta0*(S-Sbar) by -1 since we want 
+    // rhstotal to contain div(beta*Vproj) - beta0*(S-Sbar)
     for (int lev=0; lev<=finest_level; ++lev) {
         rhcc[lev].mult(-1.0,0,1,1);
     }
 
     // Assemble the nodal RHS as the sum of the cell-centered RHS averaged to nodes 
     // plus div (beta0*Vproj) on nodes
+    // so rhstotal = div(beta*Vproj) - beta0*(S-Sbar)
     mlndlap.compRHS(amrex::GetVecOfPtrs(rhstotal),
                     amrex::GetVecOfPtrs(Vproj),
-                    amrex::GetVecOfConstPtrs(rhnd),
+                    {}, // pass in null rhnd
                     amrex::GetVecOfPtrs(rhcc));
 
+    // restore rhcc
     for (int lev=0; lev<=finest_level; ++lev) {
         rhcc[lev].mult(-1.0,0,1,1);
     }
