@@ -31,8 +31,9 @@ module make_flux_module
 
   use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
+  use network, only: nspec
   use meth_params_module, only: rho_comp, rhoh_comp, enthalpy_pred_type, species_pred_type, &
-                                  evolve_base_state
+                                  evolve_base_state, spec_comp
 
   implicit none
 
@@ -87,19 +88,21 @@ contains
        ! create x-fluxes
        do i = lo(1),hi(1)+1
 
-             ! edge states are rho' and X.  To make the (rho X) flux,
-             ! we need the edge state of rho0
-             rho0_edge = HALF*(rho0_edge_old(lev,i)+rho0_edge_new(lev,i))
-             sfluxx(i,comp) = &
-                  (umac(i)+w0(lev,i))*(rho0_edge+sedgex(i,rho_comp))*sedgex(i,comp)
-
-             if (evolve_base_state) then
+          ! edge states are rho' and X.  To make the (rho X) flux,
+          ! we need the edge state of rho0
+          rho0_edge = HALF*(rho0_edge_old(lev,i)+rho0_edge_new(lev,i))
+          sfluxx(i,comp) = &
+               (umac(i)+w0(lev,i))*(rho0_edge+sedgex(i,rho_comp))*sedgex(i,comp)
+          
+          if (evolve_base_state) then
+             if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                 etarhoflux(i) = etarhoflux(i) + sfluxx(i,comp)
+             end if
              
-                if ( comp.eq.endcomp) then
-                   etarhoflux(i) = etarhoflux(i) - w0(lev,i)*rho0_predicted_edge(lev,i)
-                end if
-             endif
+             if ( comp.eq.spec_comp+nspec-1) then
+                etarhoflux(i) = etarhoflux(i) - w0(lev,i)*rho0_predicted_edge(lev,i)
+             end if
+          endif
        end do
     end do ! end comp loop
 
@@ -156,10 +159,10 @@ contains
           rho0_edge = HALF*(rho0_old(lev,j)+rho0_new(lev,j))
           do i=lo(1),hi(1)+1
 
-                ! edge states are rho' and X.  To make the (rho X) flux,
-                ! we need the edge state of rho0
-                sfluxx(i,j,comp) = umac(i,j)* &
-                     (rho0_edge+sedgex(i,j,rho_comp))*sedgex(i,j,comp)
+             ! edge states are rho' and X.  To make the (rho X) flux,
+             ! we need the edge state of rho0
+             sfluxx(i,j,comp) = umac(i,j)* &
+                  (rho0_edge+sedgex(i,j,rho_comp))*sedgex(i,j,comp)
           end do
        end do
              
@@ -168,15 +171,17 @@ contains
           rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
           do i = lo(1),hi(1)
 
-                ! edge states are rho' and X.  To make the (rho X) flux,
-                ! we need the edge state of rho0
-                sfluxy(i,j,comp) = &
-                     (vmac(i,j)+w0(lev,j))*(rho0_edge+sedgey(i,j,rho_comp))*sedgey(i,j,comp)
-
-                if (evolve_base_state) then
+             ! edge states are rho' and X.  To make the (rho X) flux,
+             ! we need the edge state of rho0
+             sfluxy(i,j,comp) = &
+                  (vmac(i,j)+w0(lev,j))*(rho0_edge+sedgey(i,j,rho_comp))*sedgey(i,j,comp)
+             
+             if (evolve_base_state) then
+                if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                    etarhoflux(i,j) = etarhoflux(i,j) + sfluxy(i,j,comp)
-
-                if ( comp.eq.endcomp) then
+                end if
+                
+                if ( comp.eq.spec_comp+nspec-1) then
                    etarhoflux(i,j) = etarhoflux(i,j) - w0(lev,j)*rho0_predicted_edge(lev,j)
                 end if
              endif  ! evolve_base_state
@@ -251,20 +256,20 @@ contains
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)+1
 
-                   ! edge states are rho' and X.  To make the (rho X)
-                   ! flux, we need the edge state of rho0
-                   sfluxx(i,j,k,comp) = &
-                        umac(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp)
+                ! edge states are rho' and X.  To make the (rho X)
+                ! flux, we need the edge state of rho0
+                sfluxx(i,j,k,comp) = &
+                     umac(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp)
              end do
           end do
           
           do j=lo(2),hi(2)+1
              do i=lo(1),hi(1)
 
-                   ! edge states are rho' and X.  To make the (rho X)
-                   ! flux, we need the edge state of rho0
-                   sfluxy(i,j,k,comp) = &
-                        vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp)
+                ! edge states are rho' and X.  To make the (rho X)
+                ! flux, we need the edge state of rho0
+                sfluxy(i,j,k,comp) = &
+                     vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp)
              end do
           end do
        end do
@@ -277,15 +282,17 @@ contains
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
 
-                   ! edge states are rho' and X.  To make the (rho X)
-                   ! flux, we need the edge state of rho0
-                   sfluxz(i,j,k,comp) = (wmac(i,j,k)+w0(lev,k))* &
+                ! edge states are rho' and X.  To make the (rho X)
+                ! flux, we need the edge state of rho0
+                sfluxz(i,j,k,comp) = (wmac(i,j,k)+w0(lev,k))* &
                      (rho0_edge+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp)
 
-                   if (evolve_base_state) then
+                if (evolve_base_state) then
+                   if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                       etarhoflux(i,j,k) = etarhoflux(i,j,k) + sfluxz(i,j,k,comp)
+                   end if
                    
-                   if ( comp.eq.endcomp) then
+                   if ( comp.eq.spec_comp+nspec-1) then
                       etarhoflux(i,j,k) = etarhoflux(i,j,k) - w0(lev,k)*rho0_predicted_edge(lev,k)
                    end if
                 endif ! evolve_base_state
