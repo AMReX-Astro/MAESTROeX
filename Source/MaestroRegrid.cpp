@@ -37,35 +37,37 @@ Maestro::Regrid ()
     }
 
     // compute cutoff coordinates
-    compute_cutoff_coords(rho0_new.dataPtr());
+    compute_cutoff_coords(rho0_old.dataPtr());
 
     // make gravity
-    make_grav_cell(grav_cell_new.dataPtr(),
-                   rho0_new.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    make_grav_cell(grav_cell_old.dataPtr(),
+		   rho0_old.dataPtr(),
+		   r_cc_loc.dataPtr(),
+		   r_edge_loc.dataPtr());
 
-/* FIXME
-           ! enforce HSE
-           call enforce_HSE(rho0_old,p0_old,grav_cell)
+    // enforce HSE
+    enforce_HSE(rho0_old.dataPtr(), 
+		p0_old.dataPtr(),
+		grav_cell_old.dataPtr(),
+		r_edge_loc.dataPtr());
 
-           if (use_tfromp) then
-              ! compute full state T = T(rho,p0,X)
-              call makeTfromRhoP(sold,p0_old,mla,the_bc_tower%bc_tower_array,dx)
-           else
-              ! compute full state T = T(rho,h,X)
-              call makeTfromRhoH(sold,p0_old,mla,the_bc_tower%bc_tower_array,dx)
-           end if
+    if (use_tfromp) {
+	// compute full state T = T(rho,p0,X)
+	TfromRhoP(sold,p0_old,0);
+    } else {
+	// compute full state T = T(rho,h,X)
+	TfromRhoH(sold,p0_old);
+    }
 
-           ! force tempbar to be the average of temp
-           call average(mla,sold,tempbar,dx,temp_comp)
+    // force tempbar to be the average of temp
+    Average(sold,tempbar,Temp);
 
-           ! gamma1bar needs to be recomputed
-           call make_gamma1bar(mla,sold,gamma1bar,p0_old,dx)
+    // gamma1bar needs to be recomputed
+    MakeGamma1bar(sold,gamma1bar_old,p0_old);
 
-           ! beta0_old needs to be recomputed
-           call make_beta0(beta0_old,rho0_old,p0_old,gamma1bar,grav_cell)
-*/
+    // beta0_old needs to be recomputed
+    make_beta0(beta0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+	       gamma1bar_old.dataPtr(), grav_cell_old.dataPtr());
 
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;
