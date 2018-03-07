@@ -17,7 +17,8 @@ MAESTROEX_HOME  := ../../..
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR      := ignition_simple
+NETWORK_DIR      := general_null
+GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/$(NETWORK_DIR)/ignition.net
 
 Blocs   := . 
 

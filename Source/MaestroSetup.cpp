@@ -27,9 +27,16 @@ Maestro::Setup ()
     // in _cpp_parameters
     read_method_params();
 
+    // Initialize the runtime parameters for any of the external
+    // microphysics
+    extern_init();
+
     // define (Rho, RhoH, etc.)
     // calls network_init
     VariableSetup();
+
+    maestro_network_init();
+    burner_init();
 
     const Real* probLo = geom[0].ProbLo();
     const Real* probHi = geom[0].ProbHi();
@@ -192,6 +199,8 @@ Maestro::ReadParameters ()
 
 #include <maestro_queries.H>
 
+    // now read in vectors for ParmParse
+
     // read in boundary conditions
     Vector<int> lo_bc(AMREX_SPACEDIM);
     Vector<int> hi_bc(AMREX_SPACEDIM);
@@ -235,9 +244,25 @@ void Maestro::VariableSetup ()
     Pi = cnt++;
 
     Nscal = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
+}
 
-    maestro_network_init();
-    burner_init();
+void
+Maestro::extern_init ()
+{
+  // initialize the external runtime parameters -- these will
+  // live in the probin
+
+  if (ParallelDescriptor::IOProcessor()) {
+    std::cout << "reading extern runtime parameters ..." << std::endl;
+  }
+
+  const int probin_file_length = probin_file.length();
+  Vector<int> probin_file_name(probin_file_length);
+
+  for (int i = 0; i < probin_file_length; i++)
+    probin_file_name[i] = probin_file[i];
+
+  maestro_extern_init(probin_file_name.dataPtr(),&probin_file_length);
 }
 
 // set up BCRec definitions for BC types

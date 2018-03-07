@@ -32,23 +32,17 @@ maestro_verbose                     int         1       y
 # category: problem initialization
 #-----------------------------------------------------------------------------
 
+# input probin file
+probin_file                         string      ""
+
 # input model file
-model_file                          string      "model.hse"     y
+model_file                          string      ""             y
 
 # Turn on a perturbation in the initial data.  Problem specific.
-perturb_model                       bool        false           y
+perturb_model                       bool        false          y
 
 # print out HSE diagnostics as a function of r for the initial model
 print_init_hse_diag                 bool        false          y
-
-# used for perturbing the initial temperature field
-pert_temp_factor                    Real               1.0      y
-
-# used for perturbing the initial temperature field
-pert_rad_factor                     Real               1.0      y
-
-# used for perturbing the initial temperature field
-do_small_domain                     bool              false     y
 
 #-----------------------------------------------------------------------------
 # category: timestepping
@@ -546,3 +540,22 @@ eps_hg                              Real       1.e-12
 eps_hg_max                          Real       1.e-10
 hg_level_factor                     Real       10.
 eps_hg_bottom                       Real       1.e-4
+
+
+#-----------------------------------------------------------------------------
+# category: problem-specific
+#-----------------------------------------------------------------------------
+
+# TEST_PROBLEMS/reacting_bubble
+# used for perturbing the initial temperature field
+pert_temp_factor                    Real               1.0      y
+pert_rad_factor                     Real               1.0      y
+do_small_domain                     bool              false     y
+
+# TEST_PROBLEMS/test_convect
+# used to set up the initial vortices
+apply_vel_field                     bool               false    y
+velpert_scale                       Real               2.5e6    y
+velpert_amplitude                   Real               1.0e2    y
+velpert_height_loc                  Real               1.2e8    y
+num_vortices                        int                2        y

@@ -21,6 +21,27 @@ contains
 
   end subroutine maestro_network_init
 
+! :::
+! ::: ----------------------------------------------------------------
+! :::
+
+  subroutine maestro_extern_init(name,namlen) bind(C, name="maestro_extern_init")
+
+    ! initialize the external runtime parameters in
+    ! extern_probin_module
+
+    use amrex_fort_module, only: rt => amrex_real
+
+    integer, intent(in) :: namlen
+    integer, intent(in) :: name(namlen)
+
+    call runtime_init(name,namlen)
+
+  end subroutine maestro_extern_init
+
+! :::
+! ::: ----------------------------------------------------------------
+! :::
 
   subroutine get_num_spec(nspec_out) bind(C, name="get_num_spec")
 
@@ -30,6 +51,9 @@ contains
 
   end subroutine get_num_spec
 
+! :::
+! ::: ----------------------------------------------------------------
+! :::
 
   subroutine get_spec_names(spec_names,ispec,len) bind(C, name="get_spec_names")
 
@@ -47,6 +71,10 @@ contains
     end do
 
   end subroutine get_spec_names
+
+! :::
+! ::: ----------------------------------------------------------------
+! :::
 
   subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature, &
                                Pressure,Nscalars,prob_lo_in,prob_hi_in) &
@@ -111,6 +139,10 @@ contains
 
   end subroutine set_method_params
 
+! :::
+! ::: ----------------------------------------------------------------
+! :::
+
   subroutine set_rel_eps(rel_eps_in) bind(C,name="set_rel_eps")
 
     double precision, intent(in) :: rel_eps_in
@@ -118,6 +150,10 @@ contains
     rel_eps = rel_eps_in
 
   end subroutine set_rel_eps
+
+! :::
+! ::: ----------------------------------------------------------------
+! :::
 
   subroutine get_rel_eps(rel_eps_in) bind(C,name="get_rel_eps")
 

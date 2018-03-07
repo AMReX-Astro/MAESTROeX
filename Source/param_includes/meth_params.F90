@@ -29,9 +29,6 @@ module meth_params_module
   character (len=:), allocatable, save :: model_file
   logical                       , save :: perturb_model
   logical                       , save :: print_init_hse_diag
-  double precision              , save :: pert_temp_factor
-  double precision              , save :: pert_rad_factor
-  logical                       , save :: do_small_domain
   double precision              , save :: cfl
   logical                       , save :: use_soundspeed_firstdt
   logical                       , save :: use_divu_firstdt
@@ -69,6 +66,14 @@ module meth_params_module
   double precision              , save :: small_dens
   logical                       , save :: use_eos_e_instead_of_h
   logical                       , save :: use_pprime_in_tfromp
+  double precision              , save :: pert_temp_factor
+  double precision              , save :: pert_rad_factor
+  logical                       , save :: do_small_domain
+  logical                       , save :: apply_vel_field
+  double precision              , save :: velpert_scale
+  double precision              , save :: velpert_amplitude
+  double precision              , save :: velpert_height_loc
+  integer                       , save :: num_vortices
 
   ! End the declarations of the ParmParse parameters
 
@@ -85,12 +90,9 @@ contains
 
     maestro_verbose = 1;
     allocate(character(len=1)::model_file)
-    model_file = "model.hse";
+    model_file = "";
     perturb_model = .false.;
     print_init_hse_diag = .false.;
-    pert_temp_factor = 1.0d0;
-    pert_rad_factor = 1.0d0;
-    do_small_domain = .false.;
     cfl = 0.5d0;
     use_soundspeed_firstdt = .false.;
     use_divu_firstdt = .false.;
@@ -129,15 +131,20 @@ contains
     small_dens = 1.d-5;
     use_eos_e_instead_of_h = .false.;
     use_pprime_in_tfromp = .false.;
+    pert_temp_factor = 1.0d0;
+    pert_rad_factor = 1.0d0;
+    do_small_domain = .false.;
+    apply_vel_field = .false.;
+    velpert_scale = 2.5d6;
+    velpert_amplitude = 1.0d2;
+    velpert_height_loc = 1.2d8;
+    num_vortices = 2;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("maestro_verbose", maestro_verbose)
     call pp%query("model_file", model_file)
     call pp%query("perturb_model", perturb_model)
     call pp%query("print_init_hse_diag", print_init_hse_diag)
-    call pp%query("pert_temp_factor", pert_temp_factor)
-    call pp%query("pert_rad_factor", pert_rad_factor)
-    call pp%query("do_small_domain", do_small_domain)
     call pp%query("cfl", cfl)
     call pp%query("use_soundspeed_firstdt", use_soundspeed_firstdt)
     call pp%query("use_divu_firstdt", use_divu_firstdt)
@@ -175,6 +182,14 @@ contains
     call pp%query("small_dens", small_dens)
     call pp%query("use_eos_e_instead_of_h", use_eos_e_instead_of_h)
     call pp%query("use_pprime_in_tfromp", use_pprime_in_tfromp)
+    call pp%query("pert_temp_factor", pert_temp_factor)
+    call pp%query("pert_rad_factor", pert_rad_factor)
+    call pp%query("do_small_domain", do_small_domain)
+    call pp%query("apply_vel_field", apply_vel_field)
+    call pp%query("velpert_scale", velpert_scale)
+    call pp%query("velpert_amplitude", velpert_amplitude)
+    call pp%query("velpert_height_loc", velpert_height_loc)
+    call pp%query("num_vortices", num_vortices)
     call amrex_parmparse_destroy(pp)
 
 

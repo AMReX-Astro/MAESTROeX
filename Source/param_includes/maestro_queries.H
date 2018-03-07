@@ -5,12 +5,10 @@
 
 pp.query("do_reflux", do_reflux);
 pp.query("maestro_verbose", maestro_verbose);
+pp.query("probin_file", probin_file);
 pp.query("model_file", model_file);
 pp.query("perturb_model", perturb_model);
 pp.query("print_init_hse_diag", print_init_hse_diag);
-pp.query("pert_temp_factor", pert_temp_factor);
-pp.query("pert_rad_factor", pert_rad_factor);
-pp.query("do_small_domain", do_small_domain);
 pp.query("stop_time", stop_time);
 pp.query("max_step", max_step);
 pp.query("cfl", cfl);
@@ -137,3 +135,11 @@ pp.query("eps_hg", eps_hg);
 pp.query("eps_hg_max", eps_hg_max);
 pp.query("hg_level_factor", hg_level_factor);
 pp.query("eps_hg_bottom", eps_hg_bottom);
+pp.query("pert_temp_factor", pert_temp_factor);
+pp.query("pert_rad_factor", pert_rad_factor);
+pp.query("do_small_domain", do_small_domain);
+pp.query("apply_vel_field", apply_vel_field);
+pp.query("velpert_scale", velpert_scale);
+pp.query("velpert_amplitude", velpert_amplitude);
+pp.query("velpert_height_loc", velpert_height_loc);
+pp.query("num_vortices", num_vortices);

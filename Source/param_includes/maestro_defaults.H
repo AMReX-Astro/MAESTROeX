@@ -5,12 +5,10 @@
 
 int         Maestro::do_reflux = 1;
 int         Maestro::maestro_verbose = 1;
-std::string Maestro::model_file = "model.hse";
+std::string Maestro::probin_file = "";
+std::string Maestro::model_file = "";
 bool        Maestro::perturb_model = false;
 bool        Maestro::print_init_hse_diag = false;
-amrex::Real Maestro::pert_temp_factor = 1.0;
-amrex::Real Maestro::pert_rad_factor = 1.0;
-bool        Maestro::do_small_domain = false;
 amrex::Real Maestro::stop_time = -1.0;
 int         Maestro::max_step = 1;
 amrex::Real Maestro::cfl = 0.5;
@@ -137,3 +135,11 @@ amrex::Real Maestro::eps_hg = 1.e-12;
 amrex::Real Maestro::eps_hg_max = 1.e-10;
 amrex::Real Maestro::hg_level_factor = 10.;
 amrex::Real Maestro::eps_hg_bottom = 1.e-4;
+amrex::Real Maestro::pert_temp_factor = 1.0;
+amrex::Real Maestro::pert_rad_factor = 1.0;
+bool        Maestro::do_small_domain = false;
+bool        Maestro::apply_vel_field = false;
+amrex::Real Maestro::velpert_scale = 2.5e6;
+amrex::Real Maestro::velpert_amplitude = 1.0e2;
+amrex::Real Maestro::velpert_height_loc = 1.2e8;
+int         Maestro::num_vortices = 2;

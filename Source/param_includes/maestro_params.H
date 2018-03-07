@@ -5,12 +5,10 @@
 
 static int         do_reflux;
 static int         maestro_verbose;
+static std::string probin_file;
 static std::string model_file;
 static bool        perturb_model;
 static bool        print_init_hse_diag;
-static amrex::Real pert_temp_factor;
-static amrex::Real pert_rad_factor;
-static bool        do_small_domain;
 static amrex::Real stop_time;
 static int         max_step;
 static amrex::Real cfl;
@@ -137,3 +135,11 @@ static amrex::Real eps_hg;
 static amrex::Real eps_hg_max;
 static amrex::Real hg_level_factor;
 static amrex::Real eps_hg_bottom;
+static amrex::Real pert_temp_factor;
+static amrex::Real pert_rad_factor;
+static bool        do_small_domain;
+static bool        apply_vel_field;
+static amrex::Real velpert_scale;
+static amrex::Real velpert_amplitude;
+static amrex::Real velpert_height_loc;
+static int         num_vortices;
