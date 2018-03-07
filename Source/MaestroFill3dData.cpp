@@ -121,5 +121,21 @@ Maestro::MakeNormal ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNormal()",MakeNormal);
     
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        MultiFab& normal_mf = normal[lev];
+	const Real* dx = geom[lev].CellSize();
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(normal_mf); mfi.isValid(); ++mfi ) {
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            make_normal(BL_TO_FORTRAN_3D(normal_mf[mfi]), dx);
+        }
+    }
+
     Abort("Need to write Maestro::MakeNormal()");
 }

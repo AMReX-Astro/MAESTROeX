@@ -159,6 +159,7 @@ Maestro::Setup ()
     dSdt              .resize(max_level+1);
     pi                .resize(max_level+1);
     rhcc_for_nodalproj.resize(max_level+1);
+    normal            .resize(max_level+1);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+1+1"

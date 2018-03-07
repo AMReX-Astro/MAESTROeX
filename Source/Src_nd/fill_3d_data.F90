@@ -1,7 +1,9 @@
 
 module fill_3d_data_module
 
-  use base_state_geometry_module, only: nr_fine, max_radial_level
+  use base_state_geometry_module, only: nr_fine, max_radial_level, center
+  use bl_constants_module
+  use meth_params_module, only: prob_lo, spherical
   
   implicit none
 
@@ -130,5 +132,49 @@ contains
 #endif
 
   end subroutine addw0
+
+  subroutine make_normal(normal,n_lo,n_hi,dx) bind(C, name="make_normal")
+    
+    integer         , intent(in   ) :: n_lo(3), n_hi(3)
+    double precision, intent(  out) :: normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
+    double precision, intent(in   ) :: dx(3)
+
+    integer          :: i,j,k
+    double precision :: x,y,z,radius
+
+    ! normal is the unit vector in the radial direction (e_r) in spherical
+    ! coordinates.
+    !
+    ! in terms of Cartesian coordinates, with unit vectors e_x, e_y, e_z,
+    !    e_r = sin(theta)cos(phi) e_x + sin(theta)sin(phi) e_y + cos(theta) e_z
+    ! or
+    !    e_r = (x/R) e_x + (y/R) e_y + (z/R) e_z
+
+    if (spherical .eq. 1) then
+
+       !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius)
+       do k = n_lo(3),n_hi(3)
+          z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
+          do j = n_lo(2),n_hi(2)
+             y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
+             do i = n_lo(1),n_hi(1)
+                x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
+
+                radius = sqrt(x**2 + y**2 + z**2)
+
+                normal(i,j,k,1) = x * (ONE / radius)
+                normal(i,j,k,2) = y * (ONE / radius)
+                normal(i,j,k,3) = z * (ONE / radius)
+
+             end do
+          end do
+       end do
+       !$OMP END PARALLEL DO
+
+    else 
+       call bl_error('SHOULDNT CALL MAKE_3D_NORMAL WITH SPHERICAL = 0')
+    end if
+
+  end subroutine make_normal
 
 end module fill_3d_data_module

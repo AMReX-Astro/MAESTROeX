@@ -163,7 +163,7 @@ extern "C"
     //////////////////////
 
     //////////////////////
-    // in fill_3d_data.f90
+    // in fill_3d_data.F90
     void put_1d_array_on_cart(const int* lev, const int* lo, const int* hi,
                               amrex::Real* s0_cart,
                               const int* s0_cart_lo, const int* s0_cart_hi, const int* nc_s,
@@ -179,6 +179,9 @@ extern "C"
 #endif
 #endif
                const amrex::Real* w0, const amrex::Real* mult);
+
+    void make_normal(amrex::Real* normal, const int* n_lo, const int* n_hi,
+		     const amrex::Real* dx);
     //////////////////////
 
     //////////////////////
