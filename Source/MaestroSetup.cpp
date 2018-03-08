@@ -27,9 +27,13 @@ Maestro::Setup ()
     // in _cpp_parameters
     read_method_params();
 
-    // Initialize the runtime parameters for any of the external
-    // microphysics
-    extern_init();
+    // Initialize the runtime parameters for any of the external microphysics
+    // (in extern.f90)
+    ExternInit();
+
+    // Initialize the runtime parameters specific to the problem
+    // (in probdata.f90)
+    ProbdataInit();
 
     // define (Rho, RhoH, etc.)
     // calls network_init
@@ -247,7 +251,7 @@ void Maestro::VariableSetup ()
 }
 
 void
-Maestro::extern_init ()
+Maestro::ExternInit ()
 {
   // initialize the external runtime parameters -- these will
   // live in the probin
@@ -263,6 +267,25 @@ Maestro::extern_init ()
     probin_file_name[i] = probin_file[i];
 
   maestro_extern_init(probin_file_name.dataPtr(),&probin_file_length);
+}
+
+void
+Maestro::ProbdataInit ()
+{
+  // initialize the probdata runtime parameters -- these will
+  // live in the probin
+
+  if (ParallelDescriptor::IOProcessor()) {
+    std::cout << "reading probdata runtime parameters ..." << std::endl;
+  }
+
+  const int probin_file_length = probin_file.length();
+  Vector<int> probin_file_name(probin_file_length);
+
+  for (int i = 0; i < probin_file_length; i++)
+    probin_file_name[i] = probin_file[i];
+
+  maestro_probdata_init(probin_file_name.dataPtr(),&probin_file_length);
 }
 
 // set up BCRec definitions for BC types

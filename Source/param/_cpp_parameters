@@ -546,12 +546,6 @@ eps_hg_bottom                       Real       1.e-4
 # category: problem-specific
 #-----------------------------------------------------------------------------
 
-# TEST_PROBLEMS/reacting_bubble
-# used for perturbing the initial temperature field
-pert_temp_factor                    Real               1.0      y
-pert_rad_factor                     Real               1.0      y
-do_small_domain                     bool              false     y
-
 # TEST_PROBLEMS/test_convect
 # used to set up the initial vortices
 apply_vel_field                     bool               false    y

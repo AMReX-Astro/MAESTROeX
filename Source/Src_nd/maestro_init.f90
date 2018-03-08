@@ -43,6 +43,24 @@ contains
 ! ::: ----------------------------------------------------------------
 ! :::
 
+  subroutine maestro_probdata_init(name,namlen) bind(C, name="maestro_probdata_init")
+
+    ! initialize the probdata runtime parameters in
+    ! probdata_module
+
+    use amrex_fort_module, only: rt => amrex_real
+
+    integer, intent(in) :: namlen
+    integer, intent(in) :: name(namlen)
+
+    call probdata_init(name,namlen)
+
+  end subroutine maestro_probdata_init
+
+! :::
+! ::: ----------------------------------------------------------------
+! :::
+
   subroutine get_num_spec(nspec_out) bind(C, name="get_num_spec")
 
     integer, intent(out) :: nspec_out

@@ -550,7 +550,8 @@ private:
     ////////////
     // MaestroSetup.cpp functions
 
-    static void extern_init ();
+    void ExternInit ();
+    void ProbdataInit ();
 
     // read in C++ parameters from inputs file
     void ReadParameters ();
