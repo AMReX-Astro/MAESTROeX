@@ -66,11 +66,6 @@ module meth_params_module
   double precision              , save :: small_dens
   logical                       , save :: use_eos_e_instead_of_h
   logical                       , save :: use_pprime_in_tfromp
-  logical                       , save :: apply_vel_field
-  double precision              , save :: velpert_scale
-  double precision              , save :: velpert_amplitude
-  double precision              , save :: velpert_height_loc
-  integer                       , save :: num_vortices
 
   ! End the declarations of the ParmParse parameters
 
@@ -128,11 +123,6 @@ contains
     small_dens = 1.d-5;
     use_eos_e_instead_of_h = .false.;
     use_pprime_in_tfromp = .false.;
-    apply_vel_field = .false.;
-    velpert_scale = 2.5d6;
-    velpert_amplitude = 1.0d2;
-    velpert_height_loc = 1.2d8;
-    num_vortices = 2;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("maestro_verbose", maestro_verbose)
@@ -176,11 +166,6 @@ contains
     call pp%query("small_dens", small_dens)
     call pp%query("use_eos_e_instead_of_h", use_eos_e_instead_of_h)
     call pp%query("use_pprime_in_tfromp", use_pprime_in_tfromp)
-    call pp%query("apply_vel_field", apply_vel_field)
-    call pp%query("velpert_scale", velpert_scale)
-    call pp%query("velpert_amplitude", velpert_amplitude)
-    call pp%query("velpert_height_loc", velpert_height_loc)
-    call pp%query("num_vortices", num_vortices)
     call amrex_parmparse_destroy(pp)
 
 

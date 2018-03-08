@@ -135,8 +135,3 @@ pp.query("eps_hg", eps_hg);
 pp.query("eps_hg_max", eps_hg_max);
 pp.query("hg_level_factor", hg_level_factor);
 pp.query("eps_hg_bottom", eps_hg_bottom);
-pp.query("apply_vel_field", apply_vel_field);
-pp.query("velpert_scale", velpert_scale);
-pp.query("velpert_amplitude", velpert_amplitude);
-pp.query("velpert_height_loc", velpert_height_loc);
-pp.query("num_vortices", num_vortices);

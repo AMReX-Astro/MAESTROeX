@@ -135,8 +135,3 @@ static amrex::Real eps_hg;
 static amrex::Real eps_hg_max;
 static amrex::Real hg_level_factor;
 static amrex::Real eps_hg_bottom;
-static bool        apply_vel_field;
-static amrex::Real velpert_scale;
-static amrex::Real velpert_amplitude;
-static amrex::Real velpert_height_loc;
-static int         num_vortices;
