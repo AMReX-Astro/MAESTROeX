@@ -71,8 +71,9 @@ Maestro::Evolve ()
         t_old = t_new;
 
         // write a plotfile
-        if (plot_int > 0 && (istep % plot_int == 0 || std::fmod(t_new, plot_deltat) < dt 
-			     || istep == max_step) )
+        if (plot_int > 0 && ( (istep % plot_int == 0) || 
+                              (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
+                              (istep == max_step) ) )
         {
             Print() << "\nWriting plotfile " << istep << endl;
             WritePlotFile(istep,t_new,rho0_new,p0_new,unew,snew);
