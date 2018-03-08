@@ -52,7 +52,7 @@ Maestro::EnthalpyAdvance (int which_step,
     // compute forcing terms    
     if (enthalpy_pred_type == predict_rhohprime) {
         // make force for (rho h)'
-        MakeRhoHForce(scal_force,1,thermal,umac,1);
+        MakeRhoHForce(scal_force,1,thermal,umac,1,1);
 
         ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,RhoH,bcs_s,0);
 
@@ -185,7 +185,14 @@ Maestro::EnthalpyAdvance (int which_step,
         scal_force[lev].setVal(0.,RhoH,1,1);
     }
 
-    MakeRhoHForce(scal_force,0,thermal,umac,0);
+    //**************************************************************************
+    //     1) Create (rho h)' force at time n+1/2.
+    //          (NOTE: we don't worry about filling ghost cells of the scal_force
+    //                 because we only need them in valid regions...)     
+    //     2) Update (rho h) with conservative differencing.
+    //**************************************************************************
+
+    MakeRhoHForce(scal_force,0,thermal,umac,0,which_step);
 
     if (spherical == 1) {
     }

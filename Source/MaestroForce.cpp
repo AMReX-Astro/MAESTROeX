@@ -131,7 +131,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                        int is_prediction,
                        const Vector<MultiFab>& thermal,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                       int add_thermal)
+                       int add_thermal, 
+		       const int &which_step)
 
 {
     // timer for profiling
@@ -152,7 +153,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
       p0.shrink_to_fit();
     grav.shrink_to_fit();
 
-    if (is_prediction == 1) {
+    if (which_step == 1) {
         rho0 = rho0_old;
           p0 =   p0_old;
     }

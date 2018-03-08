@@ -308,7 +308,8 @@ private:
                         int is_prediction,
                         const amrex::Vector<amrex::MultiFab>& thermal,
                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                        int add_thermal);
+                        int add_thermal, 
+			const int &which_step);
     ////////////////////////
 
     ////////////
