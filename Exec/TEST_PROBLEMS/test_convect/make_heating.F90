@@ -30,8 +30,11 @@ contains
     double precision :: ey,ez
     double precision :: L_x,L_y
 
+    ! zero external heating
+    rho_Hext = 0.d0
+
 #if (AMREX_SPACEDIM == 2)  
-    
+
     L_x = 2.5d8
 
     if (time <= 200.0d0) then
@@ -56,6 +59,7 @@ contains
        end do
 
     end if
+
 #elif (AMREX_SPACEDIM == 3)
 
     L_x = 2.5d8
