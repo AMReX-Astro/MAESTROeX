@@ -119,13 +119,6 @@ Maestro::EstDt ()
             Print() << "Call to estdt for level " << lev << " gives dt_lev = " << dt_lev << endl;
         }
 
-        // multiply by init_shrink
-        dt_lev *= init_shrink;
-
-        if (maestro_verbose > 0) {
-            Print() << "Multiplying dt_lev by init_shrink; dt_lev = " << dt_lev << endl;
-        }
-
         // update dt over all levels
         dt = std::min(dt,dt_lev);
 
