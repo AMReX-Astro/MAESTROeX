@@ -21,7 +21,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
     if (do_heating) {
 
         // computing heating term
-        ComputeHeating(rho_Hext);
+        MakeHeating(rho_Hext,s_in);
 
         // if we aren't burning, then we should just copy the old state to the
         // new and only update the rhoh component with the heating term

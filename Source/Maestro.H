@@ -495,7 +495,8 @@ private:
                 const amrex::Real dt_react);
 
     // compute heating term, rho_Hext
-    void ComputeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext);
+    void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
+                      const amrex::Vector<amrex::MultiFab>& scal);
 
     // end MaestroReact.cpp functions
     ////////////

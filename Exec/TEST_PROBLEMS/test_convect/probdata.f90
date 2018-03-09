@@ -1,5 +1,5 @@
-  ! place problem-specific variables that will go into the probdata namelist
-  ! create a local copy probdata.f90 in your build directorymodule probdata_module
+! place problem-specific variables that will go into the probdata namelist
+! create a local copy probdata.f90 in your build directory
 
 module probdata_module
 
@@ -7,6 +7,7 @@ module probdata_module
 
   private
 
+  ! variables for the probdata namelist
   logical         , save, public :: apply_vel_field = .false.
   double precision, save, public :: velpert_scale = 2.5d6
   double precision, save, public :: velpert_amplitude = 1.d2

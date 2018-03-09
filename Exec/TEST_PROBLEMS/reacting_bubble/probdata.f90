@@ -1,5 +1,5 @@
-  ! place problem-specific variables that will go into the probdata namelist
-  ! create a local copy probdata.f90 in your build directorymodule probdata_module
+! place problem-specific variables that will go into the probdata namelist
+! create a local copy probdata.f90 in your build directorymodule probdata_module
 
 module probdata_module
 
@@ -7,6 +7,7 @@ module probdata_module
 
   private
 
+  ! variables for the probdata namelist
   double precision, save, public :: pert_temp_factor = 1.d0
   double precision, save, public :: pert_rad_factor = 1.d0
   logical         , save, public :: do_small_domain = .false.

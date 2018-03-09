@@ -374,6 +374,13 @@ extern "C"
                         const amrex::Real* r_edge_loc);
     //////////////////////
 
+    //////////////////////
+    // in make_heating.f90
+    void make_heating(const int* lo, const int* hi, 
+                            amrex::Real* rho_Hext, const int* r_lo, const int* r_hi,
+                      const amrex::Real* scal,     const int* s_lo, const int* s_hi, const int* nc_s,
+                      const amrex::Real* time);
+    //////////////////////
 
     //////////////////////
     // in make_pi_cc.F90
