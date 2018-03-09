@@ -53,13 +53,6 @@ geometry.is_periodic =  1 0
 
 maestro.do_heating = true
 
-# INITIAL CONDITIONS
-maestro.apply_vel_field = true
-maestro.velpert_scale = 5.e6
-maestro.velpert_amplitude = 1.e5
-maestro.velpert_height_loc = 1.2e8
-maestro.num_vortices = 2
-
 # VERBOSITY
 maestro.v              = 1       # verbosity
 
