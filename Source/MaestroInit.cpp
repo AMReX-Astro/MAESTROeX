@@ -313,7 +313,10 @@ void Maestro::InitProj ()
 
     // compute thermal diffusion
     if (use_thermal_diffusion) {
-        Abort("InitProj: use_thermal_diffusion not implemented");
+        // call make_thermal_coeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff)
+
+	// call make_explicit_thermal(mla,dx,thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff, &
+        //                           p0,the_bc_tower)
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -348,6 +351,10 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<MultiFab> rho_Hnuc          (finest_level+1);
     Vector<MultiFab> thermal           (finest_level+1);
     Vector<MultiFab> rhohalf           (finest_level+1);
+    Vector<MultiFab> Tcoeff            (finest_level+1);
+    Vector<MultiFab> hcoeff            (finest_level+1);
+    Vector<MultiFab> Xkcoeff           (finest_level+1);
+    Vector<MultiFab> pcoeff            (finest_level+1);
 
     Vector<Real> Sbar                ( (max_radial_level+1)*nr_fine );
     Vector<Real> w0_force            ( (max_radial_level+1)*nr_fine );
@@ -373,6 +380,10 @@ void Maestro::DivuIter (int istep_divu_iter)
         rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
         thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
         rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
+	Tcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
 
         // divu_iters do not use density weighting
         rhohalf[lev].setVal(1.);
@@ -381,7 +392,11 @@ void Maestro::DivuIter (int istep_divu_iter)
     React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
 
     if (use_thermal_diffusion) {
-        Abort("DivuIter: use_thermal_diffusion not implemented");
+        // call make_thermal_coeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff)
+	
+	// call make_explicit_thermal(mla,dx,thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff, &
+        //                           p0_old,the_bc_tower)
+	
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {

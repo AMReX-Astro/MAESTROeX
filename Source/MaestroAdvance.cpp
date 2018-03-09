@@ -259,7 +259,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // put w0 on Cartesian edges
 
             // put w0_force on Cartesian cells
-
+	    Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_u, 0);
         }
 
     }
@@ -280,7 +280,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // compute unprojected MAC velocities
     AdvancePremac(umac,w0_force);
-
+    
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
         macphi   [lev].setVal(0.);
@@ -315,7 +315,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // thermal is the forcing for rhoh or temperature
     if (use_thermal_diffusion) {
+	// call make_thermal_coeffs(s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1)
 
+	// call make_explicit_thermal(mla,dx,thermal1,s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1, &
+        //                           p0_old,the_bc_tower)
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -357,7 +360,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
 	compute_cutoff_coords(rho0_new.dataPtr());
-
     }
 
     // update grav_cell_new
@@ -445,6 +447,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
+	// call thermal_conduct(mla,dx,dt,s1,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1, &
+        //                     s2,p0_old,p0_new,the_bc_tower)
 //        ThermalConduct();
     }
 
@@ -466,8 +470,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (use_thermal_diffusion) {
         // make a copy of s2star since these are needed to compute
         // coefficients in the call to thermal_conduct_full_alg
-
-
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    MultiFab::Copy(s2star[lev],s2[lev],0,0,Nscal,3);
+	}
     }
     
     //////////////////////////////////////////////////////////////////////////////
@@ -510,7 +515,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-    
+	// call make_thermal_coeffs(snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2)
+
+	// call make_explicit_thermal(mla,dx,thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2, &
+        //                           p0_new,the_bc_tower)
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -702,6 +710,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
+	// call make_thermal_coeffs(s2star,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2)
+	// call thermal_conduct(mla,dx,dt,s1,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2, &
+        //                     s2,p0_old,p0_new,the_bc_tower)
 //        ThermalConduct();
     }
 
@@ -750,7 +761,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
+	// call make_thermal_coeffs(snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2)
 
+	// call make_explicit_thermal(mla,dx,thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2, &
+        //                           p0_new,the_bc_tower)
     }
 
     Make_S_cc(S_cc_new,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal2);

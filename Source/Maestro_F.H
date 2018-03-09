@@ -282,6 +282,16 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in make_explicit_thermal.F90
+    void make_thermal_coeffs(const int* lo,  const int *hi,
+			     const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
+			     amrex::Real* Tcoeff, const int* t_lo, const int* t_hi, 
+			     amrex::Real* hcoeff, const int* h_lo, const int* h_hi, 
+			     amrex::Real* Xkcoeff, const int* xk_lo, const int* xk_hi, const int* nc_xk, 
+			     amrex::Real* pcoeff, const int* p_lo, const int* p_hi);
+    //////////////////////
+
+    //////////////////////
     // in make_flux.F90
 #if (AMREX_SPACEDIM == 1)
     void make_rhoX_flux_1d(

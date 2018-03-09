@@ -59,6 +59,7 @@ module meth_params_module
   double precision              , save :: rotational_frequency
   double precision              , save :: co_latitude
   logical                       , save :: drive_initial_convection
+  logical                       , save :: limit_conductivity
   character (len=:), allocatable, save :: burner_threshold_species
   double precision              , save :: burner_threshold_cutoff
   double precision              , save :: reaction_sum_tol
@@ -115,6 +116,7 @@ contains
     rotational_frequency = 0.0d0;
     co_latitude = 0.0d0;
     drive_initial_convection = .false.;
+    limit_conductivity = .false.;
     allocate(character(len=1)::burner_threshold_species)
     burner_threshold_species = "";
     burner_threshold_cutoff = 1.d-10;
@@ -159,6 +161,7 @@ contains
     call pp%query("rotational_frequency", rotational_frequency)
     call pp%query("co_latitude", co_latitude)
     call pp%query("drive_initial_convection", drive_initial_convection)
+    call pp%query("limit_conductivity", limit_conductivity)
     call pp%query("burner_threshold_species", burner_threshold_species)
     call pp%query("burner_threshold_cutoff", burner_threshold_cutoff)
     call pp%query("reaction_sum_tol", reaction_sum_tol)

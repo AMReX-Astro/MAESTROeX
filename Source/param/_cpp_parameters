@@ -412,7 +412,7 @@ thermal_diffusion_type              int            1
 
 # apply the conductivity limiting---if T, then we set the thermal coefficients
 # all to 0 for $\rho <$ {\tt buoyancy\_cutoff\_factor} * {\tt base\_cutoff\_density}
-limit_conductivity                  bool            false
+limit_conductivity                  bool            false      y
 
 
 

@@ -105,8 +105,8 @@ Maestro::NodalProj (int proj_type,
     // pressure_iters_comp:     beta0/rho
     // regular_timestep_comp:   beta0/rho
     for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Divide(sig[lev],beta0_cart[lev],0,0,1,1);
         sig[lev].invert(1.0,1);
-        MultiFab::Multiply(sig[lev],beta0_cart[lev],0,0,1,1);
     }
 
 
@@ -263,7 +263,7 @@ Maestro::NodalProj (int proj_type,
     else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
         rel_tol = std::min( eps_hg_max, eps_hg*pow(hg_level_factor,finest_level) );
     }
- 
+
 
     // solve for phi
     Print() << "Calling nodal solver" << endl;
@@ -361,11 +361,13 @@ Maestro::NodalProj (int proj_type,
     }
 
     // average fine data onto coarser cells
+    AverageDown(uold,0,AMREX_SPACEDIM);
     AverageDown(unew,0,AMREX_SPACEDIM);
     AverageDown(gpi,0,AMREX_SPACEDIM);
 
     // fill ghost cells
     FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 
 }
 
