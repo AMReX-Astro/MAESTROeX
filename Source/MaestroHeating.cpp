@@ -23,6 +23,7 @@ Maestro::MakeHeating (Vector<MultiFab>& rho_Hext,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
@@ -30,7 +31,10 @@ Maestro::MakeHeating (Vector<MultiFab>& rho_Hext,
             // We will also pass "validBox", which specifies the "valid" region.
             make_heating(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                          BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-                         BL_TO_FORTRAN_FAB(scal_mf[mfi]), &t_old);
+                         BL_TO_FORTRAN_FAB(scal_mf[mfi]), dx, &t_old);
         }
     }
+
+    // average down
+    AverageDown(rho_Hext,0,1);
 }

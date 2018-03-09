@@ -379,7 +379,7 @@ extern "C"
     void make_heating(const int* lo, const int* hi, 
                             amrex::Real* rho_Hext, const int* r_lo, const int* r_hi,
                       const amrex::Real* scal,     const int* s_lo, const int* s_hi, const int* nc_s,
-                      const amrex::Real* time);
+                      const amrex::Real* dx, const amrex::Real* time);
     //////////////////////
 
     //////////////////////
