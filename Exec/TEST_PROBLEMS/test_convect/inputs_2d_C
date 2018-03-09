@@ -20,7 +20,7 @@ maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 33.333
 maestro.sponge_kappa = 100.
 
-maestro.max_step  = 0
+maestro.max_step  = 100
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 1
 maestro.init_iter             = 1
