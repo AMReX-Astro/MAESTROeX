@@ -81,7 +81,8 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
     // rho, rhoh, rhoX, tfromp, tfromh, Pi (Nscal+1)
     // X (NumSpec)
     // rho0, p0 (2)
-    int nPlot = AMREX_SPACEDIM + Nscal + NumSpec + 3;
+    // w0 (AMREX_SPACEDIM)
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 3;
 
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
@@ -89,11 +90,15 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
     // temporary MultiFab to hold plotfile data
     Vector<MultiFab*> plot_mf_data(finest_level+1);
 
+    // temporary MultiFab for calculations
+    Vector<MultiFab> tempmf(finest_level+1);
+
     int dest_comp = 0;
 
     // build temporary MultiFab to hold plotfile data
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i] = new MultiFab((s_in[i]).boxArray(),(s_in[i]).DistributionMap(),nPlot,0);
+        plot_mf_data[i] = new MultiFab((s_in[i]).boxArray(),(s_in[i]).DistributionMap(),nPlot         ,0);
+        tempmf[i].define(grids[i],dmap[i],AMREX_SPACEDIM,0);
     }
 
     // velocity
@@ -165,6 +170,13 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
     }
     dest_comp += 2;
 
+    // w0
+    Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
+    for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
+    }
+    dest_comp += AMREX_SPACEDIM;
+
     // add plot_mf_data[i] to plot_mf
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf.push_back(plot_mf_data[i]);
@@ -185,7 +197,8 @@ Maestro::PlotFileVarNames () const
     // rho, rhoh, rhoX, tfromp, tfromh, Pi (Nscal+1)
     // X (NumSpec)
     // rho0, p0 (2)
-    int nPlot = AMREX_SPACEDIM + Nscal + NumSpec + 3;
+    // w0 (AMREX_SPACEDIM)
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 3;
     Vector<std::string> names(nPlot);
 
     int cnt = 0;
@@ -244,6 +257,13 @@ Maestro::PlotFileVarNames () const
 
     names[cnt++] = "rho0";
     names[cnt++] = "p0";
+
+    // add w0
+    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+        std::string x = "w0";
+        x += (120+i);
+        names[cnt++] = x;
+    }
 
     return names;
 }
