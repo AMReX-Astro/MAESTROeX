@@ -55,9 +55,11 @@ contains
     do j = lo(2),hi(2)
     do i = lo(1),hi(1)
 
-#if (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 1)
+       r = i
+#elif (AMREX_SPACEDIM == 2)
        r = j
-#else
+#elif (AMREX_SPACEDIM == 3)
        r = k
 #endif
 
@@ -83,6 +85,14 @@ contains
        do k=lo(3),hi(3)
        do j=lo(2),hi(2)
        do i=lo(1),hi(1)
+
+#if (AMREX_SPACEDIM == 1)
+       r = i
+#elif (AMREX_SPACEDIM == 2)
+       r = j
+#elif (AMREX_SPACEDIM == 3)
+       r = k
+#endif
 
              if (r .le. -1) then
                 ! do not modify force since dw0/dr=0
