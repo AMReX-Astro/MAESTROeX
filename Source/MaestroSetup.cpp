@@ -248,6 +248,12 @@ void Maestro::VariableSetup ()
     Pi = cnt++;
 
     Nscal = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
+
+    // set number of ghost cells for sold/new and uold/new
+    ng_s = 3;
+    if (ppm_type == 2 || bds_type == 1) {
+        ng_s = 4;
+    }
 }
 
 void

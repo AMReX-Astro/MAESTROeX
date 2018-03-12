@@ -598,6 +598,7 @@ private:
 
     // these are defined in VariableSetup()
     static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi, Nscal;
+    static int ng_s; // number of ghost cells for sold/new and uold/new
 
     // these are defined in Maestro.cpp
     // these represent the four types of nodal projections

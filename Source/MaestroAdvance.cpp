@@ -113,30 +113,30 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     for (int lev=0; lev<=finest_level; ++lev) {
         // cell-centered MultiFabs
-        rhohalf     [lev].define(grids[lev], dmap[lev],       1, 1);
-        macrhs      [lev].define(grids[lev], dmap[lev],       1, 0);
-        macphi      [lev].define(grids[lev], dmap[lev],       1, 1);
-        S_cc_nph    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
-        thermal1    [lev].define(grids[lev], dmap[lev],       1, 0);
-        thermal2    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1, 0);
-        rho_Hext    [lev].define(grids[lev], dmap[lev],       1, 0);
-        s1          [lev].define(grids[lev], dmap[lev],   Nscal, 3);
-        s2          [lev].define(grids[lev], dmap[lev],   Nscal, 3);
-        s2star      [lev].define(grids[lev], dmap[lev],   Nscal, 3);
-        peosbar_cart[lev].define(grids[lev], dmap[lev],       1, 0);
-        delta_p_term[lev].define(grids[lev], dmap[lev],       1, 0);
-        Tcoeff      [lev].define(grids[lev], dmap[lev],       1, 1);
-        hcoeff1     [lev].define(grids[lev], dmap[lev],       1, 1);
-        Xkcoeff1    [lev].define(grids[lev], dmap[lev], NumSpec, 1);
-        pcoeff1     [lev].define(grids[lev], dmap[lev],       1, 1);
-        hcoeff2     [lev].define(grids[lev], dmap[lev],       1, 1);
-        Xkcoeff2    [lev].define(grids[lev], dmap[lev],       1, 1);
-        pcoeff2     [lev].define(grids[lev], dmap[lev], NumSpec, 1);
-        scal_force  [lev].define(grids[lev], dmap[lev],   Nscal, 1);
-        delta_chi   [lev].define(grids[lev], dmap[lev],       1, 0);
-        sponge      [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf     [lev].define(grids[lev], dmap[lev],       1,    1);
+        macrhs      [lev].define(grids[lev], dmap[lev],       1,    0);
+        macphi      [lev].define(grids[lev], dmap[lev],       1,    1);
+        S_cc_nph    [lev].define(grids[lev], dmap[lev],       1,    0);
+        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec,    0);
+        thermal1    [lev].define(grids[lev], dmap[lev],       1,    0);
+        thermal2    [lev].define(grids[lev], dmap[lev],       1,    0);
+        rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1,    0);
+        rho_Hext    [lev].define(grids[lev], dmap[lev],       1,    0);
+        s1          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
+        s2          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
+        s2star      [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
+        peosbar_cart[lev].define(grids[lev], dmap[lev],       1,    0);
+        delta_p_term[lev].define(grids[lev], dmap[lev],       1,    0);
+        Tcoeff      [lev].define(grids[lev], dmap[lev],       1,    1);
+        hcoeff1     [lev].define(grids[lev], dmap[lev],       1,    1);
+        Xkcoeff1    [lev].define(grids[lev], dmap[lev], NumSpec,    1);
+        pcoeff1     [lev].define(grids[lev], dmap[lev],       1,    1);
+        hcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
+        Xkcoeff2    [lev].define(grids[lev], dmap[lev],       1,    1);
+        pcoeff2     [lev].define(grids[lev], dmap[lev], NumSpec,    1);
+        scal_force  [lev].define(grids[lev], dmap[lev],   Nscal,    1);
+        delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
+        sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
 
         // face-centered in the dm-direction (planar only)
         AMREX_D_TERM(etarhoflux[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
@@ -325,7 +325,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1, 3);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,ng_s);
     }
 
     if (maestro_verbose >= 1) {
@@ -451,8 +451,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // pass temperature through for seeding the temperature update eos call
     // pi goes along for the ride
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1, 3);
-        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1, 3);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,ng_s);
+        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,ng_s);
     }
 
     // now update temperature
@@ -467,7 +467,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // make a copy of s2star since these are needed to compute
         // coefficients in the call to thermal_conduct_full_alg
 	for (int lev=0; lev<=finest_level; ++lev) {
-	    MultiFab::Copy(s2star[lev],s2[lev],0,0,Nscal,3);
+	    MultiFab::Copy(s2star[lev],s2[lev],0,0,Nscal,ng_s);
 	}
     }
     
@@ -597,7 +597,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1, 3);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,ng_s);
     }
 
     if (maestro_verbose >= 1) {
@@ -715,8 +715,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // pass temperature through for seeding the temperature update eos call
     // pi goes along for the ride
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1, 3);
-        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1, 3);
+        MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,ng_s);
+        MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,ng_s);
     }
 
     // now update temperature

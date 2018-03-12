@@ -167,72 +167,72 @@ Maestro::ReadCheckPoint ()
 
     // Header
     {
-    std::string File(restart_file + "/Header");
-    Vector<char> fileCharPtr;
-    ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
-    std::string fileCharPtrString(fileCharPtr.dataPtr());
-    std::istringstream is(fileCharPtrString, std::istringstream::in);
+        std::string File(restart_file + "/Header");
+        Vector<char> fileCharPtr;
+        ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
+        std::string fileCharPtrString(fileCharPtr.dataPtr());
+        std::istringstream is(fileCharPtrString, std::istringstream::in);
 
-    // read in title line
-    std::getline(is, line);
+        // read in title line
+        std::getline(is, line);
 
-    // read in time step number
-    is >> start_step;
-    GotoNextLine(is);
-    ++start_step;
+        // read in time step number
+        is >> start_step;
+        GotoNextLine(is);
+        ++start_step;
 
-    // read in finest_level
-    is >> finest_level;
-    GotoNextLine(is);
-
-    // read in step
-    is >> step;
-    GotoNextLine(is);
-
-    // read in dt
-    is >> dt;
-    GotoNextLine(is);
-
-    // read in time
-    is >> t_old;
-    GotoNextLine(is);
-
-    // read in rel_eps
-    Real rel_eps;
-    is >> rel_eps;
-    GotoNextLine(is);
-    set_rel_eps(&rel_eps);    
-
-    for (int lev = 0; lev <= finest_level; ++lev) {
-
-        // read in level 'lev' BoxArray from Header
-        BoxArray ba;
-        ba.readFrom(is);
+        // read in finest_level
+        is >> finest_level;
         GotoNextLine(is);
 
-        // create a distribution mapping
-        DistributionMapping dm { ba, ParallelDescriptor::NProcs() };
+        // read in step
+        is >> step;
+        GotoNextLine(is);
 
-        // set BoxArray grids and DistributionMapping dmap in AMReX_AmrMesh.H class
-        SetBoxArray(lev, ba);
-        SetDistributionMap(lev, dm);
+        // read in dt
+        is >> dt;
+        GotoNextLine(is);
 
-        // build MultiFab data
-        sold    [lev].define(ba, dm,          Nscal, 3);
-        snew    [lev].define(ba, dm,          Nscal, 3);
-        uold    [lev].define(ba, dm, AMREX_SPACEDIM, 3);
-        unew    [lev].define(ba, dm, AMREX_SPACEDIM, 3);
-        S_cc_old[lev].define(ba, dm,              1, 0);
-        S_cc_new[lev].define(ba, dm,              1, 0);
-        gpi     [lev].define(ba, dm, AMREX_SPACEDIM, 0);
-        dSdt    [lev].define(ba, dm,              1, 0);
-        pi      [lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
+        // read in time
+        is >> t_old;
+        GotoNextLine(is);
 
-        rhcc_for_nodalproj[lev].define(ba, dm, 1, 1);
+        // read in rel_eps
+        Real rel_eps;
+        is >> rel_eps;
+        GotoNextLine(is);
+        set_rel_eps(&rel_eps);    
 
-        if (spherical == 1) {
-            normal[lev].define(ba, dm, 1, 1);
-        }
+        for (int lev = 0; lev <= finest_level; ++lev) {
+
+            // read in level 'lev' BoxArray from Header
+            BoxArray ba;
+            ba.readFrom(is);
+            GotoNextLine(is);
+
+            // create a distribution mapping
+            DistributionMapping dm { ba, ParallelDescriptor::NProcs() };
+
+            // set BoxArray grids and DistributionMapping dmap in AMReX_AmrMesh.H class
+            SetBoxArray(lev, ba);
+            SetDistributionMap(lev, dm);
+
+            // build MultiFab data
+            sold              [lev].define(ba, dm,          Nscal, ng_s);
+            snew              [lev].define(ba, dm,          Nscal, ng_s);
+            uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
+            unew              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
+            S_cc_old          [lev].define(ba, dm,              1,    0);
+            S_cc_new          [lev].define(ba, dm,              1,    0);
+            gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
+            dSdt              [lev].define(ba, dm,              1,    0);
+            rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
+
+            pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
+
+            if (spherical == 1) {
+                normal[lev].define(ba, dm, 1, 1);
+            }
     }
     }
 

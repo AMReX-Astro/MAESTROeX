@@ -44,10 +44,10 @@ Maestro::Init ()
         // build (define) the following MultiFabs (that weren't read in from checkpoint):
         // snew, unew, S_cc_new, rhcc_for_nodalproj, normal, pi
         for (int lev=0; lev<=finest_level; ++lev) {
-            snew              [lev].define(grids[lev], dmap[lev],          Nscal, 3);
-            unew              [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 3);
-            S_cc_new          [lev].define(grids[lev], dmap[lev],              1, 0);
-            rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],              1, 1);
+            snew              [lev].define(grids[lev], dmap[lev],          Nscal, ng_s);
+            unew              [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+            S_cc_new          [lev].define(grids[lev], dmap[lev],              1,    0);
+            rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],              1,    1);
             if (spherical == 1) {
                 normal[lev].define(grids[lev], dmap[lev], 1, 1);
             }
@@ -231,29 +231,28 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNewLevelFromScratch()",MakeNewLevelFromScratch);
 
-    sold    [lev].define(ba, dm,          Nscal, 3);
-    snew    [lev].define(ba, dm,          Nscal, 3);
-    uold    [lev].define(ba, dm, AMREX_SPACEDIM, 3);
-    unew    [lev].define(ba, dm, AMREX_SPACEDIM, 3);
-    S_cc_old[lev].define(ba, dm,              1, 0);
-    S_cc_new[lev].define(ba, dm,              1, 0);
-    gpi     [lev].define(ba, dm, AMREX_SPACEDIM, 0);
-    dSdt    [lev].define(ba, dm,              1, 0);
-    pi      [lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
+    sold              [lev].define(ba, dm,          Nscal, ng_s);
+    snew              [lev].define(ba, dm,          Nscal, ng_s);
+    uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
+    unew              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
+    S_cc_old          [lev].define(ba, dm,              1,    0);
+    S_cc_new          [lev].define(ba, dm,              1,    0);
+    gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
+    dSdt              [lev].define(ba, dm,              1,    0);
+    rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 
-    rhcc_for_nodalproj[lev].define(ba, dm, 1, 1);
+    pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
 
-    sold    [lev].setVal(0.);
-    snew    [lev].setVal(0.);
-    uold    [lev].setVal(0.);
-    unew    [lev].setVal(0.);
-    S_cc_old[lev].setVal(0.);
-    S_cc_new[lev].setVal(0.);
-    gpi     [lev].setVal(0.);
-    dSdt    [lev].setVal(0.);
-    pi      [lev].setVal(0.);   
-
+    sold              [lev].setVal(0.);
+    snew              [lev].setVal(0.);
+    uold              [lev].setVal(0.);
+    unew              [lev].setVal(0.);
+    S_cc_old          [lev].setVal(0.);
+    S_cc_new          [lev].setVal(0.);
+    gpi               [lev].setVal(0.);
+    dSdt              [lev].setVal(0.);
     rhcc_for_nodalproj[lev].setVal(0.);
+    pi                [lev].setVal(0.);   
 
     if (spherical == 1) {
         normal[lev].define(ba, dm, 1, 1);
@@ -467,6 +466,6 @@ void Maestro::InitIter ()
 
     // copy pi from snew to sold
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1, 3);
+        MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1,ng_s);
     }
 }
