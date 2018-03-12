@@ -177,4 +177,159 @@ contains
 
   end subroutine make_normal
 
+  subroutine put_data_on_faces(lo, hi, &
+                                 scc, cc_lo, cc_hi, &
+                                 facex, x_lo, x_hi, &
+#if (AMREX_SPACEDIM >= 2)
+                                 facey, y_lo, y_hi, &
+#if (AMREX_SPACEDIM == 3)
+                                 facez, z_lo, z_hi, &
+#endif
+#endif
+                                 harmonic_avg) bind(C, name="put_data_on_faces")
+    
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: cc_lo(3), cc_hi(3)
+    double precision, intent(in   ) :: scc(cc_lo(1):cc_hi(1),cc_lo(2):cc_hi(2),cc_lo(3):cc_hi(3))
+    integer         , intent(in   ) :: x_lo(3), x_hi(3)
+    double precision, intent(inout) :: facex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
+#if (AMREX_SPACEDIM >= 2)
+    integer         , intent(in   ) :: y_lo(3), y_hi(3)
+    double precision, intent(inout) :: facey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
+#if (AMREX_SPACEDIM == 3)
+    integer         , intent(in   ) :: z_lo(3), z_hi(3)
+    double precision, intent(inout) :: facez(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
+#endif
+#endif
+    integer         , intent(in   ) :: harmonic_avg
+
+    ! local
+    integer :: i,j,k
+    double precision :: denom
+
+    if (harmonic_avg .eq. 1) then
+
+       !$OMP PARALLEL PRIVATE(i,j,k,denom)
+
+       !$OMP DO
+       k = lo(3)
+       j = lo(2)
+#if (AMREX_SPACEDIM == 3)
+       do k = lo(3),hi(3)
+#endif
+#if (AMREX_SPACEDIM >= 2)
+          do j = lo(2),hi(2)
+#endif
+             do i = lo(1),hi(1)+1
+                denom = (scc(i,j,k) + scc(i-1,j,k))
+                if (denom .ne. 0.d0) then
+                   facex(i,j,k) = TWO*(scc(i,j,k) * scc(i-1,j,k)) / denom
+                else
+                   facex(i,j,k) = HALF*denom
+                end if
+             end do
+#if (AMREX_SPACEDIM >= 2)
+          end do
+#endif
+#if (AMREX_SPACEDIM == 3)
+       end do
+#endif
+       !$OMP END DO NOWAIT
+
+       !$OMP DO
+#if (AMREX_SPACEDIM == 3)
+       do k = lo(3),hi(3)
+#endif
+#if (AMREX_SPACEDIM >= 2)
+          do j = lo(2),hi(2)+1
+             do i = lo(1),hi(1)
+                denom = (scc(i,j,k) + scc(i,j-1,k))
+                if (denom .ne. 0.d0) then
+                   facey(i,j,k) = TWO*(scc(i,j,k) * scc(i,j-1,k)) / denom
+                else
+                   facey(i,j,k) = HALF*denom
+                end if
+             end do
+          end do
+#endif
+#if (AMREX_SPACEDIM == 3)
+       end do
+#endif
+       !$OMP END DO NOWAIT
+
+       !$OMP DO
+#if (AMREX_SPACEDIM == 3)
+       do k = lo(3),hi(3)+1
+          do j = lo(2),hi(2)
+             do i = lo(1),hi(1)
+                denom = (scc(i,j,k) + scc(i,j,k-1))
+                if (denom .ne. 0.d0) then
+                   facez(i,j,k) = TWO*(scc(i,j,k) * scc(i,j,k-1)) / denom
+                else
+                   facez(i,j,k) = HALF*denom
+                end if
+             end do
+          end do
+       end do
+#endif
+       !$OMP END DO
+
+       !$OMP END PARALLEL
+
+    else
+
+       !$OMP PARALLEL PRIVATE(i,j,k)
+
+       !$OMP DO
+#if (AMREX_SPACEDIM == 3)
+       do k = lo(3),hi(3)
+#endif
+#if (AMREX_SPACEDIM >= 2)
+          do j = lo(2),hi(2)
+#endif
+             do i = lo(1),hi(1)+1
+                facex(i,j,k) = HALF*(scc(i,j,k)+scc(i-1,j,k))
+             end do
+#if (AMREX_SPACEDIM >= 2)
+          end do
+#endif
+#if (AMREX_SPACEDIM == 3)
+       end do
+#endif
+       !$OMP END DO NOWAIT
+
+       !$OMP DO
+#if (AMREX_SPACEDIM == 3)
+       do k = lo(3),hi(3)
+#endif
+#if (AMREX_SPACEDIM >= 2)
+          do j = lo(2),hi(2)+1
+             do i = lo(1),hi(1)
+                facey(i,j,k) = HALF*(scc(i,j,k)+scc(i,j-1,k))
+             end do
+          end do
+#endif
+#if (AMREX_SPACEDIM == 3)
+       end do
+#endif
+       !$OMP END DO NOWAIT
+
+       !$OMP DO
+#if (AMREX_SPACEDIM == 3)
+       do k = lo(3),hi(3)+1
+          do j = lo(2),hi(2)
+             do i = lo(1),hi(1)
+                facez(i,j,k) = HALF*(scc(i,j,k)+scc(i,j,k-1))
+             end do
+          end do
+       end do
+#endif
+       !$OMP END DO
+
+       !$OMP END PARALLEL
+
+    end if
+
+  end subroutine put_data_on_faces
+
 end module fill_3d_data_module

@@ -139,3 +139,49 @@ Maestro::MakeNormal ()
 
     Abort("Need to write Maestro::MakeNormal()");
 }
+
+
+void 
+Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc, 
+			Vector<std::array< MultiFab, AMREX_SPACEDIM >>& face, 
+			int harmonic_avg) {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PutDataOnFaces()",PutDataOnFaces);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        MultiFab& facex_mf = face[lev][0];
+#if (AMREX_SPACEDIM >= 2)
+        MultiFab& facey_mf = face[lev][1];
+#if (AMREX_SPACEDIM == 3)
+        MultiFab& facez_mf = face[lev][2];
+#endif
+#endif
+        // need one cell-centered MF for the MFIter
+        const MultiFab& scc_mf = s_cc[lev];
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(scc_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& validBox = mfi.validbox();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            put_data_on_faces(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			      BL_TO_FORTRAN_3D(scc_mf[mfi]), 
+			      BL_TO_FORTRAN_3D(facex_mf[mfi]),
+#if (AMREX_SPACEDIM >= 2)
+			      BL_TO_FORTRAN_3D(facey_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			      BL_TO_FORTRAN_3D(facez_mf[mfi]),
+#endif
+#endif
+			      &harmonic_avg);
+        }
+    }
+
+}

@@ -182,6 +182,17 @@ extern "C"
 
     void make_normal(amrex::Real* normal, const int* n_lo, const int* n_hi,
 		     const amrex::Real* dx);
+
+    void put_data_on_faces(const int* lo, const int* hi,
+			   const amrex::Real* scc, const int* cc_lo, const int* cc_hi, 
+			   amrex::Real* facex, const int* x_lo, const int* x_hi,
+#if (AMREX_SPACEDIM >= 2)
+			   amrex::Real* facey, const int* y_lo, const int* y_hi,
+#if (AMREX_SPACEDIM == 3)
+			   amrex::Real* facez, const int* z_lo, const int* z_hi,
+#endif
+#endif
+			   const int* harmonic_avg);
     //////////////////////
 
     //////////////////////
