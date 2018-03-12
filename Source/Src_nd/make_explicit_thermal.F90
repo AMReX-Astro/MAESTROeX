@@ -26,7 +26,7 @@ contains
     ! for the thermal diffusion term in the enthalpy equation.  
     !
     ! note: we explicitly fill the ghostcells by looping over them directly
-    ! in the _2d and _3d routines below.
+
     integer         , intent(in   ) :: lo(3), hi(3) 
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
     double precision, intent(in   ) :: scal(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
