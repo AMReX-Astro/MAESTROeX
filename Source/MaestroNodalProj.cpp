@@ -68,6 +68,13 @@ Maestro::NodalProj (int proj_type,
     // note sig is only used for regular_timestep_comp, and currently holds rhohalf
     CreateUvecForProj(proj_type,Vproj,sig);
 
+    bool using_alt_energy_fix = false;
+    if (use_alt_energy_fix && 
+        proj_type != initial_projection_comp && 
+        proj_type != divu_iters_comp) {
+        using_alt_energy_fix = true;
+    }
+
     // build a multifab to store a Cartesian version of beta0 with 1 ghost cell
     Vector<MultiFab> beta0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -97,18 +104,22 @@ Maestro::NodalProj (int proj_type,
             MultiFab::Multiply(Vproj[lev],beta0_cart[lev],0,dir,1,1);
         }
     }
-    //if (proj_type == divu_iters_comp) PrintMF(beta0_cart);
 
-    // invert sig then multiply by beta0 so sig now holds:
+    // invert sig then multiply by beta0 (or beta0^2 if alt_energy_fix)
+    // so sig now holds:
     // initial_projection_comp: beta0
     // divu_iters_comp:         beta0
     // pressure_iters_comp:     beta0/rho
     // regular_timestep_comp:   beta0/rho
-    for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Divide(sig[lev],beta0_cart[lev],0,0,1,1);
-        sig[lev].invert(1.0,1);
-    }
 
+    for (int lev=0; lev<=finest_level; ++lev) {
+        sig[lev].invert(1.0,1);
+        MultiFab::Multiply(sig[lev],beta0_cart[lev],0,0,1,1);
+        // if using_alt_energy_fix, multiply sig by beta0 again
+        if (using_alt_energy_fix) {
+            MultiFab::Multiply(sig[lev],beta0_cart[lev],0,0,1,1);
+        }
+    }
 
 /*
   set_outflow_bcs() was used in IAMR/Projection.cpp
@@ -264,7 +275,6 @@ Maestro::NodalProj (int proj_type,
         rel_tol = std::min( eps_hg_max, eps_hg*pow(hg_level_factor,finest_level) );
     }
 
-
     // solve for phi
     Print() << "Calling nodal solver" << endl;
     Real mlmg_err = mlmg.solve(amrex::GetVecOfPtrs(phi),
@@ -279,13 +289,18 @@ Maestro::NodalProj (int proj_type,
         }
     }
 
-    // divide sig by beta0 so it now holds
+    // divide sig by beta0 (or beta0^2 if alt_energy_fix)
+    // so it now holds
     // initial_projection_comp: 1
     // divu_iters_comp:         1
     // pressure_iters_comp:     1/rho
     // regular_timestep_comp:   1/rho
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Divide(sig[lev],beta0_cart[lev],0,0,1,1);
+        // if using_alt_energy_fix, divide sig by beta0 again
+        if (using_alt_energy_fix) {
+            MultiFab::Divide(sig[lev],beta0_cart[lev],0,0,1,1);
+        }
     }
   
     // reset sig in the MLNodeLaplacian object so the call to updateVelocity
@@ -294,45 +309,21 @@ Maestro::NodalProj (int proj_type,
         mlndlap.setSigma(ilev, sig[ilev]);
     }
 
-    // update velocity
-    // initial_projection_comp: Utilde^0   = Vproj - sig*grad(phi)
-    // divu_iters_comp:         Utilde^0   = Vproj - sig*grad(phi)
-    // pressure_iters_comp:     Utilde^n+1 = Utilde^n + dt(Vproj-sig*grad(phi))
-    // regular_timestep_comp:   Utilde^n+1 = Vproj - sig*grad(phi)
-    if (proj_type == initial_projection_comp || 
-        proj_type == divu_iters_comp) {
-        // Vproj = Vproj - sig*grad(phi)
-        mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
-        // Utilde^0   = Vproj - sig*grad(phi)
-        for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Copy(uold[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
-        }
-    }
-    else if (proj_type == pressure_iters_comp) {
-        // Vproj = Vproj - sig*grad(phi)
-        mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
-        // Utilde^n+1 = Utilde^n + dt(V-sig*grad(phi))
-        for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Copy(unew[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
-            unew[lev].mult(dt);
-            MultiFab::Add(unew[lev],uold[lev],0,0,AMREX_SPACEDIM,0);
-        }
-    }
-    else if (proj_type == regular_timestep_comp) {
-        // Vproj = Vproj - sig*grad(phi)
-        mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
-        // Utilde^n+1 = Vproj - sig*grad(phi)
-        for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Copy(unew[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
-        }
-    }
-
     // compute a cell-centered grad(phi) from nodal phi
     Vector<MultiFab> gphi(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         gphi[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
     }
     ComputeGradPhi(phi,gphi);
+
+    // if using_alt_energy_fix, convert grad(phi) to beta0*grad(phi)
+    if (using_alt_energy_fix) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+                MultiFab::Multiply(gphi[lev],beta0_cart[lev],0,dir,1,0);
+            }
+        }
+    }
 
     // update pi and grad(pi)
     // initial_projection_comp: pi = 0         grad(pi) = 0
@@ -360,6 +351,53 @@ Maestro::NodalProj (int proj_type,
         }
     }
 
+    // update velocity
+    // initial_projection_comp: Utilde^0   = Vproj - sig*grad(phi)
+    // divu_iters_comp:         Utilde^0   = Vproj - sig*grad(phi)
+    // pressure_iters_comp:     Utilde^n+1 = Utilde^n + dt(Vproj-sig*grad(phi))
+    // regular_timestep_comp:   Utilde^n+1 = Vproj - sig*grad(phi)
+    if (proj_type == initial_projection_comp || 
+        proj_type == divu_iters_comp) {
+        // Vproj = Vproj - sig*grad(phi)
+        mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
+        // Utilde^0   = Vproj - sig*grad(phi)
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(uold[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
+        }
+    }
+    else if (proj_type == pressure_iters_comp) {
+        // Vproj = Vproj - sig*grad(phi)
+        // we do this manually instead of using mlndlap.updateVelocity() because
+        // for alt_energy_fix we neet beta0*grad(phi)
+        for (int lev=0; lev<=finest_level; ++lev) {
+            for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+                MultiFab::Multiply(gphi[lev],sig[lev],0,dir,1,0);
+            }
+            MultiFab::Subtract(Vproj[lev],gphi[lev],0,0,AMREX_SPACEDIM,0);
+        }
+        // Utilde^n+1 = Utilde^n + dt(Vproj-sig*grad(phi))
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(unew[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
+            unew[lev].mult(dt);
+            MultiFab::Add(unew[lev],uold[lev],0,0,AMREX_SPACEDIM,0);
+        }
+    }
+    else if (proj_type == regular_timestep_comp) {
+        // Vproj = Vproj - sig*grad(phi)
+        // we do this manually instead of using mlndlap.updateVelocity() because
+        // for alt_energy_fix we neet beta0*grad(phi)
+        for (int lev=0; lev<=finest_level; ++lev) {
+            for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+                MultiFab::Multiply(gphi[lev],sig[lev],0,dir,1,0);
+            }
+            MultiFab::Subtract(Vproj[lev],gphi[lev],0,0,AMREX_SPACEDIM,0);
+        }
+        // Utilde^n+1 = Vproj - sig*grad(phi)
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(unew[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
+        }
+    }
+
     // average fine data onto coarser cells
     AverageDown(uold,0,AMREX_SPACEDIM);
     AverageDown(unew,0,AMREX_SPACEDIM);
@@ -368,6 +406,12 @@ Maestro::NodalProj (int proj_type,
     // fill ghost cells
     FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
     FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+
+    if (proj_type == pressure_iters_comp ||
+        proj_type == regular_timestep_comp) {
+        // average pi from nodes to cell-centers and store in the Pi component of snew
+        MakePiCC(beta0_cart);
+    }
 
 }
 
@@ -545,7 +589,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
 
 
 // average nodal pi to cell-centers and put in the Pi component of snew
-void Maestro::MakePiCC()
+void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePiCC()",MakePiCC);
@@ -553,6 +597,7 @@ void Maestro::MakePiCC()
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& pi_mf = pi[lev];
               MultiFab& snew_mf = snew[lev];
+        const MultiFab& beta0_cart_mf = beta0_cart[lev];
 
         for ( MFIter mfi(snew_mf); mfi.isValid(); ++mfi ) {
 
@@ -566,7 +611,8 @@ void Maestro::MakePiCC()
             // We will also pass "validBox", which specifies the "valid" region.
             make_pi_cc(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                        BL_TO_FORTRAN_3D(pi_mf[mfi]),
-                       snew_fab.dataPtr(Pi), ARLIM_3D(snew_fab.loVect()), ARLIM_3D(snew_fab.hiVect()));
+                       snew_fab.dataPtr(Pi), ARLIM_3D(snew_fab.loVect()), ARLIM_3D(snew_fab.hiVect()),
+                       BL_TO_FORTRAN_3D(beta0_cart_mf[mfi]));
         }
     }
 

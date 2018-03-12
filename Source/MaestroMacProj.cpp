@@ -63,9 +63,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         acoef[lev].setVal(0.);
     }
 
-    // average face-centered Bcoefficients to 1/rho 
-    // AvgFaceBcoeffsInv(face_bcoef,rho);
-
     // OR 1) average face-centered B coefficients to rho
     for (int lev=0; lev<=finest_level; ++lev) {
         amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
@@ -84,6 +81,9 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // multiply face-centered B coefficients by beta0 so they contain beta0/rho
     mult_or_div = 1;
     MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+    if (use_alt_energy_fix) {
+        MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+    }
 
     // 
     // Set up implicit solve using MLABecLaplacian class

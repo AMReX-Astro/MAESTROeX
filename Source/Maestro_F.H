@@ -395,8 +395,9 @@ extern "C"
     //////////////////////
     // in make_pi_cc.F90
     void make_pi_cc(const int* lo, const int* hi,
-                    const amrex::Real* pi,  const int* p_lo, const int* p_hi,
-                    amrex::Real* pi_cc,     const int* c_lo, const int* c_hi);
+                    const amrex::Real* pi,         const int* p_lo, const int* p_hi,
+                          amrex::Real* pi_cc,      const int* c_lo, const int* c_hi,
+                    const amrex::Real* beta0_cart, const int* b_lo, const int* b_hi);
     //////////////////////
 
     //////////////////////

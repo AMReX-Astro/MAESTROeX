@@ -439,7 +439,7 @@ private:
                         amrex::Vector<amrex::MultiFab>& gphi);
 
     // average nodal pi to cell-centers and put in the Pi component of snew
-    void MakePiCC();
+    void MakePiCC(const amrex::Vector<amrex::MultiFab>& beta0_cart);
 
     // end MaestroNodalProj.cpp functions
     ////////////
