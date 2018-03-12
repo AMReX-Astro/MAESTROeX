@@ -11,7 +11,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BL_PROFILE_VAR("Maestro::AdvanceTimeStep()",AdvanceTimeStep);
 
     // features to be added later:
-    // -delta_gamma1_term
+    // -ppm
+    // -dpdt_factor
+    // -do_smallscale
 
     // cell-centered MultiFabs needed within the AdvanceTimeStep routine
     Vector<MultiFab>      rhohalf(finest_level+1);
@@ -26,7 +28,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     Vector<MultiFab>           s1(finest_level+1);
     Vector<MultiFab>           s2(finest_level+1);
     Vector<MultiFab>       s2star(finest_level+1);
-    Vector<MultiFab>   beta0_cart(finest_level+1);
     Vector<MultiFab> peosbar_cart(finest_level+1);
     Vector<MultiFab> delta_p_term(finest_level+1);
     Vector<MultiFab>       Tcoeff(finest_level+1);
@@ -44,10 +45,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     Vector<MultiFab> etarhoflux(finest_level+1);
 
     // face-centered
-    Vector<std::array< MultiFab, AMREX_SPACEDIM > >            umac(finest_level+1);
-    Vector<std::array< MultiFab, AMREX_SPACEDIM > >           sedge(finest_level+1);
-    Vector<std::array< MultiFab, AMREX_SPACEDIM > >           sflux(finest_level+1);
-    Vector<std::array< MultiFab, AMREX_SPACEDIM > > beta0_cart_edge(finest_level+1);
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > >  umac(finest_level+1);
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > sedge(finest_level+1);
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > sflux(finest_level+1);
 
     ////////////////////////
     // needed for spherical routines only
@@ -125,7 +125,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         s1          [lev].define(grids[lev], dmap[lev],   Nscal, 3);
         s2          [lev].define(grids[lev], dmap[lev],   Nscal, 3);
         s2star      [lev].define(grids[lev], dmap[lev],   Nscal, 3);
-        beta0_cart  [lev].define(grids[lev], dmap[lev],       1, 1);
         peosbar_cart[lev].define(grids[lev], dmap[lev],       1, 0);
         delta_p_term[lev].define(grids[lev], dmap[lev],       1, 0);
         Tcoeff      [lev].define(grids[lev], dmap[lev],       1, 1);
@@ -145,18 +144,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                      etarhoflux[lev].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
         // face-centered arrays of MultiFabs
-        AMREX_D_TERM(umac           [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1,     1);,
-                     umac           [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1,     1);,
-                     umac           [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1,     1););
-        AMREX_D_TERM(sedge          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], Nscal, 0);,
-                     sedge          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], Nscal, 0);,
-                     sedge          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0););
-        AMREX_D_TERM(sflux          [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], Nscal, 0);,
-                     sflux          [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], Nscal, 0);,
-                     sflux          [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0););
-        AMREX_D_TERM(beta0_cart_edge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
-                     beta0_cart_edge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
-                     beta0_cart_edge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
+        AMREX_D_TERM(umac [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1,     1);,
+                     umac [lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1,     1);,
+                     umac [lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1,     1););
+        AMREX_D_TERM(sedge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], Nscal, 0);,
+                     sedge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], Nscal, 0);,
+                     sedge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0););
+        AMREX_D_TERM(sflux[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], Nscal, 0);,
+                     sflux[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], Nscal, 0);,
+                     sflux[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0););
     }
 
 #if (AMREX_SPACEDIM == 3)
