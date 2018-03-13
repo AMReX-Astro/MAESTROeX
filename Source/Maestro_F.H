@@ -289,7 +289,7 @@ extern "C"
     void sum_etarho(const int* lev, const int* domlo, const int* domhi,
 		    const int* lo,  const int *hi,
 		    const amrex::Real* etarhoflux, const int* x_lo, const int* x_hi,
-                    amrex::Real* etarhosum, amrex::Real* ncell);
+                    amrex::Real* etarhosum);
     //////////////////////
 
     //////////////////////

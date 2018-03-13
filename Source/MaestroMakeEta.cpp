@@ -13,29 +13,38 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
 
     // Local variables
-    Vector<Real> etarhosum( (nr_fine+1)*(max_radial_level+1) ); 
-    Vector<Real> ncell( (nr_fine+1)*(max_radial_level+1) );
+    Vector<Real> etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0 ); 
     etarhosum.shrink_to_fit();
-    ncell.shrink_to_fit();
 
-    for (int i=0; i<(nr_fine+1)*(max_radial_level+1); ++i) {
-	etarhosum[i] = 0.0;
-	ncell[i] = 0.0;
-    }
+    // this stores how many cells there are laterally at each level
+    Vector<Real> ncell(max_radial_level+1);
 
     if (spherical == 0) {
 	for (int lev=0; lev<=finest_level; ++lev) {
 
+            // Get the index space of the domain
+            const Box& domainBox = geom[lev].Domain();
+
+            // compute number of cells at any given height for each level
+            if (AMREX_SPACEDIM==1) {
+                ncell[lev] = 1;
+            }
+            else if (AMREX_SPACEDIM==2) {
+                ncell[lev] = domainBox.bigEnd(0)+1;
+            }
+            else if (AMREX_SPACEDIM==3) {
+                ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
+            }
+
 	    // get references to the MultiFabs at level lev
 	    const MultiFab& sold_mf = sold[lev];
 	    const MultiFab& etarhoflux_mf = etarho_flux[lev];
-	    
+                
 	    // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 	    for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 		
 		// Get the index space of the valid region
 		const Box& validBox = mfi.validbox();
-		const Box& domainBox = geom[lev].Domain();
 
 		// call fortran subroutine
 		// use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
@@ -44,9 +53,8 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
 		sum_etarho(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
 			   ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 			   BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
-			   etarhosum.dataPtr(), ncell.dataPtr());
+			   etarhosum.dataPtr());
 	    }	    
-
 	}
 
 	ParallelDescriptor::ReduceRealSum(etarhosum.dataPtr(),(nr_fine+1)*(max_radial_level+1));
