@@ -4,11 +4,11 @@ maestro.model_file = "model.hse.cool.coulomb"
 maestro.probin_file = "probin"
 maestro.perturb_model = true
 
-maestro.ppm_type = 0
+maestro.ppm_type = 1
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
-geometry.prob_hi     =  2.7e7  2.7e7  3.6e8
+geometry.prob_hi     =  2.7e7  2.7e7  3.24e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -25,8 +25,8 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 48 48 640
-amr.max_grid_size      = 640
+amr.n_cell             = 48 48 576
+amr.max_grid_size      = 48
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 # refinement ratio
@@ -52,6 +52,11 @@ maestro.init_divu_iter        = 1
 maestro.init_iter             = 1
 maestro.do_reflux             = 1 # do we do the hyperbolic reflux
 
+maestro.grav_const = -1.5e10
+
+maestro.anelastic_cutoff = 3.e6
+maestro.base_cutoff_density = 3.e6
+
 maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 10.e0
@@ -59,7 +64,7 @@ maestro.sponge_kappa = 10.e0
 
 # PLOTFILES
 maestro.plot_file  = plt    # root name of plot file
-maestro.plot_int   = 10      # number of timesteps between plot files
+maestro.plot_int   = 1      # number of timesteps between plot files
 maestro.plot_deltat = 0.5d0
 
 # CHECKPOINT
@@ -70,7 +75,7 @@ maestro.chk_int         = 100
 maestro.eps_init_proj_cart = 1.e-12
 maestro.eps_init_proj_sph  = 1.e-10
 # tolerances for the divu iterations
-maestro.eps_divu_cart      = 1.e-8
+maestro.eps_divu_cart      = 1.e-12
 maestro.eps_divu_sph       = 1.e-10
 maestro.divu_iter_factor   = 100.
 maestro.divu_level_factor  = 10.
