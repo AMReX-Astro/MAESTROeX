@@ -21,6 +21,7 @@ module ppm_module
 
   private
 
+  public :: ppm_1d, ppm_2d, ppm_3d
 
 contains
 

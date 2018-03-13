@@ -8,7 +8,8 @@ module velpred_module
 
   use amrex_constants_module
   use slope_module
-  use meth_params_module, only: rel_eps
+  use ppm_module
+  use meth_params_module, only: ppm_type, rel_eps
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
@@ -20,7 +21,7 @@ contains
 #if (AMREX_SPACEDIM == 1)
   subroutine velpred_1d(lev, domlo, domhi, lo, hi, &
                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                        ufull,  uf_lo, uf_hi, nc_uf, &
+                        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
                         umac,   uu_lo, uu_hi, &
                         force,   f_lo,  f_hi, nc_f, &
                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_1d")
@@ -29,6 +30,7 @@ contains
     integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut
     integer, value,   intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
+    integer, value,   intent(in   ) :: ng_uf
     integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
     integer         , intent(in   ) ::  f_lo(1),  f_hi(1), nc_f
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
@@ -42,6 +44,9 @@ contains
     ! Local variables
     double precision :: slopex(lo(1)-1:hi(1)+1,1)
 
+    double precision, allocatable :: Ipu(:), Ipf(:)
+    double precision, allocatable :: Imu(:), Imf(:)
+
     ! these correspond to umac_L, etc.
     double precision, allocatable :: umacl(:),umacr(:)
 
@@ -50,6 +55,12 @@ contains
     integer :: i,is,ie
 
     logical :: test
+
+    allocate(Ipu(lo(1)-1:hi(1)+1))
+    allocate(Imu(lo(1)-1:hi(1)+1))
+
+    allocate(Ipf(lo(1)-1:hi(1)+1))
+    allocate(Imf(lo(1)-1:hi(1)+1))
 
     allocate(umacl(lo(1):hi(1)+1))
     allocate(umacr(lo(1):hi(1)+1))
@@ -62,7 +73,13 @@ contains
 
     hx = dx(1)
 
-    call slopex_1d(utilde,slopex,domlo,domhi,lo,hi,ng_u,1,adv_bc)
+    if (ppm_type .eq. 0) then
+       call slopex_1d(utilde,slopex,domlo,domhi,lo,hi,ng_u,1,adv_bc)
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_1d(utilde(:,1),ng_u,ufull(:,1),ng_uf,Ipu,Imu, &
+                   domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+
+    end if
 
     !******************************************************************
     ! Create umac 
@@ -124,7 +141,7 @@ contains
 #if (AMREX_SPACEDIM == 2)
   subroutine velpred_2d(lev, domlo, domhi, lo, hi, &
                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                        ufull,  uf_lo, uf_hi, nc_uf, &
+                        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
                         utrans, uu_lo, uu_hi, &
                         vtrans, uv_lo, uv_hi, &
                         umac  , mu_lo, mu_hi, &
@@ -136,6 +153,7 @@ contains
     integer         , intent(in   ) :: ut_lo(2), ut_hi(2), nc_ut
     integer, value,   intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(2), uf_hi(2), nc_uf
+    integer, value,   intent(in   ) :: ng_uf
     integer         , intent(in   ) :: uu_lo(2), uu_hi(2)
     integer         , intent(in   ) :: uv_lo(2), uv_hi(2)
     integer         , intent(in   ) :: mu_lo(2), mu_hi(2)
@@ -156,6 +174,11 @@ contains
     double precision :: slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2)
     double precision :: slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2)
 
+    double precision, allocatable :: Ipu(:,:,:), Ipfx(:,:,:)
+    double precision, allocatable :: Imu(:,:,:), Imfx(:,:,:)
+    double precision, allocatable :: Ipv(:,:,:), Ipfy(:,:,:)
+    double precision, allocatable :: Imv(:,:,:), Imfy(:,:,:)
+
     ! these correspond to u_L^x, etc.
     double precision, allocatable :: ulx(:,:,:),urx(:,:,:),uimhx(:,:,:)
     double precision, allocatable :: uly(:,:,:),ury(:,:,:),uimhy(:,:,:)
@@ -170,6 +193,16 @@ contains
     integer :: i,j,is,js,ie,je
 
     logical :: test
+
+    allocate(Ipu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Imu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Ipv(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Imv(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+
+    allocate(Ipfx(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Imfx(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Ipfy(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Imfy(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
 
     allocate(  ulx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,2))
     allocate(  urx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,2))
@@ -196,25 +229,47 @@ contains
     hx = dx(1)
     hy = dx(2)
 
-    call slopex_2d(utilde,slopex,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
-    call slopey_2d(utilde,slopey,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
+    if (ppm_type .eq. 0) then
+       call slopex_2d(utilde,slopex,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
+       call slopey_2d(utilde,slopey,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_2d(utilde(:,:,1),ng_ut, &
+                   ufull(:,:,1),ufull(:,:,2),ng_uf, &
+                   Ipu,Imu,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+       call ppm_2d(utilde(:,:,2),ng_ut, &
+                   ufull(:,:,1),ufull(:,:,2),ng_uf, &
+                   Ipv,Imv,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+    end if
        
     !******************************************************************
     ! Create u_{\i-\half\e_x}^x, etc.
     !******************************************************************
 
-    do j=js-1,je+1
-       do i=is,ie+1
-          maxu = max(ZERO,ufull(i-1,j,1))
-          minu = min(ZERO,ufull(i  ,j,1))
-          ! extrapolate both components of velocity to left face
-          ulx(i,j,1) = utilde(i-1,j,1) + (HALF - (dt2/hx)*maxu)*slopex(i-1,j,1)
-          ulx(i,j,2) = utilde(i-1,j,2) + (HALF - (dt2/hx)*maxu)*slopex(i-1,j,2)
-          ! extrapolate both components of velocity to right face
-          urx(i,j,1) = utilde(i  ,j,1) - (HALF + (dt2/hx)*minu)*slopex(i  ,j,1)
-          urx(i,j,2) = utilde(i  ,j,2) - (HALF + (dt2/hx)*minu)*slopex(i  ,j,2)
+    if (ppm_type .eq. 0) then
+       do j=js-1,je+1
+          do i=is,ie+1
+             maxu = max(ZERO,ufull(i-1,j,1))
+             minu = min(ZERO,ufull(i  ,j,1))
+             ! extrapolate both components of velocity to left face
+             ulx(i,j,1) = utilde(i-1,j,1) + (HALF - (dt2/hx)*maxu)*slopex(i-1,j,1)
+             ulx(i,j,2) = utilde(i-1,j,2) + (HALF - (dt2/hx)*maxu)*slopex(i-1,j,2)
+             ! extrapolate both components of velocity to right face
+             urx(i,j,1) = utilde(i  ,j,1) - (HALF + (dt2/hx)*minu)*slopex(i  ,j,1)
+             urx(i,j,2) = utilde(i  ,j,2) - (HALF + (dt2/hx)*minu)*slopex(i  ,j,2)
+          end do
        end do
-    end do
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do j=js-1,je+1
+          do i=is,ie+1
+             ! extrapolate both components of velocity to left face
+             ulx(i,j,1) = Ipu(i-1,j,1)
+             ulx(i,j,2) = Ipv(i-1,j,1)
+             ! extrapolate both components of velocity to right face
+             urx(i,j,1) = Imu(i,j,1)
+             urx(i,j,2) = Imv(i,j,1)
+          end do
+       end do
+    end if
     
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -271,18 +326,31 @@ contains
        enddo
     enddo
 
-    do j=js,je+1
-       do i=is-1,ie+1
-          maxu = max(ZERO,ufull(i,j-1,2))
-          minu = min(ZERO,ufull(i,j  ,2))
-          ! extrapolate both components of velocity to left face
-          uly(i,j,1) = utilde(i,j-1,1) + (HALF-(dt2/hy)*maxu)*slopey(i,j-1,1)
-          uly(i,j,2) = utilde(i,j-1,2) + (HALF-(dt2/hy)*maxu)*slopey(i,j-1,2)
-          ! extrapolate both components of velocity to right face
-          ury(i,j,1) = utilde(i,j  ,1) - (HALF+(dt2/hy)*minu)*slopey(i,j  ,1)
-          ury(i,j,2) = utilde(i,j  ,2) - (HALF+(dt2/hy)*minu)*slopey(i,j  ,2)
+    if (ppm_type .eq. 0) then
+       do j=js,je+1
+          do i=is-1,ie+1
+             maxu = max(ZERO,ufull(i,j-1,2))
+             minu = min(ZERO,ufull(i,j  ,2))
+             ! extrapolate both components of velocity to left face
+             uly(i,j,1) = utilde(i,j-1,1) + (HALF-(dt2/hy)*maxu)*slopey(i,j-1,1)
+             uly(i,j,2) = utilde(i,j-1,2) + (HALF-(dt2/hy)*maxu)*slopey(i,j-1,2)
+             ! extrapolate both components of velocity to right face
+             ury(i,j,1) = utilde(i,j  ,1) - (HALF+(dt2/hy)*minu)*slopey(i,j  ,1)
+             ury(i,j,2) = utilde(i,j  ,2) - (HALF+(dt2/hy)*minu)*slopey(i,j  ,2)
+          end do
        end do
-    end do
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do j=js,je+1
+          do i=is-1,ie+1
+             ! extrapolate both components of velocity to left face
+             uly(i,j,1) = Ipu(i,j-1,2)
+             uly(i,j,2) = Ipv(i,j-1,2)
+             ! extrapolate both components of velocity to right face
+             ury(i,j,1) = Imu(i,j,2)
+             ury(i,j,2) = Imv(i,j,2)
+          end do
+       end do
+    end if
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -458,7 +526,7 @@ contains
 #if (AMREX_SPACEDIM == 3)
   subroutine velpred_3d(lev, domlo, domhi, lo, hi, &
                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                        ufull,  uf_lo, uf_hi, nc_uf, &
+                        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
                         utrans, uu_lo, uu_hi, &
                         vtrans, uv_lo, uv_hi, &
                         wtrans, uw_lo, uw_hi, &
@@ -472,6 +540,7 @@ contains
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut
     integer, value,   intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
+    integer, value,   intent(in   ) :: ng_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: uw_lo(3), uw_hi(3)
@@ -496,6 +565,13 @@ contains
     double precision, allocatable :: slopex(:,:,:,:)
     double precision, allocatable :: slopey(:,:,:,:)
     double precision, allocatable :: slopez(:,:,:,:)
+
+    double precision, allocatable :: Ipu(:,:,:,:), Ipfx(:,:,:,:)
+    double precision, allocatable :: Imu(:,:,:,:), Imfx(:,:,:,:)
+    double precision, allocatable :: Ipv(:,:,:,:), Ipfy(:,:,:,:)
+    double precision, allocatable :: Imv(:,:,:,:), Imfy(:,:,:,:)
+    double precision, allocatable :: Ipw(:,:,:,:), Ipfz(:,:,:,:)
+    double precision, allocatable :: Imw(:,:,:,:), Imfz(:,:,:,:)
 
     ! these correspond to u_L^x, etc.
     double precision, allocatable:: ulx(:,:,:,:),urx(:,:,:,:),uimhx(:,:,:,:)
@@ -539,6 +615,20 @@ contains
 
     logical :: test
 
+    allocate(Ipu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Imu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Ipv(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Imv(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Ipw(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Imw(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+
+    allocate(Ipfx(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Imfx(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Ipfy(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Imfy(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Ipfz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Imfz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+
     allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
     allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
     allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
@@ -558,11 +648,23 @@ contains
     hy = dx(2)
     hz = dx(3)
 
-    do k = lo(3)-1,hi(3)+1
-       call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
-       call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
-    end do
-    call slopez_3d(utilde,slopez,domlo,domhi,lo,hi,ng_ut,3,adv_bc)
+    if (ppm_type .eq. 0) then
+       do k = lo(3)-1,hi(3)+1
+          call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
+          call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
+       end do
+       call slopez_3d(utilde,slopez,domlo,domhi,lo,hi,ng_ut,3,adv_bc)
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_3d(utilde(:,:,:,1),ng_ut, &
+                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+                   Ipu,Imu,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+       call ppm_3d(utilde(:,:,:,2),ng_ut, &
+                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+                   Ipv,Imv,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+       call ppm_3d(utilde(:,:,:,3),ng_ut, &
+                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+                   Ipw,Imw,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
+    end if
 
     !******************************************************************
     ! Create u_{\i-\half\e_x}^x, etc.
