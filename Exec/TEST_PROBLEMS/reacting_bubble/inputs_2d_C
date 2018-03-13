@@ -21,6 +21,9 @@ geometry.is_periodic =  1 0 0
 # VERBOSITY
 maestro.v              = 1       # verbosity
 
+# DEBUG FOR NAN
+amrex.fpe_trap_invalid = 1       # floating point exception
+
 # GRIDDING AND REFINEMENT
 amr.n_cell             = 384 640
 amr.max_grid_size      = 64

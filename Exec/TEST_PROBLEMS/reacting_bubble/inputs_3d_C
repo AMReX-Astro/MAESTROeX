@@ -1,7 +1,10 @@
 
 # INITIAL MODEL
 maestro.model_file = "model.hse.cool.coulomb"
+maestro.probin_file = "probin"
 maestro.perturb_model = true
+
+maestro.ppm_type = 0
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
@@ -82,4 +85,3 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
-amrex.fpe_trap_invald = 1
