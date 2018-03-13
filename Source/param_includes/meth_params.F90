@@ -60,6 +60,8 @@ module meth_params_module
   double precision              , save :: co_latitude
   logical                       , save :: drive_initial_convection
   logical                       , save :: use_alt_energy_fix
+  integer                       , save :: temp_diffusion_formulation
+  integer                       , save :: thermal_diffusion_type
   logical                       , save :: limit_conductivity
   character (len=:), allocatable, save :: burner_threshold_species
   double precision              , save :: burner_threshold_cutoff
@@ -118,6 +120,8 @@ contains
     co_latitude = 0.0d0;
     drive_initial_convection = .false.;
     use_alt_energy_fix = .true.;
+    temp_diffusion_formulation = 2;
+    thermal_diffusion_type = 1;
     limit_conductivity = .false.;
     allocate(character(len=1)::burner_threshold_species)
     burner_threshold_species = "";
@@ -164,6 +168,8 @@ contains
     call pp%query("co_latitude", co_latitude)
     call pp%query("drive_initial_convection", drive_initial_convection)
     call pp%query("use_alt_energy_fix", use_alt_energy_fix)
+    call pp%query("temp_diffusion_formulation", temp_diffusion_formulation)
+    call pp%query("thermal_diffusion_type", thermal_diffusion_type)
     call pp%query("limit_conductivity", limit_conductivity)
     call pp%query("burner_threshold_species", burner_threshold_species)
     call pp%query("burner_threshold_cutoff", burner_threshold_cutoff)

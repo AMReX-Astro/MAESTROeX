@@ -405,10 +405,10 @@ use_thermal_diffusion               bool            false
 # How to compute the explicit thermal diffusion term.  @@
 # 1 = in terms of $T$; @@
 # 2 = in terms of $\rho,p_0,X$.
-temp_diffusion_formulation          int            2
+temp_diffusion_formulation          int            2	    y
 
 # In the thermal diffusion solver, 1 = Crank-Nicholson; 2 = Backward Euler.
-thermal_diffusion_type              int            1
+thermal_diffusion_type              int            1 	    y
 
 # apply the conductivity limiting---if T, then we set the thermal coefficients
 # all to 0 for $\rho <$ {\tt buoyancy\_cutoff\_factor} * {\tt base\_cutoff\_density}

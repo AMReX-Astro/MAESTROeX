@@ -574,6 +574,40 @@ private:
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
     ////////////
 
+    ////////////////////////
+    // MaestroThermal.cpp functions
+    void MakeExplicitThermal (amrex::Vector<amrex::MultiFab>& thermal,
+			      const amrex::Vector<amrex::MultiFab>& scal,
+			      const amrex::Vector<amrex::MultiFab>& Tcoeff,
+			      const amrex::Vector<amrex::MultiFab>& hcoeff,
+			      const amrex::Vector<amrex::MultiFab>& Xkcoeff,
+			      const amrex::Vector<amrex::MultiFab>& pcoeff,
+			      const amrex::Vector<amrex::Real>& p0, 
+			      int temp_formulation);
+
+    void ApplyThermal (amrex::MLABecLaplacian& mlabec, 
+		       amrex::Vector<amrex::MultiFab>& thermalout, 
+		 const amrex::Vector<amrex::MultiFab>& coeff,
+		       amrex::Vector<amrex::MultiFab>& phi, 
+		 int comp);
+
+    void MakeThermalCoeffs(const amrex::Vector<amrex::MultiFab>& scal,
+			   amrex::Vector<amrex::MultiFab>& Tcoeff,
+			   amrex::Vector<amrex::MultiFab>& hcoeff, 
+			   amrex::Vector<amrex::MultiFab>& Xkcoeff, 
+			   amrex::Vector<amrex::MultiFab>& pcoeff);
+
+    void ThermalConduct (const amrex::Vector<amrex::MultiFab>& s1,
+			       amrex::Vector<amrex::MultiFab>& s2,
+			 const amrex::Vector<amrex::MultiFab>& hcoeff1,
+			 const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
+			 const amrex::Vector<amrex::MultiFab>& pcoeff1,
+			 const amrex::Vector<amrex::MultiFab>& hcoeff2, 
+			 const amrex::Vector<amrex::MultiFab>& Xkcoeff2, 
+			 const amrex::Vector<amrex::MultiFab>& pcoeff2,
+			 const amrex::Vector<amrex::Real>& p0_old,
+			 const amrex::Vector<amrex::Real>& po_new);
+    ////////////////////////
 
     ////////////////////////
     // MaestroVelocityAdvance.cpp functions

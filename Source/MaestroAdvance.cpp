@@ -311,10 +311,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // thermal is the forcing for rhoh or temperature
     if (use_thermal_diffusion) {
-	// call make_thermal_coeffs(s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1)
+	MakeThermalCoeffs(s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1);
 
-	// call make_explicit_thermal(mla,dx,thermal1,s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1, &
-        //                           p0_old,the_bc_tower)
+	MakeExplicitThermal(thermal1,s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1,p0_old,
+	                    temp_diffusion_formulation);
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -443,9 +443,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-	// call thermal_conduct(mla,dx,dt,s1,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1, &
-        //                     s2,p0_old,p0_new,the_bc_tower)
-//        ThermalConduct();
+       ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1,p0_old,p0_new);
     }
 
     // pass temperature through for seeding the temperature update eos call
@@ -511,10 +509,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-	// call make_thermal_coeffs(snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2)
+	MakeThermalCoeffs(snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2);
 
-	// call make_explicit_thermal(mla,dx,thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2, &
-        //                           p0_new,the_bc_tower)
+	MakeExplicitThermal(thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
+	                    temp_diffusion_formulation);
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -706,10 +704,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-	// call make_thermal_coeffs(s2star,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2)
-	// call thermal_conduct(mla,dx,dt,s1,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2, &
-        //                     s2,p0_old,p0_new,the_bc_tower)
-//        ThermalConduct();
+	MakeThermalCoeffs(s2star,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2);
+
+	ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2,p0_old,p0_new);
     }
 
     // pass temperature through for seeding the temperature update eos call
@@ -757,10 +754,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-	// call make_thermal_coeffs(snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2)
+	MakeThermalCoeffs(snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2);
 
-	// call make_explicit_thermal(mla,dx,thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2, &
-        //                           p0_new,the_bc_tower)
+	MakeExplicitThermal(thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
+	                    temp_diffusion_formulation);
     }
 
     Make_S_cc(S_cc_new,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal2);
