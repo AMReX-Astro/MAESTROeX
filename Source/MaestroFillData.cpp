@@ -198,6 +198,11 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     for (int lev=start_lev; lev<=end_lev; ++lev) {
+
+        // Get the index space of the domain
+        const Box& domainBox = geom[lev].Domain();
+
+        // get references to the MultiFabs at level lev
         MultiFab& sold_mf = sold[lev];  // need a cell-centered MF for the MFIter        
         MultiFab& umacx_mf = umac[lev][0];
         MultiFab& umacy_mf = umac[lev][1];
@@ -209,7 +214,6 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
             // Get the index space of the valid (cell-centered) region
             const Box& validBox = mfi.validbox();
-            const Box& domainBox = geom[lev].Domain();
 
             fill_umac_ghost(ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
                             ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),

@@ -69,6 +69,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
+        // Get the index space and grid spacing of the domain
+        const Box& domainBox = geom[lev].Domain();
+        const Real* dx = geom[lev].CellSize();
+
         // get references to the MultiFabs at level lev
         const MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
@@ -85,8 +89,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
-            const Box& domainBox = geom[lev].Domain();
-            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
@@ -142,6 +144,10 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
+        // Get the index space and grid spacing of the domain
+        const Box& domainBox = geom[lev].Domain();
+        const Real* dx = geom[lev].CellSize();
+
         // get references to the MultiFabs at level lev
         const MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
@@ -162,8 +168,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
-            const Box& domainBox = geom[lev].Domain();
-            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
@@ -218,6 +222,10 @@ void
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
+        // Get the index space and grid spacing of the domain
+        const Box& domainBox = geom[lev].Domain();
+        const Real* dx = geom[lev].CellSize();
+
         // get references to the MultiFabs at level lev
         const MultiFab& scal_mf   = state[lev];
               MultiFab& sedgex_mf = sedge[lev][0];
@@ -239,8 +247,6 @@ void
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
-            const Box& domainBox = geom[lev].Domain();
-            const Real* dx = geom[lev].CellSize();
 
 	    // Be careful to pass in comp+1 for fortran indexing
             for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
