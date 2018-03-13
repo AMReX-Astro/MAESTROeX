@@ -30,7 +30,7 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
     // Variable to store values to be acted upon by (div B grad) operator
     Vector<MultiFab> phi(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-	phi[lev].define(grids[lev], dmap[lev], 1, 0);
+	phi[lev].define(grids[lev], dmap[lev], 1, 1);
 	phi[lev].setVal(0.);
     }
 
@@ -48,10 +48,6 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
     int stencil_order = 2;
     mlabec.setMaxOrder(stencil_order);
 
-    for (int lev = 0; lev <= finest_level; ++lev) {
-	mlabec.setLevelBC(lev, &thermal[lev]);
-    }
-
     if (temp_formulation == 1) 
     {
 	// compute div Tcoeff grad T
@@ -60,10 +56,10 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 
 	// set value of phi
 	for (int lev=0; lev<=finest_level; ++lev) {
-	    MultiFab::Copy(phi[lev],scal[lev],Temp,0,1,0);
+	    MultiFab::Copy(phi[lev],scal[lev],Temp,0,1,1);
 	}
 
-	ApplyThermal(mlabec, thermal, Tcoeff, phi, Temp); 
+	ApplyThermal(mlabec, thermal, Tcoeff, phi, bcs_s, Temp); 
     }
     else { // if temp_formulation == 2
 
@@ -79,11 +75,11 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 
 	// set value of phi
 	for (int lev=0; lev<=finest_level; ++lev) {
-	    MultiFab::Copy(phi[lev],scal[lev],RhoH,0,1,0);
-	    MultiFab::Divide(phi[lev],scal[lev],Rho,0,1,0);
+	    MultiFab::Copy(phi[lev],scal[lev],RhoH,0,1,1);
+	    MultiFab::Divide(phi[lev],scal[lev],Rho,0,1,1);
 	}
 
-	ApplyThermal(mlabec, resid, hcoeff, phi, RhoH); 
+	ApplyThermal(mlabec, resid, hcoeff, phi, bcs_s, RhoH); 
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 	    MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
@@ -101,12 +97,12 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 	for (int nspec=FirstSpec; nspec<FirstSpec+NumSpec; ++nspec) {
 	    // set value of phi
 	    for (int lev=0; lev<=finest_level; ++lev) {
-		MultiFab::Copy(phi[lev],scal[lev],nspec,0,1,0);
-		MultiFab::Divide(phi[lev],scal[lev],Rho,0,1,0);
+		MultiFab::Copy(phi[lev],scal[lev],nspec,0,1,1);
+		MultiFab::Divide(phi[lev],scal[lev],Rho,0,1,1);
 		MultiFab::Copy(Xicoeff[lev],Xkcoeff[lev],nspec-FirstSpec,0,1,1);
 	    }
 
-	    ApplyThermal(mlabec, resid, Xicoeff, phi, nspec); 
+	    ApplyThermal(mlabec, resid, Xicoeff, phi, bcs_s, nspec); 
 
 	    for (int lev=0; lev<=finest_level; ++lev) {
 		MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
@@ -117,9 +113,10 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 	mlabec.setScalars(0.0, 1.0);
 	
 	// set value of phi
-	Put1dArrayOnCart(p0, phi, 0, 0, bcs_s, Temp);
+	Put1dArrayOnCart(p0, phi, 0, 0, bcs_f,0);
+	FillPatch(t_old, phi, phi, phi, 0, 0, 1, 0,bcs_f);
 
-	ApplyThermal(mlabec, resid, pcoeff, phi, Temp); 
+	ApplyThermal(mlabec, resid, pcoeff, phi, bcs_f, 0); 
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 	    MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
@@ -136,7 +133,8 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
 			   Vector<MultiFab>& thermalout, 
 			   const Vector<MultiFab>& coeff,
 			   Vector<MultiFab>& phi, 
-			   int comp) 
+			   const Vector<BCRec>& bcs,
+			   int bccomp) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ApplyThermal()",ApplyThermal);
@@ -152,18 +150,18 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
         }
         else {
 	    // lo-side BCs
-            if (bcs_s[comp].lo(idim) == Outflow) {
+            if (bcs[bccomp].lo(idim) == BCType::foextrap) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-            } else if (bcs_s[comp].lo(idim) == Inflow) {
+            } else if (bcs[bccomp].lo(idim) == BCType::ext_dir) {
                 mlmg_lobc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
 
 	    // hi-side BCs
-            if (bcs_s[comp].hi(idim) == Outflow) {
+            if (bcs[bccomp].hi(idim) == BCType::foextrap) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } else if (bcs_s[comp].hi(idim) == Inflow) {
+            } else if (bcs[bccomp].hi(idim) == BCType::ext_dir) {
                 mlmg_hibc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
@@ -173,6 +171,10 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
 
     mlabec.setDomainBC(mlmg_lobc,mlmg_hibc);
     
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	mlabec.setLevelBC(lev, &phi[lev]);
+    }
+
     // coefficients for solver
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > face_bcoef(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -252,9 +254,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 			 const Vector<MultiFab>& pcoeff1,
 			 const Vector<MultiFab>& hcoeff2, 
 			 const Vector<MultiFab>& Xkcoeff2, 
-			 const Vector<MultiFab>& pcoeff2,
-			 const Vector<Real>& p0_old,
-			 const Vector<Real>& po_new)
+			 const Vector<MultiFab>& pcoeff2)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ThermalConduct()",ThermalConduct);
@@ -307,7 +307,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
         AMREX_D_TERM(face_bcoef[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
                      face_bcoef[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
                      face_bcoef[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
-	phi[lev].define(grids[lev], dmap[lev], 1, 0);
+	phi[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
     // set cell-centered A coefficient to zero
@@ -320,8 +320,8 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 
     // initialize value of phi to h^(2) as a guess
     for (int lev=0; lev<=finest_level; ++lev) {
-	MultiFab::Copy(phi[lev],s2[lev],RhoH,0,1,0);
-	MultiFab::Divide(phi[lev],s2[lev],Rho,0,1,0);
+	MultiFab::Copy(phi[lev],s2[lev],RhoH,0,1,1);
+	MultiFab::Divide(phi[lev],s2[lev],Rho,0,1,1);
     }
 
     // 
@@ -345,18 +345,18 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
         }
         else {
 	    // lo-side BCs
-            if (bcs_s[RhoH].lo(idim) == Outflow) {
+            if (bcs_s[RhoH].lo(idim) == BCType::foextrap) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-            } else if (bcs_s[RhoH].lo(idim) == Inflow) {
+            } else if (bcs_s[RhoH].lo(idim) == BCType::ext_dir) {
                 mlmg_lobc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
 
 	    // hi-side BCs
-            if (bcs_s[RhoH].hi(idim) == Outflow) {
+            if (bcs_s[RhoH].hi(idim) == BCType::foextrap) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } else if (bcs_s[RhoH].hi(idim) == Inflow) {
+            } else if (bcs_s[RhoH].hi(idim) == BCType::ext_dir) {
                 mlmg_hibc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
@@ -399,8 +399,8 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
     
     // load new rho*h into s2
     for (int lev = 0; lev <= finest_level; ++lev) {
-	MultiFab::Copy(s2[lev],phi[lev],0,RhoH,1,0);
-	MultiFab::Multiply(s2[lev],s2[lev],Rho,RhoH,1,0);
+	MultiFab::Copy(s2[lev],phi[lev],0,RhoH,1,1);
+	MultiFab::Multiply(s2[lev],s2[lev],Rho,RhoH,1,1);
     }
 
     // average fine data onto coarser cells

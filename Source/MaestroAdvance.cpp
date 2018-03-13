@@ -132,8 +132,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Xkcoeff1    [lev].define(grids[lev], dmap[lev], NumSpec,    1);
         pcoeff1     [lev].define(grids[lev], dmap[lev],       1,    1);
         hcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
-        Xkcoeff2    [lev].define(grids[lev], dmap[lev],       1,    1);
-        pcoeff2     [lev].define(grids[lev], dmap[lev], NumSpec,    1);
+        Xkcoeff2    [lev].define(grids[lev], dmap[lev], NumSpec,    1);
+        pcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
         scal_force  [lev].define(grids[lev], dmap[lev],   Nscal,    1);
         delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
         sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
@@ -443,7 +443,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-       ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1,p0_old,p0_new);
+       ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1);
     }
 
     // pass temperature through for seeding the temperature update eos call
@@ -706,7 +706,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (use_thermal_diffusion) {
 	MakeThermalCoeffs(s2star,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2);
 
-	ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2,p0_old,p0_new);
+	ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2);
     }
 
     // pass temperature through for seeding the temperature update eos call

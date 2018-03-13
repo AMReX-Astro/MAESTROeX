@@ -589,7 +589,8 @@ private:
 		       amrex::Vector<amrex::MultiFab>& thermalout, 
 		 const amrex::Vector<amrex::MultiFab>& coeff,
 		       amrex::Vector<amrex::MultiFab>& phi, 
-		 int comp);
+		 const amrex::Vector<amrex::BCRec>& bcs,
+		 int bccomp);
 
     void MakeThermalCoeffs(const amrex::Vector<amrex::MultiFab>& scal,
 			   amrex::Vector<amrex::MultiFab>& Tcoeff,
@@ -604,9 +605,7 @@ private:
 			 const amrex::Vector<amrex::MultiFab>& pcoeff1,
 			 const amrex::Vector<amrex::MultiFab>& hcoeff2, 
 			 const amrex::Vector<amrex::MultiFab>& Xkcoeff2, 
-			 const amrex::Vector<amrex::MultiFab>& pcoeff2,
-			 const amrex::Vector<amrex::Real>& p0_old,
-			 const amrex::Vector<amrex::Real>& po_new);
+			 const amrex::Vector<amrex::MultiFab>& pcoeff2);
     ////////////////////////
 
     ////////////////////////
