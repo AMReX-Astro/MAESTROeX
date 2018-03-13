@@ -210,12 +210,12 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 }
 
 void
-    Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
-			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-			   const Vector<MultiFab>& force,
-			   int is_vel, const Vector<BCRec>& bcs, int nbccomp, 
-			   int start_scomp, int start_bccomp, int num_comp, int is_conservative)
+Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
+                       Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                       const Vector<MultiFab>& force,
+                       int is_vel, const Vector<BCRec>& bcs, int nbccomp, 
+                       int start_scomp, int start_bccomp, int num_comp, int is_conservative)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeScal()",MakeEdgeScal);
@@ -281,6 +281,7 @@ void
                     BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
+                    umac_mf.nGrow(),
                     BL_TO_FORTRAN_FAB(force_mf[mfi]),
                     dx, &dt, &is_vel, bcs[0].data(),
                     &nbccomp, &scomp, &bccomp, &is_conservative);

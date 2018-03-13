@@ -274,6 +274,7 @@ extern "C"
                       const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
 #endif
 #endif
+                      int ng_um,
                       const amrex::Real* force,  const int* f_lo, const int* f_hi, const int* nc_f,
                       const amrex::Real* dx, const amrex::Real* dt, const int* is_vel,
                       const int* adv_bc, const int* nbccomp, const int* comp, const int* bccomp,

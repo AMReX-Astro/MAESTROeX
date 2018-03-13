@@ -14,7 +14,8 @@ module make_edge_scal_module
 
   use amrex_constants_module
   use slope_module
-  use meth_params_module, only: rel_eps
+  use ppm_module
+  use meth_params_module, only: rel_eps, ppm_type
 
   implicit none
 
@@ -26,7 +27,7 @@ contains
   subroutine make_edge_scal_1d(domlo, domhi, lo, hi, &
                                s,      s_lo, s_hi, nc_s, ng_s, &
                                sedgex, x_lo, x_hi, nc_x, &
-                               umac,   u_lo, u_hi, &
+                               umac,   u_lo, u_hi, ng_um, &
                                force,  f_lo, f_hi, nc_f, &
                                dx, dt, is_vel, adv_bc, nbccomp, &
                                comp, bccomp, is_conservative) bind(C,name="make_edge_scal_1d")
@@ -36,6 +37,7 @@ contains
     integer, value,   intent(in   ) :: ng_s
     integer         , intent(in   ) :: x_lo(1), x_hi(1), nc_x
     integer         , intent(in   ) :: u_lo(1), u_hi(1)
+    integer, value,   intent(in   ) :: ng_um
     integer         , intent(in   ) :: f_lo(1), f_hi(1), nc_f
     double precision, intent(in   ) :: s     (s_lo(1):s_hi(1),nc_s)
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),nc_x)
@@ -46,14 +48,25 @@ contains
     integer         , intent(in   ) :: adv_bc(1,2,nbccomp)
 
     ! Local variables
-    double precision :: slopex(lo(1)-1:hi(1)+1,1)
+    double precision, allocatable :: slopex(:,:)
 
     double precision :: hx,dt2,dt4,savg,fl,fr
 
     integer :: i,is,ie
 
+    double precision, allocatable :: Ip(:), Ipf(:)
+    double precision, allocatable :: Im(:), Imf(:)
+
     ! these correspond to \mathrm{sedge}_L^x, etc.
     double precision, allocatable:: sedgelx(:),sedgerx(:)
+
+    allocate(Ip(lo(1)-1:hi(1)+1))
+    allocate(Im(lo(1)-1:hi(1)+1))
+
+    allocate(Ipf(lo(1)-1:hi(1)+1))
+    allocate(Imf(lo(1)-1:hi(1)+1))
+
+    allocate(slopex(lo(1)-1:hi(1)+1,1))
 
     ! Final edge states.
     ! lo:hi+1 in the normal direction
@@ -64,7 +77,12 @@ contains
     is = lo(1)
     ie = hi(1)
 
-    call slopex_1d(s(:,comp:),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+    if (ppm_type .eq. 0) then
+       call slopex_1d(s(:,comp:),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_1d(s(:,comp),ng_s,umac,ng_um,Ip,Im, &
+                   domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+    end if
 
     dt2 = HALF*dt
     dt4 = dt/4.0d0
@@ -75,12 +93,20 @@ contains
     ! Create sedgelx, etc.
     !******************************************************************
 
-    ! loop over appropriate x-faces   
-    do i=is,ie+1
-       ! make sedgelx, sedgerx with 1D extrapolation
-       sedgelx(i) = s(i-1,comp) + (HALF - dt2*umac(i)/hx)*slopex(i-1,1)
-       sedgerx(i) = s(i  ,comp) - (HALF + dt2*umac(i)/hx)*slopex(i  ,1)
-    enddo
+    ! loop over appropriate x-faces    
+    if (ppm_type .eq. 0) then
+       do i=is,ie+1
+          ! make sedgelx, sedgerx with 1D extrapolation
+          sedgelx(i) = s(i-1,comp) + (HALF - dt2*umac(i)/hx)*slopex(i-1,1)
+          sedgerx(i) = s(i  ,comp) - (HALF + dt2*umac(i)/hx)*slopex(i  ,1)
+       enddo
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do i=is,ie+1
+          ! make sedgelx, sedgerx with 1D extrapolation
+          sedgelx(i) = Ip(i-1)
+          sedgerx(i) = Im(i  )
+       end do
+    end if
 
     ! loop over appropriate x-faces
     do i=is,ie+1
@@ -149,8 +175,6 @@ contains
     end if
     end if
 
-    deallocate(sedgelx,sedgerx)
-
   end subroutine make_edge_scal_1d
 #endif
 
@@ -160,7 +184,7 @@ contains
                                sedgex, x_lo, x_hi, nc_x, &
                                sedgey, y_lo, y_hi, nc_y, &
                                umac,   u_lo, u_hi, &
-                               vmac,   v_lo, v_hi, &
+                               vmac,   v_lo, v_hi, ng_um, &
                                force,  f_lo, f_hi, nc_f, &
                                dx, dt, is_vel, adv_bc, nbccomp, &
                                comp, bccomp, is_conservative) bind(C,name="make_edge_scal_2d")
@@ -172,6 +196,7 @@ contains
     integer         , intent(in   ) :: y_lo(2), y_hi(2), nc_y
     integer         , intent(in   ) :: u_lo(2), u_hi(2)
     integer         , intent(in   ) :: v_lo(2), v_hi(2)
+    integer, value,   intent(in   ) :: ng_um
     integer         , intent(in   ) :: f_lo(2), f_hi(2), nc_f
     double precision, intent(in   ) :: s     (s_lo(1):s_hi(1),s_lo(2):s_hi(2),nc_s)
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),nc_x)
@@ -184,12 +209,15 @@ contains
     integer         , intent(in   ) :: adv_bc(2,2,nbccomp)
 
     ! Local variables
-    double precision :: slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1)
-    double precision :: slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1)
+    double precision, allocatable :: slopex(:,:,:)
+    double precision, allocatable :: slopey(:,:,:)
 
     double precision :: hx,hy,dt2,dt4,savg,fl,fr
 
     integer :: i,j,is,js,ie,je
+
+    double precision, allocatable :: Ip(:,:,:), Ipf(:,:,:)
+    double precision, allocatable :: Im(:,:,:), Imf(:,:,:)
 
     ! these correspond to s_L^x, etc.
     double precision, allocatable:: slx(:,:),srx(:,:)
@@ -201,6 +229,15 @@ contains
     ! these correspond to \mathrm{sedge}_L^x, etc.
     double precision, allocatable:: sedgelx(:,:),sedgerx(:,:)
     double precision, allocatable:: sedgely(:,:),sedgery(:,:)
+
+    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+
+    allocate(Ipf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Imf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+
+    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1))
+    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1))
 
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
@@ -226,9 +263,13 @@ contains
     js = lo(2)
     je = hi(2)
 
-    call slopex_2d(s(:,:,comp:comp),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
-    call slopey_2d(s(:,:,comp:comp),slopey,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
-
+    if (ppm_type .eq. 0) then
+       call slopex_2d(s(:,:,comp:comp),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
+       call slopey_2d(s(:,:,comp:comp),slopey,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_2d(s(:,:,comp),ng_s,umac,vmac,ng_um,Ip,Im, &
+                   domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+    end if
     dt2 = HALF*dt
     dt4 = dt/4.0d0
 
@@ -240,13 +281,23 @@ contains
     !******************************************************************
 
     ! loop over appropriate x-faces
-    do j=js-1,je+1
-       do i=is,ie+1
-          ! make slx, srx with 1D extrapolation
-          slx(i,j) = s(i-1,j,comp) + (HALF - dt2*umac(i,j)/hx)*slopex(i-1,j,1)
-          srx(i,j) = s(i  ,j,comp) - (HALF + dt2*umac(i,j)/hx)*slopex(i  ,j,1)
-       enddo
-    enddo
+    if (ppm_type .eq. 0) then
+       do j=js-1,je+1
+          do i=is,ie+1
+             ! make slx, srx with 1D extrapolation
+             slx(i,j) = s(i-1,j,comp) + (HALF - dt2*umac(i,j)/hx)*slopex(i-1,j,1)
+             srx(i,j) = s(i  ,j,comp) - (HALF + dt2*umac(i,j)/hx)*slopex(i  ,j,1)
+          enddo
+       enddo       
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do j=js-1,je+1
+          do i=is,ie+1
+             ! make slx, srx with 1D extrapolation
+             slx(i,j) = Ip(i-1,j,1)
+             srx(i,j) = Im(i  ,j,1)
+          end do
+       end do
+    end if
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -302,13 +353,23 @@ contains
     enddo
 
     ! loop over appropriate y-faces
-    do j=js,je+1
-       do i=is-1,ie+1
-          ! make sly, sry with 1D extrapolation
-          sly(i,j) = s(i,j-1,comp) + (HALF - dt2*vmac(i,j)/hy)*slopey(i,j-1,1)
-          sry(i,j) = s(i,j  ,comp) - (HALF + dt2*vmac(i,j)/hy)*slopey(i,j  ,1)
+    if (ppm_type .eq. 0) then
+       do j=js,je+1
+          do i=is-1,ie+1
+             ! make sly, sry with 1D extrapolation
+             sly(i,j) = s(i,j-1,comp) + (HALF - dt2*vmac(i,j)/hy)*slopey(i,j-1,1)
+             sry(i,j) = s(i,j  ,comp) - (HALF + dt2*vmac(i,j)/hy)*slopey(i,j  ,1)
+          enddo
        enddo
-    enddo
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do j=js,je+1
+          do i=is-1,ie+1
+             ! make sly, sry with 1D extrapolation
+             sly(i,j) = Ip(i,j-1,2)
+             sry(i,j) = Im(i,j  ,2)
+          enddo
+       enddo
+    end if
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -517,8 +578,6 @@ contains
     end if
     end if
 
-    deallocate(slx,srx,sly,sry,simhx,simhy,sedgelx,sedgerx,sedgely,sedgery)
-
   end subroutine make_edge_scal_2d
 #endif
 
@@ -531,7 +590,7 @@ contains
                                sedgez, z_lo, z_hi, nc_z, &
                                umac,   u_lo, u_hi, &
                                vmac,   v_lo, v_hi, &
-                               wmac,   w_lo, w_hi, &
+                               wmac,   w_lo, w_hi, ng_um, &
                                force,  f_lo, f_hi, nc_f, &
                                dx, dt, is_vel, adv_bc, nbccomp, &
                                comp, bccomp, is_conservative) bind(C,name="make_edge_scal_3d")
@@ -545,6 +604,7 @@ contains
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
+    integer, value,   intent(in   ) :: ng_um
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     double precision, intent(in   ) :: s     (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
@@ -567,6 +627,9 @@ contains
     double precision :: savg
 
     integer :: i,j,k,is,js,ks,ie,je,ke
+
+    double precision, allocatable :: Ip(:,:,:,:), Ipf(:,:,:,:)
+    double precision, allocatable :: Im(:,:,:,:), Imf(:,:,:,:)
 
     ! these correspond to s_L^x, etc.
     double precision, allocatable:: slx(:,:,:),srx(:,:,:)
@@ -595,6 +658,12 @@ contains
     allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
     allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
 
+    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+
+    allocate(Ipf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Imf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+
     is = lo(1)
     ie = hi(1)
     js = lo(2)
@@ -602,11 +671,16 @@ contains
     ks = lo(3)
     ke = hi(3)
 
-    do k = lo(3)-1,hi(3)+1
-       call slopex_2d(s(:,:,k,comp:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
-       call slopey_2d(s(:,:,k,comp:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
-    end do
-    call slopez_3d(s(:,:,:,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+    if (ppm_type .eq. 0) then
+       do k = lo(3)-1,hi(3)+1
+          call slopex_2d(s(:,:,k,comp:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+          call slopey_2d(s(:,:,k,comp:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+       end do
+       call slopez_3d(s(:,:,:,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_3d(s(:,:,:,comp),ng_s,umac,vmac,wmac,ng_um,Ip,Im, &
+                   domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+    end if
 
     dt2 = HALF*dt
     dt3 = dt/3.0d0
@@ -629,15 +703,29 @@ contains
     allocate(simhx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
     
     ! loop over appropriate x-faces
-    do k=ks-1,ke+1
-       do j=js-1,je+1
-          do i=is,ie+1
-             ! make slx, srx with 1D extrapolation
-             slx(i,j,k) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*slopex(i-1,j,k,1)
-             srx(i,j,k) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*slopex(i  ,j,k,1)
+    if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
+       do k=ks-1,ke+1
+          do j=js-1,je+1
+             do i=is,ie+1
+                ! make slx, srx with 1D extrapolation
+                slx(i,j,k) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*slopex(i-1,j,k,1)
+                srx(i,j,k) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*slopex(i  ,j,k,1)
+             enddo
           enddo
        enddo
-    enddo
+       !$OMP END PARALLEL DO
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do k=ks-1,ke+1
+          do j=js-1,je+1
+             do i=is,ie+1
+                ! make slx, srx with 1D extrapolation
+                slx(i,j,k) = Ip(i-1,j,k,1)
+                srx(i,j,k) = Im(i  ,j,k,1)
+             end do
+          end do
+       end do
+    end if
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -702,15 +790,29 @@ contains
     allocate(simhy(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
 
     ! loop over appropriate y-faces
-    do k=ks-1,ke+1
-       do j=js,je+1
-          do i=is-1,ie+1
-             ! make sly, sry with 1D extrapolation
-             sly(i,j,k) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*slopey(i,j-1,k,1)
-             sry(i,j,k) = s(i,j  ,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*slopey(i,j  ,k,1)
+    if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
+       do k=ks-1,ke+1
+          do j=js,je+1
+             do i=is-1,ie+1
+                ! make sly, sry with 1D extrapolation
+                sly(i,j,k) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*slopey(i,j-1,k,1)
+                sry(i,j,k) = s(i,j  ,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*slopey(i,j  ,k,1)
+             enddo
           enddo
        enddo
-    enddo
+       !$OMP END PARALLEL DO
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do k=ks-1,ke+1
+          do j=js,je+1
+             do i=is-1,ie+1
+                ! make sly, sry with 1D extrapolation
+                sly(i,j,k) = Ip(i,j-1,k,2)
+                sry(i,j,k) = Im(i,j  ,k,2)
+             enddo
+          enddo
+       enddo
+    end if
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -775,17 +877,29 @@ contains
     allocate(simhz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
 
     ! loop over appropriate z-faces
-    do k=ks,ke+1
-       do j=js-1,je+1
-          do i=is-1,ie+1
-             ! make slz, srz with 1D extrapolation
-             slz(i,j,k) = s(i,j,k-1,comp) + (HALF - dt2*wmac(i,j,k)/hz)*slopez(i,j,k-1,1)
-             srz(i,j,k) = s(i,j,k  ,comp) - (HALF + dt2*wmac(i,j,k)/hz)*slopez(i,j,k  ,1)
+    if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
+       do k=ks,ke+1
+          do j=js-1,je+1
+             do i=is-1,ie+1
+                ! make slz, srz with 1D extrapolation
+                slz(i,j,k) = s(i,j,k-1,comp) + (HALF - dt2*wmac(i,j,k)/hz)*slopez(i,j,k-1,1)
+                srz(i,j,k) = s(i,j,k  ,comp) - (HALF + dt2*wmac(i,j,k)/hz)*slopez(i,j,k  ,1)
+             enddo
           enddo
        enddo
-    enddo
-
-    deallocate(slopex,slopey,slopez)
+       !$OMP END PARALLEL DO
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do k=ks,ke+1
+          do j=js-1,je+1
+             do i=is-1,ie+1
+                ! make slz, srz with 1D extrapolation
+                slz(i,j,k) = Ip(i,j,k-1,3)
+                srz(i,j,k) = Im(i,j,k  ,3)
+             enddo
+          enddo
+       enddo
+    end if
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
@@ -936,8 +1050,6 @@ contains
        enddo
     enddo
 
-    deallocate(slxy,srxy)
-
     ! loop over appropriate xz faces
 
     ! These are transverse terms.  The size allocation is tricky.
@@ -1032,8 +1144,6 @@ contains
           enddo
        enddo
     enddo
-
-    deallocate(slxz,srxz)
 
     ! loop over appropriate yx faces
 
@@ -1130,8 +1240,6 @@ contains
        enddo
     enddo
 
-    deallocate(slyx,sryx)
-
     ! loop over appropriate yz faces
 
     ! These are transverse terms.  The size allocation is tricky.
@@ -1171,8 +1279,6 @@ contains
           enddo
        enddo
     end if
-
-    deallocate(simhz)
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -1229,8 +1335,6 @@ contains
        enddo
     enddo
 
-    deallocate(slyz,sryz)
-
     ! loop over appropriate zx faces
 
     ! These are transverse terms.  The size allocation is tricky.
@@ -1270,8 +1374,6 @@ contains
           enddo
        end do
     end if
-
-    deallocate(simhx)
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
@@ -1328,8 +1430,6 @@ contains
        enddo
     enddo
 
-    deallocate(slzx,srzx)
-
     ! loop over appropriate zy faces
 
     ! These are transverse terms.  The size allocation is tricky.
@@ -1369,8 +1469,6 @@ contains
           enddo
        enddo
     end if
-
-    deallocate(simhy)
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
@@ -1426,8 +1524,6 @@ contains
           enddo
        enddo
     enddo
-
-    deallocate(slzy,srzy)
 
     !******************************************************************
     ! Create sedgelx, etc.
@@ -1492,8 +1588,6 @@ contains
        end do
     end if
 
-    deallocate(slx,srx,simhyz,simhzy)
-
     do k=ks,ke
        do j=js,je
           do i=is,ie+1
@@ -1547,8 +1641,6 @@ contains
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
     end if
     end if
-
-    deallocate(sedgelx,sedgerx)
 
     allocate(sedgely(lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3)))
     allocate(sedgery(lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3)))
@@ -1606,8 +1698,6 @@ contains
        end do
     end if
 
-    deallocate(sly,sry,simhxz,simhzx)
-
     do k=ks,ke
        do j=js,je+1
           do i=is,ie
@@ -1661,8 +1751,6 @@ contains
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
     end if
     end if
-
-    deallocate(sedgely,sedgery)
 
     allocate(sedgelz(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)+1))
     allocate(sedgerz(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)+1))
@@ -1720,8 +1808,6 @@ contains
        end do
     end if
 
-    deallocate(slz,srz,simhxy,simhyx)
-
     do k=ks,ke+1
        do j=js,je
           do i=is,ie
@@ -1775,8 +1861,6 @@ contains
        call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
     end if
     end if
-
-    deallocate(sedgelz,sedgerz)
 
   end subroutine make_edge_scal_3d
 #endif
