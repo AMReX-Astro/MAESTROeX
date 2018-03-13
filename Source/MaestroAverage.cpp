@@ -24,19 +24,23 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // this stores how many cells there are laterally at each level
         Vector<int> ncell(max_radial_level+1);
+
+        // loop is over the existing levels (up to finest_level)
         for (int lev=0; lev<=finest_level; ++lev) {
+            
+            // Get the index space of the domain
             const Box domainBox = geom[0].Domain();
 
-            if (AMREX_SPACEDIM==2) {
+            // compute number of cells at any given height for each level
+            if (AMREX_SPACEDIM==1) {
+                ncell[lev] = 1;
+            }
+            else if (AMREX_SPACEDIM==2) {
                 ncell[lev] = domainBox.bigEnd(0)+1;
             }
             else if (AMREX_SPACEDIM==3) {
                 ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
             }
-        }
-
-        // loop is over the existing levels (up to finest_level)
-        for (int lev=0; lev<=finest_level; ++lev) {
 
             // get references to the MultiFabs at level lev
             const MultiFab& phi_mf = phi[lev];
