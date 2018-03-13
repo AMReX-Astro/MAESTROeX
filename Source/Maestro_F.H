@@ -539,7 +539,7 @@ extern "C"
                       const int* lev, const int* domlo, const int* domhi,
                       const int* lo, const int* hi,
                       const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, int ng_ut,
-                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf,
+                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf, int ng_uf,
                       amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
 #if (AMREX_SPACEDIM >= 2)
                       amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,

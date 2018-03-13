@@ -5,7 +5,8 @@ module mkutrans_module
 
   use amrex_constants_module
   use slope_module
-  use meth_params_module, only: rel_eps
+  use ppm_module
+  use meth_params_module, only: rel_eps, ppm_type
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
@@ -17,7 +18,7 @@ contains
 #if (AMREX_SPACEDIM == 1)
   subroutine mkutrans_1d(lev, domlo, domhi, lo, hi, &
                          utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                         ufull,  uf_lo, uf_hi, nc_uf, &
+                         ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
                          utrans, uu_lo, uu_hi, &
                          w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_1d")
 
@@ -25,6 +26,7 @@ contains
     integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut
     integer, value  , intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
+    integer, value  , intent(in   ) :: ng_uf
     integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),nc_uf)
@@ -33,7 +35,10 @@ contains
     double precision, intent(in   ) :: dx(1), dt
     integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
     
-    double precision :: slopex(lo(1)-1:hi(1)+1,1)
+    double precision, allocatable :: slopex(:,:)
+
+    double precision, allocatable :: Ip(:)
+    double precision, allocatable :: Im(:)
 
     double precision, allocatable :: ulx(:),urx(:)
 
@@ -42,9 +47,14 @@ contains
     integer :: i,is,ie
 
     logical :: test
+
+    allocate(slopex(lo(1)-1:hi(1)+1,1))
     
     allocate(ulx(lo(1):hi(1)+1))
     allocate(urx(lo(1):hi(1)+1))
+
+    allocate(Ip(lo(1)-1:hi(1)+1))
+    allocate(Im(lo(1)-1:hi(1)+1))
 
     is = lo(1)
     ie = hi(1)
@@ -53,17 +63,31 @@ contains
     
     hx = dx(1)
     
-    call slopex_1d(utilde(:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+    if (ppm_type .eq. 0) then
+       call slopex_1d(utilde(:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_1d(utilde(:,1),ng_ut,ufull(:,1),ng_uf,Ip,Im, &
+                   domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+    end if
+
 
     !******************************************************************
     ! create utrans
     !******************************************************************
 
-    do i=is,ie+1
-       ! extrapolate to edges
-       ulx(i) = utilde(i-1,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,1)))*slopex(i-1,1)
-       urx(i) = utilde(i  ,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,1)))*slopex(i  ,1)
-    end do
+    if (ppm_type .eq. 0) then
+       do i=is,ie+1
+          ! extrapolate to edges
+          ulx(i) = utilde(i-1,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,1)))*slopex(i-1,1)
+          urx(i) = utilde(i  ,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,1)))*slopex(i  ,1)
+       end do
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do i=is,ie+1
+          ! extrapolate to edges
+          ulx(i) = Ip(i-1)
+          urx(i) = Im(i  )
+       end do
+    end if
 
     ! impose lo i side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -110,15 +134,13 @@ contains
        utrans(i) = merge(ZERO,utrans(i),test)
     end do
 
-    deallocate(ulx,urx)
-
   end subroutine mkutrans_1d
 #endif
 
 #if (AMREX_SPACEDIM == 2)
   subroutine mkutrans_2d(lev, domlo, domhi, lo, hi, &
                          utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                         ufull,  uf_lo, uf_hi, nc_uf, &
+                         ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
                          utrans, uu_lo, uu_hi, &
                          vtrans, uv_lo, uv_hi, &
                          w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
@@ -127,6 +149,7 @@ contains
     integer         , intent(in   ) :: ut_lo(2), ut_hi(2), nc_ut
     integer, value  , intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(2), uf_hi(2), nc_uf
+    integer, value  , intent(in   ) :: ng_uf
     integer         , intent(in   ) :: uu_lo(2), uu_hi(2)
     integer         , intent(in   ) :: uv_lo(2), uv_hi(2)
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),nc_ut)
@@ -137,8 +160,11 @@ contains
     double precision, intent(in   ) :: dx(2), dt
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
     
-    double precision :: slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1)
-    double precision :: slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1)
+    double precision, allocatable :: slopex(:,:,:)
+    double precision, allocatable :: slopey(:,:,:)
+
+    double precision, allocatable :: Ip(:,:,:)
+    double precision, allocatable :: Im(:,:,:)
 
     double precision, allocatable :: ulx(:,:),urx(:,:)
     double precision, allocatable :: vly(:,:),vry(:,:)
@@ -148,12 +174,18 @@ contains
     integer :: i,j,is,js,ie,je
 
     logical :: test
+
+    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1))
+    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1))
     
     allocate(ulx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1))
     allocate(urx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1))
 
     allocate(vly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1))
     allocate(vry(lo(1)-1:hi(1)+1,lo(2):hi(2)+1))
+
+    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
 
     is = lo(1)
     js = lo(2)
@@ -165,20 +197,36 @@ contains
     hx = dx(1)
     hy = dx(2)
     
-    call slopex_2d(utilde(:,:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-    call slopey_2d(utilde(:,:,2:2),slopey,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
+    if (ppm_type .eq. 0) then
+       call slopex_2d(utilde(:,:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+       call slopey_2d(utilde(:,:,2:2),slopey,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_2d(utilde(:,:,1),ng_ut, &
+                   ufull(:,:,1),ufull(:,:,2),ng_uf, &
+                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+    end if
 
     !******************************************************************
     ! create utrans
     !******************************************************************
 
-    do j=js,je
-       do i=is,ie+1
-          ! extrapolate to edges
-          ulx(i,j) = utilde(i-1,j,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,1)))*slopex(i-1,j,1)
-          urx(i,j) = utilde(i  ,j,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,1)))*slopex(i  ,j,1)
+    if (ppm_type .eq. 0) then
+       do j=js,je
+          do i=is,ie+1
+             ! extrapolate to edges
+             ulx(i,j) = utilde(i-1,j,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,1)))*slopex(i-1,j,1)
+             urx(i,j) = utilde(i  ,j,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,1)))*slopex(i  ,j,1)
+          end do
        end do
-    end do
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do j=js,je
+          do i=is,ie+1
+             ! extrapolate to edges
+             ulx(i,j) = Ip(i-1,j,1)
+             urx(i,j) = Im(i  ,j,1)
+          end do
+       end do
+    end if
     
     ! impose lo i side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -230,14 +278,30 @@ contains
     !******************************************************************
     ! create vtrans
     !******************************************************************
+    if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_2d(utilde(:,:,2),ng_ut, &
+                   ufull(:,:,1),ufull(:,:,2),ng_uf, &
+                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+    end if
 
-    do j=js,je+1
-       do i=is,ie
-          ! extrapolate to edges
-          vly(i,j) = utilde(i,j-1,2) + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,2)))*slopey(i,j-1,1)
-          vry(i,j) = utilde(i,j  ,2) - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,2)))*slopey(i,j  ,1)
+    if (ppm_type .eq. 0) then
+       do j=js,je+1
+          do i=is,ie
+             ! extrapolate to edges
+             vly(i,j) = utilde(i,j-1,2) + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,2)))*slopey(i,j-1,1)
+             vry(i,j) = utilde(i,j  ,2) - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,2)))*slopey(i,j  ,1)
+          end do
        end do
-    end do
+
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do j=js,je+1
+          do i=is,ie
+             ! extrapolate to edges
+             vly(i,j) = Ip(i,j-1,2)
+             vry(i,j) = Im(i,j  ,2)
+          end do
+       end do
+    end if
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -286,15 +350,13 @@ contains
        enddo
     enddo
 
-    deallocate(ulx,urx,vly,vry)
-
   end subroutine mkutrans_2d
 #endif
 
 #if (AMREX_SPACEDIM == 3)
   subroutine mkutrans_3d(lev, domlo, domhi, lo, hi, &
                          utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                         ufull,  uf_lo, uf_hi, nc_uf, &
+                         ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
                          utrans, uu_lo, uu_hi, &
                          vtrans, uv_lo, uv_hi, &
                          wtrans, uw_lo, uw_hi, &
@@ -304,6 +366,7 @@ contains
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut
     integer, value  , intent(in   ) :: ng_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
+    integer, value  , intent(in   ) :: ng_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: uw_lo(3), uw_hi(3)
@@ -320,6 +383,9 @@ contains
     double precision, allocatable :: slopey(:,:,:,:)
     double precision, allocatable :: slopez(:,:,:,:)
     
+    double precision, allocatable :: Ip(:,:,:,:)
+    double precision, allocatable :: Im(:,:,:,:)
+    
     double precision hx,hy,hz,dt2,uavg
     
     logical :: test
@@ -334,6 +400,9 @@ contains
     allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
     allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
 
+    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+
     is = lo(1)
     js = lo(2)
     ks = lo(3)
@@ -347,11 +416,17 @@ contains
     hy = dx(2)
     hz = dx(3)
     
-    do k = lo(3)-1,hi(3)+1
-       call slopex_2d(utilde(:,:,k,1:1),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-       call slopey_2d(utilde(:,:,k,2:2),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
-    end do
-    call slopez_3d(utilde(:,:,:,3:3),slopez,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,3:3))
+    if (ppm_type .eq. 0) then
+       do k = lo(3)-1,hi(3)+1
+          call slopex_2d(utilde(:,:,k,1:1),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+          call slopey_2d(utilde(:,:,k,2:2),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
+       end do
+       call slopez_3d(utilde(:,:,:,3:3),slopez,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,3:3))
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_3d(utilde(:,:,:,1),ng_ut, &
+                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+    end if
     
     !******************************************************************
     ! create utrans
@@ -360,18 +435,29 @@ contains
     allocate(ulx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
     allocate(urx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
 
-    do k=ks,ke
-       do j=js,je
-          do i=is,ie+1
-             ! extrapolate to edges
-             ulx(i,j,k) = utilde(i-1,j,k,1) &
-                  + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,k,1)))*slopex(i-1,j,k,1)
-             urx(i,j,k) = utilde(i  ,j,k,1) &
-                  - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,k,1)))*slopex(i  ,j,k,1)
+    if (ppm_type .eq. 0) then
+       do k=ks,ke
+          do j=js,je
+             do i=is,ie+1
+                ! extrapolate to edges
+                ulx(i,j,k) = utilde(i-1,j,k,1) &
+                     + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,k,1)))*slopex(i-1,j,k,1)
+                urx(i,j,k) = utilde(i  ,j,k,1) &
+                     - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,k,1)))*slopex(i  ,j,k,1)
+             end do
           end do
        end do
-    end do
-    deallocate(slopex)
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do k=ks,ke
+          do j=js,je
+             do i=is,ie+1
+                ! extrapolate to edges
+                ulx(i,j,k) = Ip(i-1,j,k,1)
+                urx(i,j,k) = Im(i  ,j,k,1)
+             end do
+          end do
+       end do
+    end if
     
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -422,29 +508,43 @@ contains
        enddo
     enddo
 
-    deallocate(ulx,urx)
-
     !******************************************************************
     ! create vtrans
     !******************************************************************
 
+    if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_3d(utilde(:,:,:,2),ng_ut, &
+                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+    end if
+
     allocate(vly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
     allocate(vry(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
 
-    do k=ks,ke
-       do j=js,je+1
-          do i=is,ie
-             ! extrapolate to edges
-             vly(i,j,k) = utilde(i,j-1,k,2) &
-                  + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,k,2)))*slopey(i,j-1,k,1)
-             vry(i,j,k) = utilde(i,j  ,k,2) &
-                  - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,k,2)))*slopey(i,j  ,k,1)
+    if (ppm_type .eq. 0) then
+       do k=ks,ke
+          do j=js,je+1
+             do i=is,ie
+                ! extrapolate to edges
+                vly(i,j,k) = utilde(i,j-1,k,2) &
+                     + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,k,2)))*slopey(i,j-1,k,1)
+                vry(i,j,k) = utilde(i,j  ,k,2) &
+                     - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,k,2)))*slopey(i,j  ,k,1)
+             enddo
           enddo
        enddo
-    enddo
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do k=ks,ke
+          do j=js,je+1
+             do i=is,ie
+                ! extrapolate to edges
+                vly(i,j,k) = Ip(i,j-1,k,2)
+                vry(i,j,k) = Im(i,j  ,k,2)
+             enddo
+          enddo
+       enddo
+    end if
 
-    deallocate(slopey)
-    
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
        select case(phys_bc(2,1))
@@ -494,29 +594,43 @@ contains
        enddo
     enddo
 
-    deallocate(vly,vry)
-
     !******************************************************************
     ! create wtrans
     !******************************************************************
 
+    if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       call ppm_3d(utilde(:,:,:,3),ng_ut, &
+                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
+    end if
+
     allocate(wlz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
     allocate(wrz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
 
-    do k=ks,ke+1
-       do j=js,je
-          do i=is,ie
-             ! extrapolate to edges
-             wlz(i,j,k) = utilde(i,j,k-1,3) &
-                  + (HALF-(dt2/hz)*max(ZERO,ufull(i,j,k-1,3)))*slopez(i,j,k-1,1)
-             wrz(i,j,k) = utilde(i,j,k  ,3) &
-                  - (HALF+(dt2/hz)*min(ZERO,ufull(i,j,k  ,3)))*slopez(i,j,k  ,1)
+    if (ppm_type .eq. 0) then
+       do k=ks,ke+1
+          do j=js,je
+             do i=is,ie
+                ! extrapolate to edges
+                wlz(i,j,k) = utilde(i,j,k-1,3) &
+                     + (HALF-(dt2/hz)*max(ZERO,ufull(i,j,k-1,3)))*slopez(i,j,k-1,1)
+                wrz(i,j,k) = utilde(i,j,k  ,3) &
+                     - (HALF+(dt2/hz)*min(ZERO,ufull(i,j,k  ,3)))*slopez(i,j,k  ,1)
+             end do
           end do
        end do
-    end do
+    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+       do k=ks,ke+1
+          do j=js,je
+             do i=is,ie
+                ! extrapolate to edges
+                wlz(i,j,k) = Ip(i,j,k-1,3)
+                wrz(i,j,k) = Im(i,j,k  ,3)
+             end do
+          end do
+       end do
+    end if
 
-    deallocate(slopez)
-    
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
        select case(phys_bc(3,1))
@@ -565,8 +679,6 @@ contains
           enddo
        enddo
     enddo
-
-    deallocate(wlz,wrz)
 
   end subroutine mkutrans_3d
 #endif

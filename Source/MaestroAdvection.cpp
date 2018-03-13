@@ -104,7 +104,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         &lev, domainBox.loVect(), domainBox.hiVect(),
                         validBox.loVect(), validBox.hiVect(),
                         BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
-                        BL_TO_FORTRAN_FAB(ufull_mf[mfi]),
+                        BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
                         BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
