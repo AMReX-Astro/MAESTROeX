@@ -42,7 +42,7 @@ contains
     integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
 
     ! Local variables
-    double precision :: slopex(lo(1)-1:hi(1)+1,1)
+    double precision, allocatable :: slopex(:,:)
 
     double precision, allocatable :: Ipu(:), Ipf(:)
     double precision, allocatable :: Imu(:), Imf(:)
@@ -55,6 +55,8 @@ contains
     integer :: i,is,ie
 
     logical :: test
+
+    allocate(slopex(lo(1)-1:hi(1)+1,1))
 
     allocate(Ipu(lo(1)-1:hi(1)+1))
     allocate(Imu(lo(1)-1:hi(1)+1))
@@ -142,8 +144,6 @@ contains
     end select
     end if
 
-    deallocate(umacl,umacr)
-
   end subroutine velpred_1d
 #endif
 
@@ -180,8 +180,8 @@ contains
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
 
     ! Local variables
-    double precision :: slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2)
-    double precision :: slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2)
+    double precision, allocatable :: slopex(:,:,:)
+    double precision, allocatable :: slopey(:,:,:)
 
     double precision, allocatable :: Ipu(:,:,:), Ipfx(:,:,:)
     double precision, allocatable :: Imu(:,:,:), Imfx(:,:,:)
@@ -202,6 +202,9 @@ contains
     integer :: i,j,is,js,ie,je
 
     logical :: test
+
+    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
 
     allocate(Ipu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
     allocate(Imu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
@@ -527,8 +530,6 @@ contains
     end select
     end if
 
-    deallocate(ulx,urx,uimhx,uly,ury,uimhy,umacl,umacr,vmacl,vmacr)
-
   end subroutine velpred_2d
 #endif
 
@@ -624,6 +625,10 @@ contains
 
     logical :: test
 
+    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+
     allocate(Ipu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
     allocate(Imu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
     allocate(Ipv(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
@@ -637,10 +642,6 @@ contains
     allocate(Imfy(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
     allocate(Ipfz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
     allocate(Imfz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
-
-    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
-    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
-    allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
 
     is = lo(1)
     ie = hi(1)
@@ -721,8 +722,6 @@ contains
           end do
        end do
     end if
-
-    deallocate(slopex)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -833,8 +832,6 @@ contains
        enddo
     end if
 
-    deallocate(slopey)
-
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
     select case(phys_bc(2,1))
@@ -942,8 +939,6 @@ contains
           end do
        end do
     end if
-
-    deallocate(slopez)
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
@@ -1080,7 +1075,6 @@ contains
        enddo
     enddo
 
-    deallocate(ulyz,uryz)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
@@ -1148,8 +1142,6 @@ contains
        enddo
     enddo
 
-    deallocate(ulzy,urzy)
-
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
@@ -1169,8 +1161,6 @@ contains
           enddo
        enddo
     enddo
-
-    deallocate(uimhz)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -1218,8 +1208,6 @@ contains
           enddo
        enddo
     enddo
-
-    deallocate(vlxz,vrxz)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
@@ -1287,8 +1275,6 @@ contains
        enddo
     enddo
 
-    deallocate(vlzx,vrzx)
-
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
@@ -1308,8 +1294,6 @@ contains
           enddo
        enddo
     enddo
-
-    deallocate(uimhy)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -1358,8 +1342,6 @@ contains
        enddo
     enddo
 
-    deallocate(wlxy,wrxy)
-
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
@@ -1379,8 +1361,6 @@ contains
           enddo
        enddo
     enddo
-
-    deallocate(uimhx)
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -1429,8 +1409,6 @@ contains
        enddo
     enddo
 
-    deallocate(wlyx,wryx)
-
     !******************************************************************
     ! Create umac, etc.
     !******************************************************************
@@ -1477,8 +1455,6 @@ contains
        enddo
     enddo
 
-    deallocate(ulx,urx,uimhyz,uimhzy)
-
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
     select case(phys_bc(1,1))
@@ -1508,8 +1484,6 @@ contains
        call bl_error("velpred_3d: invalid boundary type phys_bc(1,2)")
     end select
     end if
-
-    deallocate(umacl,umacr)
 
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
@@ -1553,8 +1527,6 @@ contains
        enddo
     enddo
 
-    deallocate(uly,ury,vimhxz,vimhzx)
-
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
     select case(phys_bc(2,1))
@@ -1584,8 +1556,6 @@ contains
        call bl_error("velpred_3d: invalid boundary type phys_bc(2,2)")
     end select
     end if
-
-    deallocate(vmacl,vmacr)
 
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
@@ -1631,8 +1601,6 @@ contains
        enddo
     enddo
 
-    deallocate(ulz,urz,wimhxy,wimhyx)
-
     ! impose hi side bc's
     if (lo(3) .eq. domlo(3)) then
     select case(phys_bc(3,1))
@@ -1662,8 +1630,6 @@ contains
        call bl_error("velpred_3d: invalid boundary type phys_bc(3,2)")
     end select
     end if
-
-    deallocate(wmacl,wmacr)
 
   end subroutine velpred_3d
 #endif
