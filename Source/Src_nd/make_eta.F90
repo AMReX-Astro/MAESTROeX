@@ -35,8 +35,8 @@ contains
 
     double precision, intent(  out) :: etarho_ec(0:max_radial_level,0:nr_fine)
     double precision, intent(  out) :: etarho_cc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: etarhosum(0:nr_fine,0:max_radial_level)
-    double precision, intent(in   ) :: ncell(0:nr_fine,0:max_radial_level)
+    double precision, intent(in   ) :: etarhosum(0:nr_fine,0:max_radial_level) ! note swapped shaping
+    double precision, intent(in   ) ::     ncell(0:nr_fine,0:max_radial_level) ! note swapped shaping
     
     ! Local variables
     integer :: r,i,n
@@ -46,7 +46,7 @@ contains
 
     do n=0,finest_radial_level
        do i=1,numdisjointchunks(n)
-          do r = r_start_coord(n,i), r_end_coord(n,i)
+          do r = r_start_coord(n,i), r_end_coord(n,i)+1
              etarho_ec(n,r) = etarhosum(r,n) / dble(ncell(r,n))
           end do
        end do
@@ -82,8 +82,8 @@ contains
     integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: x_lo(3), x_hi(3) 
     double precision, intent(in   ) :: etarhoflux(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
-    double precision, intent(inout) :: etarhosum(0:nr_fine,0:max_radial_level)
-    double precision, intent(inout) :: ncell(0:nr_fine,0:max_radial_level)
+    double precision, intent(inout) :: etarhosum(0:nr_fine,0:max_radial_level) ! note swapped shaping
+    double precision, intent(inout) ::     ncell(0:nr_fine,0:max_radial_level) ! note swapped shaping
 
     ! local
     integer :: i,j,k
