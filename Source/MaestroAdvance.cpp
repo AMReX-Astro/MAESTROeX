@@ -443,7 +443,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-       ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1);
+	ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1);
     }
 
     // pass temperature through for seeding the temperature update eos call

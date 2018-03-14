@@ -34,6 +34,13 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 	phi[lev].setVal(0.);
     }
 
+    // temporary residual variable
+    Vector<MultiFab> resid(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	resid[lev].define(grids[lev], dmap[lev],1, 0);
+	resid[lev].setVal(0.);
+    }
+
     // 
     // Compute thermal = div B grad phi using MLABecLaplacian class
     //  
@@ -52,26 +59,25 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
     {
 	// compute div Tcoeff grad T
 	// alpha is set to zero 
-	mlabec.setScalars(0.0, -1.0);
+	mlabec.setScalars(0.0, 1.0);
 
 	// set value of phi
 	for (int lev=0; lev<=finest_level; ++lev) {
 	    MultiFab::Copy(phi[lev],scal[lev],Temp,0,1,1);
 	}
 
-	ApplyThermal(mlabec, thermal, Tcoeff, phi, bcs_s, Temp); 
+	ApplyThermal(mlabec, resid, Tcoeff, phi, bcs_s, RhoH); 
+
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
+		MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
+	    }
+	}
     }
     else { // if temp_formulation == 2
-
-	// temporary residual variable
-	Vector<MultiFab> resid(finest_level+1);
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    resid[lev].define(grids[lev], dmap[lev],1, 0);
-	    resid[lev].setVal(0.);
-	}
-
+	
 	// 1. Compute div hcoeff grad h
-	mlabec.setScalars(0.0, -1.0);
+	mlabec.setScalars(0.0, 1.0);
 
 	// set value of phi
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -85,7 +91,7 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 	    MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
 	}
 
-	// 2. Compute -div Xkcoeff grad Xk
+	// 2. Compute div Xkcoeff grad Xk
 	mlabec.setScalars(0.0, 1.0);
 
 	// temporary Xk coeff variable
@@ -108,8 +114,8 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 		MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
 	    }
 	}
-
-	// 3. Compute -div pcoeff grad p0
+	
+	// 3. Compute div pcoeff grad p0
 	mlabec.setScalars(0.0, 1.0);
 	
 	// set value of phi
@@ -151,8 +157,10 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
         else {
 	    // lo-side BCs
             if (bcs[bccomp].lo(idim) == BCType::foextrap) {
+		// outflow
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
             } else if (bcs[bccomp].lo(idim) == BCType::ext_dir) {
+		// inflow
                 mlmg_lobc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
@@ -160,8 +168,10 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
 
 	    // hi-side BCs
             if (bcs[bccomp].hi(idim) == BCType::foextrap) {
+		// outflow
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
             } else if (bcs[bccomp].hi(idim) == BCType::ext_dir) {
+		// inflow
                 mlmg_hibc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
@@ -176,11 +186,14 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
     }
 
     // coefficients for solver
+    Vector<MultiFab> acoef(finest_level+1);
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > face_bcoef(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
+        acoef[lev].define(grids[lev], dmap[lev], 1, 1);
         AMREX_D_TERM(face_bcoef[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
                      face_bcoef[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
                      face_bcoef[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+	acoef[lev].setVal(0.);
     }
 
     // average face-centered B coefficients
@@ -188,6 +201,7 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
 
     // set coefficient matrix
     for (int lev = 0; lev <= finest_level; ++lev) {
+	mlabec.setACoeffs(lev, acoef[lev]);
 	mlabec.setBCoeffs(lev, amrex::GetArrOfConstPtrs(face_bcoef[lev]));
     }
 
@@ -303,7 +317,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > face_bcoef(finest_level+1);
     Vector<MultiFab> phi(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        acoef[lev].define(grids[lev], dmap[lev], 1, 0);
+        acoef[lev].define(grids[lev], dmap[lev], 1, 1);
         AMREX_D_TERM(face_bcoef[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
                      face_bcoef[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
                      face_bcoef[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
@@ -312,7 +326,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 
     // set cell-centered A coefficient to zero
     for (int lev=0; lev<=finest_level; ++lev) {
-	MultiFab::Copy(acoef[lev],s2[lev],Rho,0,1,0);
+	MultiFab::Copy(acoef[lev],s2[lev],Rho,0,1,1);
     }
 
     // average face-centered Bcoefficients
@@ -370,7 +384,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 	mlabec.setLevelBC(lev, &phi[lev]);
     }
 
-    mlabec.setScalars(1.0, dt/2.0);
+    mlabec.setScalars(1.0, -dt/2.0);
 
     for (int lev = 0; lev <= finest_level; ++lev) {
 	mlabec.setACoeffs(lev, acoef[lev]);
