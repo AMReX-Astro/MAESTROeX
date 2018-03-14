@@ -280,7 +280,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 	Dcoeff[lev].setVal(0.);
     }
 
-    // solverrhs will hold solver RHS = (rho h)^1  + 
+    // solverrhs will hold solver RHS = (rho h)^2  + 
     //           dt/2 div . ( hcoeff1 grad h^1) -
     //           dt/2 sum_k div . (Xkcoeff2 grad X_k^2 + Xkcoeff1 grad X_k^1) -
     //           dt/2 div . ( pcoeff2 grad p_0^new + pcoeff1 grad p_0^old)
@@ -291,9 +291,9 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 	resid[lev].define(grids[lev], dmap[lev], 1, 0);
     }
 
-    // compute RHS = (rho h)^1
+    // compute RHS = rho^{(2)}h^{(2')}
     for (int lev = 0; lev <= finest_level; ++lev) {
-	MultiFab::Copy(solverrhs[lev],s1[lev],RhoH,0,1,0);
+	MultiFab::Copy(solverrhs[lev],s2[lev],RhoH,0,1,0);
     }
 
     // compute resid = div(hcoeff1 grad h^1) - sum_k div(Xkcoeff1 grad Xk^1) - div(pcoeff1 grad p0_old)
