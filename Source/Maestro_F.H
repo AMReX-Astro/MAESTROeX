@@ -450,7 +450,12 @@ extern "C"
                                amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
                                const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
                                const amrex::Real* Sbar,
-                               const amrex::Real* beta0);
+                               const amrex::Real* beta0,
+                               const amrex::Real* gamma1bar, 
+			       const amrex::Real* p0,  
+                               const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi,
+			             amrex::Real* delta_chi, const int* dc_lo, const int* dc_hi, 
+			       const Real* dt, const int* is_predictor);
 
     //////////////////////
 

@@ -412,7 +412,12 @@ private:
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
                              const amrex::Vector<amrex::MultiFab>& S_cc,
                              const amrex::Vector<amrex::Real>& Sbar,
-                             const amrex::Vector<amrex::Real>& beta0);
+                             const amrex::Vector<amrex::Real>& beta0, 
+                             const amrex::Vector<amrex::Real>& gamma1bar, 
+			     const amrex::Vector<amrex::Real>& p0,  
+                             const amrex::Vector<amrex::MultiFab>& delta_p_term,
+			           amrex::Vector<amrex::MultiFab>& delta_chi, 
+                             int is_predictor);
 
     // end MaestroMakeS.cpp functions
     ////////////

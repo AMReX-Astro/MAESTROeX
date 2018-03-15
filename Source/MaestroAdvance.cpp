@@ -283,10 +283,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_old);
+    is_predictor = 1;
+    MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_old,gamma1bar_old,p0_old,
+		       delta_p_term,delta_chi,is_predictor);
 
     // MAC projection
-    is_predictor = 1;
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////
@@ -569,10 +570,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_nph);
+    is_predictor = 0;
+    MakeRHCCforMacProj(macrhs,S_cc_nph,Sbar,beta0_nph,gamma1bar_new,p0_new, 
+		       delta_p_term,delta_chi,is_predictor);
 
     // MAC projection
-    is_predictor = 0;
     MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////

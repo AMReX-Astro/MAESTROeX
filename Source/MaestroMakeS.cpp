@@ -96,7 +96,12 @@ void
 Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const Vector<MultiFab>& S_cc,
                              const Vector<Real>& Sbar,
-                             const Vector<Real>& beta0)
+                             const Vector<Real>& beta0, 
+                             const Vector<Real>& gamma1bar, 
+			     const Vector<Real>& p0,  
+                             const Vector<MultiFab>& delta_p_term,
+			     Vector<MultiFab>& delta_chi, 
+			     int is_predictor)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()",MakeRHCCforMacProj);
@@ -107,6 +112,8 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
         // get references to the MultiFabs at level lev
               MultiFab& rhcc_mf = rhcc[lev];
         const MultiFab& S_cc_mf = S_cc[lev];
+	const MultiFab& delta_p_mf = delta_p_term[lev];
+	      MultiFab& delta_chi_mf = delta_chi[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
@@ -121,7 +128,11 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
             make_rhcc_for_macproj(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                                   BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
                                   BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-                                  Sbar.dataPtr(), beta0.dataPtr());
+                                  Sbar.dataPtr(), beta0.dataPtr(), 
+                                  gamma1bar.dataPtr(), p0.dataPtr(), 
+                                  BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
+                                  BL_TO_FORTRAN_3D(delta_chi_mf[mfi]),
+                                  &dt, &is_predictor);
         }
     }
 }

@@ -5,7 +5,7 @@ module make_S_module
   use eos_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, dpdt_factor
-  use base_state_geometry_module, only:  max_radial_level, nr_fine
+  use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord
 
   implicit none
 
@@ -118,7 +118,11 @@ contains
   subroutine make_rhcc_for_macproj(lev, lo, hi, &
                                    rhcc, c_lo, c_hi, &
                                    S_cc,  s_lo, s_hi, &
-                                   Sbar, beta0) bind (C,name="make_rhcc_for_macproj")
+                                   Sbar, beta0, &
+                                   gamma1bar, p0, & 
+                                   delta_p_term, dp_lo, dp_hi, &
+                                   delta_chi, dc_lo, dc_hi, &
+                                   dt, is_predictor) bind (C,name="make_rhcc_for_macproj")
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
@@ -127,7 +131,16 @@ contains
     double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) :: Sbar (0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
-
+    double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
+    integer         , intent (in   ) :: dp_lo(3), dp_hi(3)
+    double precision, intent (in   ) :: delta_p_term(dp_lo(1):dp_hi(1),dp_lo(2):dp_hi(2),dp_lo(3):dp_hi(3))
+    integer         , intent (in   ) :: dc_lo(3), dc_hi(3)
+    double precision, intent (inout) :: delta_chi(dc_lo(1):dc_hi(1),dc_lo(2):dc_hi(2),dc_lo(3):dc_hi(3))
+    double precision, intent (in   ) :: dt
+    integer         , intent (in   ) :: is_predictor
+    
+    ! Local variables
     integer i,j,k,r
 
     ! loop over the data
@@ -149,7 +162,48 @@ contains
     enddo
 
     if (dpdt_factor .gt. 0.0d0) then
-       call amrex_abort("make_rhcc_for_macproj: dpdt_factor not implemented - refer to MAESTRO make_macrhs.f90")
+
+       if (is_predictor .eq. 1) &
+          delta_chi = 0.d0
+
+#if (AMREX_SPACEDIM == 3)
+
+       do k = lo(3),hi(3)
+          if (k .lt. base_cutoff_density_coord(lev)) then
+             do j = lo(2),hi(2)                
+                do i = lo(1),hi(1)
+                   delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / &
+                           (dt*gamma1bar(lev,k)*p0(lev,k))
+                   rhcc(i,j,k) = rhcc(i,j,k) + beta0(lev,k) * delta_chi(i,j,k)
+                end do
+             end do
+          end if
+       end do
+
+#elif (AMREX_SPACEDIM == 2) 
+       k = lo(3)
+       do j = lo(2),hi(2)
+          if (j .lt. base_cutoff_density_coord(lev)) then
+             do i = lo(1),hi(1)
+                delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / & 
+                        (dt*gamma1bar(lev,j)*p0(lev,j))
+                rhcc(i,j,k) = rhcc(i,j,k) + beta0(lev,j) * delta_chi(i,j,k)
+             end do
+          end if
+       end do
+
+#elif (AMREX_SPACEDIM == 1)
+       k = lo(3)
+       j = lo(2)
+       do i = lo(1),hi(1)
+          if (i .lt. base_cutoff_density_coord(n)) then
+             delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / &
+                     (dt*gamma1bar(lev,i)*p0(lev,i))
+             rhcc(i,j,k) = rhcc(i,j,k) + beta0(lev,i) * delta_chi(i,j,k)
+          end if
+       end do
+#endif
+
     end if
 
   end subroutine make_rhcc_for_macproj
