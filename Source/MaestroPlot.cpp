@@ -81,8 +81,9 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
     // rho, rhoh, rhoX, tfromp, tfromh, Pi (Nscal+1)
     // X (NumSpec)
     // rho0, p0 (2)
+    // deltaT (1)
     // w0 (AMREX_SPACEDIM)
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 3;
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 4;
 
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
@@ -152,6 +153,33 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
     }
     ++dest_comp;
 
+    // deltaT
+    // compute & copy tfromp
+    TfromRhoP(s_in,p0_in);
+    for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
+    }
+    // for (int i = 0; i <= finest_level; ++i) {
+    // 	MultiFab::Copy(tempmf[i],s_in[i],Temp,0,1,0);
+    // }
+    // compute tfromh
+    TfromRhoH(s_in,p0_in);
+    // compute deltaT = (tfromp - tfromh) / tfromh
+    for (int i = 0; i <= finest_level; ++i) {
+	MultiFab::Subtract(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
+	MultiFab::Divide(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
+    }
+    // // compute deltaT = (tfromh - tfromp) / tfromh
+    // for (int i = 0; i <= finest_level; ++i) {
+    // 	MultiFab::LinComb(tempmf[i],1.0,s_in[i],Temp,-1.0,tempmf[i],0,0,1,0);
+    // 	MultiFab::Divide(tempmf[i],s_in[i],Temp,0,1,0);
+    // }
+    // // copy to plot variables
+    // for (int i = 0; i <= finest_level; ++i) {
+    //     plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+    // }
+    ++dest_comp;
+
     // restore tfromp if necessary
     if (use_tfromp) {
         TfromRhoP(s_in,p0_in);
@@ -197,8 +225,9 @@ Maestro::PlotFileVarNames () const
     // rho, rhoh, rhoX, tfromp, tfromh, Pi (Nscal+1)
     // X (NumSpec)
     // rho0, p0 (2)
+    // deltaT (1)
     // w0 (AMREX_SPACEDIM)
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 3;
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 4;
     Vector<std::string> names(nPlot);
 
     int cnt = 0;
@@ -253,6 +282,7 @@ Maestro::PlotFileVarNames () const
 
     names[cnt++] = "tfromp";
     names[cnt++] = "tfromh";
+    names[cnt++] = "deltaT";
     names[cnt++] = "Pi";
 
     names[cnt++] = "rho0";
