@@ -159,9 +159,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
     }
-    // for (int i = 0; i <= finest_level; ++i) {
-    // 	MultiFab::Copy(tempmf[i],s_in[i],Temp,0,1,0);
-    // }
+    
     // compute tfromh
     TfromRhoH(s_in,p0_in);
     // compute deltaT = (tfromp - tfromh) / tfromh
@@ -169,15 +167,6 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
 	MultiFab::Subtract(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
 	MultiFab::Divide(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
     }
-    // // compute deltaT = (tfromh - tfromp) / tfromh
-    // for (int i = 0; i <= finest_level; ++i) {
-    // 	MultiFab::LinComb(tempmf[i],1.0,s_in[i],Temp,-1.0,tempmf[i],0,0,1,0);
-    // 	MultiFab::Divide(tempmf[i],s_in[i],Temp,0,1,0);
-    // }
-    // // copy to plot variables
-    // for (int i = 0; i <= finest_level; ++i) {
-    //     plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
-    // }
     ++dest_comp;
 
     // restore tfromp if necessary
