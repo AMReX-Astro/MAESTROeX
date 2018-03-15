@@ -151,4 +151,50 @@ contains
 
   end subroutine makeTfromRhoP
 
+  !----------------------------------------------------------------------------
+  ! makePfromRhoH
+  !----------------------------------------------------------------------------
+  subroutine makePfromRhoH(lo, hi, &
+                            state, s_lo, s_hi, nc_s, & 
+                            temp_old, t_lo, t_hi, & 
+                            peos, p_lo, p_hi) bind(C,name="makePfromRhoH")
+
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
+    double precision, intent(in   ) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent(in   ) :: t_lo(3), t_hi(3)
+    double precision, intent(in   ) :: temp_old(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
+    integer         , intent(in   ) :: p_lo(3), p_hi(3)
+    double precision, intent(inout) :: peos(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
+
+    ! Local variables
+    integer :: i, j, k
+    integer :: pt_index(3)
+    type (eos_t) :: eos_state
+
+    !$OMP PARALLEL DO PRIVATE(i,j,k, eos_state, pt_index)
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+             
+             ! (rho, H) --> T, p
+             eos_state%rho   = state(i,j,k,rho_comp)
+             eos_state%T     = temp_old(i,j,k)
+             eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
+
+             pt_index(:) = (/i, j, k/)
+             
+             call eos(eos_input_rh, eos_state, pt_index)
+             
+             peos(i,j,k) = eos_state%p
+             
+          enddo
+       enddo
+    enddo
+    !$OMP END PARALLEL DO
+
+  end subroutine makePfromRhoH
+
 end module rhoh_vs_t_module

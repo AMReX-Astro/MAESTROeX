@@ -603,6 +603,11 @@ extern "C"
     void makeTfromRhoP (const int* lev, const int* lo, const int* hi, 
                         amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
                         const amrex::Real* p0, const int* updateRhoH);
+
+    void makePfromRhoH(const int* lo, const int* hi, 
+		       const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,  
+		       const amrex::Real* temp_old, const int* t_lo, const int* t_hi,  
+		       amrex::Real* peos, const int* p_lo, const int* p_hi);
     //////////////////////
 
     //////////////////////
