@@ -881,8 +881,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
 	    }
 	    
-	    // call correct_nodalrhs(the_bc_tower,mla,rho0_new,nodalrhs,beta0_nph,dx,dt, &
-	    //		  gamma1bar_new,p0_new,delta_p_term)
+	    CorrectRHCCforNodalProj(rhcc_for_nodalproj,rho0_new,beta0_nph,gamma1bar_new,
+				    p0_new,delta_p_term);
         }
     }
 

@@ -419,6 +419,12 @@ private:
 			           amrex::Vector<amrex::MultiFab>& delta_chi, 
                              int is_predictor);
 
+    void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
+				 const amrex::Vector<amrex::Real>& rho0,
+				 const amrex::Vector<amrex::Real>& beta0,
+				 const amrex::Vector<amrex::Real>& gamma1bar,
+				 const amrex::Vector<amrex::Real>& p0, 
+				 const amrex::Vector<amrex::MultiFab>& delta_p_term);
     // end MaestroMakeS.cpp functions
     ////////////
 

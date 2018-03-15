@@ -455,8 +455,19 @@ extern "C"
 			       const amrex::Real* p0,  
                                const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi,
 			             amrex::Real* delta_chi, const int* dc_lo, const int* dc_hi, 
-			       const Real* dt, const int* is_predictor);
+			       const amrex::Real* dt, const int* is_predictor);
 
+    void create_correction_cc(const int* lev, const int* lo, const int* hi, 
+			      amrex::Real* correction_cc, const int* c_lo, const int* c_hi, 
+			      const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi, 
+			      const amrex::Real* beta0, 
+			      const amrex::Real* gamma1bar, 
+			      const amrex::Real* p0,
+			      const amrex::Real* dt);
+
+    void create_correction_nodal(const int* lo, const int* hi, 
+				 amrex::Real* correction_nodal, const int* cn_lo, const int* cn_hi, 
+				 const amrex::Real* correction_cc, const int* cc_lo, const int* cc_hi);
     //////////////////////
 
 

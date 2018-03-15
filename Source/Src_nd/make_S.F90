@@ -208,4 +208,114 @@ contains
 
   end subroutine make_rhcc_for_macproj
 
+  subroutine create_correction_cc(lev, lo, hi, &
+                                                 correction_cc, c_lo, c_hi, &
+                                                 delta_p_term, dp_lo, dp_hi, &
+                                                 beta0, gamma1bar, &
+                                                 p0,dt) &
+           bind (C,name="create_correction_cc")
+
+    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: c_lo(3), c_hi(3)
+    double precision, intent(  out) :: correction_cc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+    integer         , intent(in   ) :: dp_lo(3), dp_hi(3)
+    double precision, intent(in   ) :: delta_p_term(dp_lo(1):dp_hi(1),dp_lo(2):dp_hi(2),dp_lo(3):dp_hi(3))
+    double precision, intent(in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)    
+    double precision, intent(in   ) :: dt
+    
+    ! Local variables
+    integer :: i, j, k
+    double precision :: correction_factor
+
+#if (AMREX_SPACEDIM == 3)
+    !$OMP PARALLEL DO PRIVATE(i,j,k,correction_factor)
+    do k = lo(3),hi(3)
+       if(k .lt. base_cutoff_density_coord(lev)) then
+          correction_factor = beta0(lev,k)*(dpdt_factor/(gamma1bar(lev,k)*p0(lev,k))) / dt
+       else
+          correction_factor = 0.0d0
+       end if
+       do j = lo(2),hi(2)
+          do i = lo(1),hi(1)
+             correction_cc(i,j,k) = correction_factor*delta_p_term(i,j,k)
+          end do
+       end do
+    end do
+    !$OMP END PARALLEL DO
+#elif (AMREX_SPACEDIM == 2)
+    k = lo(3)
+    do j = lo(2),hi(2)
+       if(j .lt. base_cutoff_density_coord(lev)) then
+          correction_factor = beta0(lev,j)*(dpdt_factor/(gamma1bar(lev,j)*p0(lev,j))) / dt
+       else
+          correction_factor = 0.0d0
+       end if
+       do i = lo(1),hi(1)
+          correction_cc(i,j,k) = correction_factor*delta_p_term(i,j,k)
+       end do
+    end do
+#elif (AMREX_SPACEDIM ==1 )
+    k = lo(3)
+    j = lo(2)
+    do i = lo(1),hi(1)
+       if(i .lt. base_cutoff_density_coord(lev)) then
+          correction_factor = beta0(lev,i)*(dpdt_factor/(gamma1bar(lev,i)*p0(lev,i))) / dt
+       else
+          correction_factor = 0.0d0
+       end if
+       correction_cc(i,j,k) = correction_factor*delta_p_term(i,j,k)
+    end do
+#endif
+    
+  end subroutine create_correction_cc
+
+  subroutine create_correction_nodal(lo, hi, &
+                                       correction_nodal, cn_lo, cn_hi, &
+                                       correction_cc, cc_lo, cc_hi) &
+           bind (C,name="create_correction_nodal")
+
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: cn_lo(3), cn_hi(3)
+    double precision, intent(  out) :: correction_nodal(cn_lo(1):cn_hi(1),cn_lo(2):cn_hi(2),cn_lo(3):cn_hi(3))
+    integer         , intent(in   ) :: cc_lo(3), cc_hi(3)
+    double precision, intent(in   ) :: correction_cc(cc_lo(1):cc_hi(1),cc_lo(2):cc_hi(2),cc_lo(3):cc_hi(3))
+    
+    ! Local variables
+    integer :: i, j, k
+
+#if (AMREX_SPACEDIM == 3)
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
+    do k = lo(3), hi(3)+1
+       do j = lo(2), hi(2)+1
+          do i = lo(1), hi(1)+1
+             correction_nodal(i,j,k) = 0.125 * &
+                  (correction_cc(i,j  ,k-1) + correction_cc(i-1,j  ,k-1) &
+                 + correction_cc(i,j-1,k-1) + correction_cc(i-1,j-1,k-1) &
+                 + correction_cc(i,j  ,k  ) + correction_cc(i-1,j  ,k  ) &
+                 + correction_cc(i,j-1,k  ) + correction_cc(i-1,j-1,k  ) )
+          end do
+       end do
+    end do
+    !$OMP END PARALLEL DO
+#elif (AMREX_SPACEDIM == 2)
+    k = lo(3)
+    do j = lo(2),hi(2)+1
+       do i = lo(1), hi(1)+1
+          correction_nodal(i,j,k) = 0.25 * &
+               (correction_cc(i,j  ,k) + correction_cc(i-1,j  ,k) &
+              + correction_cc(i,j-1,k) + correction_cc(i-1,j-1,k) )
+       end do
+    end do
+#elif (AMREX_SPACEDIM == 1 )
+    k = lo(3)
+    j = lo(2)
+    do i = lo(1), hi(1)+1
+       correction_nodal(i,j,k) = 0.5 * ( correction_cc(i,j,k) + correction_cc(i-1,j,k) )
+    end do
+#endif
+    
+  end subroutine create_correction_nodal
+
 end module make_S_module
