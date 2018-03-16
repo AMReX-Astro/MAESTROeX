@@ -464,10 +464,6 @@ extern "C"
 			      const amrex::Real* gamma1bar, 
 			      const amrex::Real* p0,
 			      const amrex::Real* dt);
-
-    void create_correction_nodal(const int* lo, const int* hi, 
-				 amrex::Real* correction_nodal, const int* cn_lo, const int* cn_hi, 
-				 const amrex::Real* correction_cc, const int* cc_lo, const int* cc_hi);
     //////////////////////
 
 
