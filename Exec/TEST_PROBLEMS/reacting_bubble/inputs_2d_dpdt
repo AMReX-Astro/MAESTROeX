@@ -4,7 +4,7 @@ maestro.model_file = "model.hse.cool.coulomb"
 maestro.probin_file = "probin"
 maestro.perturb_model = true
 
-maestro.ppm_type = 1
+maestro.ppm_type = 2
 
 # PROBLEM SIZE
 geometry.prob_lo = 0.0    0.0
@@ -27,7 +27,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 # GRIDDING AND REFINEMENT
 amr.n_cell             = 96 160
 amr.max_grid_size      = 160
-amr.max_levs           = 0       # maximum level number allowed
+amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
@@ -38,7 +38,7 @@ maestro.temperr = 6.5e8 6.5e8
 
 # TIME STEPPING
 maestro.max_step  = 100000000
-maestro.stop_time = 2.5d0
+maestro.stop_time = 2.5e0
 maestro.cfl       = 0.9    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
@@ -61,13 +61,14 @@ maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 10.e0
 maestro.sponge_kappa = 10.e0
 
-maestro.dpdt_factor = 1.e0 
+maestro.dpdt_factor = 1.e0
 
 maestro.use_particles = false
 
 # PLOTFILES
 maestro.plot_file  = plt    # root name of plot file
-maestro.plot_deltat = 0.5e0
+maestro.plot_int   = 10     # number of timesteps between plot files
+maestro.plot_deltat = 0.5d0
 
 # CHECKPOINT
 maestro.check_base_name = chk
