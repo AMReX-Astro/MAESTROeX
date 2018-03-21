@@ -6,6 +6,7 @@ using namespace amrex;
 void
 Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                           const Vector<Real>& w0_force,
                           const Vector<Real>& rho0_nph,
                           const Vector<Real>& grav_cell_nph, 
@@ -36,7 +37,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Add w0 to MAC velocities
     //////////////////////////////////
 
-    Addw0(umac,1.);
+    Addw0(umac,w0mac,1.);
 
     //////////////////////////////////
     // Create the edge states of velocity using the MAC velocity plus w0 on edges.
@@ -48,7 +49,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Subtract w0 from MAC velocities.
     //////////////////////////////////
 
-    Addw0(umac,-1.);
+    Addw0(umac,w0mac,-1.);
 
     //////////////////////////////////
     // Now create the force at half-time using rhohalf 

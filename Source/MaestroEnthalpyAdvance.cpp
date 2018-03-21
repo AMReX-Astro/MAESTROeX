@@ -11,6 +11,7 @@ Maestro::EnthalpyAdvance (int which_step,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
                           Vector<MultiFab>& scal_force,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			  const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const Vector<MultiFab>& thermal)
 {
     // timer for profiling
@@ -78,7 +79,7 @@ Maestro::EnthalpyAdvance (int which_step,
     // Add w0 to MAC velocities
     //////////////////////////////////
 
-    Addw0(umac,1.);
+    Addw0(umac,w0mac,1.);
 
     //////////////////////////////////
     // Create the edge states of (rho h)' or h or T 
@@ -152,7 +153,7 @@ Maestro::EnthalpyAdvance (int which_step,
     // Subtract w0 from MAC velocities
     //////////////////////////////////
 
-    Addw0(umac,-1.);
+    Addw0(umac,w0mac,-1.);
    
     //////////////////////////////////
     // Compute fluxes

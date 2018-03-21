@@ -170,6 +170,14 @@ extern "C"
                               const amrex::Real* s0, const int* is_input_edge_centered,
                               const int* is_output_a_vector);
 
+    void put_1d_array_on_cart_3d_sphr(const int* lo, const int* hi,  
+				      amrex::Real* s0_cart, 
+				      const int* s0_cart_lo, const int* s0_cart_hi, const int* nc_s, 
+                                      const amrex::Real* s0, const amrex::Real* dx,
+				      const int* is_input_edge_centered, 
+				      const int* is_output_a_vector, 
+				      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
+
     void addw0(const int* lev, const int* lo, const int* hi,
                amrex::Real* uedge, const int* u_lo, const int* u_hi,
 #if (AMREX_SPACEDIM >= 2)
@@ -179,6 +187,33 @@ extern "C"
 #endif
 #endif
                const amrex::Real* w0, const amrex::Real* mult);
+
+    void addw0_sphr(const int* lo, const int* hi,  
+		    amrex::Real* umac, const int* u_lo, const int* u_hi,  
+		    amrex::Real* vmac, const int* v_lo, const int* v_hi,  
+		    amrex::Real* wmac, const int* w_lo, const int* w_hi, 
+		    const amrex::Real* w0macx, const int* x_lo, const int* x_hi,  
+		    const amrex::Real* w0macy, const int* y_lo, const int* y_hi, 
+		    const amrex::Real* w0macz, const int* z_lo, const int* z_hi,  
+		    const amrex::Real* mult);
+
+    void make_w0mac_sphr(const int* lo, const int* hi, 
+			 amrex::Real* w0, 
+			 amrex::Real* w0macx, const int* x_lo, const int* x_hi, 
+			 amrex::Real* w0macy, const int* y_lo, const int* y_hi, 
+			 amrex::Real* w0macz, const int* z_lo, const int* z_hi, 
+			 amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi, const int* nc_w0, 
+			 const amrex::Real* dx, 
+			 const amrex::Real* r_edge_loc);
+
+    void make_s0mac_sphr(const int* lo, const int* hi, 
+			 const amrex::Real* s0, 
+			 amrex::Real* s0macx, const int* x_lo, const int* x_hi, 
+			 amrex::Real* s0macy, const int* y_lo, const int* y_hi, 
+			 amrex::Real* s0macz, const int* z_lo, const int* z_hi, 
+			 amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi, 
+			 const amrex::Real* dx, 
+			 const amrex::Real* r_cc_loc);
 
     void make_normal(amrex::Real* normal, const int* n_lo, const int* n_hi,
 		     const amrex::Real* dx);

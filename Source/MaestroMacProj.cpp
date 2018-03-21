@@ -29,11 +29,32 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // allocate AND compute it here
     Vector<Real> beta0_edge( (max_radial_level+1)*(nr_fine+1) );
     beta0_edge.shrink_to_fit();
-    cell_to_edge(beta0.dataPtr(),beta0_edge.dataPtr());
+    
+    Vector< std::array< MultiFab,AMREX_SPACEDIM > > beta0_cart_edge(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+	AMREX_D_TERM(beta0_cart_edge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+		     beta0_cart_edge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+		     beta0_cart_edge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+    }
+	
+    if (spherical == 1) {
+	MakeS0mac(beta0, beta0_cart_edge);
+    } else {
+	cell_to_edge(beta0.dataPtr(),beta0_edge.dataPtr());
+    }
 
     // convert Utilde^* to beta0*Utilde^*
-    int mult_or_div = 1;
-    MultFacesByBeta0(umac,beta0,beta0_edge,mult_or_div);
+    int mult_or_div;
+    if (spherical == 0) {
+	mult_or_div = 1;
+	MultFacesByBeta0(umac,beta0,beta0_edge,mult_or_div);
+    } else { // spherical == 1
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+		MultiFab::Multiply(umac[lev][idim],beta0_cart_edge[lev][idim],0,0,1,0);
+	    }
+	}
+    }
 
     // compute the RHS for the solve, RHS = macrhs - div(beta0*umac)
     ComputeMACSolverRHS(solverrhs,macrhs,umac);
@@ -79,10 +100,21 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // multiply face-centered B coefficients by beta0 so they contain beta0/rho
-    mult_or_div = 1;
-    MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
-    if (use_alt_energy_fix) {
-        MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+    if (spherical == 0) {
+	mult_or_div = 1;
+	MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+	if (use_alt_energy_fix) {
+	    MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+	}
+    } else { //spherical == 1
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+		MultiFab::Multiply(face_bcoef[lev][idim],beta0_cart_edge[lev][idim],0,0,1,0);
+		if (use_alt_energy_fix) {
+		    MultiFab::Multiply(face_bcoef[lev][idim],beta0_cart_edge[lev][idim],0,0,1,0);
+		}
+	    }
+	}
     }
 
     // 
@@ -148,8 +180,16 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
     
     // convert beta0*Utilde to Utilde
-    mult_or_div = 0;
-    MultFacesByBeta0(umac,beta0,beta0_edge,mult_or_div);
+    if (spherical == 0) {
+	mult_or_div = 0;
+	MultFacesByBeta0(umac,beta0,beta0_edge,mult_or_div);
+    } else {
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+		MultiFab::Divide(umac[lev][idim],beta0_cart_edge[lev][idim],0,0,1,0);
+	    }
+	}
+    }
 
     // fill periodic ghost cells
     for (int lev = 0; lev <= finest_level; ++lev) {

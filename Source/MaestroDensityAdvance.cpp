@@ -12,6 +12,7 @@ Maestro::DensityAdvance (int which_step,
                          Vector<MultiFab>& scal_force,
 			 Vector<MultiFab>& etarhoflux,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac, 
+			 const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
 			 const Vector<Real>& rho0_predicted_edge)
 {
     // timer for profiling
@@ -73,7 +74,7 @@ Maestro::DensityAdvance (int which_step,
     // Add w0 to MAC velocities (trans velocities already have w0).
     /////////////////////////////////////////////////////////////////
 
-    Addw0(umac,1.);
+    Addw0(umac,w0mac,1.);
     
     /////////////////////////////////////////////////////////////////
     // Create the edge states of (rho X)' or X and rho'
@@ -133,7 +134,7 @@ Maestro::DensityAdvance (int which_step,
     // Subtract w0 from MAC velocities.
     /////////////////////////////////////////////////////////////////
 
-    Addw0(umac,-1.);
+    Addw0(umac,w0mac,-1.);
 
 
     /////////////////////////////////////////////////////////////////

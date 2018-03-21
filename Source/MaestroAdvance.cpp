@@ -270,9 +270,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         if (spherical == 1) {
             // put w0 on Cartesian edges
+	    MakeW0mac(w0mac);
 
             // put w0_force on Cartesian cells
-	    Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_u, 0);
+	    Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
         }
 
     }
@@ -292,7 +293,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0_force);
+    AdvancePremac(umac,w0mac,w0_force);
     
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -305,6 +306,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		       delta_p_term,delta_chi,is_predictor);
 
     // MAC projection
+    // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////
@@ -364,7 +366,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,rho0_predicted_edge);
+    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
@@ -450,7 +452,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << endl;
     }
     
-    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,thermal1);
+    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -592,9 +594,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         if (spherical == 1) {
             // put w0 on Cartesian edges
+	    MakeW0mac(w0mac);
 
             // put w0_force on Cartesian cells
-
+	    Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
         }
     }
 
@@ -607,7 +610,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0_force);
+    AdvancePremac(umac,w0mac,w0_force);
 
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -616,6 +619,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		       delta_p_term,delta_chi,is_predictor);
 
     // MAC projection
+    // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////
@@ -652,7 +656,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,rho0_predicted_edge);
+    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
     if (evolve_base_state && use_etarho) {
 
@@ -736,7 +740,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << endl;
     }
 
-    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,thermal1);
+    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -825,7 +829,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // Define rho at half time using the new rho from Step 8
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
        
-    VelocityAdvance(rhohalf, umac, w0_force, rho0_nph, grav_cell_nph, sponge);
+    VelocityAdvance(rhohalf, umac, w0mac, w0_force, rho0_nph, grav_cell_nph, sponge);
 
 
     if (evolve_base_state && is_initIter) {

@@ -6,6 +6,7 @@ using namespace amrex;
 // compute unprojected mac velocities
 void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const Vector<Real>& w0_force)
 {
     // timer for profiling
@@ -54,7 +55,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,w0_force,do_add_utilde_force);
 
     // add w0 to trans velocities
-    Addw0 (utrans,1.);
+    Addw0 (utrans,w0mac,1.);
 
     VelPred(utilde,ufull,utrans,umac,vel_force);
 }

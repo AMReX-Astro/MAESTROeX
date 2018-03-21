@@ -464,26 +464,26 @@ use_pprime_in_tfromp                 bool            false      y
 # 1 = piecewise constant; @@
 # 2 = piecewise linear; @@
 # 3 = quadratic
-s0_interp_type                      int            3
+s0_interp_type                      int            3	    y
 
 # The interpolation for filling a cell-centered multifab from a 1D edge-centered array. @@
 # 1 = piecewise constant; @@
 # 2 = piecewise linear; @@
 # 3 = quadratic
-w0_interp_type                      int            2
+w0_interp_type                      int            2	    y
 
 # The interpolation for filling an edge based multifab from a 1D bin-centered array. @@
 # 1 = Interpolate s0 to cell centers (with s0\_interp\_type), then average to edges; @@
 # 2 = Interpolate s0 to edges directly using linear interpolation; @@
 # 3 = Interpolate s0 to edges directly using quadratic interpolation.
-s0mac_interp_type                   int            1
+s0mac_interp_type                   int            1        y
 
 # The interpolation for putting w0 on edges.  We only compute the normal component. @@
 # 1 = Interpolate w0 to cell centers (with w0\_interp\_type), then average to edges; @@
 # 2 = Interpolate w0 to edges directly using linear interpolation; @@
 # 3 = Interpolate w0 to edges directly using quadratic interpolation; @@
 # 4 = Interpolate w0 to nodes using linear interpolation, then average to edges.
-w0mac_interp_type                   int            1
+w0mac_interp_type                   int            1 	      y
 
 
 #-----------------------------------------------------------------------------

@@ -70,6 +70,10 @@ module meth_params_module
   double precision              , save :: small_dens
   logical                       , save :: use_eos_e_instead_of_h
   logical                       , save :: use_pprime_in_tfromp
+  integer                       , save :: s0_interp_type
+  integer                       , save :: w0_interp_type
+  integer                       , save :: s0mac_interp_type
+  integer                       , save :: w0mac_interp_type
 
   ! End the declarations of the ParmParse parameters
 
@@ -131,6 +135,10 @@ contains
     small_dens = 1.d-5;
     use_eos_e_instead_of_h = .false.;
     use_pprime_in_tfromp = .false.;
+    s0_interp_type = 3;
+    w0_interp_type = 2;
+    s0mac_interp_type = 1;
+    w0mac_interp_type = 1;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("maestro_verbose", maestro_verbose)
@@ -178,6 +186,10 @@ contains
     call pp%query("small_dens", small_dens)
     call pp%query("use_eos_e_instead_of_h", use_eos_e_instead_of_h)
     call pp%query("use_pprime_in_tfromp", use_pprime_in_tfromp)
+    call pp%query("s0_interp_type", s0_interp_type)
+    call pp%query("w0_interp_type", w0_interp_type)
+    call pp%query("s0mac_interp_type", s0mac_interp_type)
+    call pp%query("w0mac_interp_type", w0mac_interp_type)
     call amrex_parmparse_destroy(pp)
 
 

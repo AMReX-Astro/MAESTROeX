@@ -69,6 +69,7 @@ private:
     ////////////
     // MaestroAdvection.cpp functions
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const amrex::Vector<amrex::Real>& w0_force);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
@@ -176,6 +177,7 @@ private:
                          amrex::Vector<amrex::MultiFab>& scal_force,
 			 amrex::Vector<amrex::MultiFab>& etarhoflux,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac, 
+			 const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
 			 const amrex::Vector<amrex::Real>& rho0_predicted_edge);
     ////////////////////////
 
@@ -200,6 +202,7 @@ private:
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                           amrex::Vector<amrex::MultiFab>& scal_force,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const amrex::Vector<amrex::MultiFab>& thermal);
     ////////////////////////
 
@@ -278,7 +281,13 @@ private:
                            int sbccomp = 0);
 
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+		const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                 const amrex::Real& mult);
+
+    void MakeW0mac (amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac);
+
+    void MakeS0mac (const amrex::Vector<amrex::Real>& s0, 
+		    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
     void MakeNormal ();
 
@@ -627,6 +636,7 @@ private:
     // MaestroVelocityAdvance.cpp functions
     void VelocityAdvance (const amrex::Vector<amrex::MultiFab>& rhohalf,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const amrex::Vector<amrex::Real>& w0_force,
                           const amrex::Vector<amrex::Real>& rho0_nph,
                           const amrex::Vector<amrex::Real>& grav_cell_nph,
