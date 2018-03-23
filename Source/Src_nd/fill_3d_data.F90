@@ -10,6 +10,8 @@ module fill_3d_data_module
 
   private
 
+  public :: put_1d_array_on_cart_sphr
+
 contains
 
   subroutine put_1d_array_on_cart(lev, lo, hi, &
@@ -81,11 +83,11 @@ contains
   end subroutine put_1d_array_on_cart
 
   subroutine put_1d_array_on_cart_sphr(lo, hi, & 
-                                             s0_cart, s0_cart_lo, s0_cart_hi, nc_s, &
-                                             s0, dx, &
-                                             is_input_edge_centered, &
-                                             is_output_a_vector, &
-                                             r_cc_loc, r_edge_loc) &
+                                          s0_cart, s0_cart_lo, s0_cart_hi, nc_s, &
+                                          s0, dx, &
+                                          is_input_edge_centered, &
+                                          is_output_a_vector, &
+                                          r_cc_loc, r_edge_loc) &
             bind(C, name="put_1d_array_on_cart_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)

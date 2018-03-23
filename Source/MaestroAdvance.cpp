@@ -293,7 +293,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force);
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
     
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -610,7 +610,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force);
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
 
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -829,7 +829,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // Define rho at half time using the new rho from Step 8
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
        
-    VelocityAdvance(rhohalf, umac, w0mac, w0_force, rho0_nph, grav_cell_nph, sponge);
+    VelocityAdvance(rhohalf,umac,w0mac,w0_force,w0_force_cart,rho0_nph,grav_cell_nph,sponge);
 
 
     if (evolve_base_state && is_initIter) {

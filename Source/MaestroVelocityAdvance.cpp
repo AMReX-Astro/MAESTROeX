@@ -8,6 +8,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 			  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                           const Vector<Real>& w0_force,
+			  const Vector<MultiFab>& w0_force_cart,
                           const Vector<Real>& rho0_nph,
                           const Vector<Real>& grav_cell_nph, 
 			  const Vector<MultiFab>& sponge)
@@ -31,7 +32,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Create the velocity forcing term at time n using rho 
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,1);
+    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,1);
     
     //////////////////////////////////
     // Add w0 to MAC velocities
@@ -55,7 +56,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Now create the force at half-time using rhohalf 
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,1);
+    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,1);
 
     //////////////////////////////////
     // Update the velocity with convective differencing

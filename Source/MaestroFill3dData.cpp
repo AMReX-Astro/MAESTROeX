@@ -114,7 +114,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 			   BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 			   &mult);
 #else
-		Abort("Addw0: Spherical is not valid for DIM < 3.");
+		Abort("Addw0: Spherical is not valid for DIM < 3");
 #endif
 	    } //end spherical
 

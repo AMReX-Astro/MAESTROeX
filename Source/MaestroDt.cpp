@@ -16,6 +16,13 @@ Maestro::EstDt ()
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
+    // build dummy w0_force_cart and set equal to zero
+    Vector<MultiFab> w0_force_cart_dummy(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+	w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], 3, 1);
+	w0_force_cart_dummy[lev].setVal(0.);
+    }
+
     // build a dummy umac and set equal to zero
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > umac_dummy(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -49,7 +56,7 @@ Maestro::EstDt ()
 	}
 
 	if (evolve_base_state) {
-	    // call make_w0mac(mla,w0,w0mac,dx,the_bc_tower%bc_tower_array)
+	    MakeW0mac(w0mac);
 	}
     }
 
@@ -60,7 +67,8 @@ Maestro::EstDt ()
     }
 
     int do_add_utilde_force = 0;
-    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,w0_force_dummy,do_add_utilde_force);
+    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
+		 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
     
     Real dt_lev = 1.e99;
     Real umax_lev = 0.;
@@ -74,6 +82,11 @@ Maestro::EstDt ()
         MultiFab& vel_force_mf = vel_force[lev];
         MultiFab& S_cc_old_mf = S_cc_old[lev];
         MultiFab& dSdt_mf = dSdt[lev];
+	MultiFab& w0macx_mf = w0mac[lev][0];
+	MultiFab& w0macy_mf = w0mac[lev][1];
+#if (AMREX_SPACEDIM == 3)
+	MultiFab& w0macz_mf = w0mac[lev][2];
+#endif
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(uold_mf); mfi.isValid(); ++mfi ) {
@@ -90,17 +103,41 @@ Maestro::EstDt ()
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            estdt(&lev,&dt_grid,&umax_grid,
-                  ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                  ZFILL(dx),
-                  BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                  BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                  BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                  BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                  BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
-                  w0.dataPtr(),
-                  p0_old.dataPtr(),
-                  gamma1bar_old.dataPtr());
+	    if (spherical == 0) {
+		estdt(&lev,&dt_grid,&umax_grid,
+		      ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		      ZFILL(dx),
+		      BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+		      BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+		      BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+		      BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+		      BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
+		      w0.dataPtr(),
+		      p0_old.dataPtr(),
+		      gamma1bar_old.dataPtr());
+	    } else { 
+
+#if (AMREX_SPACEDIM == 3)
+		estdt_sphr(&dt_grid,&umax_grid,
+			   ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			   ZFILL(dx),
+			   BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+			   BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+			   BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+			   BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+			   BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
+			   w0.dataPtr(),
+			   BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+			   BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+			   BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+			   p0_old.dataPtr(),
+			   gamma1bar_old.dataPtr(), 
+			   r_cc_loc.dataPtr(), 
+			   r_edge_loc.dataPtr());
+#else
+		Abort("EstDt: Spherical is not valid for DIM < 3");
+#endif
+	    }	    
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
@@ -166,6 +203,13 @@ Maestro::FirstDt ()
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
+    // build dummy w0_force_cart and set equal to zero
+    Vector<MultiFab> w0_force_cart_dummy(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+	w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], 3, 1);
+	w0_force_cart_dummy[lev].setVal(0.);
+    }
+
     // build a dummy umac and set equal to zero
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > umac_dummy(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -186,7 +230,8 @@ Maestro::FirstDt ()
     }
 
     int do_add_utilde_force = 0;
-    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,w0_force_dummy,do_add_utilde_force);
+    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
+		 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
     
     Real dt_lev = 1.e99;
     Real umax_lev = 0.;

@@ -42,8 +42,13 @@ Maestro::DensityAdvance (int which_step,
         scal_force[lev].setVal(0.);
     }
 
-    if (spherical == 1) {
+    Vector<MultiFab> rho0_old_cart(finest_level);
+    for (int lev=0; lev<=finest_level; ++lev) {
+	rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+    }
 
+    if (spherical == 1) {
+	Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
     }
 
     // ** density source term **
@@ -143,6 +148,10 @@ Maestro::DensityAdvance (int which_step,
 
     if (which_step == 1) {
   
+	if (spherical == 1) {
+
+	}
+
 	// compute species fluxes
 	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac,
 		     rho0_old,rho0_edge_old, 
@@ -151,6 +160,10 @@ Maestro::DensityAdvance (int which_step,
 		     FirstSpec,NumSpec);
 	
     } else if (which_step == 2) {
+
+	if (spherical == 1) {
+
+	}
 
 	// compute species fluxes
 	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac,

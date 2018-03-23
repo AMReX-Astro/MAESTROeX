@@ -10,10 +10,27 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<Real>& rho0,
                        const Vector<Real>& grav_cell,
                        const Vector<Real>& w0_force,
+		       const Vector<MultiFab>& w0_force_cart,
                        int do_add_utilde_force)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeVelForce()",MakeVelForce);
+
+    // For spherical case
+    Vector<MultiFab> gradw0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+	gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+	gradw0_cart[lev].setVal(0.);
+    }	
+    
+    if (spherical == 1) {
+	Vector<Real> gradw0( (max_radial_level+1)*nr_fine );
+	gradw0.shrink_to_fit();
+	
+	compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
+
+	Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
+    }
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -25,6 +42,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         const MultiFab& vedge_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wedge_mf = uedge[lev][2];
+	const MultiFab& gradw0_mf = gradw0_cart[lev];
+	const MultiFab& normal_mf = normal[lev];
+	const MultiFab& w0force_mf = w0_force_cart[lev];
 #endif
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -32,25 +52,49 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
-
-            // call fortran subroutine
+            const Real* dx = geom[lev].CellSize();
+	    
+	    // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            make_vel_force(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                           BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
-                           BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
-                           BL_TO_FORTRAN_3D(uedge_mf[mfi]),
-                           BL_TO_FORTRAN_3D(vedge_mf[mfi]),
+	    if (spherical == 0) {
+		make_vel_force(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			       BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+			       BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
+			       BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
+			       BL_TO_FORTRAN_3D(uedge_mf[mfi]),
+			       BL_TO_FORTRAN_3D(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                           BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+			       BL_TO_FORTRAN_3D(wedge_mf[mfi]),
 #endif
-                           w0.dataPtr(),
-                           w0_force.dataPtr(),
-                           rho0.dataPtr(),
-                           grav_cell.dataPtr(),
-                           &do_add_utilde_force);
+			       w0.dataPtr(),
+			       w0_force.dataPtr(),
+			       rho0.dataPtr(),
+			       grav_cell.dataPtr(),
+			       &do_add_utilde_force);
+	    } else {
+
+#if (AMREX_SPACEDIM == 3) 
+		make_vel_force_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				    BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+				    BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
+				    BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
+				    BL_TO_FORTRAN_3D(uedge_mf[mfi]),
+				    BL_TO_FORTRAN_3D(vedge_mf[mfi]),
+				    BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+				    BL_TO_FORTRAN_FAB(normal_mf[mfi]),
+				    BL_TO_FORTRAN_3D(gradw0_mf[mfi]),
+				    BL_TO_FORTRAN_FAB(w0force_mf[mfi]),
+				    rho0.dataPtr(),
+				    grav_cell.dataPtr(),
+				    dx,
+				    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(), 
+				    &do_add_utilde_force);
+#else
+		Abort("MakeVelForce: Spherical is not valid for DIM < 3");
+#endif
+	    }
         }
     }
 

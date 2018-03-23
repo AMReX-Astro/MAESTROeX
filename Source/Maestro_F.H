@@ -103,6 +103,20 @@ extern "C"
                const amrex::Real* dSdt,  const int* t_lo, const int* t_hi,
                const amrex::Real* w0, const amrex::Real* p0, const amrex::Real* gamma1bar);
 
+    void estdt_sphr(amrex::Real* dt, amrex::Real* umax, 
+		    const int* lo, const int* hi, const amrex::Real* dx,
+		    const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
+		    const amrex::Real* u, const int* u_lo, const int* u_hi, const int* nc_u,
+		    const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f, 
+		    const amrex::Real* divu, const int* d_lo, const int* d_hi, 
+		    const amrex::Real* dSdt, const int* t_lo, const int* t_hi, 
+		    const amrex::Real* w0, 
+		    const amrex::Real* w0macx, const int* x_lo, const int* x_hi,  
+		    const amrex::Real* w0macy, const int* y_lo, const int* y_hi, 
+		    const amrex::Real* w0macz, const int* z_lo, const int* z_hi, 
+		    const amrex::Real* p0, const amrex::Real* gamma1bar, 
+		    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
+
     void firstdt(const int* lev, amrex::Real* dt, amrex::Real* umax,
                  const int* lo, const int* hi, 
                  const amrex::Real* dx,
@@ -131,6 +145,9 @@ extern "C"
                           const amrex::Real* phi,  const int* p_lo, const int* p_hi,
                                 amrex::Real* gphi, const int* g_lo, const int* g_hi, const int* nc_g,
                           const amrex::Real* dx);
+
+    void compute_grad_phi_rad(const amrex::Real* phi, 
+			      amrex::Real* gphi_rad);
     //////////////////////
 
     //////////////////////
@@ -548,6 +565,22 @@ extern "C"
                         const amrex::Real* rho0,
                         const amrex::Real* grav,
                         const int* do_add_utilde_force);
+
+    void make_vel_force_sphr(const int* lo, const int* hi, 
+			     amrex::Real* vel_force, const int* f_lo, const int* f_hi, const int* nc_f, 
+			     const amrex::Real* gpi, const int* g_lo, const int* g_hi, const int* nc_g, 
+			     const amrex::Real* rho, const int* r_lo, const int* r_hi, 
+			     const amrex::Real* uedge, const int* u_lo, const int* u_hi, 
+			     const amrex::Real* vedge, const int* v_lo, const int* v_hi, 
+			     const amrex::Real* wedge, const int* w_lo, const int* w_hi, 
+			     const amrex::Real* normal, const int* n_lo, const int* n_hi, const int* nc_n,
+			     const amrex::Real* gradw0_cart, const int* gw_lo, const int* gw_hi, 
+			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi, const int* nc_wf, 
+			     const amrex::Real* rho0, const amrex::Real* grav, 
+			     const amrex::Real* dx, 
+			     const amrex::Real* r_cc_loc, 
+			     const amrex::Real* r_edge_loc, 
+			     const int* do_add_utilde_force);
     //////////////////////
 
     //////////////////////
