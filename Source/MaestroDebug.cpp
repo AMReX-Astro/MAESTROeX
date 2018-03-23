@@ -4,9 +4,9 @@
 using namespace amrex;
 
 
-// print out the contents of a cell-centered Vector of MultiFabs
+// print out the contents of a Vector of MultiFabs
 void
-Maestro::PrintMF (const Vector<MultiFab>& CC)
+Maestro::PrintMF (Vector<MultiFab>& MF)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintMF()",PrintMF);
@@ -14,10 +14,10 @@ Maestro::PrintMF (const Vector<MultiFab>& CC)
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const MultiFab& CC_mf = CC[lev];
+        MultiFab& MF_mf = MF[lev];
 
-        const BoxArray& ba = CC_mf.boxArray();
-        const DistributionMapping& dm = CC_mf.DistributionMap();
+        const BoxArray& ba = MF_mf.boxArray();
+        const DistributionMapping& dm = MF_mf.DistributionMap();
         const int myProc = ParallelDescriptor::MyProc();
 
         for (int i=0; i<ba.size(); ++i) {
@@ -34,7 +34,7 @@ Maestro::PrintMF (const Vector<MultiFab>& CC)
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
                 print_mf(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                         BL_TO_FORTRAN_FAB(CC_mf[i]));
+                         BL_TO_FORTRAN_FAB(MF_mf[i]));
 
             }
             // add this barrier so only one grid gets printed out at a time
@@ -44,7 +44,7 @@ Maestro::PrintMF (const Vector<MultiFab>& CC)
 }
 
 void
-Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
+Maestro::PrintEdge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir)
 {
     // timer for profiling
@@ -53,7 +53,7 @@ Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const MultiFab& EDGE_mf = EDGE[lev][dir];
+        MultiFab& EDGE_mf = EDGE[lev][dir];
 
         const BoxArray& ba = EDGE_mf.boxArray();
         const DistributionMapping& dm = EDGE_mf.DistributionMap();

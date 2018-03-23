@@ -11,7 +11,7 @@ contains
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3), nc_m
-    double precision, intent (in   ) :: mf(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3),nc_m)
+    double precision, intent (inout) :: mf(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3),nc_m)
 
     integer comp,i,j,k
 
@@ -43,7 +43,7 @@ contains
     
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3), nc_m
-    double precision, intent (in   ) :: mf(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3),nc_m)
+    double precision, intent (inout) :: mf(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3),nc_m)
 
     integer comp,i,j,k
 

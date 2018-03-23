@@ -163,8 +163,8 @@ private:
 
     ////////////////////////
     // MaestroDebug.cpp functions
-    void PrintMF   (const amrex::Vector<amrex::MultiFab>& CC);
-    void PrintEdge (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
+    void PrintMF   (amrex::Vector<amrex::MultiFab>& CC);
+    void PrintEdge (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir);
     ////////////////////////
 
