@@ -82,9 +82,9 @@ Maestro::EstDt ()
         MultiFab& vel_force_mf = vel_force[lev];
         MultiFab& S_cc_old_mf = S_cc_old[lev];
         MultiFab& dSdt_mf = dSdt[lev];
+#if (AMREX_SPACEDIM == 3)
 	MultiFab& w0macx_mf = w0mac[lev][0];
 	MultiFab& w0macy_mf = w0mac[lev][1];
-#if (AMREX_SPACEDIM == 3)
 	MultiFab& w0macz_mf = w0mac[lev][2];
 #endif
 
@@ -96,8 +96,7 @@ Maestro::EstDt ()
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
-
-            const Real* dx = geom[lev].CellSize();
+	    const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
@@ -260,15 +259,32 @@ Maestro::FirstDt ()
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            firstdt(&lev,&dt_grid,&umax_grid,
-                    ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                    ZFILL(dx),
-                    BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                    BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                    BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                    BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                    p0_old.dataPtr(),
-                    gamma1bar_old.dataPtr());
+	    if (spherical == 0 ) {
+		firstdt(&lev,&dt_grid,&umax_grid,
+			ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			ZFILL(dx),
+			BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+			BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+			BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+			BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+			p0_old.dataPtr(),
+			gamma1bar_old.dataPtr());
+	    } else {
+#if (AMREX_SPACEDIM == 3) 
+		firstdt_sphr(&dt_grid,&umax_grid,
+			     ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			     ZFILL(dx),
+			     BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+			     BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+			     BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+			     BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+			     p0_old.dataPtr(),
+			     gamma1bar_old.dataPtr(),
+			     r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+#else
+		Abort("FirstDt: Spherical is not valid for DIM < 3");
+#endif
+	    }
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);

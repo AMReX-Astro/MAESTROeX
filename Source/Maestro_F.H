@@ -125,6 +125,16 @@ extern "C"
                  const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
                  const amrex::Real* divu,  const int* d_lo, const int* d_hi,
                  const amrex::Real* p0, const amrex::Real* gamma1bar);
+
+    void firstdt_sphr(amrex::Real* dt, amrex::Real* umax,
+		      const int* lo, const int* hi, 
+		      const amrex::Real* dx,
+		      const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
+		      const amrex::Real* u,     const int* u_lo, const int* u_hi, const int* nc_u,
+		      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
+		      const amrex::Real* divu,  const int* d_lo, const int* d_hi,
+		      const amrex::Real* p0, const amrex::Real* gamma1bar, 
+		      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
     //////////////////////
 
 
@@ -257,6 +267,15 @@ extern "C"
                   const amrex::Real* s0_init, 
                   const amrex::Real* p0_init,
                   const amrex::Real* dx);
+
+    void initdata_sphr(const amrex::Real* time, 
+		       const int* lo, const int* hi,
+		       const amrex::Real* scal, const int* scal_lo, const int* scal_hi, const int* nc_s,
+		       const amrex::Real* vel,  const int* vel_lo,  const int* vel_hi,  const int* nc_v,
+		       const amrex::Real* s0_init, 
+		       const amrex::Real* p0_init,
+		       const amrex::Real* dx, 
+		       const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
     //////////////////////
 
     //////////////////////

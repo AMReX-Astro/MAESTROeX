@@ -557,4 +557,165 @@ contains
 
   end subroutine firstdt
 
+  subroutine firstdt_sphr(dt, umax, lo, hi, dx, &
+                           scal,  s_lo, s_hi, nc_s, &
+                           u,     u_lo, u_hi, nc_u, &
+                           force, f_lo, f_hi, nc_f, &
+                           divu,  d_lo, d_hi, &
+                           p0, gamma1bar, &
+                           r_cc_loc, r_edge_loc) bind (C,name="firstdt_sphr")
+
+    
+    double precision, intent(inout) :: dt, umax
+    integer         , intent(in   ) :: lo(3), hi(3)
+    double precision, intent(in   ) :: dx(3)
+    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
+    integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
+    integer         , intent(in   ) :: d_lo(3), d_hi(3)
+    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
+    double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    
+    ! local variables
+    double precision :: spdx,spdy,spdz,pforcex,pforcey,pforcez,ux,uy,uz 
+    double precision :: gp_dot_u,gamma1bar_p_avg,eps,dt_divu,dt_sound,denom,rho_min
+    integer          :: i,j,k,r
+
+    double precision, allocatable :: gp0_cart(:,:,:,:)
+
+    double precision :: gp0(0:max_radial_level,0:nr_fine)
+
+    integer pt_index(3)
+    type (eos_t) :: eos_state
+
+    allocate(gp0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),3))
+
+    eps = 1.0d-8
+    
+    rho_min = 1.d-20
+    
+    spdx    = 0.d0
+    spdy    = 0.d0 
+    spdz    = 0.d0 
+    pforcex = 0.d0 
+    pforcey = 0.d0 
+    pforcez = 0.d0 
+    ux      = 0.d0
+    uy      = 0.d0
+    uz      = 0.d0
+    
+    dt = 1.d99
+    umax = 0.d0
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+
+             ! compute the sound speed from rho and temp
+             eos_state%rho   = scal(i,j,k,rho_comp)
+             eos_state%T     = scal(i,j,k,temp_comp)
+             eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             pt_index(:) = (/i, j, k/)
+             
+             ! dens, temp, and xmass are inputs
+             call eos(eos_input_rt, eos_state, pt_index)
+             
+             spdx    = max(spdx,eos_state%cs)
+             spdy    = max(spdy,eos_state%cs)
+             spdz    = max(spdz,eos_state%cs)
+             pforcex = max(pforcex,abs(force(i,j,k,1)))
+             pforcey = max(pforcey,abs(force(i,j,k,2)))
+             pforcez = max(pforcez,abs(force(i,j,k,3)))
+             ux      = max(ux,abs(u(i,j,k,1)))
+             uy      = max(uy,abs(u(i,j,k,2)))
+             uz      = max(uz,abs(u(i,j,k,3)))
+
+          enddo
+       enddo
+    enddo
+
+    umax = max(umax,ux,uy,uz)
+
+    ux = ux / dx(1)
+    uy = uy / dx(2)
+    uz = uz / dx(3)
+    
+    spdx = spdx / dx(1)
+    spdy = spdy / dx(2)
+    spdz = spdz / dx(3)
+    
+    ! advective constraint
+    if (ux .ne. 0.d0 .or. uy .ne. 0.d0 .or. uz .ne. 0.d0) then
+       dt = cfl / max(ux,uy,uz)
+    else if (spdx .ne. 0.d0 .and. spdy .ne. 0.d0 .and. spdz .ne. 0.d0) then
+       dt = cfl / max(spdx,spdy,spdz)
+    end if
+
+    ! sound speed constraint
+    if (use_soundspeed_firstdt) then
+       if (spdx .eq. 0.d0 .and. spdy .eq. 0.d0 .and. spdz .eq. 0.d0) then
+          dt_sound = 1.d99
+       else
+          dt_sound = cfl / max(spdx,spdy,spdz)
+       end if
+       dt = min(dt,dt_sound)
+    end if
+
+    ! force constraints
+    if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
+    if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
+    if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+    
+    ! divU constraint
+    if (use_divu_firstdt) then
+
+       dt_divu = 1.d99
+
+       ! spherical divU constraint
+       !$OMP PARALLEL DO PRIVATE(r,gamma1bar_p_avg)
+       do r=1,nr_fine-1
+          gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
+          gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
+       end do
+       !$OMP END PARALLEL DO
+       gp0(0,nr_fine) = gp0(0,nr_fine-1)
+       gp0(0,      0) = gp0(0,        1)
+       
+       call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,lo,hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc)
+
+       !$OMP PARALLEL DO PRIVATE(i,j,k,gp_dot_u,denom) REDUCTION(MIN : dt_divu)
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+                
+                gp_dot_u = u(i,j,k,1) * gp0_cart(i,j,k,1) + &
+                           u(i,j,k,2) * gp0_cart(i,j,k,2) + &
+                           u(i,j,k,3) * gp0_cart(i,j,k,3)
+                   
+                denom = divU(i,j,k) - gp_dot_u 
+                
+                if (denom > 0.d0) then
+                   dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                endif
+                
+             enddo
+          enddo
+       enddo
+       !$OMP END PARALLEL DO
+
+       dt = min(dt,dt_divu)
+
+    end if
+
+    deallocate(gp0_cart)
+
+  end subroutine firstdt_sphr
+
 end module compute_dt_module

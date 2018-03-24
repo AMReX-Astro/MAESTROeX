@@ -270,11 +270,20 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
         const int* lo  = box.loVect();
         const int* hi  = box.hiVect();
 
-        initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-                 BL_TO_FORTRAN_FAB(scal[mfi]), 
-                 BL_TO_FORTRAN_FAB(vel[mfi]), 
-                 s0_init.dataPtr(), p0_init.dataPtr(),
-                 ZFILL(dx));
+	if (spherical == 0) {
+	    initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+		     BL_TO_FORTRAN_FAB(scal[mfi]), 
+		     BL_TO_FORTRAN_FAB(vel[mfi]), 
+		     s0_init.dataPtr(), p0_init.dataPtr(),
+		     ZFILL(dx));
+	} else {
+	    initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+	    		  BL_TO_FORTRAN_FAB(scal[mfi]), 
+	    		  BL_TO_FORTRAN_FAB(vel[mfi]), 
+	    		  s0_init.dataPtr(), p0_init.dataPtr(),
+	    		  ZFILL(dx), 
+	    		  r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	}
     }
 }
 
