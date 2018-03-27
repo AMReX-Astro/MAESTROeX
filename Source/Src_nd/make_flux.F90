@@ -305,7 +305,123 @@ contains
     end do
 
   end subroutine make_rhoX_flux_3d
-#endif
+
+  !----------------------------------------------------------------------------
+  ! make_rhoX_flux_3d_sphr
+  !----------------------------------------------------------------------------
+  subroutine make_rhoX_flux_3d_sphr(lo, hi, &
+                                 sfluxx, fx_lo, fx_hi, nc_fx, &
+                                 sfluxy, fy_lo, fy_hi, nc_fy, &
+                                 sfluxz, fz_lo, fz_hi, nc_fz, &
+                                 sedgex, x_lo, x_hi, nc_x, &
+                                 sedgey, y_lo, y_hi, nc_y, &
+                                 sedgez, z_lo, z_hi, nc_z, &
+                                 umac,   u_lo, u_hi, &
+                                 vmac,   v_lo, v_hi, &
+                                 wmac,   w_lo, w_hi, &
+                                 w0macx, wx_lo, wx_hi, &
+                                 w0macy, wy_lo, wy_hi, &
+                                 w0macz, wz_lo, wz_hi, &
+                                 rho0_edgex, rx_lo, rx_hi, &
+                                 rho0_edgey, ry_lo, ry_hi, &
+                                 rho0_edgez, rz_lo, rz_hi, &
+                                 startcomp, endcomp) bind(C,name="make_rhoX_flux_3d_sphr")
+
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
+    double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3),nc_fx)
+    integer         , intent(in   ) :: fy_lo(3), fy_hi(3), nc_fy
+    double precision, intent(inout) :: sfluxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),fy_lo(3):fy_hi(3),nc_fy)
+    integer         , intent(in   ) :: fz_lo(3), fz_hi(3), nc_fz
+    double precision, intent(inout) :: sfluxz(fz_lo(1):fz_hi(1),fz_lo(2):fz_hi(2),fz_lo(3):fz_hi(3),nc_fz)
+    integer         , intent(in   ) :: x_lo(3), x_hi(3), nc_x
+    double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
+    integer         , intent(in   ) :: y_lo(3), y_hi(3), nc_y
+    double precision, intent(inout) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nc_y)
+    integer         , intent(in   ) :: z_lo(3), z_hi(3), nc_z
+    double precision, intent(inout) :: sedgez(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nc_z)
+    integer         , intent(in   ) :: u_lo(3), u_hi(3)
+    double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
+    integer         , intent(in   ) :: v_lo(3), v_hi(3)
+    double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
+    double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
+    integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
+    double precision, intent(inout) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
+    integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
+    double precision, intent(inout) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
+    integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
+    double precision, intent(inout) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
+    integer         , intent(in   ) :: rx_lo(3), rx_hi(3)
+    double precision, intent(in   ) :: rho0_edgex(rx_lo(1):rx_hi(1),rx_lo(2):rx_hi(2),rx_lo(3):rx_hi(3))
+    integer         , intent(in   ) :: ry_lo(3), ry_hi(3)
+    double precision, intent(in   ) :: rho0_edgey(ry_lo(1):ry_hi(1),ry_lo(2):ry_hi(2),ry_lo(3):ry_hi(3))
+    integer         , intent(in   ) :: rz_lo(3), rz_hi(3)
+    double precision, intent(in   ) :: rho0_edgez(rz_lo(1):rz_hi(1),rz_lo(2):rz_hi(2),rz_lo(3):rz_hi(3)) 
+    integer         , intent(in   ) :: startcomp, endcomp
+
+    ! local
+    integer          :: comp
+    integer          :: i,j,k
+    ! double precision :: rho0_edge
+    
+
+    do comp = startcomp, endcomp
+
+       ! loop for x-fluxes
+       !$OMP PARALLEL PRIVATE(i,j,k,rho0_edge)
+       !$OMP DO
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)+1
+
+                ! edge states are rho' and X.  To make the (rho X)
+                ! flux, we need the edge state of rho0
+                ! rho0_edge = HALF*(rho0macx_old(i,j,k)+rho0macx_new(i,j,k))
+                sfluxx(i,j,k,comp) = (umac(i,j,k) + w0macx(i,j,k)) * &
+                     (rho0_edgex(i,j,k) + sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp)
+             end do
+          end do
+       end do
+       !$OMP END DO NOWAIT
+
+       ! loop for y-fluxes
+       !$OMP DO
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)+1
+             do i = lo(1), hi(1)
+
+                ! edge states are rho' and X.  To make the (rho X)
+                ! flux, we need the edge state of rho0
+                ! rho0_edge = HALF*(rho0macy_old(i,j,k)+rho0macy_new(i,j,k))
+                sfluxy(i,j,k,comp) = (vmac(i,j,k) + w0macy(i,j,k)) * &
+                     (rho0_edgey(i,j,k) + sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp)
+             end do
+          end do
+       end do
+       !$OMP END DO NOWAIT
+
+       ! loop for z-fluxes
+       !$OMP DO
+       do k = lo(3), hi(3)+1
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+
+                ! edge states are rho' and X.  To make the (rho X)
+                ! flux, we need the edge state of rho0
+                ! rho0_edge = HALF*(rho0macz_old(i,j,k)+rho0macz_new(i,j,k))
+                sfluxz(i,j,k,comp) = (wmac(i,j,k) + w0macz(i,j,k)) * &
+                     (rho0_edgez(i,j,k) + sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp)
+             end do
+          end do
+       end do
+       !$OMP END DO
+       !$OMP END PARALLEL
+
+    end do ! end loop over components
+     
+  end subroutine make_rhoX_flux_3d_sphr
+#endif 
 
 
 #if (AMREX_SPACEDIM == 1)

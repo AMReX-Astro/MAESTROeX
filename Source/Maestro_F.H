@@ -225,7 +225,7 @@ extern "C"
 		    const amrex::Real* mult);
 
     void make_w0mac_sphr(const int* lo, const int* hi, 
-			 amrex::Real* w0, 
+			 const amrex::Real* w0, 
 			 amrex::Real* w0macx, const int* x_lo, const int* x_hi, 
 			 amrex::Real* w0macy, const int* y_lo, const int* y_hi, 
 			 amrex::Real* w0macz, const int* z_lo, const int* z_hi, 
@@ -408,8 +408,28 @@ extern "C"
 #endif
 			   const amrex::Real* rho0_old, const amrex::Real* rho0_edge_old,
 			   const amrex::Real* rho0_new, const amrex::Real* rho0_edge_new,
-			   const amrex::Real* rh0_predicted_edge, const amrex::Real* w0, 
+			   const amrex::Real* rho0_predicted_edge, const amrex::Real* w0, 
 			   const int* startcomp, const int* endcomp);
+
+#if (AMREX_SPACEDIM == 3) 
+    void make_rhoX_flux_3d_sphr(const int* lo, const int* hi,
+				amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, const int* nc_fx, 
+				amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi, const int* nc_fy, 
+				amrex::Real* sfluxz, const int* fz_lo, const int* fz_hi, const int* nc_fz, 
+				amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x, 
+				amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y, 
+				amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z, 
+				const amrex::Real* umac,   const int* u_lo, const int* u_hi,
+				const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
+				const amrex::Real* wmac,   const int* w_lo, const int* w_hi, 
+				const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi,
+				const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi,
+				const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
+				const amrex::Real* rho0_edgex, const int* rx_lo, const int* rx_hi,
+				const amrex::Real* rho0_edgey, const int* ry_lo, const int* ry_hi,
+				const amrex::Real* rho0_edgez, const int* rz_lo, const int* rz_hi,
+				const int* startcomp, const int* endcomp);
+#endif
 
 #if (AMREX_SPACEDIM == 1)
     void make_rhoh_flux_1d(
@@ -453,6 +473,12 @@ extern "C"
                           amrex::Real* gamma, const int* g_lo, const int* g_hi,
                     const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
                     const amrex::Real* p0);
+
+    void make_gamma_sphr(const int* lo, const int* hi, 
+			 amrex::Real* gamma, const int* g_lo, const int* g_hi,
+			 const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
+			 const amrex::Real* p0, const amrex::Real* dx, 
+			 const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
     //////////////////////
 
     //////////////////////
@@ -516,6 +542,29 @@ extern "C"
                                  const amrex::Real* Sbar,
                                  const amrex::Real* beta0);
 
+    void make_rhcc_for_nodalproj_sphr(const int* lo, const int* hi, 
+				      amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
+				      const amrex::Real* S_cc, const int* s_lo, const int* s_hi,
+				      const amrex::Real* Sbar_cart, const int* sb_lo, const int* sb_hi,
+				      const amrex::Real* beta0_cart, const int* b_lo, const int* b_hi);
+
+    void create_correction_cc(const int* lev, const int* lo, const int* hi, 
+			      amrex::Real* correction_cc, const int* c_lo, const int* c_hi, 
+			      const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi, 
+			      const amrex::Real* beta0, 
+			      const amrex::Real* gamma1bar, 
+			      const amrex::Real* p0,
+			      const amrex::Real* dt);
+
+    void create_correction_cc_sphr(const int* lo, const int* hi, 
+				   amrex::Real* correction_cc, const int* c_lo, const int* c_hi, 
+				   const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi, 
+				   const amrex::Real* beta0_cart, const int* b_lo, const int* b_hi, 
+				   const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi, 
+				   const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
+				   const amrex::Real* rho0_cart, const int* r_lo, const int* r_hi,
+				   const amrex::Real* dt);
+
     // rhcc = beta0 * (S - Sbar) + beta0 * delta_chi
     void make_rhcc_for_macproj(const int* lev, const int* lo, const int* hi, 
                                amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
@@ -528,13 +577,19 @@ extern "C"
 			             amrex::Real* delta_chi, const int* dc_lo, const int* dc_hi, 
 			       const amrex::Real* dt, const int* is_predictor);
 
-    void create_correction_cc(const int* lev, const int* lo, const int* hi, 
-			      amrex::Real* correction_cc, const int* c_lo, const int* c_hi, 
-			      const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi, 
-			      const amrex::Real* beta0, 
-			      const amrex::Real* gamma1bar, 
-			      const amrex::Real* p0,
-			      const amrex::Real* dt);
+    void make_rhcc_for_macproj_sphr(const int* lo, const int* hi, 
+				    amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
+				    const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
+				    const amrex::Real* Sbar,
+				    const amrex::Real* beta0,
+				    const amrex::Real* rho0,
+				    const amrex::Real* dx,
+				    const amrex::Real* gamma1bar, 
+				    const amrex::Real* p0,  
+				    const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi,
+				    amrex::Real* delta_chi, const int* dc_lo, const int* dc_hi, 
+				    const amrex::Real* dt, const int* is_predictor, 
+				    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
     //////////////////////
 
 

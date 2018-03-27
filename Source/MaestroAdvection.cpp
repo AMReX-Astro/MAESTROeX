@@ -306,8 +306,10 @@ void
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 			   const Vector<Real>& r0_old,
 			   const Vector<Real>& r0_edge_old,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rho0mac_old,
 			   const Vector<Real>& r0_new,
 			   const Vector<Real>& r0_edge_new,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rho0mac_new,
 			   const Vector<Real>& r0_predicted_edge, 
 			   int start_comp, int num_comp)
 {
@@ -349,42 +351,64 @@ void
 	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
 	    // lo/hi coordinates (including ghost cells), and/or the # of components
 	    // We will also pass "validBox", which specifies the "valid" region.
+	    if (spherical == 0) {
+
 #if (AMREX_SPACEDIM == 1)
-	    make_rhoX_flux_1d(
+		make_rhoX_flux_1d(
 #elif (AMREX_SPACEDIM == 2)
-	    make_rhoX_flux_2d(
+	        make_rhoX_flux_2d(
 #elif (AMREX_SPACEDIM == 3)
-            make_rhoX_flux_3d(
+                make_rhoX_flux_3d(
 #endif
-			      &lev, validBox.loVect(), validBox.hiVect(),
-			      BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+				  &lev, validBox.loVect(), validBox.hiVect(),
+				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			      BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			      BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 #endif
 #endif
-			      BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
-			      BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+				  BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			      BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			      BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
 #endif
 #endif
-			      BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				  BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			      BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			      BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
-			      r0_old.dataPtr(), r0_edge_old.dataPtr(), 
-			      r0_new.dataPtr(), r0_edge_new.dataPtr(),
-			      r0_predicted_edge.dataPtr(),
-			      w0.dataPtr(), 
-			      &startcomp, &endcomp);
-	    
+				  r0_old.dataPtr(), r0_edge_old.dataPtr(), 
+				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
+				  r0_predicted_edge.dataPtr(),
+				  w0.dataPtr(), 
+				  &startcomp, &endcomp);
+	    } else {
+
+#if (AMREX_SPACEDIM == 3)
+		// make_rhoX_flux_3d_sphr(validBox.loVect(), validBox.hiVect(),
+		// 	               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+		// 	               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+		// 	               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]), 
+		// 		       BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+		// 		       BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+		// 		       BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+		// 		       BL_TO_FORTRAN_3D(umac_mf[mfi]),
+		// 		       BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+		// 		       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+		// 		       BL_TO_FORTRAN_3D(rho0macx_mf[mfi]), 
+		// 		       BL_TO_FORTRAN_3D(rho0macy_mf[mfi]),
+		// 		       BL_TO_FORTRAN_3D(rho0macz_mf[mfi]),
+		// 		       &startcomp, &endcomp);
+#else
+	        Abort();
+#endif
+	    } // end spherical
 	} // end MFIter loop
     } // end loop over levels
 

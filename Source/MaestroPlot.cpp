@@ -187,6 +187,33 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
     }
     dest_comp += 2;
 
+    if (spherical == 1) {
+	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+	Vector<MultiFab> w0r_cart(finest_level+1);
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    // w0mac will contain an edge-centered w0 on a Cartesian grid,
+	    // for use in computing divergences.
+	    AMREX_D_TERM(w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			 w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			 w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
+	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+		w0mac[lev][idim].setVal(0.);
+	    }
+
+	    // w0r_cart is w0 but onto a Cartesian grid in cell-centered as
+	    // a scalar.  Since w0 is the radial expansion velocity, w0r_cart
+	    // is the radial w0 in a zone
+	    w0r_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+	    w0r_cart[lev].setVal(0.);
+	}
+
+	if (evolve_base_state == 1) {
+	    MakeW0mac(w0mac);
+	    Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
+	}
+    }   // spherical
+
     // w0
     Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
     for (int i = 0; i <= finest_level; ++i) {

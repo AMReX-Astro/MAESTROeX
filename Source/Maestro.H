@@ -97,8 +97,10 @@ private:
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		       const amrex::Vector<amrex::Real>& r0_old,
 		       const amrex::Vector<amrex::Real>& r0_edge_old,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rho0mac_old,
 		       const amrex::Vector<amrex::Real>& r0_new,
 		       const amrex::Vector<amrex::Real>& r0_edge_new,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rho0mac_new,
 		       const amrex::Vector<amrex::Real>& r0_predicted_edge,
 		       int start_comp, int num_comp);
 
@@ -421,6 +423,7 @@ private:
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
+			     const amrex::Vector<amrex::Real>& rho0, 
                              const amrex::Vector<amrex::MultiFab>& S_cc,
                              const amrex::Vector<amrex::Real>& Sbar,
                              const amrex::Vector<amrex::Real>& beta0, 

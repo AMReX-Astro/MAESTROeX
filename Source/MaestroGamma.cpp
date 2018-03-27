@@ -33,10 +33,20 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            make_gamma(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                       BL_TO_FORTRAN_3D(gamma1_mf[mfi]),
-                       BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                       p0.dataPtr());
+	    if (spherical == 0) { 
+		make_gamma(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			   BL_TO_FORTRAN_3D(gamma1_mf[mfi]),
+			   BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+			   p0.dataPtr());
+	    } else {
+		const Real* dx = geom[lev].CellSize();
+
+		make_gamma_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				BL_TO_FORTRAN_3D(gamma1_mf[mfi]),
+				BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+				p0.dataPtr(), dx, 
+				r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	    }
         }
     }
 
