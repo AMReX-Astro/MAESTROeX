@@ -17,6 +17,12 @@ Maestro::EnthalpyAdvance (int which_step,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
 
+    // Create cell-centered base state quantity
+    Vector<Real> h0_old( (max_radial_level+1)*nr_fine );
+    Vector<Real> h0_new( (max_radial_level+1)*nr_fine );
+    h0_old.shrink_to_fit();
+    h0_new.shrink_to_fit();
+
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
@@ -162,24 +168,97 @@ Maestro::EnthalpyAdvance (int which_step,
     // for which_step .eq. 1, we pass in only the old base state quantities
     // for which_step .eq. 2, we pass in the old and new for averaging within mkflux
     if (which_step == 1) {
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > >  rho0mac_old(finest_level+1);
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
         if (spherical == 1) {
+	    for (int i=0; i<h0_old.size(); ++i) {
+		h0_old[i] = rhoh0_old[i] / rho0_old[i];
+	    }
+
+	    for (int lev=0; lev<=finest_level; ++lev) {
+		AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+
+		AMREX_D_TERM(rhoh0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     rhoh0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     rhoh0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+
+		AMREX_D_TERM(h0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     h0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+	    }
+
+	    MakeS0mac(rho0_old,rho0mac_old);
+	    MakeS0mac(rhoh0_old,rhoh0mac_old);
+	    MakeS0mac(h0_old,h0mac_old);
         }
 
         // compute enthalpy fluxes
-	MakeRhoHFlux(scalold, sflux, sedge, umac,
-		     rho0_old,rho0_edge_old,rho0_old,rho0_edge_old,
-		     rhoh0_old,rhoh0_edge_old,rhoh0_old,rhoh0_edge_old);
+	MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac, 
+		     rho0_old,rho0_edge_old,rho0mac_old, 
+		     rho0_old,rho0_edge_old,rho0mac_old,
+		     rhoh0_old,rhoh0_edge_old,rhoh0mac_old, 
+		     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
+		     h0mac_old,h0mac_old);
     }
     else if (which_step == 2) {
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > >  rho0mac_old(finest_level+1);
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > >  rho0mac_new(finest_level+1);
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_new(finest_level+1);
+	Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
         if (spherical == 1) {
+	    for (int i=0; i<h0_old.size(); ++i) {
+		h0_old[i] = rhoh0_old[i] / rho0_old[i];
+		h0_new[i] = rhoh0_new[i] / rho0_new[i];
+	    }
+
+	    for (int lev=0; lev<=finest_level; ++lev) {
+		AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+
+		AMREX_D_TERM(rhoh0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     rhoh0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     rhoh0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+
+		AMREX_D_TERM(h0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     h0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+
+		AMREX_D_TERM(rho0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     rho0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     rho0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+
+		AMREX_D_TERM(rhoh0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     rhoh0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     rhoh0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+
+		AMREX_D_TERM(h0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
+			     h0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
+			     h0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+	    }
+
+	    MakeS0mac(rho0_old,rho0mac_old);
+	    MakeS0mac(rhoh0_old,rhoh0mac_old);
+	    MakeS0mac(h0_old,h0mac_old);
+	    MakeS0mac(rho0_new,rho0mac_new);
+	    MakeS0mac(rhoh0_new,rhoh0mac_new);
+	    MakeS0mac(h0_new,h0mac_new);
         }
 
         // compute enthalpy fluxes
-	MakeRhoHFlux(scalold, sflux, sedge, umac,
-		     rho0_old,rho0_edge_old,rho0_new,rho0_edge_new,
-		     rhoh0_old,rhoh0_edge_old,rhoh0_new,rhoh0_edge_new);
+	MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
+		     rho0_old,rho0_edge_old,rho0mac_old, 
+		     rho0_new,rho0_edge_new,rho0mac_new,
+		     rhoh0_old,rhoh0_edge_old,rhoh0mac_old, 
+		     rhoh0_new,rhoh0_edge_new,rhoh0mac_new, 
+		     h0mac_old,h0mac_new);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {

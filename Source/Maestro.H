@@ -95,12 +95,13 @@ private:
 		       amrex::Vector<amrex::MultiFab>& etarhoflux,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
 		       const amrex::Vector<amrex::Real>& r0_old,
 		       const amrex::Vector<amrex::Real>& r0_edge_old,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rho0mac_old,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
 		       const amrex::Vector<amrex::Real>& r0_new,
 		       const amrex::Vector<amrex::Real>& r0_edge_new,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rho0mac_new,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
 		       const amrex::Vector<amrex::Real>& r0_predicted_edge,
 		       int start_comp, int num_comp);
 
@@ -108,14 +109,21 @@ private:
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux, 
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
 		       const amrex::Vector<amrex::Real>& r0_old,
 		       const amrex::Vector<amrex::Real>& r0_edge_old,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
 		       const amrex::Vector<amrex::Real>& r0_new,
 		       const amrex::Vector<amrex::Real>& r0_edge_new,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
 		       const amrex::Vector<amrex::Real>& rh0_old,
 		       const amrex::Vector<amrex::Real>& rh0_edge_old,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
 		       const amrex::Vector<amrex::Real>& rh0_new,
-		       const amrex::Vector<amrex::Real>& rh0_edge_new);
+		       const amrex::Vector<amrex::Real>& rh0_edge_new,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_old,
+		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_new);
 
     void UpdateScal (const amrex::Vector<amrex::MultiFab>& stateold,
 		     amrex::Vector<amrex::MultiFab>& statenew,

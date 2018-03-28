@@ -160,7 +160,7 @@ Maestro::DensityAdvance (int which_step,
 	}
 
 	// compute species fluxes
-	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac,
+	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
 		     rho0_old,rho0_edge_old,rho0mac_old,
 		     rho0_old,rho0_edge_old,rho0mac_old,
 		     rho0_predicted_edge,
@@ -186,7 +186,7 @@ Maestro::DensityAdvance (int which_step,
 	}
 
 	// compute species fluxes
-	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac,
+	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
 		     rho0_old,rho0_edge_old,rho0mac_old,
 		     rho0_new,rho0_edge_new,rho0mac_new,
 		     rho0_predicted_edge,

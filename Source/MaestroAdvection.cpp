@@ -304,12 +304,13 @@ void
 			   Vector<MultiFab>& etarhoflux, 
 			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
 			   const Vector<Real>& r0_old,
 			   const Vector<Real>& r0_edge_old,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rho0mac_old,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
 			   const Vector<Real>& r0_new,
 			   const Vector<Real>& r0_edge_new,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rho0mac_new,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
 			   const Vector<Real>& r0_predicted_edge, 
 			   int start_comp, int num_comp)
 {
@@ -337,7 +338,19 @@ void
               MultiFab& sedgez_mf      = sedge[lev][2];
 	      MultiFab& sfluxz_mf      = sflux[lev][2];
         const MultiFab& wmac_mf        = umac[lev][2];
+	
+	// if spherical == 1
+	const MultiFab& w0macx_mf = w0mac[lev][0];
+	const MultiFab& w0macy_mf = w0mac[lev][1];
+	const MultiFab& w0macz_mf = w0mac[lev][2];
+	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez; 
+	rho0mac_edgex.define(grids[lev], dmap[lev], 1, 0);
+	rho0mac_edgey.define(grids[lev], dmap[lev], 1, 0);
+	rho0mac_edgez.define(grids[lev], dmap[lev], 1, 0);
 
+	MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
+	MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
+	MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
 #endif
 #endif
 
@@ -389,24 +402,27 @@ void
 				  w0.dataPtr(), 
 				  &startcomp, &endcomp);
 	    } else {
-
-#if (AMREX_SPACEDIM == 3)
-		// make_rhoX_flux_3d_sphr(validBox.loVect(), validBox.hiVect(),
-		// 	               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-		// 	               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-		// 	               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]), 
-		// 		       BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-		// 		       BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-		// 		       BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-		// 		       BL_TO_FORTRAN_3D(umac_mf[mfi]),
-		// 		       BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-		// 		       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-		// 		       BL_TO_FORTRAN_3D(rho0macx_mf[mfi]), 
-		// 		       BL_TO_FORTRAN_3D(rho0macy_mf[mfi]),
-		// 		       BL_TO_FORTRAN_3D(rho0macz_mf[mfi]),
-		// 		       &startcomp, &endcomp);
+		    
+#if (AMREX_SPACEDIM == 3)	       
+		make_rhoX_flux_3d_sphr(validBox.loVect(), validBox.hiVect(),
+			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]), 
+				       BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+				       BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+				       BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+				       BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				       BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				       BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+				       BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+				       BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]), 
+				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
+				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
+				       &startcomp, &endcomp);
 #else
-	        Abort();
+	        Abort("MakeRhoXFlux: Spherical is not valid for DIM < 3");
 #endif
 	    } // end spherical
 	} // end MFIter loop
@@ -423,14 +439,21 @@ void
 			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux, 
 			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
 			   const Vector<Real>& r0_old,
 			   const Vector<Real>& r0_edge_old,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
 			   const Vector<Real>& r0_new,
 			   const Vector<Real>& r0_edge_new,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
 			   const Vector<Real>& rh0_old,
 			   const Vector<Real>& rh0_edge_old,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
 			   const Vector<Real>& rh0_new,
-			   const Vector<Real>& rh0_edge_new)
+			   const Vector<Real>& rh0_edge_new, 
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_old,
+			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_new)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHFlux()",MakeRhoHFlux);
@@ -452,6 +475,25 @@ void
 	      MultiFab& sfluxz_mf = sflux[lev][2];
         const MultiFab& wmac_mf   = umac[lev][2];
 
+	// if spherical == 1
+	const MultiFab& w0macx_mf = w0mac[lev][0];
+	const MultiFab& w0macy_mf = w0mac[lev][1];
+	const MultiFab& w0macz_mf = w0mac[lev][2];
+	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez; 
+	MultiFab h0mac_edgex, h0mac_edgey, h0mac_edgez;
+	rho0mac_edgex.define(grids[lev], dmap[lev], 1, 0);
+	rho0mac_edgey.define(grids[lev], dmap[lev], 1, 0);
+	rho0mac_edgez.define(grids[lev], dmap[lev], 1, 0);
+	h0mac_edgex.define(grids[lev], dmap[lev], 1, 0);
+	h0mac_edgey.define(grids[lev], dmap[lev], 1, 0);
+	h0mac_edgez.define(grids[lev], dmap[lev], 1, 0);
+
+	MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
+	MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
+	MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
+	MultiFab::LinComb(h0mac_edgex,0.5,h0mac_old[lev][0],0,0.5,h0mac_new[lev][0],0,0,1,0);
+	MultiFab::LinComb(h0mac_edgey,0.5,h0mac_old[lev][1],0,0.5,h0mac_new[lev][1],0,0,1,0);
+	MultiFab::LinComb(h0mac_edgez,0.5,h0mac_old[lev][2],0,0.5,h0mac_new[lev][2],0,0,1,0);
 #endif
 #endif
 
@@ -465,41 +507,67 @@ void
 	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
 	    // lo/hi coordinates (including ghost cells), and/or the # of components
 	    // We will also pass "validBox", which specifies the "valid" region.
+	    if (spherical == 0) {
 #if (AMREX_SPACEDIM == 1)
-	    make_rhoh_flux_1d(
+		make_rhoh_flux_1d(
 #elif (AMREX_SPACEDIM == 2)
-	    make_rhoh_flux_2d(
+		make_rhoh_flux_2d(
 #elif (AMREX_SPACEDIM == 3)
-            make_rhoh_flux_3d(
+                make_rhoh_flux_3d(
 #endif
-			      &lev, validBox.loVect(), validBox.hiVect(),
-			      BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+				  &lev, validBox.loVect(), validBox.hiVect(),
+				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			      BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			      BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 #endif
 #endif
-			      BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			      BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			      BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+				  BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
 #endif
 #endif
-			      BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				  BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			      BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			      BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
-			      r0_old.dataPtr(), r0_edge_old.dataPtr(), 
-			      r0_new.dataPtr(), r0_edge_new.dataPtr(),
-			      rh0_old.dataPtr(), rh0_edge_old.dataPtr(), 
-			      rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
-			      w0.dataPtr());
-	    
+				  r0_old.dataPtr(), r0_edge_old.dataPtr(), 
+				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
+				  rh0_old.dataPtr(), rh0_edge_old.dataPtr(), 
+				  rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
+				  w0.dataPtr());
+	    } else {
+
+#if (AMREX_SPACEDIM == 3)	       
+		make_rhoh_flux_3d_sphr(validBox.loVect(), validBox.hiVect(),
+			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]), 
+				       BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+				       BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+				       BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+				       BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				       BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				       BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+				       BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+				       BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]), 
+				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
+				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
+				       BL_TO_FORTRAN_3D(h0mac_edgex[mfi]), 
+				       BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
+				       BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
+#else
+	        Abort("MakeRhoXFlux: Spherical is not valid for DIM < 3");
+#endif
+	    }	    
 	} // end MFIter loop
     } // end loop over levels
 
