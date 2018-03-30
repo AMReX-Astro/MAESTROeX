@@ -61,7 +61,14 @@ Maestro::EnthalpyAdvance (int which_step,
         // make force for (rho h)'
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
 
-        ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,RhoH,bcs_s,0);
+	Vector<MultiFab> rhoh0_old_cart(finest_level+1);
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+	}
+
+	Put1dArrayOnCart(rhoh0_old,rhoh0_old_cart,0,0,bcs_s,RhoH);
+
+        ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,rhoh0_old_cart,RhoH,bcs_s,0);
 
     }
     else if (enthalpy_pred_type == predict_h ||
@@ -274,8 +281,14 @@ Maestro::EnthalpyAdvance (int which_step,
 
     MakeRhoHForce(scal_force,0,thermal,umac,0,which_step);
 
+    Vector<MultiFab> p0_new_cart(finest_level+1);
     if (spherical == 1) {
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+	}
+
+	Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
     }
 
-    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new.dataPtr());
+    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new.dataPtr(), p0_new_cart);
 }

@@ -75,7 +75,8 @@ private:
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
-                     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans);
+                     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
+                     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
 
     void VelPred (const amrex::Vector<amrex::MultiFab>& utilde,
                   const amrex::Vector<amrex::MultiFab>& ufull,
@@ -130,7 +131,8 @@ private:
 		     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
 		     const amrex::Vector<amrex::MultiFab>& force, 
 		     int start_scomp, int num_comp, 
-		     const amrex::Real* p0 = NULL);
+		     const amrex::Real* p0 = NULL, 
+		     const amrex::Vector<amrex::MultiFab>& p0_cart = {});
 
     void UpdateVel (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
@@ -324,6 +326,7 @@ private:
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<amrex::Real>& s0,
                          const amrex::Vector<amrex::Real>& s0_edge,
+			 const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
                          const amrex::Vector<amrex::BCRec>& bcs,
                          int fullform);

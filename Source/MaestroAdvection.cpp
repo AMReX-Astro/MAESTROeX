@@ -44,7 +44,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // create utrans
-    MakeUtrans(utilde,ufull,utrans);
+    MakeUtrans(utilde,ufull,utrans,w0mac);
     
     // create a MultiFab to hold the velocity forcing
     Vector<MultiFab> vel_force(finest_level+1);
@@ -65,7 +65,8 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 void
 Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                      const Vector<MultiFab>& ufull,
-                     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans)
+                     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
+		     const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeUtrans()",MakeUtrans);
@@ -84,6 +85,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
               MultiFab& vtrans_mf  = utrans[lev][1];
 #if (AMREX_SPACEDIM == 3)
               MultiFab& wtrans_mf  = utrans[lev][2];
+	const MultiFab& w0macx_mf  = w0mac[lev][0];
+	const MultiFab& w0macy_mf  = w0mac[lev][1];
+	const MultiFab& w0macz_mf  = w0mac[lev][2];
 #endif
 #endif
 
@@ -113,6 +117,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                         BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
 #endif
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
@@ -578,12 +585,12 @@ void
 }
 
 void
-    Maestro::UpdateScal (const Vector<MultiFab>& stateold,
-			 Vector<MultiFab>& statenew,
-			 const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-			 const Vector<MultiFab>& force, 
-			 int start_comp, int num_comp, 
-			 const Real* p0)
+    Maestro::UpdateScal(const Vector<MultiFab>& stateold,
+			Vector<MultiFab>& statenew,
+			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+			const Vector<MultiFab>& force, 
+			int start_comp, int num_comp, 
+			const Real* p0, const Vector<MultiFab>& p0_cart)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateScal()",UpdateScal);
@@ -602,6 +609,7 @@ void
         const MultiFab& sfluxy_mf = sflux[lev][1];
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& sfluxz_mf = sflux[lev][2];
+	const MultiFab& p0cart_mf = p0_cart[lev];
 #endif
 #endif
         const MultiFab& force_mf = force[lev];
@@ -620,27 +628,44 @@ void
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
+		if (spherical == 0) {
 #if (AMREX_SPACEDIM == 1)
-                update_rhoh_1d(
+		    update_rhoh_1d(
 #elif (AMREX_SPACEDIM == 2)
-                update_rhoh_2d(
+                    update_rhoh_2d(
 #elif (AMREX_SPACEDIM == 3)
-                update_rhoh_3d(
+                    update_rhoh_3d(
 #endif
-			       &lev, validBox.loVect(), validBox.hiVect(),
-			       BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
-			       BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
-			       BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+				   &lev, validBox.loVect(), validBox.hiVect(),
+				   BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
+				   BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
+				   BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			       BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+				   BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			       BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+				   BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 #endif
 #endif
-			       BL_TO_FORTRAN_FAB(force_mf[mfi]),
-			       p0, 
-			       dx, &dt,
-			       &NumSpec);
+				   BL_TO_FORTRAN_FAB(force_mf[mfi]),
+				   p0, 
+				   dx, &dt,
+				   &NumSpec);
+		} else {
+#if (AMREX_SPACEDIM == 3) 
+		    update_rhoh_3d_sphr(validBox.loVect(), validBox.hiVect(),
+					BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
+					BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
+					BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+					BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+					BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+					BL_TO_FORTRAN_FAB(force_mf[mfi]),
+					BL_TO_FORTRAN_3D(p0cart_mf[mfi]), 
+					dx, &dt,
+					&NumSpec);
+#else
+		    
+#endif
+		}
 
 	    }
 	    else if (start_comp == FirstSpec) 

@@ -503,6 +503,87 @@ contains
     end if
 
   end subroutine update_rhoh_3d
+
+  subroutine update_rhoh_3d_sphr(lo, hi, &
+                                   sold,   so_lo, so_hi, nc_so, &
+                                   snew,   sn_lo, sn_hi, nc_sn, &
+                                   sfluxx, x_lo, x_hi, nc_x, &
+                                   sfluxy, y_lo, y_hi, nc_y, &
+                                   sfluxz, z_lo, z_hi, nc_z, &
+                                   force,  f_lo, f_hi, nc_f, & 
+                                   p0_new_cart, p_lo, p_hi, &
+                                   dx, dt, &
+                                   nspec) bind(C,name="update_rhoh_3d_sphr")
+
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: so_lo(3), so_hi(3), nc_so
+    double precision, intent(in   ) :: sold  (so_lo(1):so_hi(1),so_lo(2):so_hi(2),so_lo(3):so_hi(3),nc_so)
+    integer         , intent(in   ) :: sn_lo(3), sn_hi(3), nc_sn
+    double precision, intent(inout) :: snew  (sn_lo(1):sn_hi(1),sn_lo(2):sn_hi(2),sn_lo(3):sn_hi(3),nc_sn)
+    integer         , intent(in   ) :: x_lo(3), x_hi(3), nc_x
+    double precision, intent(in   ) :: sfluxx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
+    integer         , intent(in   ) :: y_lo(3), y_hi(3), nc_y
+    double precision, intent(in   ) :: sfluxy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nc_y)
+    integer         , intent(in   ) :: z_lo(3), z_hi(3), nc_z
+    double precision, intent(in   ) :: sfluxz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nc_z)
+    integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
+    double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    integer         , intent(in   ) :: p_lo(3), p_hi(3)
+    double precision, intent(in   ) :: p0_new_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
+    double precision, intent(in   ) :: dx(3), dt
+    integer         , intent(in   ) :: nspec
+
+    ! Local variables
+    integer          :: i, j, k
+    double precision :: divterm
+    
+    integer :: pt_index(3)
+    type(eos_t) :: eos_state
+
+    !$OMP PARALLEL PRIVATE(i,j,k,divterm) 
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+                
+             divterm = (sfluxx(i+1,j,k,rhoh_comp) - sfluxx(i,j,k,rhoh_comp))/dx(1) &
+                  + (sfluxy(i,j+1,k,rhoh_comp) - sfluxy(i,j,k,rhoh_comp))/dx(2) &
+                  + (sfluxz(i,j,k+1,rhoh_comp) - sfluxz(i,j,k,rhoh_comp))/dx(3)
+             snew(i,j,k,rhoh_comp) = sold(i,j,k,rhoh_comp) + dt * (-divterm + force(i,j,k,rhoh_comp))
+                
+          enddo
+       enddo
+    enddo
+    !$OMP END PARALLEL
+    
+    if ( do_eos_h_above_cutoff ) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,eos_state,pt_index)
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+
+                if (snew(i,j,k,rho_comp) .le. base_cutoff_density) then
+
+                   eos_state%rho = snew(i,j,k,rho_comp)
+                   eos_state%T   = sold(i,j,k,temp_comp)
+                   eos_state%p   = p0_new_cart(i,j,k)
+                   eos_state%xn  = snew(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+                   pt_index(:) = (/i, j, k/)
+
+                   ! (rho,P) --> T,h
+                   call eos(eos_input_rp, eos_state, pt_index)
+
+                   snew(i,j,k,rhoh_comp) = snew(i,j,k,rho_comp) * eos_state%h
+
+                end if
+
+             enddo
+          enddo
+       enddo
+       !$OMP END PARALLEL DO
+    end if
+
+  end subroutine update_rhoh_3d_sphr
 #endif
 
 end module update_scal_module

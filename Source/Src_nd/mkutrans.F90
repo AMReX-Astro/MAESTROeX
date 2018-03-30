@@ -6,7 +6,7 @@ module mkutrans_module
   use amrex_constants_module
   use slope_module
   use ppm_module
-  use meth_params_module, only: rel_eps, ppm_type
+  use meth_params_module, only: rel_eps, ppm_type, spherical
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
@@ -360,7 +360,11 @@ contains
                          utrans, uu_lo, uu_hi, &
                          vtrans, uv_lo, uv_hi, &
                          wtrans, uw_lo, uw_hi, &
-                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
+                         w0macx, wx_lo, wx_hi, &
+                         w0macy, wy_lo, wy_hi, &
+                         w0macz, wz_lo, wz_hi, &
+                         w0, &
+                         dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
 
     integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut
@@ -370,11 +374,17 @@ contains
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: uw_lo(3), uw_hi(3)
+    integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
+    integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
+    integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
     double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2),uv_lo(3):uv_hi(3))
     double precision, intent(inout) :: wtrans(uw_lo(1):uw_hi(1),uw_lo(2):uw_hi(2),uw_lo(3):uw_hi(3))
+    double precision, intent(in   ) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
+    double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
+    double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3), dt
     integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
@@ -495,18 +505,34 @@ contains
        end select
     end if
 
-    do k=ks,ke
-       do j=js,je
-          do i=is,ie+1
-             ! solve Riemann problem using full velocity
-             uavg = HALF*(ulx(i,j,k)+urx(i,j,k))
-             test = ((ulx(i,j,k) .le. ZERO .and. urx(i,j,k) .ge. ZERO) .or. &
-                  (abs(ulx(i,j,k)+urx(i,j,k)) .lt. rel_eps))
-             utrans(i,j,k) = merge(ulx(i,j,k),urx(i,j,k),uavg .gt. ZERO)
-             utrans(i,j,k) = merge(ZERO,utrans(i,j,k),test)
+    if (spherical .eq. 1) then
+       do k=ks,ke
+          do j=js,je
+             do i=is,ie+1
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(ulx(i,j,k)+urx(i,j,k))
+                test = ((ulx(i,j,k)+w0macx(i,j,k) .le. ZERO .and. &
+                     urx(i,j,k)+w0macx(i,j,k) .ge. ZERO) .or. &
+                     (abs(ulx(i,j,k)+urx(i,j,k)+TWO*w0macx(i,j,k)) .lt. rel_eps))
+                utrans(i,j,k) = merge(ulx(i,j,k),urx(i,j,k),uavg+w0macx(i,j,k) .gt. ZERO)
+                utrans(i,j,k) = merge(ZERO,utrans(i,j,k),test)
+             enddo
           enddo
        enddo
-    enddo
+    else
+       do k=ks,ke
+          do j=js,je
+             do i=is,ie+1
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(ulx(i,j,k)+urx(i,j,k))
+                test = ((ulx(i,j,k) .le. ZERO .and. urx(i,j,k) .ge. ZERO) .or. &
+                     (abs(ulx(i,j,k)+urx(i,j,k)) .lt. rel_eps))
+                utrans(i,j,k) = merge(ulx(i,j,k),urx(i,j,k),uavg .gt. ZERO)
+                utrans(i,j,k) = merge(ZERO,utrans(i,j,k),test)
+             enddo
+          enddo
+       enddo
+    end if
 
     !******************************************************************
     ! create vtrans
@@ -581,18 +607,34 @@ contains
        end select
     end if
     
-    do k=ks,ke
-       do j=js,je+1
-          do i=is,ie
-             ! solve Riemann problem using full velocity
-             uavg = HALF*(vly(i,j,k)+vry(i,j,k))
-             test = ((vly(i,j,k) .le. ZERO .and. vry(i,j,k) .ge. ZERO) .or. &
-                  (abs(vly(i,j,k)+vry(i,j,k)) .lt. rel_eps))
-             vtrans(i,j,k) = merge(vly(i,j,k),vry(i,j,k),uavg .gt. ZERO)
-             vtrans(i,j,k) = merge(ZERO,vtrans(i,j,k),test)
+    if (spherical .eq. 1) then
+       do k=ks,ke
+          do j=js,je+1
+             do i=is,ie
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(vly(i,j,k)+vry(i,j,k))
+                test = ((vly(i,j,k)+w0macy(i,j,k) .le. ZERO .and. &
+                     vry(i,j,k)+w0macy(i,j,k) .ge. ZERO) .or. &
+                     (abs(vly(i,j,k)+vry(i,j,k)+TWO*w0macy(i,j,k)) .lt. rel_eps))
+                vtrans(i,j,k) = merge(vly(i,j,k),vry(i,j,k),uavg+w0macy(i,j,k) .gt. ZERO)
+                vtrans(i,j,k) = merge(ZERO,vtrans(i,j,k),test)
+             enddo
           enddo
        enddo
-    enddo
+    else
+       do k=ks,ke
+          do j=js,je+1
+             do i=is,ie
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(vly(i,j,k)+vry(i,j,k))
+                test = ((vly(i,j,k) .le. ZERO .and. vry(i,j,k) .ge. ZERO) .or. &
+                     (abs(vly(i,j,k)+vry(i,j,k)) .lt. rel_eps))
+                vtrans(i,j,k) = merge(vly(i,j,k),vry(i,j,k),uavg .gt. ZERO)
+                vtrans(i,j,k) = merge(ZERO,vtrans(i,j,k),test)
+             enddo
+          enddo
+       enddo
+    end if
 
     !******************************************************************
     ! create wtrans
@@ -667,18 +709,34 @@ contains
        end select
     end if
     
-    do k=ks,ke+1
-       do j=js,je
-          do i=is,ie
-             ! solve Riemann problem using full velocity
-             uavg = HALF*(wlz(i,j,k)+wrz(i,j,k))
-             test = ((wlz(i,j,k)+w0(lev,k).le.ZERO .and. wrz(i,j,k)+w0(lev,k).ge.ZERO) .or. &
-                  (abs(wlz(i,j,k)+wrz(i,j,k)+TWO*w0(lev,k)) .lt. rel_eps))
-             wtrans(i,j,k) = merge(wlz(i,j,k),wrz(i,j,k),uavg+w0(lev,k) .gt. ZERO)
-             wtrans(i,j,k) = merge(ZERO,wtrans(i,j,k),test)
+    if (spherical .eq. 1) then
+       do k=ks,ke+1
+          do j=js,je
+             do i=is,ie
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(wlz(i,j,k)+wrz(i,j,k))
+                test = ((wlz(i,j,k)+w0macz(i,j,k) .le. ZERO .and. &
+                     wrz(i,j,k)+w0macz(i,j,k) .ge. ZERO) .or. &
+                     (abs(wlz(i,j,k)+wrz(i,j,k)+TWO*w0macz(i,j,k)) .lt. rel_eps))
+                wtrans(i,j,k) = merge(wlz(i,j,k),wrz(i,j,k),uavg+w0macz(i,j,k) .gt. ZERO)
+                wtrans(i,j,k) = merge(ZERO,wtrans(i,j,k),test)
+             enddo
           enddo
        enddo
-    enddo
+    else
+       do k=ks,ke+1
+          do j=js,je
+             do i=is,ie
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(wlz(i,j,k)+wrz(i,j,k))
+                test = ((wlz(i,j,k)+w0(lev,k).le.ZERO .and. wrz(i,j,k)+w0(lev,k).ge.ZERO) .or. &
+                     (abs(wlz(i,j,k)+wrz(i,j,k)+TWO*w0(lev,k)) .lt. rel_eps))
+                wtrans(i,j,k) = merge(wlz(i,j,k),wrz(i,j,k),uavg+w0(lev,k) .gt. ZERO)
+                wtrans(i,j,k) = merge(ZERO,wtrans(i,j,k),test)
+             enddo
+          enddo
+       enddo
+    end if
 
   end subroutine mkutrans_3d
 #endif

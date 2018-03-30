@@ -32,14 +32,23 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 
             // Get the index space of the valid region
             const Box& validBox = mfi.validbox();
+	    const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            put_1d_array_on_cart(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                                 BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-                                 s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
+	    if (spherical == 0) {
+		put_1d_array_on_cart(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				     BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+				     s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
+	    } else {
+		put_1d_array_on_cart_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+					  BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+					  s0.dataPtr(), dx, 
+					  &is_input_edge_centered, &is_output_a_vector, 
+					  r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	    }
         }
     }
 
