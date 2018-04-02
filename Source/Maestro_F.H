@@ -371,6 +371,21 @@ extern "C"
 		    const int* lo,  const int *hi,
 		    const amrex::Real* etarhoflux, const int* x_lo, const int* x_hi,
                     amrex::Real* etarhosum);
+
+    void construct_eta_cart(const int* lo, const int* hi, 
+			    const amrex::Real* rho_old, const int* ro_lo, const int* ro_hi, 
+			    const amrex::Real* rho_new, const int* rn_lo, const int* rn_hi, 
+			    const amrex::Real* umac,    const int* u_lo,  const int* u_hi, 
+			    const amrex::Real* vmac,    const int* v_lo,  const int* v_hi, 
+			    const amrex::Real* wmac,    const int* w_lo,  const int* w_hi, 
+			    const amrex::Real* w0macx,  const int* x_lo,  const int* x_hi, 
+			    const amrex::Real* w0macy,  const int* y_lo,  const int* y_hi, 
+			    const amrex::Real* w0macz,  const int* z_lo,  const int* z_hi, 
+			    const amrex::Real* normal,  const int* n_lo,  const int* n_hi, 
+			    amrex::Real* eta_cart, const int* e_lo,  const int* e_hi, 
+			    const amrex::Real* rho0_old, const amrex::Real* rho0_new, 
+			    const amrex::Real* dx, 
+			    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
     //////////////////////
 
     //////////////////////
@@ -929,6 +944,23 @@ void update_rhoh_3d_sphr(const int* lo, const int* hi,
 			 const amrex::Real* force, const int* f_lo, const int* f_hi, 
 			 const amrex::Real* sponge, const int* s_lo, const int* s_hi, 
 			 const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt);
+
+    void update_velocity_sphr(const int* lo, const int* hi,
+			      const amrex::Real* uold, const int* uo_lo, const int* uo_hi,
+			       amrex::Real* unew, const int* un_lo, const int* un_hi,
+			      const amrex::Real* umac, const int* u_lo, const int* u_hi, 
+			      const amrex::Real* vmac, const int* v_lo, const int* v_hi, 
+			      const amrex::Real* wmac, const int* w_lo, const int* w_hi, 
+			      const amrex::Real* uedgex, const int* x_lo, const int* x_hi, 
+			      const amrex::Real* uedgey, const int* y_lo, const int* y_hi, 
+			      const amrex::Real* uedgez, const int* z_lo, const int* z_hi, 
+			      const amrex::Real* force, const int* f_lo, const int* f_hi, 
+			      const amrex::Real* sponge, const int* s_lo, const int* s_hi, 
+			      const amrex::Real* w0, 
+			      const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi, 
+			      const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi, 
+			      const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
+			      const amrex::Real* dx, const amrex::Real* dt);
     //////////////////////
 
     //////////////////////
@@ -956,6 +988,9 @@ void update_rhoh_3d_sphr(const int* lo, const int* hi,
                       amrex::Real* vmac, const int* mv_lo, const int* mv_hi,
 #if (AMREX_SPACEDIM == 3)
                       amrex::Real* wmac, const int* mw_lo, const int* mw_hi,
+		      const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi,
+		      const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi,
+		      const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
 #endif
 #endif
                       const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,

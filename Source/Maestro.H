@@ -82,6 +82,7 @@ private:
                   const amrex::Vector<amrex::MultiFab>& ufull,
                   const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
                   amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                  const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                   const amrex::Vector<amrex::MultiFab>& force);
 
     void MakeEdgeScal (const amrex::Vector<amrex::MultiFab>& state,
@@ -137,7 +138,8 @@ private:
     void UpdateVel (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
 		    const amrex::Vector<amrex::MultiFab>& force,
-		    const amrex::Vector<amrex::MultiFab>& sponge);
+		    const amrex::Vector<amrex::MultiFab>& sponge,
+		    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
     ////////////
 
     ////////////
@@ -413,6 +415,13 @@ private:
     void MakeEtarho (amrex::Vector<amrex::Real>& etarho_edge,
 		     amrex::Vector<amrex::Real>& etarho_cell,
 		     const amrex::Vector<amrex::MultiFab>& etarho_flux);
+
+    void MakeEtarhoSphr (const amrex::Vector<amrex::MultiFab>& scal_old,
+			 const amrex::Vector<amrex::MultiFab>& scal_new,
+			 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+			 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+			 amrex::Vector<amrex::Real>& etarho_edge,
+			 amrex::Vector<amrex::Real>& etarho_cell);
     ////////////
 
     ////////////

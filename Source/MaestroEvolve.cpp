@@ -12,6 +12,11 @@ Maestro::Evolve ()
 
     Print() << "Calling Evolve()" << endl;
 
+    // check to make sure spherical is only used for 3d
+    if (spherical == 1 && AMREX_SPACEDIM != 3) {
+	Abort ("spherical = 1 and dm != 3");
+    }
+
     for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
     {
 

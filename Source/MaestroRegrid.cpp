@@ -25,6 +25,12 @@ Maestro::Regrid ()
         // and "regrid" the base state rho0, rhoh0, tempbar
         // call init_multilevel
         // look at MAESTRO/Source/varden.f90:750-1060
+	if (evolve_base_state) {
+
+	} else {
+
+	}
+
     }
 
     if (spherical == 1) {

@@ -49,7 +49,7 @@ Maestro::Init ()
             S_cc_new          [lev].define(grids[lev], dmap[lev],              1,    0);
             rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],              1,    1);
             if (spherical == 1) {
-                normal[lev].define(grids[lev], dmap[lev], 1, 1);
+                normal[lev].define(grids[lev], dmap[lev], 3, 1);
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
         }
@@ -255,7 +255,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     pi                [lev].setVal(0.);   
 
     if (spherical == 1) {
-        normal[lev].define(ba, dm, 1, 1);
+        normal[lev].define(ba, dm, 3, 1);
     }
 
     const Real* dx = geom[lev].CellSize();

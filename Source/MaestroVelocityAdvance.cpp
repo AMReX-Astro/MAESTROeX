@@ -62,6 +62,6 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Update the velocity with convective differencing
     //////////////////////////////////
     
-    UpdateVel(umac, uedge, vel_force, sponge);
+    UpdateVel(umac, uedge, vel_force, sponge, w0mac);
 
 }

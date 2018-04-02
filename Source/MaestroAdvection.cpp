@@ -59,7 +59,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // add w0 to trans velocities
     Addw0 (utrans,w0mac,1.);
 
-    VelPred(utilde,ufull,utrans,umac,vel_force);
+    VelPred(utilde,ufull,utrans,umac,w0mac,vel_force);
 }
 
 void
@@ -147,6 +147,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                   const Vector<MultiFab>& ufull,
                   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
                   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+		  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                   const Vector<MultiFab>& force)
 {
     // timer for profiling
@@ -169,6 +170,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wtrans_mf  = utrans[lev][2];
               MultiFab& wmac_mf    = umac[lev][2];
+	const MultiFab& w0macx_mf  = w0mac[lev][0];
+	const MultiFab& w0macy_mf  = w0mac[lev][1];
+	const MultiFab& w0macz_mf  = w0mac[lev][2];
 #endif
 #endif
         const MultiFab& force_mf = force[lev];
@@ -206,6 +210,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                         BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
 #endif
                         BL_TO_FORTRAN_FAB(force_mf[mfi]),
@@ -663,7 +670,7 @@ void
 					dx, &dt,
 					&NumSpec);
 #else
-		    
+		    Abort("UpdateScal: Spherical is not valid for DIM < 3");
 #endif
 		}
 
@@ -717,10 +724,11 @@ void
 }
 
 void
-    Maestro::UpdateVel ( const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-			 const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
-			 const Vector<MultiFab>& force,
-			 const Vector<MultiFab>& sponge)
+    Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
+			const Vector<MultiFab>& force,
+			const Vector<MultiFab>& sponge, 
+			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
@@ -738,6 +746,11 @@ void
 #if (AMREX_SPACEDIM == 3)
 	const MultiFab& wmac_mf   = umac[lev][2];
         const MultiFab& uedgez_mf = uedge[lev][2];
+
+	// if spherical == 1
+	const MultiFab& w0macx_mf = w0mac[lev][0];
+	const MultiFab& w0macy_mf = w0mac[lev][1];
+	const MultiFab& w0macz_mf = w0mac[lev][2];
 #endif
 #endif
         const MultiFab& force_mf = force[lev];
@@ -750,28 +763,50 @@ void
             const Box& validBox = mfi.validbox();
             const Real* dx = geom[lev].CellSize();
 
-	    update_velocity( &lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-			     BL_TO_FORTRAN_3D(uold_mf[mfi]),
-			     BL_TO_FORTRAN_3D(unew_mf[mfi]),
-			     BL_TO_FORTRAN_3D(umac_mf[mfi]),
+	    if (spherical == 0) {
+		update_velocity( &lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				 BL_TO_FORTRAN_3D(uold_mf[mfi]),
+				 BL_TO_FORTRAN_3D(unew_mf[mfi]),
+				 BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			     BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				 BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			     BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				 BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
-			     BL_TO_FORTRAN_3D(uedgex_mf[mfi]),
+				 BL_TO_FORTRAN_3D(uedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-			     BL_TO_FORTRAN_3D(uedgey_mf[mfi]),
+				 BL_TO_FORTRAN_3D(uedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			     BL_TO_FORTRAN_3D(uedgez_mf[mfi]),
+				 BL_TO_FORTRAN_3D(uedgez_mf[mfi]),
 #endif
 #endif
-			     BL_TO_FORTRAN_3D(force_mf[mfi]),
-			     BL_TO_FORTRAN_3D(sponge_mf[mfi]),
-			     w0.dataPtr(), 
-			     dx, &dt);
-
+				 BL_TO_FORTRAN_3D(force_mf[mfi]),
+				 BL_TO_FORTRAN_3D(sponge_mf[mfi]),
+				 w0.dataPtr(), 
+				 dx, &dt);
+	    } else {
+#if (AMREX_SPACEDIM == 3)
+		update_velocity_sphr( ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				      BL_TO_FORTRAN_3D(uold_mf[mfi]),
+				      BL_TO_FORTRAN_3D(unew_mf[mfi]),
+				      BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				      BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				      BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				      BL_TO_FORTRAN_3D(uedgex_mf[mfi]),
+				      BL_TO_FORTRAN_3D(uedgey_mf[mfi]),
+				      BL_TO_FORTRAN_3D(uedgez_mf[mfi]),
+				      BL_TO_FORTRAN_3D(force_mf[mfi]),
+				      BL_TO_FORTRAN_3D(sponge_mf[mfi]),
+				      w0.dataPtr(), 
+				      BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+				      BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+				      BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+				      dx, &dt);
+#else
+		Abort("UpdateVel: Spherical is not valid for DIM < 3");
+#endif
+	    }
         } // end MFIter loop
     } // end loop over levels
 

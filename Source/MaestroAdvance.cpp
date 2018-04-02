@@ -370,9 +370,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
-        // includes spherical option in C++ function
-        MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
-	
+	if (spherical == 0) {
+	    MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+	} else {
+	    MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+	}
+
         // correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
 	compute_cutoff_coords(rho0_new.dataPtr());
@@ -661,8 +664,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (evolve_base_state && use_etarho) {
 
         // compute the new etarho
-        // includes spherical option in C++ function
-        MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+        if (spherical == 0) {
+	    MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+	} else {
+	    MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+	}
 
         // correct the base state density by "averaging"
         // call average(mla,s2,rho0_new,dx,rho_comp)

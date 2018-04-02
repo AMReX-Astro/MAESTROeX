@@ -9,7 +9,7 @@ module velpred_module
   use amrex_constants_module
   use slope_module
   use ppm_module
-  use meth_params_module, only: ppm_type, rel_eps
+  use meth_params_module, only: ppm_type, rel_eps, spherical
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
@@ -543,6 +543,9 @@ contains
                         umac,   mu_lo, mu_hi, &
                         vmac,   mv_lo, mv_hi, &
                         wmac,   mw_lo, mw_hi, &
+                        w0macx, wx_lo, wx_hi, &
+                        w0macy, wy_lo, wy_hi, &
+                        w0macz, wz_lo, wz_hi, &
                         force,   f_lo,  f_hi, nc_f, &
                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_3d")
 
@@ -557,6 +560,9 @@ contains
     integer         , intent(in   ) :: mu_lo(3), mu_hi(3)
     integer         , intent(in   ) :: mv_lo(3), mv_hi(3)
     integer         , intent(in   ) :: mw_lo(3), mw_hi(3)
+    integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
+    integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
+    integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
     integer         , intent(in   ) ::  f_lo(3),  f_hi(3), nc_f
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
@@ -566,6 +572,9 @@ contains
     double precision, intent(inout) :: umac  (mu_lo(1):mu_hi(1),mu_lo(2):mu_hi(2),mu_lo(3):mu_hi(3))
     double precision, intent(inout) :: vmac  (mv_lo(1):mv_hi(1),mv_lo(2):mv_hi(2),mv_lo(3):mv_hi(3))
     double precision, intent(inout) :: wmac  (mw_lo(1):mw_hi(1),mw_lo(2):mw_hi(2),mw_lo(3):mw_hi(3))
+    double precision, intent(in   ) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
+    double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
+    double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
     double precision, intent(in   ) :: force ( f_lo(1): f_hi(1), f_lo(2): f_hi(2), f_lo(3): f_hi(3),nc_f)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3), dt
@@ -622,6 +631,7 @@ contains
     double precision :: fl, fr
 
     integer :: i,j,k,is,js,ie,je,ks,ke
+    integer :: level
 
     logical :: test
 
@@ -657,6 +667,12 @@ contains
     hx = dx(1)
     hy = dx(2)
     hz = dx(3)
+
+    if (spherical == 0) then
+       level = lev
+    else
+       level = 0
+    end if
 
     if (ppm_type .eq. 0) then
        do k = lo(3)-1,hi(3)+1
@@ -1442,18 +1458,38 @@ contains
        enddo
     enddo
 
-    do k=ks,ke
-       do j=js,je
-          do i=is,ie+1
-             ! solve Riemann problem using full velocity
-             uavg = HALF*(umacl(i,j,k)+umacr(i,j,k))
-             test = ((umacl(i,j,k) .le. ZERO .and. umacr(i,j,k) .ge. ZERO) .or. &
-                  (abs(umacl(i,j,k)+umacr(i,j,k)) .lt. rel_eps))
-             umac(i,j,k) = merge(umacl(i,j,k),umacr(i,j,k),uavg .gt. ZERO)
-             umac(i,j,k) = merge(ZERO,umac(i,j,k),test)
+    if (spherical .eq. 1) then
+
+       do k=ks,ke
+          do j=js,je
+             do i=is,ie+1
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(umacl(i,j,k)+umacr(i,j,k))
+                test = ((umacl(i,j,k)+w0macx(i,j,k) .le. ZERO .and. &
+                         umacr(i,j,k)+w0macx(i,j,k) .ge. ZERO) .or. &
+                    (abs(umacl(i,j,k)+umacr(i,j,k)+TWO*w0macx(i,j,k)) .lt. rel_eps))
+                umac(i,j,k) = merge(umacl(i,j,k),umacr(i,j,k),uavg+w0macx(i,j,k) .gt. ZERO)
+                umac(i,j,k) = merge(ZERO,umac(i,j,k),test)
+             enddo
           enddo
        enddo
-    enddo
+
+    else
+
+       do k=ks,ke
+          do j=js,je
+             do i=is,ie+1
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(umacl(i,j,k)+umacr(i,j,k))
+                test = ((umacl(i,j,k) .le. ZERO .and. umacr(i,j,k) .ge. ZERO) .or. &
+                     (abs(umacl(i,j,k)+umacr(i,j,k)) .lt. rel_eps))
+                umac(i,j,k) = merge(umacl(i,j,k),umacr(i,j,k),uavg .gt. ZERO)
+                umac(i,j,k) = merge(ZERO,umac(i,j,k),test)
+             enddo
+          enddo
+       enddo
+
+    end if
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -1514,18 +1550,38 @@ contains
        enddo
     enddo
 
-    do k=ks,ke
-       do j=js,je+1
-          do i=is,ie
-             ! solve Riemann problem using full velocity
-             uavg = HALF*(vmacl(i,j,k)+vmacr(i,j,k))
-             test = ((vmacl(i,j,k) .le. ZERO .and. vmacr(i,j,k) .ge. ZERO) .or. &
-                  (abs(vmacl(i,j,k)+vmacr(i,j,k)) .lt. rel_eps))
-             vmac(i,j,k) = merge(vmacl(i,j,k),vmacr(i,j,k),uavg .gt. ZERO)
-             vmac(i,j,k) = merge(ZERO,vmac(i,j,k),test)
+    if (spherical .eq. 1) then
+
+       do k=ks,ke
+          do j=js,je+1
+             do i=is,ie
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(vmacl(i,j,k)+vmacr(i,j,k))
+                test = ((vmacl(i,j,k)+w0macy(i,j,k) .le. ZERO .and. &
+                         vmacr(i,j,k)+w0macy(i,j,k) .ge. ZERO) .or. &
+                    (abs(vmacl(i,j,k)+vmacr(i,j,k)+TWO*w0macy(i,j,k)) .lt. rel_eps))
+                vmac(i,j,k) = merge(vmacl(i,j,k),vmacr(i,j,k),uavg+w0macy(i,j,k) .gt. ZERO)
+                vmac(i,j,k) = merge(ZERO,vmac(i,j,k),test)
+             enddo
           enddo
        enddo
-    enddo
+
+    else
+
+       do k=ks,ke
+          do j=js,je+1
+             do i=is,ie
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(vmacl(i,j,k)+vmacr(i,j,k))
+                test = ((vmacl(i,j,k) .le. ZERO .and. vmacr(i,j,k) .ge. ZERO) .or. &
+                     (abs(vmacl(i,j,k)+vmacr(i,j,k)) .lt. rel_eps))
+                vmac(i,j,k) = merge(vmacl(i,j,k),vmacr(i,j,k),uavg .gt. ZERO)
+                vmac(i,j,k) = merge(ZERO,vmac(i,j,k),test)
+             enddo
+          enddo
+       enddo
+
+    end if
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -1586,20 +1642,40 @@ contains
        enddo
     enddo
 
-    do k=ks,ke+1
-       do j=js,je
-          do i=is,ie
-             ! solve Riemann problem using full velocity
-             uavg = HALF*(wmacl(i,j,k)+wmacr(i,j,k))
-             test = ((wmacl(i,j,k)+w0(lev,k) .le. ZERO .and. &
-                      wmacr(i,j,k)+w0(lev,k) .ge. ZERO) .or. &
-                  (abs(wmacl(i,j,k)+wmacr(i,j,k)+TWO*w0(lev,k)) .lt. rel_eps))
-             wmac(i,j,k) = merge(wmacl(i,j,k),wmacr(i,j,k),uavg+w0(lev,k) .gt. ZERO)
-             wmac(i,j,k) = merge(ZERO,wmac(i,j,k),test)
-             
+    if (spherical .eq. 1) then
+
+       do k=ks,ke+1
+          do j=js,je
+             do i=is,ie
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(wmacl(i,j,k)+wmacr(i,j,k))
+                test = ((wmacl(i,j,k)+w0macz(i,j,k) .le. ZERO .and. &
+                         wmacr(i,j,k)+w0macz(i,j,k) .ge. ZERO) .or. &
+                    (abs(wmacl(i,j,k)+wmacr(i,j,k)+TWO*w0macz(i,j,k)) .lt. rel_eps))
+                wmac(i,j,k) = merge(wmacl(i,j,k),wmacr(i,j,k),uavg+w0macz(i,j,k) .gt. ZERO)
+                wmac(i,j,k) = merge(ZERO,wmac(i,j,k),test)
+             enddo
           enddo
        enddo
-    enddo
+
+    else
+
+       do k=ks,ke+1
+          do j=js,je
+             do i=is,ie
+                ! solve Riemann problem using full velocity
+                uavg = HALF*(wmacl(i,j,k)+wmacr(i,j,k))
+                test = ((wmacl(i,j,k)+w0(level,k) .le. ZERO .and. &
+                     wmacr(i,j,k)+w0(level,k) .ge. ZERO) .or. &
+                     (abs(wmacl(i,j,k)+wmacr(i,j,k)+TWO*w0(level,k)) .lt. rel_eps))
+                wmac(i,j,k) = merge(wmacl(i,j,k),wmacr(i,j,k),uavg+w0(level,k) .gt. ZERO)
+                wmac(i,j,k) = merge(ZERO,wmac(i,j,k),test)
+                
+             enddo
+          enddo
+       enddo
+
+    end if
 
     ! impose hi side bc's
     if (lo(3) .eq. domlo(3)) then
