@@ -18,11 +18,6 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // planar case
 
-	// dummy variables for non-spherical version
-	const int nr_irreg_dummy = 1;
-	const Vector<Real> radii_dummy(nr_irreg_dummy+1);
-	Vector<int> ncell_sphr_dummy(nr_irreg_dummy+1);
-
         // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
         // so we can simply swap this result with phibar
         Vector<Real> phisum((max_radial_level+1)*nr_fine,0.0);
@@ -35,7 +30,6 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             
             // Get the index space of the domain
             const Box domainBox = geom[0].Domain();
-	    const Real* dx = geom[lev].CellSize();
 
             // compute number of cells at any given height for each level
             if (AMREX_SPACEDIM==1) {
@@ -64,9 +58,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 // We will also pass "validBox", which specifies the "valid" region.
                 average(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                         BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
-                        phisum.dataPtr(), 
-			radii_dummy.dataPtr(), &nr_irreg_dummy, 
-			dx, ncell_sphr_dummy.dataPtr());
+                        phisum.dataPtr());
             }
         }
 
@@ -82,7 +74,59 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     }
     else {
         // spherical case
-        Abort("Average does not work for spherical yet.");
+
+	// For spherical, we construct a 1D array at each level, phisum, that has space
+	// allocated for every possible radius that a cell-center at each level can 
+	// map into.  The radial locations have been precomputed and stored in radii.
+        Vector<Real> phisum((max_radial_level+1)*(nr_irreg+2),0.0);
+	Vector<Real>  radii((max_radial_level+1)*(nr_irreg+3));
+        Vector<int> ncell((max_radial_level+1)*(nr_irreg+2));
+
+	// radii contains every possible distance that a cell-center at the finest
+	// level can map into
+	for (int lev=0; lev<=finest_level; ++lev) {
+            
+            // Get the index space of the domain
+	    const Real* dx = geom[lev].CellSize();
+
+	    compute_radii_sphr(&lev, radii.dataPtr(), dx);
+        }
+
+
+        // loop is over the existing levels (up to finest_level)
+        for (int lev=0; lev<=finest_level; ++lev) {
+            
+            // Get the index space of the domain
+            const Box domainBox = geom[0].Domain();
+	    const Real* dx = geom[lev].CellSize();
+
+            // get references to the MultiFabs at level lev
+            const MultiFab& phi_mf = phi[lev];
+
+            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+            for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
+            {
+
+                // Get the index space of the valid region
+                const Box& validBox = mfi.validbox();
+
+                // call fortran subroutine
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // lo/hi coordinates (including ghost cells), and/or the # of components
+                // We will also pass "validBox", which specifies the "valid" region.
+                sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
+				phisum.dataPtr(), radii.dataPtr(), 
+				dx, ncell.dataPtr());
+            }
+        }
+
+        // reduction over boxes to get sum
+        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*(nr_irreg+2));
+	ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(max_radial_level+1)*(nr_irreg+2));
+
+        average_sphr(phisum.dataPtr(),phibar.dataPtr(),ncell.dataPtr(),radii.dataPtr());
+
     }
 
 

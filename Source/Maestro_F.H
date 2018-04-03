@@ -34,11 +34,20 @@ extern "C"
     // in average.f90
     void average(const int* lev, const int* lo, const int* hi,
                  const amrex::Real* phi, const int* p_lo, const int* p_hi, 
-                 amrex::Real* phisum, 
-		 const amrex::Real* radii, const int* nr_irreg, 
-		 const amrex::Real* dx, int* ncell);
+                 amrex::Real* phisum);
 
     void divide_phisum_by_ncell(amrex::Real* phisum, int* ncell);
+
+    void average_sphr(amrex::Real* phisum, amrex::Real* phibar, 
+		      int* ncell, amrex::Real* radii);
+
+    void sum_phi_3d_sphr(const int* lev, const int* lo, const int* hi,
+		      const amrex::Real* phi, const int* p_lo, const int* p_hi, 
+		      amrex::Real* phisum, 
+		      const amrex::Real* radii, 
+		      const amrex::Real* dx, int* ncell);
+
+    void compute_radii_sphr(const int* lev, amrex::Real* radii, const amrex::Real* dx);
     //////////////////////
 
     //////////////////////
@@ -50,7 +59,8 @@ extern "C"
                                   const amrex::Real* r_cc_loc,
                                   const amrex::Real* r_edge_loc,
                                   const amrex::Real* dx_fine,
-                                  const int* domhi_fine);
+                                  const int* domhi_fine, 
+				  int* nr_irreg_out);
 
     void compute_cutoff_coords(const amrex::Real* rho0);
 

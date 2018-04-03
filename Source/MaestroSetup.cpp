@@ -146,7 +146,8 @@ Maestro::Setup ()
                              r_cc_loc.dataPtr(),
                              r_edge_loc.dataPtr(),
                              geom[max_level].CellSize(),
-                             domainBoxFine.hiVect());
+                             domainBoxFine.hiVect(), 
+			     &nr_irreg);
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.

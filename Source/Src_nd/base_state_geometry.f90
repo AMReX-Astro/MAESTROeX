@@ -48,7 +48,8 @@ contains
 
   subroutine init_base_state_geometry(max_radial_level_in,nr_fine_in,dr_fine_in, &
                                       r_cc_loc,r_edge_loc, &
-                                      dx_fine,domhi_fine) &
+                                      dx_fine,domhi_fine, &
+                                      nr_irreg_out) &
                                       bind(C, name="init_base_state_geometry")
 
     integer          , intent(in   ) :: max_radial_level_in
@@ -58,6 +59,7 @@ contains
     double precision , intent(inout) :: r_edge_loc(0:max_radial_level_in,0:nr_fine_in  )
     double precision , intent(in   ) ::    dx_fine(0:amrex_spacedim-1)
     integer          , intent(in   ) :: domhi_fine(0:amrex_spacedim-1)
+    integer          , intent(inout) :: nr_irreg_out
 
     ! local
     integer :: n,i,domhi
@@ -131,6 +133,8 @@ contains
        else
           nr_irreg = (3*(domhi-0.5d0)**2-0.75d0)/2.d0
        endif
+
+       nr_irreg_out = nr_irreg
        
     end if
 

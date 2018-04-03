@@ -789,6 +789,7 @@ private:
     int finest_radial_level;
     int nr_fine;
     amrex::Real dr_fine;
+    int nr_irreg;
 
     // these provide information about the multilevel base state configuration
     amrex::Vector<int> numdisjointchunks;
