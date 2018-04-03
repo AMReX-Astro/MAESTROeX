@@ -18,8 +18,13 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // planar case
 
+	// dummy variables for non-spherical version
+	const int nr_irreg_dummy = 1;
+	const Vector<Real> radii_dummy(nr_irreg_dummy+1);
+	Vector<int> ncell_sphr_dummy(nr_irreg_dummy+1);
+
         // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
-        // so we can simply swap thie result with phibar
+        // so we can simply swap this result with phibar
         Vector<Real> phisum((max_radial_level+1)*nr_fine,0.0);
 
         // this stores how many cells there are laterally at each level
@@ -30,6 +35,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             
             // Get the index space of the domain
             const Box domainBox = geom[0].Domain();
+	    const Real* dx = geom[lev].CellSize();
 
             // compute number of cells at any given height for each level
             if (AMREX_SPACEDIM==1) {
@@ -58,7 +64,9 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 // We will also pass "validBox", which specifies the "valid" region.
                 average(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                         BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
-                        phisum.dataPtr());
+                        phisum.dataPtr(), 
+			radii_dummy.dataPtr(), &nr_irreg_dummy, 
+			dx, ncell_sphr_dummy.dataPtr());
             }
         }
 

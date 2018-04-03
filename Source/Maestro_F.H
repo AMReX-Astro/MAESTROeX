@@ -34,7 +34,9 @@ extern "C"
     // in average.f90
     void average(const int* lev, const int* lo, const int* hi,
                  const amrex::Real* phi, const int* p_lo, const int* p_hi, 
-                 amrex::Real* phisum);
+                 amrex::Real* phisum, 
+		 const amrex::Real* radii, const int* nr_irreg, 
+		 const amrex::Real* dx, int* ncell);
 
     void divide_phisum_by_ncell(amrex::Real* phisum, int* ncell);
     //////////////////////
