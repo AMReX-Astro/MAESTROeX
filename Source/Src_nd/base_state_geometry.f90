@@ -338,8 +338,8 @@ contains
     else
        
        numdisjointchunks(0) = 1
-       r_start_coord(n,1) = 0
-       r_end_coord(n,1) = nr(n)-1
+       r_start_coord(0,1) = 0
+       r_end_coord(0,1) = nr(0)-1
        
     end if
 

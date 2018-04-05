@@ -20,7 +20,7 @@ contains
     double precision, intent (inout) :: phisum(0:max_radial_level,0:nr_fine-1)
 
     ! local
-    integer          :: i,j,k
+    integer          :: j,k
 
     if (amrex_spacedim .eq. 1) then
        phisum(lev,:) = sum(phi(lo(1):hi(1),0,0));
@@ -66,9 +66,9 @@ contains
     double precision, intent(inout) :: radii(0:max_radial_level,-1:nr_irreg+1)
 
     ! local
-    integer          :: i,j,n,r
+    integer          :: j,n,r
     integer          :: min_all, min_lev
-    integer          :: max_rcoord(0:max_radial_level),rcoord(0:max_radial_level)
+    integer          :: max_rcoord(0:max_radial_level), rcoord(0:max_radial_level)
     integer          :: stencil_coord(0:max_radial_level)
     double precision :: radius
 
@@ -92,7 +92,7 @@ contains
 
     ! choose which level to interpolate from
     do n=0,max_radial_level
-       rcoord(n) = -1
+       rcoord(n) = 0
     end do
 
     do r=0,nr_fine-1
@@ -184,12 +184,12 @@ contains
 
     do r=0,nr_fine-1
 
-       radius = (dble(r)+0.5d0)*dr(1)
+       radius = (dble(r)+0.5d0)*dr(0)
 
        ! find the closest coordinate
        do j=stencil_coord(which_lev(r)),max_rcoord(which_lev(r))
-          if (abs(radius-radii(j  ,which_lev(r))) .lt. &
-               abs(radius-radii(j+1,which_lev(r)))) then
+          if (abs(radius-radii(which_lev(r) ,j  )) .lt. &
+               abs(radius-radii(which_lev(r),j+1))) then
              stencil_coord(which_lev(r)) = j
              exit
           end if
@@ -209,13 +209,13 @@ contains
        end if
 
        call quad_interp(radius, &
-                        radii(stencil_coord(which_lev(r))-1,which_lev(r)), &
-                        radii(stencil_coord(which_lev(r))  ,which_lev(r)), &
-                        radii(stencil_coord(which_lev(r))+1,which_lev(r)), &
+                        radii(which_lev(r),stencil_coord(which_lev(r))-1), &
+                        radii(which_lev(r),stencil_coord(which_lev(r))  ), &
+                        radii(which_lev(r),stencil_coord(which_lev(r))+1), &
                         phibar(0,r), &
-                        phisum(stencil_coord(which_lev(r))-1,which_lev(r)), &
-                        phisum(stencil_coord(which_lev(r))  ,which_lev(r)), &
-                        phisum(stencil_coord(which_lev(r))+1,which_lev(r)), limit)
+                        phisum(which_lev(r),stencil_coord(which_lev(r))-1), &
+                        phisum(which_lev(r),stencil_coord(which_lev(r))  ), &
+                        phisum(which_lev(r),stencil_coord(which_lev(r))+1), limit)
 
     end do
 
@@ -266,7 +266,7 @@ contains
   end subroutine average_sphr
 
   subroutine sum_phi_3d_sphr(lev,lo,hi,phi,p_lo,p_hi,phisum, &
-                           radii, dx, ncell) bind (C,name="sum_phi_3d_sphr")
+                              radii, dx, ncell) bind (C,name="sum_phi_3d_sphr")
 
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
@@ -316,9 +316,9 @@ contains
 
     integer         , intent(in   ) :: lev
     double precision, intent(inout) :: radii(0:max_radial_level,-1:nr_irreg+1)
-    integer         , intent(in   ) :: dx(3)
+    double precision, intent(in   ) :: dx(3)
 
-    integer :: n,r
+    integer :: r
 
     do r=0,nr_irreg
        radii(lev,r) = sqrt(0.75d0+2.d0*r)*dx(1)

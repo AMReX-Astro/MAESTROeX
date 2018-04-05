@@ -80,7 +80,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 	// map into.  The radial locations have been precomputed and stored in radii.
         Vector<Real> phisum((max_radial_level+1)*(nr_irreg+2),0.0);
 	Vector<Real>  radii((max_radial_level+1)*(nr_irreg+3));
-        Vector<int> ncell((max_radial_level+1)*(nr_irreg+2));
+        Vector<int> ncell((max_radial_level+1)*(nr_irreg+2),0);
 
 	// radii contains every possible distance that a cell-center at the finest
 	// level can map into
@@ -92,7 +92,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 	    compute_radii_sphr(&lev, radii.dataPtr(), dx);
         }
 
-
+	
         // loop is over the existing levels (up to finest_level)
         for (int lev=0; lev<=finest_level; ++lev) {
             
