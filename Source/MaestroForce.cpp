@@ -237,9 +237,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     if (spherical == 1) {
 	for (int lev=0; lev<=finest_level; ++lev) {
 	    p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-	    AMREX_D_TERM(p0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			 p0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			 p0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+	    AMREX_D_TERM(p0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			 p0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			 p0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 	}
 
 	Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);

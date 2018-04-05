@@ -185,17 +185,17 @@ Maestro::EnthalpyAdvance (int which_step,
 	    }
 
 	    for (int lev=0; lev<=finest_level; ++lev) {
-		AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
-		AMREX_D_TERM(rhoh0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     rhoh0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     rhoh0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(rhoh0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     rhoh0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     rhoh0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
-		AMREX_D_TERM(h0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     h0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(h0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     h0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 	    }
 
 	    MakeS0mac(rho0_old,rho0mac_old);
@@ -226,29 +226,29 @@ Maestro::EnthalpyAdvance (int which_step,
 	    }
 
 	    for (int lev=0; lev<=finest_level; ++lev) {
-		AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
-		AMREX_D_TERM(rhoh0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     rhoh0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     rhoh0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(rhoh0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     rhoh0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     rhoh0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
-		AMREX_D_TERM(h0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     h0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(h0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     h0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
-		AMREX_D_TERM(rho0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     rho0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     rho0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(rho0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     rho0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     rho0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
-		AMREX_D_TERM(rhoh0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     rhoh0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     rhoh0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(rhoh0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     rhoh0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     rhoh0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
-		AMREX_D_TERM(h0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);,
-			     h0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);,
-			     h0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
+		AMREX_D_TERM(h0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+			     h0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+			     h0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 	    }
 
 	    MakeS0mac(rho0_old,rho0mac_old);
