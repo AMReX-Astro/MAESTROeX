@@ -101,7 +101,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
     BL_PROFILE_VAR("Maestro::Burner()",Burner);
 
     // Put tempbar_init on cart
-    Vector<MultiFab> tempbar_init_cart(finest_level);
+    Vector<MultiFab> tempbar_init_cart(finest_level+1);
 
     if (spherical == 1) {
 	for (int lev=0; lev<=finest_level; ++lev) {

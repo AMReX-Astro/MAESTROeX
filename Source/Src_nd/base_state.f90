@@ -31,7 +31,7 @@ module base_state_module
 
 contains
 
-  subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar) &
+  subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init) &
        bind(C, name="init_base_state")
 
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
@@ -40,6 +40,7 @@ contains
     double precision, intent(inout) ::   rhoh0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(inout) ::      p0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(inout) :: tempbar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) :: tempbar_init(0:max_radial_level,0:nr_fine-1)
 
     ! local variables
     double precision :: base_cutoff_density_loc
@@ -183,6 +184,7 @@ contains
        rho0 = s0_init(:,:,rho_comp)
        rhoh0 = s0_init(:,:,rhoh_comp)
        tempbar = s0_init(:,:,temp_comp)
+       tempbar_init = s0_init(:,:,temp_comp)
        p0 = p0_init       
 
        ! check whether we are in HSE
