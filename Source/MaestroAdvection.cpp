@@ -362,9 +362,11 @@ void
 	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
 	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 
-	MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
-	MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
-	MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
+	if (spherical == 1) {
+	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
+	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
+	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
+	}
 #endif
 #endif
 
@@ -502,12 +504,14 @@ void
 	h0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
 	h0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 
-	MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
-	MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
-	MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
-	MultiFab::LinComb(h0mac_edgex,0.5,h0mac_old[lev][0],0,0.5,h0mac_new[lev][0],0,0,1,0);
-	MultiFab::LinComb(h0mac_edgey,0.5,h0mac_old[lev][1],0,0.5,h0mac_new[lev][1],0,0,1,0);
-	MultiFab::LinComb(h0mac_edgez,0.5,h0mac_old[lev][2],0,0.5,h0mac_new[lev][2],0,0,1,0);
+	if (spherical == 1) {
+	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
+	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
+	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
+	    MultiFab::LinComb(h0mac_edgex,0.5,h0mac_old[lev][0],0,0.5,h0mac_new[lev][0],0,0,1,0);
+	    MultiFab::LinComb(h0mac_edgey,0.5,h0mac_old[lev][1],0,0.5,h0mac_new[lev][1],0,0,1,0);
+	    MultiFab::LinComb(h0mac_edgez,0.5,h0mac_old[lev][2],0,0.5,h0mac_new[lev][2],0,0,1,0);
+	}
 #endif
 #endif
 
@@ -619,7 +623,7 @@ void
 
 	MultiFab p0_cart_dummy;
 	p0_cart_dummy.define(grids[lev], dmap[lev], 1, 1);
-	if (start_comp == RhoH) {
+	if (start_comp == RhoH && spherical == 1) {
 	    MultiFab::Copy(p0_cart_dummy,p0_cart[lev],0,0,1,1);
 	} 
 	const MultiFab& p0cart_mf = p0_cart_dummy;
