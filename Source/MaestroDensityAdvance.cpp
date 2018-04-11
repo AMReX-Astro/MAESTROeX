@@ -109,17 +109,11 @@ Maestro::DensityAdvance (int which_step,
 
 	// we are predicting X to the edges, using the advective form of
 	// the prediction
-	// call make_edge_scal(sold,sedge,umac,scal_force, &
-	//                     dx,dt,is_vel,the_bc_level, &
-	//                     spec_comp,dm+spec_comp,nspec,.false.,mla)
 	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,0);
     }
    
     // predict rho or rho' at the edges (depending on species_pred_type)
     if (species_pred_type == predict_rhoprime_and_X) {
-	// call make_edge_scal(sold,sedge,umac,scal_force, &
-	//                     dx,dt,is_vel,the_bc_level, &
-	//                     rho_comp,dm+rho_comp,1,.false.,mla)
 	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,Rho,Rho,1,0);
     }
     

@@ -105,8 +105,8 @@ contains
     ! local variables
     integer          :: r
     double precision :: dtdr
-    double precision :: force(0:0,0:nr_fine-1)
-    double precision :: edge(0:0,0:nr_fine)
+    double precision :: force(0:max_radial_level,0:nr_fine-1)
+    double precision :: edge(0:max_radial_level,0:nr_fine)
     
     dtdr = dt / dr(0)
 
@@ -234,8 +234,8 @@ contains
     double precision :: dtdr
     double precision :: div_w0_cart
 
-    double precision :: force(0:0,0:nr_fine-1)
-    double precision ::  edge(0:0,0:nr_fine)
+    double precision :: force(0:max_radial_level,0:nr_fine-1)
+    double precision ::  edge(0:max_radial_level,0:nr_fine)
     
     dtdr = dt / dr(0)
 

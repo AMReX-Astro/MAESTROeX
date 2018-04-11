@@ -196,7 +196,7 @@ contains
           correction_cc(i,j,k) = correction_factor*delta_p_term(i,j,k)
        end do
     end do
-#elif (AMREX_SPACEDIM ==1 )
+#elif (AMREX_SPACEDIM == 1 )
     k = lo(3)
     j = lo(2)
     do i = lo(1),hi(1)

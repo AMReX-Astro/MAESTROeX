@@ -631,7 +631,6 @@ contains
     double precision :: fl, fr
 
     integer :: i,j,k,is,js,ie,je,ks,ke
-    integer :: level
 
     logical :: test
 
@@ -667,12 +666,6 @@ contains
     hx = dx(1)
     hy = dx(2)
     hz = dx(3)
-
-    if (spherical == 0) then
-       level = lev
-    else
-       level = 0
-    end if
 
     if (ppm_type .eq. 0) then
        do k = lo(3)-1,hi(3)+1
@@ -1665,10 +1658,10 @@ contains
              do i=is,ie
                 ! solve Riemann problem using full velocity
                 uavg = HALF*(wmacl(i,j,k)+wmacr(i,j,k))
-                test = ((wmacl(i,j,k)+w0(level,k) .le. ZERO .and. &
-                     wmacr(i,j,k)+w0(level,k) .ge. ZERO) .or. &
-                     (abs(wmacl(i,j,k)+wmacr(i,j,k)+TWO*w0(level,k)) .lt. rel_eps))
-                wmac(i,j,k) = merge(wmacl(i,j,k),wmacr(i,j,k),uavg+w0(level,k) .gt. ZERO)
+                test = ((wmacl(i,j,k)+w0(lev,k) .le. ZERO .and. &
+                     wmacr(i,j,k)+w0(lev,k) .ge. ZERO) .or. &
+                     (abs(wmacl(i,j,k)+wmacr(i,j,k)+TWO*w0(lev,k)) .lt. rel_eps))
+                wmac(i,j,k) = merge(wmacl(i,j,k),wmacr(i,j,k),uavg+w0(lev,k) .gt. ZERO)
                 wmac(i,j,k) = merge(ZERO,wmac(i,j,k),test)
                 
              enddo
