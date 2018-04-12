@@ -84,9 +84,12 @@ Maestro::Evolve ()
             WritePlotFile(istep,t_new,rho0_new,p0_new,unew,snew);
         }
 
-        // write a checkpoint file
         if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )
         {
+	    // write out any buffered diagnostic information
+            //  call flush_diag()
+
+	    // write a checkpoint file
             Print() << "\nWriting checkpoint" << istep << endl;
             WriteCheckPoint(istep);
         }

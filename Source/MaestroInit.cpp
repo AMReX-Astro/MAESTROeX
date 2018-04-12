@@ -217,6 +217,12 @@ Maestro::InitData ()
             // set rhoh0 to be the average
             Average(sold,rhoh0_old,RhoH);
         }
+
+	// set tempbar to be the average
+	Average(sold,tempbar,Temp);
+	for (int i=0; i<tempbar.size(); ++i) {
+	    tempbar_init[i] = tempbar[i];
+	}
     }
 }
 

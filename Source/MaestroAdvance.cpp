@@ -345,6 +345,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
     for (int lev=0; lev<=finest_level; ++lev) {
+	s2[lev].setVal(0.);
         MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,ng_s);
     }
 
@@ -898,6 +899,21 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
+
+    if (!is_initIter) {
+	if (!fix_base_state) { 
+	    // compute tempbar by "averaging"
+	    Average(snew,tempbar,Temp);
+	}
+
+	// output any runtime diagnostics
+	// pass in the new time value, time+dt
+	// call diag(time+dt,dt,dx,snew,rho_Hnuc2,rho_Hext,thermal2,rho_omegadot2,&
+        //          rho0_new,rhoh0_new,p0_new,tempbar, &
+        //          gamma1bar_new,beta0_new, &
+        //          unew,w0,normal, &
+        //          mla,the_bc_tower)
+    }
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
             << " DT = " << dt << endl;

@@ -14,6 +14,10 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Average()",Average);
 
+    for (int i=0; i<phibar.size(); ++i) {
+	phibar[i] = 0.0;
+    }
+
     if (spherical == 0) {
 
         // planar case
@@ -94,7 +98,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
 	
         // loop is over the existing levels (up to finest_level)
-        for (int lev=0; lev<=finest_level; ++lev) {
+        for (int lev=finest_level; lev>=0; --lev) {
             
             // Get the index space of the domain
             const Box domainBox = geom[0].Domain();
