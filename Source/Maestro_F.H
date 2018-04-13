@@ -158,6 +158,16 @@ extern "C"
 		      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
     //////////////////////
 
+    //////////////////////
+    // in compute_grad_phi.F90
+    void compute_grad_phi(const int* lo, const int* hi,
+                          const amrex::Real* phi,  const int* p_lo, const int* p_hi,
+                                amrex::Real* gphi, const int* g_lo, const int* g_hi, const int* nc_g,
+                          const amrex::Real* dx);
+
+    void compute_grad_phi_rad(const amrex::Real* phi, 
+			      amrex::Real* gphi_rad);
+    //////////////////////
 
     //////////////////////
     // in debug.F90
@@ -171,14 +181,29 @@ extern "C"
     //////////////////////
 
     //////////////////////
-    // in compute_grad_phi.F90
-    void compute_grad_phi(const int* lo, const int* hi,
-                          const amrex::Real* phi,  const int* p_lo, const int* p_hi,
-                                amrex::Real* gphi, const int* g_lo, const int* g_hi, const int* nc_g,
-                          const amrex::Real* dx);
+    // in diag.F90
+    void diag(const int* lev, const int* lo, const int* hi, 
+	      const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
+	      const amrex::Real* rho_Hnuc, const int* hn_lo, const int* hn_hi, 
+	      const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi, 
+	      const amrex::Real* rho0, const amrex::Real* p0, 
+	      const amrex::Real* u, const int* u_lo, const int* u_hi,  
+	      const amrex::Real* w0, const amrex::Real* dx, 
+	      amrex::Real* Mach_max, amrex::Real* temp_max, 
+	      amrex::Real* enuc_max, amrex::Real* Hext_max);
 
-    void compute_grad_phi_rad(const amrex::Real* phi, 
-			      amrex::Real* gphi_rad);
+    void diag_sphr(const int* lev, const int* lo, const int* hi, 
+		   const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
+		   const amrex::Real* rho0, const amrex::Real* p0, 
+		   const amrex::Real* u, const int* u_lo, const int* u_hi,
+		   const amrex::Real* w0macx, const int* x_lo, const int* x_hi, 
+		   const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
+		   const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
+		   const amrex::Real* w0r, const int* wr_lo, const int* wr_hi, 
+		   const amrex::Real* dx,
+		   const amrex::Real* normal, const int* n_lo, const int* n_hi,
+		   amrex::Real* T_max, amrex::Real* coord_Tmax, amrex::Real* vel_Tmax, 
+		   amrex::Real* T_center, amrex::Real* Mach_max);
     //////////////////////
 
     //////////////////////

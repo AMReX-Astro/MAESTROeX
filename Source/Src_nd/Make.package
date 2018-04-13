@@ -20,6 +20,7 @@ F90EXE_sources += bc_fill_nd.F90
 F90EXE_sources += compute_dt.F90
 F90EXE_sources += compute_grad_phi.F90
 F90EXE_sources += debug.F90
+F90EXE_sources += diag.F90
 F90EXE_sources += fill_3d_data.F90
 F90EXE_sources += fill_umac_ghost.F90
 F90EXE_sources += make_flux.F90

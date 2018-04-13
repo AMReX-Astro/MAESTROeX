@@ -140,6 +140,9 @@ Maestro::Init ()
         if (chk_int > 0) {
             Print() << "\nWriting checkpoint 0 after all initialization" << endl;
             WriteCheckPoint(0);
+
+	    Print() << "\nWriting diagnosis file after all initialization" << endl;
+	    WriteDiagFile(0,t_old,rho0_old,p0_old,uold,sold);
         }
     }
 }

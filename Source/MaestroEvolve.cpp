@@ -87,7 +87,7 @@ Maestro::Evolve ()
         if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )
         {
 	    // write out any buffered diagnostic information
-            //  call flush_diag()
+            WriteDiagFile(istep,t_new,rho0_new,p0_new,unew,snew);
 
 	    // write a checkpoint file
             Print() << "\nWriting checkpoint" << istep << endl;

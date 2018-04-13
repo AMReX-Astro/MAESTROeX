@@ -197,6 +197,28 @@ private:
     ////////////////////////
 
     ////////////
+    // MaestroDiag.cpp functions
+    // put together an array of multifabs for writing
+    amrex::Vector<const amrex::MultiFab*> DiagFileMF (const amrex::Vector<amrex::MultiFab>& p0_cart,
+                                                      const amrex::Vector<amrex::MultiFab>& rho0_cart,
+                                                      const amrex::Vector<amrex::MultiFab>& u_in,
+                                                      amrex::Vector<amrex::MultiFab>& s_in,
+                                                      const amrex::Vector<amrex::Real>& p0_in);
+
+    // set plotfile variables names
+    amrex::Vector<std::string> DiagFileVarNames () const;
+
+    // write plotfile to disk
+    void WriteDiagFile (const int step,
+                        const amrex::Real dt_in,
+                        const amrex::Vector<amrex::Real>& rho0_in,
+                        const amrex::Vector<amrex::Real>& p0_in,
+                        const amrex::Vector<amrex::MultiFab>& u_in,
+                        amrex::Vector<amrex::MultiFab>& s_in);
+    // end MaestroDiag.cpp functions
+    ////////////
+
+    ////////////
     // Time step computation in MaestroDt.cpp
 
     // compute the time step
