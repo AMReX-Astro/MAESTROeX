@@ -104,15 +104,94 @@ Maestro::WriteDiagFile (const int step,
     // the maxiumum.  We then pack the coordinates and velocities
     // into a local array and gather that to the I/O processor and
     // pick the values corresponding to the maximum.
+    int nprocs = ParallelDescriptor::NProcs();
+    int ioproc = ParallelDescriptor::IOProcessorNumber();
 
-    // Gather (Real* sendbuf,
-    //              int   sendcount,
-    //              Real* recvbuf,
-    //              int   root);
-    // ParallelDescriptor::Gather(&T_max);
+    Vector<Real> Tmax_global(nprocs);
+    
+    if (nprocs == 1) {
+	Tmax_global[0] = T_max;
+    } else {
+	ParallelDescriptor::Gather(&T_max, 1, &Tmax_global[0], 1, ioproc);
+    }
 
+    // determine index of max global T
+    int index_max = 0;
+    Real T_max_data = 0.0;
+    for (int ip=0; ip<nprocs; ++ip) {
+	if (Tmax_global[ip] > T_max_data) {
+	    T_max_data = Tmax_global[ip];
+	    index_max = ip;
+	}
+    }
+    
+    // T_max_coords will contain both the coordinate information and
+    // the velocity information, so there are 2*dm values on each
+    // proc
+    Vector<Real> T_max_coords(2*AMREX_SPACEDIM);
+    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+	T_max_coords[i] = coord_Tmax[i];
+	T_max_coords[i+3] = vel_Tmax[i];
+    }
 
-    Real Rloc_Tmax=0.0, vr_Tmax=0.0;
+    Vector<Real> Tmax_coords_global(2*AMREX_SPACEDIM*nprocs);
+
+    if (nprocs == 1) {
+	for (int i=0; i<2*AMREX_SPACEDIM; ++i) {
+	    Tmax_coords_global[i] = T_max_coords[i];
+	}
+    } else {
+	ParallelDescriptor::Gather(&T_max_coords[0], 6, &Tmax_coords_global[0], 6, ioproc);
+    }
+
+    // initialize global variables
+    Vector<Real> coord_Tmax_data(AMREX_SPACEDIM);
+    Vector<Real> vel_Tmax_data(AMREX_SPACEDIM);
+    Real Rloc_Tmax, vr_Tmax;
+
+    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+	coord_Tmax_data[i] = Tmax_coords_global[2*AMREX_SPACEDIM*index_max+i];
+	vel_Tmax_data[i] = Tmax_coords_global[2*AMREX_SPACEDIM*index_max+i+3];
+    }
+
+    //
+    // reduce the current level's data with the global data
+    //
+    if (ParallelDescriptor::IOProcessor()) {
+
+	// if T_max_data is the new max, then copy the location as well
+	if ( T_max_data > T_max ) {
+	    T_max = T_max_data;
+	    
+	    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+		coord_Tmax[i] = coord_Tmax_data[i];
+		vel_Tmax[i] = vel_Tmax_data[i];
+	    }
+
+	    // compute center of domain
+	    Vector<Real> center(3, 0.0);
+	    const Real* probLo = geom[0].ProbLo();
+	    const Real* probHi = geom[0].ProbHi();
+
+	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+		center[idim] = 0.5*(*(probLo+idim) + *(probHi+idim));
+	    }
+
+	    // compute the radius of the bubble from the center
+	    Rloc_Tmax = sqrt( (coord_Tmax[0] - center[0])*(coord_Tmax[0] - center[0]) + 
+			      (coord_Tmax[1] - center[1])*(coord_Tmax[1] - center[1]) + 
+			      (coord_Tmax[2] - center[2])*(coord_Tmax[2] - center[2]) );
+
+	    // use the coordinates of the hot spot and the velocity components
+            // to compute the radial velocity at the hotspot
+	    vr_Tmax = ((coord_Tmax[0] - center[0])/Rloc_Tmax)*vel_Tmax[0] + 
+		      ((coord_Tmax[1] - center[1])/Rloc_Tmax)*vel_Tmax[1] + 
+		      ((coord_Tmax[2] - center[2])/Rloc_Tmax)*vel_Tmax[2];
+	    
+	    T_center /= 8.0;  // ncenter = 8
+	}
+
+    }
 
 
     // write out diagnosis data
