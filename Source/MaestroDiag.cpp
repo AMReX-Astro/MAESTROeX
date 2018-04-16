@@ -53,12 +53,22 @@ Maestro::WriteDiagFile (const int step,
 
     // initialize diagnosis variables
     Real T_max=0.0, T_center=0.0; 
+    int ncenter=0;
     Vector<Real> coord_Tmax(AMREX_SPACEDIM,0.0);
     Vector<Real> vel_Tmax(AMREX_SPACEDIM,0.0);
     Real Mach_max=0.0;
+    Real Rloc_Tmax, vr_Tmax;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 	
+	// diagnosis variables at each level
+	Real T_max_local=0.0;
+	Real T_center_level=0.0;
+	int ncenter_level=0;
+	Vector<Real> coord_Tmax_local(AMREX_SPACEDIM,0.0);
+	Vector<Real> vel_Tmax_local(AMREX_SPACEDIM,0.0);
+	Real Mach_max_level=0.0;
+
 	// get references to the MultiFabs at level lev
 	const MultiFab& sin_mf = s_in[lev];
 	const MultiFab& uin_mf = u_in[lev];
@@ -88,111 +98,129 @@ Maestro::WriteDiagFile (const int step,
 		      BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
 		      dx, 
 		      BL_TO_FORTRAN_3D(normal_mf[mfi]), 
-		      &T_max, coord_Tmax.dataPtr(), vel_Tmax.dataPtr(), 
-		      &T_center, &Mach_max);
+		      &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(), 
+		      &ncenter_level, &T_center_level, &Mach_max_level);
 	}
-    }
 
-    // sum T_center over all processors
-    ParallelDescriptor::ReduceRealSum(T_center);
+	// sum ncenter and T_center over all processors
+	ParallelDescriptor::ReduceRealSum(T_center_level);
+	ParallelDescriptor::ReduceIntSum(ncenter_level);
+	
+	// find the largest Mach number over all processors
+	ParallelDescriptor::ReduceRealMax(Mach_max_level);
+	
+	// for T_max, we want to know where the hot spot is, so we do a
+	// gather on the temperature and find the index corresponding to
+	// the maxiumum.  We then pack the coordinates and velocities
+	// into a local array and gather that to the I/O processor and
+	// pick the values corresponding to the maximum.
+	int nprocs = ParallelDescriptor::NProcs();
+	int ioproc = ParallelDescriptor::IOProcessorNumber();
 
-    // find the largest Mach number over all processors
-    ParallelDescriptor::ReduceRealMax(Mach_max);
-
-    // for T_max, we want to know where the hot spot is, so we do a
-    // gather on the temperature and find the index corresponding to
-    // the maxiumum.  We then pack the coordinates and velocities
-    // into a local array and gather that to the I/O processor and
-    // pick the values corresponding to the maximum.
-    int nprocs = ParallelDescriptor::NProcs();
-    int ioproc = ParallelDescriptor::IOProcessorNumber();
-
-    Vector<Real> Tmax_global(nprocs);
+	Vector<Real> T_max_data(nprocs);
     
-    if (nprocs == 1) {
-	Tmax_global[0] = T_max;
-    } else {
-	ParallelDescriptor::Gather(&T_max, 1, &Tmax_global[0], 1, ioproc);
-    }
-
-    // determine index of max global T
-    int index_max = 0;
-    Real T_max_data = 0.0;
-    for (int ip=0; ip<nprocs; ++ip) {
-	if (Tmax_global[ip] > T_max_data) {
-	    T_max_data = Tmax_global[ip];
-	    index_max = ip;
+	if (nprocs == 1) {
+	    T_max_data[0] = T_max_local;
+	} else {
+	    ParallelDescriptor::Gather(&T_max_local, 1, &T_max_data[0], 1, ioproc);
 	}
-    }
+
+	// determine index of max global T
+	int index_max = 0;
+	Real T_max_level = 0.0;
+	for (int ip=0; ip<nprocs; ++ip) {
+	    if (T_max_data[ip] > T_max_level) {
+		T_max_level = T_max_data[ip];
+		index_max = ip;
+	    }
+	}
     
-    // T_max_coords will contain both the coordinate information and
-    // the velocity information, so there are 2*dm values on each
-    // proc
-    Vector<Real> T_max_coords(2*AMREX_SPACEDIM);
-    for (int i=0; i<AMREX_SPACEDIM; ++i) {
-	T_max_coords[i] = coord_Tmax[i];
-	T_max_coords[i+3] = vel_Tmax[i];
-    }
-
-    Vector<Real> Tmax_coords_global(2*AMREX_SPACEDIM*nprocs);
-
-    if (nprocs == 1) {
-	for (int i=0; i<2*AMREX_SPACEDIM; ++i) {
-	    Tmax_coords_global[i] = T_max_coords[i];
+	// T_max_coords will contain both the coordinate information and
+	// the velocity information, so there are 2*dm values on each
+	// proc
+	Vector<Real> T_max_coords(2*AMREX_SPACEDIM);
+	for (int i=0; i<AMREX_SPACEDIM; ++i) {
+	    T_max_coords[i] = coord_Tmax_local[i];
+	    T_max_coords[i+3] = vel_Tmax_local[i];
 	}
-    } else {
-	ParallelDescriptor::Gather(&T_max_coords[0], 6, &Tmax_coords_global[0], 6, ioproc);
+
+	Vector<Real> T_max_coords_level(2*AMREX_SPACEDIM*nprocs);
+
+	if (nprocs == 1) {
+	    for (int i=0; i<2*AMREX_SPACEDIM; ++i) {
+		T_max_coords_level[i] = T_max_coords[i];
+	    }
+	} else {
+	    ParallelDescriptor::Gather(&T_max_coords[0], 6, &T_max_coords_level[0], 6, ioproc);
+	}
+	
+	// initialize global variables
+	Vector<Real> coord_Tmax_level(AMREX_SPACEDIM);
+	Vector<Real> vel_Tmax_level(AMREX_SPACEDIM);
+	
+	for (int i=0; i<AMREX_SPACEDIM; ++i) {
+	    coord_Tmax_level[i] = T_max_coords_level[2*AMREX_SPACEDIM*index_max+i];
+	    vel_Tmax_level[i] = T_max_coords_level[2*AMREX_SPACEDIM*index_max+i+3];
+	}
+
+	//
+	// reduce the current level's data with the global data
+	//
+	if (ParallelDescriptor::IOProcessor()) {
+
+	    // if T_max_level is the new max, then copy the location as well
+	    if ( T_max_level > T_max ) {
+		T_max = T_max_level;
+		
+		for (int i=0; i<AMREX_SPACEDIM; ++i) {
+		    coord_Tmax[i] = coord_Tmax_level[i];
+		    vel_Tmax[i] = vel_Tmax_level[i];
+		}
+		
+		// compute center of domain
+		Vector<Real> center(3, 0.0);
+		const Real* probLo = geom[0].ProbLo();
+		const Real* probHi = geom[0].ProbHi();
+		
+		for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+		    center[idim] = 0.5*(*(probLo+idim) + *(probHi+idim));
+		}
+
+		// compute the radius of the bubble from the center
+		Rloc_Tmax = sqrt( (coord_Tmax[0] - center[0])*(coord_Tmax[0] - center[0]) + 
+				  (coord_Tmax[1] - center[1])*(coord_Tmax[1] - center[1]) + 
+				  (coord_Tmax[2] - center[2])*(coord_Tmax[2] - center[2]) );
+
+		// use the coordinates of the hot spot and the velocity components
+		// to compute the radial velocity at the hotspot
+		vr_Tmax = ((coord_Tmax[0] - center[0])/Rloc_Tmax)*vel_Tmax[0] + 
+		    ((coord_Tmax[1] - center[1])/Rloc_Tmax)*vel_Tmax[1] + 
+		    ((coord_Tmax[2] - center[2])/Rloc_Tmax)*vel_Tmax[2];
+	    }	
+
+	    T_center = T_center + T_center_level;
+
+	    ncenter = ncenter + ncenter_level;
+
+	    if ( Mach_max_level > Mach_max ) {
+		Mach_max = Mach_max_level;
+	    }
+	}
     }
 
-    // initialize global variables
-    Vector<Real> coord_Tmax_data(AMREX_SPACEDIM);
-    Vector<Real> vel_Tmax_data(AMREX_SPACEDIM);
-    Real Rloc_Tmax, vr_Tmax;
-
-    for (int i=0; i<AMREX_SPACEDIM; ++i) {
-	coord_Tmax_data[i] = Tmax_coords_global[2*AMREX_SPACEDIM*index_max+i];
-	vel_Tmax_data[i] = Tmax_coords_global[2*AMREX_SPACEDIM*index_max+i+3];
-    }
-
-    //
-    // reduce the current level's data with the global data
-    //
+    // normalize
     if (ParallelDescriptor::IOProcessor()) {
 
-	// if T_max_data is the new max, then copy the location as well
-	if ( T_max_data > T_max ) {
-	    T_max = T_max_data;
-	    
-	    for (int i=0; i<AMREX_SPACEDIM; ++i) {
-		coord_Tmax[i] = coord_Tmax_data[i];
-		vel_Tmax[i] = vel_Tmax_data[i];
-	    }
-
-	    // compute center of domain
-	    Vector<Real> center(3, 0.0);
-	    const Real* probLo = geom[0].ProbLo();
-	    const Real* probHi = geom[0].ProbHi();
-
-	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-		center[idim] = 0.5*(*(probLo+idim) + *(probHi+idim));
-	    }
-
-	    // compute the radius of the bubble from the center
-	    Rloc_Tmax = sqrt( (coord_Tmax[0] - center[0])*(coord_Tmax[0] - center[0]) + 
-			      (coord_Tmax[1] - center[1])*(coord_Tmax[1] - center[1]) + 
-			      (coord_Tmax[2] - center[2])*(coord_Tmax[2] - center[2]) );
-
-	    // use the coordinates of the hot spot and the velocity components
-            // to compute the radial velocity at the hotspot
-	    vr_Tmax = ((coord_Tmax[0] - center[0])/Rloc_Tmax)*vel_Tmax[0] + 
-		      ((coord_Tmax[1] - center[1])/Rloc_Tmax)*vel_Tmax[1] + 
-		      ((coord_Tmax[2] - center[2])/Rloc_Tmax)*vel_Tmax[2];
-	    
-	    T_center /= 8.0;  // ncenter = 8
+	// for a full star ncenter should be 8 -- there are only 8 zones
+	// that have a vertex at the center of the star.  For an octant,
+	// ncenter should be 1
+	if ( !((ncenter == 8 && !octant) ||
+	       (ncenter == 1 && octant)) ) {
+	    Abort("ERROR: ncenter invalid in Diag()");
+	} else {
+	    T_center = T_center/ncenter;
 	}
-
     }
-
 
     // write out diagnosis data
     if (ParallelDescriptor::IOProcessor()) {
@@ -202,24 +230,39 @@ Maestro::WriteDiagFile (const int step,
 	if (step == 0) {
 	    // create file after initialization
 	    diagfile.open(diagfilename, std::ofstream::out | 
-			       std::ofstream::trunc | std::ofstream::binary);
+			  std::ofstream::trunc | std::ofstream::binary);
 
 	    // write variable names
-	    diagfile << "time \t max{T} \t x(max{T}) \t y(max{T}) \t z(max{T}) \t";
-	    diagfile << "vx(max{T}) \t vy(max{T}) \t vz(max{T}) \t";
-	    diagfile << "R(max{T}) \t vr(max{T}) \t T_center" << endl;
+	    diagfile << std::setw(20) << std::left << "time"; 
+	    diagfile << std::setw(20) << std::left << "max{T}"; 
+	    diagfile << std::setw(20) << std::left << "x(max{T})"; 
+	    diagfile << std::setw(20) << std::left << "y(max{T})";
+	    diagfile << std::setw(20) << std::left << "z(max{T})";
+	    diagfile << std::setw(20) << std::left << "vx(max{T})";
+	    diagfile << std::setw(20) << std::left << "vy(max{T})";
+	    diagfile << std::setw(20) << std::left << "vz(max{T})";
+	    diagfile << std::setw(20) << std::left << "R(max{T})";
+	    diagfile << std::setw(20) << std::left << "vr(max{T})"; 
+	    diagfile << std::setw(20) << std::left << "T_center" << endl;
 
 	} else {
 	    // append to file 
 	    diagfile.open(diagfilename, std::ofstream::out | 
-			       std::ofstream::app | std::ofstream::binary);
+			  std::ofstream::app | std::ofstream::binary);
 	}
 
 	diagfile.precision(15);
-	diagfile << t_in << "\t" << T_max <<"\t"; 
-	diagfile << coord_Tmax[0] << "\t" << coord_Tmax[1] << "\t" << coord_Tmax[2] << "\t";
-	diagfile << vel_Tmax[0] << "\t" << vel_Tmax[1] << "\t" << vel_Tmax[2] << "\t"; 
-	diagfile << Rloc_Tmax << "\t" << vr_Tmax << "\t" << T_center << endl;
+	diagfile << std::setw(20) << std::left << t_in;
+	diagfile << std::setw(20) << std::left << T_max; 
+	diagfile << std::setw(20) << std::left << coord_Tmax[0];
+	diagfile << std::setw(20) << std::left << coord_Tmax[1];
+	diagfile << std::setw(20) << std::left << coord_Tmax[2];
+	diagfile << std::setw(20) << std::left << vel_Tmax[0];
+	diagfile << std::setw(20) << std::left << vel_Tmax[1];
+	diagfile << std::setw(20) << std::left << vel_Tmax[2]; 
+	diagfile << std::setw(20) << std::left << Rloc_Tmax;
+	diagfile << std::setw(20) << std::left << vr_Tmax;
+	diagfile << std::setw(20) << std::left << T_center << endl;
 
 	// close file
 	diagfile.close();
@@ -390,88 +433,4 @@ Maestro::DiagFileMF (const Vector<MultiFab>& p0_cart,
 
     return plot_mf;
 
-}
-
-// set plotfile variable names
-Vector<std::string>
-Maestro::DiagFileVarNames () const
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::PlotFileVarNames()",PlotFileVarNames);
-
-    // velocities (AMREX_SPACEDIM)
-    // rho, rhoh, rhoX, tfromp, tfromh, Pi (Nscal+1)
-    // X (NumSpec)
-    // rho0, p0 (2)
-    // deltaT (1)
-    // w0 (AMREX_SPACEDIM)
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 4;
-    Vector<std::string> names(nPlot);
-
-    int cnt = 0;
-
-    // add velocities
-    for (int i=0; i<AMREX_SPACEDIM; ++i) {
-        std::string x = "vel";
-        x += (120+i);
-        names[cnt++] = x;
-    }
-
-    // density and enthalpy
-    names[cnt++] = "rho";
-    names[cnt++] = "rhoh";
-
-    for (int i = 0; i < NumSpec; i++) {
-        int len = 20;
-        Vector<int> int_spec_names(len);
-        //
-        // This call return the actual length of each string in "len"
-        //
-        get_spec_names(int_spec_names.dataPtr(),&i,&len);
-        char* spec_name = new char[len+1];
-        for (int j = 0; j < len; j++)
-            spec_name[j] = int_spec_names[j];
-        spec_name[len] = '\0';
-        std::string spec_string = "rhoX(";
-        spec_string += spec_name;
-        spec_string += ')';
-
-        names[cnt++] = spec_string;
-    }
-
-    for (int i = 0; i < NumSpec; i++) {
-        int len = 20;
-        Vector<int> int_spec_names(len);
-        //
-        // This call return the actual length of each string in "len"
-        //
-        get_spec_names(int_spec_names.dataPtr(),&i,&len);
-        char* spec_name = new char[len+1];
-        for (int j = 0; j < len; j++) {
-            spec_name[j] = int_spec_names[j];
-        }
-        spec_name[len] = '\0';
-        std::string spec_string = "X(";
-        spec_string += spec_name;
-        spec_string += ')';
-
-        names[cnt++] = spec_string;
-    }
-
-    names[cnt++] = "tfromp";
-    names[cnt++] = "tfromh";
-    names[cnt++] = "deltaT";
-    names[cnt++] = "Pi";
-
-    names[cnt++] = "rho0";
-    names[cnt++] = "p0";
-
-    // add w0
-    for (int i=0; i<AMREX_SPACEDIM; ++i) {
-        std::string x = "w0";
-        x += (120+i);
-        names[cnt++] = x;
-    }
-
-    return names;
 }

@@ -205,9 +205,6 @@ private:
                                                       amrex::Vector<amrex::MultiFab>& s_in,
                                                       const amrex::Vector<amrex::Real>& p0_in);
 
-    // set plotfile variables names
-    amrex::Vector<std::string> DiagFileVarNames () const;
-
     // write plotfile to disk
     void WriteDiagFile (const int step,
                         const amrex::Real dt_in,

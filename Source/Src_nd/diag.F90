@@ -116,7 +116,7 @@ contains
                         dx, &
                         normal, n_lo, n_hi, &
                         T_max, coord_Tmax, vel_Tmax, &
-                        T_center, Mach_max) bind(C, name="diag_sphr")
+                        ncenter, T_center, Mach_max) bind(C, name="diag_sphr")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -136,7 +136,8 @@ contains
     double precision, intent(in   ) :: dx(3)
     integer         , intent(in   ) :: n_lo(3), n_hi(3)
     double precision, intent(in   ) ::   normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
-    double precision, intent(inout) :: T_max, T_center, coord_Tmax(3), vel_Tmax(3)
+    double precision, intent(inout) :: T_max, coord_Tmax(3), vel_Tmax(3), T_center
+    integer         , intent(inout) :: ncenter
     double precision, intent(inout) :: Mach_max
 
     !     Local variables
@@ -168,6 +169,8 @@ contains
                 if ( abs(x - center(1)) < dx(1)  .and. &
                      abs(y - center(2)) < dx(2)  .and. &
                      abs(z - center(3)) < dx(3) ) then
+
+                   ncenter = ncenter + 1
 
                    T_center = T_center + scal(i,j,k,temp_comp)
                 endif

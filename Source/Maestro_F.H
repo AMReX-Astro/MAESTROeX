@@ -203,7 +203,7 @@ extern "C"
 		   const amrex::Real* dx,
 		   const amrex::Real* normal, const int* n_lo, const int* n_hi,
 		   amrex::Real* T_max, amrex::Real* coord_Tmax, amrex::Real* vel_Tmax, 
-		   amrex::Real* T_center, amrex::Real* Mach_max);
+		   int* ncenter, amrex::Real* T_center, amrex::Real* Mach_max);
     //////////////////////
 
     //////////////////////
