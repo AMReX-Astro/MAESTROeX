@@ -44,6 +44,7 @@ pp.query("plot_gpi", plot_gpi);
 pp.query("plot_cs", plot_cs);
 pp.query("plot_base_name", plot_base_name);
 pp.query("check_base_name", check_base_name);
+pp.query("diag_buf_size", diag_buf_size);
 pp.query("plot_ad_excess", plot_ad_excess);
 pp.query("plot_processors", plot_processors);
 pp.query("plot_pidivu", plot_pidivu);

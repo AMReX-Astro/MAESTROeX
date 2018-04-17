@@ -17,6 +17,9 @@ Maestro::Evolve ()
 	Abort ("spherical = 1 and dm != 3");
     }
 
+    // index for diag array buffer
+    int diag_index=0;
+
     for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
     {
 
@@ -75,6 +78,9 @@ Maestro::Evolve ()
 
         t_old = t_new;
 
+	// save diag output into buffer
+	DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
+
         // write a plotfile
         if (plot_int > 0 && ( (istep % plot_int == 0) || 
                               (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
@@ -86,13 +92,15 @@ Maestro::Evolve ()
 
         if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )
         {
-	    // write out any buffered diagnostic information
-            WriteDiagFile(istep,t_new,rho0_new,p0_new,unew,snew);
-
 	    // write a checkpoint file
             Print() << "\nWriting checkpoint" << istep << endl;
             WriteCheckPoint(istep);
         }
+
+	if (diag_index == diag_buf_size || istep == max_step) {
+	    // write out any buffered diagnostic information
+            WriteDiagFile(diag_index);
+	}
 
         // move new state into old state by swapping pointers
         for (int lev=0; lev<=finest_level; ++lev) {

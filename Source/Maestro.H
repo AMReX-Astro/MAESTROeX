@@ -199,19 +199,16 @@ private:
     ////////////
     // MaestroDiag.cpp functions
     // put together an array of multifabs for writing
-    amrex::Vector<const amrex::MultiFab*> DiagFileMF (const amrex::Vector<amrex::MultiFab>& p0_cart,
-                                                      const amrex::Vector<amrex::MultiFab>& rho0_cart,
-                                                      const amrex::Vector<amrex::MultiFab>& u_in,
-                                                      amrex::Vector<amrex::MultiFab>& s_in,
-                                                      const amrex::Vector<amrex::Real>& p0_in);
+    void WriteDiagFile (int& index);
 
     // write plotfile to disk
-    void WriteDiagFile (const int step,
-                        const amrex::Real dt_in,
-                        const amrex::Vector<amrex::Real>& rho0_in,
-                        const amrex::Vector<amrex::Real>& p0_in,
-                        const amrex::Vector<amrex::MultiFab>& u_in,
-                        amrex::Vector<amrex::MultiFab>& s_in);
+    void DiagFile (const int step,
+		   const amrex::Real dt_in,
+		   const amrex::Vector<amrex::Real>& rho0_in,
+		   const amrex::Vector<amrex::Real>& p0_in,
+		   const amrex::Vector<amrex::MultiFab>& u_in,
+		   const amrex::Vector<amrex::MultiFab>& s_in,
+		   int& index);
     // end MaestroDiag.cpp functions
     ////////////
 
@@ -817,6 +814,9 @@ private:
 
     // tagging criteria
     amrex::Vector<amrex::Real> temperr;
+
+    // diag file array buffers
+    amrex::Vector<amrex::Real> diagfile_data;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+1"

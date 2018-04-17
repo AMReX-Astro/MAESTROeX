@@ -44,6 +44,7 @@ static bool        plot_gpi;
 static bool        plot_cs;
 static std::string plot_base_name;
 static std::string check_base_name;
+static int         diag_buf_size;
 static bool        plot_ad_excess;
 static bool        plot_processors;
 static bool        plot_pidivu;

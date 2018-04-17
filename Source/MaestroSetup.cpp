@@ -118,6 +118,9 @@ Maestro::Setup ()
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
 
+    // diag file data arrays
+    diagfile_data.resize(diag_buf_size*11);
+
     // make sure C++ is as efficient as possible with memory usage
     s0_init      .shrink_to_fit();
     p0_init      .shrink_to_fit();
@@ -141,6 +144,7 @@ Maestro::Setup ()
     w0           .shrink_to_fit();
     etarho_ec    .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
+    diagfile_data.shrink_to_fit();
 
     init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
                              r_cc_loc.dataPtr(),
@@ -226,7 +230,6 @@ Maestro::ReadParameters ()
     if (n > 0) {
         pp.getarr("temperr", temperr, 0, n);
     }
-
 }
 
 // define variable mappings (Rho, RhoH, ..., Nscal, etc.)

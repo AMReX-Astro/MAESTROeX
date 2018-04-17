@@ -175,6 +175,10 @@ plot_base_name                      string          "plt"
 # prefix to use in checkpoint file names
 check_base_name                     string          "chk"
 
+# number of timesteps to buffer diagnostic output information before writing
+# (note: not implemented for all problems)
+diag_buf_size                       int            10
+
 # plot the adiabatic excess
 plot_ad_excess                      bool            false
 

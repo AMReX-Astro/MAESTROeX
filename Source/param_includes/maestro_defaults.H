@@ -44,6 +44,7 @@ bool        Maestro::plot_gpi = true;
 bool        Maestro::plot_cs = false;
 std::string Maestro::plot_base_name = "plt";
 std::string Maestro::check_base_name = "chk";
+int         Maestro::diag_buf_size = 10;
 bool        Maestro::plot_ad_excess = false;
 bool        Maestro::plot_processors = false;
 bool        Maestro::plot_pidivu = false;

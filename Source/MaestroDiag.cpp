@@ -6,15 +6,16 @@ using namespace amrex;
 
 // write plotfile to disk
 void
-Maestro::WriteDiagFile (const int step,
-                        const Real t_in,
-                        const Vector<Real>& rho0_in,
-                        const Vector<Real>& p0_in,
-                        const Vector<MultiFab>& u_in,
-                        Vector<MultiFab>& s_in)
+Maestro::DiagFile (const int step,
+		   const Real t_in,
+		   const Vector<Real>& rho0_in,
+		   const Vector<Real>& p0_in,
+		   const Vector<MultiFab>& u_in,
+		   const Vector<MultiFab>& s_in,
+		   int& index)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::WriteDiagFile()",WriteDiagFile);
+    BL_PROFILE_VAR("Maestro::DiagFile()",DiagFile);
 
     // w0mac will contain an edge-centered w0 on a Cartesian grid,   
     // for use in computing divergences.
@@ -222,7 +223,7 @@ Maestro::WriteDiagFile (const int step,
 	}
     }
 
-    // write out diagnosis data
+    // write out diagnosis data if at initialization
     if (ParallelDescriptor::IOProcessor()) {
 	const std::string& diagfilename = "diag_temp.out";
 	std::ofstream diagfile;
@@ -245,192 +246,75 @@ Maestro::WriteDiagFile (const int step,
 	    diagfile << std::setw(20) << std::left << "vr(max{T})"; 
 	    diagfile << std::setw(20) << std::left << "T_center" << endl;
 
+	    diagfile.precision(10);
+	    diagfile << std::scientific;
+	    diagfile << std::setw(20) << std::left << t_in; 
+	    diagfile << std::setw(20) << std::left << T_max; 
+	    diagfile << std::setw(20) << std::left << coord_Tmax[0]; 
+	    diagfile << std::setw(20) << std::left << coord_Tmax[1];
+	    diagfile << std::setw(20) << std::left << coord_Tmax[2];
+	    diagfile << std::setw(20) << std::left << vel_Tmax[0];
+	    diagfile << std::setw(20) << std::left << vel_Tmax[1];
+	    diagfile << std::setw(20) << std::left << vel_Tmax[2];
+	    diagfile << std::setw(20) << std::left << Rloc_Tmax;
+	    diagfile << std::setw(20) << std::left << vr_Tmax; 
+	    diagfile << std::setw(20) << std::left << T_center << endl;
+
 	} else {
-	    // append to file 
-	    diagfile.open(diagfilename, std::ofstream::out | 
-			  std::ofstream::app | std::ofstream::binary);
+
+	    // store variable values in data array to be written later
+	    diagfile_data[index*11  ] = t_in;
+	    diagfile_data[index*11+1] = T_max;
+	    diagfile_data[index*11+2] = coord_Tmax[0];
+	    diagfile_data[index*11+3] = coord_Tmax[1];
+	    diagfile_data[index*11+4] = coord_Tmax[2];
+	    diagfile_data[index*11+5] = vel_Tmax[0];
+	    diagfile_data[index*11+6] = vel_Tmax[1];
+	    diagfile_data[index*11+7] = vel_Tmax[2];
+	    diagfile_data[index*11+8] = Rloc_Tmax;
+	    diagfile_data[index*11+9] = vr_Tmax;
+	    diagfile_data[index*11+10] = T_center;
+	    index += 1;
 	}
-
-	diagfile.precision(15);
-	diagfile << std::setw(20) << std::left << t_in;
-	diagfile << std::setw(20) << std::left << T_max; 
-	diagfile << std::setw(20) << std::left << coord_Tmax[0];
-	diagfile << std::setw(20) << std::left << coord_Tmax[1];
-	diagfile << std::setw(20) << std::left << coord_Tmax[2];
-	diagfile << std::setw(20) << std::left << vel_Tmax[0];
-	diagfile << std::setw(20) << std::left << vel_Tmax[1];
-	diagfile << std::setw(20) << std::left << vel_Tmax[2]; 
-	diagfile << std::setw(20) << std::left << Rloc_Tmax;
-	diagfile << std::setw(20) << std::left << vr_Tmax;
-	diagfile << std::setw(20) << std::left << T_center << endl;
-
-	// close file
-	diagfile.close();
     }
-
 }
 
 
 // put together a vector of multifabs for writing
-Vector<const MultiFab*>
-Maestro::DiagFileMF (const Vector<MultiFab>& p0_cart,
-                     const Vector<MultiFab>& rho0_cart,
-                     const Vector<MultiFab>& u_in,
-                           Vector<MultiFab>& s_in,
-                     const Vector<Real>& p0_in)
+void
+Maestro::WriteDiagFile (int& index)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::DiagFileMF()",DiagFileMF);
+    BL_PROFILE_VAR("Maestro::WriteDiagFile()",WriteDiagFile);
 
-    // velocities (AMREX_SPACEDIM)
-    // rho, rhoh, rhoX, tfromp, tfromh, Pi (Nscal+1)
-    // X (NumSpec)
-    // rho0, p0 (2)
-    // deltaT (1)
-    // w0 (AMREX_SPACEDIM)
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 4;
+    // time
+    // T_max
+    // coord_Tmax (3)
+    // vel_Tmax (3)
+    // Rloc_Tmax
+    // vr_Tmax
+    // T_center
 
-    // MultiFab to hold plotfile data
-    Vector<const MultiFab*> plot_mf;
+    // write out diagnosis data
+    if (ParallelDescriptor::IOProcessor()) {
+	const std::string& diagfilename = "diag_temp.out";
+	std::ofstream diagfile(diagfilename, std::ofstream::out | 
+			  std::ofstream::app | std::ofstream::binary);
 
-    // temporary MultiFab to hold plotfile data
-    Vector<MultiFab*> plot_mf_data(finest_level+1);
-
-    // temporary MultiFab for calculations
-    Vector<MultiFab> tempmf(finest_level+1);
-
-    int dest_comp = 0;
-
-    // build temporary MultiFab to hold plotfile data
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i] = new MultiFab((s_in[i]).boxArray(),(s_in[i]).DistributionMap(),nPlot         ,0);
-        tempmf[i].define(grids[i],dmap[i],AMREX_SPACEDIM,0);
-    }
-
-    // velocity
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((u_in[i]),0,dest_comp,AMREX_SPACEDIM);
-    }
-    dest_comp += AMREX_SPACEDIM;
-
-    // rho
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((s_in[i]),Rho,dest_comp,1);
-    }
-    ++dest_comp;
-
-    // rhoh
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((s_in[i]),RhoH,dest_comp,1);
-    }
-    ++dest_comp;
-
-    // rhoX
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((s_in[i]),FirstSpec,dest_comp,NumSpec);
-    }
-    dest_comp += NumSpec;
-
-    // X
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((s_in[i]),FirstSpec,dest_comp,NumSpec);
-        for (int comp=0; comp<NumSpec; ++comp) {
-            MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
-        }
-    }
-    dest_comp += NumSpec;
-
-    // compute tfromp
-    TfromRhoP(s_in,p0_in);
-
-    // tfromp
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
-    }
-    ++dest_comp;
-
-    // compute tfromh
-    TfromRhoH(s_in,p0_in);
-
-    for (int i = 0; i <= finest_level; ++i) {
-        // tfromh
-        plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
-    }
-    ++dest_comp;
-
-    // deltaT
-    // compute & copy tfromp
-    TfromRhoP(s_in,p0_in);
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
-    }
-    
-    // compute tfromh
-    TfromRhoH(s_in,p0_in);
-    // compute deltaT = (tfromp - tfromh) / tfromh
-    for (int i = 0; i <= finest_level; ++i) {
-	MultiFab::Subtract(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
-	MultiFab::Divide(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
-    }
-    ++dest_comp;
-
-    // restore tfromp if necessary
-    if (use_tfromp) {
-        TfromRhoP(s_in,p0_in);
-    }
-
-    // pi
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((s_in[i]),Pi,dest_comp,1);
-    }
-    ++dest_comp;
-
-    // rho0 and p0
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((rho0_cart[i]),0,dest_comp  ,1);
-        plot_mf_data[i]->copy((  p0_cart[i]),0,dest_comp+1,1);
-    }
-    dest_comp += 2;
-
-    if (spherical == 1) {
-	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
-	Vector<MultiFab> w0r_cart(finest_level+1);
-
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    // w0mac will contain an edge-centered w0 on a Cartesian grid,
-	    // for use in computing divergences.
-	    AMREX_D_TERM(w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
-			 w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
-			 w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
-	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-		w0mac[lev][idim].setVal(0.);
+	diagfile.precision(10);
+	diagfile << std::scientific;
+	for (int ii=0; ii<index; ++ii) {
+	    for (int icomp=0; icomp<11; ++icomp) {
+		diagfile << std::setw(20) << std::left << diagfile_data[ii*11+icomp];
 	    }
-
-	    // w0r_cart is w0 but onto a Cartesian grid in cell-centered as
-	    // a scalar.  Since w0 is the radial expansion velocity, w0r_cart
-	    // is the radial w0 in a zone
-	    w0r_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-	    w0r_cart[lev].setVal(0.);
+	    diagfile << endl;
 	}
 
-	if (evolve_base_state == 1) {
-	    MakeW0mac(w0mac);
-	    Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
-	}
-    }   // spherical
+	// close file
+	diagfile.close();
 
-    // w0
-    Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
+	// reset buffer array
+	index = 0;
     }
-    dest_comp += AMREX_SPACEDIM;
-
-    // add plot_mf_data[i] to plot_mf
-    for (int i = 0; i <= finest_level; ++i) {
-        plot_mf.push_back(plot_mf_data[i]);
-    }
-
-    return plot_mf;
 
 }
