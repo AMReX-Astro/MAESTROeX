@@ -276,11 +276,11 @@ Maestro::NodalProj (int proj_type,
     }
 
     // solve for phi
-    Print() << "Calling nodal solver" << endl;
+    Print() << "Calling nodal solver" << std::endl;
     Real mlmg_err = mlmg.solve(amrex::GetVecOfPtrs(phi),
                                amrex::GetVecOfConstPtrs(rhstotal),
                                rel_tol, abs_tol);
-    Print() << "Done calling nodal solver" << endl;
+    Print() << "Done calling nodal solver" << std::endl;
 
     // convert beta0*Vproj back to Vproj
     for (int lev=0; lev<=finest_level; ++lev) {

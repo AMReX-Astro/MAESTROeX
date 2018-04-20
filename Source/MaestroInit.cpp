@@ -14,7 +14,7 @@ Maestro::Init ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Init()",Init);
 
-    Print() << "Calling Init()" << endl;
+    Print() << "Calling Init()" << std::endl;
 
     if (restart_file == "") {
 
@@ -24,12 +24,12 @@ Maestro::Init ()
         InitData();
 
         if (plot_int > 0) {
-            Print() << "\nWriting plotfile 9999999 after InitData" << endl;
+            Print() << "\nWriting plotfile 9999999 after InitData" << std::endl;
             WritePlotFile(9999999,t_old,rho0_old,p0_old,uold,sold);
         }
     }
     else {
-        Print() << "Initializing from checkpoint " << restart_file << endl;
+        Print() << "Initializing from checkpoint " << restart_file << std::endl;
 
         // read in checkpoint file
         // this builds (defines) and fills the following MultiFabs:
@@ -88,11 +88,11 @@ Maestro::Init ()
 
         // initial projection
         if (do_initial_projection) {
-            Print() << "Doing initial projection" << endl;
+            Print() << "Doing initial projection" << std::endl;
             InitProj();
 
             if (plot_int > 0) {
-                Print() << "\nWriting plotfile 9999998 after InitProj" << endl;
+                Print() << "\nWriting plotfile 9999998 after InitProj" << std::endl;
                 WritePlotFile(9999998,t_old,rho0_old,p0_old,uold,sold);
             }
         }
@@ -103,19 +103,19 @@ Maestro::Init ()
         // divu iters - also update dt at end of each divu_iter
         if (init_divu_iter > 0) {
             for (int i=1; i<=init_divu_iter; ++i) {
-                Print() << "Doing initial divu iteration #" << i << endl;
+                Print() << "Doing initial divu iteration #" << i << std::endl;
                 DivuIter(i);
             }
 
             if (plot_int > 0) {
-                Print() << "\nWriting plotfile 9999997 after final DivuIter" << endl;
+                Print() << "\nWriting plotfile 9999997 after final DivuIter" << std::endl;
                 WritePlotFile(9999997,t_old,rho0_old,p0_old,uold,sold);
             }
         }
 
         if (stop_time >= 0. && t_old+dt > stop_time) {
             dt = std::min(dt,stop_time-t_old);
-            Print() << "Stop time limits dt = " << dt << endl;
+            Print() << "Stop time limits dt = " << dt << std::endl;
         }
 
         dtold = dt;
@@ -128,21 +128,21 @@ Maestro::Init ()
 
         // initial (pressure) iters
         for (int i=1; i<= init_iter; ++i) {
-            Print() << "Doing initial pressure iteration #" << i << endl;
+            Print() << "Doing initial pressure iteration #" << i << std::endl;
             InitIter();
         }
 
         if (plot_int > 0) {
-            Print() << "\nWriting plotfile 0 after all initialization" << endl;
+            Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
             WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
         }
 
         if (chk_int > 0) {
-            Print() << "\nWriting checkpoint 0 after all initialization" << endl;
+            Print() << "\nWriting checkpoint 0 after all initialization" << std::endl;
             WriteCheckPoint(0);
 
 	    int index_dummy=0;
-	    Print() << "\nWriting diagnosis file after all initialization" << endl;
+	    Print() << "\nWriting diagnosis file after all initialization" << std::endl;
 	    DiagFile(0,t_old,rho0_old,p0_old,uold,sold,index_dummy);
         }
     }
@@ -155,7 +155,7 @@ Maestro::InitData ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitData()",InitData);
 
-    Print() << "Calling InitData()" << endl;
+    Print() << "Calling InitData()" << std::endl;
 
     // read in model file and fill in s0_init and p0_init for all levels
     init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
@@ -458,18 +458,18 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     if (maestro_verbose > 0) {
         Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
-                << " gives dt = " << dt << endl;
+                << " gives dt = " << dt << std::endl;
     }
     
     dt *= init_shrink;
     if (maestro_verbose > 0) {
-        Print() << "Multiplying dt by init_shrink; dt = " << dt << endl;
+        Print() << "Multiplying dt by init_shrink; dt = " << dt << std::endl;
     }
     
     if (dt > dt_hold) {
         if (maestro_verbose > 0) {
             Print() << "Ignoring this new dt since it's larger than the previous dt = "
-                    << dt_hold << endl;
+                    << dt_hold << std::endl;
         }
         dt = std::min(dt_hold,dt);
     }
@@ -478,7 +478,7 @@ void Maestro::DivuIter (int istep_divu_iter)
         // fixed dt
         dt = fixed_dt;
         if (maestro_verbose > 0) {
-            Print() << "Setting fixed dt = " << dt << endl;
+            Print() << "Setting fixed dt = " << dt << std::endl;
         }
     }
 }

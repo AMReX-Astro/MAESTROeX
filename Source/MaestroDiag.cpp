@@ -244,7 +244,7 @@ Maestro::DiagFile (const int step,
 	    diagfile << std::setw(20) << std::left << "vz(max{T})";
 	    diagfile << std::setw(20) << std::left << "R(max{T})";
 	    diagfile << std::setw(20) << std::left << "vr(max{T})"; 
-	    diagfile << std::setw(20) << std::left << "T_center" << endl;
+	    diagfile << std::setw(20) << std::left << "T_center" << std::endl;
 
 	    diagfile.precision(10);
 	    diagfile << std::scientific;
@@ -258,7 +258,7 @@ Maestro::DiagFile (const int step,
 	    diagfile << std::setw(20) << std::left << vel_Tmax[2];
 	    diagfile << std::setw(20) << std::left << Rloc_Tmax;
 	    diagfile << std::setw(20) << std::left << vr_Tmax; 
-	    diagfile << std::setw(20) << std::left << T_center << endl;
+	    diagfile << std::setw(20) << std::left << T_center << std::endl;
 
 	} else {
 
@@ -307,7 +307,7 @@ Maestro::WriteDiagFile (int& index)
 	    for (int icomp=0; icomp<11; ++icomp) {
 		diagfile << std::setw(20) << std::left << diagfile_data[ii*11+icomp];
 	    }
-	    diagfile << endl;
+	    diagfile << std::endl;
 	}
 
 	// close file

@@ -204,7 +204,7 @@ Maestro::DensityAdvance (int which_step,
     // if (verbose >= 1) {
     // 	Real smin, smax;
     // 	for (int lev=0; lev<=finest_level; ++lev) {
-    // 	    // Print() << "Level " << lev << endl;
+    // 	    // Print() << "Level " << lev << std::endl;
 
     // 	    for (int comp = FirstSpec; comp < FirstSpec+NumSpec; ++comp) {
     // 		MultiFab::Divide(snew[lev],snew[lev],Rho,comp,1,ng_s);
@@ -212,7 +212,7 @@ Maestro::DensityAdvance (int which_step,
     // 		smin = snew[lev].min(comp); 
     // 		smax = snew[lev].max(comp);
              
-    //          Print() << "Last species: " << smin << " " << smax << endl;
+    //          Print() << "Last species: " << smin << " " << smax << std::endl;
 
     // 		MultiFab::Multiply(snew[lev],snew[lev],Rho,comp,1,ng_s);
     // 	    }
@@ -220,14 +220,14 @@ Maestro::DensityAdvance (int which_step,
     // 	    smin = snew[lev].min(Rho); 
     // 	    smax = snew[lev].max(Rho);
           
-    // 	    Print() << "Rho: " << smin << " " << smax << endl;
+    // 	    Print() << "Rho: " << smin << " " << smax << std::endl;
     // 	}
     // }
 
 
-// Print() << "... Level 0 update:" << endl;
-// Print() << "... new min/max : density           " << smin[0] << "    " << smax[0] << endl;
-// Print() << "... new min/max : " << endl;
-// Print() << "... new min/max : tracer            " << endl;
+// Print() << "... Level 0 update:" << std::endl;
+// Print() << "... new min/max : density           " << smin[0] << "    " << smax[0] << std::endl;
+// Print() << "... new min/max : " << std::endl;
+// Print() << "... new min/max : tracer            " << std::endl;
 
 }

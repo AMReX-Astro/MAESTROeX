@@ -102,12 +102,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     const Real strt_total = ParallelDescriptor::second();
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
-            << " DT = " << dt << endl << endl;
+            << " DT = " << dt << std::endl << std::endl;
 
     if (maestro_verbose > 0) {
-        Print() << "Cell Count:" << endl;
+        Print() << "Cell Count:" << std::endl;
         for (int lev=0; lev<=finest_level; ++lev) {
-            Print() << "Level " << lev << ", " << CountCells(lev) << " cells" << endl;
+            Print() << "Level " << lev << ", " << CountCells(lev) << " cells" << std::endl;
         }
     }
 
@@ -179,7 +179,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 1 : react state >>>" << endl;
+        Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
 
     React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
@@ -189,7 +189,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 2 : make w0 >>>" << endl;
+        Print() << "<<< STEP 2 : make w0 >>>" << std::endl;
     }
 
     if (t_old == 0.) {
@@ -289,7 +289,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 3 : create MAC velocities >>>" << endl;
+        Print() << "<<< STEP 3 : create MAC velocities >>>" << std::endl;
     }
 
     // compute unprojected MAC velocities
@@ -314,7 +314,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 4 : advect base >>>" << endl;
+        Print() << "<<< STEP 4 : advect base >>>" << std::endl;
     }
 
     // advect the base state density
@@ -350,8 +350,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (maestro_verbose >= 1) {
-        Print() << "            :  density_advance >>>" << endl;
-        Print() << "            :   tracer_advance >>>" << endl;
+        Print() << "            :  density_advance >>>" << std::endl;
+        Print() << "            :   tracer_advance >>>" << std::endl;
     }
 
     // set etarhoflux to zero
@@ -453,7 +453,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (maestro_verbose >= 1) {
-        Print() << "            : enthalpy_advance >>>" << endl;
+        Print() << "            : enthalpy_advance >>>" << std::endl;
     }
     
     EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
@@ -463,7 +463,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 4a: thermal conduct >>>" << endl;
+        Print() << "<<< STEP 4a: thermal conduct >>>" << std::endl;
     }
 
     if (use_thermal_diffusion) {
@@ -498,7 +498,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 5 : react state >>>" << endl;
+        Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
 
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
@@ -524,7 +524,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 6 : make new S and new w0 >>>" << endl;
+        Print() << "<<< STEP 6 : make new S and new w0 >>>" << std::endl;
     }
 
     if (evolve_base_state) {
@@ -610,7 +610,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 7 : create MAC velocities >>>" << endl;
+        Print() << "<<< STEP 7 : create MAC velocities >>>" << std::endl;
     }
 
     // compute unprojected MAC velocities
@@ -631,7 +631,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 8 : advect base >>>" << endl;
+        Print() << "<<< STEP 8 : advect base >>>" << std::endl;
     }
 
     // advect the base state density
@@ -650,8 +650,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (maestro_verbose >= 1) {
-        Print() << "            :  density_advance >>>" << endl;
-        Print() << "            :   tracer_advance >>>" << endl;
+        Print() << "            :  density_advance >>>" << std::endl;
+        Print() << "            :   tracer_advance >>>" << std::endl;
     }
 
     // set etarhoflux to zero
@@ -744,7 +744,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (maestro_verbose >= 1) {
-        Print() << "            : enthalpy_advance >>>" << endl;
+        Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
     EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
@@ -754,7 +754,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 8a: thermal conduct >>>" << endl;
+        Print() << "<<< STEP 8a: thermal conduct >>>" << std::endl;
     }
 
     if (use_thermal_diffusion) {
@@ -783,7 +783,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 9 : react state >>>" << endl;
+        Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
 
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
@@ -804,7 +804,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 10: make new S >>>" << endl;
+        Print() << "<<< STEP 10: make new S >>>" << std::endl;
     }
 
     if (use_thermal_diffusion) {
@@ -830,7 +830,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 11: update and project new velocity >>>" << endl;
+        Print() << "<<< STEP 11: update and project new velocity >>>" << std::endl;
     }
 
     // Define rho at half time using the new rho from Step 8
@@ -916,7 +916,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
-            << " DT = " << dt << endl;
+            << " DT = " << dt << std::endl;
 
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;

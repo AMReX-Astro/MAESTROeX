@@ -10,7 +10,7 @@ Maestro::Evolve ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Evolve()",Evolve);
 
-    Print() << "Calling Evolve()" << endl;
+    Print() << "Calling Evolve()" << std::endl;
 
     // check to make sure spherical is only used for 3d
     if (spherical == 1 && AMREX_SPACEDIM != 3) {
@@ -39,7 +39,7 @@ Maestro::Evolve ()
 
             if (verbose > 0) {
                 Print() << "Call to estdt at beginning of step " << istep
-                        << " gives dt =" << dt << endl;
+                        << " gives dt =" << dt << std::endl;
             }
 
             // fixme - add nuclear_dt_scalefac timestep limiter
@@ -47,13 +47,13 @@ Maestro::Evolve ()
             if (dt > max_dt_growth*dtold) {
                 dt = max_dt_growth*dtold;
                 if (verbose > 0) {
-                    Print() << "dt_growth factor limits the new dt = " << dt << endl;
+                    Print() << "dt_growth factor limits the new dt = " << dt << std::endl;
                 }
             }
 
             if (dt > max_dt) {
                 if (verbose > 0) {
-                    Print() << "max_dt limits the new dt = " << max_dt << endl;
+                    Print() << "max_dt limits the new dt = " << max_dt << std::endl;
                 }
                 dt = max_dt;
             }
@@ -67,7 +67,7 @@ Maestro::Evolve ()
 
             if (stop_time >= 0. && t_old+dt > stop_time) {
                 dt = std::min(dt,stop_time-t_old);
-                Print() << "Stop time limits dt = " << dt << endl;
+                Print() << "Stop time limits dt = " << dt << std::endl;
             }
 
             t_new = t_old + dt;
@@ -86,14 +86,14 @@ Maestro::Evolve ()
                               (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
                               (istep == max_step) ) )
         {
-            Print() << "\nWriting plotfile " << istep << endl;
+            Print() << "\nWriting plotfile " << istep << std::endl;
             WritePlotFile(istep,t_new,rho0_new,p0_new,unew,snew);
         }
 
         if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )
         {
 	    // write a checkpoint file
-            Print() << "\nWriting checkpoint" << istep << endl;
+            Print() << "\nWriting checkpoint" << istep << std::endl;
             WriteCheckPoint(istep);
         }
 

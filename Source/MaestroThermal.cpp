@@ -234,7 +234,7 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
 	MultiFab& Xkcoeff_mf = Xkcoeff[lev];
 	MultiFab& pcoeff_mf  = pcoeff[lev];
 
-	Print() << "... Level " << lev << " create thermal coeffs:" << endl;
+	Print() << "... Level " << lev << " create thermal coeffs:" << std::endl;
 
 	// loop over boxes
 	for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi) {

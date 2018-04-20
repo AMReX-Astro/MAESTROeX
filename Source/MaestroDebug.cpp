@@ -24,8 +24,8 @@ Maestro::PrintMF (Vector<MultiFab>& MF)
             if (dm[i] == myProc) {
 
                 // we want all processors to write, not just the IOProcessor
-                std::cout << "Grid #" << i << endl;
-                std::cout << "Processor #" << myProc << endl;
+                std::cout << "Grid #" << i << std::endl;
+                std::cout << "Processor #" << myProc << std::endl;
 
                 const Box& validBox = ba[i];
 
@@ -63,8 +63,8 @@ Maestro::PrintEdge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
             if (dm[i] == myProc) {
 
                 // we want all processors to write, not just the IOProcessor
-                std::cout << "Grid #" << i << endl;
-                std::cout << "Processor #" << myProc << endl;
+                std::cout << "Grid #" << i << std::endl;
+                std::cout << "Processor #" << myProc << std::endl;
 
                 // EDGE BASED
                 const Box& validBox = ba[i];

@@ -14,7 +14,7 @@ Maestro::Setup ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Setup()",Setup);
 
-    Print() << "Calling Setup()" << endl;
+    Print() << "Calling Setup()" << std::endl;
 
     ///////
     // Geometry on all levels has been defined already.
@@ -202,7 +202,7 @@ Maestro::ReadParameters ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReadParameters()",ReadParameters);
 
-    Print() << "Calling ReadParameters()" << endl;
+    Print() << "Calling ReadParameters()" << std::endl;
 
     ParmParse pp("maestro");
 
@@ -238,7 +238,7 @@ void Maestro::VariableSetup ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VariableSetup()",VariableSetup);
 
-    Print() << "Calling VariableSetup()" << endl;
+    Print() << "Calling VariableSetup()" << std::endl;
 
     int cnt = 0;
     Rho = cnt++;
@@ -305,7 +305,7 @@ Maestro::BCSetup()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::BCSetup()",BCSetup);
 
-    Print() << "Calling BCSetup()" << endl;
+    Print() << "Calling BCSetup()" << std::endl;
 
     bcs_s.resize(Nscal);          // scalars
     bcs_u.resize(AMREX_SPACEDIM); // velocitiy

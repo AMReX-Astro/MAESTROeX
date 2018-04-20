@@ -152,7 +152,7 @@ Maestro::EstDt ()
         umax = std::max(umax,umax_lev);
 
         if (maestro_verbose > 0) {
-            Print() << "Call to estdt for level " << lev << " gives dt_lev = " << dt_lev << endl;
+            Print() << "Call to estdt for level " << lev << " gives dt_lev = " << dt_lev << std::endl;
         }
 
         // update dt over all levels
@@ -161,7 +161,7 @@ Maestro::EstDt ()
     }  // end loop over levels
    
     if (maestro_verbose > 0) {
-        Print() << "Minimum estdt over all levels = " << dt << endl;
+        Print() << "Minimum estdt over all levels = " << dt << std::endl;
     }
 
     if (dt < small_dt) {
@@ -170,7 +170,7 @@ Maestro::EstDt ()
 
     if (dt > max_dt) {
         if (maestro_verbose > 0) {
-            Print() << "max_dt limits the new dt = " << max_dt << endl;
+            Print() << "max_dt limits the new dt = " << max_dt << std::endl;
         }
         dt = max_dt;
     }
@@ -179,7 +179,7 @@ Maestro::EstDt ()
         // fixed dt
         dt = fixed_dt;
         if (maestro_verbose > 0) {
-            Print() << "Setting fixed dt = " << dt << endl;
+            Print() << "Setting fixed dt = " << dt << std::endl;
         }
     }
 
@@ -300,14 +300,14 @@ Maestro::FirstDt ()
         umax = std::max(umax,umax_lev);
 
         if (maestro_verbose > 0) {
-            Print() << "Call to firstdt for level " << lev << " gives dt_lev = " << dt_lev << endl;
+            Print() << "Call to firstdt for level " << lev << " gives dt_lev = " << dt_lev << std::endl;
         }
 
         // multiply by init_shrink
         dt_lev *= init_shrink;
 
         if (maestro_verbose > 0) {
-            Print() << "Multiplying dt_lev by init_shrink; dt_lev = " << dt_lev << endl;
+            Print() << "Multiplying dt_lev by init_shrink; dt_lev = " << dt_lev << std::endl;
         }
 
         // update dt over all levels
@@ -316,7 +316,7 @@ Maestro::FirstDt ()
     }  // end loop over levels
    
     if (maestro_verbose > 0) {
-        Print() << "Minimum firstdt over all levels = " << dt << endl;
+        Print() << "Minimum firstdt over all levels = " << dt << std::endl;
     }
 
     if (dt < small_dt) {
@@ -325,7 +325,7 @@ Maestro::FirstDt ()
 
     if (dt > max_dt) {
         if (maestro_verbose > 0) {
-            Print() << "max_dt limits the new dt = " << max_dt << endl;
+            Print() << "max_dt limits the new dt = " << max_dt << std::endl;
         }
         dt = max_dt;
     }
@@ -334,7 +334,7 @@ Maestro::FirstDt ()
         // fixed dt
         dt = fixed_dt;
         if (maestro_verbose > 0) {
-            Print() << "Setting fixed dt = " << dt << endl;
+            Print() << "Setting fixed dt = " << dt << std::endl;
         }
     }
 
