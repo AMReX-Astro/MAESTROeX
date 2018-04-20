@@ -14,6 +14,10 @@ Maestro::DiagFile (const int step,
 		   const Vector<MultiFab>& s_in,
 		   int& index)
 {
+    if (spherical == 0) {
+        return;
+    }
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DiagFile()",DiagFile);
 
