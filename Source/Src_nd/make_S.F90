@@ -406,7 +406,7 @@ contains
     
     deallocate(Sbar_cart)
     
-    if (dpdt_factor .ge. 0.0d0) then
+    if (dpdt_factor .gt. 0.0d0) then
        
        allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
        call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc)

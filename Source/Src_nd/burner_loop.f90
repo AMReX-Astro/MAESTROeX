@@ -242,18 +242,20 @@ contains
           x_out = x_in
           rhowdot = 0.d0
           rhoH = 0.d0
-       endif
-               
-       ! check if sum{X_k} = 1
-       sumX = 0.d0
-       do n = 1, nspec
-          sumX = sumX + x_out(n)
-       enddo
-       if (abs(sumX - 1.d0) > reaction_sum_tol) then
-          call bl_error("ERROR: abundances do not sum to 1", abs(sumX-1.d0))
+
+          ! if we didn't burn, make sure that our abundances sum to
+          ! 1 -- this shouldn't normally be an issue, but some
+          ! combination of AMR + hitting the low density cutoff
+          ! can introduce a small error
+          sumX = 0.d0
           do n = 1, nspec
-             state_out % xn(n) = state_out % xn(n)/sumX
+             sumX = sumX + x_out(n)
           enddo
+          if (abs(sumX - 1.d0) > reaction_sum_tol) then
+             do n = 1, nspec
+                state_out % xn(n) = state_out % xn(n)/sumX
+             enddo
+          endif
        endif
 
        ! pass the density and pi through
