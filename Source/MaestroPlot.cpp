@@ -19,7 +19,20 @@ Maestro::WritePlotFile (const int step,
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
 
-    const std::string& plotfilename = PlotFileName(step);
+    std::string plotfilename;
+
+    if (step == 9999999) {
+        plotfilename = "plt_InitData";
+    }
+    else if (step == 9999998) {
+        plotfilename = "plt_after_InitProj";
+    }
+    else if (step == 9999997) {
+        plotfilename = "plt_after_DivuIter";
+    }
+    else {
+        plotfilename = PlotFileName(step);
+    }
 
     // convert p0 to multi-D MultiFab
     Vector<MultiFab> p0_cart(finest_level+1);
