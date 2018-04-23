@@ -66,12 +66,12 @@ maestro.sponge_kappa = 10.e0
 maestro.use_thermal_diffusion = false
 
 # PLOTFILES
-maestro.plot_base_name  = plt    # root name of plot file
+maestro.plot_base_name  = reacting_bubble_3d_plt    # root name of plot file
 maestro.plot_int   = 1      # number of timesteps between plot files
 maestro.plot_deltat = 0.5e0
 
 # CHECKPOINT
-maestro.check_base_name = chk
+maestro.check_base_name = reacting_bubble_3d_chk
 maestro.chk_int         = 100
 
 # tolerances for the initial projection
