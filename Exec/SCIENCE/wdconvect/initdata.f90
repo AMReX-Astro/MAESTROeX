@@ -4,7 +4,7 @@ module initdata_module
   use parallel, only: parallel_IOProcessor
   use bl_constants_module
   use network, only: nspec
-  use amrex_fort_module, only : amrex_spacedim
+  use amrex_fort_module, only : amrex_spacedim, amrex_random
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
                                   prob_lo, prob_hi 
@@ -205,22 +205,22 @@ contains
     do i=1,3
        do j=1,3
           do k=1,3
-             rand = (.5)**i * (.7)**j * (.3)**k * (-1.)**i
+             rand = amrex_random()
              rand = 2.0d0*rand - 1.0d0
              alpha(i,j,k) = rand
-             rand = (.5)**i * (.3)**j * (.7)**k * (-1)**j
+             rand = amrex_random()
              rand = 2.0d0*rand - 1.0d0
              beta(i,j,k) = rand
-             rand = (.3)**i * (.5)**j * (.7)**k * (-1)**k
+             rand = amrex_random()
              rand = 2.0d0*rand - 1.0d0
              gamma(i,j,k) = rand
-             rand = (.3)**i * (.7)**j * (.5)**k * (-1)**(i+j)
+             rand = amrex_random()
              rand = 2.0d0*M_PI*rand
              phix(i,j,k) = rand
-             rand = (.7)**i * (.3)**j * (.5)**k * (-1)**(j+k)
+             rand = amrex_random()
              rand = 2.0d0*M_PI*rand
              phiy(i,j,k) = rand
-             rand = (.7)**i * (.5)**j * (.3)**k * (-1)**(i+k)
+             rand = amrex_random() 
              rand = 2.0d0*M_PI*rand
              phiz(i,j,k) = rand
           enddo
