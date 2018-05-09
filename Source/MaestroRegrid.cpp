@@ -101,7 +101,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 
     const Real* dx      = geom[lev].CellSize();
 
-    const MultiFab& state = snew[lev];
+    const MultiFab& state = sold[lev];
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -110,7 +110,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         Vector<int>  itags;
 
 	// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for (MFIter mfi(state,true); mfi.isValid(); ++mfi)
+        for (MFIter mfi(state); mfi.isValid(); ++mfi)
         {
             const Box& tilebox  = mfi.tilebox();
 
