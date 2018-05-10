@@ -25,7 +25,8 @@ contains
                          rho_Hext, e_lo, e_hi, &
                          rho_odot, r_lo, r_hi, nc_r, &
                          rho_Hnuc, n_lo, n_hi, &
-                         tempbar_init_in, dt_in) bind (C,name="burner_loop")
+                         tempbar_init_in, dt_in, &
+                         mask) bind (C,name="burner_loop")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
@@ -40,6 +41,7 @@ contains
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: tempbar_init_in(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: dt_in
+    integer         , intent (in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
 
     ! local
     integer          :: i, j, k, n
@@ -50,6 +52,7 @@ contains
     double precision :: rhowdot(nspec)
     double precision :: rhoH
     double precision :: x_test
+    logical          :: cell_valid
     double precision :: sumX
 
     type (burn_t)    :: state_in, state_out
@@ -63,86 +66,94 @@ contains
     do j = lo(2), hi(2)
     do i = lo(1), hi(1)
 
-       rho = s_in(i,j,k,rho_comp)
-       do n = 1, nspec
-          x_in(n) = s_in(i,j,k,n+spec_comp-1) / rho
-       enddo
-
-       if (drive_initial_convection) then
-          T_in = tempbar_init_in(lev,k)
-       else
-          T_in = s_in(i,j,k,temp_comp)
+       ! make sure the cell isn't covered by finer cells
+       cell_valid = .true.
+       if ( present(mask) ) then
+          if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
        endif
-               
-       ! Fortran doesn't guarantee short-circuit evaluation of logicals 
-       ! so we need to test the value of ispec_threshold before using it 
-       ! as an index in x_in
-       if (ispec_threshold > 0) then
-          x_test = x_in(ispec_threshold)
-       else
-          x_test = 0.d0
-       endif
-               
-       ! if the threshold species is not in the network, then we burn
-       ! normally.  if it is in the network, make sure the mass
-       ! fraction is above the cutoff.
-       if (rho > burning_cutoff_density .and.                &
-            ( ispec_threshold < 0 .or.                       &
-             (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
-          ! Initialize burn state_in and state_out
-          state_in % e   = 0.0d0
-          state_in % rho = rho
-          state_in % T   = T_in
-          do n = 1, nspec
-             state_in % xn(n) = x_in(n)
-          enddo
-          state_out = state_in
-          call burner(state_in, state_out, dt_in)
-          do n = 1, nspec
-             x_out(n) = state_out % xn(n)
-          enddo
-          do n = 1, nspec
-             rhowdot(n) = state_out % rho * &
-                  (state_out % xn(n) - state_in % xn(n)) / dt_in
-          enddo
-          rhoH = state_out % rho * (state_out % e - state_in % e) / dt_in
-       else
-          x_out = x_in
-          rhowdot = 0.d0
-          rhoH = 0.d0
-       endif
-               
-       ! check if sum{X_k} = 1
-       sumX = 0.d0
-       do n = 1, nspec
-          sumX = sumX + x_out(n)
-       enddo
-       if (abs(sumX - 1.d0) > reaction_sum_tol) then
-          call bl_error("ERROR: abundances do not sum to 1", abs(sumX-1.d0))
-          do n = 1, nspec
-             state_out % xn(n) = state_out % xn(n)/sumX
-          enddo
-       endif
-
-       ! pass the density and pi through
-       s_out(i,j,k,rho_comp) = s_in(i,j,k,rho_comp)
-       s_out(i,j,k,pi_comp) = s_in(i,j,k,pi_comp)
        
-       ! update the species
-       do n = 1, nspec
-          s_out(i,j,k,n+spec_comp-1) = x_out(n) * rho
-       enddo
-               
-       ! store the energy generation and species create quantities
-       do n = 1, nspec
-          rho_odot(i,j,k,n) = rhowdot(n)
-       enddo
-       rho_Hnuc(i,j,k) = rhoH
-               
-       ! update the enthalpy -- include the change due to external heating
-       s_out(i,j,k,rhoh_comp) = s_in(i,j,k,rhoh_comp) &
-            + dt_in*rho_Hnuc(i,j,k) + dt_in*rho_Hext(i,j,k)
+       if (cell_valid) then
+          rho = s_in(i,j,k,rho_comp)
+          do n = 1, nspec
+             x_in(n) = s_in(i,j,k,n+spec_comp-1) / rho
+          enddo
 
+          if (drive_initial_convection) then
+             T_in = tempbar_init_in(lev,k)
+          else
+             T_in = s_in(i,j,k,temp_comp)
+          endif
+               
+          ! Fortran doesn't guarantee short-circuit evaluation of logicals 
+          ! so we need to test the value of ispec_threshold before using it 
+          ! as an index in x_in
+          if (ispec_threshold > 0) then
+             x_test = x_in(ispec_threshold)
+          else
+             x_test = 0.d0
+          endif
+               
+          ! if the threshold species is not in the network, then we burn
+          ! normally.  if it is in the network, make sure the mass
+          ! fraction is above the cutoff.
+          if (rho > burning_cutoff_density .and.                &
+               ( ispec_threshold < 0 .or.                       &
+               (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
+             ! Initialize burn state_in and state_out
+             state_in % e   = 0.0d0
+             state_in % rho = rho
+             state_in % T   = T_in
+             do n = 1, nspec
+                state_in % xn(n) = x_in(n)
+             enddo
+             state_out = state_in
+             call burner(state_in, state_out, dt_in)
+             do n = 1, nspec
+                x_out(n) = state_out % xn(n)
+             enddo
+             do n = 1, nspec
+                rhowdot(n) = state_out % rho * &
+                     (state_out % xn(n) - state_in % xn(n)) / dt_in
+             enddo
+             rhoH = state_out % rho * (state_out % e - state_in % e) / dt_in
+          else
+             x_out = x_in
+             rhowdot = 0.d0
+             rhoH = 0.d0
+          endif
+               
+          ! check if sum{X_k} = 1
+          sumX = 0.d0
+          do n = 1, nspec
+             sumX = sumX + x_out(n)
+          enddo
+          if (abs(sumX - 1.d0) > reaction_sum_tol) then
+             call bl_error("ERROR: abundances do not sum to 1", abs(sumX-1.d0))
+             do n = 1, nspec
+                state_out % xn(n) = state_out % xn(n)/sumX
+             enddo
+          endif
+
+          ! pass the density and pi through
+          s_out(i,j,k,rho_comp) = s_in(i,j,k,rho_comp)
+          s_out(i,j,k,pi_comp) = s_in(i,j,k,pi_comp)
+          
+          ! update the species
+          do n = 1, nspec
+             s_out(i,j,k,n+spec_comp-1) = x_out(n) * rho
+          enddo
+               
+          ! store the energy generation and species create quantities
+          do n = 1, nspec
+             rho_odot(i,j,k,n) = rhowdot(n)
+          enddo
+          rho_Hnuc(i,j,k) = rhoH
+               
+          ! update the enthalpy -- include the change due to external heating
+          s_out(i,j,k,rhoh_comp) = s_in(i,j,k,rhoh_comp) &
+               + dt_in*rho_Hnuc(i,j,k) + dt_in*rho_Hext(i,j,k)
+
+       endif
     enddo
     enddo
     enddo
@@ -155,7 +166,8 @@ contains
                                 rho_Hext, e_lo, e_hi, &
                                 rho_odot, r_lo, r_hi, nc_r, &
                                 rho_Hnuc, n_lo, n_hi, &
-                                tempbar_init_cart, t_lo, t_hi, dt_in) & 
+                                tempbar_init_cart, t_lo, t_hi, dt_in, & 
+                                mask) & 
              bind (C,name="burner_loop_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -172,6 +184,7 @@ contains
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (in   ) :: tempbar_init_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, intent (in   ) :: dt_in
+    integer         , intent (in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
 
     ! local
     integer          :: i, j, k, n
@@ -182,6 +195,7 @@ contains
     double precision :: rhowdot(nspec)
     double precision :: rhoH
     double precision :: x_test
+    logical          :: cell_valid
     double precision :: sumX
 
     type (burn_t)    :: state_in, state_out
@@ -195,88 +209,96 @@ contains
     do j = lo(2), hi(2)
     do i = lo(1), hi(1)
 
-       rho = s_in(i,j,k,rho_comp)
-       do n = 1, nspec
-          x_in(n) = s_in(i,j,k,n+spec_comp-1) / rho
-       enddo
-
-       if (drive_initial_convection) then
-          T_in = tempbar_init_cart(i,j,k)
-       else
-          T_in = s_in(i,j,k,temp_comp)
+       ! make sure the cell isn't covered by finer cells
+       cell_valid = .true.
+       if ( present(mask) ) then
+          if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
        endif
-               
-       ! Fortran doesn't guarantee short-circuit evaluation of logicals 
-       ! so we need to test the value of ispec_threshold before using it 
-       ! as an index in x_in
-       if (ispec_threshold > 0) then
-          x_test = x_in(ispec_threshold)
-       else
-          x_test = 0.d0
-       endif
-               
-       ! if the threshold species is not in the network, then we burn
-       ! normally.  if it is in the network, make sure the mass
-       ! fraction is above the cutoff.
-       if (rho > burning_cutoff_density .and.                &
-            ( ispec_threshold < 0 .or.                       &
-             (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
-          ! Initialize burn state_in and state_out
-          state_in % e   = 0.0d0
-          state_in % rho = rho
-          state_in % T   = T_in
-          do n = 1, nspec
-             state_in % xn(n) = x_in(n)
-          enddo
-          state_out = state_in
-          call burner(state_in, state_out, dt_in)
-          do n = 1, nspec
-             x_out(n) = state_out % xn(n)
-          enddo
-          do n = 1, nspec
-             rhowdot(n) = state_out % rho * &
-                  (state_out % xn(n) - state_in % xn(n)) / dt_in
-          enddo
-          rhoH = state_out % rho * (state_out % e - state_in % e) / dt_in
-       else
-          x_out = x_in
-          rhowdot = 0.d0
-          rhoH = 0.d0
 
-          ! if we didn't burn, make sure that our abundances sum to
-          ! 1 -- this shouldn't normally be an issue, but some
-          ! combination of AMR + hitting the low density cutoff
-          ! can introduce a small error
-          sumX = 0.d0
+       if (cell_valid) then
+          rho = s_in(i,j,k,rho_comp)
           do n = 1, nspec
-             sumX = sumX + x_out(n)
+             x_in(n) = s_in(i,j,k,n+spec_comp-1) / rho
           enddo
-          if (abs(sumX - 1.d0) > reaction_sum_tol) then
-             do n = 1, nspec
-                state_out % xn(n) = state_out % xn(n)/sumX
-             enddo
+          
+          if (drive_initial_convection) then
+             T_in = tempbar_init_cart(i,j,k)
+          else
+             T_in = s_in(i,j,k,temp_comp)
           endif
-       endif
-
-       ! pass the density and pi through
-       s_out(i,j,k,rho_comp) = s_in(i,j,k,rho_comp)
-       s_out(i,j,k,pi_comp) = s_in(i,j,k,pi_comp)
+          
+          ! Fortran doesn't guarantee short-circuit evaluation of logicals 
+          ! so we need to test the value of ispec_threshold before using it 
+          ! as an index in x_in
+          if (ispec_threshold > 0) then
+             x_test = x_in(ispec_threshold)
+          else
+             x_test = 0.d0
+          endif
+          
+          ! if the threshold species is not in the network, then we burn
+          ! normally.  if it is in the network, make sure the mass
+          ! fraction is above the cutoff.
+          if (rho > burning_cutoff_density .and.                &
+               ( ispec_threshold < 0 .or.                       &
+               (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
+             ! Initialize burn state_in and state_out
+             state_in % e   = 0.0d0
+             state_in % rho = rho
+             state_in % T   = T_in
+             do n = 1, nspec
+                state_in % xn(n) = x_in(n)
+             enddo
+             state_out = state_in
+             call burner(state_in, state_out, dt_in)
+             do n = 1, nspec
+                x_out(n) = state_out % xn(n)
+             enddo
+             do n = 1, nspec
+                rhowdot(n) = state_out % rho * &
+                     (state_out % xn(n) - state_in % xn(n)) / dt_in
+             enddo
+             rhoH = state_out % rho * (state_out % e - state_in % e) / dt_in
+          else
+             x_out = x_in
+             rhowdot = 0.d0
+             rhoH = 0.d0
+             
+             ! if we didn't burn, make sure that our abundances sum to
+             ! 1 -- this shouldn't normally be an issue, but some
+             ! combination of AMR + hitting the low density cutoff
+             ! can introduce a small error
+             sumX = 0.d0
+             do n = 1, nspec
+                sumX = sumX + x_out(n)
+             enddo
+             if (abs(sumX - 1.d0) > reaction_sum_tol) then
+                do n = 1, nspec
+                   state_out % xn(n) = state_out % xn(n)/sumX
+                enddo
+             endif
+          endif
+          
+          ! pass the density and pi through
+          s_out(i,j,k,rho_comp) = s_in(i,j,k,rho_comp)
+          s_out(i,j,k,pi_comp) = s_in(i,j,k,pi_comp)
        
-       ! update the species
-       do n = 1, nspec
-          s_out(i,j,k,n+spec_comp-1) = x_out(n) * rho
-       enddo
-               
-       ! store the energy generation and species create quantities
-       do n = 1, nspec
-          rho_odot(i,j,k,n) = rhowdot(n)
-       enddo
-       rho_Hnuc(i,j,k) = rhoH
-               
-       ! update the enthalpy -- include the change due to external heating
-       s_out(i,j,k,rhoh_comp) = s_in(i,j,k,rhoh_comp) &
-            + dt_in*rho_Hnuc(i,j,k) + dt_in*rho_Hext(i,j,k)
+          ! update the species
+          do n = 1, nspec
+             s_out(i,j,k,n+spec_comp-1) = x_out(n) * rho
+          enddo
+          
+          ! store the energy generation and species create quantities
+          do n = 1, nspec
+             rho_odot(i,j,k,n) = rhowdot(n)
+          enddo
+          rho_Hnuc(i,j,k) = rhoH
+          
+          ! update the enthalpy -- include the change due to external heating
+          s_out(i,j,k,rhoh_comp) = s_in(i,j,k,rhoh_comp) &
+               + dt_in*rho_Hnuc(i,j,k) + dt_in*rho_Hext(i,j,k)
 
+       endif
     enddo
     enddo
     enddo

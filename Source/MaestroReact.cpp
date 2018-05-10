@@ -124,6 +124,14 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
               MultiFab&     rho_Hnuc_mf =     rho_Hnuc[lev];
 	const MultiFab& tempbar_cart_mf = tempbar_init_cart[lev];
 
+	// create mask assuming refinement ratio = 2
+	int finelev = lev+1;
+	if (lev == finest_level) finelev = finest_level;
+
+	const BoxArray& fba = s_in[finelev].boxArray();
+	const iMultiFab& mask = makeFineMask(s_in_mf, fba, IntVect(2));
+
+
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(s_in_mf); mfi.isValid(); ++mfi ) {
 
@@ -135,21 +143,43 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
-		burner_loop_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				 BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
-				 BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
-				 BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-				 BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-				 BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
-				 BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in);
+		if (lev == finest_level) {
+		    burner_loop_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				     BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+				     BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+				     BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+				     BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+				     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
+				     BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in);
+		} else {
+		    burner_loop_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				     BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+				     BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+				     BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+				     BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+				     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
+				     BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in, 
+				     mask[mfi].dataPtr());
+		}
 	    } else {
-		burner_loop(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-			    BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
-			    BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
-			    BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-			    BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-			    BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
-			    tempbar_init.dataPtr(), &dt_in);
+		if (lev == finest_level) {
+		    burner_loop(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+				BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+				BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+				BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+				BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
+				tempbar_init.dataPtr(), &dt_in);
+		} else {
+		    burner_loop(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+				BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+				BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+				BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+				BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
+				tempbar_init.dataPtr(), &dt_in, 
+				mask[mfi].dataPtr());
+		}
 	    }
         }
     }
