@@ -39,15 +39,17 @@ extern "C"
     void divide_phisum_by_ncell(amrex::Real* phisum, int* ncell);
 
     void average_sphr(amrex::Real* phisum, amrex::Real* phibar, 
-		      int* ncell, amrex::Real* radii);
+		      int* ncell, amrex::Real* radii, const int* finest_level);
 
     void sum_phi_3d_sphr(const int* lev, const int* lo, const int* hi,
-		      const amrex::Real* phi, const int* p_lo, const int* p_hi, 
-		      amrex::Real* phisum, 
-		      const amrex::Real* radii, 
-		      const amrex::Real* dx, int* ncell);
+			 const amrex::Real* phi, const int* p_lo, const int* p_hi, 
+			 amrex::Real* phisum, 
+			 const amrex::Real* radii, const int* finest_level, 
+			 const amrex::Real* dx, int* ncell, 
+			 const int* mask=NULL);
 
-    void compute_radii_sphr(const int* lev, amrex::Real* radii, const amrex::Real* dx);
+    void compute_radii_sphr(const int* lev, amrex::Real* radii, const int* finest_level, 
+			    const amrex::Real* dx);
     //////////////////////
 
     //////////////////////

@@ -57,19 +57,20 @@ contains
   ! spherical subroutines
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine average_sphr(phisum,phibar,ncell,radii) & 
+  subroutine average_sphr(phisum,phibar,ncell,radii,finest_level) & 
        bind (C,name="average_sphr")
 
-    double precision, intent(inout) :: phisum(0:max_radial_level,-1:nr_irreg)
+    integer         , intent(in   ) :: finest_level
+    double precision, intent(inout) :: phisum(0:finest_level,-1:nr_irreg)
     double precision, intent(inout) :: phibar(0:max_radial_level,0:nr_fine-1)
-    integer         , intent(inout) ::  ncell(0:max_radial_level,-1:nr_irreg)
-    double precision, intent(inout) :: radii(0:max_radial_level,-1:nr_irreg+1)
+    integer         , intent(inout) ::  ncell(0:finest_level,-1:nr_irreg)
+    double precision, intent(inout) :: radii(0:finest_level,-1:nr_irreg+1)
 
     ! local
     integer          :: j,n,r
     integer          :: min_all, min_lev
-    integer          :: max_rcoord(0:max_radial_level), rcoord(0:max_radial_level)
-    integer          :: stencil_coord(0:max_radial_level)
+    integer          :: max_rcoord(0:finest_level), rcoord(0:finest_level)
+    integer          :: stencil_coord(0:finest_level)
     double precision :: radius
 
     integer          :: which_lev(0:nr_fine-1)
@@ -77,7 +78,7 @@ contains
     logical          :: limit
 
     ! normalize phisum so it actually stores the average at a radius
-    do n=0,max_radial_level
+    do n=0,finest_level
        do r=0,nr_irreg
           if (ncell(n,r) .ne. 0.d0) then
              phisum(n,r) = phisum(n,r) / dble(ncell(n,r))
@@ -86,12 +87,12 @@ contains
     end do
     
     ! compute center point for the finest level
-    phisum(max_radial_level,-1) =  (11.d0/8.d0)*phisum(max_radial_level,0) &
-                                 - (3.d0/8.d0)*phisum(max_radial_level,1)
-    ncell(max_radial_level,-1) = 1
+    phisum(finest_level,-1) =  (11.d0/8.d0)*phisum(finest_level,0) &
+                                 - (3.d0/8.d0)*phisum(finest_level,1)
+    ncell(finest_level,-1) = 1
 
     ! choose which level to interpolate from
-    do n=0,max_radial_level
+    do n=0,finest_level
        rcoord(n) = 0
     end do
 
@@ -100,7 +101,7 @@ contains
        radius = (dble(r)+0.5d0)*dr(0)
 
        ! for each level, find the closest coordinate
-       do n=0,max_radial_level
+       do n=0,finest_level
           do j=rcoord(n),nr_irreg
              if (abs(radius-radii(n,j)) .lt. abs(radius-radii(n,j+1))) then
                 rcoord(n) = j
@@ -110,10 +111,10 @@ contains
        end do
        
        ! make sure closest coordinate is in bounds
-       do n=0,max_radial_level-1
+       do n=0,finest_level-1
           rcoord(n) = max(rcoord(n),1)
        end do
-       do n=0,max_radial_level
+       do n=0,finest_level
           rcoord(n) = min(rcoord(n),nr_irreg-1)
        end do
        
@@ -123,7 +124,7 @@ contains
                      ncell(0,rcoord(0)  ), &
                      ncell(0,rcoord(0)+1))
 
-       do n=1,max_radial_level
+       do n=1,finest_level
           min_lev = min(ncell(n,rcoord(n)-1), &
                         ncell(n,rcoord(n)  ), &
                         ncell(n,rcoord(n)+1))
@@ -139,7 +140,7 @@ contains
        j = 1
        do while (min_all .eq. 0)
           j = j+1
-          do n=0,max_radial_level
+          do n=0,finest_level
              min_lev = max(ncell(n,max(1,rcoord(n)-j)), &
                            ncell(n,min(rcoord(n)+j,nr_irreg-1)))
              if (min_lev .ne. 0) then
@@ -153,7 +154,7 @@ contains
     end do
 
     ! squish the list at each level down to exclude points with no contribution
-    do n=0,max_radial_level
+    do n=0,finest_level
        j=0
        do r=0,nr_irreg
           do while(ncell(n,j) .eq. 0)
@@ -196,13 +197,13 @@ contains
        end do
 
        ! make sure the interpolation points will be in bounds
-       if (which_lev(r) .ne. max_radial_level) then
+       if (which_lev(r) .ne. finest_level) then
           stencil_coord(which_lev(r)) = max(stencil_coord(which_lev(r)),1)
        end if
        stencil_coord(which_lev(r)) = min(stencil_coord(which_lev(r)), &
                                          max_rcoord(which_lev(r))-1)
 
-       if (r > nr_fine - 1 - drdxfac*2.d0**(max_radial_level-1)) then
+       if (r > nr_fine - 1 - drdxfac*2.d0**(finest_level-1)) then
           limit = .false. 
        else 
           limit = .true.
@@ -266,20 +267,23 @@ contains
   end subroutine average_sphr
 
   subroutine sum_phi_3d_sphr(lev,lo,hi,phi,p_lo,p_hi,phisum, &
-                              radii, dx, ncell) bind (C,name="sum_phi_3d_sphr")
+                              radii, finest_level, dx, ncell, & 
+                              mask) bind (C,name="sum_phi_3d_sphr")
 
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: lev, lo(3), hi(3), finest_level
     integer         , intent (in   ) :: p_lo(3), p_hi(3)
     double precision, intent (in   ) :: phi(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
-    double precision, intent (inout) :: phisum(0:max_radial_level,-1:nr_irreg)
-    double precision, intent (in   ) :: radii(0:max_radial_level,-1:nr_irreg+1)
+    double precision, intent (inout) :: phisum(0:finest_level,-1:nr_irreg)
+    double precision, intent (in   ) :: radii(0:finest_level,-1:nr_irreg+1)
     double precision, intent (in   ) :: dx(3)
-    integer         , intent (inout) :: ncell(0:max_radial_level,-1:nr_irreg)
+    integer         , intent (inout) :: ncell(0:finest_level,-1:nr_irreg)
+    integer         , intent (in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
 
     ! local
     integer          :: i,j,k,index
     double precision :: x,y,z,radius
+    logical          :: cell_valid
 
     do k=lo(3),hi(3)
        z = prob_lo(3) + (dble(k) + 0.5d0)*dx(3) - center(3)
@@ -290,32 +294,42 @@ contains
           do i=lo(1),hi(1)
              x = prob_lo(1) + (dble(i) + 0.5d0)*dx(1) - center(1)
              
-             ! compute distance to center
-             radius = sqrt(x**2 + y**2 + z**2)
-             
-             ! figure out which radii index this point maps into
-             index = ((radius / dx(1))**2 - 0.75d0) / 2.d0
-             
-             ! due to roundoff error, need to ensure that we are in the proper radial bin
-             if (index .lt. nr_irreg) then
-                if (abs(radius-radii(lev,index)) .gt. abs(radius-radii(lev,index+1))) then
-                   index = index+1
-                end if
+             ! make sure the cell isn't covered by finer cells
+             cell_valid = .true.
+             if ( present(mask) ) then
+                if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
              end if
              
-             phisum(lev,index) = phisum(lev,index) + phi(i,j,k)
-             ncell(lev,index)  = ncell(lev,index) + 1
+             if (cell_valid) then
+
+                ! compute distance to center
+                radius = sqrt(x**2 + y**2 + z**2)
              
+                ! figure out which radii index this point maps into
+                index = ((radius / dx(1))**2 - 0.75d0) / 2.d0
+             
+                ! due to roundoff error, need to ensure that we are in the proper radial bin
+                if (index .lt. nr_irreg) then
+                   if (abs(radius-radii(lev,index)) .gt. abs(radius-radii(lev,index+1))) then
+                      index = index+1
+                   end if
+                end if
+                
+                phisum(lev,index) = phisum(lev,index) + phi(i,j,k)
+                ncell(lev,index)  = ncell(lev,index) + 1
+             
+             end if
+
           end do
        end do
     end do
 
   end subroutine sum_phi_3d_sphr
 
-  subroutine compute_radii_sphr(lev,radii,dx) bind (C,name="compute_radii_sphr")
+  subroutine compute_radii_sphr(lev,radii,finest_level,dx) bind (C,name="compute_radii_sphr")
 
-    integer         , intent(in   ) :: lev
-    double precision, intent(inout) :: radii(0:max_radial_level,-1:nr_irreg+1)
+    integer         , intent(in   ) :: lev, finest_level
+    double precision, intent(inout) :: radii(0:finest_level,-1:nr_irreg+1)
     double precision, intent(in   ) :: dx(3)
 
     integer :: r

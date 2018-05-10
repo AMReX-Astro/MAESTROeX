@@ -82,9 +82,9 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 	// For spherical, we construct a 1D array at each level, phisum, that has space
 	// allocated for every possible radius that a cell-center at each level can 
 	// map into.  The radial locations have been precomputed and stored in radii.
-        Vector<Real> phisum((max_radial_level+1)*(nr_irreg+2),0.0);
-	Vector<Real>  radii((max_radial_level+1)*(nr_irreg+3));
-        Vector<int> ncell((max_radial_level+1)*(nr_irreg+2),0);
+        Vector<Real> phisum((finest_level+1)*(nr_irreg+2),0.0);
+	Vector<Real>  radii((finest_level+1)*(nr_irreg+3));
+        Vector<int> ncell((finest_level+1)*(nr_irreg+2),0);
 
 	// radii contains every possible distance that a cell-center at the finest
 	// level can map into
@@ -93,19 +93,25 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             // Get the index space of the domain
 	    const Real* dx = geom[lev].CellSize();
 
-	    compute_radii_sphr(&lev, radii.dataPtr(), dx);
+	    compute_radii_sphr(&lev, radii.dataPtr(), &finest_level, dx);
         }
 
-	
         // loop is over the existing levels (up to finest_level)
         for (int lev=finest_level; lev>=0; --lev) {
             
-            // Get the index space of the domain
-            const Box domainBox = geom[0].Domain();
+            // Get the grid size of the domain
 	    const Real* dx = geom[lev].CellSize();
 
             // get references to the MultiFabs at level lev
             const MultiFab& phi_mf = phi[lev];
+	    
+	    // create mask assuming refinement ratio = 2
+	    int finelev = lev+1;
+	    if (lev == finest_level) finelev = finest_level;
+
+	    const BoxArray& fba = phi[finelev].boxArray();
+	    const iMultiFab& mask = makeFineMask(phi_mf, fba, IntVect(2));
+
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
             for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
@@ -118,18 +124,28 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
-                sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
-				phisum.dataPtr(), radii.dataPtr(), 
-				dx, ncell.dataPtr());
+		if (lev == finest_level) {
+		    sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		    		    BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
+		    		    phisum.dataPtr(), radii.dataPtr(), &finest_level, 
+		    		    dx, ncell.dataPtr());
+		} else {
+		    // we include the mask so we don't double count; i.e., we only consider
+		    // cells that are not covered by finer cells when constructing the sum
+		    sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				    BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
+				    phisum.dataPtr(), radii.dataPtr(), &finest_level, 
+				    dx, ncell.dataPtr(), 
+				    mask[mfi].dataPtr());
+		}
             }
         }
 
         // reduction over boxes to get sum
-        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*(nr_irreg+2));
-	ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(max_radial_level+1)*(nr_irreg+2));
+        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(finest_level+1)*(nr_irreg+2));
+	ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(finest_level+1)*(nr_irreg+2));
 
-        average_sphr(phisum.dataPtr(),phibar.dataPtr(),ncell.dataPtr(),radii.dataPtr());
+        average_sphr(phisum.dataPtr(),phibar.dataPtr(),ncell.dataPtr(),radii.dataPtr(),&finest_level);
 
     }
 
