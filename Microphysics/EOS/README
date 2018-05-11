@@ -10,7 +10,7 @@ gamma_law:
 
    NOTE: this simple version of the EOS does not compute all of the
    thermodynamic variables defined in the eos_type, but only those
-   needed for Castro's execution.  
+   needed for MAESTROeX's execution.  
 
    A full implementation of the gamma_law EOS is available as
    gamma_law_general in the Microphysics/ repo

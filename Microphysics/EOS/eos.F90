@@ -34,7 +34,7 @@ contains
     ! if they are smaller than that.
 
     ! Note that in this routine we use the Fortran-based parallel_IOProcessor()
-    ! command rather than the C++-based version used elsewhere in Castro; this
+    ! command rather than the C++-based version used elsewhere in MAESTROeX; this
     ! ensures compatibility with Fortran-based test programs.
 
     if (present(small_temp)) then
