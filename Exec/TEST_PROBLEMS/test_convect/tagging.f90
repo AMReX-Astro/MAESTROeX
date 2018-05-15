@@ -47,15 +47,6 @@ contains
     double precision :: temperr, denserr
     
     
-    if (parallel_IOProcessor()) then
-       print*,"Create a local copy of tagging.f90 in your build directory"
-       print*,"Here is a sample that tags the temperature above temperr"
-    end if
-
-    ! abort program
-    call bl_error()
-
-
     ! set temperature and density flags
     temperr = tag_err(1)
     denserr = tag_err(2)

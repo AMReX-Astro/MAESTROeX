@@ -117,7 +117,7 @@ Maestro::Setup ()
     w0        .resize( (max_radial_level+1)*(nr_fine+1) );
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
-
+    
     // diag file data arrays
     diagfile_data.resize(diag_buf_size*11);
 
@@ -145,6 +145,7 @@ Maestro::Setup ()
     etarho_ec    .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
     diagfile_data.shrink_to_fit();
+
 
     init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
                              r_cc_loc.dataPtr(),
@@ -193,6 +194,20 @@ Maestro::Setup ()
         ng_adv = 3;
     }
 
+    // tagging criteria
+    tag_err.resize(max_level);
+    for (int lev=0; lev<max_level; ++lev) {
+	tag_err[lev].resize(2);
+	tag_err[lev].shrink_to_fit();
+    }
+    tag_err.shrink_to_fit();
+
+    // combine tagging criteria
+    for (int lev=0; lev<max_level; ++lev) {
+	tag_err[lev][0] = temperr[lev];
+	tag_err[lev][1] = denserr[lev];
+    }
+
 }
 
 // read in some parameters from inputs file
@@ -226,10 +241,17 @@ Maestro::ReadParameters ()
     }
 
     // read in tagging criteria
-    int n = pp.countval("temperr");
-    if (n > 0) {
-        pp.getarr("temperr", temperr, 0, n);
+    // temperature
+    int ntemp = pp.countval("temperr");
+    if (ntemp > 0) {
+        pp.getarr("temperr", temperr, 0, ntemp);
     }
+    // density
+    int ndens = pp.countval("denserr");
+    if (ndens > 0) {
+        pp.getarr("denserr", denserr, 0, ndens);
+    }
+
 }
 
 // define variable mappings (Rho, RhoH, ..., Nscal, etc.)

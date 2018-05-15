@@ -34,6 +34,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 
 # TAGGING
 maestro.temperr = 6.0e8 
+maestro.denserr = 1.0e8
 
 # TIME STEPPING
 maestro.max_step  = 100

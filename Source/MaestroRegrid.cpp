@@ -94,7 +94,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ErrorEst()",ErrorEst);
 
-    if (lev >= temperr.size()) return;
+    if (lev >= tag_err.size()) return;
 
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
@@ -132,7 +132,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
                         BL_TO_FORTRAN_3D(state[mfi]),
                         &tagval, &clearval, 
                         ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()), 
-                        ZFILL(dx), &time, &temperr[lev]);
+                        ZFILL(dx), &time, tag_err[lev].dataPtr());
             //
             // Now update the tags in the TagBox in the tilebox region
             // to be equal to itags

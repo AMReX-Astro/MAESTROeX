@@ -1,6 +1,7 @@
 module tagging_module
 
-  use meth_params_module, only: temp_comp, nscal
+  use meth_params_module, only: temp_comp, rho_comp, nscal
+  use probdata_module, only: tag_density_3
 
   implicit none
 
@@ -46,15 +47,6 @@ contains
     integer          :: i, j, k
     double precision :: temperr, denserr
     
-    
-    if (parallel_IOProcessor()) then
-       print*,"Create a local copy of tagging.f90 in your build directory"
-       print*,"Here is a sample that tags the temperature above temperr"
-    end if
-
-    ! abort program
-    call bl_error()
-
 
     ! set temperature and density flags
     temperr = tag_err(1)
@@ -64,7 +56,7 @@ contains
     do k = lo(3), hi(3)
     do j = lo(2), hi(2)
     do i = lo(1), hi(1)
-       if (state(i,j,k,temp_comp) .ge. temperr) then
+       if (state(i,j,k,rho_comp) .ge. tag_density_3) then
           tag(i,j,k) = set
        endif
     enddo
