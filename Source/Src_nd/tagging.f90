@@ -1,5 +1,6 @@
 module tagging_module
 
+  use parallel, only: parallel_IOProcessor
   use meth_params_module, only: temp_comp, nscal
 
   implicit none
