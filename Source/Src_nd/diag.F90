@@ -25,7 +25,8 @@ contains
                   rho0, p0, &
                   u, u_lo, u_hi, &
                   w0, dx, &
-                  Mach_max,temp_max,enuc_max,Hext_max) bind(C, name="diag")
+                  Mach_max,temp_max,enuc_max,Hext_max, &
+                  mask) bind(C, name="diag")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -41,12 +42,14 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3)
     double precision, intent(inout) :: Mach_max, temp_max, enuc_max, Hext_max
+    integer         , intent(in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
 
     !     Local variables
     integer            :: i, j, k
     double precision   :: weight
     double precision   :: x, y, z
     double precision   :: vel
+    logical            :: cell_valid
 
     type (eos_t) :: eos_state
 
@@ -70,33 +73,42 @@ contains
           do i = lo(1), hi(1)
              x = prob_lo(1) + (dble(i) + 0.5d0) * dx(1)
 
-             ! vel is the magnitude of the velocity, including w0
+             ! make sure the cell isn't covered by finer cells
+             cell_valid = .true.
+             if ( present(mask) ) then
+                if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
+             end if
+             
+             if (cell_valid) then
+
+                ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
-             vel = sqrt( (u(i,1) + HALF*(w0(lev,i) + w0(lev,i+1)) )**2 )
+                vel = sqrt( (u(i,1) + HALF*(w0(lev,i) + w0(lev,i+1)) )**2 )
 #elsif (AMREX_SPACEDIM == 2)
-             vel = sqrt(  u(i,j,1)**2 + &
-                        ( u(i,j,2) + HALF*(w0(lev,j) + w0(lev,j+1)) )**2 )
+                vel = sqrt(  u(i,j,1)**2 + &
+                           ( u(i,j,2) + HALF*(w0(lev,j) + w0(lev,j+1)) )**2 )
 #elsif (AMREX_SPACEDIM == 3)
-             vel = sqrt(  u(i,j,k,1)**2 + &
-                          u(i,j,k,2)**2 + &
-                        ( u(i,j,k,3) + 0.5d0*(w0(lev,k) + w0(lev,k+1)) )**2 )
+                vel = sqrt(  u(i,j,k,1)**2 + &
+                             u(i,j,k,2)**2 + &
+                           ( u(i,j,k,3) + 0.5d0*(w0(lev,k) + w0(lev,k+1)) )**2 )
 #endif
              
-             ! call the EOS to get the sound speed and internal energy       
-             eos_state%T     = scal(i,j,k,temp_comp)
-             eos_state%rho   = scal(i,j,k,rho_comp)
-             eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+                ! call the EOS to get the sound speed and internal energy       
+                eos_state%T     = scal(i,j,k,temp_comp)
+                eos_state%rho   = scal(i,j,k,rho_comp)
+                eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             call eos(eos_input_rt, eos_state)
+                call eos(eos_input_rt, eos_state)
+                
+                ! max Mach number                                       
+                Mach_max = max(Mach_max,vel/eos_state%cs)
 
-             ! max Mach number                                       
-             Mach_max = max(Mach_max,vel/eos_state%cs)
+                ! max temp and enuc
+                temp_max = max(temp_max,scal(i,j,k,temp_comp))
+                enuc_max = max(enuc_max,rho_Hnuc(i,j,k)/scal(i,j,k,rho_comp))
+                Hext_max = max(Hext_max,rho_Hext(i,j,k)/scal(i,j,k,rho_comp))
 
-             ! max temp and enuc
-             temp_max = max(temp_max,scal(i,j,k,temp_comp))
-             enuc_max = max(enuc_max,rho_Hnuc(i,j,k)/scal(i,j,k,rho_comp))
-             Hext_max = max(Hext_max,rho_Hext(i,j,k)/scal(i,j,k,rho_comp))
-
+             endif
           enddo
        enddo
     enddo
@@ -116,7 +128,8 @@ contains
                         dx, &
                         normal, n_lo, n_hi, &
                         T_max, coord_Tmax, vel_Tmax, &
-                        ncenter, T_center, Mach_max) bind(C, name="diag_sphr")
+                        ncenter, T_center, Mach_max, &
+                        mask) bind(C, name="diag_sphr")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -139,12 +152,14 @@ contains
     double precision, intent(inout) :: T_max, coord_Tmax(3), vel_Tmax(3), T_center
     integer         , intent(inout) :: ncenter
     double precision, intent(inout) :: Mach_max
+    integer         , intent(in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
 
     !     Local variables
     integer          :: i, j, k
     double precision :: weight
     double precision :: x, y, z
     double precision :: vel, velr
+    logical          :: cell_valid
 
     type (eos_t) :: eos_state
 
@@ -162,8 +177,15 @@ contains
           do i = lo(1), hi(1)
              x = prob_lo(1) + (dble(i) + 0.5d0) * dx(1)
 
+             ! make sure the cell isn't covered by finer cells
+             cell_valid = .true.
+             if ( present(mask) ) then
+                if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
+             end if
+
              ! we only consider cells inside of where the sponging begins
-             if ( scal(i,j,k,rho_comp) >= sponge_start_factor*sponge_center_density ) then
+             if ( cell_valid .and. & 
+                  scal(i,j,k,rho_comp) >= sponge_start_factor*sponge_center_density ) then
 
                 ! is it one of the 8 zones surrounding the center?
                 if ( abs(x - center(1)) < dx(1)  .and. &

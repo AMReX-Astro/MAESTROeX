@@ -84,6 +84,14 @@ Maestro::DiagFile (const int step,
 	const MultiFab& normal_mf = normal[lev];
 	const Real* dx = geom[lev].CellSize();
 
+	// create mask assuming refinement ratio = 2
+	int finelev = lev+1;
+	if (lev == finest_level) finelev = finest_level;
+
+	const BoxArray& fba = s_in[finelev].boxArray();
+	const iMultiFab& mask = makeFineMask(sin_mf, fba, IntVect(2));
+
+
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(sin_mf); mfi.isValid(); ++mfi ) {
 
@@ -93,18 +101,36 @@ Maestro::DiagFile (const int step,
 	    // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
-	    diag_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-		      BL_TO_FORTRAN_FAB(sin_mf[mfi]),
-		      rho0_in.dataPtr(), p0_in.dataPtr(), 
-		      BL_TO_FORTRAN_3D(uin_mf[mfi]), 
-		      BL_TO_FORTRAN_3D(w0macx_mf[mfi]), 
-		      BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-		      BL_TO_FORTRAN_3D(w0macz_mf[mfi]), 
-		      BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
-		      dx, 
-		      BL_TO_FORTRAN_3D(normal_mf[mfi]), 
-		      &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(), 
-		      &ncenter_level, &T_center_level, &Mach_max_level);
+	    if (lev == finest_level) {
+		diag_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			  BL_TO_FORTRAN_FAB(sin_mf[mfi]),
+			  rho0_in.dataPtr(), p0_in.dataPtr(), 
+			  BL_TO_FORTRAN_3D(uin_mf[mfi]), 
+			  BL_TO_FORTRAN_3D(w0macx_mf[mfi]), 
+			  BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+			  BL_TO_FORTRAN_3D(w0macz_mf[mfi]), 
+			  BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
+			  dx, 
+			  BL_TO_FORTRAN_3D(normal_mf[mfi]), 
+			  &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(), 
+			  &ncenter_level, &T_center_level, &Mach_max_level);
+	    } else {
+		// we include the mask so we don't double count; i.e., we only consider
+		// cells that are not covered by finer cells 
+		diag_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			  BL_TO_FORTRAN_FAB(sin_mf[mfi]),
+			  rho0_in.dataPtr(), p0_in.dataPtr(), 
+			  BL_TO_FORTRAN_3D(uin_mf[mfi]), 
+			  BL_TO_FORTRAN_3D(w0macx_mf[mfi]), 
+			  BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+			  BL_TO_FORTRAN_3D(w0macz_mf[mfi]), 
+			  BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
+			  dx, 
+			  BL_TO_FORTRAN_3D(normal_mf[mfi]), 
+			  &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(), 
+			  &ncenter_level, &T_center_level, &Mach_max_level, 
+			  mask[mfi].dataPtr());
+	    }
 	}
 
 	// sum ncenter and T_center over all processors
