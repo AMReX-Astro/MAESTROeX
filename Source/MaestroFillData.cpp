@@ -275,13 +275,13 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
 
                 // number of boxes and weights used for KnapSack distribution
                 const int N = fine_src_ba.size();
-                std::vector<long> wgts(dir);
+                std::vector<long> wgts(N);
 
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
                 // set weights equal to number of points in the box
-                for (int i = 0; i < N; i++) {
+                for (int i = 0; i < N; ++i) {
                     wgts[i] = fine_src_ba[i].numPts();
                 }
 
@@ -355,15 +355,16 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                 // to we don't change the values on the C-F interface
                 uedge[lev][dir].copy(uedge_f_save);
             }
-        }
 
-        // fill peroidic ghost cells
-        for (int d=0; d<AMREX_SPACEDIM; ++d) {
-            uedge[lev][d].FillBoundary(geom[lev].periodicity());
-        }
+        } // end if
 
-        // fill ghost cells behind physical boundaries
-        FillUmacGhost(uedge,lev);
+	// fill periodic ghost cells
+	for (int d=0; d<AMREX_SPACEDIM; ++d) {
+	    uedge[lev][d].FillBoundary(geom[lev].periodicity());
+	}
+	
+	// fill ghost cells behind physical boundaries
+	FillUmacGhost(uedge,lev);
 
     } // end loop over levels
 

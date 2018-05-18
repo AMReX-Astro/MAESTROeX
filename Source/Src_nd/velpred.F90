@@ -35,7 +35,7 @@ contains
     integer         , intent(in   ) ::  f_lo(1),  f_hi(1), nc_f
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),nc_uf)
-    double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1))
+    double precision, intent(inout) :: umac(uu_lo(1):uu_hi(1))
     double precision, intent(in   ) :: force ( f_lo(1): f_hi(1),nc_f)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(1), dt

@@ -134,12 +134,18 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         }
     }
 
-    // fill ghost cells behind physical boundaries
-    FillUmacGhost(utrans);
+    if (finest_level == 0) {
+	// fill ghost cells behind physical boundaries
+	FillUmacGhost(utrans);
+    } else {
+	// FIXME need to add edge_restriction 
+	//
+	//
 
-    // FIXME need to add edge_restriction and create_umac_grown
-    //
-    //
+	// fill ghost cells for all levels
+	FillPatchUedge(utrans);
+    }
+
 }
 
 void

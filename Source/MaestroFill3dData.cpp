@@ -141,9 +141,12 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
     // fill ghost cells behind physical boundaries
     FillUmacGhost(uedge);
 
-    // FIXME need to add edge_restriction and create_umac_grown
+    // FIXME need to add edge_restriction 
     //
     //
+
+    // fill all ghost cells for edge-based velocity field
+    FillPatchUedge(uedge);
 
 }
 

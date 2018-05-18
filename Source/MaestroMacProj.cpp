@@ -167,10 +167,12 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 		     mac_fluxes[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0););
     }
 
+    Vector< std::array<MultiFab*,AMREX_SPACEDIM> > mac_fluxptr(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
 	// fluxes computed are "-B grad phi"
-	mac_mlmg.getFluxes({amrex::GetArrOfPtrs(mac_fluxes[lev])});
+	mac_fluxptr[lev] = GetArrOfPtrs(mac_fluxes[lev]);
     }
+    mac_mlmg.getFluxes(mac_fluxptr);
 
     for (int lev = 0; lev <= finest_level; ++lev) {
 	for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
@@ -178,7 +180,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	    MultiFab::Add(umac[lev][idim], mac_fluxes[lev][idim], 0, 0, 1, 0);
 	}
     }
-    
+
     // convert beta0*Utilde to Utilde
     if (spherical == 0) {
 	mult_or_div = 0;
