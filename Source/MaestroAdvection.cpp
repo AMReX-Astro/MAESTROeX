@@ -127,7 +127,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         } // end MFIter loop
     } // end loop over levels
     
-    // fill peroidic ghost cells
+    // fill periodic ghost cells
     for (int lev=0; lev<=finest_level; ++lev) {
         for (int d=0; d<AMREX_SPACEDIM; ++d) {
             utrans[lev][d].FillBoundary(geom[lev].periodicity());
@@ -448,12 +448,46 @@ void
 #endif
 	    } // end spherical
 	} // end MFIter loop
+
+
+	// increment or decrement the flux registers by area and time-weighted fluxes
+        // Note that the fluxes need to be scaled by dt and area
+        // In this example we are solving s_t = -div(+F)
+        // The fluxes contain, e.g., F_{i+1/2,j} = (s*u)_{i+1/2,j}
+        // Keep this in mind when considering the different sign convention for updating
+        // the flux registers from the coarse or fine grid perspective
+        // NOTE: the flux register associated with flux_reg_s[lev] is associated
+        // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
+        if (do_reflux) { 
+
+	    // Get the grid size
+	    const Real* dx = geom[lev].CellSize();
+	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
+
+	    if (flux_reg_s[lev+1]) 
+            {
+                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
+                    // update the lev+1/lev flux register (index lev+1)   
+                    flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,start_comp,start_comp,num_comp, -1.0*dt*area[i]);
+		    // also include density flux
+                    flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,Rho,Rho,1, -1.0*dt*area[i]);
+                }	
+            }
+	    if (flux_reg_s[lev])
+            {
+                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
+                    // update the lev/lev-1 flux register (index lev) 
+                    flux_reg_s[lev]->FineAdd(sflux[lev][i],i,start_comp,start_comp,num_comp, 1.0*dt*area[i]);
+		    // also include density flux
+                    flux_reg_s[lev]->FineAdd(sflux[lev][i],i,Rho,Rho,1, 1.0*dt*area[i]);
+                }
+            }
+        }
+
     } // end loop over levels
 
-    // FIXME need to add edge_restriction
-    //
-    //
 
+    // Something analogous to edge_restriction is done in UpdateScal()
 }
 
 void
@@ -593,11 +627,41 @@ void
 #endif
 	    }	    
 	} // end MFIter loop
+
+		    
+        // increment or decrement the flux registers by area and time-weighted fluxes
+        // Note that the fluxes need to be scaled by dt and area
+        // In this example we are solving s_t = -div(+F)
+        // The fluxes contain, e.g., F_{i+1/2,j} = (s*u)_{i+1/2,j}
+        // Keep this in mind when considering the different sign convention for updating
+        // the flux registers from the coarse or fine grid perspective
+        // NOTE: the flux register associated with flux_reg_s[lev] is associated
+        // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
+        if (do_reflux) { 
+
+	    // Get the grid size
+	    const Real* dx = geom[lev].CellSize();
+	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
+
+	    if (flux_reg_s[lev+1])
+            {
+                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
+                    // update the lev+1/lev flux register (index lev+1)   
+                    flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,RhoH,RhoH,1, -1.0*dt*area[i]);
+                }	
+            }
+	    if (flux_reg_s[lev])
+            {
+                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
+                    // update the lev/lev-1 flux register (index lev) 
+                    flux_reg_s[lev]->FineAdd(sflux[lev][i],i,RhoH,RhoH,1, 1.0*dt*area[i]);
+                }
+            }
+        }
+
     } // end loop over levels
 
-    // FIXME need to add edge_restriction
-    //
-    //
+    // Something analogous to edge_restriction is done in UpdateScal()
 
 }
 
@@ -726,6 +790,15 @@ void
     } // end loop over levels
 
 
+    // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
+    if (do_reflux) {
+	for (int lev=finest_level-1; lev>=0; --lev) {
+            // update lev based on coarse-fine flux mismatch
+            flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, start_comp, start_comp, num_comp, geom[lev]);
+        }
+    }
+    
+
     // average fine data onto coarser cells
     AverageDown(statenew,start_comp,num_comp);
 
@@ -734,6 +807,12 @@ void
 
     // do the same for density if we updated the species
     if (start_comp == FirstSpec) {
+	if (do_reflux) {
+	    for (int lev=finest_level-1; lev>=0; --lev) {
+		// update lev based on coarse-fine flux mismatch
+		flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1, geom[lev]);
+	    }
+	}
 	AverageDown(statenew,Rho,1);
 	FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
     }

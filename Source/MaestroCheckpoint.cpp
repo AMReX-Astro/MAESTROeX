@@ -233,6 +233,12 @@ Maestro::ReadCheckPoint ()
             if (spherical == 1) {
                 normal[lev].define(ba, dm, 1, 1);
             }
+
+	    // build FluxRegister data
+	    if (lev > 0 && do_reflux) {
+		flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+		flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
+	    }
     }
     }
 

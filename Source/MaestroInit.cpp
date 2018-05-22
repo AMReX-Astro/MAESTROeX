@@ -296,6 +296,11 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	    		  r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
 	}
     }
+
+    if (lev > 0 && do_reflux) {
+	flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+	flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
+    }
 }
 
 
