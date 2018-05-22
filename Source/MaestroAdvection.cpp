@@ -138,9 +138,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 	// fill ghost cells behind physical boundaries
 	FillUmacGhost(utrans);
     } else {
-	// FIXME need to add edge_restriction 
-	//
-	//
+	// edge_restriction 
+	AverageDownFaces(utrans);
 
 	// fill ghost cells for all levels
 	FillPatchUedge(utrans);
@@ -226,9 +225,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         } // end MFIter loop
     } // end loop over levels
 
-    // FIXME need to add edge_restriction
-    //
-    //
+    // edge_restriction
+    AverageDownFaces(umac);
 
 }
 
@@ -312,9 +310,12 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         } // end MFIter loop
     } // end loop over levels
 
-    // FIXME need to add edge_restriction
-    //
-    //
+    // We use edge_restriction for the output velocity if is_vel == 1
+    // we do not use edge_restriction for scalars because instead we will use
+    // reflux on the fluxes in make_flux.
+    if (is_vel == 1) {
+	AverageDownFaces(sedge);
+    }
 
 }
 

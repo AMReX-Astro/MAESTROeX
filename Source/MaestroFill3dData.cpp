@@ -131,7 +131,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
     }
 
     
-    // fill peroidic ghost cells
+    // fill periodic ghost cells
     for (int lev=0; lev<=finest_level; ++lev) {
         for (int d=0; d<AMREX_SPACEDIM; ++d) {
             uedge[lev][d].FillBoundary(geom[lev].periodicity());
@@ -141,9 +141,8 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
     // fill ghost cells behind physical boundaries
     FillUmacGhost(uedge);
 
-    // FIXME need to add edge_restriction 
-    //
-    //
+    // edge_restriction 
+    AverageDownFaces(uedge);
 
     // fill all ghost cells for edge-based velocity field
     FillPatchUedge(uedge);
