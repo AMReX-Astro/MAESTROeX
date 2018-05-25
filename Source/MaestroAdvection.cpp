@@ -483,6 +483,10 @@ void
                     flux_reg_s[lev]->FineAdd(sflux[lev][i],i,Rho,Rho,1, 1.0*dt*area[i]);
                 }
             }
+
+	    if (spherical == 0) {
+		// need edge_restrict for cell-centered etarhoflux
+	    }
         }
 
     } // end loop over levels

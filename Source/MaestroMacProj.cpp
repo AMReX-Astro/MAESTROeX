@@ -57,6 +57,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // compute the RHS for the solve, RHS = macrhs - div(beta0*umac)
+    AverageDownFaces(umac);
     ComputeMACSolverRHS(solverrhs,macrhs,umac);
 
     // create a MultiFab filled with rho and 1 ghost cell.
@@ -98,6 +99,9 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	    face_bcoef[lev][idim].invert(1.0,0,1);
 	}
     }
+
+    // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
+    AverageDownFaces(face_bcoef);
 
     // multiply face-centered B coefficients by beta0 so they contain beta0/rho
     if (spherical == 0) {
@@ -174,6 +178,9 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
     mac_mlmg.getFluxes(mac_fluxptr);
 
+    // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
+    AverageDownFaces(mac_fluxes);
+
     for (int lev = 0; lev <= finest_level; ++lev) {
 	for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
 	    // add -B grad phi to beta0*Utilde
@@ -193,15 +200,24 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	}
     }
 
-    // fill periodic ghost cells
-    for (int lev = 0; lev <= finest_level; ++lev) {
-        for (int d = 0; d < AMREX_SPACEDIM; ++d) {
-            umac[lev][d].FillBoundary(geom[lev].periodicity());
-        }
-    }
 
-    // fill ghost cells behind physical boundaries
-    FillUmacGhost(umac);
+    if (finest_level == 0) {
+	// fill periodic ghost cells
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int d = 0; d < AMREX_SPACEDIM; ++d) {
+		umac[lev][d].FillBoundary(geom[lev].periodicity());
+	    }
+	}
+
+	// fill ghost cells behind physical boundaries
+	FillUmacGhost(umac);
+    } else {
+	// edge_restriction for velocities
+	AverageDownFaces(umac);
+	
+	// fill level n ghost cells using interpolation from level n-1 data
+	FillPatchUedge(umac);
+    }
 
 }
 

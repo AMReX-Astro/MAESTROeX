@@ -328,5 +328,7 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 			      &harmonic_avg);
         }
     }
-
+    
+    // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
+    AverageDownFaces(face);
 }

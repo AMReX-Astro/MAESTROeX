@@ -70,11 +70,11 @@ Maestro::EstDt ()
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
 		 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
     
-    Real dt_lev = 1.e99;
-    Real umax_lev = 0.;
     Real umax = 0.;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
+	Real dt_lev = 1.e99;
+	Real umax_lev = 0.;
 
         // get references to the MultiFabs at level lev
         MultiFab& uold_mf = uold[lev];
@@ -231,12 +231,12 @@ Maestro::FirstDt ()
     int do_add_utilde_force = 0;
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
 		 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
-    
-    Real dt_lev = 1.e99;
-    Real umax_lev = 0.;
+
     Real umax = 0.;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
+	Real dt_lev = 1.e99;
+	Real umax_lev = 0.;
 
         // get references to the MultiFabs at level lev
         MultiFab& uold_mf = uold[lev];
@@ -245,7 +245,7 @@ Maestro::FirstDt ()
         MultiFab& S_cc_old_mf = S_cc_old[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(uold_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;

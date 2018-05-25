@@ -9,6 +9,7 @@
   tag_density_1 = 5.e7
   tag_density_2 = 1.e8
   tag_density_3 = 1.e8
+  tag_density_3 = 1.e9
   particle_temp_cutoff = 6.e8
   particle_tpert_threshold = 2.e7
 
