@@ -126,15 +126,15 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
         } // end MFIter loop
     } // end loop over levels
-    
-    // fill periodic ghost cells
-    for (int lev=0; lev<=finest_level; ++lev) {
-        for (int d=0; d<AMREX_SPACEDIM; ++d) {
-            utrans[lev][d].FillBoundary(geom[lev].periodicity());
-        }
-    }
 
-    if (finest_level == 0) {
+    if (finest_level == 0) {    
+	// fill periodic ghost cells
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int d=0; d<AMREX_SPACEDIM; ++d) {
+		utrans[lev][d].FillBoundary(geom[lev].periodicity());
+	    }
+	}
+
 	// fill ghost cells behind physical boundaries
 	FillUmacGhost(utrans);
     } else {
@@ -485,7 +485,7 @@ void
             }
 
 	    if (spherical == 0) {
-		// need edge_restrict for cell-centered etarhoflux
+		// need edge_restrict for etarhoflux
 	    }
         }
 
@@ -628,7 +628,7 @@ void
 				       BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
 #else
-	        Abort("MakeRhoXFlux: Spherical is not valid for DIM < 3");
+	        Abort("MakeRhoHFlux: Spherical is not valid for DIM < 3");
 #endif
 	    }	    
 	} // end MFIter loop

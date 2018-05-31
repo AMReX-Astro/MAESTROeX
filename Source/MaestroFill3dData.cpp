@@ -130,23 +130,23 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
         }
     }
 
-    
-    // fill periodic ghost cells
-    for (int lev=0; lev<=finest_level; ++lev) {
-        for (int d=0; d<AMREX_SPACEDIM; ++d) {
-            uedge[lev][d].FillBoundary(geom[lev].periodicity());
-        }
+    if (finest_level == 0) {
+	// fill periodic ghost cells
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int d=0; d<AMREX_SPACEDIM; ++d) {
+		uedge[lev][d].FillBoundary(geom[lev].periodicity());
+	    }
+	}
+
+	// fill ghost cells behind physical boundaries
+	FillUmacGhost(uedge);
+    } else {
+	// edge_restriction 
+	AverageDownFaces(uedge);
+	
+	// fill all ghost cells for edge-based velocity field
+	FillPatchUedge(uedge);
     }
-
-    // fill ghost cells behind physical boundaries
-    FillUmacGhost(uedge);
-
-    // edge_restriction 
-    AverageDownFaces(uedge);
-
-    // fill all ghost cells for edge-based velocity field
-    FillPatchUedge(uedge);
-
 }
 
 
