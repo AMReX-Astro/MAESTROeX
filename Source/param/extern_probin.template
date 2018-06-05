@@ -3,7 +3,7 @@
 
 module extern_probin_module
 
-  use bl_types
+  use amrex_fort_module, only: rt => amrex_real
 
   implicit none
 
