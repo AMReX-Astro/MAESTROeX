@@ -105,16 +105,32 @@ Maestro::DensityAdvance (int which_step,
     // predicted here, depending on species_pred_type
 
     int is_vel = 0; // false
-    if (species_pred_type == predict_rhoprime_and_X) {
+    if (species_pred_type == predict_rhoprime_and_X || 
+	species_pred_type == predict_rho_and_X) {
 
 	// we are predicting X to the edges, using the advective form of
 	// the prediction
 	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,0);
+
+    } else if (species_pred_type == predict_rhoX) {
+
+	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,1);
     }
    
     // predict rho or rho' at the edges (depending on species_pred_type)
-    if (species_pred_type == predict_rhoprime_and_X) {
+    if (species_pred_type == predict_rhoprime_and_X || 
+	species_pred_type == predict_rho_and_X) {
 	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,Rho,Rho,1,0);
+    
+    } else if (species_pred_type == predict_rhoX) {
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+		MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec,1,0);
+		if (NumSpec > 1) 
+		    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec+1,NumSpec-1,0);
+	    }
+	}
     }
     
     if (species_pred_type == predict_rhoprime_and_X) {
