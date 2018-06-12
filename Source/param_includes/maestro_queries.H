@@ -77,6 +77,7 @@ pp.query("dpdt_factor", dpdt_factor);
 pp.query("do_planar_invsq_grav", do_planar_invsq_grav);
 pp.query("planar_invsq_mass", planar_invsq_mass);
 pp.query("evolve_base_state", evolve_base_state);
+pp.query("use_exact_base_state", use_exact_base_state);
 pp.query("fix_base_state", fix_base_state);
 pp.query("do_smallscale", do_smallscale);
 pp.query("do_eos_h_above_cutoff", do_eos_h_above_cutoff);

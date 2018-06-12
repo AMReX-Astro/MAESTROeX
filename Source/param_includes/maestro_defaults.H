@@ -77,6 +77,7 @@ amrex::Real Maestro::dpdt_factor = 0.0;
 bool        Maestro::do_planar_invsq_grav = false;
 amrex::Real Maestro::planar_invsq_mass = 0.0;
 bool        Maestro::evolve_base_state = true;
+bool        Maestro::use_exact_base_state = false;
 bool        Maestro::fix_base_state = false;
 bool        Maestro::do_smallscale = false;
 bool        Maestro::do_eos_h_above_cutoff = true;

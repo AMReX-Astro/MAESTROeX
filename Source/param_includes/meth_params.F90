@@ -48,6 +48,7 @@ module meth_params_module
   logical                       , save :: do_planar_invsq_grav
   double precision              , save :: planar_invsq_mass
   logical                       , save :: evolve_base_state
+  logical                       , save :: use_exact_base_state
   logical                       , save :: do_eos_h_above_cutoff
   integer                       , save :: enthalpy_pred_type
   integer                       , save :: species_pred_type
@@ -112,6 +113,7 @@ contains
     do_planar_invsq_grav = .false.;
     planar_invsq_mass = 0.0d0;
     evolve_base_state = .true.;
+    use_exact_base_state = .false.;
     do_eos_h_above_cutoff = .true.;
     enthalpy_pred_type = 1;
     species_pred_type = 1;
@@ -164,6 +166,7 @@ contains
     call pp%query("do_planar_invsq_grav", do_planar_invsq_grav)
     call pp%query("planar_invsq_mass", planar_invsq_mass)
     call pp%query("evolve_base_state", evolve_base_state)
+    call pp%query("use_exact_base_state", use_exact_base_state)
     call pp%query("do_eos_h_above_cutoff", do_eos_h_above_cutoff)
     call pp%query("enthalpy_pred_type", enthalpy_pred_type)
     call pp%query("species_pred_type", species_pred_type)

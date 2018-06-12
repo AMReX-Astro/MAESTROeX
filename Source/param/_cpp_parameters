@@ -298,6 +298,9 @@ planar_invsq_mass                   Real               0.0      y
 # turn on (true) or off (false) basestate evolution
 evolve_base_state                   bool            true	y
 
+# turn on (true) or off (false) basestate evolution
+use_exact_base_state                bool            false	y
+
 # if true, don't call average to reset the base state at all, even during
 # initialization
 fix_base_state                      bool            false

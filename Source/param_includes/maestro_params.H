@@ -77,6 +77,7 @@ static amrex::Real dpdt_factor;
 static bool        do_planar_invsq_grav;
 static amrex::Real planar_invsq_mass;
 static bool        evolve_base_state;
+static bool        use_exact_base_state;
 static bool        fix_base_state;
 static bool        do_smallscale;
 static bool        do_eos_h_above_cutoff;
