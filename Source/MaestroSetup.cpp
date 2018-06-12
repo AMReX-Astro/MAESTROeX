@@ -78,6 +78,15 @@ Maestro::Setup ()
         }       
         max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
         nr_fine = int(max_dist / dr_fine) + 1;
+
+	// compute nr_irreg
+	int domhi = domainBoxFine.bigEnd(0)+1;
+	if (!octant) {
+	    nr_irreg = (3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0;
+	} else {
+	    nr_irreg = (3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0;
+	}
+
     }
     else {
         // compute max_radial_level
@@ -92,32 +101,55 @@ Maestro::Setup ()
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    s0_init      .resize( (max_radial_level+1)*nr_fine*Nscal );
-    p0_init      .resize( (max_radial_level+1)*nr_fine );
-    rho0_old     .resize( (max_radial_level+1)*nr_fine );
-    rho0_new     .resize( (max_radial_level+1)*nr_fine );
-    rhoh0_old    .resize( (max_radial_level+1)*nr_fine );
-    rhoh0_new    .resize( (max_radial_level+1)*nr_fine );
-    p0_old       .resize( (max_radial_level+1)*nr_fine );
-    p0_new       .resize( (max_radial_level+1)*nr_fine );
-    tempbar      .resize( (max_radial_level+1)*nr_fine );
-    tempbar_init .resize( (max_radial_level+1)*nr_fine );
-    beta0_old    .resize( (max_radial_level+1)*nr_fine );
-    beta0_new    .resize( (max_radial_level+1)*nr_fine );
-    gamma1bar_old.resize( (max_radial_level+1)*nr_fine );
-    gamma1bar_new.resize( (max_radial_level+1)*nr_fine );
-    etarho_cc    .resize( (max_radial_level+1)*nr_fine );
-    psi          .resize( (max_radial_level+1)*nr_fine );
-    grav_cell_old.resize( (max_radial_level+1)*nr_fine );
-    grav_cell_new.resize( (max_radial_level+1)*nr_fine );
+    if (spherical == 1 && use_exact_base_state == 1) {
+	// base states are stored
+	s0_init      .resize( (max_radial_level+1)*nr_irreg*Nscal );
+	p0_init      .resize( (max_radial_level+1)*nr_irreg );
+	rho0_old     .resize( (max_radial_level+1)*nr_irreg );
+	rho0_new     .resize( (max_radial_level+1)*nr_irreg );
+	rhoh0_old    .resize( (max_radial_level+1)*nr_irreg );
+	rhoh0_new    .resize( (max_radial_level+1)*nr_irreg );
+	p0_old       .resize( (max_radial_level+1)*nr_irreg );
+	p0_new       .resize( (max_radial_level+1)*nr_irreg );
+	tempbar      .resize( (max_radial_level+1)*nr_irreg );
+	tempbar_init .resize( (max_radial_level+1)*nr_irreg );
+	beta0_old    .resize( (max_radial_level+1)*nr_irreg );
+	beta0_new    .resize( (max_radial_level+1)*nr_irreg );
+	gamma1bar_old.resize( (max_radial_level+1)*nr_irreg );
+	gamma1bar_new.resize( (max_radial_level+1)*nr_irreg );
+	grav_cell_old.resize( (max_radial_level+1)*nr_irreg );
+	grav_cell_new.resize( (max_radial_level+1)*nr_irreg );
+    } else {
+	// base states are stored
+	s0_init      .resize( (max_radial_level+1)*nr_fine*Nscal );
+	p0_init      .resize( (max_radial_level+1)*nr_fine );
+	rho0_old     .resize( (max_radial_level+1)*nr_fine );
+	rho0_new     .resize( (max_radial_level+1)*nr_fine );
+	rhoh0_old    .resize( (max_radial_level+1)*nr_fine );
+	rhoh0_new    .resize( (max_radial_level+1)*nr_fine );
+	p0_old       .resize( (max_radial_level+1)*nr_fine );
+	p0_new       .resize( (max_radial_level+1)*nr_fine );
+	tempbar      .resize( (max_radial_level+1)*nr_fine );
+	tempbar_init .resize( (max_radial_level+1)*nr_fine );
+	beta0_old    .resize( (max_radial_level+1)*nr_fine );
+	beta0_new    .resize( (max_radial_level+1)*nr_fine );
+	gamma1bar_old.resize( (max_radial_level+1)*nr_fine );
+	gamma1bar_new.resize( (max_radial_level+1)*nr_fine );
+	etarho_cc    .resize( (max_radial_level+1)*nr_fine );
+	psi          .resize( (max_radial_level+1)*nr_fine );
+	grav_cell_old.resize( (max_radial_level+1)*nr_fine );
+	grav_cell_new.resize( (max_radial_level+1)*nr_fine );
+    }
     r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    w0        .resize( (max_radial_level+1)*(nr_fine+1) );
-    etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
+    if (use_exact_base_state == 0) {
+	w0        .resize( (max_radial_level+1)*(nr_fine+1) );
+	etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
+    }
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
-    
+
     // diag file data arrays
     diagfile_data.resize(diag_buf_size*11);
 
@@ -136,13 +168,15 @@ Maestro::Setup ()
     beta0_new    .shrink_to_fit();
     gamma1bar_old.shrink_to_fit();
     gamma1bar_new.shrink_to_fit();
-    etarho_cc    .shrink_to_fit();
-    psi          .shrink_to_fit();
     grav_cell_old.shrink_to_fit();
     grav_cell_new.shrink_to_fit();
+    if (use_exact_base_state == 0) {
+	etarho_cc    .shrink_to_fit();
+	psi          .shrink_to_fit();
+	w0           .shrink_to_fit();
+	etarho_ec    .shrink_to_fit();
+    }
     r_cc_loc     .shrink_to_fit();
-    w0           .shrink_to_fit();
-    etarho_ec    .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
     diagfile_data.shrink_to_fit();
 

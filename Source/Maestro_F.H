@@ -62,7 +62,7 @@ extern "C"
                                   const amrex::Real* r_edge_loc,
                                   const amrex::Real* dx_fine,
                                   const int* domhi_fine, 
-				  int* nr_irreg_out);
+				  int* nr_irreg_in);
 
     void compute_cutoff_coords(const amrex::Real* rho0);
 
