@@ -110,7 +110,7 @@ contains
                   (umac(i)+w0(lev,i))*sedgex(i,rho_comp)*sedgex(i,comp)
           end if
 
-          if (evolve_base_state && use_exact_base_state == 0) then
+          if (evolve_base_state .and. .not.use_exact_base_state) then
              if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                 etarhoflux(i) = etarhoflux(i) + sfluxx(i,comp)
              end if
@@ -217,7 +217,7 @@ contains
 
              endif
 
-             if (evolve_base_state && use_exact_base_state == 0) then
+             if (evolve_base_state .and. .not.use_exact_base_state) then
                 if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                    etarhoflux(i,j) = etarhoflux(i,j) + sfluxy(i,j,comp)
                 end if
@@ -368,7 +368,7 @@ contains
 
                 endif
 
-                if (evolve_base_state && use_exact_base_state == 0) then
+                if (evolve_base_state .and. .not.use_exact_base_state) then
                    if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                       etarhoflux(i,j,k) = etarhoflux(i,j,k) + sfluxz(i,j,k,comp)
                    end if
