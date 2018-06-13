@@ -55,7 +55,7 @@ Maestro::EstDt ()
 	    }
 	}
 
-	if (evolve_base_state) {
+	if (evolve_base_state && use_exact_base_state == 0) {
 	    MakeW0mac(w0mac);
 	}
     }

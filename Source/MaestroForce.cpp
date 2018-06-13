@@ -246,10 +246,14 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 	MakeS0mac(p0, p0mac);
     }
 
-    make_grav_cell(grav.dataPtr(),
-                   rho0.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    if (use_exact_base_state) {
+	// Need to write make_grav_cell_irreg for rho0[0:nr_irreg-1]
+    } else {
+	make_grav_cell(grav.dataPtr(),
+		       rho0.dataPtr(),
+		       r_cc_loc.dataPtr(),
+		       r_edge_loc.dataPtr());
+    }
 
 
     for (int lev=0; lev<=finest_level; ++lev) {

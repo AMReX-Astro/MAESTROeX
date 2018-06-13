@@ -33,7 +33,7 @@ module make_flux_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use network, only: nspec
   use meth_params_module, only: rho_comp, rhoh_comp, enthalpy_pred_type, species_pred_type, &
-                                  evolve_base_state, spec_comp
+                                  evolve_base_state, use_exact_base_state, spec_comp
 
   implicit none
 
@@ -110,7 +110,7 @@ contains
                   (umac(i)+w0(lev,i))*sedgex(i,rho_comp)*sedgex(i,comp)
           end if
 
-          if (evolve_base_state) then
+          if (evolve_base_state && use_exact_base_state == 0) then
              if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                 etarhoflux(i) = etarhoflux(i) + sfluxx(i,comp)
              end if
@@ -217,7 +217,7 @@ contains
 
              endif
 
-             if (evolve_base_state) then
+             if (evolve_base_state && use_exact_base_state == 0) then
                 if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                    etarhoflux(i,j) = etarhoflux(i,j) + sfluxy(i,j,comp)
                 end if
@@ -368,7 +368,7 @@ contains
 
                 endif
 
-                if (evolve_base_state) then
+                if (evolve_base_state && use_exact_base_state == 0) then
                    if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                       etarhoflux(i,j,k) = etarhoflux(i,j,k) + sfluxz(i,j,k,comp)
                    end if

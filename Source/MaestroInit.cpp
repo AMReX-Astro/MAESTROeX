@@ -69,10 +69,14 @@ Maestro::Init ()
     }
 
     // make gravity
-    make_grav_cell(grav_cell_old.dataPtr(),
-                   rho0_old.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    if (use_exact_base_state) {
+	// Need to write make_grav_cell_irreg for rho0[0:nr_irreg-1]
+    } else {
+	make_grav_cell(grav_cell_old.dataPtr(),
+		       rho0_old.dataPtr(),
+		       r_cc_loc.dataPtr(),
+		       r_edge_loc.dataPtr());
+    }
 
     if (restart_file == "") {
 
@@ -185,10 +189,10 @@ Maestro::InitData ()
     if (fix_base_state) {
         // compute cutoff coordinates
         compute_cutoff_coords(rho0_old.dataPtr());
-        make_grav_cell(grav_cell_old.dataPtr(),
-                       rho0_old.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+	make_grav_cell(grav_cell_old.dataPtr(),
+		       rho0_old.dataPtr(),
+		       r_cc_loc.dataPtr(),
+		       r_edge_loc.dataPtr());
     }
     else {
         if (do_smallscale) {
@@ -203,17 +207,23 @@ Maestro::InitData ()
             Average(sold,rho0_old,Rho);
             compute_cutoff_coords(rho0_old.dataPtr());
 
-            // compute gravity
-            make_grav_cell(grav_cell_old.dataPtr(),
-                           rho0_old.dataPtr(),
-                           r_cc_loc.dataPtr(),
-                           r_edge_loc.dataPtr());
+	    if (use_exact_base_state) {
+		// Need to write make_grav_cell_irreg for rho0[0:nr_irreg-1]
+		// Need to write enforce_HSE_irreg for p0[0:nr_irreg-1]
+	    } else {
+		// compute gravity
+		make_grav_cell(grav_cell_old.dataPtr(),
+			       rho0_old.dataPtr(),
+			       r_cc_loc.dataPtr(),
+			       r_edge_loc.dataPtr());
 
-            // compute p0 with HSE
-            enforce_HSE(rho0_old.dataPtr(),
-                        p0_old.dataPtr(),
-                        grav_cell_old.dataPtr(),
-                        r_edge_loc.dataPtr());
+		// compute p0 with HSE
+		enforce_HSE(rho0_old.dataPtr(),
+			    p0_old.dataPtr(),
+			    grav_cell_old.dataPtr(),
+			    r_edge_loc.dataPtr());
+	    }
+
 
             // call eos with r,p as input to recompute T,h
             TfromRhoP(sold,p0_old,1);
@@ -359,7 +369,7 @@ void Maestro::InitProj ()
     // compute S at cell-centers
     Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
 
-    if (evolve_base_state) {
+    if (evolve_base_state && use_exact_base_state == 0) {
         // average S into Sbar
         Average(S_cc_old,Sbar,0);
     }
@@ -397,8 +407,8 @@ void Maestro::DivuIter (int istep_divu_iter)
     p0_minus_peosbar.shrink_to_fit();
     delta_chi_w0    .shrink_to_fit();
 
-    std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
+    std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
     std::fill(psi.begin(),                  psi.end(),                  0.);
     std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
@@ -438,7 +448,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     // compute S at cell-centers
     Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
 
-    if (evolve_base_state) {
+    if (evolve_base_state && use_exact_base_state == 0) {
         Average(S_cc_old,Sbar,0);
 
         int is_predictor = 1;

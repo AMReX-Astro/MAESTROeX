@@ -221,7 +221,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
 	    w0r_cart[lev].setVal(0.);
 	}
 
-	if (evolve_base_state == 1) {
+	if (evolve_base_state == 1 && use_exact_base_state == 0) {
 	    MakeW0mac(w0mac);
 	    Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
 	}
