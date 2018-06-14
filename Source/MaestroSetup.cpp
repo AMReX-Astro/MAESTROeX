@@ -103,22 +103,23 @@ Maestro::Setup ()
     // these are cell-centered
     if (spherical == 1 && use_exact_base_state == 1) {
 	// base states are stored
-	s0_init      .resize( (max_radial_level+1)*nr_irreg*Nscal );
-	p0_init      .resize( (max_radial_level+1)*nr_irreg );
-	rho0_old     .resize( (max_radial_level+1)*nr_irreg );
-	rho0_new     .resize( (max_radial_level+1)*nr_irreg );
-	rhoh0_old    .resize( (max_radial_level+1)*nr_irreg );
-	rhoh0_new    .resize( (max_radial_level+1)*nr_irreg );
-	p0_old       .resize( (max_radial_level+1)*nr_irreg );
-	p0_new       .resize( (max_radial_level+1)*nr_irreg );
-	tempbar      .resize( (max_radial_level+1)*nr_irreg );
-	tempbar_init .resize( (max_radial_level+1)*nr_irreg );
-	beta0_old    .resize( (max_radial_level+1)*nr_irreg );
-	beta0_new    .resize( (max_radial_level+1)*nr_irreg );
-	gamma1bar_old.resize( (max_radial_level+1)*nr_irreg );
-	gamma1bar_new.resize( (max_radial_level+1)*nr_irreg );
-	grav_cell_old.resize( (max_radial_level+1)*nr_irreg );
-	grav_cell_new.resize( (max_radial_level+1)*nr_irreg );
+	s0_init      .resize( (max_radial_level+1)*(nr_irreg+1)*Nscal );
+	p0_init      .resize( (max_radial_level+1)*(nr_irreg+1) );
+	rho0_old     .resize( (max_radial_level+1)*(nr_irreg+1) );
+	rho0_new     .resize( (max_radial_level+1)*(nr_irreg+1) );
+	rhoh0_old    .resize( (max_radial_level+1)*(nr_irreg+1) );
+	rhoh0_new    .resize( (max_radial_level+1)*(nr_irreg+1) );
+	p0_old       .resize( (max_radial_level+1)*(nr_irreg+1) );
+	p0_new       .resize( (max_radial_level+1)*(nr_irreg+1) );
+	tempbar      .resize( (max_radial_level+1)*(nr_irreg+1) );
+	tempbar_init .resize( (max_radial_level+1)*(nr_irreg+1) );
+	beta0_old    .resize( (max_radial_level+1)*(nr_irreg+1) );
+	beta0_new    .resize( (max_radial_level+1)*(nr_irreg+1) );
+	gamma1bar_old.resize( (max_radial_level+1)*(nr_irreg+1) );
+	gamma1bar_new.resize( (max_radial_level+1)*(nr_irreg+1) );
+	grav_cell_old.resize( (max_radial_level+1)*(nr_irreg+1) );
+	grav_cell_new.resize( (max_radial_level+1)*(nr_irreg+1) );
+	r_cc_loc     .resize( (max_radial_level+1)*(nr_irreg+1) );
     } else {
 	// base states are stored
 	s0_init      .resize( (max_radial_level+1)*nr_fine*Nscal );
@@ -139,16 +140,18 @@ Maestro::Setup ()
 	psi          .resize( (max_radial_level+1)*nr_fine );
 	grav_cell_old.resize( (max_radial_level+1)*nr_fine );
 	grav_cell_new.resize( (max_radial_level+1)*nr_fine );
+	r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
     }
-    r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    if (use_exact_base_state == 0) {
+    if (use_exact_base_state) {
+	r_edge_loc.resize( (max_radial_level+1)*(nr_irreg+2) );
+    } else {
 	w0        .resize( (max_radial_level+1)*(nr_fine+1) );
 	etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
+	r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
     }
-    r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
 
     // diag file data arrays
     diagfile_data.resize(diag_buf_size*11);
@@ -181,12 +184,21 @@ Maestro::Setup ()
     diagfile_data.shrink_to_fit();
 
 
-    init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
-                             r_cc_loc.dataPtr(),
-                             r_edge_loc.dataPtr(),
-                             geom[max_level].CellSize(),
-                             domainBoxFine.hiVect(), 
-			     &nr_irreg);
+    if (use_exact_base_state) {	
+	init_base_state_geometry_irreg(&max_radial_level,&nr_fine,&dr_fine,
+				       r_cc_loc.dataPtr(),
+				       r_edge_loc.dataPtr(),
+				       geom[max_level].CellSize(),
+				       domainBoxFine.hiVect(), 
+				       &nr_irreg);
+    } else {
+	init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
+				 r_cc_loc.dataPtr(),
+				 r_edge_loc.dataPtr(),
+				 geom[max_level].CellSize(),
+				 domainBoxFine.hiVect(), 
+				 &nr_irreg);
+    }
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
