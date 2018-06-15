@@ -252,7 +252,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 #endif
 
-    if (evolve_base_state && use_exact_base_state == 0) {
+    if (evolve_base_state) {
 
         // compute Sbar = average(S_cc_nph)
         Average(S_cc_nph,Sbar,0);
@@ -318,7 +318,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // advect the base state density
-    if (evolve_base_state && use_exact_base_state == 0) {
+    if (evolve_base_state) {
 	advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
 			 rho0_predicted_edge.dataPtr(), &dt,
 			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
@@ -371,13 +371,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state && use_etarho) {
 
-	if (use_exact_base_state == 0) {
-	    // compute the new etarho
-	    if (spherical == 0) {
-		MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
-	    } else {
-		MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
-	    }
+	// compute the new etarho
+	if (spherical == 0) {
+	    MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+	} else {
+	    MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
 	}
 
         // correct the base state density by "averaging"
@@ -399,51 +397,43 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // base state pressure update
     if (evolve_base_state) {
 
-	if (use_exact_base_state) {
-	    // set new p0 through HSE
-	    p0_new = p0_old;
-
-	    // Need to write enforce_HSE_irreg
-
-	} else {
-	    // set new p0 through HSE
-	    p0_new = p0_old;
+	// set new p0 through HSE
+	p0_new = p0_old;
+	
+	enforce_HSE(rho0_new.dataPtr(),
+		    p0_new.dataPtr(),
+		    grav_cell_new.dataPtr(),
+		    r_edge_loc.dataPtr());
+	
+	// make psi
+	if (spherical == 0) { 
+	    make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
 	    
-	    enforce_HSE(rho0_new.dataPtr(),
-			p0_new.dataPtr(),
-			grav_cell_new.dataPtr(),
-			r_edge_loc.dataPtr());
-
-	    // make psi
-	    if (spherical == 0) { 
-		make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
-		
-	    } else {
-		// compute p0_nph
-		for (int i=0; i<p0_nph.size(); ++i) {
-		    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-		}
-		
-		// compute gamma1bar^{(1)} and store it in gamma1bar_temp1
-		MakeGamma1bar(s1, gamma1bar_temp1, p0_old);
-		
-		// compute gamma1bar^{(2),*} and store it in gamma1bar_temp2
-		MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
-		
-		// compute gamma1bar^{nph,*} and store it in gamma1bar_temp2
-		for(int i=0; i<gamma1bar_temp2.size(); ++i) {
-		    gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
-		}
-		
-		// make time-centered psi
-		make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
-				   gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
-				   Sbar.dataPtr(),
-				   r_cc_loc.dataPtr(),
-				   r_edge_loc.dataPtr());
-
+	} else {
+	    // compute p0_nph
+	    for (int i=0; i<p0_nph.size(); ++i) {
+		p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	    }
-	} // end use_exact_base_state
+	    
+	    // compute gamma1bar^{(1)} and store it in gamma1bar_temp1
+	    MakeGamma1bar(s1, gamma1bar_temp1, p0_old);
+	    
+	    // compute gamma1bar^{(2),*} and store it in gamma1bar_temp2
+	    MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
+	    
+	    // compute gamma1bar^{nph,*} and store it in gamma1bar_temp2
+	    for(int i=0; i<gamma1bar_temp2.size(); ++i) {
+		gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
+	    }
+	    
+	    // make time-centered psi
+	    make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
+			       gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
+			       Sbar.dataPtr(),
+			       r_cc_loc.dataPtr(),
+			       r_edge_loc.dataPtr());
+	    
+	}
     }
     else {
         p0_new = p0_old;
@@ -454,12 +444,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// compute rhoh0_old by "averaging"
 	Average(s1, rhoh0_old, RhoH);
 
-	if (use_exact_base_state == 0) {
-	    advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(), 
-				 rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
-				 rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
-				 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-	}
+	advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(), 
+			     rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
+			     rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
+			     r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
     else {
         rhoh0_new = rhoh0_old;
@@ -596,7 +584,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	}
     }
 
-    if (evolve_base_state && use_exact_base_state == 0) {
+    if (evolve_base_state) {
 
         // compute Sbar = average(S_cc_nph)
         Average(S_cc_nph,Sbar,0);
@@ -648,7 +636,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // advect the base state density
-    if (evolve_base_state && use_exact_base_state == 0) {
+    if (evolve_base_state) {
 	advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
 			 rho0_predicted_edge.dataPtr(), &dt,
 			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
@@ -677,13 +665,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state && use_etarho) {
 
-	if (use_exact_base_state == 0) {
-	    // compute the new etarho
-	    if (spherical == 0) {
-		MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
-	    } else {
-		MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
-	    }
+	// compute the new etarho
+	if (spherical == 0) {
+	    MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+	} else {
+	    MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
 	}
 
         // correct the base state density by "averaging"
@@ -716,49 +702,41 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // base state pressure update
     if (evolve_base_state) {
 
-	if (use_exact_base_state) {
-	    // set new p0 through HSE
-	    p0_new = p0_old;
+	// set new p0 through HSE
+	p0_new = p0_old;
+	
+	enforce_HSE(rho0_new.dataPtr(),
+		    p0_new.dataPtr(),
+		    grav_cell_new.dataPtr(),
+		    r_edge_loc.dataPtr());
+	
+	for (int i=0; i<p0_nph.size(); ++i) {
+	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	}
+	
+	// make psi
+	if (spherical == 0) {
+	    make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
 	    
-	    // Need to write enforce_HSE_irreg
-
 	} else {
-	    // set new p0 through HSE
-	    p0_new = p0_old;
+	    // compute gamma1bar^{(2)} and store it in gamma1bar_temp2
+	    MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
 	    
-	    enforce_HSE(rho0_new.dataPtr(),
-			p0_new.dataPtr(),
-			grav_cell_new.dataPtr(),
-			r_edge_loc.dataPtr());
-
-	    for (int i=0; i<p0_nph.size(); ++i) {
-		p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	    // compute gamma1bar^{nph} and store it in gamma1bar_temp2
+	    for (int i=0; i<gamma1bar_temp2.size(); ++i) {
+		gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
 	    }
 	    
-	    // make psi
-	    if (spherical == 0) {
-		make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
-		
-	    } else {
-		// compute gamma1bar^{(2)} and store it in gamma1bar_temp2
-		MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
-		
-		// compute gamma1bar^{nph} and store it in gamma1bar_temp2
-		for (int i=0; i<gamma1bar_temp2.size(); ++i) {
-		    gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
-		}
-		
-		make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
-				   gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
-				   Sbar.dataPtr(),
-				   r_cc_loc.dataPtr(),
-				   r_edge_loc.dataPtr());
-	    }
-	} // end use_exact_base_state
+	    make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
+			       gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
+			       Sbar.dataPtr(),
+			       r_cc_loc.dataPtr(),
+			       r_edge_loc.dataPtr());
+	}
     }
 
     // base state enthalpy update
-    if (evolve_base_state && use_exact_base_state == 0) {
+    if (evolve_base_state) {
 	advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(), 
 			     rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
 			     rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
@@ -838,7 +816,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     Make_S_cc(S_cc_new,snew,rho_omegadot,rho_Hnuc,rho_Hext,thermal2);
 
-    if (evolve_base_state && use_exact_base_state == 0) {
+    if (evolve_base_state) {
         Average(S_cc_new,Sbar,0);
     }
 
