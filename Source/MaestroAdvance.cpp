@@ -387,16 +387,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // update grav_cell_new
     if (evolve_base_state) {
-
-	if (use_exact_base_state) {
-	    // Need to write make_grav_cell_irreg for rho0[0:nr_irreg-1]
-	} else {
-	    make_grav_cell(grav_cell_new.dataPtr(),
-			   rho0_new.dataPtr(),
-			   r_cc_loc.dataPtr(),
-			   r_edge_loc.dataPtr());
-	}
-
+	make_grav_cell(grav_cell_new.dataPtr(),
+		       rho0_new.dataPtr(),
+		       r_cc_loc.dataPtr(),
+		       r_edge_loc.dataPtr());
     }
     else {
         grav_cell_new = grav_cell_old;
@@ -701,27 +695,20 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // update grav_cell_new, rho0_nph, grav_cell_nph
     if (evolve_base_state) {
-
-	if (use_exact_base_state) {
-	    // Need to use make_grav_cell_irreg()
-	} else {
-	    make_grav_cell(grav_cell_new.dataPtr(),
-			   rho0_new.dataPtr(),
-			   r_cc_loc.dataPtr(),
-			   r_edge_loc.dataPtr());
-	    
-	    for(int i=0; i<beta0_nph.size(); ++i) {
-		rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-	    }
-	    
-	    make_grav_cell(grav_cell_nph.dataPtr(),
-			   rho0_nph.dataPtr(),
-			   r_cc_loc.dataPtr(),
-			   r_edge_loc.dataPtr());
+	make_grav_cell(grav_cell_new.dataPtr(),
+		       rho0_new.dataPtr(),
+		       r_cc_loc.dataPtr(),
+		       r_edge_loc.dataPtr());
+	
+	for(int i=0; i<beta0_nph.size(); ++i) {
+	    rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
 	}
-
-    }
-    else {
+	
+	make_grav_cell(grav_cell_nph.dataPtr(),
+		       rho0_nph.dataPtr(),
+		       r_cc_loc.dataPtr(),
+		       r_edge_loc.dataPtr());
+    } else {
         rho0_nph = rho0_old;
         grav_cell_nph = grav_cell_old;
     }

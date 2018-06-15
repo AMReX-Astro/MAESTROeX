@@ -64,15 +64,6 @@ extern "C"
                                   const int* domhi_fine, 
 				  int* nr_irreg_in);
 
-    void init_base_state_geometry_irreg(const int* max_radial_level_in,
-					const int* nr_fine_in,
-					const amrex::Real* dr_fine_in,
-					const amrex::Real* r_cc_loc,
-					const amrex::Real* r_edge_loc,
-					const amrex::Real* dx_fine,
-					const int* domhi_fine, 
-					int* nr_irreg_in);
-
     void compute_cutoff_coords(const amrex::Real* rho0);
 
     void init_multilevel(const int* finest_radial_level_in);

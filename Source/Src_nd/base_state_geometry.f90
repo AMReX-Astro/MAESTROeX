@@ -11,7 +11,8 @@ module base_state_geometry_module
   use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, octant, anelastic_cutoff, base_cutoff_density, &
-                                burning_cutoff_density, prob_lo, prob_hi
+                                burning_cutoff_density, prob_lo, prob_hi, &
+                                use_exact_base_state
 
   implicit none
 
@@ -119,12 +120,23 @@ contains
 
        ! spherical case
        ! compute r_cc_loc, r_edge_loc
-       do i=0,nr_fine-1
-          r_cc_loc(0,i) = (dble(i)+HALF)*dr(0)
-       end do
-       do i=0,nr_fine
-          r_edge_loc(0,i) = (dble(i))*dr(0)
-       end do
+       if (use_exact_base_state) then
+          ! nr_fine = nr_irreg + 1
+          do i=0,nr_fine-1 
+             r_cc_loc(0,i) = sqrt(0.75d0+2.d0*i)*dx_fine(0)
+          end do
+          r_edge_loc(0,0) = 0.d0
+          do i=0,nr_fine-1
+             r_edge_loc(0,i+1) = sqrt(0.75d0+2.d0*(i+0.5d0))*dx_fine(0)
+          end do
+       else
+          do i=0,nr_fine-1
+             r_cc_loc(0,i) = (dble(i)+HALF)*dr(0)
+          end do
+          do i=0,nr_fine
+             r_edge_loc(0,i) = (dble(i))*dr(0)
+          end do
+       end if
 
     end if
 
@@ -133,79 +145,6 @@ contains
     allocate(burning_cutoff_density_coord(0:max_radial_level))
 
   end subroutine init_base_state_geometry
-
-  subroutine init_base_state_geometry_irreg(max_radial_level_in,nr_fine_in,dr_fine_in, &
-                                              r_cc_loc,r_edge_loc, &
-                                              dx_fine,domhi_fine, &
-                                              nr_irreg_in) &
-                                              bind(C, name="init_base_state_geometry_irreg")
-
-    integer          , intent(in   ) :: max_radial_level_in
-    integer          , intent(in   ) :: nr_fine_in
-    double precision , intent(in   ) :: dr_fine_in
-    integer          , intent(in   ) :: nr_irreg_in
-    double precision , intent(inout) ::   r_cc_loc(0:max_radial_level_in,0:nr_irreg_in  )
-    double precision , intent(inout) :: r_edge_loc(0:max_radial_level_in,0:nr_irreg_in+1)
-    double precision , intent(in   ) ::    dx_fine(0:amrex_spacedim-1)
-    integer          , intent(in   ) :: domhi_fine(0:amrex_spacedim-1)
-
-    ! local
-    integer :: n,i,domhi
-
-    if ( parallel_IOProcessor() ) then
-       print*,'Calling init_base_state_geometry_irreg()'
-    end if
-
-    max_radial_level = max_radial_level_in
-    nr_fine = nr_fine_in
-    dr_fine = dr_fine_in
-    nr_irreg = nr_irreg_in
-
-    ! FIXME - we want to set this after regridding 
-    finest_radial_level = max_radial_level
-
-    ! compute center(:)
-    if (octant) then
-       if (.not. (spherical == 1 .and. amrex_spacedim == 3 .and. &
-                  all(prob_lo(1:amrex_spacedim) == 0.d0) ) ) then
-          call amrex_error("ERROR: octant requires spherical with prob_lo = 0.0")
-       endif
-       center = 0.d0
-    else
-       center = 0.5d0*(prob_lo + prob_hi)
-    endif
-       
-    ! allocate space for dr, nr
-    allocate(dr(0:max_radial_level))
-    allocate(nr(0:max_radial_level))
-
-    ! compute nr(:) and dr(:)
-    nr(max_radial_level) = nr_fine
-    dr(max_radial_level) = dr_fine
-
-    ! computes dr, nr, r_cc_loc, r_edge_loc
-    if (spherical .eq. 0) then
-       ! cartesian case
-       call amrex_error("ERROR: init_base_state_geometry_irreg() not implemented for non-spherical problems")
-    else
-
-       ! spherical case
-       ! use_exact_base_state is checked in C++
-       do i=0,nr_irreg 
-          r_cc_loc(0,i) = sqrt(0.75d0+2.d0*i)*dx_fine(0)
-       end do
-       r_edge_loc(0,0) = 0.d0
-       do i=0,nr_irreg
-          r_edge_loc(0,i+1) = sqrt(0.75d0+2.d0*(i+0.5d0))*dx_fine(0)
-       end do
-
-    end if
-
-    allocate(      anelastic_cutoff_coord(0:max_radial_level))
-    allocate(   base_cutoff_density_coord(0:max_radial_level))
-    allocate(burning_cutoff_density_coord(0:max_radial_level))
-
-  end subroutine init_base_state_geometry_irreg
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

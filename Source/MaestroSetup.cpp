@@ -64,27 +64,31 @@ Maestro::Setup ()
         // compute dr_fine
         dr_fine = dxFine[0] / drdxfac;
        
-        // compute nr_fine
-        double lenx, leny, lenz, max_dist;
-        if (octant) {
-            lenx = probHi[0] - probLo[0];
-            leny = probHi[1] - probLo[1];
-            lenz = probHi[2] - probLo[2];
-        }
-        else {
-            lenx = 0.5*(probHi[0] - probLo[0]);
-            leny = 0.5*(probHi[1] - probLo[1]);
-            lenz = 0.5*(probHi[2] - probLo[2]);
-        }       
-        max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
-        nr_fine = int(max_dist / dr_fine) + 1;
-
 	// compute nr_irreg
 	int domhi = domainBoxFine.bigEnd(0)+1;
 	if (!octant) {
 	    nr_irreg = (3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0;
 	} else {
 	    nr_irreg = (3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0;
+	}
+
+        // compute nr_fine
+	if (use_exact_base_state) {
+	    nr_fine = nr_irreg + 1;
+	} else {
+	    double lenx, leny, lenz, max_dist;
+	    if (octant) {
+		lenx = probHi[0] - probLo[0];
+		leny = probHi[1] - probLo[1];
+		lenz = probHi[2] - probLo[2];
+	    }
+	    else {
+		lenx = 0.5*(probHi[0] - probLo[0]);
+		leny = 0.5*(probHi[1] - probLo[1]);
+		lenz = 0.5*(probHi[2] - probLo[2]);
+	    }       
+	    max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
+	    nr_fine = int(max_dist / dr_fine) + 1;
 	}
 
     }
@@ -101,56 +105,33 @@ Maestro::Setup ()
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    if (spherical == 1 && use_exact_base_state == 1) {
-	// base states are stored
-	s0_init      .resize( (max_radial_level+1)*(nr_irreg+1)*Nscal );
-	p0_init      .resize( (max_radial_level+1)*(nr_irreg+1) );
-	rho0_old     .resize( (max_radial_level+1)*(nr_irreg+1) );
-	rho0_new     .resize( (max_radial_level+1)*(nr_irreg+1) );
-	rhoh0_old    .resize( (max_radial_level+1)*(nr_irreg+1) );
-	rhoh0_new    .resize( (max_radial_level+1)*(nr_irreg+1) );
-	p0_old       .resize( (max_radial_level+1)*(nr_irreg+1) );
-	p0_new       .resize( (max_radial_level+1)*(nr_irreg+1) );
-	tempbar      .resize( (max_radial_level+1)*(nr_irreg+1) );
-	tempbar_init .resize( (max_radial_level+1)*(nr_irreg+1) );
-	beta0_old    .resize( (max_radial_level+1)*(nr_irreg+1) );
-	beta0_new    .resize( (max_radial_level+1)*(nr_irreg+1) );
-	gamma1bar_old.resize( (max_radial_level+1)*(nr_irreg+1) );
-	gamma1bar_new.resize( (max_radial_level+1)*(nr_irreg+1) );
-	grav_cell_old.resize( (max_radial_level+1)*(nr_irreg+1) );
-	grav_cell_new.resize( (max_radial_level+1)*(nr_irreg+1) );
-	r_cc_loc     .resize( (max_radial_level+1)*(nr_irreg+1) );
-    } else {
-	// base states are stored
-	s0_init      .resize( (max_radial_level+1)*nr_fine*Nscal );
-	p0_init      .resize( (max_radial_level+1)*nr_fine );
-	rho0_old     .resize( (max_radial_level+1)*nr_fine );
-	rho0_new     .resize( (max_radial_level+1)*nr_fine );
-	rhoh0_old    .resize( (max_radial_level+1)*nr_fine );
-	rhoh0_new    .resize( (max_radial_level+1)*nr_fine );
-	p0_old       .resize( (max_radial_level+1)*nr_fine );
-	p0_new       .resize( (max_radial_level+1)*nr_fine );
-	tempbar      .resize( (max_radial_level+1)*nr_fine );
-	tempbar_init .resize( (max_radial_level+1)*nr_fine );
-	beta0_old    .resize( (max_radial_level+1)*nr_fine );
-	beta0_new    .resize( (max_radial_level+1)*nr_fine );
-	gamma1bar_old.resize( (max_radial_level+1)*nr_fine );
-	gamma1bar_new.resize( (max_radial_level+1)*nr_fine );
-	etarho_cc    .resize( (max_radial_level+1)*nr_fine );
-	psi          .resize( (max_radial_level+1)*nr_fine );
-	grav_cell_old.resize( (max_radial_level+1)*nr_fine );
-	grav_cell_new.resize( (max_radial_level+1)*nr_fine );
-	r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
-    }
+    // base states are stored
+    s0_init      .resize( (max_radial_level+1)*nr_fine*Nscal );
+    p0_init      .resize( (max_radial_level+1)*nr_fine );
+    rho0_old     .resize( (max_radial_level+1)*nr_fine );
+    rho0_new     .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_old    .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_new    .resize( (max_radial_level+1)*nr_fine );
+    p0_old       .resize( (max_radial_level+1)*nr_fine );
+    p0_new       .resize( (max_radial_level+1)*nr_fine );
+    tempbar      .resize( (max_radial_level+1)*nr_fine );
+    tempbar_init .resize( (max_radial_level+1)*nr_fine );
+    beta0_old    .resize( (max_radial_level+1)*nr_fine );
+    beta0_new    .resize( (max_radial_level+1)*nr_fine );
+    gamma1bar_old.resize( (max_radial_level+1)*nr_fine );
+    gamma1bar_new.resize( (max_radial_level+1)*nr_fine );
+    etarho_cc    .resize( (max_radial_level+1)*nr_fine );
+    psi          .resize( (max_radial_level+1)*nr_fine );
+    grav_cell_old.resize( (max_radial_level+1)*nr_fine );
+    grav_cell_new.resize( (max_radial_level+1)*nr_fine );
+    r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    if (use_exact_base_state) {
-	r_edge_loc.resize( (max_radial_level+1)*(nr_irreg+2) );
-    } else {
+    r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
+    if (use_exact_base_state == 0) {
 	w0        .resize( (max_radial_level+1)*(nr_fine+1) );
 	etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
-	r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
     }
 
     // diag file data arrays
@@ -183,22 +164,12 @@ Maestro::Setup ()
     r_edge_loc   .shrink_to_fit();
     diagfile_data.shrink_to_fit();
 
-
-    if (use_exact_base_state) {	
-	init_base_state_geometry_irreg(&max_radial_level,&nr_fine,&dr_fine,
-				       r_cc_loc.dataPtr(),
-				       r_edge_loc.dataPtr(),
-				       geom[max_level].CellSize(),
-				       domainBoxFine.hiVect(), 
-				       &nr_irreg);
-    } else {
-	init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
-				 r_cc_loc.dataPtr(),
-				 r_edge_loc.dataPtr(),
-				 geom[max_level].CellSize(),
-				 domainBoxFine.hiVect(), 
-				 &nr_irreg);
-    }
+    init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
+			     r_cc_loc.dataPtr(),
+			     r_edge_loc.dataPtr(),
+			     geom[max_level].CellSize(),
+			     domainBoxFine.hiVect(), 
+			     &nr_irreg);
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.

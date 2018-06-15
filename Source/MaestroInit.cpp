@@ -69,14 +69,10 @@ Maestro::Init ()
     }
 
     // make gravity
-    if (use_exact_base_state) {
-	// Need to write make_grav_cell_irreg for rho0[0:nr_irreg-1]
-    } else {
-	make_grav_cell(grav_cell_old.dataPtr(),
-		       rho0_old.dataPtr(),
-		       r_cc_loc.dataPtr(),
-		       r_edge_loc.dataPtr());
-    }
+    make_grav_cell(grav_cell_old.dataPtr(),
+		   rho0_old.dataPtr(),
+		   r_cc_loc.dataPtr(),
+		   r_edge_loc.dataPtr());
 
     if (restart_file == "") {
 
@@ -162,9 +158,14 @@ Maestro::InitData ()
     Print() << "Calling InitData()" << std::endl;
 
     // read in model file and fill in s0_init and p0_init for all levels
-    init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-                    rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(), 
-		    tempbar_init.dataPtr());
+    if (use_exact_base_state) {
+	// Need to write init_base_state_irreg to read in model file for 
+	// irregularly-spaced radial base states
+    } else {
+	init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
+			rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(), 
+			tempbar_init.dataPtr());
+    }
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
@@ -207,16 +208,15 @@ Maestro::InitData ()
             Average(sold,rho0_old,Rho);
             compute_cutoff_coords(rho0_old.dataPtr());
 
+	    // compute gravity
+	    make_grav_cell(grav_cell_old.dataPtr(),
+			   rho0_old.dataPtr(),
+			   r_cc_loc.dataPtr(),
+			   r_edge_loc.dataPtr());
+
 	    if (use_exact_base_state) {
-		// Need to write make_grav_cell_irreg for rho0[0:nr_irreg-1]
 		// Need to write enforce_HSE_irreg for p0[0:nr_irreg-1]
 	    } else {
-		// compute gravity
-		make_grav_cell(grav_cell_old.dataPtr(),
-			       rho0_old.dataPtr(),
-			       r_cc_loc.dataPtr(),
-			       r_edge_loc.dataPtr());
-
 		// compute p0 with HSE
 		enforce_HSE(rho0_old.dataPtr(),
 			    p0_old.dataPtr(),
