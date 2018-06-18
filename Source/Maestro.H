@@ -63,6 +63,9 @@ private:
     // advance solution at all levels for a single time step
     void AdvanceTimeStep (bool is_initIter);
 
+    // advance solution for a single time step with irregular base state spacing
+    void AdvanceTimeStepIrreg (bool is_initIter);
+
     // end MaestroAdvance.cpp functions
     ////////////
 
