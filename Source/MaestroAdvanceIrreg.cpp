@@ -37,7 +37,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Vector<MultiFab>       sponge(finest_level+1);
 
     // face-centered in the dm-direction (planar only)
-    Vector<MultiFab> etarhoflux(finest_level+1);
+    Vector<MultiFab> etarhoflux_dummy(finest_level+1);
 
     // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > >  umac(finest_level+1);
@@ -48,10 +48,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // needed for spherical routines only
 
     // cell-centered
-    Vector<MultiFab> w0_force_cart(finest_level+1);
+    Vector<MultiFab> w0_force_cart_dummy(finest_level+1);
 
     // face-centered
-    Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac_dummy(finest_level+1);
 
 
     // end spherical-only MultiFabs
@@ -62,28 +62,24 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Vector<Real> grav_cell_nph   ( (max_radial_level+1)*nr_fine );
     Vector<Real> rho0_nph        ( (max_radial_level+1)*nr_fine );
     Vector<Real> p0_nph          ( (max_radial_level+1)*nr_fine );
-    Vector<Real> p0_minus_peosbar( (max_radial_level+1)*nr_fine );
     Vector<Real> peosbar         ( (max_radial_level+1)*nr_fine );
-    Vector<Real> w0_force        ( (max_radial_level+1)*nr_fine );
-    Vector<Real> Sbar            ( (max_radial_level+1)*nr_fine );
+    Vector<Real> w0_force_dummy  ( (max_radial_level+1)*nr_fine );
+    Vector<Real> Sbar_dummy      ( (max_radial_level+1)*nr_fine );
     Vector<Real> beta0_nph       ( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
-    Vector<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
+    Vector<Real> rho0_pred_edge_dummy( (max_radial_level+1)*(nr_fine+1) );
 
     // make sure C++ is as efficient as possible with memory usage
-    grav_cell_nph      .shrink_to_fit();
-    rho0_nph           .shrink_to_fit();
-    p0_nph             .shrink_to_fit();
-    p0_minus_peosbar   .shrink_to_fit();
-    peosbar            .shrink_to_fit();
-    w0_force           .shrink_to_fit();
-    Sbar               .shrink_to_fit();
-    beta0_nph          .shrink_to_fit();
-    w0_old             .shrink_to_fit();
-    rho0_predicted_edge.shrink_to_fit();
+    grav_cell_nph       .shrink_to_fit();
+    rho0_nph            .shrink_to_fit();
+    p0_nph              .shrink_to_fit();
+    peosbar             .shrink_to_fit();
+    w0_force_dummy      .shrink_to_fit();
+    Sbar_dummy          .shrink_to_fit();
+    beta0_nph           .shrink_to_fit();
+    rho0_pred_edge_dummy.shrink_to_fit();
 
     int is_predictor;
 
@@ -128,9 +124,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
 
         // face-centered in the dm-direction (planar only)
-        AMREX_D_TERM(etarhoflux[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
-                     etarhoflux[lev].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
-                     etarhoflux[lev].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
+        AMREX_D_TERM(etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
+                     etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
+                     etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
 
         // face-centered arrays of MultiFabs
         AMREX_D_TERM(umac [lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1,     1);,
@@ -146,16 +142,42 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
 #if (AMREX_SPACEDIM == 3)
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-        w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-        w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+        w0mac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+        w0mac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+        w0mac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
     }
     if (spherical == 1) {
         for (int lev=0; lev<=finest_level; ++lev) {
-            w0_force_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+            w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         }
     }
 #endif
+
+    
+    // set etarhoflux_dummy to zero
+    for (int lev=0; lev<=finest_level; ++lev) {
+        etarhoflux_dummy[lev].setVal(0.);
+    }
+
+#if (AMREX_SPACEDIM == 3)
+    // initialize MultiFabs and Vectors to ZERO
+    for (int lev=0; lev<=finest_level; ++lev) {
+        for (int d=0; d<AMREX_SPACEDIM; ++d) {
+            w0mac_dummy[lev][d].setVal(0.);
+        }
+    }
+    if (spherical == 1) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            w0_force_cart_dummy[lev].setVal(0.);
+        }
+    }
+#endif
+
+    // set dummy variables to zero
+    std::fill(Sbar_dummy    .begin(), Sbar_dummy    .end(), 0.);
+    std::fill(w0_force_dummy.begin(), w0_force_dummy.end(), 0.);
+    std::fill(rho0_pred_edge_dummy.begin(), rho0_pred_edge_dummy.end(), 0.);
+    
 
     // make the sponge for all levels
     if (do_sponge) {
@@ -178,7 +200,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 2 : make w0 >>>" << std::endl;
+        Print() << "<<< STEP 2 : compute provisional S >>>" << std::endl;
     }
 
     if (t_old == 0.) {
@@ -197,19 +219,16 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // no ghost cells for S_cc_nph
     AverageDown(S_cc_nph,0,1);
 
-    // compute p0_minus_peosbar = p0_old - peosbar (for making w0) and
     // compute delta_p_term = peos_old - peosbar_cart (for RHS of projections)
     if (dpdt_factor > 0.0) {
-	// peos_old now holds the thermodynamic p computed from sold(rho,h,X)
+	// peos_old (delta_p_term) now holds the thermodynamic p computed from sold(rho,h,X)
 	PfromRhoH(sold,sold,delta_p_term);
 
 	// compute peosbar = Avg(peos_old)
 	Average(delta_p_term,peosbar,0);
 
-	// compute p0_minus_peosbar = p0_old - peosbar
-	for (int i=0; i<p0_minus_peosbar.size(); ++i) {
-	    p0_minus_peosbar[i] = p0_old[i] - peosbar[i];
-	}
+	// p0_minus_peosbar = p0_new - peosbar
+	// no need to compute p0_minus_peosbar since make_w0 is not called
        
 	// compute peosbar_cart from peosbar
 	Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
@@ -221,30 +240,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
     else {
         // these should have no effect if dpdt_factor <= 0
-        std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
         for (int lev=0; lev<=finest_level; ++lev) {
             delta_p_term[lev].setVal(0.);
         }
     }
 
-#if (AMREX_SPACEDIM == 3)
-    // initialize MultiFabs and Vectors to ZERO
-    for (int lev=0; lev<=finest_level; ++lev) {
-        for (int d=0; d<AMREX_SPACEDIM; ++d) {
-            w0mac[lev][d].setVal(0.);
-        }
-    }
-    if (spherical == 1) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            w0_force_cart[lev].setVal(0.);
-        }
-    }
-#endif
-
-    // these should have no effect, same as evolve_base_state = false
-    std::fill(Sbar    .begin(), Sbar    .end(), 0.);
-    std::fill(w0_force.begin(), w0_force.end(), 0.);
-    
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 3 -- construct the advective velocity
@@ -255,7 +255,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
     
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -263,8 +263,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
+    // Sbar_dummy = 0
     is_predictor = 1;
-    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,gamma1bar_old,p0_old,
+    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar_dummy,beta0_old,gamma1bar_old,p0_old,
 		       delta_p_term,delta_chi,is_predictor);
 
     // MAC projection
@@ -307,10 +308,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         Print() << "            :   tracer_advance >>>" << std::endl;
     }
 
-    // set etarhoflux to zero
-    for (int lev=0; lev<=finest_level; ++lev) {
-        etarhoflux[lev].setVal(0.);
-    }
     // set sedge and sflux to zero
     for (int lev=0; lev<=finest_level; ++lev) {
 	for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
@@ -320,9 +317,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
+    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
 
-    // no need for etarho
+    // no need to compute etarho
     if (evolve_base_state) {
         // correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
@@ -370,7 +367,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
     
-    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac_dummy,thermal1);
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -438,7 +435,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-        Print() << "<<< STEP 6 : make new S and new w0 >>>" << std::endl;
+        Print() << "<<< STEP 6 : make new S >>>" << std::endl;
     }
 
     if (evolve_base_state) {
@@ -467,7 +464,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
     AverageDown(S_cc_nph,0,1);
 
-    // compute p0_minus_peosbar = p0_new - peosbar (for making w0)
     // and delta_p_term = peos_new - peosbar_cart (for RHS of projection)
     if (dpdt_factor > 0.) {
 	// peos_new now holds the thermodynamic p computed from snew(rho,h,X)
@@ -476,10 +472,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	// compute peosbar = Avg(peos_new)
 	Average(delta_p_term,peosbar,0);
 
-	// compute p0_minus_peosbar = p0_new - peosbar
-	for (int i=0; i<p0_minus_peosbar.size(); ++i) {
-	    p0_minus_peosbar[i] = p0_new[i] - peosbar[i];
-	}
+	// p0_minus_peosbar = p0_new - peosbar
+	// no need to compute p0_minus_peosbar since make_w0 is not called
        
 	// compute peosbar_cart from peosbar
 	Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
@@ -491,7 +485,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
     else {
 	// these should have no effect if dpdt_factor <= 0
-	std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
 	for (int lev=0; lev<=finest_level; ++lev) {
 	    delta_p_term[lev].setVal(0.);
 	}
@@ -499,7 +492,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
 
     //////////////////////////////////////////////////////////////////////////////
-    // STEP 7 -- redo the construction of the advective velocity using the current w0
+    // STEP 7 -- redo the construction of the advective velocity
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
@@ -507,12 +500,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
 
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     is_predictor = 0;
-    MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,gamma1bar_new,p0_new, 
+    MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar_dummy,beta0_nph,gamma1bar_new,p0_new, 
 		       delta_p_term,delta_chi,is_predictor);
 
     // MAC projection
@@ -540,15 +533,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         Print() << "            :   tracer_advance >>>" << std::endl;
     }
 
-    // set etarhoflux to zero
-    for (int lev=0; lev<=finest_level; ++lev) {
-        etarhoflux[lev].setVal(0.);
-    }
-
     // advect rhoX, rho, and tracers
-    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
+    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
 
-    // no need for etarho
+    // no need to compute etarho
     if (evolve_base_state) {
         // correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
@@ -599,7 +587,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac_dummy,thermal1);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -684,13 +672,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // Define rho at half time using the new rho from Step 8
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
        
-    VelocityAdvance(rhohalf,umac,w0mac,w0_force,w0_force_cart,rho0_nph,grav_cell_nph,sponge);
+    VelocityAdvance(rhohalf,umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,
+		    rho0_nph,grav_cell_nph,sponge);
 
-
-    if (evolve_base_state && is_initIter) {
-        // throw away w0 by setting w0 = w0_old
-        w0 = w0_old;
-    }
 
     int proj_type;
 
@@ -708,7 +692,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
             MultiFab::Copy(rhcc_for_nodalproj_old[lev], rhcc_for_nodalproj[lev], 0, 0, 1, 1);
         }
 
-        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph);
+        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar_dummy,beta0_nph);
         
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Subtract(rhcc_for_nodalproj[lev], rhcc_for_nodalproj_old[lev], 0, 0, 1, 1);
@@ -720,7 +704,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         proj_type = regular_timestep_comp;
 
-        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph);
+        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar_dummy,beta0_nph);
 
 	// compute delta_p_term = peos_new - peosbar_cart (for RHS of projection)
         if (dpdt_factor > 0.) {
@@ -730,7 +714,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    // compute peosbar = Avg(peos_new)
 	    Average(delta_p_term,peosbar,0);
 
-	    // no need to compute p0_minus_peosbar since make_w0 is not called after here
+	    // no need to compute p0_minus_peosbar since make_w0 is not called
 
 	    // compute peosbar_cart from peosbar
 	    Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
