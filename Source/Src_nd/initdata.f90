@@ -83,11 +83,13 @@ contains
                            scal, scal_lo, scal_hi, nc_s, &
                            vel, vel_lo, vel_hi, nc_v, &
                            s0_init, p0_init, &
-                           dx, r_cc_loc, r_edge_loc) bind(C, name="initdata_sphr")
+                           dx, r_cc_loc, r_edge_loc, &
+                           cc_to_r, ccr_lo, ccr_hi) bind(C, name="initdata_sphr")
     
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
     integer         , intent(in   ) :: vel_lo(3), vel_hi(3), nc_v
+    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent(in   ) :: time
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
                                             scal_lo(2):scal_hi(2), &
@@ -98,8 +100,10 @@ contains
     double precision, intent(in   ) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(in   ) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
-    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: r_cc_loc  (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: cc_to_r   (ccr_lo(1):ccr_hi(1), &
+                                                  ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     !     Local variables
     integer          :: i,j,k,comp
@@ -107,6 +111,11 @@ contains
 
     type (eos_t) :: eos_state
     integer :: pt_index(3)
+
+    if (parallel_IOProcessor()) then
+       print*,"Create a local copy of initdata.f90 in your build directory"
+       print*,"Here is a sample that initializes v=0 and the scalars using s0"
+    end if
 
     ! abort program
     call bl_error()

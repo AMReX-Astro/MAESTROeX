@@ -120,18 +120,20 @@ Maestro::Setup ()
     beta0_new    .resize( (max_radial_level+1)*nr_fine );
     gamma1bar_old.resize( (max_radial_level+1)*nr_fine );
     gamma1bar_new.resize( (max_radial_level+1)*nr_fine );
-    etarho_cc    .resize( (max_radial_level+1)*nr_fine );
-    psi          .resize( (max_radial_level+1)*nr_fine );
     grav_cell_old.resize( (max_radial_level+1)*nr_fine );
     grav_cell_new.resize( (max_radial_level+1)*nr_fine );
     r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
+    if (use_exact_base_state == 0) {
+	psi      .resize( (max_radial_level+1)*nr_fine );
+	etarho_cc.resize( (max_radial_level+1)*nr_fine );
+    }
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
     if (use_exact_base_state == 0) {
-	w0        .resize( (max_radial_level+1)*(nr_fine+1) );
-	etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
+	w0       .resize( (max_radial_level+1)*(nr_fine+1) );
+	etarho_ec.resize( (max_radial_level+1)*(nr_fine+1) );
     }
 
     // diag file data arrays
@@ -155,10 +157,10 @@ Maestro::Setup ()
     grav_cell_old.shrink_to_fit();
     grav_cell_new.shrink_to_fit();
     if (use_exact_base_state == 0) {
-	etarho_cc    .shrink_to_fit();
-	psi          .shrink_to_fit();
-	w0           .shrink_to_fit();
-	etarho_ec    .shrink_to_fit();
+	etarho_cc.shrink_to_fit();
+	psi      .shrink_to_fit();
+	w0       .shrink_to_fit();
+	etarho_ec.shrink_to_fit();
     }
     r_cc_loc     .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
@@ -168,7 +170,6 @@ Maestro::Setup ()
 			     r_cc_loc.dataPtr(),
 			     r_edge_loc.dataPtr(),
 			     geom[max_level].CellSize(),
-			     domainBoxFine.hiVect(), 
 			     &nr_irreg);
 
     // No valid BoxArray and DistributionMapping have been defined.
@@ -194,6 +195,7 @@ Maestro::Setup ()
     pi                .resize(max_level+1);
     rhcc_for_nodalproj.resize(max_level+1);
     normal            .resize(max_level+1);
+    cell_cc_to_r      .resize(max_level+1);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+1+1"

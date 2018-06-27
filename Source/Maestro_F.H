@@ -58,11 +58,14 @@ extern "C"
     void init_base_state_geometry(const int* max_radial_level_in,
                                   const int* nr_fine_in,
                                   const amrex::Real* dr_fine_in,
-                                  const amrex::Real* r_cc_loc,
-                                  const amrex::Real* r_edge_loc,
+                                  amrex::Real* r_cc_loc,
+                                  amrex::Real* r_edge_loc,
                                   const amrex::Real* dx_fine,
-                                  const int* domhi_fine, 
 				  int* nr_irreg_in);
+
+    void init_base_state_map_sphr(amrex::Real* cc_to_r, const int* lo, const int* hi,
+				  const amrex::Real* dx_fine,
+				  const amrex::Real* dx_lev);
 
     void compute_cutoff_coords(const amrex::Real* rho0);
 
@@ -325,7 +328,8 @@ extern "C"
 		       const amrex::Real* s0_init, 
 		       const amrex::Real* p0_init,
 		       const amrex::Real* dx, 
-		       const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
+		       const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
+		       const amrex::Real* cell_cc_to_r, const int* ccr_lo, const int* ccr_hi);
     //////////////////////
 
     //////////////////////

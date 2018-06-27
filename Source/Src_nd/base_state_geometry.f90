@@ -49,7 +49,7 @@ contains
 
   subroutine init_base_state_geometry(max_radial_level_in,nr_fine_in,dr_fine_in, &
                                       r_cc_loc,r_edge_loc, &
-                                      dx_fine,domhi_fine, &
+                                      dx_fine, &
                                       nr_irreg_in) &
                                       bind(C, name="init_base_state_geometry")
 
@@ -59,11 +59,10 @@ contains
     integer          , intent(in   ) :: nr_irreg_in
     double precision , intent(inout) ::   r_cc_loc(0:max_radial_level_in,0:nr_fine_in-1)
     double precision , intent(inout) :: r_edge_loc(0:max_radial_level_in,0:nr_fine_in  )
-    double precision , intent(in   ) ::    dx_fine(0:amrex_spacedim-1)
-    integer          , intent(in   ) :: domhi_fine(0:amrex_spacedim-1)
+    double precision , intent(in   ) :: dx_fine(0:amrex_spacedim-1)
 
     ! local
-    integer :: n,i,domhi
+    integer :: n,i
 
     if ( parallel_IOProcessor() ) then
        print*,'Calling init_base_state_geometry()'
@@ -145,6 +144,44 @@ contains
     allocate(burning_cutoff_density_coord(0:max_radial_level))
 
   end subroutine init_base_state_geometry
+
+  subroutine init_base_state_map_sphr(cc_to_r, lo, hi, &
+                                      dx_fine, dx_lev) &
+                                      bind(C, name="init_base_state_map_sphr")
+
+    integer          , intent(in   ) :: lo(3), hi(3)
+    double precision , intent(inout) :: cc_to_r(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    double precision , intent(in   ) :: dx_fine(0:amrex_spacedim-1)
+    double precision , intent(in   ) ::  dx_lev(3)
+
+    ! local
+    integer :: i,j,k
+    double precision :: index,x,y,z
+
+    if ( spherical .eq. 0 ) then
+       print*,'init_base_state_map_sphr() does not work for planar'
+       call abort()
+    end if
+    
+    ! map cell centers to base state indices  
+    if (use_exact_base_state) then
+
+          do k = lo(3),hi(3)
+             z = prob_lo(3) + (dble(k)+0.5d0)*dx_lev(3) - center(3)
+             do j = lo(2),hi(2)
+                y = prob_lo(2) + (dble(j)+0.5d0)*dx_lev(2) - center(2)
+                do i = lo(1),hi(1)
+                   x = prob_lo(1) + (dble(i)+0.5d0)*dx_lev(1) - center(1)
+                   
+                   index = (x**2 + y**2 + z**2)/(2.0d0*dx_fine(0)**2) - 0.375d0
+                   cc_to_r(i,j,k) = nint(index)
+                end do
+             end do
+          end do
+       
+    end if
+
+  end subroutine init_base_state_map_sphr
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

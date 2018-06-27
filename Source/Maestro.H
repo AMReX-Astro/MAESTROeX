@@ -760,6 +760,7 @@ private:
     // we make this persistent in that we only have to rebuild and
     // fill this after regridding
     amrex::Vector<amrex::MultiFab> normal;
+    amrex::Vector<amrex::MultiFab> cell_cc_to_r;
 
     // stores domain boundary conditions
     // these muse be vectors (rather than arrays) so we can ParmParse them

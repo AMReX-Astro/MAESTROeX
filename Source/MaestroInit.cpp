@@ -50,6 +50,7 @@ Maestro::Init ()
             rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],              1,    1);
             if (spherical == 1) {
                 normal[lev].define(grids[lev], dmap[lev], 3, 1);
+		cell_cc_to_r[lev].define(grids[lev], dmap[lev], 1, 0);
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
         }
@@ -276,13 +277,16 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     pi                [lev].setVal(0.);   
 
     if (spherical == 1) {
-        normal[lev].define(ba, dm, 3, 1);
+        normal      [lev].define(ba, dm, 3, 1);
+	cell_cc_to_r[lev].define(ba, dm, 1, 0);
     }
 
     const Real* dx = geom[lev].CellSize();
+    const Real* dx_fine = geom[max_level].CellSize();
 
     MultiFab& scal = sold[lev];
     MultiFab& vel = uold[lev];
+    MultiFab& cc_to_r = cell_cc_to_r[lev];
 
     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
     for (MFIter mfi(scal); mfi.isValid(); ++mfi)
@@ -298,12 +302,17 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		     s0_init.dataPtr(), p0_init.dataPtr(),
 		     ZFILL(dx));
 	} else {
+	    init_base_state_map_sphr(BL_TO_FORTRAN_3D(cc_to_r[mfi]),
+				    ZFILL(dx_fine),
+				    ZFILL(dx));
+	    
 	    initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
 	    		  BL_TO_FORTRAN_FAB(scal[mfi]), 
 	    		  BL_TO_FORTRAN_FAB(vel[mfi]), 
 	    		  s0_init.dataPtr(), p0_init.dataPtr(),
 	    		  ZFILL(dx), 
-	    		  r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	    		  r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+			  BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	}
     }
 
