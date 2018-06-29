@@ -361,7 +361,16 @@ extern "C"
                           const amrex::Real* p0,
                           const amrex::Real* tempbar,
 			  const amrex::Real* tempbar_init);
-
+    
+    void init_base_state_irreg (const amrex::Real* s0_init, 
+				const amrex::Real* p0_init,
+				const amrex::Real* rho0,
+				const amrex::Real* rhoh0,
+				const amrex::Real* p0,
+				const amrex::Real* tempbar,
+				const amrex::Real* tempbar_init,
+				const amrex::Real* r_cc_loc,
+				const amrex::Real* r_edge_loc);
     //////////////////////
 
     //////////////////////

@@ -160,8 +160,10 @@ Maestro::InitData ()
 
     // read in model file and fill in s0_init and p0_init for all levels
     if (use_exact_base_state) {
-	// Need to write init_base_state_irreg to read in model file for 
-	// irregularly-spaced radial base states
+	init_base_state_irreg(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
+			      rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(), 
+			      tempbar_init.dataPtr(),
+			      r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     } else {
 	init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
 			rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(), 
