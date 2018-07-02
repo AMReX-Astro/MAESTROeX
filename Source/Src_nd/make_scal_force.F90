@@ -1,7 +1,7 @@
 module make_scal_force_module
 
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, base_cutoff_density_coord
-  use meth_params_module, only: enthalpy_pred_type
+  use meth_params_module, only: enthalpy_pred_type, use_exact_base_state
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
   implicit none
@@ -170,7 +170,8 @@ contains
                                 p0macz, z_lo, z_hi, &
                                 dx, psi, &
                                 is_prediction, add_thermal, &
-                                r_cc_loc, r_edge_loc) &
+                                r_cc_loc, r_edge_loc, &
+                                cc_to_r, ccr_lo, ccr_hi) &
              bind(C,name="mkrhohforce_sphr")
 
     ! compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
@@ -199,6 +200,9 @@ contains
     integer         , intent(in   ) :: is_prediction, add_thermal
     double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local variable
     double precision, allocatable :: psi_cart(:,:,:,:)
@@ -247,8 +251,13 @@ contains
 
        allocate(psi_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
 
-       call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0,r_cc_loc,r_edge_loc)
-
+       if (use_exact_base_state) then
+          psi_cart = 0.d0
+       else
+          call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0, &
+               r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
+       end if
+          
        !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)
@@ -374,7 +383,8 @@ contains
                                       wmac,  w_lo, w_hi, &
                                       s0_cart,s0_lo, s0_hi, & 
                                       w0, dx, do_fullform, &
-                                      r_cc_loc, r_edge_loc) &
+                                      r_cc_loc, r_edge_loc, &
+                                      cc_to_r, ccr_lo, ccr_hi) &
              bind(C,name="modify_scal_force_sphr")
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
@@ -395,6 +405,9 @@ contains
     integer         , intent(in   ) :: do_fullform
     double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
     
     ! Local variables
     integer :: i,j,k,r
@@ -417,7 +430,8 @@ contains
     !$OMP END PARALLEL DO
 
     ! compute w0 contribution to divu
-    call put_1d_array_on_cart_sphr(lo,hi,divu_cart,lo,hi,1,divu,dx,0,0,r_cc_loc,r_edge_loc)
+    call put_1d_array_on_cart_sphr(lo,hi,divu_cart,lo,hi,1,divu,dx,0,0,r_cc_loc,r_edge_loc, &
+                                      cc_to_r,ccr_lo,ccr_hi)
     
     !$OMP PARALLEL DO PRIVATE(i,j,k,divumac,s0_xhi,s0_xlo,s0_yhi,s0_ylo) &
     !$OMP PRIVATE(s0_zhi,s0_zlo,divs0u)

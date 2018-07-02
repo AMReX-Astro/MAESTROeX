@@ -133,6 +133,7 @@ contains
                                  rho0, grav, &
                                  dx, &
                                  r_cc_loc, r_edge_loc, &
+                                 cc_to_r, ccr_lo, ccr_hi, &
                                  do_add_utilde_force) &
                                  bind(C, name="make_vel_force_sphr")
 
@@ -160,6 +161,9 @@ contains
     double precision, intent (in   ) :: dx(3)
     double precision, intent (in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
     integer         , intent (in   ) :: do_add_utilde_force
 
     integer         :: i,j,k
@@ -177,8 +181,10 @@ contains
 
     vel_force = ZERO
 
-    call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc)
-    call put_1d_array_on_cart_sphr(lo,hi,grav_cart,lo,hi,3,grav,dx,0,1,r_cc_loc,r_edge_loc)
+    call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
+                                      cc_to_r,ccr_lo,ccr_hi)
+    call put_1d_array_on_cart_sphr(lo,hi,grav_cart,lo,hi,3,grav,dx,0,1,r_cc_loc,r_edge_loc, &
+                                      cc_to_r,ccr_lo,ccr_hi)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,xx,yy,zz,rhopert,centrifugal_term,coriolis_term)
     do k = lo(3),hi(3)

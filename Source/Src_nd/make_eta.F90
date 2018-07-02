@@ -182,7 +182,8 @@ contains
                                   normal,   n_lo,  n_hi, &
                                   eta_cart, e_lo,  e_hi, &
                                   rho0_old, rho0_new, dx, &
-                                  r_cc_loc, r_edge_loc) &
+                                  r_cc_loc, r_edge_loc, &
+                                  cc_to_r, ccr_lo, ccr_hi) &
        bind(C, name="construct_eta_cart")
 
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -211,6 +212,9 @@ contains
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local 
     double precision ::      rho0_nph(0:max_radial_level,0:nr_fine-1)
@@ -229,8 +233,10 @@ contains
        rho0_nph(0,r) = HALF*(rho0_old(0,r) + rho0_new(0,r))
     enddo
 
-    call put_1d_array_on_cart_sphr(lo,hi,rho0_new_cart,lo,hi,1,rho0_new,dx,0,0,r_cc_loc,r_edge_loc) 
-    call put_1d_array_on_cart_sphr(lo,hi,rho0_nph_cart,lo,hi,1,rho0_nph,dx,0,0,r_cc_loc,r_edge_loc) 
+    call put_1d_array_on_cart_sphr(lo,hi,rho0_new_cart,lo,hi,1,rho0_new,dx,0,0, &
+                                     r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi) 
+    call put_1d_array_on_cart_sphr(lo,hi,rho0_nph_cart,lo,hi,1,rho0_nph,dx,0,0, &
+                                     r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi) 
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,U_dot_er)
     do k = lo(3),hi(3)

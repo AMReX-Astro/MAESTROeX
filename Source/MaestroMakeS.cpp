@@ -228,6 +228,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
         const MultiFab& S_cc_mf = S_cc[lev];
 	const MultiFab& delta_p_mf = delta_p_term[lev];
 	      MultiFab& delta_chi_mf = delta_chi[lev];
+	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
@@ -251,7 +252,8 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 					   BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
 					   BL_TO_FORTRAN_3D(delta_chi_mf[mfi]),
 					   &dt, &is_predictor, 
-					   r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+					   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+					   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	    } else {
 		make_rhcc_for_macproj(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 				      BL_TO_FORTRAN_3D(rhcc_mf[mfi]),

@@ -86,6 +86,7 @@ Maestro::EstDt ()
 	MultiFab& w0macx_mf = w0mac[lev][0];
 	MultiFab& w0macy_mf = w0mac[lev][1];
 	MultiFab& w0macz_mf = w0mac[lev][2];
+	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 #endif
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -132,7 +133,8 @@ Maestro::EstDt ()
 			   p0_old.dataPtr(),
 			   gamma1bar_old.dataPtr(), 
 			   r_cc_loc.dataPtr(), 
-			   r_edge_loc.dataPtr());
+			   r_edge_loc.dataPtr(),
+			   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #else
 		Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
@@ -243,6 +245,7 @@ Maestro::FirstDt ()
         MultiFab& sold_mf = sold[lev];
         MultiFab& vel_force_mf = vel_force[lev];
         MultiFab& S_cc_old_mf = S_cc_old[lev];
+	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
@@ -280,7 +283,8 @@ Maestro::FirstDt ()
 			     BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
 			     p0_old.dataPtr(),
 			     gamma1bar_old.dataPtr(),
-			     r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+			     r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+			     BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #else
 		Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif

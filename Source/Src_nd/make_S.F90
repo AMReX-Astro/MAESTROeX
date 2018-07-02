@@ -359,7 +359,8 @@ contains
                                            delta_p_term, dp_lo, dp_hi, &
                                            delta_chi, dc_lo, dc_hi, &
                                            dt, is_predictor, & 
-                                           r_cc_loc, r_edge_loc) & 
+                                           r_cc_loc, r_edge_loc, &
+                                           cc_to_r, ccr_lo, ccr_hi) & 
               bind (C,name="make_rhcc_for_macproj_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -381,6 +382,9 @@ contains
     integer         , intent (in   ) :: is_predictor
     double precision, intent (in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                                ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     !     Local variables
     integer :: i, j, k
@@ -391,10 +395,12 @@ contains
     double precision, allocatable ::      rho0_cart(:,:,:,:)
 
     allocate(div_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,div_cart,lo,hi,1,beta0,dx,0,0,r_cc_loc,r_edge_loc)
+    call put_1d_array_on_cart_sphr(lo,hi,div_cart,lo,hi,1,beta0,dx,0,0,r_cc_loc,r_edge_loc, &
+                                      cc_to_r,ccr_lo,ccr_hi)
     
     allocate(Sbar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,Sbar_cart,lo,hi,1,Sbar,dx,0,0,r_cc_loc,r_edge_loc) 
+    call put_1d_array_on_cart_sphr(lo,hi,Sbar_cart,lo,hi,1,Sbar,dx,0,0,r_cc_loc,r_edge_loc, &
+                                      cc_to_r, ccr_lo, ccr_hi) 
     
     do k = lo(3),hi(3)
     do j = lo(2),hi(2)
@@ -409,13 +415,16 @@ contains
     if (dpdt_factor .gt. 0.0d0) then
        
        allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc)
+       call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0, &
+                                         r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
        
        allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc)
+       call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
+                                         cc_to_r,ccr_lo,ccr_hi)
        
        allocate(rho0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc) 
+       call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
+                                         cc_to_r,ccr_lo,ccr_hi) 
        
        if (is_predictor .eq. 1) &
           delta_chi = 0.d0

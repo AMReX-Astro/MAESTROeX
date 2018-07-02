@@ -455,8 +455,10 @@ contains
                 endif
              endif
 
-             dr_irreg = r_cc_loc(n,r) - r_cc_loc(n,r-1)  ! cell-center to cell-center
+             ! cell-center to cell-center??? <- NOT SURE ABOUT THIS
+             dr_irreg = r_cc_loc(n,r) - r_cc_loc(n,r-1)  
              dpdr = (p0_init(n,r) - p0_init(n,r-1))/dr_irreg
+             
              rhog = HALF*(s0_init(n,r,rho_comp) + s0_init(n,r-1,rho_comp))*g
 
              if (print_init_hse_diag) then

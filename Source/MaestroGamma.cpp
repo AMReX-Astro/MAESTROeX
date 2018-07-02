@@ -22,6 +22,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
         // get references to the MultiFabs at level lev
               MultiFab& gamma1_mf = gamma1[lev];
         const MultiFab&   scal_mf =   scal[lev];
+	const MultiFab&   cc_to_r = cell_cc_to_r[lev];
         
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(gamma1_mf); mfi.isValid(); ++mfi ) {
@@ -45,7 +46,8 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 				BL_TO_FORTRAN_3D(gamma1_mf[mfi]),
 				BL_TO_FORTRAN_FAB(scal_mf[mfi]),
 				p0.dataPtr(), dx, 
-				r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+				r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+				BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	    }
         }
     }

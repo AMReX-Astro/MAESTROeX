@@ -74,7 +74,8 @@ contains
                               gamma, g_lo, g_hi, &
                               scal,  s_lo, s_hi, nc_s, &
                               p0, dx, & 
-                              r_cc_loc, r_edge_loc) bind(C, name="make_gamma_sphr")
+                              r_cc_loc, r_edge_loc, &
+                              cc_to_r, ccr_lo, ccr_hi) bind(C, name="make_gamma_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: g_lo(3), g_hi(3)
@@ -85,6 +86,9 @@ contains
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! local variables
     integer :: i, j, k
@@ -95,7 +99,8 @@ contains
     type (eos_t) :: eos_state
 
     allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc)
+    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
+                                      cc_to_r,ccr_lo,ccr_hi)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,eos_state,pt_index)
     do k = lo(3), hi(3)

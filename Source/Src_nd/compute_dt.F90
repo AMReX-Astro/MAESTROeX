@@ -199,7 +199,8 @@ contains
                          w0macy, y_lo, y_hi, & 
                          w0macz, z_lo, z_hi, &
                          p0, gamma1bar, &
-                         r_cc_loc, r_edge_loc) bind (C,name="estdt_sphr")
+                         r_cc_loc, r_edge_loc, &
+                         cc_to_r, ccr_lo, ccr_hi) bind (C,name="estdt_sphr")
     
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -225,6 +226,9 @@ contains
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
     
     double precision, allocatable :: gp0_cart(:,:,:,:)
 
@@ -344,7 +348,8 @@ contains
     gp0(0,nr_fine) = gp0(0,nr_fine-1)
     gp0(0,      0) = gp0(0,        1)
 
-    call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,lo,hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc)
+    call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,lo,hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc, &
+                                      cc_to_r,ccr_lo,ccr_hi)
     
     !$OMP PARALLEL DO PRIVATE(i,j,k,a,b,c,gp_dot_u,denom) REDUCTION(MIN : dt)
     do k = lo(3), hi(3)
@@ -563,7 +568,8 @@ contains
                            force, f_lo, f_hi, nc_f, &
                            divu,  d_lo, d_hi, &
                            p0, gamma1bar, &
-                           r_cc_loc, r_edge_loc) bind (C,name="firstdt_sphr")
+                           r_cc_loc, r_edge_loc, &
+                           cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
 
     
     double precision, intent(inout) :: dt, umax
@@ -581,6 +587,9 @@ contains
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
     
     ! local variables
     double precision :: spdx,spdy,spdz,pforcex,pforcey,pforcez,ux,uy,uz 
@@ -688,7 +697,8 @@ contains
        gp0(0,nr_fine) = gp0(0,nr_fine-1)
        gp0(0,      0) = gp0(0,        1)
        
-       call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,lo,hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc)
+       call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,lo,hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc, &
+                                         cc_to_r,ccr_lo,ccr_hi)
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,gp_dot_u,denom) REDUCTION(MIN : dt_divu)
        do k = lo(3), hi(3)

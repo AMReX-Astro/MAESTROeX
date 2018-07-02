@@ -155,15 +155,18 @@ contains
 
     ! initialize temp
     call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,temp_comp),scal_lo,scal_hi,1, &
-                                     s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc)
-
+                                     s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc, &
+                                     cc_to_r,ccr_lo,ccr_hi)
+    
     ! initialize p0_cart
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0_init,dx,0,0,r_cc_loc,r_edge_loc) 
-
+    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0_init,dx,0,0,r_cc_loc,r_edge_loc, & 
+                                     cc_to_r,ccr_lo,ccr_hi)
+         
     ! initialize species
     do comp = spec_comp, spec_comp+nspec-1
        call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,comp),scal_lo,scal_hi,1, &
-                                        s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc)
+                                        s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc, & 
+                                        cc_to_r,ccr_lo,ccr_hi)
     end do
 
     ! initialize rho as sum of partial densities rho*X_i

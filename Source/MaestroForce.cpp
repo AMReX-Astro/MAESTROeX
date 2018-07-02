@@ -46,6 +46,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 	const MultiFab& normal_mf = normal[lev];
 	const MultiFab& w0force_mf = w0_force_cart[lev];
 #endif
+	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(vel_force_mf); mfi.isValid(); ++mfi ) {
@@ -89,7 +90,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 				    rho0.dataPtr(),
 				    grav_cell.dataPtr(),
 				    dx,
-				    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(), 
+				    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+				    BL_TO_FORTRAN_3D(cc_to_r[mfi]),
 				    &do_add_utilde_force);
 #else
 		Abort("MakeVelForce: Spherical is not valid for DIM < 3");
@@ -270,6 +272,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 #endif
 #endif
         const MultiFab& thermal_mf = thermal[lev];
+	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(scal_force_mf); mfi.isValid(); ++mfi ) {
@@ -297,7 +300,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 				 BL_TO_FORTRAN_3D(p0macz_mf[mfi]),
 				 dx, psi.dataPtr(),
 				 &is_prediction, &add_thermal, 
-				 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+				 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+				 BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #else
 	        Abort("MakeRhoHForce: Spherical is not valid for DIM < 3");
 #endif

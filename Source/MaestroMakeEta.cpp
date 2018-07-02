@@ -95,6 +95,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 	const MultiFab& w0macz_mf = w0mac[lev][2];
 	const MultiFab& normal_mf = normal[lev];
 	MultiFab& etacart_mf = eta_cart[lev];
+	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(scalold_mf); mfi.isValid(); ++mfi ) {
@@ -117,7 +118,8 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 				BL_TO_FORTRAN_3D(normal_mf[mfi]),
 				BL_TO_FORTRAN_3D(etacart_mf[mfi]),
 				rho0_old.dataPtr(), rho0_new.dataPtr(),
-				dx, r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+				dx, r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+				BL_TO_FORTRAN_3D(cc_to_r[mfi]));
         } // end MFIter loop
     } // end loop over levels
 

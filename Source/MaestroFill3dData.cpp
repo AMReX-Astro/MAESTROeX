@@ -26,6 +26,7 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 
         // get references to the MultiFabs at level lev
         MultiFab& s0_cart_mf = s0_cart[lev];
+	MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(s0_cart_mf); mfi.isValid(); ++mfi ) {
@@ -47,7 +48,8 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 					  BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
 					  s0.dataPtr(), dx, 
 					  &is_input_edge_centered, &is_output_a_vector, 
-					  r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+					  r_cc_loc.dataPtr(), r_edge_loc.dataPtr(), 
+					  BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	    }
         }
     }
