@@ -247,9 +247,9 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
             // create a BoxArray whose boxes include only the cell-centered ghost cells 
             // associated with the fine grids
             BoxList f_bndry_bl = amrex::GetBndryCells(grids[lev],nGrow);
-            BoxArray f_bndry_ba(f_bndry_bl);
-            f_bndry_bl.clear();
-
+            BoxArray f_bndry_ba(std::move(f_bndry_bl));
+            f_bndry_ba.maxSize(32);
+            
             // create a coarsened version of the fine ghost cell BoxArray
             BoxArray c_bndry_ba = f_bndry_ba;
             c_bndry_ba.coarsen(refRatio(lev-1));
