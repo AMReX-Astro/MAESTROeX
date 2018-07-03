@@ -1,0 +1,5 @@
+07-02-2018
+Initial commit of development/master branches.
+Planar and spherical work for single level grids.
+wdconvect and reacting bubble tests implemented.
+AMR and variable spherical base state spacing are WIP.
