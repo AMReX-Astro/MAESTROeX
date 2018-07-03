@@ -217,7 +217,8 @@ contains
                            scal, scal_lo, scal_hi, nc_s, &
                            vel, vel_lo, vel_hi, nc_v, &
                            s0_init, p0_init, &
-                           dx, r_cc_loc, r_edge_loc) bind(C, name="initdata_sphr")
+                           dx, r_cc_loc, r_edge_loc, &
+                           cc_to_r, ccr_lo, ccr_hi) bind(C, name="initdata_sphr")
     
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
@@ -234,6 +235,9 @@ contains
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     !     Local variables
     integer          :: i,j,k,comp
@@ -258,15 +262,18 @@ contains
 
     ! initialize temp
     call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,temp_comp),scal_lo,scal_hi,1, &
-                                     s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc)
-
+                                     s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc, &
+                                     cc_to_r,ccr_lo,ccr_hi)
+                                     
     ! initialize p0_cart
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0_init,dx,0,0,r_cc_loc,r_edge_loc) 
+    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0_init,dx,0,0,r_cc_loc,r_edge_loc, &
+                                      cc_to_r,ccr_lo,ccr_hi) 
 
     ! initialize species
     do comp = spec_comp, spec_comp+nspec-1
        call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,comp),scal_lo,scal_hi,1, &
-                                        s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc)
+                                        s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc, &
+                                        cc_to_r,ccr_lo,ccr_hi)
     end do
 
     ! initialize rho as sum of partial densities rho*X_i
