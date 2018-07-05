@@ -76,8 +76,53 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         std::swap(phisum,phibar);
 
     }
+    else if (spherical == 1 && use_exact_base_state) {
+	// spherical case with uneven base state spacing
+
+	// phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
+        // so we can simply swap this result with phibar
+        Vector<Real> phisum((max_radial_level+1)*nr_fine,0.0);
+
+        // this stores how many cells there are at each level
+        Vector<int> ncell((max_radial_level+1)*nr_fine,0);
+
+        // loop is over the existing levels (up to finest_level)
+        for (int lev=0; lev<=finest_level; ++lev) {
+            
+            // get references to the MultiFabs at level lev
+            const MultiFab& phi_mf = phi[lev];
+	    const MultiFab& cc_to_r = cell_cc_to_r[lev];
+
+            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+            for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
+            {
+
+                // Get the index space of the valid region
+                const Box& validBox = mfi.validbox();
+
+                // call fortran subroutine
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // lo/hi coordinates (including ghost cells), and/or the # of components
+                // We will also pass "validBox", which specifies the "valid" region.
+                average_sphr_irreg(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				   BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
+				   phisum.dataPtr(), ncell.dataPtr(),
+				   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+            }
+        }
+
+        // reduction over boxes to get sum
+        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
+	ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(max_radial_level+1)*nr_fine);
+
+        // divide phisum by ncell so it stores "phibar"
+        divide_phisum_by_ncell_irreg(phisum.dataPtr(),ncell.dataPtr());
+
+        // swap pointers so phibar contains the computed average
+        std::swap(phisum,phibar);
+    }
     else {
-        // spherical case
+        // spherical case with even base state spacing
 
 	// For spherical, we construct a 1D array at each level, phisum, that has space
 	// allocated for every possible radius that a cell-center at each level can 

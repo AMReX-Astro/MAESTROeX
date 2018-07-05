@@ -57,6 +57,54 @@ contains
   ! spherical subroutines
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  subroutine average_sphr_irreg(lev,lo,hi,phi,p_lo,p_hi,phisum,ncell, &
+                                  cc_to_r,ccr_lo,ccr_hi) bind (C,name="average_sphr_irreg")
+
+
+    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: p_lo(3), p_hi(3)
+    double precision, intent (in   ) :: phi(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
+    double precision, intent (inout) :: phisum(0:max_radial_level,0:nr_fine-1)
+    integer         , intent (inout) ::  ncell(0:max_radial_level,0:nr_fine-1)
+    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
+    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+                                                ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+
+    ! local
+    integer          :: i,j,k,index
+
+    do i=lo(1),hi(1)
+    do j=lo(2),hi(2)
+    do k=lo(3),hi(3)
+       index = cc_to_r(i,j,k)
+       phisum(lev,index) = phisum(lev,index) + phi(i,j,k)
+       ncell(lev,index) = ncell(lev,index) + 1
+    end do
+    end do
+    end do
+
+  end subroutine average_sphr_irreg
+
+  subroutine divide_phisum_by_ncell_irreg(phisum,ncell) &
+       bind (C,name="divide_phisum_by_ncell_irreg")
+
+    double precision, intent(inout) :: phisum(0:max_radial_level,0:nr_fine-1)
+    integer         , intent(in   ) ::  ncell(0:max_radial_level,0:nr_fine-1)
+
+    integer :: n,r
+
+    do n=0,max_radial_level
+       do r=0,nr_fine-1
+          phisum(n,r) = phisum(n,r) / ncell(n,r)
+       end do
+    end do
+
+    call restrict_base(phisum,1)
+    call fill_ghost_base(phisum,1)
+
+  end subroutine divide_phisum_by_ncell_irreg
+
+  
   subroutine average_sphr(phisum,phibar,ncell,radii,finest_level) & 
        bind (C,name="average_sphr")
 

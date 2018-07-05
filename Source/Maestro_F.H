@@ -35,8 +35,15 @@ extern "C"
     void average(const int* lev, const int* lo, const int* hi,
                  const amrex::Real* phi, const int* p_lo, const int* p_hi, 
                  amrex::Real* phisum);
-
+    
     void divide_phisum_by_ncell(amrex::Real* phisum, int* ncell);
+
+    void average_sphr_irreg(const int* lev, const int* lo, const int* hi,
+			    const amrex::Real* phi, const int* p_lo, const int* p_hi, 
+			    amrex::Real* phisum, int* ncell, 
+			    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+    
+    void divide_phisum_by_ncell_irreg(amrex::Real* phisum, int* ncell);
 
     void average_sphr(amrex::Real* phisum, amrex::Real* phibar, 
 		      int* ncell, amrex::Real* radii, const int* finest_level);
