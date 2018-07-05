@@ -220,6 +220,7 @@ extern "C"
     void enforce_HSE(const amrex::Real* rho0,
                            amrex::Real* p0,
                      const amrex::Real* grav_cell,
+		     const amrex::Real* r_cc_loc,
                      const amrex::Real* r_edge_loc);
     //////////////////////
 

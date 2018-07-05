@@ -403,6 +403,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	enforce_HSE(rho0_new.dataPtr(),
 		    p0_new.dataPtr(),
 		    grav_cell_new.dataPtr(),
+		    r_cc_loc.dataPtr(),
 		    r_edge_loc.dataPtr());
 	
 	// make psi
@@ -708,6 +709,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	enforce_HSE(rho0_new.dataPtr(),
 		    p0_new.dataPtr(),
 		    grav_cell_new.dataPtr(),
+		    r_cc_loc.dataPtr(),
 		    r_edge_loc.dataPtr());
 	
 	for (int i=0; i<p0_nph.size(); ++i) {

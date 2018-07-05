@@ -217,16 +217,12 @@ Maestro::InitData ()
 			   r_cc_loc.dataPtr(),
 			   r_edge_loc.dataPtr());
 
-	    if (use_exact_base_state) {
-		// Need to write enforce_HSE_irreg for p0[0:nr_irreg-1]
-	    } else {
-		// compute p0 with HSE
-		enforce_HSE(rho0_old.dataPtr(),
-			    p0_old.dataPtr(),
-			    grav_cell_old.dataPtr(),
-			    r_edge_loc.dataPtr());
-	    }
-
+	    // compute p0 with HSE
+	    enforce_HSE(rho0_old.dataPtr(),
+			p0_old.dataPtr(),
+			grav_cell_old.dataPtr(),
+			r_cc_loc.dataPtr(),
+			r_edge_loc.dataPtr());
 
             // call eos with r,p as input to recompute T,h
             TfromRhoP(sold,p0_old,1);
