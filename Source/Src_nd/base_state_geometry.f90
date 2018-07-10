@@ -162,22 +162,22 @@ contains
        print*,'init_base_state_map_sphr() does not work for planar'
        call abort()
     end if
-    
+
     ! map cell centers to base state indices  
     if (use_exact_base_state) then
 
-          do k = lo(3),hi(3)
-             z = prob_lo(3) + (dble(k)+0.5d0)*dx_lev(3) - center(3)
-             do j = lo(2),hi(2)
-                y = prob_lo(2) + (dble(j)+0.5d0)*dx_lev(2) - center(2)
-                do i = lo(1),hi(1)
-                   x = prob_lo(1) + (dble(i)+0.5d0)*dx_lev(1) - center(1)
-                   
-                   index = (x**2 + y**2 + z**2)/(2.0d0*dx_fine(0)**2) - 0.375d0
-                   cc_to_r(i,j,k) = nint(index)
-                end do
+       do k = lo(3),hi(3)
+          z = prob_lo(3) + (dble(k)+0.5d0)*dx_lev(3) - center(3)
+          do j = lo(2),hi(2)
+             y = prob_lo(2) + (dble(j)+0.5d0)*dx_lev(2) - center(2)
+             do i = lo(1),hi(1)
+                x = prob_lo(1) + (dble(i)+0.5d0)*dx_lev(1) - center(1)
+                
+                index = (x**2 + y**2 + z**2)/(2.0d0*dx_fine(0)**2) - 0.375d0
+                cc_to_r(i,j,k) = nint(index)
              end do
           end do
+       end do
        
     end if
 

@@ -82,7 +82,7 @@ contains
     end do
     end do
     end do
-
+ 
   end subroutine average_sphr_irreg
 
   subroutine divide_phisum_by_ncell_irreg(phisum,ncell) &
@@ -95,7 +95,10 @@ contains
 
     do n=0,max_radial_level
        do r=0,nr_fine-1
-          phisum(n,r) = phisum(n,r) / ncell(n,r)
+          ! divide only if ncell>0
+          if (ncell(n,r) > 0) then 
+             phisum(n,r) = phisum(n,r) / ncell(n,r)
+          end if
        end do
     end do
 
