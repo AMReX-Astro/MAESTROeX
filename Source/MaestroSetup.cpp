@@ -131,8 +131,8 @@ Maestro::Setup ()
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
+    w0        .resize( (max_radial_level+1)*(nr_fine+1) );
     if (use_exact_base_state == 0) {
-	w0       .resize( (max_radial_level+1)*(nr_fine+1) );
 	etarho_ec.resize( (max_radial_level+1)*(nr_fine+1) );
     }
 
@@ -156,10 +156,10 @@ Maestro::Setup ()
     gamma1bar_new.shrink_to_fit();
     grav_cell_old.shrink_to_fit();
     grav_cell_new.shrink_to_fit();
+    w0           .shrink_to_fit();
     if (use_exact_base_state == 0) {
 	etarho_cc.shrink_to_fit();
 	psi      .shrink_to_fit();
-	w0       .shrink_to_fit();
 	etarho_ec.shrink_to_fit();
     }
     r_cc_loc     .shrink_to_fit();
