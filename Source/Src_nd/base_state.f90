@@ -164,6 +164,7 @@ contains
                 if ( parallel_IOProcessor() ) then
                    write (*,*) ' '
                    write (*,*) 'setting r_cutoff to ', r
+                   write (*,*) 'radius at r_cutoff ', rloc
                 end if
 
                 base_cutoff_density_loc = rloc
@@ -278,7 +279,7 @@ contains
     real(kind=dp_t) :: rloc,rmax,starting_rad,mod_dr
     real(kind=dp_t) :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
     real(kind=dp_t) :: sumX
-    real(kind=dp_t) :: dr_irreg
+    real(kind=dp_t) :: dr_irreg, rfrac
     
     real(kind=dp_t), allocatable :: model_dr(:)
 
@@ -398,6 +399,7 @@ contains
                 if ( parallel_IOProcessor() ) then
                    write (*,*) ' '
                    write (*,*) 'setting r_cutoff to ', r
+                   write (*,*) 'radius at r_cutoff ', rloc
                 end if
 
                 base_cutoff_density_loc = rloc
@@ -456,10 +458,11 @@ contains
              endif
 
              ! cell-center to cell-center??? <- NOT SURE ABOUT THIS
-             dr_irreg = r_cc_loc(n,r) - r_cc_loc(n,r-1)  
+             dr_irreg = r_cc_loc(n,r) - r_cc_loc(n,r-1)
              dpdr = (p0_init(n,r) - p0_init(n,r-1))/dr_irreg
-             
-             rhog = HALF*(s0_init(n,r,rho_comp) + s0_init(n,r-1,rho_comp))*g
+
+             rfrac = (r_edge_loc(n,r) - r_cc_loc(n,r-1))/(r_cc_loc(n,r) - r_cc_loc(n,r-1))
+             rhog = ((1.d0-rfrac)*s0_init(n,r,rho_comp) + rfrac*s0_init(n,r-1,rho_comp))*g
 
              if (print_init_hse_diag) then
                 if ( parallel_IOProcessor() ) then
