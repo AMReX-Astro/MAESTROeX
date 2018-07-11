@@ -55,7 +55,7 @@ maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 
 maestro.grav_const = -1.5e10
 maestro.do_burning = true
-maestro.enthalpy_pred_type = 1
+maestro.enthalpy_pred_type = 0 # predict\_rhoh
 maestro.dpdt_factor = 0.0e0
 maestro.use_eos_coulomb = true
 
