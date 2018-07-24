@@ -391,6 +391,14 @@ extern "C"
                     const amrex::Real* p0,
                     const amrex::Real* gamma1bar,
                     const amrex::Real* grav_cell);
+    
+    void make_beta0_irreg(      amrex::Real* beta0,
+			   const amrex::Real* rho0,
+			   const amrex::Real* p0,
+			   const amrex::Real* gamma1bar,
+			   const amrex::Real* grav_cell,
+		      	   const amrex::Real* r_cc_loc,
+			   const amrex::Real* r_edge_loc);
     //////////////////////
 
 

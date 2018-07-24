@@ -418,8 +418,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
-        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+        make_beta0_irreg(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+			 gamma1bar_new.dataPtr(), grav_cell_new.dataPtr(),
+			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
     else {
         // Just pass beta0 and gamma1bar through if not evolving base state
@@ -633,8 +634,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state) {
         //compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
-        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+        make_beta0_irreg(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+			 gamma1bar_new.dataPtr(), grav_cell_new.dataPtr(),
+			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
 
     for(int i=0; i<beta0_nph.size(); ++i) {
