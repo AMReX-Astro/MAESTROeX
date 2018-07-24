@@ -95,9 +95,12 @@ contains
 
     do n=0,max_radial_level
        do r=0,nr_fine-1
-          ! divide only if ncell>0
+          ! divide only if ncell>0, 
+          ! else keep value constant b/c it is outside the cutoff coords
           if (ncell(n,r) > 0) then 
              phisum(n,r) = phisum(n,r) / ncell(n,r)
+          else
+             phisum(n,r) = phisum(n,r-1)
           end if
        end do
     end do
