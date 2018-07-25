@@ -74,8 +74,12 @@ Maestro::Evolve ()
         }
 
         // advance the solution by dt
-        AdvanceTimeStep(false);
-
+	if (use_exact_base_state) {
+	    AdvanceTimeStepIrreg(false);
+	} else {
+	    AdvanceTimeStep(false);
+	}
+	    
         t_old = t_new;
 
 	// save diag output into buffer
