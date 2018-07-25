@@ -433,8 +433,6 @@ contains
     end if
     !$OMP END PARALLEL DO
 
-    print *,"hack, entered put_1d_array_on_cart_sphr"
-    print *,"hack,",ccr_lo,ccr_hi
     ! compute w0 contribution to divu
     call put_1d_array_on_cart_sphr(lo,hi,divu_cart,lo,hi,1,divu,dx,0,0,r_cc_loc,r_edge_loc, &
                                       cc_to_r,ccr_lo,ccr_hi)
