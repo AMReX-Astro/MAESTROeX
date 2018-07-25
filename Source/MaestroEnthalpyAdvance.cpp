@@ -73,8 +73,16 @@ Maestro::EnthalpyAdvance (int which_step,
     }
     else if (enthalpy_pred_type == predict_h ||
              enthalpy_pred_type == predict_rhoh) {
-        // make force for h by calling mkrhohforce then dividing by rho
-        Abort("MaestroEnthalpyAdvance forcing");
+        // make force for (rho h)
+        MakeRhoHForce(scal_force,1,thermal,umac,1,1);
+
+	// make force for h by calling mkrhohforce then dividing by rho
+	if (enthalpy_pred_type == predict_h) {
+	    for (int lev=0; lev<=finest_level; ++lev) {
+		MultiFab::Divide(scal_force[lev],scalold[lev],RhoH,Rho,1,1);
+	    }
+	}
+	    
     }
     else if (enthalpy_pred_type == predict_hprime) {
         // first compute h0_old
@@ -126,7 +134,7 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_rhoh) {
         // use the conservative form of the prediction
-        Abort("MaestroEnthalpyAdvance predict_rhoh");
+        MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,1);
     }
     else {
         // use the advective form of the prediction

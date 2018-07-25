@@ -521,8 +521,12 @@ void Maestro::InitIter ()
     BL_PROFILE_VAR("Maestro::InitIter()",InitIter);
 
     // advance the solution by dt
-    AdvanceTimeStep(true);
-
+    if (use_exact_base_state) {
+	AdvanceTimeStepIrreg(true);
+    } else {
+	AdvanceTimeStep(true);
+    }
+	
     // copy pi from snew to sold
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1,ng_s);

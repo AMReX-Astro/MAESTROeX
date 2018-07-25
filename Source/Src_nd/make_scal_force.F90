@@ -421,18 +421,24 @@ contains
 
     allocate(divu_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
 
-    !$OMP PARALLEL DO PRIVATE(r)    
-    do r=0,nr_fine-1
-       divu(0,r) = (r_edge_loc(0,r+1)**2 * w0(0,r+1) - &
-                    r_edge_loc(0,r  )**2 * w0(0,r  ) ) / &
-                   (dr(0)*r_cc_loc(0,r)**2)
-    end do
+    !$OMP PARALLEL DO PRIVATE(r)
+    if (use_exact_base_state) then
+       divu(0,:) = 0.0d0
+    else
+       do r=0,nr_fine-1
+          divu(0,r) = (r_edge_loc(0,r+1)**2 * w0(0,r+1) - &
+                       r_edge_loc(0,r  )**2 * w0(0,r  ) ) / &
+                      (dr(0)*r_cc_loc(0,r)**2)
+       end do
+    end if
     !$OMP END PARALLEL DO
 
+    print *,"hack, entered put_1d_array_on_cart_sphr"
+    print *,"hack,",ccr_lo,ccr_hi
     ! compute w0 contribution to divu
     call put_1d_array_on_cart_sphr(lo,hi,divu_cart,lo,hi,1,divu,dx,0,0,r_cc_loc,r_edge_loc, &
                                       cc_to_r,ccr_lo,ccr_hi)
-    
+
     !$OMP PARALLEL DO PRIVATE(i,j,k,divumac,s0_xhi,s0_xlo,s0_yhi,s0_ylo) &
     !$OMP PRIVATE(s0_zhi,s0_zlo,divs0u)
     do k = lo(3),hi(3)

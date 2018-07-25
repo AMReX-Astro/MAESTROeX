@@ -741,7 +741,8 @@ extern "C"
 				const amrex::Real* s0,  const int* s0_lo, const int* s0_hi, 
 				const amrex::Real* w0,
 				const amrex::Real* dx, const int* do_fullform, 
-				const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
+				const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
+				const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
     void mkrhohforce(const int* lev, const int* lo, const int* hi,
                      amrex::Real* rhoh_force, const int* f_lo, const int* f_hi,

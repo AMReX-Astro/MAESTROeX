@@ -139,6 +139,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wmac_mf = umac[lev][2];
 	const MultiFab& s0cart_mf = s0_cart[lev];
+	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 #endif
 #endif
 
@@ -165,7 +166,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 				       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 				       BL_TO_FORTRAN_3D(s0cart_mf[mfi]), 
 				       w0.dataPtr(), dx, &fullform, 
-				       r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+				       r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+				       BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #else
 		Abort("ModifyScalForce: Spherical is not valid for DIM < 3");
 #endif

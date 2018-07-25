@@ -177,7 +177,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     std::fill(Sbar_dummy    .begin(), Sbar_dummy    .end(), 0.);
     std::fill(w0_force_dummy.begin(), w0_force_dummy.end(), 0.);
     std::fill(rho0_pred_edge_dummy.begin(), rho0_pred_edge_dummy.end(), 0.);
-    
+    std::fill(w0.begin(), w0.end(), 0.);
 
     // make the sponge for all levels
     if (do_sponge) {
