@@ -251,12 +251,8 @@ contains
 
        allocate(psi_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
 
-       if (use_exact_base_state) then
-          psi_cart = 0.d0
-       else
-          call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0, &
+       call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0, &
                r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
-       end if
           
        !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)

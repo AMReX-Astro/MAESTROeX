@@ -62,10 +62,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Vector<Real> grav_cell_nph   ( (max_radial_level+1)*nr_fine );
     Vector<Real> rho0_nph        ( (max_radial_level+1)*nr_fine );
     Vector<Real> p0_nph          ( (max_radial_level+1)*nr_fine );
+    Vector<Real> p0_minus_peosbar( (max_radial_level+1)*nr_fine );
     Vector<Real> peosbar         ( (max_radial_level+1)*nr_fine );
     Vector<Real> w0_force_dummy  ( (max_radial_level+1)*nr_fine );
-    Vector<Real> Sbar_dummy      ( (max_radial_level+1)*nr_fine );
+    Vector<Real> Sbar            ( (max_radial_level+1)*nr_fine );
     Vector<Real> beta0_nph       ( (max_radial_level+1)*nr_fine );
+    Vector<Real> gamma1bar_nph   ( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -76,9 +78,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     rho0_nph            .shrink_to_fit();
     p0_nph              .shrink_to_fit();
     peosbar             .shrink_to_fit();
+    p0_minus_peosbar    .shrink_to_fit();
     w0_force_dummy      .shrink_to_fit();
-    Sbar_dummy          .shrink_to_fit();
+    Sbar                .shrink_to_fit();
     beta0_nph           .shrink_to_fit();
+    gamma1bar_nph       .shrink_to_fit();
     rho0_pred_edge_dummy.shrink_to_fit();
 
     int is_predictor;
@@ -173,8 +177,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 #endif
 
+    std::fill(Sbar.begin(), Sbar.end(), 0.);
+    
     // set dummy variables to zero
-    std::fill(Sbar_dummy    .begin(), Sbar_dummy    .end(), 0.);
     std::fill(w0_force_dummy.begin(), w0_force_dummy.end(), 0.);
     std::fill(rho0_pred_edge_dummy.begin(), rho0_pred_edge_dummy.end(), 0.);
     std::fill(w0.begin(), w0.end(), 0.);
@@ -227,9 +232,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	// compute peosbar = Avg(peos_old)
 	Average(delta_p_term,peosbar,0);
 
-	// p0_minus_peosbar = p0_new - peosbar
-	// no need to compute p0_minus_peosbar since make_w0 is not called
-       
+	// p0_minus_peosbar = p0_old - peosbar
+	for (int i=0; i<p0_minus_peosbar.size(); ++i) {
+	    p0_minus_peosbar[i] = p0_old[i] - peosbar[i];
+	}
+	
 	// compute peosbar_cart from peosbar
 	Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
 
@@ -240,6 +247,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
     else {
         // these should have no effect if dpdt_factor <= 0
+        std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
         for (int lev=0; lev<=finest_level; ++lev) {
             delta_p_term[lev].setVal(0.);
         }
@@ -262,10 +270,14 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         macphi   [lev].setVal(0.);
     }
 
+    // Sbar = (1 / gamma1bar * p0) * dp/dt
+    for (int i=0; i<Sbar.size(); ++i) {
+	Sbar[i] = (1.0/(gamma1bar_old[i]*p0_old[i]))*(p0_old[i] - p0_nm1[i])/dtold;
+    }
+    
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    // Sbar_dummy = 0
     is_predictor = 1;
-    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar_dummy,beta0_old,gamma1bar_old,p0_old,
+    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,gamma1bar_old,p0_old,
 		       delta_p_term,delta_chi,is_predictor);
 
     // MAC projection
@@ -273,7 +285,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////
-    // STEP 4 -- advect the base state and full state through dt
+    // STEP 4 -- advect the full state through dt
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
@@ -349,6 +361,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 		    r_cc_loc.dataPtr(),
 		    r_edge_loc.dataPtr());
 	
+	// compute p0_nph
+	for (int i=0; i<p0_nph.size(); ++i) {
+	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	}
+
 	// no need for psi
     }
     else {
@@ -360,9 +377,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	// compute rhoh0_old by "averaging"
 	Average(s1, rhoh0_old, RhoH);
     }
-    else {
-        rhoh0_new = rhoh0_old;
-    }
+    rhoh0_new = rhoh0_old;
 
     if (maestro_verbose >= 1) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
@@ -430,6 +445,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     for(int i=0; i<beta0_nph.size(); ++i) {
         beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+	gamma1bar_nph[i] = 0.5*(gamma1bar_old[i]+gamma1bar_new[i]);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -475,7 +491,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	Average(delta_p_term,peosbar,0);
 
 	// p0_minus_peosbar = p0_new - peosbar
-	// no need to compute p0_minus_peosbar since make_w0 is not called
+	for (int i=0; i<p0_minus_peosbar.size(); ++i) {
+	    p0_minus_peosbar[i] = p0_new[i] - peosbar[i];
+	}
        
 	// compute peosbar_cart from peosbar
 	Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
@@ -504,10 +522,14 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // compute unprojected MAC velocities
     AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
 
+    // compute Sbar
+    for (int i=0; i<Sbar.size(); ++i) {
+	Sbar[i] = (1.0/(gamma1bar_nph[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
+    }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     is_predictor = 0;
-    MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar_dummy,beta0_nph,gamma1bar_new,p0_new, 
+    MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,gamma1bar_new,p0_new, 
 		       delta_p_term,delta_chi,is_predictor);
 
     // MAC projection
@@ -515,7 +537,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
 
     //////////////////////////////////////////////////////////////////////////////
-    // STEP 8 -- advect the base state and full state through dt
+    // STEP 8 -- advect the full state through dt
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
@@ -682,6 +704,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     int proj_type;
 
+    // set Sbar to zero
+    std::fill(Sbar.begin(), Sbar.end(), 0.);
+    
     // Project the new velocity field
     if (is_initIter) {
 
@@ -696,7 +721,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
             MultiFab::Copy(rhcc_for_nodalproj_old[lev], rhcc_for_nodalproj[lev], 0, 0, 1, 1);
         }
 
-        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar_dummy,beta0_nph);
+        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph);
         
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Subtract(rhcc_for_nodalproj[lev], rhcc_for_nodalproj_old[lev], 0, 0, 1, 1);
@@ -708,7 +733,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         proj_type = regular_timestep_comp;
 
-        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar_dummy,beta0_nph);
+        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph);
 
 	// compute delta_p_term = peos_new - peosbar_cart (for RHS of projection)
         if (dpdt_factor > 0.) {

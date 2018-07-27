@@ -114,6 +114,7 @@ Maestro::Evolve ()
 
             std::swap( rho0_old, rho0_new);
             std::swap(rhoh0_old,rhoh0_new);
+	    std::swap(   p0_nm1,   p0_old);
             std::swap(   p0_old,   p0_new);
 
             std::swap(beta0_old,beta0_new);

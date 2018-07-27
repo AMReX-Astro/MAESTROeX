@@ -221,19 +221,33 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     Vector<Real> rho0( (max_radial_level+1)*nr_fine );
     Vector<Real>   p0( (max_radial_level+1)*nr_fine );
     Vector<Real> grav( (max_radial_level+1)*nr_fine );
+    Vector<Real> dpdt( (max_radial_level+1)*nr_fine );
     rho0.shrink_to_fit();
       p0.shrink_to_fit();
     grav.shrink_to_fit();
+    dpdt.shrink_to_fit();
 
     if (which_step == 1) {
         rho0 = rho0_old;
           p0 =   p0_old;
+	  
+	if (use_exact_base_state) {
+	    for (int i=0; i<p0_old.size(); ++i) {
+		dpdt[i] = (p0_old[i] - p0_nm1[i])/dtold;
+	    }
+	}
     }
     else {
         for(int i=0; i<rho0.size(); ++i) {
             rho0[i] = 0.5*(rho0_old[i]+rho0_new[i]);
               p0[i] = 0.5*(  p0_old[i]+  p0_new[i]);
         }
+
+	if (use_exact_base_state) {
+	    for (int i=0; i<p0_old.size(); ++i) {
+		dpdt[i] = (p0_new[i] - p0_old[i])/dt;
+	    }
+	}
     }
 
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -289,21 +303,40 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 	    if (spherical == 1) {
 		const Real* dx = geom[lev].CellSize();
 #if (AMREX_SPACEDIM == 3)
-		mkrhohforce_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				 scal_force_mf[mfi].dataPtr(RhoH), 
-				 ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
-				 BL_TO_FORTRAN_3D(umac_mf[mfi]),
-				 BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-				 BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-				 BL_TO_FORTRAN_3D(thermal_mf[mfi]),
-				 BL_TO_FORTRAN_3D(p0cart_mf[mfi]),
-				 BL_TO_FORTRAN_3D(p0macx_mf[mfi]),
-				 BL_TO_FORTRAN_3D(p0macy_mf[mfi]),
-				 BL_TO_FORTRAN_3D(p0macz_mf[mfi]),
-				 dx, psi.dataPtr(),
-				 &is_prediction, &add_thermal, 
-				 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				 BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+		if (use_exact_base_state) {
+		    // Use input parameter dpdt in place of psi
+		    mkrhohforce_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				     scal_force_mf[mfi].dataPtr(RhoH), 
+				     ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
+				     BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				     BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				     BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				     BL_TO_FORTRAN_3D(thermal_mf[mfi]),
+				     BL_TO_FORTRAN_3D(p0cart_mf[mfi]),
+				     BL_TO_FORTRAN_3D(p0macx_mf[mfi]),
+				     BL_TO_FORTRAN_3D(p0macy_mf[mfi]),
+				     BL_TO_FORTRAN_3D(p0macz_mf[mfi]),
+				     dx, dpdt.dataPtr(),
+				     &is_prediction, &add_thermal, 
+				     r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+				     BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+		} else {
+		    mkrhohforce_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				     scal_force_mf[mfi].dataPtr(RhoH), 
+				     ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
+				     BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				     BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				     BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				     BL_TO_FORTRAN_3D(thermal_mf[mfi]),
+				     BL_TO_FORTRAN_3D(p0cart_mf[mfi]),
+				     BL_TO_FORTRAN_3D(p0macx_mf[mfi]),
+				     BL_TO_FORTRAN_3D(p0macy_mf[mfi]),
+				     BL_TO_FORTRAN_3D(p0macz_mf[mfi]),
+				     dx, psi.dataPtr(),
+				     &is_prediction, &add_thermal, 
+				     r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+				     BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+		}
 #else
 	        Abort("MakeRhoHForce: Spherical is not valid for DIM < 3");
 #endif

@@ -114,6 +114,7 @@ Maestro::Setup ()
     rhoh0_new    .resize( (max_radial_level+1)*nr_fine );
     p0_old       .resize( (max_radial_level+1)*nr_fine );
     p0_new       .resize( (max_radial_level+1)*nr_fine );
+    p0_nm1       .resize( (max_radial_level+1)*nr_fine );
     tempbar      .resize( (max_radial_level+1)*nr_fine );
     tempbar_init .resize( (max_radial_level+1)*nr_fine );
     beta0_old    .resize( (max_radial_level+1)*nr_fine );
@@ -144,6 +145,7 @@ Maestro::Setup ()
     rhoh0_new    .shrink_to_fit();
     p0_old       .shrink_to_fit();
     p0_new       .shrink_to_fit();
+    p0_nm1       .shrink_to_fit();
     tempbar      .shrink_to_fit();
     tempbar_init .shrink_to_fit();
     beta0_old    .shrink_to_fit();

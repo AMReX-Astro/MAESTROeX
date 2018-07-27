@@ -246,6 +246,11 @@ Maestro::InitData ()
 	for (int i=0; i<tempbar.size(); ++i) {
 	    tempbar_init[i] = tempbar[i];
 	}
+
+	// set p0^{-1} = p0_old
+	for (int i=0; i<p0_old.size(); ++i) {
+	    p0_nm1[i] = p0_old[i];
+	}
     }
 }
 

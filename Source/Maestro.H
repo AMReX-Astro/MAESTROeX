@@ -795,6 +795,8 @@ private:
     amrex::Vector<amrex::Real> grav_cell_old;
     amrex::Vector<amrex::Real> grav_cell_new;
     amrex::Vector<amrex::Real> r_cc_loc;
+    // p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
+    amrex::Vector<amrex::Real> p0_nm1; 
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
