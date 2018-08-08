@@ -38,21 +38,23 @@ Maestro::WriteCheckPoint (int step) {
     // ---- ParallelDescriptor::IOProcessor() creates the directories
     amrex::PreBuildDirectorHierarchy(checkpointname, "Level_", nlevels, true);
 
+    VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+
     // write Header file
    if (ParallelDescriptor::IOProcessor()) {
 
+       std::ofstream HeaderFile;
+       HeaderFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
        std::string HeaderFileName(checkpointname + "/Header");
-       std::ofstream HeaderFile(HeaderFileName.c_str(), std::ofstream::out   |
-				                        std::ofstream::trunc |
-				                        std::ofstream::binary);
+       HeaderFile.open(HeaderFileName.c_str(), std::ofstream::out   |
+                                               std::ofstream::trunc |
+                                               std::ofstream::binary);
+ 
        if( ! HeaderFile.good()) {
            amrex::FileOpenFailed(HeaderFileName);
        }
 
        HeaderFile.precision(17);
-
-       VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
-       HeaderFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
 
        // write out title line
        HeaderFile << "Checkpoint file for MAESTRO\n";
@@ -101,18 +103,17 @@ Maestro::WriteCheckPoint (int step) {
    // write out the cell-centered base state
    if (ParallelDescriptor::IOProcessor()) {
 
+       std::ofstream BaseCCFile;
+       BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
        std::string BaseCCFileName(checkpointname + "/BaseCC");
-       std::ofstream BaseCCFile(BaseCCFileName.c_str(), std::ofstream::out   |
-				                        std::ofstream::trunc |
-				                        std::ofstream::binary);
+       BaseCCFile.open(BaseCCFileName.c_str(), std::ofstream::out   |
+                                               std::ofstream::trunc |
+                                               std::ofstream::binary);
        if( ! BaseCCFile.good()) {
            amrex::FileOpenFailed(BaseCCFileName);
        }
 
        BaseCCFile.precision(17);
-
-       VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
-       BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
 
        for (int i=0; i<rho0_new.size(); ++i) {
            BaseCCFile << rho0_new[i] << " "
@@ -130,18 +131,17 @@ Maestro::WriteCheckPoint (int step) {
    // write out the face-centered base state
    if (ParallelDescriptor::IOProcessor()) {
 
+       std::ofstream BaseFCFile;
+       BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
        std::string BaseFCFileName(checkpointname + "/BaseFC");
-       std::ofstream BaseFCFile(BaseFCFileName.c_str(), std::ofstream::out   |
-				                        std::ofstream::trunc |
-				                        std::ofstream::binary);
+       BaseFCFile.open(BaseFCFileName.c_str(), std::ofstream::out   |
+                                               std::ofstream::trunc |
+                                               std::ofstream::binary);
        if( ! BaseFCFile.good()) {
            amrex::FileOpenFailed(BaseFCFileName);
        }
 
        BaseFCFile.precision(17);
-
-       VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
-       BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
 
        for (int i=0; i<w0.size(); ++i) {
            BaseFCFile << w0[i] << " "
