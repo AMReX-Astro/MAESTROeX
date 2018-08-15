@@ -23,7 +23,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Vector<MultiFab>           s1(finest_level+1);
     Vector<MultiFab>           s2(finest_level+1);
     Vector<MultiFab>       s2star(finest_level+1);
-    Vector<MultiFab> peosbar_cart(finest_level+1);
+    Vector<MultiFab>      p0_cart(finest_level+1);
     Vector<MultiFab> delta_p_term(finest_level+1);
     Vector<MultiFab>       Tcoeff(finest_level+1);
     Vector<MultiFab>      hcoeff1(finest_level+1);
@@ -62,7 +62,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Vector<Real> grav_cell_nph   ( (max_radial_level+1)*nr_fine );
     Vector<Real> rho0_nph        ( (max_radial_level+1)*nr_fine );
     Vector<Real> p0_nph          ( (max_radial_level+1)*nr_fine );
-    Vector<Real> p0_minus_peosbar( (max_radial_level+1)*nr_fine );
     Vector<Real> peosbar         ( (max_radial_level+1)*nr_fine );
     Vector<Real> w0_force_dummy  ( (max_radial_level+1)*nr_fine );
     Vector<Real> Sbar            ( (max_radial_level+1)*nr_fine );
@@ -78,7 +77,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     rho0_nph            .shrink_to_fit();
     p0_nph              .shrink_to_fit();
     peosbar             .shrink_to_fit();
-    p0_minus_peosbar    .shrink_to_fit();
     w0_force_dummy      .shrink_to_fit();
     Sbar                .shrink_to_fit();
     beta0_nph           .shrink_to_fit();
@@ -114,7 +112,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         s1          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
         s2          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
         s2star      [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
-        peosbar_cart[lev].define(grids[lev], dmap[lev],       1,    0);
+        p0_cart     [lev].define(grids[lev], dmap[lev],       1,    0);
         delta_p_term[lev].define(grids[lev], dmap[lev],       1,    0);
         Tcoeff      [lev].define(grids[lev], dmap[lev],       1,    1);
         hcoeff1     [lev].define(grids[lev], dmap[lev],       1,    1);
@@ -224,30 +222,23 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // no ghost cells for S_cc_nph
     AverageDown(S_cc_nph,0,1);
 
-    // compute delta_p_term = peos_old - peosbar_cart (for RHS of projections)
+    // compute delta_p_term = peos_old - p0_old (for RHS of projections)
     if (dpdt_factor > 0.0) {
 	// peos_old (delta_p_term) now holds the thermodynamic p computed from sold(rho,h,X)
 	PfromRhoH(sold,sold,delta_p_term);
 
-	// compute peosbar = Avg(peos_old)
-	Average(delta_p_term,peosbar,0);
-
-	// p0_minus_peosbar = p0_old - peosbar
-	for (int i=0; i<p0_minus_peosbar.size(); ++i) {
-	    p0_minus_peosbar[i] = p0_old[i] - peosbar[i];
-	}
+	// no need to compute peosbar, p0_minus_peosbar since make_w0 is not called
 	
-	// compute peosbar_cart from peosbar
-	Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+	// compute p0_cart from p0
+	Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
 
-	// compute delta_p_term = peos_old - peosbar_cart
+	// compute delta_p_term = peos_old - p0_old
 	for (int lev=0; lev<=finest_level; ++lev) {
-	    MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
+	    MultiFab::Subtract(delta_p_term[lev],p0_cart[lev],0,0,1,0);
 	}
     }
     else {
         // these should have no effect if dpdt_factor <= 0
-        std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
         for (int lev=0; lev<=finest_level; ++lev) {
             delta_p_term[lev].setVal(0.);
         }
@@ -272,7 +263,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // Sbar = (1 / gamma1bar * p0) * dp/dt
     for (int i=0; i<Sbar.size(); ++i) {
-	Sbar[i] = (1.0/(gamma1bar_old[i]*p0_old[i]))*(p0_old[i] - p0_nm1[i])/dtold;
+	Sbar[i] = (p0_old[i] - p0_nm1[i])/(dtold*gamma1bar_old[i]*p0_old[i]);
     }
     
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -374,11 +365,14 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // base state enthalpy update
     if (evolve_base_state) {
-	// compute rhoh0_old by "averaging"
+	// compute rhoh0_old and rhoh0_new by "averaging"
 	Average(s1, rhoh0_old, RhoH);
+	Average(s2, rhoh0_new, RhoH);
     }
-    rhoh0_new = rhoh0_old;
-
+    else {
+	rhoh0_new = rhoh0_old;
+    }
+    
     if (maestro_verbose >= 1) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
@@ -482,25 +476,19 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
     AverageDown(S_cc_nph,0,1);
 
-    // and delta_p_term = peos_new - peosbar_cart (for RHS of projection)
+    // and delta_p_term = peos_new - p0_new (for RHS of projection)
     if (dpdt_factor > 0.) {
 	// peos_new now holds the thermodynamic p computed from snew(rho,h,X)
 	PfromRhoH(snew,snew,delta_p_term);
 
-	// compute peosbar = Avg(peos_new)
-	Average(delta_p_term,peosbar,0);
-
-	// p0_minus_peosbar = p0_new - peosbar
-	for (int i=0; i<p0_minus_peosbar.size(); ++i) {
-	    p0_minus_peosbar[i] = p0_new[i] - peosbar[i];
-	}
+	// no need to compute peosbar,p0_minus_peosbar since make_w0 is not called
        
-	// compute peosbar_cart from peosbar
-	Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+	// compute p0_cart from p0
+	Put1dArrayOnCart(p0_new, p0_cart, 0, 0, bcs_f, 0);
 
-	// compute delta_p_term = peos_new - peosbar_cart
+	// compute delta_p_term = peos_new - p0_new
 	for (int lev=0; lev<=finest_level; ++lev) {
-	    MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
+	    MultiFab::Subtract(delta_p_term[lev],p0_cart[lev],0,0,1,0);
 	} 
     }
     else {
@@ -607,6 +595,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	// no need for psi
     }
 
+    // base state enthalpy averaging
+    if (evolve_base_state) {
+	Average(s2, rhoh0_new, RhoH);
+    }
+    
     // base state enthalpy update
     if (maestro_verbose >= 1) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
@@ -735,22 +728,19 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph);
 
-	// compute delta_p_term = peos_new - peosbar_cart (for RHS of projection)
+	// compute delta_p_term = peos_new - p0_new (for RHS of projection)
         if (dpdt_factor > 0.) {
 	    // peos_new now holds the thermodynamic p computed from snew(rho h X)
 	    PfromRhoH(snew,snew,delta_p_term);
 	    
-	    // compute peosbar = Avg(peos_new)
-	    Average(delta_p_term,peosbar,0);
-
-	    // no need to compute p0_minus_peosbar since make_w0 is not called
+	    // no need to compute peosbar, p0_minus_peosbar since make_w0 is not called
 
 	    // compute peosbar_cart from peosbar
-	    Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+	    Put1dArrayOnCart(p0_new, p0_cart, 0, 0, bcs_f, 0);
 
-	    // compute delta_p_term = peos_new - peosbar_cart
+	    // compute delta_p_term = peos_new - p0_new
 	    for (int lev=0; lev<=finest_level; ++lev) {
-		MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
+		MultiFab::Subtract(delta_p_term[lev],p0_cart[lev],0,0,1,0);
 	    }
 	    
 	    CorrectRHCCforNodalProj(rhcc_for_nodalproj,rho0_new,beta0_nph,gamma1bar_new,
