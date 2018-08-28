@@ -3,7 +3,7 @@
 ! or add runtime parameters, please edit _cpp_parameters and then run
 ! mk_params.sh
 
-! This module stores the runtime parameters and integer names for 
+! This module stores the runtime parameters and integer names for
 ! indexing arrays.
 !
 ! The Fortran-specific parameters are initialized in set_method_params(),
@@ -58,6 +58,7 @@ module meth_params_module
   integer                       , save :: beta0_type
   logical                       , save :: use_linear_grav_in_beta0
   double precision              , save :: rotational_frequency
+  double precision              , save :: rotation_radius
   double precision              , save :: co_latitude
   logical                       , save :: drive_initial_convection
   logical                       , save :: use_alt_energy_fix
@@ -122,6 +123,7 @@ contains
     ppm_type = 1;
     beta0_type = 1;
     use_linear_grav_in_beta0 = .false.;
+    rotation_radius = 1.0d6;
     rotational_frequency = 0.0d0;
     co_latitude = 0.0d0;
     drive_initial_convection = .false.;
@@ -175,6 +177,7 @@ contains
     call pp%query("ppm_type", ppm_type)
     call pp%query("beta0_type", beta0_type)
     call pp%query("use_linear_grav_in_beta0", use_linear_grav_in_beta0)
+    call pp%query("rotation_radius", rotation_radius)
     call pp%query("rotational_frequency", rotational_frequency)
     call pp%query("co_latitude", co_latitude)
     call pp%query("drive_initial_convection", drive_initial_convection)
@@ -211,7 +214,7 @@ contains
     end if
 
 
-    
+
   end subroutine finalize_meth_params
 
 end module meth_params_module

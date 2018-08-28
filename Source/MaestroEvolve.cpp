@@ -79,16 +79,19 @@ Maestro::Evolve ()
 	} else {
 	    AdvanceTimeStep(false);
 	}
-	    
+
         t_old = t_new;
 
 	// save diag output into buffer
 	DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
 
+    // std::cout << "\nt_new % plot_deltat " << std::fmod(t_new, plot_deltat) << " < dt? " << dt << '\n';
+
         // write a plotfile
-        if (plot_int > 0 && ( (istep % plot_int == 0) || 
+        if (plot_int > 0 && ( (istep % plot_int == 0) ||
                               (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
-                              (istep == max_step) ) )
+                              (istep == max_step) ||
+                               t_new >= stop_time) )
         {
             Print() << "\nWriting plotfile " << istep << std::endl;
             WritePlotFile(istep,t_new,rho0_new,p0_new,unew,snew);

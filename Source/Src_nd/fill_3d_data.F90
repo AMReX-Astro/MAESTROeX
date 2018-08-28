@@ -6,12 +6,12 @@ module fill_3d_data_module
   use meth_params_module, only: prob_lo, spherical, s0_interp_type, w0_interp_type, &
                                   w0mac_interp_type, s0mac_interp_type, &
                                   use_exact_base_state
-  
+
   implicit none
 
   private
 
-  public :: put_1d_array_on_cart_sphr, quad_interp
+  public :: put_1d_array_on_cart, put_1d_array_on_cart_sphr, quad_interp
 
 contains
 
@@ -19,7 +19,7 @@ contains
                                   s0_cart, s0_cart_lo, s0_cart_hi, nc_s, &
                                   s0, is_input_edge_centered, is_output_a_vector) &
                                   bind(C, name="put_1d_array_on_cart")
-    
+
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s0_cart_lo(3), s0_cart_hi(3), nc_s
     double precision, intent(inout) :: s0_cart(s0_cart_lo(1):s0_cart_hi(1), &
@@ -82,8 +82,8 @@ contains
     end if
 
   end subroutine put_1d_array_on_cart
-  
-  subroutine put_1d_array_on_cart_sphr(lo, hi, & 
+
+  subroutine put_1d_array_on_cart_sphr(lo, hi, &
                                           s0_cart, s0_cart_lo, s0_cart_hi, nc_s, &
                                           s0, dx, &
                                           is_input_edge_centered, &
@@ -95,7 +95,7 @@ contains
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: s0_cart_lo(3), s0_cart_hi(3), nc_s
     double precision, intent(inout) :: s0_cart(s0_cart_lo(1):s0_cart_hi(1), &
-                                              s0_cart_lo(2):s0_cart_hi(2), & 
+                                              s0_cart_lo(2):s0_cart_hi(2), &
                                               s0_cart_lo(3):s0_cart_hi(3), nc_s)
     double precision, intent(in   ) :: s0(0:max_radial_level,0:nr_fine-1+is_input_edge_centered)
     double precision, intent(in   ) :: dx(3)
@@ -112,18 +112,18 @@ contains
     double precision :: radius,rfac,s0_cart_val
 
     if (use_exact_base_state) then
-       
+
        if (is_input_edge_centered .eq. 1) then
 
           ! we currently do not need edge interpolation,
           ! but from previous experience, we implemented
-          ! three different ideas for computing s0_cart, 
+          ! three different ideas for computing s0_cart,
           ! where s0 is edge-centered.
           ! 1.  Piecewise constant
           ! 2.  Piecewise linear
           ! 3.  Quadratic
           ! we will only implement (1) below
-          
+
           do k = lo(3),hi(3)
              z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
              do j = lo(2),hi(2)
@@ -132,9 +132,9 @@ contains
                    x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
                    radius = sqrt(x**2 + y**2 + z**2)
                    index  = cc_to_r(i,j,k)
-                   
+
                    rfac = (radius - r_cc_loc(0,index)) / (r_edge_loc(0,index+1) - r_edge_loc(0,index))
-                   
+
                    if (rfac .gt. 0.5d0) then
                       s0_cart_val = s0(0,index+1)
                    else
@@ -148,16 +148,16 @@ contains
                    else
                       s0_cart(i,j,k,1) = s0_cart_val
                    end if
-                   
+
                 end do
              end do
           end do
-          
+
        else
-          
-          ! we directly inject the spherical values into each cell center 
+
+          ! we directly inject the spherical values into each cell center
           ! because s0 is also bin-centered.
-          
+
           do k = lo(3),hi(3)
              z = prob_lo(3) +(dble(k)+HALF)*dx(3) - center(3)
              do j = lo(2),hi(2)
@@ -182,12 +182,12 @@ contains
           end do
 
        end if  ! is_input_edge_centered
-       
+
     else
-       
+
        if (is_input_edge_centered .eq. 1) then
 
-          ! we currently have three different ideas for computing s0_cart, 
+          ! we currently have three different ideas for computing s0_cart,
           ! where s0 is edge-centered.
           ! 1.  Piecewise constant
           ! 2.  Piecewise linear
@@ -305,7 +305,7 @@ contains
 
        else
 
-          ! we currently have three different ideas for computing s0_cart, 
+          ! we currently have three different ideas for computing s0_cart,
           ! where s0 is bin-centered.
           ! 1.  Piecewise constant
           ! 2.  Piecewise linear
@@ -425,16 +425,16 @@ contains
           end if
 
        end if  ! is_input_edge_centered
-    
+
     end if  ! use_exact_base_state
 
   end subroutine put_1d_array_on_cart_sphr
 
-  subroutine quad_interp(x,x0,x1,x2,y,y0,y1,y2) 
+  subroutine quad_interp(x,x0,x1,x2,y,y0,y1,y2)
 
     double precision, intent(in   ) :: x,x0,x1,x2,y0,y1,y2
     double precision, intent(  out) :: y
-    
+
     y = y0 + (y1-y0)/(x1-x0)*(x-x0) &
            + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1)
 
@@ -452,7 +452,7 @@ contains
 #endif
 #endif
                    w0,mult) bind(C, name="addw0")
-    
+
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(inout) :: uedge(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
@@ -497,13 +497,13 @@ contains
 
   end subroutine addw0
 
-  subroutine addw0_sphr(lo, hi, & 
-                         umac, u_lo, u_hi, & 
-                         vmac, v_lo, v_hi, & 
-                         wmac, w_lo, w_hi, & 
-                         w0macx, x_lo, x_hi, & 
-                         w0macy, y_lo, y_hi, & 
-                         w0macz, z_lo, z_hi, & 
+  subroutine addw0_sphr(lo, hi, &
+                         umac, u_lo, u_hi, &
+                         vmac, v_lo, v_hi, &
+                         wmac, w_lo, w_hi, &
+                         w0macx, x_lo, x_hi, &
+                         w0macy, y_lo, y_hi, &
+                         w0macz, z_lo, z_hi, &
                          mult) bind(C, name="addw0_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -823,7 +823,7 @@ contains
 
                 radius = sqrt(x**2 + y**2 + z**2)
                 index  = int(radius / dr(0))
-                
+
                 rfac = (radius - dble(index)*dr(0)) / dr(0)
 
                 if (index .lt. nr_fine) then
@@ -951,7 +951,7 @@ contains
        !$OMP END DO
 
        !$OMP END PARALLEL
-      
+
     else if (s0mac_interp_type .eq. 2) then
 
        !$OMP PARALLEL PRIVATE(i,j,k,x,y,z,radius,index)
@@ -1156,7 +1156,7 @@ contains
   end subroutine make_s0mac_sphr
 
   subroutine make_normal(normal,n_lo,n_hi,dx) bind(C, name="make_normal")
-    
+
     integer         , intent(in   ) :: n_lo(3), n_hi(3)
     double precision, intent(  out) :: normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
     double precision, intent(in   ) :: dx(3)
@@ -1193,7 +1193,7 @@ contains
        end do
        !$OMP END PARALLEL DO
 
-    else 
+    else
        call bl_error('SHOULDNT CALL MAKE_3D_NORMAL WITH SPHERICAL = 0')
     end if
 
@@ -1209,7 +1209,7 @@ contains
 #endif
 #endif
                                  harmonic_avg) bind(C, name="put_data_on_faces")
-    
+
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: cc_lo(3), cc_hi(3)
     double precision, intent(in   ) :: scc(cc_lo(1):cc_hi(1),cc_lo(2):cc_hi(2),cc_lo(3):cc_hi(3))

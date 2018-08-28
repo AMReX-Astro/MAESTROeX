@@ -1,5 +1,5 @@
 ! rotation
-! 
+!
 ! co_latitude, rotation_radius, theta_in_rad, sin_theta and cos_theta
 ! are only important when wanting to rotate a plane-parallel patch
 ! which lives at an angle co_latitude from the rotation axis and at a
@@ -25,19 +25,19 @@ module rotation_module
 
   private
 
-  public :: init_rotation
-
   double precision, save :: sin_theta, cos_theta, omega
- 
+
+  public :: init_rotation, sin_theta, cos_theta, omega
+
 
 contains
 
-  subroutine init_rotation()
+  subroutine init_rotation() bind(C, name="init_rotation")
 
     double precision :: theta_in_rad
 
     theta_in_rad = M_PI * co_latitude / 180.d0
-    
+
     sin_theta = sin(theta_in_rad)
     cos_theta = cos(theta_in_rad)
 
