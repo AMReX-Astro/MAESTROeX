@@ -73,7 +73,7 @@ private:
     // MaestroAdvection.cpp functions
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                        const amrex::Vector<amrex::Real>& w0_force, 
+                        const amrex::Vector<amrex::Real>& w0_force,
 			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
@@ -92,11 +92,11 @@ private:
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<amrex::MultiFab>& force,
-                       int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp, 
+                       int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
                        int start_scomp, int start_bccomp, int num_comp, int is_conservative);
 
     void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux, 
+		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
 		       amrex::Vector<amrex::MultiFab>& etarhoflux,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
@@ -111,7 +111,7 @@ private:
 		       int start_comp, int num_comp);
 
     void MakeRhoHFlux (const amrex::Vector<amrex::MultiFab>& state,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux, 
+		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
@@ -133,9 +133,9 @@ private:
     void UpdateScal (const amrex::Vector<amrex::MultiFab>& stateold,
 		     amrex::Vector<amrex::MultiFab>& statenew,
 		     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-		     const amrex::Vector<amrex::MultiFab>& force, 
-		     int start_scomp, int num_comp, 
-		     const amrex::Real* p0 = NULL, 
+		     const amrex::Vector<amrex::MultiFab>& force,
+		     int start_scomp, int num_comp,
+		     const amrex::Real* p0 = NULL,
 		     const amrex::Vector<amrex::MultiFab>& p0_cart = {});
 
     void UpdateVel (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
@@ -165,8 +165,8 @@ private:
 
     ////////////
     // MaestroConvert.cpp functions
-    void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal, 
-                        const amrex::Vector<amrex::Real>& s0, 
+    void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
+                        const amrex::Vector<amrex::Real>& s0,
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
@@ -194,7 +194,7 @@ private:
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                          amrex::Vector<amrex::MultiFab>& scal_force,
 			 amrex::Vector<amrex::MultiFab>& etarhoflux,
-                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac, 
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			 const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
 			 const amrex::Vector<amrex::Real>& rho0_predicted_edge);
     ////////////////////////
@@ -252,7 +252,7 @@ private:
                     const amrex::Vector<amrex::BCRec>& bcs_in);
 
     // compute a new multifab by coping in phi from valid region and filling ghost cells
-    // works for single level and 2-level cases 
+    // works for single level and 2-level cases
     // (fill fine grid ghost by interpolating from coarse)
     // scomp of the source component
     // dcomp is the destination component AND the bc component
@@ -306,7 +306,7 @@ private:
 
     ////////////////////////
     // MaestroFill3dData.cpp functions
-    
+
     void Put1dArrayOnCart (const amrex::Vector<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
@@ -320,13 +320,13 @@ private:
 
     void MakeW0mac (amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac);
 
-    void MakeS0mac (const amrex::Vector<amrex::Real>& s0, 
+    void MakeS0mac (const amrex::Vector<amrex::Real>& s0,
 		    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
     void MakeNormal ();
 
-    void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc, 
-			amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM >>& face, 
+    void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc,
+			amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM >>& face,
 			int harmonic_avg);
     // end MaestroFill3dData.cpp functions
     ////////////
@@ -334,12 +334,14 @@ private:
     ////////////////////////
     // MaestroForce.cpp functions
     void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
+                       int is_final_update,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const amrex::Vector<amrex::Real>& rho0,
                        const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
-		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+		               const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
@@ -356,7 +358,7 @@ private:
                         int is_prediction,
                         const amrex::Vector<amrex::MultiFab>& thermal,
                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                        int add_thermal, 
+                        int add_thermal,
 			const int &which_step);
     ////////////////////////
 
@@ -376,8 +378,8 @@ private:
     // fill in multifab and base state data
     void InitData ();
 
-    // During initialization of a simulation, Maestro::InitData() calls 
-    // AmrCore::InitFromScratch(), which calls 
+    // During initialization of a simulation, Maestro::InitData() calls
+    // AmrCore::InitFromScratch(), which calls
     // a MakeNewGrids() function that repeatedly calls this function to create
     // finer levels.  This function creates a new fine
     // level that did not exist before by interpolating from the coarser level
@@ -462,21 +464,21 @@ private:
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
-			     const amrex::Vector<amrex::Real>& rho0, 
+			     const amrex::Vector<amrex::Real>& rho0,
                              const amrex::Vector<amrex::MultiFab>& S_cc,
                              const amrex::Vector<amrex::Real>& Sbar,
-                             const amrex::Vector<amrex::Real>& beta0, 
-                             const amrex::Vector<amrex::Real>& gamma1bar, 
-			     const amrex::Vector<amrex::Real>& p0,  
+                             const amrex::Vector<amrex::Real>& beta0,
+                             const amrex::Vector<amrex::Real>& gamma1bar,
+			     const amrex::Vector<amrex::Real>& p0,
                              const amrex::Vector<amrex::MultiFab>& delta_p_term,
-			           amrex::Vector<amrex::MultiFab>& delta_chi, 
+			           amrex::Vector<amrex::MultiFab>& delta_chi,
                              int is_predictor);
 
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
 				 const amrex::Vector<amrex::Real>& rho0,
 				 const amrex::Vector<amrex::Real>& beta0,
 				 const amrex::Vector<amrex::Real>& gamma1bar,
-				 const amrex::Vector<amrex::Real>& p0, 
+				 const amrex::Vector<amrex::Real>& p0,
 				 const amrex::Vector<amrex::MultiFab>& delta_p_term);
     // end MaestroMakeS.cpp functions
     ////////////
@@ -615,7 +617,7 @@ private:
                     int updateRhoH = 0);
 
     void PfromRhoH (const amrex::Vector<amrex::MultiFab>& state,
-                    const amrex::Vector<amrex::MultiFab>& s_old, 
+                    const amrex::Vector<amrex::MultiFab>& s_old,
 		    amrex::Vector<amrex::MultiFab>& peos);
     ////////////
 
@@ -650,20 +652,20 @@ private:
 			      const amrex::Vector<amrex::MultiFab>& hcoeff,
 			      const amrex::Vector<amrex::MultiFab>& Xkcoeff,
 			      const amrex::Vector<amrex::MultiFab>& pcoeff,
-			      const amrex::Vector<amrex::Real>& p0, 
+			      const amrex::Vector<amrex::Real>& p0,
 			      int temp_formulation);
 
-    void ApplyThermal (amrex::MLABecLaplacian& mlabec, 
-		       amrex::Vector<amrex::MultiFab>& thermalout, 
+    void ApplyThermal (amrex::MLABecLaplacian& mlabec,
+		       amrex::Vector<amrex::MultiFab>& thermalout,
 		 const amrex::Vector<amrex::MultiFab>& coeff,
-		       amrex::Vector<amrex::MultiFab>& phi, 
+		       amrex::Vector<amrex::MultiFab>& phi,
 		 const amrex::Vector<amrex::BCRec>& bcs,
 		 int bccomp);
 
     void MakeThermalCoeffs(const amrex::Vector<amrex::MultiFab>& scal,
 			   amrex::Vector<amrex::MultiFab>& Tcoeff,
-			   amrex::Vector<amrex::MultiFab>& hcoeff, 
-			   amrex::Vector<amrex::MultiFab>& Xkcoeff, 
+			   amrex::Vector<amrex::MultiFab>& hcoeff,
+			   amrex::Vector<amrex::MultiFab>& Xkcoeff,
 			   amrex::Vector<amrex::MultiFab>& pcoeff);
 
     void ThermalConduct (const amrex::Vector<amrex::MultiFab>& s1,
@@ -671,8 +673,8 @@ private:
 			 const amrex::Vector<amrex::MultiFab>& hcoeff1,
 			 const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
 			 const amrex::Vector<amrex::MultiFab>& pcoeff1,
-			 const amrex::Vector<amrex::MultiFab>& hcoeff2, 
-			 const amrex::Vector<amrex::MultiFab>& Xkcoeff2, 
+			 const amrex::Vector<amrex::MultiFab>& hcoeff2,
+			 const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
 			 const amrex::Vector<amrex::MultiFab>& pcoeff2);
     ////////////////////////
 
@@ -682,7 +684,7 @@ private:
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const amrex::Vector<amrex::Real>& w0_force,
-			  const amrex::Vector<amrex::MultiFab>& w0_force_cart, 
+			  const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                           const amrex::Vector<amrex::Real>& rho0_nph,
                           const amrex::Vector<amrex::Real>& grav_cell_nph,
 			  const amrex::Vector<amrex::MultiFab>& sponge);
@@ -692,7 +694,7 @@ private:
     /*
       private data members
     */
-    
+
     ////////////////
     // static data members defined in _cpp_parameters
     // this file is in Source/param_includes/
@@ -756,7 +758,7 @@ private:
     // during a regular time step we overwrite this
     amrex::Vector<amrex::MultiFab> rhcc_for_nodalproj;
 
-    // spherical only - 
+    // spherical only -
     // we make this persistent in that we only have to rebuild and
     // fill this after regridding
     amrex::Vector<amrex::MultiFab> normal;
@@ -796,7 +798,7 @@ private:
     amrex::Vector<amrex::Real> grav_cell_new;
     amrex::Vector<amrex::Real> r_cc_loc;
     // p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
-    amrex::Vector<amrex::Real> p0_nm1; 
+    amrex::Vector<amrex::Real> p0_nm1;
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -805,7 +807,7 @@ private:
     amrex::Vector<amrex::Real> r_edge_loc;
 
     // information for the base state
-    // we also store these (except for the large arrays) 
+    // we also store these (except for the large arrays)
     // in base_state.f90 in a fortran module for convenience
     int max_radial_level;
     int finest_radial_level;
@@ -831,7 +833,7 @@ private:
     // this will be sized "max_level+1"
     // NOTE: the flux register associated with flux_reg[lev] is associated
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-    // therefore flux_reg[0] and flux_reg[max_level] are never actually 
+    // therefore flux_reg[0] and flux_reg[max_level] are never actually
     // used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;

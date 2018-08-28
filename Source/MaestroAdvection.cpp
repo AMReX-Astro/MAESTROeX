@@ -7,7 +7,7 @@ using namespace amrex;
 void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 			const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                        const Vector<Real>& w0_force, 
+                        const Vector<Real>& w0_force,
 			const Vector<MultiFab>& w0_force_cart)
 {
     // timer for profiling
@@ -45,7 +45,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // create utrans
     MakeUtrans(utilde,ufull,utrans,w0mac);
-    
+
     // create a MultiFab to hold the velocity forcing
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -53,8 +53,9 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     int do_add_utilde_force = 1;
-    MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
-		 w0_force,w0_force_cart,do_add_utilde_force);
+	int is_final_update = 0;
+    MakeVelForce(vel_force,is_final_update,utrans,sold,rho0_old,grav_cell_old,
+		 w0_force,w0_force_cart,w0mac,do_add_utilde_force);
 
     // add w0 to trans velocities
     Addw0 (utrans,w0mac,1.);
@@ -98,7 +99,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             const Box& validBox = mfi.validbox();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 #if (AMREX_SPACEDIM == 1)
@@ -127,7 +128,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         } // end MFIter loop
     } // end loop over levels
 
-    if (finest_level == 0) {    
+    if (finest_level == 0) {
 	// fill periodic ghost cells
 	for (int lev=0; lev<=finest_level; ++lev) {
 	    for (int d=0; d<AMREX_SPACEDIM; ++d) {
@@ -138,7 +139,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 	// fill ghost cells behind physical boundaries
 	FillUmacGhost(utrans);
     } else {
-	// edge_restriction 
+	// edge_restriction
 	AverageDownFaces(utrans);
 
 	// fill ghost cells for all levels
@@ -189,7 +190,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             const Box& validBox = mfi.validbox();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 #if (AMREX_SPACEDIM == 1)
@@ -235,7 +236,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                        Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                        const Vector<MultiFab>& force,
-                       int is_vel, const Vector<BCRec>& bcs, int nbccomp, 
+                       int is_vel, const Vector<BCRec>& bcs, int nbccomp,
                        int start_scomp, int start_bccomp, int num_comp, int is_conservative)
 {
     // timer for profiling
@@ -275,7 +276,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                 int bccomp = start_bccomp + scomp - start_scomp;
 
                 // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
 #if (AMREX_SPACEDIM == 1)
@@ -306,7 +307,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     BL_TO_FORTRAN_FAB(force_mf[mfi]),
                     dx, &dt, &is_vel, bcs[0].data(),
                     &nbccomp, &scomp, &bccomp, &is_conservative);
-            } // end loop over components 
+            } // end loop over components
         } // end MFIter loop
     } // end loop over levels
 
@@ -321,8 +322,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 
 void
     Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
-			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux, 
-			   Vector<MultiFab>& etarhoflux, 
+			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+			   Vector<MultiFab>& etarhoflux,
 			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
@@ -332,7 +333,7 @@ void
 			   const Vector<Real>& r0_new,
 			   const Vector<Real>& r0_edge_new,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-			   const Vector<Real>& r0_predicted_edge, 
+			   const Vector<Real>& r0_predicted_edge,
 			   int start_comp, int num_comp)
 {
     // timer for profiling
@@ -359,12 +360,12 @@ void
               MultiFab& sedgez_mf      = sedge[lev][2];
 	      MultiFab& sfluxz_mf      = sflux[lev][2];
         const MultiFab& wmac_mf        = umac[lev][2];
-	
+
 	// if spherical == 1
 	const MultiFab& w0macx_mf = w0mac[lev][0];
 	const MultiFab& w0macy_mf = w0mac[lev][1];
 	const MultiFab& w0macz_mf = w0mac[lev][2];
-	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez; 
+	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
 	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
 	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
 	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
@@ -384,7 +385,7 @@ void
             const Box& validBox = mfi.validbox();
 
 	    // call fortran subroutine
-	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 	    // lo/hi coordinates (including ghost cells), and/or the # of components
 	    // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 0) {
@@ -419,24 +420,24 @@ void
 				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
-				  r0_old.dataPtr(), r0_edge_old.dataPtr(), 
+				  r0_old.dataPtr(), r0_edge_old.dataPtr(),
 				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
 				  r0_predicted_edge.dataPtr(),
-				  w0.dataPtr(), 
+				  w0.dataPtr(),
 				  &startcomp, &endcomp);
 	    } else {
-		    
-#if (AMREX_SPACEDIM == 3)	       
-		if (use_exact_base_state) 
+
+#if (AMREX_SPACEDIM == 3)
+		if (use_exact_base_state)
 		{
 		    // add make_rhoX_flux_3d_sphr_irreg()
-		} 
-		else 
+		}
+		else
 		{
 		    make_rhoX_flux_3d_sphr(validBox.loVect(), validBox.hiVect(),
 			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]), 
+			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 				       BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 				       BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 				       BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
@@ -446,7 +447,7 @@ void
 				       BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
 				       BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
 				       BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]), 
+				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
 				       &startcomp, &endcomp);
@@ -466,25 +467,25 @@ void
         // the flux registers from the coarse or fine grid perspective
         // NOTE: the flux register associated with flux_reg_s[lev] is associated
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-        if (do_reflux) { 
+        if (do_reflux) {
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
 	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
 
-	    if (flux_reg_s[lev+1]) 
+	    if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                    // update the lev+1/lev flux register (index lev+1)   
+                    // update the lev+1/lev flux register (index lev+1)
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,start_comp,start_comp,num_comp, -1.0*dt*area[i]);
 		    // also include density flux
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,Rho,Rho,1, -1.0*dt*area[i]);
-                }	
+                }
             }
 	    if (flux_reg_s[lev])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                    // update the lev/lev-1 flux register (index lev) 
+                    // update the lev/lev-1 flux register (index lev)
                     flux_reg_s[lev]->FineAdd(sflux[lev][i],i,start_comp,start_comp,num_comp, 1.0*dt*area[i]);
 		    // also include density flux
                     flux_reg_s[lev]->FineAdd(sflux[lev][i],i,Rho,Rho,1, 1.0*dt*area[i]);
@@ -504,7 +505,7 @@ void
 
 void
     Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
-			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux, 
+			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
 			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
@@ -518,14 +519,14 @@ void
 			   const Vector<Real>& rh0_edge_old,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
 			   const Vector<Real>& rh0_new,
-			   const Vector<Real>& rh0_edge_new, 
+			   const Vector<Real>& rh0_edge_new,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_old,
 			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_new)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHFlux()",MakeRhoHFlux);
-    
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -547,7 +548,7 @@ void
 	const MultiFab& w0macx_mf = w0mac[lev][0];
 	const MultiFab& w0macy_mf = w0mac[lev][1];
 	const MultiFab& w0macz_mf = w0mac[lev][2];
-	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez; 
+	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
 	MultiFab h0mac_edgex, h0mac_edgey, h0mac_edgez;
 	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
 	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
@@ -574,7 +575,7 @@ void
             const Box& validBox = mfi.validbox();
 
 	    // call fortran subroutine
-	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 	    // lo/hi coordinates (including ghost cells), and/or the # of components
 	    // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 0) {
@@ -607,24 +608,24 @@ void
 				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
 #endif
 #endif
-				  r0_old.dataPtr(), r0_edge_old.dataPtr(), 
+				  r0_old.dataPtr(), r0_edge_old.dataPtr(),
 				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
-				  rh0_old.dataPtr(), rh0_edge_old.dataPtr(), 
+				  rh0_old.dataPtr(), rh0_edge_old.dataPtr(),
 				  rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
 				  w0.dataPtr());
 	    } else {
 
-#if (AMREX_SPACEDIM == 3)	       
-	        if (use_exact_base_state) 
+#if (AMREX_SPACEDIM == 3)
+	        if (use_exact_base_state)
 		{
 		    // Need make_rhoh_flux_sphr_irreg
 		}
-		else 
+		else
 		{
 		    make_rhoh_flux_3d_sphr(validBox.loVect(), validBox.hiVect(),
 			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]), 
+			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 				       BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 				       BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 				       BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
@@ -634,20 +635,20 @@ void
 				       BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
 				       BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
 				       BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]), 
+				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
-				       BL_TO_FORTRAN_3D(h0mac_edgex[mfi]), 
+				       BL_TO_FORTRAN_3D(h0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
 		}
 #else
 	        Abort("MakeRhoHFlux: Spherical is not valid for DIM < 3");
 #endif
-	    }	    
+	    }
 	} // end MFIter loop
 
-		    
+
         // increment or decrement the flux registers by area and time-weighted fluxes
         // Note that the fluxes need to be scaled by dt and area
         // In this example we are solving s_t = -div(+F)
@@ -656,7 +657,7 @@ void
         // the flux registers from the coarse or fine grid perspective
         // NOTE: the flux register associated with flux_reg_s[lev] is associated
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-        if (do_reflux) { 
+        if (do_reflux) {
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
@@ -665,14 +666,14 @@ void
 	    if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                    // update the lev+1/lev flux register (index lev+1)   
+                    // update the lev+1/lev flux register (index lev+1)
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,RhoH,RhoH,1, -1.0*dt*area[i]);
-                }	
+                }
             }
 	    if (flux_reg_s[lev])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                    // update the lev/lev-1 flux register (index lev) 
+                    // update the lev/lev-1 flux register (index lev)
                     flux_reg_s[lev]->FineAdd(sflux[lev][i],i,RhoH,RhoH,1, 1.0*dt*area[i]);
                 }
             }
@@ -688,8 +689,8 @@ void
     Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 			Vector<MultiFab>& statenew,
 			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-			const Vector<MultiFab>& force, 
-			int start_comp, int num_comp, 
+			const Vector<MultiFab>& force,
+			int start_comp, int num_comp,
 			const Real* p0, const Vector<MultiFab>& p0_cart)
 {
     // timer for profiling
@@ -714,7 +715,7 @@ void
 	p0_cart_dummy.define(grids[lev], dmap[lev], 1, 1);
 	if (start_comp == RhoH && spherical == 1) {
 	    MultiFab::Copy(p0_cart_dummy,p0_cart[lev],0,0,1,1);
-	} 
+	}
 	const MultiFab& p0cart_mf = p0_cart_dummy;
 #endif
 #endif
@@ -727,11 +728,11 @@ void
             const Box& validBox = mfi.validbox();
             const Real* dx = geom[lev].CellSize();
 
-	    if (start_comp == RhoH) 
+	    if (start_comp == RhoH)
 	    {   // Enthalpy update
-		
+
                 // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
 		if (spherical == 0) {
@@ -753,11 +754,11 @@ void
 #endif
 #endif
 				   BL_TO_FORTRAN_FAB(force_mf[mfi]),
-				   p0, 
+				   p0,
 				   dx, &dt,
 				   &NumSpec);
 		} else {
-#if (AMREX_SPACEDIM == 3) 
+#if (AMREX_SPACEDIM == 3)
 		    update_rhoh_3d_sphr(validBox.loVect(), validBox.hiVect(),
 					BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
 					BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
@@ -765,7 +766,7 @@ void
 					BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 					BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 					BL_TO_FORTRAN_FAB(force_mf[mfi]),
-					BL_TO_FORTRAN_3D(p0cart_mf[mfi]), 
+					BL_TO_FORTRAN_3D(p0cart_mf[mfi]),
 					dx, &dt,
 					&NumSpec);
 #else
@@ -774,11 +775,11 @@ void
 		}
 
 	    }
-	    else if (start_comp == FirstSpec) 
+	    else if (start_comp == FirstSpec)
 	    {   // RhoX update
 
                 // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
 #if (AMREX_SPACEDIM == 1)
@@ -801,7 +802,7 @@ void
                     BL_TO_FORTRAN_FAB(force_mf[mfi]),
                     dx, &dt,
                     &startcomp, &endcomp);
-            } 
+            }
 	    else {
 		Abort("Invalid scalar in UpdateScal().");
 	    } // end if
@@ -816,7 +817,7 @@ void
             flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, start_comp, start_comp, num_comp, geom[lev]);
         }
     }
-    
+
 
     // average fine data onto coarser cells
     AverageDown(statenew,start_comp,num_comp);
@@ -841,12 +842,12 @@ void
     Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 			const Vector<MultiFab>& force,
-			const Vector<MultiFab>& sponge, 
+			const Vector<MultiFab>& sponge,
 			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
-    
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -897,7 +898,7 @@ void
 #endif
 				 BL_TO_FORTRAN_3D(force_mf[mfi]),
 				 BL_TO_FORTRAN_3D(sponge_mf[mfi]),
-				 w0.dataPtr(), 
+				 w0.dataPtr(),
 				 dx, &dt);
 	    } else {
 #if (AMREX_SPACEDIM == 3)
@@ -912,7 +913,7 @@ void
 				      BL_TO_FORTRAN_3D(uedgez_mf[mfi]),
 				      BL_TO_FORTRAN_3D(force_mf[mfi]),
 				      BL_TO_FORTRAN_3D(sponge_mf[mfi]),
-				      w0.dataPtr(), 
+				      w0.dataPtr(),
 				      BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
 				      BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
 				      BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
@@ -924,7 +925,7 @@ void
         } // end MFIter loop
     } // end loop over levels
 
-    
+
     // average fine data onto coarser cells
     AverageDown(unew,0,AMREX_SPACEDIM);
 
@@ -932,4 +933,3 @@ void
     FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
 
 }
-

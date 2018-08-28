@@ -776,6 +776,7 @@ extern "C"
     //////////////////////
     // in make_vel_force.f90
     void make_vel_force(const int* lev, const int* lo, const int* hi,
+                        const int* is_final_update,
                         amrex::Real* vel_force, const int* f_lo, const int* f_hi, const int* nc_f,
                         const amrex::Real* gpi, const int* g_lo, const int* g_hi, const int* nc_g,
                         const amrex::Real* rho, const int* r_lo, const int* r_hi,
@@ -792,6 +793,7 @@ extern "C"
                         const int* do_add_utilde_force);
 
     void make_vel_force_sphr(const int* lo, const int* hi,
+                 const int* is_final_update,
 			     amrex::Real* vel_force, const int* f_lo, const int* f_hi, const int* nc_f,
 			     const amrex::Real* gpi, const int* g_lo, const int* g_hi, const int* nc_g,
 			     const amrex::Real* rho, const int* r_lo, const int* r_hi,
@@ -804,6 +806,8 @@ extern "C"
 			     const amrex::Real* w0y_cart, const int* wcy_lo, const int* wcy_hi,
 			     const amrex::Real* gradw0_cart, const int* gw_lo, const int* gw_hi,
 			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi, const int* nc_wf,
+			     const amrex::Real* w0macx, const int* w0x_lo, const int* w0x_hi,
+                 const amrex::Real* w0macy, const int* w0y_lo, const int* w0y_hi,
 			     const amrex::Real* rho0, const amrex::Real* grav,
 			     const amrex::Real* dx,
 			     const amrex::Real* r_cc_loc,

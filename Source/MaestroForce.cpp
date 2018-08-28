@@ -5,12 +5,14 @@ using namespace amrex;
 
 void
 Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
+                       int is_final_update,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                        const Vector<MultiFab>& rho,
                        const Vector<Real>& rho0,
                        const Vector<Real>& grav_cell,
                        const Vector<Real>& w0_force,
                        const Vector<MultiFab>& w0_force_cart,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                        int do_add_utilde_force)
 {
 	// timer for profiling
@@ -51,8 +53,10 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 		const MultiFab& gradw0_mf = gradw0_cart[lev];
 		const MultiFab& normal_mf = normal[lev];
 		const MultiFab& w0force_mf = w0_force_cart[lev];
+        const MultiFab& w0macx_mf = w0mac[lev][0];
+        const MultiFab& w0macy_mf = w0mac[lev][1];
 #endif
-        const MultiFab& uold_mf = uold[lev];
+		const MultiFab& uold_mf = uold[lev];
 		const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -68,6 +72,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 			// We will also pass "validBox", which specifies the "valid" region.
 			if (spherical == 0) {
 				make_vel_force(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                               &is_final_update,
 				               BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
 				               BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
 				               BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
@@ -76,7 +81,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 #if (AMREX_SPACEDIM == 3)
 				               BL_TO_FORTRAN_3D(wedge_mf[mfi]),
 #endif
-                               BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+				               BL_TO_FORTRAN_FAB(uold_mf[mfi]),
 				               w0.dataPtr(),
 				               w0_force.dataPtr(),
 				               rho0.dataPtr(),
@@ -86,6 +91,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
 #if (AMREX_SPACEDIM == 3)
 				make_vel_force_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                                    &is_final_update,
 				                    BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
 				                    BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
@@ -98,6 +104,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 				                    BL_TO_FORTRAN_FAB(w0y_mf[mfi]),
 				                    BL_TO_FORTRAN_3D(gradw0_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(w0force_mf[mfi]),
+                                    BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+                                    BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
 				                    rho0.dataPtr(),
 				                    grav_cell.dataPtr(),
 				                    dx,

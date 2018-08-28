@@ -13,6 +13,7 @@ module make_vel_force_module
 contains
 
   subroutine make_vel_force(lev, lo, hi, &
+                            is_final_update, &
                             vel_force, f_lo, f_hi, nc_f, &
                             gpi, g_lo, g_hi, nc_g, &
                             rho, r_lo, r_hi, &
@@ -27,6 +28,7 @@ contains
                             bind(C, name="make_vel_force")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: is_final_update
     integer         , intent (in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent (in   ) :: g_lo(3), g_hi(3), nc_g
     integer         , intent (in   ) :: r_lo(3), r_hi(3)
@@ -107,30 +109,31 @@ contains
        ! the coriolis term is:
        !    TWO * omega x U
        ! where omega is given above and U = (u, v, w) is the velocity
+#if (AMREX_SPACEDIM == 3)
+       if (is_final_update) then
 
-       ! if (is_final_update) then
-       !
-       !    ! use uedge so we are time-centered
-       !    coriolis_term(1) = -TWO * omega * &
-       !         HALF*(vedge(i,j,k) + vedge(i,j+1,k)) * cos_theta
-       !
-       !    coriolis_term(2) =  TWO * omega * &
-       !         (HALF*(wedge(i,j,k)   + w0(k) + &
-       !                wedge(i,j,k+1) + w0(k+1)) * sin_theta + &
-       !          HALF*(uedge(i,j,k) + uedge(i+1,j,k)) * cos_theta)
-       !
-       !    coriolis_term(3) = -TWO * omega * &
-       !         HALF*(vedge(i,j,k) + vedge(i,j+1,k)) * sin_theta
-       !
-       ! else
+          ! use uedge so we are time-centered
+          coriolis_term(1) = -TWO * omega * &
+               HALF*(vedge(i,j,k) + vedge(i,j+1,k)) * cos_theta
+
+          coriolis_term(2) =  TWO * omega * &
+               (HALF*(wedge(i,j,k)   + w0(lev,k) + &
+                      wedge(i,j,k+1) + w0(lev,k+1)) * sin_theta + &
+                HALF*(uedge(i,j,k) + uedge(i+1,j,k)) * cos_theta)
+
+          coriolis_term(3) = -TWO * omega * &
+               HALF*(vedge(i,j,k) + vedge(i,j+1,k)) * sin_theta
+
+       else
           coriolis_term(1) = -TWO * omega * uold(i,j,k,2) * cos_theta
 
           coriolis_term(2) =  TWO * omega * ((uold(i,j,k,3) + HALF*(w0(lev,k) + w0(lev,k+1))) * sin_theta + &
                                              uold(i,j,k,1) * cos_theta)
 
           coriolis_term(3) = -TWO * omega * uold(i,j,k,2) * sin_theta
-       ! endif
 
+       endif
+#endif
        ! note: if use_alt_energy_fix = T, then gphi is already
        ! weighted by beta0
        vel_force(i,j,k,1:AMREX_SPACEDIM-1) =  -coriolis_term(1:AMREX_SPACEDIM-1) - centrifugal_term(1:AMREX_SPACEDIM-1) - &
@@ -186,6 +189,7 @@ contains
   end subroutine make_vel_force
 
   subroutine make_vel_force_sphr(lo, hi, &
+                                 is_final_update, &
                                  vel_force, f_lo, f_hi, nc_f, &
                                  gpi, g_lo, g_hi, nc_g, &
                                  rho, r_lo, r_hi, &
@@ -198,6 +202,8 @@ contains
                                  w0y_cart, wcy_lo, wcy_hi, &
                                  gradw0_cart, gw_lo, gw_hi, &
                                  w0_force_cart, wf_lo, wf_hi, nc_wf, &
+                                 w0macx, w0x_lo, w0x_hi, &
+                                 w0macy, w0y_lo, w0y_hi, &
                                  rho0, grav, &
                                  dx, &
                                  r_cc_loc, r_edge_loc, &
@@ -206,6 +212,7 @@ contains
                                  bind(C, name="make_vel_force_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
+    integer         , intent (in   ) :: is_final_update
     integer         , intent (in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent (in   ) :: g_lo(3), g_hi(3), nc_g
     integer         , intent (in   ) :: r_lo(3), r_hi(3)
@@ -218,6 +225,8 @@ contains
     integer         , intent (in   ) :: wcy_lo(3), wcy_hi(3)
     integer         , intent (in   ) :: gw_lo(3), gw_hi(3)
     integer         , intent (in   ) :: wf_lo(3), wf_hi(3), nc_wf
+    integer         , intent (in   ) :: w0x_lo(3), w0x_hi(3)
+    integer         , intent (in   ) :: w0y_lo(3), w0y_hi(3)
     double precision, intent (inout) :: vel_force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent (in   ) ::       gpi(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),nc_g)
     double precision, intent (in   ) ::       rho(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
@@ -230,6 +239,8 @@ contains
     double precision, intent (in   ) ::    w0y_cart(wcy_lo(1):wcy_hi(1),wcy_lo(2):wcy_hi(2),wcy_lo(3):wcy_hi(3))
     double precision, intent (in   ) :: gradw0_cart(gw_lo(1):gw_hi(1),gw_lo(2):gw_hi(2),gw_lo(3):gw_hi(3))
     double precision, intent (in   ) :: w0_force_cart(wf_lo(1):wf_hi(1),wf_lo(2):wf_hi(2),wf_lo(3):wf_hi(3),nc_wf)
+    double precision, intent (in   ) :: w0macx(w0x_lo(1):w0x_hi(1),w0x_lo(2):w0x_hi(2),w0x_lo(3):w0x_hi(3))
+    double precision, intent (in   ) :: w0macy(w0y_lo(1):w0y_hi(1),w0y_lo(2):w0y_hi(2),w0y_lo(3):w0y_hi(3))
     double precision, intent (in   ) ::     rho0(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) ::     grav(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: dx(3)
@@ -239,6 +250,7 @@ contains
     double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
                                                ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
     integer         , intent (in   ) :: do_add_utilde_force
+
 
     integer         :: i,j,k
 
@@ -294,24 +306,24 @@ contains
 
              ! 2 omega x U = - 2 omega v e_x  + 2 omega u e_y
              ! (with omega = omega e_z)
-             ! if (is_final_update) then
-             !
-             !    ! use uedge so we are time-centered
-             !    coriolis_term(1) = -TWO * omega * &
-             !         HALF*(vedge(i,j,k)   + w0macy(i,j,k) + &
-             !               vedge(i,j+1,k) + w0macy(i,j+1,k))
-             !
-             !    coriolis_term(2) =  TWO * omega * &
-             !         HALF*(uedge(i,j,k)   + w0macx(i,j,k) + &
-             !               uedge(i+1,j,k) + w0macx(i+1,j,k))
-             !
-             !    coriolis_term(3) = ZERO
-             !
-             ! else
+             if (is_final_update .eq. 1) then
+
+                ! use uedge so we are time-centered
+                coriolis_term(1) = -TWO * omega * &
+                     HALF*(vedge(i,j,k)   + w0macy(i,j,k) + &
+                           vedge(i,j+1,k) + w0macy(i,j+1,k))
+
+                coriolis_term(2) =  TWO * omega * &
+                     HALF*(uedge(i,j,k)   + w0macx(i,j,k) + &
+                           uedge(i+1,j,k) + w0macx(i+1,j,k))
+
+                coriolis_term(3) = ZERO
+
+             else
                 coriolis_term(1) = -TWO * omega * (uold(i,j,k,2) + w0y_cart(i,j,k))
                 coriolis_term(2) =  TWO * omega * (uold(i,j,k,1) + w0x_cart(i,j,k))
                 coriolis_term(3) = ZERO
-             ! endif
+             endif
 
 
              ! F_Coriolis = -2 omega x U
