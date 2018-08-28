@@ -18,11 +18,13 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeVelForce()",MakeVelForce);
 
+    // TODO: how do I properly do the w0_cart thing?
+
 	// For spherical case
 	Vector<MultiFab> w0_cart(finest_level+1);
 	Vector<MultiFab> gradw0_cart(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
-		w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+		w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
 		w0_cart[lev].setVal(0.);
 		gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
 		gradw0_cart[lev].setVal(0.);
@@ -35,7 +37,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 		compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
 
 		Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
-		Put1dArrayOnCart(w0,w0_cart,0,0,bcs_f,0);
+		Put1dArrayOnCart(w0,w0_cart,0,1,bcs_f,0);
 	}
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -48,8 +50,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 		const MultiFab& vedge_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
 		const MultiFab& wedge_mf = uedge[lev][2];
-		const MultiFab& w0x_mf = w0_cart[lev][0];
-		const MultiFab& w0y_mf = w0_cart[lev][1];
+		const MultiFab& w0x_mf = w0_cart[lev];
+		const MultiFab& w0y_mf = w0_cart[lev];
 		const MultiFab& gradw0_mf = gradw0_cart[lev];
 		const MultiFab& normal_mf = normal[lev];
 		const MultiFab& w0force_mf = w0_force_cart[lev];
@@ -100,8 +102,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 				                    BL_TO_FORTRAN_3D(wedge_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(uold_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(normal_mf[mfi]),
-				                    BL_TO_FORTRAN_FAB(w0x_mf[mfi]),
-				                    BL_TO_FORTRAN_FAB(w0y_mf[mfi]),
+				                    BL_TO_FORTRAN_3D(w0x_mf[mfi]),
+				                    BL_TO_FORTRAN_3D(w0y_mf[mfi]),
 				                    BL_TO_FORTRAN_3D(gradw0_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(w0force_mf[mfi]),
                                     BL_TO_FORTRAN_3D(w0macx_mf[mfi]),

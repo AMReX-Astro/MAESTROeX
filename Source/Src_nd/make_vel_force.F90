@@ -110,7 +110,7 @@ contains
        !    TWO * omega x U
        ! where omega is given above and U = (u, v, w) is the velocity
 #if (AMREX_SPACEDIM == 3)
-       if (is_final_update) then
+       if (is_final_update .eq. 1) then
 
           ! use uedge so we are time-centered
           coriolis_term(1) = -TWO * omega * &
@@ -268,6 +268,8 @@ contains
     allocate(grav_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),3))
 
     vel_force = ZERO
+
+    ! write(*,*) "I got here"
 
     call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
                                       cc_to_r,ccr_lo,ccr_hi)

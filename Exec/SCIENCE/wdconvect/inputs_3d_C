@@ -26,7 +26,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 64 64 64
+amr.n_cell             = 32 32 32
 amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -38,7 +38,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.temperr = 6.5e8 6.5e8 6.5e8
 
 # TIME STEPPING
-maestro.max_step  = 0
+maestro.max_step  = 1
 maestro.stop_time = 30000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
