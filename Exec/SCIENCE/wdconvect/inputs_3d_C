@@ -26,7 +26,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 32 32 32
+amr.n_cell             = 16 16 16
 amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -72,7 +72,7 @@ maestro.use_tfromp = true
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
-maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_int   = -1      # number of timesteps between plot files
 maestro.plot_deltat = 10.0e0
 
 # CHECKPOINT
@@ -97,3 +97,6 @@ maestro.eps_hg             = 1.e-11
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
+
+# REACTIONS
+maestro.do_burning = false

@@ -198,8 +198,7 @@ contains
                                  wedge, w_lo, w_hi, &
                                  uold, uo_lo, uo_hi, nc_uo, &
                                  normal, n_lo, n_hi, nc_n, &
-                                 w0x_cart, wcx_lo, wcx_hi, &
-                                 w0y_cart, wcy_lo, wcy_hi, &
+                                 w0_cart, wc_lo, wc_hi, nc_wc, &
                                  gradw0_cart, gw_lo, gw_hi, &
                                  w0_force_cart, wf_lo, wf_hi, nc_wf, &
                                  w0macx, w0x_lo, w0x_hi, &
@@ -221,8 +220,7 @@ contains
     integer         , intent (in   ) :: w_lo(3), w_hi(3)
     integer         , intent (in   ) :: uo_lo(3), uo_hi(3), nc_uo
     integer         , intent (in   ) :: n_lo(3), n_hi(3), nc_n
-    integer         , intent (in   ) :: wcx_lo(3), wcx_hi(3)
-    integer         , intent (in   ) :: wcy_lo(3), wcy_hi(3)
+    integer         , intent (in   ) :: wc_lo(3), wc_hi(3), nc_wc
     integer         , intent (in   ) :: gw_lo(3), gw_hi(3)
     integer         , intent (in   ) :: wf_lo(3), wf_hi(3), nc_wf
     integer         , intent (in   ) :: w0x_lo(3), w0x_hi(3)
@@ -235,8 +233,7 @@ contains
     double precision, intent (in   ) ::     wedge(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent (in   ) ::    uold(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2),uo_lo(3):uo_hi(3),nc_uo)
     double precision, intent (in   ) ::    normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),nc_n)
-    double precision, intent (in   ) ::    w0x_cart(wcx_lo(1):wcx_hi(1),wcx_lo(2):wcx_hi(2),wcx_lo(3):wcx_hi(3))
-    double precision, intent (in   ) ::    w0y_cart(wcy_lo(1):wcy_hi(1),wcy_lo(2):wcy_hi(2),wcy_lo(3):wcy_hi(3))
+    double precision, intent (in   ) ::    w0_cart(wc_lo(1):wc_hi(1),wc_lo(2):wc_hi(2),wc_lo(3):wc_hi(3), nc_wc)
     double precision, intent (in   ) :: gradw0_cart(gw_lo(1):gw_hi(1),gw_lo(2):gw_hi(2),gw_lo(3):gw_hi(3))
     double precision, intent (in   ) :: w0_force_cart(wf_lo(1):wf_hi(1),wf_lo(2):wf_hi(2),wf_lo(3):wf_hi(3),nc_wf)
     double precision, intent (in   ) :: w0macx(w0x_lo(1):w0x_hi(1),w0x_lo(2):w0x_hi(2),w0x_lo(3):w0x_hi(3))
@@ -322,8 +319,8 @@ contains
                 coriolis_term(3) = ZERO
 
              else
-                coriolis_term(1) = -TWO * omega * (uold(i,j,k,2) + w0y_cart(i,j,k))
-                coriolis_term(2) =  TWO * omega * (uold(i,j,k,1) + w0x_cart(i,j,k))
+                coriolis_term(1) = -TWO * omega * (uold(i,j,k,2) + w0_cart(i,j,k,2))
+                coriolis_term(2) =  TWO * omega * (uold(i,j,k,1) + w0_cart(i,j,k,1))
                 coriolis_term(3) = ZERO
              endif
 
