@@ -29,6 +29,11 @@ DEFINES += -DCRSEGRNDOMP
 # Maestro needs to compute additional thermodynamic derivatives in the EOS
 DEFINES += -DEXTRA_THERMO
 
+# Rotation preprocessor flag
+ifeq ($(USE_ROTATION), TRUE)
+   DEFINES += -DROTATION
+endif
+
 USE_MG = FALSE
 
 #------------------------------------------------------------------------------
@@ -65,7 +70,7 @@ INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
 
 #------------------------------------------------------------------------------
-# microphysics 
+# microphysics
 #------------------------------------------------------------------------------
 
 ifdef MICROPHYSICS_HOME
@@ -145,7 +150,7 @@ include $(Bpack)
 INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
 
-include $(AMREX_HOME)/Src/LinearSolvers/C_to_F_MG/Make.package 
+include $(AMREX_HOME)/Src/LinearSolvers/C_to_F_MG/Make.package
 include $(AMREX_HOME)/Src/LinearSolvers/F_MG/FParallelMG.mak
 include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
 

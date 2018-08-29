@@ -12,7 +12,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<Real>& grav_cell,
                        const Vector<Real>& w0_force,
                        const Vector<MultiFab>& w0_force_cart,
+#ifdef ROTATION
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+#endif
                        int do_add_utilde_force)
 {
 	// timer for profiling
@@ -37,7 +39,10 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 		compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
 
 		Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
+
+#ifdef ROTATION
 		Put1dArrayOnCart(w0,w0_cart,1,1,bcs_f,0);
+#endif
 	}
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -50,14 +55,16 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 		const MultiFab& vedge_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
 		const MultiFab& wedge_mf = uedge[lev][2];
-		const MultiFab& w0_mf = w0_cart[lev];
 		const MultiFab& gradw0_mf = gradw0_cart[lev];
 		const MultiFab& normal_mf = normal[lev];
 		const MultiFab& w0force_mf = w0_force_cart[lev];
+#ifdef ROTATION
+		const MultiFab& w0_mf = w0_cart[lev];
         const MultiFab& w0macx_mf = w0mac[lev][0];
         const MultiFab& w0macy_mf = w0mac[lev][1];
-#endif
 		const MultiFab& uold_mf = uold[lev];
+#endif
+#endif
 		const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -81,8 +88,10 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 				               BL_TO_FORTRAN_3D(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				               BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+#ifdef ROTATION
+   				               BL_TO_FORTRAN_FAB(uold_mf[mfi]),
 #endif
-				               BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+#endif
 				               w0.dataPtr(),
 				               w0_force.dataPtr(),
 				               rho0.dataPtr(),
@@ -99,13 +108,15 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 				                    BL_TO_FORTRAN_3D(uedge_mf[mfi]),
 				                    BL_TO_FORTRAN_3D(vedge_mf[mfi]),
 				                    BL_TO_FORTRAN_3D(wedge_mf[mfi]),
-				                    BL_TO_FORTRAN_FAB(uold_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(normal_mf[mfi]),
-				                    BL_TO_FORTRAN_FAB(w0_mf[mfi]),
 				                    BL_TO_FORTRAN_3D(gradw0_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(w0force_mf[mfi]),
+#ifdef ROTATION
+				                    BL_TO_FORTRAN_FAB(w0_mf[mfi]),
                                     BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
                                     BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+				                    BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+#endif
 				                    rho0.dataPtr(),
 				                    grav_cell.dataPtr(),
 				                    dx,

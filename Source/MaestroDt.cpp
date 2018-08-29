@@ -69,7 +69,11 @@ Maestro::EstDt ()
 	int do_add_utilde_force = 0;
 	int is_final_update = 0;
 	MakeVelForce(vel_force,is_final_update,umac_dummy,sold,rho0_old,grav_cell_old,
-	             w0_force_dummy,w0_force_cart_dummy,w0mac,do_add_utilde_force);
+	             w0_force_dummy,w0_force_cart_dummy,
+#ifdef ROTATION
+				 w0mac,
+#endif
+				 do_add_utilde_force);
 
 	Real umax = 0.;
 
@@ -231,6 +235,7 @@ Maestro::FirstDt ()
 		vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
 	}
 
+#ifdef ROTATION
     // face-centered
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
@@ -239,9 +244,7 @@ Maestro::FirstDt ()
 		for (int lev=0; lev<=finest_level; ++lev) {
 			w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
 			w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#if (AMREX_SPACEDIM == 3)
 			w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-#endif
 		}
 
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -254,11 +257,16 @@ Maestro::FirstDt ()
 			MakeW0mac(w0mac);
 		}
 	}
+#endif
 
 	int do_add_utilde_force = 0;
 	int is_final_update = 0;
 	MakeVelForce(vel_force,is_final_update,umac_dummy,sold,rho0_old,grav_cell_old,
-	             w0_force_dummy,w0_force_cart_dummy,w0mac,do_add_utilde_force);
+	             w0_force_dummy,w0_force_cart_dummy,
+#ifdef ROTATION
+				 w0mac,
+#endif
+				 do_add_utilde_force);
 
 	Real umax = 0.;
 
