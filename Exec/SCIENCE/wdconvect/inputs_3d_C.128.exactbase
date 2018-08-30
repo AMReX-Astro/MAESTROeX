@@ -36,7 +36,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.temperr = 6.5e8 6.5e8
 
 # TIME STEPPING
-maestro.max_step  = 5
+maestro.max_step  = 150
 maestro.stop_time = 10000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -47,7 +47,7 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 # ALGORITHMIC OPTIONS
 maestro.spherical = 1
 maestro.use_exact_base_state = true
-maestro.evolve_base_state = true
+maestro.evolve_base_state = false
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
@@ -56,6 +56,7 @@ maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 maestro.grav_const = -1.5e10
 maestro.do_burning = true
 maestro.enthalpy_pred_type = 0 # predict\_rhoh
+maestro.species_pred_type = 2 # predict the full ($\rho X$) itself
 maestro.dpdt_factor = 0.0e0
 maestro.use_eos_coulomb = true
 
@@ -75,8 +76,8 @@ maestro.use_tfromp = true
 
 # PLOTFILES
 maestro.plot_file  = plt    # root name of plot file
-maestro.plot_int   = 1     # number of timesteps between plot files
-maestro.plot_deltat = 100.0e0
+maestro.plot_int   = 10     # number of timesteps between plot files
+maestro.plot_deltat = 1000.0e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
