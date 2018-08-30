@@ -6,7 +6,7 @@
 ! what form the incoming edge states take.  This depends on
 ! species_pred_type:
 !
-! predict_rhoprime_and_X: 
+! predict_rhoprime_and_X:
 !    We have rho' and X, and need a edge-centered base state to
 !    make the final fluxes
 !
@@ -15,7 +15,7 @@
 !    No base state input needed.
 !
 ! predict_rho_and_X:
-!   The fluxes are computed from the product of the rho and X 
+!   The fluxes are computed from the product of the rho and X
 !   edge states, again, no base state input needed.
 !
 !
@@ -38,7 +38,7 @@ module make_flux_module
   implicit none
 
   private
-  
+
     integer, parameter :: predict_rhoh             = 0;
     integer, parameter :: predict_rhohprime        = 1;
     integer, parameter :: predict_h                = 2;
@@ -52,7 +52,7 @@ module make_flux_module
     integer, parameter :: predict_rho_and_X        = 3;
 
 contains
-  
+
 #if (AMREX_SPACEDIM == 1)
   subroutine make_rhoX_flux_1d(lev, lo, hi, &
                                  sfluxx, fx_lo, fx_hi, nc_fx, &
@@ -62,21 +62,21 @@ contains
                                  rho0_old, rho0_edge_old, &
                                  rho0_new, rho0_edge_new, &
                                  rho0_predicted_edge, &
-                                 w0, & 
+                                 w0, &
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_1d")
 
     integer         , intent(in   ) :: lev, lo(1), hi(1)
     integer         , intent(in   ) :: fx_lo(1), fx_hi(1), nc_fx
     double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),nc_fx)
-    integer         , intent(in   ) :: eta_lo(1), eta_hi(1) 
+    integer         , intent(in   ) :: eta_lo(1), eta_hi(1)
     double precision, intent(inout) :: etarhoflux(eta_lo(1):eta_hi(1))
     integer         , intent(in   ) :: x_lo(1), x_hi(1), nc_x
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),nc_x)
     integer         , intent(in   ) :: u_lo(1), u_hi(1)
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1))
-    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
@@ -90,6 +90,7 @@ contains
     do comp = startcomp, endcomp
 
        ! create x-fluxes
+       !$OMP PARALLEL DO PRIVATE(i,rho0_edge)
        do i = lo(1),hi(1)+1
 
           if (species_pred_type == predict_rhoprime_and_X) then
@@ -102,7 +103,7 @@ contains
           else if (species_pred_type == predict_rhoX) then
              ! edge states are (rho X)
              sfluxx(i,comp) = &
-                  (umac(i)+w0(lev,i))*sedgex(i,comp)  
+                  (umac(i)+w0(lev,i))*sedgex(i,comp)
 
           else if (species_pred_type == predict_rho_and_X) then
              ! edge states are rho and X
@@ -114,13 +115,14 @@ contains
              if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                 etarhoflux(i) = etarhoflux(i) + sfluxx(i,comp)
              end if
-             
+
              if ( comp.eq.spec_comp+nspec-1) then
                 etarhoflux(i) = etarhoflux(i) - w0(lev,i)*rho0_predicted_edge(lev,i)
              end if
           endif
        end do
     end do ! end comp loop
+    !$OMP END PARALLEL DO
 
   end subroutine make_rhoX_flux_1d
 #endif
@@ -137,7 +139,7 @@ contains
                                  rho0_old, rho0_edge_old, &
                                  rho0_new, rho0_edge_new, &
                                  rho0_predicted_edge, &
-                                 w0, & 
+                                 w0, &
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_2d")
 
     integer         , intent(in   ) :: lev, lo(2), hi(2)
@@ -155,9 +157,9 @@ contains
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2))
     integer         , intent(in   ) :: v_lo(2), v_hi(2)
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2))
-    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
@@ -168,9 +170,10 @@ contains
     integer          :: i,j
     double precision :: rho0_edge
 
-    do comp = startcomp, endcomp 
+    do comp = startcomp, endcomp
 
        ! create x-fluxes
+       !$OMP PARALLEL DO PRIVATE(i,j,rho0_edge)
        do j=lo(2),hi(2)
           rho0_edge = HALF*(rho0_old(lev,j)+rho0_new(lev,j))
           do i=lo(1),hi(1)+1
@@ -180,7 +183,7 @@ contains
                  ! we need the edge state of rho0
                  sfluxx(i,j,comp) = umac(i,j)* &
                       (rho0_edge+sedgex(i,j,rho_comp))*sedgex(i,j,comp)
-                 
+
              else if (species_pred_type == predict_rhoX) then
                 ! edge states are (rho X)
                 sfluxx(i,j,comp) = umac(i,j)*sedgex(i,j,comp)
@@ -193,8 +196,10 @@ contains
              end if
           end do
        end do
-             
+       !$OMP END PARALLEL DO
+
        ! create y-fluxes
+       !$OMP PARALLEL DO PRIVATE(i,j,rho0_edge)
        do j = lo(2),hi(2)+1
           rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
           do i = lo(1),hi(1)
@@ -221,13 +226,14 @@ contains
                 if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                    etarhoflux(i,j) = etarhoflux(i,j) + sfluxy(i,j,comp)
                 end if
-                
+
                 if ( comp.eq.spec_comp+nspec-1) then
                    etarhoflux(i,j) = etarhoflux(i,j) - w0(lev,j)*rho0_predicted_edge(lev,j)
                 end if
              endif  ! evolve_base_state
           end do
        end do
+       !$OMP END PARALLEL DO
     end do
 
   end subroutine make_rhoX_flux_2d
@@ -249,7 +255,7 @@ contains
                                  rho0_old, rho0_edge_old, &
                                  rho0_new, rho0_edge_new, &
                                  rho0_predicted_edge, &
-                                 w0, & 
+                                 w0, &
                                  startcomp, endcomp) bind(C,name="make_rhoX_flux_3d")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
@@ -275,7 +281,7 @@ contains
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
@@ -285,12 +291,12 @@ contains
     integer          :: comp
     integer          :: i,j,k
     double precision :: rho0_edge
-    
-    do comp = startcomp, endcomp 
+
+    do comp = startcomp, endcomp
        ! create x-fluxes and y-fluxes
 
        !$OMP PARALLEL PRIVATE(i,j,k,rho0_edge)
-       !$OMP DO 
+       !$OMP DO
        do k=lo(3),hi(3)
           rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
 
@@ -306,9 +312,9 @@ contains
                 else if (species_pred_type == predict_rhoX) then
                    ! edge states are (rho X)
                    sfluxx(i,j,k,comp) = &
-                        umac(i,j,k)*sedgex(i,j,k,comp)          
+                        umac(i,j,k)*sedgex(i,j,k,comp)
 
-                else if (species_pred_type == predict_rho_and_X) then         
+                else if (species_pred_type == predict_rho_and_X) then
                    ! edge states are rho and X
                    sfluxx(i,j,k,comp) = &
                         umac(i,j,k)*sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp)
@@ -317,7 +323,7 @@ contains
 
              end do
           end do
-          
+
           do j=lo(2),hi(2)+1
              do i=lo(1),hi(1)
 
@@ -372,7 +378,7 @@ contains
                    if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
                       etarhoflux(i,j,k) = etarhoflux(i,j,k) + sfluxz(i,j,k,comp)
                    end if
-                   
+
                    if ( comp.eq.spec_comp+nspec-1) then
                       etarhoflux(i,j,k) = etarhoflux(i,j,k) - w0(lev,k)*rho0_predicted_edge(lev,k)
                    end if
@@ -438,19 +444,19 @@ contains
     integer         , intent(in   ) :: ry_lo(3), ry_hi(3)
     double precision, intent(in   ) :: rho0_edgey(ry_lo(1):ry_hi(1),ry_lo(2):ry_hi(2),ry_lo(3):ry_hi(3))
     integer         , intent(in   ) :: rz_lo(3), rz_hi(3)
-    double precision, intent(in   ) :: rho0_edgez(rz_lo(1):rz_hi(1),rz_lo(2):rz_hi(2),rz_lo(3):rz_hi(3)) 
+    double precision, intent(in   ) :: rho0_edgez(rz_lo(1):rz_hi(1),rz_lo(2):rz_hi(2),rz_lo(3):rz_hi(3))
     integer         , intent(in   ) :: startcomp, endcomp
 
     ! local
     integer          :: comp
     integer          :: i,j,k
     ! double precision :: rho0_edge
-    
+
 
     do comp = startcomp, endcomp
 
        ! loop for x-fluxes
-       !$OMP PARALLEL PRIVATE(i,j,k,rho0_edge)
+       !$OMP PARALLEL PRIVATE(i,j,k)
        !$OMP DO
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
@@ -539,9 +545,9 @@ contains
        !$OMP END PARALLEL
 
     end do ! end loop over components
-     
+
   end subroutine make_rhoX_flux_3d_sphr
-#endif 
+#endif
 
 
 #if (AMREX_SPACEDIM == 1)
@@ -562,13 +568,13 @@ contains
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),nc_x)
     integer         , intent(in   ) :: u_lo(1), u_hi(1)
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1))
-    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rhoh0_old(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rhoh0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rhoh0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rhoh0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rhoh0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rhoh0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
 
@@ -659,13 +665,13 @@ contains
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2))
     integer         , intent(in   ) :: v_lo(2), v_hi(2)
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2))
-    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rhoh0_old(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rhoh0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rhoh0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rhoh0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rhoh0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rhoh0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
 
@@ -681,13 +687,13 @@ contains
     have_hprime = enthalpy_pred_type.eq.predict_hprime
 
     have_rhoh = enthalpy_pred_type.eq.predict_rhoh
-    
+
     ! create x-fluxes
     if (have_h) then
        ! enthalpy edge state is h
 
        if (species_pred_type == predict_rhoprime_and_X) then
-          ! density edge state is rho'          
+          ! density edge state is rho'
           do j=lo(2),hi(2)
              rho0_edge = HALF*(rho0_old(lev,j)+rho0_new(lev,j))
              do i=lo(1),hi(1)+1
@@ -721,7 +727,7 @@ contains
           end do
        end do
 
-    else if (enthalpy_pred_type.eq.predict_rhohprime) then 
+    else if (enthalpy_pred_type.eq.predict_rhohprime) then
        ! enthalpy edge state is (rho h)'
        do j=lo(2),hi(2)
           rhoh0_edge = HALF*(rhoh0_old(lev,j)+rhoh0_new(lev,j))
@@ -733,7 +739,7 @@ contains
     else
        call bl_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
     end if
-    
+
     ! create y-fluxes
     if (have_h) then
        ! enthalpy edge state is h
@@ -828,11 +834,11 @@ contains
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rhoh0_old(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rhoh0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rhoh0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rhoh0_new(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rhoh0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rhoh0_edge_new(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
 
@@ -840,7 +846,7 @@ contains
     integer          :: i,j,k
     double precision :: rho0_edge, rhoh0_edge
     logical         :: have_h, have_hprime, have_rhoh
-    
+
     have_h = enthalpy_pred_type.eq.predict_h .or. &
              enthalpy_pred_type.eq.predict_T_then_h .or. &
              enthalpy_pred_type.eq.predict_Tprime_then_h
@@ -855,7 +861,7 @@ contains
 
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
-          
+
           !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge)
           do k=lo(3),hi(3)
              rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
@@ -865,7 +871,7 @@ contains
                         umac(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp)
                 end do
              end do
-             
+
              do j=lo(2),hi(2)+1
                 do i=lo(1),hi(1)
                    sfluxy(i,j,k,rhoh_comp) = &
@@ -900,12 +906,12 @@ contains
        endif
 
     else if (have_hprime) then
-       
+
        ! enthalpy edge state is h'
        call bl_error("make_rhoh_flux_3d : predict_hprime not coded yet")
 
     else if (have_rhoh) then
-       
+
        !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
@@ -952,7 +958,7 @@ contains
 
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
-          
+
           !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge)
           do k=lo(3),hi(3)+1
              rho0_edge = HALF*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k))
@@ -1013,11 +1019,11 @@ contains
           end do
        end do
        !$OMP END PARALLEL DO
-       
+
     else
        call bl_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
     end if
-    
+
 
   end subroutine make_rhoh_flux_3d
 
@@ -1085,28 +1091,28 @@ contains
     ! local
     integer          :: i,j,k
     logical          :: have_h, have_hprime, have_rhoh
-    
+
     have_h = enthalpy_pred_type.eq.predict_h .or. &
              enthalpy_pred_type.eq.predict_T_then_h .or. &
              enthalpy_pred_type.eq.predict_Tprime_then_h
-    
+
     have_hprime = enthalpy_pred_type.eq.predict_hprime
 
     have_rhoh = enthalpy_pred_type.eq.predict_rhoh
-    
+
     ! create x-fluxes
     if (have_h) then
 
        ! enthalpy edge state is h
 
        if (species_pred_type == predict_rhoprime_and_X) then
-          ! density edge state is rho' 
-       
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge)
+          ! density edge state is rho'
+
+          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)+1
-                   
+
                    sfluxx(i,j,k,rhoh_comp) = (umac(i,j,k) + w0macx(i,j,k)) * &
                      (rho0_edgex(i,j,k) + sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp)
 
@@ -1114,10 +1120,10 @@ contains
              end do
           end do
           !$OMP END PARALLEL DO
-          
+
        else if (species_pred_type == predict_rho_and_X .or. &
                 species_pred_type == predict_rhoX) then
-          ! density edge state is rho 
+          ! density edge state is rho
 
           !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)
@@ -1142,17 +1148,17 @@ contains
           ! density edge state is rho'
 
           ! (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
-          ! computed from (rho h)_0 / rho_0 
+          ! computed from (rho h)_0 / rho_0
           ! sfluxx = (umac(i,j,k)+w0macx(i,j,k)) * (rho h)_edge
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge,h0_edge)
+          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)+1
-                   
+
                    sfluxx(i,j,k,rhoh_comp) = (umac(i,j,k)+w0macx(i,j,k)) * &
                         (sedgex(i,j,k,rho_comp)+rho0_edgex(i,j,k)) * (sedgex(i,j,k,rhoh_comp)+h0_edgex(i,j,k))
-                   
+
                 end do
              end do
           end do
@@ -1176,7 +1182,7 @@ contains
              do i = lo(1), hi(1)+1
 
                 sfluxx(i,j,k,rhoh_comp) = (umac(i,j,k) + w0macx(i,j,k))*sedgex(i,j,k,rhoh_comp)
-                
+
              end do
           end do
        end do
@@ -1186,14 +1192,14 @@ contains
 
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge,h0_edge)
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)+1
 
                 ! Average (rho h) onto edges by averaging rho and h
-                ! separately onto edges.  
-                !  (rho h)_edge = (rho h)' + (rho_0 * h_0) 
+                ! separately onto edges.
+                !  (rho h)_edge = (rho h)' + (rho_0 * h_0)
                 ! where h_0 is computed from (rho h)_0 / rho_0
 
                 sfluxx(i,j,k,rhoh_comp) = &
@@ -1213,15 +1219,15 @@ contains
 
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
-          
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge)
+
+          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)+1
                 do i = lo(1), hi(1)
-                
+
                    sfluxy(i,j,k,rhoh_comp) = (vmac(i,j,k) + w0macy(i,j,k)) * &
                         (rho0_edgey(i,j,k) + sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp)
-                   
+
                 end do
              end do
           end do
@@ -1254,17 +1260,17 @@ contains
           ! density edge state is rho'
 
           ! (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
-          ! computed from (rho h)_0 / rho_0 
+          ! computed from (rho h)_0 / rho_0
           ! sfluxy = (vmac(i,j,k)+w0macy(i,j,k)) * (rho h)_edge
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge,h0_edge)
+          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)+1
                 do i = lo(1), hi(1)
-                   
+
                    sfluxy(i,j,k,rhoh_comp) = (vmac(i,j,k)+w0macy(i,j,k)) * &
                         (sedgey(i,j,k,rho_comp)+rho0_edgey(i,j,k)) * (sedgey(i,j,k,rhoh_comp)+h0_edgey(i,j,k))
-                   
+
                 end do
              end do
           end do
@@ -1287,9 +1293,9 @@ contains
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)+1
              do i = lo(1), hi(1)
-                
+
                 sfluxy(i,j,k,rhoh_comp) = (vmac(i,j,k) + w0macy(i,j,k))*sedgey(i,j,k,rhoh_comp)
-                
+
              end do
           end do
        end do
@@ -1299,14 +1305,14 @@ contains
 
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge,h0_edge)
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)+1
              do i = lo(1), hi(1)
 
                 ! Average (rho h) onto edges by averaging rho and h
-                ! separately onto edges.  
-                !  (rho h)_edge = (rho h)' + (rho_0 * h_0) 
+                ! separately onto edges.
+                !  (rho h)_edge = (rho h)' + (rho_0 * h_0)
                 ! where h_0 is computed from (rho h)_0 / rho_0
 
                 sfluxy(i,j,k,rhoh_comp) = &
@@ -1327,11 +1333,11 @@ contains
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge)
+          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)+1
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
-                
+
                    sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k) + w0macz(i,j,k)) * &
                         (rho0_edgez(i,j,k) + sedgez(i,j,k,rho_comp))*sedgez(i,j,k,rhoh_comp)
 
@@ -1369,15 +1375,15 @@ contains
           ! (rho h)_edge = (h' + h_0) * (rho' + rho_0)
           ! where h0 is computed from (rho h)_0 / rho_0
           ! sfluxz = (wmac(i,j,k)+w0macz(i,j,k)) * (rho h)_edge
-          
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge,h0_edge)
+
+          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)+1
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
-                   
+
                    sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k)+w0macz(i,j,k)) * &
                         (sedgez(i,j,k,rho_comp)+rho0_edgez(i,j,k)) * (sedgez(i,j,k,rhoh_comp)+h0_edgez(i,j,k))
-                   
+
                 end do
              end do
           end do
@@ -1399,7 +1405,7 @@ contains
        do k = lo(3), hi(3)+1
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
-                
+
                 sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k) + w0macz(i,j,k))*sedgez(i,j,k,rhoh_comp)
 
              end do
@@ -1411,14 +1417,14 @@ contains
 
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge,h0_edge)
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3), hi(3)+1
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
 
                 ! Average (rho h) onto edges by averaging rho and h
-                ! separately onto edges.  
-                !  (rho h)_edge = (rho h)' + (rho_0 * h_0) 
+                ! separately onto edges.
+                !  (rho h)_edge = (rho h)' + (rho_0 * h_0)
                 ! where h_0 is computed from (rho h)_0 / rho_0
 
                 sfluxz(i,j,k,rhoh_comp) = &

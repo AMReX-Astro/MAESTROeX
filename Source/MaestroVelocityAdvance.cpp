@@ -39,9 +39,9 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 	is_final_update = 0;
 	MakeVelForce(vel_force,is_final_update,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,
 #ifdef ROTATION
-        w0mac,
+	             w0mac,
 #endif
-        1);
+	             1);
 
 	//////////////////////////////////
 	// Add w0 to MAC velocities
@@ -68,9 +68,9 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 	is_final_update = 1;
 	MakeVelForce(vel_force,is_final_update,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,
 #ifdef ROTATION
-        w0mac,
+	             w0mac,
 #endif
-        1);
+	             1);
 
 	//////////////////////////////////
 	// Update the velocity with convective differencing

@@ -1233,9 +1233,10 @@ contains
 
        !$OMP PARALLEL PRIVATE(i,j,k,denom)
 
-       !$OMP DO
+
        k = lo(3)
        j = lo(2)
+       !$OMP DO
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif

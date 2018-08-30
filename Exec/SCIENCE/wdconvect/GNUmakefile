@@ -1,8 +1,8 @@
 DEBUG      = TRUE
 DIM        = 3
 COMP	   = gnu
-USE_MPI    = TRUE
-USE_OMP    = FALSE
+USE_MPI    = FALSE
+USE_OMP    = TRUE
 USE_REACT  = TRUE
 
 USE_ROTATION = TRUE

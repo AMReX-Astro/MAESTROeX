@@ -15,21 +15,21 @@ module make_vel_force_module
 contains
 
   subroutine make_vel_force(lev, lo, hi, &
-                            is_final_update, &
-                            vel_force, f_lo, f_hi, nc_f, &
-                            gpi, g_lo, g_hi, nc_g, &
-                            rho, r_lo, r_hi, &
-                            uedge, u_lo, u_hi, &
-                            vedge, v_lo, v_hi, &
+       is_final_update, &
+       vel_force, f_lo, f_hi, nc_f, &
+       gpi, g_lo, g_hi, nc_g, &
+       rho, r_lo, r_hi, &
+       uedge, u_lo, u_hi, &
+       vedge, v_lo, v_hi, &
 #if (AMREX_SPACEDIM == 3)
-                            wedge, w_lo, w_hi, &
+       wedge, w_lo, w_hi, &
 #ifdef ROTATION
-                            uold, uo_lo, uo_hi, nc_uo, &
+       uold, uo_lo, uo_hi, nc_uo, &
 #endif
 #endif
-                            w0,w0_force,rho0,grav, &
-                            do_add_utilde_force) &
-                            bind(C, name="make_vel_force")
+       w0,w0_force,rho0,grav, &
+       do_add_utilde_force) &
+       bind(C, name="make_vel_force")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: is_final_update
@@ -95,137 +95,142 @@ contains
     centrifugal_term(1) = - omega**2 * rotation_radius * sin_theta * sin_theta
     centrifugal_term(2) = ZERO
     centrifugal_term(3) = omega**2 * rotation_radius * cos_theta * sin_theta &
-                          - omega**2 * rotation_radius
+         - omega**2 * rotation_radius
 #endif
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,rhopert,coriolis_term)
     do k = lo(3),hi(3)
-    do j = lo(2),hi(2)
-    do i = lo(1),hi(1)
+       do j = lo(2),hi(2)
+          do i = lo(1),hi(1)
 
 #if (AMREX_SPACEDIM == 1)
-       r = i
+             r = i
 #elif (AMREX_SPACEDIM == 2)
-       r = j
+             r = j
 #elif (AMREX_SPACEDIM == 3)
-       r = k
+             r = k
 #endif
 
-       rhopert = rho(i,j,k) - rho0(lev,r)
+             rhopert = rho(i,j,k) - rho0(lev,r)
 
-       ! cutoff the buoyancy term if we are outside of the star
-       if (rho(i,j,k) .lt. buoyancy_cutoff_factor*base_cutoff_density) then
-          rhopert = 0.d0
-       end if
-
-#ifdef ROTATION
-       ! the coriolis term is:
-       !    TWO * omega x U
-       ! where omega is given above and U = (u, v, w) is the velocity
-       if (is_final_update .eq. 1) then
-
-          ! use uedge so we are time-centered
-          coriolis_term(1) = -TWO * omega * &
-               HALF*(vedge(i,j,k) + vedge(i,j+1,k)) * cos_theta
-
-          coriolis_term(2) =  TWO * omega * &
-               (HALF*(wedge(i,j,k)   + w0(lev,k) + &
-                      wedge(i,j,k+1) + w0(lev,k+1)) * sin_theta + &
-                HALF*(uedge(i,j,k) + uedge(i+1,j,k)) * cos_theta)
-
-          coriolis_term(3) = -TWO * omega * &
-               HALF*(vedge(i,j,k) + vedge(i,j+1,k)) * sin_theta
-
-       else
-          coriolis_term(1) = -TWO * omega * uold(i,j,k,2) * cos_theta
-
-          coriolis_term(2) =  TWO * omega * ((uold(i,j,k,3) + HALF*(w0(lev,k) + w0(lev,k+1))) * sin_theta + &
-                                             uold(i,j,k,1) * cos_theta)
-
-          coriolis_term(3) = -TWO * omega * uold(i,j,k,2) * sin_theta
-
-       endif
-       ! note: if use_alt_energy_fix = T, then gphi is already
-       ! weighted by beta0
-       vel_force(i,j,k,1:AMREX_SPACEDIM-1) =  -coriolis_term(1:AMREX_SPACEDIM-1) - centrifugal_term(1:AMREX_SPACEDIM-1) - &
-            gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k)
-
-        vel_force(i,j,k,AMREX_SPACEDIM) = -coriolis_term(3) - centrifugal_term(3) + &
-             ( rhopert * grav(lev,r) - gpi(i,j,k,AMREX_SPACEDIM) ) / rho(i,j,k) - w0_force(lev,r)
-#else
-
-        ! note: if use_alt_energy_fix = T, then gphi is already
-        ! weighted by beta0
-        vel_force(i,j,k,1:AMREX_SPACEDIM-1) = - gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k)
-
-        vel_force(i,j,k,AMREX_SPACEDIM) = &
-            ( rhopert * grav(lev,r) - gpi(i,j,k,AMREX_SPACEDIM) ) / rho(i,j,k) - w0_force(lev,r)
-
-#endif
-
-    end do
-    end do
-    end do
-
-    if (do_add_utilde_force .eq. 1) then
-       do k=lo(3),hi(3)
-       do j=lo(2),hi(2)
-       do i=lo(1),hi(1)
-
-#if (AMREX_SPACEDIM == 1)
-       r = i
-#elif (AMREX_SPACEDIM == 2)
-       r = j
-#elif (AMREX_SPACEDIM == 3)
-       r = k
-#endif
-
-             if (r .le. -1) then
-                ! do not modify force since dw0/dr=0
-             else if (r .ge. nr(lev)) then
-                ! do not modify force since dw0/dr=0
-             else
-
-#if (AMREX_SPACEDIM == 2)
-                vel_force(i,j,k,2) = vel_force(i,j,k,2) &
-                     - (vedge(i,j+1,k)+vedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
-
-#else
-                vel_force(i,j,k,3) = vel_force(i,j,k,3) &
-                     - (wedge(i,j,k+1)+wedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
-
-#endif
+             ! cutoff the buoyancy term if we are outside of the star
+             if (rho(i,j,k) .lt. buoyancy_cutoff_factor*base_cutoff_density) then
+                rhopert = 0.d0
              end if
 
+#ifdef ROTATION
+             ! the coriolis term is:
+             !    2.0d0 * omega x U
+             ! where omega is given above and U = (u, v, w) is the velocity
+             if (is_final_update .eq. 1) then
+
+                ! use uedge so we are time-centered
+                coriolis_term(1) = -2.0d0 * omega * &
+                     HALF*(vedge(i,j,k) + vedge(i,j+1,k)) * cos_theta
+
+                coriolis_term(2) =  2.0d0 * omega * &
+                     (HALF*(wedge(i,j,k)   + w0(lev,k) + &
+                            wedge(i,j,k+1) + w0(lev,k+1)) * sin_theta + &
+                     HALF*(uedge(i,j,k) + uedge(i+1,j,k)) * cos_theta)
+
+                coriolis_term(3) = -2.0d0 * omega * &
+                     HALF*(vedge(i,j,k) + vedge(i,j+1,k)) * sin_theta
+
+             else
+                coriolis_term(1) = -2.0d0 * omega * uold(i,j,k,2) * cos_theta
+
+                coriolis_term(2) =  2.0d0 * omega * &
+                    ((uold(i,j,k,3) + HALF*(w0(lev,k) + w0(lev,k+1))) * sin_theta + &
+                     uold(i,j,k,1) * cos_theta)
+
+                coriolis_term(3) = -2.0d0 * omega * uold(i,j,k,2) * sin_theta
+
+             endif
+             ! note: if use_alt_energy_fix = T, then gphi is already
+             ! weighted by beta0
+             vel_force(i,j,k,1:AMREX_SPACEDIM-1) =  -coriolis_term(1:AMREX_SPACEDIM-1) - centrifugal_term(1:AMREX_SPACEDIM-1) - &
+                  gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k)
+
+             vel_force(i,j,k,AMREX_SPACEDIM) = -coriolis_term(3) - centrifugal_term(3) + &
+                  ( rhopert * grav(lev,r) - gpi(i,j,k,AMREX_SPACEDIM) ) / rho(i,j,k) - w0_force(lev,r)
+#else
+
+             ! note: if use_alt_energy_fix = T, then gphi is already
+             ! weighted by beta0
+             vel_force(i,j,k,1:AMREX_SPACEDIM-1) = - gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k)
+
+             vel_force(i,j,k,AMREX_SPACEDIM) = &
+                  ( rhopert * grav(lev,r) - gpi(i,j,k,AMREX_SPACEDIM) ) / rho(i,j,k) - w0_force(lev,r)
+
+#endif
+
+          end do
        end do
+    end do
+    !$OMP END PARALLEL DO
+
+    if (do_add_utilde_force .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
+       do k=lo(3),hi(3)
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
+
+#if (AMREX_SPACEDIM == 1)
+                r = i
+#elif (AMREX_SPACEDIM == 2)
+                r = j
+#elif (AMREX_SPACEDIM == 3)
+                r = k
+#endif
+
+                if (r .le. -1) then
+                   ! do not modify force since dw0/dr=0
+                else if (r .ge. nr(lev)) then
+                   ! do not modify force since dw0/dr=0
+                else
+
+#if (AMREX_SPACEDIM == 2)
+                   vel_force(i,j,k,2) = vel_force(i,j,k,2) &
+                        - (vedge(i,j+1,k)+vedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
+
+#else
+                   vel_force(i,j,k,3) = vel_force(i,j,k,3) &
+                        - (wedge(i,j,k+1)+wedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
+
+#endif
+                end if
+
+             end do
+          end do
        end do
-       end do
+       !$OMP END PARALLEL DO
     endif
 
   end subroutine make_vel_force
 
   subroutine make_vel_force_sphr(lo, hi, &
-                                 is_final_update, &
-                                 vel_force, f_lo, f_hi, nc_f, &
-                                 gpi, g_lo, g_hi, nc_g, &
-                                 rho, r_lo, r_hi, &
-                                 uedge, u_lo, u_hi, &
-                                 vedge, v_lo, v_hi, &
-                                 wedge, w_lo, w_hi, &
-                                 normal, n_lo, n_hi, nc_n, &
-                                 gradw0_cart, gw_lo, gw_hi, &
-                                 w0_force_cart, wf_lo, wf_hi, nc_wf, &
+       is_final_update, &
+       vel_force, f_lo, f_hi, nc_f, &
+       gpi, g_lo, g_hi, nc_g, &
+       rho, r_lo, r_hi, &
+       uedge, u_lo, u_hi, &
+       vedge, v_lo, v_hi, &
+       wedge, w_lo, w_hi, &
+       normal, n_lo, n_hi, nc_n, &
+       gradw0_cart, gw_lo, gw_hi, &
+       w0_force_cart, wf_lo, wf_hi, nc_wf, &
 #ifdef ROTATION
-                                 w0_cart, wc_lo, wc_hi, nc_wc, &
-                                 w0macx, w0x_lo, w0x_hi, &
-                                 w0macy, w0y_lo, w0y_hi, &
-                                 uold, uo_lo, uo_hi, nc_uo, &
+       w0_cart, wc_lo, wc_hi, nc_wc, &
+       w0macx, w0x_lo, w0x_hi, &
+       w0macy, w0y_lo, w0y_hi, &
+       uold, uo_lo, uo_hi, nc_uo, &
 #endif
-                                 rho0, grav, &
-                                 dx, &
-                                 r_cc_loc, r_edge_loc, &
-                                 cc_to_r, ccr_lo, ccr_hi, &
-                                 do_add_utilde_force) &
-                                 bind(C, name="make_vel_force_sphr")
+       rho0, grav, &
+       dx, &
+       r_cc_loc, r_edge_loc, &
+       cc_to_r, ccr_lo, ccr_hi, &
+       do_add_utilde_force) &
+       bind(C, name="make_vel_force_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: is_final_update
@@ -266,7 +271,7 @@ contains
     double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
     integer         , intent (in   ) :: do_add_utilde_force
 
 
@@ -275,9 +280,9 @@ contains
     double precision, allocatable :: rho0_cart(:,:,:,:)
     double precision, allocatable :: grav_cart(:,:,:,:)
 
-
     double precision :: rhopert
     double precision :: xx, yy, zz
+
 #ifdef ROTATION
     real(kind=dp_t) :: centrifugal_term(3), coriolis_term(3)
 #endif
@@ -290,9 +295,9 @@ contains
     vel_force = ZERO
 
     call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
-                                      cc_to_r,ccr_lo,ccr_hi)
+         cc_to_r,ccr_lo,ccr_hi)
     call put_1d_array_on_cart_sphr(lo,hi,grav_cart,lo,hi,3,grav,dx,0,1,r_cc_loc,r_edge_loc, &
-                                      cc_to_r,ccr_lo,ccr_hi)
+         cc_to_r,ccr_lo,ccr_hi)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,xx,yy,zz,rhopert,centrifugal_term,coriolis_term)
     do k = lo(3),hi(3)
@@ -330,29 +335,27 @@ contains
              if (is_final_update .eq. 1) then
 
                 ! use uedge so we are time-centered
-                coriolis_term(1) = -TWO * omega * &
+                coriolis_term(1) = -2.0d0 * omega * &
                      HALF*(vedge(i,j,k)   + w0macy(i,j,k) + &
-                           vedge(i,j+1,k) + w0macy(i,j+1,k))
+                     vedge(i,j+1,k) + w0macy(i,j+1,k))
 
-                coriolis_term(2) =  TWO * omega * &
+                coriolis_term(2) =  2.0d0 * omega * &
                      HALF*(uedge(i,j,k)   + w0macx(i,j,k) + &
-                           uedge(i+1,j,k) + w0macx(i+1,j,k))
+                     uedge(i+1,j,k) + w0macx(i+1,j,k))
 
                 coriolis_term(3) = ZERO
 
              else
-                coriolis_term(1) = -TWO * omega * (uold(i,j,k,2) + w0_cart(i,j,k,2))
-                coriolis_term(2) =  TWO * omega * (uold(i,j,k,1) + w0_cart(i,j,k,1))
+                coriolis_term(1) = -2.0d0 * omega * (uold(i,j,k,2) + w0_cart(i,j,k,2))
+                coriolis_term(2) =  2.0d0 * omega * (uold(i,j,k,1) + w0_cart(i,j,k,1))
                 coriolis_term(3) = ZERO
              endif
-
 
              ! F_Coriolis = -2 omega x U
              ! F_centrifugal = - omega x (omega x r)
 
              ! we just computed the absolute value of the forces above, so use
              ! the right sign here
-
 
              ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
@@ -369,7 +372,7 @@ contains
                   - w0_force_cart(i,j,k,3)
 #else
 
-            ! note: if use_alt_energy_fix = T, then gphi is already weighted
+             ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
              vel_force(i,j,k,1) = ( rhopert * grav_cart(i,j,k,1) - gpi(i,j,k,1) ) / rho(i,j,k) &
                   - w0_force_cart(i,j,k,1)
@@ -378,7 +381,7 @@ contains
                   - w0_force_cart(i,j,k,2)
 
              vel_force(i,j,k,3) = ( rhopert * grav_cart(i,j,k,3) - gpi(i,j,k,3) ) / rho(i,j,k) &
-                - w0_force_cart(i,j,k,3)
+                  - w0_force_cart(i,j,k,3)
 
 #endif
           end do

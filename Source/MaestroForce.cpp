@@ -20,7 +20,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeVelForce()",MakeVelForce);
 
-    // TODO: how do I properly do the w0_cart thing?
+	// TODO: how do I properly do the w0_cart thing?
 
 	// For spherical case
 	Vector<MultiFab> w0_cart(finest_level+1);
@@ -60,8 +60,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 		const MultiFab& w0force_mf = w0_force_cart[lev];
 #ifdef ROTATION
 		const MultiFab& w0_mf = w0_cart[lev];
-        const MultiFab& w0macx_mf = w0mac[lev][0];
-        const MultiFab& w0macy_mf = w0mac[lev][1];
+		const MultiFab& w0macx_mf = w0mac[lev][0];
+		const MultiFab& w0macy_mf = w0mac[lev][1];
 		const MultiFab& uold_mf = uold[lev];
 #endif
 #endif
@@ -80,7 +80,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 			// We will also pass "validBox", which specifies the "valid" region.
 			if (spherical == 0) {
 				make_vel_force(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                               &is_final_update,
+				               &is_final_update,
 				               BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
 				               BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
 				               BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
@@ -89,7 +89,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 #if (AMREX_SPACEDIM == 3)
 				               BL_TO_FORTRAN_3D(wedge_mf[mfi]),
 #ifdef ROTATION
-   				               BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+				               BL_TO_FORTRAN_FAB(uold_mf[mfi]),
 #endif
 #endif
 				               w0.dataPtr(),
@@ -101,7 +101,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
 #if (AMREX_SPACEDIM == 3)
 				make_vel_force_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                                    &is_final_update,
+				                    &is_final_update,
 				                    BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
 				                    BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
@@ -113,8 +113,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 				                    BL_TO_FORTRAN_FAB(w0force_mf[mfi]),
 #ifdef ROTATION
 				                    BL_TO_FORTRAN_FAB(w0_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+				                    BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+				                    BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
 				                    BL_TO_FORTRAN_FAB(uold_mf[mfi]),
 #endif
 				                    rho0.dataPtr(),
