@@ -297,8 +297,8 @@ contains
 
                 else 
 
-                   m(n,r_start_coord(n,i)) = m(n-1,r_start_coord(n,i)/2.d0)
-                   grav_edge(n,r_start_coord(n,i)) = grav_edge(n-1,r_start_coord(n,i)/2.d0)
+                   m(n,r_start_coord(n,i)) = m(n-1,r_start_coord(n,i)/2)
+                   grav_edge(n,r_start_coord(n,i)) = grav_edge(n-1,r_start_coord(n,i)/2)
 
                 end if
 
