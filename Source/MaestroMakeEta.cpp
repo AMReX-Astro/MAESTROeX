@@ -13,7 +13,7 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
 
     // Local variables
-    Vector<Real> etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0 ); 
+    Vector<Real> etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0 );
     etarhosum.shrink_to_fit();
 
     // this stores how many cells there are laterally at each level
@@ -34,31 +34,32 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
 	else if (AMREX_SPACEDIM==3) {
 	    ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
 	}
-	
+
 	// get references to the MultiFabs at level lev
 	const MultiFab& sold_mf = sold[lev];
 	const MultiFab& etarhoflux_mf = etarho_flux[lev];
-        
-	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-	for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
-	    
-	    // Get the index space of the valid region
-	    const Box& validBox = mfi.validbox();
-	    
+
+	// Loop over boxes and tiles (make sure mfi takes a cell-centered multifab as an argument)
+	// NOTE: looks thread safe
+	for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
+
+	    // Get the index space of the valid tile region
+	    const Box& bx = mfi.tilebox();
+
 	    // call fortran subroutine
-	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 	    // lo/hi coordinates (including ghost cells)
-	    // We will also pass "validBox", which specifies the "valid" region.
+	    // We will also pass "bx", which specifies the "valid" tile region.
 	    sum_etarho(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-		       ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		       ARLIM_3D(bx.loVect()), ARLIM_3D(bx.hiVect()),
 		       BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
 		       etarhosum.dataPtr());
-	}	    
+	}
     }
-    
+
     ParallelDescriptor::ReduceRealSum(etarhosum.dataPtr(),(nr_fine+1)*(max_radial_level+1));
-    
-    make_etarho_planar(etarho_edge.dataPtr(), etarho_cell.dataPtr(), 
+
+    make_etarho_planar(etarho_edge.dataPtr(), etarho_cell.dataPtr(),
 		       etarhosum.dataPtr(), ncell.dataPtr());
 
 }
@@ -98,14 +99,15 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(scalold_mf); mfi.isValid(); ++mfi ) {
+		// NOTE: looks thread safe
+        for ( MFIter mfi(scalold_mf,true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& bx = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
 
-	    construct_eta_cart( validBox.loVect(), validBox.hiVect(),
-				scalold_mf[mfi].dataPtr(Rho), 
+	    construct_eta_cart( bx.loVect(), bx.hiVect(),
+				scalold_mf[mfi].dataPtr(Rho),
 				scalold_mf[mfi].loVect(), scalold_mf[mfi].hiVect(),
 				scalnew_mf[mfi].dataPtr(Rho),
 				scalnew_mf[mfi].loVect(), scalnew_mf[mfi].hiVect(),
@@ -126,7 +128,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 #else
     Abort("MakeEtarhoSphr: Spherical is not valid for DIM != 3");
 #endif
-    
+
     // average fine data onto coarser cells & fill ghost cells
     AverageDown(eta_cart,0,1);
     FillPatch(t_old, eta_cart, eta_cart, eta_cart, 0, 0, 1, 0, bcs_f);
@@ -136,7 +138,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 
     // put eta on base state edges
     // note that in spherical the base state has no refinement
-    // the 0th value of etarho = 0, since U dot . e_r must be 
+    // the 0th value of etarho = 0, since U dot . e_r must be
     // zero at the center (since e_r is not defined there)
     etarho_edge[0] = 0.0;
     for (int r=1; r<nr_fine; ++r) {
@@ -145,5 +147,3 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     // probably should do some better extrapolation here eventually
     etarho_edge[nr_fine] = etarho_cell[nr_fine-1];
 }
-
-

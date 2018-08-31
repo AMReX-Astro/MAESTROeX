@@ -1,26 +1,26 @@
 !
 ! Compute eta_rho = Avg { rho' U dot e_r }  (see paper III, Eq. 30)
 !
-! We keep make three quantities here: 
+! We keep make three quantities here:
 !    etarho     is edge-centered
 !    etarho_cc  is cell-centered
 !
-! For plane-parallel geometries, we compute etarho by averaging up 
+! For plane-parallel geometries, we compute etarho by averaging up
 ! interface fluxes (etarho_flux) created in mkflux.  We compute etarho_cc
 ! from etarho.
 !
-! For spherical geometries, 
-!      We construct a multifab containing {rho' (U dot e_r)} and 
-!      use the average routine to put it in cell-centers 
-!      on the base state to get etarho_cc.  We compute etarho from these 
-!      cell-centered quantites by averaging to the center.  
+! For spherical geometries,
+!      We construct a multifab containing {rho' (U dot e_r)} and
+!      use the average routine to put it in cell-centers
+!      on the base state to get etarho_cc.  We compute etarho from these
+!      cell-centered quantites by averaging to the center.
 !
 
 module make_eta_module
 
   use bl_constants_module
   use base_state_geometry_module, only: nr_fine, dr, &
-                                        max_radial_level, numdisjointchunks, & 
+                                        max_radial_level, numdisjointchunks, &
                                         r_start_coord, r_end_coord, finest_radial_level, &
                                         restrict_base, fill_ghost_base
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
@@ -38,10 +38,10 @@ contains
     double precision, intent(  out) :: etarho_cc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: etarhosum(0:nr_fine,0:max_radial_level) ! note swapped shaping
     double precision, intent(in   ) ::     ncell(0:nr_fine)
-    
+
     ! Local variables
     integer :: r,i,n
-   
+
     etarho_ec       = ZERO
     etarho_cc       = ZERO
 
@@ -73,7 +73,7 @@ contains
     ! this is just to be safe in case things change in the future
     call restrict_base(etarho_ec,1)
     call fill_ghost_base(etarho_ec,1)
-    
+
   end subroutine make_etarho_planar
 
   subroutine sum_etarho(lev, domlo, domhi, lo, hi, &
@@ -81,7 +81,7 @@ contains
                          etarhosum) bind(C, name="sum_etarho")
 
     integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
-    integer         , intent(in   ) :: x_lo(3), x_hi(3) 
+    integer         , intent(in   ) :: x_lo(3), x_hi(3)
     double precision, intent(in   ) :: etarhoflux(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
     double precision, intent(inout) :: etarhosum(0:nr_fine,0:max_radial_level) ! note swapped shaping
 
@@ -96,7 +96,7 @@ contains
        do i=lo(1),hi(1)
           etarhosum(i,lev) = etarhoflux(i,j,k)
        end do
-       
+
 #elif (AMREX_SPACEDIM == 2)
        k = lo(3)
        do j=lo(2),hi(2)
@@ -120,7 +120,7 @@ contains
        ! we only add the contribution at the top edge if we are at the top of the domain
        ! this prevents double counting
        top_edge = .false.
-#if (AMREX_SPACEDIM == 1) 
+#if (AMREX_SPACEDIM == 1)
        do k = 1,numdisjointchunks(lev)
           if (hi(1) .eq. r_end_coord(lev,k)) then
              top_edge = .true.
@@ -165,7 +165,7 @@ contains
 #endif
 
   end subroutine sum_etarho
-  
+
   !---------------------------------------------------------------------------
   ! spherical routines
   !---------------------------------------------------------------------------
@@ -207,7 +207,7 @@ contains
     double precision, intent(in   ) ::   w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
     double precision, intent(in   ) ::   normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
     double precision, intent(inout) :: eta_cart(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
-    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1) 
+    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
@@ -216,7 +216,7 @@ contains
     double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
                                                ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
-    ! Local 
+    ! Local
     double precision ::      rho0_nph(0:max_radial_level,0:nr_fine-1)
 
     double precision, allocatable :: rho0_new_cart(:,:,:,:)
@@ -225,8 +225,8 @@ contains
     double precision :: U_dot_er
     integer :: i,j,k,r
 
-    allocate(rho0_new_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    allocate(rho0_nph_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    bl_allocate(rho0_new_cart,lo,hi)
+    bl_allocate(rho0_nph_cart,lo,hi)
 
     ! put the time-centered base state density on a Cartesian patch.
     do r = 0, nr_fine-1
@@ -234,9 +234,9 @@ contains
     enddo
 
     call put_1d_array_on_cart_sphr(lo,hi,rho0_new_cart,lo,hi,1,rho0_new,dx,0,0, &
-                                     r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi) 
+                                     r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
     call put_1d_array_on_cart_sphr(lo,hi,rho0_nph_cart,lo,hi,1,rho0_nph,dx,0,0, &
-                                     r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi) 
+                                     r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,U_dot_er)
     do k = lo(3),hi(3)
@@ -258,7 +258,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
   end subroutine construct_eta_cart
 
 end module make_eta_module
