@@ -89,14 +89,14 @@ Maestro::Init ()
 			     grav_cell_old.dataPtr(),
 			     r_cc_loc.dataPtr(),
 			     r_edge_loc.dataPtr());
-	} else { 
+	} else {
 	    make_beta0(beta0_old.dataPtr(),
 		       rho0_old.dataPtr(),
 		       p0_old.dataPtr(),
 		       gamma1bar_old.dataPtr(),
 		       grav_cell_old.dataPtr());
 	}
-	    
+
         // initial projection
         if (do_initial_projection) {
             Print() << "Doing initial projection" << std::endl;
@@ -171,16 +171,16 @@ Maestro::InitData ()
     // read in model file and fill in s0_init and p0_init for all levels
     if (use_exact_base_state) {
 	init_base_state_irreg(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-			      rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(), 
+			      rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
 			      tempbar_init.dataPtr(),
 			      r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     } else {
 	init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-			rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(), 
+			rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
 			tempbar_init.dataPtr());
     }
 
-    // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function 
+    // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);
 
@@ -254,9 +254,9 @@ Maestro::InitData ()
     }
 }
 
-// During initialization of a simulation, Maestro::InitData() calls 
-// AmrCore::InitFromScratch(), which calls 
-// a MakeNewGrids() function that repeatedly calls this function to build 
+// During initialization of a simulation, Maestro::InitData() calls
+// AmrCore::InitFromScratch(), which calls
+// a MakeNewGrids() function that repeatedly calls this function to build
 // and initialize finer levels.  This function creates a new fine
 // level that did not exist before by interpolating from the coarser level
 // overrides the pure virtual function in AmrCore
@@ -287,7 +287,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     gpi               [lev].setVal(0.);
     dSdt              [lev].setVal(0.);
     rhcc_for_nodalproj[lev].setVal(0.);
-    pi                [lev].setVal(0.);   
+    pi                [lev].setVal(0.);
 
     if (spherical == 1) {
         normal      [lev].define(ba, dm, 3, 1);
@@ -302,28 +302,28 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     MultiFab& cc_to_r = cell_cc_to_r[lev];
 
     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-    for (MFIter mfi(scal); mfi.isValid(); ++mfi)
+    for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
     {
-        const Box& box = mfi.validbox();
-        const int* lo  = box.loVect();
-        const int* hi  = box.hiVect();
+        const Box& tilebox = mfi.tilebox();
+        const int* lo  = tilebox.loVect();
+        const int* hi  = tilebox.hiVect();
 
 	if (spherical == 0) {
 	    initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-		     BL_TO_FORTRAN_FAB(scal[mfi]), 
-		     BL_TO_FORTRAN_FAB(vel[mfi]), 
+		     BL_TO_FORTRAN_FAB(scal[mfi]),
+		     BL_TO_FORTRAN_FAB(vel[mfi]),
 		     s0_init.dataPtr(), p0_init.dataPtr(),
 		     ZFILL(dx));
 	} else {
 	    init_base_state_map_sphr(BL_TO_FORTRAN_3D(cc_to_r[mfi]),
 				    ZFILL(dx_fine),
 				    ZFILL(dx));
-	    
+
 	    initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-	    		  BL_TO_FORTRAN_FAB(scal[mfi]), 
-	    		  BL_TO_FORTRAN_FAB(vel[mfi]), 
+	    		  BL_TO_FORTRAN_FAB(scal[mfi]),
+	    		  BL_TO_FORTRAN_FAB(vel[mfi]),
 	    		  s0_init.dataPtr(), p0_init.dataPtr(),
-	    		  ZFILL(dx), 
+	    		  ZFILL(dx),
 	    		  r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
 			  BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	}
@@ -366,7 +366,7 @@ void Maestro::InitProj ()
         pcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
 
         // we don't have a legit timestep yet, so we set rho_omegadot,
-        // rho_Hnuc, and rho_Hext to 0 
+        // rho_Hnuc, and rho_Hext to 0
         rho_omegadot[lev].setVal(0.);
         rho_Hnuc[lev].setVal(0.);
         rho_Hext[lev].setVal(0.);
@@ -457,14 +457,14 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     if (use_thermal_diffusion) {
 	MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
-	
+
 	MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
 	                    temp_diffusion_formulation);
     }
     else {
         for (int lev=0; lev<=finest_level; ++lev) {
             thermal[lev].setVal(0.);
-        }        
+        }
     }
 
     // compute S at cell-centers
@@ -475,7 +475,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 
         int is_predictor = 1;
         make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr() ,Sbar.dataPtr(),
-                rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(), 
+                rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
                 p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
                 p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
                 etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
@@ -497,12 +497,12 @@ void Maestro::DivuIter (int istep_divu_iter)
         Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
                 << " gives dt = " << dt << std::endl;
     }
-    
+
     dt *= init_shrink;
     if (maestro_verbose > 0) {
         Print() << "Multiplying dt by init_shrink; dt = " << dt << std::endl;
     }
-    
+
     if (dt > dt_hold) {
         if (maestro_verbose > 0) {
             Print() << "Ignoring this new dt since it's larger than the previous dt = "
@@ -531,7 +531,7 @@ void Maestro::InitIter ()
     } else {
 	AdvanceTimeStep(true);
     }
-	
+
     // copy pi from snew to sold
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1,ng_s);

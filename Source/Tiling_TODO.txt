@@ -8,17 +8,17 @@ NOTE: check bl_allocates as I think I messed up a few which need extra dimension
 ./MaestroFillData.cpp:          1/3 NOTE: check growntilebox use, the other MFIter's access a variable's own box rather than creating one?
 ./MaestroMacProj.cpp:           done, everything looked very thread safe
 ./MaestroDt.cpp:                done
-./MaestroMakeS.cpp:
-./MaestroForce.cpp:
-./PhysBCFunctMaestro.cpp:
-./MaestroHeating.cpp:
-./MaestroGamma.cpp:
+./MaestroMakeS.cpp:             done
+./MaestroForce.cpp:             done
+./PhysBCFunctMaestro.cpp:       ? uses box rather than validbox
+./MaestroHeating.cpp:           done
+./MaestroGamma.cpp:             done
 ./MaestroFill3dData.cpp:
-./MaestroAverage.cpp:
-./MaestroInit.cpp:
+./MaestroAverage.cpp:           done
+./MaestroInit.cpp:              done
 ./MaestroAdvection.cpp:
-./MaestroSponge.cpp:
-./MaestroDiag.cpp:
+./MaestroSponge.cpp:            done
+./MaestroDiag.cpp:              done
 ./MaestroThermal.cpp:
 ./MaestroReact.cpp:
 ./MaestroRhoHT.cpp:

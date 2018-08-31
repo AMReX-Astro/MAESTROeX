@@ -22,7 +22,7 @@ contains
                         gamma, g_lo, g_hi, &
                         scal,  s_lo, s_hi, nc_s, &
                         p0) bind(C,name="make_gamma")
-    
+
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: g_lo(3), g_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
@@ -56,12 +56,12 @@ contains
        endif
        eos_state%T     = scal(i,j,k,temp_comp)
        eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-       
+
        pt_index(:) = (/i, j, k/)
-       
+
        ! dens, pres, and xmass are inputs
        call eos(eos_input_rp, eos_state, pt_index)
-       
+
        gamma(i,j,k) = eos_state%gam1
 
     end do
@@ -73,7 +73,7 @@ contains
   subroutine make_gamma_sphr(lo, hi, &
                               gamma, g_lo, g_hi, &
                               scal,  s_lo, s_hi, nc_s, &
-                              p0, dx, & 
+                              p0, dx, &
                               r_cc_loc, r_edge_loc, &
                               cc_to_r, ccr_lo, ccr_hi) bind(C, name="make_gamma_sphr")
 
@@ -98,11 +98,10 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    bl_allocate(p0_cart,lo,hi)
     call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
                                       cc_to_r,ccr_lo,ccr_hi)
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k,eos_state,pt_index)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -126,9 +125,8 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
-    deallocate(p0_cart)
+    bl_deallocate(p0_cart)
 
   end subroutine make_gamma_sphr
 

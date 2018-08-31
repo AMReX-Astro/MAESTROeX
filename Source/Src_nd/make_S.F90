@@ -429,7 +429,6 @@ contains
        if (is_predictor .eq. 1) &
             delta_chi = 0.d0
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
@@ -441,7 +440,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
        bl_deallocate(gamma1bar_cart)
        bl_deallocate(p0_cart)

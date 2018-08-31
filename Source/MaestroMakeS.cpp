@@ -167,17 +167,17 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 	const MultiFab& rho0_mf = rho0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(correction_cc_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(correction_cc_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
-		create_correction_cc_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		create_correction_cc_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 					  BL_TO_FORTRAN_3D(correction_cc_mf[mfi]),
 					  BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
 					  BL_TO_FORTRAN_3D(beta0_mf[mfi]),
@@ -185,7 +185,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 					  BL_TO_FORTRAN_3D(p0_mf[mfi]),
 					  BL_TO_FORTRAN_3D(rho0_mf[mfi]), &dt);
 	    } else {
-		create_correction_cc(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		create_correction_cc(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				     BL_TO_FORTRAN_3D(correction_cc_mf[mfi]),
 				     BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
 				     beta0.dataPtr(), gamma1bar.dataPtr(),
@@ -231,10 +231,10 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -243,7 +243,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 	    if (spherical == 1) {
 		const Real* dx = geom[lev].CellSize();
 
-		make_rhcc_for_macproj_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		make_rhcc_for_macproj_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 					   BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 					   BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
 					   Sbar.dataPtr(), beta0.dataPtr(),
@@ -255,7 +255,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 					   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
 					   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	    } else {
-		make_rhcc_for_macproj(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		make_rhcc_for_macproj(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				      BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 				      BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
 				      Sbar.dataPtr(), beta0.dataPtr(),

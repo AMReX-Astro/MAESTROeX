@@ -4,7 +4,7 @@ module make_vel_force_module
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, center
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
   use bl_constants_module
-  
+
   implicit none
 
   private
@@ -23,7 +23,7 @@ contains
                             w0,w0_force,rho0,grav, &
                             do_add_utilde_force) &
                             bind(C, name="make_vel_force")
-    
+
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent (in   ) :: g_lo(3), g_hi(3), nc_g
@@ -51,7 +51,7 @@ contains
     integer :: i,j,k,r
     double precision :: rhopert
 
-    vel_force = 0.d0
+    vel_force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),1:nc_f) = 0.d0
 
     do k = lo(3),hi(3)
     do j = lo(2),hi(2)
@@ -66,7 +66,7 @@ contains
 #endif
 
        rhopert = rho(i,j,k) - rho0(lev,r)
-             
+
        ! cutoff the buoyancy term if we are outside of the star
        if (rho(i,j,k) .lt. buoyancy_cutoff_factor*base_cutoff_density) then
           rhopert = 0.d0
@@ -74,7 +74,7 @@ contains
 
        ! note: if use_alt_energy_fix = T, then gphi is already
        ! weighted by beta0
-       vel_force(i,j,k,1:AMREX_SPACEDIM-1) = - gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k) 
+       vel_force(i,j,k,1:AMREX_SPACEDIM-1) = - gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k)
 
        vel_force(i,j,k,AMREX_SPACEDIM) = &
             ( rhopert * grav(lev,r) - gpi(i,j,k,AMREX_SPACEDIM) ) / rho(i,j,k) - w0_force(lev,r)
@@ -112,7 +112,7 @@ contains
 
 #endif
              end if
-             
+
        end do
        end do
        end do
@@ -243,6 +243,6 @@ contains
 
     deallocate(rho0_cart,grav_cart)
 
-  end subroutine make_vel_force_sphr  
+  end subroutine make_vel_force_sphr
 
 end module make_vel_force_module
