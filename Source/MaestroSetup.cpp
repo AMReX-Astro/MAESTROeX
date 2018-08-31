@@ -194,12 +194,12 @@ Maestro::Setup ()
     cell_cc_to_r      .resize(max_level+1);
 
     // stores fluxes at coarse-fine interface for synchronization
-    // this will be sized "max_level+1+1"
+    // this will be sized "max_level+2"
     // NOTE: the flux register associated with flux_reg[lev] is associated
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] is never actually used in the reflux operation
-    flux_reg_s.resize(max_level+1);
-    flux_reg_u.resize(max_level+1);
+    flux_reg_s.resize(max_level+2);
+    flux_reg_u.resize(max_level+2);
 
     // number of ghost cells needed for hyperbolic step
     if (ppm_type == 2 || bds_type == 1) {
