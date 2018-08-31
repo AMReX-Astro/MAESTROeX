@@ -26,16 +26,16 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         const MultiFab& thermal_mf = thermal[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(S_cc_mf,true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            make_S_cc(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_S_cc(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                       BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
                       BL_TO_FORTRAN_FAB(scal_mf[mfi]),
                       BL_TO_FORTRAN_FAB(rho_odot_mf[mfi]),
@@ -86,23 +86,23 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 	const MultiFab& beta0_mf = beta0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
-		make_rhcc_for_nodalproj_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		make_rhcc_for_nodalproj_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 					     BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 					     BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
 					     BL_TO_FORTRAN_3D(Sbar_mf[mfi]),
 					     BL_TO_FORTRAN_3D(beta0_mf[mfi]));
 	    } else {
-		make_rhcc_for_nodalproj(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		make_rhcc_for_nodalproj(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 					BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 					BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
 					Sbar.dataPtr(), beta0.dataPtr());
@@ -115,12 +115,12 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
     FillPatch(t_old, rhcc, rhcc, rhcc, 0, 0, 1, 0, bcs_f);
 }
 
-void 
+void
 Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 				 const Vector<Real>& rho0,
 				 const Vector<Real>& beta0,
 				 const Vector<Real>& gamma1bar,
-				 const Vector<Real>& p0, 
+				 const Vector<Real>& p0,
 				 const Vector<MultiFab>& delta_p_term)
 {
     // timer for profiling
@@ -150,7 +150,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 	    beta0_cart[lev]    .setVal(0.);
 	    rho0_cart[lev]     .setVal(0.);
 	}
-	
+
 	Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
 	Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 	Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
@@ -173,22 +173,22 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
             const Box& validBox = mfi.validbox();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
 		create_correction_cc_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 					  BL_TO_FORTRAN_3D(correction_cc_mf[mfi]),
 					  BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
-					  BL_TO_FORTRAN_3D(beta0_mf[mfi]), 
-					  BL_TO_FORTRAN_3D(gamma1bar_mf[mfi]), 
-					  BL_TO_FORTRAN_3D(p0_mf[mfi]), 
+					  BL_TO_FORTRAN_3D(beta0_mf[mfi]),
+					  BL_TO_FORTRAN_3D(gamma1bar_mf[mfi]),
+					  BL_TO_FORTRAN_3D(p0_mf[mfi]),
 					  BL_TO_FORTRAN_3D(rho0_mf[mfi]), &dt);
 	    } else {
 		create_correction_cc(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 				     BL_TO_FORTRAN_3D(correction_cc_mf[mfi]),
 				     BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
-				     beta0.dataPtr(), gamma1bar.dataPtr(), 
+				     beta0.dataPtr(), gamma1bar.dataPtr(),
 				     p0.dataPtr(), &dt);
 	    }
         }
@@ -207,14 +207,14 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
 void
 Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
-			     const Vector<Real>& rho0, 
+			     const Vector<Real>& rho0,
                              const Vector<MultiFab>& S_cc,
                              const Vector<Real>& Sbar,
-                             const Vector<Real>& beta0, 
-                             const Vector<Real>& gamma1bar, 
-			     const Vector<Real>& p0,  
+                             const Vector<Real>& beta0,
+                             const Vector<Real>& gamma1bar,
+			     const Vector<Real>& p0,
                              const Vector<MultiFab>& delta_p_term,
-			     Vector<MultiFab>& delta_chi, 
+			     Vector<MultiFab>& delta_chi,
 			     int is_predictor)
 {
     // timer for profiling
@@ -237,7 +237,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
             const Box& validBox = mfi.validbox();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
@@ -246,25 +246,24 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 		make_rhcc_for_macproj_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 					   BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 					   BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-					   Sbar.dataPtr(), beta0.dataPtr(), 
-					   rho0.dataPtr(), dx, 
-					   gamma1bar.dataPtr(), p0.dataPtr(), 
+					   Sbar.dataPtr(), beta0.dataPtr(),
+					   rho0.dataPtr(), dx,
+					   gamma1bar.dataPtr(), p0.dataPtr(),
 					   BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
 					   BL_TO_FORTRAN_3D(delta_chi_mf[mfi]),
-					   &dt, &is_predictor, 
+					   &dt, &is_predictor,
 					   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
 					   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	    } else {
 		make_rhcc_for_macproj(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 				      BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 				      BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-				      Sbar.dataPtr(), beta0.dataPtr(), 
-				      gamma1bar.dataPtr(), p0.dataPtr(), 
+				      Sbar.dataPtr(), beta0.dataPtr(),
+				      gamma1bar.dataPtr(), p0.dataPtr(),
 				      BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
 				      BL_TO_FORTRAN_3D(delta_chi_mf[mfi]),
 				      &dt, &is_predictor);
-	    } 
+	    }
         }
     }
 }
-

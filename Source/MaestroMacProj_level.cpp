@@ -5,10 +5,10 @@
 using namespace amrex;
 
 // umac enters with face-centered, time-centered Utilde^* and should leave with Utilde
-// macphi is the solution to the elliptic solve and 
+// macphi is the solution to the elliptic solve and
 //   enters as either zero, or the solution to the predictor MAC projection
 // macrhs enters as beta0*(S-Sbar)
-// beta0 is a 1d cell-centered array    
+// beta0 is a 1d cell-centered array
 void
 Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   Vector<MultiFab>& macphi,
@@ -29,14 +29,14 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // allocate AND compute it here
     Vector<Real> beta0_edge( (max_radial_level+1)*(nr_fine+1) );
     beta0_edge.shrink_to_fit();
-    
+
     Vector< std::array< MultiFab,AMREX_SPACEDIM > > beta0_cart_edge(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
 	AMREX_D_TERM(beta0_cart_edge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
 		     beta0_cart_edge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
 		     beta0_cart_edge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
     }
-	
+
     if (spherical == 1) {
 	MakeS0mac(beta0, beta0_cart_edge);
     } else {
@@ -121,13 +121,13 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	}
     }
 
-    // 
+    //
     // Set up implicit solve using MLABecLaplacian class
     //
     for (int lev = 0; lev <= finest_level; ++lev) {
 	MacLevelSolve(lev,umac[lev],macphi,solverrhs[lev],acoef[lev],face_bcoef[lev]);
     }
-    
+
     // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
     AverageDownFaces(umac);
 
@@ -157,18 +157,18 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     } else {
 	// edge_restriction for velocities
 	AverageDownFaces(umac);
-	
+
 	// fill level n ghost cells using interpolation from level n-1 data
 	FillPatchUedge(umac);
     }
 
 }
 
-// Set up implicit solve using MLABecLaplacian class 
-void Maestro::MacLevelSolve(const int& ilev, 
+// Set up implicit solve using MLABecLaplacian class
+void Maestro::MacLevelSolve(const int& ilev,
 			    std::array< MultiFab, AMREX_SPACEDIM >& umac,
 			    Vector<MultiFab>& macphi,
-			    const MultiFab& solverrhs, 
+			    const MultiFab& solverrhs,
 			    const MultiFab& acoef,
 			    const std::array< MultiFab, AMREX_SPACEDIM >& face_bcoef) {
     LPInfo info;
@@ -210,7 +210,7 @@ void Maestro::MacLevelSolve(const int& ilev,
     // update velocity, beta0 * Utilde = beta0 * Utilde^* - B grad phi
 
     // storage for "-B grad_phi"
-    std::array<MultiFab,AMREX_SPACEDIM> mac_fluxes;  
+    std::array<MultiFab,AMREX_SPACEDIM> mac_fluxes;
     AMREX_D_TERM(mac_fluxes[0].define(convert(grids[ilev],nodal_flag_x), dmap[ilev], 1, 0);,
 		 mac_fluxes[1].define(convert(grids[ilev],nodal_flag_y), dmap[ilev], 1, 0);,
 		 mac_fluxes[2].define(convert(grids[ilev],nodal_flag_z), dmap[ilev], 1, 0););
@@ -232,7 +232,7 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     BL_PROFILE_VAR("Maestro::MultFacesByBeta0()",MultFacesByBeta0);
 
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
-    for (int lev = 0; lev <= finest_level; ++lev) 
+    for (int lev = 0; lev <= finest_level; ++lev)
     {
 	// get references to the MultiFabs at level lev
 	MultiFab& xedge_mf = edge[lev][0];
@@ -247,14 +247,14 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 	MultiFab& sold_mf = sold[lev];
 
 	// loop over boxes
-	for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi) {
+	for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi) {
 
 	    // Get the index space of valid region
-	    const Box& validBox = mfi.validbox();
+	    const Box& tileBox = mfi.tilebox();
 
 	    // call fortran subroutine
-	    mult_beta0(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
-		       BL_TO_FORTRAN_3D(xedge_mf[mfi]), 
+	    mult_beta0(&lev,ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
+		       BL_TO_FORTRAN_3D(xedge_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
 		       BL_TO_FORTRAN_3D(yedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
@@ -266,7 +266,7 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 
 	}
     }
-    
+
 
 }
 
@@ -279,7 +279,7 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     BL_PROFILE_VAR("Maestro::ComputeMACSolverRHS()",ComputeMACSolverRHS);
 
     // Note that umac = beta0*mac
-    for (int lev = 0; lev <= finest_level; ++lev) 
+    for (int lev = 0; lev <= finest_level; ++lev)
     {
 	// get references to the MultiFabs at level lev
 	MultiFab& solverrhs_mf = solverrhs[lev];
@@ -293,17 +293,17 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 #endif
 
 	// loop over boxes
-	for ( MFIter mfi(solverrhs_mf); mfi.isValid(); ++mfi) {
+	for ( MFIter mfi(solverrhs_mf, true); mfi.isValid(); ++mfi) {
 
 	    // Get the index space of valid region
-	    const Box& validBox = mfi.validbox();
+	    const Box& tileBox = mfi.tilebox();
 	    const Real* dx = geom[lev].CellSize();
 
 	    // call fortran subroutine
-	    mac_solver_rhs(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
-			   BL_TO_FORTRAN_3D(solverrhs_mf[mfi]), 
-			   BL_TO_FORTRAN_3D(macrhs_mf[mfi]), 
-			   BL_TO_FORTRAN_3D(uedge_mf[mfi]), 
+	    mac_solver_rhs(&lev,ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
+			   BL_TO_FORTRAN_3D(solverrhs_mf[mfi]),
+			   BL_TO_FORTRAN_3D(macrhs_mf[mfi]),
+			   BL_TO_FORTRAN_3D(uedge_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
 			   BL_TO_FORTRAN_3D(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
@@ -314,7 +314,7 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 
 	}
     }
-    
+
 }
 
 // Average bcoefs at faces using inverse of rho
@@ -324,8 +324,8 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()",AvgFaceBcoeffsInv);
 
-    // write an MFIter loop 
-    for (int lev = 0; lev <= finest_level; ++lev) 
+    // write an MFIter loop
+    for (int lev = 0; lev <= finest_level; ++lev)
     {
 	// get references to the MultiFabs at level lev
 	MultiFab& xbcoef_mf = facebcoef[lev][0];
@@ -340,14 +340,14 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 	const MultiFab& rhocc_mf = rhocc[lev];
 
 	// loop over boxes
-	for ( MFIter mfi(rhocc_mf); mfi.isValid(); ++mfi) {
+	for ( MFIter mfi(rhocc_mf, true); mfi.isValid(); ++mfi) {
 
 	    // Get the index space of valid region
-	    const Box& validBox = mfi.validbox();
+	    const Box& tileBox = mfi.tilebox();
 
 	    // call fortran subroutine
-	    mac_bcoef_face(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()), 
-			   BL_TO_FORTRAN_3D(xbcoef_mf[mfi]), 
+	    mac_bcoef_face(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()),
+			   BL_TO_FORTRAN_3D(xbcoef_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
 			   BL_TO_FORTRAN_3D(ybcoef_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
@@ -358,12 +358,12 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 
 	}
     }
-    
+
 
 }
 
 // Set boundaries for MAC velocities
-void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec) 
+void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SetMacSolverBCs()",SetMacSolverBCs);
@@ -372,7 +372,7 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
 
-    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) 
+    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
     {
 	if (Geometry::isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
@@ -395,7 +395,7 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
             } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }
-        }	
+        }
     }
 
     mlabec.setDomainBC(mlmg_lobc,mlmg_hibc);

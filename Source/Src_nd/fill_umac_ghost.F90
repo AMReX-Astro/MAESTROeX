@@ -2,7 +2,7 @@
 #include "AMReX_BC_TYPES.H"
 
 module fill_umac_ghost_module
-  
+
   implicit none
 
   private
@@ -17,7 +17,7 @@ contains
 #endif
                              phys_bc) bind(C, name="fill_umac_ghost")
 
-    
+
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: umac_lo(3), umac_hi(3)
     integer         , intent(in   ) :: vmac_lo(3), vmac_hi(3)
@@ -39,28 +39,28 @@ contains
     if (lo(1) .eq. domlo(1)) then
        select case (phys_bc(1,1))
        case (Inflow)
-          umac(lo(1)-1,:,:) = umac(lo(1),:,:)
-          vmac(lo(1)-1,:,:) = 0.d0
+          umac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = umac(lo(1),lo(2):hi(2),lo(3):hi(3))
+          vmac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
 #if (AMREX_SPACEDIM == 3)
-          wmac(lo(1)-1,:,:) = 0.d0
+          wmac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
 #endif
        case (SlipWall, NoSlipWall)
-          umac(lo(1)-1,:,:) = 0.d0
-          vmac(lo(1)-1,:,:) = 0.d0
+          umac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
+          vmac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
 #if (AMREX_SPACEDIM == 3)
-          wmac(lo(1)-1,:,:) = 0.d0
+          wmac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
 #endif
        case (Outflow)
-          umac(lo(1)-1,:,:) = umac(lo(1),:,:)
-          vmac(lo(1)-1,:,:) = vmac(lo(1),:,:)
+          umac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = umac(lo(1),lo(2):hi(2),lo(3):hi(3))
+          vmac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = vmac(lo(1),lo(2):hi(2),lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(lo(1)-1,:,:) = wmac(lo(1),:,:)
+          wmac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = wmac(lo(1),lo(2):hi(2),lo(3):hi(3))
 #endif
        case (Symmetry)
-          umac(lo(1)-1,:,:) = -umac(lo(1)+1,:,:)
-          vmac(lo(1)-1,:,:) = vmac(lo(1),:,:)
+          umac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = -umac(lo(1)+1,lo(2):hi(2),lo(3):hi(3))
+          vmac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = vmac(lo(1),lo(2):hi(2),lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(lo(1)-1,:,:) = wmac(lo(1),:,:)
+          wmac(lo(1)-1,lo(2):hi(2),lo(3):hi(3)) = wmac(lo(1),lo(2):hi(2),lo(3):hi(3))
 #endif
        case (Interior)
           ! do nothing
@@ -72,28 +72,28 @@ contains
     if (hi(1) .eq. domhi(1)) then
        select case (phys_bc(1,2))
        case (Inflow)
-          umac(hi(1)+2,:,:) = umac(hi(1)+1,:,:)
-          vmac(hi(1)+1,:,:) = 0.d0
+          umac(hi(1)+2,lo(2):hi(2),lo(3):hi(3)) = umac(hi(1)+1,lo(2):hi(2),lo(3):hi(3))
+          vmac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
 #if (AMREX_SPACEDIM == 3)
-          wmac(hi(1)+1,:,:) = 0.d0
+          wmac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
 #endif
        case (SlipWall, NoSlipWall)
-          umac(hi(1)+2,:,:) = 0.d0
-          vmac(hi(1)+1,:,:) = 0.d0
+          umac(hi(1)+2,lo(2):hi(2),lo(3):hi(3)) = 0.d0
+          vmac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
 #if (AMREX_SPACEDIM == 3)
-          wmac(hi(1)+1,:,:) = 0.d0
+          wmac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = 0.d0
 #endif
        case (Outflow)
-          umac(hi(1)+2,:,:) = umac(hi(1)+1,:,:)
-          vmac(hi(1)+1,:,:) = vmac(hi(1),:,:)
+          umac(hi(1)+2,lo(2):hi(2),lo(3):hi(3)) = umac(hi(1)+1,lo(2):hi(2),lo(3):hi(3))
+          vmac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = vmac(hi(1),lo(2):hi(2),lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(hi(1)+1,:,:) = wmac(hi(1),:,:)
+          wmac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = wmac(hi(1),lo(2):hi(2),lo(3):hi(3))
 #endif
        case (Symmetry)
-          umac(hi(1)+2,:,:) = -umac(hi(1),:,:)
-          vmac(hi(1)+1,:,:) = vmac(hi(1),:,:)
+          umac(hi(1)+2,lo(2):hi(2),lo(3):hi(3)) = -umac(hi(1),lo(2):hi(2),lo(3):hi(3))
+          vmac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = vmac(hi(1),lo(2):hi(2),lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(hi(1)+1,:,:) = wmac(hi(1),:,:)
+          wmac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = wmac(hi(1),lo(2):hi(2),lo(3):hi(3))
 #endif
        case (Interior)
           ! do nothing
@@ -105,28 +105,28 @@ contains
     if (lo(2) .eq. domlo(2)) then
        select case (phys_bc(2,1))
        case (Inflow)
-          umac(:,lo(2)-1,:) = 0.d0
-          vmac(:,lo(2)-1,:) = vmac(:,lo(2),:)
+          umac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = 0.d0
+          vmac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = vmac(lo(1):hi(1),lo(2),lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(:,lo(2)-1,:) = 0.d0
+          wmac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = 0.d0
 #endif
        case (SlipWall, NoSlipWall)
-          umac(:,lo(2)-1,:) = 0.d0
-          vmac(:,lo(2)-1,:) = 0.d0
+          umac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = 0.d0
+          vmac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = 0.d0
 #if (AMREX_SPACEDIM == 3)
-          wmac(:,lo(2)-1,:) = 0.d0
+          wmac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = 0.d0
 #endif
        case (Outflow)
-          umac(:,lo(2)-1,:) = umac(:,lo(2),:)
-          vmac(:,lo(2)-1,:) = vmac(:,lo(2),:)
+          umac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = umac(lo(1):hi(1),lo(2),lo(3):hi(3))
+          vmac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = vmac(lo(1):hi(1),lo(2),lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(:,lo(2)-1,:) = wmac(:,lo(2),:)
+          wmac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = wmac(lo(1):hi(1),lo(2),lo(3):hi(3))
 #endif
        case (Symmetry)
-          umac(:,lo(2)-1,:) = umac(:,lo(2),:)
-          vmac(:,lo(2)-1,:) = -vmac(:,lo(2)+1,:)
+          umac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = umac(lo(1):hi(1),lo(2),lo(3):hi(3))
+          vmac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = -vmac(lo(1):hi(1),lo(2)+1,lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(:,lo(2)-1,:) = wmac(:,lo(2),:)
+          wmac(lo(1):hi(1),lo(2)-1,lo(3):hi(3)) = wmac(lo(1):hi(1),lo(2),lo(3):hi(3))
 #endif
        case (Interior)
           ! do nothing
@@ -138,28 +138,28 @@ contains
     if (hi(2) .eq. domhi(2)) then
        select case (phys_bc(2,2))
        case (Inflow)
-          umac(:,hi(2)+1,:) = 0.d0
-          vmac(:,hi(2)+2,:) = vmac(:,hi(2)+1,:)
+          umac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = 0.d0
+          vmac(lo(1):hi(1),hi(2)+2,lo(3):hi(3)) = vmac(lo(1):hi(1),hi(2)+1,lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(:,hi(2)+1,:) = 0.d0
+          wmac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = 0.d0
 #endif
        case (SlipWall, NoSlipWall)
-          umac(:,hi(2)+1,:) = 0.d0
-          vmac(:,hi(2)+2,:) = 0.d0
+          umac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = 0.d0
+          vmac(lo(1):hi(1),hi(2)+2,lo(3):hi(3)) = 0.d0
 #if (AMREX_SPACEDIM == 3)
-          wmac(:,hi(2)+1,:) = 0.d0
+          wmac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = 0.d0
 #endif
        case (Outflow)
-          umac(:,hi(2)+1,:) = umac(:,hi(2),:)
-          vmac(:,hi(2)+2,:) = vmac(:,hi(2)+1,:)
+          umac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = umac(lo(1):hi(1),hi(2),lo(3):hi(3))
+          vmac(lo(1):hi(1),hi(2)+2,lo(3):hi(3)) = vmac(lo(1):hi(1),hi(2)+1,lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(:,hi(2)+1,:) = wmac(:,hi(2),:)
+          wmac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = wmac(lo(1):hi(1),hi(2),lo(3):hi(3))
 #endif
        case (Symmetry)
-          umac(:,hi(2)+1,:) = umac(:,hi(2),:)
-          vmac(:,hi(2)+2,:) = -vmac(:,hi(2),:)
+          umac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = umac(lo(1):hi(1),hi(2),lo(3):hi(3))
+          vmac(lo(1):hi(1),hi(2)+2,lo(3):hi(3)) = -vmac(lo(1):hi(1),hi(2),lo(3):hi(3))
 #if (AMREX_SPACEDIM == 3)
-          wmac(:,hi(2)+1,:) = wmac(:,hi(2),:)
+          wmac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = wmac(lo(1):hi(1),hi(2),lo(3):hi(3))
 #endif
        case (Interior)
           ! do nothing
@@ -173,21 +173,21 @@ contains
     if (lo(3) .eq. domlo(3)) then
        select case (phys_bc(3,1))
        case (Inflow)
-          umac(:,:,lo(3)-1) = 0.d0
-          vmac(:,:,lo(3)-1) = 0.d0
-          wmac(:,:,lo(3)-1) = wmac(:,:,lo(3))
+          umac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = 0.d0
+          vmac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = 0.d0
+          wmac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = wmac(lo(1):hi(1),lo(2):hi(2),lo(3))
        case (SlipWall, NoSlipWall)
-          umac(:,:,lo(3)-1) = 0.d0
-          vmac(:,:,lo(3)-1) = 0.d0
-          wmac(:,:,lo(3)-1) = 0.d0
+          umac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = 0.d0
+          vmac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = 0.d0
+          wmac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = 0.d0
        case (Outflow)
-          umac(:,:,lo(3)-1) = umac(:,:,lo(3))
-          vmac(:,:,lo(3)-1) = vmac(:,:,lo(3))
-          wmac(:,:,lo(3)-1) = wmac(:,:,lo(3))
+          umac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = umac(lo(1):hi(1),lo(2):hi(2),lo(3))
+          vmac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = vmac(lo(1):hi(1),lo(2):hi(2),lo(3))
+          wmac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = wmac(lo(1):hi(1),lo(2):hi(2),lo(3))
        case (Symmetry)
-          umac(:,:,lo(3)-1) = umac(:,:,lo(3))
-          vmac(:,:,lo(3)-1) = vmac(:,:,lo(3))
-          wmac(:,:,lo(3)-1) = -wmac(:,:,lo(3)+1)
+          umac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = umac(lo(1):hi(1),lo(2):hi(2),lo(3))
+          vmac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = vmac(lo(1):hi(1),lo(2):hi(2),lo(3))
+          wmac(lo(1):hi(1),lo(2):hi(2),lo(3)-1) = -wmac(lo(1):hi(1),lo(2):hi(2),lo(3)+1)
        case (Interior)
           ! do nothing
        case default
@@ -198,21 +198,21 @@ contains
     if (hi(3) .eq. domhi(3)) then
        select case (phys_bc(3,2))
        case (Inflow)
-          umac(:,:,hi(3)+1) = 0.d0
-          vmac(:,:,hi(3)+1) = 0.d0
-          wmac(:,:,hi(3)+2) = wmac(:,:,hi(3)+1)
+          umac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = 0.d0
+          vmac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = 0.d0
+          wmac(lo(1):hi(1),lo(2):hi(2),hi(3)+2) = wmac(lo(1):hi(1),lo(2):hi(2),hi(3)+1)
        case (SlipWall, NoSlipWall)
-          umac(:,:,hi(3)+1) = 0.d0
-          vmac(:,:,hi(3)+1) = 0.d0
-          wmac(:,:,hi(3)+2) = 0.d0
+          umac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = 0.d0
+          vmac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = 0.d0
+          wmac(lo(1):hi(1),lo(2):hi(2),hi(3)+2) = 0.d0
        case (Outflow)
-          umac(:,:,hi(3)+1) = umac(:,:,hi(3))
-          vmac(:,:,hi(3)+1) = vmac(:,:,hi(3))
-          wmac(:,:,hi(3)+2) = wmac(:,:,hi(3)+1)
+          umac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = umac(lo(1):hi(1),lo(2):hi(2),hi(3))
+          vmac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = vmac(lo(1):hi(1),lo(2):hi(2),hi(3))
+          wmac(lo(1):hi(1),lo(2):hi(2),hi(3)+2) = wmac(lo(1):hi(1),lo(2):hi(2),hi(3)+1)
        case (Symmetry)
-          umac(:,:,hi(3)+1) = umac(:,:,hi(3))
-          vmac(:,:,hi(3)+1) = vmac(:,:,hi(3))
-          wmac(:,:,hi(3)+2) = -wmac(:,:,hi(3))
+          umac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = umac(lo(1):hi(1),lo(2):hi(2),hi(3))
+          vmac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = vmac(lo(1):hi(1),lo(2):hi(2),hi(3))
+          wmac(lo(1):hi(1),lo(2):hi(2),hi(3)+2) = -wmac(lo(1):hi(1),lo(2):hi(2),hi(3))
        case (Interior)
           ! do nothing
        case default
@@ -220,9 +220,9 @@ contains
     end if
 
 #endif
-    
+
   end subroutine fill_umac_ghost
-  
+
   subroutine PC_EDGE_INTERP(lo, hi, nc, ratio, dir, &
                             crse, c_lo, c_hi, nc_c, &
                             fine, f_lo, f_hi, nc_f) bind(C,name="PC_EDGE_INTERP")
@@ -328,7 +328,7 @@ contains
 #endif
 
   end subroutine PC_EDGE_INTERP
-  
+
   subroutine EDGE_INTERP(flo, fhi, nc, ratio, dir, &
                          fine, f_lo, f_hi, nc_f) bind(C,name="EDGE_INTERP")
 
@@ -345,7 +345,7 @@ contains
 #endif
     !
     !     Do linear in dir, pc transverse to dir, leave alone the fine values
-    !     lining up with coarse edges--assume these have been set to hold the 
+    !     lining up with coarse edges--assume these have been set to hold the
     !     values you want to interpolate to the rest.
     !
 
@@ -361,7 +361,7 @@ contains
                      do P=MAX(j,flo(1)),MIN(j+ratio(1)-1,fhi(1))
                         fine(i+M,P,k,n) = val
                      enddo
-                  enddo                     
+                  enddo
                enddo
             enddo
          enddo

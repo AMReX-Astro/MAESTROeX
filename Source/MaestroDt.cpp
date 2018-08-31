@@ -69,7 +69,7 @@ Maestro::EstDt ()
     int do_add_utilde_force = 0;
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
 		 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
-    
+
     Real umax = 0.;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -90,22 +90,22 @@ Maestro::EstDt ()
 #endif
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(uold_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
 
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 	    const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 0) {
 		estdt(&lev,&dt_grid,&umax_grid,
-		      ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		      ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 		      ZFILL(dx),
 		      BL_TO_FORTRAN_FAB(sold_mf[mfi]),
 		      BL_TO_FORTRAN_FAB(uold_mf[mfi]),
@@ -115,11 +115,11 @@ Maestro::EstDt ()
 		      w0.dataPtr(),
 		      p0_old.dataPtr(),
 		      gamma1bar_old.dataPtr());
-	    } else { 
+	    } else {
 
 #if (AMREX_SPACEDIM == 3)
 		estdt_sphr(&dt_grid,&umax_grid,
-			   ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			   ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 			   ZFILL(dx),
 			   BL_TO_FORTRAN_FAB(sold_mf[mfi]),
 			   BL_TO_FORTRAN_FAB(uold_mf[mfi]),
@@ -131,14 +131,14 @@ Maestro::EstDt ()
 			   BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
 			   BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 			   p0_old.dataPtr(),
-			   gamma1bar_old.dataPtr(), 
-			   r_cc_loc.dataPtr(), 
+			   gamma1bar_old.dataPtr(),
+			   r_cc_loc.dataPtr(),
 			   r_edge_loc.dataPtr(),
 			   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #else
 		Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
-	    }	    
+	    }
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
@@ -161,7 +161,7 @@ Maestro::EstDt ()
         dt = std::min(dt,dt_lev);
 
     }  // end loop over levels
-   
+
     if (maestro_verbose > 0) {
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
     }
@@ -248,23 +248,23 @@ Maestro::FirstDt ()
 	const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 0 ) {
 		firstdt(&lev,&dt_grid,&umax_grid,
-			ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 			ZFILL(dx),
 			BL_TO_FORTRAN_FAB(sold_mf[mfi]),
 			BL_TO_FORTRAN_FAB(uold_mf[mfi]),
@@ -273,9 +273,9 @@ Maestro::FirstDt ()
 			p0_old.dataPtr(),
 			gamma1bar_old.dataPtr());
 	    } else {
-#if (AMREX_SPACEDIM == 3) 
+#if (AMREX_SPACEDIM == 3)
 		firstdt_sphr(&dt_grid,&umax_grid,
-			     ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+			     ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 			     ZFILL(dx),
 			     BL_TO_FORTRAN_FAB(sold_mf[mfi]),
 			     BL_TO_FORTRAN_FAB(uold_mf[mfi]),
@@ -318,7 +318,7 @@ Maestro::FirstDt ()
         dt = std::min(dt,dt_lev);
 
     }  // end loop over levels
-   
+
     if (maestro_verbose > 0) {
         Print() << "Minimum firstdt over all levels = " << dt << std::endl;
     }

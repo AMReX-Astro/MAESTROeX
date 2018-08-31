@@ -12,11 +12,11 @@ Maestro::Regrid ()
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
-            
+
     // regrid could add newly refine levels (if finest_level < max_level)
     // so we save the previous finest level index
     regrid(0, t_new);
-            
+
     if (spherical == 0) {
         finest_radial_level = finest_level;
         init_multilevel(&finest_level);
@@ -37,7 +37,7 @@ Maestro::Regrid ()
     if (spherical == 1) {
         MakeNormal();
     }
-    
+
     if (evolve_base_state) {
         // force rho0 to be the average of rho
 	Average(sold,rho0_old,Rho);
@@ -53,7 +53,7 @@ Maestro::Regrid ()
 		   r_edge_loc.dataPtr());
 
     // enforce HSE
-    enforce_HSE(rho0_old.dataPtr(), 
+    enforce_HSE(rho0_old.dataPtr(),
 		p0_old.dataPtr(),
 		grav_cell_old.dataPtr(),
 		r_cc_loc.dataPtr(),
@@ -82,16 +82,16 @@ Maestro::Regrid ()
 	make_beta0(beta0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
 		   gamma1bar_old.dataPtr(), grav_cell_old.dataPtr());
     }
-    
+
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;
-            
+
     // print wallclock time
     ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
     if (maestro_verbose > 0) {
         Print() << "Time to regrid: " << end_total << '\n';
     }
-        
+
 }
 
 // tag all cells for refinement
@@ -118,18 +118,18 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         Vector<int>  itags;
 
 	// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for (MFIter mfi(state); mfi.isValid(); ++mfi)
+        for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
         {
             const Box& tilebox  = mfi.tilebox();
 
             TagBox&     tagfab  = tags[mfi];
-	    
+
             // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
             // So we are going to get a temporary integer array.
             // set itags initially to 'untagged' everywhere
             // we define itags over the tilebox region
             tagfab.get_itags(itags, tilebox);
-	    
+
             // data pointer and index space
             int*        tptr    = itags.dataPtr();
             const int*  tlo     = tilebox.loVect();
@@ -138,8 +138,8 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
             // tag cells for refinement
             state_error(tptr,  ARLIM_3D(tlo), ARLIM_3D(thi),
                         BL_TO_FORTRAN_3D(state[mfi]),
-                        &tagval, &clearval, 
-                        ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()), 
+                        &tagval, &clearval,
+                        ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                         ZFILL(dx), &time, tag_err[lev].dataPtr());
             //
             // Now update the tags in the TagBox in the tilebox region
@@ -199,7 +199,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
-    }    
+    }
 }
 
 // within a call to AmrCore::regrid, this function fills in data at a level
@@ -208,7 +208,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 void
 Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 				 const DistributionMapping& dm)
-{    
+{
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNewLevelFromCoarse()",MakeNewLevelFromCoarse);
 
