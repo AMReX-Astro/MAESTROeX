@@ -41,9 +41,9 @@ contains
 #elif (AMREX_SPACEDIM == 3)
        r = k
 #endif
-             
+
           ! (rho, (h->e)) --> T, p
-            
+
           eos_state%rho   = state(i,j,k,rho_comp)
           eos_state%T     = state(i,j,k,temp_comp)
           eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
@@ -51,13 +51,13 @@ contains
           ! e = h - p/rho
           eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
                p0(lev,r) / state(i,j,k,rho_comp)
-          
+
           pt_index(:) = (/i, j, k/)
-          
+
           call eos(eos_input_re, eos_state, pt_index)
-          
+
           state(i,j,k,temp_comp) = eos_state%T
-          
+
        enddo
        enddo
        enddo
@@ -75,21 +75,21 @@ contains
 #elif (AMREX_SPACEDIM == 3)
        r = k
 #endif
-             
+
           ! (rho, h) --> T, p
-             
+
           eos_state%rho   = state(i,j,k,rho_comp)
           eos_state%T     = state(i,j,k,temp_comp)
           eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
           eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
-          
+
           pt_index(:) = (/i, j, k/)
-                
+
           call eos(eos_input_rh, eos_state, pt_index)
-                
+
           state(i,j,k,temp_comp) = eos_state%T
-             
+
        enddo
        enddo
        enddo
@@ -99,7 +99,7 @@ contains
   end subroutine makeTfromRhoH
 
   subroutine makeTfromRhoH_sphr(lo,hi,state,s_lo,s_hi,nc_s,p0,dx,r_cc_loc,r_edge_loc, &
-                                  cc_to_r,ccr_lo,ccr_hi) & 
+                                  cc_to_r,ccr_lo,ccr_hi) &
        bind(C,name="makeTfromRhoH_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -121,16 +121,16 @@ contains
 
     if (use_eos_e_instead_of_h) then
 
-       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       bl_allocate(p0_cart,lo,hi)
        call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
                                          cc_to_r,ccr_lo,ccr_hi)
 
        do k = lo(3), hi(3)
        do j = lo(2), hi(2)
        do i = lo(1), hi(1)
-             
+
           ! (rho, (h->e)) --> T, p
-            
+
           eos_state%rho   = state(i,j,k,rho_comp)
           eos_state%T     = state(i,j,k,temp_comp)
           eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
@@ -138,13 +138,13 @@ contains
           ! e = h - p/rho
           eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
                p0_cart(i,j,k,1) / state(i,j,k,rho_comp)
-          
+
           pt_index(:) = (/i, j, k/)
-          
+
           call eos(eos_input_re, eos_state, pt_index)
-          
+
           state(i,j,k,temp_comp) = eos_state%T
-          
+
        enddo
        enddo
        enddo
@@ -156,19 +156,19 @@ contains
        do i = lo(1), hi(1)
 
           ! (rho, h) --> T, p
-             
+
           eos_state%rho   = state(i,j,k,rho_comp)
           eos_state%T     = state(i,j,k,temp_comp)
           eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
           eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
-          
+
           pt_index(:) = (/i, j, k/)
-                
+
           call eos(eos_input_rh, eos_state, pt_index)
-                
+
           state(i,j,k,temp_comp) = eos_state%T
-             
+
        enddo
        enddo
        enddo
@@ -202,9 +202,9 @@ contains
 #elif (AMREX_SPACEDIM == 3)
        r = k
 #endif
-             
+
        ! (rho, p) --> T
-             
+
        eos_state%rho   = state(i,j,k,rho_comp)
        eos_state%T     = state(i,j,k,temp_comp)
        if (use_pprime_in_tfromp) then
@@ -216,15 +216,15 @@ contains
        eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
        pt_index(:) = (/i, j, k/)
-             
+
        call eos(eos_input_rp, eos_state, pt_index)
-             
+
        state(i,j,k,temp_comp) = eos_state%T
 
        if (updateRhoH .eq. 1) then
           state(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
        end if
-       
+
     enddo
     enddo
     enddo
@@ -253,16 +253,16 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    bl_allocate(p0_cart,lo,hi)
     call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
                                       cc_to_r,ccr_lo,ccr_hi)
 
     do k = lo(3), hi(3)
     do j = lo(2), hi(2)
     do i = lo(1), hi(1)
-             
+
        ! (rho, p) --> T
-             
+
        eos_state%rho   = state(i,j,k,rho_comp)
        eos_state%T     = state(i,j,k,temp_comp)
        if (use_pprime_in_tfromp) then
@@ -274,15 +274,15 @@ contains
        eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
        pt_index(:) = (/i, j, k/)
-             
+
        call eos(eos_input_rp, eos_state, pt_index)
-             
+
        state(i,j,k,temp_comp) = eos_state%T
 
        if (updateRhoH .eq. 1) then
           state(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
        end if
-       
+
     enddo
     enddo
     enddo
@@ -293,8 +293,8 @@ contains
   ! makePfromRhoH
   !----------------------------------------------------------------------------
   subroutine makePfromRhoH(lo, hi, &
-                            state, s_lo, s_hi, nc_s, & 
-                            temp_old, t_lo, t_hi, & 
+                            state, s_lo, s_hi, nc_s, &
+                            temp_old, t_lo, t_hi, &
                             peos, p_lo, p_hi) bind(C,name="makePfromRhoH")
 
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -310,11 +310,10 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k, eos_state, pt_index)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             
+
              ! (rho, H) --> T, p
              eos_state%rho   = state(i,j,k,rho_comp)
              eos_state%T     = temp_old(i,j,k)
@@ -323,15 +322,14 @@ contains
              eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
 
              pt_index(:) = (/i, j, k/)
-             
+
              call eos(eos_input_rh, eos_state, pt_index)
-             
+
              peos(i,j,k) = eos_state%p
-             
+
           enddo
        enddo
     enddo
-    !$OMP END PARALLEL DO
 
   end subroutine makePfromRhoH
 

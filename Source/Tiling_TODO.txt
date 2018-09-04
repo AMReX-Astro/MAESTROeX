@@ -19,6 +19,6 @@ NOTE: check bl_allocates as I think I messed up a few which need extra dimension
 ./MaestroAdvection.cpp:
 ./MaestroSponge.cpp:            done
 ./MaestroDiag.cpp:              done
-./MaestroThermal.cpp:
-./MaestroReact.cpp:
+./MaestroThermal.cpp:           ? noticed fortran function used layer of ghost cells - should I use a growntilebox instead? Original function used a validbox.
+./MaestroReact.cpp:             done
 ./MaestroRhoHT.cpp:

@@ -39,7 +39,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
         // not heating, so we zero rho_Hext
         for (int lev=0; lev<=finest_level; ++lev) {
             rho_Hext[lev].setVal(0.);
-        }        
+        }
     }
 
     // apply burning term
@@ -59,10 +59,10 @@ Maestro::React (const Vector<MultiFab>& s_in,
         for (int lev=0; lev<=finest_level; ++lev) {
             rho_omegadot[lev].setVal(0.);
             rho_Hnuc[lev].setVal(0.);
-        }        
+        }
 
     }
-    
+
 
     // if we aren't doing any heating/burning, then just copy the old to the new
     if (!do_heating && !do_burning) {
@@ -133,53 +133,53 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(s_in_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s_in_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
 		if (lev == finest_level) {
-		    burner_loop_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		    burner_loop_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				     BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
 				     BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
 				     BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
 				     BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-				     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
+				     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
 				     BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in);
 		} else {
-		    burner_loop_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		    burner_loop_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				     BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
 				     BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
 				     BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
 				     BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-				     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
-				     BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in, 
+				     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+				     BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in,
 				     mask[mfi].dataPtr());
 		}
-	    } else {
-		if (lev == finest_level) {
-		    burner_loop(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
-				BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
-				BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-				BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-				BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
-				tempbar_init.dataPtr(), &dt_in);
-		} else {
-		    burner_loop(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
-				BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
-				BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-				BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-				BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]), 
-				tempbar_init.dataPtr(), &dt_in, 
-				mask[mfi].dataPtr());
-		}
+    	    } else {
+    		if (lev == finest_level) {
+    		    burner_loop(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+    				BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+    				BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+    				BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+    				BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+    				BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+    				tempbar_init.dataPtr(), &dt_in);
+    		} else {
+    		    burner_loop(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+    				BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+    				BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+    				BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+    				BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+    				BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+    				tempbar_init.dataPtr(), &dt_in,
+    				mask[mfi].dataPtr());
+    		}
 	    }
         }
     }
