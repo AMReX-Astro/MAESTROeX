@@ -749,7 +749,6 @@ contains
 
     ! loop over appropriate x-faces
     if (ppm_type .eq. 0) then
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js-1,je+1
              do i=is,ie+1
@@ -759,7 +758,6 @@ contains
              enddo
           enddo
        enddo
-       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks-1,ke+1
           do j=js-1,je+1
@@ -836,7 +834,6 @@ contains
 
     ! loop over appropriate y-faces
     if (ppm_type .eq. 0) then
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js,je+1
              do i=is-1,ie+1
@@ -846,7 +843,6 @@ contains
              enddo
           enddo
        enddo
-       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks-1,ke+1
           do j=js,je+1

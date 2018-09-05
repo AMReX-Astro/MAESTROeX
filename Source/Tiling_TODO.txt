@@ -1,6 +1,3 @@
-NOTE: check bl_allocates as I think I messed up a few which need extra dimensions
-
-
 ./MaestroMakeEta.cpp:           done
 ./MaestroNodalProj.cpp:         2/3 NOTE: has a loop which gets boxes from a BoxArray(?) - check how to tile this
 ./MaestroRegrid.cpp:            already used a tilebox?

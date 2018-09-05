@@ -1715,8 +1715,6 @@ contains
 
        dsvl = ZERO
 
-       !$OMP PARALLEL PRIVATE(i,j,k,dsc,dsl,dsr)
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-2,hi(1)+2
@@ -1730,9 +1728,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+2
@@ -1748,9 +1744,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -1773,8 +1767,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
        !
        ! Different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's.
        !
@@ -1788,7 +1780,6 @@ contains
 
              i = lo(1)+1
 
-             !$OMP PARALLEL DO PRIVATE(j,k)
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)-1,hi(2)+1
                    !
@@ -1825,7 +1816,6 @@ contains
                    end if
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           end if
        end if
@@ -1841,7 +1831,6 @@ contains
 
              i = hi(1)-1
 
-             !$OMP PARALLEL DO PRIVATE(j,k)
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)-1,hi(2)+1
                    !
@@ -1878,7 +1867,6 @@ contains
                    end if
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           end if
        end if
@@ -1893,10 +1881,6 @@ contains
           call bl_error("Need 4 ghost cells for ppm_type=2")
        end if
 
-       !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-       !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-       !$OMP PRIVATE(delam,delap,D2ABS)
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-2,hi(1)+3
@@ -1919,13 +1903,11 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
        !
        ! Use Colella 2008 limiters.
        ! This is a new version of the algorithm
        ! to eliminate sensitivity to roundoff.
        !
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -2004,8 +1986,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
 
        ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
        if (lo(1) .eq. domlo(1)) then
@@ -2018,11 +1998,6 @@ contains
              sedge(lo(1),lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1) = &
                   s(lo(1)-1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1)
 
-             !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-             !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-             !$OMP PRIVATE(delam,delap,D2ABS)
-
-             !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)-1,hi(2)+1
                    ! use a modified stencil to get sedge on the first interior edge
@@ -2039,12 +2014,10 @@ contains
                    sp(lo(1)  ,j,k) = sedge(lo(1)+1,j,k)
                 end do
              end do
-             !$OMP END DO
              !
              ! Apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells.
              !
-             !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)-1,hi(2)+1
                    do i=lo(1)+1,lo(1)+2
@@ -2121,8 +2094,6 @@ contains
                    end do
                 end do
              end do
-             !$OMP END DO
-             !$OMP END PARALLEL
           end if
        end if
 
@@ -2134,10 +2105,6 @@ contains
              sp(hi(1),lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1) = &
                   s(hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1)
 
-             !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-             !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-             !$OMP PRIVATE(delam,delap,D2ABS)
-             !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)-1,hi(2)+1
                    !
@@ -2158,12 +2125,10 @@ contains
                    sm(hi(1)  ,j,k) = sedge(hi(1),j,k)
                 end do
              end do
-             !$OMP END DO
              !
              ! Apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells.
              !
-             !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)-1,hi(2)+1
                    do i=hi(1)-2,hi(1)-1
@@ -2242,8 +2207,6 @@ contains
                    end do
                 end do
              end do
-             !$OMP END DO
-             !$OMP END PARALLEL
           end if
 
        end if
@@ -2257,7 +2220,6 @@ contains
 
        ! u is MAC velocity -- use edge-based indexing
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,sigma,s6)
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)
@@ -2283,11 +2245,9 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,sigma,s6)
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)
@@ -2313,7 +2273,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     endif
 
@@ -2345,8 +2304,6 @@ contains
 
        dsvl = ZERO
 
-       !$OMP PARALLEL PRIVATE(i,j,k,dsc,dsl,dsr)
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-2,hi(2)+2
              do i=lo(1)-1,hi(1)+1
@@ -2360,9 +2317,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+2
              do i=lo(1)-1,hi(1)+1
@@ -2378,9 +2333,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -2403,8 +2356,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
        !
        ! Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
        !
@@ -2418,7 +2369,6 @@ contains
 
              j = lo(2)+1
 
-             !$OMP PARALLEL DO PRIVATE(i,k)
              do k=lo(3)-1,hi(3)+1
                 do i=lo(1)-1,hi(1)+1
                    !
@@ -2455,7 +2405,6 @@ contains
                    end if
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           end if
        end if
@@ -2470,7 +2419,6 @@ contains
 
              j = hi(2)-1
 
-             !$OMP PARALLEL DO PRIVATE(i,k)
              do k=lo(3)-1,hi(3)+1
                 do i=lo(1)-1,hi(1)+1
                    !
@@ -2507,7 +2455,6 @@ contains
                    end if
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           end if
        end if
@@ -2518,11 +2465,7 @@ contains
        ! ppm_type = 2
        !----------------------------------------------------------------------
 
-       !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-       !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-       !$OMP PRIVATE(delam,delap,D2ABS)
-       !$OMP DO
-       do k=lo(3)-1,hi(3)+1
+         do k=lo(3)-1,hi(3)+1
           do j=lo(2)-2,hi(2)+3
              do i=lo(1)-1,hi(1)+1
                 !
@@ -2544,13 +2487,11 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
        !
        ! Use Colella 2008 limiters.
        ! This is a new version of the algorithm
        ! to eliminate sensitivity to roundoff.
        !
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -2629,8 +2570,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
        !
        ! Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
        !
@@ -2644,10 +2583,6 @@ contains
              sedge(lo(1)-1:hi(1)+1,lo(2),lo(3)-1:hi(3)+1) = &
                   s(lo(1)-1:hi(1)+1,lo(2)-1,lo(3)-1:hi(3)+1)
 
-             !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-             !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-             !$OMP PRIVATE(delam,delap,D2ABS)
-             !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do i=lo(1)-1,hi(1)+1
                    !
@@ -2668,12 +2603,10 @@ contains
                    sp(i,lo(2)  ,k) = sedge(i,lo(2)+1,k)
                 end do
              end do
-             !$OMP END DO
              !
              ! Apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells.
              !
-             !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)+1,lo(2)+2
                    do i=lo(1)-1,hi(1)+1
@@ -2752,8 +2685,6 @@ contains
                    end do
                 end do
              end do
-             !$OMP END DO
-             !$OMP END PARALLEL
           end if
        end if
 
@@ -2767,10 +2698,6 @@ contains
              sedge(lo(1)-1:hi(1)+1,hi(2)+1,lo(3)-1:hi(3)+1) = &
                   s(lo(1)-1:hi(1)+1,hi(2)+1,lo(3)-1:hi(3)+1)
 
-             !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-             !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-             !$OMP PRIVATE(delam,delap,D2ABS)
-             !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do i=lo(1)-1,hi(1)+1
                    !
@@ -2791,12 +2718,10 @@ contains
                    sm(i,hi(2)  ,k) = sedge(i,hi(2),k)
                 end do
              end do
-             !$OMP END DO
              !
              ! Apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells.
              !
-             !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do j=hi(2)-2,hi(2)-1
                    do i=lo(1)-1,hi(1)+1
@@ -2875,8 +2800,6 @@ contains
                    end do
                 end do
              end do
-             !$OMP END DO
-             !$OMP END PARALLEL
           end if
        end if
 
@@ -2890,7 +2813,6 @@ contains
 
        ! v is MAC velocity -- use edge-based indexing
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,sigma,s6)
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)
              do i=lo(1)-1,hi(1)+1
@@ -2918,11 +2840,9 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,sigma,s6)
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)
              do i=lo(1)-1,hi(1)+1
@@ -2950,7 +2870,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     endif
 
@@ -2982,8 +2901,6 @@ contains
 
        dsvl = ZERO
 
-       !$OMP PARALLEL PRIVATE(i,j,k,dsc,dsl,dsr)
-       !$OMP DO
        do k=lo(3)-2,hi(3)+2
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -2997,9 +2914,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 
-       !$OMP DO
        do k=lo(3)-1,hi(3)+2
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -3015,9 +2930,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -3040,8 +2953,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
        !
        ! Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
        !
@@ -3055,7 +2966,6 @@ contains
 
              k = lo(3)+1
 
-             !$OMP PARALLEL DO PRIVATE(i,j)
              do j=lo(2)-1,hi(2)+1
                 do i=lo(1)-1,hi(1)+1
                    !
@@ -3092,7 +3002,6 @@ contains
                    end if
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           end if
        end if
@@ -3107,7 +3016,6 @@ contains
 
              k = hi(3)-1
 
-             !$OMP PARALLEL DO PRIVATE(i,j)
              do j=lo(2)-1,hi(2)+1
                 do i=lo(1)-1,hi(1)+1
                    !
@@ -3144,7 +3052,6 @@ contains
                    end if
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           end if
        end if
@@ -3155,10 +3062,6 @@ contains
        ! ppm_type = 2
        !----------------------------------------------------------------------
 
-       !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-       !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-       !$OMP PRIVATE(delam,delap,D2ABS)
-       !$OMP DO
        do k=lo(3)-2,hi(3)+3
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -3181,12 +3084,10 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
        !
        ! Use Colella 2008 limiters.
        ! This is a new version of the algorithm
        ! to eliminate sensitivity to roundoff.
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -3265,8 +3166,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
        !
        ! Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
        !
@@ -3280,10 +3179,6 @@ contains
              sedge(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)) = &
                   s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1)
 
-             !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-             !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-             !$OMP PRIVATE(delam,delap,D2ABS)
-             !$OMP DO
              do j=lo(2)-1,hi(2)+1
                 do i=lo(1)-1,hi(1)+1
                    !
@@ -3304,12 +3199,10 @@ contains
                    sp(i,j,lo(3)  ) = sedge(i,j,lo(3)+1)
                 end do
              end do
-             !$OMP END DO
              !
              ! Apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells.
              !
-             !$OMP DO
              do j=lo(2)-1,hi(2)+1
                 do k=lo(3)+1,lo(3)+2
                    do i=lo(1)-1,hi(1)+1
@@ -3388,8 +3281,6 @@ contains
                    end do
                 end do
              end do
-             !$OMP END DO
-             !$OMP END PARALLEL
           end if
        end if
 
@@ -3403,10 +3294,6 @@ contains
              sedge(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,hi(3)+1) = &
                   s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,hi(3)+1)
 
-             !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
-             !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
-             !$OMP PRIVATE(delam,delap,D2ABS)
-             !$OMP DO
              do j=lo(2)-1,hi(2)+1
                 do i=lo(1)-1,hi(1)+1
                    !
@@ -3427,12 +3314,10 @@ contains
                    sm(i,j,hi(3)  ) = sedge(i,j,hi(3))
                 end do
              end do
-             !$OMP END DO
              !
              ! Apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells.
              !
-             !$OMP DO
              do j=lo(2)-1,hi(2)+1
                 do k=hi(3)-2,hi(3)-1
                    do i=lo(1)-1,hi(1)+1
@@ -3511,8 +3396,6 @@ contains
                    end do
                 end do
              end do
-             !$OMP END DO
-             !$OMP END PARALLEL
           end if
        end if
 
@@ -3526,8 +3409,6 @@ contains
 
        ! w is MAC velocity -- use edge-based indexing
 
-       !$OMP PARALLEL PRIVATE(i,j,k,sigma,s6)
-       !$OMP DO
        do k=lo(3)-1,hi(3)
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -3542,9 +3423,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k=lo(3),hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -3559,13 +3438,9 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
 
     else
 
-       !$OMP PARALLEL PRIVATE(i,j,k,sigma,s6)
-       !$OMP DO
        do k=lo(3)-1,hi(3)
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -3580,9 +3455,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k=lo(3),hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -3597,8 +3470,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
 
     endif
 
