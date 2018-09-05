@@ -1,5 +1,6 @@
 module make_scal_force_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, base_cutoff_density_coord
   use meth_params_module, only: enthalpy_pred_type, use_exact_base_state
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
@@ -205,7 +206,7 @@ contains
          ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local variable
-    double precision, allocatable :: psi_cart(:,:,:,:)
+    double precision, pointer :: psi_cart(:,:,:,:)
 
     double precision :: divup, p0divu
     integer          :: i,j,k
@@ -247,7 +248,7 @@ contains
          (is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_rhoh) .OR. &
          (is_prediction .eq. 0)) then
 
-       bl_allocate(psi_cart,lo,hi)
+       call bl_allocate(psi_cart,lo,hi,1)
 
        call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0, &
             r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
@@ -259,7 +260,7 @@ contains
              enddo
           enddo
        enddo
-       bl_deallocate(psi_cart)
+       call bl_deallocate(psi_cart)
     endif
 
     if (add_thermal .eq. 1) then
@@ -407,9 +408,9 @@ contains
     double precision :: s0_zlo,s0_zhi
 
     double precision :: divu(0:max_radial_level,0:nr_fine-1)
-    double precision, allocatable :: divu_cart(:,:,:,:)
+    double precision, pointer :: divu_cart(:,:,:,:)
 
-    bl_allocate(divu_cart,lo,hi)
+    call bl_allocate(divu_cart,lo,hi,1)
 
     if (use_exact_base_state) then
        divu(0,:) = 0.0d0
@@ -486,7 +487,7 @@ contains
        end do
     end do
 
-    bl_deallocate(divu_cart)
+    call bl_deallocate(divu_cart)
 
   end subroutine modify_scal_force_sphr
 

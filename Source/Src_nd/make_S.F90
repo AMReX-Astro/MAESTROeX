@@ -1,5 +1,6 @@
 module make_S_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_error_module
   use eos_type_module
   use eos_module
@@ -382,17 +383,17 @@ contains
 
     !     Local variables
     integer :: i, j, k
-    double precision, allocatable ::       div_cart(:,:,:,:)
-    double precision, allocatable ::      Sbar_cart(:,:,:,:)
-    double precision, allocatable :: gamma1bar_cart(:,:,:,:)
-    double precision, allocatable ::        p0_cart(:,:,:,:)
-    double precision, allocatable ::      rho0_cart(:,:,:,:)
+    double precision, pointer ::       div_cart(:,:,:,:)
+    double precision, pointer ::      Sbar_cart(:,:,:,:)
+    double precision, pointer :: gamma1bar_cart(:,:,:,:)
+    double precision, pointer ::        p0_cart(:,:,:,:)
+    double precision, pointer ::      rho0_cart(:,:,:,:)
 
-    bl_allocate(div_cart,lo,hi)
+    call bl_allocate(div_cart,lo,hi,1)
     call put_1d_array_on_cart_sphr(lo,hi,div_cart,lo,hi,1,beta0,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
-    bl_allocate(Sbar_cart,lo,hi)
+    call bl_allocate(Sbar_cart,lo,hi,1)
     call put_1d_array_on_cart_sphr(lo,hi,Sbar_cart,lo,hi,1,Sbar,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r, ccr_lo, ccr_hi)
 
@@ -404,19 +405,19 @@ contains
        end do
     end do
 
-    bl_deallocate(Sbar_cart)
+    call bl_deallocate(Sbar_cart)
 
     if (dpdt_factor .gt. 0.0d0) then
 
-       bl_allocate(gamma1bar_cart,lo,hi))
+       call bl_allocate(gamma1bar_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0, &
             r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
-       bl_allocate(p0_cart,lo,hi)
+       call bl_allocate(p0_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
-       bl_allocate(rho0_cart,lo,hi)
+       call bl_allocate(rho0_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
@@ -435,13 +436,13 @@ contains
           end do
        end do
 
-       bl_deallocate(gamma1bar_cart)
-       bl_deallocate(p0_cart)
-       bl_deallocate(rho0_cart)
+       call bl_deallocate(gamma1bar_cart)
+       call bl_deallocate(p0_cart)
+       call bl_deallocate(rho0_cart)
 
     end if
 
-    bl_deallocate(div_cart)
+    call bl_deallocate(div_cart)
 
   end subroutine make_rhcc_for_macproj_sphr
 

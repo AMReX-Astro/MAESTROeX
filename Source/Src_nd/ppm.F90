@@ -52,14 +52,14 @@ contains
     double precision, parameter :: C = 1.25d0
 
     ! s_{\ib,+}, s_{\ib,-}
-    double precision, allocatable :: sp(:)
-    double precision, allocatable :: sm(:)
+    double precision, pointer :: sp(:)
+    double precision, pointer :: sm(:)
 
     ! \delta s_{\ib}^{vL}
-    double precision, allocatable :: dsvl(:)
+    double precision, pointer :: dsvl(:)
 
     ! s_{i+\half}^{H.O.}
-    double precision, allocatable :: sedge(:)
+    double precision, pointer :: sedge(:)
 
     ! cell-centered indexing
     call bl_allocate(sp,lo(1)-1,hi(1)+1)
@@ -579,14 +579,14 @@ contains
     double precision, parameter :: C = 1.25d0
 
     ! s_{\ib,+}, s_{\ib,-}
-    double precision, allocatable :: sp(:,:)
-    double precision, allocatable :: sm(:,:)
+    double precision, pointer :: sp(:,:)
+    double precision, pointer :: sm(:,:)
 
     ! \delta s_{\ib}^{vL}
-    double precision, allocatable :: dsvl(:,:)
+    double precision, pointer :: dsvl(:,:)
 
     ! s_{i+\half}^{H.O.}
-    double precision, allocatable :: sedge(:,:)
+    double precision, pointer :: sedge(:,:)
 
     ! cell-centered indexing
     call bl_allocate(sp,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1)
@@ -1679,14 +1679,14 @@ contains
     double precision, parameter :: C = 1.25d0
 
     ! s_{\ib,+}, s_{\ib,-}
-    double precision, allocatable :: sp(:,:,:)
-    double precision, allocatable :: sm(:,:,:)
+    double precision, pointer :: sp(:,:,:)
+    double precision, pointer :: sm(:,:,:)
 
     ! \delta s_{\ib}^{vL}
-    double precision, allocatable :: dsvl(:,:,:)
+    double precision, pointer :: dsvl(:,:,:)
 
     ! s_{i+\half}^{H.O.}
-    double precision, allocatable :: sedge(:,:,:)
+    double precision, pointer :: sedge(:,:,:)
 
     ! cell-centered indexing
     call bl_allocate(sp,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)

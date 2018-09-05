@@ -12,6 +12,7 @@
 
 module make_edge_scal_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use slope_module
   use ppm_module
@@ -48,31 +49,31 @@ contains
     integer         , intent(in   ) :: adv_bc(1,2,nbccomp)
 
     ! Local variables
-    double precision, allocatable :: slopex(:,:)
+    double precision, pointer :: slopex(:,:)
 
     double precision :: hx,dt2,dt4,savg,fl,fr
 
     integer :: i,is,ie
 
-    double precision, allocatable :: Ip(:), Ipf(:)
-    double precision, allocatable :: Im(:), Imf(:)
+    double precision, pointer :: Ip(:), Ipf(:)
+    double precision, pointer :: Im(:), Imf(:)
 
     ! these correspond to \mathrm{sedge}_L^x, etc.
-    double precision, allocatable:: sedgelx(:),sedgerx(:)
+    double precision, pointer:: sedgelx(:),sedgerx(:)
 
-    bl_allocate(Ip,lo(1)-1,hi(1)+1)
-    bl_allocate(Im,lo(1)-1,hi(1)+1)
+    call bl_allocate(Ip,lo(1)-1,hi(1)+1)
+    call bl_allocate(Im,lo(1)-1,hi(1)+1)
 
-    bl_allocate(Ipf,lo(1)-1,hi(1)+1)
-    bl_allocate(Imf,lo(1)-1,hi(1)+1)
+    call bl_allocate(Ipf,lo(1)-1,hi(1)+1)
+    call bl_allocate(Imf,lo(1)-1,hi(1)+1)
 
-    bl_allocate(slopex,lo(1)-1,hi(1)+1,1)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1)
 
     ! Final edge states.
     ! lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    bl_allocate(sedgelx,lo(1),hi(1)+1)
-    bl_allocate(sedgerx,lo(1),hi(1)+1)
+    call bl_allocate(sedgelx,lo(1),hi(1)+1)
+    call bl_allocate(sedgerx,lo(1),hi(1)+1)
 
     is = lo(1)
     ie = hi(1)
@@ -209,54 +210,54 @@ contains
     integer         , intent(in   ) :: adv_bc(2,2,nbccomp)
 
     ! Local variables
-    double precision, allocatable :: slopex(:,:,:)
-    double precision, allocatable :: slopey(:,:,:)
+    double precision, pointer :: slopex(:,:,:)
+    double precision, pointer :: slopey(:,:,:)
 
     double precision :: hx,hy,dt2,dt4,savg,fl,fr
 
     integer :: i,j,is,js,ie,je
 
-    double precision, allocatable :: Ip(:,:,:), Ipf(:,:,:)
-    double precision, allocatable :: Im(:,:,:), Imf(:,:,:)
+    double precision, pointer :: Ip(:,:,:), Ipf(:,:,:)
+    double precision, pointer :: Im(:,:,:), Imf(:,:,:)
 
     ! these correspond to s_L^x, etc.
-    double precision, allocatable:: slx(:,:),srx(:,:)
-    double precision, allocatable:: sly(:,:),sry(:,:)
+    double precision, pointer:: slx(:,:),srx(:,:)
+    double precision, pointer:: sly(:,:),sry(:,:)
 
     ! these correspond to s_{\i-\half\e_x}^x, etc.
-    double precision, allocatable:: simhx(:,:),simhy(:,:)
+    double precision, pointer:: simhx(:,:),simhy(:,:)
 
     ! these correspond to \mathrm{sedge}_L^x, etc.
-    double precision, allocatable:: sedgelx(:,:),sedgerx(:,:)
-    double precision, allocatable:: sedgely(:,:),sedgery(:,:)
+    double precision, pointer:: sedgelx(:,:),sedgerx(:,:)
+    double precision, pointer:: sedgely(:,:),sedgery(:,:)
 
-    bl_allocate(Ip,lo(1:2)-1,hi(1:2)+1,2)
-    bl_allocate(Im,lo(1:2)-1,hi(1:2)+1,2)
+    call bl_allocate(Ip,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Im,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
-    bl_allocate(Ipf,lo(1:2)-1,hi(1:2)+1,2)
-    bl_allocate(Imf,lo(1:2)-1,hi(1:2)+1,2)
+    call bl_allocate(Ipf,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Imf,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
-    bl_allocate(slopex,lo(1:2)-1,hi(1:2)+1,2)
-    bl_allocate(slopey,lo(1:2)-1,hi(1:2)+1,2)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse direction
-    bl_allocate(slx,lo(1:2)-1,hi(1:2)+1)
-    bl_allocate(srx,lo(1:2)-1,hi(1:2)+1)
-    bl_allocate(simhx,lo(1:2)-1,hi(1:2)+1)
+    call bl_allocate(slx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
+    call bl_allocate(srx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
+    call bl_allocate(simhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
 
-    bl_allocate(sly,lo(1:2)-1,hi(1:2)+1)
-    bl_allocate(sry,lo(1:2)-1,hi(1:2)+1)
-    bl_allocate(simhy,lo(1:2)-1,hi(1:2)+1)
+    call bl_allocate(sly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
+    call bl_allocate(sry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
+    call bl_allocate(simhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
 
     ! Final edge states.
     ! lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    bl_allocate(sedgelx,lo(1:2),hi(1:2)+1)
-    bl_allocate(sedgerx,lo(1:2),hi(1:2)+1)
-    bl_allocate(sedgely,lo(1:2),hi(1:2)+1)
-    bl_allocate(sedgery,lo(1:2),hi(1:2)+1)
+    call bl_allocate(sedgelx,lo(1),hi(1)+1,lo(2),hi(2))
+    call bl_allocate(sedgerx,lo(1),hi(1)+1,lo(2),hi(2))
+    call bl_allocate(sedgely,lo(1),hi(1),lo(2),hi(2)+1)
+    call bl_allocate(sedgery,lo(1),hi(1),lo(2),hi(2)+1)
 
     is = lo(1)
     ie = hi(1)
@@ -619,56 +620,56 @@ contains
     integer         , intent(in   ) :: adv_bc(3,2,nbccomp)
 
     ! Local variables
-    double precision, allocatable :: slopex(:,:,:,:)
-    double precision, allocatable :: slopey(:,:,:,:)
-    double precision, allocatable :: slopez(:,:,:,:)
+    double precision, pointer :: slopex(:,:,:,:)
+    double precision, pointer :: slopey(:,:,:,:)
+    double precision, pointer :: slopez(:,:,:,:)
 
     double precision :: hx,hy,hz,dt2,dt3,dt4,dt6,fl,fr
     double precision :: savg
 
     integer :: i,j,k,is,js,ks,ie,je,ke
 
-    double precision, allocatable :: Ip(:,:,:,:), Ipf(:,:,:,:)
-    double precision, allocatable :: Im(:,:,:,:), Imf(:,:,:,:)
+    double precision, pointer :: Ip(:,:,:,:), Ipf(:,:,:,:)
+    double precision, pointer :: Im(:,:,:,:), Imf(:,:,:,:)
 
     ! these correspond to s_L^x, etc.
-    double precision, allocatable:: slx(:,:,:),srx(:,:,:)
-    double precision, allocatable:: sly(:,:,:),sry(:,:,:)
-    double precision, allocatable:: slz(:,:,:),srz(:,:,:)
+    double precision, pointer:: slx(:,:,:),srx(:,:,:)
+    double precision, pointer:: sly(:,:,:),sry(:,:,:)
+    double precision, pointer:: slz(:,:,:),srz(:,:,:)
 
     ! these correspond to s_{\i-\half\e_x}^x, etc.
-    double precision, allocatable:: simhx(:,:,:),simhy(:,:,:),simhz(:,:,:)
+    double precision, pointer:: simhx(:,:,:),simhy(:,:,:),simhz(:,:,:)
 
     ! these correspond to s_L^{x|y}, etc.
-    double precision, allocatable:: slxy(:,:,:),srxy(:,:,:),slxz(:,:,:),srxz(:,:,:)
-    double precision, allocatable:: slyx(:,:,:),sryx(:,:,:),slyz(:,:,:),sryz(:,:,:)
-    double precision, allocatable:: slzx(:,:,:),srzx(:,:,:),slzy(:,:,:),srzy(:,:,:)
+    double precision, pointer:: slxy(:,:,:),srxy(:,:,:),slxz(:,:,:),srxz(:,:,:)
+    double precision, pointer:: slyx(:,:,:),sryx(:,:,:),slyz(:,:,:),sryz(:,:,:)
+    double precision, pointer:: slzx(:,:,:),srzx(:,:,:),slzy(:,:,:),srzy(:,:,:)
 
     ! these correspond to s_{\i-\half\e_x}^{x|y}, etc.
-    double precision, allocatable:: simhxy(:,:,:),simhxz(:,:,:)
-    double precision, allocatable:: simhyx(:,:,:),simhyz(:,:,:)
-    double precision, allocatable:: simhzx(:,:,:),simhzy(:,:,:)
+    double precision, pointer:: simhxy(:,:,:),simhxz(:,:,:)
+    double precision, pointer:: simhyx(:,:,:),simhyz(:,:,:)
+    double precision, pointer:: simhzx(:,:,:),simhzy(:,:,:)
 
     ! these correspond to \mathrm{sedge}_L^x, etc.
-    double precision, allocatable:: sedgelx(:,:,:),sedgerx(:,:,:)
-    double precision, allocatable:: sedgely(:,:,:),sedgery(:,:,:)
-    double precision, allocatable:: sedgelz(:,:,:),sedgerz(:,:,:)
+    double precision, pointer:: sedgelx(:,:,:),sedgerx(:,:,:)
+    double precision, pointer:: sedgely(:,:,:),sedgery(:,:,:)
+    double precision, pointer:: sedgelz(:,:,:),sedgerz(:,:,:)
 
     ! used in corner coupling for conservative quantities
-    double precision, allocatable:: divu(:,:,:)
+    double precision, pointer:: divu(:,:,:)
 
-    bl_allocate(slopex,lo-1,hi+1)
-    bl_allocate(slopey,lo-1,hi+1)
-    bl_allocate(slopez,lo-1,hi+1)
+    call bl_allocate(slopex,lo-1,hi+1,1)
+    call bl_allocate(slopey,lo-1,hi+1,1)
+    call bl_allocate(slopez,lo-1,hi+1,1)
 
-    bl_allocate(Ip,lo-1,hi+1,3)
-    bl_allocate(Im,lo-1,hi+1,3)
+    call bl_allocate(Ip,lo-1,hi+1,3)
+    call bl_allocate(Im,lo-1,hi+1,3)
 
-    bl_allocate(Ipf,lo-1,hi+1,3)
-    bl_allocate(Imf,lo-1,hi+1,3)
+    call bl_allocate(Ipf,lo-1,hi+1,3)
+    call bl_allocate(Imf,lo-1,hi+1,3)
 
     if (is_conservative .eq. 1) then
-       bl_allocate(divu,lo-1,hi+1)
+       call bl_allocate(divu,lo-1,hi+1)
     end if
 
     is = lo(1)
@@ -717,9 +718,9 @@ contains
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    bl_allocate(slx,lo-1,hi+1)
-    bl_allocate(srx,lo-1,hi+1)
-    bl_allocate(simhx,lo-1,hi+1)
+    call bl_allocate(slx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(srx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(simhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
 
     ! loop over appropriate x-faces
     if (ppm_type .eq. 0) then
@@ -804,9 +805,9 @@ contains
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    bl_allocate(sly,lo-1,hi+1)
-    bl_allocate(sry,lo-1,hi+1)
-    bl_allocate(simhy,lo-1,hi+1)
+    call bl_allocate(sly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(sry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(simhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     ! loop over appropriate y-faces
     if (ppm_type .eq. 0) then
@@ -891,13 +892,12 @@ contains
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    bl_allocate(slz,lo-1,hi+1)
-    bl_allocate(srz,lo-1,hi+1)
-    bl_allocate(simhz,lo-1,hi+1)
+    call bl_allocate(slz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(srz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(simhz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     ! loop over appropriate z-faces
     if (ppm_type .eq. 0) then
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke+1
           do j=js-1,je+1
              do i=is-1,ie+1
@@ -907,7 +907,6 @@ contains
              enddo
           enddo
        enddo
-       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks,ke+1
           do j=js-1,je+1
@@ -979,9 +978,9 @@ contains
     ! Create s_{\i-\half\e_x}^{x|y}, etc.
     !******************************************************************
 
-    bl_allocate(slxy,lo-1,hi+1)
-    bl_allocate(srxy,lo-1,hi+1)
-    bl_allocate(simhxy,lo-1,hi+1)
+    call bl_allocate(slxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    call bl_allocate(srxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    call bl_allocate(simhxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
 
     ! loop over appropriate xy faces
     if (is_conservative .eq. 1) then
@@ -1079,9 +1078,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    bl_allocate(slxz,lo-1,hi+1)
-    bl_allocate(srxz,lo-1,hi+1)
-    bl_allocate(simhxz,lo-1,hi+1)
+    call bl_allocate(slxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(srxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(simhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
     if (is_conservative .eq. 1) then
        do k=ks,ke
@@ -1178,9 +1177,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    bl_allocate(slyx,lo-1,hi+1)
-    bl_allocate(sryx,lo-1,hi+1)
-    bl_allocate(simhyx,lo-1,hi+1)
+    call bl_allocate(slyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(sryx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(simhyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (is_conservative .eq. 1) then
        do k=ks-1,ke+1
@@ -1277,9 +1276,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    bl_allocate(slyz,lo-1,hi+1)
-    bl_allocate(sryz,lo-1,hi+1)
-    bl_allocate(simhyz,lo-1,hi+1)
+    call bl_allocate(slyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(sryz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(simhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
 
     if (is_conservative .eq. 1) then
        do k=ks,ke
@@ -1376,9 +1375,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    bl_allocate(slzx,lo-1,hi+1)
-    bl_allocate(srzx,lo-1,hi+1)
-    bl_allocate(simhzx,lo-1,hi+1)
+    call bl_allocate(slzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(srzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(simhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     if (is_conservative .eq. 1) then
        do k=ks,ke+1
@@ -1475,9 +1474,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    bl_allocate(slzy,lo-1,hi+1)
-    bl_allocate(srzy,lo-1,hi+1)
-    bl_allocate(simhzy,lo-1,hi+1)
+    call bl_allocate(slzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(srzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(simhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
 
     if (is_conservative .eq. 1) then
        do k=ks,ke+1
@@ -1575,8 +1574,8 @@ contains
     ! Final edge states.
     ! lo:hi+1 in the normal direction
     ! lo:hi in the transverse directions
-    bl_allocate(sedgelx,lo,hi+1)
-    bl_allocate(sedgerx,lo,hi+1)
+    call bl_allocate(sedgelx,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
+    call bl_allocate(sedgerx,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
 
     ! loop over appropriate x-faces
     if (is_conservative .eq. 1) then
@@ -1685,8 +1684,8 @@ contains
        end if
     end if
 
-    bl_allocate(sedgely,lo,hi+1)
-    bl_allocate(sedgery,lo,hi+1)
+    call bl_allocate(sedgely,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(sedgery,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
 
     ! loop over appropriate y-faces
     if (is_conservative .eq. 1) then
@@ -1795,8 +1794,8 @@ contains
        end if
     end if
 
-    bl_allocate(sedgelz,lo,hi+1)
-    bl_allocate(sedgerz,lo,hi+1)
+    call bl_allocate(sedgelz,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(sedgerz,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
 
     ! loop over appropriate z-faces
     if (is_conservative .eq. 1) then

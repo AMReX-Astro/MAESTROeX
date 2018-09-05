@@ -1,5 +1,6 @@
 module make_vel_force_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, prob_lo
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, center
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
@@ -168,16 +169,16 @@ contains
 
     integer         :: i,j,k
 
-    double precision, allocatable :: rho0_cart(:,:,:,:)
-    double precision, allocatable :: grav_cart(:,:,:,:)
+    double precision, pointer :: rho0_cart(:,:,:,:)
+    double precision, pointer :: grav_cart(:,:,:,:)
 
     double precision :: rhopert
     double precision :: xx, yy, zz
 
     real(kind=dp_t) :: Ut_dot_er
 
-    bl_allocate(rho0_cart,lo,hi)
-    bl_allocate(grav_cart,lo,hi,3)
+    call bl_allocate(rho0_cart,lo,hi,1)
+    call bl_allocate(grav_cart,lo,hi,3)
 
     vel_force(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_f) = ZERO
 
@@ -237,8 +238,8 @@ contains
 
     endif
 
-    bl_deallocate(rho0_cart)
-    bl_deallocate(grav_cart)
+    call bl_deallocate(rho0_cart)
+    call bl_deallocate(grav_cart)
 
   end subroutine make_vel_force_sphr
 

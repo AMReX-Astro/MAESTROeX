@@ -1,5 +1,6 @@
 module rhoh_vs_t_module
 
+  use amrex_mempool_module, only : bl_allocate
   use eos_type_module
   use eos_module
   use network, only: nspec
@@ -115,13 +116,13 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    double precision, allocatable :: p0_cart(:,:,:,:)
+    double precision, pointer :: p0_cart(:,:,:,:)
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     if (use_eos_e_instead_of_h) then
 
-       bl_allocate(p0_cart,lo,hi)
+       call bl_allocate(p0_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
                                          cc_to_r,ccr_lo,ccr_hi)
 
@@ -249,11 +250,11 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    double precision, allocatable :: p0_cart(:,:,:,:)
+    double precision, pointer :: p0_cart(:,:,:,:)
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-    bl_allocate(p0_cart,lo,hi)
+    call bl_allocate(p0_cart,lo,hi,1)
     call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
                                       cc_to_r,ccr_lo,ccr_hi)
 

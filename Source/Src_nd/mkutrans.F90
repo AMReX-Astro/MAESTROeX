@@ -3,6 +3,7 @@
 
 module mkutrans_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use slope_module
   use ppm_module
@@ -35,12 +36,12 @@ contains
     double precision, intent(in   ) :: dx(1), dt
     integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
 
-    double precision, allocatable :: slopex(:,:)
+    double precision, pointer :: slopex(:,:)
 
-    double precision, allocatable :: Ip(:)
-    double precision, allocatable :: Im(:)
+    double precision, pointer :: Ip(:)
+    double precision, pointer :: Im(:)
 
-    double precision, allocatable :: ulx(:),urx(:)
+    double precision, pointer :: ulx(:),urx(:)
 
     double precision hx,dt2,uavg
 
@@ -48,13 +49,13 @@ contains
 
     logical :: test
 
-    bl_allocate(slopex,lo(1)-1,hi(1)+1)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1)
 
-    bl_allocate(ulx,lo(1),hi(1)+1)
-    bl_allocate(urx,lo(1),hi(1)+1)
+    call bl_allocate(ulx,lo(1),hi(1)+1)
+    call bl_allocate(urx,lo(1),hi(1)+1)
 
-    bl_allocate(Ip,lo(1)-1,hi(1)+1)
-    bl_allocate(Im,lo(1)-1,hi(1)+1)
+    call bl_allocate(Ip,lo(1)-1,hi(1)+1)
+    call bl_allocate(Im,lo(1)-1,hi(1)+1)
 
     is = lo(1)
     ie = hi(1)
@@ -160,14 +161,14 @@ contains
     double precision, intent(in   ) :: dx(2), dt
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
 
-    double precision, allocatable :: slopex(:,:,:)
-    double precision, allocatable :: slopey(:,:,:)
+    double precision, pointer :: slopex(:,:,:)
+    double precision, pointer :: slopey(:,:,:)
 
-    double precision, allocatable :: Ip(:,:,:)
-    double precision, allocatable :: Im(:,:,:)
+    double precision, pointer :: Ip(:,:,:)
+    double precision, pointer :: Im(:,:,:)
 
-    double precision, allocatable :: ulx(:,:),urx(:,:)
-    double precision, allocatable :: vly(:,:),vry(:,:)
+    double precision, pointer :: ulx(:,:),urx(:,:)
+    double precision, pointer :: vly(:,:),vry(:,:)
 
     double precision hx,hy,dt2,uavg
 
@@ -175,17 +176,17 @@ contains
 
     logical :: test
 
-    bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1)
-    bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,1)
+    call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,1)
 
-    bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
-    bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
+    call bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
+    call bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
 
-    bl_allocate(vly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
-    bl_allocate(vry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
+    call bl_allocate(vly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
+    call bl_allocate(vry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
 
-    bl_allocate(Ip,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(Im,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
+    call bl_allocate(Ip,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Im,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
     is = lo(1)
     js = lo(2)
@@ -389,12 +390,12 @@ contains
     double precision, intent(in   ) :: dx(3), dt
     integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
 
-    double precision, allocatable :: slopex(:,:,:,:)
-    double precision, allocatable :: slopey(:,:,:,:)
-    double precision, allocatable :: slopez(:,:,:,:)
+    double precision, pointer :: slopex(:,:,:,:)
+    double precision, pointer :: slopey(:,:,:,:)
+    double precision, pointer :: slopez(:,:,:,:)
 
-    double precision, allocatable :: Ip(:,:,:,:)
-    double precision, allocatable :: Im(:,:,:,:)
+    double precision, pointer :: Ip(:,:,:,:)
+    double precision, pointer :: Im(:,:,:,:)
 
     double precision hx,hy,hz,dt2,uavg
 
@@ -402,16 +403,16 @@ contains
 
     integer :: i,j,k,is,js,ks,ie,je,ke
 
-    double precision, allocatable:: ulx(:,:,:),urx(:,:,:)
-    double precision, allocatable:: vly(:,:,:),vry(:,:,:)
-    double precision, allocatable:: wlz(:,:,:),wrz(:,:,:)
+    double precision, pointer:: ulx(:,:,:),urx(:,:,:)
+    double precision, pointer:: vly(:,:,:),vry(:,:,:)
+    double precision, pointer:: wlz(:,:,:),wrz(:,:,:)
 
-    bl_allocate(slopex,lo-1,hi+1)
-    bl_allocate(slopey,lo-1,hi+1)
-    bl_allocate(slopez,lo-1,hi+1)
+    call bl_allocate(slopex,lo-1,hi+1,1)
+    call bl_allocate(slopey,lo-1,hi+1,1)
+    call bl_allocate(slopez,lo-1,hi+1,1)
 
-    bl_allocate(Ip,lo-1,hi+1,3)
-    bl_allocate(Im,lo-1,hi+1,3)
+    call bl_allocate(Ip,lo-1,hi+1,3)
+    call bl_allocate(Im,lo-1,hi+1,3)
 
     is = lo(1)
     js = lo(2)
@@ -442,8 +443,8 @@ contains
     ! create utrans
     !******************************************************************
 
-    bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
-    bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (ppm_type .eq. 0) then
        do k=ks,ke
@@ -544,8 +545,8 @@ contains
             Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
     end if
 
-    bl_allocate(vly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
-    bl_allocate(vry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(vly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(vry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (ppm_type .eq. 0) then
        do k=ks,ke
@@ -646,8 +647,8 @@ contains
             Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
     end if
 
-    bl_allocate(wlz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    bl_allocate(wrz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(wlz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(wrz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     if (ppm_type .eq. 0) then
        do k=ks,ke+1

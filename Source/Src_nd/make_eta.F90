@@ -18,6 +18,7 @@
 
 module make_eta_module
 
+  use amrex_mempool_module, only : bl_allocate
   use bl_constants_module
   use base_state_geometry_module, only: nr_fine, dr, &
        max_radial_level, numdisjointchunks, &
@@ -219,14 +220,14 @@ contains
     ! Local
     double precision ::      rho0_nph(0:max_radial_level,0:nr_fine-1)
 
-    double precision, allocatable :: rho0_new_cart(:,:,:,:)
-    double precision, allocatable :: rho0_nph_cart(:,:,:,:)
+    double precision, pointer :: rho0_new_cart(:,:,:,:)
+    double precision, pointer :: rho0_nph_cart(:,:,:,:)
 
     double precision :: U_dot_er
     integer :: i,j,k,r
 
-    bl_allocate(rho0_new_cart,lo,hi)
-    bl_allocate(rho0_nph_cart,lo,hi)
+    call bl_allocate(rho0_new_cart,lo,hi,1)
+    call bl_allocate(rho0_nph_cart,lo,hi,1)
 
     ! put the time-centered base state density on a Cartesian patch.
     do r = 0, nr_fine-1

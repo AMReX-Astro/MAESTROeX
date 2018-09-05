@@ -564,7 +564,7 @@ contains
     integer          :: i,j,k,index
     double precision :: x,y,z
     double precision :: radius,w0_cart_val,rfac
-    double precision, allocatable :: w0_nodal(:,:,:,:)
+    double precision, pointer :: w0_nodal(:,:,:,:)
 
     ! we currently have three different ideas for computing w0mac
     ! 1.  Interpolate w0 to cell centers, then average to edges

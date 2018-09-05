@@ -231,7 +231,7 @@ contains
     double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
          ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
-    double precision, allocatable :: gp0_cart(:,:,:,:)
+    double precision, pointer :: gp0_cart(:,:,:,:)
 
     double precision :: gp0(0:max_radial_level,0:nr_fine)
 
@@ -240,7 +240,7 @@ contains
     double precision :: fx, fy, fz, eps, denom, a, b, c
     integer          :: i,j,k,r
 
-    call bl_allocate(gp0_cart,lo,hi)
+    call bl_allocate(gp0_cart,lo,hi,3)
 
     rho_min = 1.d-20
 
@@ -583,14 +583,14 @@ contains
     double precision :: gp_dot_u,gamma1bar_p_avg,eps,dt_divu,dt_sound,denom,rho_min
     integer          :: i,j,k,r
 
-    double precision, allocatable :: gp0_cart(:,:,:,:)
+    double precision, pointer :: gp0_cart(:,:,:,:)
 
     double precision :: gp0(0:max_radial_level,0:nr_fine)
 
     integer pt_index(3)
     type (eos_t) :: eos_state
 
-    call bl_allocate(gp0_cart,lo,hi)
+    call bl_allocate(gp0_cart,lo,hi,3)
 
     eps = 1.0d-8
 

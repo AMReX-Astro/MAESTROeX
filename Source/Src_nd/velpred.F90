@@ -6,6 +6,7 @@
 
 module velpred_module
 
+  use amrex_mempool_module, only : bl_allocate
   use amrex_constants_module
   use slope_module
   use ppm_module
@@ -42,13 +43,13 @@ contains
     integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
 
     ! Local variables
-    double precision, allocatable :: slopex(:,:)
+    double precision, pointer :: slopex(:,:)
 
-    double precision, allocatable :: Ipu(:), Ipf(:)
-    double precision, allocatable :: Imu(:), Imf(:)
+    double precision, pointer :: Ipu(:), Ipf(:)
+    double precision, pointer :: Imu(:), Imf(:)
 
     ! these correspond to umac_L, etc.
-    double precision, allocatable :: umacl(:),umacr(:)
+    double precision, pointer :: umacl(:),umacr(:)
 
     double precision :: hx, dt2, dt4, uavg
 
@@ -56,16 +57,16 @@ contains
 
     logical :: test
 
-    bl_allocate(slopex,lo(1)-1,hi(1)+1)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1,1)
 
-    bl_allocate(Ipu,lo(1)-1,hi(1)+1)
-    bl_allocate(Imu,lo(1)-1,hi(1)+1)
+    call bl_allocate(Ipu,lo(1)-1,hi(1)+1)
+    call bl_allocate(Imu,lo(1)-1,hi(1)+1)
 
-    bl_allocate(Ipf,lo(1)-1,hi(1)+1)
-    bl_allocate(Imf,lo(1)-1,hi(1)+1)
+    call bl_allocate(Ipf,lo(1)-1,hi(1)+1)
+    call bl_allocate(Imf,lo(1)-1,hi(1)+1)
 
-    bl_allocate(umacl,lo(1),hi(1)+1)
-    bl_allocate(umacr,lo(1),hi(1)+1)
+    call bl_allocate(umacl,lo(1),hi(1)+1)
+    call bl_allocate(umacr,lo(1),hi(1)+1)
 
     is = lo(1)
     ie = hi(1)
@@ -180,21 +181,21 @@ contains
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
 
     ! Local variables
-    double precision, allocatable :: slopex(:,:,:)
-    double precision, allocatable :: slopey(:,:,:)
+    double precision, pointer :: slopex(:,:,:)
+    double precision, pointer :: slopey(:,:,:)
 
-    double precision, allocatable :: Ipu(:,:,:), Ipfx(:,:,:)
-    double precision, allocatable :: Imu(:,:,:), Imfx(:,:,:)
-    double precision, allocatable :: Ipv(:,:,:), Ipfy(:,:,:)
-    double precision, allocatable :: Imv(:,:,:), Imfy(:,:,:)
+    double precision, pointer :: Ipu(:,:,:), Ipfx(:,:,:)
+    double precision, pointer :: Imu(:,:,:), Imfx(:,:,:)
+    double precision, pointer :: Ipv(:,:,:), Ipfy(:,:,:)
+    double precision, pointer :: Imv(:,:,:), Imfy(:,:,:)
 
     ! these correspond to u_L^x, etc.
-    double precision, allocatable :: ulx(:,:,:),urx(:,:,:),uimhx(:,:,:)
-    double precision, allocatable :: uly(:,:,:),ury(:,:,:),uimhy(:,:,:)
+    double precision, pointer :: ulx(:,:,:),urx(:,:,:),uimhx(:,:,:)
+    double precision, pointer :: uly(:,:,:),ury(:,:,:),uimhy(:,:,:)
 
     ! these correspond to umac_L, etc.
-    double precision, allocatable :: umacl(:,:),umacr(:,:)
-    double precision, allocatable :: vmacl(:,:),vmacr(:,:)
+    double precision, pointer :: umacl(:,:),umacr(:,:)
+    double precision, pointer :: vmacl(:,:),vmacr(:,:)
 
     double precision :: hx, hy, dt2, dt4, uavg, maxu, minu
     double precision :: fl, fr
@@ -203,32 +204,32 @@ contains
 
     logical :: test
 
-    bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(slopey,,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
-    bl_allocate(Ipu,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(Imu,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(Ipv,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(Imv,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
+    call bl_allocate(Ipu,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Imu,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Ipv,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Imv,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
-    bl_allocate(Ipfx,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(Imfx,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(Ipfy,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(Imfy,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
+    call bl_allocate(Ipfx,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Imfx,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Ipfy,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(Imfy,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
-    bl_allocate(  ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(  urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,2)
-    bl_allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,2)
+    call bl_allocate(  ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(  urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    call bl_allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
-    bl_allocate(  uly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,2)
-    bl_allocate(  ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,2)
-    bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,2)
+    call bl_allocate(  uly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,1,2)
+    call bl_allocate(  ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,1,2)
+    call bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,1,2)
 
-    bl_allocate(umacl,lo(1),hi(1)+1,lo(2),hi(2))
-    bl_allocate(umacr,lo(1),hi(1)+1,lo(2),hi(2))
+    call bl_allocate(umacl,lo(1),hi(1)+1,lo(2),hi(2))
+    call bl_allocate(umacr,lo(1),hi(1)+1,lo(2),hi(2))
 
-    bl_allocate(vmacl,lo(1),hi(1),lo(2),hi(2)+1)
-    bl_allocate(vmacr,lo(1),hi(1),lo(2),hi(2)+1)
+    call bl_allocate(vmacl,lo(1),hi(1),lo(2),hi(2)+1)
+    call bl_allocate(vmacr,lo(1),hi(1),lo(2),hi(2)+1)
 
     is = lo(1)
     ie = hi(1)
@@ -581,51 +582,51 @@ contains
     integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
 
     ! local variables
-    double precision, allocatable :: slopex(:,:,:,:)
-    double precision, allocatable :: slopey(:,:,:,:)
-    double precision, allocatable :: slopez(:,:,:,:)
+    double precision, pointer :: slopex(:,:,:,:)
+    double precision, pointer :: slopey(:,:,:,:)
+    double precision, pointer :: slopez(:,:,:,:)
 
-    double precision, allocatable :: Ipu(:,:,:,:), Ipfx(:,:,:,:)
-    double precision, allocatable :: Imu(:,:,:,:), Imfx(:,:,:,:)
-    double precision, allocatable :: Ipv(:,:,:,:), Ipfy(:,:,:,:)
-    double precision, allocatable :: Imv(:,:,:,:), Imfy(:,:,:,:)
-    double precision, allocatable :: Ipw(:,:,:,:), Ipfz(:,:,:,:)
-    double precision, allocatable :: Imw(:,:,:,:), Imfz(:,:,:,:)
+    double precision, pointer :: Ipu(:,:,:,:), Ipfx(:,:,:,:)
+    double precision, pointer :: Imu(:,:,:,:), Imfx(:,:,:,:)
+    double precision, pointer :: Ipv(:,:,:,:), Ipfy(:,:,:,:)
+    double precision, pointer :: Imv(:,:,:,:), Imfy(:,:,:,:)
+    double precision, pointer :: Ipw(:,:,:,:), Ipfz(:,:,:,:)
+    double precision, pointer :: Imw(:,:,:,:), Imfz(:,:,:,:)
 
     ! these correspond to u_L^x, etc.
-    double precision, allocatable:: ulx(:,:,:,:),urx(:,:,:,:),uimhx(:,:,:,:)
-    double precision, allocatable:: uly(:,:,:,:),ury(:,:,:,:),uimhy(:,:,:,:)
-    double precision, allocatable:: ulz(:,:,:,:),urz(:,:,:,:),uimhz(:,:,:,:)
+    double precision, pointer:: ulx(:,:,:,:),urx(:,:,:,:),uimhx(:,:,:,:)
+    double precision, pointer:: uly(:,:,:,:),ury(:,:,:,:),uimhy(:,:,:,:)
+    double precision, pointer:: ulz(:,:,:,:),urz(:,:,:,:),uimhz(:,:,:,:)
 
     ! these correspond to u_L^{y|z}, etc.
-    double precision, allocatable:: ulyz(:,:,:)
-    double precision, allocatable:: uryz(:,:,:)
-    double precision, allocatable:: uimhyz(:,:,:)
+    double precision, pointer:: ulyz(:,:,:)
+    double precision, pointer:: uryz(:,:,:)
+    double precision, pointer:: uimhyz(:,:,:)
 
-    double precision, allocatable:: ulzy(:,:,:)
-    double precision, allocatable:: urzy(:,:,:)
-    double precision, allocatable:: uimhzy(:,:,:)
+    double precision, pointer:: ulzy(:,:,:)
+    double precision, pointer:: urzy(:,:,:)
+    double precision, pointer:: uimhzy(:,:,:)
 
-    double precision, allocatable:: vlxz(:,:,:)
-    double precision, allocatable:: vrxz(:,:,:)
-    double precision, allocatable:: vimhxz(:,:,:)
+    double precision, pointer:: vlxz(:,:,:)
+    double precision, pointer:: vrxz(:,:,:)
+    double precision, pointer:: vimhxz(:,:,:)
 
-    double precision, allocatable:: vlzx(:,:,:)
-    double precision, allocatable:: vrzx(:,:,:)
-    double precision, allocatable:: vimhzx(:,:,:)
+    double precision, pointer:: vlzx(:,:,:)
+    double precision, pointer:: vrzx(:,:,:)
+    double precision, pointer:: vimhzx(:,:,:)
 
-    double precision, allocatable:: wlxy(:,:,:)
-    double precision, allocatable:: wrxy(:,:,:)
-    double precision, allocatable:: wimhxy(:,:,:)
+    double precision, pointer:: wlxy(:,:,:)
+    double precision, pointer:: wrxy(:,:,:)
+    double precision, pointer:: wimhxy(:,:,:)
 
-    double precision, allocatable:: wlyx(:,:,:)
-    double precision, allocatable:: wryx(:,:,:)
-    double precision, allocatable:: wimhyx(:,:,:)
+    double precision, pointer:: wlyx(:,:,:)
+    double precision, pointer:: wryx(:,:,:)
+    double precision, pointer:: wimhyx(:,:,:)
 
     ! these correspond to umac_L, etc.
-    double precision, allocatable:: umacl(:,:,:),umacr(:,:,:)
-    double precision, allocatable:: vmacl(:,:,:),vmacr(:,:,:)
-    double precision, allocatable:: wmacl(:,:,:),wmacr(:,:,:)
+    double precision, pointer:: umacl(:,:,:),umacr(:,:,:)
+    double precision, pointer:: vmacl(:,:,:),vmacr(:,:,:)
+    double precision, pointer:: wmacl(:,:,:),wmacr(:,:,:)
 
     double precision :: hx, hy, hz, dt2, dt4, dt6, uavg, maxu, minu
     double precision :: fl, fr
@@ -634,23 +635,23 @@ contains
 
     logical :: test
 
-    bl_allocate(slopex,lo-1,hi+1,3)
-    bl_allocate(slopey,lo-1,hi+1,3)
-    bl_allocate(slopez,lo-1,hi+1,3)
+    call bl_allocate(slopex,lo-1,hi+1,3)
+    call bl_allocate(slopey,lo-1,hi+1,3)
+    call bl_allocate(slopez,lo-1,hi+1,3)
 
-    bl_allocate(Ipu,lo-1,hi+1,3)
-    bl_allocate(Imu,lo-1,hi+1,3)
-    bl_allocate(Ipv,lo-1,hi+1,3)
-    bl_allocate(Imv,lo-1,hi+1,3)
-    bl_allocate(Ipw,lo-1,hi+1,3)
-    bl_allocate(Imw,lo-1,hi+1,3)
+    call bl_allocate(Ipu,lo-1,hi+1,3)
+    call bl_allocate(Imu,lo-1,hi+1,3)
+    call bl_allocate(Ipv,lo-1,hi+1,3)
+    call bl_allocate(Imv,lo-1,hi+1,3)
+    call bl_allocate(Ipw,lo-1,hi+1,3)
+    call bl_allocate(Imw,lo-1,hi+1,3)
 
-    bl_allocate(Ipfx,lo-1,hi+1,3)
-    bl_allocate(Imfx,lo-1,hi+1,3)
-    bl_allocate(Ipfy,lo-1,hi+1,3)
-    bl_allocate(Imfy,lo-1,hi+1,3)
-    bl_allocate(Ipfz,lo-1,hi+1,3)
-    bl_allocate(Imfz,lo-1,hi+1,3)
+    call bl_allocate(Ipfx,lo-1,hi+1,3)
+    call bl_allocate(Imfx,lo-1,hi+1,3)
+    call bl_allocate(Ipfy,lo-1,hi+1,3)
+    call bl_allocate(Imfy,lo-1,hi+1,3)
+    call bl_allocate(Ipfz,lo-1,hi+1,3)
+    call bl_allocate(Imfz,lo-1,hi+1,3)
 
     is = lo(1)
     ie = hi(1)
@@ -692,8 +693,8 @@ contains
     ! normal predictor states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,3)
-    bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,3)
+    call bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
+    call bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
        do k=ks-1,ke+1
@@ -778,7 +779,7 @@ contains
        end select
     end if
 
-    bl_allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,3)
+    call bl_allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     do k=ks-1,ke+1
        do j=js-1,je+1
@@ -801,8 +802,8 @@ contains
 
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    bl_allocate(uly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,3)
-    bl_allocate(ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,3)
+    call bl_allocate(uly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
+    call bl_allocate(ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
        do k=ks-1,ke+1
@@ -887,7 +888,7 @@ contains
        end select
     end if
 
-    bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,3)
+    call bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,3)
 
     do k=ks-1,ke+1
        do j=js,je+1
@@ -909,8 +910,8 @@ contains
     ! normal predictor states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    bl_allocate(ulz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,3)
-    bl_allocate(urz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,3)
+    call bl_allocate(ulz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
+    call bl_allocate(urz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
        do k=ks,ke+1
@@ -995,7 +996,7 @@ contains
        end select
     end if
 
-    bl_allocate(uimhz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,3)
+    call bl_allocate(uimhz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
 
     do k=ks,ke+1
        do j=js-1,je+1
@@ -1022,9 +1023,9 @@ contains
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    bl_allocate(ulyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
-    bl_allocate(uryz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
-    bl_allocate(uimhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(ulyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(uryz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(uimhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
 
     ! uimhyz loop
     do k=ks,ke
@@ -1089,9 +1090,9 @@ contains
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    bl_allocate(ulzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
-    bl_allocate(urzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
-    bl_allocate(uimhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(ulzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(urzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(uimhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
 
     ! uimhzy loop
     do k=ks,ke+1
@@ -1155,8 +1156,8 @@ contains
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    bl_allocate(vlxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
-    bl_allocate(vrxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vlxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vrxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
     ! vimhxz loop
     do k=ks,ke
@@ -1205,7 +1206,7 @@ contains
        end select
     end if
 
-    bl_allocate(vimhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vimhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
     do k=ks,ke
        do j=js-1,je+1
@@ -1222,9 +1223,9 @@ contains
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    bl_allocate(vlzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    bl_allocate(vrzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    bl_allocate(vimhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(vlzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(vrzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(vimhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     ! vimhzx loop
     do k=ks,ke+1
@@ -1288,8 +1289,8 @@ contains
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    bl_allocate(wlxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
-    bl_allocate(wrxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    call bl_allocate(wlxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    call bl_allocate(wrxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
 
     ! wimhxy loop
     do k=ks-1,ke+1
@@ -1338,7 +1339,7 @@ contains
        end select
     end if
 
-    bl_allocate(wimhxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    call bl_allocate(wimhxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
 
     do k=ks-1,ke+1
        do j=js,je
@@ -1355,8 +1356,8 @@ contains
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    bl_allocate(wlyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
-    bl_allocate(wryx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(wlyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(wryx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     ! wimhyx loop
     do k=ks-1,ke+1
@@ -1405,7 +1406,7 @@ contains
        end select
     end if
 
-    bl_allocate(wimhyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(wimhyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     do k=ks-1,ke+1
        do j=js,je+1
@@ -1425,8 +1426,8 @@ contains
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    bl_allocate(umacl,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
-    bl_allocate(umacr,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
+    call bl_allocate(umacl,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
+    call bl_allocate(umacr,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
 
     do k=ks,ke
        do j=js,je
@@ -1517,8 +1518,8 @@ contains
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    bl_allocate(vmacl,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
-    bl_allocate(vmacr,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vmacl,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vmacr,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
 
     do k=ks,ke
        do j=js,je+1
@@ -1609,8 +1610,8 @@ contains
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    bl_allocate(wmacl,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
-    bl_allocate(wmacr,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(wmacl,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(wmacr,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
 
     do k=ks,ke+1
        do j=js,je
