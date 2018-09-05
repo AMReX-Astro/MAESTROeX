@@ -1,5 +1,6 @@
 module compute_dt_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use eos_type_module
   use eos_module
   use network, only: nspec
@@ -239,7 +240,7 @@ contains
     double precision :: fx, fy, fz, eps, denom, a, b, c
     integer          :: i,j,k,r
 
-    bl_allocate(gp0_cart,lo,hi)
+    call bl_allocate(gp0_cart,lo,hi)
 
     rho_min = 1.d-20
 
@@ -372,7 +373,7 @@ contains
        enddo
     enddo
 
-    bl_deallocate(gp0_cart)
+    call bl_deallocate(gp0_cart)
 
   end subroutine estdt_sphr
 
@@ -589,7 +590,7 @@ contains
     integer pt_index(3)
     type (eos_t) :: eos_state
 
-    bl_allocate(gp0_cart,lo,hi)
+    call bl_allocate(gp0_cart,lo,hi)
 
     eps = 1.0d-8
 
@@ -708,7 +709,7 @@ contains
 
     end if
 
-    bl_deallocate(gp0_cart)
+    call bl_deallocate(gp0_cart)
 
   end subroutine firstdt_sphr
 

@@ -136,7 +136,6 @@ contains
     ! Local variables
     integer :: i,j,k
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -144,7 +143,6 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
   end subroutine make_rhcc_for_nodalproj_sphr
 
@@ -170,7 +168,6 @@ contains
     double precision :: correction_factor
 
 #if (AMREX_SPACEDIM == 3)
-    !$OMP PARALLEL DO PRIVATE(i,j,k,correction_factor)
     do k = lo(3),hi(3)
        if(k .lt. base_cutoff_density_coord(lev)) then
           correction_factor = beta0(lev,k)*(dpdt_factor/(gamma1bar(lev,k)*p0(lev,k))) / dt
@@ -183,7 +180,6 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 #elif (AMREX_SPACEDIM == 2)
     k = lo(3)
     do j = lo(2),hi(2)
@@ -239,7 +235,6 @@ contains
     integer :: i, j, k
     double precision :: correction_factor
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k,correction_factor)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -253,7 +248,6 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
   end subroutine create_correction_cc_sphr
 
@@ -306,7 +300,7 @@ contains
     if (dpdt_factor .gt. 0.0d0) then
 
        if (is_predictor .eq. 1) &
-            delta_chi = 0.d0
+            delta_chi(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.d0
 
 #if (AMREX_SPACEDIM == 3)
 
@@ -414,7 +408,7 @@ contains
 
     if (dpdt_factor .gt. 0.0d0) then
 
-       allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       bl_allocate(gamma1bar_cart,lo,hi))
        call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0, &
             r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
@@ -427,7 +421,7 @@ contains
             cc_to_r,ccr_lo,ccr_hi)
 
        if (is_predictor .eq. 1) &
-            delta_chi = 0.d0
+            delta_chi(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.d0
 
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)

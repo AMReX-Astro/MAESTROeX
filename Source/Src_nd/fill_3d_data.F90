@@ -1,6 +1,7 @@
 
 module fill_3d_data_module
 
+  use amrex_mempool_module, only : bl_allocate
   use base_state_geometry_module, only: nr_fine, max_radial_level, center, dr
   use bl_constants_module
   use meth_params_module, only: prob_lo, spherical, s0_interp_type, w0_interp_type, &
@@ -432,13 +433,13 @@ contains
 
   subroutine addw0(lev, lo, hi, &
        uedge, u_lo, u_hi, &
-       #if (AMREX_SPACEDIM >= 2)
-    vedge, v_lo, v_hi, &
-         #if (AMREX_SPACEDIM == 3)
-    wedge, w_lo, w_hi, &
-         #endif
+#if (AMREX_SPACEDIM >= 2)
+       vedge, v_lo, v_hi, &
+#if (AMREX_SPACEDIM == 3)
+       wedge, w_lo, w_hi, &
 #endif
-    w0,mult) bind(C, name="addw0")
+#endif
+       w0,mult) bind(C, name="addw0")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
@@ -599,7 +600,7 @@ contains
 
     else if (w0mac_interp_type .eq. 2) then
 
-      do k = lo(3)-1,hi(3)+1
+       do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
              y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
@@ -762,7 +763,7 @@ contains
 
     else if (w0mac_interp_type .eq. 4) then
 
-       allocate(w0_nodal(lo(1)-1:hi(1)+2,lo(2)-1:hi(2)+2,lo(3)-1:hi(3)+2,3))
+       call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
 
        do k = lo(3)-1,hi(3)+2
           z = prob_lo(3) + (dble(k))*dx(3) - center(3)
@@ -1110,13 +1111,13 @@ contains
   subroutine put_data_on_faces(lo, hi, &
        scc, cc_lo, cc_hi, &
        facex, x_lo, x_hi, &
-       #if (AMREX_SPACEDIM >= 2)
-    facey, y_lo, y_hi, &
-         #if (AMREX_SPACEDIM == 3)
-    facez, z_lo, z_hi, &
-         #endif
+#if (AMREX_SPACEDIM >= 2)
+       facey, y_lo, y_hi, &
+#if (AMREX_SPACEDIM == 3)
+       facez, z_lo, z_hi, &
 #endif
-    harmonic_avg) bind(C, name="put_data_on_faces")
+#endif
+       harmonic_avg) bind(C, name="put_data_on_faces")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: cc_lo(3), cc_hi(3)

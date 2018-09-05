@@ -20,9 +20,9 @@ module make_eta_module
 
   use bl_constants_module
   use base_state_geometry_module, only: nr_fine, dr, &
-                                        max_radial_level, numdisjointchunks, &
-                                        r_start_coord, r_end_coord, finest_radial_level, &
-                                        restrict_base, fill_ghost_base
+       max_radial_level, numdisjointchunks, &
+       r_start_coord, r_end_coord, finest_radial_level, &
+       restrict_base, fill_ghost_base
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
   implicit none
@@ -32,7 +32,7 @@ module make_eta_module
 contains
 
   subroutine make_etarho_planar(etarho_ec, etarho_cc, &
-                                  etarhosum, ncell) bind(C, name="make_etarho_planar")
+       etarhosum, ncell) bind(C, name="make_etarho_planar")
 
     double precision, intent(  out) :: etarho_ec(0:max_radial_level,0:nr_fine)
     double precision, intent(  out) :: etarho_cc(0:max_radial_level,0:nr_fine-1)
@@ -77,8 +77,8 @@ contains
   end subroutine make_etarho_planar
 
   subroutine sum_etarho(lev, domlo, domhi, lo, hi, &
-                         etarhoflux, x_lo, x_hi, &
-                         etarhosum) bind(C, name="sum_etarho")
+       etarhoflux, x_lo, x_hi, &
+       etarhosum) bind(C, name="sum_etarho")
 
     integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
@@ -89,78 +89,78 @@ contains
     integer :: i,j,k
     logical :: top_edge
 
-       ! Sum etarho
+    ! Sum etarho
 #if (AMREX_SPACEDIM == 1)
-       k = lo(3)
-       j = lo(2)
-       do i=lo(1),hi(1)
-          etarhosum(i,lev) = etarhoflux(i,j,k)
-       end do
+    k = lo(3)
+    j = lo(2)
+    do i=lo(1),hi(1)
+       etarhosum(i,lev) = etarhoflux(i,j,k)
+    end do
 
 #elif (AMREX_SPACEDIM == 2)
-       k = lo(3)
-       do j=lo(2),hi(2)
-          do i=lo(1),hi(1)
-             etarhosum(j,lev) = etarhosum(j,lev) + etarhoflux(i,j,k)
-          end do
+    k = lo(3)
+    do j=lo(2),hi(2)
+       do i=lo(1),hi(1)
+          etarhosum(j,lev) = etarhosum(j,lev) + etarhoflux(i,j,k)
        end do
+    end do
 
 #elif (AMREX_SPACEDIM == 3)
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
-                etarhosum(k,lev) = etarhosum(k,lev) + etarhoflux(i,j,k)
-             end do
+    do k=lo(3),hi(3)
+       do j=lo(2),hi(2)
+          do i=lo(1),hi(1)
+             etarhosum(k,lev) = etarhosum(k,lev) + etarhoflux(i,j,k)
           end do
        end do
+    end do
 
 #endif
 
 
-       ! we only add the contribution at the top edge if we are at the top of the domain
-       ! this prevents double counting
-       top_edge = .false.
+    ! we only add the contribution at the top edge if we are at the top of the domain
+    ! this prevents double counting
+    top_edge = .false.
 #if (AMREX_SPACEDIM == 1)
-       do k = 1,numdisjointchunks(lev)
-          if (hi(1) .eq. r_end_coord(lev,k)) then
-             top_edge = .true.
-          end if
-       end do
-       if (top_edge) then
-          k = hi(3)
-          j = hi(2)
-          i = hi(1)+1
-          etarhosum(i,lev) = etarhoflux(i,j,k)
+    do k = 1,numdisjointchunks(lev)
+       if (hi(1) .eq. r_end_coord(lev,k)) then
+          top_edge = .true.
        end if
+    end do
+    if (top_edge) then
+       k = hi(3)
+       j = hi(2)
+       i = hi(1)+1
+       etarhosum(i,lev) = etarhoflux(i,j,k)
+    end if
 
 #elif (AMREX_SPACEDIM == 2)
-       do i=1,numdisjointchunks(lev)
-          if (hi(2) .eq. r_end_coord(lev,i)) then
-             top_edge = .true.
-          end if
-       end do
-       if(top_edge) then
-          k = hi(3)
-          j = hi(2)+1
-          do i=lo(1),hi(1)
-             etarhosum(j,lev) = etarhosum(j,lev) + etarhoflux(i,j,k)
-          end do
+    do i=1,numdisjointchunks(lev)
+       if (hi(2) .eq. r_end_coord(lev,i)) then
+          top_edge = .true.
        end if
+    end do
+    if(top_edge) then
+       k = hi(3)
+       j = hi(2)+1
+       do i=lo(1),hi(1)
+          etarhosum(j,lev) = etarhosum(j,lev) + etarhoflux(i,j,k)
+       end do
+    end if
 
 #elif (AMREX_SPACEDIM == 3)
-       do i=1,numdisjointchunks(lev)
-          if (hi(3) .eq. r_end_coord(lev,i)) then
-             top_edge = .true.
-          end if
-       end do
-       if(top_edge) then
-          k=hi(3)+1
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
-                etarhosum(k,lev) = etarhosum(k,lev) + etarhoflux(i,j,k)
-             end do
-          end do
+    do i=1,numdisjointchunks(lev)
+       if (hi(3) .eq. r_end_coord(lev,i)) then
+          top_edge = .true.
        end if
+    end do
+    if(top_edge) then
+       k=hi(3)+1
+       do j=lo(2),hi(2)
+          do i=lo(1),hi(1)
+             etarhosum(k,lev) = etarhosum(k,lev) + etarhoflux(i,j,k)
+          end do
+       end do
+    end if
 
 #endif
 
@@ -171,19 +171,19 @@ contains
   !---------------------------------------------------------------------------
 
   subroutine construct_eta_cart(lo, hi, &
-                                  rho_old, ro_lo, ro_hi, &
-                                  rho_new, rn_lo, rn_hi, &
-                                  umac,     u_lo,  u_hi, &
-                                  vmac,     v_lo,  v_hi, &
-                                  wmac,     w_lo,  w_hi, &
-                                  w0macx,   x_lo,  x_hi, &
-                                  w0macy,   y_lo,  y_hi, &
-                                  w0macz,   z_lo,  z_hi, &
-                                  normal,   n_lo,  n_hi, &
-                                  eta_cart, e_lo,  e_hi, &
-                                  rho0_old, rho0_new, dx, &
-                                  r_cc_loc, r_edge_loc, &
-                                  cc_to_r, ccr_lo, ccr_hi) &
+       rho_old, ro_lo, ro_hi, &
+       rho_new, rn_lo, rn_hi, &
+       umac,     u_lo,  u_hi, &
+       vmac,     v_lo,  v_hi, &
+       wmac,     w_lo,  w_hi, &
+       w0macx,   x_lo,  x_hi, &
+       w0macy,   y_lo,  y_hi, &
+       w0macz,   z_lo,  z_hi, &
+       normal,   n_lo,  n_hi, &
+       eta_cart, e_lo,  e_hi, &
+       rho0_old, rho0_new, dx, &
+       r_cc_loc, r_edge_loc, &
+       cc_to_r, ccr_lo, ccr_hi) &
        bind(C, name="construct_eta_cart")
 
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -214,7 +214,7 @@ contains
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local
     double precision ::      rho0_nph(0:max_radial_level,0:nr_fine-1)
@@ -234,24 +234,24 @@ contains
     enddo
 
     call put_1d_array_on_cart_sphr(lo,hi,rho0_new_cart,lo,hi,1,rho0_new,dx,0,0, &
-                                     r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
+         r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
     call put_1d_array_on_cart_sphr(lo,hi,rho0_nph_cart,lo,hi,1,rho0_nph,dx,0,0, &
-                                     r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
+         r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
 
              U_dot_er = HALF*(    umac(i,j,k) +   umac(i+1,j,k) &
-                              + w0macx(i,j,k) + w0macx(i+1,j,k)) * normal(i,j,k,1) + &
-                        HALF*(    vmac(i,j,k) +   vmac(i,j+1,k) &
-                              + w0macy(i,j,k) + w0macy(i,j+1,k)) * normal(i,j,k,2) + &
-                        HALF*(    wmac(i,j,k) +   wmac(i,j,k+1) &
-                              + w0macz(i,j,k) + w0macz(i,j,k+1)) * normal(i,j,k,3)
+                  + w0macx(i,j,k) + w0macx(i+1,j,k)) * normal(i,j,k,1) + &
+                  HALF*(    vmac(i,j,k) +   vmac(i,j+1,k) &
+                  + w0macy(i,j,k) + w0macy(i,j+1,k)) * normal(i,j,k,2) + &
+                  HALF*(    wmac(i,j,k) +   wmac(i,j,k+1) &
+                  + w0macz(i,j,k) + w0macz(i,j,k+1)) * normal(i,j,k,3)
 
              ! construct time-centered [ rho' (U dot e_r) ]
              eta_cart(i,j,k) = (HALF*(rho_old(i,j,k) + rho_new(i,j,k)) - &
-                                rho0_nph_cart(i,j,k,1)) * U_dot_er
+                  rho0_nph_cart(i,j,k,1)) * U_dot_er
 
           enddo
        enddo

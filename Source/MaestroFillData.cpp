@@ -12,13 +12,13 @@ Maestro::FillPatch (Real time,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
                     const Vector<BCRec>& bcs_in)
 {
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::FillPatch()",FillPatch);
+		// timer for profiling
+		BL_PROFILE_VAR("Maestro::FillPatch()",FillPatch);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, time, mf[lev], mf_old, mf_new, srccomp, destcomp, ncomp,
-                  startbccomp, bcs_in);
-    }
+		for (int lev=0; lev<=finest_level; ++lev) {
+				FillPatch(lev, time, mf[lev], mf_old, mf_new, srccomp, destcomp, ncomp,
+				          startbccomp, bcs_in);
+		}
 }
 
 // compute a new multifab by coping in phi from valid region and filling ghost cells
@@ -34,35 +34,35 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
                     const Vector<BCRec>& bcs_in)
 {
 
-    Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
+		Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
 
-    if (lev == 0)
-    {
-        Vector<MultiFab*> smf;
-        Vector<Real> stime;
-        GetData(0, time, smf, stime, mf_old, mf_new);
+		if (lev == 0)
+		{
+				Vector<MultiFab*> smf;
+				Vector<Real> stime;
+				GetData(0, time, smf, stime, mf_old, mf_new);
 
-        PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFunctBase(phifill));
-        FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
-                             geom[lev], physbc);
-    }
-    else
-    {
-        Vector<MultiFab*> cmf, fmf;
-        Vector<Real> ctime, ftime;
-        GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
-        GetData(lev  , time, fmf, ftime, mf_old, mf_new);
+				PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFunctBase(phifill));
+				FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
+				                     geom[lev], physbc);
+		}
+		else
+		{
+				Vector<MultiFab*> cmf, fmf;
+				Vector<Real> ctime, ftime;
+				GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
+				GetData(lev, time, fmf, ftime, mf_old, mf_new);
 
-        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
-        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
+				PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
+				PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
 
-        Interpolater* mapper = &cell_cons_interp;
+				Interpolater* mapper = &cell_cons_interp;
 
-        FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
-                           srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                           cphysbc, fphysbc, refRatio(lev-1),
-                           mapper, bcs);
-    }
+				FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
+				                   srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
+				                   cphysbc, fphysbc, refRatio(lev-1),
+				                   mapper, bcs);
+		}
 }
 
 // fill an entire multifab by interpolating from the coarser level
@@ -76,26 +76,26 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
                           int srccomp, int destcomp, int ncomp,
                           const Vector<BCRec>& bcs)
 {
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::FillCoarsePatch()",FillCoarsePatch);
+		// timer for profiling
+		BL_PROFILE_VAR("Maestro::FillCoarsePatch()",FillCoarsePatch);
 
-    AMREX_ASSERT(lev > 0);
+		AMREX_ASSERT(lev > 0);
 
-    Vector<MultiFab*> cmf;
-    Vector<Real> ctime;
-    GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
+		Vector<MultiFab*> cmf;
+		Vector<Real> ctime;
+		GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
 
-    if (cmf.size() != 1) {
-        Abort("FillCoarsePatch: how did this happen?");
-    }
+		if (cmf.size() != 1) {
+				Abort("FillCoarsePatch: how did this happen?");
+		}
 
-    PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
-    PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
+		PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
+		PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
 
-    Interpolater* mapper = &cell_cons_interp;
-    InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                          cphysbc, fphysbc, refRatio(lev-1),
-                          mapper, bcs);
+		Interpolater* mapper = &cell_cons_interp;
+		InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
+		                      cphysbc, fphysbc, refRatio(lev-1),
+		                      mapper, bcs);
 }
 
 // utility to copy in data from mf_old and/or mf_new into mf
@@ -111,31 +111,31 @@ Maestro::GetData (int lev, Real time,
                   Vector<MultiFab>& mf_old,
                   Vector<MultiFab>& mf_new)
 {
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::GetData()",GetData);
+		// timer for profiling
+		BL_PROFILE_VAR("Maestro::GetData()",GetData);
 
-    mf.clear();
-    mftime.clear();
+		mf.clear();
+		mftime.clear();
 
-    const Real teps = (t_new - t_old) * 1.e-3;
+		const Real teps = (t_new - t_old) * 1.e-3;
 
-    if (time >= t_new - teps && time <= t_new + teps)
-    {
-        mf.push_back(&mf_new[lev]);
-        mftime.push_back(t_new);
-    }
-    else if (time >= t_old - teps && time <= t_old + teps)
-    {
-        mf.push_back(&mf_old[lev]);
-        mftime.push_back(t_old);
-    }
-    else
-    {
-        mf.push_back(&mf_old[lev]);
-        mf.push_back(&mf_new[lev]);
-        mftime.push_back(t_old);
-        mftime.push_back(t_new);
-    }
+		if (time >= t_new - teps && time <= t_new + teps)
+		{
+				mf.push_back(&mf_new[lev]);
+				mftime.push_back(t_new);
+		}
+		else if (time >= t_old - teps && time <= t_old + teps)
+		{
+				mf.push_back(&mf_old[lev]);
+				mftime.push_back(t_old);
+		}
+		else
+		{
+				mf.push_back(&mf_old[lev]);
+				mf.push_back(&mf_new[lev]);
+				mftime.push_back(t_old);
+				mftime.push_back(t_new);
+		}
 }
 
 // set covered coarse cells to be the average of overlying fine cells
@@ -144,35 +144,35 @@ Maestro::AverageDown (Vector<MultiFab>& mf,
                       int comp,
                       int ncomp)
 {
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::AverageDown()",AverageDown);
+		// timer for profiling
+		BL_PROFILE_VAR("Maestro::AverageDown()",AverageDown);
 
-    for (int lev = finest_level-1; lev >= 0; --lev) {
-        average_down(mf[lev+1], mf[lev],
-                     geom[lev+1], geom[lev],
-                     comp, ncomp, refRatio(lev));
-    }
+		for (int lev = finest_level-1; lev >= 0; --lev) {
+				average_down(mf[lev+1], mf[lev],
+				             geom[lev+1], geom[lev],
+				             comp, ncomp, refRatio(lev));
+		}
 }
 
 // set covered faces to be the average of overlying fine faces
 void
 Maestro::AverageDownFaces (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge)
 {
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::AverageDownFaces()",AverageDownFaces);
+		// timer for profiling
+		BL_PROFILE_VAR("Maestro::AverageDownFaces()",AverageDownFaces);
 
-    for (int lev = finest_level-1; lev >= 0; --lev) {
+		for (int lev = finest_level-1; lev >= 0; --lev) {
 
-        Vector<const MultiFab*> edge_f(AMREX_SPACEDIM);
-        Vector<      MultiFab*> edge_c(AMREX_SPACEDIM);
+				Vector<const MultiFab*> edge_f(AMREX_SPACEDIM);
+				Vector<      MultiFab*> edge_c(AMREX_SPACEDIM);
 
-        for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
-            edge_f[dir] = &(edge[lev+1][dir]);
-            edge_c[dir] = &(edge[lev  ][dir]);
-        }
+				for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
+						edge_f[dir] = &(edge[lev+1][dir]);
+						edge_c[dir] = &(edge[lev  ][dir]);
+				}
 
-        average_down_faces(edge_f, edge_c, refRatio(lev));
-    }
+				average_down_faces(edge_f, edge_c, refRatio(lev));
+		}
 
 }
 
@@ -183,189 +183,188 @@ void
 Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         int level)
 {
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::FillUmacGhost()",FillUmacGhost);
+		// timer for profiling
+		BL_PROFILE_VAR("Maestro::FillUmacGhost()",FillUmacGhost);
 
-    int start_lev;
-    int end_lev;
-    if (level == -1) {
-        start_lev = 0;
-        end_lev = finest_level;
-    }
-    else {
-        start_lev = level;
-        end_lev = level;
-    }
+		int start_lev;
+		int end_lev;
+		if (level == -1) {
+				start_lev = 0;
+				end_lev = finest_level;
+		}
+		else {
+				start_lev = level;
+				end_lev = level;
+		}
 
-    for (int lev=start_lev; lev<=end_lev; ++lev) {
+		for (int lev=start_lev; lev<=end_lev; ++lev) {
 
-        // Get the index space of the domain
-        const Box& domainBox = geom[lev].Domain();
+				// Get the index space of the domain
+				const Box& domainBox = geom[lev].Domain();
 
-        // get references to the MultiFabs at level lev
-        MultiFab& sold_mf = sold[lev];  // need a cell-centered MF for the MFIter
-        MultiFab& umacx_mf = umac[lev][0];
-        MultiFab& umacy_mf = umac[lev][1];
+				// get references to the MultiFabs at level lev
+				MultiFab& sold_mf = sold[lev]; // need a cell-centered MF for the MFIter
+				MultiFab& umacx_mf = umac[lev][0];
+				MultiFab& umacy_mf = umac[lev][1];
 #if (AMREX_SPACEDIM == 3)
-        MultiFab& umacz_mf = umac[lev][2];
+				MultiFab& umacz_mf = umac[lev][2];
 #endif
-        // NOTE: I *think* this needs a growntilebox so it can reach 2 layers of ghost cells 
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
-            // Get the index space of the valid (cell-centered) region
-            const Box& grownbox = mfi.growntilebox(2);
+						// Get the index space of the valid (cell-centered) region
+						const Box& tilebox = mfi.tilebox();
 
-            fill_umac_ghost(ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                            ARLIM_3D(grownbox.loVect()), ARLIM_3D(grownbox.hiVect()),
-                            BL_TO_FORTRAN_3D(umacx_mf[mfi]),
-                            BL_TO_FORTRAN_3D(umacy_mf[mfi]),
+						fill_umac_ghost(ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
+						                ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+						                BL_TO_FORTRAN_3D(umacx_mf[mfi]),
+						                BL_TO_FORTRAN_3D(umacy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                            BL_TO_FORTRAN_3D(umacz_mf[mfi]),
+						                BL_TO_FORTRAN_3D(umacz_mf[mfi]),
 #endif
-                            phys_bc.dataPtr());
+						                phys_bc.dataPtr());
 
-        }
-    }
+				}
+		}
 }
 
 // fill in all ghost cells for an edge-based MAC velocity field
 void
 Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
 {
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::FillPatchUedge()",FillPatchUedge);
+		// timer for profiling
+		BL_PROFILE_VAR("Maestro::FillPatchUedge()",FillPatchUedge);
 
-    // in IAMR and original MAESTRO this routine was called "create_umac_grown"
+		// in IAMR and original MAESTRO this routine was called "create_umac_grown"
 
-    int nGrow = uedge[0][0].nGrow();
+		int nGrow = uedge[0][0].nGrow();
 
-    for (int lev=0; lev<= finest_level; ++lev) {
+		for (int lev=0; lev<= finest_level; ++lev) {
 
-        // for refined levels we need to "fillpatch" the MAC velocity field
-        if (lev > 0) {
+				// for refined levels we need to "fillpatch" the MAC velocity field
+				if (lev > 0) {
 
-            // create a BoxArray whose boxes include only the cell-centered ghost cells
-            // associated with the fine grids
-            BoxList f_bndry_bl = amrex::GetBndryCells(grids[lev],nGrow);
-            BoxArray f_bndry_ba(std::move(f_bndry_bl));
-            f_bndry_ba.maxSize(32);
+						// create a BoxArray whose boxes include only the cell-centered ghost cells
+						// associated with the fine grids
+						BoxList f_bndry_bl = amrex::GetBndryCells(grids[lev],nGrow);
+						BoxArray f_bndry_ba(std::move(f_bndry_bl));
+						f_bndry_ba.maxSize(32);
 
-            // create a coarsened version of the fine ghost cell BoxArray
-            BoxArray c_bndry_ba = f_bndry_ba;
-            c_bndry_ba.coarsen(refRatio(lev-1));
+						// create a coarsened version of the fine ghost cell BoxArray
+						BoxArray c_bndry_ba = f_bndry_ba;
+						c_bndry_ba.coarsen(refRatio(lev-1));
 
-            // recreate the fine ghost cell BoxArray so it overlaps perfectly
-            // with the coarse ghost cell BoxArray
-            // (if there was an odd number of fine ghost cells previously this
-            // makes the coarse and fine BoxArrays cover the same physical locations)
-            f_bndry_ba = c_bndry_ba;
-            f_bndry_ba.refine(refRatio(lev-1));
+						// recreate the fine ghost cell BoxArray so it overlaps perfectly
+						// with the coarse ghost cell BoxArray
+						// (if there was an odd number of fine ghost cells previously this
+						// makes the coarse and fine BoxArrays cover the same physical locations)
+						f_bndry_ba = c_bndry_ba;
+						f_bndry_ba.refine(refRatio(lev-1));
 
-            for (int dir = 0; dir < BL_SPACEDIM; ++dir) {
-                // crse_src & fine_src must have same parallel distribution.
-                // We'll use the KnapSack distribution for the fine_src_ba.
-                // Since fine_src_ba should contain more points, this'll lead
-                // to a better distribution.
-                BoxArray crse_src_ba(c_bndry_ba);
-                BoxArray fine_src_ba(f_bndry_ba);
+						for (int dir = 0; dir < BL_SPACEDIM; ++dir) {
+								// crse_src & fine_src must have same parallel distribution.
+								// We'll use the KnapSack distribution for the fine_src_ba.
+								// Since fine_src_ba should contain more points, this'll lead
+								// to a better distribution.
+								BoxArray crse_src_ba(c_bndry_ba);
+								BoxArray fine_src_ba(f_bndry_ba);
 
-                // grow BoxArrays nodally
-                crse_src_ba.surroundingNodes(dir);
-                fine_src_ba.surroundingNodes(dir);
+								// grow BoxArrays nodally
+								crse_src_ba.surroundingNodes(dir);
+								fine_src_ba.surroundingNodes(dir);
 
-                // number of boxes and weights used for KnapSack distribution
-                const int N = fine_src_ba.size();
-                std::vector<long> wgts(N);
+								// number of boxes and weights used for KnapSack distribution
+								const int N = fine_src_ba.size();
+								std::vector<long> wgts(N);
 
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-                // set weights equal to number of points in the box
-                for (int i = 0; i < N; ++i) {
-                    wgts[i] = fine_src_ba[i].numPts();
-                }
+								// set weights equal to number of points in the box
+								for (int i = 0; i < N; ++i) {
+										wgts[i] = fine_src_ba[i].numPts();
+								}
 
-                // This DM won't be put into the cache.
-                DistributionMapping dm;
-                dm.KnapSackProcessorMap(wgts,ParallelDescriptor::NProcs());
+								// This DM won't be put into the cache.
+								DistributionMapping dm;
+								dm.KnapSackProcessorMap(wgts,ParallelDescriptor::NProcs());
 
-                // allocate coarse and fine umac in the boundary region
-                MultiFab crse_src;
-                MultiFab fine_src;
+								// allocate coarse and fine umac in the boundary region
+								MultiFab crse_src;
+								MultiFab fine_src;
 
-                crse_src.define(crse_src_ba, dm, 1, 0);
-                fine_src.define(fine_src_ba, dm, 1, 0);
+								crse_src.define(crse_src_ba, dm, 1, 0);
+								fine_src.define(fine_src_ba, dm, 1, 0);
 
-                crse_src.setVal(1.e200);
-                fine_src.setVal(1.e200);
+								crse_src.setVal(1.e200);
+								fine_src.setVal(1.e200);
 
-                // We want to fill crse_src from coarse uedge
-                crse_src.copy(uedge[lev-1][dir],0,0,1,1,0);
+								// We want to fill crse_src from coarse uedge
+								crse_src.copy(uedge[lev-1][dir],0,0,1,1,0);
 
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-                for (MFIter mfi(crse_src); mfi.isValid(); ++mfi) {
-                    const int  nComp = 1;
-                    const Box& box   = crse_src[mfi].box();
-                    IntVect rr = refRatio(lev-1);
-                    const int* rat = rr.getVect();
-                    // For edge-based data, fill fine values with piecewise-constant interp of coarse data.
-                    // Operate only on faces that overlap--ie, only fill the fine faces that make up each
-                    // coarse face, leave the in-between faces alone.
-                    PC_EDGE_INTERP(box.loVect(), box.hiVect(), &nComp, rat, &dir,
-                                   BL_TO_FORTRAN_FAB(crse_src[mfi]),
-                                   BL_TO_FORTRAN_FAB(fine_src[mfi]));
-                }
-                crse_src.clear();
-                //
-                // Replace pc-interpd fine data with preferred u_mac data at
-                // this level u_mac valid only on surrounding faces of valid
-                // region - this op will not fill grow region.
-                //
-                fine_src.copy(uedge[lev][dir]);
-                //
-                // Interpolate unfilled grow cells using best data from
-                // surrounding faces of valid region, and pc-interpd data
-                // on fine edges overlaying coarse edges.
-                //
+								for (MFIter mfi(crse_src); mfi.isValid(); ++mfi) {
+										const int nComp = 1;
+										const Box& box   = crse_src[mfi].box();
+										IntVect rr = refRatio(lev-1);
+										const int* rat = rr.getVect();
+										// For edge-based data, fill fine values with piecewise-constant interp of coarse data.
+										// Operate only on faces that overlap--ie, only fill the fine faces that make up each
+										// coarse face, leave the in-between faces alone.
+										PC_EDGE_INTERP(box.loVect(), box.hiVect(), &nComp, rat, &dir,
+										               BL_TO_FORTRAN_FAB(crse_src[mfi]),
+										               BL_TO_FORTRAN_FAB(fine_src[mfi]));
+								}
+								crse_src.clear();
+								//
+								// Replace pc-interpd fine data with preferred u_mac data at
+								// this level u_mac valid only on surrounding faces of valid
+								// region - this op will not fill grow region.
+								//
+								fine_src.copy(uedge[lev][dir]);
+								//
+								// Interpolate unfilled grow cells using best data from
+								// surrounding faces of valid region, and pc-interpd data
+								// on fine edges overlaying coarse edges.
+								//
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-                for (MFIter mfi(fine_src); mfi.isValid(); ++mfi) {
-                    const int  nComp = 1;
-                    const Box& fbox  = fine_src[mfi].box();
-                    IntVect rr = refRatio(lev-1);
-                    const int* rat = rr.getVect();
-                    // Do linear in dir, pc transverse to dir, leave alone the fine values
-                    // lining up with coarse edges--assume these have been set to hold the
-                    // values you want to interpolate to the rest.
-                    EDGE_INTERP(fbox.loVect(), fbox.hiVect(), &nComp, rat, &dir,
-                                BL_TO_FORTRAN_FAB(fine_src[mfi]));
-                }
+								for (MFIter mfi(fine_src); mfi.isValid(); ++mfi) {
+										const int nComp = 1;
+										const Box& fbox  = fine_src[mfi].box();
+										IntVect rr = refRatio(lev-1);
+										const int* rat = rr.getVect();
+										// Do linear in dir, pc transverse to dir, leave alone the fine values
+										// lining up with coarse edges--assume these have been set to hold the
+										// values you want to interpolate to the rest.
+										EDGE_INTERP(fbox.loVect(), fbox.hiVect(), &nComp, rat, &dir,
+										            BL_TO_FORTRAN_FAB(fine_src[mfi]));
+								}
 
-                // make a copy of the original fine uedge but with no ghost cells
-                MultiFab uedge_f_save(uedge[lev][dir].boxArray(),uedge[lev][dir].DistributionMap(), 1,0);
-                uedge_f_save.copy(uedge[lev][dir]);
+								// make a copy of the original fine uedge but with no ghost cells
+								MultiFab uedge_f_save(uedge[lev][dir].boxArray(),uedge[lev][dir].DistributionMap(), 1,0);
+								uedge_f_save.copy(uedge[lev][dir]);
 
-                // copy in the grown data into fine uedge
-                uedge[lev][dir].copy(fine_src,0,0,1,0,nGrow);
+								// copy in the grown data into fine uedge
+								uedge[lev][dir].copy(fine_src,0,0,1,0,nGrow);
 
-                // copy the original valid region back into uedge
-                // to we don't change the values on the C-F interface
-                uedge[lev][dir].copy(uedge_f_save);
-            }
+								// copy the original valid region back into uedge
+								// to we don't change the values on the C-F interface
+								uedge[lev][dir].copy(uedge_f_save);
+						}
 
-        } // end if
+				} // end if
 
-	// fill periodic ghost cells
-	for (int d=0; d<AMREX_SPACEDIM; ++d) {
-	    uedge[lev][d].FillBoundary(geom[lev].periodicity());
-	}
+				// fill periodic ghost cells
+				for (int d=0; d<AMREX_SPACEDIM; ++d) {
+						uedge[lev][d].FillBoundary(geom[lev].periodicity());
+				}
 
-	// fill ghost cells behind physical boundaries
-	FillUmacGhost(uedge,lev);
+				// fill ghost cells behind physical boundaries
+				FillUmacGhost(uedge,lev);
 
-    } // end loop over levels
+		} // end loop over levels
 
 }

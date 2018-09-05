@@ -17,10 +17,10 @@ contains
 
 #if (AMREX_SPACEDIM == 1)
   subroutine mkutrans_1d(lev, domlo, domhi, lo, hi, &
-                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                         ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
-                         utrans, uu_lo, uu_hi, &
-                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_1d")
+       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
+       utrans, uu_lo, uu_hi, &
+       w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_1d")
 
     integer         , intent(in   ) :: lev, domlo(1), domhi(1), lo(1), hi(1)
     integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut
@@ -34,7 +34,7 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(1), dt
     integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
-    
+
     double precision, allocatable :: slopex(:,:)
 
     double precision, allocatable :: Ip(:)
@@ -48,26 +48,26 @@ contains
 
     logical :: test
 
-    allocate(slopex(lo(1)-1:hi(1)+1,1))
-    
-    allocate(ulx(lo(1):hi(1)+1))
-    allocate(urx(lo(1):hi(1)+1))
+    bl_allocate(slopex,lo(1)-1,hi(1)+1)
 
-    allocate(Ip(lo(1)-1:hi(1)+1))
-    allocate(Im(lo(1)-1:hi(1)+1))
+    bl_allocate(ulx,lo(1),hi(1)+1)
+    bl_allocate(urx,lo(1),hi(1)+1)
+
+    bl_allocate(Ip,lo(1)-1,hi(1)+1)
+    bl_allocate(Im,lo(1)-1,hi(1)+1)
 
     is = lo(1)
     ie = hi(1)
-    
+
     dt2 = HALF*dt
-    
+
     hx = dx(1)
-    
+
     if (ppm_type .eq. 0) then
        call slopex_1d(utilde(:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_1d(utilde(:,1),ng_ut,ufull(:,1),ng_uf,Ip,Im, &
-                   domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+            domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
     end if
 
 
@@ -101,13 +101,13 @@ contains
        case (Outflow)
           ulx(is) = min(urx(is),ZERO)
           urx(is) = ulx(is)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_1d: invalid boundary type phys_bc(1,1)")
        end select
     end if
 
-    ! impose hi i side bc's    
+    ! impose hi i side bc's
     if (hi(1) .eq. domhi(1)) then
        select case(phys_bc(1,2))
        case (Inflow)
@@ -119,7 +119,7 @@ contains
        case (Outflow)
           ulx(ie+1) = max(ulx(ie+1),ZERO)
           urx(ie+1) = ulx(ie+1)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_1d: invalid boundary type phys_bc(1,2)")
        end select
@@ -129,7 +129,7 @@ contains
        ! solve Riemann problem using full velocity
        uavg = HALF*(ulx(i)+urx(i))
        test = ((ulx(i)+w0(lev,i) .le. ZERO .and. urx(i)+w0(lev,i) .ge. ZERO) .or. &
-               (abs(ulx(i)+urx(i)+TWO*w0(lev,i)) .lt. rel_eps))
+            (abs(ulx(i)+urx(i)+TWO*w0(lev,i)) .lt. rel_eps))
        utrans(i) = merge(ulx(i),urx(i),uavg+w0(lev,i) .gt. ZERO)
        utrans(i) = merge(ZERO,utrans(i),test)
     end do
@@ -139,11 +139,11 @@ contains
 
 #if (AMREX_SPACEDIM == 2)
   subroutine mkutrans_2d(lev, domlo, domhi, lo, hi, &
-                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                         ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
-                         utrans, uu_lo, uu_hi, &
-                         vtrans, uv_lo, uv_hi, &
-                         w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
+       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
+       utrans, uu_lo, uu_hi, &
+       vtrans, uv_lo, uv_hi, &
+       w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
 
     integer         , intent(in   ) :: lev, domlo(2), domhi(2), lo(2), hi(2)
     integer         , intent(in   ) :: ut_lo(2), ut_hi(2), nc_ut
@@ -159,7 +159,7 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(2), dt
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
-    
+
     double precision, allocatable :: slopex(:,:,:)
     double precision, allocatable :: slopey(:,:,:)
 
@@ -175,35 +175,35 @@ contains
 
     logical :: test
 
-    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1))
-    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1))
-    
-    allocate(ulx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1))
-    allocate(urx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1))
+    bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1)
+    bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1)
 
-    allocate(vly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1))
-    allocate(vry(lo(1)-1:hi(1)+1,lo(2):hi(2)+1))
+    bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
+    bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
 
-    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
-    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,2))
+    bl_allocate(vly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
+    bl_allocate(vry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
+
+    bl_allocate(Ip,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
+    bl_allocate(Im,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,2)
 
     is = lo(1)
     js = lo(2)
     ie = hi(1)
     je = hi(2)
-    
+
     dt2 = HALF*dt
-    
+
     hx = dx(1)
     hy = dx(2)
-    
+
     if (ppm_type .eq. 0) then
        call slopex_2d(utilde(:,:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
        call slopey_2d(utilde(:,:,2:2),slopey,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_2d(utilde(:,:,1),ng_ut, &
-                   ufull(:,:,1),ufull(:,:,2),ng_uf, &
-                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+            ufull(:,:,1),ufull(:,:,2),ng_uf, &
+            Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
     end if
 
     !******************************************************************
@@ -227,7 +227,7 @@ contains
           end do
        end do
     end if
-    
+
     ! impose lo i side bc's
     if (lo(1) .eq. domlo(1)) then
        select case(phys_bc(1,1))
@@ -240,14 +240,14 @@ contains
        case (Outflow)
           ulx(is,js:je) = min(urx(is,js:je),ZERO)
           urx(is,js:je) = ulx(is,js:je)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_2d: invalid boundary type phys_bc(1,1)")
        end select
     end if
 
-    ! impose hi i side bc's  
-    if (hi(1) .eq. domhi(1)) then  
+    ! impose hi i side bc's
+    if (hi(1) .eq. domhi(1)) then
        select case(phys_bc(1,2))
        case (Inflow)
           ulx(ie+1,js:je) = utilde(ie+1,js:je,1)
@@ -258,7 +258,7 @@ contains
        case (Outflow)
           ulx(ie+1,js:je) = max(ulx(ie+1,js:je),ZERO)
           urx(ie+1,js:je) = ulx(ie+1,js:je)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_2d: invalid boundary type phys_bc(1,2)")
        end select
@@ -280,8 +280,8 @@ contains
     !******************************************************************
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_2d(utilde(:,:,2),ng_ut, &
-                   ufull(:,:,1),ufull(:,:,2),ng_uf, &
-                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+            ufull(:,:,1),ufull(:,:,2),ng_uf, &
+            Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
     end if
 
     if (ppm_type .eq. 0) then
@@ -315,7 +315,7 @@ contains
        case (Outflow)
           vly(is:ie,js) = min(vry(is:ie,js),ZERO)
           vry(is:ie,js) = vly(is:ie,js)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_2d: invalid boundary type phys_bc(2,1)")
        end select
@@ -333,7 +333,7 @@ contains
        case (Outflow)
           vly(is:ie,je+1) = max(vly(is:ie,je+1),ZERO)
           vry(is:ie,je+1) = vly(is:ie,je+1)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_2d: invalid boundary type phys_bc(2,2)")
        end select
@@ -355,16 +355,16 @@ contains
 
 #if (AMREX_SPACEDIM == 3)
   subroutine mkutrans_3d(lev, domlo, domhi, lo, hi, &
-                         utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-                         ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
-                         utrans, uu_lo, uu_hi, &
-                         vtrans, uv_lo, uv_hi, &
-                         wtrans, uw_lo, uw_hi, &
-                         w0macx, wx_lo, wx_hi, &
-                         w0macy, wy_lo, wy_hi, &
-                         w0macz, wz_lo, wz_hi, &
-                         w0, &
-                         dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
+       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
+       utrans, uu_lo, uu_hi, &
+       vtrans, uv_lo, uv_hi, &
+       wtrans, uw_lo, uw_hi, &
+       w0macx, wx_lo, wx_hi, &
+       w0macy, wy_lo, wy_hi, &
+       w0macz, wz_lo, wz_hi, &
+       w0, &
+       dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
 
     integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut
@@ -388,30 +388,30 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3), dt
     integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
-    
+
     double precision, allocatable :: slopex(:,:,:,:)
     double precision, allocatable :: slopey(:,:,:,:)
     double precision, allocatable :: slopez(:,:,:,:)
-    
+
     double precision, allocatable :: Ip(:,:,:,:)
     double precision, allocatable :: Im(:,:,:,:)
-    
+
     double precision hx,hy,hz,dt2,uavg
-    
+
     logical :: test
 
     integer :: i,j,k,is,js,ks,ie,je,ke
-    
+
     double precision, allocatable:: ulx(:,:,:),urx(:,:,:)
     double precision, allocatable:: vly(:,:,:),vry(:,:,:)
     double precision, allocatable:: wlz(:,:,:),wrz(:,:,:)
 
-    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
-    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
-    allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
+    bl_allocate(slopex,lo-1,hi+1)
+    bl_allocate(slopey,lo-1,hi+1)
+    bl_allocate(slopez,lo-1,hi+1)
 
-    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
-    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    bl_allocate(Ip,lo-1,hi+1,3)
+    bl_allocate(Im,lo-1,hi+1,3)
 
     is = lo(1)
     js = lo(2)
@@ -419,13 +419,13 @@ contains
     ie = hi(1)
     je = hi(2)
     ke = hi(3)
-    
+
     dt2 = HALF*dt
-    
+
     hx = dx(1)
     hy = dx(2)
     hz = dx(3)
-    
+
     if (ppm_type .eq. 0) then
        do k = lo(3)-1,hi(3)+1
           call slopex_2d(utilde(:,:,k,1:1),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
@@ -434,16 +434,16 @@ contains
        call slopez_3d(utilde(:,:,:,3:3),slopez,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,3:3))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_3d(utilde(:,:,:,1),ng_ut, &
-                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+            ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+            Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
     end if
-    
+
     !******************************************************************
     ! create utrans
     !******************************************************************
 
-    allocate(ulx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(urx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
+    bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (ppm_type .eq. 0) then
        do k=ks,ke
@@ -468,7 +468,7 @@ contains
           end do
        end do
     end if
-    
+
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
        select case(phys_bc(1,1))
@@ -481,14 +481,14 @@ contains
        case (Outflow)
           ulx(is,js:je,ks:ke) = min(urx(is,js:je,ks:ke),ZERO)
           urx(is,js:je,ks:ke) = ulx(is,js:je,ks:ke)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_3d: invalid boundary type phys_bc(1,1)")
        end select
     end if
 
     ! impose hi side bc's
-    if (hi(1) .eq. domhi(1)) then  
+    if (hi(1) .eq. domhi(1)) then
        select case(phys_bc(1,2))
        case (Inflow)
           ulx(ie+1,js:je,ks:ke) = utilde(ie+1,js:je,ks:ke,1)
@@ -499,7 +499,7 @@ contains
        case (Outflow)
           ulx(ie+1,js:je,ks:ke) = max(ulx(ie+1,js:je,ks:ke),ZERO)
           urx(ie+1,js:je,ks:ke) = ulx(ie+1,js:je,ks:ke)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_3d: invalid boundary type phys_bc(1,2)")
        end select
@@ -540,12 +540,12 @@ contains
 
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_3d(utilde(:,:,:,2),ng_ut, &
-                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+            ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+            Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
     end if
 
-    allocate(vly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(vry(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
+    bl_allocate(vly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    bl_allocate(vry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (ppm_type .eq. 0) then
        do k=ks,ke
@@ -583,7 +583,7 @@ contains
        case (Outflow)
           vly(is:ie,js,ks:ke) = min(vry(is:ie,js,ks:ke),ZERO)
           vry(is:ie,js,ks:ke) = vly(is:ie,js,ks:ke)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_3d: invalid boundary type phys_bc(2,1)")
        end select
@@ -601,12 +601,12 @@ contains
        case (Outflow)
           vly(is:ie,je+1,ks:ke) = max(vly(is:ie,je+1,ks:ke),ZERO)
           vry(is:ie,je+1,ks:ke) = vly(is:ie,je+1,ks:ke)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_3d: invalid boundary type phys_bc(2,2)")
        end select
     end if
-    
+
     if (spherical .eq. 1) then
        do k=ks,ke
           do j=js,je+1
@@ -642,12 +642,12 @@ contains
 
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_3d(utilde(:,:,:,3),ng_ut, &
-                   ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-                   Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
+            ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+            Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
     end if
 
-    allocate(wlz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
-    allocate(wrz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
+    bl_allocate(wlz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    bl_allocate(wrz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     if (ppm_type .eq. 0) then
        do k=ks,ke+1
@@ -685,7 +685,7 @@ contains
        case (Outflow)
           wlz(is:ie,js:je,ks) = min(wrz(is:ie,js:je,ks),ZERO)
           wrz(is:ie,js:je,ks) = wlz(is:ie,js:je,ks)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_3d: invalid boundary type phys_bc(3,1)")
        end select
@@ -703,12 +703,12 @@ contains
        case (Outflow)
           wlz(is:ie,js:je,ke+1) = max(wlz(is:ie,js:je,ke+1),ZERO)
           wrz(is:ie,js:je,ke+1) = wlz(is:ie,js:je,ke+1)
-       case (Interior) 
+       case (Interior)
        case  default
           call bl_error("mkutrans_3d: invalid boundary type phys_bc(3,2)")
        end select
     end if
-    
+
     if (spherical .eq. 1) then
        do k=ks,ke+1
           do j=js,je
@@ -740,5 +740,5 @@ contains
 
   end subroutine mkutrans_3d
 #endif
-  
+
 end module mkutrans_module

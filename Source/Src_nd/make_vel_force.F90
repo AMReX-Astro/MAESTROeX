@@ -12,17 +12,17 @@ module make_vel_force_module
 contains
 
   subroutine make_vel_force(lev, lo, hi, &
-                            vel_force, f_lo, f_hi, nc_f, &
-                            gpi, g_lo, g_hi, nc_g, &
-                            rho, r_lo, r_hi, &
-                            uedge, u_lo, u_hi, &
-                            vedge, v_lo, v_hi, &
+       vel_force, f_lo, f_hi, nc_f, &
+       gpi, g_lo, g_hi, nc_g, &
+       rho, r_lo, r_hi, &
+       uedge, u_lo, u_hi, &
+       vedge, v_lo, v_hi, &
 #if (AMREX_SPACEDIM == 3)
-                            wedge, w_lo, w_hi, &
+       wedge, w_lo, w_hi, &
 #endif
-                            w0,w0_force,rho0,grav, &
-                            do_add_utilde_force) &
-                            bind(C, name="make_vel_force")
+       w0,w0_force,rho0,grav, &
+       do_add_utilde_force) &
+       bind(C, name="make_vel_force")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: f_lo(3), f_hi(3), nc_f
@@ -51,91 +51,91 @@ contains
     integer :: i,j,k,r
     double precision :: rhopert
 
-    vel_force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),1:nc_f) = 0.d0
+    vel_force(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_f) = 0.d0
 
     do k = lo(3),hi(3)
-    do j = lo(2),hi(2)
-    do i = lo(1),hi(1)
+       do j = lo(2),hi(2)
+          do i = lo(1),hi(1)
 
 #if (AMREX_SPACEDIM == 1)
-       r = i
+             r = i
 #elif (AMREX_SPACEDIM == 2)
-       r = j
+             r = j
 #elif (AMREX_SPACEDIM == 3)
-       r = k
+             r = k
 #endif
 
-       rhopert = rho(i,j,k) - rho0(lev,r)
+             rhopert = rho(i,j,k) - rho0(lev,r)
 
-       ! cutoff the buoyancy term if we are outside of the star
-       if (rho(i,j,k) .lt. buoyancy_cutoff_factor*base_cutoff_density) then
-          rhopert = 0.d0
-       end if
+             ! cutoff the buoyancy term if we are outside of the star
+             if (rho(i,j,k) .lt. buoyancy_cutoff_factor*base_cutoff_density) then
+                rhopert = 0.d0
+             end if
 
-       ! note: if use_alt_energy_fix = T, then gphi is already
-       ! weighted by beta0
-       vel_force(i,j,k,1:AMREX_SPACEDIM-1) = - gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k)
+             ! note: if use_alt_energy_fix = T, then gphi is already
+             ! weighted by beta0
+             vel_force(i,j,k,1:AMREX_SPACEDIM-1) = - gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k)
 
-       vel_force(i,j,k,AMREX_SPACEDIM) = &
-            ( rhopert * grav(lev,r) - gpi(i,j,k,AMREX_SPACEDIM) ) / rho(i,j,k) - w0_force(lev,r)
+             vel_force(i,j,k,AMREX_SPACEDIM) = &
+                  ( rhopert * grav(lev,r) - gpi(i,j,k,AMREX_SPACEDIM) ) / rho(i,j,k) - w0_force(lev,r)
 
-    end do
-    end do
+          end do
+       end do
     end do
 
     if (do_add_utilde_force .eq. 1) then
        do k=lo(3),hi(3)
-       do j=lo(2),hi(2)
-       do i=lo(1),hi(1)
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
 
 #if (AMREX_SPACEDIM == 1)
-       r = i
+                r = i
 #elif (AMREX_SPACEDIM == 2)
-       r = j
+                r = j
 #elif (AMREX_SPACEDIM == 3)
-       r = k
+                r = k
 #endif
 
-             if (r .le. -1) then
-                ! do not modify force since dw0/dr=0
-             else if (r .ge. nr(lev)) then
-                ! do not modify force since dw0/dr=0
-             else
+                if (r .le. -1) then
+                   ! do not modify force since dw0/dr=0
+                else if (r .ge. nr(lev)) then
+                   ! do not modify force since dw0/dr=0
+                else
 
 #if (AMREX_SPACEDIM == 2)
-                vel_force(i,j,k,2) = vel_force(i,j,k,2) &
-                     - (vedge(i,j+1,k)+vedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
+                   vel_force(i,j,k,2) = vel_force(i,j,k,2) &
+                        - (vedge(i,j+1,k)+vedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
 
 #else
-                vel_force(i,j,k,3) = vel_force(i,j,k,3) &
-                     - (wedge(i,j,k+1)+wedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
+                   vel_force(i,j,k,3) = vel_force(i,j,k,3) &
+                        - (wedge(i,j,k+1)+wedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
 
 #endif
-             end if
+                end if
 
-       end do
-       end do
+             end do
+          end do
        end do
     endif
 
   end subroutine make_vel_force
 
   subroutine make_vel_force_sphr(lo, hi, &
-                                 vel_force, f_lo, f_hi, nc_f, &
-                                 gpi, g_lo, g_hi, nc_g, &
-                                 rho, r_lo, r_hi, &
-                                 uedge, u_lo, u_hi, &
-                                 vedge, v_lo, v_hi, &
-                                 wedge, w_lo, w_hi, &
-                                 normal, n_lo, n_hi, nc_n, &
-                                 gradw0_cart, gw_lo, gw_hi, &
-                                 w0_force_cart, wf_lo, wf_hi, nc_wf, &
-                                 rho0, grav, &
-                                 dx, &
-                                 r_cc_loc, r_edge_loc, &
-                                 cc_to_r, ccr_lo, ccr_hi, &
-                                 do_add_utilde_force) &
-                                 bind(C, name="make_vel_force_sphr")
+       vel_force, f_lo, f_hi, nc_f, &
+       gpi, g_lo, g_hi, nc_g, &
+       rho, r_lo, r_hi, &
+       uedge, u_lo, u_hi, &
+       vedge, v_lo, v_hi, &
+       wedge, w_lo, w_hi, &
+       normal, n_lo, n_hi, nc_n, &
+       gradw0_cart, gw_lo, gw_hi, &
+       w0_force_cart, wf_lo, wf_hi, nc_wf, &
+       rho0, grav, &
+       dx, &
+       r_cc_loc, r_edge_loc, &
+       cc_to_r, ccr_lo, ccr_hi, &
+       do_add_utilde_force) &
+       bind(C, name="make_vel_force_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: f_lo(3), f_hi(3), nc_f
@@ -163,7 +163,7 @@ contains
     double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-                                               ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
     integer         , intent (in   ) :: do_add_utilde_force
 
     integer         :: i,j,k
@@ -176,17 +176,16 @@ contains
 
     real(kind=dp_t) :: Ut_dot_er
 
-    allocate(rho0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    allocate(grav_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),3))
+    bl_allocate(rho0_cart,lo,hi)
+    bl_allocate(grav_cart,lo,hi,3)
 
-    vel_force = ZERO
+    vel_force(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_f) = ZERO
 
     call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
-                                      cc_to_r,ccr_lo,ccr_hi)
+         cc_to_r,ccr_lo,ccr_hi)
     call put_1d_array_on_cart_sphr(lo,hi,grav_cart,lo,hi,3,grav,dx,0,1,r_cc_loc,r_edge_loc, &
-                                      cc_to_r,ccr_lo,ccr_hi)
+         cc_to_r,ccr_lo,ccr_hi)
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k,xx,yy,zz,rhopert,centrifugal_term,coriolis_term)
     do k = lo(3),hi(3)
        zz = prob_lo(3) + (dble(k) + HALF)*dx(3) - center(3)
        do j = lo(2),hi(2)
@@ -215,12 +214,10 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
 
     if (do_add_utilde_force .eq. 1) then
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,Ut_dot_er)
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
@@ -237,11 +234,11 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     endif
 
-    deallocate(rho0_cart,grav_cart)
+    bl_deallocate(rho0_cart)
+    bl_deallocate(grav_cart)
 
   end subroutine make_vel_force_sphr
 
