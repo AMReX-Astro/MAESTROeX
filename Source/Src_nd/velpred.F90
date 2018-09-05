@@ -6,7 +6,7 @@
 
 module velpred_module
 
-  use amrex_mempool_module, only : bl_allocate
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use slope_module
   use ppm_module
@@ -144,6 +144,17 @@ contains
           call bl_error("velpred_1d: invalid boundary type phys_bc(1,2)")
        end select
     end if
+
+    call bl_deallocate(slopex)
+
+    call bl_deallocate(Ipu)
+    call bl_deallocate(Imu)
+
+    call bl_deallocate(Ipf)
+    call bl_deallocate(Imf)
+
+    call bl_deallocate(umacl)
+    call bl_deallocate(umacr)
 
   end subroutine velpred_1d
 #endif
@@ -530,6 +541,31 @@ contains
           call bl_error("velpred_2d: invalid boundary type phys_bc(2,2)")
        end select
     end if
+
+    call bl_deallocate(slopex)
+    call bl_deallocate(slopey)
+
+    call bl_deallocate(Ipu)
+    call bl_deallocate(Imu)
+    call bl_deallocate(Ipfx)
+    call bl_deallocate(Imfx)
+    call bl_deallocate(Ipv)
+    call bl_deallocate(Imv)
+    call bl_deallocate(Ipfy)
+    call bl_deallocate(Imfy)
+
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+    call bl_deallocate(uimhx)
+
+    call bl_deallocate(uly)
+    call bl_deallocate(ury)
+    call bl_deallocate(uimhy)
+
+    call bl_deallocate(umacl)
+    call bl_deallocate(umacr)
+    call bl_deallocate(vmacl)
+    call bl_deallocate(vmacr)
 
   end subroutine velpred_2d
 #endif
@@ -1700,6 +1736,63 @@ contains
           call bl_error("velpred_3d: invalid boundary type phys_bc(3,2)")
        end select
     end if
+
+    call bl_deallocate(slopex)
+    call bl_deallocate(slopey)
+    call bl_deallocate(slopez)
+
+    call bl_deallocate(Ipu)
+    call bl_deallocate(Imu)
+    call bl_deallocate(Ipfx)
+    call bl_deallocate(Imfx)
+    call bl_deallocate(Ipv)
+    call bl_deallocate(Imv)
+    call bl_deallocate(Ipfy)
+    call bl_deallocate(Imfy)
+    call bl_deallocate(Ipw)
+    call bl_deallocate(Imw)
+    call bl_deallocate(Ipfz)
+    call bl_deallocate(Imfz)
+
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+    call bl_deallocate(uimhx)
+
+    call bl_deallocate(uly)
+    call bl_deallocate(ury)
+    call bl_deallocate(uimhy)
+
+    call bl_deallocate(ulz)
+    call bl_deallocate(urz)
+    call bl_deallocate(uimhz)
+
+    call bl_deallocate(ulyz)
+    call bl_deallocate(uryz)
+    call bl_deallocate(uimhyz)
+    call bl_deallocate(ulzy)
+    call bl_deallocate(urzy)
+    call bl_deallocate(uimhzy)
+
+    call bl_deallocate(vlxz)
+    call bl_deallocate(vrxz)
+    call bl_deallocate(vimhxz)
+    call bl_deallocate(vlzx)
+    call bl_deallocate(vrzx)
+    call bl_deallocate(vimhzx)
+
+    call bl_deallocate(wlxy)
+    call bl_deallocate(wrxy)
+    call bl_deallocate(wimhxy)
+    call bl_deallocate(wlyx)
+    call bl_deallocate(wryx)
+    call bl_deallocate(wimhyx)
+
+    call bl_deallocate(umacl)
+    call bl_deallocate(umacr)
+    call bl_deallocate(vmacl)
+    call bl_deallocate(vmacr)
+    call bl_deallocate(wmacl)
+    call bl_deallocate(wmacr)
 
   end subroutine velpred_3d
 #endif

@@ -135,6 +135,12 @@ contains
        utrans(i) = merge(ZERO,utrans(i),test)
     end do
 
+    call bl_deallocate(slopex)
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+
   end subroutine mkutrans_1d
 #endif
 
@@ -350,6 +356,17 @@ contains
           vtrans(i,j) = merge(ZERO,vtrans(i,j),test)
        enddo
     enddo
+
+    call bl_deallocate(slopex)
+    call bl_deallocate(slopey)
+
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
+
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+    call bl_deallocate(vly)
+    call bl_deallocate(vry)
 
   end subroutine mkutrans_2d
 #endif
@@ -738,6 +755,20 @@ contains
           enddo
        enddo
     end if
+
+    call bl_deallocate(slopex)
+    call bl_deallocate(slopey)
+    call bl_deallocate(slopez)
+
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
+
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+    call bl_deallocate(vly)
+    call bl_deallocate(vry)
+    call bl_deallocate(wlz)
+    call bl_deallocate(wrz)
 
   end subroutine mkutrans_3d
 #endif

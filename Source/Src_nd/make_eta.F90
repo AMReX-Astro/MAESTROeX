@@ -18,7 +18,7 @@
 
 module make_eta_module
 
-  use amrex_mempool_module, only : bl_allocate
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use bl_constants_module
   use base_state_geometry_module, only: nr_fine, dr, &
        max_radial_level, numdisjointchunks, &
@@ -257,6 +257,9 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(rho0_new_cart)
+    call bl_deallocate(rho0_nph_cart)
 
   end subroutine construct_eta_cart
 

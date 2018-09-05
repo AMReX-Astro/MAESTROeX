@@ -176,6 +176,14 @@ contains
        end if
     end if
 
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
+    call bl_deallocate(Ipf)
+    call bl_deallocate(Imf)
+    call bl_deallocate(slopex)
+    call bl_deallocate(sedgelx)
+    call bl_deallocate(sedgerx)
+
   end subroutine make_edge_scal_1d
 #endif
 
@@ -578,6 +586,23 @@ contains
           call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
        end if
     end if
+
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
+    call bl_deallocate(Ipf)
+    call bl_deallocate(Imf)
+    call bl_deallocate(slopex)
+    call bl_deallocate(slopey)
+    call bl_deallocate(slx)
+    call bl_deallocate(srx)
+    call bl_deallocate(simhx)
+    call bl_deallocate(sly)
+    call bl_deallocate(sry)
+    call bl_deallocate(simhy)
+    call bl_deallocate(sedgelx)
+    call bl_deallocate(sedgerx)
+    call bl_deallocate(sedgely)
+    call bl_deallocate(sedgery)
 
   end subroutine make_edge_scal_2d
 #endif
@@ -1903,6 +1928,58 @@ contains
           call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
        end if
     end if
+
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
+    call bl_deallocate(Ipf)
+    call bl_deallocate(Imf)
+
+    call bl_deallocate(slopex)
+    call bl_deallocate(slopey)
+    call bl_deallocate(slopez)
+
+    call bl_deallocate(slx)
+    call bl_deallocate(srx)
+    call bl_deallocate(simhx)
+
+    call bl_deallocate(sly)
+    call bl_deallocate(sry)
+    call bl_deallocate(simhy)
+
+    call bl_deallocate(slz)
+    call bl_deallocate(srz)
+    call bl_deallocate(simhz)
+
+    call bl_deallocate(slxy)
+    call bl_deallocate(srxy)
+    call bl_deallocate(slxz)
+    call bl_deallocate(srxz)
+
+    call bl_deallocate(slyx)
+    call bl_deallocate(sryx)
+    call bl_deallocate(slyz)
+    call bl_deallocate(sryz)
+
+    call bl_deallocate(slzx)
+    call bl_deallocate(srzx)
+    call bl_deallocate(slzy)
+    call bl_deallocate(srzy)
+
+    call bl_deallocate(simhxy)
+    call bl_deallocate(simhxz)
+    call bl_deallocate(simhyx)
+    call bl_deallocate(simhyz)
+    call bl_deallocate(simhzx)
+    call bl_deallocate(simhzy)
+
+    call bl_deallocate(sedgelx)
+    call bl_deallocate(sedgerx)
+    call bl_deallocate(sedgely)
+    call bl_deallocate(sedgery)
+    call bl_deallocate(sedgelz)
+    call bl_deallocate(sedgerz)
+
+    call bl_deallocate(divu)
 
   end subroutine make_edge_scal_3d
 #endif

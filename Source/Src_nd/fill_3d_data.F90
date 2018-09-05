@@ -1,7 +1,7 @@
 
 module fill_3d_data_module
 
-  use amrex_mempool_module, only : bl_allocate
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use base_state_geometry_module, only: nr_fine, max_radial_level, center, dr
   use bl_constants_module
   use meth_params_module, only: prob_lo, spherical, s0_interp_type, w0_interp_type, &
@@ -817,6 +817,8 @@ contains
              end do
           end do
        end do
+
+       call bl_deallocate(w0_nodal)
 
     else
        call bl_error('Error: w0mac_interp_type not defined')
