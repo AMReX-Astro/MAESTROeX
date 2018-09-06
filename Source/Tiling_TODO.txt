@@ -1,21 +1,20 @@
 ./MaestroMakeEta.cpp:           done
 ./MaestroNodalProj.cpp:         2/3 NOTE: has a loop which gets boxes from a BoxArray(?) - check how to tile this
-./MaestroRegrid.cpp:            already used a tilebox?
-./MaestroMacProj_level.cpp:     mult_beta0 uses ghosts
-./MaestroFillData.cpp:          1/3 NOTE: fill_umac_ghost needs ghosts, the other MFIter's access a variable's own box rather than creating one?
-./MaestroMacProj.cpp:           mult_beta0 uses ghosts
+./MaestroRegrid.cpp:            done, already used a tilebox?
+./MaestroMacProj_level.cpp:     done
+./MaestroFillData.cpp:          1/3, but other two have pragmas
+./MaestroMacProj.cpp:           done
 ./MaestroDt.cpp:                done
 ./MaestroMakeS.cpp:             done
 ./MaestroForce.cpp:             done
-./PhysBCFunctMaestro.cpp:       ? uses box rather than validbox
+./PhysBCFunctMaestro.cpp:       uses box rather than validbox (but it does have a pragma omp?)
 ./MaestroHeating.cpp:           done
 ./MaestroGamma.cpp:             done
-./MaestroFill3dData.cpp:        addw0, make_w0mac, make_s0mac, put_data_on_faces use ghost cells?
+./MaestroFill3dData.cpp:        done
 ./MaestroAverage.cpp:           done
 ./MaestroInit.cpp:              done
 ./MaestroAdvection.cpp:         done
 ./MaestroSponge.cpp:            done
 ./MaestroDiag.cpp:              done
-./MaestroThermal.cpp:           ? noticed fortran function used layer of ghost cells - should I use a growntilebox instead? Original function used a validbox.
-./MaestroReact.cpp:             done
+./MaestroThermal.cpp:           done
 ./MaestroRhoHT.cpp:             done

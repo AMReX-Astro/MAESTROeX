@@ -500,6 +500,9 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
 								vel[lev].setBndry(0.0, idir, 1);
 						}
 						else {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 								for (MFIter mfi(vel[lev]); mfi.isValid(); ++mfi) {
 										int i = mfi.index();
 										FArrayBox& v_fab = (vel[lev])[mfi];
