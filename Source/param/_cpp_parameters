@@ -1,5 +1,5 @@
 # This file contains the runtime parameters for all MAESTRO problems.
-# Before compiling, you need to parse this file by calling mk_params.sh, 
+# Before compiling, you need to parse this file by calling mk_params.sh,
 # which calls_maestro_params.py, to create the source code in Source/param/
 
 # Problem-specific runtime parameters should be defined in a _parameters
@@ -49,7 +49,7 @@ print_init_hse_diag                 bool        false          y
 #-----------------------------------------------------------------------------
 
 # simulation stop time
-stop_time                           Real        -1.0 
+stop_time                           Real        -1.0
 
 # Maximum number of steps in the simulation.
 max_step                            int         1
@@ -491,6 +491,50 @@ s0mac_interp_type                   int            1        y
 # 3 = Interpolate w0 to edges directly using quadratic interpolation; @@
 # 4 = Interpolate w0 to nodes using linear interpolation, then average to edges.
 w0mac_interp_type                   int            1 	      y
+
+#-----------------------------------------------------------------------------
+# category: diagnostics, I/O
+#-----------------------------------------------------------------------------
+
+# display warnings in Fortran90 routines
+print_fortran_warnings       int           (0, 1)
+
+# display information about updates to the state (how much mass, momentum, energy added)
+print_update_diagnostics     int           (0, 1)
+
+# calculate losses of material through physical grid boundaries
+track_grid_losses            int            0                    y
+
+# how often (number of coarse timesteps) to compute integral sums (for runtime diagnostics)
+sum_interval                 int           -1
+
+# how often (simulation time) to compute integral sums (for runtime diagnostics)
+sum_per                      Real          -1.0e0
+
+# display center of mass diagnostics
+show_center_of_mass          int           0
+
+# abort if we exceed CFL = 1 over the cource of a timestep
+hard_cfl_limit               int           1
+
+# a string describing the simulation that will be copied into the
+# plotfile's {\tt job\_info} file
+job_name                     string        ""
+
+# write a final plotfile and checkpoint upon completion
+output_at_completion         int           1
+
+# Do we want to reset the time in the checkpoint?
+# This ONLY takes effect if amr.regrid\_on\_restart = 1 and amr.checkpoint\_on\_restart = 1,
+# (which require that max\_step and stop\_time be less than the value in the checkpoint)
+# and you set it to value greater than this default value.
+reset_checkpoint_time        Real          -1.e200
+
+# Do we want to reset the number of steps in the checkpoint?
+# This ONLY takes effect if amr.regrid\_on\_restart = 1 and amr.checkpoint\_on\_restart = 1,
+# (which require that max\_step and stop\_time be less than the value in the checkpoint)
+# and you set it to value greater than this default value.
+reset_checkpoint_step        int           -1
 
 
 #-----------------------------------------------------------------------------

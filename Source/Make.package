@@ -1,5 +1,5 @@
 CEXE_sources += main.cpp
-CEXE_sources += Maestro.cpp 
+CEXE_sources += Maestro.cpp
 CEXE_sources += MaestroAdvance.cpp
 CEXE_sources += MaestroAdvanceIrreg.cpp
 CEXE_sources += MaestroAdvection.cpp
@@ -9,9 +9,9 @@ CEXE_sources += MaestroConvert.cpp
 CEXE_sources += MaestroDebug.cpp
 CEXE_sources += MaestroDensityAdvance.cpp
 CEXE_sources += MaestroDiag.cpp
-CEXE_sources += MaestroDt.cpp 
+CEXE_sources += MaestroDt.cpp
 CEXE_sources += MaestroEnthalpyAdvance.cpp
-CEXE_sources += MaestroEvolve.cpp 
+CEXE_sources += MaestroEvolve.cpp
 CEXE_sources += MaestroFillData.cpp
 CEXE_sources += MaestroFill3dData.cpp
 CEXE_sources += MaestroForce.cpp
@@ -33,6 +33,7 @@ CEXE_sources += MaestroVelocityAdvance.cpp
 CEXE_sources += PhysBCFunctMaestro.cpp
 
 CEXE_headers += Maestro.H
+CEXE_headers += MaestroPlot.H
 CEXE_headers += PhysBCFunctMaestro.H
 
 CEXE_headers += Maestro_F.H

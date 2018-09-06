@@ -90,6 +90,26 @@ contains
 
   end subroutine get_spec_names
 
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine get_spec_az(ispec,A,Z) bind(C, name="get_spec_az")
+
+    use network, only: nspec, aion, zion
+    use amrex_fort_module, only: rt => amrex_real
+
+    implicit none
+
+    integer,  intent(in   ) :: ispec
+    real(rt), intent(inout) :: A, Z
+
+    ! C++ is 0-based indexing, so increment
+    A = aion(ispec+1)
+    Z = zion(ispec+1)
+
+  end subroutine get_spec_az
+
 ! :::
 ! ::: ----------------------------------------------------------------
 ! :::

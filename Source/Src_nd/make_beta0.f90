@@ -337,11 +337,10 @@ module make_beta0_module
              end if
 
              do r=r_start_coord(n,j),r_end_coord(n,j)
-
-                dri = r_edge_loc(n,r+1) - r_edge_loc(n,r)
-                drc = r_cc_loc(n,r+1) - r_cc_loc(n,r-1)
                    
                 if (r < anelastic_cutoff_coord(n)) then
+
+                   dri = r_edge_loc(n,r+1) - r_edge_loc(n,r)
                    
                    if (r .eq. 0 .or. r .eq. nr(n)-1) then
                       
@@ -350,6 +349,8 @@ module make_beta0_module
                       nu = ZERO
                       
                    else
+                      
+                      drc = r_cc_loc(n,r+1) - r_cc_loc(n,r-1)
 
                       ! piecewise linear reconstruction of rho0,
                       ! gamma1bar, and p0 -- see paper III, appendix C

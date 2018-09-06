@@ -118,6 +118,25 @@ int         Maestro::s0_interp_type = 3;
 int         Maestro::w0_interp_type = 2;
 int         Maestro::s0mac_interp_type = 1;
 int         Maestro::w0mac_interp_type = 1;
+#ifdef AMREX_DEBUG
+int         Maestro::print_fortran_warnings = 1;
+#else
+int         Maestro::print_fortran_warnings = 0;
+#endif
+#ifdef AMREX_DEBUG
+int         Maestro::print_update_diagnostics = 1;
+#else
+int         Maestro::print_update_diagnostics = 0;
+#endif
+int         Maestro::track_grid_losses = 0;
+int         Maestro::sum_interval = -1;
+amrex::Real Maestro::sum_per = -1.0e0;
+int         Maestro::show_center_of_mass = 0;
+int         Maestro::hard_cfl_limit = 1;
+std::string Maestro::job_name = "";
+int         Maestro::output_at_completion = 1;
+amrex::Real Maestro::reset_checkpoint_time = -1.e200;
+int         Maestro::reset_checkpoint_step = -1;
 bool        Maestro::use_particles = false;
 bool        Maestro::store_particle_vels = false;
 bool        Maestro::do_heating = false;
