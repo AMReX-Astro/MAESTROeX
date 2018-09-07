@@ -87,10 +87,8 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // OR 1) average face-centered B coefficients to rho
     for (int lev=0; lev<=finest_level; ++lev) {
-        amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
-                                                        &face_bcoef[lev][1],
-                                                        &face_bcoef[lev][2])},
-                                            rho[lev], geom[lev]);
+        amrex::average_cellcenter_to_face(GetArrOfPtrs(face_bcoef[lev]),
+                                          rho[lev], geom[lev]);
     }
 
     // AND 2) invert B coefficients to 1/rho
