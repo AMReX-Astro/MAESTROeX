@@ -20,13 +20,13 @@ subroutine probdata_init(name,namlen)
   use probdata_module
 
   implicit none
-  
+
   integer :: namlen
   integer :: name(namlen)
 
-  if (parallel_IOProcessor()) then
-     print*,"Create a local copy of probdata.f90 in your build directory"
-  end if
+  ! if (parallel_IOProcessor()) then
+  !    print*,"Create a local copy of probdata.f90 in your build directory"
+  ! end if
 
   ! abort program
   call bl_error()

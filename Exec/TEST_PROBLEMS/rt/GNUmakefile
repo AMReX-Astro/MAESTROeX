@@ -26,4 +26,9 @@ GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/simple.net
 Bpack   := ./Make.package
 Blocs   := .
 
+# EXTERN_SEARCH += .
+#
+PROBIN_PARAMETER_DIRS := .
+
+#include $(MAESTROEX_HOME)/Exec/GMaestro.mak
 include $(MAESTROEX_HOME)/Exec/Make.Maestro

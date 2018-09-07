@@ -9,7 +9,7 @@ extern "C"
 
     // these are interfaces to fortran subroutines
 
-    void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
+    // void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
 
     //////////////////////
     // in advect_base.F90
