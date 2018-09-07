@@ -36,9 +36,7 @@ contains
     integer, intent(in) :: namlen
     integer, intent(in) :: name(namlen)
     !
-    ! call runtime_init(name,namlen)
-
-    call runtime_init(.true.)
+    call runtime_init(name,namlen)
 
   end subroutine maestro_extern_init
 
@@ -56,7 +54,7 @@ contains
     integer, intent(in) :: namlen
     integer, intent(in) :: name(namlen)
 
-    call probdata_init(name,namlen)
+    ! call probdata_init(name,namlen)
 
   end subroutine maestro_probdata_init
 
