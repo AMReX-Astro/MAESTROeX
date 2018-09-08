@@ -262,8 +262,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // Sbar = (1 / gamma1bar * p0) * dp/dt
-    for (int i=0; i<Sbar.size(); ++i) {
-	Sbar[i] = (p0_old[i] - p0_nm1[i])/(dtold*gamma1bar_old[i]*p0_old[i]);
+    if (evolve_base_state) {
+        for (int i=0; i<Sbar.size(); ++i) {
+            Sbar[i] = (p0_old[i] - p0_nm1[i])/(dtold*gamma1bar_old[i]*p0_old[i]);
+        }
     }
     
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -511,8 +513,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
 
     // compute Sbar
-    for (int i=0; i<Sbar.size(); ++i) {
-	Sbar[i] = (1.0/(gamma1bar_nph[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
+    if (evolve_base_state) {
+        for (int i=0; i<Sbar.size(); ++i) {
+            Sbar[i] = (1.0/(gamma1bar_nph[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
+        }
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -698,7 +702,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     int proj_type;
 
     // set Sbar to zero
-    std::fill(Sbar.begin(), Sbar.end(), 0.);
+    // FIXME - I think this should be
+    // (1.0/(gamma1bar_new[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
+    if (evolve_base_state) {
+        std::fill(Sbar.begin(), Sbar.end(), 0.);
+    }
     
     // Project the new velocity field
     if (is_initIter) {
