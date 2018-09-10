@@ -275,6 +275,8 @@ Maestro::NodalProj (int proj_type,
         rel_tol = std::min( eps_hg_max, eps_hg*pow(hg_level_factor,finest_level) );
     }
 
+    VisMF::Write(rhstotal[0],"a_rhstotal");
+    
     // solve for phi
     Print() << "Calling nodal solver" << std::endl;
     Real mlmg_err = mlmg.solve(amrex::GetVecOfPtrs(phi),

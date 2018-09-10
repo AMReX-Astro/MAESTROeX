@@ -76,6 +76,8 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 	Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
     }
 
+    VisMF::Write(beta0_cart[0],"a_beta0_cart");
+    
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // fill rhcc
