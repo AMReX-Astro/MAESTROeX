@@ -1,0 +1,789 @@
+%% This manuscript uses the AASTeX v6.2 LaTeX 2e macros
+%%
+%% AASTeX is now based on Alexey Vikhlinin's emulateapj.cls 
+%% (Copyright 2000-2015).  See the classfile for details.
+
+%% AASTeX requires revtex4-1.cls (http://publish.aps.org/revtex4/) and
+%% other external packages (latexsym, graphicx, amssymb, longtable, and epsf).
+%% All of these external packages should already be present in the modern TeX 
+%% distributions.  If not they can also be obtained at www.ctan.org.
+
+%% The first piece of markup in an AASTeX v6.x document is the \documentclass
+%% command. LaTeX will ignore any data that comes before this command. The 
+%% documentclass can take an optional argument to modify the output style.
+%% The command below calls the preprint style  which will produce a tightly 
+%% typeset, one-column, single-spaced document.  It is the default and thus
+%% does not need to be explicitly stated.
+%%
+%%
+%% using aastex version 6.2
+\documentclass{aastex62}
+
+%% The default is a single spaced, 10 point font, single spaced article.
+%% There are 5 other style options available via an optional argument. They
+%% can be envoked like this:
+%%
+%% \documentclass[argument]{aastex62}
+%% 
+%% where the layout options are:
+%%
+%%  twocolumn   : two text columns, 10 point font, single spaced article.
+%%                This is the most compact and represent the final published
+%%                derived PDF copy of the accepted manuscript from the publisher
+%%  manuscript  : one text column, 12 point font, double spaced article.
+%%  preprint    : one text column, 12 point font, single spaced article.  
+%%  preprint2   : two text columns, 12 point font, single spaced article.
+%%  modern      : a stylish, single text column, 12 point font, article with
+%% 		  wider left and right margins. This uses the Daniel
+%% 		  Foreman-Mackey and David Hogg design.
+%%  RNAAS       : Preferred style for Research Notes which are by design 
+%%                lacking an abstract and brief. DO NOT use \begin{abstract}
+%%                and \end{abstract} with this style.
+%%
+%% Note that you can submit to the AAS Journals in any of these 6 styles.
+%%
+%% There are other optional arguments one can envoke to allow other stylistic
+%% actions. The available options are:
+%%
+%%  astrosymb    : Loads Astrosymb font and define \astrocommands. 
+%%  tighten      : Makes baselineskip slightly smaller, only works with 
+%%                 the twocolumn substyle.
+%%  times        : uses times font instead of the default
+%%  linenumbers  : turn on lineno package.
+%%  trackchanges : required to see the revision mark up and print its output
+%%  longauthor   : Do not use the more compressed footnote style (default) for 
+%%                 the author/collaboration/affiliations. Instead print all
+%%                 affiliation information after each name. Creates a much
+%%                 long author list but may be desirable for short author papers
+%%
+%% these can be used in any combination, e.g.
+%%
+%% \documentclass[twocolumn,linenumbers,trackchanges]{aastex62}
+%%
+%% AASTeX v6.* now includes \hyperref support. While we have built in specific
+%% defaults into the classfile you can manually override them with the
+%% \hypersetup command. For example,
+%%
+%%\hypersetup{linkcolor=red,citecolor=green,filecolor=cyan,urlcolor=magenta}
+%%
+%% will change the color of the internal links to red, the links to the
+%% bibliography to green, the file links to cyan, and the external links to
+%% magenta. Additional information on \hyperref options can be found here:
+%% https://www.tug.org/applications/hyperref/manual.html#x1-40003
+%%
+%% If you want to create your own macros, you can do so
+%% using \newcommand. Your macros should appear before
+%% the \begin{document} command.
+%%
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand\aastex{AAS\TeX}
+\newcommand\latex{La\TeX}
+
+% for non-stacked fractions
+\newcommand{\sfrac}[2]{\mathchoice
+  {\kern0em\raise.5ex\hbox{\the\scriptfont0 #1}\kern-.15em/
+   \kern-.15em\lower.25ex\hbox{\the\scriptfont0 #2}}
+  {\kern0em\raise.5ex\hbox{\the\scriptfont0 #1}\kern-.15em/
+   \kern-.15em\lower.25ex\hbox{\the\scriptfont0 #2}}
+  {\kern0em\raise.5ex\hbox{\the\scriptscriptfont0 #1}\kern-.2em/
+   \kern-.15em\lower.25ex\hbox{\the\scriptscriptfont0 #2}}
+  {#1\!/#2}}
+
+\newcommand{\myhalf}{\sfrac{1}{2}}
+\newcommand{\thalf}{\sfrac{3}{2}}
+
+\newcommand{\eb}{{\bf{e}}}
+\newcommand{\Ub}{{\bf{U}}}
+\newcommand{\Ubt}{\widetilde{\Ub}}
+\newcommand{\Vb}{{\bf{V}}}
+\newcommand{\xb}{{\bf{x}}}
+
+\newcommand{\dr}{\Delta r}
+\newcommand{\dt}{\Delta t}
+
+\newcommand{\etarho}{\eta_\rho}
+\newcommand{\gammaonebar}{\overline{\Gamma_1}}
+\newcommand{\Hext}{H_{\rm ext}}
+\newcommand{\Hnuc}{H_{\rm nuc}}
+\newcommand{\omegadot}{\dot\omega}
+\newcommand{\pred}{{\rm pred}}
+\newcommand{\Sbar}{\overline{S}}
+
+\newcommand{\inp}{\mathrm{in}}
+\newcommand{\outp}{\mathrm{out}}
+\newcommand{\nph}{{n+\myhalf}}
+\newcommand{\nmh}{{n-\myhalf}}
+\newcommand{\ow}{\overline{w_0}}
+\newcommand{\dw}{\delta w_0}
+\newcommand{\uadvone}{\Ub^{\mathrm{ADV},\star}}
+\newcommand{\uadvonedag}{\Ub^{\mathrm{ADV},\dagger,\star}}
+\newcommand{\uadvtwo}{\Ub^{\mathrm{ADV}}}
+\newcommand{\uadvtwodag}{\Ub^{\mathrm{ADV},\dagger}}
+\newcommand{\gcc}{\mathrm{g~cm^{-3} }}
+
+% for the red MarginPars
+\usepackage{color}
+% make the MarginPars look pretty
+\setlength{\marginparwidth}{0.5in}
+\newcommand{\MarginPar}[1]{\marginpar{\vskip-\baselineskip\raggedright\tiny\sffamily
+\hrule\smallskip{\color{red}#1}\par\smallskip\hrule}}
+
+%% Reintroduced the \received and \accepted commands from AASTeX v5.2
+\received{XXX X, XXXX}
+\revised{XXX X, XXXX}
+\accepted{XXX X, XXXX}
+%% Command to document which AAS Journal the manuscript was submitted to.
+%% Adds "Submitted to " the arguement.
+\submitjournal{ApJ}
+
+%% Mark up commands to limit the number of authors on the front page.
+%% Note that in AASTeX v6.2 a \collaboration call (see below) counts as
+%% an author in this case.
+%
+%\AuthorCollaborationLimit=3
+%
+%% Will only show Schwarz, Muench and "the AAS Journals Data Scientist 
+%% collaboration" on the front page of this example manuscript.
+%%
+%% Note that all of the author will be shown in the published article.
+%% This feature is meant to be used prior to acceptance to make the
+%% front end of a long author article more manageable. Please do not use
+%% this functionality for manuscripts with less than 20 authors. Conversely,
+%% please do use this when the number of authors exceeds 40.
+%%
+%% Use \allauthors at the manuscript end to show the full author list.
+%% This command should only be used with \AuthorCollaborationLimit is used.
+
+%% The following command can be used to set the latex table counters.  It
+%% is needed in this document because it uses a mix of latex tabular and
+%% AASTeX deluxetables.  In general it should not be needed.
+%\setcounter{table}{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% The following section outlines numerous optional output that
+%% can be displayed in the front matter or as running meta-data.
+%%
+%% If you wish, you may supply running head information, although
+%% this information may be modified by the editorial offices.
+\shorttitle{MAESTROeX Low Mach Number Astrophysics}
+\shortauthors{Fan et al.}
+%%
+%% You can add a light gray and diagonal water-mark to the first page 
+%% with this command:
+% \watermark{text}
+%% where "text", e.g. DRAFT, is the text to appear.  If the text is 
+%% long you can control the water-mark size with:
+%  \setwatermarkfontsize{dimension}
+%% where dimension is any recognized LaTeX dimension, e.g. pt, in, etc.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% This is the end of the preamble.  Indicate the beginning of the
+%% manuscript itself with \begin{document}.
+
+\begin{document}
+
+\title{Title}
+
+%% LaTeX will automatically break titles if they run longer than
+%% one line. However, you may use \\ to force a line break if
+%% you desire. In v6.2 you can include a footnote in the title.
+
+%% A significant change from earlier AASTEX versions is in the structure for 
+%% calling author and affilations. The change was necessary to implement 
+%% autoindexing of affilations which prior was a manual process that could 
+%% easily be tedious in large author manuscripts.
+%%
+%% The \author command is the same as before except it now takes an optional
+%% arguement which is the 16 digit ORCID. The syntax is:
+%% \author[xxxx-xxxx-xxxx-xxxx]{Author Name}
+%%
+%% This will hyperlink the author name to the author's ORCID page. Note that
+%% during compilation, LaTeX will do some limited checking of the format of
+%% the ID to make sure it is valid.
+%%
+%% Use \affiliation for affiliation information. The old \affil is now aliased
+%% to \affiliation. AASTeX v6.2 will automatically index these in the header.
+%% When a duplicate is found its index will be the same as its previous entry.
+%%
+%% Note that \altaffilmark and \altaffiltext have been removed and thus 
+%% can not be used to document secondary affiliations. If they are used latex
+%% will issue a specific error message and quit. Please use multiple 
+%% \affiliation calls for to document more than one affiliation.
+%%
+%% The new \altaffiliation can be used to indicate some secondary information
+%% such as fellowships. This command produces a non-numeric footnote that is
+%% set away from the numeric \affiliation footnotes.  NOTE that if an
+%% \altaffiliation command is used it must come BEFORE the \affiliation call,
+%% right after the \author command, in order to place the footnotes in
+%% the proper location.
+%%
+%% Use \email to set provide email addresses. Each \email will appear on its
+%% own line so you can put multiple email address in one \email call. A new
+%% \correspondingauthor command is available in V6.2 to identify the
+%% corresponding author of the manuscript. It is the author's responsibility
+%% to make sure this name is also in the author list.
+%%
+%% While authors can be grouped inside the same \author and \affiliation
+%% commands it is better to have a single author for each. This allows for
+%% one to exploit all the new benefits and should make book-keeping easier.
+%%
+%% If done correctly the peer review system will be able to
+%% automatically put the author and affiliation information from the manuscript
+%% and save the corresponding author the trouble of entering it by hand.
+
+\correspondingauthor{Doreen Fan}
+\email{DFan@lbl.gov}
+
+\author{Doreen Fan}
+\affil{Lawrence Berkelely National Laboratory \\
+Center for Computational Sciences and Engineering \\
+One Cyclotron Road, MS 50A-3111 \\
+Berkeley, CA 94720, USA}
+
+\author{Andrew Nonaka}
+\affil{Lawrence Berkelely National Laboratory \\
+Center for Computational Sciences and Engineering \\
+One Cyclotron Road, MS 50A-3111 \\
+Berkeley, CA 94720, USA}
+
+\author{Ann Almgren}
+\affil{Lawrence Berkelely National Laboratory \\
+Center for Computational Sciences and Engineering \\
+One Cyclotron Road, MS 50A-3111 \\
+Berkeley, CA 94720, USA}
+
+\author{Michael Zingale}
+\affil{Stony Brook University \\
+Department of Physics and Astronomy \\
+Stony Brook, NY 11794-3800, USA}
+
+%% Note that the \and command from previous versions of AASTeX is now
+%% depreciated in this version as it is no longer necessary. AASTeX 
+%% automatically takes care of all commas and "and"s between authors names.
+
+%% AASTeX 6.2 has the new \collaboration and \nocollaboration commands to
+%% provide the collaboration status of a group of authors. These commands 
+%% can be used either before or after the list of corresponding authors. The
+%% argument for \collaboration is the collaboration identifier. Authors are
+%% encouraged to surround collaboration identifiers with ()s. The 
+%% \nocollaboration command takes no argument and exists to indicate that
+%% the nearby authors are not part of surrounding collaborations.
+
+%% Mark off the abstract in the ``abstract'' environment. 
+\begin{abstract}
+Insert abstract here.
+
+\end{abstract}
+
+%% Keywords should appear after the \end{abstract} command. 
+%% See the online documentation for the full list of available subject
+%% keywords and the rules for their use.
+\keywords{insert keywords here}
+
+%% From the front matter, we move on to the body of the paper.
+%% Sections are demarcated by \section and \subsection, respectively.
+%% Observe the use of the LaTeX \label
+%% command after the \subsection to give a symbolic KEY to the
+%% subsection for cross-referencing in a \ref command.
+%% You can use LaTeX's \ref and \label commands to keep track of
+%% cross-references to sections, equations, tables, and figures.
+%% That way, if you change the order of any elements, LaTeX will
+%% automatically renumber them.
+%%
+%% We recommend that authors also use the natbib \citep
+%% and \citet commands to identify citations.  The citations are
+%% tied to the reference list via symbolic KEYs. The KEY corresponds
+%% to the KEY in the \bibitem in the reference list below. 
+
+\section{Introduction} \label{sec:intro}
+
+Sample citation \cite{MAESTRO_I,MAESTRO_II,MAESTRO_III,MAESTRO_IV,MAESTRO_V}
+
+%% This command is needed to show the entire author+affilation list when
+%% the collaboration and author truncation commands are used.  It has to
+%% go at the end of the manuscript.
+%\allauthors
+
+%% Include this line if you are using the \added, \replaced, \deleted
+%% commands to see a summary list of all changes at the end of the article.
+%\listofchanges
+
+\section{Using Exact Spherical Base States on Irregular Grid} \label{sec:exactbasestate}
+
+\subsection{Potential Problems}
+\begin{enumerate}
+\item How do we define \verb|r_edge_loc| for irregularly-spaced base states whose cell-centered values are defined at $r_m=\Delta x\sqrt{\frac{3}{4} + 2m}$?
+\item We would stil need to approximate the values at edges when advecting the base states (i.e. $\rho_0^{\nph,\pred}$). This may affect the nice properties we would get with exact cell-centered base state values.
+\item Excessive memory storage may be required (\verb|nr_irreg >> nr_fine|). 
+\end{enumerate}
+
+\subsection{A Possible Solution}
+We could choose to no longer advect the base states for both predictor and corrector steps. This would solve the problems with computing state values at cell edges. Instead, we propose to only update the base states $\rho_0$ and $p_0$ by computing the average of the full state values after advecting the full states. This would result in the following changes in the algorithm from Paper V:
+%
+\begin{enumerate}
+\item Steps 4 and 8 will be greatly simplified, leading to a more efficient algorithm.
+\item There is no longer a need for $w_0$, so we can use the full velocity $\Ub$ instead of $\Ubt$. As a consequence, $\eta$ and $\psi$ also do not need to be computed. This has the added advantage of saving some memory storage by removing many of the terms needed when we decided to split terms into its base state and perturbation state in our previous implementation.
+\item By placing the base states exactly at cell-centers, we eliminate interpolation errors and simplify the existing code.
+\end{enumerate}
+%
+
+\subsection{Main Algorithm Description}\label{Sec:Main Algorithm Description}
+We now describe the proposed algorithm, making frequent use of the
+shorthand notations mentioned in Paper V, Appendix A3.  In summary, in the predictor step ({\bf
+  Steps 2-5}) we use an estimate of the expansion term, $S$, to
+compute a preliminary solution at the new time level, denoted with an
+``$n+1,\star$'' superscript.  In the corrector step ({\bf Steps 6-9}),
+we use the results from the predictor step to compute a more accurate
+expansion term, and compute the final solution at the new time level,
+denoted with an ``$n+1$'' superscript.  We use Strang-splitting to
+achieve second-order accuracy in time.  
+
+
+\begin{description}
+
+%--------------------------------------------------------------------------
+% STEP 0
+%--------------------------------------------------------------------------
+
+\item[Step 0.] {\em Initialization}
+The initialization step only occurs at the beginning of the simulation. 
+The initialization step computes initial values for $\pi^{-\myhalf}$, $S^0$, and
+$S^1$ for use in time stepping routine.  We pass through {\bf Step 1} -- {\bf Step 12},
+but only keep these values. 
+The initial values for $\Ub^0, \rho^0, (\rho h)^0, X_k^0, T^0, 
+\rho_0^0, p_0^0$, and $\overline{\Gamma}_1^0$ are specified from the problem-dependent 
+initial conditions.  The initial time step, $\dt^0$, is computed as in 
+Paper III.  
+
+%--------------------------------------------------------------------------
+% STEP 1
+%--------------------------------------------------------------------------
+\item[Step 1.] {\em React the full state through the first time interval of $\dt / 2.$}
+
+Call {\bf React State}$[\rho^n, (\rho h)^n, X_k^n, T^n, (\rho\Hext)^n, p_0^n] \rightarrow [\rho^{(1)},(\rho h)^{(1)},X_k^{(1)},T^{(1)},(\rho \omegadot_k)^{(1)},(\rho \Hnuc)^{(1)}]$.
+
+%--------------------------------------------------------------------------
+% STEP 2
+%--------------------------------------------------------------------------
+
+\item[Step 2.] {\em Compute the provisional time-centered expansion, 
+    $S^{\nph,\star}$.}
+
+We compute an estimate for the time-centered expansion term in the velocity 
+divergence constraint.  Following \citet{Bell:2004}, we extrapolate
+to the half-time using $S$ at the previous and current
+time steps,
+\begin{equation}
+S^{\nph,\star} = S^n + \frac{\dt^n}{2} \frac{S^n - S^{n-1}}{\dt^{n-1}}.
+\end{equation}
+Note that in the first time step we average $S^0$ and $S^1$ from the
+initialization step.
+
+%--------------------------------------------------------------------------
+% STEP 3
+%--------------------------------------------------------------------------
+\item[Step 3.] {\em Construct the provisional time-centered advective velocity on 
+edges, $\uadvone$.}
+
+Using the equation below,
+% 
+\begin{equation}
+\frac{\partial\Ub}{\partial t} = -\Ub\cdot\nabla\Ub - \frac{1}{\rho}\nabla\pi - \frac{\rho-\rho_0}{\rho}g\eb_r, \label{eq:u_update}
+\end{equation}
+%
+we compute time-centered edge velocities, $\uadvonedag$, using 
+$\Ub^n$.  The $\dagger$ superscript refers to the 
+fact that the predicted velocity field does not satisfy the divergence 
+constraint.  We then construct $\uadvone$ from $\uadvonedag$
+using a MAC projection.  
+We note that $\uadvone$ satisfies the divergence constraint 
+\begin{equation}
+\nabla \cdot \left(\beta_0^n \uadvone\right) = \beta_0^n \left(S^{\nph,\star} - \frac{1}{\overline{\Gamma}_1^np_0^n}\frac{p_0^n-p_0^{n-1}}{\Delta t^{n-1}} + \chi^n\right),
+\end{equation}
+\begin{equation}
+ \beta_0^n = \beta_0 \left(\rho_0^n, p_0^n, \overline{\Gamma}_1^n\right),
+\end{equation}
+\begin{equation}
+\chi^n = \frac{f}{\overline{\Gamma}_1^n p_0^n}\frac{p_{\rm eos}^n(\rho,h,X_k) - p_0^n}{\Delta t^n}
+\end{equation}
+where $\beta_0$ is computed as described in Appendix C of Paper III.
+\MarginPar{add volume discrepancy stuff}
+
+%--------------------------------------------------------------------------
+% STEP 4
+%--------------------------------------------------------------------------
+\item[Step 4.] {\em Advect the full state through a time interval of $\dt.$}
+
+\begin{enumerate}
+\renewcommand{\theenumi}{{\bf \Alph{enumi}}}
+
+\item Update $(\rho X_k)$ using a discretized version of
+%
+\begin{equation}
+\frac{\partial(\rho X_k)}{\partial t} = -\nabla\cdot(\rho X_k\Ub) + \rho\omegadot_k,
+\end{equation}
+%
+omitting the reaction terms, which were already 
+accounted for in {\bf React State}.  The update consists of two steps:
+
+\begin{enumerate}
+\renewcommand{\labelenumii}{{\bf \roman{enumii}}.}
+
+\item Compute the time-centered species edge states, $(\rho X_k)^{\nph,\pred}$,
+  for the conservative update of $(\rho X_k)^{(1)}$ using 
+  $\Ub = \uadvone$ and $\rho_0^n$. 
+\MarginPar{We may not need $\rho_0$ if we predict $\rho X$ or $\rho$ and $X$.}
+
+\item Evolve $(\rho X_k)^{(1)} \rightarrow (\rho X_k)^{(2),\star}$ using
+\begin{equation}
+(\rho X_k)^{(2),\star} = (\rho X_k)^{(1)} 
+  - \dt \left\{ \nabla \cdot \left[ \uadvone (\rho X_k)^{\nph,\pred} \right] \right\},
+\end{equation}
+\begin{equation}
+\rho^{(2),\star} = \sum_k (\rho X_k)^{(2),\star},
+\qquad
+X_k^{(2),\star} = (\rho X_k)^{(2),\star} / \rho^{(2),\star}.
+\end{equation}
+
+\end{enumerate}
+
+\item Update $\rho_0$ by setting $\rho_0^{n+1,\star} =$ {\bf Avg}$(\rho^{(2),\star})$.
+
+\item Update $p_0$ by calling 
+{\bf Enforce HSE}$[p_0^n,\rho_0^{n+1,\star}] \rightarrow [p_0^{n+1,\star}]$.
+
+\item Update the enthalpy using a discretized version of equation
+%
+\begin{equation} 
+\frac{\partial(\rho h)}{\partial t} = -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
+\end{equation}
+%
+again omitting the reaction and heating terms
+since we already accounted for
+them in {\bf React State}.  This equation takes the form:
+\begin{equation}
+\frac{\partial (\rho h)}{\partial t}  = - \nabla \cdot (\Ub \rho h) + \frac{\partial p_0}{\partial t} + (\Ub \cdot \eb_r) \frac{\partial p_0}{\partial r}.
+\end{equation}
+For spherical geometry, we solve the
+analytically equivalent form,
+\begin{equation}
+\frac{\partial (\rho h)}{\partial t}  = - \nabla \cdot (\Ub \rho h) + \frac{\partial p_0}{\partial t} + \nabla \cdot (\Ub p_0) - p_0 \nabla \cdot \Ub.
+\end{equation}
+The update consists of two steps:
+
+\begin{enumerate}
+\renewcommand{\labelenumii}{{\bf \roman{enumii}}.}
+
+\item Compute the time-centered enthalpy edge state, $(\rho h)^{\nph,\pred},$
+  for the conservative update of $(\rho h)^{(1)}$
+  using $\Ub = \uadvone$ and $(\rho h)^n$,
+
+\item Evolve $(\rho h)^{(1)} \rightarrow (\rho h)^{(2),\star}$.
+\begin{description}
+\item For planar geometry,
+\begin{eqnarray}
+(\rho h)^{(2),\star} 
+&=& (\rho h)^{(1)} \nonumber \\
+&&- \dt^n \left\{ \nabla \cdot \left[ \uadvone (\rho h)^{\nph,\pred} \right] \right\} \nonumber \\ 
+&& + \dt^n \left(\uadvone \cdot \eb_r\right) \left(\frac{\partial p_0}{\partial r} \right)^{n} \nonumber \\ 
+&& + \dt^n \left( \frac{p_0^n - p_0^{n-1}}{\dt^{n-1}} \right),
+\end{eqnarray}
+
+\item For spherical geometry,
+\begin{eqnarray}
+(\rho h)^{(2),\star} 
+&=& (\rho h)^{(1)} \nonumber \\
+&&- \dt^n \left\{ \nabla \cdot \left[ \uadvone (\rho h)^{\nph,\pred} \right] \right\} \nonumber \\ 
+&& + \dt^n \left \{ \nabla \cdot \left (\uadvone p_0^{n} \right ) - p_0^{n} \nabla \cdot \uadvone \right \} \nonumber \\
+&& + \dt^n \left( \frac{p_0^n - p_0^{n-1}}{\dt^{n-1}} \right),
+\end{eqnarray}
+\end{description}
+
+\end{enumerate}
+
+Note that during the first time step we use $\dt^n$ instead of $\dt^{n-1}$.
+Then, for each Cartesian cell where $\rho^{(2),\star} < \rho_\mathrm{cutoff}$,
+we recompute enthalpy using
+\begin{equation}
+(\rho h)^{(2),\star} = \rho^{(2),\star}h\left(\rho^{(2),\star},p_0^{n+1,\star},X_k^{(2),\star}\right).
+\end{equation}
+
+\item Update the temperature using the equation of state:
+$T^{(2),\star} = 
+  T(\rho^{(2),\star}, h^{(2),\star}, X_k^{(2),\star})$ (planar geometry) or
+$T^{(2),\star} = 
+  T(\rho^{(2),\star}, p_0^{n+1,\star}, X_k^{(2),\star})$ (spherical geometry).
+\end{enumerate}
+
+%--------------------------------------------------------------------------
+% STEP 5
+%--------------------------------------------------------------------------
+\item[Step 5.] {\em React the full state through a second time interval of $\dt / 2.$}
+
+Call {\bf React State}$[ \rho^{(2),\star},(\rho h)^{(2),\star}, X_k^{(2),\star}, T^{(2),\star}, 
+(\rho\Hext)^{(2),\star}, p_0^{n+1,\star}]$\\
+\phantom{ }\hfill $\rightarrow [ \rho^{n+1,\star},(\rho h)^{n+1,\star}, X_k^{n+1,\star}, T^{n+1,\star}, (\rho \omegadot_k)^{(2),\star}, (\rho \Hnuc)^{(2),\star} ].$
+
+%--------------------------------------------------------------------------
+% STEP 6
+%--------------------------------------------------------------------------
+\item[Step 6.] {\em Compute the time-centered expansion, $S^{\nph,\star}$.}
+
+\item First, compute $S^{n+1,\star}$ with
+\begin{equation}
+S^{n+1,\star} =  -\sigma  \sum_k  \xi_k  (\omegadot_k)^{(2),\star}  + \frac{1}{\rho^{n+1,\star} p_\rho} \sum_k p_{X_k}  ({\omegadot}_k)^{(2),\star} + \sigma \Hnuc^{(2),\star} + \sigma \Hext^{(2),\star},
+\end{equation}
+  where $(\omegadot_k)^{(2),\star} = (\rho \omegadot_k)^{(2),\star} /
+  \rho^{(2),\star}$ and the thermodynamic quantities are defined using
+  $\rho^{n+1,\star}, X_k^{n+1,\star},$ and $T^{n+1,\star}$ as inputs to
+  the equation of state.  Then, define
+\begin{equation}
+ S^{\nph} = \frac{S^n + S^{n+1,\star}}{2},
+\end{equation}
+
+%--------------------------------------------------------------------------
+% STEP 7
+%--------------------------------------------------------------------------
+\item[Step 7.] {\em Construct the time-centered advective velocity on edges, $\uadvtwo$.}
+
+The procedure to construct $\uadvtwodag$ is identical to the procedure
+for computing $\uadvonedag$ in {\bf Step 3}, but uses 
+the updated value $S^{\nph}$ rather than $S^{\nph,\star}$.  
+We note that $\uadvtwo$ satisfies the divergence constraint 
+\begin{equation}
+\nabla \cdot \left(\beta_0^{\nph} \uadvtwo\right) =
+\beta_0^{\nph} \left(S^{\nph} - \frac{1}{\overline{\Gamma}_1^{n+\myhalf}p_0^n}\frac{p_0^{n+1,\star}-p_0^n}{\Delta t^n} + \chi^{n+\myhalf}\right),
+\end{equation}
+\begin{equation}
+\beta_0^{\nph} = \frac{ \beta_0^n +  \beta_0^{n+1,\star} }{2};
+\qquad
+ \beta_0^{n+1,\star} = \beta_0 \left(\rho_0^{n+1,\star}, p_0^{n+1,\star}, \overline{\Gamma}_1^{n+1,\star}\right),
+\end{equation}
+\begin{equation}
+\overline{\Gamma}_1^{\nph} = \frac{ \overline{\Gamma}_1^n +  \overline{\Gamma}_1^{n+1,\star} }{2}.
+\end{equation}
+\begin{equation}
+\chi^{n+\myhalf} = \chi^n + \frac{f}{\overline{\Gamma}_1^{n+1,\star} p_0^{n+1,\star}}\frac{p_{\rm eos}^{n+1,\star}(\rho,h,X_k) - p_0^{n+1,\star}}{\Delta t^n}
+\end{equation}
+\MarginPar{add volume discrepancy stuff}
+
+%--------------------------------------------------------------------------
+% STEP 8
+%--------------------------------------------------------------------------
+\item[Step 8.] {\em Advect the base state and full state through a time interval of $\dt.$}
+
+\begin{enumerate}
+\renewcommand{\theenumi}{{\bf \Alph{enumi}}}
+
+\item Update $(\rho X_k)$.  This step is identical to {\bf Step 4A} except we use
+  the updated values $\uadvtwo$ and $\rho_0^{(2a)}$ rather than 
+  $\uadvone$ and $\rho_0^{(2a),\star}$.  In particular:
+
+\begin{enumerate}
+\renewcommand{\labelenumii}{{\bf \roman{enumii}}.}
+
+\item Compute the time-centered species edge states, $(\rho X_k)^{\nph,\pred}$,
+  for the conservative update of $(\rho X_k)^{(1)}$ using $\Ub = \uadvtwo$ and 
+  $\rho_0^n$.
+
+\item Evolve $(\rho X_k)^{(1)} \rightarrow (\rho X_k)^{(2)}$ using
+\begin{equation}
+(\rho X_k)^{(2)} = (\rho X_k)^{(1)} 
+- \dt \left\{ \nabla \cdot \left[\uadvtwo (\rho X_k)^{\nph,\pred} \right] \right\},
+\end{equation}
+\begin{equation}
+\rho^{(2)} = \sum_k (\rho X_k)^{(2)},
+\qquad
+X_k^{(2)} = (\rho X_k)^{(2)} / \rho^{(2)}.
+\end{equation}
+
+\end{enumerate}
+
+\item Update $\rho_0$ by setting $\rho_0^{n+1} =$ {\bf Avg}$(\rho^{(2)})$.
+
+\item Update $p_0$ by calling
+{\bf Enforce HSE}$[p_0^n,\rho_0^{n+1}] \rightarrow [p_0^{n+1}]$.
+
+\item Update the enthalpy.  This step is identical to {\bf Step 4D} except we use
+  the updated values $\uadvtwo, \rho_0^{n+1}, (\rho h)_0^{n+1}$, and $p_0^{n+\myhalf}$ 
+  rather than 
+  $\uadvone, \rho_0^{n+1,\star}, (\rho h)_0^{n+1,\star}$, and $p_0^n$.  
+  In particular:
+\MarginPar{Again, we may not need $\rho_0$ and $(\rho h)_0$.}
+
+\begin{enumerate}
+\renewcommand{\labelenumii}{{\bf \roman{enumii}}.}
+
+\item Compute the time-centered enthalpy edge state, $(\rho h)^{\nph,\pred},$
+  for the conservative update of $(\rho h)^{(1)}$.  
+
+\item Evolve $(\rho h)^{(1)} \rightarrow (\rho h)^{(2)}$.
+\begin{description}
+\item For planar geometry,
+\begin{eqnarray}
+(\rho h)^{(2)} 
+&=& (\rho h)^{(1)} - \dt \left\{ \nabla \cdot \left[ \uadvtwo (\rho h)^{\nph,\pred} \right] \right\} \nonumber \\
+&& + \dt \left(\uadvtwo \cdot \eb_r\right) \left(\frac{\partial p_0}{\partial r} \right)^\nph \nonumber \\
+&& + \dt \left( \frac{p_0^{n+1} - p_0^n}{\dt^n} \right),
+\end{eqnarray}
+
+\item For spherical geometry,
+\begin{eqnarray}
+(\rho h)^{(2)} 
+&=& (\rho h)^{(1)} - \dt \left\{ \nabla \cdot \left[ \uadvtwo (\rho h)^{\nph,\pred} \right] \right\} \nonumber \\
+&& + \dt \left[ \nabla \cdot \left (\uadvtwo p_0^{\nph} \right ) - p_0^{\nph} \nabla \cdot \uadvtwo \right] \nonumber \\
+&& + \dt \left( \frac{p_0^{n+1} - p_0^n}{\dt^n} \right),
+\end{eqnarray}
+\end{description}
+where $p_0^\nph$ is defined as $p_0^\nph = (p_0^n+p_0^{n+1})/2$.
+
+\end{enumerate}
+
+Then, for each Cartesian cell where $\rho^{(2)} < \rho_\mathrm{cutoff}$, we recompute enthalpy using
+\begin{equation}
+(\rho h)^{(2)} = \rho^{(2)}h\left(\rho^{(2)},p_0^{n+1},X_k^{(2)}\right).
+\end{equation}
+
+\item Update the temperature using the equation of state:
+$T^{(2)} = 
+   T(\rho^{(2)}, h^{(2)}, X_k^{(2)})$ (planar geometry) or
+$T^{(2)} = 
+   T(\rho^{(2)}, p_0^{n+1}, X_k^{(2)})$ (spherical geometry).
+\end{enumerate}
+
+%--------------------------------------------------------------------------
+% STEP 9
+%--------------------------------------------------------------------------
+\item[Step 9.] {\em React the full state through a second time interval of $\dt / 2.$}
+
+Call {\bf React State}$[\rho^{(2)},(\rho h)^{(2)}, X_k^{(2)},T^{(2)}, (\rho\Hext)^{(2)}, p_0^{n+1}] \rightarrow [\rho^{n+1}, (\rho h)^{n+1}, X_k^{n+1}, T^{n+1}, (\rho \omegadot_k)^{(2)}, (\rho \Hnuc)^{(2)} ].$  
+
+%--------------------------------------------------------------------------
+% STEP 10
+%--------------------------------------------------------------------------
+\item[Step 10.] {\em Define the new time expansion, $S^{n+1}$, and $\overline{\Gamma}_1^{n+1}$.}
+
+\begin{enumerate}
+\renewcommand{\theenumi}{{\bf \Alph{enumi}}}
+\item Define
+\begin{equation}
+  S^{n+1} =  -\sigma  \sum_k  \xi_k (\omegadot_k)^{(2)}  + \sigma \Hnuc^{(2)} +
+  \frac{1}{\rho^{n+1} p_\rho} \sum_k p_{X_k}  ({\omegadot}_k)^{(2)}  
+   + \sigma \Hext^{(2)},
+\end{equation}
+where $(\omegadot_k)^{(2)} = (\rho \omegadot_k)^{(2)} / \rho^{(2)}$
+and the thermodynamic quantities are defined using $\rho^{n+1}$,
+$X_k^{n+1}$, and $T^{n+1}$ as inputs to the equation of state.
+
+\item Define
+\begin{equation}
+\overline{\Gamma}_1^{n+1} = {\rm{\bf Avg}}\left[\Gamma_1\left(\rho^{n+1}, p_0^{n+1}, 
+X_k^{n+1}\right) \right].
+\end{equation}
+
+\end{enumerate}
+
+
+%--------------------------------------------------------------------------
+% STEP 11
+%--------------------------------------------------------------------------
+\item[Step 11.] {\em Update the velocity}.  
+
+First, we compute the time-centered edge velocities, $\Ub^{\nph,\pred}$.
+Then, we define
+\begin{equation}
+\rho^\nph = \frac{\rho^n + \rho^{n+1}}{2}, \qquad \rho_0^\nph = \frac{\rho_0^n + \rho_0^{n+1}}{2}.
+\end{equation}
+We update the velocity field $\Ub^n$ to $\Ub^{n+1,\dagger}$ by discretizing 
+equation (\ref{eq:u_update}) as
+\begin{eqnarray}
+\Ub^{n+1,\dagger} 
+&=& \Ub^n - \dt \left[\uadvtwo \cdot \nabla \Ub^{\nph,\pred} \right] \nonumber \\
+&& - \dt \left[ - \frac{1}{\rho^\nph} \mathbf{G} \pi^\nmh + \frac{\left(\rho^\nph-\rho_0^\nph\right)}{\rho^\nph} g^{\nph} \eb_r \right],\nonumber \\
+\end{eqnarray}
+where $\mathbf{G}$ approximates a cell-centered gradient from nodal
+data.  Again, the $\dagger$ superscript refers 
+to the fact that the updated velocity does not satisfy the divergence 
+constraint.
+
+Finally, we use an approximate nodal projection to define $\Ub^{n+1}$
+from $\Ub^{n+1,\dagger},$  such that $\Ub^{n+1}$ approximately
+satisfies 
+\begin{equation}
+\nabla \cdot \left(\beta_0^{n+1} \Ub^{n+1} \right) 
+= \beta_0^{n+1} S^{n+1},
+\end{equation}
+\MarginPar{I think we need the 1/gamma1bar part too}
+where 
+\begin{equation}
+\beta_0^{n+1} = \beta \left(\rho_0^{n+1}, p_0^{n+1}, \overline{\Gamma}_1^{n+1}, g^{n+1}\right).
+\end{equation}
+As part of the projection we also define the new-time perturbational pressure,
+$\pi^\nph.$  This projection necessarily differs from the MAC projection used in 
+{\bf Step 3} and {\bf Step 7} because the velocities in those steps are defined
+on edges and $\Ub^{n+1}$ is defined at cell centers, requiring different divergence
+and gradient operators.  Details of the approximate projection are given in Paper III.
+
+%--------------------------------------------------------------------------
+% STEP 12
+%--------------------------------------------------------------------------
+\item[Step 12.] {\em Compute a new $\dt.$}
+
+Compute $\dt$ for the next time step with a similar procedure described in
+\S 3.4 of Paper III. However, we are using $\Ub^{n+1}$
+as computed in {\bf Step 11} instead of $w_0$ and $\Ubt^{n+1}$ as in Paper V.
+The following constraints need to be satisfied.
+
+\begin{enumerate}
+\renewcommand{\theenumi}{{\bf \Alph{enumi}}}
+\item Use standard CFL condition for explicit methods using CFL factor $\sigma^{\mathrm{CFL}}$. 
+  For a calculation in $n_{\mathrm{dim}}$ dimensions ($n_{\mathrm{dim}}=2$ or 3), 
+  the first constraint is 
+\begin{equation}
+\dt_{\Ub} = \sigma^\mathrm{CFL}  \min_{i=1\ldots n_\mathrm{dim}} \left \{ \dt_i \right \}\enskip,
+\end{equation}
+  where
+\begin{equation}
+\dt_i = \min_{\bf x}  \left \{ \frac{\Delta x_i}{\left | \Ub \right |}  \right \}\enskip.
+\end{equation} 
+
+\item Use the forcing terms rather than the velocities. 
+  This constraint is necessary when a calculation is started from rest, 
+  since in that case the velocity-based time step would be infinite. Define
+\begin{equation}
+\dt_{\rm F} = \min_{i=1\ldots n_\mathrm{dim}} \left \{ \dt_{\rm F_i} \right \}\enskip,
+\end{equation}
+where
+\begin{equation}
+\dt_{\rm F_i} = \sqrt{2 \Delta x_i / {F_i}_\mathrm{max}}\enskip,
+\end{equation}
+where ${F_i}_\mathrm{max}$ is the maximum buoyancy force in the
+$i^\mathrm{th}$ coordinate direction.
+
+\item To prevent local expansion from numerically emptying a cell, 
+  we require that the density be reduced by no more than 40\% in a single time step.
+  This constraint is expressed as $\dt \leq \dt_S$ where 
+\begin{equation}
+ \Delta t_S \; (\nabla \cdot \Ub)  \leq 0.40 \enskip ,
+\end{equation}
+  in every cell.
+
+\end{enumerate}
+
+\end{description}
+
+\noindent This completes one step of the algorithm.
+
+
+\section{Conclusions and Future Work}
+
+\acknowledgements
+
+
+\bibliographystyle{aasjournal.bst}
+\bibliography{references}
+
+\end{document}
+
