@@ -1,7 +1,7 @@
 
 # INITIAL MODEL
 maestro.model_file = "kepler_new_6.25e8.hybrid.hse.6048.dr"
-maestro.probin_file = "probin"
+maestro.probin_file = "extern"
 
 maestro.drdxfac = 5
 

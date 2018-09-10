@@ -20,13 +20,13 @@ module base_state_module
   use amrex_fort_module, only: amrex_spacedim
   use network, only: nspec
   use meth_params_module, only: nscal, model_file, spherical, base_cutoff_density, &
-                                do_2d_planar_octant, do_planar_invsq_grav, rho_comp, &
-                                rhoh_comp, spec_comp, temp_comp, grav_const, &
-                                planar_invsq_mass, print_init_hse_diag, prob_lo, &
-                                prob_hi, small_dens, small_temp, &
-                                anelastic_cutoff, buoyancy_cutoff_factor
+       do_2d_planar_octant, do_planar_invsq_grav, rho_comp, &
+       rhoh_comp, spec_comp, temp_comp, grav_const, &
+       planar_invsq_mass, print_init_hse_diag, prob_lo, &
+       prob_hi, small_dens, small_temp, &
+       anelastic_cutoff, buoyancy_cutoff_factor
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
-  use probdata_module, only: rho_base, p_base
+  use probin_module, only: rho_base, p_base
 
   implicit none
 
@@ -131,42 +131,42 @@ contains
 
        do r=0,nr(n)-1
 
-           ! Current height above the bottom of the domain
-           rloc = (dble(r) + HALF)*dr(n)
+          ! Current height above the bottom of the domain
+          rloc = (dble(r) + HALF)*dr(n)
 
-           !Init density, pressure, and temp
-           d_ambient = rho_base
-           p_ambient = p_base
-           t_ambient = t_guess
+          !Init density, pressure, and temp
+          d_ambient = rho_base
+          p_ambient = p_base
+          t_ambient = t_guess
 
-           ! Depending on location, initialize the mass fraction
-           if (rloc > rshr1 .and. rloc < rshr2) then
-              ! Middle -- jet
-              xn_ambient(:) = xn_jet(:)
-           else
-              ! Outer regions -- still fluid
-              xn_ambient(:) = xn_still(:)
-           endif
+          ! Depending on location, initialize the mass fraction
+          if (rloc > rshr1 .and. rloc < rshr2) then
+             ! Middle -- jet
+             xn_ambient(:) = xn_jet(:)
+          else
+             ! Outer regions -- still fluid
+             xn_ambient(:) = xn_still(:)
+          endif
 
-           ! use the EOS to make the state consistent
-           ! We set density and pressure, and from this the EoS yields many
-           ! thermodynamic quantities (temperature and enthalpy being the two we
-           ! care about in this problem).
-           eos_state%T     = t_ambient
-           eos_state%rho   = d_ambient
-           eos_state%p     = p_ambient
-           eos_state%xn(:) = xn_ambient(:)
+          ! use the EOS to make the state consistent
+          ! We set density and pressure, and from this the EoS yields many
+          ! thermodynamic quantities (temperature and enthalpy being the two we
+          ! care about in this problem).
+          eos_state%T     = t_ambient
+          eos_state%rho   = d_ambient
+          eos_state%p     = p_ambient
+          eos_state%xn(:) = xn_ambient(:)
 
-           ! (rho,p) --> T, h
-           call eos(eos_input_rp, eos_state)
+          ! (rho,p) --> T, h
+          call eos(eos_input_rp, eos_state)
 
-           !Now that we've calculated all of the ambient values and churned them
-           !through the EoS we can finally initialize the fluid state.
-           s0_init(n, r, rho_comp)                    = d_ambient
-           s0_init(n, r, rhoh_comp)                   = d_ambient * eos_state%h
-           s0_init(n, r, spec_comp:spec_comp+nspec-1) = d_ambient * xn_ambient(1:nspec)
-           s0_init(n, r, temp_comp)                   = eos_state%T
-           p0_init(n, r)                              = p_base
+          !Now that we've calculated all of the ambient values and churned them
+          !through the EoS we can finally initialize the fluid state.
+          s0_init(n, r, rho_comp)                    = d_ambient
+          s0_init(n, r, rhoh_comp)                   = d_ambient * eos_state%h
+          s0_init(n, r, spec_comp:spec_comp+nspec-1) = d_ambient * xn_ambient(1:nspec)
+          s0_init(n, r, temp_comp)                   = eos_state%T
+          p0_init(n, r)                              = p_base
 
        end do
 
@@ -196,7 +196,7 @@ contains
   end subroutine init_base_state
 
   subroutine init_base_state_irreg(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init, &
-                                     r_cc_loc, r_edge_loc) &
+       r_cc_loc, r_edge_loc) &
        bind(C, name="init_base_state_irreg")
 
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)

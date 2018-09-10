@@ -1,7 +1,7 @@
 
 # INITIAL MODEL
 maestro.model_file = "model.hse.cool.coulomb"
-maestro.probin_file = "probin"
+maestro.probin_file = "extern"
 maestro.perturb_model = true
 
 maestro.ppm_type = 2
@@ -55,7 +55,7 @@ maestro.grav_const = -1.5e10
 
 maestro.anelastic_cutoff = 3.e6
 maestro.base_cutoff_density = 3.e6
- 
+
 maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 10.e0
@@ -92,4 +92,3 @@ maestro.eps_hg             = 1.e-12
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
-

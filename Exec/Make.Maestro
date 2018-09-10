@@ -167,7 +167,7 @@ EXTERN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(EXTER
 
 F90EXE_sources += probin.F90
 
-PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/dummy.probin.template
+PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 
 

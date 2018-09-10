@@ -1,6 +1,6 @@
 
 # INITIAL MODEL
-maestro.probin_file = "probin"
+maestro.probin_file = "extern"
 maestro.perturb_model = true
 
 maestro.ppm_type = 1

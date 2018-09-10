@@ -1,7 +1,7 @@
 
 # INITIAL MODEL
 maestro.model_file = "model.hse.cool.coulomb"
-maestro.probin_file = "probin"
+maestro.probin_file = "extern"
 maestro.perturb_model = true
 
 maestro.ppm_type = 0
