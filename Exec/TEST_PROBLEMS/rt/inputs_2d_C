@@ -6,7 +6,7 @@ maestro.perturb_model = true
 maestro.ppm_type = 0
 
 maestro.max_step  = 10000000
-maestro.stop_time = 2.5
+maestro.stop_time = 0.1
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0  0.0  0.0
@@ -52,8 +52,8 @@ maestro.temperr = 6.5e8 6.5e8
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
-maestro.plot_int   = 100     # number of timesteps between plot files
-maestro.plot_deltat = 0.5e0
+maestro.plot_int   = -1     # number of timesteps between plot files
+maestro.plot_deltat = 1.0e0
 
 # CHECKPOINT
 maestro.check_base_name = chk

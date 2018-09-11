@@ -25,7 +25,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 384 640
+amr.n_cell             = 192 320
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -38,7 +38,7 @@ maestro.temperr = 6.5e8 6.5e8
 
 # TIME STEPPING
 maestro.max_step  = 1000
-maestro.stop_time = 2.5
+maestro.stop_time = 0.5
 maestro.cfl       = 0.9    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
@@ -61,12 +61,12 @@ maestro.use_thermal_diffusion = false
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
-maestro.plot_int   = 10      # number of timesteps between plot files
-maestro.plot_deltat = 0.5e0
+maestro.plot_int   = 1000      # number of timesteps between plot files
+maestro.plot_deltat = 0.2e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = 100
+maestro.chk_int         = -1
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
