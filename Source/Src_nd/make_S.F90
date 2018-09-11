@@ -18,21 +18,27 @@ contains
 
   subroutine make_S_cc(lo, hi, &
        S_cc,  s_lo, s_hi, &
+       delta_gamma1_term,  dg_lo, dg_hi, &
+       delta_gamma1,  df_lo, df_hi, &
        scal,  c_lo, c_hi, nc_c, &
        rodot, r_lo, r_hi, nc_r, &
        rHnuc, n_lo, n_hi, &
        rHext, e_lo, e_hi, &
-       therm, t_lo, t_hi,
-    p0m gamma1bar, dx) bind (C,name="make_S_cc")
+       therm, t_lo, t_hi, &
+       p0, gamma1bar, dx) bind (C,name="make_S_cc")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
+    integer         , intent (in   ) :: df_lo(3), df_hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3), nc_c
     integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (inout) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
+    double precision, intent (inout) :: delta_gamma1_term(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
+    double precision, intent (inout) :: delta_gamma1(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) :: scal (c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3),nc_c)
     double precision, intent (in   ) :: rodot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
     double precision, intent (in   ) :: rHnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
@@ -115,15 +121,18 @@ contains
   subroutine make_rhcc_for_nodalproj(lev, lo, hi, &
        rhcc, c_lo, c_hi, &
        S_cc,  s_lo, s_hi, &
-       Sbar, beta0) bind (C,name="make_rhcc_for_nodalproj")
+       Sbar, beta0, &
+       delta_gamma1_term, dg_lo, dg_hi) bind (C,name="make_rhcc_for_nodalproj")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
     double precision, intent (inout) :: rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) :: Sbar (0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: delta_gamma1_term (dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
 
     integer i,j,k,r
 
@@ -139,7 +148,7 @@ contains
 #elif (AMREX_SPACEDIM == 3)
              r = k
 #endif
-             rhcc(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r))
+             rhcc(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r) + delta_gamma1_term(i,j,k))
 
           enddo
        enddo
@@ -151,7 +160,8 @@ contains
        rhcc, c_lo, c_hi, &
        S_cc, s_lo, s_hi, &
        Sbar_cart, sb_lo, sb_hi, &
-       beta0_cart, b_lo, b_hi) &
+       beta0_cart, b_lo, b_hi, &
+       delta_gamma1_term, dg_lo, dg_hi) &
        bind (C,name="make_rhcc_for_nodalproj_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -159,10 +169,12 @@ contains
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: sb_lo(3), sb_hi(3)
     integer         , intent (in   ) :: b_lo(3), b_hi(3)
+    integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
     double precision, intent (inout) ::  rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision, intent (in   ) ::  S_cc(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) :: Sbar_cart(sb_lo(1):sb_hi(1),sb_lo(2):sb_hi(2),sb_lo(3):sb_hi(3))
     double precision, intent (in   ) :: beta0_cart(b_lo(1):b_hi(1),b_lo(2):b_hi(2),b_lo(3):b_hi(3))
+    double precision, intent (in   ) :: delta_gamma1_term (dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
 
     ! Local variables
     integer :: i,j,k
@@ -171,7 +183,7 @@ contains
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
-             rhcc(i,j,k) = beta0_cart(i,j,k) * (S_cc(i,j,k) - Sbar_cart(i,j,k)) !no delta_gamma1_term
+             rhcc(i,j,k) = beta0_cart(i,j,k) * (S_cc(i,j,k) - Sbar_cart(i,j,k) + delta_gamma1_term(i,j,k))
           end do
        end do
     end do
@@ -292,6 +304,7 @@ contains
        rhcc, c_lo, c_hi, &
        S_cc,  s_lo, s_hi, &
        Sbar, beta0, &
+       delta_gamma1_term, dg_lo, dg_hi, &
        gamma1bar, p0, &
        delta_p_term, dp_lo, dp_hi, &
        delta_chi, dc_lo, dc_hi, &
@@ -300,10 +313,12 @@ contains
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
     double precision, intent (inout) :: rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) :: Sbar (0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: delta_gamma1_term (dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
     integer         , intent (in   ) :: dp_lo(3), dp_hi(3)
@@ -328,7 +343,7 @@ contains
 #elif (AMREX_SPACEDIM == 3)
              r = k
 #endif
-             rhcc(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r))
+             rhcc(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r) + delta_gamma1_term(i,j,k))
 
           enddo
        enddo
@@ -386,6 +401,7 @@ contains
        S_cc,  s_lo, s_hi, &
        Sbar, beta0, &
        rho0, dx, &
+       delta_gamma1_term, dg_lo, dg_hi, &
        gamma1bar, p0, &
        delta_p_term, dp_lo, dp_hi, &
        delta_chi, dc_lo, dc_hi, &
@@ -397,12 +413,14 @@ contains
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
     double precision, intent (inout) :: rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision, intent (in   ) :: S_cc(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) ::  Sbar(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) ::  rho0(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: dx(3)
+    double precision, intent (in   ) :: delta_gamma1_term (dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
     integer         , intent (in   ) :: dp_lo(3), dp_hi(3)
@@ -436,7 +454,7 @@ contains
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
-             rhcc(i,j,k) = div_cart(i,j,k,1) * (S_cc(i,j,k) - Sbar_cart(i,j,k,1)) !no delta_gamma1_term
+             rhcc(i,j,k) = div_cart(i,j,k,1) * (S_cc(i,j,k) - Sbar_cart(i,j,k,1) + delta_gamma1_term(i,j,k))
           end do
        end do
     end do

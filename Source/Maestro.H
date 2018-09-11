@@ -455,6 +455,8 @@ private:
 
     // compute S at cell-centers
     void Make_S_cc (amrex::Vector<amrex::MultiFab>& S_cc,
+                    amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
+                    amrex::Vector<amrex::MultiFab>& delta_gamma1,
                     const amrex::Vector<amrex::MultiFab>& scal,
                     const amrex::Vector<amrex::MultiFab>& rho_omegadot,
                     const amrex::Vector<amrex::MultiFab>& rho_Hnuc,
@@ -465,18 +467,20 @@ private:
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
                                const amrex::Vector<amrex::MultiFab>& S_cc,
                                const amrex::Vector<amrex::Real>& Sbar,
-                               const amrex::Vector<amrex::Real>& beta0);
+                               const amrex::Vector<amrex::Real>& beta0,
+                               const Vector<MultiFab>& delta_gamma1_term);
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
-			     const amrex::Vector<amrex::Real>& rho0,
+			                       const amrex::Vector<amrex::Real>& rho0,
                              const amrex::Vector<amrex::MultiFab>& S_cc,
                              const amrex::Vector<amrex::Real>& Sbar,
                              const amrex::Vector<amrex::Real>& beta0,
+                             const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
                              const amrex::Vector<amrex::Real>& gamma1bar,
-			     const amrex::Vector<amrex::Real>& p0,
+			                       const amrex::Vector<amrex::Real>& p0,
                              const amrex::Vector<amrex::MultiFab>& delta_p_term,
-			           amrex::Vector<amrex::MultiFab>& delta_chi,
+			                       amrex::Vector<amrex::MultiFab>& delta_chi,
                              int is_predictor);
 
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,

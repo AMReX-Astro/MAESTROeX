@@ -395,7 +395,8 @@ void Maestro::InitProj ()
 		}
 
 		// compute S at cell-centers
-		Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+		Make_S_cc(S_cc_old,delta_gamma_1_term,delta_gamma1,sold,rho_omegadot,rho_Hnuc,
+		          rho_Hext,thermal,p0_old,gamma1bar_old);
 
 		if (evolve_base_state && use_exact_base_state == 0) {
 				// average S into Sbar
@@ -403,7 +404,7 @@ void Maestro::InitProj ()
 		}
 
 		// make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-		MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old);
+		MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
 
 		// perform a nodal projection
 		NodalProj(initial_projection_comp,rhcc_for_nodalproj);
@@ -482,7 +483,8 @@ void Maestro::DivuIter (int istep_divu_iter)
 		}
 
 		// compute S at cell-centers
-		Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,rho_omegadot,rho_Hnuc,
+		          rho_Hext,thermal,p0_old,gamma1bar_old);
 
 		if (evolve_base_state && use_exact_base_state == 0) {
 				Average(S_cc_old,Sbar,0);
@@ -497,7 +499,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 		}
 
 		// make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-		MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old);
+		MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
 
 		// perform a nodal projection
 		NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
