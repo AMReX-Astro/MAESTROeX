@@ -470,8 +470,6 @@ void Maestro::DivuIter (int istep_divu_iter)
     // compute S at cell-centers
     Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
 
-    VisMF::Write(S_cc_old[0],"a_S_cc_old");
-
     if (evolve_base_state && use_exact_base_state == 0) {
         Average(S_cc_old,Sbar,0);
 
