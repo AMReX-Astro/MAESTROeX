@@ -654,13 +654,13 @@ extern "C"
     // compute S from constraint div(u) = S
     void make_S_cc(const int* lo, const int* hi,
                          amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
-            amrex::Real* delta_gamma1_term,  const int* s_lo, const int* s_hi,
-                 amrex::Real* delta_gamma1,  const int* s_lo, const int* s_hi,
+            amrex::Real* delta_gamma1_term,  const int* dg_lo, const int* dg_hi,
+                 amrex::Real* delta_gamma1,  const int* df_lo, const int* df_hi,
                    const amrex::Real* scal,  const int* c_lo, const int* c_hi, const int* nc_c,
                    const amrex::Real* rodot, const int* r_lo, const int* r_hi, const int* nc_r,
                    const amrex::Real* rHnuc, const int* n_lo, const int* n_hi,
                    const amrex::Real* rHext, const int* e_lo, const int* e_hi,
-                   const amrex::Real* therm, const int* t_lo, const int* t_hi
+                   const amrex::Real* therm, const int* t_lo, const int* t_hi,
                    const amrex::Real* p0, const amrex::Real* gamma1bar, const amrex::Real* dx);
 
     // rhcc = beta0 * (S - Sbar)

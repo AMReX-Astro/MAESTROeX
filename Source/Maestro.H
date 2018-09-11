@@ -461,14 +461,16 @@ private:
                     const amrex::Vector<amrex::MultiFab>& rho_omegadot,
                     const amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
-                    const amrex::Vector<amrex::MultiFab>& thermal);
+                    const amrex::Vector<amrex::MultiFab>& thermal,
+                    const amrex::Vector<amrex::Real>& p0,
+                    const amrex::Vector<amrex::Real>& gamma1bar);
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
                                const amrex::Vector<amrex::MultiFab>& S_cc,
                                const amrex::Vector<amrex::Real>& Sbar,
                                const amrex::Vector<amrex::Real>& beta0,
-                               const Vector<MultiFab>& delta_gamma1_term);
+                               const amrex::Vector<amrex::MultiFab>& delta_gamma1_term);
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,

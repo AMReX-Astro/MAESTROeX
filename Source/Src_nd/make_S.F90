@@ -5,10 +5,10 @@ module make_S_module
   use eos_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, dpdt_factor, base_cutoff_density
-  use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord
+  use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_coord, nr
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
-  use probin_module, only: use_delta_gamma1_term
-  use geometry, only: anelastic_cutoff_coord, nr
+  ! use probdata_module, only: use_delta_gamma1_term
+  ! use geometry, only: anelastic_cutoff_coord, nr
 
   implicit none
 
@@ -94,7 +94,7 @@ contains
 #else
              r = k
 #endif
-             if (use_delta_gamma1_term .and. r < anelastic_cutoff_coord(n)) then
+             if (r < anelastic_cutoff_coord(n)) then
                 if (r .eq. 0) then
                    gradp0 = (p0(lev,r+1) - p0(r))/dx(AMREX_SPACEDIM)
                 else if (r .eq. nr(n)-1) then
