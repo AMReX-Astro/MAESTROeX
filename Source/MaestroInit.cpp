@@ -492,8 +492,10 @@ void Maestro::DivuIter (int istep_divu_iter)
 				Average(S_cc_old,Sbar,0);
 
 				// compute Sbar = Sbar + delta_gamma1_termbar
-				for(int i=0; i<Sbar.size(); ++i) {
-						Sbar[i] += delta_gamma1_termbar[i];
+				if (use_delta_gamma1_term) {
+						for(int i=0; i<Sbar.size(); ++i) {
+								Sbar[i] += delta_gamma1_termbar[i];
+						}
 				}
 
 				int is_predictor = 1;

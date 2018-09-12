@@ -60,10 +60,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 								               BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
 								               BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
 								               BL_TO_FORTRAN_3D(thermal_mf[mfi]),
-     								           p0.dataPtr(),gamma1bar.dataPtr(), dx,
+								               p0.dataPtr(),gamma1bar.dataPtr(), dx,
 								               BL_TO_FORTRAN_FAB(normal_mf[mfi]),
-                               r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                               BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+								               r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+								               BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 
 						} else {
 								make_S_cc(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
@@ -79,56 +79,54 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 								          p0.dataPtr(),gamma1bar.dataPtr(), dx);
 						}
 				}
-
 		}
 
 		// average fine data onto coarser cells
 		AverageDown(S_cc,0,1);
 
-		// horizontal average of delta_gamma1_term
-		Average(delta_gamma1_term,delta_gamma1_termbar,0);
+		if (use_delta_gamma1_term) {
 
-		// if (use_delta_gamma1_term) {
-		for (int lev=0; lev<=finest_level; ++lev) {
+				// horizontal average of delta_gamma1_term
+				Average(delta_gamma1_term,delta_gamma1_termbar,0);
+        
+				for (int lev=0; lev<=finest_level; ++lev) {
 
-				// get references to the MultiFabs at level lev
-				MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
-				const MultiFab& delta_gamma1_mf = delta_gamma1[lev];
-				const MultiFab& cc_to_r = cell_cc_to_r[lev];
-				const Real* dx = geom[lev].CellSize();
+						// get references to the MultiFabs at level lev
+						MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
+						const MultiFab& delta_gamma1_mf = delta_gamma1[lev];
+						const MultiFab& cc_to_r = cell_cc_to_r[lev];
+						const Real* dx = geom[lev].CellSize();
 
-				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-				for ( MFIter mfi(delta_gamma1_term_mf); mfi.isValid(); ++mfi ) {
+						// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+						for ( MFIter mfi(delta_gamma1_term_mf); mfi.isValid(); ++mfi ) {
 
-						// Get the index space of the valid region
-						const Box& validBox = mfi.validbox();
+								// Get the index space of the valid region
+								const Box& validBox = mfi.validbox();
 
-						// call fortran subroutine
-						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-						// lo/hi coordinates (including ghost cells), and/or the # of components
-						// We will also pass "validBox", which specifies the "valid" region.
+								// call fortran subroutine
+								// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+								// lo/hi coordinates (including ghost cells), and/or the # of components
+								// We will also pass "validBox", which specifies the "valid" region.
+								if (spherical == 1) {
+										create_correction_delta_gamma1_term_sphr(&lev,
+										                                         ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+										                                         BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
+										                                         BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
+										                                         gamma1bar.dataPtr(), psi.dataPtr(),
+										                                         p0.dataPtr(), dx,
+										                                         r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+										                                         BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+								} else {
+										create_correction_delta_gamma1_term(&lev,
+										                                    ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+										                                    BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
+										                                    BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
+										                                    gamma1bar.dataPtr(), psi.dataPtr(), p0.dataPtr());
 
-						if (spherical == 1) {
-								create_correction_delta_gamma1_term_sphr(&lev,
-								                                         ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-								                                         BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
-								                                         BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
-								                                         gamma1bar.dataPtr(), psi.dataPtr(),
-								                                         p0.dataPtr(), dx,
-								                                         r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-								                                         BL_TO_FORTRAN_3D(cc_to_r[mfi]));
-						} else {
-								create_correction_delta_gamma1_term(&lev,
-								                                    ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-								                                    BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
-								                                    BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
-								                                    gamma1bar.dataPtr(), psi.dataPtr(), p0.dataPtr());
-
+								}
 						}
 				}
-
 		}
-
 }
 
 // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi

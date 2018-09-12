@@ -4,11 +4,9 @@ module make_S_module
   use eos_type_module
   use eos_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, dpdt_factor, base_cutoff_density
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, dpdt_factor, base_cutoff_density, use_delta_gamma1_term
   use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_coord, nr, dr
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
-  ! use probdata_module, only: use_delta_gamma1_term
-  ! use geometry, only: anelastic_cutoff_coord, nr
 
   implicit none
 
@@ -98,7 +96,7 @@ contains
 #else
              r = k
 #endif
-             if (r < anelastic_cutoff_coord(lev)) then
+             if (use_delta_gamma1_term .and. r < anelastic_cutoff_coord(lev)) then
                 if (r .eq. 0) then
                    gradp0 = (p0(lev,r+1) - p0(lev,r))/dx(AMREX_SPACEDIM)
                 else if (r .eq. nr(lev)-1) then
@@ -180,28 +178,30 @@ contains
     double precision, allocatable ::   gradp0_cart(:,:,:,:)
     double precision, allocatable ::gamma1bar_cart(:,:,:,:)
 
-    ! compute gradp0 and put it on a cart
-    do r = 0, nr_fine-1
-       if (r == 0) then
-          gradp0(1,r) = (p0(lev,r+1) - p0(lev,r))/dr(lev)
-       else if (r == nr_fine-1) then
-          gradp0(1,r) = (p0(lev,r) - p0(lev,r-1))/dr(lev)
-       else
-          gradp0(1,r) = 0.5d0*(p0(lev,r+1) - p0(lev,r-1))/dr(lev)
-       endif
-    enddo
+    if (use_delta_gamma1_term) then
+       ! compute gradp0 and put it on a cart
+       do r = 0, nr_fine-1
+          if (r == 0) then
+             gradp0(1,r) = (p0(lev,r+1) - p0(lev,r))/dr(lev)
+          else if (r == nr_fine-1) then
+             gradp0(1,r) = (p0(lev,r) - p0(lev,r-1))/dr(lev)
+          else
+             gradp0(1,r) = 0.5d0*(p0(lev,r+1) - p0(lev,r-1))/dr(lev)
+          endif
+       enddo
 
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
+       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
+            cc_to_r,ccr_lo,ccr_hi)
 
-    allocate(gradp0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,gradp0_cart,lo,hi,1,gradp0,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
+       allocate(gradp0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call put_1d_array_on_cart_sphr(lo,hi,gradp0_cart,lo,hi,1,gradp0,dx,0,0,r_cc_loc,r_edge_loc, &
+            cc_to_r,ccr_lo,ccr_hi)
 
-    allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
+       allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
+            cc_to_r,ccr_lo,ccr_hi)
+    endif
 
     ! loop over the data
     do k = lo(3),hi(3)
@@ -235,28 +235,30 @@ contains
                   + sigma*xi_term &
                   + pres_term/(eos_state%rho*eos_state%dpdr)
 
-             ! if (use_delta_gamma1_term) then
-             delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k,1)
+             if (use_delta_gamma1_term) then
+                delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k,1)
 
-             Ut_dot_er = &
-                  u(i,j,k,1)*normal(i,j,k,1) + &
-                  u(i,j,k,2)*normal(i,j,k,2) + &
-                  u(i,j,k,3)*normal(i,j,k,3)
+                Ut_dot_er = &
+                     u(i,j,k,1)*normal(i,j,k,1) + &
+                     u(i,j,k,2)*normal(i,j,k,2) + &
+                     u(i,j,k,3)*normal(i,j,k,3)
 
-             delta_gamma1_term(i,j,k) = delta_gamma1(i,j,k)*Ut_dot_er* &
-                  gradp0_cart(i,j,k,1)/ &
-                  (gamma1bar_cart(i,j,k,1)**2*p0_cart(i,j,k,1))
+                delta_gamma1_term(i,j,k) = delta_gamma1(i,j,k)*Ut_dot_er* &
+                     gradp0_cart(i,j,k,1)/ &
+                     (gamma1bar_cart(i,j,k,1)**2*p0_cart(i,j,k,1))
 
-             ! else
-             !    dg1_term(i,j,k) = ZERO
-             !    delta_gamma1(i,j,k) = ZERO
-             ! end if
+             else
+                delta_gamma1_term(i,j,k) = 0.0d0
+                delta_gamma1(i,j,k) = 0.0d0
+             end if
 
           enddo
        enddo
     enddo
 
-    deallocate(p0_cart, gradp0_cart, gamma1bar_cart)
+    if (use_delta_gamma1_term) then
+       deallocate(p0_cart, gradp0_cart, gamma1bar_cart)
+    endif
 
   end subroutine make_S_cc_sphr
 

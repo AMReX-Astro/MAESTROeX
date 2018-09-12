@@ -599,8 +599,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 				Average(S_cc_nph,Sbar,0);
 
 				// compute Sbar = Sbar + delta_gamma1_termbar
-				for(int i=0; i<Sbar.size(); ++i) {
-						Sbar[i] += delta_gamma1_termbar[i];
+				if (use_delta_gamma1_term) {
+						for(int i=0; i<Sbar.size(); ++i) {
+								Sbar[i] += delta_gamma1_termbar[i];
+						}
 				}
 
 				// compute w0, w0_force, and delta_chi_w0
@@ -836,8 +838,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 				Average(S_cc_new,Sbar,0);
 
 				// compute Sbar = Sbar + delta_gamma1_termbar
-				for(int i=0; i<Sbar.size(); ++i) {
-						Sbar[i] += delta_gamma1_termbar[i];
+				if (use_delta_gamma1_term) {
+						for(int i=0; i<Sbar.size(); ++i) {
+								Sbar[i] += delta_gamma1_termbar[i];
+						}
 				}
 		}
 
