@@ -395,7 +395,7 @@ void Maestro::InitProj ()
 		}
 
 		// compute S at cell-centers
-		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,rho_omegadot,rho_Hnuc,
+		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
 		          rho_Hext,thermal,p0_old,gamma1bar_old);
 
 		if (evolve_base_state && use_exact_base_state == 0) {
@@ -483,7 +483,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 		}
 
 		// compute S at cell-centers
-		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,rho_omegadot,rho_Hnuc,
+		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
 		          rho_Hext,thermal,p0_old,gamma1bar_old);
 
 		if (evolve_base_state && use_exact_base_state == 0) {

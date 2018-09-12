@@ -9,6 +9,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     Vector<MultiFab>& delta_gamma1_term,
                     Vector<MultiFab>& delta_gamma1,
                     const Vector<MultiFab>& scal,
+                    const Vector<MultiFab>& u,
                     const Vector<MultiFab>& rho_omegadot,
                     const Vector<MultiFab>& rho_Hnuc,
                     const Vector<MultiFab>& rho_Hext,
@@ -26,11 +27,12 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 				MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
 				MultiFab& delta_gamma1_mf = delta_gamma1[lev];
 				const MultiFab& scal_mf = scal[lev];
+				const MultiFab& u_mf = u[lev];
 				const MultiFab& rho_odot_mf = rho_omegadot[lev];
 				const MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
 				const MultiFab& rho_Hext_mf = rho_Hext[lev];
 				const MultiFab& thermal_mf = thermal[lev];
-        const Real* dx = geom[lev].CellSize();
+				const Real* dx = geom[lev].CellSize();
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 				for ( MFIter mfi(S_cc_mf); mfi.isValid(); ++mfi ) {
@@ -42,11 +44,12 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 						// lo/hi coordinates (including ghost cells), and/or the # of components
 						// We will also pass "validBox", which specifies the "valid" region.
-						make_S_cc(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+						make_S_cc(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 						          BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
 						          BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
 						          BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
 						          BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+						          BL_TO_FORTRAN_FAB(u_mf[mfi]),
 						          BL_TO_FORTRAN_FAB(rho_odot_mf[mfi]),
 						          BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
 						          BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),

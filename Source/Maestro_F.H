@@ -652,11 +652,12 @@ extern "C"
     // in make_S.f90
 
     // compute S from constraint div(u) = S
-    void make_S_cc(const int* lo, const int* hi,
+    void make_S_cc(const int* lev, const int* lo, const int* hi,
                          amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
             amrex::Real* delta_gamma1_term,  const int* dg_lo, const int* dg_hi,
                  amrex::Real* delta_gamma1,  const int* df_lo, const int* df_hi,
                    const amrex::Real* scal,  const int* c_lo, const int* c_hi, const int* nc_c,
+                   const amrex::Real* u,     const int* u_lo, const int* u_hi, const int* nc_u,
                    const amrex::Real* rodot, const int* r_lo, const int* r_hi, const int* nc_r,
                    const amrex::Real* rHnuc, const int* n_lo, const int* n_hi,
                    const amrex::Real* rHext, const int* e_lo, const int* e_hi,
@@ -725,14 +726,14 @@ extern "C"
 				    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
     void create_correction_delta_gamma1_term(const int* lev, const int* lo, const int* hi,
-				    const amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
+				    amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
 				    const amrex::Real* delta_gamma1, const int* df_lo, const int* df_hi,
 			      const amrex::Real* gamma1bar,
 			      const amrex::Real* psi,
 			      const amrex::Real* p0);
 
     void create_correction_delta_gamma1_term_sphr(const int* lo, const int* hi,
-				   const amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
+				   amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
            const amrex::Real* delta_gamma1, const int* df_lo, const int* df_hi,
 				   const amrex::Real* gamma1bar,
 				   const amrex::Real* psi,

@@ -552,7 +552,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		}
 
 		// compute S at cell-centers
-		Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,rho_omegadot,rho_Hnuc,
+		Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
 		          rho_Hext,thermal2,p0_old,gamma1bar_new);
 
 		// set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
@@ -824,7 +824,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 				                    temp_diffusion_formulation);
 		}
 
-		Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,rho_omegadot,rho_Hnuc,
+		Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
 		          rho_Hext,thermal2,p0_new,gamma1bar_new);
 
 		if (evolve_base_state) {

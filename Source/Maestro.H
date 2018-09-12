@@ -458,6 +458,7 @@ private:
                     amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
                     amrex::Vector<amrex::MultiFab>& delta_gamma1,
                     const amrex::Vector<amrex::MultiFab>& scal,
+                    const amrex::Vector<amrex::MultiFab>& u,
                     const amrex::Vector<amrex::MultiFab>& rho_omegadot,
                     const amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,

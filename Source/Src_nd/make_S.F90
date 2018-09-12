@@ -16,22 +16,25 @@ module make_S_module
 
 contains
 
-  subroutine make_S_cc(lo, hi, &
+  subroutine make_S_cc(lev, lo, hi, &
        S_cc,  s_lo, s_hi, &
        delta_gamma1_term,  dg_lo, dg_hi, &
        delta_gamma1,  df_lo, df_hi, &
        scal,  c_lo, c_hi, nc_c, &
+       u,  u_lo, u_hi, nc_u, &
        rodot, r_lo, r_hi, nc_r, &
        rHnuc, n_lo, n_hi, &
        rHext, e_lo, e_hi, &
        therm, t_lo, t_hi, &
        p0, gamma1bar, dx) bind (C,name="make_S_cc")
 
+    integer         , intent (in   ) :: lev
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
     integer         , intent (in   ) :: df_lo(3), df_hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3), nc_c
+    integer         , intent (in   ) :: u_lo(3), u_hi(3), nc_u
     integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
@@ -40,6 +43,7 @@ contains
     double precision, intent (inout) :: delta_gamma1_term(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (inout) :: delta_gamma1(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (in   ) :: scal (c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3),nc_c)
+    double precision, intent (in   ) :: u (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent (in   ) :: rodot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
     double precision, intent (in   ) :: rHnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: rHext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
@@ -94,10 +98,10 @@ contains
 #else
              r = k
 #endif
-             if (r < anelastic_cutoff_coord(n)) then
+             if (r < anelastic_cutoff_coord(lev)) then
                 if (r .eq. 0) then
-                   gradp0 = (p0(lev,r+1) - p0(r))/dx(AMREX_SPACEDIM)
-                else if (r .eq. nr(n)-1) then
+                   gradp0 = (p0(lev,r+1) - p0(lev,r))/dx(AMREX_SPACEDIM)
+                else if (r .eq. nr(lev)-1) then
                    gradp0 = (p0(lev,r) - p0(lev,r-1))/dx(AMREX_SPACEDIM)
                 else
                    gradp0 = 0.5d0*(p0(lev,r+1) - p0(lev,r-1))/dx(AMREX_SPACEDIM)
@@ -108,8 +112,8 @@ contains
                 delta_gamma1_term(i,j,k) = (eos_state%gam1 - gamma1bar(lev,r))*u(i,j,k,AMREX_SPACEDIM)* &
                      gradp0/(gamma1bar(lev,r)*gamma1bar(lev,r)*p0(lev,r))
              else
-                delta_gamma1_term(i,j,k) = ZERO
-                delta_gamma1(i,j,k) = ZERO
+                delta_gamma1_term(i,j,k) = 0.0d0
+                delta_gamma1(i,j,k) = 0.0d0
              endif
 
           enddo
@@ -508,7 +512,7 @@ contains
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: dg_lo(3), dg_hi(3)
-    double precision, intent(in   ) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
+    double precision, intent(inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     integer         , intent(in   ) :: df_lo(3), df_hi(3)
     double precision, intent(in   ) :: delta_gamma1(df_lo(1):df_hi(1),df_lo(2):df_hi(2),dg_lo(3):df_hi(3))
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
@@ -553,7 +557,7 @@ contains
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: dg_lo(3), dg_hi(3)
-    double precision, intent(in   ) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
+    double precision, intent(inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     integer         , intent(in   ) :: df_lo(3), df_hi(3)
     double precision, intent(in   ) :: delta_gamma1(df_lo(1):df_hi(1),df_lo(2):df_hi(2),dg_lo(3):df_hi(3))
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
