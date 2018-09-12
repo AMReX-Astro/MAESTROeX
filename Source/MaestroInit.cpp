@@ -415,6 +415,7 @@ void Maestro::InitProj ()
 
 void Maestro::DivuIter (int istep_divu_iter)
 {
+
 		// timer for profiling
 		BL_PROFILE_VAR("Maestro::DivuIter()",DivuIter);
 
@@ -428,20 +429,19 @@ void Maestro::DivuIter (int istep_divu_iter)
 		Vector<MultiFab> hcoeff            (finest_level+1);
 		Vector<MultiFab> Xkcoeff           (finest_level+1);
 		Vector<MultiFab> pcoeff            (finest_level+1);
+		Vector<MultiFab> delta_gamma1      (finest_level+1);
+		Vector<MultiFab> delta_gamma1_term (finest_level+1);
 
 		Vector<Real> Sbar                  ( (max_radial_level+1)*nr_fine );
 		Vector<Real> w0_force              ( (max_radial_level+1)*nr_fine );
 		Vector<Real> p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
 		Vector<Real> delta_chi_w0          ( (max_radial_level+1)*nr_fine );
-		Vector<MultiFab> delta_gamma1      ( (max_radial_level+1)*nr_fine );
-		Vector<MultiFab> delta_gamma1_term ( (max_radial_level+1)*nr_fine );
-		Vector<Real> delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
+		Vector<Real> delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
+
 		Sbar.shrink_to_fit();
 		w0_force.shrink_to_fit();
 		p0_minus_peosbar.shrink_to_fit();
 		delta_chi_w0.shrink_to_fit();
-		delta_gamma1.shrink_to_fit();
-		delta_gamma1_term.shrink_to_fit();
 		delta_gamma1_termbar.shrink_to_fit();
 
 		std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
@@ -450,9 +450,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 		std::fill(psi.begin(),                  psi.end(),                  0.);
 		std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
 		std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
-		std::fill(delta_gamma1.begin(),         delta_gamma1.end(),         0.);
-		std::fill(delta_gamma1_term.begin(),    delta_gamma1_term.end(),    0.);
-
+		std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
 
 		for (int lev=0; lev<=finest_level; ++lev) {
 				stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
@@ -465,8 +463,8 @@ void Maestro::DivuIter (int istep_divu_iter)
 				hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
 				Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
 				pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
-				delta_gamma1      [lev].define(grids[lev], dmap[lev],       1,    1);
-				delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1,    1);
+				delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
+				delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
 
 				// divu_iters do not use density weighting
 				rhohalf[lev].setVal(1.);

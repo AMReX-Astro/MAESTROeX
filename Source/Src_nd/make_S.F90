@@ -191,20 +191,17 @@ contains
        endif
     enddo
 
-
     allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call   put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,lev,p0,dx,0,0,r_cc_loc,r_edge_loc, &
+    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
     allocate(gradp0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
     call put_1d_array_on_cart_sphr(lo,hi,gradp0_cart,lo,hi,1,gradp0,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
-
     allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,lev,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
+    call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
-
 
     ! loop over the data
     do k = lo(3),hi(3)
@@ -239,7 +236,7 @@ contains
                   + pres_term/(eos_state%rho*eos_state%dpdr)
 
              ! if (use_delta_gamma1_term) then
-             delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(1,i,j,k)
+             delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k,1)
 
              Ut_dot_er = &
                   u(i,j,k,1)*normal(i,j,k,1) + &
@@ -247,8 +244,8 @@ contains
                   u(i,j,k,3)*normal(i,j,k,3)
 
              delta_gamma1_term(i,j,k) = delta_gamma1(i,j,k)*Ut_dot_er* &
-                  gradp0_cart(1,i,j,k)/ &
-                  (gamma1bar_cart(1,i,j,k)**2*p0_cart(1,i,j,k))
+                  gradp0_cart(i,j,k,1)/ &
+                  (gamma1bar_cart(i,j,k,1)**2*p0_cart(i,j,k,1))
 
              ! else
              !    dg1_term(i,j,k) = ZERO
@@ -258,6 +255,8 @@ contains
           enddo
        enddo
     enddo
+
+    deallocate(p0_cart, gradp0_cart, gamma1bar_cart)
 
   end subroutine make_S_cc_sphr
 
