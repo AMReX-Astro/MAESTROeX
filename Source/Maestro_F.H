@@ -732,7 +732,7 @@ extern "C"
 			      const amrex::Real* psi,
 			      const amrex::Real* p0);
 
-    void create_correction_delta_gamma1_term_sphr(const int* lo, const int* hi,
+    void create_correction_delta_gamma1_term_sphr(const int* lev, const int* lo, const int* hi,
 				   amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
            const amrex::Real* delta_gamma1, const int* df_lo, const int* df_hi,
 				   const amrex::Real* gamma1bar,

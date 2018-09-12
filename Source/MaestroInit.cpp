@@ -354,7 +354,9 @@ void Maestro::InitProj ()
 		Vector<MultiFab>  delta_gamma1_term(finest_level+1);
 
 		Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
+		Vector<Real> delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
 		Sbar.shrink_to_fit();
+		delta_gamma1_termbar.shrink_to_fit();
 
 		for (int lev=0; lev<=finest_level; ++lev) {
 				rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
@@ -396,7 +398,7 @@ void Maestro::InitProj ()
 
 		// compute S at cell-centers
 		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-		          rho_Hext,thermal,p0_old,gamma1bar_old);
+		          rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
 		if (evolve_base_state && use_exact_base_state == 0) {
 				// average S into Sbar
@@ -433,12 +435,14 @@ void Maestro::DivuIter (int istep_divu_iter)
 		Vector<Real> delta_chi_w0          ( (max_radial_level+1)*nr_fine );
 		Vector<MultiFab> delta_gamma1      ( (max_radial_level+1)*nr_fine );
 		Vector<MultiFab> delta_gamma1_term ( (max_radial_level+1)*nr_fine );
+		Vector<Real> delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
 		Sbar.shrink_to_fit();
 		w0_force.shrink_to_fit();
 		p0_minus_peosbar.shrink_to_fit();
 		delta_chi_w0.shrink_to_fit();
 		delta_gamma1.shrink_to_fit();
 		delta_gamma1_term.shrink_to_fit();
+		delta_gamma1_termbar.shrink_to_fit();
 
 		std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
 		std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
@@ -484,10 +488,15 @@ void Maestro::DivuIter (int istep_divu_iter)
 
 		// compute S at cell-centers
 		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-		          rho_Hext,thermal,p0_old,gamma1bar_old);
+		          rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
 		if (evolve_base_state && use_exact_base_state == 0) {
 				Average(S_cc_old,Sbar,0);
+
+				// compute Sbar = Sbar + delta_gamma1_termbar
+				for(int i=0; i<Sbar.size(); ++i) {
+						Sbar[i] += delta_gamma1_termbar[i];
+				}
 
 				int is_predictor = 1;
 				make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),

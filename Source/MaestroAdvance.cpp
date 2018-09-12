@@ -76,6 +76,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		Vector<Real> beta0_nph       ( (max_radial_level+1)*nr_fine );
 		Vector<Real> gamma1bar_temp1 ( (max_radial_level+1)*nr_fine );
 		Vector<Real> gamma1bar_temp2 ( (max_radial_level+1)*nr_fine );
+		Vector<Real> delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
 		Vector<Real> delta_chi_w0    ( (max_radial_level+1)*nr_fine );
 
 		// vectors store the multilevel 1D states as one very long array
@@ -94,6 +95,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		beta0_nph.shrink_to_fit();
 		gamma1bar_temp1.shrink_to_fit();
 		gamma1bar_temp2.shrink_to_fit();
+		delta_gamma1_termbar.shrink_to_fit();
 		delta_chi_w0.shrink_to_fit();
 		w0_old.shrink_to_fit();
 		rho0_predicted_edge.shrink_to_fit();
@@ -553,7 +555,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 		// compute S at cell-centers
 		Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-		          rho_Hext,thermal2,p0_old,gamma1bar_new);
+		          rho_Hext,thermal2,p0_old,gamma1bar_new,delta_gamma1_termbar,psi);
 
 		// set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -596,7 +598,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 				// compute Sbar = average(S_cc_nph)
 				Average(S_cc_nph,Sbar,0);
 
-				// TODO: add delta_gamma1_bar to Sbar here
+				// compute Sbar = Sbar + delta_gamma1_termbar
+				for(int i=0; i<Sbar.size(); ++i) {
+						Sbar[i] += delta_gamma1_termbar[i];
+				}
 
 				// compute w0, w0_force, and delta_chi_w0
 				is_predictor = 0;
@@ -825,12 +830,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		}
 
 		Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-		          rho_Hext,thermal2,p0_new,gamma1bar_new);
+		          rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
 
 		if (evolve_base_state) {
 				Average(S_cc_new,Sbar,0);
 
-				// TODO: add delta_gamma1_termbar to Sbar here
+				// compute Sbar = Sbar + delta_gamma1_termbar
+				for(int i=0; i<Sbar.size(); ++i) {
+						Sbar[i] += delta_gamma1_termbar[i];
+				}
 		}
 
 		// define dSdt = (S_cc_new - S_cc_old) / dt

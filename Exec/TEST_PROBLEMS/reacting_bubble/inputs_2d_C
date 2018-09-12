@@ -38,7 +38,7 @@ maestro.temperr = 6.5e8 6.5e8
 
 # TIME STEPPING
 maestro.max_step  = 1000
-maestro.stop_time = 0.5
+maestro.stop_time = 5
 maestro.cfl       = 0.9    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
@@ -62,7 +62,7 @@ maestro.use_thermal_diffusion = false
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
 maestro.plot_int   = 1000      # number of timesteps between plot files
-maestro.plot_deltat = 0.2e0
+maestro.plot_deltat = 1e0
 
 # CHECKPOINT
 maestro.check_base_name = chk

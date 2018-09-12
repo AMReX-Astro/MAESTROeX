@@ -69,6 +69,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 		Vector<Real> Sbar            ( (max_radial_level+1)*nr_fine );
 		Vector<Real> beta0_nph       ( (max_radial_level+1)*nr_fine );
 		Vector<Real> gamma1bar_nph   ( (max_radial_level+1)*nr_fine );
+		Vector<Real> delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
 
 		// vectors store the multilevel 1D states as one very long array
 		// these are edge-centered
@@ -84,6 +85,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 		beta0_nph.shrink_to_fit();
 		gamma1bar_nph.shrink_to_fit();
 		rho0_pred_edge_dummy.shrink_to_fit();
+		delta_gamma1_termbar.shrink_to_fit();
 
 		int is_predictor;
 
@@ -475,7 +477,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
 		// compute S at cell-centers
 		Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-		          rho_Hext,thermal2,p0_new,gamma1bar_new);
+		          rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
 
 		// set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -522,6 +524,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 				for (int i=0; i<Sbar.size(); ++i) {
 						Sbar[i] = (1.0/(gamma1bar_nph[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
 				}
+
+				// compute Sbar = Sbar + delta_gamma1_termbar
+				for(int i=0; i<Sbar.size(); ++i) {
+						Sbar[i] += delta_gamma1_termbar[i];
+				}
+
 		}
 
 		// compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -683,7 +691,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 		}
 
 		Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-		          rho_Hext,thermal2,p0_new,gamma1bar_new);
+		          rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
 
 		// define dSdt = (S_cc_new - S_cc_old) / dt
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -712,6 +720,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 		// (1.0/(gamma1bar_new[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
 		if (evolve_base_state) {
 				std::fill(Sbar.begin(), Sbar.end(), 0.);
+
+				// compute Sbar = Sbar + delta_gamma1_termbar
+				for(int i=0; i<Sbar.size(); ++i) {
+						Sbar[i] += delta_gamma1_termbar[i];
+				}
 		}
 
 		// Project the new velocity field

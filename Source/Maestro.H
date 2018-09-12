@@ -464,7 +464,9 @@ private:
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal,
                     const amrex::Vector<amrex::Real>& p0,
-                    const amrex::Vector<amrex::Real>& gamma1bar);
+                    const amrex::Vector<amrex::Real>& gamma1bar,
+                    amrex::Vector<amrex::Real>& delta_gamma1_termbar,
+                    const amrex::Vector<amrex::Real>& psi);
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
