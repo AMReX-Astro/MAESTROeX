@@ -1,13 +1,12 @@
 DEBUG      = FALSE
 DIM        = 2
 COMP	   = gnu
-USE_MPI    = FALSE
+USE_MPI    = TRUE
 USE_OMP    = FALSE
 USE_REACT  = TRUE
 
 TINY_PROFILE = FALSE
-PROFILE      = TRUE # TRUE overrides TINY_PROFILE
-TRACE_PROFILE = TRUE
+PROFILE      = FALSE
 
 # define the location of the MAESTROEX home directory
 MAESTROEX_HOME  := ../../..
