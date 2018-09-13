@@ -1,0 +1,52 @@
+# latex intermediates
+*.aux
+*.log
+*.dvi
+*.toc
+*.bbl
+*.blg
+*.lof
+*.lot
+*.idx
+*.ilg
+*.ind
+Docs/*.out
+Docs/*.ps
+Docs/*.pdf
+Docs/*/*.pdf
+
+# emacs temporaries
+*~
+\#*
+
+
+# Castro executables
+Maestro*.ex
+*.exe
+
+# plt and chk files
+plt*
+chk*
+*plt?????
+*chk?????
+*plt?????.old*
+*chk?????.old*
+*.xmgr
+
+# build directories
+o/
+d/
+f/
+t/
+tmp_build_dir/
+AMReX_buildInfo.cpp
+
+# These files are created at build time
+Exec/**/extern.[fF]90
+Exec/**/actual_network.[fF]90
+Exec/**/helm_table.dat
+
+*.hack
+*.bak
+
+Backtrace.*
