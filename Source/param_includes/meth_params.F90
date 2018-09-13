@@ -3,7 +3,7 @@
 ! or add runtime parameters, please edit _cpp_parameters and then run
 ! mk_params.sh
 
-! This module stores the runtime parameters and integer names for 
+! This module stores the runtime parameters and integer names for
 ! indexing arrays.
 !
 ! The Fortran-specific parameters are initialized in set_method_params(),
@@ -52,6 +52,7 @@ module meth_params_module
   logical                       , save :: do_eos_h_above_cutoff
   integer                       , save :: enthalpy_pred_type
   integer                       , save :: species_pred_type
+  logical                       , save :: use_delta_gamma1_term
   integer                       , save :: slope_order
   double precision              , save :: grav_const
   integer                       , save :: ppm_type
@@ -117,6 +118,7 @@ contains
     do_eos_h_above_cutoff = .true.;
     enthalpy_pred_type = 1;
     species_pred_type = 1;
+    use_delta_gamma1_term = .false.;
     slope_order = 4;
     grav_const = -1.5d10;
     ppm_type = 1;
@@ -170,6 +172,7 @@ contains
     call pp%query("do_eos_h_above_cutoff", do_eos_h_above_cutoff)
     call pp%query("enthalpy_pred_type", enthalpy_pred_type)
     call pp%query("species_pred_type", species_pred_type)
+    call pp%query("use_delta_gamma1_term", use_delta_gamma1_term)
     call pp%query("slope_order", slope_order)
     call pp%query("grav_const", grav_const)
     call pp%query("ppm_type", ppm_type)
@@ -204,14 +207,14 @@ contains
     implicit none
 
     if (allocated(model_file)) then
-        deallocate(model_file)
+       deallocate(model_file)
     end if
     if (allocated(burner_threshold_species)) then
-        deallocate(burner_threshold_species)
+       deallocate(burner_threshold_species)
     end if
 
 
-    
+
   end subroutine finalize_meth_params
 
 end module meth_params_module

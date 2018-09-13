@@ -6,7 +6,7 @@ USE_OMP    = FALSE
 USE_REACT  = TRUE
 
 TINY_PROFILE = FALSE
-PROFILE      = FALSE # TRUE overrides TINY_PROFILE
+PROFILE      = FALSE
 
 # define the location of the MAESTROEX home directory
 MAESTROEX_HOME  := ../../..

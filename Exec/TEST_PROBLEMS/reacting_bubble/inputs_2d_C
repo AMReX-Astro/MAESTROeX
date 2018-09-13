@@ -66,7 +66,7 @@ maestro.plot_deltat = 0.5e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = 100
+maestro.chk_int         = -1
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
