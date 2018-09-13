@@ -4,30 +4,30 @@ module make_explicit_thermal_module
   use eos_module
   use conductivity_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, & 
-                                  buoyancy_cutoff_factor, base_cutoff_density, &
-                                  limit_conductivity
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, &
+       buoyancy_cutoff_factor, base_cutoff_density, &
+       limit_conductivity
   use bl_constants_module
 
   implicit none
 
   private
 
-contains 
+contains
 
   subroutine make_thermal_coeffs(lo, hi, &
-                                   scal, s_lo, s_hi, nc_s, &
-                                   Tcoeff, t_lo, t_hi, & 
-                                   hcoeff, h_lo, h_hi, & 
-                                   Xkcoeff, xk_lo, xk_hi, nc_xk, & 
-                                   pcoeff, p_lo, p_hi) bind(C,name="make_thermal_coeffs")
+       scal, s_lo, s_hi, nc_s, &
+       Tcoeff, t_lo, t_hi, &
+       hcoeff, h_lo, h_hi, &
+       Xkcoeff, xk_lo, xk_hi, nc_xk, &
+       pcoeff, p_lo, p_hi) bind(C,name="make_thermal_coeffs")
 
     ! create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
-    ! for the thermal diffusion term in the enthalpy equation.  
+    ! for the thermal diffusion term in the enthalpy equation.
     !
     ! note: we explicitly fill the ghostcells by looping over them directly
 
-    integer         , intent(in   ) :: lo(3), hi(3) 
+    integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
     double precision, intent(in   ) :: scal(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     integer         , intent(in   ) :: t_lo(3), t_hi(3)
@@ -45,20 +45,21 @@ contains
     double precision :: conductivity
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! create Tcoeff = -kth, 
-!        hcoeff = -kth/cp, 
-!       Xkcoeff = xik*kth/cp, 
-!        pcoeff = hp*kth/cp
+    ! create Tcoeff = -kth,
+    !        hcoeff = -kth/cp,
+    !       Xkcoeff = xik*kth/cp,
+    !        pcoeff = hp*kth/cp
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!print *, "... Level ", lev, " create thermal coeffs:"
+    !print *, "... Level ", lev, " create thermal coeffs:"
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k,comp,eos_state,conductivity)
+
     k = lo(3)
     j = lo(2)
+    !$OMP PARALLEL DO PRIVATE(i,j,k,comp,eos_state,conductivity)
 #if (AMREX_SPACEDIM == 3)
     do k=lo(3)-1,hi(3)+1
 #endif
-#if (AMREX_SPACEDIM >= 2) 
+#if (AMREX_SPACEDIM >= 2)
        do j=lo(2)-1,hi(2)+1
 #endif
           do i=lo(1)-1,hi(1)+1
@@ -74,21 +75,21 @@ contains
                 Xkcoeff(i,j,k,:) = ZERO
 
              else
-             
+
                 eos_state%rho   = scal(i,j,k,rho_comp)
                 eos_state%T     = scal(i,j,k,temp_comp)
                 eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-             
+
                 ! dens, temp, and xmass are inputs
                 call conducteos(eos_input_rt, eos_state, conductivity)
-                
+
                 Tcoeff(i,j,k) = -conductivity
                 hcoeff(i,j,k) = -conductivity/eos_state%cp
                 pcoeff(i,j,k) = (conductivity/eos_state%cp)* &
                      ((1.0d0/eos_state%rho)* &
                      (1.0d0-eos_state%p/(eos_state%rho*eos_state%dpdr))+ &
                      eos_state%dedr/eos_state%dpdr)
-                
+
                 do comp=1,nspec
                    Xkcoeff(i,j,k,comp) = (conductivity/eos_state%cp)*eos_state%dhdX(comp)
                 enddo

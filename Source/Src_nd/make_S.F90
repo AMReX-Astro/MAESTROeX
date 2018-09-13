@@ -662,16 +662,14 @@ contains
     ! Local variables
     integer :: i, j, k
 
-#if (AMREX_SPACEDIM == 3)
+    j = lo(2)
+    k = lo(3)
     !$OMP PARALLEL DO PRIVATE(i,j,k)
+#if (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
-#else
-       k = lo(3)
 #endif
 #if (AMREX_SPACEDIM >= 2)
        do j = lo(2),hi(2)
-#else
-          j = lo(2)
 #endif
           do i = lo(1),hi(1)
              delta_gamma1_term(i,j,k) = delta_gamma1_term(i,j,k) &
@@ -727,17 +725,14 @@ contains
     call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
-
-#if (AMREX_SPACEDIM == 3)
+    j = lo(2)
+    k = lo(3)
     !$OMP PARALLEL DO PRIVATE(i,j,k)
+#if (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
-#else
-       k = lo(3)
 #endif
 #if (AMREX_SPACEDIM >= 2)
        do j = lo(2),hi(2)
-#else
-          j = lo(2)
 #endif
           do i = lo(1),hi(1)
              delta_gamma1_term(i,j,k) = delta_gamma1_term(i,j,k) &
