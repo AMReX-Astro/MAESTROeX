@@ -350,9 +350,13 @@ void Maestro::InitProj ()
 		Vector<MultiFab>             hcoeff(finest_level+1);
 		Vector<MultiFab>            Xkcoeff(finest_level+1);
 		Vector<MultiFab>             pcoeff(finest_level+1);
+		Vector<MultiFab>       delta_gamma1(finest_level+1);
+		Vector<MultiFab>  delta_gamma1_term(finest_level+1);
 
 		Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
+		Vector<Real> delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
 		Sbar.shrink_to_fit();
+		delta_gamma1_termbar.shrink_to_fit();
 
 		for (int lev=0; lev<=finest_level; ++lev) {
 				rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
@@ -364,12 +368,16 @@ void Maestro::InitProj ()
 				hcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
 				Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec,    1);
 				pcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
+				delta_gamma1      [lev].define(grids[lev], dmap[lev],       1,    1);
+				delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1,    1);
 
 				// we don't have a legit timestep yet, so we set rho_omegadot,
 				// rho_Hnuc, and rho_Hext to 0
 				rho_omegadot[lev].setVal(0.);
 				rho_Hnuc[lev].setVal(0.);
 				rho_Hext[lev].setVal(0.);
+				delta_gamma1[lev].setVal(0.);
+				delta_gamma1_term[lev].setVal(0.);
 
 				// initial projection does not use density weighting
 				rhohalf[lev].setVal(1.);
@@ -389,7 +397,8 @@ void Maestro::InitProj ()
 		}
 
 		// compute S at cell-centers
-		Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
+		          rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
 		if (evolve_base_state && use_exact_base_state == 0) {
 				// average S into Sbar
@@ -397,7 +406,7 @@ void Maestro::InitProj ()
 		}
 
 		// make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-		MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old);
+		MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
 
 		// perform a nodal projection
 		NodalProj(initial_projection_comp,rhcc_for_nodalproj);
@@ -419,15 +428,20 @@ void Maestro::DivuIter (int istep_divu_iter)
 		Vector<MultiFab> hcoeff            (finest_level+1);
 		Vector<MultiFab> Xkcoeff           (finest_level+1);
 		Vector<MultiFab> pcoeff            (finest_level+1);
+		Vector<MultiFab> delta_gamma1      (finest_level+1);
+		Vector<MultiFab> delta_gamma1_term (finest_level+1);
 
-		Vector<Real> Sbar                ( (max_radial_level+1)*nr_fine );
-		Vector<Real> w0_force            ( (max_radial_level+1)*nr_fine );
-		Vector<Real> p0_minus_peosbar    ( (max_radial_level+1)*nr_fine );
-		Vector<Real> delta_chi_w0        ( (max_radial_level+1)*nr_fine );
+		Vector<Real> Sbar                  ( (max_radial_level+1)*nr_fine );
+		Vector<Real> w0_force              ( (max_radial_level+1)*nr_fine );
+		Vector<Real> p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
+		Vector<Real> delta_chi_w0          ( (max_radial_level+1)*nr_fine );
+		Vector<Real> delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
+
 		Sbar.shrink_to_fit();
 		w0_force.shrink_to_fit();
 		p0_minus_peosbar.shrink_to_fit();
 		delta_chi_w0.shrink_to_fit();
+		delta_gamma1_termbar.shrink_to_fit();
 
 		std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
 		std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
@@ -435,7 +449,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 		std::fill(psi.begin(),                  psi.end(),                  0.);
 		std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
 		std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
-
+		std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
 
 		for (int lev=0; lev<=finest_level; ++lev) {
 				stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
@@ -448,6 +462,8 @@ void Maestro::DivuIter (int istep_divu_iter)
 				hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
 				Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
 				pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+				delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
+				delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
 
 				// divu_iters do not use density weighting
 				rhohalf[lev].setVal(1.);
@@ -468,10 +484,18 @@ void Maestro::DivuIter (int istep_divu_iter)
 		}
 
 		// compute S at cell-centers
-		Make_S_cc(S_cc_old,sold,rho_omegadot,rho_Hnuc,rho_Hext,thermal);
+		Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
+		          rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
 		if (evolve_base_state && use_exact_base_state == 0) {
 				Average(S_cc_old,Sbar,0);
+
+				// compute Sbar = Sbar + delta_gamma1_termbar
+				if (use_delta_gamma1_term) {
+						for(int i=0; i<Sbar.size(); ++i) {
+								Sbar[i] += delta_gamma1_termbar[i];
+						}
+				}
 
 				int is_predictor = 1;
 				make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
@@ -483,7 +507,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 		}
 
 		// make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-		MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old);
+		MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
 
 		// perform a nodal projection
 		NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);

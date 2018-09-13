@@ -6,11 +6,18 @@ using namespace amrex;
 // compute S at cell-centers
 void
 Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
+                    Vector<MultiFab>& delta_gamma1_term,
+                    Vector<MultiFab>& delta_gamma1,
                     const Vector<MultiFab>& scal,
+                    const Vector<MultiFab>& u,
                     const Vector<MultiFab>& rho_omegadot,
                     const Vector<MultiFab>& rho_Hnuc,
                     const Vector<MultiFab>& rho_Hext,
-                    const Vector<MultiFab>& thermal)
+                    const Vector<MultiFab>& thermal,
+                    const Vector<Real>& p0,
+                    const Vector<Real>& gamma1bar,
+                    Vector<Real>& delta_gamma1_termbar,
+                    const Vector<Real>& psi)
 {
 		// timer for profiling
 		BL_PROFILE_VAR("Maestro::Make_S_cc()",Make_S_cc);
@@ -19,14 +26,20 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
 				// get references to the MultiFabs at level lev
 				MultiFab& S_cc_mf = S_cc[lev];
+				MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
+				MultiFab& delta_gamma1_mf = delta_gamma1[lev];
 				const MultiFab& scal_mf = scal[lev];
+				const MultiFab& u_mf = u[lev];
 				const MultiFab& rho_odot_mf = rho_omegadot[lev];
 				const MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
 				const MultiFab& rho_Hext_mf = rho_Hext[lev];
 				const MultiFab& thermal_mf = thermal[lev];
+				const MultiFab& normal_mf = normal[lev];
+				const MultiFab& cc_to_r = cell_cc_to_r[lev];
+				const Real* dx = geom[lev].CellSize();
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-				for ( MFIter mfi(S_cc_mf,true); mfi.isValid(); ++mfi ) {
+				for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
 						const Box& tileBox = mfi.tilebox();
@@ -35,20 +48,85 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 						// lo/hi coordinates (including ghost cells), and/or the # of components
 						// We will also pass "validBox", which specifies the "valid" region.
-						make_S_cc(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-						          BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-						          BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-						          BL_TO_FORTRAN_FAB(rho_odot_mf[mfi]),
-						          BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-						          BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-						          BL_TO_FORTRAN_3D(thermal_mf[mfi]));
-				}
 
+						if (spherical == 1) {
+								make_S_cc_sphr(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+								               BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
+								               BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
+								               BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
+								               BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+								               BL_TO_FORTRAN_FAB(u_mf[mfi]),
+								               BL_TO_FORTRAN_FAB(rho_odot_mf[mfi]),
+								               BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+								               BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+								               BL_TO_FORTRAN_3D(thermal_mf[mfi]),
+								               p0.dataPtr(),gamma1bar.dataPtr(), dx,
+								               BL_TO_FORTRAN_FAB(normal_mf[mfi]),
+								               r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+								               BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+
+						} else {
+								make_S_cc(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+								          BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
+								          BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
+								          BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
+								          BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+								          BL_TO_FORTRAN_FAB(u_mf[mfi]),
+								          BL_TO_FORTRAN_FAB(rho_odot_mf[mfi]),
+								          BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+								          BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+								          BL_TO_FORTRAN_3D(thermal_mf[mfi]),
+								          p0.dataPtr(),gamma1bar.dataPtr(), dx);
+						}
+				}
 		}
 
 		// average fine data onto coarser cells
 		AverageDown(S_cc,0,1);
 
+		if (use_delta_gamma1_term) {
+
+				// horizontal average of delta_gamma1_term
+				Average(delta_gamma1_term,delta_gamma1_termbar,0);
+
+				for (int lev=0; lev<=finest_level; ++lev) {
+
+						// get references to the MultiFabs at level lev
+						MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
+						const MultiFab& delta_gamma1_mf = delta_gamma1[lev];
+						const MultiFab& cc_to_r = cell_cc_to_r[lev];
+						const Real* dx = geom[lev].CellSize();
+
+						// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+						for ( MFIter mfi(delta_gamma1_term_mf, true); mfi.isValid(); ++mfi ) {
+
+								// Get the index space of the valid region
+								const Box& tileBox = mfi.tilebox();
+
+								// call fortran subroutine
+								// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+								// lo/hi coordinates (including ghost cells), and/or the # of components
+								// We will also pass "validBox", which specifies the "valid" region.
+								if (spherical == 1) {
+										create_correction_delta_gamma1_term_sphr(&lev,
+										                                         ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+										                                         BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
+										                                         BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
+										                                         gamma1bar.dataPtr(), psi.dataPtr(),
+										                                         p0.dataPtr(), dx,
+										                                         r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+										                                         BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+								} else {
+										create_correction_delta_gamma1_term(&lev,
+										                                    ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+										                                    BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
+										                                    BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
+										                                    gamma1bar.dataPtr(), psi.dataPtr(), p0.dataPtr());
+
+								}
+						}
+				}
+		}
 }
 
 // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -56,7 +134,8 @@ void
 Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
                                const Vector<MultiFab>& S_cc,
                                const Vector<Real>& Sbar,
-                               const Vector<Real>& beta0)
+                               const Vector<Real>& beta0,
+                               const Vector<MultiFab>& delta_gamma1_term)
 {
 		// timer for profiling
 		BL_PROFILE_VAR("Maestro::MakeRHCCforNodalProj()",MakeRHCCforNodalProj);
@@ -85,6 +164,8 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 				const MultiFab& Sbar_mf = Sbar_cart[lev];
 				const MultiFab& beta0_mf = beta0_cart[lev];
 
+				const MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
+
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 				for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
 
@@ -100,12 +181,14 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 								                             BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 								                             BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
 								                             BL_TO_FORTRAN_3D(Sbar_mf[mfi]),
-								                             BL_TO_FORTRAN_3D(beta0_mf[mfi]));
+								                             BL_TO_FORTRAN_3D(beta0_mf[mfi]),
+								                             BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]));
 						} else {
 								make_rhcc_for_nodalproj(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 								                        BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 								                        BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-								                        Sbar.dataPtr(), beta0.dataPtr());
+								                        Sbar.dataPtr(), beta0.dataPtr(),
+								                        BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]));
 						}
 				}
 		}
@@ -211,6 +294,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const Vector<MultiFab>& S_cc,
                              const Vector<Real>& Sbar,
                              const Vector<Real>& beta0,
+                             const Vector<MultiFab>& delta_gamma1_term,
                              const Vector<Real>& gamma1bar,
                              const Vector<Real>& p0,
                              const Vector<MultiFab>& delta_p_term,
@@ -226,6 +310,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 				// get references to the MultiFabs at level lev
 				MultiFab& rhcc_mf = rhcc[lev];
 				const MultiFab& S_cc_mf = S_cc[lev];
+				const MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
 				const MultiFab& delta_p_mf = delta_p_term[lev];
 				MultiFab& delta_chi_mf = delta_chi[lev];
 				const MultiFab& cc_to_r = cell_cc_to_r[lev];
@@ -248,6 +333,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 								                           BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
 								                           Sbar.dataPtr(), beta0.dataPtr(),
 								                           rho0.dataPtr(), dx,
+								                           BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
 								                           gamma1bar.dataPtr(), p0.dataPtr(),
 								                           BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
 								                           BL_TO_FORTRAN_3D(delta_chi_mf[mfi]),
@@ -259,6 +345,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 								                      BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
 								                      BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
 								                      Sbar.dataPtr(), beta0.dataPtr(),
+								                      BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
 								                      gamma1bar.dataPtr(), p0.dataPtr(),
 								                      BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
 								                      BL_TO_FORTRAN_3D(delta_chi_mf[mfi]),

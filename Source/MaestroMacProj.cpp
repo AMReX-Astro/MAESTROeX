@@ -87,9 +87,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 		// OR 1) average face-centered B coefficients to rho
 		for (int lev=0; lev<=finest_level; ++lev) {
-				amrex::average_cellcenter_to_face({AMREX_D_DECL(&face_bcoef[lev][0],
-				                                                &face_bcoef[lev][1],
-				                                                &face_bcoef[lev][2])},
+				amrex::average_cellcenter_to_face(GetArrOfPtrs(face_bcoef[lev]),
 				                                  rho[lev], geom[lev]);
 		}
 
@@ -246,7 +244,6 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 				MultiFab& sold_mf = sold[lev];
 
 				// loop over boxes
-				// NOTE: thread safe
 				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi) {
 
 						// Get the index space of valid region
@@ -293,7 +290,6 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 #endif
 
 				// loop over boxes
-				// NOTE: thread safe
 				for ( MFIter mfi(solverrhs_mf, true); mfi.isValid(); ++mfi) {
 
 						// Get the index space of valid region
@@ -343,7 +339,6 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 				const MultiFab& rhocc_mf = rhocc[lev];
 
 				// loop over boxes
-				// NOTE: thread safe
 				for ( MFIter mfi(rhocc_mf, true); mfi.isValid(); ++mfi) {
 
 						// Get the index space of valid region
