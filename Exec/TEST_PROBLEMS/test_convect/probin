@@ -1,4 +1,13 @@
-&extern
+&probdata
+
+  ! override the default values of the probdata namelist values here
+  apply_vel_field = T
+  velpert_scale = 5.d6
+  velpert_amplitude = 1.d5
+  velpert_height_loc = 1.2e8
+  num_vortices = 2
+
+  !extern
 
   ! Note that some of the parameters in this
   ! namelist are specific to the default EOS,
@@ -9,6 +18,6 @@
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  !const_conductivity = 1.0d0
+  use_eos_coulomb = F
 
 /

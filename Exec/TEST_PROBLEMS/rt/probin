@@ -1,4 +1,14 @@
-&extern
+&probin
+
+  ! override the default values of the probdata namelist values here
+  rho_1 = 1.d0
+  rho_2 = 2.d0
+  vel_amplitude  = 0.25d0
+  vel_width = 0.025d0
+  nmodes  = 1
+  p0_base = 5.0d0
+
+  !extern
 
   ! Note that some of the parameters in this
   ! namelist are specific to the default EOS,
@@ -9,6 +19,8 @@
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  use_eos_coulomb = T
+  eos_gamma = 5.0d0/3.0d0
+  eos_assume_neutral = T
+  const_conductivity = 1.0d0
 
 /

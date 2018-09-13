@@ -165,7 +165,7 @@ endif
 
 EXTERN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(EXTERN_SEARCH))
 
-F90EXE_sources += probin.F90
+F90EXE_sources += extern.F90
 
 PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
@@ -187,11 +187,11 @@ ifdef CUDA
 endif
 
 
-probin.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
+extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
 	@echo " "
-	@echo "${bold}WRITING probin.F90${normal}"
+	@echo "${bold}WRITING extern.F90${normal}"
 	$(FBOXLIB_HOME)/Tools/F_scripts/write_probin.py \
-          -t $(PROBIN_TEMPLATE) -o probin.F90 -n probin \
+          -t $(PROBIN_TEMPLATE) -o extern.F90 -n probin \
           --pa "$(PROBIN_PARAMETERS)" --pb "$(EXTERN_PARAMETERS)" $(MANAGED_PROBIN_FLAG)
 	@echo " "
 

@@ -11,7 +11,7 @@ f90EXE_sources += make_grav.f90
 f90EXE_sources += make_edge_state.f90
 f90EXE_sources += make_w0.f90
 f90EXE_sources += maestro_init.f90
-f90EXE_sources += probdata.f90
+#f90EXE_sources += probdata.f90
 f90EXE_sources += rotation.f90
 f90EXE_sources += tagging.f90
 

@@ -1,4 +1,17 @@
-&extern
+&probdata
+
+  ! override the default values of the probdata namelist values here
+  velpert_amplitude = 1.e5
+  velpert_radius = 2.e7
+  velpert_scale = 1.e7
+  velpert_steep = 1.e5
+  tag_density_1 = 5.e7
+  tag_density_2 = 1.e8
+  tag_density_3 = 1.e8
+  particle_temp_cutoff = 6.e8
+  particle_tpert_threshold = 2.e7
+
+  !extern
 
   ! Note that some of the parameters in this
   ! namelist are specific to the default EOS,
@@ -9,8 +22,6 @@
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  eos_gamma = 5.0d0/3.0d0
-  eos_assume_neutral = T
-  const_conductivity = 1.0d0
+  use_eos_coulomb = T
 
 /
