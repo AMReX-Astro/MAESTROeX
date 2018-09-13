@@ -92,7 +92,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(utilde_mf,true); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -183,6 +186,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -264,6 +270,9 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -378,6 +387,9 @@ void
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -568,6 +580,9 @@ void
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -721,6 +736,9 @@ void
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(scalold_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -871,7 +889,10 @@ void
 	const MultiFab& sponge_mf = sponge[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(force_mf,true); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(force_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

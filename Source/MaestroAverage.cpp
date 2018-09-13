@@ -50,17 +50,17 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 						const MultiFab& phi_mf = phi[lev];
 
 						// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-						for ( MFIter mfi(phi_mf, true); mfi.isValid(); ++mfi )
+						for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
 						{
 
 								// Get the index space of the valid region
-								const Box& tileBox = mfi.tilebox();
+								const Box& validBox = mfi.validbox();
 
 								// call fortran subroutine
 								// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 								// lo/hi coordinates (including ghost cells), and/or the # of components
 								// We will also pass "validBox", which specifies the "valid" region.
-								average(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+								average(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 								        BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
 								        phisum.dataPtr());
 						}
@@ -94,17 +94,17 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 						const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 						// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-						for ( MFIter mfi(phi_mf, true); mfi.isValid(); ++mfi )
+						for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
 						{
 
 								// Get the index space of the valid region
-								const Box& tileBox = mfi.tilebox();
+								const Box& validBox = mfi.validbox();
 
 								// call fortran subroutine
 								// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 								// lo/hi coordinates (including ghost cells), and/or the # of components
 								// We will also pass "validBox", which specifies the "valid" region.
-								average_sphr_irreg(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+								average_sphr_irreg(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 								                   BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
 								                   phisum.dataPtr(), ncell.dataPtr(),
 								                   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
@@ -159,25 +159,25 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
 
 						// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-						for ( MFIter mfi(phi_mf, true); mfi.isValid(); ++mfi )
+						for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
 						{
 
 								// Get the index space of the valid region
-								const Box& tileBox = mfi.tilebox();
+								const Box& validBox = mfi.validbox();
 
 								// call fortran subroutine
 								// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 								// lo/hi coordinates (including ghost cells), and/or the # of components
 								// We will also pass "validBox", which specifies the "valid" region.
 								if (lev == finest_level) {
-										sum_phi_3d_sphr(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+										sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 										                BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
 										                phisum.dataPtr(), radii.dataPtr(), &finest_level,
 										                dx, ncell.dataPtr());
 								} else {
 										// we include the mask so we don't double count; i.e., we only consider
 										// cells that are not covered by finer cells when constructing the sum
-										sum_phi_3d_sphr(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+										sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 										                BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
 										                phisum.dataPtr(), radii.dataPtr(), &finest_level,
 										                dx, ncell.dataPtr(),

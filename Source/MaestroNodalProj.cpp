@@ -569,7 +569,9 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
 		for (int lev=0; lev<=finest_level; ++lev) {
 				const MultiFab& phi_mf = phi[lev];
 				MultiFab& gphi_mf = gphi[lev];
-				// NOTE: looks thread safe
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(gphi_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the tile's valid region
@@ -601,7 +603,9 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
 				const MultiFab& pi_mf = pi[lev];
 				MultiFab& snew_mf = snew[lev];
 				const MultiFab& beta0_cart_mf = beta0_cart[lev];
-				// NOTE: looks thread safe
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(snew_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the tile's valid region

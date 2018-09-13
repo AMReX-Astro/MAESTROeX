@@ -90,6 +90,9 @@ Maestro::EstDt ()
 #endif
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
 
 						Real dt_grid = 1.e99;
@@ -248,6 +251,9 @@ Maestro::FirstDt ()
 				const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
 						Real dt_grid = 1.e99;

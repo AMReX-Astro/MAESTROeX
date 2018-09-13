@@ -143,10 +143,10 @@ Maestro::Init ()
 						InitIter();
 				}
 
-				if (plot_int > 0) {
-						Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
-						WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
-				}
+				// if (plot_int > 0) {
+				// 		Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
+				// 		WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
+				// }
 
 				if (chk_int > 0) {
 						Print() << "\nWriting checkpoint 0 after all initialization" << std::endl;
@@ -302,6 +302,9 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 		for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
 		{
 				const Box& tilebox = mfi.tilebox();

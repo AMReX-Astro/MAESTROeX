@@ -93,6 +93,9 @@ Maestro::DiagFile (const int step,
 
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(sin_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region

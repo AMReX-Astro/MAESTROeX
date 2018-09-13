@@ -133,6 +133,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(s_in_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region

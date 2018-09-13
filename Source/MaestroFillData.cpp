@@ -209,6 +209,9 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 #if (AMREX_SPACEDIM == 3)
 				MultiFab& umacz_mf = umac[lev][2];
 #endif
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid (cell-centered) region

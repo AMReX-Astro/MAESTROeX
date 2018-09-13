@@ -49,6 +49,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 				const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(vel_force_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -144,6 +147,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #endif
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(scal_force_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -291,6 +297,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 				const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(scal_force_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region

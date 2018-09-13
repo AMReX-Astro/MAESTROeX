@@ -118,6 +118,9 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 				Vector<int>  itags;
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
 				{
 						const Box& tilebox  = mfi.tilebox();

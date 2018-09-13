@@ -29,6 +29,9 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 				MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(s0_cart_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -92,6 +95,9 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 				MultiFab& sold_mf = sold[lev];
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -187,6 +193,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 				const Real* dx = geom[lev].CellSize();
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(w0cart_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -243,6 +252,9 @@ Maestro::MakeS0mac (const Vector<Real>& s0,
 				const Real* dx = geom[lev].CellSize();
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(s0cart_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -276,6 +288,9 @@ Maestro::MakeNormal ()
 				const Real* dx = geom[lev].CellSize();
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(normal_mf, true); mfi.isValid(); ++mfi ) {
 
 						// call fortran subroutine
@@ -309,6 +324,9 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 				const MultiFab& scc_mf = s_cc[lev];
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(scc_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region

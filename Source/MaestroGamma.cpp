@@ -25,6 +25,9 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 				const MultiFab&   cc_to_r = cell_cc_to_r[lev];
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(gamma1_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region

@@ -41,17 +41,17 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
 
 				// Loop over boxes and tiles (make sure mfi takes a cell-centered multifab as an argument)
 				// NOTE: looks thread safe
-				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
+				for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid tile region
-						const Box& tilebox = mfi.tilebox();
+						const Box& validbox = mfi.validbox();
 
 						// call fortran subroutine
 						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 						// lo/hi coordinates (including ghost cells)
 						// We will also pass "bx", which specifies the "valid" tile region.
 						sum_etarho(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-						           ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+						           ARLIM_3D(validbox.loVect()), ARLIM_3D(validbox.hiVect()),
 						           BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
 						           etarhosum.dataPtr());
 				}
@@ -99,14 +99,13 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 				const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-				// NOTE: looks thread safe
-				for ( MFIter mfi(scalold_mf,true); mfi.isValid(); ++mfi ) {
+				for ( MFIter mfi(scalold_mf); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
-						const Box& tilebox = mfi.tilebox();
+						const Box& validbox = mfi.validbox();
 						const Real* dx = geom[lev].CellSize();
 
-						construct_eta_cart( tilebox.loVect(), tilebox.hiVect(),
+						construct_eta_cart( validbox.loVect(), validbox.hiVect(),
 						                    scalold_mf[mfi].dataPtr(Rho),
 						                    scalold_mf[mfi].loVect(), scalold_mf[mfi].hiVect(),
 						                    scalnew_mf[mfi].dataPtr(Rho),

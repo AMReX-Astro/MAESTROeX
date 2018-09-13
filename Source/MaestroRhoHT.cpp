@@ -17,6 +17,9 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 		const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 		for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
 			// Get the index space of the valid region
@@ -62,6 +65,9 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 		const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 		for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
 			// Get the index space of the valid region
@@ -116,6 +122,9 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 		MultiFab& peos_mf = peos[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 		for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
 
 			// Get the index space of the valid region

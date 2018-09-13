@@ -247,6 +247,9 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 				MultiFab& sold_mf = sold[lev];
 
 				// loop over boxes
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi) {
 
 						// Get the index space of valid region
@@ -293,6 +296,9 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 #endif
 
 				// loop over boxes
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(solverrhs_mf, true); mfi.isValid(); ++mfi) {
 
 						// Get the index space of valid region
@@ -340,6 +346,9 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 				const MultiFab& rhocc_mf = rhocc[lev];
 
 				// loop over boxes
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(rhocc_mf, true); mfi.isValid(); ++mfi) {
 
 						// Get the index space of valid region

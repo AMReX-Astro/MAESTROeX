@@ -39,6 +39,9 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 				const Real* dx = geom[lev].CellSize();
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -98,6 +101,9 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 						const Real* dx = geom[lev].CellSize();
 
 						// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 						for ( MFIter mfi(delta_gamma1_term_mf, true); mfi.isValid(); ++mfi ) {
 
 								// Get the index space of the valid region
@@ -167,6 +173,9 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 				const MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -250,6 +259,9 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 				const MultiFab& rho0_mf = rho0_cart[lev];
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(correction_cc_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
@@ -316,6 +328,9 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 				const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 				for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid region
