@@ -23,6 +23,6 @@ CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := ignition_chamulak
 
 Bpack   := ./Make.package
-Blocs   := . 
+Blocs   := .
 
 include $(MAESTROEX_HOME)/Exec/Make.Maestro

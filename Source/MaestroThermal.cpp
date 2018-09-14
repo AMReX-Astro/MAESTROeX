@@ -248,6 +248,7 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
 
 						// call fortran subroutine
 						make_thermal_coeffs(ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
+            // make_thermal_coeffs(ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()),
 						                    BL_TO_FORTRAN_FAB(scal_mf[mfi]),
 						                    BL_TO_FORTRAN_3D(Tcoeff_mf[mfi]),
 						                    BL_TO_FORTRAN_3D(hcoeff_mf[mfi]),

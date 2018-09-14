@@ -924,7 +924,7 @@ contains
        end select
     end if
 
-    call bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,3)
+    call bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     do k=ks-1,ke+1
        do j=js,je+1

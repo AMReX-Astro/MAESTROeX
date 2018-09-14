@@ -11,9 +11,9 @@ module make_heating_module
 contains
 
   subroutine make_heating(lo, hi, &
-                          rho_Hext, r_lo, r_hi, &
-                          scal,     s_lo, s_hi, nc_s, &
-                          dx, time ) bind (C,name="make_heating")
+       rho_Hext, r_lo, r_hi, &
+       scal,     s_lo, s_hi, nc_s, &
+       dx, time ) bind (C,name="make_heating")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: r_lo(3), r_hi(3)
@@ -31,9 +31,9 @@ contains
     double precision :: L_x,L_y
 
     ! zero external heating
-    rho_Hext = 0.d0
+    rho_Hext(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.d0
 
-#if (AMREX_SPACEDIM == 2)  
+#if (AMREX_SPACEDIM == 2)
 
     L_x = 2.5d8
 
@@ -42,20 +42,20 @@ contains
        y_layer = 1.25d8
 
        do k = lo(3),hi(3)
-       do j = lo(2),hi(2)
-          y = (dble(j)+0.5d0)*dx(2) + prob_lo(2)
-          ey = exp(-(y-y_layer)*(y-y_layer)/1.d14)
-          do i = lo(1),hi(1)
-             x =  (dble(i)+0.5d0)*dx(1) + prob_lo(1)
+          do j = lo(2),hi(2)
+             y = (dble(j)+0.5d0)*dx(2) + prob_lo(2)
+             ey = exp(-(y-y_layer)*(y-y_layer)/1.d14)
+             do i = lo(1),hi(1)
+                x =  (dble(i)+0.5d0)*dx(1) + prob_lo(1)
 
-             rho_Hext(i,j,k) = ey*(1.d0 + &
-                  .00625d0 * sin(2*M_PI*x/L_x) &
-                  + .01875d0 * sin((6*M_PI*x/L_x) + M_PI/3.d0) &
-                  + .01250d0 * sin((8*M_PI*x/L_x) + M_PI/5.d0))*2.5d16
+                rho_Hext(i,j,k) = ey*(1.d0 + &
+                     .00625d0 * sin(2*M_PI*x/L_x) &
+                     + .01875d0 * sin((6*M_PI*x/L_x) + M_PI/3.d0) &
+                     + .01250d0 * sin((8*M_PI*x/L_x) + M_PI/5.d0))*2.5d16
 
-             rho_Hext(i,j,k) = rho_Hext(i,j,k) * scal(i,j,k,rho_comp)
+                rho_Hext(i,j,k) = rho_Hext(i,j,k) * scal(i,j,k,rho_comp)
+             end do
           end do
-       end do
        end do
 
     end if
@@ -86,7 +86,7 @@ contains
 
 
                 rho_Hext(i,j,k) = rho_Hext(i,j,k) * scal(i,j,k,rho_comp)
-                
+
              end do
           end do
        enddo
@@ -98,4 +98,3 @@ contains
   end subroutine make_heating
 
 end module make_heating_module
-

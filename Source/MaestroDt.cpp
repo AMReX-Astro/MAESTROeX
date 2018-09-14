@@ -91,7 +91,7 @@ Maestro::EstDt ()
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
 				for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
 
@@ -252,7 +252,7 @@ Maestro::FirstDt ()
 
 				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
 				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
