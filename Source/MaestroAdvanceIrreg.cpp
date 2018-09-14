@@ -265,6 +265,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 		for (int lev=0; lev<=finest_level; ++lev) {
 				delta_chi[lev].setVal(0.);
 				macphi   [lev].setVal(0.);
+				delta_gamma1_term[lev].setVal(0.);
 		}
 
 		// Sbar = (1 / gamma1bar * p0) * dp/dt

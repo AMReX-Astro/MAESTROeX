@@ -1220,13 +1220,11 @@ contains
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
-#if (AMREX_SPACEDIM >= 2)
           do j = lo(2),hi(2)+1
              do i = lo(1),hi(1)
                 facey(i,j,k) = HALF*(scc(i,j,k)+scc(i,j-1,k))
              end do
           end do
-#endif
 #if (AMREX_SPACEDIM == 3)
        end do
 #endif

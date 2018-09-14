@@ -39,8 +39,7 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
 				const MultiFab& sold_mf = sold[lev];
 				const MultiFab& etarhoflux_mf = etarho_flux[lev];
 
-				// Loop over boxes and tiles (make sure mfi takes a cell-centered multifab as an argument)
-				// NOTE: looks thread safe
+				// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 				for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 
 						// Get the index space of the valid tile region

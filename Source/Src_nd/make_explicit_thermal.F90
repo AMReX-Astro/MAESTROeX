@@ -5,8 +5,8 @@ module make_explicit_thermal_module
   use conductivity_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, &
-                                  buoyancy_cutoff_factor, base_cutoff_density, &
-                                  limit_conductivity
+       buoyancy_cutoff_factor, base_cutoff_density, &
+       limit_conductivity
   use bl_constants_module
 
   implicit none
@@ -16,11 +16,11 @@ module make_explicit_thermal_module
 contains
 
   subroutine make_thermal_coeffs(lo, hi, &
-                                   scal, s_lo, s_hi, nc_s, &
-                                   Tcoeff, t_lo, t_hi, &
-                                   hcoeff, h_lo, h_hi, &
-                                   Xkcoeff, xk_lo, xk_hi, nc_xk, &
-                                   pcoeff, p_lo, p_hi) bind(C,name="make_thermal_coeffs")
+       scal, s_lo, s_hi, nc_s, &
+       Tcoeff, t_lo, t_hi, &
+       hcoeff, h_lo, h_hi, &
+       Xkcoeff, xk_lo, xk_hi, nc_xk, &
+       pcoeff, p_lo, p_hi) bind(C,name="make_thermal_coeffs")
 
     ! create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
     ! for the thermal diffusion term in the enthalpy equation.
@@ -45,12 +45,13 @@ contains
     double precision :: conductivity
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! create Tcoeff = -kth,
-!        hcoeff = -kth/cp,
-!       Xkcoeff = xik*kth/cp,
-!        pcoeff = hp*kth/cp
+    ! create Tcoeff = -kth,
+    !        hcoeff = -kth/cp,
+    !       Xkcoeff = xik*kth/cp,
+    !        pcoeff = hp*kth/cp
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!print *, "... Level ", lev, " create thermal coeffs:"
+    !print *, "... Level ", lev, " create thermal coeffs:"
+
 
     k = lo(3)
     j = lo(2)
