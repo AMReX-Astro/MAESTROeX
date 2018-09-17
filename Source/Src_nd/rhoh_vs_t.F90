@@ -119,6 +119,10 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
+#ifdef AMREX_USE_CUDA
+    attributes(managed) :: p0_cart
+#endif
+    
     !$gpu
     
     if (use_eos_e_instead_of_h) then
@@ -258,6 +262,10 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
+#ifdef AMREX_USE_CUDA
+    attributes(managed) :: p0_cart
+#endif
+    
     !$gpu
     
     allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))

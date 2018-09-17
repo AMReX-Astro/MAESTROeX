@@ -23,7 +23,6 @@ CEXE_sources += MaestroMakeEta.cpp
 CEXE_sources += MaestroMakeS.cpp
 CEXE_sources += MaestroNodalProj.cpp
 CEXE_sources += MaestroPlot.cpp
-CEXE_sources += MaestroReact.cpp
 CEXE_sources += MaestroRegrid.cpp
 CEXE_sources += MaestroRhoHT.cpp
 CEXE_sources += MaestroSetup.cpp
@@ -37,3 +36,7 @@ CEXE_headers += MaestroPlot.H
 CEXE_headers += PhysBCFunctMaestro.H
 
 FEXE_headers += Maestro_F.H
+
+ifeq ($(USE_REACT), TRUE) 
+     CEXE_sources += MaestroReact.cpp
+endif
