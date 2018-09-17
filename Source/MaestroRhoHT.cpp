@@ -28,14 +28,18 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
-		makeTfromRhoH_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				   BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+		
+#pragma gpu
+		makeTfromRhoH_sphr(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()),
+				   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(), 
 				   p0.dataPtr(), dx, 
 				   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+				   BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 	    } else {
-		makeTfromRhoH(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-			      BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+
+#pragma gpu
+		makeTfromRhoH(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()), &lev,
+			      BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(),
 			      p0.dataPtr());
 	    }
         }
@@ -73,14 +77,18 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
-		makeTfromRhoP_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				   BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+
+#pragma gpu
+		makeTfromRhoP_sphr(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()),
+				   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(),
 				   p0.dataPtr(), dx, &updateRhoH, 
 				   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+				   BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 	    } else {
-		makeTfromRhoP(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-			      BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+
+#pragma gpu
+		makeTfromRhoP(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()), &lev,
+			      BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(), 
 			      p0.dataPtr(),&updateRhoH);
 	    }
         }
@@ -125,11 +133,12 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            makePfromRhoH(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                          BL_TO_FORTRAN_FAB(state_mf[mfi]),
+#pragma gpu
+	    makePfromRhoH(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()),
+                          BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf[mfi].nCompPtr(), 
 			  sold_mf[mfi].dataPtr(Temp), 
-			  ARLIM_3D(sold_mf[mfi].loVect()), ARLIM_3D(sold_mf[mfi].hiVect()),
-                          BL_TO_FORTRAN_3D(peos_mf[mfi]));
+			  AMREX_INT_ANYD(sold_mf[mfi].loVect()), AMREX_INT_ANYD(sold_mf[mfi].hiVect()),
+                          BL_TO_FORTRAN_ANYD(peos_mf[mfi]));
         }
 
     }

@@ -943,7 +943,7 @@ extern "C"
 
     //////////////////////
     // in rhoh_vs_t.F90
-    void makeTfromRhoH (const int* lev, const int* lo, const int* hi,
+    void makeTfromRhoH (const int* lo, const int* hi, const int* lev, 
                         amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
                         const amrex::Real* p0);
 
@@ -953,7 +953,7 @@ extern "C"
 			     const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 			     const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void makeTfromRhoP (const int* lev, const int* lo, const int* hi,
+    void makeTfromRhoP (const int* lo, const int* hi, const int* lev, 
                         amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
                         const amrex::Real* p0, const int* updateRhoH);
 

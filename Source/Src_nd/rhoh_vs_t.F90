@@ -12,11 +12,9 @@ module rhoh_vs_t_module
 
   private
 
-  public :: makeTfromRhoH, makeTfromRhoP
-
 contains
 
-  subroutine makeTfromRhoH(lev,lo,hi,state,s_lo,s_hi,nc_s,p0) bind(C,name="makeTfromRhoH")
+  subroutine makeTfromRhoH(lo,hi,lev,state,s_lo,s_hi,nc_s,p0) bind(C,name="makeTfromRhoH")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
@@ -28,6 +26,8 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
+    !$gpu
+    
     if (use_eos_e_instead_of_h) then
 
        do k = lo(3), hi(3)
@@ -119,6 +119,8 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
+    !$gpu
+    
     if (use_eos_e_instead_of_h) then
 
        allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
@@ -149,6 +151,7 @@ contains
        enddo
        enddo
 
+       deallocate(p0_cart)
     else
 
        do k = lo(3), hi(3)
@@ -177,7 +180,7 @@ contains
 
   end subroutine makeTfromRhoH_sphr
 
-  subroutine makeTfromRhoP(lev,lo,hi,state,s_lo,s_hi,nc_s,p0,updateRhoH) &
+  subroutine makeTfromRhoP(lo,hi,lev,state,s_lo,s_hi,nc_s,p0,updateRhoH) &
        bind(C,name="makeTfromRhoP")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
@@ -191,6 +194,8 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
+    !$gpu
+    
     do k = lo(3), hi(3)
     do j = lo(2), hi(2)
     do i = lo(1), hi(1)
@@ -253,6 +258,8 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
+    !$gpu
+    
     allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
     call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
                                       cc_to_r,ccr_lo,ccr_hi)
@@ -287,6 +294,7 @@ contains
     enddo
     enddo
 
+    deallocate(p0_cart)
   end subroutine makeTfromRhoP_sphr
 
   !----------------------------------------------------------------------------
@@ -310,6 +318,8 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
+    !$gpu
+    
     !$OMP PARALLEL DO PRIVATE(i,j,k, eos_state, pt_index)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)

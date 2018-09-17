@@ -3,7 +3,7 @@
 ! or add runtime parameters, please edit _cpp_parameters and then run
 ! mk_params.sh
 
-! This module stores the runtime parameters and integer names for
+! This module stores the runtime parameters and integer names for 
 ! indexing arrays.
 !
 ! The Fortran-specific parameters are initialized in set_method_params(),
@@ -52,7 +52,6 @@ module meth_params_module
   logical                       , save :: do_eos_h_above_cutoff
   integer                       , save :: enthalpy_pred_type
   integer                       , save :: species_pred_type
-  logical                       , save :: use_delta_gamma1_term
   integer                       , save :: slope_order
   double precision              , save :: grav_const
   integer                       , save :: ppm_type
@@ -76,6 +75,61 @@ module meth_params_module
   integer                       , save :: w0_interp_type
   integer                       , save :: s0mac_interp_type
   integer                       , save :: w0mac_interp_type
+  integer                       , save :: track_grid_losses
+
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: maestro_verbose
+  
+  attributes(managed) :: perturb_model
+  attributes(managed) :: print_init_hse_diag
+  attributes(managed) :: cfl
+  attributes(managed) :: use_soundspeed_firstdt
+  attributes(managed) :: use_divu_firstdt
+  attributes(managed) :: spherical
+  attributes(managed) :: octant
+  attributes(managed) :: do_2d_planar_octant
+  attributes(managed) :: drdxfac
+  attributes(managed) :: do_sponge
+  attributes(managed) :: sponge_kappa
+  attributes(managed) :: sponge_center_density
+  attributes(managed) :: sponge_start_factor
+  attributes(managed) :: anelastic_cutoff
+  attributes(managed) :: base_cutoff_density
+  attributes(managed) :: burning_cutoff_density
+  attributes(managed) :: buoyancy_cutoff_factor
+  attributes(managed) :: dpdt_factor
+  attributes(managed) :: do_planar_invsq_grav
+  attributes(managed) :: planar_invsq_mass
+  attributes(managed) :: evolve_base_state
+  attributes(managed) :: use_exact_base_state
+  attributes(managed) :: do_eos_h_above_cutoff
+  attributes(managed) :: enthalpy_pred_type
+  attributes(managed) :: species_pred_type
+  attributes(managed) :: slope_order
+  attributes(managed) :: grav_const
+  attributes(managed) :: ppm_type
+  attributes(managed) :: beta0_type
+  attributes(managed) :: use_linear_grav_in_beta0
+  attributes(managed) :: rotational_frequency
+  attributes(managed) :: co_latitude
+  attributes(managed) :: drive_initial_convection
+  attributes(managed) :: use_alt_energy_fix
+  attributes(managed) :: temp_diffusion_formulation
+  attributes(managed) :: thermal_diffusion_type
+  attributes(managed) :: limit_conductivity
+  
+  attributes(managed) :: burner_threshold_cutoff
+  attributes(managed) :: reaction_sum_tol
+  attributes(managed) :: small_temp
+  attributes(managed) :: small_dens
+  attributes(managed) :: use_eos_e_instead_of_h
+  attributes(managed) :: use_pprime_in_tfromp
+  attributes(managed) :: s0_interp_type
+  attributes(managed) :: w0_interp_type
+  attributes(managed) :: s0mac_interp_type
+  attributes(managed) :: w0mac_interp_type
+  attributes(managed) :: track_grid_losses
+#endif
 
   ! End the declarations of the ParmParse parameters
 
@@ -118,7 +172,6 @@ contains
     do_eos_h_above_cutoff = .true.;
     enthalpy_pred_type = 1;
     species_pred_type = 1;
-    use_delta_gamma1_term = .false.;
     slope_order = 4;
     grav_const = -1.5d10;
     ppm_type = 1;
@@ -143,6 +196,7 @@ contains
     w0_interp_type = 2;
     s0mac_interp_type = 1;
     w0mac_interp_type = 1;
+    track_grid_losses = 0;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("maestro_verbose", maestro_verbose)
@@ -172,7 +226,6 @@ contains
     call pp%query("do_eos_h_above_cutoff", do_eos_h_above_cutoff)
     call pp%query("enthalpy_pred_type", enthalpy_pred_type)
     call pp%query("species_pred_type", species_pred_type)
-    call pp%query("use_delta_gamma1_term", use_delta_gamma1_term)
     call pp%query("slope_order", slope_order)
     call pp%query("grav_const", grav_const)
     call pp%query("ppm_type", ppm_type)
@@ -196,6 +249,7 @@ contains
     call pp%query("w0_interp_type", w0_interp_type)
     call pp%query("s0mac_interp_type", s0mac_interp_type)
     call pp%query("w0mac_interp_type", w0mac_interp_type)
+    call pp%query("track_grid_losses", track_grid_losses)
     call amrex_parmparse_destroy(pp)
 
 
@@ -207,14 +261,14 @@ contains
     implicit none
 
     if (allocated(model_file)) then
-       deallocate(model_file)
+        deallocate(model_file)
     end if
     if (allocated(burner_threshold_species)) then
-       deallocate(burner_threshold_species)
+        deallocate(burner_threshold_species)
     end if
 
 
-
+    
   end subroutine finalize_meth_params
 
 end module meth_params_module

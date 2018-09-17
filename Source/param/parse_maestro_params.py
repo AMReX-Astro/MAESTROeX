@@ -216,6 +216,13 @@ class Param(object):
 
         return ostr
 
+    def get_cuda_managed_string(self):
+        """this is the string that sets the variable as managed for CUDA"""
+        if self.f90_dtype == "string":
+            return "\n"
+        else:
+            return "attributes(managed) :: {}\n".format(self.f90_name) 
+    
     def get_query_string(self, language):
         # this is the line that queries the ParmParse object to get
         # the value of the runtime parameter from the inputs file.
@@ -313,10 +320,23 @@ def write_meth_module(plist, meth_template):
     for p in param_decls:
         decls += "  {}".format(p)
 
+    cuda_managed_decls = [p.get_cuda_managed_string() for p in plist if p.in_fortran == 1]
+
+    cuda_managed_string = ""
+    for p in cuda_managed_decls:
+        cuda_managed_string += "  {}".format(p)
+                                                                      
     for line in mt:
         if line.find("@@f90_declarations@@") > 0:
             mo.write(decls)
 
+            # Do the CUDA managed declarations
+
+            mo.write("\n")
+            mo.write("#ifdef AMREX_USE_CUDA\n")
+            mo.write(cuda_managed_string)
+            mo.write("#endif\n")
+             
             # Now do the OpenACC declarations
 
 #            mo.write("\n")
