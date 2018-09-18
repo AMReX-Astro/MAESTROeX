@@ -33,6 +33,10 @@ module network
   ! this will be computed here, not in the actual network
   real(kind=dp_t) :: aion_inv(nspec)
 
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: aion_inv
+#endif
+
   !$acc declare create(aion_inv)
 
 contains
