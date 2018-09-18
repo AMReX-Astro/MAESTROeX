@@ -282,11 +282,11 @@ class Param(object):
             return None
 
         if self.f90_dtype == "int":
-            tstr = "integer                       , save :: {}\n".format(self.f90_name)
+            tstr = "integer,           allocatable, save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "Real":
-            tstr = "double precision              , save :: {}\n".format(self.f90_name)
+            tstr = "double precision,  allocatable, save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "bool":
-            tstr = "logical                       , save :: {}\n".format(self.f90_name)
+            tstr = "logical,           allocatable, save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "string":
             tstr = "character (len=:), allocatable, save :: {}\n".format(self.f90_name)
         else:
