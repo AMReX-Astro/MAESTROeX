@@ -17,11 +17,17 @@ module meth_params_module
 
   ! variables in the module
 
-  integer, save :: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp
-  integer, save :: nscal
-  double precision, save :: prob_lo(3), prob_hi(3)
-  double precision, save :: rel_eps
+  integer, allocatable, save :: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp
+  integer, allocatable, save :: nscal
+  double precision, allocatable, save :: rel_eps
 
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp
+  attributes(managed) :: nscal
+  attributes(managed) :: rel_eps
+#endif
+
+  double precision, save :: prob_lo(3), prob_hi(3)
 
   ! Begin the declarations of the ParmParse parameters
 
