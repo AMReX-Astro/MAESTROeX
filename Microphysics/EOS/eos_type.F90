@@ -58,6 +58,25 @@ module eos_type_module
   real(dp_t), save :: minh    = 1.d-200
   real(dp_t), save :: maxh    = 1.d200
 
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: mintemp
+  attributes(managed) :: maxtemp
+  attributes(managed) :: mindens
+  attributes(managed) :: maxdens
+  attributes(managed) :: minx
+  attributes(managed) :: maxx
+  attributes(managed) :: minye
+  attributes(managed) :: maxye
+  attributes(managed) :: mine
+  attributes(managed) :: maxe
+  attributes(managed) :: minp
+  attributes(managed) :: maxp
+  attributes(managed) :: mins
+  attributes(managed) :: maxs
+  attributes(managed) :: minh
+  attributes(managed) :: maxh
+#endif
+
   !$acc declare &
   !$acc create(mintemp, maxtemp, mindens, maxdens, minx, maxx, minye, maxye) &
   !$acc create(mine, maxe, minp, maxp, mins, maxs, minh, maxh)
@@ -165,6 +184,8 @@ contains
 
     type (eos_t), intent(inout) :: state
 
+    !$gpu
+
     ! Calculate abar, the mean nucleon number,
     ! zbar, the mean proton number,
     ! mu, the mean molecular weight,
@@ -191,6 +212,8 @@ contains
     implicit none
 
     type (eos_t), intent(inout) :: state
+
+    !$gpu
 
     state % dpdX(:) = state % dpdA * (state % abar * aion_inv(:))   &
                                    * (aion(:) - state % abar) &
@@ -228,6 +251,8 @@ contains
 
     type (eos_t), intent(inout) :: state
 
+    !$gpu
+
     state % xn = max(small_x, min(ONE, state % xn))
 
     state % xn = state % xn / sum(state % xn)
@@ -245,6 +270,8 @@ contains
     implicit none
 
     type (eos_t), intent(inout) :: state
+
+    !$gpu
 
     state % T = min(maxtemp, max(mintemp, state % T))
     state % rho = min(maxdens, max(mindens, state % rho))
@@ -278,6 +305,8 @@ contains
 
     real(dp_t), intent(out) :: small_temp_out
 
+    !$gpu
+
     small_temp_out = mintemp
 
   end subroutine eos_get_small_temp
@@ -291,6 +320,8 @@ contains
     implicit none
 
     real(dp_t), intent(out) :: small_dens_out
+
+    !$gpu
 
     small_dens_out = mindens
 
@@ -306,6 +337,8 @@ contains
 
     real(dp_t), intent(out) :: max_temp_out
 
+    !$gpu
+
     max_temp_out = maxtemp
 
   end subroutine eos_get_max_temp
@@ -319,6 +352,8 @@ contains
     implicit none
 
     real(dp_t), intent(out) :: max_dens_out
+
+    !$gpu
 
     max_dens_out = maxdens
 
