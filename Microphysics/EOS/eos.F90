@@ -20,7 +20,7 @@ contains
     use actual_eos_module, only: actual_eos_init
 
     implicit none
-
+    
     real(rt), optional :: small_temp
     real(rt), optional :: small_dens
 
@@ -76,8 +76,8 @@ contains
     use eos_type_module, only: eos_t, composition, composition_derivatives
     use actual_eos_module, only: actual_eos
     use eos_override_module, only: eos_override
-#ifndef ACC
-    use bl_error_module, only: bl_error
+#if (!(defined(AMREX_USE_CUDA) || defined(AMREX_USE_ACC)))
+    use amrex_error_module, only: amrex_error
 #endif
 
     implicit none
@@ -90,10 +90,12 @@ contains
 
     logical :: has_been_reset
 
+    !$gpu
+    
     ! Local variables
 
-#ifndef ACC
-    if (.not. initialized) call bl_error('EOS: not initialized')
+#if (!(defined(AMREX_USE_CUDA) || defined(AMREX_USE_ACC)))
+    if (.not. initialized) call amrex_error('EOS: not initialized')
 #endif
 
     ! Get abar, zbar, etc.
@@ -139,6 +141,8 @@ contains
     type (eos_t), intent(inout) :: state
     logical,      intent(inout) :: has_been_reset
 
+    !$gpu
+    
     ! Reset the input quantities to valid values. For inputs other than rho and T,
     ! this will evolve an EOS call, which will negate the need to do the main EOS call.
 
@@ -201,6 +205,8 @@ contains
     type (eos_t), intent(inout) :: state
     logical,      intent(inout) :: has_been_reset
 
+    !$gpu
+    
     state % rho = min(maxdens, max(mindens, state % rho))
 
   end subroutine reset_rho
@@ -220,6 +226,8 @@ contains
     type (eos_t), intent(inout) :: state
     logical,      intent(inout) :: has_been_reset
 
+    !$gpu
+    
     state % T = min(maxtemp, max(mintemp, state % T))
 
   end subroutine reset_T
@@ -237,6 +245,8 @@ contains
     type (eos_t), intent(inout) :: state
     logical,      intent(inout) :: has_been_reset
 
+    !$gpu
+    
     if (state % e .lt. mine .or. state % e .gt. maxe) then
        call eos_reset(state, has_been_reset)
     endif
@@ -256,6 +266,8 @@ contains
     type (eos_t), intent(inout) :: state
     logical,      intent(inout) :: has_been_reset
 
+    !$gpu
+    
     if (state % h .lt. minh .or. state % h .gt. maxh) then
        call eos_reset(state, has_been_reset)
     endif
@@ -275,6 +287,8 @@ contains
     type (eos_t), intent(inout) :: state
     logical,      intent(inout) :: has_been_reset
 
+    !$gpu
+    
     if (state % s .lt. mins .or. state % s .gt. maxs) then
        call eos_reset(state, has_been_reset)
     endif
@@ -294,6 +308,8 @@ contains
     type (eos_t), intent(inout) :: state
     logical,      intent(inout) :: has_been_reset
 
+    !$gpu
+    
     if (state % p .lt. minp .or. state % p .gt. maxp) then
        call eos_reset(state, has_been_reset)
     endif
@@ -317,6 +333,8 @@ contains
     type (eos_t), intent(inout) :: state
     logical,      intent(inout) :: has_been_reset
 
+    !$gpu
+    
     state % T = min(maxtemp, max(mintemp, state % T))
     state % rho = min(maxdens, max(mindens, state % rho))
 
@@ -328,7 +346,7 @@ contains
 
 
 
-#ifndef ACC
+#if (!(defined(AMREX_USE_CUDA) || defined(AMREX_USE_ACC)))
   subroutine check_inputs(input, state)
 
     !$acc routine seq
