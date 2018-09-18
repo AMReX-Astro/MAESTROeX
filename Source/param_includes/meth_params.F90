@@ -58,6 +58,7 @@ module meth_params_module
   logical                       , save :: do_eos_h_above_cutoff
   integer                       , save :: enthalpy_pred_type
   integer                       , save :: species_pred_type
+  logical                       , save :: use_delta_gamma1_term
   integer                       , save :: slope_order
   double precision              , save :: grav_const
   integer                       , save :: ppm_type
@@ -111,6 +112,7 @@ module meth_params_module
   attributes(managed) :: do_eos_h_above_cutoff
   attributes(managed) :: enthalpy_pred_type
   attributes(managed) :: species_pred_type
+  attributes(managed) :: use_delta_gamma1_term
   attributes(managed) :: slope_order
   attributes(managed) :: grav_const
   attributes(managed) :: ppm_type
@@ -178,6 +180,7 @@ contains
     do_eos_h_above_cutoff = .true.;
     enthalpy_pred_type = 1;
     species_pred_type = 1;
+    use_delta_gamma1_term = .false.;
     slope_order = 4;
     grav_const = -1.5d10;
     ppm_type = 1;
@@ -232,6 +235,7 @@ contains
     call pp%query("do_eos_h_above_cutoff", do_eos_h_above_cutoff)
     call pp%query("enthalpy_pred_type", enthalpy_pred_type)
     call pp%query("species_pred_type", species_pred_type)
+    call pp%query("use_delta_gamma1_term", use_delta_gamma1_term)
     call pp%query("slope_order", slope_order)
     call pp%query("grav_const", grav_const)
     call pp%query("ppm_type", ppm_type)
