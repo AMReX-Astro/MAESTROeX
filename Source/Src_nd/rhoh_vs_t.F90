@@ -119,11 +119,11 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-#ifdef AMREX_USE_CUDA
-    attributes(managed) :: p0_cart
-#endif
+! #ifdef AMREX_USE_CUDA
+!    attributes(managed) :: p0_cart
+! #endif
     
-    !$gpu
+    
     
     if (use_eos_e_instead_of_h) then
 
@@ -262,11 +262,11 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-#ifdef AMREX_USE_CUDA
-    attributes(managed) :: p0_cart
-#endif
+! #ifdef AMREX_USE_CUDA
+!    attributes(managed) :: p0_cart
+! #endif
     
-    !$gpu
+    
     
     allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
     call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &

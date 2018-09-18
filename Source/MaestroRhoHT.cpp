@@ -29,12 +29,12 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
 		
-#pragma gpu
-		makeTfromRhoH_sphr(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()),
-				   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(), 
+
+		makeTfromRhoH_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				   BL_TO_FORTRAN_3D(scal_mf[mfi]), scal_mf[mfi].nCompPtr(), 
 				   p0.dataPtr(), dx, 
 				   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				   BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+				   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	    } else {
 
 #pragma gpu
@@ -78,12 +78,12 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
 
-#pragma gpu
-		makeTfromRhoP_sphr(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()),
-				   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(),
+		
+		makeTfromRhoP_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+				   BL_TO_FORTRAN_3D(scal_mf[mfi]), scal_mf[mfi].nCompPtr(),
 				   p0.dataPtr(), dx, &updateRhoH, 
 				   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				   BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+				   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 	    } else {
 
 #pragma gpu
