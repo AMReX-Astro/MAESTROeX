@@ -77,7 +77,6 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
-
 		
 		makeTfromRhoP_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 				   BL_TO_FORTRAN_3D(scal_mf[mfi]), scal_mf[mfi].nCompPtr(),

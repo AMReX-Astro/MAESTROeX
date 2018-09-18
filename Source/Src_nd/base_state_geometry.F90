@@ -26,9 +26,9 @@ module base_state_geometry_module
   ! finest_radial_level is the current finest level index, which may be less than
   ! max_radial_level depending on the refinement criteria
 
-  integer         , save, public :: max_radial_level
+  integer         , allocatable, save, public :: max_radial_level
   integer         , save, public :: finest_radial_level
-  integer         , save, public :: nr_fine   ! number of zones associated with *max_radial_level*
+  integer         , allocatable, save, public :: nr_fine   ! number of zones associated with *max_radial_level*
   double precision, save, public :: dr_fine   ! base state grid spacing associated with *max_radial_level*
 
   integer         , save, public  :: nr_irreg
@@ -45,6 +45,11 @@ module base_state_geometry_module
   integer         , allocatable, save, public  :: base_cutoff_density_coord(:)
   integer         , allocatable, save, public  :: burning_cutoff_density_coord(:)
 
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: max_radial_level
+  attributes(managed) :: nr_fine 
+#endif
+  
 contains
 
   subroutine init_base_state_geometry(max_radial_level_in,nr_fine_in,dr_fine_in, &

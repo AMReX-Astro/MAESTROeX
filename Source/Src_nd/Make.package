@@ -1,6 +1,6 @@
 f90EXE_sources += average.f90
 f90EXE_sources += base_state.f90
-f90EXE_sources += base_state_geometry.f90
+F90EXE_sources += base_state_geometry.F90
 f90EXE_sources += cell_to_edge.f90
 f90EXE_sources += enforce_HSE.f90
 f90EXE_sources += initdata.f90
