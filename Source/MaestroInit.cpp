@@ -471,8 +471,18 @@ void Maestro::DivuIter (int istep_divu_iter)
 				rhohalf[lev].setVal(1.);
 		}
 
+#ifdef REACTIONS
 		React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+#else
+		for (int lev=0; lev<=finest_level; ++lev) {
+		    MultiFab::Copy(stemp[lev],sold[lev],0,0,Nscal,0);
 
+		    rho_Hext[lev].setVal(0.);
+		    rho_omegadot[lev].setVal(0.);
+		    rho_Hnuc[lev].setVal(0.);
+		}
+#endif
+		
 		if (use_thermal_diffusion) {
 				MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
 
