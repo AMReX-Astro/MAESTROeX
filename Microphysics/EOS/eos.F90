@@ -15,8 +15,8 @@ contains
 
     use amrex_fort_module, only: rt => amrex_real
     use parallel, only: parallel_IOProcessor
-    use bl_error_module, only: bl_warn
-    use eos_type_module, only: mintemp, mindens
+    use amrex_error_module
+    use eos_type_module
     use actual_eos_module, only: actual_eos_init
 
     implicit none
@@ -24,6 +24,42 @@ contains
     real(rt), optional :: small_temp
     real(rt), optional :: small_dens
 
+    ! Allocate and set default values
+    allocate(mintemp)
+    allocate(maxtemp)
+    allocate(mindens)
+    allocate(maxdens)
+    allocate(minx)
+    allocate(maxx)
+    allocate(minye)
+    allocate(maxye)
+    allocate(mine)
+    allocate(maxe)
+    allocate(minp)
+    allocate(maxp)
+    allocate(mins)
+    allocate(maxs)
+    allocate(minh)
+    allocate(maxh)
+    
+    mintemp = 1.d-200
+    maxtemp = 1.d200
+    mindens = 1.d-200
+    maxdens = 1.d200
+    minx    = 1.d-200
+    maxx    = 1.d0 + 1.d-12
+    minye   = 1.d-200
+    maxye   = 1.d0 + 1.d-12
+    mine    = 1.d-200
+    maxe    = 1.d200
+    minp    = 1.d-200
+    maxp    = 1.d200
+    mins    = 1.d-200
+    maxs    = 1.d200
+    minh    = 1.d-200
+    maxh    = 1.d200
+
+    
     ! Set up any specific parameters or initialization steps required by the EOS we are using.
 
     call actual_eos_init
@@ -40,7 +76,7 @@ contains
     if (present(small_temp)) then
        if (small_temp < mintemp) then
           if (parallel_IOProcessor()) then
-             call bl_warn('EOS: small_temp cannot be less than the mintemp allowed by the EOS. Resetting small_temp to mintemp.')
+             call bl_warning('EOS: small_temp cannot be less than the mintemp allowed by the EOS. Resetting small_temp to mintemp.')
           endif
           small_temp = mintemp
        else
@@ -51,7 +87,7 @@ contains
     if (present(small_dens)) then
        if (small_dens < mindens) then
           if (parallel_IOProcessor()) then
-             call bl_warn('EOS: small_dens cannot be less than the mindens allowed by the EOS. Resetting small_dens to mindens.')
+             call bl_warning('EOS: small_dens cannot be less than the mindens allowed by the EOS. Resetting small_dens to mindens.')
           endif
           small_dens = mindens
        else

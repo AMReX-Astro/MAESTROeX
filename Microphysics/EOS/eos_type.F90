@@ -41,22 +41,22 @@ module eos_type_module
 
   ! Minimum and maximum thermodynamic quantities permitted by the EOS.
 
-  real(dp_t), save :: mintemp = 1.d-200
-  real(dp_t), save :: maxtemp = 1.d200
-  real(dp_t), save :: mindens = 1.d-200
-  real(dp_t), save :: maxdens = 1.d200
-  real(dp_t), save :: minx    = 1.d-200
-  real(dp_t), save :: maxx    = 1.d0 + 1.d-12
-  real(dp_t), save :: minye   = 1.d-200
-  real(dp_t), save :: maxye   = 1.d0 + 1.d-12
-  real(dp_t), save :: mine    = 1.d-200
-  real(dp_t), save :: maxe    = 1.d200
-  real(dp_t), save :: minp    = 1.d-200
-  real(dp_t), save :: maxp    = 1.d200
-  real(dp_t), save :: mins    = 1.d-200
-  real(dp_t), save :: maxs    = 1.d200
-  real(dp_t), save :: minh    = 1.d-200
-  real(dp_t), save :: maxh    = 1.d200
+  real(dp_t), allocatable, save :: mintemp 
+  real(dp_t), allocatable, save :: maxtemp 
+  real(dp_t), allocatable, save :: mindens 
+  real(dp_t), allocatable, save :: maxdens 
+  real(dp_t), allocatable, save :: minx    
+  real(dp_t), allocatable, save :: maxx   
+  real(dp_t), allocatable, save :: minye  
+  real(dp_t), allocatable, save :: maxye  
+  real(dp_t), allocatable, save :: mine   
+  real(dp_t), allocatable, save :: maxe   
+  real(dp_t), allocatable, save :: minp  
+  real(dp_t), allocatable, save :: maxp  
+  real(dp_t), allocatable, save :: mins  
+  real(dp_t), allocatable, save :: maxs  
+  real(dp_t), allocatable, save :: minh  
+  real(dp_t), allocatable, save :: maxh  
 
 #ifdef AMREX_USE_CUDA
   attributes(managed) :: mintemp
