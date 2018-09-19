@@ -204,7 +204,9 @@ class Param(object):
         # to 1, and the Fortran parmparse will resize
         if self.dtype == "string":
             ostr += "    allocate(character(len=1)::{})\n".format(name)
-
+        else:
+            ostr += "    allocate({})\n".format(name)
+                                                                                 
         if not self.debug_default is None:
             ostr += "#ifdef AMREX_DEBUG\n"
             ostr += "    {} = {};\n".format(name, debug_default)

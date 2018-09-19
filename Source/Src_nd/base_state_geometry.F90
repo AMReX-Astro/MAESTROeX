@@ -69,6 +69,9 @@ contains
     ! local
     integer :: n,i
 
+    allocate(max_radial_level)
+    allocate(nr_fine)
+    
     if ( parallel_IOProcessor() ) then
        print*,'Calling init_base_state_geometry()'
     end if

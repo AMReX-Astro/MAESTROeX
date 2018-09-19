@@ -123,9 +123,6 @@ contains
     double precision, intent(in) :: prob_lo_in(3), prob_hi_in(3)
 
     integer :: ioproc
-
-    allocate(prob_lo(3))
-    allocate(prob_hi(3))
     
     !---------------------------------------------------------------------
     ! conserved state components
