@@ -16,7 +16,8 @@ contains
 
   subroutine makeTfromRhoH(lo,hi,lev,state,s_lo,s_hi,nc_s,p0) bind(C,name="makeTfromRhoH")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer         , intent (in   ), value :: lev
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
     double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
@@ -187,11 +188,12 @@ contains
   subroutine makeTfromRhoP(lo,hi,lev,state,s_lo,s_hi,nc_s,p0,updateRhoH) &
        bind(C,name="makeTfromRhoP")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer         , intent (in   ), value :: lev
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
     double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    integer         , intent (in   ) :: updateRhoH
+    integer         , intent (in   ), value :: updateRhoH
 
     ! Local variables
     integer :: i, j, k, r
