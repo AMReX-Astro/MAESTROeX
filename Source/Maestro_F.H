@@ -949,9 +949,7 @@ extern "C"
     
     void makeTfromRhoH_sphr (const int* lo, const int* hi,
 			     amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
-			     const amrex::Real* p0, const amrex::Real* dx,
-			     const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-			     const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+			     const amrex::Real* p0, const int* p_lo, const int* p_hi);
 
     void makeTfromRhoP (const int* lo, const int* hi, const int lev, 
                         const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
@@ -959,9 +957,8 @@ extern "C"
 
     void makeTfromRhoP_sphr (const int* lo, const int* hi,
 			     amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
-			     const amrex::Real* p0, const amrex::Real* dx, const int* updateRhoH,
-			     const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-			     const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+			     const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
+			     const int updateRhoH);
 
     void makePfromRhoH(const int* lo, const int* hi,
                        const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,

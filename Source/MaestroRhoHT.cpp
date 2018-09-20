@@ -10,11 +10,23 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoH()",TfromRhoH);
 
+    // base state on cartesian grid
+    Vector<MultiFab> p0_cart(finest_level+1);
+
+    if (spherical) {
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    p0_cart[lev].define(grids[lev], dmap[lev],1,0);
+	}
+	if (use_eos_e_instead_of_h) {
+	    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+	}
+    }
+    
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_mf = scal[lev];
-	const MultiFab& cc_to_r = cell_cc_to_r[lev];
+	const MultiFab& p0cart_mf = p0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
@@ -28,13 +40,11 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
-		
 
-		makeTfromRhoH_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				   BL_TO_FORTRAN_3D(scal_mf[mfi]), scal_mf[mfi].nCompPtr(), 
-				   p0.dataPtr(), dx, 
-				   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+#pragma gpu
+		makeTfromRhoH_sphr(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()),
+				   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(), 
+				   BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]));
 	    } else {
 
 #pragma gpu
@@ -59,11 +69,23 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoP()",TfromRhoP);
 
+    // base state on cartesian grid
+    Vector<MultiFab> p0_cart(finest_level+1);
+
+    if (spherical) {
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    p0_cart[lev].define(grids[lev], dmap[lev],1,0);
+	}
+
+	Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+    }
+
+    
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_mf = scal[lev];
-	const MultiFab& cc_to_r = cell_cc_to_r[lev];
+	const MultiFab& p0cart_mf = p0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
@@ -77,12 +99,11 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 1) {
-		
-		makeTfromRhoP_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-				   BL_TO_FORTRAN_3D(scal_mf[mfi]), scal_mf[mfi].nCompPtr(),
-				   p0.dataPtr(), dx, &updateRhoH, 
-				   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+
+#pragma gpu
+		makeTfromRhoP_sphr(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()),
+				   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(),
+				   BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), updateRhoH);
 	    } else {
 
 #pragma gpu
