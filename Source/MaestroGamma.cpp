@@ -6,7 +6,7 @@ using namespace amrex;
 void
 Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
                         Vector<Real>& gamma1bar,
-                        const Vector<Real>& p0)
+                        const RealVector& p0)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGamma1bar()",MakeGamma1bar);

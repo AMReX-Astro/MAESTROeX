@@ -18,6 +18,17 @@
 #include <PhysBCFunctMaestro.H>
 #include <Maestro_F.H>
 
+#ifdef AMREX_USE_CUDA
+#include <AMReX_CudaAllocators.H>
+#endif
+
+// Define vector types for CUDA
+#ifdef AMREX_USE_CUDA
+typedef amrex::Vector< amrex::Real, amrex::CudaManagedAllocator<amrex::Real> > RealVector;
+#else
+typedef amrex::Vector< amrex::Real > RealVector;
+#endif
+
 class Maestro
     : public amrex::AmrCore
 {
@@ -215,7 +226,7 @@ private:
     void DiagFile (const int step,
 		   const amrex::Real dt_in,
 		   const amrex::Vector<amrex::Real>& rho0_in,
-		   const amrex::Vector<amrex::Real>& p0_in,
+		   const RealVector& p0_in,
 		   const amrex::Vector<amrex::MultiFab>& u_in,
 		   const amrex::Vector<amrex::MultiFab>& s_in,
 		   int& index);
@@ -320,6 +331,14 @@ private:
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
+#ifdef AMREX_USE_CUDA
+    void Put1dArrayOnCart (const amrex::Vector< amrex::Real, amrex::CudaManagedAllocator<amrex::Real> >& s0,
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);
+#endif
 
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
 		const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
@@ -330,6 +349,11 @@ private:
     void MakeS0mac (const amrex::Vector<amrex::Real>& s0,
 		    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
+#ifdef AMREX_USE_CUDA
+    void MakeS0mac (const amrex::Vector< amrex::Real, amrex::CudaManagedAllocator<amrex::Real> >& s0,
+		    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
+#endif
+    
     void MakeNormal ();
 
     void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc,
@@ -374,7 +398,7 @@ private:
 
     void MakeGamma1bar (const amrex::Vector<amrex::MultiFab>& scal,
                         amrex::Vector<amrex::Real>& gamma1bar,
-                        const amrex::Vector<amrex::Real>& p0);
+                        const RealVector& p0);
 
     // end MaestroGamma.cpp functions
     ////////////
@@ -465,7 +489,7 @@ private:
                     const amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal,
-                    const amrex::Vector<amrex::Real>& p0,
+                    const RealVector& p0,
                     const amrex::Vector<amrex::Real>& gamma1bar,
                     amrex::Vector<amrex::Real>& delta_gamma1_termbar,
                     const amrex::Vector<amrex::Real>& psi);
@@ -485,7 +509,7 @@ private:
                              const amrex::Vector<amrex::Real>& beta0,
                              const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
                              const amrex::Vector<amrex::Real>& gamma1bar,
-			                       const amrex::Vector<amrex::Real>& p0,
+			     const RealVector& p0,
                              const amrex::Vector<amrex::MultiFab>& delta_p_term,
 			                       amrex::Vector<amrex::MultiFab>& delta_chi,
                              int is_predictor);
@@ -494,7 +518,7 @@ private:
 				 const amrex::Vector<amrex::Real>& rho0,
 				 const amrex::Vector<amrex::Real>& beta0,
 				 const amrex::Vector<amrex::Real>& gamma1bar,
-				 const amrex::Vector<amrex::Real>& p0,
+				 const RealVector& p0,
 				 const amrex::Vector<amrex::MultiFab>& delta_p_term);
     // end MaestroMakeS.cpp functions
     ////////////
@@ -540,7 +564,7 @@ private:
                                                       const amrex::Vector<amrex::MultiFab>& rho0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& u_in,
                                                       amrex::Vector<amrex::MultiFab>& s_in,
-                                                      const amrex::Vector<amrex::Real>& p0_in);
+                                                      const RealVector& p0_in);
 
     // set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames () const;
@@ -549,7 +573,7 @@ private:
     void WritePlotFile (const int step,
                         const amrex::Real dt_in,
                         const amrex::Vector<amrex::Real>& rho0_in,
-                        const amrex::Vector<amrex::Real>& p0_in,
+                        const RealVector& p0_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in);
 
@@ -568,7 +592,7 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_Hext,
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                const amrex::Vector<amrex::Real>& p0,
+                const RealVector& p0,
                 const amrex::Real dt_react);
 
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
@@ -576,7 +600,7 @@ private:
                 const amrex::Vector<amrex::MultiFab>& rho_Hext,
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                const amrex::Vector<amrex::Real>& p0,
+                const RealVector& p0,
                 const amrex::Real dt_react);
 
     // compute heating term, rho_Hext
@@ -626,12 +650,12 @@ private:
     ////////////
     // MaestroRhoHT.cpp functions
     void TfromRhoH (amrex::Vector<amrex::MultiFab>& scal,
-                    const amrex::Vector<amrex::Real>& p0);
+                    const RealVector& p0);
 
     void TfromRhoP (amrex::Vector<amrex::MultiFab>& scal,
-                    const amrex::Vector<amrex::Real>& p0,
+                    const RealVector& p0,
                     int updateRhoH = 0);
-
+    
     void PfromRhoH (const amrex::Vector<amrex::MultiFab>& state,
                     const amrex::Vector<amrex::MultiFab>& s_old,
 		    amrex::Vector<amrex::MultiFab>& peos);
@@ -668,7 +692,7 @@ private:
 			      const amrex::Vector<amrex::MultiFab>& hcoeff,
 			      const amrex::Vector<amrex::MultiFab>& Xkcoeff,
 			      const amrex::Vector<amrex::MultiFab>& pcoeff,
-			      const amrex::Vector<amrex::Real>& p0,
+			      const RealVector& p0,
 			      int temp_formulation);
 
     void ApplyThermal (amrex::MLABecLaplacian& mlabec,
@@ -795,13 +819,13 @@ private:
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     amrex::Vector<amrex::Real> s0_init;
-    amrex::Vector<amrex::Real> p0_init;
+    RealVector p0_init;
     amrex::Vector<amrex::Real> rho0_old;
     amrex::Vector<amrex::Real> rho0_new;
     amrex::Vector<amrex::Real> rhoh0_old;
     amrex::Vector<amrex::Real> rhoh0_new;
-    amrex::Vector<amrex::Real> p0_old;
-    amrex::Vector<amrex::Real> p0_new;
+    RealVector p0_old;
+    RealVector p0_new;
     amrex::Vector<amrex::Real> tempbar;
     amrex::Vector<amrex::Real> tempbar_init;
     amrex::Vector<amrex::Real> beta0_old;
@@ -814,7 +838,7 @@ private:
     amrex::Vector<amrex::Real> grav_cell_new;
     amrex::Vector<amrex::Real> r_cc_loc;
     // p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
-    amrex::Vector<amrex::Real> p0_nm1;
+    RealVector p0_nm1;
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered

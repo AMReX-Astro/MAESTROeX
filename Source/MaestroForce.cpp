@@ -219,7 +219,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     Vector<Real> rho0( (max_radial_level+1)*nr_fine );
-    Vector<Real>   p0( (max_radial_level+1)*nr_fine );
+    RealVector     p0( (max_radial_level+1)*nr_fine );
     Vector<Real> grav( (max_radial_level+1)*nr_fine );
     Vector<Real> dpdt( (max_radial_level+1)*nr_fine );
     rho0.shrink_to_fit();

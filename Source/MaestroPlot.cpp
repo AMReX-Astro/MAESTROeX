@@ -10,7 +10,7 @@ void
 Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Vector<Real>& rho0_in,
-                        const Vector<Real>& p0_in,
+                        const RealVector& p0_in,
                         const Vector<MultiFab>& u_in,
                         Vector<MultiFab>& s_in)
 {
@@ -86,7 +86,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
                      const Vector<MultiFab>& rho0_cart,
                      const Vector<MultiFab>& u_in,
                      Vector<MultiFab>& s_in,
-                     const Vector<Real>& p0_in)
+                     const RealVector& p0_in)
 {
 		// timer for profiling
 		BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);

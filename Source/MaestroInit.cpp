@@ -197,9 +197,10 @@ Maestro::InitData ()
 
 		// free memory in s0_init and p0_init by swapping it
 		// with an empty vector that will go out of scope
-		Vector<Real> s0_swap, p0_swap;
+		Vector<Real> s0_swap;
+		RealVector p0_swap;
 		std::swap(s0_swap,s0_init);
-		std::swap(p0_swap,p0_init);
+		p0_swap.swap(p0_init);
 
 		if (fix_base_state) {
 				// compute cutoff coordinates

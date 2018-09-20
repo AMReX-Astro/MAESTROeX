@@ -943,19 +943,19 @@ extern "C"
 
     //////////////////////
     // in rhoh_vs_t.F90
-    void makeTfromRhoH (const int* lo, const int* hi, const int* lev, 
-                        amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
+    void makeTfromRhoH (const int* lo, const int* hi, const int lev, 
+                        const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
                         const amrex::Real* p0);
-
+    
     void makeTfromRhoH_sphr (const int* lo, const int* hi,
 			     amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
 			     const amrex::Real* p0, const amrex::Real* dx,
 			     const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 			     const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void makeTfromRhoP (const int* lo, const int* hi, const int* lev, 
-                        amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
-                        const amrex::Real* p0, const int* updateRhoH);
+    void makeTfromRhoP (const int* lo, const int* hi, const int lev, 
+                        const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
+                        const amrex::Real* p0, const int updateRhoH);
 
     void makeTfromRhoP_sphr (const int* lo, const int* hi,
 			     amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
@@ -964,9 +964,9 @@ extern "C"
 			     const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
     void makePfromRhoH(const int* lo, const int* hi,
-		       const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
-		       const amrex::Real* temp_old, const int* t_lo, const int* t_hi,
-		       amrex::Real* peos, const int* p_lo, const int* p_hi);
+                       const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
+		       const amrex::Real* temp_old, const int* t_lo, const int* t_hi, 
+                       const amrex::Real* peos, const int* p_lo, const int* p_hi);
     //////////////////////
 
     //////////////////////

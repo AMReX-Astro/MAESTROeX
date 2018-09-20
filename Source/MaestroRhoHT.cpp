@@ -5,7 +5,7 @@ using namespace amrex;
 
 void
 Maestro::TfromRhoH (Vector<MultiFab>& scal,
-                    const Vector<Real>& p0)
+                    const RealVector& p0)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoH()",TfromRhoH);
@@ -38,7 +38,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 	    } else {
 
 #pragma gpu
-		makeTfromRhoH(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()), &lev,
+		makeTfromRhoH(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()), lev,
 			      BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(),
 			      p0.dataPtr());
 	    }
@@ -53,7 +53,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
 void
 Maestro::TfromRhoP (Vector<MultiFab>& scal,
-                    const Vector<Real>& p0,
+                    const RealVector& p0,
                     int updateRhoH)
 {
     // timer for profiling
@@ -86,9 +86,9 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 	    } else {
 
 #pragma gpu
-		makeTfromRhoP(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()), &lev,
+		makeTfromRhoP(AMREX_INT_ANYD(validBox.loVect()), AMREX_INT_ANYD(validBox.hiVect()), lev,
 			      BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf[mfi].nCompPtr(), 
-			      p0.dataPtr(),&updateRhoH);
+			      p0.dataPtr(), updateRhoH);
 	    }
         }
 

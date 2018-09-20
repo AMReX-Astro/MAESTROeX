@@ -14,7 +14,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& rho_Hnuc,
                     const Vector<MultiFab>& rho_Hext,
                     const Vector<MultiFab>& thermal,
-                    const Vector<Real>& p0,
+                    const RealVector& p0,
                     const Vector<Real>& gamma1bar,
                     Vector<Real>& delta_gamma1_termbar,
                     const Vector<Real>& psi)
@@ -202,7 +202,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
                                  const Vector<Real>& rho0,
                                  const Vector<Real>& beta0,
                                  const Vector<Real>& gamma1bar,
-                                 const Vector<Real>& p0,
+                                 const RealVector& p0,
                                  const Vector<MultiFab>& delta_p_term)
 {
 		// timer for profiling
@@ -295,7 +295,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const Vector<Real>& beta0,
                              const Vector<MultiFab>& delta_gamma1_term,
                              const Vector<Real>& gamma1bar,
-                             const Vector<Real>& p0,
+                             const RealVector& p0,
                              const Vector<MultiFab>& delta_p_term,
                              Vector<MultiFab>& delta_chi,
                              int is_predictor)

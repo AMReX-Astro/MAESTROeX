@@ -19,7 +19,7 @@ Maestro::Evolve ()
 
     // index for diag array buffer
     int diag_index=0;
-
+    
     for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
     {
 
@@ -111,15 +111,17 @@ Maestro::Evolve ()
             std::swap(    sold[lev],     snew[lev]);
             std::swap(    uold[lev],     unew[lev]);
             std::swap(S_cc_old[lev], S_cc_new[lev]);
-
-            std::swap( rho0_old, rho0_new);
-            std::swap(rhoh0_old,rhoh0_new);
-	    std::swap(   p0_nm1,   p0_old);
-            std::swap(   p0_old,   p0_new);
-
-            std::swap(beta0_old,beta0_new);
-            std::swap(grav_cell_old,grav_cell_new);
-        }
+	}
+	
+	std::swap( rho0_old, rho0_new);
+	std::swap(rhoh0_old,rhoh0_new);
+	
+	// Note std::swap() is incompatible with CudaManagedAllocator
+	p0_nm1.swap(p0_old);
+        p0_old.swap(p0_new);
+        
+	std::swap(beta0_old,beta0_new);
+	std::swap(grav_cell_old,grav_cell_new);
 
     }
 }
