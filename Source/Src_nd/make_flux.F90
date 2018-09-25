@@ -450,7 +450,7 @@ contains
     do comp = startcomp, endcomp
 
        ! loop for x-fluxes
-       !$OMP PARALLEL PRIVATE(i,j,k,rho0_edge)
+       !$OMP PARALLEL PRIVATE(i,j,k,rho0_edgex)
        !$OMP DO
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
@@ -1186,7 +1186,7 @@ contains
 
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge,h0_edgex)
+       !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgex,h0_edgex)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)+1
