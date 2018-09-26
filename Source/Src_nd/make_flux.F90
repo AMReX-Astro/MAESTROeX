@@ -289,8 +289,6 @@ contains
     do comp = startcomp, endcomp
        ! create x-fluxes and y-fluxes
 
-       !$OMP PARALLEL PRIVATE(i,j,k,rho0_edge)
-       !$OMP DO
        do k=lo(3),hi(3)
           rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
 
@@ -342,10 +340,8 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
        ! create z-fluxes
-       !$OMP DO
        do k=lo(3),hi(3)+1
           rho0_edge = HALF*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k))
           do j=lo(2),hi(2)
@@ -380,8 +376,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
 
     end do
 
@@ -446,12 +440,9 @@ contains
     integer          :: i,j,k
     ! double precision :: rho0_edge
 
-
     do comp = startcomp, endcomp
 
        ! loop for x-fluxes
-       !$OMP PARALLEL PRIVATE(i,j,k,rho0_edgex)
-       !$OMP DO
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)+1
@@ -477,10 +468,8 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
        ! loop for y-fluxes
-       !$OMP DO
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)+1
              do i = lo(1), hi(1)
@@ -506,10 +495,8 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
        ! loop for z-fluxes
-       !$OMP DO
        do k = lo(3), hi(3)+1
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
@@ -535,8 +522,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
 
     end do ! end loop over components
 
@@ -856,7 +841,6 @@ contains
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge)
           do k=lo(3),hi(3)
              rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
              do j=lo(2),hi(2)
@@ -873,13 +857,11 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        else if (species_pred_type == predict_rho_and_X .or. &
             species_pred_type == predict_rhoX) then
           ! density edge state is rho
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k=lo(3),hi(3)
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)+1
@@ -895,7 +877,6 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        endif
 
@@ -906,7 +887,6 @@ contains
 
     else if (have_rhoh) then
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)+1
@@ -920,12 +900,10 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else if (enthalpy_pred_type.eq.predict_rhohprime) then
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rhoh0_edge)
        do k=lo(3),hi(3)
           rhoh0_edge = HALF*(rhoh0_old(lev,k)+rhoh0_new(lev,k))
           do j=lo(2),hi(2)
@@ -940,7 +918,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else
        call bl_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
@@ -953,7 +930,6 @@ contains
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edge)
           do k=lo(3),hi(3)+1
              rho0_edge = HALF*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k))
              do j=lo(2),hi(2)
@@ -963,13 +939,11 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        else if (species_pred_type == predict_rho_and_X .or. &
             species_pred_type == predict_rhoX) then
           ! density edge state is rho
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k=lo(3),hi(3)+1
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
@@ -978,7 +952,6 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        endif
 
@@ -989,7 +962,6 @@ contains
 
     else if (have_rhoh) then
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=lo(3),hi(3)+1
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
@@ -997,12 +969,10 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else if (enthalpy_pred_type.eq.predict_rhohprime) then
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rhoh0_edge)
        do k=lo(3),hi(3)+1
           rhoh0_edge = HALF*(rhoh0_edge_old(lev,k)+rhoh0_edge_new(lev,k))
           do j=lo(2),hi(2)
@@ -1012,7 +982,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else
        call bl_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
@@ -1102,7 +1071,6 @@ contains
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgex)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)+1
@@ -1113,13 +1081,11 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        else if (species_pred_type == predict_rho_and_X .or. &
             species_pred_type == predict_rhoX) then
           ! density edge state is rho
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)+1
@@ -1130,7 +1096,6 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        endif
 
@@ -1145,7 +1110,6 @@ contains
           ! computed from (rho h)_0 / rho_0
           ! sfluxx = (umac(i,j,k)+w0macx(i,j,k)) * (rho h)_edge
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgex,h0_edgex)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)+1
@@ -1156,7 +1120,6 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
@@ -1170,7 +1133,6 @@ contains
 
     else if (have_rhoh) then
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)+1
@@ -1180,13 +1142,11 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else
 
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgex,h0_edgex)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)+1
@@ -1202,7 +1162,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     endif
 
@@ -1214,7 +1173,6 @@ contains
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgey)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)+1
                 do i = lo(1), hi(1)
@@ -1225,13 +1183,11 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        else if (species_pred_type == predict_rho_and_X .or. &
             species_pred_type == predict_rhoX) then
           ! density edge state is rho
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)+1
                 do i = lo(1), hi(1)
@@ -1242,7 +1198,6 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        endif
 
@@ -1257,7 +1212,6 @@ contains
           ! computed from (rho h)_0 / rho_0
           ! sfluxy = (vmac(i,j,k)+w0macy(i,j,k)) * (rho h)_edge
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgey,h0_edgey)
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)+1
                 do i = lo(1), hi(1)
@@ -1268,7 +1222,6 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
@@ -1283,7 +1236,6 @@ contains
 
     else if (have_rhoh) then
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)+1
              do i = lo(1), hi(1)
@@ -1293,13 +1245,11 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else
 
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgey,h0_edgey)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)+1
              do i = lo(1), hi(1)
@@ -1315,7 +1265,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     endif
 
@@ -1327,7 +1276,6 @@ contains
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgez)
           do k = lo(3), hi(3)+1
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
@@ -1338,13 +1286,11 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        else if (species_pred_type == predict_rho_and_X .or. &
             species_pred_type == predict_rhoX) then
           ! density edge state is rho
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k)
           do k = lo(3), hi(3)+1
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
@@ -1355,7 +1301,6 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        endif
 
@@ -1370,7 +1315,6 @@ contains
           ! where h0 is computed from (rho h)_0 / rho_0
           ! sfluxz = (wmac(i,j,k)+w0macz(i,j,k)) * (rho h)_edge
 
-          !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgez,h0_edgez)
           do k = lo(3), hi(3)+1
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
@@ -1381,7 +1325,6 @@ contains
                 end do
              end do
           end do
-          !$OMP END PARALLEL DO
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
@@ -1395,7 +1338,6 @@ contains
 
     else if (have_rhoh) then
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3), hi(3)+1
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
@@ -1405,13 +1347,11 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else
 
        ! enthalpy edge state is (rho h)'
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,rho0_edgez,h0_edgez)
        do k = lo(3), hi(3)+1
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
@@ -1427,7 +1367,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     endif
 

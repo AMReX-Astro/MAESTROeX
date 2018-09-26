@@ -682,12 +682,12 @@ contains
     call bl_allocate(Ipw,lo-1,hi+1,3)
     call bl_allocate(Imw,lo-1,hi+1,3)
 
-    call bl_allocate(Ipfx,lo-1,hi+1,3)
-    call bl_allocate(Imfx,lo-1,hi+1,3)
-    call bl_allocate(Ipfy,lo-1,hi+1,3)
-    call bl_allocate(Imfy,lo-1,hi+1,3)
-    call bl_allocate(Ipfz,lo-1,hi+1,3)
-    call bl_allocate(Imfz,lo-1,hi+1,3)
+    ! call bl_allocate(Ipfx,lo-1,hi+1,3)
+    ! call bl_allocate(Imfx,lo-1,hi+1,3)
+    ! call bl_allocate(Ipfy,lo-1,hi+1,3)
+    ! call bl_allocate(Imfy,lo-1,hi+1,3)
+    ! call bl_allocate(Ipfz,lo-1,hi+1,3)
+    ! call bl_allocate(Imfz,lo-1,hi+1,3)
 
     is = lo(1)
     ie = hi(1)
@@ -768,6 +768,8 @@ contains
           end do
        end do
     end if
+
+    call bl_deallocate(slopex)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -878,6 +880,8 @@ contains
        enddo
     end if
 
+    call bl_deallocate(slopey)
+
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
        select case(phys_bc(2,1))
@@ -985,6 +989,14 @@ contains
           end do
        end do
     end if
+
+    call bl_deallocate(slopez)
+    call bl_deallocate(Ipu)
+    call bl_deallocate(Imu)
+    call bl_deallocate(Ipv)
+    call bl_deallocate(Imv)
+    call bl_deallocate(Ipw)
+    call bl_deallocate(Imw)
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
@@ -1121,6 +1133,8 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(ulyz)
+    call bl_deallocate(uryz)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
@@ -1188,6 +1202,9 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(ulzy)
+    call bl_deallocate(urzy)
+
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
@@ -1207,6 +1224,8 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(uimhz)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -1254,6 +1273,9 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(vlxz)
+    call bl_deallocate(vrxz)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
@@ -1321,6 +1343,9 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(vlzx)
+    call bl_deallocate(vrzx)
+
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
@@ -1340,6 +1365,8 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(uimhy)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -1388,6 +1415,9 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(wlxy)
+    call bl_deallocate(wrxy)
+
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
@@ -1407,6 +1437,8 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(uimhx)
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -1455,6 +1487,9 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(wlyx)
+    call bl_deallocate(wryx)
+
     !******************************************************************
     ! Create umac, etc.
     !******************************************************************
@@ -1487,6 +1522,11 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+    call bl_deallocate(uimhyz)
+    call bl_deallocate(uimhzy)
 
     if (spherical .eq. 1) then
 
@@ -1551,6 +1591,9 @@ contains
        end select
     end if
 
+    call bl_deallocate(umacl)
+    call bl_deallocate(umacr)
+
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
@@ -1579,6 +1622,11 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(uly)
+    call bl_deallocate(ury)
+    call bl_deallocate(vimhxz)
+    call bl_deallocate(vimhzx)
 
     if (spherical .eq. 1) then
 
@@ -1643,6 +1691,9 @@ contains
        end select
     end if
 
+    call bl_deallocate(vmacl)
+    call bl_deallocate(vmacr)
+
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
@@ -1671,6 +1722,11 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(ulz)
+    call bl_deallocate(urz)
+    call bl_deallocate(wimhxy)
+    call bl_deallocate(wimhyx)
 
     if (spherical .eq. 1) then
 
@@ -1737,60 +1793,6 @@ contains
        end select
     end if
 
-    call bl_deallocate(slopex)
-    call bl_deallocate(slopey)
-    call bl_deallocate(slopez)
-
-    call bl_deallocate(Ipu)
-    call bl_deallocate(Imu)
-    call bl_deallocate(Ipfx)
-    call bl_deallocate(Imfx)
-    call bl_deallocate(Ipv)
-    call bl_deallocate(Imv)
-    call bl_deallocate(Ipfy)
-    call bl_deallocate(Imfy)
-    call bl_deallocate(Ipw)
-    call bl_deallocate(Imw)
-    call bl_deallocate(Ipfz)
-    call bl_deallocate(Imfz)
-
-    call bl_deallocate(ulx)
-    call bl_deallocate(urx)
-    call bl_deallocate(uimhx)
-
-    call bl_deallocate(uly)
-    call bl_deallocate(ury)
-    call bl_deallocate(uimhy)
-
-    call bl_deallocate(ulz)
-    call bl_deallocate(urz)
-    call bl_deallocate(uimhz)
-
-    call bl_deallocate(ulyz)
-    call bl_deallocate(uryz)
-    call bl_deallocate(uimhyz)
-    call bl_deallocate(ulzy)
-    call bl_deallocate(urzy)
-    call bl_deallocate(uimhzy)
-
-    call bl_deallocate(vlxz)
-    call bl_deallocate(vrxz)
-    call bl_deallocate(vimhxz)
-    call bl_deallocate(vlzx)
-    call bl_deallocate(vrzx)
-    call bl_deallocate(vimhzx)
-
-    call bl_deallocate(wlxy)
-    call bl_deallocate(wrxy)
-    call bl_deallocate(wimhxy)
-    call bl_deallocate(wlyx)
-    call bl_deallocate(wryx)
-    call bl_deallocate(wimhyx)
-
-    call bl_deallocate(umacl)
-    call bl_deallocate(umacr)
-    call bl_deallocate(vmacl)
-    call bl_deallocate(vmacr)
     call bl_deallocate(wmacl)
     call bl_deallocate(wmacr)
 

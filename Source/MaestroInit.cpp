@@ -52,7 +52,7 @@ Maestro::Init ()
                 normal[lev].define(grids[lev], dmap[lev], 3, 1);
                 cell_cc_to_r[lev].define(grids[lev], dmap[lev], 1, 0);
             }
-            pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
+            pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);             // nodal
         }
 
         // set finest_radial_level in fortran

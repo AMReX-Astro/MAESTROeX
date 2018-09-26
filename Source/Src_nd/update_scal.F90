@@ -3,7 +3,7 @@ module update_scal_module
 
   use amrex_constants_module
   use meth_params_module, only: rho_comp, rhoh_comp,spec_comp, temp_comp, &
-                                  do_eos_h_above_cutoff, base_cutoff_density
+       do_eos_h_above_cutoff, base_cutoff_density
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use eos_module
   use eos_type_module
@@ -16,12 +16,12 @@ contains
 
 #if (AMREX_SPACEDIM == 1)
   subroutine update_rhoX_1d(lo, hi, &
-                              sold,   so_lo, so_hi, nc_so, &
-                              snew,   sn_lo, sn_hi, nc_sn, &
-                              sfluxx, x_lo, x_hi, nc_x, &
-                              force,  f_lo, f_hi, nc_f, &
-                              dx, dt, &
-                              startcomp, endcomp) bind(C,name="update_rhoX_1d")
+       sold,   so_lo, so_hi, nc_so, &
+       snew,   sn_lo, sn_hi, nc_sn, &
+       sfluxx, x_lo, x_hi, nc_x, &
+       force,  f_lo, f_hi, nc_f, &
+       dx, dt, &
+       startcomp, endcomp) bind(C,name="update_rhoX_1d")
 
     integer         , intent(in   ) :: lo(1), hi(1)
     integer         , intent(in   ) :: so_lo(1), so_hi(1), nc_so
@@ -97,13 +97,13 @@ contains
 
 #if (AMREX_SPACEDIM == 2)
   subroutine update_rhoX_2d(lo, hi, &
-                              sold,   so_lo, so_hi, nc_so, &
-                              snew,   sn_lo, sn_hi, nc_sn, &
-                              sfluxx, x_lo, x_hi, nc_x, &
-                              sfluxy, y_lo, y_hi, nc_y, &
-                              force,  f_lo, f_hi, nc_f, &
-                              dx, dt, &
-                              startcomp, endcomp) bind(C,name="update_rhoX_2d")
+       sold,   so_lo, so_hi, nc_so, &
+       snew,   sn_lo, sn_hi, nc_sn, &
+       sfluxx, x_lo, x_hi, nc_x, &
+       sfluxy, y_lo, y_hi, nc_y, &
+       force,  f_lo, f_hi, nc_f, &
+       dx, dt, &
+       startcomp, endcomp) bind(C,name="update_rhoX_2d")
 
     integer         , intent(in   ) :: lo(2), hi(2)
     integer         , intent(in   ) :: so_lo(2), so_hi(2), nc_so
@@ -130,7 +130,7 @@ contains
           do i=lo(1),hi(1)
 
              divterm = (sfluxx(i+1,j,comp) - sfluxx(i,j,comp))/dx(1) &
-                     + (sfluxy(i,j+1,comp) - sfluxy(i,j,comp))/dx(2)
+                  + (sfluxy(i,j+1,comp) - sfluxy(i,j,comp))/dx(2)
              snew(i,j,comp) = sold(i,j,comp) + dt*(-divterm + force(i,j,comp))
 
           end do
@@ -190,14 +190,14 @@ contains
 
 #if (AMREX_SPACEDIM == 3)
   subroutine update_rhoX_3d(lo, hi, &
-                              sold,   so_lo, so_hi, nc_so, &
-                              snew,   sn_lo, sn_hi, nc_sn, &
-                              sfluxx, x_lo, x_hi, nc_x, &
-                              sfluxy, y_lo, y_hi, nc_y, &
-                              sfluxz, z_lo, z_hi, nc_z, &
-                              force,  f_lo, f_hi, nc_f, &
-                              dx, dt, &
-                              startcomp, endcomp) bind(C,name="update_rhoX_3d")
+       sold,   so_lo, so_hi, nc_so, &
+       snew,   sn_lo, sn_hi, nc_sn, &
+       sfluxx, x_lo, x_hi, nc_x, &
+       sfluxy, y_lo, y_hi, nc_y, &
+       sfluxz, z_lo, z_hi, nc_z, &
+       force,  f_lo, f_hi, nc_f, &
+       dx, dt, &
+       startcomp, endcomp) bind(C,name="update_rhoX_3d")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: so_lo(3), so_hi(3), nc_so
@@ -221,29 +221,24 @@ contains
     double precision :: delta, frac, sumX
     logical          :: has_negative_species
 
-    !$OMP PARALLEL PRIVATE(i,j,k,divterm,comp)
     do comp = startcomp, endcomp
-       !$OMP DO
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
 
                 divterm = (sfluxx(i+1,j,k,comp) - sfluxx(i,j,k,comp))/dx(1) &
-                        + (sfluxy(i,j+1,k,comp) - sfluxy(i,j,k,comp))/dx(2) &
-                        + (sfluxz(i,j,k+1,comp) - sfluxz(i,j,k,comp))/dx(3)
+                     + (sfluxy(i,j+1,k,comp) - sfluxy(i,j,k,comp))/dx(2) &
+                     + (sfluxz(i,j,k+1,comp) - sfluxz(i,j,k,comp))/dx(3)
                 snew(i,j,k,comp) = sold(i,j,k,comp) + dt * (-divterm + force(i,j,k,comp))
 
              enddo
           enddo
        enddo
-       !$OMP END DO NOWAIT
     end do
-    !$OMP END PARALLEL
 
     ! update density
     snew(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),rho_comp) = sold(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),rho_comp)
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k,has_negative_species,comp,delta,sumX,comp2,frac)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -290,7 +285,6 @@ contains
           enddo
        enddo
     enddo
-    !$OMP END PARALLEL DO
 
   end subroutine update_rhoX_3d
 #endif
@@ -298,13 +292,13 @@ contains
 
 #if (AMREX_SPACEDIM == 1)
   subroutine update_rhoh_1d(lev, lo, hi, &
-                              sold,   so_lo, so_hi, nc_so, &
-                              snew,   sn_lo, sn_hi, nc_sn, &
-                              sfluxx, x_lo, x_hi, nc_x, &
-                              force,  f_lo, f_hi, nc_f, &
-                              p0_new, &
-                              dx, dt, &
-                              nspec) bind(C,name="update_rhoh_1d")
+       sold,   so_lo, so_hi, nc_so, &
+       snew,   sn_lo, sn_hi, nc_sn, &
+       sfluxx, x_lo, x_hi, nc_x, &
+       force,  f_lo, f_hi, nc_f, &
+       p0_new, &
+       dx, dt, &
+       nspec) bind(C,name="update_rhoh_1d")
 
     integer         , intent(in   ) :: lev, lo(1), hi(1)
     integer         , intent(in   ) :: so_lo(1), so_hi(1), nc_so
@@ -356,14 +350,14 @@ contains
 
 #if (AMREX_SPACEDIM == 2)
   subroutine update_rhoh_2d(lev, lo, hi, &
-                              sold,   so_lo, so_hi, nc_so, &
-                              snew,   sn_lo, sn_hi, nc_sn, &
-                              sfluxx, x_lo, x_hi, nc_x, &
-                              sfluxy, y_lo, y_hi, nc_y, &
-                              force,  f_lo, f_hi, nc_f, &
-                              p0_new, &
-                              dx, dt, &
-                              nspec) bind(C,name="update_rhoh_2d")
+       sold,   so_lo, so_hi, nc_so, &
+       snew,   sn_lo, sn_hi, nc_sn, &
+       sfluxx, x_lo, x_hi, nc_x, &
+       sfluxy, y_lo, y_hi, nc_y, &
+       force,  f_lo, f_hi, nc_f, &
+       p0_new, &
+       dx, dt, &
+       nspec) bind(C,name="update_rhoh_2d")
 
     integer         , intent(in   ) :: lev, lo(2), hi(2)
     integer         , intent(in   ) :: so_lo(2), so_hi(2), nc_so
@@ -425,15 +419,15 @@ contains
 
 #if (AMREX_SPACEDIM == 3)
   subroutine update_rhoh_3d(lev, lo, hi, &
-                              sold,   so_lo, so_hi, nc_so, &
-                              snew,   sn_lo, sn_hi, nc_sn, &
-                              sfluxx, x_lo, x_hi, nc_x, &
-                              sfluxy, y_lo, y_hi, nc_y, &
-                              sfluxz, z_lo, z_hi, nc_z, &
-                              force,  f_lo, f_hi, nc_f, &
-                              p0_new, &
-                              dx, dt, &
-                              nspec) bind(C,name="update_rhoh_3d")
+       sold,   so_lo, so_hi, nc_so, &
+       snew,   sn_lo, sn_hi, nc_sn, &
+       sfluxx, x_lo, x_hi, nc_x, &
+       sfluxy, y_lo, y_hi, nc_y, &
+       sfluxz, z_lo, z_hi, nc_z, &
+       force,  f_lo, f_hi, nc_f, &
+       p0_new, &
+       dx, dt, &
+       nspec) bind(C,name="update_rhoh_3d")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: so_lo(3), so_hi(3), nc_so
@@ -459,7 +453,6 @@ contains
     integer :: pt_index(3)
     type(eos_t) :: eos_state
 
-    !$OMP PARALLEL PRIVATE(i,j,k,divterm)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -472,10 +465,8 @@ contains
           enddo
        enddo
     enddo
-    !$OMP END PARALLEL
 
     if ( do_eos_h_above_cutoff ) then
-       !$OMP PARALLEL DO PRIVATE(i,j,k,eos_state,pt_index)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
@@ -499,21 +490,20 @@ contains
              enddo
           enddo
        enddo
-       !$OMP END PARALLEL DO
     end if
 
   end subroutine update_rhoh_3d
 
   subroutine update_rhoh_3d_sphr(lo, hi, &
-                                   sold,   so_lo, so_hi, nc_so, &
-                                   snew,   sn_lo, sn_hi, nc_sn, &
-                                   sfluxx, x_lo, x_hi, nc_x, &
-                                   sfluxy, y_lo, y_hi, nc_y, &
-                                   sfluxz, z_lo, z_hi, nc_z, &
-                                   force,  f_lo, f_hi, nc_f, &
-                                   p0_new_cart, p_lo, p_hi, &
-                                   dx, dt, &
-                                   nspec) bind(C,name="update_rhoh_3d_sphr")
+       sold,   so_lo, so_hi, nc_so, &
+       snew,   sn_lo, sn_hi, nc_sn, &
+       sfluxx, x_lo, x_hi, nc_x, &
+       sfluxy, y_lo, y_hi, nc_y, &
+       sfluxz, z_lo, z_hi, nc_z, &
+       force,  f_lo, f_hi, nc_f, &
+       p0_new_cart, p_lo, p_hi, &
+       dx, dt, &
+       nspec) bind(C,name="update_rhoh_3d_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: so_lo(3), so_hi(3), nc_so
@@ -540,7 +530,6 @@ contains
     integer :: pt_index(3)
     type(eos_t) :: eos_state
 
-    !$OMP PARALLEL PRIVATE(i,j,k,divterm)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -553,10 +542,8 @@ contains
           enddo
        enddo
     enddo
-    !$OMP END PARALLEL
 
     if ( do_eos_h_above_cutoff ) then
-       !$OMP PARALLEL DO PRIVATE(i,j,k,eos_state,pt_index)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
@@ -580,7 +567,6 @@ contains
              enddo
           enddo
        enddo
-       !$OMP END PARALLEL DO
     end if
 
   end subroutine update_rhoh_3d_sphr
