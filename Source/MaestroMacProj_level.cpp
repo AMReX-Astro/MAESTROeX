@@ -349,7 +349,7 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(rhocc_mf); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(rhocc_mf, true); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();

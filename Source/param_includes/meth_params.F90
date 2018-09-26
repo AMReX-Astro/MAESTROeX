@@ -3,7 +3,7 @@
 ! or add runtime parameters, please edit _cpp_parameters and then run
 ! mk_params.sh
 
-! This module stores the runtime parameters and integer names for
+! This module stores the runtime parameters and integer names for 
 ! indexing arrays.
 !
 ! The Fortran-specific parameters are initialized in set_method_params(),
@@ -76,6 +76,7 @@ module meth_params_module
   integer                       , save :: w0_interp_type
   integer                       , save :: s0mac_interp_type
   integer                       , save :: w0mac_interp_type
+  integer                       , save :: track_grid_losses
 
   ! End the declarations of the ParmParse parameters
 
@@ -143,6 +144,7 @@ contains
     w0_interp_type = 2;
     s0mac_interp_type = 1;
     w0mac_interp_type = 1;
+    track_grid_losses = 0;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("maestro_verbose", maestro_verbose)
@@ -196,6 +198,7 @@ contains
     call pp%query("w0_interp_type", w0_interp_type)
     call pp%query("s0mac_interp_type", s0mac_interp_type)
     call pp%query("w0mac_interp_type", w0mac_interp_type)
+    call pp%query("track_grid_losses", track_grid_losses)
     call amrex_parmparse_destroy(pp)
 
 
@@ -207,14 +210,14 @@ contains
     implicit none
 
     if (allocated(model_file)) then
-       deallocate(model_file)
+        deallocate(model_file)
     end if
     if (allocated(burner_threshold_species)) then
-       deallocate(burner_threshold_species)
+        deallocate(burner_threshold_species)
     end if
 
 
-
+    
   end subroutine finalize_meth_params
 
 end module meth_params_module

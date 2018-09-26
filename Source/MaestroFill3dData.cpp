@@ -352,3 +352,32 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
     // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
     AverageDownFaces(face);
 }
+
+
+void
+Maestro::MakeCCtoRadii ()
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeCCtoRadius()",MakeCCtoRadii);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        const Real* dx = geom[lev].CellSize();
+	const Real* dx_fine = geom[max_level].CellSize();
+
+	MultiFab& cc_to_r = cell_cc_to_r[lev];
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        for ( MFIter mfi(cc_to_r); mfi.isValid(); ++mfi ) {
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            init_base_state_map_sphr(BL_TO_FORTRAN_3D(cc_to_r[mfi]),
+				     ZFILL(dx_fine),
+				     ZFILL(dx));
+        }
+    }
+
+}

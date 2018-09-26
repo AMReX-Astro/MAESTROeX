@@ -350,7 +350,7 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #pragma omp parallel
 #endif
 // NOTE: not sure if this should be tiled
-        for ( MFIter mfi(rhocc_mf); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(rhocc_mf, true); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tilebox = mfi.tilebox();

@@ -136,7 +136,8 @@ Maestro::WriteCheckPoint (int step) {
 						           << psi[i] << " "
 						           << tempbar[i] << " "
 						           << etarho_cc[i] << " "
-						           << tempbar_init[i] << "\n";
+						           << tempbar_init[i] << " "
+							   << p0_old[i] << "\n";
 				}
 		}
 
@@ -244,6 +245,7 @@ Maestro::ReadCheckPoint ()
 
 						if (spherical == 1) {
 								normal[lev].define(ba, dm, 1, 1);
+								cell_cc_to_r[lev].define(ba, dm, 1, 0);
 						}
 
 						// build FluxRegister data
@@ -317,6 +319,8 @@ Maestro::ReadCheckPoint ()
 						etarho_cc[i] = std::stod(word);
 						lis >> word;
 						tempbar_init[i] = std::stod(word);
+						lis >> word;
+						p0_nm1[i] = std::stod(word);
 				}
 		}
 
