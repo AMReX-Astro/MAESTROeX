@@ -26,7 +26,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 64 64 64
+amr.n_cell             = 32 32 32
 amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -70,6 +70,8 @@ maestro.use_divu_firstdt = true
 
 maestro.use_tfromp = true
 
+maestro.do_burning = 0
+
 # PLOTFILES
 maestro.plot_base_name  = wdconvect_plt   # root name of plot file
 maestro.plot_int   = 1      # number of timesteps between plot files
@@ -77,7 +79,7 @@ maestro.plot_deltat = 10.0e0
 
 # CHECKPOINT
 maestro.check_base_name = wdconvect_chk
-maestro.chk_int         = 25
+maestro.chk_int         = -1
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12

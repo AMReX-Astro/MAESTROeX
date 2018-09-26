@@ -718,12 +718,12 @@ contains
 
     if (ppm_type .eq. 0) then
        do k = lo(3)-1,hi(3)+1
-          call slopex_2d(s(:,:,k,comp:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
-          call slopey_2d(s(:,:,k,comp:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+          call slopex_2d(s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,k,comp:),slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+          call slopey_2d(s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,k,comp:),slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
        end do
-       call slopez_3d(s(:,:,:,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+       call slopez_3d(s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_3d(s(:,:,:,comp),ng_s,umac,vmac,wmac,ng_um,Ip,Im, &
+       call ppm_3d(s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,comp),ng_s,umac,vmac,wmac,ng_um,Ip,Im, &
             domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
     end if
 
@@ -825,6 +825,8 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(slopex)
+
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
@@ -910,6 +912,8 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(slopey)
+
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
@@ -994,6 +998,8 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(slopez)
 
     !******************************************************************
     ! Create s_{\i-\half\e_x}^{x|y}, etc.
@@ -1092,6 +1098,9 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(slxy)
+    call bl_deallocate(srxy)
 
     ! loop over appropriate xz faces
 
@@ -1192,6 +1201,9 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(slxz)
+    call bl_deallocate(srxz)
+
     ! loop over appropriate yx faces
 
     ! These are transverse terms.  The size allocation is tricky.
@@ -1290,6 +1302,9 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(slyx)
+    call bl_deallocate(sryx)
 
     ! loop over appropriate yz faces
 
@@ -1390,6 +1405,10 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(simhz)
+    call bl_deallocate(slyz)
+    call bl_deallocate(sryz)
+
     ! loop over appropriate zx faces
 
     ! These are transverse terms.  The size allocation is tricky.
@@ -1489,6 +1508,10 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(simhx)
+    call bl_deallocate(slzx)
+    call bl_deallocate(srzx)
+
     ! loop over appropriate zy faces
 
     ! These are transverse terms.  The size allocation is tricky.
@@ -1587,6 +1610,13 @@ contains
           enddo
        enddo
     enddo
+
+    call bl_deallocate(simhy)
+    call bl_deallocate(slzy)
+    call bl_deallocate(srzy)
+    if (is_conservative .eq. 1) then
+       call bl_deallocate(divu)
+    end if
 
     !******************************************************************
     ! Create sedgelx, etc.
@@ -1705,6 +1735,11 @@ contains
        end if
     end if
 
+    call bl_deallocate(slx)
+    call bl_deallocate(srx)
+    call bl_deallocate(sedgelx)
+    call bl_deallocate(sedgerx)
+
     call bl_allocate(sedgely,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
     call bl_allocate(sedgery,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
 
@@ -1814,6 +1849,11 @@ contains
           call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
        end if
     end if
+
+    call bl_deallocate(sly)
+    call bl_deallocate(sry)
+    call bl_deallocate(sedgely)
+    call bl_deallocate(sedgery)
 
     call bl_allocate(sedgelz,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
     call bl_allocate(sedgerz,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
@@ -1930,36 +1970,8 @@ contains
     call bl_deallocate(Ipf)
     call bl_deallocate(Imf)
 
-    call bl_deallocate(slopex)
-    call bl_deallocate(slopey)
-    call bl_deallocate(slopez)
-
-    call bl_deallocate(slx)
-    call bl_deallocate(srx)
-    call bl_deallocate(simhx)
-
-    call bl_deallocate(sly)
-    call bl_deallocate(sry)
-    call bl_deallocate(simhy)
-
     call bl_deallocate(slz)
     call bl_deallocate(srz)
-    call bl_deallocate(simhz)
-
-    call bl_deallocate(slxy)
-    call bl_deallocate(srxy)
-    call bl_deallocate(slxz)
-    call bl_deallocate(srxz)
-
-    call bl_deallocate(slyx)
-    call bl_deallocate(sryx)
-    call bl_deallocate(slyz)
-    call bl_deallocate(sryz)
-
-    call bl_deallocate(slzx)
-    call bl_deallocate(srzx)
-    call bl_deallocate(slzy)
-    call bl_deallocate(srzy)
 
     call bl_deallocate(simhxy)
     call bl_deallocate(simhxz)
@@ -1968,16 +1980,11 @@ contains
     call bl_deallocate(simhzx)
     call bl_deallocate(simhzy)
 
-    call bl_deallocate(sedgelx)
-    call bl_deallocate(sedgerx)
-    call bl_deallocate(sedgely)
-    call bl_deallocate(sedgery)
     call bl_deallocate(sedgelz)
     call bl_deallocate(sedgerz)
 
-    call bl_deallocate(divu)
-
   end subroutine make_edge_scal_3d
+
 #endif
 
 end module make_edge_scal_module

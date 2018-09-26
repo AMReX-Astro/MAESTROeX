@@ -34,7 +34,7 @@ contains
     integer outcomp
 
     ! zero s0_cart, then fill in the non-zero values
-    s0_cart = 0.d0
+    s0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
 
     if (is_output_a_vector .eq. 1) then
        outcomp = AMREX_SPACEDIM

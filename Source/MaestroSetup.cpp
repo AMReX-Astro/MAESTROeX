@@ -43,6 +43,7 @@ Maestro::Setup ()
     VariableSetup();
 
     maestro_network_init();
+
     burner_init();
 
     const Real* probLo = geom[0].ProbLo();

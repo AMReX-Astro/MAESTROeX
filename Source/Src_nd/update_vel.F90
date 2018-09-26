@@ -11,26 +11,26 @@ module update_vel_module
 contains
 
   subroutine update_velocity(lev, lo, hi, &
-                               uold, uo_lo, uo_hi, &
-                               unew, un_lo, un_hi, &
-                               umac,  u_lo, u_hi, &
+       uold, uo_lo, uo_hi, &
+       unew, un_lo, un_hi, &
+       umac,  u_lo, u_hi, &
 #if (AMREX_SPACEDIM >= 2)
-                               vmac,  v_lo, v_hi, &
+       vmac,  v_lo, v_hi, &
 #if (AMREX_SPACEDIM == 3)
-                               wmac,  w_lo, w_hi, &
+       wmac,  w_lo, w_hi, &
 #endif
 #endif
-                               uedgex, x_lo, x_hi, &
+       uedgex, x_lo, x_hi, &
 #if (AMREX_SPACEDIM >= 2)
-                               uedgey, y_lo, y_hi, &
+       uedgey, y_lo, y_hi, &
 #if (AMREX_SPACEDIM == 3)
-                               uedgez, z_lo, z_hi, &
+       uedgez, z_lo, z_hi, &
 #endif
 #endif
-                               force,  f_lo, f_hi, &
-                               sponge, s_lo, s_hi, & 
-                               w0, dx, dt) &
-                               bind(C,name="update_velocity")
+       force,  f_lo, f_hi, &
+       sponge, s_lo, s_hi, &
+       w0, dx, dt) &
+       bind(C,name="update_velocity")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: uo_lo(3), uo_hi(3)
@@ -63,101 +63,101 @@ contains
     double precision, intent(in   ) :: sponge (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent(in   ) :: w0     (0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(AMREX_SPACEDIM), dt
-    
+
     integer :: i,j,k, dim
     double precision :: ubar, vbar, wbar, w0bar
     double precision :: ugradu, ugradv, ugradw
-    
+
     ! 1) Subtract (Utilde dot grad) Utilde term from old Utilde
     ! 2) Add forcing term to new Utilde
     !$OMP PARALLEL DO PRIVATE(i,j,k,ubar,vbar,wbar,ugradu,ugradv,ugradw)
     do k = lo(3),hi(3)
-    do j = lo(2),hi(2)
-    do i = lo(1),hi(1)
+       do j = lo(2),hi(2)
+          do i = lo(1),hi(1)
 
-       ! create cell-centered Utilde
-       dim = i
-       ubar = HALF*(umac(i,j,k) + umac(i+1,j,k))
+             ! create cell-centered Utilde
+             dim = i
+             ubar = HALF*(umac(i,j,k) + umac(i+1,j,k))
 #if (AMREX_SPACEDIM >= 2)
-       dim = j
-       vbar = HALF*(vmac(i,j,k) + vmac(i,j+1,k))
+             dim = j
+             vbar = HALF*(vmac(i,j,k) + vmac(i,j+1,k))
 #if (AMREX_SPACEDIM == 3)
-       dim = k
-       wbar = HALF*(wmac(i,j,k) + wmac(i,j,k+1))
+             dim = k
+             wbar = HALF*(wmac(i,j,k) + wmac(i,j,k+1))
 #endif
 #endif
 
-       ! create (Utilde dot grad) Utilde
-       ugradu = ( ubar*(uedgex(i+1,j,k,1) - uedgex(i,j,k,1))/dx(1) &
+             ! create (Utilde dot grad) Utilde
+             ugradu = ( ubar*(uedgex(i+1,j,k,1) - uedgex(i,j,k,1))/dx(1) &
 #if (AMREX_SPACEDIM >= 2)
-                + vbar*(uedgey(i,j+1,k,1) - uedgey(i,j,k,1))/dx(2) &
+                  + vbar*(uedgey(i,j+1,k,1) - uedgey(i,j,k,1))/dx(2) &
 #if (AMREX_SPACEDIM == 3)
-                + wbar*(uedgez(i,j,k+1,1) - uedgez(i,j,k,1))/dx(3) &
+                  + wbar*(uedgez(i,j,k+1,1) - uedgez(i,j,k,1))/dx(3) &
 #endif
 #endif
                   )
 
 #if (AMREX_SPACEDIM >= 2)
-       ugradv = ( ubar*(uedgex(i+1,j,k,2) - uedgex(i,j,k,2))/dx(1) &
-                + vbar*(uedgey(i,j+1,k,2) - uedgey(i,j,k,2))/dx(2) &
+             ugradv = ( ubar*(uedgex(i+1,j,k,2) - uedgex(i,j,k,2))/dx(1) &
+                  + vbar*(uedgey(i,j+1,k,2) - uedgey(i,j,k,2))/dx(2) &
 #if (AMREX_SPACEDIM == 3)
-                + wbar*(uedgez(i,j,k+1,2) - uedgez(i,j,k,2))/dx(3) &
+                  + wbar*(uedgez(i,j,k+1,2) - uedgez(i,j,k,2))/dx(3) &
 #endif
 #endif
-                  ) 
+                  )
 
 #if (AMREX_SPACEDIM == 3)
-       ugradw = ubar*(uedgex(i+1,j,k,3) - uedgex(i,j,k,3))/dx(1) &
-                + vbar*(uedgey(i,j+1,k,3) - uedgey(i,j,k,3))/dx(2) &
-                + wbar*(uedgez(i,j,k+1,3) - uedgez(i,j,k,3))/dx(3)
-#endif 
-                  
-       ! update with (Utilde dot grad) Utilde and force
-       unew(i,j,k,1) = uold(i,j,k,1) - dt * ugradu + dt * force(i,j,k,1)
+             ugradw = ubar*(uedgex(i+1,j,k,3) - uedgex(i,j,k,3))/dx(1) &
+                  + vbar*(uedgey(i,j+1,k,3) - uedgey(i,j,k,3))/dx(2) &
+                  + wbar*(uedgez(i,j,k+1,3) - uedgez(i,j,k,3))/dx(3)
+#endif
+
+             ! update with (Utilde dot grad) Utilde and force
+             unew(i,j,k,1) = uold(i,j,k,1) - dt * ugradu + dt * force(i,j,k,1)
 #if (AMREX_SPACEDIM >= 2)
-       unew(i,j,k,2) = uold(i,j,k,2) - dt * ugradv + dt * force(i,j,k,2)
+             unew(i,j,k,2) = uold(i,j,k,2) - dt * ugradv + dt * force(i,j,k,2)
 #if (AMREX_SPACEDIM == 3)
-       unew(i,j,k,3) = uold(i,j,k,3) - dt * ugradw + dt * force(i,j,k,3)
+             unew(i,j,k,3) = uold(i,j,k,3) - dt * ugradw + dt * force(i,j,k,3)
 #endif
 #endif
 
-       ! subtract (w0 dot grad) Utilde term
-       w0bar = HALF*(w0(lev,dim) + w0(lev,dim+1))
-       unew(i,j,k,:) = unew(i,j,k,:) - dt * w0bar * &
+             ! subtract (w0 dot grad) Utilde term
+             w0bar = HALF*(w0(lev,dim) + w0(lev,dim+1))
+             unew(i,j,k,:) = unew(i,j,k,:) - dt * w0bar * &
 #if (AMREX_SPACEDIM == 1)
-                          (uedgex(i+1,j,k,1) - uedgex(i,j,k,1))/dx(1)
-#elif (AMREX_SPACEDIM == 2) 
-                          (uedgey(i,j+1,k,:) - uedgey(i,j,k,:))/dx(2)
+                  (uedgex(i+1,j,k,1) - uedgex(i,j,k,1))/dx(1)
+#elif (AMREX_SPACEDIM == 2)
+             (uedgey(i,j+1,k,:) - uedgey(i,j,k,:))/dx(2)
 #elif (AMREX_SPACEDIM == 3)
-                          (uedgez(i,j,k+1,:) - uedgez(i,j,k,:))/dx(3)
+             (uedgez(i,j,k+1,:) - uedgez(i,j,k,:))/dx(3)
 #endif
 
-       ! Add the sponge
-       if (do_sponge) unew(i,j,k,:) = unew(i,j,k,:) * sponge(i,j,k)
+             ! Add the sponge
+             if (do_sponge) unew(i,j,k,:) = unew(i,j,k,:) * sponge(i,j,k)
 
-    end do
-    end do
+          end do
+       end do
     end do
     !$OMP END PARALLEL DO
 
   end subroutine update_velocity
 
   subroutine update_velocity_sphr(lo, hi, &
-                               uold, uo_lo, uo_hi, &
-                               unew, un_lo, un_hi, &
-                               umac,  u_lo, u_hi, &
-                               vmac,  v_lo, v_hi, &
-                               wmac,  w_lo, w_hi, &
-                               uedgex, x_lo, x_hi, &
-                               uedgey, y_lo, y_hi, &
-                               uedgez, z_lo, z_hi, &
-                               force,  f_lo, f_hi, &
-                               sponge, s_lo, s_hi, & 
-                               w0, & 
-                               w0macx, wx_lo, wx_hi, & 
-                               w0macy, wy_lo, wy_hi, &
-                               w0macz, wz_lo, wz_hi, & 
-                               dx, dt) bind(C,name="update_velocity_sphr")
+       uold, uo_lo, uo_hi, &
+       unew, un_lo, un_hi, &
+       umac,  u_lo, u_hi, &
+       vmac,  v_lo, v_hi, &
+       wmac,  w_lo, w_hi, &
+       uedgex, x_lo, x_hi, &
+       uedgey, y_lo, y_hi, &
+       uedgez, z_lo, z_hi, &
+       force,  f_lo, f_hi, &
+       sponge, s_lo, s_hi, &
+       w0, &
+       w0macx, wx_lo, wx_hi, &
+       w0macy, wy_lo, wy_hi, &
+       w0macz, wz_lo, wz_hi, &
+       dx, dt) bind(C,name="update_velocity_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: uo_lo(3), uo_hi(3)
@@ -188,10 +188,10 @@ contains
     integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
     double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
     double precision, intent(in   ) :: dx(3), dt
-    
+
     ! Local variables
     integer :: i, j, k
-    double precision :: ubar, vbar, wbar, w0bar
+    double precision :: ubar, vbar, wbar
     double precision :: ugradu, ugradv, ugradw
     double precision :: gradux,graduy,graduz
     double precision :: gradvx,gradvy,gradvz
@@ -241,34 +241,34 @@ contains
              gradux = (uedgex(i+1,j,k,1) - uedgex(i,j,k,1))/dx(1)
              gradvx = (uedgex(i+1,j,k,2) - uedgex(i,j,k,2))/dx(1)
              gradwx = (uedgex(i+1,j,k,3) - uedgex(i,j,k,3))/dx(1)
-             
+
              graduy = (uedgey(i,j+1,k,1) - uedgey(i,j,k,1))/dx(2)
              gradvy = (uedgey(i,j+1,k,2) - uedgey(i,j,k,2))/dx(2)
              gradwy = (uedgey(i,j+1,k,3) - uedgey(i,j,k,3))/dx(2)
-             
+
              graduz = (uedgez(i,j,k+1,1) - uedgez(i,j,k,1))/dx(3)
              gradvz = (uedgez(i,j,k+1,2) - uedgez(i,j,k,2))/dx(3)
              gradwz = (uedgez(i,j,k+1,3) - uedgez(i,j,k,3))/dx(3)
-             
+
              w0_gradur = gradux * HALF*(w0macx(i,j,k)+w0macx(i+1,j,k)) &
                   + graduy * HALF*(w0macy(i,j,k)+w0macy(i,j+1,k)) &
                   + graduz * HALF*(w0macz(i,j,k)+w0macz(i,j,k+1))
-             
+
              w0_gradvr = gradvx * HALF*(w0macx(i,j,k)+w0macx(i+1,j,k)) &
                   + gradvy * HALF*(w0macy(i,j,k)+w0macy(i,j+1,k)) &
                   + gradvz * HALF*(w0macz(i,j,k)+w0macz(i,j,k+1))
-             
+
              w0_gradwr = gradwx * HALF*(w0macx(i,j,k)+w0macx(i+1,j,k)) &
                   + gradwy * HALF*(w0macy(i,j,k)+w0macy(i,j+1,k)) &
                   + gradwz * HALF*(w0macz(i,j,k)+w0macz(i,j,k+1))
-             
+
              unew(i,j,k,1) = unew(i,j,k,1) - dt * w0_gradur
              unew(i,j,k,2) = unew(i,j,k,2) - dt * w0_gradvr
              unew(i,j,k,3) = unew(i,j,k,3) - dt * w0_gradwr
-             
+
              ! Add the sponge
              if (do_sponge) unew(i,j,k,:) = unew(i,j,k,:) * sponge(i,j,k)
-             
+
           enddo
        enddo
     enddo

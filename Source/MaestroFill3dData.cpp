@@ -14,58 +14,58 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
                            const Vector<BCRec>& bcs,
                            int sbccomp)
 {
-		// timer for profiling
-		BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()",Put1dArrayOnCart);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()",Put1dArrayOnCart);
 
-		int ng = s0_cart[0].nGrow();
-		if (ng > 0 && bcs.size() == 0) {
-				Abort("Put1dArrayOnCart with ghost cells requires bcs input");
-		}
+    int ng = s0_cart[0].nGrow();
+    if (ng > 0 && bcs.size() == 0) {
+        Abort("Put1dArrayOnCart with ghost cells requires bcs input");
+    }
 
-		for (int lev=0; lev<=finest_level; ++lev) {
+    for (int lev=0; lev<=finest_level; ++lev) {
 
-				// get references to the MultiFabs at level lev
-				MultiFab& s0_cart_mf = s0_cart[lev];
-				MultiFab& cc_to_r = cell_cc_to_r[lev];
+        // get references to the MultiFabs at level lev
+        MultiFab& s0_cart_mf = s0_cart[lev];
+        MultiFab& cc_to_r = cell_cc_to_r[lev];
 
-				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-				for ( MFIter mfi(s0_cart_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s0_cart_mf, true); mfi.isValid(); ++mfi ) {
 
-						// Get the index space of the valid region
-						const Box& tileBox = mfi.tilebox();
-						const Real* dx = geom[lev].CellSize();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Real* dx = geom[lev].CellSize();
 
-						// call fortran subroutine
-						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-						// lo/hi coordinates (including ghost cells), and/or the # of components
-						// We will also pass "validBox", which specifies the "valid" region.
-						if (spherical == 0) {
-								put_1d_array_on_cart(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-								                     BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-								                     s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
-						} else {
-								put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-								                          BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-								                          s0.dataPtr(), dx,
-								                          &is_input_edge_centered, &is_output_a_vector,
-								                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-								                          BL_TO_FORTRAN_3D(cc_to_r[mfi]));
-						}
-				}
-		}
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            if (spherical == 0) {
+                put_1d_array_on_cart(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                                     BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+                                     s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
+            } else {
+                put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                                          BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+                                          s0.dataPtr(), dx,
+                                          &is_input_edge_centered, &is_output_a_vector,
+                                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+                                          BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+            }
+        }
+    }
 
-		int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;
+    int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;
 
-		// set covered coarse cells to be the average of overlying fine cells
-		AverageDown(s0_cart,0,ncomp);
+    // set covered coarse cells to be the average of overlying fine cells
+    AverageDown(s0_cart,0,ncomp);
 
-		// fill ghost cells using first-order extrapolation
-		if (ng > 0) {
-				FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs);
-		}
+    // fill ghost cells using first-order extrapolation
+    if (ng > 0) {
+        FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs);
+    }
 }
 
 
@@ -74,145 +74,145 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                 const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
                 const Real& mult)
 {
-		// timer for profiling
-		BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
 
-		for (int lev=0; lev<=finest_level; ++lev) {
+    for (int lev=0; lev<=finest_level; ++lev) {
 
-				// get references to the MultiFabs at level lev
-				MultiFab& uedge_mf = uedge[lev][0];
+        // get references to the MultiFabs at level lev
+        MultiFab& uedge_mf = uedge[lev][0];
 #if (AMREX_SPACEDIM >= 2)
-				MultiFab& vedge_mf = uedge[lev][1];
+        MultiFab& vedge_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
-				MultiFab& wedge_mf = uedge[lev][2];
-				const MultiFab& w0macx_mf = w0mac[lev][0];
-				const MultiFab& w0macy_mf = w0mac[lev][1];
-				const MultiFab& w0macz_mf = w0mac[lev][2];
+        MultiFab& wedge_mf = uedge[lev][2];
+        const MultiFab& w0macx_mf = w0mac[lev][0];
+        const MultiFab& w0macy_mf = w0mac[lev][1];
+        const MultiFab& w0macz_mf = w0mac[lev][2];
 #endif
 #endif
 
-				// need one cell-centered MF for the MFIter
-				MultiFab& sold_mf = sold[lev];
+        // need one cell-centered MF for the MFIter
+        MultiFab& sold_mf = sold[lev];
 
-				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-				for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
-						// Get the index space of the valid region
-						const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-						// call fortran subroutine
-						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-						// lo/hi coordinates (including ghost cells), and/or the # of components
-						// We will also pass "validBox", which specifies the "valid" region.
-						if (spherical == 0) {
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            if (spherical == 0) {
 
-								addw0(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-								      BL_TO_FORTRAN_3D(uedge_mf[mfi]),
+                addw0(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                      BL_TO_FORTRAN_3D(uedge_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-								      BL_TO_FORTRAN_3D(vedge_mf[mfi]),
+                      BL_TO_FORTRAN_3D(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-								      BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+                      BL_TO_FORTRAN_3D(wedge_mf[mfi]),
 #endif
 #endif
-								      w0.dataPtr(),&mult);
+                      w0.dataPtr(),&mult);
 
-						} else {
+            } else {
 
 #if (AMREX_SPACEDIM == 3)
-								addw0_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-								           BL_TO_FORTRAN_3D(uedge_mf[mfi]),
-								           BL_TO_FORTRAN_3D(vedge_mf[mfi]),
-								           BL_TO_FORTRAN_3D(wedge_mf[mfi]),
-								           BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-								           BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-								           BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-								           &mult);
+                addw0_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                           BL_TO_FORTRAN_3D(uedge_mf[mfi]),
+                           BL_TO_FORTRAN_3D(vedge_mf[mfi]),
+                           BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+                           BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+                           BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+                           BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                           &mult);
 #else
-								Abort("Addw0: Spherical is not valid for DIM < 3");
+                Abort("Addw0: Spherical is not valid for DIM < 3");
 #endif
-						} //end spherical
+            }             //end spherical
 
-				}
-		}
+        }
+    }
 
-		if (finest_level == 0) {
-				// fill periodic ghost cells
-				for (int lev=0; lev<=finest_level; ++lev) {
-						for (int d=0; d<AMREX_SPACEDIM; ++d) {
-								uedge[lev][d].FillBoundary(geom[lev].periodicity());
-						}
-				}
+    if (finest_level == 0) {
+        // fill periodic ghost cells
+        for (int lev=0; lev<=finest_level; ++lev) {
+            for (int d=0; d<AMREX_SPACEDIM; ++d) {
+                uedge[lev][d].FillBoundary(geom[lev].periodicity());
+            }
+        }
 
-				// fill ghost cells behind physical boundaries
-				FillUmacGhost(uedge);
-		} else {
-				// edge_restriction
-				AverageDownFaces(uedge);
+        // fill ghost cells behind physical boundaries
+        FillUmacGhost(uedge);
+    } else {
+        // edge_restriction
+        AverageDownFaces(uedge);
 
-				// fill all ghost cells for edge-based velocity field
-				FillPatchUedge(uedge);
-		}
+        // fill all ghost cells for edge-based velocity field
+        FillPatchUedge(uedge);
+    }
 }
 
 
 void
 Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 {
-		// timer for profiling
-		BL_PROFILE_VAR("Maestro::MakeW0mac()",MakeW0mac);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeW0mac()",MakeW0mac);
 
-		if (spherical == 0) {
-				Abort("Error: only call MakeW0mac for spherical");
-		}
+    if (spherical == 0) {
+        Abort("Error: only call MakeW0mac for spherical");
+    }
 
-		// Construct a cartesian version of w0
-		Vector<MultiFab> w0_cart(finest_level+1);
-		for (int lev=0; lev<=finest_level; ++lev) {
-				w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 2);
-				w0_cart[lev].setVal(0.);
-		}
+    // Construct a cartesian version of w0
+    Vector<MultiFab> w0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 2);
+        w0_cart[lev].setVal(0.);
+    }
 
-		if (w0mac_interp_type == 1) {
-				Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0);
-		}
+    if (w0mac_interp_type == 1) {
+        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0);
+    }
 
-		if (w0mac[0][0].nGrow() != 1) {
-				Abort("Error: MakeW0mac assumes one ghost cell");
-		}
+    if (w0mac[0][0].nGrow() != 1) {
+        Abort("Error: MakeW0mac assumes one ghost cell");
+    }
 
-		for (int lev=0; lev<=finest_level; ++lev) {
+    for (int lev=0; lev<=finest_level; ++lev) {
 
-				// get references to the MultiFabs at level lev
-				MultiFab& w0macx_mf = w0mac[lev][0];
-				MultiFab& w0macy_mf = w0mac[lev][1];
-				MultiFab& w0macz_mf = w0mac[lev][2];
-				MultiFab& w0cart_mf = w0_cart[lev];
-				const Real* dx = geom[lev].CellSize();
+        // get references to the MultiFabs at level lev
+        MultiFab& w0macx_mf = w0mac[lev][0];
+        MultiFab& w0macy_mf = w0mac[lev][1];
+        MultiFab& w0macz_mf = w0mac[lev][2];
+        MultiFab& w0cart_mf = w0_cart[lev];
+        const Real* dx = geom[lev].CellSize();
 
-				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-				for ( MFIter mfi(w0cart_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(w0cart_mf, true); mfi.isValid(); ++mfi ) {
 
-						// Get the index space of the valid region
-						const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-						// call fortran subroutine
-						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-						// lo/hi coordinates (including ghost cells), and/or the # of components
-						make_w0mac_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-						                w0.dataPtr(),
-						                BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-						                BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-						                BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-						                BL_TO_FORTRAN_FAB(w0cart_mf[mfi]),
-						                dx, r_edge_loc.dataPtr());
-				}
-		}
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            make_w0mac_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                            w0.dataPtr(),
+                            BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+                            BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+                            BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                            BL_TO_FORTRAN_FAB(w0cart_mf[mfi]),
+                            dx, r_edge_loc.dataPtr());
+        }
+    }
 }
 
 
@@ -220,85 +220,85 @@ void
 Maestro::MakeS0mac (const Vector<Real>& s0,
                     Vector<std::array< MultiFab,AMREX_SPACEDIM > >& s0mac)
 {
-		// timer for profiling
-		BL_PROFILE_VAR("Maestro::MakeS0mac()",MakeS0mac);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeS0mac()",MakeS0mac);
 
-		if (spherical == 0) {
-				Abort("Error: only call MakeS0mac for spherical");
-		}
+    if (spherical == 0) {
+        Abort("Error: only call MakeS0mac for spherical");
+    }
 
-		// Construct a cartesian version of w0
-		Vector<MultiFab> s0_cart(finest_level+1);
-		for (int lev=0; lev<=finest_level; ++lev) {
-				s0_cart[lev].define(grids[lev], dmap[lev], 1, 2);
-				s0_cart[lev].setVal(0.);
-		}
+    // Construct a cartesian version of w0
+    Vector<MultiFab> s0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        s0_cart[lev].define(grids[lev], dmap[lev], 1, 2);
+        s0_cart[lev].setVal(0.);
+    }
 
-		if (s0mac_interp_type == 1) {
-				Put1dArrayOnCart(s0, s0_cart, 0, 0, bcs_f, 0);
-		}
+    if (s0mac_interp_type == 1) {
+        Put1dArrayOnCart(s0, s0_cart, 0, 0, bcs_f, 0);
+    }
 
-		if (s0mac[0][0].nGrow() != 1) {
-				Abort("Error: MakeS0mac assumes one ghost cell");
-		}
+    if (s0mac[0][0].nGrow() != 1) {
+        Abort("Error: MakeS0mac assumes one ghost cell");
+    }
 
-		for (int lev=0; lev<=finest_level; ++lev) {
+    for (int lev=0; lev<=finest_level; ++lev) {
 
-				// get references to the MultiFabs at level lev
-				MultiFab& s0macx_mf = s0mac[lev][0];
-				MultiFab& s0macy_mf = s0mac[lev][1];
-				MultiFab& s0macz_mf = s0mac[lev][2];
-				MultiFab& s0cart_mf = s0_cart[lev];
-				const Real* dx = geom[lev].CellSize();
+        // get references to the MultiFabs at level lev
+        MultiFab& s0macx_mf = s0mac[lev][0];
+        MultiFab& s0macy_mf = s0mac[lev][1];
+        MultiFab& s0macz_mf = s0mac[lev][2];
+        MultiFab& s0cart_mf = s0_cart[lev];
+        const Real* dx = geom[lev].CellSize();
 
-				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-				for ( MFIter mfi(s0cart_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s0cart_mf, true); mfi.isValid(); ++mfi ) {
 
-						// Get the index space of the valid region
-						const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-						// call fortran subroutine
-						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-						// lo/hi coordinates (including ghost cells), and/or the # of components
-						make_s0mac_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-						                s0.dataPtr(),
-						                BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
-						                BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
-						                BL_TO_FORTRAN_3D(s0macz_mf[mfi]),
-						                BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
-						                dx, r_cc_loc.dataPtr());
-				}
-		}
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            make_s0mac_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                            s0.dataPtr(),
+                            BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
+                            BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
+                            BL_TO_FORTRAN_3D(s0macz_mf[mfi]),
+                            BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
+                            dx, r_cc_loc.dataPtr());
+        }
+    }
 }
 
 
 void
 Maestro::MakeNormal ()
 {
-		// timer for profiling
-		BL_PROFILE_VAR("Maestro::MakeNormal()",MakeNormal);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeNormal()",MakeNormal);
 
-		for (int lev=0; lev<=finest_level; ++lev) {
+    for (int lev=0; lev<=finest_level; ++lev) {
 
-				// get references to the MultiFabs at level lev
-				MultiFab& normal_mf = normal[lev];
-				const Real* dx = geom[lev].CellSize();
+        // get references to the MultiFabs at level lev
+        MultiFab& normal_mf = normal[lev];
+        const Real* dx = geom[lev].CellSize();
 
-				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-				for ( MFIter mfi(normal_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(normal_mf, true); mfi.isValid(); ++mfi ) {
 
-						// call fortran subroutine
-						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-						// lo/hi coordinates (including ghost cells), and/or the # of components
-						make_normal(BL_TO_FORTRAN_3D(normal_mf[mfi]), dx);
-				}
-		}
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            make_normal(BL_TO_FORTRAN_3D(normal_mf[mfi]), dx);
+        }
+    }
 
 }
 
@@ -307,48 +307,48 @@ void
 Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& face,
                         int harmonic_avg) {
-		// timer for profiling
-		BL_PROFILE_VAR("Maestro::PutDataOnFaces()",PutDataOnFaces);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PutDataOnFaces()",PutDataOnFaces);
 
-		for (int lev=0; lev<=finest_level; ++lev) {
+    for (int lev=0; lev<=finest_level; ++lev) {
 
-				// get references to the MultiFabs at level lev
-				MultiFab& facex_mf = face[lev][0];
+        // get references to the MultiFabs at level lev
+        MultiFab& facex_mf = face[lev][0];
 #if (AMREX_SPACEDIM >= 2)
-				MultiFab& facey_mf = face[lev][1];
+        MultiFab& facey_mf = face[lev][1];
 #if (AMREX_SPACEDIM == 3)
-				MultiFab& facez_mf = face[lev][2];
+        MultiFab& facez_mf = face[lev][2];
 #endif
 #endif
-				// need one cell-centered MF for the MFIter
-				const MultiFab& scc_mf = s_cc[lev];
+        // need one cell-centered MF for the MFIter
+        const MultiFab& scc_mf = s_cc[lev];
 
-				// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-				for ( MFIter mfi(scc_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scc_mf, true); mfi.isValid(); ++mfi ) {
 
-						// Get the index space of the valid region
-						const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-						// call fortran subroutine
-						// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-						// lo/hi coordinates (including ghost cells), and/or the # of components
-						// We will also pass "validBox", which specifies the "valid" region.
-						put_data_on_faces(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-						                  BL_TO_FORTRAN_3D(scc_mf[mfi]),
-						                  BL_TO_FORTRAN_3D(facex_mf[mfi]),
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            put_data_on_faces(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                              BL_TO_FORTRAN_3D(scc_mf[mfi]),
+                              BL_TO_FORTRAN_3D(facex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-						                  BL_TO_FORTRAN_3D(facey_mf[mfi]),
+                              BL_TO_FORTRAN_3D(facey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-						                  BL_TO_FORTRAN_3D(facez_mf[mfi]),
+                              BL_TO_FORTRAN_3D(facez_mf[mfi]),
 #endif
 #endif
-						                  &harmonic_avg);
-				}
-		}
+                              &harmonic_avg);
+        }
+    }
 
-		// Make sure that the fine edges average down onto the coarse edges (edge_restriction)
-		AverageDownFaces(face);
+    // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
+    AverageDownFaces(face);
 }
