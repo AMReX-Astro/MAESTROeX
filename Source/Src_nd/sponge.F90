@@ -5,8 +5,8 @@ module sponge_module
   use parallel, only: parallel_IOProcessor
   use base_state_geometry_module, only: dr, r_end_coord, max_radial_level, nr_fine, center
   use meth_params_module, only: maestro_verbose, sponge_start_factor, &
-                                sponge_center_density, sponge_kappa, spherical, &
-                                drdxfac, prob_lo
+       sponge_center_density, sponge_kappa, spherical, &
+       drdxfac, prob_lo
 
   implicit none
 
@@ -28,7 +28,7 @@ module sponge_module
 
 contains
 
- subroutine init_sponge(rho0) bind(C, name="init_sponge")
+  subroutine init_sponge(rho0) bind(C, name="init_sponge")
 
     ! The sponge has a HALF * ( 1 - cos( (r - r_sp)/L)) profile, where
     ! the width, L, is r_tp - r_sp.
@@ -112,69 +112,69 @@ contains
        do i=lo(1),hi(1)
           r = prob_lo(1) + (dble(i)+HALF)*dx(1)
 #elif (AMREX_SPACEDIM == 2)
-       do j=lo(2),hi(2)
-          r = prob_lo(2) + (dble(j)+HALF)*dx(2)
+          do j=lo(2),hi(2)
+             r = prob_lo(2) + (dble(j)+HALF)*dx(2)
 #else
-       do k = lo(3),hi(3)
-          r = prob_lo(3) + (dble(k)+HALF)*dx(3)
+             do k = lo(3),hi(3)
+                r = prob_lo(3) + (dble(k)+HALF)*dx(3)
 #endif
-          if (r >= r_sp) then
-             if (r < r_tp) then
-                smdamp = HALF*(ONE - cos(M_PI*(r - r_sp)/(r_tp - r_sp)))
-             else
-                smdamp = ONE
-             endif
-#if (AMREX_SPACEDIM == 1)
-             sponge(i,lo(2):hi(2),lo(3):hi(3)) = ONE / (ONE + dt * smdamp* sponge_kappa)
-#elif (AMREX_SPACEDIM == 2)
-             sponge(lo(1):hi(1),j,lo(3):hi(3)) = ONE / (ONE + dt * smdamp* sponge_kappa)
-#else
-             sponge(lo(1):hi(1),lo(2):hi(2),k) = ONE / (ONE + dt * smdamp* sponge_kappa)
-#endif
-          endif
-       end do
-
-    else
-
-       do k = lo(3),hi(3)
-          z = prob_lo(3) + (dble(k)+HALF)*dx(3)
-
-          do j = lo(2),hi(2)
-             y = prob_lo(2) + (dble(j)+HALF)*dx(2)
-
-             do i = lo(1),hi(1)
-                x = prob_lo(1) + (dble(i)+HALF)*dx(1)
-
-                r = sqrt( (x-center(1))**2 + (y-center(2))**2 + (z-center(3))**2 )
-
-                ! Inner sponge: damps velocities at edge of star
                 if (r >= r_sp) then
                    if (r < r_tp) then
                       smdamp = HALF*(ONE - cos(M_PI*(r - r_sp)/(r_tp - r_sp)))
                    else
                       smdamp = ONE
                    endif
-                   sponge(i,j,k) = ONE / (ONE + dt * smdamp * sponge_kappa)
+#if (AMREX_SPACEDIM == 1)
+                   sponge(i,lo(2):hi(2),lo(3):hi(3)) = ONE / (ONE + dt * smdamp* sponge_kappa)
+#elif (AMREX_SPACEDIM == 2)
+                   sponge(lo(1):hi(1),j,lo(3):hi(3)) = ONE / (ONE + dt * smdamp* sponge_kappa)
+#else
+                   sponge(lo(1):hi(1),lo(2):hi(2),k) = ONE / (ONE + dt * smdamp* sponge_kappa)
+#endif
                 endif
-
-                ! Outer sponge: damps velocities in the corners of the domain
-                if (r >= r_sp_outer) then
-                   if (r < r_tp_outer) then
-                      smdamp = HALF * &
-                           (ONE - cos(M_PI*(r - r_sp_outer)/(r_tp_outer - r_sp_outer)))
-                   else
-                      smdamp = ONE
-                   endif
-                   sponge(i,j,k) = sponge(i,j,k) / &
-                        (ONE + dt * smdamp * 10.d0 * sponge_kappa)
-                endif
-
              end do
-          end do
-       end do
 
-    end if
+          else
 
-  end subroutine mk_sponge
+             do k = lo(3),hi(3)
+                z = prob_lo(3) + (dble(k)+HALF)*dx(3)
 
-end module sponge_module
+                do j = lo(2),hi(2)
+                   y = prob_lo(2) + (dble(j)+HALF)*dx(2)
+
+                   do i = lo(1),hi(1)
+                      x = prob_lo(1) + (dble(i)+HALF)*dx(1)
+
+                      r = sqrt( (x-center(1))**2 + (y-center(2))**2 + (z-center(3))**2 )
+
+                      ! Inner sponge: damps velocities at edge of star
+                      if (r >= r_sp) then
+                         if (r < r_tp) then
+                            smdamp = HALF*(ONE - cos(M_PI*(r - r_sp)/(r_tp - r_sp)))
+                         else
+                            smdamp = ONE
+                         endif
+                         sponge(i,j,k) = ONE / (ONE + dt * smdamp * sponge_kappa)
+                      endif
+
+                      ! Outer sponge: damps velocities in the corners of the domain
+                      if (r >= r_sp_outer) then
+                         if (r < r_tp_outer) then
+                            smdamp = HALF * &
+                                 (ONE - cos(M_PI*(r - r_sp_outer)/(r_tp_outer - r_sp_outer)))
+                         else
+                            smdamp = ONE
+                         endif
+                         sponge(i,j,k) = sponge(i,j,k) / &
+                              (ONE + dt * smdamp * 10.d0 * sponge_kappa)
+                      endif
+
+                   end do
+                end do
+             end do
+
+          end if
+
+        end subroutine mk_sponge
+
+      end module sponge_module

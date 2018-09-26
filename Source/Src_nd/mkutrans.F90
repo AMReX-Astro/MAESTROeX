@@ -487,6 +487,8 @@ contains
        end do
     end if
 
+    call bl_deallocate(slopex)
+
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
        select case(phys_bc(1,1))
@@ -552,6 +554,9 @@ contains
        enddo
     end if
 
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+
     !******************************************************************
     ! create vtrans
     !******************************************************************
@@ -588,6 +593,8 @@ contains
           enddo
        enddo
     end if
+
+    call bl_deallocate(slopey)
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -654,6 +661,9 @@ contains
        enddo
     end if
 
+    call bl_deallocate(vly)
+    call bl_deallocate(vry)
+
     !******************************************************************
     ! create wtrans
     !******************************************************************
@@ -690,6 +700,10 @@ contains
           end do
        end do
     end if
+
+    call bl_deallocate(slopez)
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
@@ -756,17 +770,6 @@ contains
        enddo
     end if
 
-    call bl_deallocate(slopex)
-    call bl_deallocate(slopey)
-    call bl_deallocate(slopez)
-
-    call bl_deallocate(Ip)
-    call bl_deallocate(Im)
-
-    call bl_deallocate(ulx)
-    call bl_deallocate(urx)
-    call bl_deallocate(vly)
-    call bl_deallocate(vry)
     call bl_deallocate(wlz)
     call bl_deallocate(wrz)
 

@@ -715,15 +715,16 @@ contains
           end do
        end do
     end if
+  
+  if (ppm_type .eq. 0) then
 
-    if (ppm_type .eq. 0) then
        do k = lo(3)-1,hi(3)+1
-          call slopex_2d(s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,k,comp:),slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
-          call slopey_2d(s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,k,comp:),slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+          call slopex_2d(s(:,:,k,comp:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+          call slopey_2d(s(:,:,k,comp:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
        end do
-       call slopez_3d(s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+       call slopez_3d(s(:,:,:,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_3d(s(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,comp),ng_s,umac,vmac,wmac,ng_um,Ip,Im, &
+       call ppm_3d(s(:,:,:,comp),ng_s,umac,vmac,wmac,ng_um,Ip,Im, &
             domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
     end if
 

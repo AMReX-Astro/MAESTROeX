@@ -70,7 +70,6 @@ contains
 
     ! 1) Subtract (Utilde dot grad) Utilde term from old Utilde
     ! 2) Add forcing term to new Utilde
-    !$OMP PARALLEL DO PRIVATE(i,j,k,ubar,vbar,wbar,ugradu,ugradv,ugradw)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -138,7 +137,6 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
   end subroutine update_velocity
 
@@ -200,7 +198,6 @@ contains
 
     ! 1) Subtract (Utilde dot grad) Utilde term from old Utilde
     ! 2) Add forcing term to new Utilde
-    !$OMP PARALLEL DO PRIVATE(i,j,k,ubar,vbar,wbar,ugradu,ugradv,ugradw)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -231,7 +228,6 @@ contains
           enddo
        enddo
     enddo
-    !$OMP END PARALLEL DO
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)

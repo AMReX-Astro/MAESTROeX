@@ -270,10 +270,11 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+// NOTE: don't think this should be tiled (or at least causes errors in 3D)
+        for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
