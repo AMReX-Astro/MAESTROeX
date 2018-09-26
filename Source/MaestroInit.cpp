@@ -63,6 +63,7 @@ Maestro::Init ()
 
     if (spherical == 1) {
         MakeNormal();
+        MakeCCtoRadii();
     }
 
     if (do_sponge) {
@@ -143,10 +144,10 @@ Maestro::Init ()
             InitIter();
         }
 
-        // if (plot_int > 0) {
-        //      Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
-        //      WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
-        // }
+        if (plot_int > 0) {
+            Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
+            WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
+        }
 
         if (chk_int > 0) {
             Print() << "\nWriting checkpoint 0 after all initialization" << std::endl;
