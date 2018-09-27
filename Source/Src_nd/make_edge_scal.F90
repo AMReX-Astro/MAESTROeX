@@ -715,8 +715,8 @@ contains
           end do
        end do
     end if
-  
-  if (ppm_type .eq. 0) then
+
+    if (ppm_type .eq. 0) then
 
        do k = lo(3)-1,hi(3)+1
           call slopex_2d(s(:,:,k,comp:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
