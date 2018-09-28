@@ -243,12 +243,10 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
-            // const Box& validBox = mfi.validbox();
             const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
             make_thermal_coeffs(ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
-                                // make_thermal_coeffs(ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()),
                                 BL_TO_FORTRAN_FAB(scal_mf[mfi]),
                                 BL_TO_FORTRAN_3D(Tcoeff_mf[mfi]),
                                 BL_TO_FORTRAN_3D(hcoeff_mf[mfi]),
