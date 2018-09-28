@@ -21,17 +21,17 @@
 
 module network
 
-  use bl_types, only : dp_t
+  use amrex_fort_module, only : rt => amrex_real
   use actual_network
 
   implicit none
 
-  private :: dp_t
+  private :: rt
 
   logical :: network_initialized = .false.
 
   ! this will be computed here, not in the actual network
-  real(kind=dp_t) :: aion_inv(nspec)
+  real(rt), allocatable :: aion_inv(:)
 
 #ifdef AMREX_USE_CUDA
   attributes(managed) :: aion_inv
@@ -47,6 +47,8 @@ contains
     use bl_constants_module, only : ONE
 
     implicit none
+
+    allocate(aion_inv(nspec))
 
     ! First, we call the specific network initialization.
     ! This should set the number of species and number of
