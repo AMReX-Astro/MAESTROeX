@@ -124,6 +124,8 @@ end subroutine runtime_init
 
     integer, intent(in) :: unit
 
+    logical :: ltest
+
     write (unit, *) "[*] indicates overridden default"
 
     @@printing@@
