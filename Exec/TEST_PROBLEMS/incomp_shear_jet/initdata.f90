@@ -42,7 +42,7 @@ contains
     double precision :: x, y, z, ymid, L_x, yshr1, yshr2
 
     ! set velocity to zero
-    vel = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     ymid = prob_lo(2) + 0.5d0*(prob_hi(2)- prob_lo(2))
     L_x = (prob_hi(1) - prob_lo(1))

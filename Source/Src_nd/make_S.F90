@@ -1,5 +1,6 @@
 module make_S_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_error_module
   use eos_type_module
   use eos_module
@@ -174,9 +175,9 @@ contains
     double precision sigma, xi_term, pres_term, Ut_dot_er
     double precision gradp0(1,0:nr_fine-1)
 
-    double precision, allocatable ::       p0_cart(:,:,:,:)
-    double precision, allocatable ::   gradp0_cart(:,:,:,:)
-    double precision, allocatable ::gamma1bar_cart(:,:,:,:)
+    double precision, pointer ::       p0_cart(:,:,:,:)
+    double precision, pointer ::   gradp0_cart(:,:,:,:)
+    double precision, pointer ::gamma1bar_cart(:,:,:,:)
 
     if (use_delta_gamma1_term) then
        ! compute gradp0 and put it on a cart
@@ -190,15 +191,15 @@ contains
           endif
        enddo
 
-       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call bl_allocate(p0_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
-       allocate(gradp0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call bl_allocate(gradp0_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,gradp0_cart,lo,hi,1,gradp0,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
-       allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call bl_allocate(gamma1bar_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
     endif
@@ -257,7 +258,9 @@ contains
     enddo
 
     if (use_delta_gamma1_term) then
-       deallocate(p0_cart, gradp0_cart, gamma1bar_cart)
+       call bl_deallocate(p0_cart)
+       call bl_deallocate(gradp0_cart)
+       call bl_deallocate(gamma1bar_cart)
     endif
 
   end subroutine make_S_cc_sphr
@@ -323,7 +326,6 @@ contains
     ! Local variables
     integer :: i,j,k
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -331,7 +333,6 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
   end subroutine make_rhcc_for_nodalproj_sphr
 
@@ -357,7 +358,6 @@ contains
     double precision :: correction_factor
 
 #if (AMREX_SPACEDIM == 3)
-    !$OMP PARALLEL DO PRIVATE(i,j,k,correction_factor)
     do k = lo(3),hi(3)
        if(k .lt. base_cutoff_density_coord(lev)) then
           correction_factor = beta0(lev,k)*(dpdt_factor/(gamma1bar(lev,k)*p0(lev,k))) / dt
@@ -370,7 +370,6 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 #elif (AMREX_SPACEDIM == 2)
     k = lo(3)
     do j = lo(2),hi(2)
@@ -426,7 +425,6 @@ contains
     integer :: i, j, k
     double precision :: correction_factor
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k,correction_factor)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -440,7 +438,6 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
   end subroutine create_correction_cc_sphr
 
@@ -496,7 +493,7 @@ contains
     if (dpdt_factor .gt. 0.0d0) then
 
        if (is_predictor .eq. 1) &
-            delta_chi = 0.d0
+            delta_chi(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.d0
 
 #if (AMREX_SPACEDIM == 3)
 
@@ -581,17 +578,17 @@ contains
 
     !     Local variables
     integer :: i, j, k
-    double precision, allocatable ::       div_cart(:,:,:,:)
-    double precision, allocatable ::      Sbar_cart(:,:,:,:)
-    double precision, allocatable :: gamma1bar_cart(:,:,:,:)
-    double precision, allocatable ::        p0_cart(:,:,:,:)
-    double precision, allocatable ::      rho0_cart(:,:,:,:)
+    double precision, pointer ::       div_cart(:,:,:,:)
+    double precision, pointer ::      Sbar_cart(:,:,:,:)
+    double precision, pointer :: gamma1bar_cart(:,:,:,:)
+    double precision, pointer ::        p0_cart(:,:,:,:)
+    double precision, pointer ::      rho0_cart(:,:,:,:)
 
-    allocate(div_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call   put_1d_array_on_cart_sphr(lo,hi,div_cart,lo,hi,1,beta0,dx,0,0,r_cc_loc,r_edge_loc, &
+    call bl_allocate(div_cart,lo,hi,1)
+    call put_1d_array_on_cart_sphr(lo,hi,div_cart,lo,hi,1,beta0,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
-    allocate(Sbar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    call bl_allocate(Sbar_cart,lo,hi,1)
     call put_1d_array_on_cart_sphr(lo,hi,Sbar_cart,lo,hi,1,Sbar,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r, ccr_lo, ccr_hi)
 
@@ -603,26 +600,25 @@ contains
        end do
     end do
 
-    deallocate(Sbar_cart)
+    call bl_deallocate(Sbar_cart)
 
     if (dpdt_factor .gt. 0.0d0) then
 
-       allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call bl_allocate(gamma1bar_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0, &
             r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
-       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call bl_allocate(p0_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
-       allocate(rho0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call bl_allocate(rho0_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
        if (is_predictor .eq. 1) &
-            delta_chi = 0.d0
+            delta_chi(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.d0
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
@@ -634,13 +630,14 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
-       deallocate(gamma1bar_cart,p0_cart,rho0_cart)
+       call bl_deallocate(gamma1bar_cart)
+       call bl_deallocate(p0_cart)
+       call bl_deallocate(rho0_cart)
 
     end if
 
-    deallocate(div_cart)
+    call bl_deallocate(div_cart)
 
   end subroutine make_rhcc_for_macproj_sphr
 
@@ -664,7 +661,6 @@ contains
 
     j = lo(2)
     k = lo(3)
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
 #if (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
 #endif
@@ -681,7 +677,6 @@ contains
     end do
 #endif
 #endif
-    !$OMP END PARALLEL DO
 
   end subroutine create_correction_delta_gamma1_term
 
@@ -710,13 +705,13 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    double precision, allocatable :: gamma1bar_cart(:,:,:,:)
-    double precision, allocatable ::        p0_cart(:,:,:,:)
-    double precision, allocatable ::      psi_cart(:,:,:,:)
+    double precision, pointer :: gamma1bar_cart(:,:,:,:)
+    double precision, pointer ::        p0_cart(:,:,:,:)
+    double precision, pointer ::      psi_cart(:,:,:,:)
 
-    allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    allocate(psi_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    call bl_allocate(gamma1bar_cart,lo,hi,1)
+    call bl_allocate(p0_cart,lo,hi,1)
+    call bl_allocate(psi_cart,lo,hi,1)
 
     call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
@@ -727,7 +722,6 @@ contains
 
     j = lo(2)
     k = lo(3)
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
 #if (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
 #endif
@@ -744,9 +738,10 @@ contains
     end do
 #endif
 #endif
-    !$OMP END PARALLEL DO
 
-    deallocate(gamma1bar_cart, p0_cart, psi_cart)
+    call bl_deallocate(gamma1bar_cart)
+    call bl_deallocate(p0_cart)
+    call bl_deallocate(psi_cart)
 
   end subroutine create_correction_delta_gamma1_term_sphr
 

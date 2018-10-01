@@ -16,21 +16,21 @@ module initdata_module
 contains
 
   subroutine initdata(lev, time, lo, hi, &
-                      scal, scal_lo, scal_hi, nc_s, &
-                      vel, vel_lo, vel_hi, nc_v, &
-                      s0_init, p0_init, &
-                      dx, r_cc_loc, r_edge_loc) bind(C, name="initdata")
-    
+       scal, scal_lo, scal_hi, nc_s, &
+       vel, vel_lo, vel_hi, nc_v, &
+       s0_init, p0_init, &
+       dx, r_cc_loc, r_edge_loc) bind(C, name="initdata")
+
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
     integer         , intent(in   ) :: vel_lo(3), vel_hi(3), nc_v
     double precision, intent(in   ) :: time
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
-                                            scal_lo(2):scal_hi(2), &
-                                            scal_lo(3):scal_hi(3), 1:nc_s)
+         scal_lo(2):scal_hi(2), &
+         scal_lo(3):scal_hi(3), 1:nc_s)
     double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
-                                           vel_lo(2):vel_hi(2), &
-                                           vel_lo(3):vel_hi(3), 1:nc_v)
+         vel_lo(2):vel_hi(2), &
+         vel_lo(3):vel_hi(3), 1:nc_v)
     double precision, intent(in   ) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(in   ) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
@@ -47,63 +47,62 @@ contains
     ! abort program
     call bl_error()
 
-
     ! set velocity to zero
-    vel = 0.d0
+    vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v) = 0.d0
 
     do k=lo(3),hi(3)
-    do j=lo(2),hi(2)
-    do i=lo(1),hi(1)
+       do j=lo(2),hi(2)
+          do i=lo(1),hi(1)
 
-       if (amrex_spacedim .eq. 1) then
-          r = i
-       else if (amrex_spacedim .eq. 2) then
-          r = j
-       else if (amrex_spacedim .eq. 3) then
-          r = k
-       end if
+             if (amrex_spacedim .eq. 1) then
+                r = i
+             else if (amrex_spacedim .eq. 2) then
+                r = j
+             else if (amrex_spacedim .eq. 3) then
+                r = k
+             end if
 
-       ! set scalars using s0
-       scal(i,j,k,rho_comp)  = s0_init(lev,r,rho_comp)
-       scal(i,j,k,rhoh_comp) = s0_init(lev,r,rhoh_comp)
-       scal(i,j,k,temp_comp) = s0_init(lev,r,temp_comp)
-       scal(i,j,k,spec_comp:spec_comp+nspec-1) = &
-            s0_init(lev,r,spec_comp:spec_comp+nspec-1)
+             ! set scalars using s0
+             scal(i,j,k,rho_comp)  = s0_init(lev,r,rho_comp)
+             scal(i,j,k,rhoh_comp) = s0_init(lev,r,rhoh_comp)
+             scal(i,j,k,temp_comp) = s0_init(lev,r,temp_comp)
+             scal(i,j,k,spec_comp:spec_comp+nspec-1) = &
+                  s0_init(lev,r,spec_comp:spec_comp+nspec-1)
 
-       ! initialize pi to zero for now
-       scal(i,j,k,pi_comp) = 0.d0
+             ! initialize pi to zero for now
+             scal(i,j,k,pi_comp) = 0.d0
 
-    end do
-    end do
+          end do
+       end do
     end do
 
   end subroutine initdata
 
   subroutine initdata_sphr(time, lo, hi, &
-                           scal, scal_lo, scal_hi, nc_s, &
-                           vel, vel_lo, vel_hi, nc_v, &
-                           s0_init, p0_init, &
-                           dx, r_cc_loc, r_edge_loc, &
-                           cc_to_r, ccr_lo, ccr_hi) bind(C, name="initdata_sphr")
-    
+       scal, scal_lo, scal_hi, nc_s, &
+       vel, vel_lo, vel_hi, nc_v, &
+       s0_init, p0_init, &
+       dx, r_cc_loc, r_edge_loc, &
+       cc_to_r, ccr_lo, ccr_hi) bind(C, name="initdata_sphr")
+
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
     integer         , intent(in   ) :: vel_lo(3), vel_hi(3), nc_v
     integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent(in   ) :: time
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
-                                            scal_lo(2):scal_hi(2), &
-                                            scal_lo(3):scal_hi(3), nc_s)
+         scal_lo(2):scal_hi(2), &
+         scal_lo(3):scal_hi(3), nc_s)
     double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
-                                           vel_lo(2):vel_hi(2), &
-                                           vel_lo(3):vel_hi(3), nc_v)
+         vel_lo(2):vel_hi(2), &
+         vel_lo(3):vel_hi(3), nc_v)
     double precision, intent(in   ) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(in   ) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: r_cc_loc  (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: cc_to_r   (ccr_lo(1):ccr_hi(1), &
-                                                  ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     !     Local variables
     integer          :: i,j,k,comp
@@ -121,30 +120,30 @@ contains
     call bl_error()
 
     ! set velocity to zero
-    vel = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     ! initialize the domain with the base state
-    scal = 0.d0
-    
+    scal(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
+
     ! if we are spherical, we want to make sure that p0 is good, since that is
     ! what is needed for HSE.  Therefore, we will put p0 onto a cart array and
     ! then initialize h from rho, X, and p0.
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    call bl_allocate(p0_cart,lo,hi,1)
 
     ! initialize temp
     call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,temp_comp),scal_lo,scal_hi,1, &
-                                     s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc, & 
-                                     cc_to_r,ccr_lo,ccr_hi)
+         s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc, &
+         cc_to_r,ccr_lo,ccr_hi)
 
     ! initialize p0_cart
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0_init,dx,0,0,r_cc_loc,r_edge_loc, & 
-                                     cc_to_r,ccr_lo,ccr_hi) 
+    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0_init,dx,0,0,r_cc_loc,r_edge_loc, &
+         cc_to_r,ccr_lo,ccr_hi)
 
     ! initialize species
     do comp = spec_comp, spec_comp+nspec-1
        call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,comp),scal_lo,scal_hi,1, &
-                                        s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc, & 
-                                        cc_to_r,ccr_lo,ccr_hi)
+            s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc, &
+            cc_to_r,ccr_lo,ccr_hi)
     end do
 
     ! initialize rho as sum of partial densities rho*X_i
@@ -157,7 +156,7 @@ contains
              enddo
           enddo
        enddo
-    enddo 
+    enddo
 
     ! initialize (rho h) and T using the EOS
     do k = lo(3), hi(3)
@@ -180,7 +179,7 @@ contains
        enddo
     enddo
 
-    deallocate(p0_cart)
+    call bl_deallocate(p0_cart)
 
   end subroutine initdata_sphr
 

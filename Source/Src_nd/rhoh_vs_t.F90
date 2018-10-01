@@ -1,10 +1,11 @@
 module rhoh_vs_t_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use eos_type_module
   use eos_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
-                                use_eos_e_instead_of_h, use_pprime_in_tfromp
+       use_eos_e_instead_of_h, use_pprime_in_tfromp
   use base_state_geometry_module, only:  max_radial_level, nr_fine
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
@@ -31,67 +32,67 @@ contains
     if (use_eos_e_instead_of_h) then
 
        do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-       do i = lo(1), hi(1)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
 
 #if (AMREX_SPACEDIM == 1)
-       r = i
+                r = i
 #elif (AMREX_SPACEDIM == 2)
-       r = j
+                r = j
 #elif (AMREX_SPACEDIM == 3)
-       r = k
+                r = k
 #endif
-             
-          ! (rho, (h->e)) --> T, p
-            
-          eos_state%rho   = state(i,j,k,rho_comp)
-          eos_state%T     = state(i,j,k,temp_comp)
-          eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-          ! e = h - p/rho
-          eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
-               p0(lev,r) / state(i,j,k,rho_comp)
-          
-          pt_index(:) = (/i, j, k/)
-          
-          call eos(eos_input_re, eos_state, pt_index)
-          
-          state(i,j,k,temp_comp) = eos_state%T
-          
-       enddo
-       enddo
+                ! (rho, (h->e)) --> T, p
+
+                eos_state%rho   = state(i,j,k,rho_comp)
+                eos_state%T     = state(i,j,k,temp_comp)
+                eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+                ! e = h - p/rho
+                eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
+                     p0(lev,r) / state(i,j,k,rho_comp)
+
+                pt_index(:) = (/i, j, k/)
+
+                call eos(eos_input_re, eos_state, pt_index)
+
+                state(i,j,k,temp_comp) = eos_state%T
+
+             enddo
+          enddo
        enddo
 
     else
 
        do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-       do i = lo(1), hi(1)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
 
 #if (AMREX_SPACEDIM == 1)
-       r = i
+                r = i
 #elif (AMREX_SPACEDIM == 2)
-       r = j
+                r = j
 #elif (AMREX_SPACEDIM == 3)
-       r = k
+                r = k
 #endif
-             
-          ! (rho, h) --> T, p
-             
-          eos_state%rho   = state(i,j,k,rho_comp)
-          eos_state%T     = state(i,j,k,temp_comp)
-          eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-          eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
-          
-          pt_index(:) = (/i, j, k/)
-                
-          call eos(eos_input_rh, eos_state, pt_index)
-                
-          state(i,j,k,temp_comp) = eos_state%T
-             
-       enddo
-       enddo
+                ! (rho, h) --> T, p
+
+                eos_state%rho   = state(i,j,k,rho_comp)
+                eos_state%T     = state(i,j,k,temp_comp)
+                eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+                eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
+
+                pt_index(:) = (/i, j, k/)
+
+                call eos(eos_input_rh, eos_state, pt_index)
+
+                state(i,j,k,temp_comp) = eos_state%T
+
+             enddo
+          enddo
        enddo
 
     endif
@@ -99,7 +100,7 @@ contains
   end subroutine makeTfromRhoH
 
   subroutine makeTfromRhoH_sphr(lo,hi,state,s_lo,s_hi,nc_s,p0,dx,r_cc_loc,r_edge_loc, &
-                                  cc_to_r,ccr_lo,ccr_hi) & 
+       cc_to_r,ccr_lo,ccr_hi) &
        bind(C,name="makeTfromRhoH_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -111,66 +112,68 @@ contains
     double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-                                                ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local variables
     integer :: i, j, k
-    double precision, allocatable :: p0_cart(:,:,:,:)
+    double precision, pointer :: p0_cart(:,:,:,:)
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     if (use_eos_e_instead_of_h) then
 
-       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+       call bl_allocate(p0_cart,lo,hi,1)
        call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-                                         cc_to_r,ccr_lo,ccr_hi)
+            cc_to_r,ccr_lo,ccr_hi)
 
        do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-       do i = lo(1), hi(1)
-             
-          ! (rho, (h->e)) --> T, p
-            
-          eos_state%rho   = state(i,j,k,rho_comp)
-          eos_state%T     = state(i,j,k,temp_comp)
-          eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
 
-          ! e = h - p/rho
-          eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
-               p0_cart(i,j,k,1) / state(i,j,k,rho_comp)
-          
-          pt_index(:) = (/i, j, k/)
-          
-          call eos(eos_input_re, eos_state, pt_index)
-          
-          state(i,j,k,temp_comp) = eos_state%T
-          
+                ! (rho, (h->e)) --> T, p
+
+                eos_state%rho   = state(i,j,k,rho_comp)
+                eos_state%T     = state(i,j,k,temp_comp)
+                eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+                ! e = h - p/rho
+                eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
+                     p0_cart(i,j,k,1) / state(i,j,k,rho_comp)
+
+                pt_index(:) = (/i, j, k/)
+
+                call eos(eos_input_re, eos_state, pt_index)
+
+                state(i,j,k,temp_comp) = eos_state%T
+
+             enddo
+          enddo
        enddo
-       enddo
-       enddo
+
+       call bl_deallocate(p0_cart)
 
     else
 
        do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-       do i = lo(1), hi(1)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
 
-          ! (rho, h) --> T, p
-             
-          eos_state%rho   = state(i,j,k,rho_comp)
-          eos_state%T     = state(i,j,k,temp_comp)
-          eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+                ! (rho, h) --> T, p
 
-          eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
-          
-          pt_index(:) = (/i, j, k/)
-                
-          call eos(eos_input_rh, eos_state, pt_index)
-                
-          state(i,j,k,temp_comp) = eos_state%T
-             
-       enddo
-       enddo
+                eos_state%rho   = state(i,j,k,rho_comp)
+                eos_state%T     = state(i,j,k,temp_comp)
+                eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+                eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
+
+                pt_index(:) = (/i, j, k/)
+
+                call eos(eos_input_rh, eos_state, pt_index)
+
+                state(i,j,k,temp_comp) = eos_state%T
+
+             enddo
+          enddo
        enddo
 
     endif
@@ -192,47 +195,47 @@ contains
     type (eos_t) :: eos_state
 
     do k = lo(3), hi(3)
-    do j = lo(2), hi(2)
-    do i = lo(1), hi(1)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
 
 #if (AMREX_SPACEDIM == 1)
-       r = i
+             r = i
 #elif (AMREX_SPACEDIM == 2)
-       r = j
+             r = j
 #elif (AMREX_SPACEDIM == 3)
-       r = k
+             r = k
 #endif
-             
-       ! (rho, p) --> T
-             
-       eos_state%rho   = state(i,j,k,rho_comp)
-       eos_state%T     = state(i,j,k,temp_comp)
-       if (use_pprime_in_tfromp) then
-          eos_state%p     = p0(lev,r) + state(i,j,k,pi_comp)
-       else
-          eos_state%p     = p0(lev,r)
-       endif
 
-       eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+             ! (rho, p) --> T
 
-       pt_index(:) = (/i, j, k/)
-             
-       call eos(eos_input_rp, eos_state, pt_index)
-             
-       state(i,j,k,temp_comp) = eos_state%T
+             eos_state%rho   = state(i,j,k,rho_comp)
+             eos_state%T     = state(i,j,k,temp_comp)
+             if (use_pprime_in_tfromp) then
+                eos_state%p     = p0(lev,r) + state(i,j,k,pi_comp)
+             else
+                eos_state%p     = p0(lev,r)
+             endif
 
-       if (updateRhoH .eq. 1) then
-          state(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
-       end if
-       
-    enddo
-    enddo
+             eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rp, eos_state, pt_index)
+
+             state(i,j,k,temp_comp) = eos_state%T
+
+             if (updateRhoH .eq. 1) then
+                state(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
+             end if
+
+          enddo
+       enddo
     enddo
 
   end subroutine makeTfromRhoP
 
   subroutine makeTfromRhoP_sphr(lo,hi,state,s_lo,s_hi,nc_s,p0,dx,updateRhoH, &
-                                  r_cc_loc, r_edge_loc, cc_to_r,ccr_lo,ccr_hi) &
+       r_cc_loc, r_edge_loc, cc_to_r,ccr_lo,ccr_hi) &
        bind(C,name="makeTfromRhoP_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -245,47 +248,49 @@ contains
     double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-                                                ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local variables
     integer :: i, j, k
-    double precision, allocatable :: p0_cart(:,:,:,:)
+    double precision, pointer :: p0_cart(:,:,:,:)
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    call bl_allocate(p0_cart,lo,hi,1)
     call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-                                      cc_to_r,ccr_lo,ccr_hi)
+         cc_to_r,ccr_lo,ccr_hi)
 
     do k = lo(3), hi(3)
-    do j = lo(2), hi(2)
-    do i = lo(1), hi(1)
-             
-       ! (rho, p) --> T
-             
-       eos_state%rho   = state(i,j,k,rho_comp)
-       eos_state%T     = state(i,j,k,temp_comp)
-       if (use_pprime_in_tfromp) then
-          eos_state%p     = p0_cart(i,j,k,1) + state(i,j,k,pi_comp)
-       else
-          eos_state%p     = p0_cart(i,j,k,1)
-       endif
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
 
-       eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+             ! (rho, p) --> T
 
-       pt_index(:) = (/i, j, k/)
-             
-       call eos(eos_input_rp, eos_state, pt_index)
-             
-       state(i,j,k,temp_comp) = eos_state%T
+             eos_state%rho   = state(i,j,k,rho_comp)
+             eos_state%T     = state(i,j,k,temp_comp)
+             if (use_pprime_in_tfromp) then
+                eos_state%p     = p0_cart(i,j,k,1) + state(i,j,k,pi_comp)
+             else
+                eos_state%p     = p0_cart(i,j,k,1)
+             endif
 
-       if (updateRhoH .eq. 1) then
-          state(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
-       end if
-       
+             eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rp, eos_state, pt_index)
+
+             state(i,j,k,temp_comp) = eos_state%T
+
+             if (updateRhoH .eq. 1) then
+                state(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
+             end if
+
+          enddo
+       enddo
     enddo
-    enddo
-    enddo
+
+    call bl_deallocate(p0_cart)
 
   end subroutine makeTfromRhoP_sphr
 
@@ -293,9 +298,9 @@ contains
   ! makePfromRhoH
   !----------------------------------------------------------------------------
   subroutine makePfromRhoH(lo, hi, &
-                            state, s_lo, s_hi, nc_s, & 
-                            temp_old, t_lo, t_hi, & 
-                            peos, p_lo, p_hi) bind(C,name="makePfromRhoH")
+       state, s_lo, s_hi, nc_s, &
+       temp_old, t_lo, t_hi, &
+       peos, p_lo, p_hi) bind(C,name="makePfromRhoH")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -310,11 +315,10 @@ contains
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k, eos_state, pt_index)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             
+
              ! (rho, H) --> T, p
              eos_state%rho   = state(i,j,k,rho_comp)
              eos_state%T     = temp_old(i,j,k)
@@ -323,15 +327,14 @@ contains
              eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
 
              pt_index(:) = (/i, j, k/)
-             
+
              call eos(eos_input_rh, eos_state, pt_index)
-             
+
              peos(i,j,k) = eos_state%p
-             
+
           enddo
        enddo
     enddo
-    !$OMP END PARALLEL DO
 
   end subroutine makePfromRhoH
 

@@ -12,11 +12,11 @@ Maestro::Regrid ()
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
-            
+
     // regrid could add newly refine levels (if finest_level < max_level)
     // so we save the previous finest level index
     regrid(0, t_new);
-            
+
     if (spherical == 0) {
         finest_radial_level = finest_level;
         init_multilevel(&finest_level);
@@ -25,22 +25,22 @@ Maestro::Regrid ()
         // and "regrid" the base state rho0, rhoh0, tempbar
         // call init_multilevel
         // look at MAESTRO/Source/varden.f90:750-1060
-	if (evolve_base_state) {
-	    // may need if statement for irregularly-spaced base states
+        if (evolve_base_state) {
+            // may need if statement for irregularly-spaced base states
 
-	} else {
+        } else {
 
-	}
+        }
 
     }
 
     if (spherical == 1) {
         MakeNormal();
     }
-    
+
     if (evolve_base_state) {
         // force rho0 to be the average of rho
-	Average(sold,rho0_old,Rho);
+        Average(sold,rho0_old,Rho);
     }
 
     // compute cutoff coordinates
@@ -48,23 +48,23 @@ Maestro::Regrid ()
 
     // make gravity
     make_grav_cell(grav_cell_old.dataPtr(),
-		   rho0_old.dataPtr(),
-		   r_cc_loc.dataPtr(),
-		   r_edge_loc.dataPtr());
+                   rho0_old.dataPtr(),
+                   r_cc_loc.dataPtr(),
+                   r_edge_loc.dataPtr());
 
     // enforce HSE
-    enforce_HSE(rho0_old.dataPtr(), 
-		p0_old.dataPtr(),
-		grav_cell_old.dataPtr(),
-		r_cc_loc.dataPtr(),
-		r_edge_loc.dataPtr());
+    enforce_HSE(rho0_old.dataPtr(),
+                p0_old.dataPtr(),
+                grav_cell_old.dataPtr(),
+                r_cc_loc.dataPtr(),
+                r_edge_loc.dataPtr());
 
     if (use_tfromp) {
-	// compute full state T = T(rho,p0,X)
-	TfromRhoP(sold,p0_old,0);
+        // compute full state T = T(rho,p0,X)
+        TfromRhoP(sold,p0_old,0);
     } else {
-	// compute full state T = T(rho,h,X)
-	TfromRhoH(sold,p0_old);
+        // compute full state T = T(rho,h,X)
+        TfromRhoH(sold,p0_old);
     }
 
     // force tempbar to be the average of temp
@@ -75,23 +75,23 @@ Maestro::Regrid ()
 
     // beta0_old needs to be recomputed
     if (use_exact_base_state) {
-	make_beta0_irreg(beta0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-			 gamma1bar_old.dataPtr(), grav_cell_old.dataPtr(),
-			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        make_beta0_irreg(beta0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+                         gamma1bar_old.dataPtr(), grav_cell_old.dataPtr(),
+                         r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     } else {
-	make_beta0(beta0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-		   gamma1bar_old.dataPtr(), grav_cell_old.dataPtr());
+        make_beta0(beta0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+                   gamma1bar_old.dataPtr(), grav_cell_old.dataPtr());
     }
-    
+
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;
-            
+
     // print wallclock time
-    ParallelDescriptor::ReduceRealMax(end_total ,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
     if (maestro_verbose > 0) {
         Print() << "Time to regrid: " << end_total << '\n';
     }
-        
+
 }
 
 // tag all cells for refinement
@@ -105,7 +105,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     if (lev >= tag_err.size()) return;
 
     const int clearval = TagBox::CLEAR;
-    const int   tagval = TagBox::SET;
+    const int tagval = TagBox::SET;
 
     const Real* dx      = geom[lev].CellSize();
 
@@ -117,19 +117,22 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     {
         Vector<int>  itags;
 
-	// loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for (MFIter mfi(state); mfi.isValid(); ++mfi)
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
         {
             const Box& tilebox  = mfi.tilebox();
 
             TagBox&     tagfab  = tags[mfi];
-	    
+
             // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
             // So we are going to get a temporary integer array.
             // set itags initially to 'untagged' everywhere
             // we define itags over the tilebox region
             tagfab.get_itags(itags, tilebox);
-	    
+
             // data pointer and index space
             int*        tptr    = itags.dataPtr();
             const int*  tlo     = tilebox.loVect();
@@ -138,8 +141,8 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
             // tag cells for refinement
             state_error(tptr,  ARLIM_3D(tlo), ARLIM_3D(thi),
                         BL_TO_FORTRAN_3D(state[mfi]),
-                        &tagval, &clearval, 
-                        ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()), 
+                        &tagval, &clearval,
+                        ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                         ZFILL(dx), &time, tag_err[lev].dataPtr());
             //
             // Now update the tags in the TagBox in the tilebox region
@@ -155,7 +158,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 // overrides the pure virtual function in AmrCore
 void
 Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
-		      const DistributionMapping& dm)
+                      const DistributionMapping& dm)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RemakeLevel()",RemakeLevel);
@@ -199,7 +202,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
-    }    
+    }
 }
 
 // within a call to AmrCore::regrid, this function fills in data at a level
@@ -207,8 +210,8 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 // overrides the pure virtual function in AmrCore
 void
 Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
-				 const DistributionMapping& dm)
-{    
+                                 const DistributionMapping& dm)
+{
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNewLevelFromCoarse()",MakeNewLevelFromCoarse);
 
