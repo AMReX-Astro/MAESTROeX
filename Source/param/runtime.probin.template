@@ -1,0 +1,134 @@
+! This module stores the runtime parameters.  The probin_init() routine is
+! used to initialize the runtime parameters
+
+! this version is a stub -- useful for when we only need a container for
+! parameters, but not for MAESTRO use.
+
+module probin_module
+
+  use amrex_fort_module, only : rt => amrex_real
+
+  implicit none
+
+  private
+
+  @@declarationsA@@
+
+#ifdef CUDA
+  @@cudaattributesA@@
+#endif
+
+end module probin_module
+
+
+module extern_probin_module
+
+  use amrex_fort_module, only : rt => amrex_real
+
+  implicit none
+
+  private
+
+  @@declarationsB@@
+
+#ifdef CUDA
+  @@cudaattributesB@@
+#endif
+
+end module extern_probin_module
+
+
+module runtime_init_module
+
+  use amrex_error_module
+  use amrex_fort_module, only : rt => amrex_real
+  use probin_module
+  use extern_probin_module
+
+  implicit none
+
+  @@namelist@@
+
+  private
+
+  public :: probin
+
+  public :: runtime_init, runtime_close, runtime_pretty_print
+
+contains
+
+subroutine runtime_init(name,namlen)
+
+  implicit none
+
+  integer :: namlen
+  integer :: name(namlen)
+
+  integer :: un, i, status
+
+  integer, parameter :: maxlen = 256
+  character (len=maxlen) :: probin_f
+
+  @@defaults@@
+
+
+  ! create the filename
+  if (namlen > maxlen) then
+     print *, 'probin file name too long'
+     stop
+  endif
+
+  do i = 1, namlen
+     probin_f(i:i) = char(name(i))
+  end do
+
+
+  ! read in the namelist
+  open (newunit=un, file=probin_f(1:namlen), status = 'old', action = 'read')
+  read (unit=un, nml=probin, iostat=status)
+
+  if (status < 0) then
+     ! the namelist does not exist, so we just go with the defaults
+     continue
+
+  else if (status > 0) then
+     ! some problem in the namelist
+     print *, 'ERROR: problem in the extern namelist'
+     stop
+  endif
+
+  close (unit=un)
+
+  @@acc@@
+
+end subroutine runtime_init
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  subroutine runtime_close()
+
+    use probin_module
+
+    @@deallocations@@
+
+  end subroutine runtime_close
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  subroutine runtime_pretty_print(unit) bind(C, name="runtime_pretty_print")
+
+    use amrex_constants_module
+    use probin_module
+    use extern_probin_module
+
+    integer, intent(in) :: unit
+
+    write (unit, *) "[*] indicates overridden default"
+
+    @@printing@@
+
+  end subroutine runtime_pretty_print
+
+
+end module runtime_init_module

@@ -6,7 +6,7 @@ maestro.perturb_model = true
 maestro.ppm_type = 0
 
 maestro.max_step  = 10000000
-maestro.stop_time = 2.5
+maestro.stop_time = 1.5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0  0.0  0.0

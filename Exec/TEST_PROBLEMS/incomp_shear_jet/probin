@@ -6,9 +6,7 @@
   rho_base = 1.0d0
   p_base = 1.0d0
 
-/
-
-&extern
+  !extern
 
   ! Note that some of the parameters in this
   ! namelist are specific to the default EOS,

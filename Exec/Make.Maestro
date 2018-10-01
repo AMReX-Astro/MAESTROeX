@@ -65,7 +65,7 @@ INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
 
 #------------------------------------------------------------------------------
-# microphysics 
+# microphysics
 #------------------------------------------------------------------------------
 
 ifdef MICROPHYSICS_HOME
@@ -145,7 +145,7 @@ include $(Bpack)
 INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
 
-include $(AMREX_HOME)/Src/LinearSolvers/C_to_F_MG/Make.package 
+include $(AMREX_HOME)/Src/LinearSolvers/C_to_F_MG/Make.package
 include $(AMREX_HOME)/Src/LinearSolvers/F_MG/FParallelMG.mak
 include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
 
@@ -166,10 +166,38 @@ endif
 
 EXTERN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(EXTERN_SEARCH))
 
-extern.F90: $(EXTERN_PARAMETERS) $(EXTERN_TEMPLATE)
-	$(AMREX_HOME)/Tools/F_scripts/write_probin.py \
-           -t $(EXTERN_TEMPLATE) -o extern.F90 -n extern \
-           --pa "$(EXTERN_PARAMETERS)"
+F90EXE_sources += extern.F90
+
+PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
+PROBIN_PARAMETER_DIRS += .
+
+
+PROBIN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(PROBIN_PARAMETER_DIRS))
+MANAGED_PROBIN_FLAG :=
+ifdef CUDA
+ ifeq ($(CUDA), t)
+   MANAGED_PROBIN_FLAG := --managed
+ endif
+endif
+
+MANAGED_PROBIN_FLAG :=
+ifdef CUDA
+  ifeq ($(CUDA), t)
+    MANAGED_PROBIN_FLAG := --managed
+  endif
+endif
+
+
+extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
+	@echo " "
+	@echo "${bold}WRITING extern.F90${normal}"
+	$(FBOXLIB_HOME)/Tools/F_scripts/write_probin.py \
+          -t $(PROBIN_TEMPLATE) -o extern.F90 -n probin \
+          --pa "$(PROBIN_PARAMETERS)" --pb "$(EXTERN_PARAMETERS)" $(MANAGED_PROBIN_FLAG)
+	@echo " "
+
+
+
 #------------------------------------------------------------------------------
 # build info
 #------------------------------------------------------------------------------
@@ -219,7 +247,9 @@ $(objEXETempDir)/AMReX_buildInfo.o: .FORCE
 include $(AMREX_HOME)/Tools/GNUMake/Make.rules
 
 clean::
+
 	$(SILENT) $(RM) extern.F90 extern.f90
+
 	$(SILENT) $(RM) AMReX_buildInfo.cpp
 
 clean::

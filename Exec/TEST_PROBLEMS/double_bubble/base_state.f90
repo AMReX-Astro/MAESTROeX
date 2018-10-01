@@ -20,13 +20,13 @@ module base_state_module
   use amrex_fort_module, only: amrex_spacedim
   use network, only: nspec
   use meth_params_module, only: nscal, model_file, spherical, base_cutoff_density, &
-                                do_2d_planar_octant, do_planar_invsq_grav, rho_comp, &
-                                rhoh_comp, spec_comp, temp_comp, grav_const, &
-                                planar_invsq_mass, print_init_hse_diag, prob_lo, &
-                                prob_hi, small_dens, small_temp, &
-                                anelastic_cutoff, buoyancy_cutoff_factor
+       do_2d_planar_octant, do_planar_invsq_grav, rho_comp, &
+       rhoh_comp, spec_comp, temp_comp, grav_const, &
+       planar_invsq_mass, print_init_hse_diag, prob_lo, &
+       prob_hi, small_dens, small_temp, &
+       anelastic_cutoff, buoyancy_cutoff_factor
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
-  use probdata_module, only: dens_base, pres_base, do_isentropic
+  use probin_module, only: dens_base, pres_base, do_isentropic
 
   implicit none
 
@@ -67,73 +67,73 @@ contains
 
     do n=0,max_radial_level
 
-        ! for isentropic, we satisfy p ~ rho^gamma, but we'll need to get gamma
-        eos_state % rho = dens_base
-        eos_state % p = pres_base
-        eos_state % xn(:) = xn_zone(:)
+       ! for isentropic, we satisfy p ~ rho^gamma, but we'll need to get gamma
+       eos_state % rho = dens_base
+       eos_state % p = pres_base
+       eos_state % xn(:) = xn_zone(:)
 
-        ! initial guess
-        eos_state % T = 1000.0d0
+       ! initial guess
+       eos_state % T = 1000.0d0
 
-        call eos(eos_input_rp, eos_state)
+       call eos(eos_input_rp, eos_state)
 
-        gamma_const = pres_base/(dens_base * eos_state % e) + 1.0d0
+       gamma_const = pres_base/(dens_base * eos_state % e) + 1.0d0
 
-        p0_init(n,0) = pres_base
-        s0_init(n,0, rho_comp) = dens_base
+       p0_init(n,0) = pres_base
+       s0_init(n,0, rho_comp) = dens_base
 
-        s0_init(n,0,rhoh_comp) = dens_base * eos_state%h
+       s0_init(n,0,rhoh_comp) = dens_base * eos_state%h
 
-        s0_init(n,0,spec_comp:spec_comp-1+nspec) = dens_base*xn_zone(:)
+       s0_init(n,0,spec_comp:spec_comp-1+nspec) = dens_base*xn_zone(:)
 
-        s0_init(n,0,temp_comp) = eos_state%T
+       s0_init(n,0,temp_comp) = eos_state%T
 
-        z0 = 0.5d0*dr(n)
+       z0 = 0.5d0*dr(n)
 
-        ! set an initial guess for the temperature -- this will be reset
-        ! by the EOS
-        temp_zone = 1000.d0
+       ! set an initial guess for the temperature -- this will be reset
+       ! by the EOS
+       temp_zone = 1000.d0
 
        do r=1,nr(n)-1
 
-           z = (dble(r)+HALF) * dr(n)
+          z = (dble(r)+HALF) * dr(n)
 
-           if (do_isentropic) then
+          if (do_isentropic) then
 
-              ! we can integrate HSE with p = K rho^gamma analytically
-              dens_zone = dens_base*(grav_const*dens_base*(gamma_const - 1.0)* &
-                   (z-z0)/ &
-                   (gamma_const*pres_base) + 1.d0)**(1.d0/(gamma_const - 1.d0))
+             ! we can integrate HSE with p = K rho^gamma analytically
+             dens_zone = dens_base*(grav_const*dens_base*(gamma_const - 1.0)* &
+                  (z-z0)/ &
+                  (gamma_const*pres_base) + 1.d0)**(1.d0/(gamma_const - 1.d0))
 
-           else
+          else
 
-              ! the density of an isothermal gamma-law atm is exponential
-              dens_zone = dens_base * exp(-z/H)
+             ! the density of an isothermal gamma-law atm is exponential
+             dens_zone = dens_base * exp(-z/H)
 
-           end if
+          end if
 
-           s0_init(n,r, rho_comp) = dens_zone
+          s0_init(n,r, rho_comp) = dens_zone
 
-           ! compute the pressure by discretizing HSE
-           p0_init(n,r) = p0_init(n,r-1) - &
-                dr(n) * HALF * (s0_init(n,r,rho_comp) + s0_init(n,r-1,rho_comp)) * &
-                abs(grav_const)
+          ! compute the pressure by discretizing HSE
+          p0_init(n,r) = p0_init(n,r-1) - &
+               dr(n) * HALF * (s0_init(n,r,rho_comp) + s0_init(n,r-1,rho_comp)) * &
+               abs(grav_const)
 
-           ! use the EOS to make the state consistent
-           eos_state%rho   = dens_zone
-           eos_state%p     = p0_init(n,r)
-           eos_state%T     = temp_zone
-           eos_state%xn(:) = xn_zone(:)
+          ! use the EOS to make the state consistent
+          eos_state%rho   = dens_zone
+          eos_state%p     = p0_init(n,r)
+          eos_state%T     = temp_zone
+          eos_state%xn(:) = xn_zone(:)
 
-           ! (rho,p) --> T, h
-           call eos(eos_input_rp, eos_state)
+          ! (rho,p) --> T, h
+          call eos(eos_input_rp, eos_state)
 
-           s0_init(n,r, rho_comp) = dens_zone
-           s0_init(n,r,rhoh_comp) = dens_zone * eos_state%h
+          s0_init(n,r, rho_comp) = dens_zone
+          s0_init(n,r,rhoh_comp) = dens_zone * eos_state%h
 
-           s0_init(n,r,spec_comp:spec_comp-1+nspec) = dens_zone*xn_zone(:)
+          s0_init(n,r,spec_comp:spec_comp-1+nspec) = dens_zone*xn_zone(:)
 
-           s0_init(n,r,temp_comp) = eos_state%T
+          s0_init(n,r,temp_comp) = eos_state%T
 
        end do
 
@@ -152,7 +152,7 @@ contains
   end subroutine init_base_state
 
   subroutine init_base_state_irreg(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init, &
-                                     r_cc_loc, r_edge_loc) &
+       r_cc_loc, r_edge_loc) &
        bind(C, name="init_base_state_irreg")
 
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)

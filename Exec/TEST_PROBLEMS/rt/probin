@@ -1,4 +1,4 @@
-&probdata
+&probin
 
   ! override the default values of the probdata namelist values here
   rho_1 = 1.d0
@@ -8,9 +8,7 @@
   nmodes  = 1
   p0_base = 5.0d0
 
-/
-
-&extern
+  !extern
 
   ! Note that some of the parameters in this
   ! namelist are specific to the default EOS,
