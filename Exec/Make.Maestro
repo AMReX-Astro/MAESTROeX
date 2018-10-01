@@ -156,8 +156,6 @@ include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
 # runtime parameter support for extern/ routines
 F90EXE_sources += extern.F90
 
-EXTERN_TEMPLATE := $(TOP)/Source/param/extern_probin.template
-
 # these are for finding runtime parameters
 EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/constants $(TOP)/Util/model_parser
 ifdef MICROPHYSICS_HOME
