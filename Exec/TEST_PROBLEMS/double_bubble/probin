@@ -9,9 +9,7 @@
   do_isentropic = T
   single = F
 
-/
-
-&extern
+  !extern
 
   ! Note that some of the parameters in this
   ! namelist are specific to the default EOS,

@@ -1,0 +1,5 @@
+apply_vel_field     logical   .true.
+velpert_scale       real      5.d6
+velpert_amplitude   real      1.d5
+velpert_height_loc  real      1.2d8
+num_vortices        integer   2

@@ -23,6 +23,7 @@ CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := ignition_simple
 
 Bpack   := ./Make.package
-Blocs   := . 
+Blocs   := .
+PROBIN_PARAMETER_DIRS := .
 
 include $(MAESTROEX_HOME)/Exec/Make.Maestro

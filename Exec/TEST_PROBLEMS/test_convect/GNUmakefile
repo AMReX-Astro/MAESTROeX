@@ -24,6 +24,7 @@ NETWORK_DIR      := general_null
 GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/$(NETWORK_DIR)/ignition.net
 
 Bpack   := ./Make.package
-Blocs   := . 
+Blocs   := .
+PROBIN_PARAMETER_DIRS := .
 
 include $(MAESTROEX_HOME)/Exec/Make.Maestro

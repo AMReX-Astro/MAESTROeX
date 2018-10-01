@@ -1,0 +1,7 @@
+pert_factor     real      8.1d-3
+pres_base       real      1.65d6
+dens_base       real      1.65d-3
+y_pert_center   real      0.7d0
+pert_width      real      0.025d0
+do_isentropic   logical   .true.
+single          logical   .false.

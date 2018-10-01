@@ -641,7 +641,6 @@ private:
     // MaestroSetup.cpp functions
 
     void ExternInit ();
-    void ProbdataInit ();
 
     // read in C++ parameters from inputs file
     void ReadParameters ();

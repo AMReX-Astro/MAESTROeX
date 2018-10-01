@@ -9,7 +9,7 @@ extern "C"
 
     // these are interfaces to fortran subroutines
 
-    void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
+    // void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
 
     //////////////////////
     // in advect_base.F90
@@ -350,7 +350,6 @@ extern "C"
 
     void maestro_network_init();
     void maestro_extern_init(const int* name, const int* namlen);
-    void maestro_probdata_init(const int* name, const int* namlen);
     void get_num_spec(int* nspec);
     void get_spec_names(int* spec_names, int* ispec, int* len);
     void get_spec_az(const int* ispec, amrex::Real* A, amrex::Real* Z);
