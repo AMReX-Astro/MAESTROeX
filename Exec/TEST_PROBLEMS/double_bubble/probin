@@ -1,6 +1,6 @@
-&probdata
+&probin
 
-  ! override the default values of the probdata namelist values here
+  ! override the default values of the probin namelist values here
   pert_factor = 8.1e-3
   pres_base = 1.65d6
   dens_base = 1.65d-3
