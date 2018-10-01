@@ -63,6 +63,7 @@ Maestro::Init ()
 
 		if (spherical == 1) {
 				MakeNormal();
+				MakeCCtoRadii();
 		}
 
 		if (do_sponge) {
@@ -74,7 +75,7 @@ Maestro::Init ()
 		               rho0_old.dataPtr(),
 		               r_cc_loc.dataPtr(),
 		               r_edge_loc.dataPtr());
-
+				
 		if (restart_file == "") {
 
 				// compute gamma1bar

@@ -36,4 +36,4 @@ CEXE_headers += Maestro.H
 CEXE_headers += MaestroPlot.H
 CEXE_headers += PhysBCFunctMaestro.H
 
-CEXE_headers += Maestro_F.H
+FEXE_headers += Maestro_F.H
