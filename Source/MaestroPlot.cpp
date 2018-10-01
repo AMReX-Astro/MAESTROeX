@@ -545,6 +545,6 @@ Maestro::WriteJobInfo (const std::string& dir) const
 				for (int i = 0; i < jobinfo_file_length; i++)
 						jobinfo_file_name[i] = FullPathJobInfoFile[i];
 
-				runtime_pretty_print(jobinfo_file_name.dataPtr(), &jobinfo_file_length);
+				// runtime_pretty_print(jobinfo_file_name.dataPtr(), &jobinfo_file_length);
 		}
 }

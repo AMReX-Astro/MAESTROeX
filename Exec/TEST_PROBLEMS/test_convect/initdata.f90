@@ -7,7 +7,7 @@ module initdata_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
        prob_lo, prob_hi
-  use probdata_module, only: apply_vel_field, velpert_scale, velpert_amplitude, &
+  use probin_module, only: apply_vel_field, velpert_scale, velpert_amplitude, &
        velpert_height_loc, num_vortices
 
   implicit none

@@ -9,7 +9,7 @@ module initdata_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
        prob_lo, prob_hi
-  use probdata_module, only: velpert_amplitude, velpert_radius, velpert_steep, velpert_scale
+  use probin_module, only: velpert_amplitude, velpert_radius, velpert_steep, velpert_scale
   use eos_module
   use eos_type_module
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
@@ -204,7 +204,6 @@ contains
     enddo
 
     call bl_deallocate(p0_cart)
-
 
     ! initialize the velocity to zero everywhere
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
