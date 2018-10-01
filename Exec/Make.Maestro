@@ -161,22 +161,11 @@ EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/constants $(TOP)/Util/model_parser
 ifdef MICROPHYSICS_HOME
    EXTERN_SEARCH += $(MICROPHYSICS_HOME)/networks/
 endif
-
 EXTERN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(EXTERN_SEARCH))
-
-F90EXE_sources += extern.F90
 
 PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
-
-
 PROBIN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(PROBIN_PARAMETER_DIRS))
-MANAGED_PROBIN_FLAG :=
-ifdef CUDA
- ifeq ($(CUDA), t)
-   MANAGED_PROBIN_FLAG := --managed
- endif
-endif
 
 MANAGED_PROBIN_FLAG :=
 ifdef CUDA
@@ -184,7 +173,6 @@ ifdef CUDA
     MANAGED_PROBIN_FLAG := --managed
   endif
 endif
-
 
 extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
 	@echo " "
