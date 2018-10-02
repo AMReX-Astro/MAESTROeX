@@ -1,7 +1,7 @@
 module average_module
 
   use base_state_geometry_module, only: max_radial_level, finest_radial_level, nr_fine, &
-                                           restrict_base, fill_ghost_base, center, nr_irreg, dr
+       restrict_base, fill_ghost_base, center, nr_irreg, dr
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, prob_lo, drdxfac
 
@@ -23,7 +23,7 @@ contains
     integer          :: j,k
 
     if (amrex_spacedim .eq. 1) then
-       phisum(lev,:) = sum(phi(lo(1):hi(1),0,0));
+       phisum(lev,0:nr_fine-1) = sum(phi(lo(1):hi(1),0,0));
     else if (amrex_spacedim .eq. 2) then
        do j=lo(2),hi(2)
           phisum(lev,j) = phisum(lev,j) + sum(phi(lo(1):hi(1),j,0))
@@ -53,12 +53,12 @@ contains
   end subroutine divide_phisum_by_ncell
 
 
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ! spherical subroutines
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine average_sphr_irreg(lev,lo,hi,phi,p_lo,p_hi,phisum,ncell, &
-                                  cc_to_r,ccr_lo,ccr_hi) bind (C,name="average_sphr_irreg")
+       cc_to_r,ccr_lo,ccr_hi) bind (C,name="average_sphr_irreg")
 
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
@@ -68,21 +68,21 @@ contains
     integer         , intent (inout) ::  ncell(0:max_radial_level,0:nr_fine-1)
     integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-                                                ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! local
     integer          :: i,j,k,index
 
     do i=lo(1),hi(1)
-    do j=lo(2),hi(2)
-    do k=lo(3),hi(3)
-       index = cc_to_r(i,j,k)
-       phisum(lev,index) = phisum(lev,index) + phi(i,j,k)
-       ncell(lev,index) = ncell(lev,index) + 1
+       do j=lo(2),hi(2)
+          do k=lo(3),hi(3)
+             index = cc_to_r(i,j,k)
+             phisum(lev,index) = phisum(lev,index) + phi(i,j,k)
+             ncell(lev,index) = ncell(lev,index) + 1
+          end do
+       end do
     end do
-    end do
-    end do
- 
+
   end subroutine average_sphr_irreg
 
   subroutine divide_phisum_by_ncell_irreg(phisum,ncell) &
@@ -95,9 +95,9 @@ contains
 
     do n=0,max_radial_level
        do r=0,nr_fine-1
-          ! divide only if ncell>0, 
+          ! divide only if ncell>0,
           ! else keep value constant b/c it is outside the cutoff coords
-          if (ncell(n,r) > 0) then 
+          if (ncell(n,r) > 0) then
              phisum(n,r) = phisum(n,r) / ncell(n,r)
           else
              phisum(n,r) = phisum(n,r-1)
@@ -110,8 +110,8 @@ contains
 
   end subroutine divide_phisum_by_ncell_irreg
 
-  
-  subroutine average_sphr(phisum,phibar,ncell,radii,finest_level) & 
+
+  subroutine average_sphr(phisum,phibar,ncell,radii,finest_level) &
        bind (C,name="average_sphr")
 
     integer         , intent(in   ) :: finest_level
@@ -139,10 +139,10 @@ contains
           end if
        end do
     end do
-    
+
     ! compute center point for the finest level
     phisum(finest_level,-1) =  (11.d0/8.d0)*phisum(finest_level,0) &
-                                 - (3.d0/8.d0)*phisum(finest_level,1)
+         - (3.d0/8.d0)*phisum(finest_level,1)
     ncell(finest_level,-1) = 1
 
     ! choose which level to interpolate from
@@ -163,7 +163,7 @@ contains
              end if
           end do
        end do
-       
+
        ! make sure closest coordinate is in bounds
        do n=0,finest_level-1
           rcoord(n) = max(rcoord(n),1)
@@ -171,18 +171,18 @@ contains
        do n=0,finest_level
           rcoord(n) = min(rcoord(n),nr_irreg-1)
        end do
-       
+
        ! choose the level with the largest min over the ncell interpolation points
        which_lev(r) = 0
        min_all = min(ncell(0,rcoord(0)-1), &
-                     ncell(0,rcoord(0)  ), &
-                     ncell(0,rcoord(0)+1))
+            ncell(0,rcoord(0)  ), &
+            ncell(0,rcoord(0)+1))
 
        do n=1,finest_level
           min_lev = min(ncell(n,rcoord(n)-1), &
-                        ncell(n,rcoord(n)  ), &
-                        ncell(n,rcoord(n)+1))
-            
+               ncell(n,rcoord(n)  ), &
+               ncell(n,rcoord(n)+1))
+
           if (min_lev .gt. min_all) then
              min_all = min_lev
              which_lev(r) = n
@@ -196,7 +196,7 @@ contains
           j = j+1
           do n=0,finest_level
              min_lev = max(ncell(n,max(1,rcoord(n)-j)), &
-                           ncell(n,min(rcoord(n)+j,nr_irreg-1)))
+                  ncell(n,min(rcoord(n)+j,nr_irreg-1)))
              if (min_lev .ne. 0) then
                 which_lev(r) = n
                 min_all = min_lev
@@ -204,7 +204,7 @@ contains
              end if
           end do
        end do
-       
+
     end do
 
     ! squish the list at each level down to exclude points with no contribution
@@ -255,22 +255,22 @@ contains
           stencil_coord(which_lev(r)) = max(stencil_coord(which_lev(r)),1)
        end if
        stencil_coord(which_lev(r)) = min(stencil_coord(which_lev(r)), &
-                                         max_rcoord(which_lev(r))-1)
+            max_rcoord(which_lev(r))-1)
 
        if (r > nr_fine - 1 - drdxfac*2.d0**(finest_level-1)) then
-          limit = .false. 
-       else 
+          limit = .false.
+       else
           limit = .true.
        end if
 
        call quad_interp(radius, &
-                        radii(which_lev(r),stencil_coord(which_lev(r))-1), &
-                        radii(which_lev(r),stencil_coord(which_lev(r))  ), &
-                        radii(which_lev(r),stencil_coord(which_lev(r))+1), &
-                        phibar(0,r), &
-                        phisum(which_lev(r),stencil_coord(which_lev(r))-1), &
-                        phisum(which_lev(r),stencil_coord(which_lev(r))  ), &
-                        phisum(which_lev(r),stencil_coord(which_lev(r))+1), limit)
+            radii(which_lev(r),stencil_coord(which_lev(r))-1), &
+            radii(which_lev(r),stencil_coord(which_lev(r))  ), &
+            radii(which_lev(r),stencil_coord(which_lev(r))+1), &
+            phibar(0,r), &
+            phisum(which_lev(r),stencil_coord(which_lev(r))-1), &
+            phisum(which_lev(r),stencil_coord(which_lev(r))  ), &
+            phisum(which_lev(r),stencil_coord(which_lev(r))+1), limit)
 
     end do
 
@@ -280,12 +280,12 @@ contains
 
       double precision, intent(in   ) :: x,x0,x1,x2,x3,y0,y1,y2,y3
       double precision, intent(  out) :: y
-      
+
       y = y0 + (y1-y0)/(x1-x0)*(x-x0) &
-          + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1) &
-          + ( ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0) &
-          -((y3-y2)/(x3-x2)-(y2-y1)/(x2-x1))/(x3-x1) ) / (x3-x0) &
-          *(x-x0)*(x-x1)*(x-x2)
+           + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1) &
+           + ( ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0) &
+           -((y3-y2)/(x3-x2)-(y2-y1)/(x2-x1))/(x3-x1) ) / (x3-x0) &
+           *(x-x0)*(x-x1)*(x-x2)
 
       if (y .gt. max(y0,y1,y2,y3)) y = max(y0,y1,y2,y3)
       if (y .lt. min(y0,y1,y2,y3)) y = min(y0,y1,y2,y3)
@@ -299,7 +299,7 @@ contains
       logical,          intent(in   ) :: limit
 
       y = y0 + (y1-y0)/(x1-x0)*(x-x0) &
-          + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1)
+           + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1)
 
 
       if (limit) then
@@ -310,7 +310,7 @@ contains
     end subroutine quad_interp
 
     subroutine lin_interp(x,x0,x1,y,y0,y1)
-      
+
       double precision, intent(in   ) :: x,x0,x1,y0,y1
       double precision, intent(  out) :: y
 
@@ -321,8 +321,8 @@ contains
   end subroutine average_sphr
 
   subroutine sum_phi_3d_sphr(lev,lo,hi,phi,p_lo,p_hi,phisum, &
-                              radii, finest_level, dx, ncell, & 
-                              mask) bind (C,name="sum_phi_3d_sphr")
+       radii, finest_level, dx, ncell, &
+       mask) bind (C,name="sum_phi_3d_sphr")
 
 
     integer         , intent (in   ) :: lev, lo(3), hi(3), finest_level
@@ -341,37 +341,37 @@ contains
 
     do k=lo(3),hi(3)
        z = prob_lo(3) + (dble(k) + 0.5d0)*dx(3) - center(3)
-       
+
        do j=lo(2),hi(2)
           y = prob_lo(2) + (dble(j) + 0.5d0)*dx(2) - center(2)
-          
+
           do i=lo(1),hi(1)
              x = prob_lo(1) + (dble(i) + 0.5d0)*dx(1) - center(1)
-             
+
              ! make sure the cell isn't covered by finer cells
              cell_valid = .true.
              if ( present(mask) ) then
                 if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
              end if
-             
+
              if (cell_valid) then
 
                 ! compute distance to center
                 radius = sqrt(x**2 + y**2 + z**2)
-             
+
                 ! figure out which radii index this point maps into
                 index = ((radius / dx(1))**2 - 0.75d0) / 2.d0
-             
+
                 ! due to roundoff error, need to ensure that we are in the proper radial bin
                 if (index .lt. nr_irreg) then
                    if (abs(radius-radii(lev,index)) .gt. abs(radius-radii(lev,index+1))) then
                       index = index+1
                    end if
                 end if
-                
+
                 phisum(lev,index) = phisum(lev,index) + phi(i,j,k)
                 ncell(lev,index)  = ncell(lev,index) + 1
-             
+
              end if
 
           end do

@@ -69,8 +69,8 @@ Maestro::NodalProj (int proj_type,
     CreateUvecForProj(proj_type,Vproj,sig);
 
     bool using_alt_energy_fix = false;
-    if (use_alt_energy_fix && 
-        proj_type != initial_projection_comp && 
+    if (use_alt_energy_fix &&
+        proj_type != initial_projection_comp &&
         proj_type != divu_iters_comp) {
         using_alt_energy_fix = true;
     }
@@ -122,34 +122,34 @@ Maestro::NodalProj (int proj_type,
     }
 
 /*
-  set_outflow_bcs() was used in IAMR/Projection.cpp
-  This routine modifies boundary conditions on phi at outflow.
-  Typically these are homogeneous Dirichlet but in some cases you need
-  to modify this.  First, if div(u) is "large enough" at outflow you need
-  to modify the boundary conditions.  This often happens in combustion
-  flame systems (PeleLM),  Second if you have hydrostatic effects
-  due to gravity you need to modify the boundary conditions.  This happens
-  in IAMR_type runs with strong gravity.  MAESTRO
-  requires neither of these since we do not run problems with strong
-  div(u) at outflow, and our pi (pressure) does not need to capture
-  stratification since we have put this pressure in perturbational form
-  by adding (rho-rho0)*g to the RHS of the velocity equation.
-*/
+   set_outflow_bcs() was used in IAMR/Projection.cpp
+   This routine modifies boundary conditions on phi at outflow.
+   Typically these are homogeneous Dirichlet but in some cases you need
+   to modify this.  First, if div(u) is "large enough" at outflow you need
+   to modify the boundary conditions.  This often happens in combustion
+   flame systems (PeleLM),  Second if you have hydrostatic effects
+   due to gravity you need to modify the boundary conditions.  This happens
+   in IAMR_type runs with strong gravity.  MAESTRO
+   requires neither of these since we do not run problems with strong
+   div(u) at outflow, and our pi (pressure) does not need to capture
+   stratification since we have put this pressure in perturbational form
+   by adding (rho-rho0)*g to the RHS of the velocity equation.
+ */
 /*
     set_outflow_bcs()
-*/
+ */
 
 /*
-  SetBoundaryVelocity() is a simplified version of the function 
-  set_boundary_velocity() in IAMR/Projection.cpp
-  basically this sets velocity in ghost cells to zero except at inflow
-  right now, the nodal solver expects ghost cells to be filled this way
-  in slightly more detail
-  1) At non-inflow faces, the normal component of velocity will be completely zero'd 
-  2) If a face is an inflow face, then the normal velocity at corners just outside inflow faces 
-     will be zero'd outside of Neumann boundaries (slipWall, noSlipWall, Symmetry) 
+   SetBoundaryVelocity() is a simplified version of the function
+   set_boundary_velocity() in IAMR/Projection.cpp
+   basically this sets velocity in ghost cells to zero except at inflow
+   right now, the nodal solver expects ghost cells to be filled this way
+   in slightly more detail
+   1) At non-inflow faces, the normal component of velocity will be completely zero'd
+   2) If a face is an inflow face, then the normal velocity at corners just outside inflow faces
+     will be zero'd outside of Neumann boundaries (slipWall, noSlipWall, Symmetry)
      BUT will retain non-zero values at periodic corners
-*/
+ */
     SetBoundaryVelocity(Vproj);
 
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
@@ -188,7 +188,7 @@ Maestro::NodalProj (int proj_type,
     mlndlap.setHarmonicAverage(false);
 
     mlndlap.setDomainBC(mlmg_lobc, mlmg_hibc);
-  
+
     // set sig in the MLNodeLaplacian object
     for (int ilev = 0; ilev <= finest_level; ++ilev) {
         mlndlap.setSigma(ilev, sig[ilev]);
@@ -210,18 +210,18 @@ Maestro::NodalProj (int proj_type,
         phi[lev].setVal(0.);
     }
 
-    // multiply rhcc = beta0*(S-Sbar) by -1 since we want 
+    // multiply rhcc = beta0*(S-Sbar) by -1 since we want
     // rhstotal to contain div(beta*Vproj) - beta0*(S-Sbar)
     for (int lev=0; lev<=finest_level; ++lev) {
         rhcc[lev].mult(-1.0,0,1,1);
     }
 
-    // Assemble the nodal RHS as the sum of the cell-centered RHS averaged to nodes 
+    // Assemble the nodal RHS as the sum of the cell-centered RHS averaged to nodes
     // plus div (beta0*Vproj) on nodes
     // so rhstotal = div(beta*Vproj) - beta0*(S-Sbar)
     mlndlap.compRHS(amrex::GetVecOfPtrs(rhstotal),
                     amrex::GetVecOfPtrs(Vproj),
-                    {}, // pass in null rhnd
+                    {},     // pass in null rhnd
                     amrex::GetVecOfPtrs(rhcc));
 
     // restore rhcc
@@ -233,7 +233,7 @@ Maestro::NodalProj (int proj_type,
     mlmg.setVerbose(mg_verbose);
     mlmg.setCGVerbose(cg_verbose);
 
-    Real abs_tol = -1.; // disable absolute tolerance
+    Real abs_tol = -1.;     // disable absolute tolerance
     Real rel_tol;
 
     // logic for choosing multigrid tolerance
@@ -258,7 +258,7 @@ Maestro::NodalProj (int proj_type,
         }
         else {
             if (istep_divu_iter == init_divu_iter) {
-                rel_tol = std::min(eps_divu_cart*pow(divu_level_factor,finest_level), 
+                rel_tol = std::min(eps_divu_cart*pow(divu_level_factor,finest_level),
                                    eps_divu_cart*pow(divu_level_factor,2));
             }
             else if (istep_divu_iter == init_divu_iter-1) {
@@ -302,7 +302,7 @@ Maestro::NodalProj (int proj_type,
             MultiFab::Divide(sig[lev],beta0_cart[lev],0,0,1,1);
         }
     }
-  
+
     // reset sig in the MLNodeLaplacian object so the call to updateVelocity
     // works properly
     for (int ilev = 0; ilev <= finest_level; ++ilev) {
@@ -338,13 +338,13 @@ Maestro::NodalProj (int proj_type,
     }
     else if (proj_type == pressure_iters_comp) {
         for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Add(pi[lev] ,phi[lev] ,0,0,1             ,0);
+            MultiFab::Add(pi[lev],phi[lev],0,0,1,0);
             MultiFab::Add(gpi[lev],gphi[lev],0,0,AMREX_SPACEDIM,0);
         }
     }
     else if (proj_type == regular_timestep_comp) {
         for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Copy(pi[lev] ,phi[lev] ,0,0,1             ,0);
+            MultiFab::Copy(pi[lev],phi[lev],0,0,1,0);
             MultiFab::Copy(gpi[lev],gphi[lev],0,0,AMREX_SPACEDIM,0);
             pi[lev].mult(1./dt);
             gpi[lev].mult(1./dt);
@@ -356,7 +356,7 @@ Maestro::NodalProj (int proj_type,
     // divu_iters_comp:         Utilde^0   = Vproj - sig*grad(phi)
     // pressure_iters_comp:     Utilde^n+1 = Utilde^n + dt(Vproj-sig*grad(phi))
     // regular_timestep_comp:   Utilde^n+1 = Vproj - sig*grad(phi)
-    if (proj_type == initial_projection_comp || 
+    if (proj_type == initial_projection_comp ||
         proj_type == divu_iters_comp) {
         // Vproj = Vproj - sig*grad(phi)
         mlndlap.updateVelocity(amrex::GetVecOfPtrs(Vproj), amrex::GetVecOfConstPtrs(phi));
@@ -420,7 +420,7 @@ Maestro::NodalProj (int proj_type,
 // divu_iters_comp:         Utilde^0                        -- uold
 // pressure_iters_comp:     (Utilde^n+1,* - Utilde^n)/dt    -- (unew-uold)/dt
 // regular_timestep_comp:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
-    // note sig is only used for regular_timestep_comp, and currently holds rhohalf
+// note sig is only used for regular_timestep_comp, and currently holds rhohalf
 void
 Maestro::CreateUvecForProj (int proj_type,
                             Vector<MultiFab>& Vproj,
@@ -485,10 +485,10 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SetBoundaryVelocity()",SetBoundaryVelocity);
 
-    // 1) At non-inflow faces, the normal component of velocity will be completely zero'd 
-    // 2) If a face is an inflow face, then the normal velocity at corners just outside inflow faces 
-    //                                will be zero'd outside of Neumann boundaries 
-    //                                (slipWall, noSlipWall, Symmetry) 
+    // 1) At non-inflow faces, the normal component of velocity will be completely zero'd
+    // 2) If a face is an inflow face, then the normal velocity at corners just outside inflow faces
+    //                                will be zero'd outside of Neumann boundaries
+    //                                (slipWall, noSlipWall, Symmetry)
     //                                BUT will retain non-zero values at periodic corners
 
     for (int lev=0; lev <= finest_level; lev++) {
@@ -500,6 +500,9 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
                 vel[lev].setBndry(0.0, idir, 1);
             }
             else {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
                 for (MFIter mfi(vel[lev]); mfi.isValid(); ++mfi) {
                     int i = mfi.index();
                     FArrayBox& v_fab = (vel[lev])[mfi];
@@ -510,7 +513,7 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
                     BoxList bxlist(reg);
 
                     if (phys_bc[idir] == Inflow && reg.smallEnd(idir) == domainBox.smallEnd(idir)) {
-                        Box bx; // bx is the region we *protect* from zero'ing
+                        Box bx;                         // bx is the region we *protect* from zero'ing
 
                         bx = amrex::adjCellLo(reg, idir);
 
@@ -525,7 +528,7 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
                     }
 
                     if (phys_bc[AMREX_SPACEDIM+idir] == Inflow && reg.bigEnd(idir) == domainBox.bigEnd(idir)) {
-                        Box bx; // bx is the region we *protect* from zero'ing
+                        Box bx;                         // bx is the region we *protect* from zero'ing
 
                         bx = amrex::adjCellHi(reg, idir);
 
@@ -540,8 +543,8 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
                         bxlist.push_back(bx);
                     }
 
-                    BoxList bxlist2 = amrex::complementIn(bxg1, bxlist); 
- 
+                    BoxList bxlist2 = amrex::complementIn(bxg1, bxlist);
+
                     for (BoxList::iterator it=bxlist2.begin(); it != bxlist2.end(); ++it) {
                         Box ovlp = *it & v_fab.box();
                         if (ovlp.ok()) {
@@ -549,10 +552,10 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
                         }
                     }
 
-                } // end loop over grids
-            } // end if/else logic for inflow
-        } // end loop over direction
-    } // end loop over levels
+                }                 // end loop over grids
+            }             // end if/else logic for inflow
+        }         // end loop over direction
+    }     // end loop over levels
 
 }
 
@@ -565,19 +568,21 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
 
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& phi_mf = phi[lev];
-              MultiFab& gphi_mf = gphi[lev];
+        MultiFab& gphi_mf = gphi[lev];
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(gphi_mf, true); mfi.isValid(); ++mfi ) {
 
-        for ( MFIter mfi(gphi_mf); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            // Get the index space of the tile's valid region
+            const Box& tilebox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            compute_grad_phi(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            // We will also pass "tileox", which specifies the tile's "valid" region.
+            compute_grad_phi(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                              BL_TO_FORTRAN_3D(phi_mf[mfi]),
                              BL_TO_FORTRAN_FAB(gphi_mf[mfi]),
                              dx);
@@ -596,20 +601,22 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
 
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& pi_mf = pi[lev];
-              MultiFab& snew_mf = snew[lev];
+        MultiFab& snew_mf = snew[lev];
         const MultiFab& beta0_cart_mf = beta0_cart[lev];
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(snew_mf, true); mfi.isValid(); ++mfi ) {
 
-        for ( MFIter mfi(snew_mf); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            // Get the index space of the tile's valid region
+            const Box& tilebox = mfi.tilebox();
             FArrayBox& snew_fab = snew_mf[mfi];
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            make_pi_cc(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            // We will also pass "tilebox", which specifies the "tile's valid" region.
+            make_pi_cc(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                        BL_TO_FORTRAN_3D(pi_mf[mfi]),
                        snew_fab.dataPtr(Pi), ARLIM_3D(snew_fab.loVect()), ARLIM_3D(snew_fab.hiVect()),
                        BL_TO_FORTRAN_3D(beta0_cart_mf[mfi]));

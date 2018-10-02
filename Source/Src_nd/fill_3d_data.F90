@@ -1,6 +1,7 @@
 
 module fill_3d_data_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use base_state_geometry_module, only: nr_fine, max_radial_level, center, dr
   use bl_constants_module
   use meth_params_module, only: prob_lo, spherical, s0_interp_type, w0_interp_type, &
@@ -33,7 +34,7 @@ contains
     integer outcomp
 
     ! zero s0_cart, then fill in the non-zero values
-    s0_cart = 0.d0
+    s0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
 
     if (is_output_a_vector .eq. 1) then
        outcomp = AMREX_SPACEDIM
@@ -195,7 +196,6 @@ contains
 
           if (w0_interp_type .eq. 1) then
 
-             !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius,index,rfac,s0_cart_val)
              do k = lo(3),hi(3)
                 z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
                 do j = lo(2),hi(2)
@@ -224,11 +224,9 @@ contains
                    end do
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           else if (w0_interp_type .eq. 2) then
 
-             !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius,index,rfac,s0_cart_val)
              do k = lo(3),hi(3)
                 z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
                 do j = lo(2),hi(2)
@@ -257,11 +255,9 @@ contains
                    end do
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           else if (w0_interp_type .eq. 3) then
 
-             !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius,index,s0_cart_val)
              do k = lo(3),hi(3)
                 z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
                 do j = lo(2),hi(2)
@@ -297,7 +293,6 @@ contains
                    end do
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           else
              call bl_error('Error: w0_interp_type not defined')
@@ -313,7 +308,6 @@ contains
 
           if (s0_interp_type .eq. 1) then
 
-             !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius,index,s0_cart_val)
              do k = lo(3),hi(3)
                 z = prob_lo(3) +(dble(k)+HALF)*dx(3) - center(3)
                 do j = lo(2),hi(2)
@@ -336,11 +330,9 @@ contains
                    end do
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           else if (s0_interp_type .eq. 2) then
 
-             !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius,index,s0_cart_val)
              do k = lo(3),hi(3)
                 z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
                 do j = lo(2),hi(2)
@@ -379,11 +371,9 @@ contains
                    end do
                 end do
              end do
-             !$OMP END PARALLEL DO
 
           else if (s0_interp_type .eq. 3) then
 
-             !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius,index,s0_cart_val)
              do k = lo(3),hi(3)
                 z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
                 do j = lo(2),hi(2)
@@ -418,8 +408,6 @@ contains
                    end do
                 end do
              end do
-             !$OMP END PARALLEL DO
-
           else
              call bl_error('Error: s0_interp_type not defined')
           end if
@@ -524,8 +512,6 @@ contains
     ! local variable
     integer :: i,j,k
 
-    !$OMP PARALLEL PRIVATE(i,j,k)
-    !$OMP DO
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)+1
@@ -533,8 +519,7 @@ contains
           end do
        end do
     end do
-    !$OMP END DO NOWAIT
-    !$OMP DO
+
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)+1
           do i = lo(1),hi(1)
@@ -542,8 +527,7 @@ contains
           end do
        end do
     end do
-    !$OMP END DO NOWAIT
-    !$OMP DO
+
     do k = lo(3),hi(3)+1
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -551,8 +535,6 @@ contains
           end do
        end do
     end do
-    !$OMP END DO
-    !$OMP END PARALLEL
 
   end subroutine addw0_sphr
 
@@ -582,7 +564,7 @@ contains
     integer          :: i,j,k,index
     double precision :: x,y,z
     double precision :: radius,w0_cart_val,rfac
-    double precision, allocatable :: w0_nodal(:,:,:,:)
+    double precision, pointer :: w0_nodal(:,:,:,:)
 
     ! we currently have three different ideas for computing w0mac
     ! 1.  Interpolate w0 to cell centers, then average to edges
@@ -592,9 +574,6 @@ contains
 
     if (w0mac_interp_type .eq. 1) then
 
-       !$OMP PARALLEL PRIVATE(i,j,k)
-
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+2
@@ -602,9 +581,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k=lo(3)-1,hi(3)+1
           do j=lo(2)-1,hi(2)+2
              do i=lo(1)-1,hi(1)+1
@@ -612,9 +589,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k=lo(3)-1,hi(3)+2
           do j=lo(2)-1,hi(2)+1
              do i=lo(1)-1,hi(1)+1
@@ -622,15 +597,9 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-
-       !$OMP END PARALLEL
 
     else if (w0mac_interp_type .eq. 2) then
 
-       !$OMP PARALLEL PRIVATE(i,j,k,x,y,z,radius,index,rfac,w0_cart_val)
-
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
@@ -653,9 +622,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+2
@@ -678,9 +645,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+2
           z = prob_lo(3) + (dble(k)     )*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
@@ -703,15 +668,9 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-
-       !$OMP END PARALLEL
 
     else if (w0mac_interp_type .eq. 3) then
 
-       !$OMP PARALLEL PRIVATE(i,j,k,x,y,z,radius,index,w0_cart_val)
-
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
@@ -741,9 +700,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+2
@@ -773,9 +730,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+2
           z = prob_lo(3) + (dble(k)     )*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
@@ -805,15 +760,11 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-
-       !$OMP END PARALLEL
 
     else if (w0mac_interp_type .eq. 4) then
 
-       allocate(w0_nodal(lo(1)-1:hi(1)+2,lo(2)-1:hi(2)+2,lo(3)-1:hi(3)+2,3))
+       call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius,index,rfac,w0_cart_val)
        do k = lo(3)-1,hi(3)+2
           z = prob_lo(3) + (dble(k))*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+2
@@ -839,11 +790,7 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
-       !$OMP PARALLEL PRIVATE(i,j,k)
-
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           do j = lo(2)-1,hi(2)+1
              do i = lo(1)-1,hi(1)+2
@@ -852,9 +799,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           do j = lo(2)-1,hi(2)+2
              do i = lo(1)-1,hi(1)+1
@@ -863,9 +808,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+2
           do j = lo(2)-1,hi(2)+1
              do i = lo(1)-1,hi(1)+1
@@ -874,9 +817,9 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 
-       !$OMP END PARALLEL
+       call bl_deallocate(w0_nodal)
+
     else
        call bl_error('Error: w0mac_interp_type not defined')
     end if
@@ -918,9 +861,6 @@ contains
 
     if (s0mac_interp_type .eq. 1) then
 
-       !$OMP PARALLEL PRIVATE(i,j,k)
-
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           do j = lo(2)-1,hi(2)+1
              do i = lo(1)-1,hi(1)+2
@@ -928,9 +868,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           do j = lo(2)-1,hi(2)+2
              do i = lo(1)-1,hi(1)+1
@@ -938,9 +876,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+2
           do j = lo(2)-1,hi(2)+1
              do i = lo(1)-1,hi(1)+1
@@ -948,15 +884,9 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-
-       !$OMP END PARALLEL
 
     else if (s0mac_interp_type .eq. 2) then
 
-       !$OMP PARALLEL PRIVATE(i,j,k,x,y,z,radius,index)
-
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
@@ -987,9 +917,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+2
@@ -1020,9 +948,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+2
           z = prob_lo(3) + (dble(k)     )*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
@@ -1053,15 +979,9 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-
-       !$OMP END PARALLEL
 
     else if (s0mac_interp_type .eq. 3) then
 
-       !$OMP PARALLEL PRIVATE(i,j,k,x,y,z,radius,index)
-
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
@@ -1087,9 +1007,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+1
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+2
@@ -1115,9 +1033,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
        do k = lo(3)-1,hi(3)+2
           z = prob_lo(3) + (dble(k)     )*dx(3) - center(3)
           do j = lo(2)-1,hi(2)+1
@@ -1143,9 +1059,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-
-       !$OMP END PARALLEL
 
     else
 
@@ -1174,7 +1087,6 @@ contains
 
     if (spherical .eq. 1) then
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,x,y,z,radius)
        do k = n_lo(3),n_hi(3)
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
           do j = n_lo(2),n_hi(2)
@@ -1191,7 +1103,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     else
        call bl_error('SHOULDNT CALL MAKE_3D_NORMAL WITH SPHERICAL = 0')
@@ -1231,12 +1142,8 @@ contains
 
     if (harmonic_avg .eq. 1) then
 
-       !$OMP PARALLEL PRIVATE(i,j,k,denom)
-
-
        k = lo(3)
        j = lo(2)
-       !$OMP DO
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
@@ -1257,9 +1164,7 @@ contains
 #if (AMREX_SPACEDIM == 3)
        end do
 #endif
-       !$OMP END DO NOWAIT
 
-       !$OMP DO
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
@@ -1278,11 +1183,8 @@ contains
 #if (AMREX_SPACEDIM == 3)
        end do
 #endif
-       !$OMP END DO NOWAIT
-
 
 #if (AMREX_SPACEDIM == 3)
-       !$OMP DO
        do k = lo(3),hi(3)+1
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
@@ -1295,17 +1197,10 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 #endif
-
-
-       !$OMP END PARALLEL
 
     else
 
-       !$OMP PARALLEL PRIVATE(i,j,k)
-
-       !$OMP DO
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
@@ -1321,10 +1216,7 @@ contains
 #if (AMREX_SPACEDIM == 3)
        end do
 #endif
-       !$OMP END DO NOWAIT
 
-#if (AMREX_SPACEDIM >= 2)
-       !$OMP DO
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
@@ -1336,12 +1228,8 @@ contains
 #if (AMREX_SPACEDIM == 3)
        end do
 #endif
-       !$OMP END DO NOWAIT
-#endif
-
 
 #if (AMREX_SPACEDIM == 3)
-       !$OMP DO
        do k = lo(3),hi(3)+1
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
@@ -1349,10 +1237,7 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
 #endif
-
-       !$OMP END PARALLEL
 
     end if
 

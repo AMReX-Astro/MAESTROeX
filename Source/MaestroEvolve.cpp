@@ -14,7 +14,7 @@ Maestro::Evolve ()
 
     // check to make sure spherical is only used for 3d
     if (spherical == 1 && AMREX_SPACEDIM != 3) {
-	Abort ("spherical = 1 and dm != 3");
+        Abort ("spherical = 1 and dm != 3");
     }
 
     // index for diag array buffer
@@ -74,21 +74,21 @@ Maestro::Evolve ()
         }
 
         // advance the solution by dt
-	if (use_exact_base_state) {
-	    AdvanceTimeStepIrreg(false);
-	} else {
-	    AdvanceTimeStep(false);
-	}
-	    
+        if (use_exact_base_state) {
+            AdvanceTimeStepIrreg(false);
+        } else {
+            AdvanceTimeStep(false);
+        }
+
         t_old = t_new;
 
-	// save diag output into buffer
-	DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
+        // save diag output into buffer
+        DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
 
         // write a plotfile
-        if (plot_int > 0 && ( (istep % plot_int == 0) || 
+        if (plot_int > 0 && ( (istep % plot_int == 0) ||
                               (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
-                              (istep == max_step) ) )
+                              (istep == max_step) ) || (t_old >= stop_time) )
         {
             Print() << "\nWriting plotfile " << istep << std::endl;
             WritePlotFile(istep,t_new,rho0_new,p0_new,unew,snew);
@@ -96,15 +96,15 @@ Maestro::Evolve ()
 
         if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )
         {
-	    // write a checkpoint file
+            // write a checkpoint file
             Print() << "\nWriting checkpoint" << istep << std::endl;
             WriteCheckPoint(istep);
         }
 
-	if (diag_index == diag_buf_size || istep == max_step) {
-	    // write out any buffered diagnostic information
+        if (diag_index == diag_buf_size || istep == max_step) {
+            // write out any buffered diagnostic information
             WriteDiagFile(diag_index);
-	}
+        }
 
         // move new state into old state by swapping pointers
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -114,7 +114,7 @@ Maestro::Evolve ()
 
             std::swap( rho0_old, rho0_new);
             std::swap(rhoh0_old,rhoh0_new);
-	    std::swap(   p0_nm1,   p0_old);
+            std::swap(   p0_nm1,   p0_old);
             std::swap(   p0_old,   p0_new);
 
             std::swap(beta0_old,beta0_new);

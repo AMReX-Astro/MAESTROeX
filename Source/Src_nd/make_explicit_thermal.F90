@@ -55,7 +55,6 @@ contains
 
     k = lo(3)
     j = lo(2)
-    !$OMP PARALLEL DO PRIVATE(i,j,k,comp,eos_state,conductivity)
 #if (AMREX_SPACEDIM == 3)
     do k=lo(3)-1,hi(3)+1
 #endif
@@ -103,7 +102,6 @@ contains
 #if (AMREX_SPACEDIM == 3)
     enddo
 #endif
-    !$OMP END PARALLEL DO
 
   end subroutine make_thermal_coeffs
 

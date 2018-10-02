@@ -48,7 +48,7 @@ contains
     enddo
 
     ! set velocity to zero
-    vel = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     if (amrex_spacedim .ne. 2 .and. apply_vel_field) then
        call bl_error("apply_vel_field only supposed for 2d")

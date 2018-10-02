@@ -1,6 +1,6 @@
-&probdata
+&probin
 
-  ! override the default values of the probdata namelist values here
+  ! override the default values of the probin namelist values here
   velpert_amplitude = 1.e5
   velpert_radius = 2.e7
   velpert_scale = 1.e7

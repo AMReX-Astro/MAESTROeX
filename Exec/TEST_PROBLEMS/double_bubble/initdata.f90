@@ -44,7 +44,7 @@ contains
     double precision :: rhoX_pert(nspec)
 
     ! set velocity to zero
-    vel = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     do k=lo(3),hi(3)
        z = prob_lo(3) + (dble(k)+0.5d0) * dx(3)

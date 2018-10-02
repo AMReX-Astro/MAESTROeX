@@ -1,6 +1,7 @@
 
 module initdata_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use parallel, only: parallel_IOProcessor
   use bl_constants_module
   use network, only: nspec
@@ -52,7 +53,7 @@ contains
     call bl_error("Planar initdata not written")
 
     ! set velocity to zero
-    vel = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)
@@ -110,7 +111,7 @@ contains
 
     !     Local variables
     integer          :: i,j,k,comp
-    double precision, allocatable :: p0_cart(:,:,:,:)
+    double precision, pointer :: p0_cart(:,:,:,:)
 
     type (eos_t) :: eos_state
     integer :: pt_index(3)
@@ -146,12 +147,12 @@ contains
 
 
     ! initialize the domain with the base state
-    scal = 0.d0
+    scal(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
 
     ! if we are spherical, we want to make sure that p0 is good, since that is
     ! what is needed for HSE.  Therefore, we will put p0 onto a cart array and
     ! then initialize h from rho, X, and p0.
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    call bl_allocate(p0_cart,lo,hi,1)
 
     ! initialize temp
     call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,temp_comp),scal_lo,scal_hi,1, &
@@ -202,9 +203,10 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(p0_cart)
 
     ! initialize the velocity to zero everywhere
-    vel = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     ! generate random numbers
     ! random numbers are not currently supported
@@ -214,26 +216,26 @@ contains
           do k=1,3
              rand = amrex_random()
              rand = 2.0d0*rand - 1.0d0
-             !rand = (.5)**i * (.7)**j * (.3)**k * (-1.)**i
+             ! rand = (.5)**i * (.7)**j * (.3)**k * (-1.)**i
              alpha(i,j,k) = rand
              rand = amrex_random()
              rand = 2.0d0*rand - 1.0d0
-             !rand = (.5)**i * (.3)**j * (.7)**k * (-1.)**j
+             ! rand = (.5)**i * (.3)**j * (.7)**k * (-1.)**j
              beta(i,j,k) = rand
              rand = amrex_random()
              rand = 2.0d0*rand - 1.0d0
-             !rand = (.3)**i * (.5)**j * (.7)**k * (-1.)**k
+             ! rand = (.3)**i * (.5)**j * (.7)**k * (-1.)**k
              gamma(i,j,k) = rand
              rand = amrex_random()
-             !rand = (.3)**i * (.7)**j * (.5)**k
+             ! rand = (.3)**i * (.7)**j * (.5)**k
              rand = 2.0d0*M_PI*rand
              phix(i,j,k) = rand
              rand = amrex_random()
-             !rand = (.7)**i * (.3)**j * (.5)**k
+             ! rand = (.7)**i * (.3)**j * (.5)**k
              rand = 2.0d0*M_PI*rand
              phiy(i,j,k) = rand
              rand = amrex_random()
-             !rand = (.7)**i * (.5)**j * (.3)**k
+             ! rand = (.7)**i * (.5)**j * (.3)**k
              rand = 2.0d0*M_PI*rand
              phiz(i,j,k) = rand
           enddo

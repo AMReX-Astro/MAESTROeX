@@ -1,6 +1,7 @@
 
 module initdata_module
 
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use eos_type_module
   use eos_module
   use network, only: nspec
@@ -44,7 +45,7 @@ contains
     double precision :: rhoX_pert(nspec)
 
     ! set velocity to zero
-    vel = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),:nc_v) = 0.d0
 
     do k=lo(3),hi(3)
        z = prob_lo(3) + (dble(k)+0.5d0) * dx(3)
@@ -244,21 +245,21 @@ contains
     double precision :: x,y,z
     double precision :: dens_pert, rhoh_pert, temp_pert
     double precision :: rhoX_pert(nspec)
-    double precision, allocatable :: p0_cart(:,:,:,:)
+    double precision, pointer :: p0_cart(:,:,:,:)
 
     type (eos_t) :: eos_state
     integer :: pt_index(3)
 
     ! set velocity to zero
-    vel = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     ! initialize the domain with the base state
-    scal = 0.d0
+    scal(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
 
     ! if we are spherical, we want to make sure that p0 is good, since that is
     ! what is needed for HSE.  Therefore, we will put p0 onto a cart array and
     ! then initialize h from rho, X, and p0.
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    call bl_allocate(p0_cart,lo,hi,1)
 
     ! initialize temp
     call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,temp_comp),scal_lo,scal_hi,1, &
@@ -334,7 +335,7 @@ contains
 
     end if
 
-    deallocate(p0_cart)
+    call bl_deallocate(p0_cart)
 
   end subroutine initdata_sphr
 
