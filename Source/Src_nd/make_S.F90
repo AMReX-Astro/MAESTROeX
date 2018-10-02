@@ -397,7 +397,7 @@ contains
 
   end subroutine create_correction_cc
 
-  subroutine create_correction_cc_sphr(lev, lo, hi, &
+  subroutine create_correction_cc_sphr(lo, hi, &
        correction_cc, c_lo, c_hi, &
        delta_p_term, dp_lo, dp_hi, &
        beta0_cart, b_lo, b_hi, &
@@ -406,7 +406,7 @@ contains
        rho0_cart, r_lo, r_hi, &
        dt) bind (C,name="create_correction_cc_sphr")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: c_lo(3), c_hi(3)
     double precision, intent(  out) :: correction_cc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     integer         , intent(in   ) :: dp_lo(3), dp_hi(3)
