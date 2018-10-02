@@ -159,6 +159,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         AMREX_D_TERM(sflux[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], Nscal, 0); ,
                      sflux[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], Nscal, 0); ,
                      sflux[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0); );
+
+        // initialize umac
+        for (int d=0; d < AMREX_SPACEDIM; ++d)
+            umac[lev][d].setVal(0.);
     }
 
 #if (AMREX_SPACEDIM == 3)
