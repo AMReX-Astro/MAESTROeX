@@ -23,8 +23,7 @@ contains
   subroutine initdata(lev, time, lo, hi, &
        scal, scal_lo, scal_hi, nc_s, &
        vel, vel_lo, vel_hi, nc_v, &
-       s0_init, p0_init, &
-       dx, r_cc_loc, r_edge_loc) bind(C, name="initdata")
+       s0_init, p0_init, dx) bind(C, name="initdata")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
@@ -39,8 +38,6 @@ contains
     double precision, intent(in   ) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(in   ) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
-    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
 
     integer          :: i,j,k,r
 
