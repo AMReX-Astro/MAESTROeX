@@ -231,7 +231,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // compute delta_p_term = peos_old - peosbar_cart (for RHS of projections)
     if (dpdt_factor > 0.0) {
 	// peos_old now holds the thermodynamic p computed from sold(rho,h,X)
+	
+#ifdef AMREX_USE_CUDA
+	// turn on GPU for eos calls
+	Device::beginDeviceLaunchRegion();
+#endif
+    
 	PfromRhoH(sold,sold,delta_p_term);
+
+#ifdef AMREX_USE_CUDA
+	// turn off GPU after eos calls
+	Device::endDeviceLaunchRegion();
+#endif
 	
 	// compute peosbar = Avg(peos_old)
 	Average(delta_p_term,peosbar,0);
@@ -500,12 +511,22 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
     
     // now update temperature
+#ifdef AMREX_USE_CUDA
+    // turn on GPU for eos calls
+    Device::beginDeviceLaunchRegion();
+#endif
+    
     if (use_tfromp) {
 	TfromRhoP(s2,p0_new,0);
     }
     else {
 	TfromRhoH(s2,p0_new);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU after eos calls
+    Device::endDeviceLaunchRegion();
+#endif
     
     if (use_thermal_diffusion) {
 	// make a copy of s2star since these are needed to compute
@@ -592,8 +613,19 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // and delta_p_term = peos_new - peosbar_cart (for RHS of projection)
     if (dpdt_factor > 0.) {
 	// peos_new now holds the thermodynamic p computed from snew(rho,h,X)
+	
+#ifdef AMREX_USE_CUDA
+	// turn on GPU for eos calls
+	Device::beginDeviceLaunchRegion();
+#endif
+    
 	PfromRhoH(snew,snew,delta_p_term);
 
+#ifdef AMREX_USE_CUDA
+	// turn off GPU after eos calls
+	Device::endDeviceLaunchRegion();
+#endif
+	
 	// compute peosbar = Avg(peos_new)
 	Average(delta_p_term,peosbar,0);
 
@@ -666,8 +698,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // MAC projection
     // includes spherical option in C++ function
+		
     MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
 
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the base state and full state through dt
     //////////////////////////////////////////////////////////////////////////////
@@ -813,6 +847,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // now update temperature
+#ifdef AMREX_USE_CUDA
+    // turn on GPU for eos calls
+    Device::beginDeviceLaunchRegion();
+#endif
+    
     if (use_tfromp) {
 	TfromRhoP(s2,p0_new,0);
     }
@@ -820,6 +859,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	TfromRhoH(s2,p0_new);
     }
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU after eos calls
+    Device::endDeviceLaunchRegion();
+#endif
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 9 -- react the full state and then base state through dt/2
     //////////////////////////////////////////////////////////////////////////////
@@ -939,7 +983,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// compute delta_p_term = peos_new - peosbar_cart (for RHS of projection)
 	if (dpdt_factor > 0.) {
 	    // peos_new now holds the thermodynamic p computed from snew(rho h X)
+	    
+#ifdef AMREX_USE_CUDA
+	    // turn on GPU for eos calls
+	    Device::beginDeviceLaunchRegion();
+#endif
+    
 	    PfromRhoH(snew,snew,delta_p_term);
+	    
+#ifdef AMREX_USE_CUDA
+	    // turn off GPU after eos calls
+	    Device::endDeviceLaunchRegion();
+#endif
 
 	    // compute peosbar = Avg(peos_new)
 	    Average(delta_p_term,peosbar,0);

@@ -8,6 +8,7 @@ module maestro_init_module
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp, &
                                 nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
   use eos_module, only: eos_init
+  use runtime_init_module
 
   implicit none
 
@@ -38,24 +39,6 @@ contains
     call runtime_init(name,namlen)
 
   end subroutine maestro_extern_init
-
-! :::
-! ::: ----------------------------------------------------------------
-! :::
-
-  subroutine maestro_probdata_init(name,namlen) bind(C, name="maestro_probdata_init")
-
-    ! initialize the probdata runtime parameters in
-    ! probdata_module
-
-    use amrex_fort_module, only: rt => amrex_real
-
-    integer, intent(in) :: namlen
-    integer, intent(in) :: name(namlen)
-
-    call probdata_init(name,namlen)
-
-  end subroutine maestro_probdata_init
 
 ! :::
 ! ::: ----------------------------------------------------------------

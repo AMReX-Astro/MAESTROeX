@@ -350,7 +350,6 @@ extern "C"
 
     void maestro_network_init();
     void maestro_extern_init(const int* name, const int* namlen);
-    void maestro_probdata_init(const int* name, const int* namlen);
     void get_num_spec(int* nspec);
     void get_spec_names(int* spec_names, int* ispec, int* len);
     void get_spec_az(const int* ispec, amrex::Real* A, amrex::Real* Z);

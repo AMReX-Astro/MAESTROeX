@@ -59,6 +59,12 @@ Maestro::Regrid ()
 		r_cc_loc.dataPtr(),
 		r_edge_loc.dataPtr());
 
+    
+#ifdef AMREX_USE_CUDA
+    // turn on GPU for eos calls
+    Device::beginDeviceLaunchRegion();
+#endif
+    
     if (use_tfromp) {
 	// compute full state T = T(rho,p0,X)
 	TfromRhoP(sold,p0_old,0);
@@ -67,6 +73,11 @@ Maestro::Regrid ()
 	TfromRhoH(sold,p0_old);
     }
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU after eos calls
+    Device::endDeviceLaunchRegion();
+#endif
+    
     // force tempbar to be the average of temp
     Average(sold,tempbar,Temp);
 

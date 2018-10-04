@@ -81,12 +81,24 @@ Maestro::React (const Vector<MultiFab>& s_in,
     AverageDown(rho_Hnuc,0,1);
 
     // now update temperature
+    
+#ifdef AMREX_USE_CUDA
+    // turn on GPU for eos calls
+    Device::beginDeviceLaunchRegion();
+#endif
+    
     if (use_tfromp) {
         TfromRhoP(s_out,p0);
     }
     else {
         TfromRhoH(s_out,p0);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU after eos calls
+    Device::endDeviceLaunchRegion();
+#endif
+    
 }
 
 void Maestro::Burner(const Vector<MultiFab>& s_in,

@@ -291,6 +291,8 @@ class Param(object):
             tstr = "logical,           allocatable, save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "string":
             tstr = "character (len=:), allocatable, save :: {}\n".format(self.f90_name)
+            print("warning: string parameter {} will not be available on the GPU".format(
+                self.f90_name))
         else:
             sys.exit("unsupported datatype for Fortran: {}".format(self.name))
 

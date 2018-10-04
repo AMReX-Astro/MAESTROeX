@@ -163,8 +163,6 @@ ifdef MICROPHYSICS_HOME
 endif
 EXTERN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(EXTERN_SEARCH))
 
-extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
-=======
 PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(PROBIN_PARAMETER_DIRS))
@@ -176,9 +174,13 @@ ifdef CUDA
   endif
 endif
 
-$(AMREX_HOME)/Tools/F_scripts/write_probin.py \
--t $(EXTERN_TEMPLATE) -o extern.F90 -n extern \
---pa "$(EXTERN_PARAMETERS)" --managed
+extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
+	    @echo " "
+	    @echo "${bold}WRITING extern.F90${normal}"
+	    $(AMREX_HOME)/Tools/F_scripts/write_probin.py \
+              -t $(PROBIN_TEMPLATE) -o extern.F90 -n probin \
+              --pa "$(PROBIN_PARAMETERS)" --pb "$(EXTERN_PARAMETERS)" --managed
+	    @echo " "
 
 #------------------------------------------------------------------------------
 # build info

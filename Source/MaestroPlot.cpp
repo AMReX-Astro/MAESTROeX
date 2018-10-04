@@ -150,8 +150,19 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
 		dest_comp += NumSpec;
 
 		// compute tfromp
+		
+#ifdef AMREX_USE_CUDA
+		// turn on GPU for eos calls
+		Device::beginDeviceLaunchRegion();
+#endif
+    
 		TfromRhoP(s_in,p0_in);
-
+		
+#ifdef AMREX_USE_CUDA
+		// turn off GPU after eos calls
+		Device::endDeviceLaunchRegion();
+#endif
+    
 		// tfromp
 		for (int i = 0; i <= finest_level; ++i) {
 				plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
@@ -159,8 +170,20 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
 		++dest_comp;
 
 		// compute tfromh
+		
+#ifdef AMREX_USE_CUDA
+		// turn on GPU for eos calls
+		Device::beginDeviceLaunchRegion();
+#endif
+    
 		TfromRhoH(s_in,p0_in);
 
+
+#ifdef AMREX_USE_CUDA
+		// turn off GPU after eos calls
+		Device::endDeviceLaunchRegion();
+#endif
+		
 		for (int i = 0; i <= finest_level; ++i) {
 				// tfromh
 				plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
@@ -169,13 +192,37 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
 
 		// deltaT
 		// compute & copy tfromp
+		
+#ifdef AMREX_USE_CUDA
+		// turn on GPU for eos calls
+		Device::beginDeviceLaunchRegion();
+#endif
+    
 		TfromRhoP(s_in,p0_in);
+		
+#ifdef AMREX_USE_CUDA
+		// turn off GPU after eos calls
+		Device::endDeviceLaunchRegion();
+#endif
+    
 		for (int i = 0; i <= finest_level; ++i) {
 				plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
 		}
 
 		// compute tfromh
+		
+#ifdef AMREX_USE_CUDA
+		// turn on GPU for eos calls
+		Device::beginDeviceLaunchRegion();
+#endif
+    
 		TfromRhoH(s_in,p0_in);
+		
+#ifdef AMREX_USE_CUDA
+		// turn off GPU after eos calls
+		Device::endDeviceLaunchRegion();
+#endif
+    
 		// compute deltaT = (tfromp - tfromh) / tfromh
 		for (int i = 0; i <= finest_level; ++i) {
 				MultiFab::Subtract(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
@@ -184,9 +231,20 @@ Maestro::PlotFileMF (const Vector<MultiFab>& p0_cart,
 		++dest_comp;
 
 		// restore tfromp if necessary
+		
+#ifdef AMREX_USE_CUDA
+		// turn on GPU for eos calls
+		Device::beginDeviceLaunchRegion();
+#endif
+    
 		if (use_tfromp) {
 				TfromRhoP(s_in,p0_in);
 		}
+		
+#ifdef AMREX_USE_CUDA
+		// turn off GPU after eos calls
+		Device::endDeviceLaunchRegion();
+#endif
 
 		// pi
 		for (int i = 0; i <= finest_level; ++i) {

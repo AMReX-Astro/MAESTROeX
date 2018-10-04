@@ -55,7 +55,11 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
         }
 
     }
-
+    
+#ifdef AMREX_USE_CUDA
+    Device::synchronize();
+#endif
+    
     // average down and fill ghost cells
     AverageDown(scal,Temp,1);
     FillPatch(t_old,scal,scal,scal,Temp,Temp,1,Temp,bcs_s);
@@ -115,7 +119,10 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
     }
 
-
+#ifdef AMREX_USE_CUDA
+    Device::synchronize();
+#endif
+    
     // average down and fill ghost cells (Temperature)
     AverageDown(scal,Temp,1);
     FillPatch(t_old,scal,scal,scal,Temp,Temp,1,Temp,bcs_s);
@@ -163,6 +170,10 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 
     }
 
+#ifdef AMREX_USE_CUDA
+    Device::synchronize();
+#endif
+    
     // average down and fill ghost cells
     AverageDown(peos,0,1);
     FillPatch(t_old,peos,peos,peos,0,0,1,0,bcs_f);

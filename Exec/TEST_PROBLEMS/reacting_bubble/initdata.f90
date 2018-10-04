@@ -8,7 +8,7 @@ module initdata_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
                                 perturb_model, prob_lo
-  use probdata_module, only: pert_temp_factor, pert_rad_factor, do_small_domain
+  use probin_module, only: pert_temp_factor, pert_rad_factor, do_small_domain
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
   
   implicit none

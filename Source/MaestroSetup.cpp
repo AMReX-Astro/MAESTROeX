@@ -34,10 +34,6 @@ Maestro::Setup ()
     // (in extern.f90)
     ExternInit();
 
-    // Initialize the runtime parameters specific to the problem
-    // (in probdata.f90)
-    ProbdataInit();
-
     // define (Rho, RhoH, etc.)
     // calls network_init
     VariableSetup();
@@ -321,24 +317,6 @@ Maestro::ExternInit ()
   maestro_extern_init(probin_file_name.dataPtr(),&probin_file_length);
 }
 
-void
-Maestro::ProbdataInit ()
-{
-  // initialize the probdata runtime parameters -- these will
-  // live in the probin
-
-  if (ParallelDescriptor::IOProcessor()) {
-    std::cout << "reading probdata runtime parameters ..." << std::endl;
-  }
-
-  const int probin_file_length = probin_file.length();
-  Vector<int> probin_file_name(probin_file_length);
-
-  for (int i = 0; i < probin_file_length; i++)
-    probin_file_name[i] = probin_file[i];
-
-  maestro_probdata_init(probin_file_name.dataPtr(),&probin_file_length);
-}
 
 // set up BCRec definitions for BC types
 void
