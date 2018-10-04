@@ -101,39 +101,26 @@ Maestro::DiagFile (const int step,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
+            int use_mask = !(lev==finest_level);
+            
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-            if (lev == finest_level) {
-                diag_sphr(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                          BL_TO_FORTRAN_FAB(sin_mf[mfi]),
-                          rho0_in.dataPtr(), p0_in.dataPtr(),
-                          BL_TO_FORTRAN_3D(uin_mf[mfi]),
-                          BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                          BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                          BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                          BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
-                          dx,
-                          BL_TO_FORTRAN_3D(normal_mf[mfi]),
-                          &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(),
-                          &ncenter_level, &T_center_level, &Mach_max_level);
-            } else {
-                // we include the mask so we don't double count; i.e., we only consider
-                // cells that are not covered by finer cells
-                diag_sphr(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                          BL_TO_FORTRAN_FAB(sin_mf[mfi]),
-                          rho0_in.dataPtr(), p0_in.dataPtr(),
-                          BL_TO_FORTRAN_3D(uin_mf[mfi]),
-                          BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                          BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                          BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                          BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
-                          dx,
-                          BL_TO_FORTRAN_3D(normal_mf[mfi]),
-                          &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(),
-                          &ncenter_level, &T_center_level, &Mach_max_level,
-                          mask[mfi].dataPtr());
-            }
+            // we include the mask so we don't double count; i.e., we only consider
+            // cells that are not covered by finer cells
+            diag_sphr(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                      BL_TO_FORTRAN_FAB(sin_mf[mfi]),
+                      rho0_in.dataPtr(), p0_in.dataPtr(),
+                      BL_TO_FORTRAN_3D(uin_mf[mfi]),
+                      BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+                      BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+                      BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                      BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
+                      dx,
+                      BL_TO_FORTRAN_3D(normal_mf[mfi]),
+                      &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(),
+                      &ncenter_level, &T_center_level, &Mach_max_level,
+                      BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);
         }
 
         // sum ncenter and T_center over all processors

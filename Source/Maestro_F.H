@@ -55,7 +55,8 @@ extern "C"
 			 amrex::Real* phisum,
 			 const amrex::Real* radii, const int* finest_level,
 			 const amrex::Real* dx, int* ncell,
-			 const int* mask=NULL);
+                         const int* mask, const int* m_lo, const int* m_hi,
+                         const int* use_mask);
 
     void compute_radii_sphr(const int* lev, amrex::Real* radii, const int* finest_level,
 			    const amrex::Real* dx);
@@ -212,7 +213,8 @@ extern "C"
 	      const amrex::Real* w0, const amrex::Real* dx,
 	      amrex::Real* Mach_max, amrex::Real* temp_max,
 	      amrex::Real* enuc_max, amrex::Real* Hext_max,
-	      const int* mask=NULL);
+              const int* mask, const int* m_lo, const int* m_hi,
+              const int* use_mask);
 
     void diag_sphr(const int* lev, const int* lo, const int* hi,
 		   const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
@@ -226,7 +228,8 @@ extern "C"
 		   const amrex::Real* normal, const int* n_lo, const int* n_hi,
 		   amrex::Real* T_max, amrex::Real* coord_Tmax, amrex::Real* vel_Tmax,
 		   int* ncenter, amrex::Real* T_center, amrex::Real* Mach_max,
-		   const int* mask=NULL);
+                   const int* mask, const int* m_lo, const int* m_hi,
+                   const int* use_mask);
     //////////////////////
 
     //////////////////////

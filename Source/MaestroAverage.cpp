@@ -165,24 +165,19 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 // Get the index space of the valid region
                 const Box& validBox = mfi.validbox();
 
+                int use_mask = !(lev==finest_level);
+                
                 // call fortran subroutine
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
-                if (lev == finest_level) {
-                    sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                                    BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
-                                    phisum.dataPtr(), radii.dataPtr(), &finest_level,
-                                    dx, ncell.dataPtr());
-                } else {
-                    // we include the mask so we don't double count; i.e., we only consider
-                    // cells that are not covered by finer cells when constructing the sum
-                    sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                                    BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
-                                    phisum.dataPtr(), radii.dataPtr(), &finest_level,
-                                    dx, ncell.dataPtr(),
-                                    mask[mfi].dataPtr());
-                }
+                // we include the mask so we don't double count; i.e., we only consider
+                // cells that are not covered by finer cells when constructing the sum
+                sum_phi_3d_sphr(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                                BL_TO_FORTRAN_N_3D(phi_mf[mfi],comp),
+                                phisum.dataPtr(), radii.dataPtr(), &finest_level,
+                                dx, ncell.dataPtr(),
+                                BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);                
             }
         }
 

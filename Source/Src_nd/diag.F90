@@ -19,14 +19,15 @@ contains
 
   !xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   subroutine diag(lev, lo, hi, &
-       scal, s_lo, s_hi, nc_s, &
-       rho_Hnuc, hn_lo, hn_hi, &
-       rho_Hext, he_lo, he_hi, &
-       rho0, p0, &
-       u, u_lo, u_hi, &
-       w0, dx, &
-       Mach_max,temp_max,enuc_max,Hext_max, &
-       mask) bind(C, name="diag")
+                  scal, s_lo, s_hi, nc_s, &
+                  rho_Hnuc, hn_lo, hn_hi, &
+                  rho_Hext, he_lo, he_hi, &
+                  rho0, p0, &
+                  u, u_lo, u_hi, &
+                  w0, dx, &
+                  Mach_max,temp_max,enuc_max,Hext_max, &
+                  mask,     m_lo, m_hi, use_mask) &
+                  bind(C, name="diag")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -42,7 +43,9 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3)
     double precision, intent(inout) :: Mach_max, temp_max, enuc_max, Hext_max
-    integer         , intent(in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    integer         , intent(in   ) :: m_lo(3), m_hi(3)
+    integer         , intent(in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer         , intent(in   ) :: use_mask
 
     !     Local variables
     integer            :: i, j, k
@@ -75,7 +78,7 @@ contains
 
              ! make sure the cell isn't covered by finer cells
              cell_valid = .true.
-             if ( present(mask) ) then
+             if ( use_mask .eq. 1) then
                 if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
              end if
 
@@ -118,18 +121,19 @@ contains
 
   !xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   subroutine diag_sphr(lev, lo, hi, &
-       scal, s_lo, s_hi, nc_s, &
-       rho0, p0, &
-       u, u_lo, u_hi, &
-       w0macx, x_lo, x_hi, &
-       w0macy, y_lo, y_hi, &
-       w0macz, z_lo, z_hi, &
-       w0r, wr_lo, wr_hi, &
-       dx, &
-       normal, n_lo, n_hi, &
-       T_max, coord_Tmax, vel_Tmax, &
-       ncenter, T_center, Mach_max, &
-       mask) bind(C, name="diag_sphr")
+                       scal, s_lo, s_hi, nc_s, &
+                       rho0, p0, &
+                       u, u_lo, u_hi, &
+                       w0macx, x_lo, x_hi, &
+                       w0macy, y_lo, y_hi, &
+                       w0macz, z_lo, z_hi, &
+                       w0r, wr_lo, wr_hi, &
+                       dx, &
+                       normal, n_lo, n_hi, &
+                       T_max, coord_Tmax, vel_Tmax, &
+                       ncenter, T_center, Mach_max, &
+                       mask,     m_lo, m_hi, use_mask) &
+                       bind(C, name="diag_sphr")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -152,7 +156,9 @@ contains
     double precision, intent(inout) :: T_max, coord_Tmax(3), vel_Tmax(3), T_center
     integer         , intent(inout) :: ncenter
     double precision, intent(inout) :: Mach_max
-    integer         , intent(in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    integer         , intent (in   ) :: m_lo(3), m_hi(3)
+    integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer         , intent (in   ) :: use_mask
 
     !     Local variables
     integer          :: i, j, k
@@ -179,7 +185,7 @@ contains
 
              ! make sure the cell isn't covered by finer cells
              cell_valid = .true.
-             if ( present(mask) ) then
+             if ( use_mask .eq. 1 ) then
                 if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
              end if
 

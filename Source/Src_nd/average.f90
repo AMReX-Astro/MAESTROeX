@@ -321,18 +321,20 @@ contains
   end subroutine average_sphr
 
   subroutine sum_phi_3d_sphr(lev,lo,hi,phi,p_lo,p_hi,phisum, &
-       radii, finest_level, dx, ncell, &
-       mask) bind (C,name="sum_phi_3d_sphr")
-
+                             radii, finest_level, dx, ncell, &
+                             mask,     m_lo, m_hi, use_mask) &
+                             bind (C,name="sum_phi_3d_sphr")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3), finest_level
     integer         , intent (in   ) :: p_lo(3), p_hi(3)
+    integer         , intent (in   ) :: m_lo(3), m_hi(3)
     double precision, intent (in   ) :: phi(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
     double precision, intent (inout) :: phisum(0:finest_level,-1:nr_irreg)
     double precision, intent (in   ) :: radii(0:finest_level,-1:nr_irreg+1)
     double precision, intent (in   ) :: dx(3)
     integer         , intent (inout) :: ncell(0:finest_level,-1:nr_irreg)
-    integer         , intent (in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer         , intent (in   ) :: use_mask
 
     ! local
     integer          :: i,j,k,index
@@ -350,7 +352,7 @@ contains
 
              ! make sure the cell isn't covered by finer cells
              cell_valid = .true.
-             if ( present(mask) ) then
+             if ( use_mask .eq. 1 ) then
                 if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
              end if
 
