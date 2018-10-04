@@ -141,48 +141,30 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
+            int use_mask = !(lev==finest_level);
+                
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
-                if (lev == finest_level) {
-                    burner_loop_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                     BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
-                                     BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
-                                     BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-                                     BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-                                     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                                     BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in);
-                } else {
-                    burner_loop_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                     BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
-                                     BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
-                                     BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-                                     BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-                                     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                                     BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in,
-                                     mask[mfi].dataPtr());
-                }
+                burner_loop_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                                 BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+                                 BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+                                 BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+                                 BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+                                 BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+                                 BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in,
+                                 BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);
             } else {
-                if (lev == finest_level) {
-                    burner_loop(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
-                                BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-                                BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                                tempbar_init.dataPtr(), &dt_in);
-                } else {
-                    burner_loop(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
-                                BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
-                                BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                                tempbar_init.dataPtr(), &dt_in,
-                                mask[mfi].dataPtr());
-                }
+                burner_loop(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                            BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+                            BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
+                            BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
+                            BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
+                            BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+                            tempbar_init.dataPtr(), &dt_in,
+                            BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);
             }
         }
     }
