@@ -209,10 +209,11 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 #if (AMREX_SPACEDIM == 3)
         MultiFab& umacz_mf = umac[lev][2];
 #endif
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
+
+        // DO NOT TILE THIS SUBROUTINE
+        // this just filling ghost cells so the fortran logic has to be reworked
+        // to properly capture the corner terms
+        for ( MFIter mfi(sold_mf, false); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid (cell-centered) region
             const Box& tilebox = mfi.tilebox();
