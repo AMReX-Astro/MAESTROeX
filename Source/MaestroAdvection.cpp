@@ -379,18 +379,19 @@ void
 	const MultiFab& w0macy_mf = w0mac[lev][1];
 	const MultiFab& w0macz_mf = w0mac[lev][2];
 	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
-	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
-	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
-	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
+	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 
-	if (spherical == 1 && use_exact_base_state == 0) {
-	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
-	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
-	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
+	if (spherical == 1) {
+	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,1);
+	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,1);
+	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,1);
 	}
 #endif
 #endif
 
+	
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 // #ifdef _OPENMP
 // #pragma omp parallel
@@ -445,12 +446,12 @@ void
 	    } else {
 
 #if (AMREX_SPACEDIM == 3)
-		if (use_exact_base_state)
-		{
-		    // add make_rhoX_flux_3d_sphr_irreg()
-		}
-		else
-		{
+		// if (use_exact_base_state)
+		// {
+		//     // add make_rhoX_flux_3d_sphr_irreg()
+		// }
+		// else
+		// {
 		    make_rhoX_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
 			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
@@ -468,7 +469,7 @@ void
 				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
 				       &startcomp, &endcomp);
-		}
+		// }
 #else
 	        Abort("MakeRhoXFlux: Spherical is not valid for DIM < 3");
 #endif
@@ -574,7 +575,7 @@ void
 	h0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
 	h0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 
-	if (spherical == 1 && use_exact_base_state == 0) {
+	if (spherical == 1) {
 	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
 	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
 	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
@@ -636,12 +637,12 @@ void
 	    } else {
 
 #if (AMREX_SPACEDIM == 3)
-	        if (use_exact_base_state)
-		{
-		    // Need make_rhoh_flux_sphr_irreg
-		}
-		else
-		{
+	        // if (use_exact_base_state)
+		// {
+		//     // Need make_rhoh_flux_sphr_irreg
+		// }
+		// else
+		// {
 		    make_rhoh_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
 			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
@@ -661,7 +662,7 @@ void
 				       BL_TO_FORTRAN_3D(h0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
-		}
+		// }
 #else
 	        Abort("MakeRhoHFlux: Spherical is not valid for DIM < 3");
 #endif
