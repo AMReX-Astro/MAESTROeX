@@ -61,9 +61,10 @@ contains
     ! relates to the volume of a cell at the coarsest level of refinement.
 #if (AMREX_SPACEDIM == 1)
     weight = 1.d0 / 2.d0**(lev)
-#elsif (AMREX_SPACEDIM == 2)
+#  elseif
+ (AMREX_SPACEDIM == 2)
     weight = 1.d0 / 4.d0**(lev)
-#elsif (AMREX_SPACEDIM == 3)
+#elseif (AMREX_SPACEDIM == 3)
     weight = 1.d0 / 8.d0**(lev)
 #endif
 
@@ -87,10 +88,10 @@ contains
                 ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
                 vel = sqrt( (u(i,1) + HALF*(w0(lev,i) + w0(lev,i+1)) )**2 )
-#elsif (AMREX_SPACEDIM == 2)
+#elseif (AMREX_SPACEDIM == 2)
                 vel = sqrt(  u(i,j,1)**2 + &
                      ( u(i,j,2) + HALF*(w0(lev,j) + w0(lev,j+1)) )**2 )
-#elsif (AMREX_SPACEDIM == 3)
+#elseif (AMREX_SPACEDIM == 3)
                 vel = sqrt(  u(i,j,k,1)**2 + &
                      u(i,j,k,2)**2 + &
                      ( u(i,j,k,3) + 0.5d0*(w0(lev,k) + w0(lev,k+1)) )**2 )
