@@ -67,7 +67,11 @@ Maestro::Init ()
     }
 
     if (do_sponge) {
-        init_sponge(rho0_old.dataPtr());
+	if (use_exact_base_state) {
+	    init_sponge_irreg(rho0_old.dataPtr(),r_cc_loc.dataPtr(),r_edge_loc.dataPtr());
+	} else {
+	    init_sponge(rho0_old.dataPtr());
+	}
     }
 
     // make gravity
@@ -404,7 +408,8 @@ void Maestro::InitProj ()
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
               rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
-    if (evolve_base_state && use_exact_base_state == 0) {
+    // NOTE: not sure if valid for use_exact_base_state
+    if (evolve_base_state) {
         // average S into Sbar
         Average(S_cc_old,Sbar,0);
     }
@@ -491,7 +496,8 @@ void Maestro::DivuIter (int istep_divu_iter)
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
               rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
-    if (evolve_base_state && use_exact_base_state == 0) {
+    // NOTE: not sure if valid for use_exact_base_state
+    if (evolve_base_state) {
         Average(S_cc_old,Sbar,0);
 
         // compute Sbar = Sbar + delta_gamma1_termbar

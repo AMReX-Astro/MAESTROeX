@@ -979,6 +979,9 @@ extern "C"
     //////////////////////
     // in sponge.F90
     void init_sponge(const amrex::Real* rho0);
+    
+    void init_sponge_irreg(const amrex::Real* rho0,
+			   const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
 
     void mk_sponge (const int* lo, const int* hi,
                     amrex::Real* sponge,  const int* s_lo, const int* s_hi,
