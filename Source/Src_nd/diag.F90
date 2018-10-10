@@ -61,9 +61,9 @@ contains
     ! relates to the volume of a cell at the coarsest level of refinement.
 #if (AMREX_SPACEDIM == 1)
     weight = 1.d0 / 2.d0**(lev)
-#elsif (AMREX_SPACEDIM == 2)
+#elif (AMREX_SPACEDIM == 2)
     weight = 1.d0 / 4.d0**(lev)
-#elsif (AMREX_SPACEDIM == 3)
+#elif (AMREX_SPACEDIM == 3)
     weight = 1.d0 / 8.d0**(lev)
 #endif
 
