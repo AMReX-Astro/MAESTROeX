@@ -5,7 +5,8 @@ module compute_dt_module
   use eos_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, &
-       cfl, use_soundspeed_firstdt, use_divu_firstdt
+       cfl, use_soundspeed_firstdt, use_divu_firstdt, &
+       use_exact_base_state
   use base_state_geometry_module, only:  max_radial_level, nr_fine, nr, dr
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
@@ -329,10 +330,17 @@ contains
          dt = min(dt,sqrt(2.0D0*dx(3)/fz))
 
     ! divU constraint
-    do r=1,nr_fine-1
-       gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
-       gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
-    end do
+    if (use_exact_base_state) then
+       do r=1,nr_fine-1
+          gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
+          gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/(r_cc_loc(0,r) - r_cc_loc(0,r-1)) ) / gamma1bar_p_avg
+       end do
+    else
+       do r=1,nr_fine-1
+          gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
+          gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
+       end do
+    end if
     gp0(0,nr_fine) = gp0(0,nr_fine-1)
     gp0(0,      0) = gp0(0,        1)
 
@@ -674,10 +682,17 @@ contains
        dt_divu = 1.d99
 
        ! spherical divU constraint
-       do r=1,nr_fine-1
-          gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
-          gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
-       end do
+       if (use_exact_base_state) then
+          do r=1,nr_fine-1
+             gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
+             gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/(r_cc_loc(0,r) - r_cc_loc(0,r-1)) ) / gamma1bar_p_avg
+          end do
+       else
+          do r=1,nr_fine-1
+             gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
+             gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
+          end do
+       end if
 
        gp0(0,nr_fine) = gp0(0,nr_fine-1)
        gp0(0,      0) = gp0(0,        1)

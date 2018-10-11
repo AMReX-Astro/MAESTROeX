@@ -131,7 +131,7 @@ contains
         ! compute sedgel and sedger
         do r=lo,hi
            u = HALF*(w0(0,r)+w0(0,r+1))
-           ubardth = dth*u/dr(0)
+           ubardth = dth*u/dr(0)  ! NOTE: ubardth=0 for use_exact_base_state case
            sedgel(r+1)= s(0,r) + (HALF-ubardth)*slope(r) + dth*force(0,r)
            sedger(r  )= s(0,r) - (HALF+ubardth)*slope(r) + dth*force(0,r)
         end do
@@ -292,8 +292,8 @@ contains
         !$OMP PARALLEL DO PRIVATE(r,sigmap,sigmam,s6)
         do r=lo,hi
            ! compute Ip and Im
-           sigmap = abs(w0(0,r+1))*dt/dr(0)
-           sigmam = abs(w0(0,r  ))*dt/dr(0)
+           sigmap = abs(w0(0,r+1))*dt/dr(0)  ! NOTE: sigmap=0 for use_exact_base_state case
+           sigmam = abs(w0(0,r  ))*dt/dr(0)  ! NOTE: sigmam=0 for use_exact_base_state case
            s6 = SIX*s(0,r) - THREE*(sm(r)+sp(r))
            if (w0(0,r+1) .gt. rel_eps) then
               Ip(r) = sp(r) - (sigmap/TWO)*(sp(r)-sm(r)-(ONE-TWO3RD*sigmap)*s6)

@@ -1,7 +1,6 @@
 module burn_type_module
 
   use bl_types, only: dp_t
-  use amrex_fort_module, only : rt => amrex_real
 #ifdef REACT_SPARSE_JACOBIAN
   use actual_network, only: nspec, nspec_evolve, naux, NETWORK_SPARSE_JAC_NNZ
 #else
@@ -225,8 +224,8 @@ contains
 
     implicit none
 
-    integer, intent(in) :: row, col
-    integer, intent(out) :: csr_loc
+    integer, intent(in   ) :: row, col
+    integer, intent(out  ) :: csr_loc
 
     integer :: num_in_row, row_start_loc, row_end_loc, i
 
@@ -258,9 +257,9 @@ contains
 
     implicit none
 
-    real(rt), intent(inout) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
-    integer, intent(in) :: row, col
-    real(rt), intent(in) :: val
+    real(dp_t), intent(inout) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
+    integer   , intent(in   ) :: row, col
+    real(dp_t), intent(in   ) :: val
 
     integer :: csr_loc
 
@@ -283,9 +282,9 @@ contains
 
     implicit none
 
-    real(rt), intent(inout) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
-    integer, intent(in) :: row, col
-    real(rt), intent(in) :: val
+    real(dp_t), intent(inout) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
+    integer   , intent(in   ) :: row, col
+    real(dp_t), intent(in   ) :: val
 
     integer :: csr_loc
 
@@ -308,9 +307,9 @@ contains
 
     implicit none
 
-    real(rt), intent(in) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
-    integer, intent(in) :: row, col
-    real(rt), intent(out) :: val
+    real(dp_t), intent(in   ) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
+    integer   , intent(in   ) :: row, col
+    real(dp_t), intent(out  ) :: val
 
     integer :: csr_loc
 
@@ -335,8 +334,8 @@ contains
     implicit none
 
     type (burn_t), intent(inout) :: state
-    integer, intent(in) :: row, col
-    real(rt), intent(in) :: val
+    integer      , intent(in   ) :: row, col
+    real(dp_t)   , intent(in   ) :: val
 
     !$gpu
 
@@ -356,8 +355,8 @@ contains
     implicit none
 
     type (burn_t), intent(inout) :: state
-    integer, intent(in) :: row, col
-    real(rt), intent(in) :: val
+    integer      , intent(in   ) :: row, col
+    real(dp_t)   , intent(in   ) :: val
 
     !$gpu
 
@@ -376,9 +375,9 @@ contains
 
     implicit none
 
-    type (burn_t), intent(in) :: state
-    integer, intent(in) :: row, col
-    real(rt), intent(out) :: val
+    type (burn_t), intent(in   ) :: state
+    integer      , intent(in   ) :: row, col
+    real(dp_t)   , intent(out  ) :: val
 
     integer :: csr_loc
 
