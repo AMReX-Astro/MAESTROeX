@@ -1,12 +1,13 @@
 module burn_type_module
 
-  use bl_types, only: dp_t
 #ifdef REACT_SPARSE_JACOBIAN
   use actual_network, only: nspec, nspec_evolve, naux, NETWORK_SPARSE_JAC_NNZ
 #else
   use actual_network, only: nspec, nspec_evolve, naux
 #endif
-  
+
+  use amrex_fort_module, only : rt => amrex_real
+
   implicit none
 
   ! A generic structure holding data necessary to do a nuclear burn.
@@ -24,38 +25,43 @@ module burn_type_module
 
   type :: burn_t
 
-    real(dp_t) :: rho
-    real(dp_t) :: T
-    real(dp_t) :: e
-    real(dp_t) :: xn(nspec)
+    real(rt) :: rho
+    real(rt) :: T
+    real(rt) :: e
+    real(rt) :: xn(nspec)
 #if naux > 0
-    real(dp_t) :: aux(naux)
+    real(rt) :: aux(naux)
 #endif
 
-    real(dp_t) :: cv
-    real(dp_t) :: cp
-    real(dp_t) :: y_e
-    real(dp_t) :: eta
-    real(dp_t) :: cs
-    real(dp_t) :: dx
-    real(dp_t) :: abar
-    real(dp_t) :: zbar
+    real(rt) :: cv
+    real(rt) :: cp
+    real(rt) :: y_e
+    real(rt) :: eta
+    real(rt) :: cs
+    real(rt) :: dx
+    real(rt) :: abar
+    real(rt) :: zbar
 
     ! Last temperature we evaluated the EOS at
-    real(dp_t) :: T_old
+    real(rt) :: T_old
 
     ! Temperature derivatives of specific heat
-    real(dp_t) :: dcvdT
-    real(dp_t) :: dcpdT
+    real(rt) :: dcvdT
+    real(rt) :: dcpdT
 
     ! The following are the actual integration data.
     ! To avoid potential incompatibilities we won't
-    ! include the integration vector y itself here.
+    ! include the integration array y itself here.
     ! It can be reconstructed from all of the above
     ! data, particularly xn, e, and T.
 
-    real(dp_t) :: ydot(neqs)
-    real(dp_t) :: jac(neqs, neqs)
+    real(rt) :: ydot(neqs)
+
+#ifdef REACT_SPARSE_JACOBIAN
+    real(rt) :: sparse_jac(NETWORK_SPARSE_JAC_NNZ)
+#else
+    real(rt) :: jac(neqs, neqs)
+#endif
 
     ! Whether we are self-heating or not.
 
@@ -73,7 +79,7 @@ module burn_type_module
 
     ! Integration time.
 
-    real(dp_t) :: time
+    real(rt) :: time
 
     ! Was the burn successful?
 
@@ -91,6 +97,8 @@ contains
 
     type (burn_t), intent(in   ) :: from_state
     type (burn_t), intent(  out) :: to_state
+
+    !$gpu
 
     to_state % rho = from_state % rho
     to_state % T   = from_state % T
@@ -117,7 +125,12 @@ contains
     to_state % dcpdT = from_state % dcpdT
 
     to_state % ydot(1:neqs) = from_state % ydot(1:neqs)
+
+#ifdef REACT_SPARSE_JACOBIAN
+    to_state % sparse_jac(1:NETWORK_SPARSE_JAC_NNZ) = from_state % sparse_jac(1:NETWORK_SPARSE_JAC_NNZ)
+#else
     to_state % jac(1:neqs, 1:neqs) = from_state % jac(1:neqs, 1:neqs)
+#endif
 
     to_state % self_heat = from_state % self_heat
 
@@ -147,6 +160,8 @@ contains
 
     type (eos_t)  :: eos_state
     type (burn_t) :: burn_state
+
+    !$gpu
 
     burn_state % rho  = eos_state % rho
     burn_state % T    = eos_state % T
@@ -180,6 +195,8 @@ contains
     type (burn_t) :: burn_state
     type (eos_t)  :: eos_state
 
+    !$gpu
+
     eos_state % rho  = burn_state % rho
     eos_state % T    = burn_state % T
     eos_state % e    = burn_state % e
@@ -202,214 +219,18 @@ contains
 
     !$acc routine seq
 
-    use bl_constants_module, only: ONE
+    use amrex_constants_module, only: ONE
     use extern_probin_module, only: small_x
 
     implicit none
 
     type (burn_t), intent(inout) :: state
 
+    !$gpu
+
     state % xn(:) = max(small_x, min(ONE, state % xn(:)))
     state % xn(:) = state % xn(:) / sum(state % xn(:))
 
   end subroutine normalize_abundances_burn
 
-  
-#ifdef REACT_SPARSE_JACOBIAN
-  subroutine lookup_csr_jac_loc(row, col, csr_loc)
-
-    !$acc routine seq
-
-    use actual_network, only: csr_jac_col_index, csr_jac_row_count
-
-    implicit none
-
-    integer, intent(in   ) :: row, col
-    integer, intent(out  ) :: csr_loc
-
-    integer :: num_in_row, row_start_loc, row_end_loc, i
-
-    !$gpu
-
-    ! Looks up the index into a CSR-formatted Jacobian
-    ! matrix given row and col indices into the
-    ! equivalent dense matrix.
-    !
-    ! Assumes the base in first element of CSR row count array is 1
-
-    num_in_row = csr_jac_row_count(row+1) - csr_jac_row_count(row)
-    row_start_loc = csr_jac_row_count(row)
-    row_end_loc   = row_start_loc + num_in_row - 1
-
-    csr_loc = -1
-    do i = row_start_loc, row_end_loc
-       if (csr_jac_col_index(i) == col) then
-          csr_loc = i
-          exit
-       endif
-    enddo
-  end subroutine lookup_csr_jac_loc
-
-
-  subroutine set_csr_jac_entry(csr_jac, row, col, val)
-
-    !$acc routine seq
-
-    implicit none
-
-    real(dp_t), intent(inout) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
-    integer   , intent(in   ) :: row, col
-    real(dp_t), intent(in   ) :: val
-
-    integer :: csr_loc
-
-    !$gpu
-
-    ! Get index into the CSR Jacobian
-    call lookup_csr_jac_loc(row, col, csr_loc)
-
-    ! Set value in CSR Jacobian only if row, col entry exists
-    if (csr_loc /= -1) then
-       csr_jac(csr_loc) = val
-    endif
-
-  end subroutine set_csr_jac_entry
-
-
-  subroutine scale_csr_jac_entry(csr_jac, row, col, val)
-
-    !$acc routine seq
-
-    implicit none
-
-    real(dp_t), intent(inout) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
-    integer   , intent(in   ) :: row, col
-    real(dp_t), intent(in   ) :: val
-
-    integer :: csr_loc
-
-    !$gpu
-
-    ! Get index into the CSR Jacobian
-    call lookup_csr_jac_loc(row, col, csr_loc)
-
-    ! Scale value in CSR Jacobian only if row, col entry exists
-    if (csr_loc /= -1) then
-       csr_jac(csr_loc) = csr_jac(csr_loc) * val
-    endif
-
-  end subroutine scale_csr_jac_entry
-
-
-  subroutine get_csr_jac_entry(csr_jac, row, col, val)
-
-    !$acc routine seq
-
-    implicit none
-
-    real(dp_t), intent(in   ) :: csr_jac(NETWORK_SPARSE_JAC_NNZ)
-    integer   , intent(in   ) :: row, col
-    real(dp_t), intent(out  ) :: val
-
-    integer :: csr_loc
-
-    !$gpu
-
-    ! Get index into the CSR Jacobian
-    call lookup_csr_jac_loc(row, col, csr_loc)
-
-    ! Get value from CSR Jacobian only if row, col entry exists
-    if (csr_loc /= -1) then
-       val = csr_jac(csr_loc)
-    endif
-
-  end subroutine get_csr_jac_entry
-#endif
-
-
-  subroutine set_jac_entry(state, row, col, val)
-
-    !$acc routine seq
-
-    implicit none
-
-    type (burn_t), intent(inout) :: state
-    integer      , intent(in   ) :: row, col
-    real(dp_t)   , intent(in   ) :: val
-
-    !$gpu
-
-#ifdef REACT_SPARSE_JACOBIAN
-    call set_csr_jac_entry(state % sparse_jac, row, col, val)
-#else
-    state % jac(row, col) = val
-#endif
-
-  end subroutine set_jac_entry
-
-
-  subroutine scale_jac_entry(state, row, col, val)
-
-    !$acc routine seq
-
-    implicit none
-
-    type (burn_t), intent(inout) :: state
-    integer      , intent(in   ) :: row, col
-    real(dp_t)   , intent(in   ) :: val
-
-    !$gpu
-
-#ifdef REACT_SPARSE_JACOBIAN
-    call scale_csr_jac_entry(state % sparse_jac, row, col, val)
-#else
-    state % jac(row, col) = state % jac(row, col) * val
-#endif
-
-  end subroutine scale_jac_entry  
-
-
-  subroutine get_jac_entry(state, row, col, val)
-
-    !$acc routine seq
-
-    implicit none
-
-    type (burn_t), intent(in   ) :: state
-    integer      , intent(in   ) :: row, col
-    real(dp_t)   , intent(out  ) :: val
-
-    integer :: csr_loc
-
-    !$gpu
-
-#ifdef REACT_SPARSE_JACOBIAN
-    call get_csr_jac_entry(state % sparse_jac, row, col, val)
-#else
-    val = state % jac(row, col)
-#endif
-
-  end subroutine get_jac_entry
-
-
-  subroutine set_jac_zero(state)
-
-    !$acc routine seq
-
-    use amrex_constants_module, only: ZERO
-
-    implicit none
-
-    type (burn_t), intent(inout) :: state
-
-    !$gpu
-
-#ifdef REACT_SPARSE_JACOBIAN
-    state % sparse_jac(:) = ZERO
-#else
-    state % jac(:,:) = ZERO
-#endif
-
-  end subroutine set_jac_zero
-  
 end module burn_type_module
