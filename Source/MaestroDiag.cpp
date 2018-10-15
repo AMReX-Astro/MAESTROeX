@@ -15,6 +15,7 @@ Maestro::DiagFile (const int step,
                    int& index)
 {
     if (spherical == 0) {
+	Print() << "ERROR: WriteDiagFile() not written for non-spherical geometry" << std::endl;
         return;
     }
 
@@ -264,7 +265,8 @@ Maestro::DiagFile (const int step,
             diagfile << std::setw(20) << std::left << "vz(max{T})";
             diagfile << std::setw(20) << std::left << "R(max{T})";
             diagfile << std::setw(20) << std::left << "vr(max{T})";
-            diagfile << std::setw(20) << std::left << "T_center" << std::endl;
+            diagfile << std::setw(20) << std::left << "T_center";
+	    diagfile << std::setw(20) << std::left << "max{Mach}" << std::endl;
 
             diagfile.precision(10);
             diagfile << std::scientific;
@@ -278,7 +280,8 @@ Maestro::DiagFile (const int step,
             diagfile << std::setw(20) << std::left << vel_Tmax[2];
             diagfile << std::setw(20) << std::left << Rloc_Tmax;
             diagfile << std::setw(20) << std::left << vr_Tmax;
-            diagfile << std::setw(20) << std::left << T_center << std::endl;
+            diagfile << std::setw(20) << std::left << T_center;
+            diagfile << std::setw(20) << std::left << Mach_max << std::endl;
 
         } else {
 
@@ -294,6 +297,7 @@ Maestro::DiagFile (const int step,
             diagfile_data[index*11+8] = Rloc_Tmax;
             diagfile_data[index*11+9] = vr_Tmax;
             diagfile_data[index*11+10] = T_center;
+	    diagfile_data[index*11+11] = Mach_max;
             index += 1;
         }
     }
@@ -314,6 +318,7 @@ Maestro::WriteDiagFile (int& index)
     // Rloc_Tmax
     // vr_Tmax
     // T_center
+    // Mach_max
 
     // write out diagnosis data
     if (ParallelDescriptor::IOProcessor()) {
@@ -324,8 +329,8 @@ Maestro::WriteDiagFile (int& index)
         diagfile.precision(10);
         diagfile << std::scientific;
         for (int ii=0; ii<index; ++ii) {
-            for (int icomp=0; icomp<11; ++icomp) {
-                diagfile << std::setw(20) << std::left << diagfile_data[ii*11+icomp];
+            for (int icomp=0; icomp<12; ++icomp) {
+                diagfile << std::setw(20) << std::left << diagfile_data[ii*12+icomp];
             }
             diagfile << std::endl;
         }
