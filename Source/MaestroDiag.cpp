@@ -286,18 +286,18 @@ Maestro::DiagFile (const int step,
         } else {
 
             // store variable values in data array to be written later
-            diagfile_data[index*11  ] = t_in;
-            diagfile_data[index*11+1] = T_max;
-            diagfile_data[index*11+2] = coord_Tmax[0];
-            diagfile_data[index*11+3] = coord_Tmax[1];
-            diagfile_data[index*11+4] = coord_Tmax[2];
-            diagfile_data[index*11+5] = vel_Tmax[0];
-            diagfile_data[index*11+6] = vel_Tmax[1];
-            diagfile_data[index*11+7] = vel_Tmax[2];
-            diagfile_data[index*11+8] = Rloc_Tmax;
-            diagfile_data[index*11+9] = vr_Tmax;
-            diagfile_data[index*11+10] = T_center;
-	    diagfile_data[index*11+11] = Mach_max;
+            diagfile_data[index*12  ] = t_in;
+            diagfile_data[index*12+1] = T_max;
+            diagfile_data[index*12+2] = coord_Tmax[0];
+            diagfile_data[index*12+3] = coord_Tmax[1];
+            diagfile_data[index*12+4] = coord_Tmax[2];
+            diagfile_data[index*12+5] = vel_Tmax[0];
+            diagfile_data[index*12+6] = vel_Tmax[1];
+            diagfile_data[index*12+7] = vel_Tmax[2];
+            diagfile_data[index*12+8] = Rloc_Tmax;
+            diagfile_data[index*12+9] = vr_Tmax;
+            diagfile_data[index*12+10] = T_center;
+	    diagfile_data[index*12+11] = Mach_max;
             index += 1;
         }
     }

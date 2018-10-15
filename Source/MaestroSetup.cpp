@@ -134,7 +134,7 @@ Maestro::Setup ()
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
 
     // diag file data arrays
-    diagfile_data.resize(diag_buf_size*11);
+    diagfile_data.resize(diag_buf_size*12);
 
     // make sure C++ is as efficient as possible with memory usage
     s0_init      .shrink_to_fit();
