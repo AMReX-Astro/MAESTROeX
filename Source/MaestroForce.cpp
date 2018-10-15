@@ -270,6 +270,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         MakeS0mac(p0, p0mac);
     }
 
+    WriteMF(p0_cart,"a_p0_cart");
+    Abort();
+
     make_grav_cell(grav.dataPtr(),
                    rho0.dataPtr(),
                    r_cc_loc.dataPtr(),

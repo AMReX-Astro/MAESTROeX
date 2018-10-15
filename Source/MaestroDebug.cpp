@@ -82,3 +82,42 @@ Maestro::PrintEdge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
         }
     }
 }
+
+// utility to write out a multilevel multifab to a plotfile
+void Maestro::WriteMF (Vector<MultiFab>& mf,
+                       std::string name)
+{
+    int nComp = mf[0].nComp();
+
+    Vector<std::string> varnames;
+    varnames.resize(nComp);
+    for (int i=0; i<nComp; ++i) {
+        varnames[i] = "X";
+    }
+
+    // temporary MultiFab to hold plotfile data
+    Vector<MultiFab*> plot_mf_data(finest_level+1);
+
+    // build temporary MultiFab to hold plotfile data
+    for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i] = new MultiFab((mf[i]).boxArray(),(mf[i]).DistributionMap(),nComp,0);
+    }
+    
+    for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i]->copy((mf[i]),0,0,nComp);
+    }
+                    
+    // MultiFab to hold plotfile data
+    Vector<const MultiFab*> plot_mf;
+    for (int i = 0; i <= finest_level; ++i) {
+        plot_mf.push_back(plot_mf_data[i]);
+    }    
+    
+    Vector<int> step_array;
+    step_array.resize(maxLevel()+1, 0);
+
+    WriteMultiLevelPlotfile(name, finest_level+1, plot_mf, varnames,
+                            Geom(), 0., step_array, refRatio());
+    
+
+}
