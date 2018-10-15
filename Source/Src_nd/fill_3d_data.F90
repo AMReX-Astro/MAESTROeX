@@ -1391,7 +1391,6 @@ contains
 
        k = lo(3)
        j = lo(2)
-       !$OMP DO
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif

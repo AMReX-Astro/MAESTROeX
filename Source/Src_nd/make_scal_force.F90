@@ -66,7 +66,6 @@ contains
 #if (AMREX_SPACEDIM == 1)
     j = 0
     k = 0
-    !$OMP PARALLEL DO PRIVATE(i,gradp0,veladv)
     do i = lo(1),hi(1)
 
        if (i .lt. base_cutoff_density_coord(lev)) then
@@ -82,10 +81,8 @@ contains
        veladv = 0.5d0*(umac(i)+umac(i+1))
        rhoh_force(i,j,k) = veladv * gradp0
     enddo
-    !$OMP END PARALLEL DO
 #elif (AMREX_SPACEDIM == 2)
     k = 0
-    !$OMP PARALLEL DO PRIVATE(i,j,gradp0,veladv)
     do j = lo(2),hi(2)
 
        if (j .lt. base_cutoff_density_coord(lev)) then
@@ -103,10 +100,8 @@ contains
           rhoh_force(i,j,k) =  veladv * gradp0
        end do
     enddo
-    !$OMP END PARALLEL DO
 
 #elif (AMREX_SPACEDIM == 3)
-    !$OMP PARALLEL DO PRIVATE(i,j,k,gradp0,veladv)
     do k = lo(3),hi(3)
 
        if (k .lt. base_cutoff_density_coord(lev)) then
@@ -126,7 +121,6 @@ contains
           end do
        end do
     enddo
-    !$OMP END PARALLEL DO
 #endif
 
     ! psi should always be in the force if we are doing the final update
@@ -425,13 +419,11 @@ contains
     if (use_exact_base_state) then
        divu(0,:) = 0.0d0
     else
-       !$OMP PARALLEL DO PRIVATE(r)
        do r=0,nr_fine-1
           divu(0,r) = (r_edge_loc(0,r+1)**2 * w0(0,r+1) - &
                r_edge_loc(0,r  )**2 * w0(0,r  ) ) / &
                (dr(0)*r_cc_loc(0,r)**2)
        end do
-       !$OMP END PARALLEL DO
     end if
 
     ! compute w0 contribution to divu

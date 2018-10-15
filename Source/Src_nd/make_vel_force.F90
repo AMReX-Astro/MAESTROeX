@@ -1,7 +1,7 @@
 module make_vel_force_module
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
-  use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, prob_lo
+  use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, prob_lo, rotation_radius
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, center
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
   use bl_constants_module
@@ -100,7 +100,6 @@ contains
          - omega**2 * rotation_radius
 #endif
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k,rhopert,coriolis_term)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -169,10 +168,8 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
     if (do_add_utilde_force .eq. 1) then
-       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
@@ -205,7 +202,6 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
     endif
 
   end subroutine make_vel_force

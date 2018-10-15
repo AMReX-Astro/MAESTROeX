@@ -90,7 +90,6 @@ contains
     do comp = startcomp, endcomp
 
        ! create x-fluxes
-       !$OMP PARALLEL DO PRIVATE(i,rho0_edge)
        do i = lo(1),hi(1)+1
 
           if (species_pred_type == predict_rhoprime_and_X) then
@@ -122,7 +121,6 @@ contains
           endif
        end do
     end do ! end comp loop
-    !$OMP END PARALLEL DO
 
   end subroutine make_rhoX_flux_1d
 #endif
@@ -173,7 +171,6 @@ contains
     do comp = startcomp, endcomp
 
        ! create x-fluxes
-       !$OMP PARALLEL DO PRIVATE(i,j,rho0_edge)
        do j=lo(2),hi(2)
           rho0_edge = HALF*(rho0_old(lev,j)+rho0_new(lev,j))
           do i=lo(1),hi(1)+1
@@ -198,7 +195,6 @@ contains
        end do
 
        ! create y-fluxes
-       !$OMP PARALLEL DO PRIVATE(i,j,rho0_edge)
        do j = lo(2),hi(2)+1
           rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
           do i = lo(1),hi(1)
@@ -232,7 +228,6 @@ contains
              endif  ! evolve_base_state
           end do
        end do
-       !$OMP END PARALLEL DO
     end do
 
   end subroutine make_rhoX_flux_2d

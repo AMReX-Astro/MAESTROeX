@@ -34,8 +34,6 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 	// Create the velocity forcing term at time n using rho
 	//////////////////////////////////
 
-	std::cout << "I'm in VelocityAdvance" << std::endl;
-
 	is_final_update = 0;
 	MakeVelForce(vel_force,is_final_update,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,
 #ifdef ROTATION
