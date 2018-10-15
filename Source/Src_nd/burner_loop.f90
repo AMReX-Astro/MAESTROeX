@@ -26,7 +26,8 @@ contains
                          rho_odot, r_lo, r_hi, nc_r, &
                          rho_Hnuc, n_lo, n_hi, &
                          tempbar_init_in, dt_in, &
-                         mask) bind (C,name="burner_loop")
+                         mask,     m_lo, m_hi, use_mask) &
+                         bind (C,name="burner_loop")
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
@@ -34,6 +35,7 @@ contains
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
+    integer         , intent (in   ) :: m_lo(3), m_hi(3)
     double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
     double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
@@ -41,7 +43,8 @@ contains
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: tempbar_init_in(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: dt_in
-    integer         , intent (in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer         , intent (in   ) :: use_mask
 
     ! local
     integer          :: i, j, k, n
@@ -68,7 +71,7 @@ contains
 
        ! make sure the cell isn't covered by finer cells
        cell_valid = .true.
-       if ( present(mask) ) then
+       if ( use_mask .eq. 1 ) then
           if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
        endif
        
@@ -167,8 +170,8 @@ contains
                                 rho_odot, r_lo, r_hi, nc_r, &
                                 rho_Hnuc, n_lo, n_hi, &
                                 tempbar_init_cart, t_lo, t_hi, dt_in, & 
-                                mask) & 
-             bind (C,name="burner_loop_sphr")
+                                mask,     m_lo, m_hi, use_mask) & 
+                                bind (C,name="burner_loop_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
@@ -176,6 +179,7 @@ contains
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
+    integer         , intent (in   ) :: m_lo(3), m_hi(3)
     double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
     double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
@@ -184,7 +188,8 @@ contains
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (in   ) :: tempbar_init_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, intent (in   ) :: dt_in
-    integer         , intent (in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer         , intent (in   ) :: use_mask
 
     ! local
     integer          :: i, j, k, n
@@ -211,7 +216,7 @@ contains
 
        ! make sure the cell isn't covered by finer cells
        cell_valid = .true.
-       if ( present(mask) ) then
+       if ( use_mask .eq. 1 ) then
           if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
        endif
 

@@ -6,8 +6,9 @@ module maestro_init_module
   use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp, &
-                                nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
+       nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
   use eos_module, only: eos_init
+  use runtime_init_module
 
   implicit none
 
@@ -21,9 +22,9 @@ contains
 
   end subroutine maestro_network_init
 
-! :::
-! ::: ----------------------------------------------------------------
-! :::
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
 
   subroutine maestro_extern_init(name,namlen) bind(C, name="maestro_extern_init")
 
@@ -34,32 +35,14 @@ contains
 
     integer, intent(in) :: namlen
     integer, intent(in) :: name(namlen)
-
+    !
     call runtime_init(name,namlen)
 
   end subroutine maestro_extern_init
 
-! :::
-! ::: ----------------------------------------------------------------
-! :::
-
-  subroutine maestro_probdata_init(name,namlen) bind(C, name="maestro_probdata_init")
-
-    ! initialize the probdata runtime parameters in
-    ! probdata_module
-
-    use amrex_fort_module, only: rt => amrex_real
-
-    integer, intent(in) :: namlen
-    integer, intent(in) :: name(namlen)
-
-    call probdata_init(name,namlen)
-
-  end subroutine maestro_probdata_init
-
-! :::
-! ::: ----------------------------------------------------------------
-! :::
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
 
   subroutine get_num_spec(nspec_out) bind(C, name="get_num_spec")
 
@@ -69,9 +52,9 @@ contains
 
   end subroutine get_num_spec
 
-! :::
-! ::: ----------------------------------------------------------------
-! :::
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
 
   subroutine get_spec_names(spec_names,ispec,len) bind(C, name="get_spec_names")
 
@@ -90,13 +73,33 @@ contains
 
   end subroutine get_spec_names
 
-! :::
-! ::: ----------------------------------------------------------------
-! :::
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine get_spec_az(ispec,A,Z) bind(C, name="get_spec_az")
+
+    use network, only: nspec, aion, zion
+    use amrex_fort_module, only: rt => amrex_real
+
+    implicit none
+
+    integer,  intent(in   ) :: ispec
+    real(rt), intent(inout) :: A, Z
+
+    ! C++ is 0-based indexing, so increment
+    A = aion(ispec+1)
+    Z = zion(ispec+1)
+
+  end subroutine get_spec_az
+
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
 
   subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature, &
-                               Pressure,Nscalars,prob_lo_in,prob_hi_in) &
-                               bind(C, name="set_method_params")
+       Pressure,Nscalars,prob_lo_in,prob_hi_in) &
+       bind(C, name="set_method_params")
 
     integer         , intent(in) :: Density, Enthalpy, FirstSpec, Temperature
     integer         , intent(in) :: Pressure, Nscalars
@@ -157,9 +160,9 @@ contains
 
   end subroutine set_method_params
 
-! :::
-! ::: ----------------------------------------------------------------
-! :::
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
 
   subroutine set_rel_eps(rel_eps_in) bind(C,name="set_rel_eps")
 
@@ -169,9 +172,9 @@ contains
 
   end subroutine set_rel_eps
 
-! :::
-! ::: ----------------------------------------------------------------
-! :::
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
 
   subroutine get_rel_eps(rel_eps_in) bind(C,name="get_rel_eps")
 

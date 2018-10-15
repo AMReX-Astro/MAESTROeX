@@ -50,8 +50,30 @@ IntVect Maestro::nodal_flag_y(0,1,0);
 IntVect Maestro::nodal_flag_z(0,0,1);
 #endif
 
+// this will be reset upon restart
+Real Maestro::previousCPUTimeUsed = 0.0;
+
+Real Maestro::startCPUTime = 0.0;
+
 Maestro::Maestro ()
-{}
+{
+}
 
 Maestro::~Maestro ()
-{}
+{
+}
+
+Real
+Maestro::getCPUTime()
+{
+
+		int numCores = ParallelDescriptor::NProcs();
+#ifdef _OPENMP
+		numCores = numCores*omp_get_max_threads();
+#endif
+
+		Real T = numCores*(ParallelDescriptor::second() - startCPUTime) +
+		         previousCPUTimeUsed;
+
+		return T;
+}

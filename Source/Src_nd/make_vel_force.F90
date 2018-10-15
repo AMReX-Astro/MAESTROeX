@@ -1,6 +1,7 @@
 module make_vel_force_module
 
-  use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, prob_lo, rotation_radius
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
+  use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, prob_lo
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, center
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
   use bl_constants_module
@@ -65,11 +66,12 @@ contains
     integer :: i,j,k,r
     double precision :: rhopert
 
+
 #ifdef ROTATION
     real(kind=dp_t) :: coriolis_term(3), centrifugal_term(3)
 #endif
 
-    vel_force = 0.d0
+    vel_force(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_f) = 0.d0
 
     ! CURRENTLY for rotation in plane-parallel, we make the (bad) assueption
     ! that all points within the patch have the same centrifugal forcing terms.
@@ -130,7 +132,7 @@ contains
 
                 coriolis_term(2) =  2.0d0 * omega * &
                      (HALF*(wedge(i,j,k)   + w0(lev,k) + &
-                            wedge(i,j,k+1) + w0(lev,k+1)) * sin_theta + &
+                     wedge(i,j,k+1) + w0(lev,k+1)) * sin_theta + &
                      HALF*(uedge(i,j,k) + uedge(i+1,j,k)) * cos_theta)
 
                 coriolis_term(3) = -2.0d0 * omega * &
@@ -140,7 +142,7 @@ contains
                 coriolis_term(1) = -2.0d0 * omega * uold(i,j,k,2) * cos_theta
 
                 coriolis_term(2) =  2.0d0 * omega * &
-                    ((uold(i,j,k,3) + HALF*(w0(lev,k) + w0(lev,k+1))) * sin_theta + &
+                     ((uold(i,j,k,3) + HALF*(w0(lev,k) + w0(lev,k+1))) * sin_theta + &
                      uold(i,j,k,1) * cos_theta)
 
                 coriolis_term(3) = -2.0d0 * omega * uold(i,j,k,2) * sin_theta
@@ -277,8 +279,8 @@ contains
 
     integer         :: i,j,k
 
-    double precision, allocatable :: rho0_cart(:,:,:,:)
-    double precision, allocatable :: grav_cart(:,:,:,:)
+    double precision, pointer :: rho0_cart(:,:,:,:)
+    double precision, pointer :: grav_cart(:,:,:,:)
 
     double precision :: rhopert
     double precision :: xx, yy, zz
@@ -289,17 +291,16 @@ contains
 
     real(kind=dp_t) :: Ut_dot_er
 
-    allocate(rho0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    allocate(grav_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),3))
+    call bl_allocate(rho0_cart,lo,hi,1)
+    call bl_allocate(grav_cart,lo,hi,3)
 
-    vel_force = ZERO
+    vel_force(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_f) = ZERO
 
     call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
     call put_1d_array_on_cart_sphr(lo,hi,grav_cart,lo,hi,3,grav,dx,0,1,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k,xx,yy,zz,rhopert,centrifugal_term,coriolis_term)
     do k = lo(3),hi(3)
        zz = prob_lo(3) + (dble(k) + HALF)*dx(3) - center(3)
        do j = lo(2),hi(2)
@@ -387,12 +388,10 @@ contains
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
 
 
     if (do_add_utilde_force .eq. 1) then
 
-       !$OMP PARALLEL DO PRIVATE(i,j,k,Ut_dot_er)
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
@@ -409,11 +408,11 @@ contains
              end do
           end do
        end do
-       !$OMP END PARALLEL DO
 
     endif
 
-    deallocate(rho0_cart,grav_cart)
+    call bl_deallocate(rho0_cart)
+    call bl_deallocate(grav_cart)
 
   end subroutine make_vel_force_sphr
 

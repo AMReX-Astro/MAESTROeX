@@ -1,4 +1,4 @@
-DEBUG      = TRUE
+DEBUG      = FALSE
 DIM        = 3
 COMP	   = gnu
 USE_MPI    = FALSE
@@ -26,5 +26,6 @@ NETWORK_DIR      := ignition_chamulak
 
 Bpack   := ./Make.package
 Blocs   := .
+PROBIN_PARAMETER_DIRS := .
 
 include $(MAESTROEX_HOME)/Exec/Make.Maestro

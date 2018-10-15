@@ -1,0 +1,33 @@
+double_bubble/
+
+ Bubble rise problem using the multigamma EOS and null reactions
+
+
+incomp_shear_jet/
+
+  A simple pure-incompressible shear layer problem.  This is the 
+  example problem used in Bell, Colella, and Glaz (1989).
+
+reacting_bubble/
+ 
+  The test problem from the Maestro paper III.  This places 3 hots
+  spots in a plane-parallel atmosphere.  Burning makes these bubbles
+  buoyant, and then roll up.
+
+  This also contains the inputs files used in the multilevel Maestro
+  paper to show adaptivity in the problem.  
+
+  Note: this problem setup was previously called test2
+ 
+
+rt/
+
+  A classic Rayleigh-Taylor instability problem.
+
+
+test_convect/
+
+  Drive convection through a plane-parallel atmosphere using an
+  externally-specified heat source.  This problem was used to compare
+  with compressible solvers in Maestro paper III and to test the
+  multilevel algorithm in the multilevel paper.

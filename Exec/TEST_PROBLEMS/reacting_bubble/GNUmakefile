@@ -1,7 +1,7 @@
 DEBUG      = FALSE
-DIM        = 2
+DIM        = 3
 COMP	   = gnu
-USE_MPI    = TRUE
+USE_MPI    = FALSE
 USE_OMP    = FALSE
 USE_REACT  = TRUE
 
@@ -23,6 +23,9 @@ CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := ignition_simple
 
 Bpack   := ./Make.package
-Blocs   := . 
+Blocs   := .
+
+PROBIN_PARAMETER_DIRS := .
+
 
 include $(MAESTROEX_HOME)/Exec/Make.Maestro

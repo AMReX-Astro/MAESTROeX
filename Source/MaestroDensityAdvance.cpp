@@ -10,14 +10,14 @@ Maestro::DensityAdvance (int which_step,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
                          Vector<MultiFab>& scal_force,
-			 Vector<MultiFab>& etarhoflux,
-                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac, 
-			 const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-			 const Vector<Real>& rho0_predicted_edge)
+                         Vector<MultiFab>& etarhoflux,
+                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                         const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
+                         const Vector<Real>& rho0_predicted_edge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DensityAdvance()",DensityAdvance);
-    
+
     Vector<Real> rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
     rho0_edge_old.shrink_to_fit();
@@ -25,10 +25,10 @@ Maestro::DensityAdvance (int which_step,
 
     if (spherical == 0) {
         // create edge-centered base state quantities.
-        // Note: rho0_edge_{old,new} 
+        // Note: rho0_edge_{old,new}
         // contains edge-centered quantities created via spatial interpolation.
         // This is to be contrasted to rho0_predicted_edge which is the half-time
-        // edge state created in advect_base. 
+        // edge state created in advect_base.
         cell_to_edge(rho0_old.dataPtr(),rho0_edge_old.dataPtr());
         cell_to_edge(rho0_new.dataPtr(),rho0_edge_new.dataPtr());
     }
@@ -44,16 +44,16 @@ Maestro::DensityAdvance (int which_step,
 
     Vector<MultiFab> rho0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-	rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
     if (spherical == 1) {
-	Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
+        Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
     }
 
     // ** density source term **
 
-    // Make source term for rho or rho' 
+    // Make source term for rho or rho'
     if (species_pred_type == predict_rhoprime_and_X) {
         // rho' souce term
         // this is needed for pred_rhoprime_and_X
@@ -80,7 +80,7 @@ Maestro::DensityAdvance (int which_step,
     /////////////////////////////////////////////////////////////////
 
     Addw0(umac,w0mac,1.);
-    
+
     /////////////////////////////////////////////////////////////////
     // Create the edge states of (rho X)' or X and rho'
     /////////////////////////////////////////////////////////////////
@@ -91,61 +91,61 @@ Maestro::DensityAdvance (int which_step,
         // we are predicting X to the edges, so convert the scalar
         // data to those quantities
 
-        // convert (rho X) --> X in scalold 
-	ConvertRhoXToX(scalold,true);
+        // convert (rho X) --> X in scalold
+        ConvertRhoXToX(scalold,true);
     }
 
     if (species_pred_type == predict_rhoprime_and_X) {
         // convert rho -> rho' in scalold
         //   . this is needed for predict_rhoprime_and_X
-	PutInPertForm(scalold, rho0_old, Rho, 0, bcs_f, true);
+        PutInPertForm(scalold, rho0_old, Rho, 0, bcs_f, true);
     }
 
     // predict species at the edges -- note, either X or (rho X) will be
     // predicted here, depending on species_pred_type
 
     int is_vel = 0; // false
-    if (species_pred_type == predict_rhoprime_and_X || 
-	species_pred_type == predict_rho_and_X) {
+    if (species_pred_type == predict_rhoprime_and_X ||
+        species_pred_type == predict_rho_and_X) {
 
-	// we are predicting X to the edges, using the advective form of
-	// the prediction
-	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,0);
+        // we are predicting X to the edges, using the advective form of
+        // the prediction
+        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,0);
 
     } else if (species_pred_type == predict_rhoX) {
 
-	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,1);
+        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,1);
     }
-   
+
     // predict rho or rho' at the edges (depending on species_pred_type)
-    if (species_pred_type == predict_rhoprime_and_X || 
-	species_pred_type == predict_rho_and_X) {
-	MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,Rho,Rho,1,0);
-    
+    if (species_pred_type == predict_rhoprime_and_X ||
+        species_pred_type == predict_rho_and_X) {
+        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,Rho,Rho,1,0);
+
     } else if (species_pred_type == predict_rhoX) {
 
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-		MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec,1,0);
-		for (int ispec=1; ispec<NumSpec; ++ispec) {
-		    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec+ispec,1,0);
-		}
-	    }
-	}
+        for (int lev=0; lev<=finest_level; ++lev) {
+            for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec,1,0);
+                for (int ispec=1; ispec<NumSpec; ++ispec) {
+                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec+ispec,1,0);
+                }
+            }
+        }
     }
-    
+
     if (species_pred_type == predict_rhoprime_and_X) {
-	// convert rho' -> rho in scalold 
-	PutInPertForm(scalold, rho0_old, Rho, Rho, bcs_s, false);
+        // convert rho' -> rho in scalold
+        PutInPertForm(scalold, rho0_old, Rho, Rho, bcs_s, false);
     }
 
     if ((species_pred_type == predict_rhoprime_and_X) ||
         (species_pred_type == predict_rho_and_X)) {
-	// convert X --> (rho X) in scalold 
-	ConvertRhoXToX(scalold,false);
+        // convert X --> (rho X) in scalold
+        ConvertRhoXToX(scalold,false);
     }
 
- 
+
     /////////////////////////////////////////////////////////////////
     // Subtract w0 from MAC velocities.
     /////////////////////////////////////////////////////////////////
@@ -158,50 +158,50 @@ Maestro::DensityAdvance (int which_step,
     /////////////////////////////////////////////////////////////////
 
     if (which_step == 1) {
-	Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
-  
-	if (spherical == 1) { 
-	    for (int lev=0; lev<=finest_level; ++lev) {
-		AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
-			     rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
-			     rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
-	    }
-	    
-	    MakeS0mac(rho0_old,rho0mac_old);
-	}
+        Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
 
-	// compute species fluxes
-	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
-		     rho0_old,rho0_edge_old,rho0mac_old,
-		     rho0_old,rho0_edge_old,rho0mac_old,
-		     rho0_predicted_edge,
-		     FirstSpec,NumSpec);
-	
+        if (spherical == 1) {
+            for (int lev=0; lev<=finest_level; ++lev) {
+                AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
+                             rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
+                             rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
+            }
+
+            MakeS0mac(rho0_old,rho0mac_old);
+        }
+
+        // compute species fluxes
+        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
+                     rho0_old,rho0_edge_old,rho0mac_old,
+                     rho0_old,rho0_edge_old,rho0mac_old,
+                     rho0_predicted_edge,
+                     FirstSpec,NumSpec);
+
     } else if (which_step == 2) {
-	Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
-	Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_new(finest_level+1);
+        Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
+        Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_new(finest_level+1);
 
-	if (spherical == 1) {
-	    for (int lev=0; lev<=finest_level; ++lev) {
-		AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
-			     rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
-			     rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
+        if (spherical == 1) {
+            for (int lev=0; lev<=finest_level; ++lev) {
+                AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
+                             rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
+                             rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
 
-		AMREX_D_TERM(rho0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);,
-			     rho0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);,
-			     rho0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1););
-	    }
-	    
-	    MakeS0mac(rho0_old,rho0mac_old);
-	    MakeS0mac(rho0_new,rho0mac_new);
-	}
+                AMREX_D_TERM(rho0mac_new[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
+                             rho0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
+                             rho0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
+            }
 
-	// compute species fluxes
-	MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
-		     rho0_old,rho0_edge_old,rho0mac_old,
-		     rho0_new,rho0_edge_new,rho0mac_new,
-		     rho0_predicted_edge,
-		     FirstSpec,NumSpec);
+            MakeS0mac(rho0_old,rho0mac_old);
+            MakeS0mac(rho0_new,rho0mac_new);
+        }
+
+        // compute species fluxes
+        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
+                     rho0_old,rho0_edge_old,rho0mac_old,
+                     rho0_new,rho0_edge_new,rho0mac_new,
+                     rho0_predicted_edge,
+                     FirstSpec,NumSpec);
     }
 
     //**************************************************************************
@@ -210,35 +210,35 @@ Maestro::DensityAdvance (int which_step,
     //     3) Define density as the sum of the (rho X)_i
     //     4) Update tracer with conservative differencing as well.
     //**************************************************************************
-    
+
     for (int lev=0; lev<=finest_level; ++lev) {
-	scal_force[lev].setVal(0.);
+        scal_force[lev].setVal(0.);
     }
 
     // p0 only used in rhoh update so it's an optional parameter
     UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec);
-    
-    // if (verbose >= 1) {
-    // 	Real smin, smax;
-    // 	for (int lev=0; lev<=finest_level; ++lev) {
-    // 	    // Print() << "Level " << lev << std::endl;
 
-    // 	    for (int comp = FirstSpec; comp < FirstSpec+NumSpec; ++comp) {
-    // 		MultiFab::Divide(snew[lev],snew[lev],Rho,comp,1,ng_s);
-             
-    // 		smin = snew[lev].min(comp); 
-    // 		smax = snew[lev].max(comp);
-             
+    // if (verbose >= 1) {
+    //  Real smin, smax;
+    //  for (int lev=0; lev<=finest_level; ++lev) {
+    //      // Print() << "Level " << lev << std::endl;
+
+    //      for (int comp = FirstSpec; comp < FirstSpec+NumSpec; ++comp) {
+    //      MultiFab::Divide(snew[lev],snew[lev],Rho,comp,1,ng_s);
+
+    //      smin = snew[lev].min(comp);
+    //      smax = snew[lev].max(comp);
+
     //          Print() << "Last species: " << smin << " " << smax << std::endl;
 
-    // 		MultiFab::Multiply(snew[lev],snew[lev],Rho,comp,1,ng_s);
-    // 	    }
-	    
-    // 	    smin = snew[lev].min(Rho); 
-    // 	    smax = snew[lev].max(Rho);
-          
-    // 	    Print() << "Rho: " << smin << " " << smax << std::endl;
-    // 	}
+    //      MultiFab::Multiply(snew[lev],snew[lev],Rho,comp,1,ng_s);
+    //      }
+
+    //      smin = snew[lev].min(Rho);
+    //      smax = snew[lev].max(Rho);
+
+    //      Print() << "Rho: " << smin << " " << smax << std::endl;
+    //  }
     // }
 
 

@@ -10,3 +10,8 @@ Spherical variable-base state implemented (still testing and debugging)
 Added files to help with AMR debugging with constant base-state spherical case
 Implemented correct corner coupling for 3d conservative quantity advection
 Implemented dpdt term for variable-base state spherical MAC projection
+
+09-04-2018
+New test problems: rt, double_bubble, shear jet, test_convect
+Some multilevel bug fixes (multilevel still WIP)
+More progress on the new use_exact_base_state algorithm (still WIP)

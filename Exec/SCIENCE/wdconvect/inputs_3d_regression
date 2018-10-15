@@ -77,7 +77,7 @@ maestro.plot_deltat = 10.0e0
 
 # CHECKPOINT
 maestro.check_base_name = wdconvect_chk
-maestro.chk_int         = 25
+maestro.chk_int         = -1
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
@@ -97,3 +97,6 @@ maestro.eps_hg             = 1.e-11
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
+
+# OMP settings
+system.regtest_reduction = 1

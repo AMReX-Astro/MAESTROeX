@@ -41,6 +41,8 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 #if (AMREX_SPACEDIM == 3)
         utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
+		for (int j=0; j < AMREX_SPACEDIM; j++)
+			utrans[lev][j].setVal(0.);
     }
 
     // create utrans
@@ -97,10 +99,14 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+		// NOTE: don't tile
         for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -114,7 +120,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             mkutrans_3d(
 #endif
                         &lev, domainBox.loVect(), domainBox.hiVect(),
-                        validBox.loVect(), validBox.hiVect(),
+                        tileBox.loVect(), tileBox.hiVect(),
                         BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
@@ -122,9 +128,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                         BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+												BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+												BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+												BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
 #endif
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
@@ -136,7 +142,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 	// fill periodic ghost cells
 	for (int lev=0; lev<=finest_level; ++lev) {
 	    for (int d=0; d<AMREX_SPACEDIM; ++d) {
-		utrans[lev][d].FillBoundary(geom[lev].periodicity());
+				utrans[lev][d].FillBoundary(geom[lev].periodicity());
 	    }
 	}
 
@@ -188,10 +194,14 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+		// NOTE: don't think this should be tiled
         for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -205,7 +215,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             velpred_3d(
 #endif
                         &lev, domainBox.loVect(), domainBox.hiVect(),
-                        validBox.loVect(), validBox.hiVect(),
+                        tileBox.loVect(), tileBox.hiVect(),
                         BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
@@ -220,9 +230,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                         BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+												BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+												BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+												BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
 #endif
                         BL_TO_FORTRAN_FAB(force_mf[mfi]),
@@ -269,10 +279,14 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+// NOTE: don't think this should be tiled (or at least causes errors in 3D)
         for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
 	    // Be careful to pass in comp+1 for fortran indexing
             for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
@@ -291,7 +305,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                 make_edge_scal_3d(
 #endif
                     domainBox.loVect(), domainBox.hiVect(),
-                    validBox.loVect(), validBox.hiVect(),
+                    tileBox.loVect(), tileBox.hiVect(),
                     BL_TO_FORTRAN_FAB(scal_mf[mfi]), scal_mf.nGrow(),
                     BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
@@ -370,23 +384,28 @@ void
 	const MultiFab& w0macy_mf = w0mac[lev][1];
 	const MultiFab& w0macz_mf = w0mac[lev][2];
 	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
-	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
-	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
-	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
+	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 
-	if (spherical == 1 && use_exact_base_state == 0) {
-	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
-	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
-	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
+	if (spherical == 1) {
+	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,1);
+	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,1);
+	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,1);
 	}
 #endif
 #endif
 
+
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+		// NOTE: don't think this should be tiled
         for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
 	    // call fortran subroutine
 	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -401,7 +420,7 @@ void
 #elif (AMREX_SPACEDIM == 3)
                 make_rhoX_flux_3d(
 #endif
-				  &lev, validBox.loVect(), validBox.hiVect(),
+				  &lev, tileBox.loVect(), tileBox.hiVect(),
 				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
@@ -432,13 +451,13 @@ void
 	    } else {
 
 #if (AMREX_SPACEDIM == 3)
-		if (use_exact_base_state)
-		{
-		    // add make_rhoX_flux_3d_sphr_irreg()
-		}
-		else
-		{
-		    make_rhoX_flux_3d_sphr(validBox.loVect(), validBox.hiVect(),
+		// if (use_exact_base_state)
+		// {
+		//     // add make_rhoX_flux_3d_sphr_irreg()
+		// }
+		// else
+		// {
+		    make_rhoX_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
 			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
@@ -455,7 +474,7 @@ void
 				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
 				       &startcomp, &endcomp);
-		}
+		// }
 #else
 	        Abort("MakeRhoXFlux: Spherical is not valid for DIM < 3");
 #endif
@@ -561,7 +580,7 @@ void
 	h0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
 	h0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 
-	if (spherical == 1 && use_exact_base_state == 0) {
+	if (spherical == 1) {
 	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
 	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
 	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
@@ -573,10 +592,13 @@ void
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
 	    // call fortran subroutine
 	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -590,7 +612,7 @@ void
 #elif (AMREX_SPACEDIM == 3)
                 make_rhoh_flux_3d(
 #endif
-				  &lev, validBox.loVect(), validBox.hiVect(),
+				  &lev, tileBox.loVect(), tileBox.hiVect(),
 				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
@@ -620,13 +642,13 @@ void
 	    } else {
 
 #if (AMREX_SPACEDIM == 3)
-	        if (use_exact_base_state)
-		{
-		    // Need make_rhoh_flux_sphr_irreg
-		}
-		else
-		{
-		    make_rhoh_flux_3d_sphr(validBox.loVect(), validBox.hiVect(),
+	        // if (use_exact_base_state)
+		// {
+		//     // Need make_rhoh_flux_sphr_irreg
+		// }
+		// else
+		// {
+		    make_rhoh_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
 			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
@@ -645,7 +667,7 @@ void
 				       BL_TO_FORTRAN_3D(h0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
-		}
+		// }
 #else
 	        Abort("MakeRhoHFlux: Spherical is not valid for DIM < 3");
 #endif
@@ -726,10 +748,13 @@ void
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(scalold_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(scalold_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
 
 	    if (start_comp == RhoH)
@@ -747,7 +772,7 @@ void
 #elif (AMREX_SPACEDIM == 3)
                     update_rhoh_3d(
 #endif
-				   &lev, validBox.loVect(), validBox.hiVect(),
+				   &lev, tileBox.loVect(), tileBox.hiVect(),
 				   BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
 				   BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
 				   BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
@@ -763,7 +788,7 @@ void
 				   &NumSpec);
 		} else {
 #if (AMREX_SPACEDIM == 3)
-		    update_rhoh_3d_sphr(validBox.loVect(), validBox.hiVect(),
+		    update_rhoh_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
 					BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
 					BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
 					BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
@@ -793,7 +818,7 @@ void
 #elif (AMREX_SPACEDIM == 3)
                 update_rhoX_3d(
 #endif
-                    validBox.loVect(), validBox.hiVect(),
+                    tileBox.loVect(), tileBox.hiVect(),
                     BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
                     BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
                     BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
@@ -876,14 +901,17 @@ void
 	const MultiFab& sponge_mf = sponge[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(force_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(force_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
 
 	    if (spherical == 0) {
-		update_velocity( &lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		update_velocity( &lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				 BL_TO_FORTRAN_3D(uold_mf[mfi]),
 				 BL_TO_FORTRAN_3D(unew_mf[mfi]),
 				 BL_TO_FORTRAN_3D(umac_mf[mfi]),
@@ -906,7 +934,7 @@ void
 				 dx, &dt);
 	    } else {
 #if (AMREX_SPACEDIM == 3)
-		update_velocity_sphr( ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+		update_velocity_sphr( ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				      BL_TO_FORTRAN_3D(uold_mf[mfi]),
 				      BL_TO_FORTRAN_3D(unew_mf[mfi]),
 				      BL_TO_FORTRAN_3D(umac_mf[mfi]),

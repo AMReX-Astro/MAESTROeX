@@ -52,6 +52,7 @@ module meth_params_module
   logical                       , save :: do_eos_h_above_cutoff
   integer                       , save :: enthalpy_pred_type
   integer                       , save :: species_pred_type
+  logical                       , save :: use_delta_gamma1_term
   integer                       , save :: slope_order
   double precision              , save :: grav_const
   integer                       , save :: ppm_type
@@ -76,6 +77,7 @@ module meth_params_module
   integer                       , save :: w0_interp_type
   integer                       , save :: s0mac_interp_type
   integer                       , save :: w0mac_interp_type
+  integer                       , save :: track_grid_losses
 
   ! End the declarations of the ParmParse parameters
 
@@ -118,6 +120,7 @@ contains
     do_eos_h_above_cutoff = .true.;
     enthalpy_pred_type = 1;
     species_pred_type = 1;
+    use_delta_gamma1_term = .false.;
     slope_order = 4;
     grav_const = -1.5d10;
     ppm_type = 1;
@@ -143,6 +146,7 @@ contains
     w0_interp_type = 2;
     s0mac_interp_type = 1;
     w0mac_interp_type = 1;
+    track_grid_losses = 0;
 
     call amrex_parmparse_build(pp, "maestro")
     call pp%query("maestro_verbose", maestro_verbose)
@@ -172,6 +176,7 @@ contains
     call pp%query("do_eos_h_above_cutoff", do_eos_h_above_cutoff)
     call pp%query("enthalpy_pred_type", enthalpy_pred_type)
     call pp%query("species_pred_type", species_pred_type)
+    call pp%query("use_delta_gamma1_term", use_delta_gamma1_term)
     call pp%query("slope_order", slope_order)
     call pp%query("grav_const", grav_const)
     call pp%query("ppm_type", ppm_type)
@@ -196,6 +201,7 @@ contains
     call pp%query("w0_interp_type", w0_interp_type)
     call pp%query("s0mac_interp_type", s0mac_interp_type)
     call pp%query("w0mac_interp_type", w0mac_interp_type)
+    call pp%query("track_grid_losses", track_grid_losses)
     call amrex_parmparse_destroy(pp)
 
 

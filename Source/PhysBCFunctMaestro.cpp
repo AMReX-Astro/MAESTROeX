@@ -4,13 +4,14 @@
 using namespace amrex;
 
 PhysBCFunctMaestro::PhysBCFunctMaestro (const Geometry& geom,
-                                        const Vector<BCRec>& bcr, 
+                                        const Vector<BCRec>& bcr,
                                         const BndryFunctBase& func)
     : m_geom(geom), m_bcr(bcr), m_bc_func(func.clone())
-{ }
+{
+}
 
 void
-PhysBCFunctMaestro::define (const Geometry& geom, 
+PhysBCFunctMaestro::define (const Geometry& geom,
                             const Vector<BCRec>& bcr,
                             const BndryFunctBase& func)
 {
@@ -26,7 +27,7 @@ PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
     BL_PROFILE_VAR("PhysBCFunctMaestro::FillBoundary",PhysBC_FillBoundary);
 
     if (mf.nGrow() == 0) return;
-    
+
     if (m_geom.isAllPeriodic()) return;
 
     const Box&     domain      = m_geom.Domain();
@@ -39,9 +40,9 @@ PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
     // create a grown domain box containing valid + periodic cells
     Box gdomain = amrex::convert(domain, mf.boxArray().ixType());
     for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-	if (m_geom.isPeriodic(i)) {
-	    gdomain.grow(i, mf.nGrow());
-	}
+        if (m_geom.isPeriodic(i)) {
+            gdomain.grow(i, mf.nGrow());
+        }
     }
 
     for (int comp=dcomp; comp<dcomp+ncomp; ++comp)
@@ -52,13 +53,12 @@ PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for (MFIter mfi(mf); mfi.isValid(); ++mfi)
         {
             FArrayBox& dest = mf[mfi];
             const Box& bx = dest.box();
-        
+
             // if there are cells not in the valid + periodic grown box
             // we need to fill them here
             if (!gdomain.contains(bx)) {

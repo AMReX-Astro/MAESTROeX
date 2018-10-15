@@ -1,0 +1,11 @@
+velpert_amplitude         real 1.e5
+velpert_amplitude         real 1.e6
+velpert_radius            real 2.e7
+velpert_scale             real 1.e7
+velpert_steep             real 1.e5
+tag_density_1             real 5.e7
+tag_density_2             real 1.e8
+tag_density_3             real 1.e8
+tag_density_3             real 1.e9
+particle_temp_cutoff      real 6.e8
+particle_tpert_threshold  real 2.e7

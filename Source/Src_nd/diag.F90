@@ -1,11 +1,11 @@
-! a generic diag module for MAESTRO.  This simply computes the 
+! a generic diag module for MAESTRO.  This simply computes the
 ! maximum Mach number on the domain and outputs it each timestep
 ! to maestro_diag.out
 
 module diag_module
 
   use meth_params_module, only: rho_comp, spec_comp, temp_comp, prob_lo, &
-                                  sponge_start_factor, sponge_center_density, base_cutoff_density
+       sponge_start_factor, sponge_center_density, base_cutoff_density
   use network, only: nspec
   use base_state_geometry_module, only:  max_radial_level, nr_fine, center
   use eos_module
@@ -26,7 +26,8 @@ contains
                   u, u_lo, u_hi, &
                   w0, dx, &
                   Mach_max,temp_max,enuc_max,Hext_max, &
-                  mask) bind(C, name="diag")
+                  mask,     m_lo, m_hi, use_mask) &
+                  bind(C, name="diag")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -42,7 +43,9 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3)
     double precision, intent(inout) :: Mach_max, temp_max, enuc_max, Hext_max
-    integer         , intent(in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    integer         , intent(in   ) :: m_lo(3), m_hi(3)
+    integer         , intent(in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer         , intent(in   ) :: use_mask
 
     !     Local variables
     integer            :: i, j, k
@@ -58,9 +61,9 @@ contains
     ! relates to the volume of a cell at the coarsest level of refinement.
 #if (AMREX_SPACEDIM == 1)
     weight = 1.d0 / 2.d0**(lev)
-#elsif (AMREX_SPACEDIM == 2)
+#elif (AMREX_SPACEDIM == 2)
     weight = 1.d0 / 4.d0**(lev)
-#elsif (AMREX_SPACEDIM == 3)
+#elif (AMREX_SPACEDIM == 3)
     weight = 1.d0 / 8.d0**(lev)
 #endif
 
@@ -69,38 +72,38 @@ contains
 
        do j = lo(2), hi(2)
           y = prob_lo(2) + (dble(j) + 0.5d0) * dx(2)
-       
+
           do i = lo(1), hi(1)
              x = prob_lo(1) + (dble(i) + 0.5d0) * dx(1)
 
              ! make sure the cell isn't covered by finer cells
              cell_valid = .true.
-             if ( present(mask) ) then
+             if ( use_mask .eq. 1) then
                 if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
              end if
-             
+
              if (cell_valid) then
 
                 ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
-                vel = sqrt( (u(i,1) + HALF*(w0(lev,i) + w0(lev,i+1)) )**2 )
+                vel = sqrt( (u(i,1) + 0.5d0*(w0(lev,i) + w0(lev,i+1)) )**2 )
 #elsif (AMREX_SPACEDIM == 2)
                 vel = sqrt(  u(i,j,1)**2 + &
-                           ( u(i,j,2) + HALF*(w0(lev,j) + w0(lev,j+1)) )**2 )
+                     ( u(i,j,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
 #elsif (AMREX_SPACEDIM == 3)
                 vel = sqrt(  u(i,j,k,1)**2 + &
-                             u(i,j,k,2)**2 + &
-                           ( u(i,j,k,3) + 0.5d0*(w0(lev,k) + w0(lev,k+1)) )**2 )
+                     u(i,j,k,2)**2 + &
+                     ( u(i,j,k,3) + 0.5d0*(w0(lev,k) + w0(lev,k+1)) )**2 )
 #endif
-             
-                ! call the EOS to get the sound speed and internal energy       
+
+                ! call the EOS to get the sound speed and internal energy
                 eos_state%T     = scal(i,j,k,temp_comp)
                 eos_state%rho   = scal(i,j,k,rho_comp)
                 eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
                 call eos(eos_input_rt, eos_state)
-                
-                ! max Mach number                                       
+
+                ! max Mach number
                 Mach_max = max(Mach_max,vel/eos_state%cs)
 
                 ! max temp and enuc
@@ -118,18 +121,19 @@ contains
 
   !xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   subroutine diag_sphr(lev, lo, hi, &
-                        scal, s_lo, s_hi, nc_s, &
-                        rho0, p0, &
-                        u, u_lo, u_hi, &
-                        w0macx, x_lo, x_hi, &
-                        w0macy, y_lo, y_hi, &
-                        w0macz, z_lo, z_hi, &
-                        w0r, wr_lo, wr_hi, & 
-                        dx, &
-                        normal, n_lo, n_hi, &
-                        T_max, coord_Tmax, vel_Tmax, &
-                        ncenter, T_center, Mach_max, &
-                        mask) bind(C, name="diag_sphr")
+                       scal, s_lo, s_hi, nc_s, &
+                       rho0, p0, &
+                       u, u_lo, u_hi, &
+                       w0macx, x_lo, x_hi, &
+                       w0macy, y_lo, y_hi, &
+                       w0macz, z_lo, z_hi, &
+                       w0r, wr_lo, wr_hi, &
+                       dx, &
+                       normal, n_lo, n_hi, &
+                       T_max, coord_Tmax, vel_Tmax, &
+                       ncenter, T_center, Mach_max, &
+                       mask,     m_lo, m_hi, use_mask) &
+                       bind(C, name="diag_sphr")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -152,7 +156,9 @@ contains
     double precision, intent(inout) :: T_max, coord_Tmax(3), vel_Tmax(3), T_center
     integer         , intent(inout) :: ncenter
     double precision, intent(inout) :: Mach_max
-    integer         , intent(in   ), optional :: mask(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    integer         , intent (in   ) :: m_lo(3), m_hi(3)
+    integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer         , intent (in   ) :: use_mask
 
     !     Local variables
     integer          :: i, j, k
@@ -173,18 +179,18 @@ contains
 
        do j = lo(2), hi(2)
           y = prob_lo(2) + (dble(j) + 0.5d0) * dx(2)
-       
+
           do i = lo(1), hi(1)
              x = prob_lo(1) + (dble(i) + 0.5d0) * dx(1)
 
              ! make sure the cell isn't covered by finer cells
              cell_valid = .true.
-             if ( present(mask) ) then
+             if ( use_mask .eq. 1 ) then
                 if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
              end if
 
              ! we only consider cells inside of where the sponging begins
-             if ( cell_valid .and. & 
+             if ( cell_valid .and. &
                   scal(i,j,k,rho_comp) >= sponge_start_factor*sponge_center_density ) then
 
                 ! is it one of the 8 zones surrounding the center?
@@ -197,16 +203,16 @@ contains
                    T_center = T_center + scal(i,j,k,temp_comp)
                 endif
 
-                ! velr is the projection of the velocity (including w0) onto 
-                ! the radial unit vector 
+                ! velr is the projection of the velocity (including w0) onto
+                ! the radial unit vector
                 velr = u(i,j,k,1)*normal(i,j,k,1) + &
-                       u(i,j,k,2)*normal(i,j,k,2) + &
-                       u(i,j,k,3)*normal(i,j,k,3) + w0r(i,j,k)
+                     u(i,j,k,2)*normal(i,j,k,2) + &
+                     u(i,j,k,3)*normal(i,j,k,3) + w0r(i,j,k)
 
                 ! vel is the magnitude of the velocity, including w0
                 vel = sqrt( (u(i,j,k,1)+0.5d0*(w0macx(i,j,k)+w0macx(i+1,j,k)))**2 + &
-                            (u(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k)))**2 + &
-                            (u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1)))**2)
+                     (u(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k)))**2 + &
+                     (u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1)))**2)
 
                 !
                 ! max T, location, and velocity at that location (including w0)
@@ -221,14 +227,14 @@ contains
                    vel_Tmax(3)   = u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1))
                 end if
 
-                ! call the EOS to get the sound speed and internal energy       
+                ! call the EOS to get the sound speed and internal energy
                 eos_state%T     = scal(i,j,k,temp_comp)
                 eos_state%rho   = scal(i,j,k,rho_comp)
                 eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-                
+
                 call eos(eos_input_rt, eos_state)
-                
-                ! max Mach number                                       
+
+                ! max Mach number
                 Mach_max = max(Mach_max,vel/eos_state%cs)
 
              end if  ! end density check
@@ -238,5 +244,5 @@ contains
     enddo
 
   end subroutine diag_sphr
-  
+
 end module diag_module

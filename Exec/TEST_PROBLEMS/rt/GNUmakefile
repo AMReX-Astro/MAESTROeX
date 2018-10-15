@@ -1,12 +1,12 @@
 DEBUG      = FALSE
 DIM        = 2
 COMP	   = gnu
-USE_MPI    = TRUE
-USE_OMP    = FALSE
+USE_MPI    = FALSE
+USE_OMP    = TRUE
 USE_REACT  = TRUE
 
 TINY_PROFILE = FALSE
-PROFILE      = FALSE # TRUE overrides TINY_PROFILE
+PROFILE      = FALSE
 
 # define the location of the MAESTROEX home directory
 MAESTROEX_HOME  := ../../..
@@ -25,5 +25,6 @@ GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/simple.net
 
 Bpack   := ./Make.package
 Blocs   := .
+PROBIN_PARAMETER_DIRS := .
 
 include $(MAESTROEX_HOME)/Exec/Make.Maestro

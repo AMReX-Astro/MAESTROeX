@@ -34,7 +34,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 #amr.grid_eff           = 0.9     # larger number results in more smaller grids around tagged cells
 
 # TAGGING
-maestro.temperr = 6.0e8 
+maestro.temperr = 6.0e8
 maestro.denserr = 1.0e8
 
 # TIME STEPPING

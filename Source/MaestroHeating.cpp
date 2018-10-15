@@ -6,7 +6,7 @@ using namespace amrex;
 // compute heating term, rho_Hext
 void
 Maestro::MakeHeating (Vector<MultiFab>& rho_Hext,
-                      const Vector<MultiFab>& scal) 
+                      const Vector<MultiFab>& scal)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeHeating()",MakeHeating);
@@ -19,17 +19,20 @@ Maestro::MakeHeating (Vector<MultiFab>& rho_Hext,
 
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            make_heating(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+            make_heating(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                          BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
                          BL_TO_FORTRAN_FAB(scal_mf[mfi]), dx, &t_old);
         }

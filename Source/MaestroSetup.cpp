@@ -16,6 +16,9 @@ Maestro::Setup ()
 
     Print() << "Calling Setup()" << std::endl;
 
+    // initialize the start time for our CPU-time tracker
+    startCPUTime = ParallelDescriptor::second();
+
     ///////
     // Geometry on all levels has been defined already.
     ///////
@@ -31,15 +34,12 @@ Maestro::Setup ()
     // (in extern.f90)
     ExternInit();
 
-    // Initialize the runtime parameters specific to the problem
-    // (in probdata.f90)
-    ProbdataInit();
-
     // define (Rho, RhoH, etc.)
     // calls network_init
     VariableSetup();
 
     maestro_network_init();
+
     burner_init();
 
     const Real* probLo = geom[0].ProbLo();
@@ -63,7 +63,7 @@ Maestro::Setup ()
 
         // compute dr_fine
         dr_fine = dxFine[0] / drdxfac;
-       
+
 	// compute nr_irreg
 	int domhi = domainBoxFine.bigEnd(0)+1;
 	if (!octant) {
@@ -86,7 +86,7 @@ Maestro::Setup ()
 		lenx = 0.5*(probHi[0] - probLo[0]);
 		leny = 0.5*(probHi[1] - probLo[1]);
 		lenz = 0.5*(probHi[2] - probLo[2]);
-	    }       
+	    }
 	    max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
 	    nr_fine = int(max_dist / dr_fine) + 1;
 	}
@@ -194,12 +194,12 @@ Maestro::Setup ()
     cell_cc_to_r      .resize(max_level+1);
 
     // stores fluxes at coarse-fine interface for synchronization
-    // this will be sized "max_level+1+1"
+    // this will be sized "max_level+2"
     // NOTE: the flux register associated with flux_reg[lev] is associated
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] is never actually used in the reflux operation
-    flux_reg_s.resize(max_level+1);
-    flux_reg_u.resize(max_level+1);
+    flux_reg_s.resize(max_level+2);
+    flux_reg_u.resize(max_level+2);
 
     // number of ghost cells needed for hyperbolic step
     if (ppm_type == 2 || bds_type == 1) {
@@ -247,7 +247,7 @@ Maestro::ReadParameters ()
     pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
 
     // storey boundary conditions in a single array
-    // order shall be 
+    // order shall be
     // LO_X, LO_Y, (LO_Z), HI_X, HI_Y, (HI_Z)
     phys_bc.resize(2*AMREX_SPACEDIM);
     for (int i=0; i<AMREX_SPACEDIM; ++i) {
@@ -314,25 +314,6 @@ Maestro::ExternInit ()
     probin_file_name[i] = probin_file[i];
 
   maestro_extern_init(probin_file_name.dataPtr(),&probin_file_length);
-}
-
-void
-Maestro::ProbdataInit ()
-{
-  // initialize the probdata runtime parameters -- these will
-  // live in the probin
-
-  if (ParallelDescriptor::IOProcessor()) {
-    std::cout << "reading probdata runtime parameters ..." << std::endl;
-  }
-
-  const int probin_file_length = probin_file.length();
-  Vector<int> probin_file_name(probin_file_length);
-
-  for (int i = 0; i < probin_file_length; i++)
-    probin_file_name[i] = probin_file[i];
-
-  maestro_probdata_init(probin_file_name.dataPtr(),&probin_file_length);
 }
 
 // set up BCRec definitions for BC types
@@ -407,7 +388,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::int_dir);
             }
-                bcs_s[Rho ].setLo(dir, BCType::int_dir);  
+                bcs_s[Rho ].setLo(dir, BCType::int_dir);
                 bcs_s[RhoH].setLo(dir, BCType::int_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::int_dir);
@@ -423,7 +404,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setLo(dir, BCType::ext_dir);  
+                bcs_s[Rho ].setLo(dir, BCType::ext_dir);
                 bcs_s[RhoH].setLo(dir, BCType::ext_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::ext_dir);
@@ -439,7 +420,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_s[Rho ].setLo(dir, BCType::foextrap);  
+                bcs_s[Rho ].setLo(dir, BCType::foextrap);
                 bcs_s[RhoH].setLo(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::foextrap);
@@ -456,7 +437,7 @@ Maestro::BCSetup()
                 bcs_u[comp].setLo(dir, BCType::reflect_even);
             }
                 bcs_u[dir ].setLo(dir, BCType::reflect_odd);
-                bcs_s[Rho ].setLo(dir, BCType::reflect_even);  
+                bcs_s[Rho ].setLo(dir, BCType::reflect_even);
                 bcs_s[RhoH].setLo(dir, BCType::reflect_even);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::reflect_even);
@@ -473,7 +454,7 @@ Maestro::BCSetup()
                 bcs_u[comp].setLo(dir, BCType::hoextrap);
             }
                 bcs_u[dir ].setLo(dir, BCType::ext_dir);
-                bcs_s[Rho ].setLo(dir, BCType::hoextrap);  
+                bcs_s[Rho ].setLo(dir, BCType::hoextrap);
                 bcs_s[RhoH].setLo(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::hoextrap);
@@ -489,7 +470,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setLo(dir, BCType::hoextrap);  
+                bcs_s[Rho ].setLo(dir, BCType::hoextrap);
                 bcs_s[RhoH].setLo(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::hoextrap);
@@ -510,7 +491,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::int_dir);
             }
-                bcs_s[Rho ].setHi(dir, BCType::int_dir);  
+                bcs_s[Rho ].setHi(dir, BCType::int_dir);
                 bcs_s[RhoH].setHi(dir, BCType::int_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::int_dir);
@@ -526,7 +507,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setHi(dir, BCType::ext_dir);  
+                bcs_s[Rho ].setHi(dir, BCType::ext_dir);
                 bcs_s[RhoH].setHi(dir, BCType::ext_dir);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::ext_dir);
@@ -542,7 +523,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_s[Rho ].setHi(dir, BCType::foextrap);  
+                bcs_s[Rho ].setHi(dir, BCType::foextrap);
                 bcs_s[RhoH].setHi(dir, BCType::foextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::foextrap);
@@ -559,7 +540,7 @@ Maestro::BCSetup()
                 bcs_u[comp].setHi(dir, BCType::reflect_even);
             }
                 bcs_u[dir].setHi(dir, BCType::reflect_odd);
-                bcs_s[Rho ].setHi(dir, BCType::reflect_even);  
+                bcs_s[Rho ].setHi(dir, BCType::reflect_even);
                 bcs_s[RhoH].setHi(dir, BCType::reflect_even);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::reflect_even);
@@ -576,7 +557,7 @@ Maestro::BCSetup()
                 bcs_u[comp].setHi(dir, BCType::hoextrap);
             }
                 bcs_u[dir].setHi(dir, BCType::ext_dir);
-                bcs_s[Rho ].setHi(dir, BCType::hoextrap);  
+                bcs_s[Rho ].setHi(dir, BCType::hoextrap);
                 bcs_s[RhoH].setHi(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::hoextrap);
@@ -592,7 +573,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setHi(dir, BCType::hoextrap);  
+                bcs_s[Rho ].setHi(dir, BCType::hoextrap);
                 bcs_s[RhoH].setHi(dir, BCType::hoextrap);
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::hoextrap);
