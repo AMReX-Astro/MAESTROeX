@@ -998,7 +998,7 @@ extern "C"
 
     //////////////////////
     // in rotation.F90
-    void init_rotation();
+    void rotation_init();
     //////////////////////
 
 

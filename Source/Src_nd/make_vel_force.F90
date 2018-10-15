@@ -93,6 +93,7 @@ contains
     !
     ! See docs/rotation for derivation and figures.
     !
+
 #ifdef ROTATION
     centrifugal_term(1) = - omega**2 * rotation_radius * sin_theta * sin_theta
     centrifugal_term(2) = ZERO
@@ -108,10 +109,9 @@ contains
              r = i
 #elif (AMREX_SPACEDIM == 2)
              r = j
-#elif (AMREX_SPACEDIM == 3)
+#else
              r = k
 #endif
-
              rhopert = rho(i,j,k) - rho0(lev,r)
 
              ! cutoff the buoyancy term if we are outside of the star
@@ -178,7 +178,7 @@ contains
                 r = i
 #elif (AMREX_SPACEDIM == 2)
                 r = j
-#elif (AMREX_SPACEDIM == 3)
+#else
                 r = k
 #endif
 
@@ -187,11 +187,12 @@ contains
                 else if (r .ge. nr(lev)) then
                    ! do not modify force since dw0/dr=0
                 else
-
-#if (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 1)
+                   vel_force(i,j,k,1) = vel_force(i,j,k,1) &
+                        - (uedge(i,j+1,k)+uedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
+#elif (AMREX_SPACEDIM == 2)
                    vel_force(i,j,k,2) = vel_force(i,j,k,2) &
                         - (vedge(i,j+1,k)+vedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
-
 #else
                    vel_force(i,j,k,3) = vel_force(i,j,k,3) &
                         - (wedge(i,j,k+1)+wedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
@@ -297,6 +298,8 @@ contains
     call put_1d_array_on_cart_sphr(lo,hi,grav_cart,lo,hi,3,grav,dx,0,1,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
+    ! write(*,*) "omega = ", omega
+
     do k = lo(3),hi(3)
        zz = prob_lo(3) + (dble(k) + HALF)*dx(3) - center(3)
        do j = lo(2),hi(2)
@@ -356,29 +359,29 @@ contains
 
              ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
-             vel_force(i,j,k,1) = -coriolis_term(1) - centrifugal_term(1) + &
-                  ( rhopert * grav_cart(i,j,k,1) - gpi(i,j,k,1) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,1)
+             vel_force(i,j,k,:) = -coriolis_term(1) - centrifugal_term(:) + &
+                  ( rhopert * grav_cart(i,j,k,:) - gpi(i,j,k,:) ) / rho(i,j,k) &
+                  - w0_force_cart(i,j,k,:)
 
-             vel_force(i,j,k,2) = -coriolis_term(2) - centrifugal_term(2) + &
-                  ( rhopert * grav_cart(i,j,k,2) - gpi(i,j,k,2) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,2)
-
-             vel_force(i,j,k,3) = -coriolis_term(3) - centrifugal_term(3) + &
-                  ( rhopert * grav_cart(i,j,k,3) - gpi(i,j,k,3) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,3)
+             ! vel_force(i,j,k,2) = -coriolis_term(2) - centrifugal_term(2) + &
+             !      ( rhopert * grav_cart(i,j,k,2) - gpi(i,j,k,2) ) / rho(i,j,k) &
+             !      - w0_force_cart(i,j,k,2)
+             !
+             ! vel_force(i,j,k,3) = -coriolis_term(3) - centrifugal_term(3) + &
+             !      ( rhopert * grav_cart(i,j,k,3) - gpi(i,j,k,3) ) / rho(i,j,k) &
+             !      - w0_force_cart(i,j,k,3)
 #else
 
              ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
-             vel_force(i,j,k,1) = ( rhopert * grav_cart(i,j,k,1) - gpi(i,j,k,1) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,1)
+             vel_force(i,j,k,:) = ( rhopert * grav_cart(i,j,k,:) - gpi(i,j,k,:) ) / rho(i,j,k) &
+                  - w0_force_cart(i,j,k,:)
 
-             vel_force(i,j,k,2) = ( rhopert * grav_cart(i,j,k,2) - gpi(i,j,k,2) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,2)
-
-             vel_force(i,j,k,3) = ( rhopert * grav_cart(i,j,k,3) - gpi(i,j,k,3) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,3)
+             ! vel_force(i,j,k,2) = ( rhopert * grav_cart(i,j,k,2) - gpi(i,j,k,2) ) / rho(i,j,k) &
+             !      - w0_force_cart(i,j,k,2)
+             !
+             ! vel_force(i,j,k,3) = ( rhopert * grav_cart(i,j,k,3) - gpi(i,j,k,3) ) / rho(i,j,k) &
+             !      - w0_force_cart(i,j,k,3)
 
 #endif
           end do
@@ -397,9 +400,7 @@ contains
                      HALF*(vedge(i,j,k)+vedge(i  ,j+1,k  ))*normal(i,j,k,2) + &
                      HALF*(wedge(i,j,k)+wedge(i  ,j,  k+1))*normal(i,j,k,3)
 
-                vel_force(i,j,k,1) = vel_force(i,j,k,1) - Ut_dot_er*gradw0_cart(i,j,k)*normal(i,j,k,1)
-                vel_force(i,j,k,2) = vel_force(i,j,k,2) - Ut_dot_er*gradw0_cart(i,j,k)*normal(i,j,k,2)
-                vel_force(i,j,k,3) = vel_force(i,j,k,3) - Ut_dot_er*gradw0_cart(i,j,k)*normal(i,j,k,3)
+                vel_force(i,j,k,:) = vel_force(i,j,k,:) - Ut_dot_er*gradw0_cart(i,j,k)*normal(i,j,k,:)
 
              end do
           end do

@@ -34,6 +34,10 @@ Maestro::Setup ()
     // (in extern.f90)
     ExternInit();
 
+#ifdef ROTATION
+    rotation_init();
+#endif
+
     // define (Rho, RhoH, etc.)
     // calls network_init
     VariableSetup();
