@@ -67,7 +67,7 @@ contains
     double precision :: rhopert
 
 
-#ifdef ROTATION
+#if defined(ROTATION) && (AMREX_SPACEDIM == 3)
     real(kind=dp_t) :: coriolis_term(3), centrifugal_term(3)
 #endif
 
@@ -94,7 +94,7 @@ contains
     ! See docs/rotation for derivation and figures.
     !
 
-#ifdef ROTATION
+#if defined(ROTATION) && (AMREX_SPACEDIM == 3)
     centrifugal_term(1) = - omega**2 * rotation_radius * sin_theta * sin_theta
     centrifugal_term(2) = ZERO
     centrifugal_term(3) = omega**2 * rotation_radius * cos_theta * sin_theta &
@@ -119,7 +119,7 @@ contains
                 rhopert = 0.d0
              end if
 
-#ifdef ROTATION
+#if defined(ROTATION) && (AMREX_SPACEDIM == 3)
              ! the coriolis term is:
              !    2.0d0 * omega x U
              ! where omega is given above and U = (u, v, w) is the velocity
@@ -298,8 +298,6 @@ contains
     call put_1d_array_on_cart_sphr(lo,hi,grav_cart,lo,hi,3,grav,dx,0,1,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
-    ! write(*,*) "omega = ", omega
-
     do k = lo(3),hi(3)
        zz = prob_lo(3) + (dble(k) + HALF)*dx(3) - center(3)
        do j = lo(2),hi(2)
@@ -362,26 +360,12 @@ contains
              vel_force(i,j,k,:) = -coriolis_term(1) - centrifugal_term(:) + &
                   ( rhopert * grav_cart(i,j,k,:) - gpi(i,j,k,:) ) / rho(i,j,k) &
                   - w0_force_cart(i,j,k,:)
-
-             ! vel_force(i,j,k,2) = -coriolis_term(2) - centrifugal_term(2) + &
-             !      ( rhopert * grav_cart(i,j,k,2) - gpi(i,j,k,2) ) / rho(i,j,k) &
-             !      - w0_force_cart(i,j,k,2)
-             !
-             ! vel_force(i,j,k,3) = -coriolis_term(3) - centrifugal_term(3) + &
-             !      ( rhopert * grav_cart(i,j,k,3) - gpi(i,j,k,3) ) / rho(i,j,k) &
-             !      - w0_force_cart(i,j,k,3)
 #else
 
              ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
              vel_force(i,j,k,:) = ( rhopert * grav_cart(i,j,k,:) - gpi(i,j,k,:) ) / rho(i,j,k) &
                   - w0_force_cart(i,j,k,:)
-
-             ! vel_force(i,j,k,2) = ( rhopert * grav_cart(i,j,k,2) - gpi(i,j,k,2) ) / rho(i,j,k) &
-             !      - w0_force_cart(i,j,k,2)
-             !
-             ! vel_force(i,j,k,3) = ( rhopert * grav_cart(i,j,k,3) - gpi(i,j,k,3) ) / rho(i,j,k) &
-             !      - w0_force_cart(i,j,k,3)
 
 #endif
           end do
