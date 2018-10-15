@@ -38,7 +38,7 @@ maestro.temperr = 6.0e8
 maestro.denserr = 1.0e8
 
 # TIME STEPPING
-maestro.max_step  = 1
+maestro.max_step  = 100
 maestro.stop_time = 30000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -50,9 +50,9 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 maestro.spherical = 1
 maestro.evolve_base_state = false
 maestro.do_initial_projection = true
-maestro.init_divu_iter        = 1
+maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
-maestro.do_reflux             = 0 # do we do the hyperbolic reflux
+maestro.do_reflux             = 1 # do we do the hyperbolic reflux
 
 maestro.grav_const = -1.5e10
 
@@ -74,11 +74,11 @@ maestro.use_tfromp = true
 # PLOTFILES
 maestro.plot_file  = plt    # root name of plot file
 maestro.plot_int   = 1      # number of timesteps between plot files
-#maestro.plot_deltat = 10.0e0
+maestro.plot_deltat = 10.0e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = -1
+maestro.chk_int         = 1
 
 # RESTART
 #maestro.restart_file    = chk0000040
