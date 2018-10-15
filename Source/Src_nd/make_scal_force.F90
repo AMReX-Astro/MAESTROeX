@@ -244,9 +244,13 @@ contains
     ! For prediction, it should not be in the force if we are predicting
     ! (rho h)', but should be there if we are predicting h or rhoh
     !
+    ! If use_exact_base_state is on, psi is instead dpdt term, which
+    ! should always be included in the force.
+    !
     if ((is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_h) .OR. &
          (is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_rhoh) .OR. &
-         (is_prediction .eq. 0)) then
+         (is_prediction .eq. 0) .OR. &
+         (use_exact_base_state)) then
 
        call bl_allocate(psi_cart,lo,hi,1)
 
