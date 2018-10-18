@@ -24,11 +24,11 @@ contains
     do j = m_lo(2),m_hi(2)
     do i = m_lo(1),m_hi(1)
 #if (AMREX_SPACEDIM == 1)
-       print*,'i,comp',i,comp,mf(i,j,k,comp)
+       print*,'lev,i,comp',lev,i,comp,mf(i,j,k,comp)
 #elif (AMREX_SPACEDIM == 2)
-       print*,'i,j,comp',i,j,comp,mf(i,j,k,comp)
+       print*,'lev,i,j,comp',lev,i,j,comp,mf(i,j,k,comp)
 #elif (AMREX_SPACEDIM == 3)
-       print*,'i,j,k,comp',i,j,k,comp,mf(i,j,k,comp)
+       print*,'lev,i,j,k,comp',lev,i,j,k,comp,mf(i,j,k,comp)
 #endif
     enddo
     enddo
@@ -56,11 +56,11 @@ contains
     do j = m_lo(2),m_hi(2)
     do i = m_lo(1),m_hi(1)
 #if (AMREX_SPACEDIM == 1)
-       print*,'i,comp',i,comp,mf(i,j,k,comp)
+       print*,'lev,i,comp',lev,i,comp,mf(i,j,k,comp)
 #elif (AMREX_SPACEDIM == 2)
-       print*,'i,j,comp',i,j,comp,mf(i,j,k,comp)
+       print*,'lev,i,j,comp',lev,i,j,comp,mf(i,j,k,comp)
 #elif (AMREX_SPACEDIM == 3)
-       print*,'i,j,k,comp',i,j,k,comp,mf(i,j,k,comp)
+       print*,'lev,i,j,k,comp',lev,i,j,k,comp,mf(i,j,k,comp)
 #endif
     enddo
     enddo
