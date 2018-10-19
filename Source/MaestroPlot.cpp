@@ -216,10 +216,11 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     }
     ++dest_comp;
     
-    // rho0 and p0
+    // rho0, rhoh0, and p0
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((rho0_cart[i]),0,dest_comp,1);
-        plot_mf_data[i]->copy((  p0_cart[i]),0,dest_comp+1,1);
+        plot_mf_data[i]->copy(( rho0_cart[i]),0,dest_comp,1);
+        plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+1,1);
+        plot_mf_data[i]->copy((   p0_cart[i]),0,dest_comp+2,1);
     }
     dest_comp += 2;
 
