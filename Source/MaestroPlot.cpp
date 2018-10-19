@@ -222,7 +222,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
         plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+1,1);
         plot_mf_data[i]->copy((   p0_cart[i]),0,dest_comp+2,1);
     }
-    dest_comp += 2;
+    dest_comp += 3;
 
     if (spherical == 1) {
         Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
