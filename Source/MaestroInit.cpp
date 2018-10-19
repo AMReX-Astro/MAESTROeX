@@ -25,7 +25,7 @@ Maestro::Init ()
 
         if (plot_int > 0) {
             Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
-            WritePlotFile(9999999,t_old,rho0_old,p0_old,uold,sold);
+            WritePlotFile(9999999,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
         }
     }
     else {
@@ -109,7 +109,7 @@ Maestro::Init ()
 
             if (plot_int > 0) {
                 Print() << "\nWriting plotfile plt_after_InitProj after InitProj" << std::endl;
-                WritePlotFile(9999998,t_old,rho0_old,p0_old,uold,sold);
+                WritePlotFile(9999998,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
             }
         }
 
@@ -125,7 +125,7 @@ Maestro::Init ()
 
             if (plot_int > 0) {
                 Print() << "\nWriting plotfile plt_after_DivuIter after final DivuIter" << std::endl;
-                WritePlotFile(9999997,t_old,rho0_old,p0_old,uold,sold);
+                WritePlotFile(9999997,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
             }
         }
 
@@ -150,7 +150,7 @@ Maestro::Init ()
 
         if (plot_int > 0) {
             Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
-            WritePlotFile(0,t_old,rho0_old,p0_old,uold,sold);
+            WritePlotFile(0,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
         }
 
         if (chk_int > 0) {
