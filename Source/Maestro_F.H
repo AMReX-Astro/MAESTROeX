@@ -120,10 +120,10 @@ extern "C"
                                 amrex::Real* rho_odot, const int* r_lo, const int* r_hi, const int* nc_r,
                                 amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                           const amrex::Real* tempbar_init_cart, const int* t_lo, const int* t_hi,
-                          const amrex::Real* dt_in, 
+                          const amrex::Real* dt_in,
                           const int* mask, const int* m_lo, const int* m_hi,
                           const int* use_mask);
-    
+
     //////////////////////
 
     //////////////////////
@@ -836,6 +836,7 @@ extern "C"
     //////////////////////
     // in make_vel_force.f90
     void make_vel_force(const int* lev, const int* lo, const int* hi,
+                        const int* is_final_update,
                         amrex::Real* vel_force, const int* f_lo, const int* f_hi, const int* nc_f,
                         const amrex::Real* gpi, const int* g_lo, const int* g_hi, const int* nc_g,
                         const amrex::Real* rho, const int* r_lo, const int* r_hi,
@@ -843,6 +844,9 @@ extern "C"
                         const amrex::Real* vedge, const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
                         const amrex::Real* wedge, const int* w_lo, const int* w_hi,
+#ifdef ROTATION
+                        const amrex::Real* uold, const int* uo_lo, const int* uo_hi, const int* nc_uo,
+#endif
 #endif
                         const amrex::Real* w0,
                         const amrex::Real* w0_force,
@@ -851,6 +855,7 @@ extern "C"
                         const int* do_add_utilde_force);
 
     void make_vel_force_sphr(const int* lo, const int* hi,
+                 const int* is_final_update,
 			     amrex::Real* vel_force, const int* f_lo, const int* f_hi, const int* nc_f,
 			     const amrex::Real* gpi, const int* g_lo, const int* g_hi, const int* nc_g,
 			     const amrex::Real* rho, const int* r_lo, const int* r_hi,
@@ -860,6 +865,12 @@ extern "C"
 			     const amrex::Real* normal, const int* n_lo, const int* n_hi, const int* nc_n,
 			     const amrex::Real* gradw0_cart, const int* gw_lo, const int* gw_hi,
 			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi, const int* nc_wf,
+#ifdef ROTATION
+			     const amrex::Real* w0_cart, const int* wc_lo, const int* wc_hi, const int* nc_wc,
+			     const amrex::Real* w0macx, const int* w0x_lo, const int* w0x_hi,
+                 const amrex::Real* w0macy, const int* w0y_lo, const int* w0y_hi,
+			     const amrex::Real* uold, const int* uo_lo, const int* uo_hi, const int* nc_uo,
+#endif
 			     const amrex::Real* rho0, const amrex::Real* grav,
 			     const amrex::Real* dx,
 			     const amrex::Real* r_cc_loc,
@@ -986,9 +997,16 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in rotation.F90
+    void rotation_init();
+    //////////////////////
+
+
+
+    //////////////////////
     // in sponge.F90
     void init_sponge(const amrex::Real* rho0);
-    
+
     void init_sponge_irreg(const amrex::Real* rho0,
 			   const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
 

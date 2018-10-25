@@ -67,11 +67,11 @@ Maestro::Init ()
     }
 
     if (do_sponge) {
-	if (use_exact_base_state) {
-	    init_sponge_irreg(rho0_old.dataPtr(),r_cc_loc.dataPtr(),r_edge_loc.dataPtr());
-	} else {
-	    init_sponge(rho0_old.dataPtr());
-	}
+    	if (use_exact_base_state) {
+    	    init_sponge_irreg(rho0_old.dataPtr(),r_cc_loc.dataPtr(),r_edge_loc.dataPtr());
+    	} else {
+    	    init_sponge(rho0_old.dataPtr());
+    	}
     }
 
     // make gravity

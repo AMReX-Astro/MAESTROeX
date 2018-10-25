@@ -74,15 +74,15 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                 const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
                 const Real& mult)
 {
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
+	for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        MultiFab& uedge_mf = uedge[lev][0];
+		// get references to the MultiFabs at level lev
+		MultiFab& uedge_mf = uedge[lev][0];
 #if (AMREX_SPACEDIM >= 2)
-        MultiFab& vedge_mf = uedge[lev][1];
+		MultiFab& vedge_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
         MultiFab& wedge_mf = uedge[lev][2];
         const MultiFab& w0macx_mf = w0mac[lev][0];
@@ -91,8 +91,8 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 #endif
 #endif
 
-        // need one cell-centered MF for the MFIter
-        MultiFab& sold_mf = sold[lev];
+		// need one cell-centered MF for the MFIter
+		MultiFab& sold_mf = sold[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -321,14 +321,14 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PutDataOnFaces()",PutDataOnFaces);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
+	for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        MultiFab& facex_mf = face[lev][0];
+		// get references to the MultiFabs at level lev
+		MultiFab& facex_mf = face[lev][0];
 #if (AMREX_SPACEDIM >= 2)
-        MultiFab& facey_mf = face[lev][1];
+		MultiFab& facey_mf = face[lev][1];
 #if (AMREX_SPACEDIM == 3)
-        MultiFab& facez_mf = face[lev][2];
+		MultiFab& facez_mf = face[lev][2];
 #endif
 #endif
         // need one cell-centered MF for the MFIter

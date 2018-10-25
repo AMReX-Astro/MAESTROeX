@@ -55,8 +55,13 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     int do_add_utilde_force = 1;
-    MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
-		 w0_force,w0_force_cart,do_add_utilde_force);
+	int is_final_update = 0;
+    MakeVelForce(vel_force,is_final_update,utrans,sold,rho0_old,grav_cell_old,
+		 w0_force,w0_force_cart,
+#ifdef ROTATION
+		 w0mac,
+#endif
+		 do_add_utilde_force);
 
     // add w0 to trans velocities
     Addw0 (utrans,w0mac,1.);
@@ -391,7 +396,7 @@ void
 #endif
 #endif
 
-	
+
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 // #ifdef _OPENMP
 // #pragma omp parallel

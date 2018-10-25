@@ -352,12 +352,16 @@ private:
     ////////////////////////
     // MaestroForce.cpp functions
     void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
+                       int is_final_update,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const amrex::Vector<amrex::Real>& rho0,
                        const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
-		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+		               const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+#ifdef ROTATION
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+#endif
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,

@@ -85,6 +85,8 @@ Maestro::Evolve ()
         // save diag output into buffer
         DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
 
+    // std::cout << "\nt_new % plot_deltat " << std::fmod(t_new, plot_deltat) << " < dt? " << dt << '\n';
+
         // write a plotfile
         if (plot_int > 0 && ( (istep % plot_int == 0) ||
                               (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||

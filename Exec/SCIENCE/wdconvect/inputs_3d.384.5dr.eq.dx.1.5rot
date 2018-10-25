@@ -1,11 +1,9 @@
-
 # INITIAL MODEL
 maestro.model_file = "kepler_new_6.25e8.hybrid.hse.320"
 maestro.probin_file = "probin"
-maestro.perturb_model = true
-
 maestro.drdxfac = 5
-#maestro.ppm_type = 1
+
+# job_name = "384^3 production run using new averaging, interp, Chamulak burner, 6.25e8 K model, base evolution, 1.5% Keplerian rotation"
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
@@ -52,9 +50,9 @@ maestro.evolve_base_state = true
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
-maestro.do_reflux             = 1 # do we do the hyperbolic reflux
+# maestro.do_reflux           = 1 # do we do the hyperbolic reflux
 
-maestro.grav_const = -1.5e10
+# maestro.grav_const = -1.5e10
 
 maestro.anelastic_cutoff = 1.e6
 maestro.base_cutoff_density = 1.e5
@@ -67,17 +65,21 @@ maestro.sponge_kappa = 10.e0
 maestro.init_shrink = 0.1e0
 maestro.use_soundspeed_firstdt = true
 maestro.use_divu_firstdt = true
+maestro.max_dt_growth = 1.1e0
 
 maestro.use_tfromp = true
+maestro.enthalpy_pred_type = 1
+maestro.dpdt_factor = 0.0
 
 # PLOTFILES
-maestro.plot_base_name  = plt    # root name of plot file
-maestro.plot_int   = -1      # number of timesteps between plot files
+maestro.plot_base_name  = wd_384_6.25e8K_1.5rotate_plt    # root name of plot file
+maestro.plot_int   = 1      # number of timesteps between plot files
 maestro.plot_deltat = 10.0e0
+maestro.plot_trac = true
 
 # CHECKPOINT
-maestro.check_base_name = chk
-maestro.chk_int         = 25
+maestro.check_base_name = wd_384_6.25e8K_1.5rotate_chk
+maestro.chk_int         = 100
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
@@ -97,6 +99,11 @@ maestro.eps_hg             = 1.e-11
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
+
+
+# ROTATION
+# 1.5% Keplerian
+maestro.rotational_frequency = 0.0133
 
 # REACTIONS
 maestro.do_burning = false

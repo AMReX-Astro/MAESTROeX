@@ -31,13 +31,13 @@ Maestro::EstDt ()
         umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         umac_dummy[lev][1].setVal(0.);
 #if (AMREX_SPACEDIM == 3)
-        umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-        umac_dummy[lev][2].setVal(0.);
+		umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+		umac_dummy[lev][2].setVal(0.);
 #endif
-    }
+	}
 
-    // face-centered
-    Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+	// face-centered
+	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
     if (spherical == 1) {
         // initialize
@@ -67,8 +67,13 @@ Maestro::EstDt ()
     }
 
     int do_add_utilde_force = 0;
-    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
-                 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
+	int is_final_update = 0;
+    MakeVelForce(vel_force,is_final_update,umac_dummy,sold,rho0_old,grav_cell_old,
+                 w0_force_dummy,w0_force_cart_dummy,
+#ifdef ROTATION
+				 w0mac,
+#endif
+				 do_add_utilde_force);
 
     Real umax = 0.;
 
@@ -222,8 +227,8 @@ Maestro::FirstDt ()
         umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         umac_dummy[lev][1].setVal(0.);
 #if (AMREX_SPACEDIM == 3)
-        umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-        umac_dummy[lev][2].setVal(0.);
+		umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+		umac_dummy[lev][2].setVal(0.);
 #endif
     }
 
@@ -233,9 +238,38 @@ Maestro::FirstDt ()
         vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
     }
 
+#ifdef ROTATION
+    // face-centered
+	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+
+	if (spherical == 1) {
+		// initialize
+		for (int lev=0; lev<=finest_level; ++lev) {
+			w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+			w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+			w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+		}
+
+		for (int lev=0; lev<=finest_level; ++lev) {
+			for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+				w0mac[lev][idim].setVal(0.);
+			}
+		}
+
+		if (evolve_base_state && use_exact_base_state == 0) {
+			MakeW0mac(w0mac);
+		}
+	}
+#endif
+
     int do_add_utilde_force = 0;
-    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
-                 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
+	int is_final_update = 0;
+    MakeVelForce(vel_force,is_final_update,umac_dummy,sold,rho0_old,grav_cell_old,
+	             w0_force_dummy,w0_force_cart_dummy,
+#ifdef ROTATION
+				 w0mac,
+#endif
+				 do_add_utilde_force);
 
     Real umax = 0.;
 
