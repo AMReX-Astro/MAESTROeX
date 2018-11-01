@@ -568,20 +568,30 @@ void
 	const MultiFab& w0macz_mf = w0mac[lev][2];
 	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
 	MultiFab h0mac_edgex, h0mac_edgey, h0mac_edgez;
+	MultiFab rhoh0mac_edgex, rhoh0mac_edgey, rhoh0mac_edgez;
 	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
 	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
 	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 	h0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
 	h0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
 	h0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
+	rhoh0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
+	rhoh0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
+	rhoh0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 
 	if (spherical == 1) {
-	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
-	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
-	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
-	    MultiFab::LinComb(h0mac_edgex,0.5,h0mac_old[lev][0],0,0.5,h0mac_new[lev][0],0,0,1,0);
-	    MultiFab::LinComb(h0mac_edgey,0.5,h0mac_old[lev][1],0,0.5,h0mac_new[lev][1],0,0,1,0);
-	    MultiFab::LinComb(h0mac_edgez,0.5,h0mac_old[lev][2],0,0.5,h0mac_new[lev][2],0,0,1,0);
+	    if (use_exact_base_state) {
+		MultiFab::LinComb(rhoh0mac_edgex,0.5,rh0mac_old[lev][0],0,0.5,rh0mac_new[lev][0],0,0,1,0);
+		MultiFab::LinComb(rhoh0mac_edgey,0.5,rh0mac_old[lev][1],0,0.5,rh0mac_new[lev][1],0,0,1,0);
+		MultiFab::LinComb(rhoh0mac_edgez,0.5,rh0mac_old[lev][2],0,0.5,rh0mac_new[lev][2],0,0,1,0);
+	    } else {
+		MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
+		MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
+		MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
+		MultiFab::LinComb(h0mac_edgex,0.5,h0mac_old[lev][0],0,0.5,h0mac_new[lev][0],0,0,1,0);
+		MultiFab::LinComb(h0mac_edgey,0.5,h0mac_old[lev][1],0,0.5,h0mac_new[lev][1],0,0,1,0);
+		MultiFab::LinComb(h0mac_edgez,0.5,h0mac_old[lev][2],0,0.5,h0mac_new[lev][2],0,0,1,0);
+	    }
 	}
 #endif
 #endif
@@ -637,12 +647,27 @@ void
 	    } else {
 
 #if (AMREX_SPACEDIM == 3)
-	        // if (use_exact_base_state)
-		// {
-		//     // Need make_rhoh_flux_sphr_irreg
-		// }
-		// else
-		// {
+	        if (use_exact_base_state)
+		{
+		    make_rhoh_flux_3d_sphr_irreg(tileBox.loVect(), tileBox.hiVect(),
+						 BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+						 BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+						 BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+						 BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+						 BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+						 BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+						 BL_TO_FORTRAN_3D(umac_mf[mfi]),
+						 BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+						 BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+						 BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+						 BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+						 BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+						 BL_TO_FORTRAN_3D(rhoh0mac_edgex[mfi]),
+						 BL_TO_FORTRAN_3D(rhoh0mac_edgey[mfi]),
+						 BL_TO_FORTRAN_3D(rhoh0mac_edgez[mfi]));
+		}
+		else
+		{
 		    make_rhoh_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
 			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
@@ -662,7 +687,7 @@ void
 				       BL_TO_FORTRAN_3D(h0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
-		// }
+		}
 #else
 	        Abort("MakeRhoHFlux: Spherical is not valid for DIM < 3");
 #endif

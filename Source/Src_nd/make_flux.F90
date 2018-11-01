@@ -1371,6 +1371,275 @@ contains
     endif
 
   end subroutine mk_rhoh_flux_3d_sphr
+
+  subroutine mk_rhoh_flux_3d_sphr_irreg(lo, hi, &
+       sfluxx, fx_lo, fx_hi, nc_fx, &
+       sfluxy, fy_lo, fy_hi, nc_fy, &
+       sfluxz, fz_lo, fz_hi, nc_fz, &
+       sedgex, x_lo, x_hi, nc_x, &
+       sedgey, y_lo, y_hi, nc_y, &
+       sedgez, z_lo, z_hi, nc_z, &
+       umac,   u_lo, u_hi, &
+       vmac,   v_lo, v_hi, &
+       wmac,   w_lo, w_hi, &
+       w0macx, wx_lo, wx_hi, &
+       w0macy, wy_lo, wy_hi, &
+       w0macz, wz_lo, wz_hi, &
+       rhoh0_edgex, hx_lo, hx_hi, &
+       rhoh0_edgey, hy_lo, hy_hi, &
+       rhoh0_edgez, hz_lo, hz_hi) bind(C,name="make_rhoh_flux_3d_sphr_irreg")
+
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
+    double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3),nc_fx)
+    integer         , intent(in   ) :: fy_lo(3), fy_hi(3), nc_fy
+    double precision, intent(inout) :: sfluxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),fy_lo(3):fy_hi(3),nc_fy)
+    integer         , intent(in   ) :: fz_lo(3), fz_hi(3), nc_fz
+    double precision, intent(inout) :: sfluxz(fz_lo(1):fz_hi(1),fz_lo(2):fz_hi(2),fz_lo(3):fz_hi(3),nc_fz)
+    integer         , intent(in   ) :: x_lo(3), x_hi(3), nc_x
+    double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
+    integer         , intent(in   ) :: y_lo(3), y_hi(3), nc_y
+    double precision, intent(inout) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nc_y)
+    integer         , intent(in   ) :: z_lo(3), z_hi(3), nc_z
+    double precision, intent(inout) :: sedgez(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nc_z)
+    integer         , intent(in   ) :: u_lo(3), u_hi(3)
+    double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
+    integer         , intent(in   ) :: v_lo(3), v_hi(3)
+    double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
+    double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
+    integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
+    double precision, intent(in   ) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
+    integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
+    double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
+    integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
+    double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
+    integer         , intent(in   ) :: hx_lo(3), hx_hi(3)
+    double precision, intent(in   ) :: rhoh0_edgex(hx_lo(1):hx_hi(1),hx_lo(2):hx_hi(2),hx_lo(3):hx_hi(3))
+    integer         , intent(in   ) :: hy_lo(3), hy_hi(3)
+    double precision, intent(in   ) :: rhoh0_edgey(hy_lo(1):hy_hi(1),hy_lo(2):hy_hi(2),hy_lo(3):hy_hi(3))
+    integer         , intent(in   ) :: hz_lo(3), hz_hi(3)
+    double precision, intent(in   ) :: rhoh0_edgez(hz_lo(1):hz_hi(1),hz_lo(2):hz_hi(2),hz_lo(3):hz_hi(3))
+
+    ! local
+    integer          :: i,j,k
+    logical          :: have_h, have_hprime, have_rhoh
+
+    have_h = enthalpy_pred_type.eq.predict_h .or. &
+         enthalpy_pred_type.eq.predict_T_then_h .or. &
+         enthalpy_pred_type.eq.predict_Tprime_then_h
+
+    have_hprime = enthalpy_pred_type.eq.predict_hprime
+
+    have_rhoh = enthalpy_pred_type.eq.predict_rhoh
+
+    ! create x-fluxes
+    if (have_h) then
+
+       ! enthalpy edge state is h
+       call bl_error("have_h not supported on irregular-spaced base state")
+
+       if (species_pred_type == predict_rhoprime_and_X) then
+          ! density edge state is rho'
+
+       else if (species_pred_type == predict_rho_and_X .or. &
+            species_pred_type == predict_rhoX) then
+          ! density edge state is rho
+
+       endif
+
+    else if (have_hprime) then
+
+       ! enthalpy edge state is h'
+       call bl_error("have_hprime not supported on irregular-spaced base state")
+
+       
+       if (species_pred_type == predict_rhoprime_and_X) then
+          ! density edge state is rho'
+
+       else if (species_pred_type == predict_rho_and_X) then
+          ! density edge state is rho
+          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+
+       else if (species_pred_type == predict_rhoX) then
+          ! density edge state is rho
+          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+
+       endif
+
+    else if (have_rhoh) then
+
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)+1
+
+                ! sfluxx(i,j,k,rhoh_comp) = (umac(i,j,k) + w0macx(i,j,k))*sedgex(i,j,k,rhoh_comp)
+                sfluxx(i,j,k,rhoh_comp) = umac(i,j,k)*sedgex(i,j,k,rhoh_comp)
+
+             end do
+          end do
+       end do
+
+    else
+
+       ! enthalpy edge state is (rho h)'
+
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)+1
+
+                ! Average (rho h) onto edges by averaging rho and h
+                ! separately onto edges.
+                !  (rho h)_edge = (rho h)' + (rhoh_0)
+
+                ! sfluxx(i,j,k,rhoh_comp) = &
+                !      (umac(i,j,k)+w0macx(i,j,k))*(rhoh0_edgex(i,j,k)+sedgex(i,j,k,rhoh_comp))
+                sfluxx(i,j,k,rhoh_comp) = umac(i,j,k)*(rhoh0_edgex(i,j,k)+sedgex(i,j,k,rhoh_comp))
+
+             end do
+          end do
+       end do
+
+    endif
+
+    ! create y-fluxes
+    if (have_h) then
+
+       ! enthalpy edge state is h
+       call bl_error("have_h not supported on irregular-spaced base state")
+
+       if (species_pred_type == predict_rhoprime_and_X) then
+          ! density edge state is rho'
+
+       else if (species_pred_type == predict_rho_and_X .or. &
+            species_pred_type == predict_rhoX) then
+          ! density edge state is rho
+
+       endif
+
+    else if (have_hprime) then
+
+       ! enthalpy edge state is h'
+       call bl_error("have_hprime not supported on irregular-spaced base state")
+
+       if (species_pred_type == predict_rhoprime_and_X) then
+          ! density edge state is rho'
+
+       else if (species_pred_type == predict_rho_and_X) then
+          ! density edge state is rho
+          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+
+       else if (species_pred_type == predict_rhoX) then
+          ! density edge state is rho
+          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+
+       endif
+
+
+    else if (have_rhoh) then
+
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)+1
+             do i = lo(1), hi(1)
+
+                ! sfluxy(i,j,k,rhoh_comp) = (vmac(i,j,k) + w0macy(i,j,k))*sedgey(i,j,k,rhoh_comp)
+                sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k)*sedgey(i,j,k,rhoh_comp)
+
+             end do
+          end do
+       end do
+
+    else
+
+       ! enthalpy edge state is (rho h)'
+
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)+1
+             do i = lo(1), hi(1)
+
+                ! Average (rho h) onto edges by averaging rho and h
+                ! separately onto edges.
+                !  (rho h)_edge = (rho h)' + (rhoh_0)
+
+                ! sfluxy(i,j,k,rhoh_comp) = &
+                !      (vmac(i,j,k)+w0macy(i,j,k))*(rhoh0_edgey(i,j,k)+sedgey(i,j,k,rhoh_comp))
+                sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k)*(rhoh0_edgey(i,j,k)+sedgey(i,j,k,rhoh_comp))
+
+             end do
+          end do
+       end do
+
+    endif
+
+    ! create z-fluxes
+    if (have_h) then
+
+       ! enthalpy edge state is h
+       call bl_error("have_h not supported on irregular-spaced base state")
+
+       if (species_pred_type == predict_rhoprime_and_X) then
+          ! density edge state is rho'
+
+       else if (species_pred_type == predict_rho_and_X .or. &
+            species_pred_type == predict_rhoX) then
+          ! density edge state is rho
+
+       endif
+
+    else if (have_hprime) then
+
+       ! enthalpy edge state is h'
+       call bl_error("have_hprime not supported on irregular-spaced base state")
+
+       if (species_pred_type == predict_rhoprime_and_X) then
+          ! density edge state is rho'
+
+       else if (species_pred_type == predict_rho_and_X) then
+          ! density edge state is rho
+          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+
+       else if (species_pred_type == predict_rhoX) then
+          ! density edge state is rho
+          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+
+       endif
+
+    else if (have_rhoh) then
+
+       do k = lo(3), hi(3)+1
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+
+                ! sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k) + w0macz(i,j,k))*sedgez(i,j,k,rhoh_comp)
+                sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)*sedgez(i,j,k,rhoh_comp)
+
+             end do
+          end do
+       end do
+
+    else
+
+       ! enthalpy edge state is (rho h)'
+
+       do k = lo(3), hi(3)+1
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+
+                ! Average (rho h) onto edges by averaging rho and h
+                ! separately onto edges.
+                !  (rho h)_edge = (rho h)' + (rhoh_0)
+
+                ! sfluxz(i,j,k,rhoh_comp) = &
+                !      (wmac(i,j,k)+w0macz(i,j,k))*(rhoh0_edgez(i,j,k)+sedgez(i,j,k,rhoh_comp))
+                sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)*(rhoh0_edgez(i,j,k)+sedgez(i,j,k,rhoh_comp))
+
+             end do
+          end do
+       end do
+
+    endif
+
+  end subroutine mk_rhoh_flux_3d_sphr_irreg
 #endif
 
 end module make_flux_module

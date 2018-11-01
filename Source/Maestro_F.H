@@ -604,6 +604,23 @@ extern "C"
 				const amrex::Real* h0_edgex,   const int* hx_lo, const int* hx_hi,
 				const amrex::Real* h0_edgey,   const int* hy_lo, const int* hy_hi,
 				const amrex::Real* h0_edgez,   const int* hz_lo, const int* hz_hi);
+    
+    void make_rhoh_flux_3d_sphr_irreg(const int* lo, const int* hi,
+				amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, const int* nc_fx,
+				amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi, const int* nc_fy,
+				amrex::Real* sfluxz, const int* fz_lo, const int* fz_hi, const int* nc_fz,
+				amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x,
+				amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y,
+				amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z,
+				const amrex::Real* umac,   const int* u_lo, const int* u_hi,
+				const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
+				const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
+				const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi,
+				const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi,
+				const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
+				const amrex::Real* rhoh0_edgex,   const int* hx_lo, const int* hx_hi,
+				const amrex::Real* rhoh0_edgey,   const int* hy_lo, const int* hy_hi,
+				const amrex::Real* rhoh0_edgez,   const int* hz_lo, const int* hz_hi);
 #endif
     //////////////////////
 
