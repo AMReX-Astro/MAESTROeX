@@ -15,3 +15,17 @@ Implemented dpdt term for variable-base state spherical MAC projection
 New test problems: rt, double_bubble, shear jet, test_convect
 Some multilevel bug fixes (multilevel still WIP)
 More progress on the new use_exact_base_state algorithm (still WIP)
+
+11-01-2018
+Implemented OpenMP in 1D routines; tiling OpenMP in 3D routines
+Added problem-specific runtime parameters to each problem directory
+Eliminated dependency on FBoxLib; now only requires AMReX
+Switch probin files to all use the namelist 'probin', not 'probdata'
+fix mask bug in reactions
+corner ghost cell fix in fill_umac_ghost
+various minor changes to wdconvect test problems
+fixed a bug with use_exact_base_state where edge states weren't being computed properly
+Irregular base state developments
+Update burn_type to be compatible with Microphysics developments
+Debugging utility for writing out a vector of MultiFabs.
+Increased diagnostics in Diag
