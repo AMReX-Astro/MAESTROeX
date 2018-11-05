@@ -679,6 +679,11 @@ extern "C"
 			    const amrex::Real* Sbar_in,
 			    const amrex::Real* r_cc_loc,
 			    const amrex::Real* r_edge_loc);
+
+    void make_psi_irreg(amrex::Real* psi,
+			const amrex::Real* p0_old,
+			const amrex::Real* p0_new,
+			const amrex::Real* dt);
     //////////////////////
 
     //////////////////////

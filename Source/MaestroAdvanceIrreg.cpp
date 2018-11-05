@@ -195,6 +195,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // make the sponge for all levels
     if (do_sponge) {
 	init_sponge_irreg(rho0_old.dataPtr(),r_cc_loc.dataPtr(),r_edge_loc.dataPtr());
+	// init_sponge(rho0_old.dataPtr());
 	MakeSponge(sponge);
     }
     
@@ -373,7 +374,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// no need for psi
+	// set psi to dpdt
+	make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
     }
     else {
 	p0_new = p0_old;
@@ -446,6 +448,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	make_beta0_irreg(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
 			 gamma1bar_new.dataPtr(), grav_cell_new.dataPtr(),
 			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	// make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+        //            gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
     }
     else {
 	// Just pass beta0 and gamma1bar through if not evolving base state
@@ -632,7 +636,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// no need for psi
+	// set psi to dpdt
+	make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
     }
 
     // base state enthalpy averaging
@@ -692,6 +697,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	make_beta0_irreg(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
 			 gamma1bar_new.dataPtr(), grav_cell_new.dataPtr(),
 			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	// make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+        //            gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
     }
 
     for(int i=0; i<beta0_nph.size(); ++i) {
