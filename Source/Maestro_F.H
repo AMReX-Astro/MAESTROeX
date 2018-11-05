@@ -1160,7 +1160,7 @@ void update_rhoh_3d_sphr(const int* lo, const int* hi,
 		      const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
 #endif
 #endif
-                      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
+                      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f, int ng_f, 
                       const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt,
                       const int* adv_bc, const int* phys_bc);
 

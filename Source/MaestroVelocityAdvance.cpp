@@ -18,7 +18,12 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	if (ppm_trace_forces == 0) {
+	    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	} else {
+	    // tracing needs more ghost cells
+	    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+	}
     }
 
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > uedge(finest_level+1);

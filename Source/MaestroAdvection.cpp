@@ -51,7 +51,12 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // create a MultiFab to hold the velocity forcing
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	if (ppm_trace_forces == 0) {
+	    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	} else {
+	    // tracing needs more ghost cells
+	    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+	}
     }
 
     int do_add_utilde_force = 1;
@@ -225,12 +230,12 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                         BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+			BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
 #endif
-                        BL_TO_FORTRAN_FAB(force_mf[mfi]),
+                        BL_TO_FORTRAN_FAB(force_mf[mfi]), force_mf.nGrow(), 
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
         } // end MFIter loop
     } // end loop over levels

@@ -354,7 +354,7 @@ bds_type                            int            0
 # if 1, then perform parabolic reconstruction on the forces used in
 # the prediction and trace under the parabola to the interfaces the
 # amount that can reach the interface over dt
-ppm_trace_forces                    int            0
+ppm_trace_forces                    int            0           y
 
 
 # what type of coefficient to use inside the velocity divergence constraint. @@
