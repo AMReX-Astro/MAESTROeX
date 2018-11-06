@@ -2,6 +2,7 @@ CEXE_sources += main.cpp
 CEXE_sources += Maestro.cpp
 CEXE_sources += MaestroAdvance.cpp
 CEXE_sources += MaestroAdvanceIrreg.cpp
+CEXE_sources += MaestroAdvanceAvg.cpp
 CEXE_sources += MaestroAdvection.cpp
 CEXE_sources += MaestroAverage.cpp
 CEXE_sources += MaestroCheckpoint.cpp

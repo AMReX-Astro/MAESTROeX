@@ -411,7 +411,7 @@ void Maestro::InitProj ()
               rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
     // NOTE: not sure if valid for use_exact_base_state
-    if (evolve_base_state && use_exact_base_state == 0) {
+    if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
         // average S into Sbar
         Average(S_cc_old,Sbar,0);
     }
@@ -500,7 +500,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
-	if (use_exact_base_state && use_delta_gamma1_term) {
+	if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
 	    for(int i=0; i<Sbar.size(); ++i) {
 		Sbar[i] += delta_gamma1_termbar[i];
 	    }
@@ -570,6 +570,8 @@ void Maestro::InitIter ()
     // advance the solution by dt
     if (use_exact_base_state) {
         AdvanceTimeStepIrreg(true);
+    } else if (average_base_state) {
+	AdvanceTimeStepAverage(true);
     } else {
         AdvanceTimeStep(true);
     }
