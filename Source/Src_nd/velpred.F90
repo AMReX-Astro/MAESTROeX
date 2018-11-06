@@ -1551,7 +1551,7 @@ contains
           do i=is,ie+1
              ! use the traced force if ppm_trace_forces = 1
              fl = merge(force(i-1,j,k,1), Ipfx(i-1,j,k,1), ppm_trace_forces == 0)
-             fr = merge(force(i,j  ,k,1), Imfx(i,  j,k,1), ppm_trace_forces == 0)
+             fr = merge(force(i  ,j,k,1), Imfx(i  ,j,k,1), ppm_trace_forces == 0)
 
              ! extrapolate to edges
              umacl(i,j,k) = ulx(i,j,k,1) &
