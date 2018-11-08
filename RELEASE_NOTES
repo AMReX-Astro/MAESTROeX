@@ -29,3 +29,6 @@ Irregular base state developments
 Update burn_type to be compatible with Microphysics developments
 Debugging utility for writing out a vector of MultiFabs.
 Increased diagnostics in Diag
+
+11-07-2018
+Simplify conductivity interface to mimic the eos interface.
