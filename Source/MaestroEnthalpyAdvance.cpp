@@ -34,14 +34,6 @@ Maestro::EnthalpyAdvance (int which_step,
      rho0_edge_new.shrink_to_fit();
     rhoh0_edge_old.shrink_to_fit();
     rhoh0_edge_new.shrink_to_fit();
-
-    if (use_exact_base_state || average_base_state) {
-	
-	// add dpdt (psi) term to rhoh0_new
-	for (int i=0; i<rhoh0_new.size(); ++i) {
-	    rhoh0_new[i] += dt*psi[i];
-	}
-    }
     
     if (spherical == 0) {
         cell_to_edge( rho0_old.dataPtr(), rho0_edge_old.dataPtr());
