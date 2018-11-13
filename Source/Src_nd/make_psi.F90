@@ -82,7 +82,7 @@ contains
 
     psi = ZERO
 
-    !$OMP PARALLEL DO PRIVATE(r,div_w0_sph)
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=0,base_cutoff_density_coord(0)-1
        
        psi(0,r) = (p0_new(0,r) - p0_old(0,r))/dt
