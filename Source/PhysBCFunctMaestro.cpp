@@ -3,6 +3,8 @@
 
 using namespace amrex;
 
+#if 0
+
 PhysBCFunctMaestro::PhysBCFunctMaestro (const Geometry& geom,
                                         const Vector<BCRec>& bcr,
                                         const BndryFunctBase& func)
@@ -77,3 +79,5 @@ PhysBCFunctMaestro::FillBoundary (MultiFab& mf, int dcomp, int ncomp, Real time)
         }
     }
 }
+
+#endif

@@ -42,9 +42,9 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         Vector<Real> stime;
         GetData(0, time, smf, stime, mf_old, mf_new);
 
-        PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFunctBase(phifill));
+        PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFuncArray(phifill));
         FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
-                             geom[lev], physbc);
+                             geom[lev], physbc, 0);
     }
     else
     {
@@ -53,15 +53,15 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
         GetData(lev, time, fmf, ftime, mf_old, mf_new);
 
-        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
-        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
+        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
+        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
 
         Interpolater* mapper = &cell_cons_interp;
 
         FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
                            srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                           cphysbc, fphysbc, refRatio(lev-1),
-                           mapper, bcs);
+                           cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+                           mapper, bcs, 0);
     }
 }
 
@@ -89,13 +89,13 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
         Abort("FillCoarsePatch: how did this happen?");
     }
 
-    PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
-    PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
+    PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
+    PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
 
     Interpolater* mapper = &cell_cons_interp;
     InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                          cphysbc, fphysbc, refRatio(lev-1),
-                          mapper, bcs);
+                          cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+                          mapper, bcs, 0);
 }
 
 // utility to copy in data from mf_old and/or mf_new into mf
