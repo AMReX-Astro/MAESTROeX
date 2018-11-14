@@ -1,6 +1,6 @@
 
 # INITIAL MODEL
-maestro.model_file = "../wdconvect/kepler_new_6.25e8.hybrid.hse.320"
+maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6144"
 maestro.probin_file = "probin"
 maestro.perturb_model = true
 
@@ -9,7 +9,7 @@ maestro.drdxfac = 5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
-geometry.prob_hi     =  5e8 5e8 5e8
+geometry.prob_hi     =  1.e10 1.e10 1.e10
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -18,6 +18,7 @@ geometry.prob_hi     =  5e8 5e8 5e8
 maestro.lo_bc = 2 2 2
 maestro.hi_bc = 2 2 2
 geometry.is_periodic =  0 0 0
+geometry.coord_sys = 1          # r-z
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
@@ -26,8 +27,8 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 64 64 64
-amr.max_grid_size      = 32
+amr.n_cell             = 64 64
+amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
@@ -38,8 +39,8 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.temperr = 6.5e8 6.5e8 6.5e8
 
 # TIME STEPPING
-maestro.max_step  = 0
-maestro.stop_time = 30000.
+maestro.max_step  = 1000
+maestro.stop_time = 10.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
@@ -72,12 +73,12 @@ maestro.use_tfromp = true
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
-maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_int   = 10      # number of timesteps between plot files
 maestro.plot_deltat = 10.0e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = 25
+maestro.chk_int         = -1
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12

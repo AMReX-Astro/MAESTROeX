@@ -240,7 +240,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 			BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
 #endif
-                        BL_TO_FORTRAN_FAB(force_mf[mfi]), force_mf.nGrow(), 
+                        BL_TO_FORTRAN_FAB(force_mf[mfi]), force_mf.nGrow(),
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
         } // end MFIter loop
     } // end loop over levels

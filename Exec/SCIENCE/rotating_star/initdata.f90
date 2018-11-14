@@ -313,13 +313,13 @@ contains
              enddo
 
              ! apply the cutoff function to the perturbational velocity
-             do i=1,3
+             do i=1,amrex_spacedim
                 vpert(i) = velpert_amplitude*vpert(i) &
                      *(0.5d0+0.5d0*tanh((velpert_radius-rloc)/velpert_steep))
              enddo
 
              ! add perturbational velocity to background velocity
-             do i=1,3
+             do i=1,amrex_spacedim
                 vel(iloc,jloc,kloc,i) = vel(iloc,jloc,kloc,i) + vpert(i)
              enddo
 

@@ -1,8 +1,8 @@
-DEBUG      = FALSE
+DEBUG      = TRUE
 DIM        = 3
 COMP	   = gnu
 USE_MPI    = FALSE
-USE_OMP    = TRUE
+USE_OMP    = FALSE
 USE_REACT  = TRUE
 
 TINY_PROFILE = FALSE
@@ -20,10 +20,13 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR      := ignition_chamulak
+NETWORK_DIR      := general_null
+GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/aprox21.net
 
 Bpack   := ./Make.package
 Blocs   := .
 PROBIN_PARAMETER_DIRS := .
 
 include $(MAESTROEX_HOME)/Exec/Make.Maestro
+
+USE_ROTATION=FALSE

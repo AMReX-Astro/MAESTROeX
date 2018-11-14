@@ -191,15 +191,15 @@ private:
 
     ////////////////////////
     // MaestroDebug.cpp functions
-    
+
     // print out the contents of a Vector of MultiFabs
     void PrintMF   (amrex::Vector<amrex::MultiFab>& CC);
 
-    
-    // print out the contents of a Vector of edge-based MultiFabs 
+
+    // print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir);
-    
+
     // utility to write out a multilevel multifab to a plotfile
     void WriteMF   (amrex::Vector<amrex::MultiFab>& mf,
                     std::string name);

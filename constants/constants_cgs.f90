@@ -4,13 +4,13 @@ module fundamental_constants_module
 
   use bl_types
   use bl_constants_module, only: M_PI
-  
+
   implicit none
 
   ! newton's gravitational constant
   real(kind=dp_t), parameter :: Gconst = 6.67428e-8_dp_t      ! cm^3/g/s^2
-! new value; if uncommented initial models will need to be re-HSE'ed
-!  real(kind=dp_t), parameter :: Gconst = 6.67384e-8_dp_t      ! cm^3/g/s^2
+  ! new value; if uncommented initial models will need to be re-HSE'ed
+  !  real(kind=dp_t), parameter :: Gconst = 6.67384e-8_dp_t      ! cm^3/g/s^2
 
   ! boltzmann's constant
   real(kind=dp_t), parameter :: k_B    = 1.3806488e-16_dp_t   ! erg/K
@@ -18,7 +18,7 @@ module fundamental_constants_module
   ! planck's constant over 2pi
   real(kind=dp_t), parameter :: hbar   = 1.054571726e-27_dp_t ! erg s
 
-  ! planck's constant 
+  ! planck's constant
   real(kind=dp_t), parameter :: hplanck = 6.62606957e-27_dp_t ! erg s
 
   ! avogradro's Number
@@ -69,5 +69,8 @@ module fundamental_constants_module
 
   ! solar mass (from http://asa.usno.navy.mil/SecK/Constants.html)
   real(kind=dp_t), parameter :: M_solar = 1.9884e33_dp_t
+
+  ! solar radius
+  real(kind=dp_t), parameter :: R_solar = 6.957e10_dp_t
 
 end module fundamental_constants_module
