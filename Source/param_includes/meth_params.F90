@@ -56,6 +56,7 @@ module meth_params_module
   integer                       , save :: slope_order
   double precision              , save :: grav_const
   integer                       , save :: ppm_type
+  integer                       , save :: ppm_trace_forces
   integer                       , save :: beta0_type
   logical                       , save :: use_linear_grav_in_beta0
   double precision              , save :: rotational_frequency
@@ -124,6 +125,7 @@ contains
     slope_order = 4;
     grav_const = -1.5d10;
     ppm_type = 1;
+    ppm_trace_forces = 0;
     beta0_type = 1;
     use_linear_grav_in_beta0 = .false.;
     rotation_radius = 1.0d6;
@@ -180,6 +182,7 @@ contains
     call pp%query("slope_order", slope_order)
     call pp%query("grav_const", grav_const)
     call pp%query("ppm_type", ppm_type)
+    call pp%query("ppm_trace_forces", ppm_trace_forces)
     call pp%query("beta0_type", beta0_type)
     call pp%query("use_linear_grav_in_beta0", use_linear_grav_in_beta0)
     call pp%query("rotation_radius", rotation_radius)

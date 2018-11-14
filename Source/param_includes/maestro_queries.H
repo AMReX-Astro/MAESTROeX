@@ -79,6 +79,7 @@ pp.query("planar_invsq_mass", planar_invsq_mass);
 pp.query("evolve_base_state", evolve_base_state);
 pp.query("use_exact_base_state", use_exact_base_state);
 pp.query("fix_base_state", fix_base_state);
+pp.query("average_base_state", average_base_state);
 pp.query("do_smallscale", do_smallscale);
 pp.query("do_eos_h_above_cutoff", do_eos_h_above_cutoff);
 pp.query("enthalpy_pred_type", enthalpy_pred_type);

@@ -13,12 +13,18 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           const Vector<Real>& grav_cell_nph,
                           const Vector<MultiFab>& sponge)
 {
+
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::VelocityAdvance()",VelocityAdvance);
 
 	Vector<MultiFab> vel_force(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
-		vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+		if (ppm_trace_forces == 0) {
+			vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+		} else {
+			// tracing needs more ghost cells
+			vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+		}
 	}
 
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > uedge(finest_level+1);
@@ -28,14 +34,11 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 		             uedge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], AMREX_SPACEDIM, 0); );
 	}
 
-	int is_final_update;
-
 	//////////////////////////////////
 	// Create the velocity forcing term at time n using rho
 	//////////////////////////////////
 
-	is_final_update = 0;
-	MakeVelForce(vel_force,is_final_update,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,
+	MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,
 #ifdef ROTATION
 	             w0mac,
 #endif
@@ -63,8 +66,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 	// Now create the force at half-time using rhohalf
 	//////////////////////////////////
 
-	is_final_update = 1;
-	MakeVelForce(vel_force,is_final_update,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,
+	MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,
 #ifdef ROTATION
 	             w0mac,
 #endif

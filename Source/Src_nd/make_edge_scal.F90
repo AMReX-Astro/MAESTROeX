@@ -16,7 +16,7 @@ module make_edge_scal_module
   use amrex_constants_module
   use slope_module
   use ppm_module
-  use meth_params_module, only: rel_eps, ppm_type
+  use meth_params_module, only: rel_eps, ppm_type, ppm_trace_forces
 
   implicit none
 
@@ -82,7 +82,11 @@ contains
        call slopex_1d(s(:,comp:),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_1d(s(:,comp),ng_s,umac,ng_um,Ip,Im, &
-            domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+                    domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+       if (ppm_trace_forces .eq. 1) then
+          call ppm_1d(force(:,comp),ng_s,umac,ng_um,Ipf,Imf, &
+                       domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+       endif
     end if
 
     dt2 = HALF*dt
@@ -112,8 +116,8 @@ contains
     ! loop over appropriate x-faces
     do i=is,ie+1
        ! make sedgelx, sedgerx
-       fl = force(i-1,comp)
-       fr = force(i  ,comp)
+       fl = merge(force(i-1,comp), Ipf(i-1), ppm_trace_forces == 0)
+       fr = merge(force(i  ,comp), Imf(i  ), ppm_trace_forces == 0)
 
        if(is_conservative .eq. 1) then
           sedgelx(i) = sedgelx(i) &
@@ -277,7 +281,11 @@ contains
        call slopey_2d(s(:,:,comp:comp),slopey,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_2d(s(:,:,comp),ng_s,umac,vmac,ng_um,Ip,Im, &
-            domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+                    domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+       if (ppm_trace_forces .eq. 1) then
+          call ppm_2d(force(:,:,comp),ng_s,umac,vmac,ng_um,Ipf,Imf, &
+                       domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+       end if
     end if
     dt2 = HALF*dt
     dt4 = dt/4.0d0
@@ -441,8 +449,8 @@ contains
     do j=js,je
        do i=is,ie+1
           ! make sedgelx, sedgerx
-          fl = force(i-1,j,comp)
-          fr = force(i,j  ,comp)
+          fl = merge(force(i-1,j,comp), Ipf(i-1,j,1), ppm_trace_forces == 0)
+          fr = merge(force(i  ,j,comp), Imf(i  ,j,1), ppm_trace_forces == 0)
 
           if(is_conservative .eq. 1) then
              sedgelx(i,j) = slx(i,j) &
@@ -516,8 +524,8 @@ contains
     do j=js,je+1
        do i=is,ie
           ! make sedgely, sedgery
-          fl = force(i,j-1,comp)
-          fr = force(i,j  ,comp)
+          fl = merge(force(i,j-1,comp), Ipf(i,j-1,2), ppm_trace_forces == 0)
+          fr = merge(force(i,j  ,comp), Imf(i,j  ,2), ppm_trace_forces == 0)
 
           if(is_conservative .eq. 1) then
              sedgely(i,j) = sly(i,j) &
@@ -725,7 +733,11 @@ contains
        call slopez_3d(s(:,:,:,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_3d(s(:,:,:,comp),ng_s,umac,vmac,wmac,ng_um,Ip,Im, &
-            domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+                    domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+       if (ppm_trace_forces .eq. 1) then
+          call ppm_3d(force(:,:,:,comp),ng_s,umac,vmac,wmac,ng_um,Ipf,Imf, &
+                       domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+       endif
     end if
 
     dt2 = HALF*dt
@@ -1635,8 +1647,8 @@ contains
           do j=js,je
              do i=is,ie+1
                 ! make sedgelx, sedgerx
-                fl = force(i-1,j,k,comp)
-                fr = force(i  ,j,k,comp)
+                fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,1), ppm_trace_forces == 0)
+                fr = merge(force(i  ,j,k,comp), Imf(i  ,j,k,1), ppm_trace_forces == 0)
 
                 sedgelx(i,j,k) = slx(i,j,k) &
                      - (dt2/hy)*(simhyz(i-1,j+1,k  )*vmac(i-1,j+1,k  ) &
@@ -1661,8 +1673,8 @@ contains
           do j=js,je
              do i=is,ie+1
                 ! make sedgelx, sedgerx
-                fl = force(i-1,j,k,comp)
-                fr = force(i  ,j,k,comp)
+                fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,1), ppm_trace_forces == 0)
+                fr = merge(force(i  ,j,k,comp), Ipf(i  ,j,k,1), ppm_trace_forces == 0)
 
                 sedgelx(i,j,k) = slx(i,j,k) &
                      - (dt4/hy)*(vmac(i-1,j+1,k  )+vmac(i-1,j,k))* &
@@ -1750,8 +1762,8 @@ contains
           do j=js,je+1
              do i=is,ie
                 ! make sedgely, sedgery
-                fl = force(i,j-1,k,comp)
-                fr = force(i,j  ,k,comp)
+                fl = merge(force(i,j-1,k,comp), Ipf(i,j-1,k,2), ppm_trace_forces == 0)
+                fr = merge(force(i,j  ,k,comp), Imf(i,j  ,k,2), ppm_trace_forces == 0)
 
                 sedgely(i,j,k) = sly(i,j,k) &
                      - (dt2/hx)*(simhxz(i+1,j-1,k  )*umac(i+1,j-1,k  ) &
@@ -1776,8 +1788,8 @@ contains
           do j=js,je+1
              do i=is,ie
                 ! make sedgely, sedgery
-                fl = force(i,j-1,k,comp)
-                fr = force(i,j  ,k,comp)
+                fl = merge(force(i,j-1,k,comp), Ipf(i,j-1,k,2), ppm_trace_forces == 0)
+                fr = merge(force(i,j  ,k,comp), Imf(i,j  ,k,2), ppm_trace_forces == 0)
 
                 sedgely(i,j,k) = sly(i,j,k) &
                      - (dt4/hx)*(umac(i+1,j-1,k  )+umac(i,j-1,k))* &
@@ -1865,8 +1877,8 @@ contains
           do j=js,je
              do i=is,ie
                 ! make sedgelz, sedgerz
-                fl = force(i,j,k-1,comp)
-                fr = force(i,j,k  ,comp)
+                fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,3), ppm_trace_forces == 0)
+                fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,3), ppm_trace_forces == 0)
 
                 sedgelz(i,j,k) = slz(i,j,k) &
                      - (dt2/hx)*(simhxy(i+1,j  ,k-1)*umac(i+1,j  ,k-1) &
@@ -1891,8 +1903,8 @@ contains
           do j=js,je
              do i=is,ie
                 ! make sedgelz, sedgerz
-                fl = force(i,j,k-1,comp)
-                fr = force(i,j,k  ,comp)
+                fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,3), ppm_trace_forces == 0)
+                fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,3), ppm_trace_forces == 0)
 
                 sedgelz(i,j,k) = slz(i,j,k) &
                      - (dt4/hx)*(umac(i+1,j  ,k-1)+umac(i,j,k-1)) &

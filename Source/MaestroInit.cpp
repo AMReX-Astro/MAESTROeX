@@ -214,9 +214,11 @@ Maestro::InitData ()
                        r_edge_loc.dataPtr());
     }
     else {
-        if (do_smallscale) {
-            // first compute cutoff coordinates using initial density profile
-            compute_cutoff_coords(rho0_old.dataPtr());
+	
+	// first compute cutoff coordinates using initial density profile
+	compute_cutoff_coords(rho0_old.dataPtr());
+	
+	if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
             std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
             std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
@@ -409,7 +411,7 @@ void Maestro::InitProj ()
               rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
     // NOTE: not sure if valid for use_exact_base_state
-    if (evolve_base_state) {
+    if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
         // average S into Sbar
         Average(S_cc_old,Sbar,0);
     }
@@ -498,22 +500,28 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
-        Average(S_cc_old,Sbar,0);
-
-        // compute Sbar = Sbar + delta_gamma1_termbar
-        if (use_delta_gamma1_term) {
-            for(int i=0; i<Sbar.size(); ++i) {
-                Sbar[i] += delta_gamma1_termbar[i];
-            }
-        }
-
-        int is_predictor = 1;
-        make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-                rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-                p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-                p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
-                etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-                r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+	if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
+	    for(int i=0; i<Sbar.size(); ++i) {
+		Sbar[i] += delta_gamma1_termbar[i];
+	    }
+	} else {
+	    Average(S_cc_old,Sbar,0);
+	    
+	    // compute Sbar = Sbar + delta_gamma1_termbar
+	    if (use_delta_gamma1_term) {
+		for(int i=0; i<Sbar.size(); ++i) {
+		    Sbar[i] += delta_gamma1_termbar[i];
+		}
+	    }
+	    
+	    int is_predictor = 1;
+	    make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
+		    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+		    p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
+		    p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
+		    etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+		    r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+	}
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -562,6 +570,8 @@ void Maestro::InitIter ()
     // advance the solution by dt
     if (use_exact_base_state) {
         AdvanceTimeStepIrreg(true);
+    } else if (average_base_state) {
+	AdvanceTimeStepAverage(true);
     } else {
         AdvanceTimeStep(true);
     }

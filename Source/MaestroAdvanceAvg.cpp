@@ -5,10 +5,10 @@ using namespace amrex;
 
 // advance a single level for a single time step, updates flux registers
 void
-Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
+Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::AdvanceTimeStepIrreg()",AdvanceTimeStepIrreg);
+    BL_PROFILE_VAR("Maestro::AdvanceTimeStepAverage()",AdvanceTimeStepAverage);
 
     // cell-centered MultiFabs needed within the AdvanceTimeStep routine
     Vector<MultiFab>      rhohalf(finest_level+1);
@@ -199,8 +199,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // make the sponge for all levels
     if (do_sponge) {
-	init_sponge_irreg(rho0_old.dataPtr(),r_cc_loc.dataPtr(),r_edge_loc.dataPtr());
-	// init_sponge(rho0_old.dataPtr());
+	init_sponge(rho0_old.dataPtr());
 	MakeSponge(sponge);
     }
     
@@ -450,11 +449,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state) {
 	// compute beta0 and gamma1bar
 	MakeGamma1bar(snew,gamma1bar_new,p0_new);
-	make_beta0_irreg(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-			 gamma1bar_new.dataPtr(), grav_cell_new.dataPtr(),
-			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-	// make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-        //            gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+	make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
     }
     else {
 	// Just pass beta0 and gamma1bar through if not evolving base state
@@ -699,11 +695,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state) {
 	//compute beta0 and gamma1bar
 	MakeGamma1bar(snew,gamma1bar_new,p0_new);
-	make_beta0_irreg(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-			 gamma1bar_new.dataPtr(), grav_cell_new.dataPtr(),
-			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-	// make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-        //            gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+	make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
     }
 
     for(int i=0; i<beta0_nph.size(); ++i) {

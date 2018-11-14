@@ -34,7 +34,7 @@ Maestro::EnthalpyAdvance (int which_step,
      rho0_edge_new.shrink_to_fit();
     rhoh0_edge_old.shrink_to_fit();
     rhoh0_edge_new.shrink_to_fit();
-
+    
     if (spherical == 0) {
         cell_to_edge( rho0_old.dataPtr(), rho0_edge_old.dataPtr());
         cell_to_edge( rho0_new.dataPtr(), rho0_edge_new.dataPtr());
@@ -56,16 +56,16 @@ Maestro::EnthalpyAdvance (int which_step,
         scal_force[lev].setVal(0.,RhoH,1,1);
     }
 
+    Vector<MultiFab> rhoh0_old_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+	rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+    }
+
     // compute forcing terms    
     if (enthalpy_pred_type == predict_rhohprime) {
         // make force for (rho h)'
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
-
-	Vector<MultiFab> rhoh0_old_cart(finest_level+1);
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-	}
-
+	
 	Put1dArrayOnCart(rhoh0_old,rhoh0_old_cart,0,0,bcs_s,RhoH);
 
         ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,rhoh0_old_cart,RhoH,bcs_s,0);
@@ -75,14 +75,14 @@ Maestro::EnthalpyAdvance (int which_step,
              enthalpy_pred_type == predict_rhoh) {
         // make force for (rho h)
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
-
+	
 	// make force for h by calling mkrhohforce then dividing by rho
 	if (enthalpy_pred_type == predict_h) {
 	    for (int lev=0; lev<=finest_level; ++lev) {
 		MultiFab::Divide(scal_force[lev],scalold[lev],RhoH,Rho,1,1);
 	    }
 	}
-	    
+	
     }
     else if (enthalpy_pred_type == predict_hprime) {
         // first compute h0_old

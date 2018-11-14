@@ -249,8 +249,7 @@ contains
     !
     if ((is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_h) .OR. &
          (is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_rhoh) .OR. &
-         (is_prediction .eq. 0) .OR. &
-         (use_exact_base_state)) then
+         (is_prediction .eq. 0)) then
 
        call bl_allocate(psi_cart,lo,hi,1)
 
@@ -441,7 +440,7 @@ contains
 
 
              if (do_fullform .eq. 1) then
-
+                
                 force(i,j,k) = force(i,j,k) - scal(i,j,k)*(divumac+divu_cart(i,j,k,1))
              else
 

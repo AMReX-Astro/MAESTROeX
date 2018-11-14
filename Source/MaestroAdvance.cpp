@@ -140,7 +140,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         hcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
         Xkcoeff2    [lev].define(grids[lev], dmap[lev], NumSpec,    1);
         pcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
-        scal_force  [lev].define(grids[lev], dmap[lev],   Nscal,    1);
+	if (ppm_trace_forces == 0) {
+	    scal_force  [lev].define(grids[lev], dmap[lev],   Nscal,    1);
+	} else {
+	    // we need more ghostcells if we are tracing the forces
+	    scal_force  [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
+	}
         delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
         sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
 

@@ -3,6 +3,9 @@
 
 #include <AMReX_PhysBCFunct.H>
 
+using PhysBCFunctMaestro = amrex::PhysBCFunct<amrex::BndryFuncArray>;
+
+#if 0
 class PhysBCFunctMaestro
     : public amrex::PhysBCFunctBase
 {
@@ -30,5 +33,6 @@ private:
     amrex::Vector<amrex::BCRec>            m_bcr;
     std::unique_ptr<amrex::BndryFunctBase> m_bc_func;
 };
+#endif
 
 #endif

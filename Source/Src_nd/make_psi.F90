@@ -69,5 +69,27 @@ contains
     !$OMP END PARALLEL DO
 
   end subroutine make_psi_spherical
+
+  subroutine make_psi_irreg(psi,p0_old,p0_new,dt) bind(C, name="make_psi_irreg")
+
+    double precision, intent(inout) ::       psi(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    p0_old(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    p0_new(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::        dt
+    
+    ! local variables
+    integer :: r
+
+    psi = ZERO
+
+    !$OMP PARALLEL DO PRIVATE(r)
+    do r=0,base_cutoff_density_coord(0)-1
+       
+       psi(0,r) = (p0_new(0,r) - p0_old(0,r))/dt
+
+    enddo
+    !$OMP END PARALLEL DO
+
+  end subroutine make_psi_irreg
   
 end module make_psi_module

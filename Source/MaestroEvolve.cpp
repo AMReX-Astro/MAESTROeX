@@ -76,6 +76,8 @@ Maestro::Evolve ()
         // advance the solution by dt
         if (use_exact_base_state) {
             AdvanceTimeStepIrreg(false);
+	} else if (average_base_state) {
+	    AdvanceTimeStepAverage(false);
         } else {
             AdvanceTimeStep(false);
         }
