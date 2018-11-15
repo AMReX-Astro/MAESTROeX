@@ -78,6 +78,10 @@ Maestro::WritePlotFile (const int step,
         Print() << "Time to write plotfile: " << end_total << '\n';
     }
 
+    for (int i = 0; i <= finest_level; ++i) {
+        delete mf[i];
+    }
+
 }
 
 
