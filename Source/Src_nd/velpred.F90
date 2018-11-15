@@ -81,10 +81,10 @@ contains
        call slopex_1d(utilde,slopex,domlo,domhi,lo,hi,ng_u,1,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_1d(utilde(:,1),ng_u,ufull(:,1),ng_uf,Ipu,Imu, &
-                    domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+            domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
        if (ppm_trace_forces .eq. 1) then
           call ppm_1d(force(:,1),ng_f,ufull(:,1),ng_uf,Ipf,Imf, &
-                       domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+               domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
        endif
     end if
 
@@ -109,7 +109,7 @@ contains
              ! extrapolate velocity to right face
              umacr(i) = Imu(i  ) + dt2*force(i  )
           end do
-       else 
+       else
           do i=is,ie+1
              ! extrapolate velocity to left face
              umacl(i) = Ipu(i-1) + dt2*Ipf(i-1)
@@ -1844,6 +1844,13 @@ contains
 
     call bl_deallocate(wmacl)
     call bl_deallocate(wmacr)
+
+    call bl_deallocate(Ipfx)
+    call bl_deallocate(Imfx)
+    call bl_deallocate(Ipfy)
+    call bl_deallocate(Imfy)
+    call bl_deallocate(Ipfz)
+    call bl_deallocate(Imfz)
 
   end subroutine velpred_3d
 #endif
