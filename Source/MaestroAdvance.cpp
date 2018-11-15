@@ -127,6 +127,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1,    0);
         rho_Hext    [lev].define(grids[lev], dmap[lev],       1,    0);
         s1          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
+        s1[lev].setVal(0.);
         s2          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
         s2star      [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
         delta_gamma1_term[lev].define(grids[lev], dmap[lev],  1,    0);
