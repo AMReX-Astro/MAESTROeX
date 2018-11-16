@@ -1,15 +1,15 @@
 
 # INITIAL MODEL
-maestro.model_file = "../wdconvect/kepler_new_6.25e8.hybrid.hse.320"
+maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6144"
 maestro.probin_file = "probin"
-maestro.perturb_model = true
+maestro.perturb_model = false
 
 maestro.drdxfac = 5
 #maestro.ppm_type = 1
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
-geometry.prob_hi     =  5e8 5e8 5e8
+geometry.prob_hi     =  1.e10  1.e10   1.e10
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -26,19 +26,20 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 64 64 64
+amr.n_cell             = 128 128 128
 amr.max_grid_size      = 32
-amr.max_level          = 0       # maximum level number allowed
+amr.max_level          = 3       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
 # TAGGING
-maestro.temperr = 6.5e8 6.5e8 6.5e8
+maestro.temperr = 4e8 4e8 4e8
+maestro.densperr = 1e9 1e9 1e9
 
 # TIME STEPPING
-maestro.max_step  = 0
+maestro.max_step  = 200
 maestro.stop_time = 30000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -48,13 +49,11 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 
 # ALGORITHMIC OPTIONS
 maestro.spherical = 1
-maestro.evolve_base_state = true
+maestro.evolve_base_state = false
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
 maestro.do_reflux             = 1 # do we do the hyperbolic reflux
-
-maestro.grav_const = -1.5e10
 
 maestro.anelastic_cutoff = 1.e6
 maestro.base_cutoff_density = 1.e5
@@ -72,7 +71,7 @@ maestro.use_tfromp = true
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
-maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_int   = 10      # number of timesteps between plot files
 maestro.plot_deltat = 10.0e0
 
 # CHECKPOINT
@@ -97,3 +96,5 @@ maestro.eps_hg             = 1.e-11
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
+
+maestro.do_burning = false

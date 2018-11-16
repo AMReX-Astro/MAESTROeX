@@ -78,6 +78,10 @@ Maestro::WritePlotFile (const int step,
         Print() << "Time to write plotfile: " << end_total << '\n';
     }
 
+    for (int i = 0; i <= finest_level; ++i) {
+        delete mf[i];
+    }
+
 }
 
 
@@ -215,7 +219,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
         MultiFab::Subtract(*plot_mf_data[i],rhoh0_cart[i],0,dest_comp,1,0);
     }
     ++dest_comp;
-    
+
     // rho0, rhoh0, and p0
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(( rho0_cart[i]),0,dest_comp,1);
@@ -261,6 +265,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     // add plot_mf_data[i] to plot_mf
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf.push_back(plot_mf_data[i]);
+        // delete [] plot_mf_data[i];
     }
 
     return plot_mf;
@@ -311,6 +316,7 @@ Maestro::PlotFileVarNames () const
         spec_string += ')';
 
         names[cnt++] = spec_string;
+        delete [] spec_name;
     }
 
     for (int i = 0; i < NumSpec; i++) {
@@ -330,9 +336,11 @@ Maestro::PlotFileVarNames () const
         spec_string += ')';
 
         names[cnt++] = spec_string;
+
+        delete [] spec_name;
     }
 
-   
+
     names[cnt++] = "tfromp";
     names[cnt++] = "tfromh";
     names[cnt++] = "deltaT";
@@ -340,7 +348,7 @@ Maestro::PlotFileVarNames () const
 
     names[cnt++] = "rhopert";
     names[cnt++] = "rhohpert";
-    
+
     names[cnt++] = "rho0";
     names[cnt++] = "rhoh0";
     names[cnt++] = "p0";

@@ -223,8 +223,10 @@ Maestro::Setup ()
 
     // combine tagging criteria
     for (int lev=0; lev<max_level; ++lev) {
-	tag_err[lev][0] = temperr[lev];
-	tag_err[lev][1] = denserr[lev];
+        if (temperr.size() > lev)
+		      tag_err[lev][0] = temperr[lev];
+        if (denserr.size() > lev)
+    		tag_err[lev][1] = denserr[lev];
     }
 
 }
