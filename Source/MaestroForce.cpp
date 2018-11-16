@@ -23,14 +23,19 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 	// TODO: how do I properly do the w0_cart thing?
 
 	// For spherical case
-	Vector<MultiFab> w0_cart(finest_level+1);
 	Vector<MultiFab> gradw0_cart(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
-		w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-		w0_cart[lev].setVal(0.);
 		gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
 		gradw0_cart[lev].setVal(0.);
 	}
+
+#ifdef ROTATION
+    Vector<MultiFab> w0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        w0_cart[lev].setVal(0.);
+    }
+#endif
 
 	if (spherical == 1) {
 		Vector<Real> gradw0( (max_radial_level+1)*nr_fine );

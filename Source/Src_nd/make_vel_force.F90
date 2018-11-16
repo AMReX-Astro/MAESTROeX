@@ -357,15 +357,15 @@ contains
 
              ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
-             vel_force(i,j,k,:) = -coriolis_term(1) - centrifugal_term(:) + &
-                  ( rhopert * grav_cart(i,j,k,:) - gpi(i,j,k,:) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,:)
+             vel_force(i,j,k,1:AMREX_SPACEDIM) = -coriolis_term(1) - centrifugal_term(1:AMREX_SPACEDIM) + &
+                  ( rhopert * grav_cart(i,j,k,1:AMREX_SPACEDIM) - gpi(i,j,k,:) ) / rho(i,j,k) &
+                  - w0_force_cart(i,j,k,1:AMREX_SPACEDIM)
 #else
 
              ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
-             vel_force(i,j,k,:) = ( rhopert * grav_cart(i,j,k,:) - gpi(i,j,k,:) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,:)
+             vel_force(i,j,k,1:AMREX_SPACEDIM) = ( rhopert * grav_cart(i,j,k,1:AMREX_SPACEDIM) - gpi(i,j,k,1:AMREX_SPACEDIM) ) / rho(i,j,k) &
+                  - w0_force_cart(i,j,k,1:AMREX_SPACEDIM)
 
 #endif
           end do
@@ -384,7 +384,7 @@ contains
                      HALF*(vedge(i,j,k)+vedge(i  ,j+1,k  ))*normal(i,j,k,2) + &
                      HALF*(wedge(i,j,k)+wedge(i  ,j,  k+1))*normal(i,j,k,3)
 
-                vel_force(i,j,k,:) = vel_force(i,j,k,:) - Ut_dot_er*gradw0_cart(i,j,k)*normal(i,j,k,:)
+                vel_force(i,j,k,1:AMREX_SPACEDIM) = vel_force(i,j,k,1:AMREX_SPACEDIM) - Ut_dot_er*gradw0_cart(i,j,k)*normal(i,j,k,1:AMREX_SPACEDIM)
 
              end do
           end do

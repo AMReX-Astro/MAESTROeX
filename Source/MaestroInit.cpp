@@ -214,10 +214,10 @@ Maestro::InitData ()
                        r_edge_loc.dataPtr());
     }
     else {
-	
+
 	// first compute cutoff coordinates using initial density profile
 	compute_cutoff_coords(rho0_old.dataPtr());
-	
+
 	if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
             std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
@@ -506,14 +506,14 @@ void Maestro::DivuIter (int istep_divu_iter)
 	    }
 	} else {
 	    Average(S_cc_old,Sbar,0);
-	    
+
 	    // compute Sbar = Sbar + delta_gamma1_termbar
 	    if (use_delta_gamma1_term) {
 		for(int i=0; i<Sbar.size(); ++i) {
 		    Sbar[i] += delta_gamma1_termbar[i];
 		}
 	    }
-	    
+
 	    int is_predictor = 1;
 	    make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
 		    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
