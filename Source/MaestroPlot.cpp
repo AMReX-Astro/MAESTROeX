@@ -393,8 +393,13 @@ Maestro::WriteJobInfo (const std::string& dir) const
         jobInfoFile << "number of MPI processes: " << ParallelDescriptor::NProcs() << "\n";
 #ifdef _OPENMP
         jobInfoFile << "number of threads:       " << omp_get_max_threads() << "\n";
-#endif
 
+        jobInfoFile << "tile size: ";
+        for (int d=0; d<AMREX_SPACEDIM; ++d) {
+            jobInfoFile << FabArrayBase::mfiter_tile_size[d] << " ";
+        }
+        jobInfoFile << "\n";
+#endif
         jobInfoFile << "\n";
         jobInfoFile << "CPU time used since start of simulation (CPU-hours): " <<
             getCPUTime()/3600.0;
