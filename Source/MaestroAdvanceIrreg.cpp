@@ -200,7 +200,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // make the sponge for all levels
     if (do_sponge) {
 	init_sponge_irreg(rho0_old.dataPtr(),r_cc_loc.dataPtr(),r_edge_loc.dataPtr());
-	// init_sponge(rho0_old.dataPtr());
 	MakeSponge(sponge);
     }
     
@@ -280,9 +279,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // Sbar = (1 / gamma1bar * p0) * dp/dt
     if (evolve_base_state) {
+
+	// Sbar = dp/dt
 	make_psi_irreg(Sbar.dataPtr(),p0_nm1.dataPtr(),p0_old.dataPtr(),&dtold);
+
+	// divide Sbar by coefficient
 	for (int i=0; i<Sbar.size(); ++i) {
-	    // Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
 	    Sbar[i] /= (gamma1bar_old[i]*p0_old[i]);
 	}
     } else {
@@ -455,8 +457,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	make_beta0_irreg(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
 			 gamma1bar_new.dataPtr(), grav_cell_new.dataPtr(),
 			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-	// make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-        //            gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
     }
     else {
 	// Just pass beta0 and gamma1bar through if not evolving base state
@@ -526,13 +526,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	}
     }
 
-    // if (evolve_base_state) {
-    //     // compute Sbar = average(S_cc_nph)
-    //     Average(S_cc_nph,Sbar,0);
-    // } else {
-	// these should have no effect if evolve_base_state = false
-	std::fill(Sbar.begin(), Sbar.end(), 0.);
-    // }
+    std::fill(Sbar.begin(), Sbar.end(), 0.);
 
 
     //////////////////////////////////////////////////////////////////////////////
@@ -548,9 +542,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // compute Sbar
     if (evolve_base_state) {
+	
+	// Sbar = dp/dt
 	make_psi_irreg(Sbar.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+
+	// Sbar = 1/(gamma1bar*p0) * dp/dt
 	for (int i=0; i<Sbar.size(); ++i) {
-	    // Sbar[i] += (1.0/(gamma1bar_nph[i]*p0_nph[i]))*(p0_new[i] - p0_old[i])/dt;
 	    Sbar[i] /= (gamma1bar_nph[i]*p0_nph[i]);
 	}
 
@@ -581,11 +578,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // no need to advect the base state density
-    // simply average the density
-    // if (evolve_base_state) {
-    // 	Average(s2, rho0_new, Rho);
-    // 	compute_cutoff_coords(rho0_new.dataPtr());
-    // }
 
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
@@ -706,8 +698,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	make_beta0_irreg(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
 			 gamma1bar_new.dataPtr(), grav_cell_new.dataPtr(),
 			 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-	// make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-        //            gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
     }
 
     for(int i=0; i<beta0_nph.size(); ++i) {
@@ -757,14 +747,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // compute Sbar
     std::fill(Sbar.begin(), Sbar.end(), 0.);
     
-    // FIXME - I think this should be
-    // (1.0/(gamma1bar_new[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
     if (evolve_base_state) {
-	// Average(S_cc_new,Sbar,0);
-
-	// for (int i=0; i<Sbar.size(); ++i) {
-	//     Sbar[i] += (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
-	// }
 	
 	// compute Sbar = Sbar + delta_gamma1_termbar
 	if (use_delta_gamma1_term) {
@@ -851,20 +834,5 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (maestro_verbose > 0) {
 	Print() << "Time to advance time step: " << end_total << '\n';
     }
-
-    // // DEBUG
-    // for (int i=0; i<Sbar.size(); ++i) {
-    // 	Sbar[i] = 1.0/(gamma1bar_new[i]*p0_new[i]) * (p0_new[i] - p0_old[i])/dt;
-    // 	// Sbar[i] = (rho0_new[i] - rho0_old[i])/rho0_old[i];
-    // 	// Sbar[i] = (grav_cell_new[i] - grav_cell_old[i])/grav_cell_old[i];
-    // }
-    
-    // Vector<MultiFab> Sbar_cart(finest_level+1);
-    // for (int lev=0; lev<=finest_level; ++lev) {
-    // 	Sbar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-    // }
-    // Put1dArrayOnCart(Sbar,Sbar_cart,0,0,bcs_f,0);
-    // std::string Sbarfilename = Concatenate("a_dpnew",istep,3);
-    // VisMF::Write(Sbar_cart[0], Sbarfilename);
     
 }

@@ -381,16 +381,16 @@ module make_beta0_module
 
                    end if
 
-                   ! edge-to-cell-center spacings
+                   ! edge-to-cell-center spacings (~ dr/2)
                    drp = r_edge_loc(n,r+1) - r_cc_loc(n,r)
                    drm = r_cc_loc(n,r) - r_edge_loc(n,r)
 
                    if (nu .eq. ZERO .or. mu .eq. ZERO .or. &
                         (nu*gamma1bar(n,r) - mu*p0(n,r)) .eq. ZERO .or. &
-                        ((gamma1bar(n,r) + HALF*mu*drp)/ &
-                        (gamma1bar(n,r) - HALF*mu*drm)) .le. ZERO .or. &
-                        ((p0(n,r) + HALF*nu*drp)/ &
-                        (p0(n,r) - HALF*nu*drm)) .le. ZERO) then
+                        ((gamma1bar(n,r) + mu*drp)/ &
+                        (gamma1bar(n,r) - mu*drm)) .le. ZERO .or. &
+                        ((p0(n,r) + nu*drp)/ &
+                        (p0(n,r) - nu*drm)) .le. ZERO) then
                       
                       ! just do piecewise constant integration
                       integral = abs(grav_cell(n,r))*rho0(n,r)*(drp+drm)/(p0(n,r)*gamma1bar(n,r))
@@ -403,10 +403,10 @@ module make_beta0_module
                       coeff2 = lambda*p0(n,r)/nu - rho0(n,r)
                       
                       integral = (abs(grav_cell(n,r))/denom)* &
-                           (coeff1*log( (gamma1bar(n,r) + HALF*mu*drp)/ &
-                                        (gamma1bar(n,r) - HALF*mu*drm)) - &
-                            coeff2*log( (p0(n,r) + HALF*nu*drp)/ &
-                                        (p0(n,r) - HALF*nu*drm)) )
+                           (coeff1*log( (gamma1bar(n,r) + mu*drp)/ &
+                                        (gamma1bar(n,r) - mu*drm)) - &
+                            coeff2*log( (p0(n,r) + nu*drp)/ &
+                                        (p0(n,r) - nu*drm)) )
 
                    endif
 
