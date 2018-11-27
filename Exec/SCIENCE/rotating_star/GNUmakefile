@@ -4,6 +4,7 @@ COMP	   = gnu
 USE_MPI    = FALSE
 USE_OMP    = TRUE
 USE_REACT  = TRUE
+USE_ROTATION = TRUE
 
 TINY_PROFILE = FALSE
 PROFILE      = FALSE # TRUE overrides TINY_PROFILE
@@ -21,7 +22,9 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := general_null
-GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/aprox21.net
+# NETWORK_DIR := ignition_chamulak
+#GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/aprox21.net
+GENERAL_NET_INPUTS = $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/ignition_wdconvect.net
 
 Bpack   := ./Make.package
 Blocs   := .

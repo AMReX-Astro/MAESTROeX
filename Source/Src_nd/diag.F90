@@ -19,15 +19,15 @@ contains
 
   !xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   subroutine diag(lev, lo, hi, &
-                  scal, s_lo, s_hi, nc_s, &
-                  rho_Hnuc, hn_lo, hn_hi, &
-                  rho_Hext, he_lo, he_hi, &
-                  rho0, p0, &
-                  u, u_lo, u_hi, &
-                  w0, dx, &
-                  Mach_max,temp_max,enuc_max,Hext_max, &
-                  mask,     m_lo, m_hi, use_mask) &
-                  bind(C, name="diag")
+       scal, s_lo, s_hi, nc_s, &
+       rho_Hnuc, hn_lo, hn_hi, &
+       rho_Hext, he_lo, he_hi, &
+       rho0, p0, &
+       u, u_lo, u_hi, &
+       w0, dx, &
+       Mach_max,temp_max,enuc_max,Hext_max, &
+       mask,     m_lo, m_hi, use_mask) &
+       bind(C, name="diag")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -87,10 +87,10 @@ contains
                 ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
                 vel = sqrt( (u(i,1) + 0.5d0*(w0(lev,i) + w0(lev,i+1)) )**2 )
-#elsif (AMREX_SPACEDIM == 2)
+#elif (AMREX_SPACEDIM == 2)
                 vel = sqrt(  u(i,j,1)**2 + &
                      ( u(i,j,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
-#elsif (AMREX_SPACEDIM == 3)
+#elif (AMREX_SPACEDIM == 3)
                 vel = sqrt(  u(i,j,k,1)**2 + &
                      u(i,j,k,2)**2 + &
                      ( u(i,j,k,3) + 0.5d0*(w0(lev,k) + w0(lev,k+1)) )**2 )
@@ -121,19 +121,19 @@ contains
 
   !xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   subroutine diag_sphr(lev, lo, hi, &
-                       scal, s_lo, s_hi, nc_s, &
-                       rho0, p0, &
-                       u, u_lo, u_hi, &
-                       w0macx, x_lo, x_hi, &
-                       w0macy, y_lo, y_hi, &
-                       w0macz, z_lo, z_hi, &
-                       w0r, wr_lo, wr_hi, &
-                       dx, &
-                       normal, n_lo, n_hi, &
-                       T_max, coord_Tmax, vel_Tmax, &
-                       ncenter, T_center, Mach_max, &
-                       mask,     m_lo, m_hi, use_mask) &
-                       bind(C, name="diag_sphr")
+       scal, s_lo, s_hi, nc_s, &
+       rho0, p0, &
+       u, u_lo, u_hi, &
+       w0macx, x_lo, x_hi, &
+       w0macy, y_lo, y_hi, &
+       w0macz, z_lo, z_hi, &
+       w0r, wr_lo, wr_hi, &
+       dx, &
+       normal, n_lo, n_hi, &
+       T_max, coord_Tmax, vel_Tmax, &
+       ncenter, T_center, Mach_max, &
+       mask,     m_lo, m_hi, use_mask) &
+       bind(C, name="diag_sphr")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s

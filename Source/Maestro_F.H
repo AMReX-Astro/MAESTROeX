@@ -604,7 +604,7 @@ extern "C"
 				const amrex::Real* h0_edgex,   const int* hx_lo, const int* hx_hi,
 				const amrex::Real* h0_edgey,   const int* hy_lo, const int* hy_hi,
 				const amrex::Real* h0_edgez,   const int* hz_lo, const int* hz_hi);
-    
+
     void make_rhoh_flux_3d_sphr_irreg(const int* lo, const int* hi,
 				amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, const int* nc_fx,
 				amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi, const int* nc_fy,
@@ -1016,7 +1016,28 @@ extern "C"
 		       const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
 		       const amrex::Real* temp_old, const int* t_lo, const int* t_hi,
 		       amrex::Real* peos, const int* p_lo, const int* p_hi);
-    //////////////////////
+
+    void makeMachfromRhoH (const int* lev, const int* lo, const int* hi,
+                       const amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
+                       const amrex::Real* u,  const int* u_lo, const int* u_hi,
+                       const amrex::Real* p0, const amrex::Real* w0,
+                       amrex::Real* mach, const int* m_lo, const int* m_hi);
+
+   void makeMachfromRhoH_sphr (const int* lev, const int* lo, const int* hi,
+                      const amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
+                      const amrex::Real* u,  const int* u_lo, const int* u_hi,
+                      const amrex::Real* p0,
+                      const amrex::Real* w0,  const int* w_lo, const int* w_hi,
+                      const amrex::Real* dx,
+                      amrex::Real* mach, const int* m_lo, const int* m_hi,
+     			       const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
+     			       const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+
+    void makeMachfromRhoP (const int* lev, const int* lo, const int* hi,
+                       const amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
+                       const amrex::Real* u,  const int* u_lo, const int* u_hi,
+                       const amrex::Real* p0, const amrex::Real* w0,
+                       amrex::Real* mach, const int* m_lo, const int* m_hi);
 
     //////////////////////
     // in rotation.F90
@@ -1178,7 +1199,7 @@ void update_rhoh_3d_sphr(const int* lo, const int* hi,
 		      const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
 #endif
 #endif
-                      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f, int ng_f, 
+                      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f, int ng_f,
                       const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt,
                       const int* adv_bc, const int* phys_bc);
 

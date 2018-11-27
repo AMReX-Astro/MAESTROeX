@@ -654,6 +654,22 @@ private:
     void PfromRhoH (const amrex::Vector<amrex::MultiFab>& state,
                     const amrex::Vector<amrex::MultiFab>& s_old,
 		    amrex::Vector<amrex::MultiFab>& peos);
+
+    void MachfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
+                    const amrex::Vector<amrex::MultiFab>& vel,
+                    const amrex::Vector<amrex::Real>& p0,
+        		    amrex::Vector<amrex::MultiFab>& mach);
+
+    void MachfromRhoHSphr (const amrex::Vector<amrex::MultiFab>& scal,
+                    const amrex::Vector<amrex::MultiFab>& vel,
+                    const amrex::Vector<amrex::Real>& p0,
+                    const amrex::Vector<amrex::MultiFab>& w0cart,
+        		    amrex::Vector<amrex::MultiFab>& mach);
+
+    void MachfromRhoP (const amrex::Vector<amrex::MultiFab>& scal,
+                    const amrex::Vector<amrex::MultiFab>& vel,
+                    const amrex::Vector<amrex::Real>& p0,
+        		    amrex::Vector<amrex::MultiFab>& mach);
     ////////////
 
     ////////////

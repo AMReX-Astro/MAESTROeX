@@ -5,7 +5,7 @@
   velpert_radius = 2.e7
   velpert_scale = 1.e7
   velpert_steep = 1.e5
-  tag_density_1 = 5.e7
+  tag_density_1 = 1.e7
   tag_density_2 = 1.e8
   tag_density_3 = 1.e8
   tag_density_3 = 1.e9

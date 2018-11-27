@@ -109,7 +109,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     // X (NumSpec)
     // rho' and rhoh' (2)
     // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 7;
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
 
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
@@ -228,6 +228,12 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     }
     dest_comp += 3;
 
+    // Mach number
+    Vector<MultiFab> mach_number(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        mach_number[lev].define(grids[lev], dmap[lev], 1, 0);
+    }
+
     if (spherical == 1) {
         Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
         Vector<MultiFab> w0r_cart(finest_level+1);
@@ -253,7 +259,18 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
             MakeW0mac(w0mac);
             Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
         }
-    } // spherical
+
+        MachfromRhoHSphr(s_in,u_in,p0_in,w0r_cart,mach_number);
+
+    } else {
+        MachfromRhoH(s_in,u_in,p0_in,mach_number);
+
+    }
+
+    for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i]->copy((mach_number[i]),0,dest_comp,1);
+    }
+    ++dest_comp;
 
     // w0
     Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
@@ -284,7 +301,7 @@ Maestro::PlotFileVarNames () const
     // X (NumSpec)
     // rho' and rhoh' (2)
     // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 7;
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
     Vector<std::string> names(nPlot);
 
     int cnt = 0;
@@ -352,6 +369,7 @@ Maestro::PlotFileVarNames () const
     names[cnt++] = "rho0";
     names[cnt++] = "rhoh0";
     names[cnt++] = "p0";
+    names[cnt++] = "MachNumber";
 
     // add w0
     for (int i=0; i<AMREX_SPACEDIM; ++i) {

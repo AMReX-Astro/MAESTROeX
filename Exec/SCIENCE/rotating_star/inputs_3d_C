@@ -1,6 +1,7 @@
 
 # INITIAL MODEL
-maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6144"
+#maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6144"
+maestro.model_file = "../wdconvect/kepler_new_6.25e8.hybrid.hse.320"
 maestro.probin_file = "probin"
 maestro.perturb_model = false
 
@@ -8,8 +9,8 @@ maestro.drdxfac = 5
 #maestro.ppm_type = 1
 
 # PROBLEM SIZE
-geometry.prob_lo     =  0.0    0.0    0.0
-geometry.prob_hi     =  1.e10  1.e10   1.e10
+geometry.prob_lo     =  -5.e8  -5.e8  -5.e8
+geometry.prob_hi     =   5.e8   5.e8   5.e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -26,7 +27,9 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 128 128 128
+#amr.n_cell             = 160 160 160
+#amr.n_cell             = 64 64 64
+amr.n_cell = 96 96 96
 amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -39,7 +42,7 @@ maestro.temperr = 4e8 4e8 4e8
 maestro.denserr = 1e9 1e9 1e9
 
 # TIME STEPPING
-maestro.max_step  = 200
+maestro.max_step  = 2000
 maestro.stop_time = 30000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -70,13 +73,13 @@ maestro.use_divu_firstdt = true
 maestro.use_tfromp = true
 
 # PLOTFILES
-maestro.plot_base_name  = plt    # root name of plot file
+maestro.plot_base_name  = rot1e4_    # root name of plot file
 maestro.plot_int   = 10      # number of timesteps between plot files
 maestro.plot_deltat = 10.0e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = 25
+maestro.chk_int         = 1000
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
@@ -98,3 +101,8 @@ maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
 maestro.do_burning = false
+
+# ROTATION
+# For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
+maestro.rotational_frequency = 1.e-4
+maestro.rotation_radius = 2.e8
