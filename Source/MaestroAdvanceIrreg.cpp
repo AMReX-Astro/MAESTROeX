@@ -280,8 +280,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // Sbar = (1 / gamma1bar * p0) * dp/dt
     if (evolve_base_state) {
+	make_psi_irreg(Sbar.dataPtr(),p0_nm1.dataPtr(),p0_old.dataPtr(),&dtold);
 	for (int i=0; i<Sbar.size(); ++i) {
-	    Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
+	    // Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
+	    Sbar[i] /= (gamma1bar_old[i]*p0_old[i]);
 	}
     } else {
 	// these should have no effect if evolve_base_state = false
@@ -546,8 +548,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // compute Sbar
     if (evolve_base_state) {
+	make_psi_irreg(Sbar.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
 	for (int i=0; i<Sbar.size(); ++i) {
-	    Sbar[i] += (1.0/(gamma1bar_nph[i]*p0_nph[i]))*(p0_new[i] - p0_old[i])/dt;
+	    // Sbar[i] += (1.0/(gamma1bar_nph[i]*p0_nph[i]))*(p0_new[i] - p0_old[i])/dt;
+	    Sbar[i] /= (gamma1bar_nph[i]*p0_nph[i]);
 	}
 
 	// compute Sbar = Sbar + delta_gamma1_termbar
