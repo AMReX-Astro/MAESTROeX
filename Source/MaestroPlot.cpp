@@ -109,7 +109,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     // X (NumSpec)
     // rho' and rhoh' (2)
     // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 7;
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
 
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
@@ -253,7 +253,13 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
             MakeW0mac(w0mac);
             Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
         }
-    } // spherical
+
+        // Mach number
+        MachfromRhoHSphr(s_in,u_in,p0_in,w0r_cart,tempmf);
+    } else {
+        // Mach number
+        MachfromRhoH(s_in,u_in,p0_in,tempmf);
+    }
 
     // w0
     Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
@@ -284,7 +290,7 @@ Maestro::PlotFileVarNames () const
     // X (NumSpec)
     // rho' and rhoh' (2)
     // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 7;
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
     Vector<std::string> names(nPlot);
 
     int cnt = 0;
@@ -352,6 +358,7 @@ Maestro::PlotFileVarNames () const
     names[cnt++] = "rho0";
     names[cnt++] = "rhoh0";
     names[cnt++] = "p0";
+    names[cnt++] = "MachNumber";
 
     // add w0
     for (int i=0; i<AMREX_SPACEDIM; ++i) {
