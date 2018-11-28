@@ -27,6 +27,9 @@ CEXE_sources += MaestroPlot.cpp
 CEXE_sources += MaestroReact.cpp
 CEXE_sources += MaestroRegrid.cpp
 CEXE_sources += MaestroRhoHT.cpp
+#ifdef ROTATION
+CEXE_sources += MaestroRotation.cpp
+#endif
 CEXE_sources += MaestroSetup.cpp
 CEXE_sources += MaestroSponge.cpp
 CEXE_sources += MaestroThermal.cpp

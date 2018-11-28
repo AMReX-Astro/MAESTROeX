@@ -110,6 +110,9 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     // rho' and rhoh' (2)
     // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
     int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
+#ifdef ROTATION
+    nPlot += AMREX_SPACEDIM; // angular momentum
+#endif
 
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
@@ -229,11 +232,6 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     dest_comp += 3;
 
     // Mach number
-    Vector<MultiFab> mach_number(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        mach_number[lev].define(grids[lev], dmap[lev], 1, 0);
-    }
-
     if (spherical == 1) {
         Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
         Vector<MultiFab> w0r_cart(finest_level+1);
@@ -260,15 +258,15 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
             Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
         }
 
-        MachfromRhoHSphr(s_in,u_in,p0_in,w0r_cart,mach_number);
+        MachfromRhoHSphr(s_in,u_in,p0_in,w0r_cart,tempmf);
 
     } else {
-        MachfromRhoH(s_in,u_in,p0_in,mach_number);
+        MachfromRhoH(s_in,u_in,p0_in,tempmf);
 
     }
 
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((mach_number[i]),0,dest_comp,1);
+        plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
     }
     ++dest_comp;
 
@@ -278,6 +276,15 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
         plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
     }
     dest_comp += AMREX_SPACEDIM;
+
+#ifdef ROTATION
+    // angular momentum
+    MakeAngularMomentum (s_in, u_in, tempmf);
+    for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
+    }
+    dest_comp += AMREX_SPACEDIM;
+#endif
 
     // add plot_mf_data[i] to plot_mf
     for (int i = 0; i <= finest_level; ++i) {
@@ -302,6 +309,9 @@ Maestro::PlotFileVarNames () const
     // rho' and rhoh' (2)
     // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
     int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
+#ifdef ROTATION
+    nPlot += AMREX_SPACEDIM; // angular momentum
+#endif
     Vector<std::string> names(nPlot);
 
     int cnt = 0;
@@ -377,6 +387,16 @@ Maestro::PlotFileVarNames () const
         x += (120+i);
         names[cnt++] = x;
     }
+
+#ifdef ROTATION
+    // angular momentum
+    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+        std::string x = "angular_momentum_";
+        x += (120+i);
+        names[cnt++] = x;
+    }
+
+#endif
 
     return names;
 }

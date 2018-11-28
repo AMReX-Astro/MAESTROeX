@@ -1042,6 +1042,15 @@ extern "C"
     //////////////////////
     // in rotation.F90
     void rotation_init();
+
+#ifdef ROTATION
+    void derangmom (const amrex::Real* L, const int* L_lo, const int* L_hi,
+       const amrex::Real* state, const int* s_lo, const int* s_hi, const int* ncomp,
+       const amrex::Real* vel, const int* v_lo, const int* v_hi,
+       const int* lo, const int* hi,
+       const int* domain_lo, const int* domain_hi,
+       const amrex::Real* delta, const amrex::Real* xlo);
+#endif
     //////////////////////
 
 

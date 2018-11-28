@@ -159,7 +159,6 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 	BL_PROFILE_VAR("Maestro::MachfromRhoH()",MachfromRhoH);
 
 	for (int lev=0; lev<=finest_level; ++lev) {
-        Print() << "hieeeeeee\n";
 
 		// get references to the MultiFabs at level lev
 		const MultiFab& scal_mf = scal[lev];
@@ -171,8 +170,6 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 #pragma omp parallel
 #endif
 		for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
-
-            Print() << "bieeeeeee\n";
 
 			// Get the index space of the valid region
 			const Box& tileBox = mfi.tilebox();
