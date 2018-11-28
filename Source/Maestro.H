@@ -676,8 +676,8 @@ private:
     ////////////
     // MaestroRotation.cpp functions
     void MakeAngularMomentum (const amrex::Vector<amrex::MultiFab>& state,
-                            const amrex::Vector<amrex::MultiFab>& vel,
-                            amrex::Vector<amrex::MultiFab>& angular_momentum);
+                              const amrex::Vector<amrex::MultiFab>& vel,
+                              amrex::Vector<amrex::MultiFab>& angular_momentum);
     ////////////
 #endif
 

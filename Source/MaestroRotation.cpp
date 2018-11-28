@@ -38,17 +38,18 @@ Maestro::MakeAngularMomentum (const Vector<MultiFab>& state,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "tileBox", which specifies the "valid" region.
 			derangmom(BL_TO_FORTRAN_3D(angular_momentum_mf[mfi]),
-			           BL_TO_FORTRAN_FAB(state_mf[mfi]),
-			           BL_TO_FORTRAN_3D(vel_mf[mfi]),
-			           ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			           domainBox.loVect(), domainBox.hiVect(),
-			           dx, xlo);
+			          BL_TO_FORTRAN_FAB(state_mf[mfi]),
+			          BL_TO_FORTRAN_3D(vel_mf[mfi]),
+			          ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+			          domainBox.loVect(), domainBox.hiVect(),
+			          dx, xlo);
 		}
 
 	}
 
 	// average fine data onto coarser cells
 	AverageDown(angular_momentum,0,AMREX_SPACEDIM);
-	FillPatch(t_old,angular_momentum,angular_momentum,angular_momentum,0,0,AMREX_SPACEDIM,0,bcs_u);
+	FillPatch(t_old,angular_momentum,angular_momentum,angular_momentum,
+	          0,0,AMREX_SPACEDIM,0,bcs_u);
 
 }
