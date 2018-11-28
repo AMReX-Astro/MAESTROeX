@@ -81,7 +81,7 @@ contains
              loc(1) = xlo(1) + (dble(i - lo(1)) + HALF) * dx(1) - center(1)
 
              rho = state(i,j,k,rho_comp)
-             mom = u(i,j,k,:)
+             mom = u(i,j,k,:) * rho
              ang_mom = cross_product(loc, mom)
 
              L(i,j,k,:) = ang_mom
