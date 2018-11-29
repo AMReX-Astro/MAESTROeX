@@ -31,7 +31,6 @@ CEXE_sources += MaestroSetup.cpp
 CEXE_sources += MaestroSponge.cpp
 CEXE_sources += MaestroThermal.cpp
 CEXE_sources += MaestroVelocityAdvance.cpp
-CEXE_sources += PhysBCFunctMaestro.cpp
 
 CEXE_headers += Maestro.H
 CEXE_headers += MaestroPlot.H
