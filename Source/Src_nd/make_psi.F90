@@ -83,10 +83,14 @@ contains
     psi = ZERO
 
     !$OMP PARALLEL DO PRIVATE(r)
-    do r=0,base_cutoff_density_coord(0)-1
-       
+    do r=0,base_cutoff_density_coord(0)
        psi(0,r) = (p0_new(0,r) - p0_old(0,r))/dt
+    enddo
+    !$OMP END PARALLEL DO
 
+    !$OMP PARALLEL DO PRIVATE(r)
+    do r=base_cutoff_density_coord(0)+1,nr_fine-1
+       psi(0,r) = psi(0,r-1)
     enddo
     !$OMP END PARALLEL DO
 

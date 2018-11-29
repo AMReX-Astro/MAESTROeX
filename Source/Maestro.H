@@ -191,15 +191,15 @@ private:
 
     ////////////////////////
     // MaestroDebug.cpp functions
-    
+
     // print out the contents of a Vector of MultiFabs
     void PrintMF   (amrex::Vector<amrex::MultiFab>& CC);
 
-    
-    // print out the contents of a Vector of edge-based MultiFabs 
+
+    // print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir);
-    
+
     // utility to write out a multilevel multifab to a plotfile
     void WriteMF   (amrex::Vector<amrex::MultiFab>& mf,
                     std::string name);
@@ -650,6 +650,17 @@ private:
     void PfromRhoH (const amrex::Vector<amrex::MultiFab>& state,
                     const amrex::Vector<amrex::MultiFab>& s_old,
 		    amrex::Vector<amrex::MultiFab>& peos);
+
+    void MachfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
+                       const amrex::Vector<amrex::MultiFab>& vel,
+                       const amrex::Vector<amrex::Real>& p0,
+                       amrex::Vector<amrex::MultiFab>& mach);
+
+    void MachfromRhoHSphr (const amrex::Vector<amrex::MultiFab>& scal,
+                           const amrex::Vector<amrex::MultiFab>& vel,
+                           const amrex::Vector<amrex::Real>& p0,
+                           const amrex::Vector<amrex::MultiFab>& w0cart,
+                           amrex::Vector<amrex::MultiFab>& mach);
     ////////////
 
     ////////////

@@ -105,7 +105,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     if (lev >= tag_err.size()) return;
 
     const int clearval = TagBox::CLEAR;
-    const int tagval = TagBox::SET;
+    const int   tagval = TagBox::SET;
 
     const Real* dx      = geom[lev].CellSize();
 
@@ -117,10 +117,6 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     {
         Vector<int>  itags;
 
-        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
         for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
         {
             const Box& tilebox  = mfi.tilebox();
