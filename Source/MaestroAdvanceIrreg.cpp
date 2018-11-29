@@ -281,11 +281,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state) {
 
 	// Sbar = dp/dt
-	make_psi_irreg(Sbar.dataPtr(),p0_nm1.dataPtr(),p0_old.dataPtr(),&dtold);
+	// make_psi_irreg(Sbar.dataPtr(),p0_nm1.dataPtr(),p0_old.dataPtr(),&dtold);
 
 	// divide Sbar by coefficient
 	for (int i=0; i<Sbar.size(); ++i) {
-	    Sbar[i] /= (gamma1bar_old[i]*p0_old[i]);
+	    Sbar[i] = psi[i]/(gamma1bar_old[i]*p0_old[i]);
+	    // Sbar[i] = 1.0/(gamma1bar_old[i]*dtold)*(1.0-p0_nm1[i]/p0_old[i]);
 	}
     } else {
 	// these should have no effect if evolve_base_state = false
@@ -348,11 +349,16 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
 
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
+    
     // no need to compute etarho
     if (evolve_base_state) {
-	// correct the base state density by "averaging"
-	Average(s2, rho0_new, Rho);
-	compute_cutoff_coords(rho0_new.dataPtr());
+    	// correct the base state density by "averaging"
+    	Average(s2, rho0_new, Rho);
+    	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
     // update grav_cell_new
@@ -383,8 +389,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt
-	make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// // set psi to dpdt
+	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+
+	// set psi to etarho * grav_const
+	make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
     }
     else {
 	p0_new = p0_old;
@@ -394,7 +403,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state) {
 	// compute rhoh0_old by "averaging"
 	Average(s1, rhoh0_old, RhoH);
-	Average(s2, rhoh0_new, RhoH);
+	// Average(s2, rhoh0_new, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
+
+	// add psi to rhoh0_new
+	for (int i=0; i<rhoh0_old.size(); ++i) {
+	    rhoh0_new[i] = rhoh0_old[i] + dt*psi[i];
+	}
     }
     else {
 	rhoh0_new = rhoh0_old;
@@ -496,7 +510,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // compute S at cell-centers
     Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-	      rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
+	      rho_Hext,thermal2,p0_old,gamma1bar_new,delta_gamma1_termbar,psi);
 
     // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -544,11 +558,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state) {
 	
 	// Sbar = dp/dt
-	make_psi_irreg(Sbar.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// make_psi_irreg(Sbar.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
 
 	// Sbar = 1/(gamma1bar*p0) * dp/dt
 	for (int i=0; i<Sbar.size(); ++i) {
-	    Sbar[i] /= (gamma1bar_nph[i]*p0_nph[i]);
+	    Sbar[i] = psi[i]/(gamma1bar_new[i]*p0_new[i]);
+	    // Sbar[i] = 1.0/(gamma1bar_new[i]*dt)*(1.0-p0_old[i]/p0_new[i]);
 	}
 
 	// compute Sbar = Sbar + delta_gamma1_termbar
@@ -578,6 +593,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // no need to advect the base state density
+    rho0_new = rho0_old;
 
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
@@ -593,11 +609,15 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
 
-    // no need to compute etarho
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
+    
+    // correct the base state density by "averaging"
     if (evolve_base_state) {
-	// correct the base state density by "averaging"
-	Average(s2, rho0_new, Rho);
-	compute_cutoff_coords(rho0_new.dataPtr());
+    	Average(s2, rho0_new, Rho);
+    	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
 
@@ -637,13 +657,20 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt
-	make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// // set psi to dpdt
+	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	
+	// set psi to etarho * grav_const
+	make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
     }
 
     // base state enthalpy averaging
+    // add new psi to rhoh0_new
     if (evolve_base_state) {
-	Average(s2, rhoh0_new, RhoH);
+	// Average(s2, rhoh0_new, RhoH);
+	for (int i=0; i<rhoh0_old.size(); ++i) {
+	    rhoh0_new[i] = rhoh0_old[i] + dt*psi[i];
+	}
     }
 
     // base state enthalpy update
@@ -702,6 +729,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     for(int i=0; i<beta0_nph.size(); ++i) {
 	beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+	gamma1bar_nph[i] = 0.5*(gamma1bar_old[i]+gamma1bar_new[i]);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -721,6 +749,18 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
 	      rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
+    
+    // compute Sbar
+    std::fill(Sbar.begin(), Sbar.end(), 0.);
+    
+    if (evolve_base_state) {
+	// compute Sbar = Sbar + delta_gamma1_termbar
+	if (use_delta_gamma1_term) {
+	    for(int i=0; i<Sbar.size(); ++i) {
+		Sbar[i] += delta_gamma1_termbar[i];
+	    }
+	}
+    }
     
     // define dSdt = (S_cc_new - S_cc_old) / dt
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -743,19 +783,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
 
     int proj_type;
-
-    // compute Sbar
-    std::fill(Sbar.begin(), Sbar.end(), 0.);
-    
-    if (evolve_base_state) {
-	
-	// compute Sbar = Sbar + delta_gamma1_termbar
-	if (use_delta_gamma1_term) {
-	    for(int i=0; i<Sbar.size(); ++i) {
-		Sbar[i] += delta_gamma1_termbar[i];
-	    }
-	}
-    }
 
     // Project the new velocity field
     if (is_initIter) {

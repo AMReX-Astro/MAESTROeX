@@ -98,12 +98,10 @@ contains
           ! divide only if ncell>0
           if (ncell(n,r) > 0) then
              phisum(n,r) = phisum(n,r) / ncell(n,r)
+          else
+             ! keep value constant if it is outside the cutoff coords
+             phisum(n,r) = phisum(n,r-1)
           end if
-       end do
-       
-       ! keep value constant if it is outside the cutoff coords
-       do r=base_cutoff_density_coord(0)+1,nr_fine-1
-          phisum(n,r) = phisum(n,r-1)
        end do
     end do
 

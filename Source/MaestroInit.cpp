@@ -179,6 +179,7 @@ Maestro::InitData ()
                               rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
                               tempbar_init.dataPtr(),
                               r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	std::fill(psi.begin(), psi.end(), 0.);
     } else {
         init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
                         rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
