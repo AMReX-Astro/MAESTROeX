@@ -70,30 +70,57 @@ contains
 
   end subroutine make_psi_spherical
 
-  subroutine make_psi_irreg(psi,p0_old,p0_new,dt) bind(C, name="make_psi_irreg")
+  subroutine make_psi_irreg(etarho_cc,grav_cell,psi) bind(C, name="make_psi_irreg")
 
+    double precision, intent(in   ) :: etarho_cc(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: grav_cell(0:max_radial_level,0:nr_fine-1)
     double precision, intent(inout) ::       psi(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::    p0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::    p0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::        dt
     
-    ! local variables
-    integer :: r
-
+    ! Local variables
+    integer         :: r,i,n
+   
     psi = ZERO
 
-    !$OMP PARALLEL DO PRIVATE(r)
-    do r=0,base_cutoff_density_coord(0)
-       psi(0,r) = (p0_new(0,r) - p0_old(0,r))/dt
-    enddo
-    !$OMP END PARALLEL DO
+    do n=0,finest_radial_level
+       do i=1,numdisjointchunks(n)
+          do r = r_start_coord(n,i), r_end_coord(n,i)
+             if (r .lt. base_cutoff_density_coord(n)) then
+                psi(n,r) = etarho_cc(n,r) * grav_cell(n,r)
+             end if
+          end do
+       end do
+    end do
 
-    !$OMP PARALLEL DO PRIVATE(r)
-    do r=base_cutoff_density_coord(0)+1,nr_fine-1
-       psi(0,r) = psi(0,r-1)
-    enddo
-    !$OMP END PARALLEL DO
-
+    call restrict_base(psi,1)
+    call fill_ghost_base(psi,1)
+    
   end subroutine make_psi_irreg
+
+!! OLD PSI SUBROUTINE  
+!!$  subroutine make_psi_irreg(psi,p0_old,p0_new,dt) bind(C, name="make_psi_irreg")
+!!$
+!!$    double precision, intent(inout) ::       psi(0:max_radial_level,0:nr_fine-1)
+!!$    double precision, intent(in   ) ::    p0_old(0:max_radial_level,0:nr_fine-1)
+!!$    double precision, intent(in   ) ::    p0_new(0:max_radial_level,0:nr_fine-1)
+!!$    double precision, intent(in   ) ::        dt
+!!$    
+!!$    ! local variables
+!!$    integer :: r
+!!$
+!!$    psi = ZERO
+!!$
+!!$    !$OMP PARALLEL DO PRIVATE(r)
+!!$    do r=0,base_cutoff_density_coord(0)
+!!$       psi(0,r) = (p0_new(0,r) - p0_old(0,r))/dt
+!!$    enddo
+!!$    !$OMP END PARALLEL DO
+!!$
+!!$    !$OMP PARALLEL DO PRIVATE(r)
+!!$    do r=base_cutoff_density_coord(0)+1,nr_fine-1
+!!$       psi(0,r) = psi(0,r-1)
+!!$    enddo
+!!$    !$OMP END PARALLEL DO
+!!$
+!!$  end subroutine make_psi_irreg
   
 end module make_psi_module

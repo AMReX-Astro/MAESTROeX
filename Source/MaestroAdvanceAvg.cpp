@@ -378,8 +378,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt
-	make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// // set psi to dpdt
+	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
     }
     else {
 	p0_new = p0_old;
@@ -637,8 +637,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt
-	make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// // set psi to dpdt
+	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
     }
 
     // base state enthalpy averaging

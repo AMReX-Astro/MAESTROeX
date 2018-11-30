@@ -348,19 +348,18 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
+    
+    // correct the base state density by "averaging"
+    if (evolve_base_state) {
+    	Average(s2, rho0_new, Rho);
+    	compute_cutoff_coords(rho0_new.dataPtr());
+    }
 
     // compute the new etarho
     if (evolve_base_state && use_etarho) {
 	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
     }
     
-    // no need to compute etarho
-    if (evolve_base_state) {
-    	// correct the base state density by "averaging"
-    	Average(s2, rho0_new, Rho);
-    	compute_cutoff_coords(rho0_new.dataPtr());
-    }
-
     // update grav_cell_new
     if (evolve_base_state) {
 	make_grav_cell(grav_cell_new.dataPtr(),
@@ -391,9 +390,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
 	// // set psi to dpdt
 	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
-
-	// set psi to etarho * grav_const
-	make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
+	
+	// set psi to dpdt = etarho * grav_cell
+	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
     }
     else {
 	p0_new = p0_old;
@@ -609,18 +608,17 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
 
-    // compute the new etarho
-    if (evolve_base_state && use_etarho) {
-	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
-    }
-    
     // correct the base state density by "averaging"
     if (evolve_base_state) {
     	Average(s2, rho0_new, Rho);
     	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
-
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
+    
     // update grav_cell_new, rho0_nph, grav_cell_nph
     if (evolve_base_state) {
 	make_grav_cell(grav_cell_new.dataPtr(),
@@ -660,8 +658,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	// // set psi to dpdt
 	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
 	
-	// set psi to etarho * grav_const
-	make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
+	// set psi to dpdt = etarho * grav_const
+	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
     }
 
     // base state enthalpy averaging
