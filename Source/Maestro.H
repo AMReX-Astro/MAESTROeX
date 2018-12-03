@@ -577,6 +577,9 @@ private:
                      amrex::Vector<amrex::MultiFab>& rad_vel,
                      amrex::Vector<amrex::MultiFab>& circ_vel);
 
+    void MakeAdExcess (const amrex::Vector<amrex::MultiFab>& state,
+                  amrex::Vector<amrex::MultiFab>& ad_excess);
+
     // end MaestroPlot.cpp functions
     ////////////
 

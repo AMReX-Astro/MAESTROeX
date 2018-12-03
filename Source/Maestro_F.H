@@ -686,6 +686,17 @@ extern "C"
                         const amrex::Real* normal, const int* n_lo, const int* n_hi,
                         amrex::Real* rad_vel, const int* r_lo, const int* r_hi,
                         amrex::Real* circ_vel, const int* c_lo, const int* c_hi);
+
+    void make_ad_excess(const int* lo, const int* hi,
+                        const amrex::Real* state, const int* s_lo, const int* s_hi,
+                        const int* nc_s,
+                        amrex::Real* ad_excess, const int* a_lo, const int* a_hi);
+
+    void make_ad_excess_sphr(const int* lo, const int* hi,
+                        const amrex::Real* state, const int* s_lo, const int* s_hi,
+                        const int* nc_s,
+                        const amrex::Real* normal, const int* n_lo, const int* n_hi,
+                        amrex::Real* ad_excess, const int* a_lo, const int* a_hi);
     /////////////////////
 
     //////////////////////
