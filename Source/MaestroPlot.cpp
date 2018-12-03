@@ -108,7 +108,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     // rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
     // X (NumSpec)
     // rho' and rhoh' (2)
-    // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
+    // rho0, rhoh0, p0, w0, MachNumber (4+AMREX_SPACEDIM)
     int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
 
     // MultiFab to hold plotfile data
