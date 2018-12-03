@@ -678,6 +678,14 @@ extern "C"
                           const amrex::Real* vel, const int* v_lo, const int* v_hi,
                           const amrex::Real* w0cart, const int* w_lo, const int* w_hi,
                           amrex::Real* magvel, const int* m_lo, const int* m_hi);
+
+
+    void make_velrc(const int* lo, const int* hi,
+                        const amrex::Real* vel, const int* v_lo, const int* v_hi,
+                        const amrex::Real* w0rcart, const int* w_lo, const int* w_hi,
+                        const amrex::Real* normal, const int* n_lo, const int* n_hi,
+                        amrex::Real* rad_vel, const int* r_lo, const int* r_hi,
+                        amrex::Real* circ_vel, const int* c_lo, const int* c_hi);
     /////////////////////
 
     //////////////////////

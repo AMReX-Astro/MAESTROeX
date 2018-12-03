@@ -76,4 +76,46 @@ contains
 
   end subroutine make_magvel_sphr
 
+  subroutine make_velrc(lo,hi,vel,v_lo,v_hi,w0rcart,w_lo,w_hi,normal,n_lo,n_hi,&
+       rad_vel,r_lo,r_hi,circ_vel,c_lo,c_hi) bind(C, name="make_velrc")
+
+    integer, intent(in) :: lo(3), hi(3)
+    integer, intent(in) :: v_lo(3), v_hi(3)
+    integer, intent(in) :: w_lo(3), w_hi(3)
+    integer, intent(in) :: n_lo(3), n_hi(3)
+    integer, intent(in) :: r_lo(3), r_hi(3)
+    integer, intent(in) :: c_lo(3), c_hi(3)
+    double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
+    double precision, intent (in) :: w0rcart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),1)
+    double precision, intent (in) :: normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
+    double precision, intent(inout) :: rad_vel(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
+    double precision, intent(inout) :: circ_vel(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+
+    integer :: i,j,k,n
+
+    circ_vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.0d0
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+
+             rad_vel(i,j,k) = vel(i,j,k,1) * normal(i,j,k,1) + &
+                  vel(i,j,k,2) * normal(i,j,k,2) + &
+                  vel(i,j,k,3) * normal(i,j,k,3)
+
+             do n = 1,3
+                circ_vel(i,j,k) = circ_vel(i,j,k) + (vel(i,j,k,n) - rad_vel(i,j,k) * normal(i,j,k,n))**2
+             enddo
+
+             circ_vel(i,j,k) = sqrt(circ_vel(i,j,k))
+
+             ! add base state vel to get full radial velocity
+             rad_vel(i,j,k) = rad_vel(i,j,k) + w0rcart(i,j,k,1)
+
+          enddo
+       enddo
+    enddo
+
+  end subroutine make_velrc
+
 end module plot_variables_module

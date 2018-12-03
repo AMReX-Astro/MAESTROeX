@@ -573,6 +573,10 @@ private:
     void MakeMagvel (const amrex::Vector<amrex::MultiFab>& vel,
                      amrex::Vector<amrex::MultiFab>& magvel);
 
+    void MakeVelrc (const amrex::Vector<amrex::MultiFab>& vel,
+                     amrex::Vector<amrex::MultiFab>& rad_vel,
+                     amrex::Vector<amrex::MultiFab>& circ_vel);
+
     // end MaestroPlot.cpp functions
     ////////////
 

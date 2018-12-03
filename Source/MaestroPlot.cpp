@@ -105,10 +105,12 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
 
 	// velocities (AMREX_SPACEDIM)
+    // magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
 	// X (NumSpec)
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
+    // MachNumber
 	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 9;
 
 	// MultiFab to hold plotfile data
@@ -133,6 +135,13 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		plot_mf_data[i]->copy((u_in[i]),0,dest_comp,AMREX_SPACEDIM);
 	}
 	dest_comp += AMREX_SPACEDIM;
+
+    // magvel
+    MakeMagvel(u_in, tempmf);
+    for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+	}
+    ++dest_comp;
 
 	// rho
 	for (int i = 0; i <= finest_level; ++i) {
@@ -260,6 +269,12 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		// Mach number
 		MachfromRhoH(s_in,u_in,p0_in,tempmf);
 	}
+
+    // MachNumber
+    for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+	}
+	++dest_comp;
 
 	// w0
 	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
@@ -610,7 +625,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 	Vector<MultiFab> w0_cart(finest_level+1);
 	if (spherical == 1) {
 		for (int lev=0; lev<=finest_level; ++lev) {
-			w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+			w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
 		}
 	}
 
@@ -658,9 +673,9 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 				// We will also pass "validBox", which specifies the "valid" region.
 
 				make_magvel_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				                BL_TO_FORTRAN_3D(vel_mf[mfi]),
-				                BL_TO_FORTRAN_3D(w0cart_mf[mfi]),
-				                BL_TO_FORTRAN_3D(magvel_mf[mfi]));
+				                 BL_TO_FORTRAN_3D(vel_mf[mfi]),
+				                 BL_TO_FORTRAN_3D(w0cart_mf[mfi]),
+				                 BL_TO_FORTRAN_3D(magvel_mf[mfi]));
 			}
 		}
 	}
@@ -668,4 +683,57 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 	// average down and fill ghost cells
 	AverageDown(magvel,0,1);
 	FillPatch(t_old,magvel,magvel,magvel,0,0,1,0,bcs_f);
+}
+
+void
+Maestro::MakeVelrc (const Vector<MultiFab>& vel,
+                    Vector<MultiFab>& rad_vel,
+                    Vector<MultiFab>& circ_vel)
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::MakeVelrc()",MakeVelrc);
+
+	Vector<MultiFab> w0r_cart(finest_level+1);
+	for (int lev=0; lev<=finest_level; ++lev) {
+		w0r_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+	}
+
+    Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0);
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+
+		// get references to the MultiFabs at level lev
+		const MultiFab& vel_mf = vel[lev];
+		MultiFab& radvel_mf = rad_vel[lev];
+		MultiFab& circvel_mf = circ_vel[lev];
+        const MultiFab& w0rcart_mf = w0r_cart[lev];
+        const MultiFab& normal_mf = normal[lev];
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+		for ( MFIter mfi(vel_mf, true); mfi.isValid(); ++mfi ) {
+
+			// Get the index space of the valid region
+			const Box& tileBox = mfi.tilebox();
+
+			// call fortran subroutine
+			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+			// lo/hi coordinates (including ghost cells), and/or the # of components
+			// We will also pass "validBox", which specifies the "valid" region.
+
+			make_velrc(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+			                 BL_TO_FORTRAN_3D(vel_mf[mfi]),
+			                 BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
+			                 BL_TO_FORTRAN_3D(normal_mf[mfi]),
+			                 BL_TO_FORTRAN_3D(radvel_mf[mfi]),
+			                 BL_TO_FORTRAN_3D(circvel_mf[mfi]));
+		}
+	}
+
+	// average down and fill ghost cells
+	AverageDown(rad_vel,0,1);
+	FillPatch(t_old,rad_vel,rad_vel,rad_vel,0,0,1,0,bcs_f);
+	AverageDown(circ_vel,0,1);
+	FillPatch(t_old,circ_vel,circ_vel,circ_vel,0,0,1,0,bcs_f);
 }
