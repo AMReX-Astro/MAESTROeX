@@ -66,7 +66,6 @@ contains
     integer :: i,j,k,r
     double precision :: rhopert
 
-
 #if defined(ROTATION) && (AMREX_SPACEDIM == 3)
     real(kind=dp_t) :: coriolis_term(3), centrifugal_term(3)
 #endif
@@ -149,10 +148,10 @@ contains
              endif
              ! note: if use_alt_energy_fix = T, then gphi is already
              ! weighted by beta0
-             vel_force(i,j,k,1:AMREX_SPACEDIM-1) =  -coriolis_term(1:AMREX_SPACEDIM-1) - centrifugal_term(1:AMREX_SPACEDIM-1) - &
-                  gpi(i,j,k,1:AMREX_SPACEDIM-1) / rho(i,j,k)
+             vel_force(i,j,k,1:2) =  -coriolis_term(1:2) - centrifugal_term(1:2) - &
+                  gpi(i,j,k,1:2) / rho(i,j,k)
 
-             vel_force(i,j,k,AMREX_SPACEDIM) = -coriolis_term(3) - centrifugal_term(3) + &
+             vel_force(i,j,k,3) = -coriolis_term(3) - centrifugal_term(3) + &
                   ( rhopert * grav(lev,r) - gpi(i,j,k,AMREX_SPACEDIM) ) / rho(i,j,k) - w0_force(lev,r)
 #else
 
@@ -357,14 +356,15 @@ contains
 
              ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
-             vel_force(i,j,k,1:AMREX_SPACEDIM) = -coriolis_term(1) - centrifugal_term(1:AMREX_SPACEDIM) + &
-                  ( rhopert * grav_cart(i,j,k,1:AMREX_SPACEDIM) - gpi(i,j,k,:) ) / rho(i,j,k) &
-                  - w0_force_cart(i,j,k,1:AMREX_SPACEDIM)
+             vel_force(i,j,k,1:3) = -coriolis_term(:) - centrifugal_term(:) + &
+                  ( rhopert * grav_cart(i,j,k,1:3) - gpi(i,j,k,1:3) ) / rho(i,j,k) &
+                  - w0_force_cart(i,j,k,1:3)
 #else
 
              ! note: if use_alt_energy_fix = T, then gphi is already weighted
              ! by beta0
-             vel_force(i,j,k,1:AMREX_SPACEDIM) = ( rhopert * grav_cart(i,j,k,1:AMREX_SPACEDIM) - gpi(i,j,k,1:AMREX_SPACEDIM) ) / rho(i,j,k) &
+             vel_force(i,j,k,1:AMREX_SPACEDIM) = ( rhopert * &
+                  grav_cart(i,j,k,1:AMREX_SPACEDIM) - gpi(i,j,k,1:AMREX_SPACEDIM) ) / rho(i,j,k) &
                   - w0_force_cart(i,j,k,1:AMREX_SPACEDIM)
 
 #endif

@@ -29,7 +29,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 # GRIDDING AND REFINEMENT
 #amr.n_cell             = 160 160 160
 #amr.n_cell             = 64 64 64
-amr.n_cell = 128 128 128
+amr.n_cell              = 128 128 128
 amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
