@@ -1,6 +1,9 @@
+#include "AMReX_BC_TYPES.H"
+
 module plot_variables_module
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
+  use amrex_fort_module, only: amrex_spacedim
   use eos_type_module
   use eos_module
   use network, only: nspec
@@ -208,6 +211,622 @@ contains
   end subroutine make_ad_excess_sphr
 
 
+  subroutine make_vorticity(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc) bind(C, name="make_vorticity")
+
+    integer, intent(in) :: lo(3), hi(3)
+    integer, intent(in) :: v_lo(3), v_hi(3)
+    integer, intent(in) :: d_lo(3), d_hi(3)
+    double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
+    double precision, intent(in) :: dx(3)
+    double precision, intent(inout) :: vort(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+    integer, intent(in) :: bc(amrex_spacedim,2)
+
+    integer :: i, j, k
+    logical :: fix_lo_x,fix_hi_x,fix_lo_y,fix_hi_y,fix_lo_z,fix_hi_z
+    double precision :: wy,vz,uz,wx,vx,uy
+
+    select case (amrex_spacedim)
+    case(1)
+       vort(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.0d0
+    case(2)
+       call make_vorticity_2d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
+    case(3)
+       call make_vorticity_3d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
+    end select
+
+  end subroutine make_vorticity
+
+  subroutine make_vorticity_2d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
+
+    integer, intent(in) :: lo(3), hi(3)
+    integer, intent(in) :: v_lo(3), v_hi(3)
+    integer, intent(in) :: d_lo(3), d_hi(3)
+    double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
+    double precision, intent(in) :: dx(3)
+    double precision, intent(inout) :: vort(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+    integer, intent(in) :: bc(2,2)
+
+    integer :: i, j, k
+    double precision :: vx, uy
+
+    k = lo(3)
+
+    do j = lo(2), hi(2)
+       do i = lo(1), hi(1)
+          vx = (vel(i+1,j,k,2) - vel(i-1,j,k,2)) / (2.d0*dx(1))
+          uy = (vel(i,j+1,k,1) - vel(i,j-1,k,1)) / (2.d0*dx(2))
+          vort(i,j,k) = vx - uy
+       enddo
+    enddo
+
+    if (bc(1,1) .eq. Inflow .or. bc(1,1) .eq. SlipWall .or. bc(1,1) .eq. NoSlipWall) then
+       i = lo(1)
+       do j = lo(2), hi(2)
+          vx = (vel(i+1,j,k,2) + 3.d0*vel(i,j,k,2) - 4.d0*vel(i-1,j,k,2)) / dx(1)
+          uy = (vel(i,j+1,k,1) - vel(i,j-1,k,1)) / (2.d0*dx(2))
+          vort(i,j,k) = vx - uy
+       end do
+    end if
+
+    if (bc(1,2) .eq. Inflow .or. bc(1,2) .eq. SlipWall .or. bc(1,2) .eq. NoSlipWall) then
+       i = hi(1)
+       do j = lo(2), hi(2)
+          vx = -(vel(i-1,j,k,2) + 3.d0*vel(i,j,k,2) - 4.d0*vel(i+1,j,k,2)) / dx(1)
+          uy = (vel(i,j+1,k,1) - vel(i,j-1,k,1)) / (2.d0*dx(2))
+          vort(i,j,k) = vx - uy
+       end do
+    end if
+
+    if (bc(2,1) .eq. Inflow .or. bc(2,1) .eq. SlipWall .or. bc(2,1) .eq. NoSlipWall) then
+       j = lo(2)
+       do i = lo(1), hi(1)
+          vx = (vel(i+1,j,k,2) - vel(i-1,j,k,2)) / (2.d0*dx(1))
+          uy = (vel(i,j+1,k,1) + 3.d0*vel(i,j,k,1) - 4.d0*vel(i,j-1,k,1)) / dx(2)
+          vort(i,j,k) = vx - uy
+       end do
+    end if
+
+    if (bc(2,2) .eq. Inflow .or. bc(2,2) .eq. SlipWall .or. bc(2,2) .eq. NoSlipWall) then
+       j = hi(2)
+       do i = lo(1), hi(1)
+          vx =  (vel(i+1,j,k,2) - vel(i-1,j,k,2)) / (2.d0*dx(1))
+          uy = -(vel(i,j-1,k,1) + 3.d0*vel(i,j,k,1) - 4.d0*vel(i,j+1,k,1)) / dx(2)
+          vort(i,j,k) = vx - uy
+       end do
+    end if
+
+
+  end subroutine make_vorticity_2d
+
+
+  subroutine make_vorticity_3d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
+
+    integer, intent(in) :: lo(3), hi(3)
+    integer, intent(in) :: v_lo(3), v_hi(3)
+    integer, intent(in) :: d_lo(3), d_hi(3)
+    double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
+    double precision, intent(in) :: dx(3)
+    double precision, intent(inout) :: vort(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+    integer, intent(in) :: bc(3,2)
+
+    integer :: i, j, k
+    logical :: fix_lo_x,fix_hi_x,fix_lo_y,fix_hi_y,fix_lo_z,fix_hi_z
+    double precision :: wy,vz,uz,wx,vx,uy
+
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+             uy = uycen(i,j,k)
+             uz = uzcen(i,j,k)
+             vx = vxcen(i,j,k)
+             vz = vzcen(i,j,k)
+             wx = wxcen(i,j,k)
+             wy = wycen(i,j,k)
+             vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+          enddo
+       enddo
+    enddo
+
+    fix_lo_x = ( bc(1,1) .eq. Inflow .or. bc(1,1) .eq. NoSlipWall )
+    fix_hi_x = ( bc(1,2) .eq. Inflow .or. bc(1,2) .eq. NoSlipWall )
+
+    fix_lo_y = ( bc(2,1) .eq. Inflow .or. bc(2,1) .eq. NoSlipWall )
+    fix_hi_y = ( bc(2,2) .eq. Inflow .or. bc(2,2) .eq. NoSlipWall )
+
+    fix_lo_z = ( bc(3,1) .eq. Inflow .or. bc(3,1) .eq. NoSlipWall )
+    fix_hi_z = ( bc(3,2) .eq. Inflow .or. bc(3,2) .eq. NoSlipWall )
+
+    !
+    !     First do all the faces
+    !
+    if (fix_lo_x) then
+       i = lo(1)
+       do k = lo(3),hi(3)
+          do j = lo(2),hi(2)
+             vx = vxlo(i,j,k)
+             wx = wxlo(i,j,k)
+             uy = uycen(i,j,k)
+             wy = wycen(i,j,k)
+             uz = uzcen(i,j,k)
+             vz = vzcen(i,j,k)
+             vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+          end do
+       end do
+    end if
+
+    if (fix_hi_x) then
+       i = hi(1)
+       do k = lo(3),hi(3)
+          do j = lo(2),hi(2)
+             vx = vxhi(i,j,k)
+             wx = wxhi(i,j,k)
+             uy = uycen(i,j,k)
+             wy = wycen(i,j,k)
+             uz = uzcen(i,j,k)
+             vz = vzcen(i,j,k)
+             vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+          end do
+       end do
+    end if
+
+    if (fix_lo_y) then
+       j = lo(2)
+       do k = lo(3),hi(3)
+          do i = lo(1),hi(1)
+             vx = vxcen(i,j,k)
+             wx = wxcen(i,j,k)
+             uy = uylo(i,j,k)
+             wy = wylo(i,j,k)
+             uz = uzcen(i,j,k)
+             vz = vzcen(i,j,k)
+             vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+          end do
+       end do
+    end if
+
+    if (fix_hi_y) then
+       j = hi(2)
+       do k = lo(3),hi(3)
+          do i = lo(1),hi(1)
+             vx = vxcen(i,j,k)
+             wx = wxcen(i,j,k)
+             uy = uyhi(i,j,k)
+             wy = wyhi(i,j,k)
+             uz = uzcen(i,j,k)
+             vz = vzcen(i,j,k)
+             vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+          end do
+       end do
+    end if
+
+    if (fix_lo_z) then
+       k = lo(3)
+       do j = lo(2),hi(2)
+          do i = lo(1),hi(1)
+             vx = vxcen(i,j,k)
+             wx = wxcen(i,j,k)
+             uy = uycen(i,j,k)
+             wy = wycen(i,j,k)
+             uz = uzlo(i,j,k)
+             vz = vzlo(i,j,k)
+             vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+          end do
+       end do
+    end if
+
+    if (fix_hi_z) then
+       k = hi(3)
+       do j = lo(2),hi(2)
+          do i = lo(1),hi(1)
+             vx = vxcen(i,j,k)
+             wx = wxcen(i,j,k)
+             uy = uycen(i,j,k)
+             wy = wycen(i,j,k)
+             uz = uzhi(i,j,k)
+             vz = vzhi(i,j,k)
+             vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+          end do
+       end do
+    end if
+    !
+    !     Next do all the edges
+    !
+    if (fix_lo_x .and. fix_lo_y) then
+       i = lo(1)
+       j = lo(2)
+       do k = lo(3),hi(3)
+          vx = vxlo(i,j,k)
+          wx = wxlo(i,j,k)
+          uy = uylo(i,j,k)
+          wy = wylo(i,j,k)
+          uz = uzcen(i,j,k)
+          vz = vzcen(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_hi_x .and. fix_lo_y) then
+       i = hi(1)
+       j = lo(2)
+       do k = lo(3),hi(3)
+          vx = vxhi(i,j,k)
+          wx = wxhi(i,j,k)
+          uy = uylo(i,j,k)
+          wy = wylo(i,j,k)
+          uz = uzcen(i,j,k)
+          vz = vzcen(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_lo_x .and. fix_hi_y) then
+       i = lo(1)
+       j = hi(2)
+       do k = lo(3),hi(3)
+          vx = vxlo(i,j,k)
+          wx = wxlo(i,j,k)
+          uy = uyhi(i,j,k)
+          wy = wyhi(i,j,k)
+          uz = uzcen(i,j,k)
+          vz = vzcen(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_hi_x .and. fix_hi_y) then
+       i = hi(1)
+       j = hi(2)
+       do k = lo(3),hi(3)
+          vx = vxhi(i,j,k)
+          wx = wxhi(i,j,k)
+          uy = uyhi(i,j,k)
+          wy = wyhi(i,j,k)
+          uz = uzcen(i,j,k)
+          vz = vzcen(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_lo_x .and. fix_lo_z) then
+       i = lo(1)
+       k = lo(3)
+       do j = lo(2),hi(2)
+          vx = vxlo(i,j,k)
+          wx = wxlo(i,j,k)
+          uy = uycen(i,j,k)
+          wy = wycen(i,j,k)
+          uz = uzlo(i,j,k)
+          vz = vzlo(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_hi_x .and. fix_lo_z) then
+       i = hi(1)
+       k = lo(3)
+       do j = lo(2),hi(2)
+          vx = vxhi(i,j,k)
+          wx = wxhi(i,j,k)
+          uy = uycen(i,j,k)
+          wy = wycen(i,j,k)
+          uz = uzlo(i,j,k)
+          vz = vzlo(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_lo_x .and. fix_hi_z) then
+       i = lo(1)
+       k = hi(3)
+       do j = lo(2),hi(2)
+          vx = vxlo(i,j,k)
+          wx = wxlo(i,j,k)
+          uy = uycen(i,j,k)
+          wy = wycen(i,j,k)
+          uz = uzhi(i,j,k)
+          vz = vzhi(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_hi_x .and. fix_hi_z) then
+       i = hi(1)
+       k = hi(3)
+       do j = lo(2),hi(2)
+          vx = vxhi(i,j,k)
+          wx = wxhi(i,j,k)
+          uy = uycen(i,j,k)
+          wy = wycen(i,j,k)
+          uz = uzhi(i,j,k)
+          vz = vzhi(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_lo_y .and. fix_lo_z) then
+       j = lo(2)
+       k = lo(3)
+       do i = lo(1),hi(1)
+          vx = vxcen(i,j,k)
+          wx = wxcen(i,j,k)
+          uy = uylo(i,j,k)
+          wy = wylo(i,j,k)
+          uz = uzlo(i,j,k)
+          vz = vzlo(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_hi_y .and. fix_lo_z) then
+       j = hi(2)
+       k = lo(3)
+       do i = lo(1),hi(1)
+          vx = vxcen(i,j,k)
+          wx = wxcen(i,j,k)
+          uy = uyhi(i,j,k)
+          wy = wyhi(i,j,k)
+          uz = uzlo(i,j,k)
+          vz = vzlo(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_lo_y .and. fix_hi_z) then
+       j = lo(2)
+       k = hi(3)
+       do i = lo(1),hi(1)
+          vx = vxcen(i,j,k)
+          wx = wxcen(i,j,k)
+          uy = uylo(i,j,k)
+          wy = wylo(i,j,k)
+          uz = uzhi(i,j,k)
+          vz = vzhi(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+
+    if (fix_hi_y .and. fix_hi_z) then
+       j = hi(2)
+       k = hi(3)
+       do i = lo(1),hi(1)
+          vx = vxcen(i,j,k)
+          wx = wxcen(i,j,k)
+          uy = uyhi(i,j,k)
+          wy = wyhi(i,j,k)
+          uz = uzhi(i,j,k)
+          vz = vzhi(i,j,k)
+          vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+       end do
+    end if
+    !
+    !     Finally do all the corners
+    !
+    if (fix_lo_x .and. fix_lo_y .and. fix_lo_z) then
+       i = lo(1)
+       j = lo(2)
+       k = lo(3)
+       vx = vxlo(i,j,k)
+       wx = wxlo(i,j,k)
+       uy = uylo(i,j,k)
+       wy = wylo(i,j,k)
+       uz = uzlo(i,j,k)
+       vz = vzlo(i,j,k)
+       vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+    end if
+
+    if (fix_hi_x .and. fix_lo_y .and. fix_lo_z) then
+       i = hi(1)
+       j = lo(2)
+       k = lo(3)
+       vx = vxhi(i,j,k)
+       wx = wxhi(i,j,k)
+       uy = uylo(i,j,k)
+       wy = wylo(i,j,k)
+       uz = uzlo(i,j,k)
+       vz = vzlo(i,j,k)
+       vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+    end if
+
+    if (fix_lo_x .and. fix_hi_y .and. fix_lo_z) then
+       i = lo(1)
+       j = hi(2)
+       k = lo(3)
+       vx = vxlo(i,j,k)
+       wx = wxlo(i,j,k)
+       uy = uyhi(i,j,k)
+       wy = wyhi(i,j,k)
+       uz = uzlo(i,j,k)
+       vz = vzlo(i,j,k)
+       vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+    end if
+
+    if (fix_hi_x .and. fix_hi_y .and. fix_lo_z) then
+       i = hi(1)
+       j = hi(2)
+       k = lo(3)
+       vx = vxhi(i,j,k)
+       wx = wxhi(i,j,k)
+       uy = uyhi(i,j,k)
+       wy = wyhi(i,j,k)
+       uz = uzlo(i,j,k)
+       vz = vzlo(i,j,k)
+       vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+    end if
+
+    if (fix_lo_x .and. fix_lo_y .and. fix_hi_z) then
+       i = lo(1)
+       j = lo(2)
+       k = hi(3)
+       vx = vxlo(i,j,k)
+       wx = wxlo(i,j,k)
+       uy = uylo(i,j,k)
+       wy = wylo(i,j,k)
+       uz = uzhi(i,j,k)
+       vz = vzhi(i,j,k)
+       vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+    end if
+
+    if (fix_hi_x .and. fix_lo_y .and. fix_hi_z) then
+       i = hi(1)
+       j = lo(2)
+       k = hi(3)
+       vx = vxhi(i,j,k)
+       wx = wxhi(i,j,k)
+       uy = uylo(i,j,k)
+       wy = wylo(i,j,k)
+       uz = uzhi(i,j,k)
+       vz = vzhi(i,j,k)
+       vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+    end if
+
+    if (fix_lo_x .and. fix_hi_y .and. fix_hi_z) then
+       i = lo(1)
+       j = hi(2)
+       k = hi(3)
+       vx = vxlo(i,j,k)
+       wx = wxlo(i,j,k)
+       uy = uyhi(i,j,k)
+       wy = wyhi(i,j,k)
+       uz = uzhi(i,j,k)
+       vz = vzhi(i,j,k)
+       vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+    end if
+
+    if (fix_hi_x .and. fix_hi_y .and. fix_hi_z) then
+       i = hi(1)
+       j = hi(2)
+       k = hi(3)
+       vx = vxhi(i,j,k)
+       wx = wxhi(i,j,k)
+       uy = uyhi(i,j,k)
+       wy = wyhi(i,j,k)
+       uz = uzhi(i,j,k)
+       vz = vzhi(i,j,k)
+       vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
+    end if
+
+  contains
+
+    function uycen(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = 0.5d0*(vel(i,j+1,k,1)-vel(i,j-1,k,1))/dx(2)
+    end function uycen
+
+    function uylo(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = (vel(i,j+1,k,1)+3.0d0*vel(i,j,k,1)-4.0d0*vel(i,j-1,k,1))/(3.0d0*dx(2))
+    end function uylo
+
+    function uyhi(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = -(vel(i,j-1,k,1)+3.0d0*vel(i,j,k,1)-4.0d0*vel(i,j+1,k,1))/(3.0d0*dx(2))
+    end function uyhi
+
+    function uzcen(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = 0.5d0*(vel(i,j,k+1,1)-vel(i,j,k-1,1))/dx(3)
+    end function uzcen
+
+    function uzlo(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = (vel(i,j,k+1,1)+3.0d0*vel(i,j,k,1)-4.0d0*vel(i,j,k-1,1))/(3.0d0*dx(3))
+    end function uzlo
+
+    function uzhi(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r =-(vel(i,j,k-1,1)+3.0d0*vel(i,j,k,1)-4.0d0*vel(i,j,k+1,1))/(3.0d0*dx(3))
+    end function uzhi
+
+    function vxcen(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = 0.5d0*(vel(i+1,j,k,2)-vel(i-1,j,k,2))/dx(1)
+    end function vxcen
+
+    function vxlo(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = (vel(i+1,j,k,2)+3.0d0*vel(i,j,k,2)-4.0d0*vel(i-1,j,k,2))/(3.0d0*dx(1))
+    end function vxlo
+
+    function vxhi(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r =-(vel(i-1,j,k,2)+3.0d0*vel(i,j,k,2)-4.0d0*vel(i+1,j,k,2))/(3.0d0*dx(1))
+    end function vxhi
+
+    function vzcen(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = 0.5d0*(vel(i,j,k+1,2)-vel(i,j,k-1,2))/dx(3)
+    end function vzcen
+
+    function vzlo(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = (vel(i,j,k+1,2)+3.0d0*vel(i,j,k,2)-4.0d0*vel(i,j,k-1,2))/(3.0d0*dx(3))
+    end function vzlo
+
+    function vzhi(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r =-(vel(i,j,k-1,2)+3.0d0*vel(i,j,k,2)-4.0d0*vel(i,j,k+1,2))/(3.0d0*dx(3))
+    end function vzhi
+
+    function wxcen(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = 0.5d0*(vel(i+1,j,k,3)-vel(i-1,j,k,3))/dx(1)
+    end function wxcen
+
+    function wxlo(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = (vel(i+1,j,k,3)+3.0d0*vel(i,j,k,3)-4.0d0*vel(i-1,j,k,3))/(3.0d0*dx(1))
+    end function wxlo
+
+    function wxhi(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r =-(vel(i-1,j,k,3)+3.0d0*vel(i,j,k,3)-4.0d0*vel(i+1,j,k,3))/(3.0d0*dx(1))
+    end function wxhi
+
+    function wycen(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = 0.5d0*(vel(i,j+1,k,3)-vel(i,j-1,k,3))/dx(2)
+    end function wycen
+
+    function wylo(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r = (vel(i,j+1,k,3)+3.0d0*vel(i,j,k,3)-4.0d0*vel(i,j-1,k,3))/(3.0d0*dx(2))
+    end function wylo
+
+    function wyhi(i,j,k) result(r)
+      integer :: i,j,k
+      double precision :: r
+      r =-(vel(i,j-1,k,3)+3.0d0*vel(i,j,k,3)-4.0d0*vel(i,j+1,k,3))/(3.0d0*dx(2))
+    end function wyhi
+
+    function vorfun(uy,uz,vx,vz,wx,wy) result(r)
+      double precision :: uy,uz,vx,vz,wx,wy
+      double precision :: r
+      r = sqrt((wy-vz)**2+(uz-wx)**2+(vx-uy)**2)
+    end function vorfun
+
+  end subroutine make_vorticity_3d
+
+
+
+
   subroutine make_magvel(lev,lo,hi,vel,v_lo,v_hi,w0,magvel,m_lo,m_hi) bind(C, name="make_magvel")
 
     integer, intent(in) :: lev, lo(3), hi(3)
@@ -280,6 +899,7 @@ contains
     integer, intent(in) :: r_lo(3), r_hi(3)
     integer, intent(in) :: c_lo(3), c_hi(3)
     double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
+
     double precision, intent (in) :: w0rcart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),1)
     double precision, intent (in) :: normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
     double precision, intent(inout) :: rad_vel(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))

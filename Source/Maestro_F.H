@@ -679,7 +679,6 @@ extern "C"
                           const amrex::Real* w0cart, const int* w_lo, const int* w_hi,
                           amrex::Real* magvel, const int* m_lo, const int* m_hi);
 
-
     void make_velrc(const int* lo, const int* hi,
                         const amrex::Real* vel, const int* v_lo, const int* v_hi,
                         const amrex::Real* w0rcart, const int* w_lo, const int* w_hi,
@@ -697,6 +696,12 @@ extern "C"
                         const int* nc_s,
                         const amrex::Real* normal, const int* n_lo, const int* n_hi,
                         amrex::Real* ad_excess, const int* a_lo, const int* a_hi);
+
+    void make_vorticity(const int* lo, const int* hi,
+                        const amrex::Real* vel, const int* v_lo, const int* v_hi,
+                        const amrex::Real* dx,
+                        amrex::Real* vorticity, const int* d_lo, const int* d_hi,
+                        const int* bc);
     /////////////////////
 
     //////////////////////

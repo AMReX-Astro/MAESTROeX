@@ -574,11 +574,14 @@ private:
                      amrex::Vector<amrex::MultiFab>& magvel);
 
     void MakeVelrc (const amrex::Vector<amrex::MultiFab>& vel,
-                     amrex::Vector<amrex::MultiFab>& rad_vel,
-                     amrex::Vector<amrex::MultiFab>& circ_vel);
+                    amrex::Vector<amrex::MultiFab>& rad_vel,
+                    amrex::Vector<amrex::MultiFab>& circ_vel);
 
     void MakeAdExcess (const amrex::Vector<amrex::MultiFab>& state,
-                  amrex::Vector<amrex::MultiFab>& ad_excess);
+                       amrex::Vector<amrex::MultiFab>& ad_excess);
+
+    void MakeVorticity (const amrex::Vector<amrex::MultiFab>& vel,
+                        amrex::Vector<amrex::MultiFab>& vorticity);
 
     // end MaestroPlot.cpp functions
     ////////////

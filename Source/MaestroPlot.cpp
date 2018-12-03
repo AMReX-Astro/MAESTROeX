@@ -111,7 +111,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
 	// MachNumber
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 9;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 10;
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
@@ -138,6 +138,13 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 
 	// magvel
 	MakeMagvel(u_in, tempmf);
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+	}
+	++dest_comp;
+
+    // vorticity
+    MakeVorticity(u_in, tempmf);
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
 	}
@@ -291,6 +298,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 
 	return plot_mf;
 
+
 }
 
 // set plotfile variable names
@@ -307,7 +315,7 @@ Maestro::PlotFileVarNames () const
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
 	// MachNumber
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 9;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 10;
 	Vector<std::string> names(nPlot);
 
 	int cnt = 0;
@@ -320,6 +328,7 @@ Maestro::PlotFileVarNames () const
 	}
 
 	names[cnt++] = "magvel";
+    names[cnt++] = "vort";
 
 	// density and enthalpy
 	names[cnt++] = "rho";
@@ -387,6 +396,7 @@ Maestro::PlotFileVarNames () const
 	}
 
 	return names;
+
 }
 
 void
@@ -801,4 +811,45 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 	// average down and fill ghost cells
 	AverageDown(ad_excess,0,1);
 	FillPatch(t_old,ad_excess,ad_excess,ad_excess,0,0,1,0,bcs_f);
+}
+
+
+void
+Maestro::MakeVorticity (const Vector<MultiFab>& vel,
+                        Vector<MultiFab>& vorticity)
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::MakeVorticity()",MakeVorticity);
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+
+		// get references to the MultiFabs at level lev
+		const MultiFab& vel_mf = vel[lev];
+		MultiFab& vorticity_mf = vorticity[lev];
+        
+		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+		for ( MFIter mfi(vel_mf, true); mfi.isValid(); ++mfi ) {
+
+			// Get the index space of the valid region
+			const Box& tileBox = mfi.tilebox();
+			const Real* dx = geom[lev].CellSize();
+
+			// call fortran subroutine
+			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+			// lo/hi coordinates (including ghost cells), and/or the # of components
+			// We will also pass "validBox", which specifies the "valid" region.
+			make_vorticity(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+			               BL_TO_FORTRAN_3D(vel_mf[mfi]), dx,
+			               BL_TO_FORTRAN_3D(vorticity_mf[mfi]), phys_bc.dataPtr());
+		}
+
+
+	}
+
+	// average down and fill ghost cells
+	AverageDown(vorticity,0,1);
+	FillPatch(t_old,vorticity,vorticity,vorticity,0,0,1,0,bcs_f);
 }
