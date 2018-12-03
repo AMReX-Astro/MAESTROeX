@@ -570,6 +570,9 @@ private:
 
     void WriteJobInfo (const std::string& dir) const;
 
+    void MakeMagvel (const amrex::Vector<amrex::MultiFab>& vel,
+                     amrex::Vector<amrex::MultiFab>& magvel);
+
     // end MaestroPlot.cpp functions
     ////////////
 

@@ -366,11 +366,11 @@ contains
                 ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
                 r = i
-                vel = sqrt( (u(i,1) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
+                vel = sqrt( (u(i,j,k,1) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
 #elif (AMREX_SPACEDIM == 2)
                 r = j
-                vel = sqrt(  u(i,j,1)**2 + &
-                     ( u(i,j,2) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
+                vel = sqrt(  u(i,j,k,1)**2 + &
+                     ( u(i,j,k,2) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
                 r = k
                 vel = sqrt(  u(i,j,k,1)**2 + &
@@ -407,11 +407,11 @@ contains
                 ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
                 r = i
-                vel = sqrt( (u(i,1) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
+                vel = sqrt( (u(i,j,k,1) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
 #elif (AMREX_SPACEDIM == 2)
                 r = j
-                vel = sqrt(  u(i,j,1)**2 + &
-                     ( u(i,j,2) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
+                vel = sqrt(  u(i,j,k,1)**2 + &
+                     ( u(i,j,k,2) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
                 r = k
                 vel = sqrt(  u(i,j,k,1)**2 + &
@@ -482,11 +482,11 @@ contains
                 ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
                 r = i
-                vel = sqrt( (u(i,1) + 0.5d0*(w0cart(i,j,k,1) + wcart(i,j,k,1)) )**2 )
+                vel = sqrt( (u(i,j,k,1) + 0.5d0*(w0cart(i,j,k,1) + wcart(i,j,k,1)) )**2 )
 #elif (AMREX_SPACEDIM == 2)
                 r = j
-                vel = sqrt(  u(i,j,1)**2 + &
-                     ( u(i,j,2) + 0.5d0*(w0cart(i,j,k,1) + w0cart(i,j,k,1)) )**2 )
+                vel = sqrt(  u(i,j,k,1)**2 + &
+                     ( u(i,j,k,2) + 0.5d0*(w0cart(i,j,k,1) + w0cart(i,j,k,1)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
                 r = k
                 vel = sqrt(  u(i,j,k,1)**2 + &
@@ -525,16 +525,16 @@ contains
                 ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
                 r = i
-                vel = sqrt( (u(i,1) + 0.5d0*(w0cart(i,j,k,1) + wcart(i,j,k,1)) )**2 )
+                vel = sqrt( (u(i,j,k,1) + w0cart(i,j,k,1) )**2 )
 #elif (AMREX_SPACEDIM == 2)
                 r = j
-                vel = sqrt(  u(i,j,1)**2 + &
-                     ( u(i,j,2) + 0.5d0*(w0cart(i,j,k,1) + w0cart(i,j,k,1)) )**2 )
+                vel = sqrt(  u(i,j,k,1)**2 + &
+                     ( u(i,j,k,2) + w0cart(i,j,k,1) )**2 )
 #elif (AMREX_SPACEDIM == 3)
                 r = k
                 vel = sqrt(  u(i,j,k,1)**2 + &
                      u(i,j,k,2)**2 + &
-                     ( u(i,j,k,3) + 0.5d0*(w0cart(i,j,k,1) + w0cart(i,j,k,1)) )**2 )
+                     ( u(i,j,k,3) + w0cart(i,j,k,1) )**2 )
 #endif
                 ! (rho, h) --> T, p
 

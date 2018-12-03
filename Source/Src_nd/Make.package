@@ -31,6 +31,7 @@ F90EXE_sources += make_explicit_thermal.F90
 F90EXE_sources += make_heating.F90
 F90EXE_sources += make_gamma.F90
 F90EXE_sources += make_pi_cc.F90
+F90EXE_sources += make_plot_variables.F90
 F90EXE_sources += make_psi.F90
 F90EXE_sources += make_S.F90
 F90EXE_sources += make_scal_force.F90

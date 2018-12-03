@@ -668,6 +668,19 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in make_plot_variables.F90
+    void make_magvel(const int* lev, const int* lo, const int* hi,
+                     const amrex::Real* vel, const int* v_lo, const int* v_hi,
+                     const amrex::Real* w0,
+                     amrex::Real* magvel, const int* m_lo, const int* m_hi);
+
+    void make_magvel_sphr(const int* lo, const int* hi,
+                          const amrex::Real* vel, const int* v_lo, const int* v_hi,
+                          const amrex::Real* w0cart, const int* w_lo, const int* w_hi,
+                          amrex::Real* magvel, const int* m_lo, const int* m_hi);
+    /////////////////////
+
+    //////////////////////
     // in make_psi.F90
     void make_psi_planar(const amrex::Real* etarho_cc,
 			       amrex::Real* psi);
@@ -683,7 +696,7 @@ extern "C"
     void make_psi_irreg(const amrex::Real* etarho_cc,
 			const amrex::Real* grav_cell,
 			      amrex::Real* psi);
-    
+
     // void make_psi_irreg(amrex::Real* psi,
     // 			const amrex::Real* p0_old,
     // 			const amrex::Real* p0_new,
