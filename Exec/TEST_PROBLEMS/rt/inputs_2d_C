@@ -54,6 +54,8 @@ maestro.temperr = 6.5e8 6.5e8
 maestro.plot_base_name  = omp    # root name of plot file
 maestro.plot_int   = 100     # number of timesteps between plot files
 maestro.plot_deltat = 1e5
+maestro.plot_cs = true
+maestro.plot_eta = true
 
 # CHECKPOINT
 maestro.check_base_name = chk

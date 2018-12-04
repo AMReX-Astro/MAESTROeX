@@ -684,6 +684,11 @@ private:
                            const amrex::Vector<amrex::Real>& p0,
                            const amrex::Vector<amrex::MultiFab>& w0cart,
                            amrex::Vector<amrex::MultiFab>& mach);
+
+    void CsfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
+                     const amrex::Vector<amrex::Real>& p0,
+                     const amrex::Vector<amrex::MultiFab>& p0cart,
+                     amrex::Vector<amrex::MultiFab>& cs);
     ////////////
 
     ////////////

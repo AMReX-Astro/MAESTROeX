@@ -117,17 +117,19 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// velocities (AMREX_SPACEDIM)
 	// magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
-	// X (NumSpec), omegadot(NumSpec)
-	// Hext, Hnuc, rho' and rhoh' (4)
+	// X (NumSpec)
+	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
-	// pioverp0, p0pluspi, gpi (2+AMREX_SPACEDIM)
+	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma
     int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 13;
 
     if (plot_omegadot) nPlot += NumSpec;
     if (plot_Hext) nPlot++;
     if (plot_Hnuc) nPlot++;
+    if (plot_eta) nPlot++;
     if (plot_gpi) nPlot += AMREX_SPACEDIM;
+    if (plot_cs) nPlot++;
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
@@ -231,10 +233,18 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     	++dest_comp;
     }
 
+    if (plot_eta) {
+        // eta_rho
+        Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0);
+    	for (int i = 0; i <= finest_level; ++i) {
+            plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+    	}
+    	++dest_comp;
+    }
+
 
 	// compute tfromp
 	TfromRhoP(s_in,p0_in);
-
 	// tfromp
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
@@ -243,7 +253,6 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 
 	// compute tfromh
 	TfromRhoH(s_in,p0_in);
-
 	for (int i = 0; i <= finest_level; ++i) {
 		// tfromh
 		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
@@ -256,7 +265,6 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
 	}
-
 	// compute tfromh
 	TfromRhoH(s_in,p0_in);
 	// compute deltaT = (tfromp - tfromh) / tfromh
@@ -296,7 +304,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     	for (int i = 0; i <= finest_level; ++i) {
     		plot_mf_data[i]->copy((gpi[i]),0,dest_comp,AMREX_SPACEDIM);
     	}
-    	++dest_comp;
+    	dest_comp += AMREX_SPACEDIM;
     }
 
 	// rhopert
@@ -367,6 +375,15 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	++dest_comp;
 
+    if (plot_cs) {
+        CsfromRhoH(s_in, p0_in, p0_cart, tempmf);
+        // soundspeed
+    	for (int i = 0; i <= finest_level; ++i) {
+    		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+    	}
+    	++dest_comp;
+    }
+
 	// w0
 	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
 	for (int i = 0; i <= finest_level; ++i) {
@@ -379,7 +396,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		plot_mf.push_back(plot_mf_data[i]);
 		// delete [] plot_mf_data[i];
 	}
-
+    
 	return plot_mf;
 
 
@@ -395,17 +412,19 @@ Maestro::PlotFileVarNames () const
 	// velocities (AMREX_SPACEDIM)
 	// magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
-	// X (NumSpec), omegadot(NumSpec)
-	// Hext, Hnuc, rho' and rhoh' (4)
+	// X (NumSpec)
+	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
-	// pioverp0, p0pluspi, gpi (2+AMREX_SPACEDIM)
+	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma
 	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 13;
 
     if (plot_omegadot) nPlot += NumSpec;
     if (plot_Hext) nPlot++;
     if (plot_Hnuc) nPlot++;
+    if (plot_eta) nPlot++;
     if (plot_gpi) nPlot += AMREX_SPACEDIM;
+    if (plot_cs) nPlot++;
 
 	Vector<std::string> names(nPlot);
 
@@ -490,6 +509,7 @@ Maestro::PlotFileVarNames () const
 
     if (plot_Hext) names[cnt++] = "Hext";
     if (plot_Hnuc) names[cnt++] = "Hnuc";
+    if (plot_eta) names[cnt++] = "eta_rho";
 
 	names[cnt++] = "tfromp";
 	names[cnt++] = "tfromh";
@@ -515,6 +535,8 @@ Maestro::PlotFileVarNames () const
 	names[cnt++] = "p0";
 	names[cnt++] = "MachNumber";
 	names[cnt++] = "deltagamma";
+
+    if (plot_cs) names[cnt++] = "soundspeed";
 
 	// add w0
 	for (int i=0; i<AMREX_SPACEDIM; ++i) {
