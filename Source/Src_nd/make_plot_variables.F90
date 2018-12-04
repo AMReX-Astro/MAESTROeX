@@ -7,9 +7,10 @@ module plot_variables_module
   use eos_type_module
   use eos_module
   use network, only: nspec
-  use meth_params_module, only: spherical, rho_comp, rhoh_comp, temp_comp, spec_comp, base_cutoff_density
+  use meth_params_module, only: spherical, rho_comp, rhoh_comp, temp_comp, spec_comp, &
+       pi_comp, use_pprime_in_tfromp, base_cutoff_density
   ! , pi_comp, &
-  !      use_eos_e_instead_of_h, use_pprime_in_tfromp
+  !      use_eos_e_instead_of_h,
   use base_state_geometry_module, only:  max_radial_level, nr_fine
   ! use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
@@ -225,14 +226,13 @@ contains
     logical :: fix_lo_x,fix_hi_x,fix_lo_y,fix_hi_y,fix_lo_z,fix_hi_z
     double precision :: wy,vz,uz,wx,vx,uy
 
-    select case (amrex_spacedim)
-    case(1)
-       vort(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.0d0
-    case(2)
-       call make_vorticity_2d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
-    case(3)
-       call make_vorticity_3d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
-    end select
+#if (AMREX_SPACEDIM == 1)
+    vort(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.0d0
+#elif (AMREX_SPACEDIM == 2)
+    call make_vorticity_2d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
+#else
+    call make_vorticity_3d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
+#endif
 
   end subroutine make_vorticity
 
@@ -931,5 +931,54 @@ contains
     enddo
 
   end subroutine make_velrc
+
+  subroutine make_deltagamma(lev,lo,hi,state,s_lo,s_hi,nc_s,p0,gamma1bar,&
+       deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma")
+
+    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: d_lo(3), d_hi(3)
+    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (inout) :: deltagamma(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+
+    ! Local variables
+    integer :: i, j, k, r
+    integer :: pt_index(3)
+    type (eos_t) :: eos_state
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+
+#if (AMREX_SPACEDIM == 1)
+             r = i
+#elif (AMREX_SPACEDIM == 2)
+             r = j
+#elif (AMREX_SPACEDIM == 3)
+             r = k
+#endif
+
+             eos_state%rho   = state(i,j,k,rho_comp)
+             eos_state%T     = state(i,j,k,temp_comp)
+             if (use_pprime_in_tfromp) then
+                eos_state%p     = p0(lev,r) + state(i,j,k,pi_comp)
+             else
+                eos_state%p     = p0(lev,r)
+             endif
+
+             eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rp, eos_state, pt_index)
+
+             deltagamma(i,j,k) = eos_state%gam1 - gamma1bar(lev,r)
+          enddo
+       enddo
+    enddo
+
+  end subroutine make_deltagamma
 
 end module plot_variables_module

@@ -93,7 +93,7 @@ Maestro::Evolve ()
                               (istep == max_step) ) || (t_old >= stop_time) )
         {
             Print() << "\nWriting plotfile " << istep << std::endl;
-            WritePlotFile(istep,t_new,rho0_new,rhoh0_new,p0_new,unew,snew);
+            WritePlotFile(istep,t_new,rho0_new,rhoh0_new,p0_new,gamma1bar_new,unew,snew);
         }
 
         if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )

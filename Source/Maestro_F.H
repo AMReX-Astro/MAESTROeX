@@ -702,7 +702,13 @@ extern "C"
                         const amrex::Real* dx,
                         amrex::Real* vorticity, const int* d_lo, const int* d_hi,
                         const int* bc);
-    /////////////////////
+
+    void make_deltagamma(const int* lev, const int* lo, const int* hi,
+                        const amrex::Real* state, const int* s_lo, const int* s_hi,
+                        const int* nc_s,
+                        const amrex::Real* p0, const amrex::Real* gamma1bar,
+                        amrex::Real* deltagamma, const int* d_lo, const int* d_hi);
+/////////////////////
 
     //////////////////////
     // in make_psi.F90

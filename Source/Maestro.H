@@ -552,9 +552,11 @@ private:
     amrex::Vector<const amrex::MultiFab*> PlotFileMF (const amrex::Vector<amrex::MultiFab>& rho0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& rhoh0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& p0_cart,
+                                                      const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
                                                       const amrex::Vector<amrex::MultiFab>& u_in,
                                                       amrex::Vector<amrex::MultiFab>& s_in,
-                                                      const amrex::Vector<amrex::Real>& p0_in);
+                                                      const amrex::Vector<amrex::Real>& p0_in,
+                                                      const amrex::Vector<amrex::Real>& gamma1bar_in);
 
     // set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames () const;
@@ -565,6 +567,7 @@ private:
                         const amrex::Vector<amrex::Real>& rho0_in,
                         const amrex::Vector<amrex::Real>& rhoh0_in,
                         const amrex::Vector<amrex::Real>& p0_in,
+                        const amrex::Vector<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in);
 
@@ -582,6 +585,13 @@ private:
 
     void MakeVorticity (const amrex::Vector<amrex::MultiFab>& vel,
                         amrex::Vector<amrex::MultiFab>& vorticity);
+
+    void MakeDeltaGamma (const amrex::Vector<amrex::MultiFab>& state,
+                         const amrex::Vector<amrex::Real>& p0,
+                         const amrex::Vector<amrex::MultiFab>& p0_cart,
+                         const amrex::Vector<amrex::Real>& gamma1bar,
+                         const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
+                         amrex::Vector<amrex::MultiFab>& deltagamma);
 
     // end MaestroPlot.cpp functions
     ////////////
