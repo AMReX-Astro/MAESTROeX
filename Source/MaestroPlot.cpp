@@ -120,8 +120,9 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// X (NumSpec), omegadot(NumSpec)
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
+	// pioverp0, p0pluspi
 	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 11;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 13;
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
@@ -132,8 +133,8 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// temporary MultiFab for calculations
 	Vector<MultiFab> tempmf(finest_level+1);
 	Vector<MultiFab> tempmf_state(finest_level+1);
-    Vector<MultiFab> tempmf_scalar1(finest_level+1);
-    Vector<MultiFab> tempmf_scalar2(finest_level+1);
+	Vector<MultiFab> tempmf_scalar1(finest_level+1);
+	Vector<MultiFab> tempmf_scalar2(finest_level+1);
 
 
 	int dest_comp = 0;
@@ -142,9 +143,9 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i] = new MultiFab((s_in[i]).boxArray(),(s_in[i]).DistributionMap(),nPlot,0);
 		tempmf[i].define(grids[i],dmap[i],AMREX_SPACEDIM,0);
-        tempmf_state[i].define(grids[i],dmap[i],Nscal,0);
-        tempmf_scalar1[i].define(grids[i],dmap[i],1,0);
-        tempmf_scalar2[i].define(grids[i],dmap[i],1,0);
+		tempmf_state[i].define(grids[i],dmap[i],Nscal,0);
+		tempmf_scalar1[i].define(grids[i],dmap[i],1,0);
+		tempmf_scalar2[i].define(grids[i],dmap[i],1,0);
 	}
 
 	// velocity
@@ -194,10 +195,10 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	dest_comp += NumSpec;
 
-    // omegadot
-    React(s_in, tempmf_state, tempmf_scalar1, tempmf, tempmf_scalar2, p0_in, dt);
+	// omegadot
+	React(s_in, tempmf_state, tempmf_scalar1, tempmf, tempmf_scalar2, p0_in, dt);
 
-    for (int i = 0; i <= finest_level; ++i) {
+	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
 		for (int comp=0; comp<NumSpec; ++comp) {
 			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
@@ -247,6 +248,20 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// pi
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((s_in[i]),Pi,dest_comp,1);
+	}
+	++dest_comp;
+
+	// pioverp0
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((s_in[i]),Pi,dest_comp,1);
+		MultiFab::Divide(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
+	}
+	++dest_comp;
+
+	// p0pluspi
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((s_in[i]),Pi,dest_comp,1);
+		MultiFab::Add(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
 	}
 	++dest_comp;
 
@@ -349,8 +364,9 @@ Maestro::PlotFileVarNames () const
 	// X (NumSpec), omegadot(NumSpec)
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
+	// pioverp0, p0pluspi
 	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 11;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 13;
 	Vector<std::string> names(nPlot);
 
 	int cnt = 0;
@@ -409,7 +425,7 @@ Maestro::PlotFileVarNames () const
 		delete [] spec_name;
 	}
 
-    for (int i = 0; i < NumSpec; i++) {
+	for (int i = 0; i < NumSpec; i++) {
 		int len = 20;
 		Vector<int> int_spec_names(len);
 		//
@@ -430,11 +446,12 @@ Maestro::PlotFileVarNames () const
 		delete [] spec_name;
 	}
 
-
 	names[cnt++] = "tfromp";
 	names[cnt++] = "tfromh";
 	names[cnt++] = "deltaT";
 	names[cnt++] = "Pi";
+	names[cnt++] = "pioverp0";
+	names[cnt++] = "p0pluspi";
 
 	names[cnt++] = "rhopert";
 	names[cnt++] = "rhohpert";
@@ -928,52 +945,52 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 		const MultiFab& state_mf = state[lev];
 		MultiFab& deltagamma_mf = deltagamma[lev];
 
-        if (spherical == 0) {
+		if (spherical == 0) {
 
-    		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-    		for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+			for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
 
-    			// Get the index space of the valid region
-    			const Box& tileBox = mfi.tilebox();
+				// Get the index space of the valid region
+				const Box& tileBox = mfi.tilebox();
 
-    			// call fortran subroutine
-    			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-    			// lo/hi coordinates (including ghost cells), and/or the # of components
-    			// We will also pass "validBox", which specifies the "valid" region.
-    			make_deltagamma(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-    			                BL_TO_FORTRAN_FAB(state_mf[mfi]),
-    			                p0.dataPtr(), gamma1bar.dataPtr(),
-    			                BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
-    		}
+				// call fortran subroutine
+				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+				// lo/hi coordinates (including ghost cells), and/or the # of components
+				// We will also pass "validBox", which specifies the "valid" region.
+				make_deltagamma(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				                BL_TO_FORTRAN_FAB(state_mf[mfi]),
+				                p0.dataPtr(), gamma1bar.dataPtr(),
+				                BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
+			}
 
-        } else {
+		} else {
 
-            const MultiFab& p0cart_mf = p0_cart[lev];
-            const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
+			const MultiFab& p0cart_mf = p0_cart[lev];
+			const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
 
-            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+			for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
+				// Get the index space of the valid region
+				const Box& tileBox = mfi.tilebox();
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-                make_deltagamma_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                BL_TO_FORTRAN_FAB(state_mf[mfi]),
-                                BL_TO_FORTRAN_3D(p0cart_mf[mfi]), BL_TO_FORTRAN_3D(gamma1barcart_mf[mfi]),
-                                BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
-            }
+				// call fortran subroutine
+				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+				// lo/hi coordinates (including ghost cells), and/or the # of components
+				// We will also pass "validBox", which specifies the "valid" region.
+				make_deltagamma_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				                     BL_TO_FORTRAN_FAB(state_mf[mfi]),
+				                     BL_TO_FORTRAN_3D(p0cart_mf[mfi]), BL_TO_FORTRAN_3D(gamma1barcart_mf[mfi]),
+				                     BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
+			}
 
-        }
+		}
 
 
 	}
