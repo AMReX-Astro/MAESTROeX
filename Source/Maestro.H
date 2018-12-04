@@ -577,6 +577,7 @@ private:
                      amrex::Vector<amrex::MultiFab>& magvel);
 
     void MakeVelrc (const amrex::Vector<amrex::MultiFab>& vel,
+                    const amrex::Vector<amrex::MultiFab>& w0rcart,
                     amrex::Vector<amrex::MultiFab>& rad_vel,
                     amrex::Vector<amrex::MultiFab>& circ_vel);
 
@@ -595,7 +596,11 @@ private:
 
     void MakeDivw0 (const amrex::Vector<amrex::Real>& w0,
                     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                    amrex::Vector<amrex::MultiFab>&divw0);
+                    amrex::Vector<amrex::MultiFab>& divw0);
+
+    void MakePiDivu (const amrex::Vector<amrex::MultiFab>& vel,
+                   const amrex::Vector<amrex::MultiFab>& pi_cc,
+                   amrex::Vector<amrex::MultiFab>& pidivu);
 
     // end MaestroPlot.cpp functions
     ////////////

@@ -726,6 +726,12 @@ extern "C"
                          const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
                          const amrex::Real* dx,
                          amrex::Real* divw0, const int* d_lo, const int* d_hi);
+
+     void make_pidivu(const int* lo, const int* hi,
+                     const amrex::Real* vel, const int* v_lo, const int* v_hi,
+                     const amrex::Real* dx,
+                     const amrex::Real* pi_cc, const int* p_lo, const int* p_hi, const int* nc,
+                     amrex::Real* pidivuw0, const int* d_lo, const int* d_hi);
 /////////////////////
 
     //////////////////////

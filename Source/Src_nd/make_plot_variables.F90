@@ -64,6 +64,35 @@ contains
              if (state(i,j,k,rho_comp) <= base_cutoff_density) then
                 nabla = 0.0d0
              else
+#if (AMREX_SPACEDIM == 1)
+                ! forward difference
+                if (i == lo(1)) then
+                   dt = state(i+1,j,k,temp_comp) - state(i,j,k,temp_comp)
+                   dp = pres(i+1,j,k) - pres(i,j,k)
+                   ! backward difference
+                else if (i == hi(1)) then
+                   dt = state(i,j,k,temp_comp) - state(i-1,j,k,temp_comp)
+                   dp = pres(i,j,k) - pres(i-1,j,k)
+                   ! centered difference
+                else
+                   dt = state(i+1,j,k,temp_comp) - state(i-1,j,k,temp_comp)
+                   dp = pres(i+1,j,k) - pres(i-1,j,k)
+                endif
+#elif (AMREX_SPACEDIM == 2)
+                ! forward difference
+                if (j == lo(2)) then
+                   dt = state(i,j+1,k,temp_comp) - state(i,j,k,temp_comp)
+                   dp = pres(i,j+1,k) - pres(i,j,k)
+                   ! backward difference
+                else if (j == hi(2)) then
+                   dt = state(i,j,k,temp_comp) - state(i,j-1,k,temp_comp)
+                   dp = pres(i,j,k) - pres(i,j-1,k)
+                   ! centered difference
+                else
+                   dt = state(i,j+1,k,temp_comp) - state(i,j-1,k,temp_comp)
+                   dp = pres(i,j+1,k) - pres(i,j-1,k)
+                endif
+#else
                 ! forward difference
                 if (k == lo(3)) then
                    dt = state(i,j,k+1,temp_comp) - state(i,j,k,temp_comp)
@@ -77,6 +106,7 @@ contains
                    dt = state(i,j,k+1,temp_comp) - state(i,j,k-1,temp_comp)
                    dp = pres(i,j,k+1) - pres(i,j,k-1)
                 endif
+#endif
 
                 ! prevent Inf
                 if (dp == 0.0d0) then
@@ -1034,7 +1064,7 @@ contains
     double precision, intent (inout) :: divw0(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
 
     ! Local variables
-    integer :: i, j, k, r
+    integer :: i, j, k
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -1080,5 +1110,40 @@ contains
     enddo
 
   end subroutine make_divw0_sphr
+
+  subroutine make_pidivu(lo,hi,vel,v_lo,v_hi,dx,pi_cc,p_lo,p_hi,nc,&
+       pidivu,d_lo,d_hi) bind(C,name="make_pidivu")
+
+    integer, intent (in) :: lo(3), hi(3)
+    integer, intent (in) :: v_lo(3), v_hi(3)
+    integer, intent (in) :: p_lo(3), p_hi(3),nc
+    integer, intent (in) :: d_lo(3), d_hi(3)
+    double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
+    double precision, intent (in) :: dx(3)
+    double precision, intent(in) :: pi_cc(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3),nc)
+    double precision, intent (inout) :: pidivu(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+
+    ! Local variables
+    integer :: i, j, k
+
+    do k=lo(3),hi(3)
+       do j=lo(2),hi(2)
+          do i=lo(1),hi(1)
+             pidivu(i,j,k) = pi_cc(i,j,k,pi_comp)*0.5d0*(vel(i+1,j,k,1) - vel(i-1,j,k,1))/dx(1)
+#if (AMREX_SPACEDIM >= 2)
+             pidivu(i,j,k) = pidivu(i,j,k) + &
+                  pi_cc(i,j,k,pi_comp)*0.5d0*(vel(i,j+1,k,2) - vel(i,j-1,k,2))/dx(2)
+#if (AMREX_SPACEDIM == 3)
+             pidivu(i,j,k) = pidivu(i,j,k) + &
+                  pi_cc(i,j,k,pi_comp)*0.5d0*(vel(i,j,k+1,3) - vel(i,j-1,k,3))/dx(3)
+#endif
+#endif
+          enddo
+       enddo
+    enddo
+
+
+
+  end subroutine make_pidivu
 
 end module plot_variables_module
