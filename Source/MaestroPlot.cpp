@@ -122,7 +122,8 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// rho0, rhoh0, h0, p0, w0 (3+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma, divw0
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 15;
+    // thermal, conductivity
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 17;
 
 	if (plot_omegadot) nPlot += NumSpec;
 	if (plot_Hext) nPlot++;
@@ -394,9 +395,45 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	dest_comp += AMREX_SPACEDIM;
 
+    // divw0
 	MakeDivw0(w0, w0mac, tempmf);
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+	}
+	dest_comp++;
+
+    // thermal
+    Vector<MultiFab> Tcoeff            (finest_level+1);
+    Vector<MultiFab> hcoeff            (finest_level+1);
+    Vector<MultiFab> Xkcoeff           (finest_level+1);
+    Vector<MultiFab> pcoeff            (finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        Tcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+    }
+
+    if (use_thermal_diffusion) {
+        MakeThermalCoeffs(s_in,Tcoeff,hcoeff,Xkcoeff,pcoeff);
+        MakeExplicitThermal(tempmf,s_in,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_in,0);
+    } else {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            Tcoeff[lev].setVal(0.);
+            tempmf[lev].setVal(0.);
+        }
+    }
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+	}
+	dest_comp++;
+
+    // conductivity
+	for (int i = 0; i <= finest_level; ++i) {
+        tempmf[i].setVal(0.);
+        plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		MultiFab::Subtract(*plot_mf_data[i],Tcoeff[i],0,dest_comp,1,0);
 	}
 	dest_comp++;
 
@@ -426,7 +463,8 @@ Maestro::PlotFileVarNames () const
 	// rho0, rhoh0, h0, p0, w0 (4+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma, divw0
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 15;
+    // thermal, conductivity
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 17;
 
 	if (plot_omegadot) nPlot += NumSpec;
 	if (plot_Hext) nPlot++;
@@ -556,6 +594,9 @@ Maestro::PlotFileVarNames () const
 	}
 
 	names[cnt++] = "divw0";
+
+    names[cnt++] = "thermal";
+    names[cnt++] = "conductivity";
 
 	return names;
 
