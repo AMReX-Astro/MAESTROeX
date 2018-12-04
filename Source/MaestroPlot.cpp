@@ -889,25 +889,54 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 		const MultiFab& state_mf = state[lev];
 		MultiFab& deltagamma_mf = deltagamma[lev];
 
-		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        if (spherical == 0) {
+
+    		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-		for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+    		for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
 
-			// Get the index space of the valid region
-			const Box& tileBox = mfi.tilebox();
-			const Real* dx = geom[lev].CellSize();
+    			// Get the index space of the valid region
+    			const Box& tileBox = mfi.tilebox();
+    			const Real* dx = geom[lev].CellSize();
 
-			// call fortran subroutine
-			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-			// lo/hi coordinates (including ghost cells), and/or the # of components
-			// We will also pass "validBox", which specifies the "valid" region.
-			make_deltagamma(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			                BL_TO_FORTRAN_FAB(state_mf[mfi]),
-			                p0.dataPtr(), gamma1bar.dataPtr(),
-			                BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
-		}
+    			// call fortran subroutine
+    			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+    			// lo/hi coordinates (including ghost cells), and/or the # of components
+    			// We will also pass "validBox", which specifies the "valid" region.
+    			make_deltagamma(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+    			                BL_TO_FORTRAN_FAB(state_mf[mfi]),
+    			                p0.dataPtr(), gamma1bar.dataPtr(),
+    			                BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
+    		}
+
+        } else {
+
+            const MultiFab& p0cart_mf = p0_cart[lev];
+            const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
+
+            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+            for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+
+                // Get the index space of the valid region
+                const Box& tileBox = mfi.tilebox();
+                const Real* dx = geom[lev].CellSize();
+
+                // call fortran subroutine
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+                // lo/hi coordinates (including ghost cells), and/or the # of components
+                // We will also pass "validBox", which specifies the "valid" region.
+                make_deltagamma_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                                BL_TO_FORTRAN_FAB(state_mf[mfi]),
+                                BL_TO_FORTRAN_3D(p0cart_mf[mfi]), BL_TO_FORTRAN_3D(gamma1barcart_mf[mfi]),
+                                BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
+            }
+
+        }
 
 
 	}

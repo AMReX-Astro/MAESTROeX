@@ -981,4 +981,48 @@ contains
 
   end subroutine make_deltagamma
 
+  subroutine make_deltagamma_sphr(lo,hi,state,s_lo,s_hi,nc_s,&
+       p0_cart,p_lo,p_hi,gamma1bar_cart,g_lo,g_hi,&
+       deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma_sphr")
+
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: p_lo(3), p_hi(3)
+    integer         , intent (in   ) :: g_lo(3), g_hi(3)
+    integer         , intent (in   ) :: d_lo(3), d_hi(3)
+    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent (in   ) :: p0_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3),1)
+    double precision, intent (in   ) :: gamma1bar_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),1)
+    double precision, intent (inout) :: deltagamma(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+
+    ! Local variables
+    integer :: i, j, k
+    integer :: pt_index(3)
+    type (eos_t) :: eos_state
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+
+             eos_state%rho   = state(i,j,k,rho_comp)
+             eos_state%T     = state(i,j,k,temp_comp)
+             if (use_pprime_in_tfromp) then
+                eos_state%p     = p0_cart(i,j,k,1) + state(i,j,k,pi_comp)
+             else
+                eos_state%p     = p0_cart(i,j,k,1)
+             endif
+
+             eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rp, eos_state, pt_index)
+
+             deltagamma(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k,1)
+          enddo
+       enddo
+    enddo
+
+  end subroutine make_deltagamma_sphr
+
 end module plot_variables_module
