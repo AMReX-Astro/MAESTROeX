@@ -119,10 +119,10 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
 	// X (NumSpec)
 	// rho' and rhoh' (2)
-	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
+	// rho0, rhoh0, h0, p0, w0 (3+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma, divw0
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 14;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 15;
 
 	if (plot_omegadot) nPlot += NumSpec;
 	if (plot_Hext) nPlot++;
@@ -321,13 +321,15 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	++dest_comp;
 
-	// rho0, rhoh0, and p0
+	// rho0, rhoh0, h0 and p0
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy(( rho0_cart[i]),0,dest_comp,1);
 		plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+1,1);
-		plot_mf_data[i]->copy((   p0_cart[i]),0,dest_comp+2,1);
+        plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+2,1);
+        MultiFab::Divide(*plot_mf_data[i], *plot_mf_data[i], dest_comp+2, dest_comp, 1,0);
+		plot_mf_data[i]->copy((   p0_cart[i]),0,dest_comp+3,1);
 	}
-	dest_comp += 3;
+	dest_comp += 4;
 
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 	Vector<MultiFab> w0r_cart(finest_level+1);
@@ -421,10 +423,10 @@ Maestro::PlotFileVarNames () const
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
 	// X (NumSpec)
 	// rho' and rhoh' (2)
-	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
+	// rho0, rhoh0, h0, p0, w0 (4+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma, divw0
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 14;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 15;
 
 	if (plot_omegadot) nPlot += NumSpec;
 	if (plot_Hext) nPlot++;
@@ -539,6 +541,7 @@ Maestro::PlotFileVarNames () const
 
 	names[cnt++] = "rho0";
 	names[cnt++] = "rhoh0";
+	names[cnt++] = "h0";
 	names[cnt++] = "p0";
 	names[cnt++] = "MachNumber";
 	names[cnt++] = "deltagamma";
