@@ -118,11 +118,16 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
 	// X (NumSpec), omegadot(NumSpec)
-	// Hext, enucdot, rho' and rhoh' (4)
+	// Hext, Hnuc, rho' and rhoh' (4)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
-	// pioverp0, p0pluspi
+	// pioverp0, p0pluspi, gpi (2+AMREX_SPACEDIM)
 	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 15;
+    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 13;
+
+    if (plot_omegadot) nPlot += NumSpec;
+    if (plot_Hext) nPlot++;
+    if (plot_Hnuc) nPlot++;
+    if (plot_gpi) nPlot += AMREX_SPACEDIM;
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
@@ -198,27 +203,33 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// omegadot
 	React(s_in, tempmf_state, tempmf_scalar1, tempmf, tempmf_scalar2, p0_in, dt);
 
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
-		for (int comp=0; comp<NumSpec; ++comp) {
-			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
-		}
-	}
-	dest_comp += NumSpec;
+    if (plot_omegadot) {
+    	for (int i = 0; i <= finest_level; ++i) {
+    		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
+    		for (int comp=0; comp<NumSpec; ++comp) {
+    			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
+    		}
+    	}
+    	dest_comp += NumSpec;
+    }
 
-    // Hext
-	for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp,1);
-		MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
-	}
-	++dest_comp;
+    if (plot_Hext) {
+        // Hext
+    	for (int i = 0; i <= finest_level; ++i) {
+            plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp,1);
+    		MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
+    	}
+    	++dest_comp;
+    }
 
-    // enucdot
-	for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((tempmf_scalar2[i]),0,dest_comp,1);
-		MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
-	}
-	++dest_comp;
+    if (plot_Hnuc) {
+        // Hnuc
+    	for (int i = 0; i <= finest_level; ++i) {
+            plot_mf_data[i]->copy((tempmf_scalar2[i]),0,dest_comp,1);
+    		MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
+    	}
+    	++dest_comp;
+    }
 
 
 	// compute tfromp
@@ -279,6 +290,14 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		MultiFab::Add(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
 	}
 	++dest_comp;
+
+    if (plot_gpi) {
+        // gpi
+    	for (int i = 0; i <= finest_level; ++i) {
+    		plot_mf_data[i]->copy((gpi[i]),0,dest_comp,AMREX_SPACEDIM);
+    	}
+    	++dest_comp;
+    }
 
 	// rhopert
 	for (int i = 0; i <= finest_level; ++i) {
@@ -377,11 +396,17 @@ Maestro::PlotFileVarNames () const
 	// magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
 	// X (NumSpec), omegadot(NumSpec)
-	// Hext, enucdot, rho' and rhoh' (4)
+	// Hext, Hnuc, rho' and rhoh' (4)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
-	// pioverp0, p0pluspi
+	// pioverp0, p0pluspi, gpi (2+AMREX_SPACEDIM)
 	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 15;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 13;
+
+    if (plot_omegadot) nPlot += NumSpec;
+    if (plot_Hext) nPlot++;
+    if (plot_Hnuc) nPlot++;
+    if (plot_gpi) nPlot += AMREX_SPACEDIM;
+
 	Vector<std::string> names(nPlot);
 
 	int cnt = 0;
@@ -440,29 +465,31 @@ Maestro::PlotFileVarNames () const
 		delete [] spec_name;
 	}
 
-	for (int i = 0; i < NumSpec; i++) {
-		int len = 20;
-		Vector<int> int_spec_names(len);
-		//
-		// This call return the actual length of each string in "len"
-		//
-		get_spec_names(int_spec_names.dataPtr(),&i,&len);
-		char* spec_name = new char[len+1];
-		for (int j = 0; j < len; j++) {
-			spec_name[j] = int_spec_names[j];
-		}
-		spec_name[len] = '\0';
-		std::string spec_string = "omegadot(";
-		spec_string += spec_name;
-		spec_string += ')';
+    if (plot_omegadot) {
+    	for (int i = 0; i < NumSpec; i++) {
+    		int len = 20;
+    		Vector<int> int_spec_names(len);
+    		//
+    		// This call return the actual length of each string in "len"
+    		//
+    		get_spec_names(int_spec_names.dataPtr(),&i,&len);
+    		char* spec_name = new char[len+1];
+    		for (int j = 0; j < len; j++) {
+    			spec_name[j] = int_spec_names[j];
+    		}
+    		spec_name[len] = '\0';
+    		std::string spec_string = "omegadot(";
+    		spec_string += spec_name;
+    		spec_string += ')';
 
-		names[cnt++] = spec_string;
+    		names[cnt++] = spec_string;
 
-		delete [] spec_name;
-	}
+    		delete [] spec_name;
+    	}
+    }
 
-    names[cnt++] = "Hext";
-    names[cnt++] = "enucdot";
+    if (plot_Hext) names[cnt++] = "Hext";
+    if (plot_Hnuc) names[cnt++] = "Hnuc";
 
 	names[cnt++] = "tfromp";
 	names[cnt++] = "tfromh";
@@ -470,6 +497,15 @@ Maestro::PlotFileVarNames () const
 	names[cnt++] = "Pi";
 	names[cnt++] = "pioverp0";
 	names[cnt++] = "p0pluspi";
+
+    if (plot_gpi) {
+        // add gpi
+    	for (int i=0; i<AMREX_SPACEDIM; ++i) {
+    		std::string x = "gpi";
+    		x += (120+i);
+    		names[cnt++] = x;
+    	}
+    }
 
 	names[cnt++] = "rhopert";
 	names[cnt++] = "rhohpert";
