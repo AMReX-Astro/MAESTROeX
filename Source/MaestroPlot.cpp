@@ -117,11 +117,11 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// velocities (AMREX_SPACEDIM)
 	// magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
-	// X (NumSpec)
+	// X (NumSpec), omegadot(NumSpec)
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
 	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 11;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 11;
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
@@ -131,6 +131,10 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 
 	// temporary MultiFab for calculations
 	Vector<MultiFab> tempmf(finest_level+1);
+	Vector<MultiFab> tempmf_state(finest_level+1);
+    Vector<MultiFab> tempmf_scalar1(finest_level+1);
+    Vector<MultiFab> tempmf_scalar2(finest_level+1);
+
 
 	int dest_comp = 0;
 
@@ -138,6 +142,9 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i] = new MultiFab((s_in[i]).boxArray(),(s_in[i]).DistributionMap(),nPlot,0);
 		tempmf[i].define(grids[i],dmap[i],AMREX_SPACEDIM,0);
+        tempmf_state[i].define(grids[i],dmap[i],Nscal,0);
+        tempmf_scalar1[i].define(grids[i],dmap[i],1,0);
+        tempmf_scalar2[i].define(grids[i],dmap[i],1,0);
 	}
 
 	// velocity
@@ -181,6 +188,17 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// X
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((s_in[i]),FirstSpec,dest_comp,NumSpec);
+		for (int comp=0; comp<NumSpec; ++comp) {
+			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
+		}
+	}
+	dest_comp += NumSpec;
+
+    // omegadot
+    React(s_in, tempmf_state, tempmf_scalar1, tempmf, tempmf_scalar2, p0_in, dt);
+
+    for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
 		for (int comp=0; comp<NumSpec; ++comp) {
 			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
 		}
@@ -328,11 +346,11 @@ Maestro::PlotFileVarNames () const
 	// velocities (AMREX_SPACEDIM)
 	// magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
-	// X (NumSpec)
+	// X (NumSpec), omegadot(NumSpec)
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
 	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 11;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 11;
 	Vector<std::string> names(nPlot);
 
 	int cnt = 0;
@@ -383,6 +401,27 @@ Maestro::PlotFileVarNames () const
 		}
 		spec_name[len] = '\0';
 		std::string spec_string = "X(";
+		spec_string += spec_name;
+		spec_string += ')';
+
+		names[cnt++] = spec_string;
+
+		delete [] spec_name;
+	}
+
+    for (int i = 0; i < NumSpec; i++) {
+		int len = 20;
+		Vector<int> int_spec_names(len);
+		//
+		// This call return the actual length of each string in "len"
+		//
+		get_spec_names(int_spec_names.dataPtr(),&i,&len);
+		char* spec_name = new char[len+1];
+		for (int j = 0; j < len; j++) {
+			spec_name[j] = int_spec_names[j];
+		}
+		spec_name[len] = '\0';
+		std::string spec_string = "omegadot(";
 		spec_string += spec_name;
 		spec_string += ')';
 
@@ -899,7 +938,6 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 
     			// Get the index space of the valid region
     			const Box& tileBox = mfi.tilebox();
-    			const Real* dx = geom[lev].CellSize();
 
     			// call fortran subroutine
     			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -924,7 +962,6 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
-                const Real* dx = geom[lev].CellSize();
 
                 // call fortran subroutine
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
