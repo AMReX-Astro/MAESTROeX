@@ -1025,4 +1025,60 @@ contains
 
   end subroutine make_deltagamma_sphr
 
+  subroutine make_divw0(lev,lo,hi,w0,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
+
+    integer, intent (in) :: lev, lo(3), hi(3)
+    integer, intent (in) :: d_lo(3), d_hi(3)
+    double precision, intent (in) :: w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in) :: dx(3)
+    double precision, intent (inout) :: divw0(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+
+    ! Local variables
+    integer :: i, j, k, r
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+#if (AMREX_SPACEDIM == 1)
+             divw0(i,j,k) = (w0(lev,i+1) - w0(lev,i)) / dx(1)
+#elif (AMREX_SPACEDIM == 2)
+             divw0(i,j,k) = (w0(lev,j+1) - w0(lev,j)) / dx(2)
+#else
+             divw0(i,j,k) = (w0(lev,k+1) - w0(lev,k)) / dx(3)
+#endif
+          enddo
+       enddo
+    enddo
+
+  end subroutine make_divw0
+
+  subroutine make_divw0_sphr(lo,hi,w0macx,x_lo,x_hi,w0macy,y_lo,y_hi,w0macz,z_lo,z_hi,&
+       dx,divw0,d_lo,d_hi) bind(C,name="make_divw0_sphr")
+
+    integer, intent (in) :: lo(3), hi(3)
+    integer, intent (in) :: x_lo(3), x_hi(3)
+    integer, intent (in) :: y_lo(3), y_hi(3)
+    integer, intent (in) :: z_lo(3), z_hi(3)
+    integer, intent (in) :: d_lo(3), d_hi(3)
+    double precision, intent (in) :: w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
+    double precision, intent (in) :: w0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
+    double precision, intent (in) :: w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
+    double precision, intent (in) :: dx(3)
+    double precision, intent (inout) :: divw0(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+
+    ! Local variables
+    integer :: i, j, k
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+             divw0(i,j,k) = (w0macx(i+1,j,k) - w0macx(i,j,k)) / dx(1) + &
+                  (w0macy(i,j+1,k) - w0macy(i,j,k)) / dx(2) + &
+                  (w0macz(i,j,k+1) - w0macz(i,j,k)) / dx(3)
+          enddo
+       enddo
+    enddo
+
+  end subroutine make_divw0_sphr
+
 end module plot_variables_module

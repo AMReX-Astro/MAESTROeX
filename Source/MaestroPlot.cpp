@@ -121,15 +121,15 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
-	// MachNumber, deltagamma
-    int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 13;
+	// MachNumber, deltagamma, divw0
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 14;
 
-    if (plot_omegadot) nPlot += NumSpec;
-    if (plot_Hext) nPlot++;
-    if (plot_Hnuc) nPlot++;
-    if (plot_eta) nPlot++;
-    if (plot_gpi) nPlot += AMREX_SPACEDIM;
-    if (plot_cs) nPlot++;
+	if (plot_omegadot) nPlot += NumSpec;
+	if (plot_Hext) nPlot++;
+	if (plot_Hnuc) nPlot++;
+	if (plot_eta) nPlot++;
+	if (plot_gpi) nPlot += AMREX_SPACEDIM;
+	if (plot_cs) nPlot++;
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
@@ -205,42 +205,42 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// omegadot
 	React(s_in, tempmf_state, tempmf_scalar1, tempmf, tempmf_scalar2, p0_in, dt);
 
-    if (plot_omegadot) {
-    	for (int i = 0; i <= finest_level; ++i) {
-    		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
-    		for (int comp=0; comp<NumSpec; ++comp) {
-    			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
-    		}
-    	}
-    	dest_comp += NumSpec;
-    }
+	if (plot_omegadot) {
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
+			for (int comp=0; comp<NumSpec; ++comp) {
+				MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
+			}
+		}
+		dest_comp += NumSpec;
+	}
 
-    if (plot_Hext) {
-        // Hext
-    	for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp,1);
-    		MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
-    	}
-    	++dest_comp;
-    }
+	if (plot_Hext) {
+		// Hext
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp,1);
+			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
+		}
+		++dest_comp;
+	}
 
-    if (plot_Hnuc) {
-        // Hnuc
-    	for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy((tempmf_scalar2[i]),0,dest_comp,1);
-    		MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
-    	}
-    	++dest_comp;
-    }
+	if (plot_Hnuc) {
+		// Hnuc
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy((tempmf_scalar2[i]),0,dest_comp,1);
+			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
+		}
+		++dest_comp;
+	}
 
-    if (plot_eta) {
-        // eta_rho
-        Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0);
-    	for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
-    	}
-    	++dest_comp;
-    }
+	if (plot_eta) {
+		// eta_rho
+		Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0);
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		}
+		++dest_comp;
+	}
 
 
 	// compute tfromp
@@ -299,13 +299,13 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	++dest_comp;
 
-    if (plot_gpi) {
-        // gpi
-    	for (int i = 0; i <= finest_level; ++i) {
-    		plot_mf_data[i]->copy((gpi[i]),0,dest_comp,AMREX_SPACEDIM);
-    	}
-    	dest_comp += AMREX_SPACEDIM;
-    }
+	if (plot_gpi) {
+		// gpi
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy((gpi[i]),0,dest_comp,AMREX_SPACEDIM);
+		}
+		dest_comp += AMREX_SPACEDIM;
+	}
 
 	// rhopert
 	for (int i = 0; i <= finest_level; ++i) {
@@ -329,9 +329,10 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	dest_comp += 3;
 
+	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+	Vector<MultiFab> w0r_cart(finest_level+1);
+
 	if (spherical == 1) {
-		Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
-		Vector<MultiFab> w0r_cart(finest_level+1);
 
 		for (int lev=0; lev<=finest_level; ++lev) {
 			// w0mac will contain an edge-centered w0 on a Cartesian grid,
@@ -375,14 +376,14 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	++dest_comp;
 
-    if (plot_cs) {
-        CsfromRhoH(s_in, p0_in, p0_cart, tempmf);
-        // soundspeed
-    	for (int i = 0; i <= finest_level; ++i) {
-    		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
-    	}
-    	++dest_comp;
-    }
+	if (plot_cs) {
+		CsfromRhoH(s_in, p0_in, p0_cart, tempmf);
+		// soundspeed
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		}
+		++dest_comp;
+	}
 
 	// w0
 	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
@@ -391,12 +392,18 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	dest_comp += AMREX_SPACEDIM;
 
+	MakeDivw0(w0, w0mac, tempmf);
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+	}
+	dest_comp++;
+
 	// add plot_mf_data[i] to plot_mf
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf.push_back(plot_mf_data[i]);
 		// delete [] plot_mf_data[i];
 	}
-    
+
 	return plot_mf;
 
 
@@ -416,15 +423,15 @@ Maestro::PlotFileVarNames () const
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
-	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 13;
+	// MachNumber, deltagamma, divw0
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 14;
 
-    if (plot_omegadot) nPlot += NumSpec;
-    if (plot_Hext) nPlot++;
-    if (plot_Hnuc) nPlot++;
-    if (plot_eta) nPlot++;
-    if (plot_gpi) nPlot += AMREX_SPACEDIM;
-    if (plot_cs) nPlot++;
+	if (plot_omegadot) nPlot += NumSpec;
+	if (plot_Hext) nPlot++;
+	if (plot_Hnuc) nPlot++;
+	if (plot_eta) nPlot++;
+	if (plot_gpi) nPlot += AMREX_SPACEDIM;
+	if (plot_cs) nPlot++;
 
 	Vector<std::string> names(nPlot);
 
@@ -484,32 +491,32 @@ Maestro::PlotFileVarNames () const
 		delete [] spec_name;
 	}
 
-    if (plot_omegadot) {
-    	for (int i = 0; i < NumSpec; i++) {
-    		int len = 20;
-    		Vector<int> int_spec_names(len);
-    		//
-    		// This call return the actual length of each string in "len"
-    		//
-    		get_spec_names(int_spec_names.dataPtr(),&i,&len);
-    		char* spec_name = new char[len+1];
-    		for (int j = 0; j < len; j++) {
-    			spec_name[j] = int_spec_names[j];
-    		}
-    		spec_name[len] = '\0';
-    		std::string spec_string = "omegadot(";
-    		spec_string += spec_name;
-    		spec_string += ')';
+	if (plot_omegadot) {
+		for (int i = 0; i < NumSpec; i++) {
+			int len = 20;
+			Vector<int> int_spec_names(len);
+			//
+			// This call return the actual length of each string in "len"
+			//
+			get_spec_names(int_spec_names.dataPtr(),&i,&len);
+			char* spec_name = new char[len+1];
+			for (int j = 0; j < len; j++) {
+				spec_name[j] = int_spec_names[j];
+			}
+			spec_name[len] = '\0';
+			std::string spec_string = "omegadot(";
+			spec_string += spec_name;
+			spec_string += ')';
 
-    		names[cnt++] = spec_string;
+			names[cnt++] = spec_string;
 
-    		delete [] spec_name;
-    	}
-    }
+			delete [] spec_name;
+		}
+	}
 
-    if (plot_Hext) names[cnt++] = "Hext";
-    if (plot_Hnuc) names[cnt++] = "Hnuc";
-    if (plot_eta) names[cnt++] = "eta_rho";
+	if (plot_Hext) names[cnt++] = "Hext";
+	if (plot_Hnuc) names[cnt++] = "Hnuc";
+	if (plot_eta) names[cnt++] = "eta_rho";
 
 	names[cnt++] = "tfromp";
 	names[cnt++] = "tfromh";
@@ -518,14 +525,14 @@ Maestro::PlotFileVarNames () const
 	names[cnt++] = "pioverp0";
 	names[cnt++] = "p0pluspi";
 
-    if (plot_gpi) {
-        // add gpi
-    	for (int i=0; i<AMREX_SPACEDIM; ++i) {
-    		std::string x = "gpi";
-    		x += (120+i);
-    		names[cnt++] = x;
-    	}
-    }
+	if (plot_gpi) {
+		// add gpi
+		for (int i=0; i<AMREX_SPACEDIM; ++i) {
+			std::string x = "gpi";
+			x += (120+i);
+			names[cnt++] = x;
+		}
+	}
 
 	names[cnt++] = "rhopert";
 	names[cnt++] = "rhohpert";
@@ -536,7 +543,7 @@ Maestro::PlotFileVarNames () const
 	names[cnt++] = "MachNumber";
 	names[cnt++] = "deltagamma";
 
-    if (plot_cs) names[cnt++] = "soundspeed";
+	if (plot_cs) names[cnt++] = "soundspeed";
 
 	// add w0
 	for (int i=0; i<AMREX_SPACEDIM; ++i) {
@@ -544,6 +551,8 @@ Maestro::PlotFileVarNames () const
 		x += (120+i);
 		names[cnt++] = x;
 	}
+
+	names[cnt++] = "divw0";
 
 	return names;
 
@@ -1074,4 +1083,75 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 	// average down and fill ghost cells
 	AverageDown(deltagamma,0,1);
 	FillPatch(t_old,deltagamma,deltagamma,deltagamma,0,0,1,0,bcs_f);
+}
+
+void
+Maestro::MakeDivw0 (const Vector<Real>& w0,
+                    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
+                    Vector<MultiFab>& divw0)
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::MakeDivw0()",MakeDivw0);
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+
+		// get references to the MultiFabs at level lev
+		MultiFab& divw0_mf = divw0[lev];
+
+		if (spherical == 0) {
+
+			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for ( MFIter mfi(divw0_mf, true); mfi.isValid(); ++mfi ) {
+
+				// Get the index space of the valid region
+				const Box& tileBox = mfi.tilebox();
+				const Real* dx = geom[lev].CellSize();
+
+				// call fortran subroutine
+				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+				// lo/hi coordinates (including ghost cells), and/or the # of components
+				// We will also pass "validBox", which specifies the "valid" region.
+				make_divw0(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				           w0.dataPtr(), dx,
+				           BL_TO_FORTRAN_3D(divw0_mf[mfi]));
+			}
+
+		} else {
+
+			const MultiFab& w0macx_mf = w0mac[lev][0];
+            const MultiFab& w0macy_mf = w0mac[lev][1];
+            const MultiFab& w0macz_mf = w0mac[lev][2];
+
+			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for ( MFIter mfi(divw0_mf, true); mfi.isValid(); ++mfi ) {
+
+				// Get the index space of the valid region
+				const Box& tileBox = mfi.tilebox();
+				const Real* dx = geom[lev].CellSize();
+
+				// call fortran subroutine
+				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+				// lo/hi coordinates (including ghost cells), and/or the # of components
+				// We will also pass "validBox", which specifies the "valid" region.
+				make_divw0_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				                BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+				                BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+				                BL_TO_FORTRAN_3D(w0macz_mf[mfi]), dx,
+				                BL_TO_FORTRAN_3D(divw0_mf[mfi]));
+			}
+
+		}
+
+
+	}
+
+	// average down and fill ghost cells
+	AverageDown(divw0,0,1);
+	FillPatch(t_old,divw0,divw0,divw0,0,0,1,0,bcs_f);
 }
