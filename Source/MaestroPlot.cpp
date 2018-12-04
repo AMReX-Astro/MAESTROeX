@@ -118,11 +118,11 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	// magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
 	// X (NumSpec), omegadot(NumSpec)
-	// rho' and rhoh' (2)
+	// Hext, enucdot, rho' and rhoh' (4)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi
 	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 13;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 15;
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
@@ -205,6 +205,21 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		}
 	}
 	dest_comp += NumSpec;
+
+    // Hext
+	for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp,1);
+		MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
+	}
+	++dest_comp;
+
+    // enucdot
+	for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i]->copy((tempmf_scalar2[i]),0,dest_comp,1);
+		MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
+	}
+	++dest_comp;
+
 
 	// compute tfromp
 	TfromRhoP(s_in,p0_in);
@@ -362,11 +377,11 @@ Maestro::PlotFileVarNames () const
 	// magvel
 	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
 	// X (NumSpec), omegadot(NumSpec)
-	// rho' and rhoh' (2)
+	// Hext, enucdot, rho' and rhoh' (4)
 	// rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi
 	// MachNumber, deltagamma
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 13;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + 2*NumSpec + 15;
 	Vector<std::string> names(nPlot);
 
 	int cnt = 0;
@@ -445,6 +460,9 @@ Maestro::PlotFileVarNames () const
 
 		delete [] spec_name;
 	}
+
+    names[cnt++] = "Hext";
+    names[cnt++] = "enucdot";
 
 	names[cnt++] = "tfromp";
 	names[cnt++] = "tfromh";
