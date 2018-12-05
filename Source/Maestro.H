@@ -556,7 +556,8 @@ private:
                                                       const amrex::Vector<amrex::MultiFab>& u_in,
                                                       amrex::Vector<amrex::MultiFab>& s_in,
                                                       const amrex::Vector<amrex::Real>& p0_in,
-                                                      const amrex::Vector<amrex::Real>& gamma1bar_in);
+                                                      const amrex::Vector<amrex::Real>& gamma1bar_in,
+                                                      const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     // set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames () const;
@@ -569,7 +570,8 @@ private:
                         const amrex::Vector<amrex::Real>& p0_in,
                         const amrex::Vector<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
-                        amrex::Vector<amrex::MultiFab>& s_in);
+                        amrex::Vector<amrex::MultiFab>& s_in,
+                        const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     void WriteJobInfo (const std::string& dir) const;
 

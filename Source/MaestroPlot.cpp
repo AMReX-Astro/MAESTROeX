@@ -14,7 +14,8 @@ Maestro::WritePlotFile (const int step,
                         const Vector<Real>& p0_in,
                         const Vector<Real>& gamma1bar_in,
                         const Vector<MultiFab>& u_in,
-                        Vector<MultiFab>& s_in)
+                        Vector<MultiFab>& s_in,
+                        const Vector<MultiFab>& S_cc_in)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
@@ -65,7 +66,7 @@ Maestro::WritePlotFile (const int step,
 	}
 	Put1dArrayOnCart(gamma1bar_in,gamma1bar_cart,0,0);
 
-	const auto& mf = PlotFileMF(rho0_cart,rhoh0_cart,p0_cart,gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in);
+	const auto& mf = PlotFileMF(rho0_cart,rhoh0_cart,p0_cart,gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in, S_cc_in);
 	const auto& varnames = PlotFileVarNames();
 
 	// WriteMultiLevelPlotfile expects an array of step numbers
@@ -109,29 +110,34 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
                      const Vector<MultiFab>& u_in,
                      Vector<MultiFab>& s_in,
                      const Vector<Real>& p0_in,
-                     const Vector<Real>& gamma1bar_in)
+                     const Vector<Real>& gamma1bar_in,
+                     const Vector<MultiFab>& S_cc_in)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
 
-	// velocities (AMREX_SPACEDIM)
+    // velocities (AMREX_SPACEDIM)
 	// magvel
 	// rho, rhoh, h, rhoX, tfromp, tfromh, deltap, deltaT Pi (Nscal+4 -- the extra 4 are h, tfromh, deltap and deltaT)
-	// X (NumSpec)
-	// rho' and rhoh' (2)
-	// rho0, rhoh0, h0, p0, w0 (3+AMREX_SPACEDIM)
+	// rho' and rhoh' and t' (3)
+	// rho0, rhoh0, h0, p0, w0 (4+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
-	// MachNumber, deltagamma, pidivu, ad_excess, divw0
+	// MachNumber, deltagamma, divw0, S
 	// thermal, conductivity
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 21;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + 21;
 
-	if (plot_omegadot) nPlot += NumSpec;
+    if (plot_spec) nPlot += NumSpec; // X
+    if (plot_spec || plot_omegadot) nPlot += NumSpec; // omegadot
+
 	if (plot_Hext) nPlot++;
 	if (plot_Hnuc) nPlot++;
 	if (plot_eta) nPlot++;
 	if (plot_gpi) nPlot += AMREX_SPACEDIM;
 	if (plot_cs) nPlot++;
+    if (plot_ad_excess) nPlot++;
+    if (plot_pidivu) nPlot++;
 	if (spherical == 1) nPlot += 2; // radial_velocity, circ_velocity
+    if (do_sponge) nPlot++;
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
@@ -201,27 +207,31 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	dest_comp += NumSpec;
 
-	// X
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),FirstSpec,dest_comp,NumSpec);
-		for (int comp=0; comp<NumSpec; ++comp) {
-			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
-		}
-	}
-	dest_comp += NumSpec;
+    if (plot_spec) {
+    	// X
+    	for (int i = 0; i <= finest_level; ++i) {
+    		plot_mf_data[i]->copy((s_in[i]),FirstSpec,dest_comp,NumSpec);
+    		for (int comp=0; comp<NumSpec; ++comp) {
+    			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
+    		}
+    	}
+    	dest_comp += NumSpec;
+    }
 
-	// omegadot
-	React(s_in, tempmf_state, tempmf_scalar1, tempmf, tempmf_scalar2, p0_in, dt);
+    if (plot_spec || plot_omegadot) {
+    	// omegadot
+    	React(s_in, tempmf_state, tempmf_scalar1, tempmf, tempmf_scalar2, p0_in, dt);
 
-	if (plot_omegadot) {
-		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
-			for (int comp=0; comp<NumSpec; ++comp) {
-				MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
-			}
-		}
-		dest_comp += NumSpec;
-	}
+    	if (plot_omegadot) {
+    		for (int i = 0; i <= finest_level; ++i) {
+    			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
+    			for (int comp=0; comp<NumSpec; ++comp) {
+    				MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
+    			}
+    		}
+    		dest_comp += NumSpec;
+    	}
+    }
 
 	if (plot_Hext) {
 		// Hext
@@ -338,6 +348,20 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	++dest_comp;
 
+    // tpert
+    Vector<Real> tempbar ((max_radial_level+1)*nr_fine);
+    tempbar.shrink_to_fit();
+    std::fill(tempbar.begin(), tempbar.end(), 0.);
+
+    Average(s_in, tempbar, Temp);
+    Put1dArrayOnCart(tempbar,tempmf,1,0,bcs_u,0);
+
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
+		MultiFab::Subtract(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
+	}
+	++dest_comp;
+
 	// rho0, rhoh0, h0 and p0
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy(( rho0_cart[i]),0,dest_comp,1);
@@ -395,23 +419,33 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	++dest_comp;
 
-	// pidivu
-	Vector<MultiFab> beta0_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        beta0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+    if (plot_pidivu) {
+    	// pidivu
+    	Vector<MultiFab> beta0_cart(finest_level+1);
+        for (int lev=0; lev<=finest_level; ++lev) {
+            beta0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        }
+        Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
+    	MakePiCC(beta0_cart);
+    	MakePiDivu(u_in, s_in, tempmf);
+    	for (int i = 0; i <= finest_level; ++i) {
+    		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+    	}
+    	++dest_comp;
     }
-    Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
-	MakePiCC(beta0_cart);
-	MakePiDivu(u_in, s_in, tempmf);
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
-	}
-	++dest_comp;
 
-	// ad_excess
-	MakeAdExcess(s_in, tempmf);
+    if (plot_ad_excess) {
+    	// ad_excess
+    	MakeAdExcess(s_in, tempmf);
+    	for (int i = 0; i <= finest_level; ++i) {
+    		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+    	}
+    	++dest_comp;
+    }
+
+    // S
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy((S_cc_in[i]),0,dest_comp,1);
 	}
 	++dest_comp;
 
@@ -483,6 +517,35 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		dest_comp += 2;
 	}
 
+    if (do_sponge) {
+        init_sponge(rho0_old.dataPtr());
+        MakeSponge(tempmf);
+
+        if (plot_sponge_fdamp) {
+            // compute f_damp assuming sponge=1/(1+dt*kappa*fdamp)
+            // therefore fdamp = (1/sponge-1)/(dt*kappa)
+            for (int i = 0; i <= finest_level; ++i) {
+                // scalar1 = 1
+                tempmf_scalar1[i].setVal(1.);
+                // scalar2 = dt * kappa
+                tempmf_scalar2[i].setVal(dt * sponge_kappa);
+                // plot_mf = 1
+                plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp,1);
+                // plot_mf = 1/sponge
+                MultiFab::Divide(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
+                // plot_mf = 1/sponge - 1
+                MultiFab::Subtract(*plot_mf_data[i],tempmf_scalar1[i],0,dest_comp,1,0);
+                // plot_mf = (1/sponge-1)/(dt*kappa)
+                MultiFab::Divide(*plot_mf_data[i],tempmf_scalar2[i],0,dest_comp,1,0);
+            }
+        } else {
+            for (int i = 0; i <= finest_level; ++i) {
+                plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+            }
+        }
+        dest_comp++;
+    }
+
 	// add plot_mf_data[i] to plot_mf
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf.push_back(plot_mf_data[i]);
@@ -504,21 +567,25 @@ Maestro::PlotFileVarNames () const
 	// velocities (AMREX_SPACEDIM)
 	// magvel
 	// rho, rhoh, h, rhoX, tfromp, tfromh, deltap, deltaT Pi (Nscal+4 -- the extra 4 are h, tfromh, deltap and deltaT)
-	// X (NumSpec)
-	// rho' and rhoh' (2)
+	// rho' and rhoh' and t' (3)
 	// rho0, rhoh0, h0, p0, w0 (4+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
-	// MachNumber, deltagamma, pidivu, ad_excess, divw0
+	// MachNumber, deltagamma, divw0, S
 	// thermal, conductivity
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 21;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + 21;
 
-	if (plot_omegadot) nPlot += NumSpec;
+    if (plot_spec) nPlot += NumSpec; // X
+    if (plot_spec || plot_omegadot) nPlot += NumSpec; // omegadot
+
 	if (plot_Hext) nPlot++;
 	if (plot_Hnuc) nPlot++;
 	if (plot_eta) nPlot++;
 	if (plot_gpi) nPlot += AMREX_SPACEDIM;
 	if (plot_cs) nPlot++;
+    if (plot_ad_excess) nPlot++;
+    if (plot_pidivu) nPlot++;
 	if (spherical == 1) nPlot += 2; // radial_velocity, circ_velocity
+    if (do_sponge) nPlot++;
 
 	Vector<std::string> names(nPlot);
 
@@ -558,28 +625,30 @@ Maestro::PlotFileVarNames () const
 		delete [] spec_name;
 	}
 
-	for (int i = 0; i < NumSpec; i++) {
-		int len = 20;
-		Vector<int> int_spec_names(len);
-		//
-		// This call return the actual length of each string in "len"
-		//
-		get_spec_names(int_spec_names.dataPtr(),&i,&len);
-		char* spec_name = new char[len+1];
-		for (int j = 0; j < len; j++) {
-			spec_name[j] = int_spec_names[j];
-		}
-		spec_name[len] = '\0';
-		std::string spec_string = "X(";
-		spec_string += spec_name;
-		spec_string += ')';
+    if (plot_spec) {
+    	for (int i = 0; i < NumSpec; i++) {
+    		int len = 20;
+    		Vector<int> int_spec_names(len);
+    		//
+    		// This call return the actual length of each string in "len"
+    		//
+    		get_spec_names(int_spec_names.dataPtr(),&i,&len);
+    		char* spec_name = new char[len+1];
+    		for (int j = 0; j < len; j++) {
+    			spec_name[j] = int_spec_names[j];
+    		}
+    		spec_name[len] = '\0';
+    		std::string spec_string = "X(";
+    		spec_string += spec_name;
+    		spec_string += ')';
 
-		names[cnt++] = spec_string;
+    		names[cnt++] = spec_string;
 
-		delete [] spec_name;
-	}
+    		delete [] spec_name;
+    	}
+    }
 
-	if (plot_omegadot) {
+	if (plot_spec || plot_omegadot) {
 		for (int i = 0; i < NumSpec; i++) {
 			int len = 20;
 			Vector<int> int_spec_names(len);
@@ -625,6 +694,7 @@ Maestro::PlotFileVarNames () const
 
 	names[cnt++] = "rhopert";
 	names[cnt++] = "rhohpert";
+	names[cnt++] = "tpert";
 
 	names[cnt++] = "rho0";
 	names[cnt++] = "rhoh0";
@@ -632,8 +702,9 @@ Maestro::PlotFileVarNames () const
 	names[cnt++] = "p0";
 	names[cnt++] = "MachNumber";
 	names[cnt++] = "deltagamma";
-	names[cnt++] = "pi_divu";
-	names[cnt++] = "ad_excess";
+	if (plot_pidivu) names[cnt++] = "pi_divu";
+	if (plot_ad_excess) names[cnt++] = "ad_excess";
+	names[cnt++] = "S";
 
 	if (plot_cs) names[cnt++] = "soundspeed";
 
@@ -653,6 +724,14 @@ Maestro::PlotFileVarNames () const
 		names[cnt++] = "radial_velocity";
 		names[cnt++] = "circ_velocity";
 	}
+
+    if (do_sponge) {
+        if (plot_sponge_fdamp) {
+            names[cnt++] = "sponge_fdamp";
+        } else {
+            names[cnt++] = "sponge";
+        }
+    }
 
 	return names;
 
