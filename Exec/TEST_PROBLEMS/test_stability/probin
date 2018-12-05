@@ -1,11 +1,11 @@
 &probin
 
   ! override the default values of the probin namelist values here
-  apply_vel_field = T
-  velpert_scale = 5.d6
   velpert_amplitude = 1.d5
-  velpert_height_loc = 1.2e8
-  num_vortices = 2
+  velpert_radius = 0.75d6
+  velpert_scale = 5.d6
+  velpert_steep = 1.0d0
+  velpert_min = 0.1d0
 
   !extern
 

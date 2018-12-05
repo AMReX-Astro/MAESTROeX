@@ -34,7 +34,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.temperr = 6.5e8 6.5e8
 
 # TIME STEPPING
-maestro.max_step  = 100000
+maestro.max_step  = 100
 maestro.stop_time = 1.0
 maestro.cfl       = 0.8    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -58,8 +58,8 @@ maestro.sponge_kappa = 10.e0
 maestro.use_thermal_diffusion = false
 
 # PLOTFILES
-maestro.plot_base_name  = omp    # root name of plot file
-maestro.plot_int   = 500      # number of timesteps between plot files
+maestro.plot_base_name  = plt    # root name of plot file
+maestro.plot_int   = 100      # number of timesteps between plot files
 maestro.plot_deltat = 1
 
 # CHECKPOINT

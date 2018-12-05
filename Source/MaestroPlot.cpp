@@ -9,6 +9,7 @@ using namespace amrex;
 void
 Maestro::WritePlotFile (const int step,
                         const Real t_in,
+                        const Real dt_in,
                         const Vector<Real>& rho0_in,
                         const Vector<Real>& rhoh0_in,
                         const Vector<Real>& p0_in,
@@ -66,7 +67,7 @@ Maestro::WritePlotFile (const int step,
 	}
 	Put1dArrayOnCart(gamma1bar_in,gamma1bar_cart,0,0);
 
-	const auto& mf = PlotFileMF(rho0_cart,rhoh0_cart,p0_cart,gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in, S_cc_in);
+	const auto& mf = PlotFileMF(t_in,dt_in,rho0_cart,rhoh0_cart,p0_cart,gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in, S_cc_in);
 	const auto& varnames = PlotFileVarNames();
 
 	// WriteMultiLevelPlotfile expects an array of step numbers
@@ -103,7 +104,9 @@ Maestro::PlotFileName (int lev) const
 
 // put together a vector of multifabs for writing
 Vector<const MultiFab*>
-Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
+Maestro::PlotFileMF (const Real t_in,
+                     const Real dt_in,
+                     const Vector<MultiFab>& rho0_cart,
                      const Vector<MultiFab>& rhoh0_cart,
                      const Vector<MultiFab>& p0_cart,
                      const Vector<MultiFab>& gamma1bar_cart,
@@ -147,7 +150,6 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 
 	// temporary MultiFab for calculations
 	Vector<MultiFab> tempmf(finest_level+1);
-	Vector<MultiFab> tempmf_state(finest_level+1);
 	Vector<MultiFab> tempmf_scalar1(finest_level+1);
 	Vector<MultiFab> tempmf_scalar2(finest_level+1);
 
@@ -157,7 +159,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i] = new MultiFab((s_in[i]).boxArray(),(s_in[i]).DistributionMap(),nPlot,0);
 		tempmf[i].define(grids[i],dmap[i],AMREX_SPACEDIM,0);
-		tempmf_state[i].define(grids[i],dmap[i],Nscal,0);
+
 		tempmf_scalar1[i].define(grids[i],dmap[i],1,0);
 		tempmf_scalar2[i].define(grids[i],dmap[i],1,0);
 	}
@@ -218,13 +220,29 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     	dest_comp += NumSpec;
     }
 
+    Vector<MultiFab> stemp             (finest_level+1);
+    Vector<MultiFab> rho_Hext          (finest_level+1);
+    Vector<MultiFab> rho_omegadot      (finest_level+1);
+    Vector<MultiFab> rho_Hnuc          (finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+    }
+
+    if (dt_in < small_dt) {
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt);
+    } else {
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in*0.5);
+    }
+
     if (plot_spec || plot_omegadot) {
     	// omegadot
-    	React(s_in, tempmf_state, tempmf_scalar1, tempmf, tempmf_scalar2, p0_in, dt);
-
     	if (plot_omegadot) {
     		for (int i = 0; i <= finest_level; ++i) {
-    			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,NumSpec);
+    			plot_mf_data[i]->copy((rho_omegadot[i]),0,dest_comp,NumSpec);
     			for (int comp=0; comp<NumSpec; ++comp) {
     				MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
     			}
@@ -236,7 +254,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	if (plot_Hext) {
 		// Hext
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy((rho_Hext[i]),0,dest_comp,1);
 			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
 		}
 		++dest_comp;
@@ -245,7 +263,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	if (plot_Hnuc) {
 		// Hnuc
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf_scalar2[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy((rho_Hnuc[i]),0,dest_comp,1);
 			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
 		}
 		++dest_comp;
@@ -367,7 +385,14 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		plot_mf_data[i]->copy(( rho0_cart[i]),0,dest_comp,1);
 		plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+1,1);
 		plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+2,1);
-		MultiFab::Divide(*plot_mf_data[i], *plot_mf_data[i], dest_comp, dest_comp+2, 1,0);
+
+        // we have to use protected_divide here to guard against division by zero
+        // in the case that there are zeros rho0
+        MultiFab& plot_mf_data_mf = *plot_mf_data[i];
+        for ( MFIter mfi(plot_mf_data_mf, true); mfi.isValid(); ++mfi ) {
+            plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
+        }
+
 		plot_mf_data[i]->copy((   p0_cart[i]),0,dest_comp+3,1);
 	}
 	dest_comp += 4;
@@ -421,12 +446,12 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 
     if (plot_pidivu) {
     	// pidivu
-    	Vector<MultiFab> beta0_cart(finest_level+1);
-        for (int lev=0; lev<=finest_level; ++lev) {
-            beta0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-        }
-        Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
-    	MakePiCC(beta0_cart);
+    	// Vector<MultiFab> beta0_cart(finest_level+1);
+        // for (int lev=0; lev<=finest_level; ++lev) {
+        //     beta0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        // }
+        // Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
+    	// MakePiCC(beta0_cart);
     	MakePiDivu(u_in, s_in, tempmf);
     	for (int i = 0; i <= finest_level; ++i) {
     		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);

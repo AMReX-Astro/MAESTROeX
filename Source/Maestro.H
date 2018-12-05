@@ -549,7 +549,9 @@ private:
     std::string PlotFileName (int lev) const;
 
     // put together an array of multifabs for writing
-    amrex::Vector<const amrex::MultiFab*> PlotFileMF (const amrex::Vector<amrex::MultiFab>& rho0_cart,
+    amrex::Vector<const amrex::MultiFab*> PlotFileMF (const amrex::Real t_in,
+                                                      const amrex::Real dt_in,
+                                                      const amrex::Vector<amrex::MultiFab>& rho0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& rhoh0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& p0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
@@ -564,6 +566,7 @@ private:
 
     // write plotfile to disk
     void WritePlotFile (const int step,
+                        const amrex::Real t_in,
                         const amrex::Real dt_in,
                         const amrex::Vector<amrex::Real>& rho0_in,
                         const amrex::Vector<amrex::Real>& rhoh0_in,
