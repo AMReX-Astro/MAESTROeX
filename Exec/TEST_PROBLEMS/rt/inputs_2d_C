@@ -5,7 +5,7 @@ maestro.perturb_model = true
 
 maestro.ppm_type = 0
 
-maestro.max_step  = 100
+maestro.max_step  = 100000
 maestro.stop_time = 1.5
 
 # PROBLEM SIZE
@@ -53,7 +53,7 @@ maestro.temperr = 6.5e8 6.5e8
 # PLOTFILES
 maestro.plot_base_name  = omp    # root name of plot file
 maestro.plot_int   = 100     # number of timesteps between plot files
-maestro.plot_deltat = 1e5
+maestro.plot_deltat = 1e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
