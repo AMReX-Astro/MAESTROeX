@@ -116,14 +116,14 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 
 	// velocities (AMREX_SPACEDIM)
 	// magvel
-	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
+	// rho, rhoh, h, rhoX, tfromp, tfromh, deltap, deltaT Pi (Nscal+4 -- the extra 4 are h, tfromh, deltap and deltaT)
 	// X (NumSpec)
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, h0, p0, w0 (3+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma, pidivu, ad_excess, divw0
 	// thermal, conductivity
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 19;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 21;
 
 	if (plot_omegadot) nPlot += NumSpec;
 	if (plot_Hext) nPlot++;
@@ -188,6 +188,13 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	}
 	++dest_comp;
 
+	// h
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((s_in[i]),RhoH,dest_comp,1);
+        MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
+	}
+	++dest_comp;
+
 	// rhoX
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((s_in[i]),FirstSpec,dest_comp,NumSpec);
@@ -243,7 +250,6 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		++dest_comp;
 	}
 
-
 	// compute tfromp
 	TfromRhoP(s_in,p0_in);
 	// tfromp
@@ -257,6 +263,16 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 	for (int i = 0; i <= finest_level; ++i) {
 		// tfromh
 		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
+	}
+	++dest_comp;
+
+    // deltap
+	// compute & copy tfromp
+    PfromRhoH(s_in,s_in,tempmf);
+	for (int i = 0; i <= finest_level; ++i) {
+		// tfromh
+		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+        MultiFab::Subtract(*plot_mf_data[i],p0_cart[i],0,dest_comp,1,0);
 	}
 	++dest_comp;
 
@@ -327,7 +343,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
 		plot_mf_data[i]->copy(( rho0_cart[i]),0,dest_comp,1);
 		plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+1,1);
 		plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+2,1);
-		MultiFab::Divide(*plot_mf_data[i], *plot_mf_data[i], dest_comp+2, dest_comp, 1,0);
+		MultiFab::Divide(*plot_mf_data[i], *plot_mf_data[i], dest_comp, dest_comp+2, 1,0);
 		plot_mf_data[i]->copy((   p0_cart[i]),0,dest_comp+3,1);
 	}
 	dest_comp += 4;
@@ -487,14 +503,14 @@ Maestro::PlotFileVarNames () const
 
 	// velocities (AMREX_SPACEDIM)
 	// magvel
-	// rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
+	// rho, rhoh, h, rhoX, tfromp, tfromh, deltap, deltaT Pi (Nscal+4 -- the extra 4 are h, tfromh, deltap and deltaT)
 	// X (NumSpec)
 	// rho' and rhoh' (2)
 	// rho0, rhoh0, h0, p0, w0 (4+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma, pidivu, ad_excess, divw0
 	// thermal, conductivity
-	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 19;
+	int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 21;
 
 	if (plot_omegadot) nPlot += NumSpec;
 	if (plot_Hext) nPlot++;
@@ -521,6 +537,7 @@ Maestro::PlotFileVarNames () const
 	// density and enthalpy
 	names[cnt++] = "rho";
 	names[cnt++] = "rhoh";
+	names[cnt++] = "h";
 
 	for (int i = 0; i < NumSpec; i++) {
 		int len = 20;
@@ -591,6 +608,7 @@ Maestro::PlotFileVarNames () const
 
 	names[cnt++] = "tfromp";
 	names[cnt++] = "tfromh";
+	names[cnt++] = "deltap";
 	names[cnt++] = "deltaT";
 	names[cnt++] = "Pi";
 	names[cnt++] = "pioverp0";
