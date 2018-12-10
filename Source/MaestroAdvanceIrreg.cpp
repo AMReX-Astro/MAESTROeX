@@ -374,6 +374,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // base state pressure update
     if (evolve_base_state) {
 
+	// set psi to dpdt = etarho * grav_cell
+	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
+	
 	// set new p0 through HSE
 	p0_new = p0_old;
 
@@ -391,8 +394,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	// // set psi to dpdt
 	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
 	
-	// set psi to dpdt = etarho * grav_cell
-	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
     }
     else {
 	p0_new = p0_old;
@@ -561,8 +562,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
 	// Sbar = 1/(gamma1bar*p0) * dp/dt
 	for (int i=0; i<Sbar.size(); ++i) {
-	    Sbar[i] = psi[i]/(gamma1bar_new[i]*p0_new[i]);
-	    // Sbar[i] = 1.0/(gamma1bar_new[i]*dt)*(1.0-p0_old[i]/p0_new[i]);
+	    // Sbar[i] = psi[i]/(gamma1bar_new[i]*p0_new[i]);
+	    Sbar[i] = 1.0/(gamma1bar_new[i]*dt)*(1.0-p0_old[i]/p0_new[i]);
 	}
 
 	// compute Sbar = Sbar + delta_gamma1_termbar
@@ -641,6 +642,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // base state pressure update
     if (evolve_base_state) {
+	
+	// set psi to dpdt = etarho * grav_const
+	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
 
 	// set new p0 through HSE
 	p0_new = p0_old;
@@ -658,8 +662,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	// // set psi to dpdt
 	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
 	
-	// set psi to dpdt = etarho * grav_const
-	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
     }
 
     // base state enthalpy averaging

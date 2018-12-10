@@ -6,7 +6,8 @@ module make_psi_module
   use base_state_geometry_module, only: nr_fine, dr, &
                                         max_radial_level, numdisjointchunks, & 
                                         r_start_coord, r_end_coord, finest_radial_level, &
-                                        restrict_base, fill_ghost_base, base_cutoff_density_coord
+                                        restrict_base, fill_ghost_base, &
+                                        base_cutoff_density_coord, anelastic_cutoff_coord
   use meth_params_module, only: grav_const
 
   implicit none
@@ -77,20 +78,18 @@ contains
     double precision, intent(inout) ::       psi(0:max_radial_level,0:nr_fine-1)
     
     ! Local variables
-    integer         :: r,i,n
+    integer         :: r
    
     psi = ZERO
 
-    do n=0,finest_radial_level
-       do i=1,numdisjointchunks(n)
-          do r = r_start_coord(n,i), r_end_coord(n,i)
-             if (r .lt. base_cutoff_density_coord(n)) then
-                psi(n,r) = etarho_cc(n,r) * grav_cell(n,r)
-             end if
-          end do
-       end do
+    do r=0,base_cutoff_density_coord(0)
+       psi(0,r) = etarho_cc(0,r) * grav_cell(0,r)
     end do
 
+    do r=base_cutoff_density_coord(0)+1,nr_fine-1
+       psi(0,r) = psi(0,r-1)
+    enddo
+    
     call restrict_base(psi,1)
     call fill_ghost_base(psi,1)
     
