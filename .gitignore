@@ -52,3 +52,4 @@ Exec/**/helm_table.dat
 Backtrace.*
 
 sphinx_docs/build
+sphinx_docs/source/runtime_parameters.rst
