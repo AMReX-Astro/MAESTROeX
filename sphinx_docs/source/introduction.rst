@@ -5,30 +5,36 @@ Introduction to MAESTROeX
 History of MAESTROeX
 ====================
 
-MAESTROeX describes the evolution of low Mach number flows that are in
-hydrostatic equilibrium. The idea for MAESTROeX grew out of our
-success in applying low Mach number combustion methods developed for
-terrestrial flames :raw-latex:`\cite{DayBell00}` to small-scale astrophysical
-flames (including Landau-Darrieus instability :raw-latex:`\cite{SNld}`,
-Rayleigh-Taylor unstable flames :raw-latex:`\cite{SNrt3d}`, and flame-turbulence
-interactions :raw-latex:`\cite{SNturb}`). Our original small-scale astrophysical
-combustion algorithm is detailed in
+MAESTROeX describes the evolution of low Mach number flows that are in
+hydrostatic equilibrium.  MAESTROeX itself derives from MAESTRO, the
+original (pure Fortran) low Mach number stellar hydrodynamics code.
+MAESTROeX is a rewrite of MAESTRO in the C++/Fortran framework of
+AMReX.  Henceforth, we will refer only to MAESTROeX, although some of
+the ideas originated in MAESTRO before the change to MAESTROeX.
+
+The idea for MAESTROeX grew out of our success in applying low Mach
+number combustion methods developed for terrestrial flames
+:cite:`DayBell00` to small-scale astrophysical flames (including
+Landau-Darrieus instability :cite:`SNld`, Rayleigh-Taylor unstable
+flames :cite:`SNrt3d`, and flame-turbulence interactions
+:cite:`SNturb`). Our original small-scale astrophysical combustion
+algorithm is detailed in
 
 -  *Adaptive Low Mach Number Simulations of Nuclear Flames,*
    J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, & M. Zingale
    2004, JCP, 195, 2, 677 (henceforth BDRWZ)
 
-MAESTRO was developed initially for modeling the convecting
-phase in a white dwarf preceding the ignition of a Type Ia supernovae.
-As such, we needed to incorporate the compressibility effects due to
+MAESTROeX was developed initially for modeling the convecting phase in
+a white dwarf preceding the ignition of a Type Ia supernovae.  As
+such, we needed to incorporate the compressibility effects due to
 large-scale stratification in the star. The method closest in spirit
-to MAESTROeX is the pseudo-incompressible method of
-Durran :raw-latex:`\cite{durran}`, developed for terrestrial atmospheric flows
-(assuming an ideal gas). Part of the complexity of the equations in
-MAESTROeX stems from the need to descibe a general equation of state.
+to MAESTROeX is the pseudo-incompressible method of Durran
+:cite:`durran`, developed for terrestrial atmospheric flows (assuming
+an ideal gas). Part of the complexity of the equations in MAESTROeX
+stems from the need to descibe a general equation of state.
 Additionally, since reactions can significantly alter the hydrostatic
 structure of a star, we incorporated extensions that capture the
-expansion of the background state :raw-latex:`\cite{almgren:2000}`. The low Mach
+expansion of the background state :cite:`almgren:2000`. The low Mach
 number equations for stellar flows were developed in a series of
 papers leading up to the first application to this problem:
 
@@ -56,38 +62,16 @@ multilevel paper:
    Flows,* A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone,
    & M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”)
 
-We have several papers that describe applications of the
-method to Type Ia supernovae, X-ray bursts, and stellar evolution. Some of these
-papers have appendices that describe enhancements to the code—these are noted
-below.
+We have many papers that describe applications of the method to Type
+Ia supernovae, X-ray bursts, and stellar evolution. These are listed
+on the main MAESTROeX website.  Some of these papers have appendices
+that describe enhancements to the code—these are noted below.
 
 -  *Multidimensional Modeling of Type I X-ray Bursts,*
    C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, & M. Zingale 2011,
    ApJ, 728, 118 (henceforth “the XRB paper”)
 
    This introduces the thermal diffusion portion of the MAESTROeX algorithm.
-
--  *The Convective Phase Preceding Type Ia Supernovae,*
-   M. Zingale, A. S. Almgren, J. B. Bell, C. M. Malone, A. Nonaka, & S. E. Woosley 2011, ApJ,
-   740, 8 (henceforth paper V)
-
--  *High-Resolution Simulations of Convection Preceding Ignition in
-   Type Ia Supernovae Using Adaptive Mesh Refinement,*
-   A. Nonaka, M. Zingale, A. J. Aspden, A. S. Almgren, J. B. Bell, & S. E. Woosley 2012,
-   ApJ, 745, 73
-
--  *Low Mach Number Modeling of Convection in Helium Shells on
-   Sub-Chandrasehkar White Dwarfs. I. Methodology,* M. Zingale,
-   A. Nonaka, A. S. Almgren, J. B. Bell, C. M. Malone, &
-   R. J. Orvedahl 2013, ApJ, 764, 97
-
--  *Low-Mach Number Modeling of Core Convection in Massive Stars,*
-   C. Gilet, A. S. Almgren, J. B. Bell, A. Nonaka, S. E. Woosley, & M. Zingale
-   2013, ApJ, 773, 137
-
--  *Multidimensional Modeling of Type I X-ray Bursts. II. Two-Dimensional
-   Convection in a Mixed H/He Accretor,*
-   C. M. Malone, M. Zingale, A. Nonaka, A. S. Almgren, & J. B. Bell 2014, ApJ, 788, 115
 
 -  *Comparisons of Two- and Three-Dimensional Convection in
    Type I X-ray Bursts* M. Zingale, C. M. Malone, A. Nonaka,
@@ -98,8 +82,8 @@ below.
 
 -  *Low Mach Number Modeling of Convection in Helium Shells on
    Sub-Chandrasekhar White Dwarfs II: Bulk Properties of Simple Models,*
-    A. M. Jacobs, M. Zingale, A. Nonaka, A. S. Almgren, & J. B. Bell
-   2015, submitted to ApJ
+   A. M. Jacobs, M. Zingale, A. Nonaka, A. S. Almgren, & J. B. Bell
+   2016, ApJ, 827, 84.
 
    This has an appendix that shows some test problems for the alternate energy
    formulation in MAESTROeX.
@@ -181,7 +165,7 @@ The pseudo-incompressible method incorporates both the local changes
 to compressibility due to reaction/heat release, and the large-scale
 changes due to the background stratification. This was originally
 derived for an ideal gas equation of state for atmospherical flows.
-Allowing the background pressure, :math:`p_0` to vary (e.g. in hydrostatic
+Allowing the background pressure, :math:`p_0` to vary (e.g. in hydrostatic
 equilibrium), differentiating pressure along particle paths gives:
 
 .. math:: \nabla \cdot (p_0^{1/\gamma} \Ub) = H
@@ -195,21 +179,21 @@ base state.
 Alternate Energy Formulation
 ----------------------------
 
-Several authors :raw-latex:`\cite{KP:2012,VLBWZ:2013}` showed that with a slightly
+Several authors :cite:`KP:2012,VLBWZ:2013` showed that with a slightly
 different momentum equation, the low Mach number system can conserve
 an energy (that is, a quantity that looks like the compressible
 energy, but formed using the low Mach number quantities). This change
 manifests itself as either a change to the buoyancy term or by
 changing :math:`\nabla \pi` to :math:`\beta_0 \nabla (\pi/\beta_0)`. Furthermore,
-:raw-latex:`\cite{VLBWZ:2013}` showed that the new formulation better captures the
+:cite:`VLBWZ:2013` showed that the new formulation better captures the
 vertical propagation of gravity waves. As of
-Dec. 2013, this new formulation is the default in MAESTROeX.
+Dec. 2013, this new formulation is the default in MAESTROeX.
 
 Projection Methods 101
 ======================
 
 Most astrophysical hydrodynamics codes
-(e.g. CASTRO :raw-latex:`\cite{castro}` or FLASH :raw-latex:`\cite{flash}`) solve the
+(e.g. CASTRO :cite:`castro` or FLASH :cite:`flash`) solve the
 compressible Euler equations, which can be written in the form:
 
 .. math:: \Ub_t + \nabla \cdot F(\Ub) = 0
@@ -229,7 +213,7 @@ information propagates. For the Euler equations, these are :math:`u` and :math:`
 compressible equations make use of this wave-nature to compute fluxes
 at the interfaces of grid cells to update the state in time. An
 excellent introduction to these methods is provided by LeVeque’s book
-:raw-latex:`\cite{leveque}`. The timestep for these methods is limited by the time
+:cite:`leveque`. The timestep for these methods is limited by the time
 it takes for the maximum characteristic speed to traverse one grid cell.
 For very subsonic flows, this means that the timestep is dominated by
 the propagation of soundwaves, which may not be important to the
@@ -248,18 +232,18 @@ are:
    \Ub_t &=& -\Ub \cdot \nabla \Ub + \nabla p \label{eq:incompressible_u} \\
    \nabla \cdot \Ub &=& 0\end{aligned}
 
-Here, :math:`\Ub` represents the velocity vector
- [1]_
-and :math:`p` is the dynamical pressure. The time-evolution equation for
-the velocity (Eq. `[eq:incompressible_u] <#eq:incompressible_u>`__) can be solved using
-techniques similar to those developed for compressible hydrodynamics,
-updating the old velocity, :math:`\Ub^n`, to the new time-level, :math:`\Ub^\star`.
-Here the ‘:math:`^\star`’ indicates that the updated velocity does not, in
-general, satisfy the divergence constraint. A projection method will
-take this updated velocity and force it to obey the constraint
-equation. The basic idea follows from the fact that any vector
-field can be expressed as the sum of a divergence-free quantity and
-the gradient of a scalar. For the velocity, we can write:
+Here, :math:`\Ub` represents the velocity vector [1]_ and :math:`p` is
+the dynamical pressure. The time-evolution equation for the velocity
+(Eq. `[eq:incompressible_u] <#eq:incompressible_u>`__) can be solved
+using techniques similar to those developed for compressible
+hydrodynamics, updating the old velocity, :math:`\Ub^n`, to the new
+time-level, :math:`\Ub^\star`.  Here the ‘:math:`^\star`’ indicates
+that the updated velocity does not, in general, satisfy the divergence
+constraint. A projection method will take this updated velocity and
+force it to obey the constraint equation. The basic idea follows from
+the fact that any vector field can be expressed as the sum of a
+divergence-free quantity and the gradient of a scalar. For the
+velocity, we can write:
 
 .. math:: \Ub^\star = \Ub^d + \nabla \phi \label{eq:decomposition}
 
@@ -280,16 +264,16 @@ Because soundwaves are filtered, the timestep constraint now depends only
 on :math:`|\Ub|`.
 
 Extensions to variable-density incompressible
-flows :raw-latex:`\cite{bellMarcus:1992b}` involve a slightly different
+flows :cite:`bellMarcus:1992b` involve a slightly different
 decomposition of the velocity field and, as a result, a slightly
 different Poisson equation. There is also a variety of different ways
-to express what is being projected :raw-latex:`\cite{almgren:bell:crutchfield}`,
+to express what is being projected :cite:`almgren:bell:crutchfield`,
 and different discretizations of the divergence and gradient operators
 lead to slightly different mathematical properties of the methods
 (leading to “approximate
-projections” :raw-latex:`\cite{almgrenBellSzymczak:1996}`). Finally, for
+projections” :cite:`almgrenBellSzymczak:1996`). Finally, for
 second-order methods, two projections are typically done per timestep.
-The first (the ‘MAC’ projection :raw-latex:`\cite{bellColellaHowell:1991}`)
+The first (the ‘MAC’ projection :cite:`bellColellaHowell:1991`)
 operates on the half-time, edge-centered advective velocities, making
 sure that they satisfy the divergence constraint. These advective
 velocities are used to construct the fluxes through the interfaces to
@@ -298,7 +282,7 @@ operates on the cell-centered velocities at the new time, again
 enforcing the divergence constraint. The MAESTROeX algorithm performs
 both of these projections.
 
-The MAESTROeX algorithm builds upon these ideas, using a different
+The MAESTROeX algorithm builds upon these ideas, using a different
 velocity constraint equation that captures the compressibility
 due to local sources and large-scale stratification.
 
@@ -314,42 +298,26 @@ at constaint radius (or height for plane-parallel simulations) as
 
 .. table:: Definition of symbols.
 
-   +-----------------------+-----------------------+-----------------------+
-   |                       |                       |                       |
-   +-----------------------+-----------------------+-----------------------+
-   | Table —continued      |                       |                       |
-   +-----------------------+-----------------------+-----------------------+
-   |                       |                       |                       |
-   +-----------------------+-----------------------+-----------------------+
-   |                       |                       |                       |
-   +-----------------------+-----------------------+-----------------------+
-   | .. raw:: latex        | specific heat at      | erg g\ :math:`^{-1}`  |
-   |                       | constant pressure     | K:math:`^{-1}`        |
-   |    \endfoot           | (:math:`c_p \equiv \l |                       |
-   |                       | eft . \partial h / \p |                       |
-   | .. raw:: latex        | artial T \right |_{p, |                       |
-   |                       | X_k}`)                |                       |
-   |    \hline             |                       |                       |
-   |                       |                       |                       |
-   | .. raw:: latex        |                       |                       |
-   |                       |                       |                       |
-   |    \endlastfoot       |                       |                       |
-   |                       |                       |                       |
-   | :math:`c_p`           |                       |                       |
-   +-----------------------+-----------------------+-----------------------+
-   | :math:`f`             | volume discrepancy    | –                     |
-   |                       | factor                |                       |
-   |                       | (:math:`0 \le f \le 1 |                       |
-   |                       | `)                    |                       |
-   +-----------------------+-----------------------+-----------------------+
-   | :math:`g`             | gravitational         | cm s\ :math:`^{-2}`   |
-   |                       | acceleration          |                       |
-   +-----------------------+-----------------------+-----------------------+
-   | :math:`h`             | specific enthalpy     | erg g\ :math:`^{-1}`  |
-   +-----------------------+-----------------------+-----------------------+
-   | :math:`\Hext`         | external heating      | erg g\ :math:`^{-1}`  |
-   |                       | energy generation     | s:math:`^{-1}`        |
-   |                       | rate                  |                       |
+   +-----------------------+-----------------------------------------------------------------+--------------------------------------+
+   | symbol                | description                                                     | units                                |
+   +=======================+=================================================================+======================================+
+   | :math:`c_p`           | specific heat at                                                | erg g :math:`^{-1}` K :math:`^{-1}`  |
+   |                       | constant pressure                                               |                                      |
+   |                       | (:math:`c_p \equiv \partial h / \partial T |_{p, X_k}`)         |                                      |
+   +-----------------------+-----------------------------------------------------------------+--------------------------------------+
+   | :math:`f`             | volume discrepancy                                              | –                                    |
+   |                       | factor                                                          |                                      |
+   |                       | (:math:`0 \le f \le 1`)                                         |                                      |
+   +-----------------------+-----------------------------------------------------------------+--------------------------------------+
+   | :math:`g`             | gravitational                                                   | cm s\ :math:`^{-2}`                  |
+   |                       | acceleration                                                    |                                      |
+   +-----------------------+-----------------------------------------------------------------+--------------------------------------+
+   | :math:`h`             | specific enthalpy                                               | erg g :math:`^{-1}`                  |
+   +-----------------------+-----------------------------------------------------------------+--------------------------------------+
+   | :math:`\Hext`         | external heating                                                | erg g :math:`^{-1}` s :math:`^{-1}`  |
+   |                       | energy generation  rate                                         |                                      |
+   +-----------------------+-----------------------------------------------------------------+--------------------------------------+
+
    +-----------------------+-----------------------+-----------------------+
    | :math:`\Hnuc`         | nuclear energy        | erg g\ :math:`^{-1}`  |
    |                       | generation rate       | s:math:`^{-1}`        |
