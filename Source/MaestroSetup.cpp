@@ -309,13 +309,7 @@ Maestro::ExternInit ()
     std::cout << "reading extern runtime parameters ..." << std::endl;
   }
 
-  const int probin_file_length = probin_file.length();
-  Vector<int> probin_file_name(probin_file_length);
-
-  for (int i = 0; i < probin_file_length; i++)
-    probin_file_name[i] = probin_file[i];
-
-  maestro_extern_init(probin_file_name.dataPtr(),&probin_file_length);
+  maestro_extern_init();
 }
 
 // set up BCRec definitions for BC types
