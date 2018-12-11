@@ -50,3 +50,5 @@ Exec/**/helm_table.dat
 *.bak
 
 Backtrace.*
+
+sphinx_docs/build
