@@ -209,6 +209,12 @@ header.major h2 {
     margin-bottom: 0.5em;
 }
 
+header.major h3 {
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+    margin-top: 1.0em;
+}
+
 
 header.major p {
     font-size: 1.25em;
@@ -1062,7 +1068,7 @@ body.landing #header nav a {
 /* Banner */
 
 #banner {
-    background-image: url(../images/med_tint.png), url(../science-images/wdmerger_08030_new.png);  /*bokeh_car_lights_bg.jpg); */
+    background-image: url(../images/med_tint.png), url(../science-images/xrb_big.png);  /*bokeh_car_lights_bg.jpg); */
     background-position: center center;
     background-size: cover;
     color: #ffffff;
