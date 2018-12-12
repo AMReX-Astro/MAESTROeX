@@ -54,19 +54,15 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinxcontrib.bibtex',
     'sphinx.ext.autosummary',
-    'nbsphinx',
     'numpydoc',
-    'sphinx.ext.inheritance_diagram',
-    'sphinx.ext.graphviz',
-    'IPython.sphinxext.ipython_console_highlighting',
     'sphinx.ext.githubpages',
     'breathe']
 
 breathe_projects = {
-    "castro":"../doxy_files/xml",
+    "maestroex":"../doxy_files/xml",
     }
 
-breathe_default_project = "castro"
+breathe_default_project = "maestroex"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
