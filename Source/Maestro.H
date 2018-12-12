@@ -549,26 +549,63 @@ private:
     std::string PlotFileName (int lev) const;
 
     // put together an array of multifabs for writing
-    amrex::Vector<const amrex::MultiFab*> PlotFileMF (const amrex::Vector<amrex::MultiFab>& rho0_cart,
+    amrex::Vector<const amrex::MultiFab*> PlotFileMF (const int nPlot,
+                                                      const amrex::Real t_in,
+                                                      const amrex::Real dt_in,
+                                                      const amrex::Vector<amrex::MultiFab>& rho0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& rhoh0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& p0_cart,
+                                                      const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
                                                       const amrex::Vector<amrex::MultiFab>& u_in,
                                                       amrex::Vector<amrex::MultiFab>& s_in,
-                                                      const amrex::Vector<amrex::Real>& p0_in);
+                                                      const amrex::Vector<amrex::Real>& p0_in,
+                                                      const amrex::Vector<amrex::Real>& gamma1bar_in,
+                                                      const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     // set plotfile variables names
-    amrex::Vector<std::string> PlotFileVarNames () const;
+    amrex::Vector<std::string> PlotFileVarNames (int * nPlot) const;
 
     // write plotfile to disk
     void WritePlotFile (const int step,
+                        const amrex::Real t_in,
                         const amrex::Real dt_in,
                         const amrex::Vector<amrex::Real>& rho0_in,
                         const amrex::Vector<amrex::Real>& rhoh0_in,
                         const amrex::Vector<amrex::Real>& p0_in,
+                        const amrex::Vector<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
-                        amrex::Vector<amrex::MultiFab>& s_in);
+                        amrex::Vector<amrex::MultiFab>& s_in,
+                        const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     void WriteJobInfo (const std::string& dir) const;
+
+    void MakeMagvel (const amrex::Vector<amrex::MultiFab>& vel,
+                     amrex::Vector<amrex::MultiFab>& magvel);
+
+    void MakeVelrc (const amrex::Vector<amrex::MultiFab>& vel,
+                    const amrex::Vector<amrex::MultiFab>& w0rcart,
+                    amrex::Vector<amrex::MultiFab>& rad_vel,
+                    amrex::Vector<amrex::MultiFab>& circ_vel);
+
+    void MakeAdExcess (const amrex::Vector<amrex::MultiFab>& state,
+                       amrex::Vector<amrex::MultiFab>& ad_excess);
+
+    void MakeVorticity (const amrex::Vector<amrex::MultiFab>& vel,
+                        amrex::Vector<amrex::MultiFab>& vorticity);
+
+    void MakeDeltaGamma (const amrex::Vector<amrex::MultiFab>& state,
+                         const amrex::Vector<amrex::Real>& p0,
+                         const amrex::Vector<amrex::MultiFab>& p0_cart,
+                         const amrex::Vector<amrex::Real>& gamma1bar,
+                         const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
+                         amrex::Vector<amrex::MultiFab>& deltagamma);
+
+    void MakeDivw0 (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                    amrex::Vector<amrex::MultiFab>& divw0);
+
+    void MakePiDivu (const amrex::Vector<amrex::MultiFab>& vel,
+                   const amrex::Vector<amrex::MultiFab>& pi_cc,
+                   amrex::Vector<amrex::MultiFab>& pidivu);
 
     // end MaestroPlot.cpp functions
     ////////////
@@ -661,6 +698,11 @@ private:
                            const amrex::Vector<amrex::Real>& p0,
                            const amrex::Vector<amrex::MultiFab>& w0cart,
                            amrex::Vector<amrex::MultiFab>& mach);
+
+    void CsfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
+                     const amrex::Vector<amrex::Real>& p0,
+                     const amrex::Vector<amrex::MultiFab>& p0cart,
+                     amrex::Vector<amrex::MultiFab>& cs);
     ////////////
 
     ////////////

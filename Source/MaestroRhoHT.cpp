@@ -241,3 +241,71 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
 	AverageDown(mach,0,1);
 	FillPatch(t_old,mach,mach,mach,0,0,1,0,bcs_f);
 }
+
+void
+Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
+                     const Vector<Real>& p0,
+                     const Vector<MultiFab>& p0cart,
+                     Vector<MultiFab>& cs)
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::CsfromRhoH()",CsfromRhoH);
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+
+		// get references to the MultiFabs at level lev
+		const MultiFab& scal_mf = scal[lev];
+		MultiFab& cs_mf = cs[lev];
+
+		if (spherical == 0) {
+
+			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+
+				// Get the index space of the valid region
+				const Box& tileBox = mfi.tilebox();
+
+				// call fortran subroutine
+				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+				// lo/hi coordinates (including ghost cells), and/or the # of components
+				// We will also pass "validBox", which specifies the "valid" region.
+				makeCsfromRhoH(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				               BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+				               p0.dataPtr(),
+				               BL_TO_FORTRAN_3D(cs_mf[mfi]));
+			}
+		} else {
+
+			const MultiFab& p0cart_mf = p0cart[lev];
+
+			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+
+				// Get the index space of the valid region
+				const Box& tileBox = mfi.tilebox();
+
+				// call fortran subroutine
+				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+				// lo/hi coordinates (including ghost cells), and/or the # of components
+				// We will also pass "validBox", which specifies the "valid" region.
+				makeCsfromRhoH_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				                    BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+				                    BL_TO_FORTRAN_3D(p0cart_mf[mfi]),
+				                    BL_TO_FORTRAN_3D(cs_mf[mfi]));
+
+
+			}
+		}
+
+	}
+
+	// average down and fill ghost cells
+	AverageDown(cs,0,1);
+	FillPatch(t_old,cs,cs,cs,0,0,1,0,bcs_f);
+}
