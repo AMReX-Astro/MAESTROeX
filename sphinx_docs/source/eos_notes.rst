@@ -12,8 +12,8 @@ advance_timestep
 ----------------
 
 Step 1.
-    | *Define the average expansion at time :math:`t^\nph` and the new :math:`w_0.`*
-    | if dpdt_factor :math:`>` 0 then
+    *Define the average expansion at time :math:`t^\nph` and the new :math:`w_0.`*
+    if dpdt_factor :math:`>` 0 then
 
     -  In makePfromRhoH, we compute a thermodynamic :math:`p^n` for the volume discrepancy
        term using :math:`(\rho,h,X)^n`.
