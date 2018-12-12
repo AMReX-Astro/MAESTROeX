@@ -139,7 +139,21 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
                         BL_TO_FORTRAN_3D(state[mfi]),
                         &tagval, &clearval,
                         ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                        ZFILL(dx), &time, tag_err[lev].dataPtr());
+                        ZFILL(dx), &time,
+			tag_err[lev].dataPtr(), tag_array[lev].dataPtr());
+
+	    // for planar refinement, we need to gather tagged entries in arrays
+	    // from all processors and then re-tag tileboxes across each tagged
+	    // height
+	    if (spherical == 0) {
+		ParallelDescriptor::ReduceIntMax(tag_array[lev].dataPtr(),nr_fine);
+
+		tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
+			  &tagval, &clearval,
+			  ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+			  ZFILL(dx), &time, tag_array[lev].dataPtr());
+	    }
+	    
             //
             // Now update the tags in the TagBox in the tilebox region
             // to be equal to itags

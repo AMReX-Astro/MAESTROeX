@@ -407,7 +407,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
 	// add psi to rhoh0_new
 	for (int i=0; i<rhoh0_old.size(); ++i) {
-	    rhoh0_new[i] = rhoh0_old[i] + dt*psi[i];
+	    // rhoh0_new[i] = rhoh0_old[i] + dt*psi[i];
+	    rhoh0_new[i] = rhoh0_old[i] + (p0_new[i] - p0_old[i]);
 	}
     }
     else {
@@ -669,7 +670,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state) {
 	// Average(s2, rhoh0_new, RhoH);
 	for (int i=0; i<rhoh0_old.size(); ++i) {
-	    rhoh0_new[i] = rhoh0_old[i] + dt*psi[i];
+	    // rhoh0_new[i] = rhoh0_old[i] + dt*psi[i];
+	    rhoh0_new[i] = rhoh0_old[i] + (p0_new[i] - p0_old[i]);
 	}
     }
 

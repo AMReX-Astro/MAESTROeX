@@ -1047,7 +1047,16 @@ extern "C"
                      const int* tagval, const int* clearval,
                      const int* lo, const int* hi,
                      const amrex::Real* dx,
-                     const amrex::Real* time, const amrex::Real* tag_err);
+                     const amrex::Real* time,
+		     amrex::Real* tag_err,
+		     int* tag_array);
+
+    void tag_boxes(int* tag, const int* tag_lo, const int* tag_hi,
+		   const int* tagval, const int* clearval,
+		   const int* lo, const int* hi,
+		   const amrex::Real* dx,
+		   const amrex::Real* time,
+		   const int* tag_array);
     //////////////////////
 
     //////////////////////
