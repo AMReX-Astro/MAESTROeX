@@ -888,15 +888,22 @@ contains
 
   end subroutine make_magvel
 
-  subroutine make_magvel_sphr(lo,hi,vel,v_lo,v_hi,w0cart,w_lo,w_hi, &
-       magvel,m_lo,m_hi) bind(C, name="make_magvel_sphr")
+  subroutine make_magvel_sphr(lo,hi,vel,v_lo,v_hi, &
+                              w0macx, x_lo, x_hi, &
+                              w0macy, y_lo, y_hi, &
+                              w0macz, z_lo, z_hi, &
+                              magvel,m_lo,m_hi) bind(C, name="make_magvel_sphr")
 
-    integer, intent(in) :: lo(3), hi(3)
-    integer, intent(in) :: v_lo(3), v_hi(3)
-    integer, intent(in) :: w_lo(3), w_hi(3)
-    integer, intent(in) :: m_lo(3), m_hi(3)
-    double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
-    double precision, intent (in) :: w0cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),1)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: v_lo(3), v_hi(3)
+    double precision, intent(in   ) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
+    integer         , intent(in   ) :: x_lo(3), x_hi(3)
+    double precision, intent(inout) :: w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
+    integer         , intent(in   ) :: y_lo(3), y_hi(3)
+    double precision, intent(inout) :: w0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
+    integer         , intent(in   ) :: z_lo(3), z_hi(3)
+    double precision, intent(inout) :: w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
+    integer         , intent(in   ) :: m_lo(3), m_hi(3)
     double precision, intent(inout) :: magvel(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
 
     integer :: i, j, k
@@ -904,14 +911,9 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-#if (AMREX_SPACEDIM == 1)
-             magvel(i,j,k) = sqrt((vel(i,j,k,1) + w0cart(i,j,k,1) )**2)
-#elif (AMREX_SPACEDIM == 2)
-             magvel(i,j,k) = sqrt(vel(i,j,k,1)**2 + (vel(i,j,k,2) + w0cart(i,j,k,1))**2 )
-#elif (AMREX_SPACEDIM == 3)
-             magvel(i,j,k) = sqrt(vel(i,j,k,1)**2 + vel(i,j,k,2)**2 + &
-                  (vel(i,j,k,3) + w0cart(i,j,k,1))**2 )
-#endif
+             magvel(i,j,k) = sqrt( (vel(i,j,k,1)+0.5d0*(w0macx(i,j,k)+w0macx(i+1,j,k)))**2 + &
+                                   (vel(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k)))**2 + &
+                                   (vel(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1)))**2)
           enddo
        enddo
     enddo

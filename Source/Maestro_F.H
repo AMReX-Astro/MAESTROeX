@@ -676,7 +676,9 @@ extern "C"
 
     void make_magvel_sphr(const int* lo, const int* hi,
                           const amrex::Real* vel, const int* v_lo, const int* v_hi,
-                          const amrex::Real* w0cart, const int* w_lo, const int* w_hi,
+                          amrex::Real* w0macx, const int* x_lo, const int* x_hi,
+                          amrex::Real* w0macy, const int* y_lo, const int* y_hi,
+                          amrex::Real* w0macz, const int* z_lo, const int* z_hi,
                           amrex::Real* magvel, const int* m_lo, const int* m_hi);
 
     void make_velrc(const int* lo, const int* hi,

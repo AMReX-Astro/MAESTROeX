@@ -600,8 +600,7 @@ private:
                          const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
                          amrex::Vector<amrex::MultiFab>& deltagamma);
 
-    void MakeDivw0 (const amrex::Vector<amrex::Real>& w0,
-                    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+    void MakeDivw0 (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                     amrex::Vector<amrex::MultiFab>& divw0);
 
     void MakePiDivu (const amrex::Vector<amrex::MultiFab>& vel,
