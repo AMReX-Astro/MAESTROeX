@@ -54,12 +54,13 @@
     <section id="one" class="wrapper style1 special">
       <div class="container">
 	<header class="major">
-	  <h2>Enable your science with MAESTROeX</h2>
+	  <h2>Model stars and atomspheres with MAESTROeX</h2>
 	  <p>MAESTROeX is part of the AMReX suite of astrophysical
 	  hydrodynamics codes that collectively provide the simulation
 	  capabilities to model explosive astrophysical phenomena.
-	  MAESTROeX specializes in supersonic flows, where radiation can
-	  be an important driver of the dynamics.</p>
+	  MAESTROeX specializes in low Mach number stratified flows, such as
+          convection in stars and atmospheres, where nuclear burning can
+          be an important heat source.</p>
 	</header>
 
 	<div class="row 150%">
@@ -67,24 +68,22 @@
 	    <section class="box">
 	      <i class="icon big rounded color1 fa-rocket"></i>
 	      <h3>Physics Capabilities</h3>
-	      <p>MAESTROeX solves the equations of hydrodynamics on an
+	      <p>MAESTROeX solves the equations of low Mach number hydrodynamics on an
 		adaptive grid, with support for a general equation of
-		state, nuclear reaction networks, rotation, and full
-		self-gravity.  Radiation hydrodynamics through a
-		multigroup flux-limited diffusion approximation is
-		also supported.</p>
+		state, and nuclear reaction networks.  The low Mach number approach
+                allows for large timesteps to efficiently model subsonic flows.</p>
 	      <a href="about.html" class="button alt">learn more</a>
 	    </section>
 	  </div>
 
 	  <div class="4u 12u$(medium)">
 	    <section class="box">
-	      <i class="icon big rounded color9 fa-tachometer"></i>
+	      <i class="icon big rounded color9 fa-tachometer-alt"></i>
 	      <h3>Performance</h3>
 	      <p>MAESTROeX is built on the AMReX adaptive mesh
 	      refinement library, and uses an advance MPI + tiled
 	      OpenMP approach to parallelism to get great performance
-		on modern architectures.  It scales from 1 to 100,000 cores,
+		on modern architectures.  It scales from 1 to 10,000s of cores,
 		and is run at most national supercomputing facilities.</p>
 	      <a href="about.html#performance" class="button alt">learn more</a>
 	    </section>
@@ -92,12 +91,12 @@
 
 	  <div class="4u$ 12u$(medium)">
 	    <section class="box">
-	      <i class="icon big rounded color6 fa-book"></i>
+	      <i class="icon big rounded color6 fa-atom"></i>
 	      <h3>Science</h3>
-	      <p>MAESTROeX has been used for scientific explorations of
-		Type Ia supernovae (the Chandra, sub-Chandra, and
-		merging white dwarf scenarios), core-collapse
-		supernovae, and pair instability supernovae.</p>
+	      <p>MAESTROeX (and its predecessor MAESTRO) has been used
+		for scientific explorations of Type Ia supernovae (the
+		Chandra and sub-Chandra	scenarios), X-ray bursts, and
+                convection in stellar evolution.</p>
 		<a href="science.html" class="button alt">learn more</a>
 	    </section>
 	  </div>
@@ -123,7 +122,7 @@ git clone https://github.com/StarKiller-astro/Microphysics.git</pre>
 
 	    <li><h3><span class="icon fa-cogs"></span> Setup your environment</h3>
 	      <pre>
-export CASTRO_HOME=/path/to/MAESTROeX
+export MAESTROEX_HOME=/path/to/MAESTROeX
 export AMREX_HOME=/path/to/amrex
 export MICROPHYSICS_HOME=/path/to/Microphysics</pre>
 	    </li>
@@ -131,15 +130,15 @@ export MICROPHYSICS_HOME=/path/to/Microphysics</pre>
 	    <li><h3><span class="icon fa-magic"></span> Compile</h3>
 	      problems are compiled in their own directory.  E.g.,
 	      <pre>
-cd Castro/Exec/Sedov/
+cd MAESTROeX/Exec/TEST_PROBLEMS/reacting_bubble/
 make DIM=2</pre>
 	    </li>
 
 	    <li><h3><span class="icon fa-laptop"></span> Run</h3>
-	      The executable name will start with <var>MAESTROeX2d</var>, and an input file
+	      The executable name will start with <var>Maestro2d</var>, and an input file
 	      is always required:
 	      <pre>
-./MAESTROeX2d.Linux.gcc.gfortran.MPI.ex inputs.2d.sph_in_cylcoords</pre>
+./Maestro2d.gnu.ex inputs_2d_C</pre>
 	    </li>
 
 	    <li><h3><span class="icon fa-image"></span> Visualize</h3>

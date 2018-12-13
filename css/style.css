@@ -1,5 +1,5 @@
 @charset "UTF-8";
-@import url(font-awesome.min.css);
+@import url("all.css");
 @import url(https://fonts.googleapis.com/css?family=Raleway:700,400);
 
 /*
@@ -282,9 +282,9 @@ textarea:focus {
     content: "";
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-family: FontAwesome;
+    font-family: "Font Awesome\ 5 Free";
     font-style: normal;
-    font-weight: normal;
+    font-weight: 900;
     text-transform: none !important;
 }
 
@@ -348,9 +348,9 @@ input[type="checkbox"] + label:before,
 input[type="radio"] + label:before {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-family: FontAwesome;
+    font-family: "Font Awesome\ 5 Free";
     font-style: normal;
-    font-weight: normal;
+    font-weight: 900;
     text-transform: none !important;
 }
 
@@ -449,9 +449,9 @@ input[type="radio"] + label:before {
 .icon:before {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    font-family: FontAwesome;
+    font-family: "Font Awesome\ 5 Free";
     font-style: normal;
-    font-weight: normal;
+    font-weight: 900;
     text-transform: none !important;
 }
 
