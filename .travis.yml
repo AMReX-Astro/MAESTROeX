@@ -27,8 +27,6 @@ before_script:
   - export AMREX_HOME=~/amrex
 
 script:
-  - ls -l
-  - pwd
 
 # after_success:
   - ./deploy_docs.sh
