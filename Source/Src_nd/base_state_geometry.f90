@@ -332,18 +332,20 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine init_multilevel(finest_radial_level_in) bind(C, name="init_multilevel")
+  subroutine init_multilevel(lev, tag_array, finest_radial_level_in) bind(C, name="init_multilevel")
 
     ! compute numdisjointchunks, r_start_coord, r_end_coord
     ! FIXME - right now there is one chunk at each level that spans the domain
 
+    integer, intent(in   ) :: lev
+    integer, intent(in   ) :: tag_array(0:nr_fine-1)
     integer, intent(in   ) :: finest_radial_level_in
 
     integer :: n
 
-    if (finest_radial_level_in .gt. 0 .and. spherical .eq. 0) then
-       call amrex_abort("base_state_geomtry: init_multilevel not written yet for planar")
-    end if
+!!$    if (finest_radial_level_in .gt. 0 .and. spherical .eq. 0) then
+!!$       call amrex_abort("base_state_geomtry: init_multilevel not written yet for planar")
+!!$    end if
 
     if (spherical .eq. 1) then
        finest_radial_level = 0
@@ -367,13 +369,15 @@ contains
     call bl_allocate(r_end_coord,0,finest_radial_level,1,1) ! FIXME - for > 1 chunk case
 
     if (spherical .eq. 0) then
-
-       ! FIXME - needs lots of work
-       do n=0,finest_radial_level
+       
+       if (lev .eq. 0) then
           numdisjointchunks(n) = 1
           r_start_coord(n,1) = 0
           r_end_coord(n,1) = nr(n)-1
-       end do
+       else
+          ! FIXME - for > 1 chunk case
+          
+       end if
 
     else
 

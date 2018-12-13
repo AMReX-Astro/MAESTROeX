@@ -79,7 +79,8 @@ extern "C"
 
     void compute_cutoff_coords(const amrex::Real* rho0);
 
-    void init_multilevel(const int* finest_radial_level_in);
+    void init_multilevel(const int* lev, const int* tag_array,
+			 const int* finest_radial_level_in);
 
     void destroy_base_state_geometry();
 

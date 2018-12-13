@@ -19,11 +19,16 @@ Maestro::Regrid ()
 
     if (spherical == 0) {
         finest_radial_level = finest_level;
-        init_multilevel(&finest_level);
+	
         // FIXME
         // we also need to redefine numdisjointchunks, r_start_coord, r_end_coord
         // and "regrid" the base state rho0, rhoh0, tempbar
-        // call init_multilevel
+	int lev = 0;
+	init_multilevel(&lev,tag_array[lev].dataPtr(),&finest_level);
+	// lev > 0
+	for (lev=1; lev<finest_level; ++lev) {
+	      init_multilevel(&lev,tag_array[lev-1].dataPtr(),&finest_level);
+	}
         // look at MAESTRO/Source/varden.f90:750-1060
         if (evolve_base_state) {
             // may need if statement for irregularly-spaced base states
