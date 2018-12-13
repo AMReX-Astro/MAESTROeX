@@ -1,0 +1,990 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Visualization &mdash; MAESTROeX 18.11
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Analysis" href="analysis.html" />
+    <link rel="prev" title="Initial Models" href="initial_models.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                18.11
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">MAESTROeX Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Visualization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plotfiles">Plotfiles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mini-vs-regular-plotfiles">Mini vs.&nbsp;regular plotfiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-amrex-file-format">the AMReX&nbsp;file format</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#header">Header</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#visualizing-with-amrvis">Visualizing with Amrvis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualizing-with-visit">Visualizing with VisIt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-visualization-scripts">Python visualization scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plotsinglevar-py">plotsinglevar.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contourcompare-py">contourcompare.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#runtimevis-py">runtimevis.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#sec-vis-yt-visualizing-with-yt">[sec:vis:yt] Visualizing with yt</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-yt">Installing yt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#working-with-yt">Working with yt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#d-datasets">2-d datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#volume-rendering">Volume Rendering</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Visualization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/visualization.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="visualization">
+<h1>Visualization<a class="headerlink" href="#visualization" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="plotfiles">
+<h2>Plotfiles<a class="headerlink" href="#plotfiles" title="Permalink to this headline">¶</a></h2>
+<p>MAESTRO&nbsp;outputs plotfile specifically for visualization and analysis.
+Table&nbsp;<a class="reference external" href="#vis:table:plotfile">[vis:table:plotfile]</a> lists the quantities stored in a plotfile.
+Not all of these may be present, dependent on what options were used in
+creating the plotfile.</p>
+<p>By default, plotfiles store double precision data, but if
+single_prec_plotfiles = T is set, then the data is
+converted to single precision before outputting—this is done to
+reduce file sizes.</p>
+<table border="1" class="docutils" id="id17">
+<caption><span class="caption-text">Plotfile quantities</span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>Table&nbsp;—continued</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>plotfile variable
+name</td>
+<td>description</td>
+<td>runtime parameter
+controlling output</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td><p class="last">x_vel</p>
+</td>
+<td><span class="math notranslate nohighlight">\(\ut\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td>y_vel</td>
+<td><span class="math notranslate nohighlight">\(\vt\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>z_vel</td>
+<td><span class="math notranslate nohighlight">\(\wt\)</span></td>
+<td>3-d runs only</td>
+</tr>
+<tr class="row-even"><td>density</td>
+<td><span class="math notranslate nohighlight">\(\rho\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>rhoh</td>
+<td><span class="math notranslate nohighlight">\((\rho h)\)</span></td>
+<td>use_tfromp = F or
+(use_tfromp = T and
+plot_h_with_use_tfrom
+p
+= T)</td>
+</tr>
+<tr class="row-even"><td>h</td>
+<td><span class="math notranslate nohighlight">\((\rho h)/\rho\)</span></td>
+<td>use_tfromp = F or
+(use_tfromp = T and
+plot_h_with_use_tfrom
+p
+= T)</td>
+</tr>
+<tr class="row-odd"><td>X(*)</td>
+<td><span class="math notranslate nohighlight">\((\rho X_k)/\rh
+o\)</span></td>
+<td>plot_spec</td>
+</tr>
+<tr class="row-even"><td>tracer</td>
+<td>tracers</td>
+<td>plot_trac</td>
+</tr>
+<tr class="row-odd"><td>w0_x</td>
+<td><span class="math notranslate nohighlight">\(w_0 \er \cdot
+\ex\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-even"><td>w0_y</td>
+<td><span class="math notranslate nohighlight">\(w_0 \er \cdot
+\ey\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-odd"><td>w0_z</td>
+<td><span class="math notranslate nohighlight">\(w_0 \er \cdot
+\ez\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-even"><td>divw0</td>
+<td><span class="math notranslate nohighlight">\(\nabla \cdot w
+_0\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-odd"><td>rho0</td>
+<td><span class="math notranslate nohighlight">\(\rho_0\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-even"><td>rhoh0</td>
+<td><span class="math notranslate nohighlight">\((\rho h)_0\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-odd"><td>h0</td>
+<td><span class="math notranslate nohighlight">\((\rho h)_0/\rh
+o_0\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-even"><td>p0</td>
+<td><span class="math notranslate nohighlight">\(p_0\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-odd"><td>radial_velocity</td>
+<td><dl class="first last docutils">
+<dt>:math:<a href="#id1"><span class="problematic" id="id2">`</span></a>Ubt cdot er</dt>
+<dd><ul class="first last simple">
+<li>w_0`</li>
+</ul>
+</dd>
+</dl>
+</td>
+<td>spherical == 1</td>
+</tr>
+<tr class="row-even"><td>circum_velocity</td>
+<td><dl class="first last docutils">
+<dt>:math:<a href="#id3"><span class="problematic" id="id4">`</span></a>| Ubt - (Ubt</dt>
+<dd>cdot er) er <a href="#id5"><span class="problematic" id="id6">|</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></dd>
+</dl>
+</td>
+<td>spherical == 1</td>
+</tr>
+<tr class="row-odd"><td>magvel</td>
+<td><span class="math notranslate nohighlight">\(| \Ubt + w_0 \
+er |\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td>momentum</td>
+<td><span class="math notranslate nohighlight">\(\rho | \Ubt +
+w_0 \er |\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>vort</td>
+<td><span class="math notranslate nohighlight">\(| \nabla \time
+s \Ubt |\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td>S</td>
+<td><span class="math notranslate nohighlight">\(S\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>rhopert</td>
+<td><span class="math notranslate nohighlight">\(\rho - \rho_0\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td>rhohpert</td>
+<td><span class="math notranslate nohighlight">\((\rho h) - (\r
+ho h)_0\)</span></td>
+<td>use_tfromp = F or
+(use_tfromp = T and
+plot_h_with_use_tfrom
+p
+= T)</td>
+</tr>
+<tr class="row-odd"><td>tfromp</td>
+<td><span class="math notranslate nohighlight">\(T(\rho, p_0, X
+_k)\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td>tfromh</td>
+<td><span class="math notranslate nohighlight">\(T(\rho, h, X_k
+)\)</span></td>
+<td>use_tfromp = F or
+(use_tfromp = T and
+plot_h_with_use_tfrom
+p
+= T)</td>
+</tr>
+<tr class="row-odd"><td>deltaT</td>
+<td><span class="math notranslate nohighlight">\([T(\rho, h, X_
+k) - T(\rho, p_0, X_k
+)]/T(\rho, h, X_k)\)</span></td>
+<td>use_tfromp = F or
+(use_tfromp = T and
+plot_h_with_use_tfrom
+p
+= T)</td>
+</tr>
+<tr class="row-even"><td>deltap</td>
+<td><dl class="first last docutils">
+<dt>:math:<a href="#id9"><span class="problematic" id="id10">`</span></a><a href="#id11"><span class="problematic" id="id12">|</span></a>p(rho,h,X_k)</dt>
+<dd><ul class="first last simple">
+<li>p_0|/p_0`</li>
+</ul>
+</dd>
+</dl>
+</td>
+<td>use_tfromp = F or
+(use_tfromp = T and
+plot_h_with_use_tfrom
+p
+= T)</td>
+</tr>
+<tr class="row-odd"><td>tpert</td>
+<td><span class="math notranslate nohighlight">\(T(\rho,h,X_k)
+- \overline{T}\)</span>
+if use_tfromp = F;
+<span class="math notranslate nohighlight">\(T(\rho,p_0,X_k
+) - \overline{T}\)</span>
+otherwise</td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td>Machnumber</td>
+<td><span class="math notranslate nohighlight">\(| \Ubt + w_0 \
+er | / c(\rho,p_0,X_k
+)\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>soundspeed</td>
+<td><span class="math notranslate nohighlight">\(c(\rho,p_0,X_k
+)\)</span></td>
+<td>plot_cs</td>
+</tr>
+<tr class="row-even"><td>deltagamma</td>
+<td><span class="math notranslate nohighlight">\(\Gamma_1(\rho,
+p_0,X_k) - \gammabar\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>entropy</td>
+<td><span class="math notranslate nohighlight">\(s(\rho,p_0,X_k
+)\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td>entropypert</td>
+<td><span class="math notranslate nohighlight">\([s(\rho,p_0,X_
+k) - \overline{s}]/\o
+verline{s}\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>sponge or
+sponge_fdamp</td>
+<td><span class="math notranslate nohighlight">\(1/(1 + \Delta
+t \kappa f_\mathrm{da
+mp})\)</span>
+by default;
+<span class="math notranslate nohighlight">\(f_\mathrm{damp
+}\)</span>
+if plot_sponge_fdamp
+= T</td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td>pi</td>
+<td><span class="math notranslate nohighlight">\(\pi\)</span></td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td>gpi_x</td>
+<td><span class="math notranslate nohighlight">\(\nabla \pi \cd
+ot \ex\)</span></td>
+<td>plot_gpi</td>
+</tr>
+<tr class="row-even"><td>gpi_y</td>
+<td><span class="math notranslate nohighlight">\(\nabla \pi \cd
+ot \ey\)</span></td>
+<td>plot_gpi</td>
+</tr>
+<tr class="row-odd"><td>gpi_z</td>
+<td><span class="math notranslate nohighlight">\(\nabla \pi \cd
+ot \ez\)</span></td>
+<td>plot_gpi</td>
+</tr>
+<tr class="row-even"><td>pioverp0</td>
+<td><span class="math notranslate nohighlight">\(\pi / p_0\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-odd"><td>p0pluspi</td>
+<td><span class="math notranslate nohighlight">\(p_0 + \pi\)</span></td>
+<td>plot_base</td>
+</tr>
+<tr class="row-even"><td>omegadot(*)</td>
+<td>:math:<a href="#id13"><span class="problematic" id="id14">`</span></a>dot{omega}_k
+`</td>
+<td>plot_omegadot</td>
+</tr>
+<tr class="row-odd"><td>enucdot</td>
+<td><span class="math notranslate nohighlight">\((\rho \Hnuc)/\
+rho\)</span></td>
+<td>plot_Hnuc</td>
+</tr>
+<tr class="row-even"><td>Hext</td>
+<td><span class="math notranslate nohighlight">\((\rho \Hext)/\
+rho\)</span></td>
+<td>plot_Hext</td>
+</tr>
+<tr class="row-odd"><td>eta_rho</td>
+<td><span class="math notranslate nohighlight">\(\etarho\)</span></td>
+<td>plot_eta</td>
+</tr>
+<tr class="row-even"><td>thermal</td>
+<td><span class="math notranslate nohighlight">\(\nabla \cdot \
+kappa \nabla T\)</span></td>
+<td>use_thermal_diffusion</td>
+</tr>
+<tr class="row-odd"><td>conductivity</td>
+<td><span class="math notranslate nohighlight">\(\kappa(\rho, T
+, X_k)\)</span></td>
+<td>use_thermal_diffusion</td>
+</tr>
+<tr class="row-even"><td>ad_excess</td>
+<td><span class="math notranslate nohighlight">\(\nabla - \nabl
+a_\mathrm{ad}\)</span></td>
+<td>plot_ad_excess</td>
+</tr>
+<tr class="row-odd"><td>particle_count</td>
+<td>number of particles
+in a cell</td>
+<td>use_particles</td>
+</tr>
+<tr class="row-even"><td>processor_number</td>
+<td>processor number
+containing the cell’s
+data</td>
+<td>plot_processors</td>
+</tr>
+<tr class="row-odd"><td>pi_divu</td>
+<td><span class="math notranslate nohighlight">\(\pi \nabla \cd
+ot \tilde{\Ub}\)</span>
+(a measure of energy
+conservation)</td>
+<td>plot_pidivu</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="mini-vs-regular-plotfiles">
+<span id="vis-sec-miniplotfile"></span><h3>Mini vs.&nbsp;regular plotfiles<a class="headerlink" href="#mini-vs-regular-plotfiles" title="Permalink to this headline">¶</a></h3>
+<p>MAESTRO&nbsp;can manage two independent sets of plotfiles. This allows you to
+output the default plotfiles, which contain a lot of variables, sparsely,
+and output mini-plotfiles much more frequently. A mini-plotfile is controlled
+by the analogous runtime parameters as the main plotfiles:</p>
+<ul class="simple">
+<li>mini_plot_int is the interval in steps between successive plotfiles</li>
+<li>mini_plot_deltat is the interval in time between successive plotfiles</li>
+<li>mini_plot_base_name is the base name that prefixes the plotfiles. The
+default is miniplt</li>
+</ul>
+<p>To set the fields that are stored in the mini plotfile, a second set
+of runtime parameters is used: mini_plot_var1,
+mini_plot_var2, <span class="math notranslate nohighlight">\(\ldots\)</span>, mini_plot_var9. These can be set to
+any of the following:</p>
+<ul class="simple">
+<li>“density”</li>
+<li>“species”: this gets all of the mass fractions</li>
+<li>the name of an individual species in the network (like “helium-4”)</li>
+<li>“radvel”: this gets both the radial and circumferential velocity</li>
+<li>“velocity”: all three componets</li>
+<li>“temperature”: this is either <span class="math notranslate nohighlight">\(T(\rho,p_0)\)</span> or <span class="math notranslate nohighlight">\(T(\rho,h)\)</span>, depending
+on the value of use_tfromp</li>
+<li>“enuc”: the nuclear energy generation rate</li>
+<li>“mach”: the Mach number</li>
+</ul>
+</div>
+<div class="section" id="the-amrex-file-format">
+<h3>the AMReX&nbsp;file format<a class="headerlink" href="#the-amrex-file-format" title="Permalink to this headline">¶</a></h3>
+<p>MAESTRO&nbsp;stores the plotfile data in a hierarchical directory format,
+with each level’s data stored in a separate subdirectory. Some meta-data
+is stored in the top-level to help interpret the structure. The basic format is:</p>
+<ul class="simple">
+<li>plt00000/<ul>
+<li>Header</li>
+<li>job_info</li>
+<li>Level_00/<ul>
+<li>Cell_D_00000</li>
+<li>…</li>
+<li>Cell_H</li>
+</ul>
+</li>
+<li>model_cc_00000</li>
+<li>model_ec_00000</li>
+</ul>
+</li>
+</ul>
+<p>In the main directory, Header contains the information required
+to interpret the data stored on disk. We describe this below. The
+job_info file is a plaintext file that contains a lot of
+information about the run (where it was run, when it was run, compiler
+options, runtime options, etc.). It is not needed to interpret the
+data. Finally, the model_cc_00000 and model_ec_00000
+contain the MAESTRO&nbsp;basestate information for the cell-centered and
+edge-centered basestate quantities respectively. These files are not
+typically used for visualization.</p>
+<div class="section" id="header">
+<h4>Header<a class="headerlink" href="#header" title="Permalink to this headline">¶</a></h4>
+<p>The main Header is written by fabio_ml_multifab_write_d by
+processor 0. The information contained is the following:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">NavierStokes-V1.1</div>
+<div class="line"><em>number of variables</em></div>
+<div class="line"><em>variable 1 name</em></div>
+<div class="line"><em>variable 2 name</em></div>
+<div class="line"><span class="math notranslate nohighlight">\(\vdots\)</span></div>
+<div class="line"><em>last variable name</em></div>
+<div class="line"><em>number of dimensions</em></div>
+<div class="line"><em>simulation time</em></div>
+<div class="line"><em>number of levels</em> (0-based)</div>
+<div class="line"><em>physical domain minimum coordinate</em> (dm numbers)</div>
+<div class="line"><em>physical domain maximum coordinate</em> (dm numbers)</div>
+<div class="line"><em>jump in refinement between level 0 and 1</em></div>
+<div class="line"><span class="math notranslate nohighlight">\(\vdots\)</span></div>
+<div class="line"><em>jump in refinement between level :math:`n-2` and :math:`n-1`</em></div>
+<div class="line"><br /></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="visualizing-with-amrvis">
+<h2>Visualizing with Amrvis<a class="headerlink" href="#visualizing-with-amrvis" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Amrvis&nbsp;is a tool developed together with AMReX&nbsp;to visualize datasets
+from codes built around the AMReX&nbsp;library. You can download the
+Amrvis&nbsp;source from:</div>
+<div class="line"><a class="reference external" href="https://ccse.lbl.gov/Downloads/downloadAmrvis.html">https://ccse.lbl.gov/Downloads/downloadAmrvis.html</a></div>
+<div class="line">Amrvis&nbsp;exists in the C++ AMReX&nbsp;framework, so the build system is
+slightly different. A different executable is needed for 2- vs.&nbsp;3-d
+datasets. Edit the GNUmakefile and set the compilers (probably
+g++ and gfortran) and the dimensionality, and turn off any
+of the volume rendering options. You will need to have the Motif library
+installed on your system (or a replacement, such as lesstif.</div>
+</div>
+<p>Once the code is built, you visualize a dataset as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">amrvis3d</span><span class="o">.</span><span class="n">Linux</span><span class="o">.</span><span class="n">g</span><span class="o">++.</span><span class="n">gfortran</span><span class="o">.</span><span class="n">ex</span> <span class="n">pltfile</span>
+</pre></div>
+</div>
+<p>where pltfile is the name of the plotfile directory. Different
+variables can be selected from the drop down menu at the top. Middle
+and right clicking in 3-d select the slice planes, and shift + middle
+or right will extract 1-d lines through the data. In 2-d, middle and
+right clicking alone extract 1-d lines.</p>
+<p>If Amrvis&nbsp;cannot find the Palette file, then the plots will be
+in grayscale. To fix this, copy the amrvis.defaults and
+Palette files to your home directory and edit amrvis.defaults so that
+the palette line points to the Palette file, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">palette</span>               <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">username</span><span class="o">/</span><span class="n">Palette</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualizing-with-visit">
+<h2>Visualizing with VisIt<a class="headerlink" href="#visualizing-with-visit" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="python-visualization-scripts">
+<span id="sec-vis-python"></span><h2>Python visualization scripts<a class="headerlink" href="#python-visualization-scripts" title="Permalink to this headline">¶</a></h2>
+<p>AmrPostprocessing/python provides some simple commandline
+tools for doing visualizations of AMReX&nbsp;plotfiles (note: a subset
+of these are distributed directly with AMReX&nbsp;in amrex/Tools/Py_util/). The main drivers
+are written in python and use a set of Fortran routines, compiled with
+f2py to interface with the plotfile data. To use the routine,
+you will need to have matplotlib and f2py installed. On a
+machine running Fedora linux, you can install these packages via</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">matplotlib</span> <span class="n">f2py</span>
+</pre></div>
+</div>
+<p>The library required by the python routines can be built by typing
+’make’ in that directory. If successful, you should find
+a library fsnapshot.so.</p>
+<p>The path to fsnapshot.so should be included in your PYTHONPATH
+environment variable. This can be done by adding:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{PYTHONPATH}</span><span class="s2">:/home/user/AmrPostprocessing/python}</span>
+</pre></div>
+</div>
+<p>to your .bashrc.</p>
+<p>It is recommended that you use matplotlib version 1.2.0 or
+higher. If the fonts look strange in the output files, you can try
+installing the lyx-fonts package and deleting your
+.matplotlib directory, and trying again.</p>
+<div class="section" id="plotsinglevar-py">
+<h3>plotsinglevar.py<a class="headerlink" href="#plotsinglevar-py" title="Permalink to this headline">¶</a></h3>
+<p>plotsinglevar.py does visualizations of 2-d AMReX&nbsp;plotfiles,
+and slices through 3-d AMReX&nbsp;plotfiles. A simple plot can be made
+via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">log</span> <span class="o">-</span><span class="n">o</span> <span class="n">test</span><span class="o">.</span><span class="n">png</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span>
+</pre></div>
+</div>
+<p>This will make a plot of “tfromp” from the plotfile plt00000 with log scaling,
+and store the output in test.png. See Figure&nbsp;<a class="reference external" href="#fig:python">[fig:python]</a>.
+If you don’t do ‘-o’, then a default output filename consisting of the
+plotfile name + component will be used.</p>
+<p>If you list 2 different variables after the plotfile name, then they
+will be plotted side-by-side in a single figure. For example,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span> <span class="n">enucdot</span>
+</pre></div>
+</div>
+<p>produces the output shown in figure&nbsp;<a class="reference external" href="#fig:python_two">[fig:python_two]</a>.</p>
+<p>Additional options include ‘-m’ to specify the minimum data
+value, ‘-M’ to specify the maximum data value, and ‘–eps’
+to make an EPS plot instead of PNG. Running the script with no parameters
+will give the full list available options.</p>
+<p>Limited 3-d support is available. When run as with a plotfile name
+and variable, it will plot slices (<span class="math notranslate nohighlight">\(x\)</span>-<span class="math notranslate nohighlight">\(y\)</span>, <span class="math notranslate nohighlight">\(x\)</span>-<span class="math notranslate nohighlight">\(z\)</span>, and <span class="math notranslate nohighlight">\(y\)</span>-<span class="math notranslate nohighlight">\(z\)</span>)
+through the center of the domain. The option ‘–origin’
+will put the slices through the origin.</p>
+</div>
+<div class="section" id="contourcompare-py">
+<h3>contourcompare.py<a class="headerlink" href="#contourcompare-py" title="Permalink to this headline">¶</a></h3>
+<p>contourcompare.py takes two or three plotfiles and a single variable as arguments
+and plots contours of the datasets on the same set of axes. This is
+form comparisons of different runs. Running the script with no parameters
+will give the full list available options.</p>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contourcompare</span><span class="o">.</span><span class="n">py</span> <span class="n">tfromp</span> <span class="n">plt00000</span> <span class="n">other_plt00000</span>
+</pre></div>
+</div>
+<p>will make a contour plot of the variable tfromp from the data in
+plt00000 and other_plt00000 shown on the same axes.</p>
+</div>
+<div class="section" id="runtimevis-py">
+<h3>runtimevis.py<a class="headerlink" href="#runtimevis-py" title="Permalink to this headline">¶</a></h3>
+<p>The runtimevis.py script is designed to be run from a submission
+script to produce plots from plotfiles as they are produced. This is
+accomplished by hooking it into the process scripts described in
+Chapter&nbsp;<a class="reference external" href="#ch:managingjobs">[ch:managingjobs]</a>.</p>
+<p>The script itself reads in an inputs file, vis.in, that
+describes the variables to plot. From 1 to 6 variables can be
+plotting from a plotfile. The script does its best to organize them
+in columns and rows to maximize the plot area. The image is always
+output at 1280<span class="math notranslate nohighlight">\(\times\)</span>720 pixels, corresponding to 720p HD resolution.
+For each variable, a block of the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>
+<span class="nb">min</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nb">max</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">log</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>is supplied. If min or max are omitted, then the data
+limits are computed automatically. If log is omitted, then no
+log is taken of the data before plotting. The script is then run as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">runtimevis</span><span class="o">.</span><span class="n">py</span> <span class="n">plt00000</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="sec-vis-yt-visualizing-with-yt">
+<h2>[sec:vis:yt] Visualizing with yt<a class="headerlink" href="#sec-vis-yt-visualizing-with-yt" title="Permalink to this headline">¶</a></h2>
+<p>ytis a Python package for analyzing and visualizing simulation data,
+and understand that AMReX&nbsp;data from MAESTRO&nbsp;and CASTRO&nbsp;(along
+with many other simulation codes). For more
+information, see the ythomepage at <a class="reference external" href="http://yt-project.org/">http://yt-project.org/</a> and
+<a href="#id15"><span class="problematic" id="id16">:raw-latex:`\cite{yt}`</span></a>.</p>
+<p>Some sample scripts that use yt&nbsp;with MAESTRO&nbsp;data are contained in
+MAESTRO/Util/yt/.</p>
+<div class="section" id="installing-yt">
+<h3>Installing yt<a class="headerlink" href="#installing-yt" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to obtain ytis through the use of an installation script:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">wget</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">hg</span><span class="o">.</span><span class="n">yt</span><span class="o">-</span><span class="n">project</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">yt</span><span class="o">/</span><span class="n">raw</span><span class="o">/</span><span class="n">yt</span><span class="o">-</span><span class="mf">3.0</span><span class="o">/</span><span class="n">doc</span><span class="o">/</span><span class="n">install_script</span><span class="o">.</span><span class="n">sh</span>
+<span class="o">&gt;</span> <span class="n">bash</span> <span class="n">install_script</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>By default, this ytinstall script will download and install, in its
+own isolated environment, all the secondary utilities needed to get
+ytup and running. Note that this currently includes installing
+<em>hdf5, zlib, bzip2, libpng, freetype, python, numpy, matplotlib,
+mercurial, ipython, h5py, Cython, Forthon</em> as well as a yt
+<em>mercurial</em> bundle of changes. You can turn off the automatic
+installation of any of these particular packages by setting the
+appropriate INST_* variable to zero in the install script; you
+may have to then change some of *_DIR variables to point to
+your own particular installation of that package. It is usually best
+to just let ytinstall its own stuff, which ensures things are
+working properly.</p>
+<p>After the install script has finished, and assuming you let yt
+install its own packages, you’ll need to <em>prepend</em> some
+environment variables with ytlocations so that your system finds
+those first and stops looking. ytprovides a simple script to
+do this, which will be announced upon successful completion.</p>
+</div>
+<div class="section" id="working-with-yt">
+<h3>Working with yt<a class="headerlink" href="#working-with-yt" title="Permalink to this headline">¶</a></h3>
+<p>The ytinstallation provides both an interactive, <em>iPython</em>-like,
+interface or the ability to import ytmodules for use in a batch
+script. The interactive interface should be in your $PATH if
+you’ve followed the instructions in the previous section; to start it,
+simply type iyt in a terminal.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span>&gt; iyt
+
+Welcome to yt!
+
+
+In [1]:
+</pre></div>
+</div>
+<p>Codes like Enzo use what are called <em>parameter files</em> to
+describe the general information—number of levels, domain
+dimensions, time, etc.—of a a dataset. ytlikes to grab this
+information before working on any specific data; this is accomplished
+via the convenience method load:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">pf</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;plt00166&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that some older versions of ytneeded an inputs file
+in the same directory as the plotfile, but as of yt3.0, all the
+necessary metadata is obtained from the job_info file inside
+the plotfile directory.
+The load method returns an instance of the StaticOutput class. One
+of the easiest ways of handling plots is via a PlotCollection
+object</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">domain_right_edge</span> <span class="o">+</span> <span class="n">pf</span><span class="o">.</span><span class="n">domain_left_edge</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">pc</span> <span class="o">=</span> <span class="n">PlotCollection</span><span class="p">(</span><span class="n">pf</span><span class="p">,</span><span class="n">center</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By default, the PlotCollection constructor places the center of
+the plot to be at the location of peak density. Here we have
+calculated the center of the domain by accessing the lower and upper
+domain boundaries via the numpy arrays
+pf.domain_left_edge and pf.domain_right_edge,
+respectively. Note that up until this point, ythas not actually
+loaded the AMR dataset.</p>
+<p>Now we would like to take some slices of tfromp in the dataset and
+generate some 2-d plots. To do this, we will use the
+PlotCollection’s add_slice method:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first call to add_slice builds an
+AMRHierarchy object associated with pf. The
+AMRHierarchy object contains information about the actual dataset,
+such as its layout in the simulation domain or on disk. Building the
+hierarchy is expensive, but once it is built the data it contains can
+be accessed via attributes and dictionary lookup. In other words, the
+subsequent add_slice operations are relatively
+cheap. The first parameter to the add_slice
+method is obviously the variable we want; the second (optional)
+parameter specifies an coordinate axis orthogonal to the slice being
+made—0 for x, 1 for y, 2 for z. Now we want to save the plots from
+the PlotCollection; this is done with the
+save method, which takes an optional basename for the generated files:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="n">pc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;my_cool_images&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This generates the following image files:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Out</span><span class="p">[</span><span class="mi">7</span><span class="p">]:</span>
+<span class="p">[</span><span class="s1">&#39;my_cool_images_Slice_x_tfromp.png&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;my_cool_images_Slice_y_tfromp.png&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;my_cool_images_Slice_z_tfromp.png&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Figure <a class="reference external" href="#fig:yt_slice">[fig:yt_slice]</a> shows an example of one of the slice images.
+Note that this was a quick and dirty generation of the image—there
+is a lot of space around the figure, which can be removed with various
+options to the ytmethods. Also, the user can specify derived
+variables, log-scaling, annotations, etc. For more information see the
+documentation at <a class="reference external" href="http://yt-project.org/docs/dev/">http://yt-project.org/docs/dev/</a>  .</p>
+<p>[fig:yt_slice]
+<img alt="Example slice through 3-d dataset with yt." src="visfigpath/my_cool_images_Slice_x_tfromp_trim" /></p>
+<p>When writing a script to use in batch mode, one has to manually import
+the import modules needed to work with yt. As such, all scripts must
+import from the yt.mods module, which is essentially a
+convenience module that sets up the appropriate ytnamespace.
+For completeness, below is a script containing our example above.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># load our namespace</span>
+<span class="kn">from</span> <span class="nn">yt.mods</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="c1"># the plotfile I&#39;m interested in</span>
+<span class="n">fn</span> <span class="o">=</span> <span class="s2">&quot;plt00166&quot;</span>
+
+<span class="c1"># load it into a StaticOutput object</span>
+<span class="n">pf</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+
+<span class="c1"># find the center of the domain</span>
+<span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">domain_right_edge</span> <span class="o">+</span> <span class="n">pf</span><span class="o">.</span><span class="n">domain_left_edge</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+<span class="c1"># associate a PlotCollection with the pf</span>
+<span class="n">pc</span> <span class="o">=</span> <span class="n">PlotCollection</span><span class="p">(</span><span class="n">pf</span><span class="p">,</span><span class="n">center</span><span class="p">)</span>
+
+<span class="c1"># add some slices of tfromp</span>
+<span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># save our plots to a files with basename</span>
+<span class="c1"># &quot;my_cool_images&quot;</span>
+<span class="n">pc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;my_cool_images&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="d-datasets">
+<h3>2-d datasets<a class="headerlink" href="#d-datasets" title="Permalink to this headline">¶</a></h3>
+<p>To visualize 2-d data, you can use the SlicePlot function,
+picking the normal direction to be “z”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">yt.mods</span> <span class="k">import</span> <span class="o">*</span>
+ <span class="n">pf</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;plt00085&quot;</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">SlicePlot</span><span class="p">(</span><span class="n">pf</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;tfromp&quot;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;tfromp.eps&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This generates the figure shown in Figure&nbsp;<a class="reference external" href="#fig:yt2d">[fig:yt2d]</a>.</p>
+<div class="figure" id="id18">
+<img alt="[fig:yt2d] Example slice through 3-d dataset with yt." src="visfigpath/tfromp" />
+<p class="caption"><span class="caption-text">[fig:yt2d] Example slice through 3-d dataset with yt.</span></p>
+</div>
+</div>
+<div class="section" id="volume-rendering">
+<h3>Volume Rendering<a class="headerlink" href="#volume-rendering" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="analysis.html" class="btn btn-neutral float-right" title="Analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="initial_models.html" class="btn btn-neutral" title="Initial Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2]}}})</script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

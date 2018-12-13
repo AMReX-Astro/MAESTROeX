@@ -1,0 +1,1298 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>namespace: maestro &mdash; MAESTROeX 18.11
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Initial Models" href="initial_models.html" />
+    <link rel="prev" title="Runtime Parameters" href="param_intro.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                18.11
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">MAESTROeX Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="param_intro.html">Runtime Parameters</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="param_intro.html#introduction-to-runtime-parameters">Introduction to Runtime Parameters</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="param_intro.html#parameters-by-namespace">Parameters by Namespace</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">namespace: <code class="docutils literal notranslate"><span class="pre">maestro</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="param_intro.html">Runtime Parameters</a> &raquo;</li>
+        
+      <li>namespace: <code class="docutils literal notranslate"><span class="pre">maestro</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/runtime_parameters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="namespace-maestro">
+<h1>namespace: <code class="docutils literal notranslate"><span class="pre">maestro</span></code><a class="headerlink" href="#namespace-maestro" title="Permalink to this headline">¶</a></h1>
+<p><strong>synchronization</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">do_reflux</span></code></td>
+<td>do we do the hyperbolic reflux at coarse-fine
+interfaces?</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>general MAESTRO</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">maestro_verbose</span></code></td>
+<td>General verbosity</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>problem initialization</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">probin_file</span></code></td>
+<td>input probin file</td>
+<td>“”</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">model_file</span></code></td>
+<td>input model file</td>
+<td>“”</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">perturb_model</span></code></td>
+<td>Turn on a perturbation in the initial data.  Problem
+specific.</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">print_init_hse_diag</span></code></td>
+<td>print out HSE diagnostics as a function of r for the
+initial model</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>timestepping</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">stop_time</span></code></td>
+<td>simulation stop time</td>
+<td>-1.0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">max_step</span></code></td>
+<td>Maximum number of steps in the simulation.</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">cfl</span></code></td>
+<td>CFL factor to use in the computation of the advection
+timestep constraint</td>
+<td>0.5</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">init_shrink</span></code></td>
+<td>the multiplicative factor ($le 1$) to reduce the
+initial timestep as computed by the various timestep
+estimators</td>
+<td>1.0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">small_dt</span></code></td>
+<td>the minimum allowed timestep – we abort if dt drops
+below this value</td>
+<td>1.e-10</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">max_dt_growth</span></code></td>
+<td>The maximum scale factor that the time step is allowed
+to grow by per time step.</td>
+<td>1.1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">max_dt</span></code></td>
+<td>This is the maximum dt that is allowed</td>
+<td>1.e33</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">fixed_dt</span></code></td>
+<td>Fix the time step.  If -1.0, then use the standard time
+step.</td>
+<td>-1.0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">nuclear_dt_fac</span></code></td>
+<td>If $T_{max}^n &gt; T_{max}^{n-1}$ set the new dt =
+min[dt, dt*{tt nuclear_dt_fac}*( $T_{max}^{n-1}$ /
+$(T_{max}^n-T_{max}^{n-1})$ ) ] for example, {tt
+nuclear_dt_fac} = 0.01 means don’t let the max temp
+grow more than approximately 1 percent not checkpoint-
+compatible yet since it wouldn’t be backwards
+compatible</td>
+<td>-1.0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">use_soundspeed_firstdt</span></code></td>
+<td>Use the soundspeed constraint when computing the first
+time step.</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_divu_firstdt</span></code></td>
+<td>Use the divu constraint when computing the first time
+step.</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>grid</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">spherical</span></code></td>
+<td>Set to 1 if you are doing a spherical problem.</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">octant</span></code></td>
+<td>set octant = T if you just want to model an octant of a
+sphere (note: only takes effect for spherical geometry)</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">do_2d_planar_octant</span></code></td>
+<td>Set to 1 if using the 2D simplified (planar) model of
+an octant.</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">regrid_int</span></code></td>
+<td>How often we regrid.</td>
+<td>-1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">amr_buf_width</span></code></td>
+<td>the number of buffer zones surrounding a cell tagged
+for refinement. note that this needs to be &gt;=
+regrid_int</td>
+<td>-1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">drdxfac</span></code></td>
+<td>ratio of radial base state zones to Cartesian full
+state zones for spherical geometry</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">minwidth</span></code></td>
+<td>The minimum size on a side for a grid created using
+make_new_grids.</td>
+<td>8</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">min_eff</span></code></td>
+<td>parameter for cluster algorithm for making new grids in
+adaptive problems</td>
+<td>0.9</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_tpert_in_tagging</span></code></td>
+<td>pass $T’$ into the tagging routines as the auxillary
+multifab instead of the default $rho <a href="#id1"><span class="problematic" id="id2">H_</span></a>mathrm{nuc}$.</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>output</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_int</span></code></td>
+<td>plot interval</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_deltat</span></code></td>
+<td>rather than use a plot interval, plot a file after the
+solution has advanced past plot_deltat in time</td>
+<td>-1.0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">chk_int</span></code></td>
+<td>Number of timesteps between writing a checkpoint file</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_h_with_use_tfromp</span></code></td>
+<td>Turn on storing of enthalpy-based quantities in the
+plotfile when we are running with {tt use_tfromp}</td>
+<td>true</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_spec</span></code></td>
+<td>plot species and omegadot in plotfile</td>
+<td>true</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_omegadot</span></code></td>
+<td>plot omegadot in plotfile</td>
+<td>true</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_Hext</span></code></td>
+<td>plot external heating (Hext) in plotfile</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_Hnuc</span></code></td>
+<td>plot nuclear energy generation rate (Hnuc) in plotfile</td>
+<td>true</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_eta</span></code></td>
+<td>plot $etarho$ in plotfile</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_trac</span></code></td>
+<td>plot tracers in plotfile</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_base</span></code></td>
+<td>plot w0_x, w0_y, w0_z, divw0, rho0, rhoh0, h0, and
+p0 in plotfile</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_gpi</span></code></td>
+<td>plot pi and grad(pi)</td>
+<td>true</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_cs</span></code></td>
+<td>plot soundspeed</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_base_name</span></code></td>
+<td>prefix to use in plotfile file names</td>
+<td>“plt”</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">check_base_name</span></code></td>
+<td>prefix to use in checkpoint file names</td>
+<td>“chk”</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">diag_buf_size</span></code></td>
+<td>number of timesteps to buffer diagnostic output
+information before writing (note: not implemented for
+all problems)</td>
+<td>10</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_ad_excess</span></code></td>
+<td>plot the adiabatic excess</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_processors</span></code></td>
+<td>create a field in the plotfile storing the processor
+number for each zone</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_pidivu</span></code></td>
+<td>plot pi * div(U) – this is a measure of conservation
+of energy</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>algorithm initialization</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">init_iter</span></code></td>
+<td>Number of initial pressure iterations.</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">init_divu_iter</span></code></td>
+<td>Number of initial divu iterations.</td>
+<td>4</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">restart_file</span></code></td>
+<td>Which file to restart from.  Empty string means do not
+restart</td>
+<td>“”</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">restart_into_finer</span></code></td>
+<td>restart and add a level of refinement</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">do_initial_projection</span></code></td>
+<td>Do the initial projection.</td>
+<td>true</td>
+</tr>
+</tbody>
+</table>
+<p><strong>linear solvers</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">mg_verbose</span></code></td>
+<td>Verbsoity of the multigrid solver, but not the bottom
+solver.</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">cg_verbose</span></code></td>
+<td>Verbosity of bottom solver</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">mg_cycle_type</span></code></td>
+<td>Type of cycle used in the MAC multigrid – 1 = F-cycle,
+2 = W-cycle, 3 = V-cycle</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">hg_cycle_type</span></code></td>
+<td>Type of cycle used in the nodal multigrid – 1 =
+F-cycle, 2 = W-cycle, 3 = V-cycle</td>
+<td>3</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">hg_bottom_solver</span></code></td>
+<td>valid values are $ge$ 0</td>
+<td>-1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">mg_bottom_solver</span></code></td>
+<td>valid values are $ge$ 0</td>
+<td>-1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">max_mg_bottom_nlevels</span></code></td>
+<td>if mg_bottom_solver == 4, then how many mg levels can
+the bottom solver mgt object have</td>
+<td>1000</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">mg_bottom_nu</span></code></td>
+<td>number of smoothing iterations to do after the
+multigrid bottom solver</td>
+<td>10</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">mg_nu_1</span></code></td>
+<td>number of smoothing iterations to do going down the
+V-cycle</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">mg_nu_2</span></code></td>
+<td>number of smoothing iterations to do going up the
+V-cycle</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">hg_dense_stencil</span></code></td>
+<td>In hgproject, in 2D, use a 9 point Laplacian (true) or
+5-point Laplacian (false).  In 3D, use a 27 point
+Laplacian (true) or 7-point Laplacian (false).</td>
+<td>true</td>
+</tr>
+</tbody>
+</table>
+<p><strong>hydrodynamics</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">do_sponge</span></code></td>
+<td>Use sponging.</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">sponge_kappa</span></code></td>
+<td>Parameter for sponge.  Problem dependent.</td>
+<td>10.e0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">sponge_center_density</span></code></td>
+<td>Center of the inner sponge.</td>
+<td>3.e6</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">sponge_start_factor</span></code></td>
+<td>The sponge begins at sponge_center_density *
+sponge_start_factor.</td>
+<td>3.333e0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_sponge_fdamp</span></code></td>
+<td>plot fdamp rather than sponge assumes sponge has the
+form 1/(1+dt*{tt sponge_kappa}*fdamp)</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff</span></code></td>
+<td>The density below which we modify the constraint to
+look like the anelastic constraint, instead of the low
+Mach constraint.  This prevents velocities from getting
+out of hand at the edge of the star. Refer to Section
+ref{Sec:Anelastic Cutoff}.</td>
+<td>3.e6</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code></td>
+<td>The density below which we keep the initial model
+constant. Refer to Section ref{Sec:Base Cutoff
+Density}</td>
+<td>3.e6</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">burning_cutoff_density</span></code></td>
+<td>The density below which we disable burning</td>
+<td>3.e6</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code></td>
+<td>The multiplicative factor (over base_cutoff_density)
+below which we do zero out the buoyancy term in the
+momentum equation.</td>
+<td>5.0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">dpdt_factor</span></code></td>
+<td>factor in front of the volume discrepancy term (0.0 =
+off)</td>
+<td>0.0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">do_planar_invsq_grav</span></code></td>
+<td>are we doing 1/r$^2$ gravity for plane-parallel</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">planar_invsq_mass</span></code></td>
+<td>the point mass for planar 1/r$^2$ gravity</td>
+<td>0.0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">evolve_base_state</span></code></td>
+<td>turn on (true) or off (false) basestate evolution</td>
+<td>true</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">use_exact_base_state</span></code></td>
+<td>turn on (true) or off (false) irregularly-spaced
+basestate</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">fix_base_state</span></code></td>
+<td>if true, don’t call average to reset the base state at
+all, even during initialization</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">average_base_state</span></code></td>
+<td>turn on (true) or off (false) basestate evolution that
+uses averages of cell-centered data instead of
+advecting</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">do_smallscale</span></code></td>
+<td>force $rho_0 = (rho h)_0 = 0$, {tt
+evolve_base_state = F} and {tt beta_type} = 3</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">do_eos_h_above_cutoff</span></code></td>
+<td>After the advective enthalpy update, recompute the
+enthalpy if we are below the base cutoff density.</td>
+<td>true</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span></code></td>
+<td>predict_rhoh = 0; newline predict_rhohprime = 1;
+newline predict_h = 2; newline
+predict_T_then_rhohprime = 3; newline
+predict_T_then_h = 4; newline predict_hprime = 5;
+newline predict_Tprime_then_h = 6.</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code></td>
+<td>Which quantities do we predict to the edges for
+computing the ($rho X$) edge states?  newline {tt
+species_pred_type} = 1 means predict $rho^prime$
+and $X$ separately.  newline {tt species_pred_type}
+= 2 means predict the full ($rho X$) itself. newline
+{tt species_pred_type} = 3 means predict $rho$ and
+$X$ separately.</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_delta_gamma1_term</span></code></td>
+<td>turns on second order correction to delta gamma1 term</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">use_etarho</span></code></td>
+<td>turn on the etarho term as described in flow chart</td>
+<td>true</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">slope_order</span></code></td>
+<td>order of slopes in piecewise linear Godunov algorithm.
+Options are 0, 2, or 4.</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">grav_const</span></code></td>
+<td>the gravitational acceleration (cm~s$^{-2}$) for plane-
+parallel geometry</td>
+<td>-1.5e10</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">ppm_type</span></code></td>
+<td>0 = no ppm (piecewise linear slopes instead) newline 1
+= 1984 ppm newline 2 = Hybrid Sekora/Colella and
+McCorquodale/Colella 2009/2010 ppm</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">bds_type</span></code></td>
+<td>0 = use ppm instead for multi-d integrator newline 1 =
+bilinear</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">ppm_trace_forces</span></code></td>
+<td>if 1, then perform parabolic reconstruction on the
+forces used in the prediction and trace under the
+parabola to the interfaces the amount that can reach
+the interface over dt</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">beta0_type</span></code></td>
+<td>what type of coefficient to use inside the velocity
+divergence constraint. newline {tt beta0_type} = 1
+uses $beta_0$; newline {tt beta0_type} = 2 uses
+$rho_0$ (anelastic); newline {tt beta0_type} = 3
+uses 1 (small-scale combustion).</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_linear_grav_in_beta0</span></code></td>
+<td>how to represent gravity in the $beta_0$ integration:
+true = piecewise linear false = piecewise constant</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">rotational_frequency</span></code></td>
+<td>rotational frequency used for computing centrifugal
+term in rotation problems.</td>
+<td>0.0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">co_latitude</span></code></td>
+<td>latitude, in radians, for problems with rotation where
+the domain is only a subset of a full star.</td>
+<td>0.0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">rotation_radius</span></code></td>
+<td>radius used for computing centrifugal term in rotation
+problems</td>
+<td>1.0e6</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">mach_max_abort</span></code></td>
+<td>maximum mach number before the code aborts</td>
+<td>-1.0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">drive_initial_convection</span></code></td>
+<td>freeze the temperature used in the reaction network to
+the initial value.  This is useful for developing an
+initial convective field to carry away the energy,
+while preventing the reactions from going nonlinear.</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">stop_initial_convection</span></code></td>
+<td>timestep beyond which we set {tt
+drive_initial_convection} = F</td>
+<td>-1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">restart_with_vel_field</span></code></td>
+<td>restart the simulation using a result from a {tt
+drive_initial_convection} = T run note that this uses
+the restart variable to specify which file to restart
+from.  After reading in the velocity information from
+the restart file, the time and timestep number are
+zeroed.</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></td>
+<td>modify the momentum equation to have $(beta_0/rho)
+nabla (pi/beta_0)$ instead of just $(1/rho) nabla
+(pi)$</td>
+<td>true</td>
+</tr>
+</tbody>
+</table>
+<p><strong>thermal diffusion</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_thermal_diffusion</span></code></td>
+<td>Use thermal diffusion.</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">temp_diffusion_formulation</span></code></td>
+<td>How to compute the explicit thermal diffusion term.
+newline 1 = in terms of $T$; newline 2 = in terms of
+$rho,p_0,X$.</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">thermal_diffusion_type</span></code></td>
+<td>In the thermal diffusion solver, 1 = Crank-Nicholson; 2
+= Backward Euler.</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">limit_conductivity</span></code></td>
+<td>apply the conductivity limiting—if T, then we set the
+thermal coefficients all to 0 for $rho &lt;$ {tt
+buoyancy_cutoff_factor} * {tt base_cutoff_density}</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>burning</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">do_burning</span></code></td>
+<td>turn on (true) or off (false) burning</td>
+<td>true</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">burner_threshold_species</span></code></td>
+<td>Name of the species to be used in burner threshold</td>
+<td>“”</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">burner_threshold_cutoff</span></code></td>
+<td>Mass fraction cutoff for burner_threshold_species
+used in burner threshold</td>
+<td>1.e-10</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">do_subgrid_burning</span></code></td>
+<td>break a zone into subzones, call the burner in each
+subzone and then average the result to the original
+cell</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">reaction_sum_tol</span></code></td>
+<td>mass fraction sum tolerance (if they don’t sum to 1
+within this tolerance, we abort)</td>
+<td>1.e-10</td>
+</tr>
+</tbody>
+</table>
+<p><strong>EOS</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">small_temp</span></code></td>
+<td>&#160;</td>
+<td>5.e6</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">small_dens</span></code></td>
+<td>&#160;</td>
+<td>1.e-5</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_tfromp</span></code></td>
+<td>When updating temperature, use $T=T(rho,p_0,X) $
+rather than $T=T(rho,h,X)$.</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">use_eos_e_instead_of_h</span></code></td>
+<td>In deriving the temperature from the $h$, first
+subtract off $p_0/rho$ to define $e$, and use that as
+the input to the EOS.</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_pprime_in_tfromp</span></code></td>
+<td>&#160;</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>base state mapping</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">s0_interp_type</span></code></td>
+<td>The interpolation for filling a cell-centered multifab
+from a 1D bin-centered array. newline 1 = piecewise
+constant; newline 2 = piecewise linear; newline 3 =
+quadratic</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">w0_interp_type</span></code></td>
+<td>The interpolation for filling a cell-centered multifab
+from a 1D edge-centered array. newline 1 = piecewise
+constant; newline 2 = piecewise linear; newline 3 =
+quadratic</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">s0mac_interp_type</span></code></td>
+<td>The interpolation for filling an edge based multifab
+from a 1D bin-centered array. newline 1 = Interpolate
+s0 to cell centers (with s0_interp_type), then
+average to edges; newline 2 = Interpolate s0 to edges
+directly using linear interpolation; newline 3 =
+Interpolate s0 to edges directly using quadratic
+interpolation.</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">w0mac_interp_type</span></code></td>
+<td>The interpolation for putting w0 on edges.  We only
+compute the normal component. newline 1 = Interpolate
+w0 to cell centers (with w0_interp_type), then
+average to edges; newline 2 = Interpolate w0 to edges
+directly using linear interpolation; newline 3 =
+Interpolate w0 to edges directly using quadratic
+interpolation; newline 4 = Interpolate w0 to nodes
+using linear interpolation, then average to edges.</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>diagnostics, I/O</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">print_fortran_warnings</span></code></td>
+<td>display warnings in Fortran90 routines</td>
+<td>(0, 1)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">print_update_diagnostics</span></code></td>
+<td>display information about updates to the state (how
+much mass, momentum, energy added)</td>
+<td>(0, 1)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">track_grid_losses</span></code></td>
+<td>calculate losses of material through physical grid
+boundaries</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">sum_interval</span></code></td>
+<td>how often (number of coarse timesteps) to compute
+integral sums (for runtime diagnostics)</td>
+<td>-1</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">sum_per</span></code></td>
+<td>how often (simulation time) to compute integral sums
+(for runtime diagnostics)</td>
+<td>-1.0e0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">show_center_of_mass</span></code></td>
+<td>display center of mass diagnostics</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">hard_cfl_limit</span></code></td>
+<td>abort if we exceed CFL = 1 over the cource of a
+timestep</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">job_name</span></code></td>
+<td>a string describing the simulation that will be copied
+into the plotfile’s {tt job_info} file</td>
+<td>“”</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">output_at_completion</span></code></td>
+<td>write a final plotfile and checkpoint upon completion</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">reset_checkpoint_time</span></code></td>
+<td>Do we want to reset the time in the checkpoint? This
+ONLY takes effect if amr.regrid_on_restart = 1 and
+amr.checkpoint_on_restart = 1, (which require that
+max_step and stop_time be less than the value in the
+checkpoint) and you set it to value greater than this
+default value.</td>
+<td>-1.e200</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">reset_checkpoint_step</span></code></td>
+<td>Do we want to reset the number of steps in the
+checkpoint? This ONLY takes effect if
+amr.regrid_on_restart = 1 and
+amr.checkpoint_on_restart = 1, (which require that
+max_step and stop_time be less than the value in the
+checkpoint) and you set it to value greater than this
+default value.</td>
+<td>-1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>particles</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">use_particles</span></code></td>
+<td>call the particle initialization, advection, etc.
+routines.</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">store_particle_vels</span></code></td>
+<td>store the velocity of the particle?</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>heating</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">do_heating</span></code></td>
+<td>use analytic heating</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>SDC</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">sdc_iters</span></code></td>
+<td>how many SDC iteractions to take (requires the code be
+compiled with {tt SDC := t}</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">sdc_couple_mac_velocity</span></code></td>
+<td>recompute MAC velocity at the beginning of each SDC
+iter</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p><strong>solver tolerances</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="51%" />
+<col width="13%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">parameter</th>
+<th class="head">description</th>
+<th class="head">default value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">eps_init_proj_cart</span></code></td>
+<td>tolerances for the initial projection</td>
+<td>1.e-12</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">eps_init_proj_sph</span></code></td>
+<td>&#160;</td>
+<td>1.e-10</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">eps_divu_cart</span></code></td>
+<td>tolerances for the divu iterations</td>
+<td>1.e-12</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">eps_divu_sph</span></code></td>
+<td>&#160;</td>
+<td>1.e-10</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">divu_iter_factor</span></code></td>
+<td>&#160;</td>
+<td><ol class="first last arabic simple" start="100">
+<li></li>
+</ol>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">divu_level_factor</span></code></td>
+<td>&#160;</td>
+<td><ol class="first last arabic simple" start="10">
+<li></li>
+</ol>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">eps_mac</span></code></td>
+<td>tolerances for the MAC projection</td>
+<td>1.e-10</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">eps_mac_max</span></code></td>
+<td>&#160;</td>
+<td>1.e-8</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">mac_level_factor</span></code></td>
+<td>&#160;</td>
+<td><ol class="first last arabic simple" start="10">
+<li></li>
+</ol>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">eps_mac_bottom</span></code></td>
+<td>&#160;</td>
+<td>1.e-3</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">eps_hg</span></code></td>
+<td>tolerances for the nodal projection</td>
+<td>1.e-12</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">eps_hg_max</span></code></td>
+<td>&#160;</td>
+<td>1.e-10</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">hg_level_factor</span></code></td>
+<td>&#160;</td>
+<td><ol class="first last arabic simple" start="10">
+<li></li>
+</ol>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">eps_hg_bottom</span></code></td>
+<td>&#160;</td>
+<td>1.e-4</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="initial_models.html" class="btn btn-neutral float-right" title="Initial Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="param_intro.html" class="btn btn-neutral" title="Runtime Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2]}}})</script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

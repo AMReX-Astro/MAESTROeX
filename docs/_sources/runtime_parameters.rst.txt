@@ -1,0 +1,586 @@
+namespace: ``maestro``
+----------------------
+
+**synchronization**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``do_reflux``                          | do we do the hyperbolic reflux at coarse-fine           | 1             |
+|                                        | interfaces?                                             |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**general MAESTRO**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``maestro_verbose``                    | General verbosity                                       | 1             |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**problem initialization**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``probin_file``                        | input probin file                                       | ""            |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``model_file``                         | input model file                                        | ""            |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``perturb_model``                      | Turn on a perturbation in the initial data.  Problem    | false         |
+|                                        | specific.                                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``print_init_hse_diag``                | print out HSE diagnostics as a function of r for the    | false         |
+|                                        | initial model                                           |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**timestepping**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``stop_time``                          | simulation stop time                                    | -1.0          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``max_step``                           | Maximum number of steps in the simulation.              | 1             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``cfl``                                | CFL factor to use in the computation of the advection   | 0.5           |
+|                                        | timestep constraint                                     |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``init_shrink``                        | the multiplicative factor ($\le 1$) to reduce the       | 1.0           |
+|                                        | initial timestep as computed by the various timestep    |               |
+|                                        | estimators                                              |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``small_dt``                           | the minimum allowed timestep -- we abort if dt drops    | 1.e-10        |
+|                                        | below this value                                        |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``max_dt_growth``                      | The maximum scale factor that the time step is allowed  | 1.1           |
+|                                        | to grow by per time step.                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``max_dt``                             | This is the maximum dt that is allowed                  | 1.e33         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``fixed_dt``                           | Fix the time step.  If -1.0, then use the standard time | -1.0          |
+|                                        | step.                                                   |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``nuclear_dt_fac``                     | If $T_{max}^n > T_{max}^{n-1}$ set the new dt =         | -1.0          |
+|                                        | min[dt, dt*{\tt nuclear\_dt\_fac}*( $T_{max}^{n-1}$ /   |               |
+|                                        | $(T_{max}^n-T_{max}^{n-1})$ ) ] for example, {\tt       |               |
+|                                        | nuclear\_dt\_fac} = 0.01 means don't let the max temp   |               |
+|                                        | grow more than approximately 1 percent not checkpoint-  |               |
+|                                        | compatible yet since it wouldn't be backwards           |               |
+|                                        | compatible                                              |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_soundspeed_firstdt``             | Use the soundspeed constraint when computing the first  | false         |
+|                                        | time step.                                              |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_divu_firstdt``                   | Use the divu constraint when computing the first time   | false         |
+|                                        | step.                                                   |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**grid**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``spherical``                          | Set to 1 if you are doing a spherical problem.          | 0             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``octant``                             | set octant = T if you just want to model an octant of a | false         |
+|                                        | sphere (note: only takes effect for spherical geometry) |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``do_2d_planar_octant``                | Set to 1 if using the 2D simplified (planar) model of   | 0             |
+|                                        | an octant.                                              |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``regrid_int``                         | How often we regrid.                                    | -1            |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``amr_buf_width``                      | the number of buffer zones surrounding a cell tagged    | -1            |
+|                                        | for refinement. note that this needs to be >=           |               |
+|                                        | regrid\_int                                             |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``drdxfac``                            | ratio of radial base state zones to Cartesian full      | 1             |
+|                                        | state zones for spherical geometry                      |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``minwidth``                           | The minimum size on a side for a grid created using     | 8             |
+|                                        | make\_new\_grids.                                       |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``min_eff``                            | parameter for cluster algorithm for making new grids in | 0.9           |
+|                                        | adaptive problems                                       |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_tpert_in_tagging``               | pass $T'$ into the tagging routines as the auxillary    | false         |
+|                                        | multifab instead of the default $\rho H_\mathrm{nuc}$.  |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**output**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``plot_int``                           | plot interval                                           | 0             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_deltat``                        | rather than use a plot interval, plot a file after the  | -1.0          |
+|                                        | solution has advanced past plot\_deltat in time         |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``chk_int``                            | Number of timesteps between writing a checkpoint file   | 0             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_h_with_use_tfromp``             | Turn on storing of enthalpy-based quantities in the     | true          |
+|                                        | plotfile when we are running with {\tt use\_tfromp}     |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_spec``                          | plot species and omegadot in plotfile                   | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_omegadot``                      | plot omegadot in plotfile                               | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_Hext``                          | plot external heating (Hext) in plotfile                | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_Hnuc``                          | plot nuclear energy generation rate (Hnuc) in plotfile  | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_eta``                           | plot $\etarho$ in plotfile                              | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_trac``                          | plot tracers in plotfile                                | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_base``                          | plot w0\_x, w0\_y, w0\_z, divw0, rho0, rhoh0, h0, and   | false         |
+|                                        | p0 in plotfile                                          |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_gpi``                           | plot pi and grad(pi)                                    | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_cs``                            | plot soundspeed                                         | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_base_name``                     | prefix to use in plotfile file names                    | "plt"         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``check_base_name``                    | prefix to use in checkpoint file names                  | "chk"         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``diag_buf_size``                      | number of timesteps to buffer diagnostic output         | 10            |
+|                                        | information before writing (note: not implemented for   |               |
+|                                        | all problems)                                           |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_ad_excess``                     | plot the adiabatic excess                               | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_processors``                    | create a field in the plotfile storing the processor    | false         |
+|                                        | number for each zone                                    |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_pidivu``                        | plot pi * div(U) -- this is a measure of conservation   | false         |
+|                                        | of energy                                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**algorithm initialization**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``init_iter``                          | Number of initial pressure iterations.                  | 4             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``init_divu_iter``                     | Number of initial divu iterations.                      | 4             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``restart_file``                       | Which file to restart from.  Empty string means do not  | ""            |
+|                                        | restart                                                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``restart_into_finer``                 | restart and add a level of refinement                   | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``do_initial_projection``              | Do the initial projection.                              | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**linear solvers**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``mg_verbose``                         | Verbsoity of the multigrid solver, but not the bottom   | 1             |
+|                                        | solver.                                                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``cg_verbose``                         | Verbosity of bottom solver                              | 0             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``mg_cycle_type``                      | Type of cycle used in the MAC multigrid -- 1 = F-cycle, | 3             |
+|                                        | 2 = W-cycle, 3 = V-cycle                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``hg_cycle_type``                      | Type of cycle used in the nodal multigrid -- 1 =        | 3             |
+|                                        | F-cycle, 2 = W-cycle, 3 = V-cycle                       |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``hg_bottom_solver``                   | valid values are $\ge$ 0                                | -1            |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``mg_bottom_solver``                   | valid values are $\ge$ 0                                | -1            |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``max_mg_bottom_nlevels``              | if mg\_bottom\_solver == 4, then how many mg levels can | 1000          |
+|                                        | the bottom solver mgt object have                       |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``mg_bottom_nu``                       | number of smoothing iterations to do after the          | 10            |
+|                                        | multigrid bottom solver                                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``mg_nu_1``                            | number of smoothing iterations to do going down the     | 2             |
+|                                        | V-cycle                                                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``mg_nu_2``                            | number of smoothing iterations to do going up the       | 2             |
+|                                        | V-cycle                                                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``hg_dense_stencil``                   | In hgproject, in 2D, use a 9 point Laplacian (true) or  | true          |
+|                                        | 5-point Laplacian (false).  In 3D, use a 27 point       |               |
+|                                        | Laplacian (true) or 7-point Laplacian (false).          |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**hydrodynamics**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``do_sponge``                          | Use sponging.                                           | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``sponge_kappa``                       | Parameter for sponge.  Problem dependent.               | 10.e0         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``sponge_center_density``              | Center of the inner sponge.                             | 3.e6          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``sponge_start_factor``                | The sponge begins at sponge\_center\_density *          | 3.333e0       |
+|                                        | sponge\_start\_factor.                                  |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_sponge_fdamp``                  | plot fdamp rather than sponge assumes sponge has the    | false         |
+|                                        | form 1/(1+dt*{\tt sponge\_kappa}*fdamp)                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``anelastic_cutoff``                   | The density below which we modify the constraint to     | 3.e6          |
+|                                        | look like the anelastic constraint, instead of the low  |               |
+|                                        | Mach constraint.  This prevents velocities from getting |               |
+|                                        | out of hand at the edge of the star. Refer to Section   |               |
+|                                        | \ref{Sec:Anelastic Cutoff}.                             |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``base_cutoff_density``                | The density below which we keep the initial model       | 3.e6          |
+|                                        | constant. Refer to Section \ref{Sec:Base Cutoff         |               |
+|                                        | Density}                                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``burning_cutoff_density``             | The density below which we disable burning              | 3.e6          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``buoyancy_cutoff_factor``             | The multiplicative factor (over base\_cutoff\_density)  | 5.0           |
+|                                        | below which we do zero out the buoyancy term in the     |               |
+|                                        | momentum equation.                                      |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``dpdt_factor``                        | factor in front of the volume discrepancy term (0.0 =   | 0.0           |
+|                                        | off)                                                    |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``do_planar_invsq_grav``               | are we doing 1/r$^2$ gravity for plane-parallel         | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``planar_invsq_mass``                  | the point mass for planar 1/r$^2$ gravity               | 0.0           |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``evolve_base_state``                  | turn on (true) or off (false) basestate evolution       | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_exact_base_state``               | turn on (true) or off (false) irregularly-spaced        | false         |
+|                                        | basestate                                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``fix_base_state``                     | if true, don't call average to reset the base state at  | false         |
+|                                        | all, even during initialization                         |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``average_base_state``                 | turn on (true) or off (false) basestate evolution that  | false         |
+|                                        | uses averages of cell-centered data instead of          |               |
+|                                        | advecting                                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``do_smallscale``                      | force $\rho_0 = (\rho h)_0 = 0$, {\tt                   | false         |
+|                                        | evolve\_base\_state = F} and {\tt beta\_type} = 3       |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``do_eos_h_above_cutoff``              | After the advective enthalpy update, recompute the      | true          |
+|                                        | enthalpy if we are below the base cutoff density.       |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``enthalpy_pred_type``                 | predict\_rhoh = 0; \newline predict\_rhohprime = 1;     | 1             |
+|                                        | \newline predict\_h = 2; \newline                       |               |
+|                                        | predict\_T\_then\_rhohprime = 3; \newline               |               |
+|                                        | predict\_T\_then\_h = 4; \newline predict\_hprime = 5;  |               |
+|                                        | \newline predict\_Tprime\_then\_h = 6.                  |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``species_pred_type``                  | Which quantities do we predict to the edges for         | 1             |
+|                                        | computing the ($\rho X$) edge states?  \newline {\tt    |               |
+|                                        | species\_pred\_type} = 1 means predict $\rho^\prime$    |               |
+|                                        | and $X$ separately.  \newline {\tt species\_pred\_type} |               |
+|                                        | = 2 means predict the full ($\rho X$) itself. \newline  |               |
+|                                        | {\tt species\_pred\_type} = 3 means predict $\rho$ and  |               |
+|                                        | $X$ separately.                                         |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_delta_gamma1_term``              | turns on second order correction to delta gamma1 term   | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_etarho``                         | turn on the etarho term as described in flow chart      | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``slope_order``                        | order of slopes in piecewise linear Godunov algorithm.  | 4             |
+|                                        | Options are 0, 2, or 4.                                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``grav_const``                         | the gravitational acceleration (cm~s$^{-2}$) for plane- | -1.5e10       |
+|                                        | parallel geometry                                       |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``ppm_type``                           | 0 = no ppm (piecewise linear slopes instead) \newline 1 | 1             |
+|                                        | = 1984 ppm \newline 2 = Hybrid Sekora/Colella and       |               |
+|                                        | McCorquodale/Colella 2009/2010 ppm                      |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``bds_type``                           | 0 = use ppm instead for multi-d integrator \newline 1 = | 0             |
+|                                        | bilinear                                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``ppm_trace_forces``                   | if 1, then perform parabolic reconstruction on the      | 0             |
+|                                        | forces used in the prediction and trace under the       |               |
+|                                        | parabola to the interfaces the amount that can reach    |               |
+|                                        | the interface over dt                                   |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``beta0_type``                         | what type of coefficient to use inside the velocity     | 1             |
+|                                        | divergence constraint. \newline {\tt beta0\_type} = 1   |               |
+|                                        | uses $\beta_0$; \newline {\tt beta0\_type} = 2 uses     |               |
+|                                        | $\rho_0$ (anelastic); \newline {\tt beta0\_type} = 3    |               |
+|                                        | uses 1 (small-scale combustion).                        |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_linear_grav_in_beta0``           | how to represent gravity in the $\beta_0$ integration:  | false         |
+|                                        | true = piecewise linear false = piecewise constant      |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``rotational_frequency``               | rotational frequency used for computing centrifugal     | 0.0           |
+|                                        | term in rotation problems.                              |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``co_latitude``                        | latitude, in radians, for problems with rotation where  | 0.0           |
+|                                        | the domain is only a subset of a full star.             |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``rotation_radius``                    | radius used for computing centrifugal term in rotation  | 1.0e6         |
+|                                        | problems                                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``mach_max_abort``                     | maximum mach number before the code aborts              | -1.0          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``drive_initial_convection``           | freeze the temperature used in the reaction network to  | false         |
+|                                        | the initial value.  This is useful for developing an    |               |
+|                                        | initial convective field to carry away the energy,      |               |
+|                                        | while preventing the reactions from going nonlinear.    |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``stop_initial_convection``            | timestep beyond which we set {\tt                       | -1            |
+|                                        | drive\_initial\_convection} = F                         |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``restart_with_vel_field``             | restart the simulation using a result from a {\tt       | false         |
+|                                        | drive\_initial\_convection} = T run note that this uses |               |
+|                                        | the restart variable to specify which file to restart   |               |
+|                                        | from.  After reading in the velocity information from   |               |
+|                                        | the restart file, the time and timestep number are      |               |
+|                                        | zeroed.                                                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_alt_energy_fix``                 | modify the momentum equation to have $(\beta_0/\rho)    | true          |
+|                                        | \nabla (\pi/\beta_0)$ instead of just $(1/\rho) \nabla  |               |
+|                                        | (\pi)$                                                  |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**thermal diffusion**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``use_thermal_diffusion``              | Use thermal diffusion.                                  | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``temp_diffusion_formulation``         | How to compute the explicit thermal diffusion term.     | 2             |
+|                                        | \newline 1 = in terms of $T$; \newline 2 = in terms of  |               |
+|                                        | $\rho,p_0,X$.                                           |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``thermal_diffusion_type``             | In the thermal diffusion solver, 1 = Crank-Nicholson; 2 | 1             |
+|                                        | = Backward Euler.                                       |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``limit_conductivity``                 | apply the conductivity limiting---if T, then we set the | false         |
+|                                        | thermal coefficients all to 0 for $\rho <$ {\tt         |               |
+|                                        | buoyancy\_cutoff\_factor} * {\tt base\_cutoff\_density} |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**burning**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``do_burning``                         | turn on (true) or off (false) burning                   | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``burner_threshold_species``           | Name of the species to be used in burner threshold      | ""            |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``burner_threshold_cutoff``            | Mass fraction cutoff for burner\_threshold\_species     | 1.e-10        |
+|                                        | used in burner threshold                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``do_subgrid_burning``                 | break a zone into subzones, call the burner in each     | false         |
+|                                        | subzone and then average the result to the original     |               |
+|                                        | cell                                                    |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``reaction_sum_tol``                   | mass fraction sum tolerance (if they don't sum to 1     | 1.e-10        |
+|                                        | within this tolerance, we abort)                        |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**EOS**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``small_temp``                         |                                                         | 5.e6          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``small_dens``                         |                                                         | 1.e-5         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_tfromp``                         | When updating temperature, use $T=T(\rho,p_0,X) $       | false         |
+|                                        | rather than $T=T(\rho,h,X)$.                            |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_eos_e_instead_of_h``             | In deriving the temperature from the $h$, first         | false         |
+|                                        | subtract off $p_0/\rho$ to define $e$, and use that as  |               |
+|                                        | the input to the EOS.                                   |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_pprime_in_tfromp``               |                                                         | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**base state mapping**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``s0_interp_type``                     | The interpolation for filling a cell-centered multifab  | 3             |
+|                                        | from a 1D bin-centered array. \newline 1 = piecewise    |               |
+|                                        | constant; \newline 2 = piecewise linear; \newline 3 =   |               |
+|                                        | quadratic                                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``w0_interp_type``                     | The interpolation for filling a cell-centered multifab  | 2             |
+|                                        | from a 1D edge-centered array. \newline 1 = piecewise   |               |
+|                                        | constant; \newline 2 = piecewise linear; \newline 3 =   |               |
+|                                        | quadratic                                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``s0mac_interp_type``                  | The interpolation for filling an edge based multifab    | 1             |
+|                                        | from a 1D bin-centered array. \newline 1 = Interpolate  |               |
+|                                        | s0 to cell centers (with s0\_interp\_type), then        |               |
+|                                        | average to edges; \newline 2 = Interpolate s0 to edges  |               |
+|                                        | directly using linear interpolation; \newline 3 =       |               |
+|                                        | Interpolate s0 to edges directly using quadratic        |               |
+|                                        | interpolation.                                          |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``w0mac_interp_type``                  | The interpolation for putting w0 on edges.  We only     | 1             |
+|                                        | compute the normal component. \newline 1 = Interpolate  |               |
+|                                        | w0 to cell centers (with w0\_interp\_type), then        |               |
+|                                        | average to edges; \newline 2 = Interpolate w0 to edges  |               |
+|                                        | directly using linear interpolation; \newline 3 =       |               |
+|                                        | Interpolate w0 to edges directly using quadratic        |               |
+|                                        | interpolation; \newline 4 = Interpolate w0 to nodes     |               |
+|                                        | using linear interpolation, then average to edges.      |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**diagnostics, I/O**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``print_fortran_warnings``             | display warnings in Fortran90 routines                  | (0, 1)        |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``print_update_diagnostics``           | display information about updates to the state (how     | (0, 1)        |
+|                                        | much mass, momentum, energy added)                      |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``track_grid_losses``                  | calculate losses of material through physical grid      | 0             |
+|                                        | boundaries                                              |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``sum_interval``                       | how often (number of coarse timesteps) to compute       | -1            |
+|                                        | integral sums (for runtime diagnostics)                 |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``sum_per``                            | how often (simulation time) to compute integral sums    | -1.0e0        |
+|                                        | (for runtime diagnostics)                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``show_center_of_mass``                | display center of mass diagnostics                      | 0             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``hard_cfl_limit``                     | abort if we exceed CFL = 1 over the cource of a         | 1             |
+|                                        | timestep                                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``job_name``                           | a string describing the simulation that will be copied  | ""            |
+|                                        | into the plotfile's {\tt job\_info} file                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``output_at_completion``               | write a final plotfile and checkpoint upon completion   | 1             |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``reset_checkpoint_time``              | Do we want to reset the time in the checkpoint? This    | -1.e200       |
+|                                        | ONLY takes effect if amr.regrid\_on\_restart = 1 and    |               |
+|                                        | amr.checkpoint\_on\_restart = 1, (which require that    |               |
+|                                        | max\_step and stop\_time be less than the value in the  |               |
+|                                        | checkpoint) and you set it to value greater than this   |               |
+|                                        | default value.                                          |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``reset_checkpoint_step``              | Do we want to reset the number of steps in the          | -1            |
+|                                        | checkpoint? This ONLY takes effect if                   |               |
+|                                        | amr.regrid\_on\_restart = 1 and                         |               |
+|                                        | amr.checkpoint\_on\_restart = 1, (which require that    |               |
+|                                        | max\_step and stop\_time be less than the value in the  |               |
+|                                        | checkpoint) and you set it to value greater than this   |               |
+|                                        | default value.                                          |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**particles**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``use_particles``                      | call the particle initialization, advection, etc.       | false         |
+|                                        | routines.                                               |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``store_particle_vels``                | store the velocity of the particle?                     | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**heating**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``do_heating``                         | use analytic heating                                    | false         |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**SDC**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``sdc_iters``                          | how many SDC iteractions to take (requires the code be  | 1             |
+|                                        | compiled with {\tt SDC := t}                            |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``sdc_couple_mac_velocity``            | recompute MAC velocity at the beginning of each SDC     | false         |
+|                                        | iter                                                    |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+
+**solver tolerances**
+
++----------------------------------------+---------------------------------------------------------+---------------+
+| parameter                              | description                                             | default value |
++========================================+=========================================================+===============+
+| ``eps_init_proj_cart``                 | tolerances for the initial projection                   | 1.e-12        |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_init_proj_sph``                  |                                                         | 1.e-10        |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_divu_cart``                      | tolerances for the divu iterations                      | 1.e-12        |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_divu_sph``                       |                                                         | 1.e-10        |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``divu_iter_factor``                   |                                                         | 100.          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``divu_level_factor``                  |                                                         | 10.           |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_mac``                            | tolerances for the MAC projection                       | 1.e-10        |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_mac_max``                        |                                                         | 1.e-8         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``mac_level_factor``                   |                                                         | 10.           |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_mac_bottom``                     |                                                         | 1.e-3         |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_hg``                             | tolerances for the nodal projection                     | 1.e-12        |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_hg_max``                         |                                                         | 1.e-10        |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``hg_level_factor``                    |                                                         | 10.           |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``eps_hg_bottom``                      |                                                         | 1.e-4         |
++----------------------------------------+---------------------------------------------------------+---------------+
+
+
+

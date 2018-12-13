@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Problem Setups &mdash; MAESTROeX 18.11
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Unit Tests" href="unit_tests.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                18.11
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Problem Setups</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#standard-test-problems">‘Standard’ Test Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#distributed-science-problems">Distributed Science Problems</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">MAESTROeX Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Problem Setups</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/problems.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="problem-setups">
+<h1>Problem Setups<a class="headerlink" href="#problem-setups" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="standard-test-problems">
+<h2>‘Standard’ Test Problems<a class="headerlink" href="#standard-test-problems" title="Permalink to this headline">¶</a></h2>
+<p>Different problems in MAESTROeX&nbsp;are contained in one of three
+sub-directories under MAESTROeX/Exec: (SCIENCE/,
+TEST_PROBLEMS/, or UNIT_TESTS/). The GNUmakefile in each
+problem directory lists the components of MAESTRO that are used
+to build the executable. TEST_PROBLEMS/ contains simple
+problems that were used in the development of MAESTROeX. Many
+of these were featured in the papers describing the MAESTROeX&nbsp;algorithm.</p>
+<p>Some of the test problems available are:</p>
+<ul>
+<li><div class="first line-block">
+<div class="line">double_bubble</div>
+<div class="line">A rising bubble problem where the bubble(s) can have a different gamma
+than the surrounding atmosphere. This uses the multigamma EOS.</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">incomp_shear_jet</div>
+<div class="line">A simple pure-incompressible shear layer problem. This is the example
+problem used in <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{bellcolellaglaz}`</span></a>. This is useful to see how to
+use MAESTROeX&nbsp;as an incompressible solver.</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">reacting_bubble</div>
+<div class="line">reacting_bubble places 3 hots spots in a plane-parallel atmosphere.
+Burning makes these bubbles buoyant, and then roll up. This problem was
+used in <a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{lowMach3}`</span></a> to compare with compressible solvers.</div>
+</div>
+<p>This problem can also be run adaptively. The tag_boxes.f90
+file in the problem directory tags cells for refinement if the
+perturbational temperature, <span class="math notranslate nohighlight">\(T^\prime\)</span>, exceeds some threshold.</p>
+</li>
+<li><div class="first line-block">
+<div class="line">rt</div>
+<div class="line">[-3mm]</div>
+</div>
+<p>A Rayleigh-Taylor instability problem. There are two methods that the
+code is run here, in the standard (using inputs_2d), the base state
+has the stratified atmosphere and we introduce a velocity perturbation
+to start the instability. The alternate method, inputs_2d_SNe, uses
+the do_smallscale runtime parameter to eliminate the base state
+and instead use the incompressible constraint to evolve the system.</p>
+</li>
+<li><div class="first line-block">
+<div class="line">test_convect</div>
+<div class="line">test_convect drives convection through a plane-parallel
+atmosphere using an externally-specified heat source. This problem
+was used to compare with compressible solvers in <a href="#id5"><span class="problematic" id="id6">:raw-latex:`\cite{lowMach3}`</span></a>
+and to test the multilevel algorithm in <a href="#id7"><span class="problematic" id="id8">:raw-latex:`\cite{multilevel}`</span></a>.</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">test_spherical</div>
+<div class="line">This problem sets up an isentropically stratified star and stirs it up
+with a random velocity field. The low Mach number constraint is
+replaced with the anelastic constraint (through
+the beta_type runtime parameter). Analytically, under
+these conditions, the density of the star should not change. This
+test problem was discussed in Maestro paper IV&nbsp;<a href="#id9"><span class="problematic" id="id10">:raw-latex:`\cite{lowMach4}`</span></a>.</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="distributed-science-problems">
+<h2>Distributed Science Problems<a class="headerlink" href="#distributed-science-problems" title="Permalink to this headline">¶</a></h2>
+<p>The following problems were used for science studies. It is
+anticipated that more will be made available with time.</p>
+<ul>
+<li><div class="first line-block">
+<div class="line">flame</div>
+<div class="line">A combustion-mode problem where we model a thermonuclear flame in a
+small domain. This enforces the low Mach combustion constraint
+divU = S. Hot ash and cool fuel are put into contact and a flame
+will ignite and propagate across the grid. Inflow boundary
+conditions are used to allow for an inflow velocity to be set to
+keep the laminar flame stationary.</div>
+</div>
+<p>In this mode, MAESTROeX&nbsp;behaves like the code described
+in <a href="#id11"><span class="problematic" id="id12">:raw-latex:`\cite{SNe}`</span></a>, which was used for models of Rayleigh-Taylor
+unstable flames&nbsp;<a href="#id13"><span class="problematic" id="id14">:raw-latex:`\cite{SNld,SNrt,SNrt3d}`</span></a>.</p>
+</li>
+<li><div class="first line-block">
+<div class="line">flame_1d</div>
+<div class="line">A 1-d version of the flame problem above. This uses a special
+elliptic solver in AMReX&nbsp;that only works for a single grid, so
+no parallel runs are allowed for this problem.</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">toy_convect</div>
+<div class="line">A nova-like problem for studying convection. This problem has seen
+extensive use in understanding which prediction types are the best
+when we have sharp species gradients. See Mike Z or Ryan for details.</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">wdconvect</div>
+<div class="line">Model convection leading up to ignition in the Chandraseskhar-mass SNe
+Ia progenitor model. This setup was the basis for the simulations
+presented in <a href="#id15"><span class="problematic" id="id16">:raw-latex:`\cite{lowMach4,wdconvect,wdturb}`</span></a>.</div>
+</div>
+</li>
+</ul>
+<span class="target" id="sec-gettingstarted-runtime"></span></div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="unit_tests.html" class="btn btn-neutral float-right" title="Unit Tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="getting_started.html" class="btn btn-neutral" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2]}}})</script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

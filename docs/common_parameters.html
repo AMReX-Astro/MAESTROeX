@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Common Runtime Parameters &mdash; MAESTROeX 18.11
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MAESTROeX Architecture" href="architecture.html" />
+    <link rel="prev" title="Unit Tests" href="unit_tests.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                18.11
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Common Runtime Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#controlling-timestepping-and-output">Controlling Timestepping and Output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#defining-the-grid-and-boundary-conditions">Defining the Grid and Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">MAESTROeX Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Common Runtime Parameters</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/common_parameters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="common-runtime-parameters">
+<h1>Common Runtime Parameters<a class="headerlink" href="#common-runtime-parameters" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="controlling-timestepping-and-output">
+<h2>Controlling Timestepping and Output<a class="headerlink" href="#controlling-timestepping-and-output" title="Permalink to this headline">¶</a></h2>
+<p>Parameters that set the maximum time for the simulation to run
+include:</p>
+<ul class="simple">
+<li>stop_time is the maximum simulation time, in seconds,
+to evolve the system for.</li>
+<li>max_step is the maximum number of steps to take.</li>
+</ul>
+<p>Parameters affecting the size of the timestep include:</p>
+<ul class="simple">
+<li>cflfac is a multiplicative factor (<span class="math notranslate nohighlight">\(\le 1\)</span>)
+applied to the advective CFL timestep</li>
+<li>init_shrink is the factor (<span class="math notranslate nohighlight">\(\le 1\)</span>) by which to reduce
+the initial timestep from the estimated first timestep.</li>
+</ul>
+<p>Parameters affecting output and restart include:</p>
+<ul class="simple">
+<li>restart tells MAESTROeX&nbsp;to restart from a checkpoint. The
+value of this parameter should be the file number to restart from.
+For example, to restart from the checkpoint file chk00010,
+you would set restart = 10.</li>
+<li>plot_int is the number of steps to take between
+outputting a plotfile</li>
+<li>plot_deltat is the simulation time to evolve between
+outputting a plotfile. Note: to output only based on simulation
+time, set plot_int = -1.</li>
+<li>check_int is the number of steps to take between
+outputting a checkpoint.</li>
+<li>plot_base_name is the basename to use for the
+plotfile filename. The step number will be appended to
+this name.</li>
+</ul>
+<p>Note that in addition to the normal plotfiles, there are <em>mini</em> plotfiles
+that store a small subset of the fields, intended to be output more frequently.
+These are described in §&nbsp;<a class="reference external" href="#vis:sec:miniplotfile">[vis:sec:miniplotfile]</a>.</p>
+</div>
+<div class="section" id="defining-the-grid-and-boundary-conditions">
+<h2>Defining the Grid and Boundary Conditions<a class="headerlink" href="#defining-the-grid-and-boundary-conditions" title="Permalink to this headline">¶</a></h2>
+<p>Parameters that determine the spatial extent of the grid,
+the types of boundaries, and the number of computational cells include:</p>
+<ul>
+<li><p class="first">max_levs is the maximum number of grid levels in the AMR
+hierarchy to use. max_levs = 1 indicates running with only a
+single level spanning the whole domain.</p>
+</li>
+<li><p class="first">n_cellx, n_celly, n_cellz the size of
+base level in terms of number of cells, in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>
+coordinate directions.</p>
+</li>
+<li><p class="first">max_grid_size the maximum extend of a grid, in any
+coordinate direction, as measured in terms of number of cells.</p>
+<p>For multilevel problems, the parameter max_grid_size_1
+controls the maximum extent on level 1 (the base
+grid), max_grid_size_2 controls the maximum extent on
+level 2, and max_grid_size_3 controls the maximum extent on
+levels 3 and higher.</p>
+</li>
+<li><p class="first">prob_lo_x, prob_lo_y, prob_lo_z is
+the physical coordinate of the lower extent of the domain boundary
+in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span> coordinate directions.</p>
+</li>
+<li><p class="first">prob_hi_x, prob_hi_y, prob_hi_z is
+the physical coordinate of the upper extent of the domain boundary
+in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span> coordinate directions.</p>
+</li>
+<li><p class="first">There are two ways to specify boundary conditions—via integer flags
+or descriptive string names. If the string names are present,
+then they will override the integer quantities in determining
+the boundary conditions.</p>
+<ul>
+<li><p class="first">bcx_lo, bcy_lo, bcz_lo
+, bcx_hi, bcy_hi, bcz_hi are the
+boundary condition types at the lower (‘lo’) and upper
+(‘hi’) domain boundaries in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>
+coordinate directions. The different types are set via integer
+flags listed in table&nbsp;<a class="reference external" href="#gs:table:bcflags">[gs:table:bcflags]</a>.</p>
+<table border="1" class="docutils" id="id1">
+<caption><span class="caption-text">[gs:table:bcflags] Boundary condition flags</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="61%" />
+<col width="39%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">BC type</th>
+<th class="head">integer flag</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>periodic</td>
+<td><span class="math notranslate nohighlight">\(-1\)</span></td>
+</tr>
+<tr class="row-odd"><td>inlet (user-defined)</td>
+<td><span class="math notranslate nohighlight">\(11\)</span></td>
+</tr>
+<tr class="row-even"><td>outlet</td>
+<td><span class="math notranslate nohighlight">\(12\)</span></td>
+</tr>
+<tr class="row-odd"><td>symmetry</td>
+<td><span class="math notranslate nohighlight">\(13\)</span></td>
+</tr>
+<tr class="row-even"><td>slip wall</td>
+<td><span class="math notranslate nohighlight">\(14\)</span></td>
+</tr>
+<tr class="row-odd"><td>no-slip wall</td>
+<td><span class="math notranslate nohighlight">\(15\)</span></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p class="first">xlo_boundary_type, ylo_boundary_type, zlo_boundary_type, xhi_boundary_type, yhi_boundary_type, zhi_boundary_type
+are the boundary condition types at the lower and upper domain
+boundaries in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span> coordinate directions. The
+boundary type is set by providing a string name—valid values are
+listed in table&nbsp;<a class="reference external" href="#gs:table:bcstrings">[gs:table:bcstrings]</a></p>
+<table border="1" class="docutils" id="id2">
+<caption><span class="caption-text">[gs:table:bcstrings] Boundary condition string names</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="58%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">BC type</th>
+<th class="head">integer flag</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>periodic</td>
+<td>“periodic”</td>
+</tr>
+<tr class="row-odd"><td>inlet (user-defined)</td>
+<td>“inlet”</td>
+</tr>
+<tr class="row-even"><td>outlet</td>
+<td>“outlet”</td>
+</tr>
+<tr class="row-odd"><td>symmetry</td>
+<td>“symmetry”</td>
+</tr>
+<tr class="row-even"><td>slip wall</td>
+<td>“slip wall”</td>
+</tr>
+<tr class="row-odd"><td>no-slip wall</td>
+<td>“no slip wall”</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<p>The string-based parameters are a newer option for specifying
+boundary conditions, and are preferred due to clarity. The
+conversion between the string names and integer flags is done
+by AMReX&nbsp;in the bc_module at the time of initializing
+the runtime parameters.</p>
+</li>
+</ul>
+<p>Note that grid cells must be square, i.e. <span class="math notranslate nohighlight">\(\Delta x = \Delta y = \Delta z\)</span>
+where <span class="math notranslate nohighlight">\(\Delta x\)</span> on the base grid is computed as <span class="math notranslate nohighlight">\(({\tt prob\_hi\_x}
+- {\tt prob\_lo\_x})/{\tt n\_cellx}\)</span>. For multilevel problems, the effective
+number of zones on the finest grid in the <span class="math notranslate nohighlight">\(x\)</span> direction will be
+<span class="math notranslate nohighlight">\({\tt n\_cellx} \cdot 2^{({\tt max\_levels} -1)}\)</span>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="architecture.html" class="btn btn-neutral float-right" title="MAESTROeX Architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="unit_tests.html" class="btn btn-neutral" title="Unit Tests" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2]}}})</script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

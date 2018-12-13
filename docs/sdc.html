@@ -1,0 +1,708 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Spectral Deferred Corrections &mdash; MAESTROeX 18.11
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Godunov Interface States" href="Godunov.html" />
+    <link rel="prev" title="Interface State Details" href="pert.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                18.11
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">MAESTROeX Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Spectral Deferred Corrections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sdc-overview">SDC Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#strang-splitting-without-thermal-diffusion-or-base-state-evolution">Strang-Splitting Without Thermal Diffusion or Base State Evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sdc-without-thermal-diffusion-or-base-state-evolution">SDC Without Thermal Diffusion or Base State Evolution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#advective-update">Advective Update</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#final-update">Final Update</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#species-source-terms">Species Source Terms.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#enthalpy-source-terms">Enthalpy Source Terms.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implementation">Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#summary-of-changes">Summary of Changes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm-flowchart-adr-with-fixed-base-state">Algorithm Flowchart - ADR with Fixed Base State</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Spectral Deferred Corrections</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sdc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="spectral-deferred-corrections">
+<h1>Spectral Deferred Corrections<a class="headerlink" href="#spectral-deferred-corrections" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sdc-overview">
+<h2>SDC Overview<a class="headerlink" href="#sdc-overview" title="Permalink to this headline">¶</a></h2>
+<p>Spectral deferred corrections (SDC) is an iterative scheme used to integrate
+the thermodynamic variables, <span class="math notranslate nohighlight">\((\rho X_k,\rho h)\)</span>, over a time step. It has
+been shown to be more accurate and efficient than Strang splitting in a
+terrestrial, non-stratified, low Mach number reacting flow solver <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{Non11}`</span></a>,
+so we would like to develop an SDC version of MAESTRO.</p>
+<p>MAESTRO&nbsp;integrates the following system of equations:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{\partial\Ub}{\partial t} &amp;=&amp;
+    -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi
+    - \frac{\rho-\rho_0}{\rho} g\eb_r,\label{eq:momentum}\\
+\frac{\partial(\rho X_k)}{\partial t} &amp;=&amp;
+    -\nabla\cdot(\rho X_k\Ub) + \rho\omegadot_k,\label{eq:species}\\
+\frac{\partial(\rho h)}{\partial t} &amp;=&amp;
+    -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt}
+    + \rho\Hnuc + \nabla\cdot k_{\rm th}\nabla T,\label{eq:enthalpy}\end{aligned}\end{split}\]</div>
+<p>together with base state evolution equations and a constraint equation.
+By default, MAESTRO&nbsp;advances the thermodynamic variables by coupling
+the different physical processes together (advection, diffusion, reactions) using
+Strang splitting. Specifically, we integrate the reaction terms
+over half a time step ignoring contributions from advection and diffusion,
+then from this intermediate state we integrate the advection and diffusion terms over
+a full time step (while ignoring reactions), and finally
+integrate the reactions over a half time step (ignoring advection and diffusion).
+For problems where
+the reactions and/or diffusion greatly alter the energy balance or composition
+as compared to advection, this operator splitting approach can lead to large
+splitting errors and highly inaccurate solutions.
+This issue is can be particularly exasperating
+for low Mach number methods that can take large advection-based time steps.</p>
+<p>An alternate approach to advancing the thermodynamic variables is SDC.
+SDC is an iterative approach to couple the various processes
+together, with each process seeing an
+approximation of the other processes as a source term. The SDC
+algorithm converges to an integral representation of the solution in
+time that couples all of the processes together in a self-consistent
+fashion, see <a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{Non11}`</span></a>.</p>
+<p>As a first attempt, we will work on coupling advection and reactions only
+via SDC, with a base state that is fixed in time, but not space.</p>
+</div>
+<div class="section" id="strang-splitting-without-thermal-diffusion-or-base-state-evolution">
+<h2>Strang-Splitting Without Thermal Diffusion or Base State Evolution<a class="headerlink" href="#strang-splitting-without-thermal-diffusion-or-base-state-evolution" title="Permalink to this headline">¶</a></h2>
+<p>In the Strang splitting version of MAESTRO, the reaction and advection
+processes operate independent of one-another. The species and
+enthalpy equations are integrated over <span class="math notranslate nohighlight">\(\Delta t\)</span> using the following
+sequence:</p>
+<ul>
+<li><p class="first">React for <span class="math notranslate nohighlight">\(\Delta t/2\)</span>:</p>
+<p>In the Strang splitting version of MAESTRO, the reaction network solves just
+the reaction portion of the species evolution equations along with a
+temperature evolution equation. This is done using a standard stiff ODE solver
+package (like VODE) on the system:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{dX_k}{dt} &amp;=&amp; \omegadot_k(\rho,X_k,T), \\
+\frac{dT}{dt}   &amp;=&amp;
+    \frac{1}{c_p} \left ( -\sum_k \xi_k  \omegadot_k  + \Hnuc \right ).\end{aligned}\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(T\)</span> is evolved solely to evaluate the reaction rates,
+<span class="math notranslate nohighlight">\(\omegadot_k(\rho,X_k,T)\)</span>. Furthermore, we simplify the problem
+“freezing” the thermodynamics—i.e., <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span> are evaluated at the
+start of the integration and held constant thereafter.
+The density remains constant during this step, i.e.,
+<span class="math notranslate nohighlight">\(\rho^\mathrm{new} = \rho^\mathrm{old}\)</span>, and we
+update the enthalpy at the end of the integration as:</p>
+<div class="math notranslate nohighlight">
+\[h^\mathrm{new} = h^\mathrm{old} + \frac{\Delta t}{2} \Hnuc.\]</div>
+</li>
+<li><p class="first">Advect for <span class="math notranslate nohighlight">\(\Delta t\)</span>:</p>
+<p>Beginning with the results from the previous reaction half time step, we integrate
+that state using the equations</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{\partial(\rho X_k)}{\partial t} &amp;=&amp;
+    -\nabla\cdot(\rho X_k\Ub), \\
+\frac{\partial(\rho h)}{\partial t} &amp;=&amp;
+    -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt}.\end{aligned}\end{split}\]</div>
+<p>Note that no reaction terms appear here. Since the advection
+takes place using the state updated from the reaction step, the effect
+of the reactions is implicitly contained in the advective update.</p>
+</li>
+<li><p class="first">React for <span class="math notranslate nohighlight">\(\Delta t/2\)</span>:</p>
+<p>Finally, we react again, starting with the state left by the advection
+step.</p>
+</li>
+</ul>
+<p>Note that MAESTRO&nbsp;uses a predictor-corrector approach. After integrating <span class="math notranslate nohighlight">\((\rho X_k,\rho h)\)</span> over
+the time step, we use this time-advanced state to get a better estimate of a time-centered <span class="math notranslate nohighlight">\(\beta_0\)</span>
+and <span class="math notranslate nohighlight">\(S\)</span>. We re-compute the advective velocities using an updated divergence constraint and repeat
+the thermodynamic variable advance.</p>
+</div>
+<div class="section" id="sdc-without-thermal-diffusion-or-base-state-evolution">
+<h2>SDC Without Thermal Diffusion or Base State Evolution<a class="headerlink" href="#sdc-without-thermal-diffusion-or-base-state-evolution" title="Permalink to this headline">¶</a></h2>
+<p>In the SDC version, the VODE integration at the end of an SDC
+iteration is responsible for updating all the thermodynamic quantities
+including both the advection (incorporated via a piecewise constant advective
+flux divergence source term) and the reactions. This provides a much stronger coupling between
+the physical processes. In particular, our system now looks like:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{d(\rho X_k)}{dt} &amp;=&amp; \rho \omegadot_k(\rho,X_k,T) - \underbrace{\nabla\cdot(\rho X_k\Ub)}_{A_{\rho X_k}}\label{eq:sdc:rhoX} \\
+\frac{d(\rho h)}{dt}   &amp;=&amp; \rho \Hnuc - \underbrace{\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt}}_{A_{\rho h}} \label{eq:sdc:rhoh}\end{aligned}\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(A_{\rho X_k}\)</span> and <span class="math notranslate nohighlight">\(A_{\rho h}\)</span> are piecewise-constant (in time)
+approximations to the change in <span class="math notranslate nohighlight">\({\rho X_k}\)</span> and <span class="math notranslate nohighlight">\({\rho h}\)</span> (respectively)
+due to the advection. These are constructed by calling density_advance
+and enthalpy_advance in MAESTRO&nbsp;and passed into the network solver
+during the reaction step. A flowchart of the MAESTRO&nbsp;SDC algorithm is
+shown in figure&nbsp;<a class="reference external" href="#fig:sdc:flowchart">[fig:sdc:flowchart]</a>.</p>
+<div class="section" id="advective-update">
+<h3>Advective Update<a class="headerlink" href="#advective-update" title="Permalink to this headline">¶</a></h3>
+<p>In the advective update, our goal is to compute <span class="math notranslate nohighlight">\(A_{\rho X_k}\)</span> and
+<span class="math notranslate nohighlight">\(A_{\rho h}\)</span>. These terms approximate the following:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+A_{\rho X_k} &amp;=&amp;  \left [- \nabla \cdot (\rho X_k \Ub) \right ]^{n+1/2} \\
+A_{\rho h}   &amp;=&amp;  \left [- \nabla \cdot (\rho h \Ub) + \frac{Dp_0}{Dt} \right ]^{n+1/2}\end{aligned}\end{split}\]</div>
+<p>The construction of the interface states used in the advective terms
+uses either a time-lagged or iteratively-lagged approximation to the reaction
+terms (<span class="math notranslate nohighlight">\(I_{\rho X_k}\)</span> and <span class="math notranslate nohighlight">\(I_{\rho h}\)</span>, see below) as a source term in the interface
+prediction. This explicitly couples the reaction process to the
+advection process.</p>
+</div>
+<div class="section" id="final-update">
+<h3>Final Update<a class="headerlink" href="#final-update" title="Permalink to this headline">¶</a></h3>
+<p>The RHS routine that the ODE solver operates on will first construct
+the density as:</p>
+<div class="math notranslate nohighlight">
+\[\rho = \sum_k (\rho X_k)\]</div>
+<p>It will then derive the temperature from the equation of state. If we
+are running with use_tfromp = T, then we do</p>
+<div class="math notranslate nohighlight">
+\[T = T(\rho, p_0, X_k)\]</div>
+<p>otherwise, we do</p>
+<div class="math notranslate nohighlight">
+\[T = T(\rho, h, X_k)\]</div>
+<p>Note that in contrast to the Strang splitting version, here we call the EOS
+every time we enter the RHS routine, but here we call the EOS to compute temperature
+rather than thermodynamic coefficients.</p>
+<p>Finally we integrate the ODE system (Eqs.&nbsp;<a class="reference external" href="#eq:sdc:rhoX">[eq:sdc:rhoX]</a> and <a class="reference external" href="#eq:sdc:rhoh">[eq:sdc:rhoh]</a>).
+At the end of the integration, we define <span class="math notranslate nohighlight">\(I_{\rho X_k}\)</span> and <span class="math notranslate nohighlight">\(I_{\rho h}\)</span>. The actual
+form of these depends on what quantities we predict to edges during
+the construction of the advective fluxes.
+Note that we only need <span class="math notranslate nohighlight">\(I_{\rho X_k}\)</span> and <span class="math notranslate nohighlight">\(I_{\rho h}\)</span> for the
+prediction of the interface states, and not the VODE integration.
+This is because all we need from the advection solver is the
+approximation to <span class="math notranslate nohighlight">\(A_{\rho X_k}\)</span> and <span class="math notranslate nohighlight">\(A_{\rho h}\)</span> and not the final
+updated state.</p>
+</div>
+<div class="section" id="species-source-terms">
+<h3>Species Source Terms.<a class="headerlink" href="#species-source-terms" title="Permalink to this headline">¶</a></h3>
+<p>For the species prediction, the form of <span class="math notranslate nohighlight">\(I\)</span> depends on
+species_pred_type (see §<a class="reference external" href="#sec:pred:density">[sec:pred:density]</a>).
+We note that there is no <span class="math notranslate nohighlight">\(I\)</span> term for <span class="math notranslate nohighlight">\(\rho\)</span> or <span class="math notranslate nohighlight">\(\rho'\)</span> prediction, since
+the density evolution equation does not have a reaction source term.</p>
+<ul>
+<li><p class="first">species_pred_type = 1 (predict_rhoprime_and_X)
+or 3 (predict_rho_and_X)</p>
+<div class="math notranslate nohighlight">
+\[I_{X_k} = \frac{1}{\rho^{n+\myhalf}} \left [
+      \frac{(\rho X_k)^\mathrm{new} -
+            (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}  \right ].\]</div>
+<p>(Andy’s Idea) Define <span class="math notranslate nohighlight">\(I_{X_k}\)</span> using</p>
+<div class="math notranslate nohighlight">
+\[I_{X_k} = \frac{X_k^\mathrm{new} - X_k^\mathrm{old}}{\Delta t} - A_{X_k},\]</div>
+<p>where we first define a state that has only been updated with advection:</p>
+<div class="math notranslate nohighlight">
+\[\frac{(\rho X_k)^{(1)} - (\rho X_k)^\mathrm{old}}{\Delta t} = A_{\rho X_k},\]</div>
+<p>and then define the species mass fractions,</p>
+<div class="math notranslate nohighlight">
+\[X_k^{(1)} = (\rho X_k)^{(1)} / \sum_k (\rho X_k)^{(1)}, \quad
+X_k^\mathrm{old} = (\rho X_k)^\mathrm{old} / \sum_k (\rho X_k)^\mathrm{old}, \quad
+X_k^\mathrm{new} = (\rho X_k)^\mathrm{new} / \sum_k (\rho X_k)^\mathrm{new},\]</div>
+<p>and finally define <span class="math notranslate nohighlight">\(A_{X_k}\)</span> using</p>
+<div class="math notranslate nohighlight">
+\[\frac{X^{(1)} - X^\mathrm{old}}{\Delta t}= A_{X_k}.\]</div>
+</li>
+<li><p class="first">species_pred_type = 2 (predict_rhoX)</p>
+<div class="math notranslate nohighlight">
+\[I_{\rho X_k} = \frac{(\rho X_k)^\mathrm{new} - (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}.
+\label{eq:sdc:Irhoo}\]</div>
+</li>
+</ul>
+</div>
+<div class="section" id="enthalpy-source-terms">
+<h3>Enthalpy Source Terms.<a class="headerlink" href="#enthalpy-source-terms" title="Permalink to this headline">¶</a></h3>
+<p>The appropriate constructions are:</p>
+<ul>
+<li><p class="first">enthalpy_pred_type = 0 (predict_rhoh)</p>
+<div class="math notranslate nohighlight">
+\[I_{\rho h} = \frac{(\rho h)^{\rm new} - (\rho h)^{\rm old}}{\Delta t} - A_{\rho h}.\]</div>
+</li>
+<li><p class="first">enthalpy_pred_type = 1 (predict_rhohprime, not implemented yet)</p>
+<p>(Andy’s Idea) Here we need an <span class="math notranslate nohighlight">\(I_{\rho h}\)</span> term for the <span class="math notranslate nohighlight">\((\rho h)'\)</span> evolution
+equation (see Eq.&nbsp;<a class="reference external" href="#rhohprimeequation">[rhohprime equation]</a>). In this case we will use
+<span class="math notranslate nohighlight">\(I_{(\rho h)'} = I_{\rho h}\)</span>. Since we are not evolving the base state, the PDE
+for <span class="math notranslate nohighlight">\((\rho h)_0\)</span> is simply <span class="math notranslate nohighlight">\(\partial(\rho h)_0/\partial t = 0\)</span>, and thus the
+evolution equation for <span class="math notranslate nohighlight">\((\rho h)'\)</span> is the same as the evolution equation
+for <span class="math notranslate nohighlight">\(\rho h\)</span>.</p>
+<p>In the future, when we enable base state evolution, the base state enthalpy
+evolution equation may need to know about the <span class="math notranslate nohighlight">\(I_{\rho h}\)</span> source term.
+In particular, should <span class="math notranslate nohighlight">\((\rho h)_0\)</span> see a <span class="math notranslate nohighlight">\(\overline{(\rho \Hnuc)}\)</span> term?
+what about an average thermal diffusion?</p>
+</li>
+<li><p class="first">enthalpy_pred_type = 2 (predict_h )</p>
+<p>This is the most straightforward prediction type. The SDC solver
+integrates the equation for <span class="math notranslate nohighlight">\((\rho h)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial(\rho h)}{\partial t} = -\nabla\cdot(\rho h \Ub) + \frac{Dp_0}{Dt}  + \rho H_{\rm nuc}\]</div>
+<p>(shown here without diffusion or external heat sources). Expanding
+the time derivative and divergence, and using the continuity equation
+we see:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial h}{\partial t} = -\Ub \cdot \nabla h + \frac{1}{\rho} \frac{Dp_0}{Dt}  + \frac{1}{\rho} (\rho H_{\rm nuc}) \label{eq:sdc:h}\]</div>
+<p>Comparing these equations, we see that</p>
+<div class="math notranslate nohighlight">
+\[I_{h}  = \frac{1}{\rho^{n+\myhalf}} \left [
+    \frac{(\rho h)^\mathrm{new} - (\rho h)^\mathrm{old}}{\Delta t} - A_{\rho h} \right ]\]</div>
+<p>(Andy’s Idea) Form <span class="math notranslate nohighlight">\(I_h\)</span> in the same way we would form <span class="math notranslate nohighlight">\(I_{X_k}\)</span> from above:</p>
+<div class="math notranslate nohighlight">
+\[I_h = \frac{h^\mathrm{new} - h^\mathrm{old}}{\Delta t} - A_h,\]</div>
+<p>where we first define</p>
+<div class="math notranslate nohighlight">
+\[\frac{(\rho h)^{(1)} - (\rho h)^\mathrm{old}}{\Delta t} = A_{\rho h},\]</div>
+<p>and then define <span class="math notranslate nohighlight">\(h\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[h^{(1)} = (\rho h)^{(1)} / \sum_k(\rho X_k)^{(1)}, \quad h^\mathrm{old} = (\rho h)^\mathrm{old} / \sum_k(\rho X_k)^\mathrm{old}, \quad h^\mathrm{new} = (\rho h)^\mathrm{new} / \sum_k(\rho X_k)^\mathrm{new},\]</div>
+<p>and finally define <span class="math notranslate nohighlight">\(A_h\)</span> using</p>
+<div class="math notranslate nohighlight">
+\[I_h = \frac{h^{(1)} - h^\mathrm{old}}{\Delta t} = A_h.\]</div>
+</li>
+<li><p class="first">enthalpy_pred_type = 3 (predict_T_then_rhoprime) or
+enthalpy_pred_type = 4 (predict_T_then_h )</p>
+<p>Both of these enthalpy_pred_types predict temperature. Expressing
+<span class="math notranslate nohighlight">\(h = h(p_0,T,X_k)\)</span> and differentiating along particle paths:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{Dh}{Dt} &amp;=&amp; \left . \frac{\partial h}{\partial T} \right |_{p,X_k} \frac{DT}{Dt} +
+                  \left . \frac{\partial h}{\partial p} \right |_{T,X_k} \frac{Dp_0}{Dt} +
+           \sum_k \left . \frac{\partial h}{\partial X_k} \right |_{p,T} \frac{DX_k}{Dt} \\
+              &amp;=&amp; c_p \frac{DT}{Dt} + h_p  \frac{Dp_0}{Dt} + \sum_k \xi_k \omegadot_k\end{aligned}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(c_p\)</span>, <span class="math notranslate nohighlight">\(h_p\)</span>, and <span class="math notranslate nohighlight">\(\xi_k\)</span> are as defined in the table of symbols
+(Table&nbsp;<a class="reference external" href="#table:sym">[table:sym]</a>), and we substitute <span class="math notranslate nohighlight">\(DX_k/Dt = \omegadot_k\)</span> (from the species
+continuity equation, Eq.&nbsp;<a class="reference external" href="#speciesequation">[species equation]</a>). Using Eq.&nbsp;<a class="reference external" href="#eq:sdc:h">[eq:sdc:h]</a>, we have
+the familiar temperature evolution equation:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\rho c_p \frac{DT}{Dt} = \underbrace{(1 - \rho h_p) \frac{Dp_0}{Dt}}_{\begin{smallmatrix}\text{already~accounted~for} \\ \text{in~T~prediction}\end{smallmatrix}} - \sum_k \xi_k \rho \omegadot_k + \rho \Hnuc\end{split}\]</div>
+<p>where the underbraced term is already present in mktempforce. Recognizing that
+Eq.&nbsp;<a class="reference external" href="#eq:sdc:Irhoh">[eq:sdc:Irhoh]</a> is the SDC approximation to <span class="math notranslate nohighlight">\((\rho \Hnuc)\)</span> and Eq.&nbsp;<a class="reference external" href="#eq:sdc:Irhoo">[eq:sdc:Irhoo]</a> is the
+SDC approximation to <span class="math notranslate nohighlight">\((\rho \omegadot_k)\)</span>, we can define</p>
+<div class="math notranslate nohighlight">
+\[I_T = \frac{1}{\rho^{n+\myhalf} c_p^{n+\myhalf}} \left \{
+  \left [ \frac{(\rho h)^\mathrm{new} - (\rho h)^\mathrm{old}}{\Delta t} - A_{\rho h} \right ]
+  - \sum_k \xi_k^{n+\myhalf} \left [      \frac{(\rho X_k)^\mathrm{new} -
+            (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}  \right ] \right \}\]</div>
+<p>(Andy’s Idea) The idea is to advance the species and enthalpy with advection
+terms only, and compute the resulting temperature, <span class="math notranslate nohighlight">\(T^{(1)}\)</span>. Compare that temperature
+with the final temperature computed by the SDC VODE call. The difference
+between these values is <span class="math notranslate nohighlight">\(I_T\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[I_T = \frac{T^\mathrm{new} - T^\mathrm{old}}{\Delta t} - A_T,\]</div>
+<p>with <span class="math notranslate nohighlight">\(A_T\)</span> given by</p>
+<div class="math notranslate nohighlight">
+\[\frac{T^{(1)} - T^\mathrm{old}}{\Delta t} = A_T,\]</div>
+<p>and <span class="math notranslate nohighlight">\(T^{(1)}\)</span> computed using the equation of state from <span class="math notranslate nohighlight">\(\rho^{(1)}, X_k^{(1)}\)</span>,
+and <span class="math notranslate nohighlight">\(h^{(1)}\)</span> (or <span class="math notranslate nohighlight">\(p_0\)</span>, if use_tfromp = T).</p>
+</li>
+</ul>
+</div>
+<div class="section" id="implementation">
+<h3>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h3>
+<p>This is done in advance.f90 just after the call to react_state,
+stored in the multifab&nbsp;called intra.
+These terms are used as the source terms for the
+advection step in the next SDC iteration.</p>
+</div>
+<div class="section" id="summary-of-changes">
+<h3>Summary of Changes<a class="headerlink" href="#summary-of-changes" title="Permalink to this headline">¶</a></h3>
+<p>The major changes from the non-SDC-enabled burners is the addition of
+the advective terms to the system of ODEs, the fact that we integrate
+<span class="math notranslate nohighlight">\((\rho X_k)\)</span> instead of just <span class="math notranslate nohighlight">\(X_k\)</span>, integrate <span class="math notranslate nohighlight">\((\rho h)\)</span> instead
+of <span class="math notranslate nohighlight">\(T\)</span>, and the need to derive the
+temperature from the input state for each RHS evaluation by VODE.</p>
+<p>Note also that the SDC integration by VODE does not operate on
+the velocities at all. That update is handled in the same fashion
+as the Strang splitting version of the code.</p>
+<p>The ignition_simple_SDC burner shows how to setup the system
+for use_tfromp = T or F. Presently, this implementation
+does not support evolve_base_state = T (in particular, we
+need to evolve <span class="math notranslate nohighlight">\(p_0\)</span> in the RHS routine).</p>
+</div>
+</div>
+<div class="section" id="algorithm-flowchart-adr-with-fixed-base-state">
+<h2>Algorithm Flowchart - ADR with Fixed Base State<a class="headerlink" href="#algorithm-flowchart-adr-with-fixed-base-state" title="Permalink to this headline">¶</a></h2>
+<p>We now include thermal diffusion and assume the base state is constant in time but not space:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{\partial\Ub}{\partial t} &amp;=&amp;
+    -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi
+    - \frac{\rho-\rho_0}{\rho} g\eb_r,\\
+\frac{\partial(\rho X_k)}{\partial t} &amp;=&amp;
+    -\nabla\cdot(\rho X_k\Ub) + \rho\omegadot_k,\label{eq:sdc species}\\
+\frac{\partial(\rho h)}{\partial t} &amp;=&amp;
+    -\nabla\cdot(\rho h\Ub) + \underbrace{\Ub\cdot\nabla p_0}_{Dp_0/Dt}
+    + \rho\Hnuc
+    + \underbrace{\nabla\cdot\frac{\kth}{c_p}\nabla h - \sum_k\nabla\cdot\frac{\xi_k k_{\rm th}}{c_p}\nabla X_k - \nabla\cdot\frac{h_p k_{\rm th}}{c_p}\nabla p_0}_{\nabla\cdot k_{\rm th}\nabla T}.\nonumber\\
+\label{eq:sdc enthalpy}\end{aligned}\end{split}\]</div>
+<div class="line-block">
+<div class="line">The time-advancement is divided into three major steps. The first step is the predictor, where we integrate the thermodynamic variables, <span class="math notranslate nohighlight">\((\rho,\rho X_k,\rho h)\)</span>, over the full time step. The second step is corrector, where we use the results from the predictor to perform a more accurate temporal integration of the thermodynamic variables. The third step is the velocity and dynamic pressure update.</div>
+<div class="line"><strong>Step 1:</strong> (<em>Compute advection velocities</em>)</div>
+<div class="line">Use <span class="math notranslate nohighlight">\(\Ub^n\)</span> and a second-order Godunov method to compute time-centered edge velocities, <span class="math notranslate nohighlight">\(\uadvsdcstar\)</span>, with time-lagged dynamic pressure and explicit buoyancy as forcing terms. The <span class="math notranslate nohighlight">\(\star\)</span> superscript indicates that this field does not satisfy the divergence constraint. Compute <span class="math notranslate nohighlight">\(S^{n+\myhalf,{\rm pred}}\)</span> by extrapolating in time,</div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[S^{n+\myhalf,{\rm pred}} = S^n + \frac{\Delta t^n}{2}\frac{S^n - S^{n-1}}{\Delta t^{n-1}},\]</div>
+<p>and project <span class="math notranslate nohighlight">\(\uadvsdcstar\)</span> to obtain <span class="math notranslate nohighlight">\(\uadvsdcpred\)</span>, which satisfies</p>
+<div class="math notranslate nohighlight">
+\[\nabla\cdot\left(\beta_0^n\uadvsdcpred\right) = S^{n+\myhalf,\rm{pred}}.\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>Step 2:</strong> (<em>Predictor</em>)</div>
+<div class="line">In this step, we integrate <span class="math notranslate nohighlight">\((\rho, \rho X_k, \rho h)\)</span> over the full time step. The quantities <span class="math notranslate nohighlight">\((S, \beta_0, k_{\rm th}, c_p, \xi_k, h_p)^n\)</span> are computed from the the thermodynamic variables at <span class="math notranslate nohighlight">\(t^n\)</span>. This step is divided into several sub-steps:</div>
+<div class="line"><strong>Step 2A:</strong> (<em>Compute advective flux divergences</em>)</div>
+<div class="line">Use <span class="math notranslate nohighlight">\(\uadvsdcpred\)</span> and a second-order Godunov integrator to compute time-centered edge states, <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^{n+\myhalf,(0)}\)</span>, with time-lagged reactions (<span class="math notranslate nohighlight">\(I^{\rm lagged} = I^{(j_{\rm max})}\)</span> from the previous time step), explicit diffusion, and time-centered thermodynamic pressure as source terms. Define the advective flux divergences as</div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+A_{\rho X_k}^{(0)} &amp;=&amp; -\nabla\cdot\left[\left(\rho X_k\right)^{n+\myhalf,{(0)}}\uadvsdcpred\right],\\
+A_{\rho h}^{(0)} &amp;=&amp; -\nabla\cdot\left[\left(\rho h\right)^{n+\myhalf,(0)}\uadvsdcpred\right] + \uadvsdcpred\cdot\nabla p_0.\end{aligned}\end{split}\]</div>
+<p>Next, use these fluxes to compute the time-advanced density,</p>
+<div class="math notranslate nohighlight">
+\[\frac{\rho^{n+1} - \rho^n}{\Delta t} = \sum_k A_{\rho X_k}^{(0)}.\]</div>
+<p>Then, compute preliminary, time-advanced species using</p>
+<div class="math notranslate nohighlight">
+\[\frac{\rho^{n+1}\widehat{X}_k^{n+1,(0)} - (\rho X_k)^n}{\Delta t} = A_{\rho X_k}^{(0)} + I_{\rho X_k}^{\rm lagged}.\label{eq:sdc species 2}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>Step 2B:</strong> (<em>Compute diffusive flux divergence</em>)</div>
+<div class="line">Solve a Crank-Nicolson-type diffusion equation for <span class="math notranslate nohighlight">\(\widehat{h}^{n+1,(0)}\)</span>, using transport coefficients evaluated at <span class="math notranslate nohighlight">\(t^n\)</span> everywhere,</div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{\rho^{n+1}\widehat{h}^{n+1,(0)} - (\rho h)^n}{\Delta t} &amp;=&amp; A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged}\nonumber\\
+&amp;&amp; + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n + \nabla\cdot\frac{\kth^n}{c_p^n}\nabla \widehat{h}^{n+1,(0)}\right)\nonumber\\
+&amp;&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
+&amp;&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right),\label{eq:sdc enthalpy 2}\end{aligned}\end{split}\]</div>
+<p>which is equivalent to</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\left(\rho^{n+1} - \frac{\Delta t}{2}\nabla\cdot\frac{k_{\rm th}^n}{c_p^n}\nabla\right)\widehat{h}^{n+1,(0)} &amp;=&amp; (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged} + \left(\half\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n\right)\nonumber\\
+&amp;&amp;\hspace{0.85in} - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
+&amp;&amp;\hspace{0.85in} - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right)\Bigg].\end{aligned}\end{split}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>Step 2C:</strong> (<em>Advance thermodynamic variables</em>)</div>
+<div class="line">Define <span class="math notranslate nohighlight">\(Q_{\rho X_k}^{(0)}\)</span> as the right hand side of (<a class="reference external" href="#eq:sdcspecies2">[eq:sdc species 2]</a>) without the <span class="math notranslate nohighlight">\(I_{\rho X_k}^{\rm lagged}\)</span> term, and define <span class="math notranslate nohighlight">\(Q_{\rho h}^{(0)}\)</span> as the right hand side of (<a class="reference external" href="#eq:sdcenthalpy2">[eq:sdc enthalpy 2]</a>) without the <span class="math notranslate nohighlight">\(I_{\rho h}^{\rm lagged}\)</span> term. Use VODE to integerate (<a class="reference external" href="#eq:sdcspecies">[eq:sdc species]</a>) and (<a class="reference external" href="#eq:sdcenthalpy">[eq:sdc enthalpy]</a>) over <span class="math notranslate nohighlight">\(\Delta t\)</span> to advance <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^n\)</span> to <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^{n+1,(0)}\)</span> using the piecewise-constant advection and diffusion source terms:</div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{\partial(\rho X_k)}{\partial t} &amp;=&amp; Q_{\rho X_k}^{(0)} + \rho\dot\omega_k\\
+\frac{\partial(\rho h)}{\partial t} &amp;=&amp; Q_{\rho h}^{(0)} + \rho\Hnuc.\end{aligned}\end{split}\]</div>
+<p>At this point we can define <span class="math notranslate nohighlight">\(I_{\rho X_k}^{(0)}\)</span> and <span class="math notranslate nohighlight">\(I_{\rho h}^{(0)}\)</span>, or whatever term we need depending on our species and enthalpy edge state prediction types, for use in the corrector step. In our first implementation, we are predicting <span class="math notranslate nohighlight">\(\rho X_k\)</span> and <span class="math notranslate nohighlight">\(\rho h\)</span>, in which case we define:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+I_{\rho X_k}^{(0)} &amp;=&amp; \frac{(\rho X_k)^{n+1,(0)} - (\rho X_k)^n}{\Delta t} - Q_{\rho X_k}^{(0)}\\
+I_{\rho h}^{(0)} &amp;=&amp; \frac{(\rho h)^{n+1,(0)} - (\rho h)^n}{\Delta t} - Q_{\rho h}^{(0)}.\end{aligned}\end{split}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>Step 3:</strong> (<em>Update advection velocities</em>)</div>
+<div class="line">First, compute <span class="math notranslate nohighlight">\(S^{n+\myhalf}\)</span> and <span class="math notranslate nohighlight">\(\beta_0^{n+\myhalf}\)</span> using</div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[S^{n+\myhalf} = \frac{S^n + S^{n+1,(0)}}{2}, \qquad \beta_0^{n+\myhalf} = \frac{\beta_0^n + \beta_0^{n+1,(0)}}{2}.\]</div>
+<p>Then, project <span class="math notranslate nohighlight">\(\uadvsdcstar\)</span> to obtain <span class="math notranslate nohighlight">\(\uadvsdc\)</span>, which satisfies</p>
+<div class="math notranslate nohighlight">
+\[\nabla\cdot\left(\beta_0^{n+\myhalf}\uadvsdc\right) = S^{n+\myhalf}.\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>Step 4:</strong> (<em>Corrector Loop</em>)</div>
+<div class="line">We loop over this step from <span class="math notranslate nohighlight">\(j=1,j_{\rm max}\)</span> times. In the corrector, we use the time-advanced state from the predictor to perform a more accurate integration of the thermodynamic variables. The quantities <span class="math notranslate nohighlight">\((S, \beta_0, k_{\rm th}, c_p, \xi_k, h_p)^{n+1,(j-1)}\)</span> are computed from <span class="math notranslate nohighlight">\((\rho,\rho X_k,\rho h)^{n+1,(j-1)}\)</span>. This step is divided into several sub-steps:</div>
+<div class="line"><strong>Step 4A:</strong> (<em>Compute advective flux divergences</em>)</div>
+<div class="line">Use <span class="math notranslate nohighlight">\(\uadvsdc\)</span> and a second-order Godunov integrator to compute time-centered edge states, <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^{n+\myhalf}\)</span>, with iteratively-lagged reactions (<span class="math notranslate nohighlight">\(I^{(j-1)}\)</span>), explicit diffusion, and time-centered thermodynamic pressure as source terms. Define the advective flux divergences as</div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+A_{\rho X_k}^{(j)} &amp;=&amp; -\nabla\cdot\left[\left(\rho X_k\right)^{n+\myhalf,(j)}\uadvsdc\right],\\
+A_{\rho h}^{(j)} &amp;=&amp; -\nabla\cdot\left[\left(\rho h\right)^{n+\myhalf,(j)}\uadvsdc\right] + \uadvsdc\cdot\nabla p_0.\end{aligned}\end{split}\]</div>
+<p>Then, compute preliminary, time-advanced species using</p>
+<div class="math notranslate nohighlight">
+\[\frac{\rho^{n+1}\widehat{X}_k^{n+1,(j)} - (\rho X_k)^n}{\Delta t} = A_{\rho X_k}^{(j)} + I_{\rho X_k}^{(j-1)}.\label{eq:sdc species 3}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>Step 4B:</strong> (<em>Compute diffusive flux divergence</em>)</div>
+<div class="line">Solve a backward-Euler-type correction equation for <span class="math notranslate nohighlight">\(\widehat{h}^{n+1,(j)}\)</span>,</div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{\rho^{n+1}\widehat{h}^{n+1,(j)} - (\rho h)^n}{\Delta t} &amp;=&amp; A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)}\nonumber\\
+&amp;&amp; + \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{h}^{n+1,(j)} + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
+&amp;&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
+&amp;&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right),\label{eq:sdc enthalpy 3}\end{aligned}\end{split}\]</div>
+<p>which is equivalent to</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\left(\rho^{n+1} - \Delta t\nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\right)\widehat{h}^{n+1,(j)} &amp;=&amp; (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)} \nonumber\\
+&amp;&amp; + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
+&amp;&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
+&amp;&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right)\Bigg].\end{aligned}\end{split}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>Step 4C:</strong> (<em>Advance thermodynamic variables</em>)</div>
+<div class="line">Define <span class="math notranslate nohighlight">\(Q_{\rho X_k}^{(j)}\)</span> as the right hand side of (<a class="reference external" href="#eq:sdcspecies3">[eq:sdc species 3]</a>) without the <span class="math notranslate nohighlight">\(I_{\rho X_k}^{(j-1)}\)</span> term, and define <span class="math notranslate nohighlight">\(Q_{\rho h}^{(j)}\)</span> as the right hand side of (<a class="reference external" href="#eq:sdcenthalpy3">[eq:sdc enthalpy 3]</a>) without the <span class="math notranslate nohighlight">\(I_{\rho h}^{(j-1)}\)</span> term. Use VODE to integerate (<a class="reference external" href="#eq:sdcspecies">[eq:sdc species]</a>) and (<a class="reference external" href="#eq:sdcenthalpy">[eq:sdc enthalpy]</a>) over <span class="math notranslate nohighlight">\(\Delta t\)</span> to advance <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^n\)</span> to <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^{n+1,(j)}\)</span> using the piecewise-constant advection and diffusion source terms:</div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\frac{\partial(\rho X_k)}{\partial t} &amp;=&amp; Q_{\rho X_k}^{(j)} + \rho\dot\omega_k\\
+\frac{\partial(\rho h)}{\partial t} &amp;=&amp; Q_{\rho h}^{(j)} + \rho\Hnuc.\end{aligned}\end{split}\]</div>
+<p>At this point we can define <span class="math notranslate nohighlight">\(I_{\rho X_k}^{(j)}\)</span>, <span class="math notranslate nohighlight">\(I_{\rho h}^{(j)}\)</span>, and any other <span class="math notranslate nohighlight">\(I\)</span> terms we need depending on
+our species and enthalpy edge state prediction types, for use in the predictor in the next time step. In our first implementation, we are predicting <span class="math notranslate nohighlight">\(\rho X_k\)</span> and <span class="math notranslate nohighlight">\(\rho h\)</span>, in which case we define:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+I_{\rho X_k}^{(j)} &amp;=&amp; \frac{(\rho X_k)^{n+1,(j)} - (\rho X_k)^n}{\Delta t} - Q_{\rho X_k}^{(j)}\\
+I_{\rho h}^{(j)} &amp;=&amp; \frac{(\rho h)^{n+1,(j)} - (\rho h)^n}{\Delta t} - Q_{\rho h}^{(j)}.\end{aligned}\end{split}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>Step 5:</strong> (<em>Advance velocity and dynamic pressure</em>)</div>
+<div class="line">Similar to the original MAESTRO&nbsp;algorithm, more to come.</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Godunov.html" class="btn btn-neutral float-right" title="Godunov Interface States" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pert.html" class="btn btn-neutral" title="Interface State Details" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2]}}})</script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

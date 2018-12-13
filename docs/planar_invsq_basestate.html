@@ -1,0 +1,450 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Modifications for a \(1/r^2\) Plane-Parallel Basestate &mdash; MAESTROeX 18.11
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Notes on Thermodynamics" href="thermo_notes.html" />
+    <link rel="prev" title="Modifications for a Spherical Self-Gravitating Star" href="spherical_basestate.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                18.11
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">MAESTROeX Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#constraint-equation">Constraint Equation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#uniform-dr-discretization">Uniform $dr$ Discretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#non-uniform-dr-discretization">Non-Uniform $dr$ Discretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/planar_invsq_basestate.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="modifications-for-a-1-r-2-plane-parallel-basestate">
+<h1>Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate<a class="headerlink" href="#modifications-for-a-1-r-2-plane-parallel-basestate" title="Permalink to this headline">¶</a></h1>
+<p>In the plane parallel assumption, we model a layer of thickness
+$Delta R$ a distance $R_mathrm{base}$ from the center of a star,
+under the assumption the $Delta R ll <a href="#id1"><span class="problematic" id="id2">R_</span></a>mathrm{base}$. In this
+assumption, we can neglect the curvature of the atmosphere. Here, we
+extend that basic assumption to allow for the gravitational acceleration
+to still fall off as $1/r^2$ as we move outward in the envelope. We assume
+that the mass of the envelope is insignificant, and that only the mass of
+the underlying star contributes to the gravitational acceleration.</p>
+<div class="section" id="constraint-equation">
+<h2>Constraint Equation<a class="headerlink" href="#constraint-equation" title="Permalink to this headline">¶</a></h2>
+<p>We begin with the $w_0$ constraint equation (derived elsewhere), including the volume-discrepancy term:
+$$nabla cdot  ({w_0 er}) = bar{S} - frac{1}{gammabar p_0} psi - frac{f}{gammabar p_0} frac{p_0 - overline{{p_0}_mathrm{EOS}}}{dt}$$
+where
+$$psi = frac{D_0 p_0}{D t} = frac{partial p_0}{partial t} + w_0 frac{partial p_0}{partial t}.$$
+In Cartesian geometry, the divergence on the left hand side is simply $partial
+w_0 / partial r$.
+Let us now define $ow$ and $dw$ such that
+$$w_0 = ow + dw$$
+We take $ow$ to satisfy
+$$frac{partial ow}{partial r} = bar{S} - frac{f}{gammabar p_0} frac{p_0 - overline{{p_0}_mathrm{EOS}}}{dt} ,$$
+leaving the equation
+$$frac{partial dw}{partial r} = - frac{1}{gammabar p_0} left ({ frac{partial p_0}{partial t} + w_0 frac{partial p_0}{partial r}} right ).$$
+If we multiply by $gammabar p_0$, differentiate by r, then switch the order of $partial
+t$ and $partial r$ where they appear in the same term, we get
+$$frac{partial}{partial r} left[ gammabar p_0 frac{partial delta w_0}{partial r} right] =</p>
+<blockquote>
+<div><ul class="simple">
+<li>frac{partial}{partial t} frac{partial p_0}{partial r} -  frac{partial}{partial r} left (w_0 frac{partial p_0}{partial r} right) .$$</li>
+</ul>
+</div></blockquote>
+<p>We then substitute in the equation of hydrostatic equilibrium:
+$$frac{partial p_0}{partial r} = -rho_0 g quadquad mbox{where} quadquad</p>
+<blockquote>
+<div>g = frac{G m}{r^2}.$$</div></blockquote>
+<p>We will assume that the mass of the atmosphere is negligible relative to the
+mass of the core, which is outside of the simulation domain. This simplifies
+the equation by allowing us to assume that $m$, the enclosed mass, is constant.
+So we now have
+$$frac{partial}{partial r} left[ gammabar p_0 frac{partial}{partial r}{({delta w_0})} right]</p>
+<blockquote>
+<div><p>= frac{partial}{partial t}{({rho_0 g}}) + frac{partial}{partial r}{({w_0 rho_0 g})}
+= rho_0 left ({frac{partial}{partial t}{g} + w_0 frac{partial}{partial r}{g}} right )</p>
+<blockquote>
+<div><ul class="simple">
+<li>g left ({frac{partial}{partial t}{rho_0} + frac{partial}{partial r}{({w_0 rho_0})}} right ).$$</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<p>We now recall Equation&nbsp;29 from Paper III:
+$$frac{partial}{partial t}{rho_0} = - nabla cdot ({w_0 rho_0 er})</p>
+<blockquote>
+<div><ul class="simple">
+<li>nabla cdot ({etarho er}),$$</li>
+</ul>
+</div></blockquote>
+<p>which is, in Cartesian geometry,
+$$frac{partial rho_0}{partial t} = - frac{partial}{partial r}{({w_0 rho_0})}</p>
+<blockquote>
+<div><ul class="simple">
+<li>frac{partial etarho}{partial r}.$$</li>
+</ul>
+</div></blockquote>
+<p>Substituting this expression yields
+$$frac{partial}{partial r}{} left[ gammabar p_0 frac{partial}{partial r}{({delta w_0})} right]</p>
+<blockquote>
+<div>= rho_0 frac{D_0 g}{D t} + g left ({- frac{partial}{partial r}{({w_0 rho_0})} - frac{partial etarho}{partial r} + frac{partial}{partial r}{({w_0 rho_0})}} right)
+= rho_0 frac{D_0 g}{D t} - g frac{partial etarho}{partial r}.$$</div></blockquote>
+<p>We then differentiate the gravitational acceleration:
+$$begin{aligned}
+frac{D_0 g}{D t}</p>
+<blockquote>
+<div>&amp; = &amp; frac{D_0}{Dt} left ({frac{G m}{r^2}} right ) nonumber \
+&amp; = &amp; G m left ({frac{partial}{partial t}{({r^{-2}})} + w_0 frac{partial}{partial r}{({r^{-2}})}} right ) nonumber \
+&amp; = &amp; - frac{2 G m w_0}{r^3} nonumber \
+&amp; = &amp; - frac{2 w_0 g}{r}.end{aligned}$$</div></blockquote>
+<p>Substituting in this expression gives our final result:
+$$frac{partial}{partial r}{} left[ gammabar p_0 frac{partial}{partial r}{({dw})} right]</p>
+<blockquote>
+<div>= - frac{2 w_0 rho_0 g}{r} - g frac{partial etarho}{partial r}$$</div></blockquote>
+</div>
+<div class="section" id="uniform-dr-discretization">
+<h2>Uniform $dr$ Discretization<a class="headerlink" href="#uniform-dr-discretization" title="Permalink to this headline">¶</a></h2>
+<p>Collecting all of the $dw$ terms on the left side, our constraint equation
+appears as:
+$$frac{partial}{partial r} left [ gammabar p_0 frac{partial dw}{partial r} right ]</p>
+<blockquote>
+<div><ul class="simple">
+<li>frac{2 rho_0 g dw}{r} = -frac{2 rho_0 g ow}{r} - g frac{partial etarho}{partial r}$$</li>
+</ul>
+</div></blockquote>
+<p>On a uniform mesh (constant $dr$, we would discretize this as:
+$$begin{aligned}
+frac{1}{dr} left { left [ gammabar p_0 frac{partial dw}{partial r} right ]_j</p>
+<blockquote>
+<div><blockquote>
+<div><blockquote>
+<div><ul class="simple">
+<li>left [ gammabar p_0 frac{partial dw}{partial r} right ]_{j-1}</li>
+</ul>
+</div></blockquote>
+<p>right }</p>
+</div></blockquote>
+<p>&amp;+&amp; left [ frac{2 rho_0 g}{r} dw right ]_{j-half} nonumber \
+= &amp;-&amp; left [ frac{2 rho_0 g}{r} ow right ]_{j-half}</p>
+<blockquote>
+<div><ul class="simple">
+<li>frac{g_{j-half}}{dr} left [ {etarho}_j - {etarho}_{j-1} right ]end{aligned}$$</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<p>Expanding the $partial dw / partial r$ terms, we have:
+$$begin{aligned}
+frac{1}{(dr)^2} left { left [ (gammabar p_0)_j</p>
+<blockquote>
+<div><blockquote>
+<div><blockquote>
+<div><blockquote>
+<div>left ({dw}_{j+half} - {dw}_{j-half} right ) right ]</div></blockquote>
+<dl class="docutils">
+<dt>right . &amp;-&amp; left . left [ (gammabar p_0)_{j-1}</dt>
+<dd>left ({dw}_{j-half} - {dw}_{j-thalf} right ) right ]</dd>
+</dl>
+</div></blockquote>
+<p>right }</p>
+</div></blockquote>
+<ul class="simple">
+<li>left [ frac{2 rho_0 g}{r} dw right ]_{j-half} nonumber \</li>
+</ul>
+<dl class="docutils">
+<dt>= &amp;-&amp; left [ frac{2 rho_0 g}{r} ow right ]_{j-half}</dt>
+<dd><ul class="first last simple">
+<li>frac{g_{j-half}}{dr} left [ {etarho}_j - {etarho}_{j-1} right ]end{aligned}$$</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<p>As with the spherical case (multilevel paper, appendix B), we write this in the form:
+$$A_j (dw)_{j-thalf} + B_j (dw)_{j-myhalf} + C_j (dw)_{j+myhalf} = F_j,$$
+then:
+$$begin{aligned}
+A_j &amp;=&amp; frac{1}{dr^2} left( {gammabar p_0}right)_{j-1}, \
+B_j &amp;=&amp; -frac{1}{dr^2} left[ left( {gammabar p_0}right)_{j}  + left( {gammabar p_0}right)_{j-1} right] +  frac{2}{r_{j-myhalf}} left (rho_0 g right )_{j-half}  , \
+C_j &amp;=&amp; frac{1}{dr^2} left( {gammabar p_0}right)_{j}  , \
+F_j &amp;=&amp;  -frac{2}{r_{j-myhalf}} (rho_0 g)_{j-half}   (ow)_{j-half} - frac{g_{j-half}}{dr} left[ left( etarho right)_{j} - left( etarho right)_{j-1} right] end{aligned}$$</p>
+</div>
+<div class="section" id="non-uniform-dr-discretization">
+<h2>Non-Uniform $dr$ Discretization<a class="headerlink" href="#non-uniform-dr-discretization" title="Permalink to this headline">¶</a></h2>
+<p>centering
+![image](planeinvsqfigpath/grid2){width=”4in”}</p>
+<p>Consider the above non-uniform grid spacing,
+where $dr_c = 2 dr_f$. Here, the discretization of the Laplacian-like term is more complex.
+We want to compute
+$$frac{partial}{partial r} left [ gammabar p_0 frac{partial dw}{partial r} right ]_{j-half}$$
+This is to be centered at $j-half$, which we accomplish by averaging the two fine grids and then
+differencing:
+$$frac{partial}{partial r} left [ gammabar p_0 frac{partial dw}{partial r} right ]_{j-half} =
+frac{1}{dr_c} left { frac{1}{2} left [</p>
+<blockquote>
+<div><blockquote>
+<div>left ( gammabar p_0 frac{partial dw}{partial r} right )_{j+1} +
+left ( gammabar p_0 frac{partial dw}{partial r} right )_{j} right ]</div></blockquote>
+<ul class="simple">
+<li>left ( gammabar p_0 frac{partial dw}{partial r} right )_{j-1}</li>
+</ul>
+</div></blockquote>
+<p>right }$$
+Expanding the $partial dw / partial r$ terms results in a equation depending on $dw$ at
+4 different edge locations—this no longer fits into the tri-diagonal format used in the
+uniform grid case. In detail, it becomes:
+$$begin{aligned}
+frac{partial}{partial r} left [ gammabar p_0 frac{partial dw}{partial r} right ]_{j-half} &amp;=&amp;
+frac{1}{dr_c} left {  frac{1}{2} left [</p>
+<blockquote>
+<div>left ( gammabar p_0 right )_{j+1} frac{(dw)_{j+thalf} - (dw)_{j+half}}{dr_f} +
+left ( gammabar p_0 right )_{j}   frac{(dw)_{j+half} - (dw)_{j-half}}{dr_f}  right ] right .  nonumber \</div></blockquote>
+<p>&amp;&amp; qquad left .  - left ( gammabar p_0 right )_{j-1} frac{(dw)_{j-half} - (dw)_{j-thalf}}{dr_c}
+right }end{aligned}$$
+which has terms proportional to $(dw)_{j-thalf}$, $(dw)_{j-half}$, $(dw)_{j+half}$, and $(dw)_{j+thalf}$</p>
+</div>
+<div class="section" id="boundary-conditions">
+<h2>Boundary Conditions<a class="headerlink" href="#boundary-conditions" title="Permalink to this headline">¶</a></h2>
+<p>Together with the assumption that the mass of the envelope does not
+contribute to the gravitational acceleration, we assume that as we move
+a fluid element in the atmosphere, it does not drive a velocity at the very
+base of the layer. Therefore, we take $w_0(<a href="#id3"><span class="problematic" id="id4">r_</span></a>mathrm{base}) = 0$.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="thermo_notes.html" class="btn btn-neutral float-right" title="Notes on Thermodynamics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="spherical_basestate.html" class="btn btn-neutral" title="Modifications for a Spherical Self-Gravitating Star" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2]}}})</script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

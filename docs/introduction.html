@@ -1,0 +1,543 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction to MAESTROeX &mdash; MAESTROeX 18.11
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MAESTROeX Flowchart" href="flowchart.html" />
+    <link rel="prev" title="Preface" href="preface.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                18.11
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to MAESTROeX</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#history-of-maestroex">History of MAESTROeX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#brief-overview-of-low-speed-approximations">Brief Overview of Low Speed Approximations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#incompressible-hydrodynamics">Incompressible Hydrodynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#anelastic-hydrodynamics">Anelastic Hydrodynamics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#low-mach-number-combustion">Low-Mach Number Combustion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pseudo-incompressible-methods">Pseudo-Incompressible Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#alternate-energy-formulation">Alternate Energy Formulation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#projection-methods-101">Projection Methods 101</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notation">Notation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">MAESTROeX Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Introduction to MAESTROeX</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction-to-maestroex">
+<h1>Introduction to MAESTROeX<a class="headerlink" href="#introduction-to-maestroex" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="history-of-maestroex">
+<h2>History of MAESTROeX<a class="headerlink" href="#history-of-maestroex" title="Permalink to this headline">¶</a></h2>
+<p>MAESTROeX describes the evolution of low Mach number flows that are in
+hydrostatic equilibrium.  MAESTROeX itself derives from MAESTRO, the
+original (pure Fortran) low Mach number stellar hydrodynamics code.
+MAESTROeX is a rewrite of MAESTRO in the C++/Fortran framework of
+AMReX.  Henceforth, we will refer only to MAESTROeX, although some of
+the ideas originated in MAESTRO before the change to MAESTROeX.</p>
+<p>The idea for MAESTROeX grew out of our success in applying low Mach
+number combustion methods developed for terrestrial flames
+[DayBell00] to small-scale astrophysical flames (including
+Landau-Darrieus instability [SNld], Rayleigh-Taylor unstable
+flames [SNrt3d], and flame-turbulence interactions
+[SNturb]). Our original small-scale astrophysical combustion
+algorithm is detailed in</p>
+<ul class="simple">
+<li><em>Adaptive Low Mach Number Simulations of Nuclear Flames,</em>
+J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, &amp; M. Zingale
+2004, JCP, 195, 2, 677 (henceforth BDRWZ)</li>
+</ul>
+<p>MAESTROeX was developed initially for modeling the convecting phase in
+a white dwarf preceding the ignition of a Type Ia supernovae.  As
+such, we needed to incorporate the compressibility effects due to
+large-scale stratification in the star. The method closest in spirit
+to MAESTROeX&nbsp;is the pseudo-incompressible method of Durran
+[durran], developed for terrestrial atmospheric flows (assuming
+an ideal gas). Part of the complexity of the equations in MAESTROeX
+stems from the need to descibe a general equation of state.
+Additionally, since reactions can significantly alter the hydrostatic
+structure of a star, we incorporated extensions that capture the
+expansion of the background state [almgren:2000]. The low Mach
+number equations for stellar flows were developed in a series of
+papers leading up to the first application to this problem:</p>
+<ul class="simple">
+<li><em>Low Mach Number Modeling of Type Ia
+Supernovae. I. Hydrodynamics,</em> A. S. Almgren, J. B. Bell,
+C. A. Rendleman, &amp; M. Zingale 2006, ApJ, 637, 922 (henceforth
+paper I)</li>
+<li><em>Low Mach Number Modeling of Type Ia Supernovae. II. Energy
+Evolution,</em> A. S. Almgren, J. B. Bell, C. A. Rendleman, &amp; M. Zingale
+2006, ApJ, 649, 927 (henceforth paper II)</li>
+<li><em>Low Mach Number Modeling of Type Ia Supernovae. III. Reactions,</em>
+A. S. Almgren, J. B. Bell, A. Nonaka, &amp; M. Zingale
+2008, ApJ, 684, 449 (henceforth paper III)</li>
+<li><em>Low Mach Number Modeling of Type Ia Supernovae. IV. White Dwarf Convection,</em>
+M. Zingale, A. S. Almgren, J. B. Bell, A. Nonaka, &amp; S. E. Woosley
+2009, ApJ, 704, 196 (henceforth paper IV)</li>
+</ul>
+<p>The current version of the algorithm is described in our
+multilevel paper:</p>
+<ul class="simple">
+<li><em>MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar
+Flows,</em> A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone,
+&amp; M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”)</li>
+</ul>
+<p>We have many papers that describe applications of the method to Type
+Ia supernovae, X-ray bursts, and stellar evolution. These are listed
+on the main MAESTROeX website.  Some of these papers have appendices
+that describe enhancements to the code—these are noted below.</p>
+<ul>
+<li><p class="first"><em>Multidimensional Modeling of Type I X-ray Bursts,</em>
+C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, &amp; M. Zingale 2011,
+ApJ, 728, 118 (henceforth “the XRB paper”)</p>
+<p>This introduces the thermal diffusion portion of the MAESTROeX&nbsp;algorithm.</p>
+</li>
+<li><p class="first"><em>Comparisons of Two- and Three-Dimensional Convection in
+Type I X-ray Bursts</em> M.&nbsp;Zingale, C.&nbsp;M.&nbsp;Malone, A.&nbsp;Nonaka,
+A.&nbsp;S.&nbsp;Almgren, &amp; J.&nbsp;B.&nbsp;Bell 2015, ApJ, 807, 60.</p>
+<p>This has an appendix that describes the Godunov state construction in more
+detail than previous papers.</p>
+</li>
+<li><p class="first"><em>Low Mach Number Modeling of Convection in Helium Shells on
+Sub-Chandrasekhar White Dwarfs II: Bulk Properties of Simple Models,</em>
+A.&nbsp;M.&nbsp;Jacobs, M.&nbsp;Zingale, A.&nbsp;Nonaka, A.&nbsp;S.&nbsp;Almgren, &amp; J.&nbsp;B.&nbsp;Bell
+2016, ApJ, 827, 84.</p>
+<p>This has an appendix that shows some test problems for the alternate energy
+formulation in MAESTROeX.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="brief-overview-of-low-speed-approximations">
+<h2>Brief Overview of Low Speed Approximations<a class="headerlink" href="#brief-overview-of-low-speed-approximations" title="Permalink to this headline">¶</a></h2>
+<p>There are many low speed formulations of the equations of hydrodynamics
+in use, each with their own applications. All of these methods share in
+common a constraint equation on the velocity field that augments the
+equations of motion.</p>
+<div class="section" id="incompressible-hydrodynamics">
+<h3>Incompressible Hydrodynamics<a class="headerlink" href="#incompressible-hydrodynamics" title="Permalink to this headline">¶</a></h3>
+<p>The simplest low Mach number approximation is incompressible
+hydrodynamics. This approximation is formally the <span class="math notranslate nohighlight">\(M \rightarrow 0\)</span>
+limit of the Navier-Stokes equations. In incompressible hydrodynamics,
+the velocity satisfies a constraint equation:</p>
+<div class="math notranslate nohighlight">
+\[\nabla \cdot \Ub = 0\]</div>
+<p>which acts to instantaneously equilibrate the flow, thereby filtering
+out soundwaves. The constraint equation implies that</p>
+<div class="math notranslate nohighlight">
+\[D\rho/Dt = 0\]</div>
+<p>(through the continuity equation) which says that the density is
+constant along particle paths. This means that there are no
+compressibility effects modeled in this approximation.</p>
+</div>
+<div class="section" id="anelastic-hydrodynamics">
+<h3>Anelastic Hydrodynamics<a class="headerlink" href="#anelastic-hydrodynamics" title="Permalink to this headline">¶</a></h3>
+<p>In the anelastic approximation small amplitude thermodynamic
+perturbations are carried with respect to a static hydrostatic
+background (described by density <span class="math notranslate nohighlight">\(\rho_0\)</span>). The density perturbation
+is ignored in the continuity equation, resulting in a constraint
+equation:</p>
+<div class="math notranslate nohighlight">
+\[\nabla \cdot (\rho_0 \Ub) = 0\]</div>
+<p>This properly captures the compressibility effects due to the
+stratification of the background. Because there is no evolution
+equation for the perturbational density, approximations are made to
+the buoyancy term in the momentum equation.</p>
+</div>
+<div class="section" id="low-mach-number-combustion">
+<h3>Low-Mach Number Combustion<a class="headerlink" href="#low-mach-number-combustion" title="Permalink to this headline">¶</a></h3>
+<p>In the low Mach number combustion model, the pressure is decomposed
+into a dynamic, <span class="math notranslate nohighlight">\(\pi\)</span>, and thermodynamic component, <span class="math notranslate nohighlight">\(p_0\)</span>, the ratio
+of which is <span class="math notranslate nohighlight">\(O(M^2)\)</span>. The total pressure is replaced everywhere by the
+thermodynamic pressure, except in the momentum equation. This
+decouples the pressure and density and filters out the sound
+waves. Large amplitude density and temperature fluctuations are
+allowed. The only requirement is that the total pressure stay close to
+the background pressure, which is assumed constant. This requirement
+can be expressed as:</p>
+<div class="math notranslate nohighlight">
+\[p = p_0\]</div>
+<p>and differentiating this along particle paths leads to a constraint on
+the velocity field:</p>
+<div class="math notranslate nohighlight">
+\[\nabla \cdot \Ub = S\]</div>
+<p>This looks like the constraint for incompressible hydrodynamics, but
+now we have a source term, <span class="math notranslate nohighlight">\(S\)</span>, representing the local compressibility
+effects due to the energy generation and thermal diffusion. Since the
+background pressure is taken to be constant, we cannot model flows
+that cover a large fraction of a pressure scale height. However, this
+method is ideal for exploring the physics of flames.</p>
+</div>
+<div class="section" id="pseudo-incompressible-methods">
+<h3>Pseudo-Incompressible Methods<a class="headerlink" href="#pseudo-incompressible-methods" title="Permalink to this headline">¶</a></h3>
+<p>The pseudo-incompressible method incorporates both the local changes
+to compressibility due to reaction/heat release, and the large-scale
+changes due to the background stratification. This was originally
+derived for an ideal gas equation of state for atmospherical flows.
+Allowing the background pressure, <span class="math notranslate nohighlight">\(p_0\)</span> to vary (e.g. in hydrostatic
+equilibrium), differentiating pressure along particle paths gives:</p>
+<div class="math notranslate nohighlight">
+\[\nabla \cdot (p_0^{1/\gamma} \Ub) = H\]</div>
+<p>where <span class="math notranslate nohighlight">\(\gamma\)</span> is the ratio of specific heats and <span class="math notranslate nohighlight">\(H\)</span> is the source.</p>
+<p>MAESTROeX&nbsp;is based on this method, generalizing this constraint to an
+arbitrary equation of state and allowing for the time-variation of the
+base state.</p>
+</div>
+<div class="section" id="alternate-energy-formulation">
+<h3>Alternate Energy Formulation<a class="headerlink" href="#alternate-energy-formulation" title="Permalink to this headline">¶</a></h3>
+<p>Several authors [KP:2012][VLBWZ:2013] showed that with a slightly
+different momentum equation, the low Mach number system can conserve
+an energy (that is, a quantity that looks like the compressible
+energy, but formed using the low Mach number quantities). This change
+manifests itself as either a change to the buoyancy term or by
+changing <span class="math notranslate nohighlight">\(\nabla \pi\)</span> to <span class="math notranslate nohighlight">\(\beta_0 \nabla (\pi/\beta_0)\)</span>. Furthermore,
+[VLBWZ:2013] showed that the new formulation better captures the
+vertical propagation of gravity waves. As of
+Dec. 2013, this new formulation is the default in MAESTROeX.</p>
+</div>
+</div>
+<div class="section" id="projection-methods-101">
+<h2>Projection Methods 101<a class="headerlink" href="#projection-methods-101" title="Permalink to this headline">¶</a></h2>
+<p>Most astrophysical hydrodynamics codes
+(e.g.&nbsp;CASTRO [castro] or FLASH [flash]) solve the
+compressible Euler equations, which can be written in the form:</p>
+<div class="math notranslate nohighlight">
+\[\Ub_t + \nabla \cdot F(\Ub) = 0\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Ub\)</span> is the vector of conserved quantities, <span class="math notranslate nohighlight">\(\Ub = (\rho, \rho u,
+\rho E)\)</span>, with <span class="math notranslate nohighlight">\(\rho\)</span> the density, <span class="math notranslate nohighlight">\(u\)</span> the velocity, and <span class="math notranslate nohighlight">\(E\)</span> the total
+energy per unit mass. This system of equations can be expressed
+as a system of advection equations:</p>
+<div class="math notranslate nohighlight">
+\[{\bf q}_t + A({\bf q}) {\bf q}_x = 0\]</div>
+<p>where <span class="math notranslate nohighlight">\({\bf q}\)</span> are called the primitive variables, and <span class="math notranslate nohighlight">\(A\)</span> is the
+Jacobian, <span class="math notranslate nohighlight">\(A \equiv \partial F / \partial U\)</span>. The eigenvalues of the
+matrix <span class="math notranslate nohighlight">\(A\)</span> are the characteristic speeds—the speeds at which
+information propagates. For the Euler equations, these are <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(u
+\pm c\)</span>, where <span class="math notranslate nohighlight">\(c\)</span> is the sound speed. Solution methods for the
+compressible equations make use of this wave-nature to compute fluxes
+at the interfaces of grid cells to update the state in time. An
+excellent introduction to these methods is provided by LeVeque’s book
+[leveque]. The timestep for these methods is limited by the time
+it takes for the maximum characteristic speed to traverse one grid cell.
+For very subsonic flows, this means that the timestep is dominated by
+the propagation of soundwaves, which may not be important to the
+overall dynamics of the flow.</p>
+<p>In contrast, solving low Mach number systems (including the equations of
+incompressible hydrodynamics) typically involves solving one or more
+advection-like equations (representing, e.g.&nbsp;conservation of mass and
+momentum) coupled with a divergence constraint on the velocity field.
+For example, the equations of constant-density incompressible flow
+are:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\Ub_t &amp;=&amp; -\Ub \cdot \nabla \Ub + \nabla p \label{eq:incompressible_u} \\
+\nabla \cdot \Ub &amp;=&amp; 0\end{aligned}\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\Ub\)</span> represents the velocity vector <a class="footnote-reference" href="#id34" id="id13">[1]</a> and <span class="math notranslate nohighlight">\(p\)</span> is
+the dynamical pressure. The time-evolution equation for the velocity
+(Eq.&nbsp;<a class="reference external" href="#eq:incompressible_u">[eq:incompressible_u]</a>) can be solved
+using techniques similar to those developed for compressible
+hydrodynamics, updating the old velocity, <span class="math notranslate nohighlight">\(\Ub^n\)</span>, to the new
+time-level, <span class="math notranslate nohighlight">\(\Ub^\star\)</span>.  Here the ‘<span class="math notranslate nohighlight">\(^\star\)</span>’ indicates
+that the updated velocity does not, in general, satisfy the divergence
+constraint. A projection method will take this updated velocity and
+force it to obey the constraint equation. The basic idea follows from
+the fact that any vector field can be expressed as the sum of a
+divergence-free quantity and the gradient of a scalar. For the
+velocity, we can write:</p>
+<div class="math notranslate nohighlight">
+\[\Ub^\star = \Ub^d + \nabla \phi \label{eq:decomposition}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Ub^d\)</span> is the divergence free portion of the velocity vector,
+<span class="math notranslate nohighlight">\(\Ub^\star\)</span>, and <span class="math notranslate nohighlight">\(\phi\)</span> is a scalar. Taking the divergence of
+Eq.&nbsp;(<a class="reference external" href="#eq:decomposition">[eq:decomposition]</a>), we have</p>
+<div class="math notranslate nohighlight">
+\[\nabla^2 \phi = \nabla \cdot \Ub^\star\]</div>
+<p>(where we used <span class="math notranslate nohighlight">\(\nabla \cdot \Ub^d = 0\)</span>).
+With appropriate boundary conditions, this Poisson equation can be
+solved for <span class="math notranslate nohighlight">\(\phi\)</span>, and the final, divergence-free velocity can
+be computed as</p>
+<div class="math notranslate nohighlight">
+\[\Ub^{n+1} = \Ub^\star - \nabla \phi\]</div>
+<p>Because soundwaves are filtered, the timestep constraint now depends only
+on <span class="math notranslate nohighlight">\(|\Ub|\)</span>.</p>
+<p>Extensions to variable-density incompressible
+flows [bellMarcus:1992b] involve a slightly different
+decomposition of the velocity field and, as a result, a slightly
+different Poisson equation. There is also a variety of different ways
+to express what is being projected [almgren:bell:crutchfield],
+and different discretizations of the divergence and gradient operators
+lead to slightly different mathematical properties of the methods
+(leading to “approximate
+projections” [almgrenBellSzymczak:1996]). Finally, for
+second-order methods, two projections are typically done per timestep.
+The first (the ‘MAC’ projection [bellColellaHowell:1991])
+operates on the half-time, edge-centered advective velocities, making
+sure that they satisfy the divergence constraint. These advective
+velocities are used to construct the fluxes through the interfaces to
+advance the solution to the new time. The second/final projection
+operates on the cell-centered velocities at the new time, again
+enforcing the divergence constraint. The MAESTROeX&nbsp;algorithm performs
+both of these projections.</p>
+<p>The MAESTROeX algorithm builds upon these ideas, using a different
+velocity constraint equation that captures the compressibility
+due to local sources and large-scale stratification.</p>
+</div>
+<div class="section" id="notation">
+<h2>Notation<a class="headerlink" href="#notation" title="Permalink to this headline">¶</a></h2>
+<p>Throughout the papers describing MAESTROeX, we’ve largely kept our
+notation consistent. Table&nbsp;<a class="reference external" href="#table:sym">[table:sym]</a> defines the
+frequently-used quantities and provides their units. Additionally,
+for any quantity <span class="math notranslate nohighlight">\(\phi\)</span>, we denote the average of <span class="math notranslate nohighlight">\(\phi\)</span> over a layer
+at constaint radius (or height for plane-parallel simulations) as
+<span class="math notranslate nohighlight">\(\overline{\phi}\)</span>.</p>
+<table class="docutils footnote" frame="void" id="id34" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id13">[1]</a></td><td>Here we see an unfortunate conflict
+of notation between the compressible hydro community and the
+incompressible community. In papers on compressible hydrodynamics,
+<span class="math notranslate nohighlight">\(\Ub\)</span> will usually mean the vector of conserved quantities. In
+incompressible / low speed papers, <span class="math notranslate nohighlight">\(\Ub\)</span> will mean the velocity vector.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="flowchart.html" class="btn btn-neutral float-right" title="MAESTROeX Flowchart" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="preface.html" class="btn btn-neutral" title="Preface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2]}}})</script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
