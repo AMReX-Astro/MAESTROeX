@@ -5,6 +5,9 @@ module make_vel_force_module
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, center
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
   use bl_constants_module
+#ifdef ROTATION
+  use rotation_module
+#endif
 
   implicit none
 
@@ -237,6 +240,25 @@ contains
        end do
 
     endif
+
+#ifdef ROTATION
+
+    do k = lo(3),hi(3)
+       zz = prob_lo(3) + (dble(k) + HALF)*dx(3) - center(3)
+       do j = lo(2),hi(2)
+          yy = prob_lo(2) + (dble(j) + HALF)*dx(2) - center(2)
+          do i = lo(1),hi(1)
+             xx = prob_lo(1) + (dble(i) + HALF)*dx(1) - center(1)
+
+             radius = sqrt(xx**2 + yy**2 + zz**2)
+
+             vel_force(i,j,k,:) = vel_force(i,j,k,:) - omega**2 * normal(i,j,k,:) * radius
+
+          end do
+       end do
+    end do
+
+#endif
 
     call bl_deallocate(rho0_cart)
     call bl_deallocate(grav_cart)

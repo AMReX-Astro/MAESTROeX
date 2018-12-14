@@ -5,9 +5,13 @@ module make_S_module
   use eos_type_module
   use eos_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, dpdt_factor, base_cutoff_density, use_delta_gamma1_term
-  use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_coord, nr, dr
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, dpdt_factor, base_cutoff_density, use_delta_gamma1_term, prob_lo
+  use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_coord, nr, dr, center
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+  use bl_constants_module
+#ifdef ROTATION
+  use rotation_module, only: omega
+#endif
 
   implicit none
 
@@ -578,6 +582,7 @@ contains
 
     !     Local variables
     integer :: i, j, k
+    double precision :: x, y, z, radius
     double precision, pointer ::       div_cart(:,:,:,:)
     double precision, pointer ::      Sbar_cart(:,:,:,:)
     double precision, pointer :: gamma1bar_cart(:,:,:,:)
@@ -620,11 +625,22 @@ contains
             delta_chi(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.d0
 
        do k = lo(3),hi(3)
+          z = prob_lo(3) +(dble(k)+HALF)*dx(3) - center(3)
           do j = lo(2),hi(2)
+             y = prob_lo(2) +(dble(j)+HALF)*dx(2) - center(2)
              do i = lo(1),hi(1)
+                x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
+
                 if (rho0_cart(i,j,k,1) .gt. base_cutoff_density) then
                    delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / &
                         (dt*gamma1bar_cart(i,j,k,1)*p0_cart(i,j,k,1))
+#ifdef ROTATION
+
+                   radius = sqrt(x**2 + y**2 + z**2)
+                   delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * &
+                        rho0_cart(i,j,k,1) * omega**2 * normal(i,j,k,:) * radius / &
+                        (dt*gamma1bar_cart(i,j,k,1)*p0_cart(i,j,k,1))
+#endif
                    rhcc(i,j,k) = rhcc(i,j,k) + div_cart(i,j,k,1) * delta_chi(i,j,k)
                 end if
              end do
