@@ -132,6 +132,9 @@
 <li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
 
             
           
@@ -199,110 +202,53 @@
 <h1>Problem Setups<a class="headerlink" href="#problem-setups" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="standard-test-problems">
 <h2>‘Standard’ Test Problems<a class="headerlink" href="#standard-test-problems" title="Permalink to this headline">¶</a></h2>
-<p>Different problems in MAESTROeX&nbsp;are contained in one of three
-sub-directories under MAESTROeX/Exec: (SCIENCE/,
-TEST_PROBLEMS/, or UNIT_TESTS/). The GNUmakefile in each
-problem directory lists the components of MAESTRO that are used
-to build the executable. TEST_PROBLEMS/ contains simple
+<p>Different problems in MAESTROeX are contained in one of three
+sub-directories under <code class="docutils literal notranslate"><span class="pre">MAESTROeX/Exec/</span></code>: <code class="docutils literal notranslate"><span class="pre">SCIENCE/</span></code>,
+<code class="docutils literal notranslate"><span class="pre">TEST_PROBLEMS/</span></code>, or <code class="docutils literal notranslate"><span class="pre">UNIT_TESTS/</span></code>).  The <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> in each
+problem directory lists the components of MAESTROeX that are used
+to build the executable. <code class="docutils literal notranslate"><span class="pre">TEST_PROBLEMS/</span></code> contains simple
 problems that were used in the development of MAESTROeX. Many
-of these were featured in the papers describing the MAESTROeX&nbsp;algorithm.</p>
+of these were featured in the papers describing the original MAESTRO algorithm.</p>
 <p>Some of the test problems available are:</p>
 <ul>
-<li><div class="first line-block">
-<div class="line">double_bubble</div>
-<div class="line">A rising bubble problem where the bubble(s) can have a different gamma
-than the surrounding atmosphere. This uses the multigamma EOS.</div>
-</div>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">double_bubble</span></code> : A rising bubble problem where the bubble(s) can
+have a different gamma than the surrounding atmosphere. This uses
+the multigamma EOS.</p>
 </li>
-<li><div class="first line-block">
-<div class="line">incomp_shear_jet</div>
-<div class="line">A simple pure-incompressible shear layer problem. This is the example
-problem used in <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{bellcolellaglaz}`</span></a>. This is useful to see how to
-use MAESTROeX&nbsp;as an incompressible solver.</div>
-</div>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">incomp_shear_jet</span></code> : A simple pure-incompressible shear layer
+problem. This is the example problem used in
+<a class="reference internal" href="references.html#bellcolellaglaz" id="id1">[BellColellaGlaz89]</a>. This is useful to see how to use MAESTROeX
+as an incompressible solver.</p>
 </li>
-<li><div class="first line-block">
-<div class="line">reacting_bubble</div>
-<div class="line">reacting_bubble places 3 hots spots in a plane-parallel atmosphere.
-Burning makes these bubbles buoyant, and then roll up. This problem was
-used in <a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{lowMach3}`</span></a> to compare with compressible solvers.</div>
-</div>
-<p>This problem can also be run adaptively. The tag_boxes.f90
-file in the problem directory tags cells for refinement if the
-perturbational temperature, <span class="math notranslate nohighlight">\(T^\prime\)</span>, exceeds some threshold.</p>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">reacting_bubble</span></code> : The reacting bubble test places 3 hots spots
+in a plane-parallel atmosphere.  Burning makes these bubbles
+buoyant, and then roll up. This problem was used in <a class="reference internal" href="references.html#lowmach3" id="id2">[AlmgrenBellNonakaZingale08]</a>
+to compare with compressible solvers.</p>
+<p>This problem can also be run adaptively. The tagging.f90 file in the
+problem directory tags cells for refinement if the temperature
+exceeds some threshold.</p>
 </li>
-<li><div class="first line-block">
-<div class="line">rt</div>
-<div class="line">[-3mm]</div>
-</div>
-<p>A Rayleigh-Taylor instability problem. There are two methods that the
-code is run here, in the standard (using inputs_2d), the base state
-has the stratified atmosphere and we introduce a velocity perturbation
-to start the instability. The alternate method, inputs_2d_SNe, uses
-the do_smallscale runtime parameter to eliminate the base state
-and instead use the incompressible constraint to evolve the system.</p>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">rt</span></code> : A Rayleigh-Taylor instability problem.  Here, the base
+state has the stratified atmosphere and we introduce a velocity
+perturbation to start the instability.</p>
 </li>
-<li><div class="first line-block">
-<div class="line">test_convect</div>
-<div class="line">test_convect drives convection through a plane-parallel
-atmosphere using an externally-specified heat source. This problem
-was used to compare with compressible solvers in <a href="#id5"><span class="problematic" id="id6">:raw-latex:`\cite{lowMach3}`</span></a>
-and to test the multilevel algorithm in <a href="#id7"><span class="problematic" id="id8">:raw-latex:`\cite{multilevel}`</span></a>.</div>
-</div>
-</li>
-<li><div class="first line-block">
-<div class="line">test_spherical</div>
-<div class="line">This problem sets up an isentropically stratified star and stirs it up
-with a random velocity field. The low Mach number constraint is
-replaced with the anelastic constraint (through
-the beta_type runtime parameter). Analytically, under
-these conditions, the density of the star should not change. This
-test problem was discussed in Maestro paper IV&nbsp;<a href="#id9"><span class="problematic" id="id10">:raw-latex:`\cite{lowMach4}`</span></a>.</div>
-</div>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">test_convect</span></code> : This is a convection test that drives convection
+through a plane-parallel atmosphere using an externally-specified
+heat source. This problem was used to compare with compressible
+solvers in <a class="reference internal" href="references.html#lowmach3" id="id3">[AlmgrenBellNonakaZingale08]</a> and to test the multilevel
+algorithm in <a class="reference internal" href="references.html#multilevel" id="id4">[NonakaAlmgrenBell+10]</a>.</p>
 </li>
 </ul>
 </div>
 <div class="section" id="distributed-science-problems">
 <h2>Distributed Science Problems<a class="headerlink" href="#distributed-science-problems" title="Permalink to this headline">¶</a></h2>
-<p>The following problems were used for science studies. It is
-anticipated that more will be made available with time.</p>
-<ul>
-<li><div class="first line-block">
-<div class="line">flame</div>
-<div class="line">A combustion-mode problem where we model a thermonuclear flame in a
-small domain. This enforces the low Mach combustion constraint
-divU = S. Hot ash and cool fuel are put into contact and a flame
-will ignite and propagate across the grid. Inflow boundary
-conditions are used to allow for an inflow velocity to be set to
-keep the laminar flame stationary.</div>
-</div>
-<p>In this mode, MAESTROeX&nbsp;behaves like the code described
-in <a href="#id11"><span class="problematic" id="id12">:raw-latex:`\cite{SNe}`</span></a>, which was used for models of Rayleigh-Taylor
-unstable flames&nbsp;<a href="#id13"><span class="problematic" id="id14">:raw-latex:`\cite{SNld,SNrt,SNrt3d}`</span></a>.</p>
-</li>
-<li><div class="first line-block">
-<div class="line">flame_1d</div>
-<div class="line">A 1-d version of the flame problem above. This uses a special
-elliptic solver in AMReX&nbsp;that only works for a single grid, so
-no parallel runs are allowed for this problem.</div>
-</div>
-</li>
-<li><div class="first line-block">
-<div class="line">toy_convect</div>
-<div class="line">A nova-like problem for studying convection. This problem has seen
-extensive use in understanding which prediction types are the best
-when we have sharp species gradients. See Mike Z or Ryan for details.</div>
-</div>
-</li>
-<li><div class="first line-block">
-<div class="line">wdconvect</div>
-<div class="line">Model convection leading up to ignition in the Chandraseskhar-mass SNe
-Ia progenitor model. This setup was the basis for the simulations
-presented in <a href="#id15"><span class="problematic" id="id16">:raw-latex:`\cite{lowMach4,wdconvect,wdturb}`</span></a>.</div>
-</div>
-</li>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">wdconvect</span></code> : Model convection leading up to ignition in the
+Chandraseskhar-mass SNe Ia progenitor model. This setup was the
+basis for the simulations presented in
+<a class="reference internal" href="references.html#lowmach4" id="id5">[ZingaleAlmgrenBell+09]</a><a class="reference internal" href="references.html#wdconvect" id="id6">[ZingaleNonakaAlmgren+11]</a><a class="reference internal" href="references.html#wdturb" id="id7">[NonakaAspdenZingale+12]</a>.</li>
 </ul>
-<span class="target" id="sec-gettingstarted-runtime"></span></div>
+</div>
 </div>
 
 
