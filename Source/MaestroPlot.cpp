@@ -973,8 +973,10 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeMagvel()",MakeMagvel);
-        
+
         Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+	
+#if (AMREX_SPACEDIM == 3)
         if (spherical == 1) {
             for (int lev=0; lev<=finest_level; ++lev) {
                 w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
@@ -982,7 +984,8 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
                 w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
             }
             MakeW0mac(w0mac);
-        }       
+        }
+#endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
