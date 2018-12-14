@@ -910,7 +910,7 @@ private:
     amrex::Vector< amrex::Vector<amrex::Real> > tag_err;
 
     // array of tagged boxes (planar)
-    amrex::Vector< amrex::Vector<int> > tag_array;
+    amrex::Vector<int> tag_array;
 
     // diag file array buffers
     amrex::Vector<amrex::Real> diagfile_data;

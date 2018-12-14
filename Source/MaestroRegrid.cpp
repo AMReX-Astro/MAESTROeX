@@ -23,12 +23,8 @@ Maestro::Regrid ()
         // FIXME
         // we also need to redefine numdisjointchunks, r_start_coord, r_end_coord
         // and "regrid" the base state rho0, rhoh0, tempbar
-	int lev = 0;
-	init_multilevel(&lev,tag_array[lev].dataPtr(),&finest_level);
-	// lev > 0
-	for (lev=1; lev<finest_level; ++lev) {
-	      init_multilevel(&lev,tag_array[lev-1].dataPtr(),&finest_level);
-	}
+	init_multilevel(tag_array.dataPtr(),&finest_level);
+	
         // look at MAESTRO/Source/varden.f90:750-1060
         if (evolve_base_state) {
             // may need if statement for irregularly-spaced base states
@@ -140,23 +136,24 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
             const int*  thi     = tilebox.hiVect();
 
             // tag cells for refinement
+	    // use row lev of tag_array to tag the correct elements
             state_error(tptr,  ARLIM_3D(tlo), ARLIM_3D(thi),
                         BL_TO_FORTRAN_3D(state[mfi]),
                         &tagval, &clearval,
                         ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                         ZFILL(dx), &time,
-			tag_err[lev].dataPtr(), tag_array[lev].dataPtr());
+			tag_err[lev].dataPtr(), &tag_array[lev*nr_fine]);
 
 	    // for planar refinement, we need to gather tagged entries in arrays
 	    // from all processors and then re-tag tileboxes across each tagged
 	    // height
 	    if (spherical == 0) {
-		ParallelDescriptor::ReduceIntMax(tag_array[lev].dataPtr(),nr_fine);
+		ParallelDescriptor::ReduceIntMax(&tag_array[lev*nr_fine],nr_fine);
 
 		tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
 			  &tagval, &clearval,
 			  ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-			  ZFILL(dx), &time, tag_array[lev].dataPtr());
+			  ZFILL(dx), &time, &tag_array[lev*nr_fine]);
 	    }
 	    
             //

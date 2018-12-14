@@ -54,19 +54,14 @@ Maestro::Init ()
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);             // nodal
 	    
-	    // set finest_radial_level in fortran
-	    // compute numdisjointchunks, r_start_coord, r_end_coord
-	    if (spherical || lev == 0) {
-	      init_multilevel(&lev,tag_array[lev].dataPtr(),&finest_level);
-	    } else {
-	      // lev > 0
-	      init_multilevel(&lev,tag_array[lev-1].dataPtr(),&finest_level);
-	    }
         }
-
         compute_cutoff_coords(rho0_old.dataPtr());
     }
 
+    // set finest_radial_level in fortran
+    // compute numdisjointchunks, r_start_coord, r_end_coord
+    init_multilevel(tag_array.dataPtr(),&finest_level);
+	    
     if (spherical == 1) {
         MakeNormal();
         MakeCCtoRadii();
@@ -198,12 +193,7 @@ Maestro::InitData ()
 
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    int lev = 0;
-    init_multilevel(&lev,tag_array[lev].dataPtr(),&finest_level);
-    // lev > 0
-    for (lev=1; lev<finest_level; ++lev) {
-      init_multilevel(&lev,tag_array[lev-1].dataPtr(),&finest_level);
-    }
+    init_multilevel(tag_array.dataPtr(),&finest_level);
 
     // average down data and fill ghost cells
     AverageDown(sold,0,Nscal);
