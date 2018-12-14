@@ -1,13 +1,3 @@
-! init_base_state is used to initialize the base state arrays from the
-! model file.  The actual reading of the model file is handled by the
-! model_parser_module in Util/
-!
-! Note: The initial base state quantities returned from this routine
-! are only a temporary base state.  These quantities are mapped onto
-! the full 2- or 3-d state in initscaldata.f90 and a new base state is
-! created after initialization by averaging the density and calling
-! enforce_HSE in initialize.f90.
-
 module base_state_module
 
   use model_parser_module
@@ -24,13 +14,34 @@ module base_state_module
                                 rhoh_comp, spec_comp, temp_comp, grav_const, &
                                 planar_invsq_mass, print_init_hse_diag, prob_lo
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
-  
+
   implicit none
 
   private
 
 contains
 
+
+!> @brief init_base_state is used to initialize the base state arrays from the
+!! model file.  The actual reading of the model file is handled by the
+!! model_parser_module in Util/
+!!
+!! @note The initial base state quantities returned from this routine
+!! are only a temporary base state.  These quantities are mapped onto
+!! the full 2- or 3-d state in initscaldata.f90 and a new base state is
+!! created after initialization by averaging the density and calling
+!! enforce_HSE in initialize.f90.
+!!
+!! @note Binds to C function ``init_base_state``
+!!
+!! @param[inout] s0_init double precision
+!! @param[inout] p0_init double precision
+!! @param[inout] rho0 double precision
+!! @param[inout] rhoh0 double precision
+!! @param[inout] p0 double precision
+!! @param[inout] tempbar double precision
+!! @param[inout] tempbar_init double precision
+!!
   subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init) &
        bind(C, name="init_base_state")
 
@@ -64,7 +75,7 @@ contains
 
     base_cutoff_density_loc = 1.d99
 
-    ! only need to read in the initial model once -- 
+    ! only need to read in the initial model once --
     ! model_parser_module stores the model data
     call read_model_file(model_file)
 
@@ -186,7 +197,7 @@ contains
        rhoh0 = s0_init(:,:,rhoh_comp)
        tempbar = s0_init(:,:,temp_comp)
        tempbar_init = s0_init(:,:,temp_comp)
-       p0 = p0_init       
+       p0 = p0_init
 
        ! check whether we are in HSE
 
@@ -252,9 +263,23 @@ contains
 
   end subroutine init_base_state
 
-  
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+!>
+!! @note Binds to C function ``init_base_state_irreg``
+!!
+!! @param[inout] s0_init double precision
+!! @param[inout] p0_init double precision
+!! @param[inout] rho0 double precision
+!! @param[inout] rhoh0 double precision
+!! @param[inout] p0 double precision
+!! @param[inout] tempbar double precision
+!! @param[inout] tempbar_init double precision
+!! @param[in] r_cc_loc double precision
+!! @param[in] r_edge_loc double precision
+!!
   subroutine init_base_state_irreg(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init, &
                                      r_cc_loc, r_edge_loc) &
        bind(C, name="init_base_state_irreg")
@@ -280,7 +305,7 @@ contains
     real(kind=dp_t) :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
     real(kind=dp_t) :: sumX
     real(kind=dp_t) :: dr_irreg, rfrac
-    
+
     real(kind=dp_t), allocatable :: model_dr(:)
 
     real(kind=dp_t), parameter :: TINY = 1.0d-10
@@ -294,20 +319,20 @@ contains
 
     base_cutoff_density_loc = 1.d99
 
-    ! only need to read in the initial model once -- 
+    ! only need to read in the initial model once --
     ! model_parser_module stores the model data
     call read_model_file(model_file)
 
     allocate (model_dr(0:npts_model-1))
-    
+
     model_dr(0) = model_r(1)
-    do i=1,npts_model-1 
-       model_dr(i) = (model_r(i+1) - model_r(i)) 
+    do i=1,npts_model-1
+       model_dr(i) = (model_r(i+1) - model_r(i))
     end do
     rmax = model_r(npts_model)
 
     do n=0,max_radial_level
-       
+
        if ( parallel_IOProcessor() ) then
           write (*,887)
           if (spherical .ne. 1) then
@@ -421,14 +446,14 @@ contains
        rhoh0 = s0_init(:,:,rhoh_comp)
        tempbar = s0_init(:,:,temp_comp)
        tempbar_init = s0_init(:,:,temp_comp)
-       p0 = p0_init       
+       p0 = p0_init
 
        ! check whether we are in HSE
 
        mencl = zero
 
        dr_irreg = r_edge_loc(n,1) - r_edge_loc(n,0)  ! edge-to-edge
-       
+
        if (spherical .eq. 1 .OR. do_2d_planar_octant .eq. 1) then
           mencl = four3rd*m_pi*dr_irreg**3*s0_init(n,0,rho_comp)
        endif

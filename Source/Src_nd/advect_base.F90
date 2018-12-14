@@ -16,6 +16,18 @@ module advect_base_module
 
 contains
 
+
+!>
+!! @note Binds to C function ``advect_base_dens``
+!!
+!! @param[in] w0 double precision
+!! @param[in] rho0_old double precision
+!! @param[out] rho0_new double precision
+!! @param[out] rho0_predicted_edge double precision
+!! @param[in] dt double precision
+!! @param[in] r_cc_loc double precision
+!! @param[in] r_edge_loc double precision
+!!
   subroutine advect_base_dens(w0,rho0_old,rho0_new, &
        rho0_predicted_edge,dt, &
        r_cc_loc, r_edge_loc) bind(C, name="advect_base_dens")
@@ -41,6 +53,14 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+!>
+!! @param[in] w0 double precision
+!! @param[in] rho0_old double precision
+!! @param[out] rho0_new double precision
+!! @param[out] rho0_predicted_edge double precision
+!! @param[in] dt double precision
+!!
   subroutine advect_base_dens_planar(w0,rho0_old,rho0_new, &
        rho0_predicted_edge,dt)
 
@@ -90,6 +110,16 @@ contains
 
   end subroutine advect_base_dens_planar
 
+
+!>
+!! @param[in] w0 double precision
+!! @param[in] rho0_old double precision
+!! @param[out] rho0_new double precision
+!! @param[out] rho0_predicted_edge double precision
+!! @param[in] dt double precision
+!! @param[in] r_cc_loc double precision
+!! @param[in] r_edge_loc double precision
+!!
   subroutine advect_base_dens_spherical(w0,rho0_old,rho0_new, &
        rho0_predicted_edge,dt, &
        r_cc_loc, r_edge_loc)
@@ -137,6 +167,20 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+!>
+!! @note Binds to C function ``advect_base_enthalpy``
+!!
+!! @param[in] w0 double precision
+!! @param[in] rho0_old double precision
+!! @param[in] rhoh0_old double precision
+!! @param[out] rhoh0_new double precision
+!! @param[in] rho0_predicted_edge double precision
+!! @param[in] psi double precision
+!! @param[in] dt double precision
+!! @param[in] r_cc_loc double precision
+!! @param[in] r_edge_loc double precision
+!!
   subroutine advect_base_enthalpy(w0,rho0_old,rhoh0_old,rhoh0_new,rho0_predicted_edge, &
        psi,dt,r_cc_loc,r_edge_loc) bind(C, name="advect_base_enthalpy")
 
@@ -165,6 +209,16 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
+!>
+!! @param[in] w0 double precision
+!! @param[in] rho0_old double precision
+!! @param[in] rhoh0_old double precision
+!! @param[out] rhoh0_new double precision
+!! @param[in] rho0_predicted_edge double precision
+!! @param[in] psi double precision
+!! @param[in] dt double precision
+!!
   subroutine advect_base_enthalpy_planar(w0,rho0_old,rhoh0_old,rhoh0_new, &
        rho0_predicted_edge,psi,dt)
 
@@ -214,6 +268,18 @@ contains
 
   end subroutine advect_base_enthalpy_planar
 
+
+!>
+!! @param[in] w0 double precision
+!! @param[in] rho0_old double precision
+!! @param[in] rhoh0_old double precision
+!! @param[out] rhoh0_new double precision
+!! @param[in] rho0_predicted_edge double precision
+!! @param[in] psi double precision
+!! @param[in] dt double precision
+!! @param[in] r_cc_loc double precision
+!! @param[in] r_edge_loc double precision
+!!
   subroutine advect_base_enthalpy_spherical(w0,rho0_old,rhoh0_old,rhoh0_new, &
        rho0_predicted_edge,psi,dt, &
        r_cc_loc, r_edge_loc)

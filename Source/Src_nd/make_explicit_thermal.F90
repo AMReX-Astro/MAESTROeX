@@ -15,6 +15,26 @@ module make_explicit_thermal_module
 
 contains
 
+
+!> @brief create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
+!! for the thermal diffusion term in the enthalpy equation.
+!!
+!! note: we explicitly fill the ghostcells by looping over them directly
+!!
+!! @note Binds to C function ``make_thermal_coeffs``
+!!
+!! @param[in] lo integer
+!! @param[in] s_lo integer
+!! @param[in] scal double precision
+!! @param[in] t_lo integer
+!! @param[inout] Tcoeff double precision
+!! @param[in] h_lo integer
+!! @param[inout] hcoeff double precision
+!! @param[in] xk_lo integer
+!! @param[inout] Xkcoeff double precision
+!! @param[in] p_lo integer
+!! @param[inout] pcoeff double precision
+!!
   subroutine make_thermal_coeffs(lo, hi, &
        scal, s_lo, s_hi, nc_s, &
        Tcoeff, t_lo, t_hi, &
@@ -22,10 +42,6 @@ contains
        Xkcoeff, xk_lo, xk_hi, nc_xk, &
        pcoeff, p_lo, p_hi) bind(C,name="make_thermal_coeffs")
 
-    ! create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
-    ! for the thermal diffusion term in the enthalpy equation.
-    !
-    ! note: we explicitly fill the ghostcells by looping over them directly
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s

@@ -1,6 +1,6 @@
-! a generic diag module for MAESTRO.  This simply computes the
-! maximum Mach number on the domain and outputs it each timestep
-! to maestro_diag.out
+!> a generic diag module for MAESTRO.  This simply computes the
+!! maximum Mach number on the domain and outputs it each timestep
+!! to maestro_diag.out
 
 module diag_module
 

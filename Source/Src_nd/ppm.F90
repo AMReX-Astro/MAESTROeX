@@ -1,14 +1,14 @@
-! compute the PPM integrals, Ip and Im.  These are the integrals under
-! the parabolic profile of the reconstructed quantity over the domain
-! that can reach the interface over the timestep dt.
-!
-! Ip captures the amount of the state that can reach the right
-! interface of the cell and Im captures what can reach the left
-! interface of the cell over the step.
-!
-! There are cases here: one (originally called the 'fpu version') uses
-! the MAC velocity for the tracing while the non-fpu versions use the
-! cell-centered velocity.
+!> compute the PPM integrals, Ip and Im.  These are the integrals under
+!! the parabolic profile of the reconstructed quantity over the domain
+!! that can reach the interface over the timestep dt.
+!!
+!! Ip captures the amount of the state that can reach the right
+!! interface of the cell and Im captures what can reach the left
+!! interface of the cell over the step.
+!!
+!! There are cases here: one (originally called the 'fpu version') uses
+!! the MAC velocity for the tracing while the non-fpu versions use the
+!! cell-centered velocity.
 
 #include "AMReX_BC_TYPES.H"
 

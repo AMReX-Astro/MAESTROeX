@@ -1,6 +1,3 @@
-! compute gamma1 for the full state.
-
-
 module make_gamma_module
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
@@ -19,6 +16,8 @@ module make_gamma_module
 
 contains
 
+  !> @brief  compute gamma1 for the full state.
+  !!
   subroutine make_gamma(lev, lo, hi, &
        gamma, g_lo, g_hi, &
        scal,  s_lo, s_hi, nc_s, &

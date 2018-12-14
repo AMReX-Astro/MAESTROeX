@@ -1,8 +1,8 @@
-! inlet_bc_module is a simple container module that holds the parameters
-! that are used by physbc to implement the inlet boundary conditions.
-! As these are problem-specific, any problem needing inlet boundary 
-! conditions should create its own version of this module, using this
-! outline.
+!> inlet_bc_module is a simple container module that holds the parameters
+!! that are used by physbc to implement the inlet boundary conditions.
+!! As these are problem-specific, any problem needing inlet boundary
+!! conditions should create its own version of this module, using this
+!! outline.
 
 module inlet_bc_module
 
