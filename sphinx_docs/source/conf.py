@@ -54,7 +54,6 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinxcontrib.bibtex',
     'sphinx.ext.autosummary',
-    'numpydoc',
     'sphinx.ext.githubpages',
     'breathe']
 
