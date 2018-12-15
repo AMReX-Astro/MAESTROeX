@@ -103,10 +103,6 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Visualization</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#plotfiles">Plotfiles</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#mini-vs-regular-plotfiles">Mini vs.&nbsp;regular plotfiles</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#the-amrex-file-format">the AMReX&nbsp;file format</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#header">Header</a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-with-amrvis">Visualizing with Amrvis</a></li>
@@ -117,13 +113,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#runtimevis-py">runtimevis.py</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#sec-vis-yt-visualizing-with-yt">[sec:vis:yt] Visualizing with yt</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#installing-yt">Installing yt</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#working-with-yt">Working with yt</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#d-datasets">2-d datasets</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#volume-rendering">Volume Rendering</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#sec-vis-yt-visualizing-with-yt">[sec:vis:yt] Visualizing with yt</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
@@ -223,332 +213,275 @@
 <h1>Visualization<a class="headerlink" href="#visualization" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="plotfiles">
 <h2>Plotfiles<a class="headerlink" href="#plotfiles" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO&nbsp;outputs plotfile specifically for visualization and analysis.
-Table&nbsp;<a class="reference external" href="#vis:table:plotfile">[vis:table:plotfile]</a> lists the quantities stored in a plotfile.
-Not all of these may be present, dependent on what options were used in
-creating the plotfile.</p>
+<p>MAESTROeX outputs plotfiles specifically for visualization and
+analysis.  The table below lists the quantities stored in a plotfile.
+Not all of these may be present, dependent on what options were used
+in creating the plotfile.</p>
 <p>By default, plotfiles store double precision data, but if
-single_prec_plotfiles = T is set, then the data is
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">fab.format</span> <span class="pre">=</span> <span class="pre">NATIVE_32</span>
+<span class="pre">`</span></code>
+is set in the inputs file, then the data is
 converted to single precision before outputting—this is done to
 reduce file sizes.</p>
-<table border="1" class="docutils" id="id17">
-<caption><span class="caption-text">Plotfile quantities</span><a class="headerlink" href="#id17" title="Permalink to this table">¶</a></caption>
+<table border="1" class="docutils" id="id2">
+<caption><span class="caption-text">Plotfile quantities</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<col width="25%" />
+<col width="44%" />
+<col width="31%" />
 </colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">plotfile variable
+name</th>
+<th class="head">description</th>
+<th class="head">runtime parameter
+controlling output</th>
+</tr>
+</thead>
 <tbody valign="top">
-<tr class="row-odd"><td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>Table&nbsp;—continued</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>plotfile variable
-name</td>
-<td>description</td>
-<td>runtime parameter
-controlling output</td>
-</tr>
-<tr class="row-even"><td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td><p class="last">x_vel</p>
-</td>
+<tr class="row-even"><td>x_vel</td>
 <td><span class="math notranslate nohighlight">\(\ut\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-even"><td>y_vel</td>
+<tr class="row-odd"><td>y_vel</td>
 <td><span class="math notranslate nohighlight">\(\vt\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-odd"><td>z_vel</td>
+<tr class="row-even"><td>z_vel</td>
 <td><span class="math notranslate nohighlight">\(\wt\)</span></td>
 <td>3-d runs only</td>
 </tr>
-<tr class="row-even"><td>density</td>
+<tr class="row-odd"><td>density</td>
 <td><span class="math notranslate nohighlight">\(\rho\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-odd"><td>rhoh</td>
+<tr class="row-even"><td>rhoh</td>
 <td><span class="math notranslate nohighlight">\((\rho h)\)</span></td>
 <td>use_tfromp = F or
 (use_tfromp = T and
-plot_h_with_use_tfrom
-p
+plot_h_with_use_tfromp
 = T)</td>
 </tr>
-<tr class="row-even"><td>h</td>
+<tr class="row-odd"><td>h</td>
 <td><span class="math notranslate nohighlight">\((\rho h)/\rho\)</span></td>
 <td>use_tfromp = F or
 (use_tfromp = T and
-plot_h_with_use_tfrom
-p
+plot_h_with_use_tfromp
 = T)</td>
 </tr>
-<tr class="row-odd"><td>X(*)</td>
-<td><span class="math notranslate nohighlight">\((\rho X_k)/\rh
-o\)</span></td>
+<tr class="row-even"><td>X(*)</td>
+<td><span class="math notranslate nohighlight">\((\rho X_k)/\rho\)</span></td>
 <td>plot_spec</td>
 </tr>
-<tr class="row-even"><td>tracer</td>
+<tr class="row-odd"><td>tracer</td>
 <td>tracers</td>
 <td>plot_trac</td>
 </tr>
-<tr class="row-odd"><td>w0_x</td>
-<td><span class="math notranslate nohighlight">\(w_0 \er \cdot
-\ex\)</span></td>
+<tr class="row-even"><td>w0_x</td>
+<td><span class="math notranslate nohighlight">\(w_0 \er \cdot \ex\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-even"><td>w0_y</td>
-<td><span class="math notranslate nohighlight">\(w_0 \er \cdot
-\ey\)</span></td>
+<tr class="row-odd"><td>w0_y</td>
+<td><span class="math notranslate nohighlight">\(w_0 \er \cdot \ey\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-odd"><td>w0_z</td>
-<td><span class="math notranslate nohighlight">\(w_0 \er \cdot
-\ez\)</span></td>
+<tr class="row-even"><td>w0_z</td>
+<td><span class="math notranslate nohighlight">\(w_0 \er \cdot \ez\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-even"><td>divw0</td>
-<td><span class="math notranslate nohighlight">\(\nabla \cdot w
-_0\)</span></td>
+<tr class="row-odd"><td>divw0</td>
+<td><span class="math notranslate nohighlight">\(\nabla \cdot w_0\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-odd"><td>rho0</td>
+<tr class="row-even"><td>rho0</td>
 <td><span class="math notranslate nohighlight">\(\rho_0\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-even"><td>rhoh0</td>
+<tr class="row-odd"><td>rhoh0</td>
 <td><span class="math notranslate nohighlight">\((\rho h)_0\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-odd"><td>h0</td>
-<td><span class="math notranslate nohighlight">\((\rho h)_0/\rh
-o_0\)</span></td>
+<tr class="row-even"><td>h0</td>
+<td><span class="math notranslate nohighlight">\((\rho h)_0/\rho_0\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-even"><td>p0</td>
+<tr class="row-odd"><td>p0</td>
 <td><span class="math notranslate nohighlight">\(p_0\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-odd"><td>radial_velocity</td>
-<td><dl class="first last docutils">
-<dt>:math:<a href="#id1"><span class="problematic" id="id2">`</span></a>Ubt cdot er</dt>
-<dd><ul class="first last simple">
-<li>w_0`</li>
+<tr class="row-even"><td>radial_velocity</td>
+<td><span class="math notranslate nohighlight">\(\Ubt \cdot \er + w_0\)</span></td>
+<td>spherical == 1</td>
+</tr>
+<tr class="row-odd"><td>circum_velocity</td>
+<td><span class="math notranslate nohighlight">\(|\Ubt - (\Ubt \cdot \er) \er |\)</span></td>
+<td>spherical == 1</td>
+</tr>
+<tr class="row-even"><td>magvel</td>
+<td><span class="math notranslate nohighlight">\(| \Ubt + w_0 \er |\)</span></td>
+<td><ul class="first last simple">
+<li></li>
 </ul>
-</dd>
-</dl>
 </td>
-<td>spherical == 1</td>
 </tr>
-<tr class="row-even"><td>circum_velocity</td>
-<td><dl class="first last docutils">
-<dt>:math:<a href="#id3"><span class="problematic" id="id4">`</span></a>| Ubt - (Ubt</dt>
-<dd>cdot er) er <a href="#id5"><span class="problematic" id="id6">|</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></dd>
-</dl>
+<tr class="row-odd"><td>momentum</td>
+<td><span class="math notranslate nohighlight">\(\rho | \Ubt + w_0 \er |\)</span></td>
+<td><ul class="first last simple">
+<li></li>
+</ul>
 </td>
-<td>spherical == 1</td>
 </tr>
-<tr class="row-odd"><td>magvel</td>
-<td><span class="math notranslate nohighlight">\(| \Ubt + w_0 \
-er |\)</span></td>
-<td>–</td>
+<tr class="row-even"><td>vort</td>
+<td><span class="math notranslate nohighlight">\(| \nabla \times \Ubt |\)</span></td>
+<td><ul class="first last simple">
+<li></li>
+</ul>
+</td>
 </tr>
-<tr class="row-even"><td>momentum</td>
-<td><span class="math notranslate nohighlight">\(\rho | \Ubt +
-w_0 \er |\)</span></td>
-<td>–</td>
-</tr>
-<tr class="row-odd"><td>vort</td>
-<td><span class="math notranslate nohighlight">\(| \nabla \time
-s \Ubt |\)</span></td>
-<td>–</td>
-</tr>
-<tr class="row-even"><td>S</td>
+<tr class="row-odd"><td>S</td>
 <td><span class="math notranslate nohighlight">\(S\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-odd"><td>rhopert</td>
+<tr class="row-even"><td>rhopert</td>
 <td><span class="math notranslate nohighlight">\(\rho - \rho_0\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-even"><td>rhohpert</td>
-<td><span class="math notranslate nohighlight">\((\rho h) - (\r
-ho h)_0\)</span></td>
+<tr class="row-odd"><td>rhohpert</td>
+<td><span class="math notranslate nohighlight">\((\rho h) - (\rho h)_0\)</span></td>
 <td>use_tfromp = F or
 (use_tfromp = T and
-plot_h_with_use_tfrom
-p
+plot_h_with_use_tfromp
 = T)</td>
 </tr>
-<tr class="row-odd"><td>tfromp</td>
-<td><span class="math notranslate nohighlight">\(T(\rho, p_0, X
-_k)\)</span></td>
+<tr class="row-even"><td>tfromp</td>
+<td><span class="math notranslate nohighlight">\(T(\rho, p_0, X_k)\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-even"><td>tfromh</td>
-<td><span class="math notranslate nohighlight">\(T(\rho, h, X_k
-)\)</span></td>
+<tr class="row-odd"><td>tfromh</td>
+<td><span class="math notranslate nohighlight">\(T(\rho, h, X_k)\)</span></td>
 <td>use_tfromp = F or
 (use_tfromp = T and
-plot_h_with_use_tfrom
-p
+plot_h_with_use_tfromp
 = T)</td>
 </tr>
-<tr class="row-odd"><td>deltaT</td>
-<td><span class="math notranslate nohighlight">\([T(\rho, h, X_
-k) - T(\rho, p_0, X_k
-)]/T(\rho, h, X_k)\)</span></td>
+<tr class="row-even"><td>deltaT</td>
+<td><span class="math notranslate nohighlight">\([T(\rho, h, X_k) -\)</span>
+<span class="math notranslate nohighlight">\(T(\rho, p_0, X_k)]\)</span>
+<span class="math notranslate nohighlight">\(/T(\rho, h, X_k)\)</span></td>
 <td>use_tfromp = F or
 (use_tfromp = T and
-plot_h_with_use_tfrom
-p
+plot_h_with_use_tfromp
 = T)</td>
 </tr>
-<tr class="row-even"><td>deltap</td>
-<td><dl class="first last docutils">
-<dt>:math:<a href="#id9"><span class="problematic" id="id10">`</span></a><a href="#id11"><span class="problematic" id="id12">|</span></a>p(rho,h,X_k)</dt>
-<dd><ul class="first last simple">
-<li>p_0|/p_0`</li>
-</ul>
-</dd>
-</dl>
-</td>
+<tr class="row-odd"><td>deltap</td>
+<td><span class="math notranslate nohighlight">\(|p(\rho,h,X_k)-p_0|/p_0\)</span></td>
 <td>use_tfromp = F or
 (use_tfromp = T and
-plot_h_with_use_tfrom
-p
+plot_h_with_use_tfromp
 = T)</td>
 </tr>
-<tr class="row-odd"><td>tpert</td>
-<td><span class="math notranslate nohighlight">\(T(\rho,h,X_k)
-- \overline{T}\)</span>
+<tr class="row-even"><td>tpert</td>
+<td><span class="math notranslate nohighlight">\(T(\rho,h,X_k)-\overline{T}\)</span>
 if use_tfromp = F;
-<span class="math notranslate nohighlight">\(T(\rho,p_0,X_k
-) - \overline{T}\)</span>
+<span class="math notranslate nohighlight">\(T(\rho,p_0,X_k)-\overline{T}\)</span>
 otherwise</td>
 <td>–</td>
 </tr>
-<tr class="row-even"><td>Machnumber</td>
-<td><span class="math notranslate nohighlight">\(| \Ubt + w_0 \
-er | / c(\rho,p_0,X_k
-)\)</span></td>
+<tr class="row-odd"><td>Machnumber</td>
+<td><span class="math notranslate nohighlight">\(|\Ubt+w_0\er |/c(\rho,p_0,X_k)\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-odd"><td>soundspeed</td>
-<td><span class="math notranslate nohighlight">\(c(\rho,p_0,X_k
-)\)</span></td>
+<tr class="row-even"><td>soundspeed</td>
+<td><span class="math notranslate nohighlight">\(c(\rho,p_0,X_k)\)</span></td>
 <td>plot_cs</td>
 </tr>
-<tr class="row-even"><td>deltagamma</td>
-<td><span class="math notranslate nohighlight">\(\Gamma_1(\rho,
-p_0,X_k) - \gammabar\)</span></td>
+<tr class="row-odd"><td>deltagamma</td>
+<td><span class="math notranslate nohighlight">\(\Gamma_1-\gammabar\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-odd"><td>entropy</td>
-<td><span class="math notranslate nohighlight">\(s(\rho,p_0,X_k
-)\)</span></td>
+<tr class="row-even"><td>entropy</td>
+<td><span class="math notranslate nohighlight">\(s(\rho,p_0,X_k)\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-even"><td>entropypert</td>
-<td><span class="math notranslate nohighlight">\([s(\rho,p_0,X_
-k) - \overline{s}]/\o
-verline{s}\)</span></td>
+<tr class="row-odd"><td>entropypert</td>
+<td><span class="math notranslate nohighlight">\([s(\rho,p_0,X_k) -\)</span>
+<span class="math notranslate nohighlight">\(\overline{s}]/\overline{s}\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-odd"><td>sponge or
+<tr class="row-even"><td>sponge or
 sponge_fdamp</td>
-<td><span class="math notranslate nohighlight">\(1/(1 + \Delta
-t \kappa f_\mathrm{da
-mp})\)</span>
+<td><span class="math notranslate nohighlight">\(1/(1+\Delta t\kappa \fdamp)\)</span>
 by default;
-<span class="math notranslate nohighlight">\(f_\mathrm{damp
-}\)</span>
-if plot_sponge_fdamp
-= T</td>
+<span class="math notranslate nohighlight">\(\fdamp\)</span>
+if plot_sponge_fdamp = T</td>
 <td>–</td>
 </tr>
-<tr class="row-even"><td>pi</td>
+<tr class="row-odd"><td>pi</td>
 <td><span class="math notranslate nohighlight">\(\pi\)</span></td>
 <td>–</td>
 </tr>
-<tr class="row-odd"><td>gpi_x</td>
-<td><span class="math notranslate nohighlight">\(\nabla \pi \cd
-ot \ex\)</span></td>
+<tr class="row-even"><td>gpi_x</td>
+<td><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ex\)</span></td>
 <td>plot_gpi</td>
 </tr>
-<tr class="row-even"><td>gpi_y</td>
-<td><span class="math notranslate nohighlight">\(\nabla \pi \cd
-ot \ey\)</span></td>
+<tr class="row-odd"><td>gpi_y</td>
+<td><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ey\)</span></td>
 <td>plot_gpi</td>
 </tr>
-<tr class="row-odd"><td>gpi_z</td>
-<td><span class="math notranslate nohighlight">\(\nabla \pi \cd
-ot \ez\)</span></td>
+<tr class="row-even"><td>gpi_z</td>
+<td><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ez\)</span></td>
 <td>plot_gpi</td>
 </tr>
-<tr class="row-even"><td>pioverp0</td>
+<tr class="row-odd"><td>pioverp0</td>
 <td><span class="math notranslate nohighlight">\(\pi / p_0\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-odd"><td>p0pluspi</td>
+<tr class="row-even"><td>p0pluspi</td>
 <td><span class="math notranslate nohighlight">\(p_0 + \pi\)</span></td>
 <td>plot_base</td>
 </tr>
-<tr class="row-even"><td>omegadot(*)</td>
-<td>:math:<a href="#id13"><span class="problematic" id="id14">`</span></a>dot{omega}_k
-`</td>
+<tr class="row-odd"><td>omegadot(*)</td>
+<td><span class="math notranslate nohighlight">\(\dot{\omega}_k\)</span></td>
 <td>plot_omegadot</td>
 </tr>
-<tr class="row-odd"><td>enucdot</td>
-<td><span class="math notranslate nohighlight">\((\rho \Hnuc)/\
-rho\)</span></td>
+<tr class="row-even"><td>enucdot</td>
+<td><span class="math notranslate nohighlight">\((\rho \Hnuc)/\rho\)</span></td>
 <td>plot_Hnuc</td>
 </tr>
-<tr class="row-even"><td>Hext</td>
-<td><span class="math notranslate nohighlight">\((\rho \Hext)/\
-rho\)</span></td>
+<tr class="row-odd"><td>Hext</td>
+<td><span class="math notranslate nohighlight">\((\rho \Hext)/\rho\)</span></td>
 <td>plot_Hext</td>
 </tr>
-<tr class="row-odd"><td>eta_rho</td>
+<tr class="row-even"><td>eta_rho</td>
 <td><span class="math notranslate nohighlight">\(\etarho\)</span></td>
 <td>plot_eta</td>
 </tr>
-<tr class="row-even"><td>thermal</td>
-<td><span class="math notranslate nohighlight">\(\nabla \cdot \
-kappa \nabla T\)</span></td>
+<tr class="row-odd"><td>thermal</td>
+<td><span class="math notranslate nohighlight">\(\nabla \cdot \kappa\nabla T\)</span></td>
 <td>use_thermal_diffusion</td>
 </tr>
-<tr class="row-odd"><td>conductivity</td>
-<td><span class="math notranslate nohighlight">\(\kappa(\rho, T
-, X_k)\)</span></td>
+<tr class="row-even"><td>conductivity</td>
+<td><span class="math notranslate nohighlight">\(\kappa(\rho, T,X_k)\)</span></td>
 <td>use_thermal_diffusion</td>
 </tr>
-<tr class="row-even"><td>ad_excess</td>
-<td><span class="math notranslate nohighlight">\(\nabla - \nabl
-a_\mathrm{ad}\)</span></td>
+<tr class="row-odd"><td>ad_excess</td>
+<td><span class="math notranslate nohighlight">\(\nabla - \nabla_\mathrm{ad}\)</span></td>
 <td>plot_ad_excess</td>
 </tr>
-<tr class="row-odd"><td>particle_count</td>
+<tr class="row-even"><td>particle_count</td>
 <td>number of particles
 in a cell</td>
 <td>use_particles</td>
 </tr>
-<tr class="row-even"><td>processor_number</td>
+<tr class="row-odd"><td>processor_number</td>
 <td>processor number
 containing the cell’s
 data</td>
 <td>plot_processors</td>
 </tr>
-<tr class="row-odd"><td>pi_divu</td>
-<td><span class="math notranslate nohighlight">\(\pi \nabla \cd
-ot \tilde{\Ub}\)</span>
+<tr class="row-even"><td>pi_divu</td>
+<td><span class="math notranslate nohighlight">\(\pi \nabla \cdot\tilde{\Ub}\)</span>
 (a measure of energy
 conservation)</td>
 <td>plot_pidivu</td>
@@ -582,60 +515,6 @@ on the value of use_tfromp</li>
 <li>“enuc”: the nuclear energy generation rate</li>
 <li>“mach”: the Mach number</li>
 </ul>
-</div>
-<div class="section" id="the-amrex-file-format">
-<h3>the AMReX&nbsp;file format<a class="headerlink" href="#the-amrex-file-format" title="Permalink to this headline">¶</a></h3>
-<p>MAESTRO&nbsp;stores the plotfile data in a hierarchical directory format,
-with each level’s data stored in a separate subdirectory. Some meta-data
-is stored in the top-level to help interpret the structure. The basic format is:</p>
-<ul class="simple">
-<li>plt00000/<ul>
-<li>Header</li>
-<li>job_info</li>
-<li>Level_00/<ul>
-<li>Cell_D_00000</li>
-<li>…</li>
-<li>Cell_H</li>
-</ul>
-</li>
-<li>model_cc_00000</li>
-<li>model_ec_00000</li>
-</ul>
-</li>
-</ul>
-<p>In the main directory, Header contains the information required
-to interpret the data stored on disk. We describe this below. The
-job_info file is a plaintext file that contains a lot of
-information about the run (where it was run, when it was run, compiler
-options, runtime options, etc.). It is not needed to interpret the
-data. Finally, the model_cc_00000 and model_ec_00000
-contain the MAESTRO&nbsp;basestate information for the cell-centered and
-edge-centered basestate quantities respectively. These files are not
-typically used for visualization.</p>
-<div class="section" id="header">
-<h4>Header<a class="headerlink" href="#header" title="Permalink to this headline">¶</a></h4>
-<p>The main Header is written by fabio_ml_multifab_write_d by
-processor 0. The information contained is the following:</p>
-<blockquote>
-<div><div class="line-block">
-<div class="line">NavierStokes-V1.1</div>
-<div class="line"><em>number of variables</em></div>
-<div class="line"><em>variable 1 name</em></div>
-<div class="line"><em>variable 2 name</em></div>
-<div class="line"><span class="math notranslate nohighlight">\(\vdots\)</span></div>
-<div class="line"><em>last variable name</em></div>
-<div class="line"><em>number of dimensions</em></div>
-<div class="line"><em>simulation time</em></div>
-<div class="line"><em>number of levels</em> (0-based)</div>
-<div class="line"><em>physical domain minimum coordinate</em> (dm numbers)</div>
-<div class="line"><em>physical domain maximum coordinate</em> (dm numbers)</div>
-<div class="line"><em>jump in refinement between level 0 and 1</em></div>
-<div class="line"><span class="math notranslate nohighlight">\(\vdots\)</span></div>
-<div class="line"><em>jump in refinement between level :math:`n-2` and :math:`n-1`</em></div>
-<div class="line"><br /></div>
-</div>
-</div></blockquote>
-</div>
 </div>
 </div>
 <div class="section" id="visualizing-with-amrvis">
@@ -765,168 +644,13 @@ log is taken of the data before plotting. The script is then run as:</p>
 </div>
 <div class="section" id="sec-vis-yt-visualizing-with-yt">
 <h2>[sec:vis:yt] Visualizing with yt<a class="headerlink" href="#sec-vis-yt-visualizing-with-yt" title="Permalink to this headline">¶</a></h2>
-<p>ytis a Python package for analyzing and visualizing simulation data,
-and understand that AMReX&nbsp;data from MAESTRO&nbsp;and CASTRO&nbsp;(along
+<p>yt is a Python package for analyzing and visualizing simulation data,
+and understand that AMReX data from MAESTROeX and CASTRO (along
 with many other simulation codes). For more
-information, see the ythomepage at <a class="reference external" href="http://yt-project.org/">http://yt-project.org/</a> and
-<a href="#id15"><span class="problematic" id="id16">:raw-latex:`\cite{yt}`</span></a>.</p>
-<p>Some sample scripts that use yt&nbsp;with MAESTRO&nbsp;data are contained in
-MAESTRO/Util/yt/.</p>
-<div class="section" id="installing-yt">
-<h3>Installing yt<a class="headerlink" href="#installing-yt" title="Permalink to this headline">¶</a></h3>
-<p>The easiest way to obtain ytis through the use of an installation script:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">wget</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">hg</span><span class="o">.</span><span class="n">yt</span><span class="o">-</span><span class="n">project</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">yt</span><span class="o">/</span><span class="n">raw</span><span class="o">/</span><span class="n">yt</span><span class="o">-</span><span class="mf">3.0</span><span class="o">/</span><span class="n">doc</span><span class="o">/</span><span class="n">install_script</span><span class="o">.</span><span class="n">sh</span>
-<span class="o">&gt;</span> <span class="n">bash</span> <span class="n">install_script</span><span class="o">.</span><span class="n">sh</span>
-</pre></div>
-</div>
-<p>By default, this ytinstall script will download and install, in its
-own isolated environment, all the secondary utilities needed to get
-ytup and running. Note that this currently includes installing
-<em>hdf5, zlib, bzip2, libpng, freetype, python, numpy, matplotlib,
-mercurial, ipython, h5py, Cython, Forthon</em> as well as a yt
-<em>mercurial</em> bundle of changes. You can turn off the automatic
-installation of any of these particular packages by setting the
-appropriate INST_* variable to zero in the install script; you
-may have to then change some of *_DIR variables to point to
-your own particular installation of that package. It is usually best
-to just let ytinstall its own stuff, which ensures things are
-working properly.</p>
-<p>After the install script has finished, and assuming you let yt
-install its own packages, you’ll need to <em>prepend</em> some
-environment variables with ytlocations so that your system finds
-those first and stops looking. ytprovides a simple script to
-do this, which will be announced upon successful completion.</p>
-</div>
-<div class="section" id="working-with-yt">
-<h3>Working with yt<a class="headerlink" href="#working-with-yt" title="Permalink to this headline">¶</a></h3>
-<p>The ytinstallation provides both an interactive, <em>iPython</em>-like,
-interface or the ability to import ytmodules for use in a batch
-script. The interactive interface should be in your $PATH if
-you’ve followed the instructions in the previous section; to start it,
-simply type iyt in a terminal.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span>&gt; iyt
-
-Welcome to yt!
-
-
-In [1]:
-</pre></div>
-</div>
-<p>Codes like Enzo use what are called <em>parameter files</em> to
-describe the general information—number of levels, domain
-dimensions, time, etc.—of a a dataset. ytlikes to grab this
-information before working on any specific data; this is accomplished
-via the convenience method load:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">pf</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;plt00166&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Note that some older versions of ytneeded an inputs file
-in the same directory as the plotfile, but as of yt3.0, all the
-necessary metadata is obtained from the job_info file inside
-the plotfile directory.
-The load method returns an instance of the StaticOutput class. One
-of the easiest ways of handling plots is via a PlotCollection
-object</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">domain_right_edge</span> <span class="o">+</span> <span class="n">pf</span><span class="o">.</span><span class="n">domain_left_edge</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
-<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">pc</span> <span class="o">=</span> <span class="n">PlotCollection</span><span class="p">(</span><span class="n">pf</span><span class="p">,</span><span class="n">center</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>By default, the PlotCollection constructor places the center of
-the plot to be at the location of peak density. Here we have
-calculated the center of the domain by accessing the lower and upper
-domain boundaries via the numpy arrays
-pf.domain_left_edge and pf.domain_right_edge,
-respectively. Note that up until this point, ythas not actually
-loaded the AMR dataset.</p>
-<p>Now we would like to take some slices of tfromp in the dataset and
-generate some 2-d plots. To do this, we will use the
-PlotCollection’s add_slice method:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The first call to add_slice builds an
-AMRHierarchy object associated with pf. The
-AMRHierarchy object contains information about the actual dataset,
-such as its layout in the simulation domain or on disk. Building the
-hierarchy is expensive, but once it is built the data it contains can
-be accessed via attributes and dictionary lookup. In other words, the
-subsequent add_slice operations are relatively
-cheap. The first parameter to the add_slice
-method is obviously the variable we want; the second (optional)
-parameter specifies an coordinate axis orthogonal to the slice being
-made—0 for x, 1 for y, 2 for z. Now we want to save the plots from
-the PlotCollection; this is done with the
-save method, which takes an optional basename for the generated files:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="n">pc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;my_cool_images&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This generates the following image files:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Out</span><span class="p">[</span><span class="mi">7</span><span class="p">]:</span>
-<span class="p">[</span><span class="s1">&#39;my_cool_images_Slice_x_tfromp.png&#39;</span><span class="p">,</span>
- <span class="s1">&#39;my_cool_images_Slice_y_tfromp.png&#39;</span><span class="p">,</span>
- <span class="s1">&#39;my_cool_images_Slice_z_tfromp.png&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>Figure <a class="reference external" href="#fig:yt_slice">[fig:yt_slice]</a> shows an example of one of the slice images.
-Note that this was a quick and dirty generation of the image—there
-is a lot of space around the figure, which can be removed with various
-options to the ytmethods. Also, the user can specify derived
-variables, log-scaling, annotations, etc. For more information see the
-documentation at <a class="reference external" href="http://yt-project.org/docs/dev/">http://yt-project.org/docs/dev/</a>  .</p>
-<p>[fig:yt_slice]
-<img alt="Example slice through 3-d dataset with yt." src="visfigpath/my_cool_images_Slice_x_tfromp_trim" /></p>
-<p>When writing a script to use in batch mode, one has to manually import
-the import modules needed to work with yt. As such, all scripts must
-import from the yt.mods module, which is essentially a
-convenience module that sets up the appropriate ytnamespace.
-For completeness, below is a script containing our example above.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># load our namespace</span>
-<span class="kn">from</span> <span class="nn">yt.mods</span> <span class="k">import</span> <span class="o">*</span>
-
-<span class="c1"># the plotfile I&#39;m interested in</span>
-<span class="n">fn</span> <span class="o">=</span> <span class="s2">&quot;plt00166&quot;</span>
-
-<span class="c1"># load it into a StaticOutput object</span>
-<span class="n">pf</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-
-<span class="c1"># find the center of the domain</span>
-<span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">domain_right_edge</span> <span class="o">+</span> <span class="n">pf</span><span class="o">.</span><span class="n">domain_left_edge</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
-
-<span class="c1"># associate a PlotCollection with the pf</span>
-<span class="n">pc</span> <span class="o">=</span> <span class="n">PlotCollection</span><span class="p">(</span><span class="n">pf</span><span class="p">,</span><span class="n">center</span><span class="p">)</span>
-
-<span class="c1"># add some slices of tfromp</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">add_slice</span><span class="p">(</span><span class="s2">&quot;tfromp&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="c1"># save our plots to a files with basename</span>
-<span class="c1"># &quot;my_cool_images&quot;</span>
-<span class="n">pc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;my_cool_images&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="d-datasets">
-<h3>2-d datasets<a class="headerlink" href="#d-datasets" title="Permalink to this headline">¶</a></h3>
-<p>To visualize 2-d data, you can use the SlicePlot function,
-picking the normal direction to be “z”:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">yt.mods</span> <span class="k">import</span> <span class="o">*</span>
- <span class="n">pf</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;plt00085&quot;</span><span class="p">)</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">SlicePlot</span><span class="p">(</span><span class="n">pf</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;tfromp&quot;</span><span class="p">)</span>
-<span class="n">s</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;tfromp.eps&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This generates the figure shown in Figure&nbsp;<a class="reference external" href="#fig:yt2d">[fig:yt2d]</a>.</p>
-<div class="figure" id="id18">
-<img alt="[fig:yt2d] Example slice through 3-d dataset with yt." src="visfigpath/tfromp" />
-<p class="caption"><span class="caption-text">[fig:yt2d] Example slice through 3-d dataset with yt.</span></p>
-</div>
-</div>
-<div class="section" id="volume-rendering">
-<h3>Volume Rendering<a class="headerlink" href="#volume-rendering" title="Permalink to this headline">¶</a></h3>
-</div>
+information, see the yt homepage at <a class="reference external" href="http://yt-project.org/">http://yt-project.org/</a> and
+[yt].</p>
+<p>Some sample scripts that use yt with MAESTRO data are contained in
+<code class="docutils literal notranslate"><span class="pre">MAESTROeX/Util/yt/</span></code>.</p>
 </div>
 </div>
 
@@ -976,7 +700,7 @@ picking the normal direction to be “z”:</p>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2]}}})</script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
     
 
   
