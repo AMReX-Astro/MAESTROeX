@@ -29,16 +29,16 @@ module sponge_module
 contains
 
 
-  !> @brief The sponge has a HALF * ( 1 - cos( (r - r_sp)/L)) profile, where
-  !! the width, L, is r_tp - r_sp.
+  !> @brief The sponge has a \f$\frac{1}{2} \left( 1 - \cos( \frac{r - r_{sp}}{L})\right)\f$ profile, where
+  !! the width, \f$L\f$, is ``r_tp - r_sp``.
   !!
-  !! The center of the sponge, r_md, is set to the radius where r =
-  !! sponge_center_density
+  !! The center of the sponge, ``r_md``, is set to the radius where ``r =
+  !! sponge_center_density``
   !!
-  !! The start of the sponge, r_sp, (moving outward from the center)
-  !! is the radius where r = sponge_start_factor * sponge_center_density
+  !! The start of the sponge, ``r_sp``, (moving outward from the center)
+  !! is the radius where ``r = sponge_start_factor * sponge_center_density``
   !!
-  !! The top of the sponge is then 2 * r_md - r_tp
+  !! The top of the sponge is then ``2 * r_md - r_tp``
   !!
   !! @note Binds to C function ``init_sponge``
   !!
@@ -101,16 +101,16 @@ contains
   end subroutine init_sponge
 
 
-  !> @brief The sponge has a HALF * ( 1 - cos( (r - r_sp)/L)) profile, where
-  !! the width, L, is r_tp - r_sp.
+  !> @brief The sponge has a \f$\frac{1}{2} \left( 1 - \cos( \frac{r - r_{sp}}{L})\right)\f$ profile, where
+  !! the width, \f$L\f$, is ``r_tp - r_sp``.
   !!
-  !! The center of the sponge, r_md, is set to the radius where r =
-  !! sponge_center_density
+  !! The center of the sponge, ``r_md``, is set to the radius where ``r =
+  !! sponge_center_density``
   !!
-  !! The start of the sponge, r_sp, (moving outward from the center)
-  !! is the radius where r = sponge_start_factor * sponge_center_density
+  !! The start of the sponge, ``r_sp``, (moving outward from the center)
+  !! is the radius where ``r = sponge_start_factor * sponge_center_density``
   !!
-  !! The top of the sponge is then 2 * r_md - r_tp
+  !! The top of the sponge is then ``2 * r_md - r_tp``
   !!
   !! @note Binds to C function ``init_sponge_irreg``
   !!

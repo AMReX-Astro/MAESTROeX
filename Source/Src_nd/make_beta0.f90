@@ -11,6 +11,15 @@ module make_beta0_module
 
  contains
 
+
+!> @brief Compute beta0 on the edges and average to the center
+!!
+!! @param[out] beta0
+!! @param[in] rho0
+!! @param[in] p0
+!! @param[in] gamma1bar
+!! @param[in] grav_cell
+!!
  subroutine make_beta0(beta0,rho0,p0,gamma1bar,grav_cell) bind(C, name="make_beta0")
 
     double precision, intent(  out) :: beta0    (0:max_radial_level,0:nr_fine-1)
@@ -36,7 +45,7 @@ module make_beta0_module
     if (beta0_type .eq. 1) then
 
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-       ! Compute beta0 on the edges and average to the center      
+       ! Compute beta0 on the edges and average to the center
        !
        ! Multilevel Outline:
        !
@@ -48,7 +57,7 @@ module make_beta0_module
        !   if n>0, compare the difference between beta0 at the top of level n to the
        !           corresponding point on level n-1
        !   do i=n-1,0,-1
-       !     Offset the centered beta on level i above this point so the total integral 
+       !     Offset the centered beta on level i above this point so the total integral
        !      is consistent
        !     Redo the anelastic cutoff part
        !   end do
@@ -74,11 +83,11 @@ module make_beta0_module
                 if (r < anelastic_cutoff_coord(n)) then
 
                    if (r .eq. 0 .or. r .eq. nr(n)-1) then
-                      
+
                       lambda = ZERO
                       mu = ZERO
                       nu = ZERO
-                      
+
                    else
 
                       ! piecewise linear reconstruction of rho0,
@@ -90,7 +99,7 @@ module make_beta0_module
                       slim   = merge(slim, zero, dpls*dmin.gt.ZERO)
                       sflag  = sign(ONE,del)
                       lambda = sflag*min(slim,abs(del))
-                      
+
                       del   = HALF* (gamma1bar(n,r+1) - gamma1bar(n,r-1))/dr(n)
                       dpls  = TWO * (gamma1bar(n,r+1) - gamma1bar(n,r  ))/dr(n)
                       dmin  = TWO * (gamma1bar(n,r  ) - gamma1bar(n,r-1))/dr(n)
@@ -98,7 +107,7 @@ module make_beta0_module
                       slim  = merge(slim, zero, dpls*dmin.gt.ZERO)
                       sflag = sign(ONE,del)
                       mu    = sflag*min(slim,abs(del))
-                      
+
                       del   = HALF* (p0(n,r+1) - p0(n,r-1))/dr(n)
                       dpls  = TWO * (p0(n,r+1) - p0(n,r  ))/dr(n)
                       dmin  = TWO * (p0(n,r  ) - p0(n,r-1))/dr(n)
@@ -115,14 +124,14 @@ module make_beta0_module
                         (gamma1bar(n,r) - HALF*mu*dr(n))) .le. ZERO .or. &
                         ((p0(n,r) + HALF*nu*dr(n))/ &
                         (p0(n,r) - HALF*nu*dr(n))) .le. ZERO) then
-                      
+
                       ! just do piecewise constant integration
                       integral = abs(grav_cell(n,r))*rho0(n,r)*dr(n)/(p0(n,r)*gamma1bar(n,r))
-                      
-                   else 
+
+                   else
 
                       if ( use_linear_grav_in_beta0 ) then
-                         
+
                          ! also do piecewise linear reconstruction of
                          ! gravity -- not documented in publication yet.
                          del   = HALF* (grav_cell(n,r+1) - grav_cell(n,r-1))/dr(n)
@@ -132,8 +141,8 @@ module make_beta0_module
                          slim  = merge(slim, zero, dpls*dmin.gt.ZERO)
                          sflag = sign(ONE,del)
                          kappa = sflag*min(slim,abs(del))
-                         
-                         denom = nu*gamma1bar(n,r) - mu*p0(n,r) 
+
+                         denom = nu*gamma1bar(n,r) - mu*p0(n,r)
                          coeff1 = (lambda*gamma1bar(n,r) - mu*rho0(n,r)) * &
                               (kappa *gamma1bar(n,r) + mu*abs(grav_cell(n,r))) / &
                               (mu*mu*denom)
@@ -141,7 +150,7 @@ module make_beta0_module
                               (-kappa*p0(n,r) - nu*abs(grav_cell(n,r))) / &
                               (nu*nu*denom)
                          coeff3 = kappa*lambda / (mu*nu)
-                         
+
                          integral =  &
                               coeff1*log( (gamma1bar(n,r) + HALF*mu*dr(n))/ &
                                           (gamma1bar(n,r) - HALF*mu*dr(n)) ) + &
@@ -178,7 +187,7 @@ module make_beta0_module
 
              if (n .gt. 0) then
 
-                ! Compare the difference between beta0 at the top of level n to the 
+                ! Compare the difference between beta0 at the top of level n to the
                 ! corresponding point on level n-1
                 offset = beta0_edge(n,r_end_coord(n,j)+1) &
                      - beta0_edge(n-1,(r_end_coord(n,j)+1)/2)
@@ -187,7 +196,7 @@ module make_beta0_module
 
                    refrat = 2**(n-i)
 
-                   ! Offset the centered beta on level i above this point so the total 
+                   ! Offset the centered beta on level i above this point so the total
                    ! integral is consistent
                    do r=r_end_coord(n,j)/refrat+1,nr(i)
                       beta0(i,r) = beta0(i,r) + offset
@@ -200,10 +209,10 @@ module make_beta0_module
                       endif
                    end do
 
-                   ! This next piece of coded is needed for the case when the anelastic 
-                   ! cutoff coordinate lives on level n.  We first average beta0 from 
-                   ! level i+1 to level i in the region between the anelastic cutoff and 
-                   ! the top of grid n.  Then recompute beta0 at level i above the top 
+                   ! This next piece of coded is needed for the case when the anelastic
+                   ! cutoff coordinate lives on level n.  We first average beta0 from
+                   ! level i+1 to level i in the region between the anelastic cutoff and
+                   ! the top of grid n.  Then recompute beta0 at level i above the top
                    ! of grid n.
                    if (r_end_coord(n,j) .ge. anelastic_cutoff_coord(n)) then
 
@@ -273,6 +282,17 @@ module make_beta0_module
 
   end subroutine make_beta0
 
+
+  !> @brief Compute beta0 on the edges and average to the center
+  !!
+  !! @param[out] beta0
+  !! @param[in] rho0
+  !! @param[in] p0
+  !! @param[in] gamma1bar
+  !! @param[in] grav_cell
+  !! @param[in] r_cc_loc
+  !! @param[in] r+edge_loc
+  !!
   subroutine make_beta0_irreg(beta0,rho0,p0,gamma1bar,grav_cell, &
                                r_cc_loc,r_edge_loc) &
                                bind(C, name="make_beta0_irreg")
@@ -303,7 +323,7 @@ module make_beta0_module
     if (beta0_type .eq. 1) then
 
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-       ! Compute beta0 on the edges and average to the center      
+       ! Compute beta0 on the edges and average to the center
        !
        ! Multilevel Outline:
        !
@@ -315,7 +335,7 @@ module make_beta0_module
        !   if n>0, compare the difference between beta0 at the top of level n to the
        !           corresponding point on level n-1
        !   do i=n-1,0,-1
-       !     Offset the centered beta on level i above this point so the total integral 
+       !     Offset the centered beta on level i above this point so the total integral
        !      is consistent
        !     Redo the anelastic cutoff part
        !   end do
@@ -337,20 +357,20 @@ module make_beta0_module
              end if
 
              do r=r_start_coord(n,j),r_end_coord(n,j)
-                   
+
                 if (r < anelastic_cutoff_coord(n)) then
 
                    drp = r_edge_loc(n,r+1) - r_edge_loc(n,r)
                    drm = r_edge_loc(n,r) - r_edge_loc(n,r-1)
-                   
+
                    if (r .eq. 0 .or. r .eq. nr(n)-1) then
-                      
+
                       lambda = ZERO
                       mu = ZERO
                       nu = ZERO
-                      
+
                    else
-                      
+
                       drc = r_cc_loc(n,r+1) - r_cc_loc(n,r-1)
 
                       ! piecewise linear reconstruction of rho0,
@@ -362,7 +382,7 @@ module make_beta0_module
                       slim   = merge(slim, zero, dpls*dmin.gt.ZERO)
                       sflag  = sign(ONE,del)
                       lambda = sflag*min(slim,abs(del))
-                      
+
                       del   =       (gamma1bar(n,r+1) - gamma1bar(n,r-1))/drc
                       dpls  = TWO * (gamma1bar(n,r+1) - gamma1bar(n,r  ))/drp
                       dmin  = TWO * (gamma1bar(n,r  ) - gamma1bar(n,r-1))/drm
@@ -370,7 +390,7 @@ module make_beta0_module
                       slim  = merge(slim, zero, dpls*dmin.gt.ZERO)
                       sflag = sign(ONE,del)
                       mu    = sflag*min(slim,abs(del))
-                      
+
                       del   =       (p0(n,r+1) - p0(n,r-1))/drc
                       dpls  = TWO * (p0(n,r+1) - p0(n,r  ))/drp
                       dmin  = TWO * (p0(n,r  ) - p0(n,r-1))/drm
@@ -391,17 +411,17 @@ module make_beta0_module
                         (gamma1bar(n,r) - mu*drm)) .le. ZERO .or. &
                         ((p0(n,r) + nu*drp)/ &
                         (p0(n,r) - nu*drm)) .le. ZERO) then
-                      
+
                       ! just do piecewise constant integration
                       integral = abs(grav_cell(n,r))*rho0(n,r)*(drp+drm)/(p0(n,r)*gamma1bar(n,r))
-                      
-                   else 
-                      
+
+                   else
+
                       ! paper III, equation C2
                       denom = nu*gamma1bar(n,r) - mu*p0(n,r)
                       coeff1 = lambda*gamma1bar(n,r)/mu - rho0(n,r)
                       coeff2 = lambda*p0(n,r)/nu - rho0(n,r)
-                      
+
                       integral = (abs(grav_cell(n,r))/denom)* &
                            (coeff1*log( (gamma1bar(n,r) + mu*drp)/ &
                                         (gamma1bar(n,r) - mu*drm)) - &
@@ -414,7 +434,7 @@ module make_beta0_module
                    beta0(n,r) = HALF*(beta0_edge(n,r) + beta0_edge(n,r+1))
 
                 else ! r >= anelastic_cutoff
-                   
+
                    beta0(n,r) = beta0(n,r-1) * (rho0(n,r)/rho0(n,r-1))
                    beta0_edge(n,r+1) = 2.d0*beta0(n,r) - beta0_edge(n,r)
                 endif
@@ -423,7 +443,7 @@ module make_beta0_module
 
              if (n .gt. 0) then
 
-                ! Compare the difference between beta0 at the top of level n to the 
+                ! Compare the difference between beta0 at the top of level n to the
                 ! corresponding point on level n-1
                 offset = beta0_edge(n,r_end_coord(n,j)+1) &
                      - beta0_edge(n-1,(r_end_coord(n,j)+1)/2)
@@ -432,7 +452,7 @@ module make_beta0_module
 
                    refrat = 2**(n-i)
 
-                   ! Offset the centered beta on level i above this point so the total 
+                   ! Offset the centered beta on level i above this point so the total
                    ! integral is consistent
                    do r=r_end_coord(n,j)/refrat+1,nr(i)
                       beta0(i,r) = beta0(i,r) + offset
@@ -445,10 +465,10 @@ module make_beta0_module
                       endif
                    end do
 
-                   ! This next piece of coded is needed for the case when the anelastic 
-                   ! cutoff coordinate lives on level n.  We first average beta0 from 
-                   ! level i+1 to level i in the region between the anelastic cutoff and 
-                   ! the top of grid n.  Then recompute beta0 at level i above the top 
+                   ! This next piece of coded is needed for the case when the anelastic
+                   ! cutoff coordinate lives on level n.  We first average beta0 from
+                   ! level i+1 to level i in the region between the anelastic cutoff and
+                   ! the top of grid n.  Then recompute beta0 at level i above the top
                    ! of grid n.
                    if (r_end_coord(n,j) .ge. anelastic_cutoff_coord(n)) then
 
@@ -517,5 +537,5 @@ module make_beta0_module
     deallocate(beta0_edge)
 
   end subroutine make_beta0_irreg
-  
+
 end module make_beta0_module

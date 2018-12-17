@@ -19,7 +19,7 @@ contains
 !> @brief create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
 !! for the thermal diffusion term in the enthalpy equation.
 !!
-!! note: we explicitly fill the ghostcells by looping over them directly
+!! @note we explicitly fill the ghostcells by looping over them directly
 !!
 !! @note Binds to C function ``make_thermal_coeffs``
 !!

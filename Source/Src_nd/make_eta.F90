@@ -1,5 +1,4 @@
-!>
-!! Compute eta_rho = Avg { rho' U dot e_r }  (see paper III, Eq. 30)
+!> Compute eta_rho = Avg { rho' U dot e_r }  (see paper III, Eq. 30)
 !!
 !! We keep make three quantities here:
 !!    etarho     is edge-centered

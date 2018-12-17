@@ -11,6 +11,8 @@ module make_scal_force_module
 
 contains
 
+  !> @brief compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
+  !!
   subroutine mkrhohforce(lev, lo, hi, &
        rhoh_force, f_lo, f_hi, &
 #if (AMREX_SPACEDIM == 1)
@@ -24,8 +26,6 @@ contains
        p0, rho0, grav, psi, &
        is_prediction, add_thermal) &
        bind(C,name="mkrhohforce")
-
-    ! compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
 
     integer         , intent(in   ) :: lev,lo(3),hi(3)
     integer         , intent(in   ) :: f_lo(3), f_hi(3)
@@ -440,7 +440,7 @@ contains
 
 
              if (do_fullform .eq. 1) then
-                
+
                 force(i,j,k) = force(i,j,k) - scal(i,j,k)*(divumac+divu_cart(i,j,k,1))
              else
 

@@ -240,7 +240,7 @@ contains
   end subroutine make_grav_cell
 
 
-!> @brief compute the base state gravity at the cell edges
+!> @brief compute the base state gravity at the cell edges.
 !! grav_edge(0) is the gravitational acceleration at the left edge of zone 0).
 !! The base state uses 0-based indexing, so grav_edge does too.
 !!
