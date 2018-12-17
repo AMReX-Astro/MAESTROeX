@@ -133,6 +133,9 @@ Maestro::Setup ()
     w0        .resize( (max_radial_level+1)*(nr_fine+1) );
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
     
+    // tagged box array for multilevel (planar)
+    tag_array .resize( (max_radial_level+1)*nr_fine );
+    
     // diag file data arrays
     diagfile_data.resize(diag_buf_size*12);
 
@@ -160,6 +163,7 @@ Maestro::Setup ()
     etarho_ec    .shrink_to_fit();
     r_cc_loc     .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
+    tag_array    .shrink_to_fit();
     diagfile_data.shrink_to_fit();
 
     init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
@@ -167,6 +171,7 @@ Maestro::Setup ()
 			     r_edge_loc.dataPtr(),
 			     geom[max_level].CellSize(),
 			     &nr_irreg);
+    
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
@@ -209,20 +214,16 @@ Maestro::Setup ()
         ng_adv = 3;
     }
 
+    std::fill(tag_array.begin(), tag_array.end(), 0);
+    
     // tagging criteria
     tag_err.resize(max_level);
-    
-    // tagged box array for multilevel (planar)
-    tag_array.resize(max_level);
     
     for (int lev=0; lev<max_level; ++lev) {
 	tag_err[lev].resize(2);
 	tag_err[lev].shrink_to_fit();
-	tag_array[lev].resize(nr_fine);
-	tag_array[lev].shrink_to_fit();
     }
     tag_err.shrink_to_fit();
-    tag_array.shrink_to_fit();
 
     // combine tagging criteria
     for (int lev=0; lev<max_level; ++lev) {
@@ -230,8 +231,6 @@ Maestro::Setup ()
 	    tag_err[lev][0] = temperr[lev];
         if (denserr.size() > lev)
 	    tag_err[lev][1] = denserr[lev];
-
-	std::fill(tag_array[lev].begin(), tag_array[lev].end(), 0);
     }
 
 }

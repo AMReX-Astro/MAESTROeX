@@ -4,7 +4,7 @@ maestro.perturb_model = true
 
 maestro.ppm_type = 0
 
-maestro.max_step  = 10000000
+maestro.max_step  = 100000
 maestro.stop_time = 1.5
 
 # PROBLEM SIZE
