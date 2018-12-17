@@ -3,7 +3,7 @@ set -e # Exit with nonzero exit code if anything fails
 
 # Build the documentation from the SOURCE_BRANCH
 # and push it to TARGET_BRANCH.
-SOURCE_BRANCH="sphinx"
+SOURCE_BRANCH="development"
 TARGET_BRANCH="gh-pages"
 
 # Pull requests and commits to other branches shouldn't try to deploy
