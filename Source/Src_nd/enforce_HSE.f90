@@ -6,7 +6,8 @@ module enforce_HSE_module
                                         max_radial_level, nr, numdisjointchunks, & 
                                         r_start_coord, r_end_coord, finest_radial_level, &
                                         restrict_base, fill_ghost_base, base_cutoff_density_coord
-  use meth_params_module, only: do_planar_invsq_grav, do_2d_planar_octant, spherical
+  use meth_params_module, only: do_planar_invsq_grav, do_2d_planar_octant, spherical, &
+                                use_exact_base_state
 
   implicit none
 
@@ -46,7 +47,7 @@ contains
 
     ! now integrate upwards from the bottom later, we will offset the
     ! entire pressure so we have effectively integrated from the "top"
-    if (spherical .eq. 1) then
+    if (use_exact_base_state .and. spherical .eq. 1) then
        do r=1,min(r_end_coord(0,1),base_cutoff_density_coord(0))
           ! uneven grid spacing
           dr1 = r_edge_loc(0,r)-r_cc_loc(0,r-1)

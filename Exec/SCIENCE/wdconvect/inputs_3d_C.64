@@ -63,8 +63,6 @@ maestro.cg_verbose     = 0
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 2
 
-maestro.probin_file = "probin"
-
 maestro.do_burning = true
 
 maestro.evolve_base_state = true
@@ -91,3 +89,32 @@ maestro.eps_hg             = 1.e-11
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
+
+&probin
+
+  ! override the default values of the probin namelist values here
+  velpert_amplitude = 1.e5
+  velpert_radius = 2.e7
+  velpert_scale = 1.e7
+  velpert_steep = 1.e5
+  tag_density_1 = 5.e7
+  tag_density_2 = 1.e8
+  tag_density_3 = 1.e8
+  tag_density_3 = 1.e9
+  particle_temp_cutoff = 6.e8
+  particle_tpert_threshold = 2.e7
+
+  !extern
+
+  ! Note that some of the parameters in this
+  ! namelist are specific to the default EOS,
+  ! network, and/or integrator used in the
+  ! makefile. If you try a different set of
+  ! microphysics routines be sure to check that
+  ! the parameters in here are consistent, as
+  ! Fortran does not like seeing unknown variables
+  ! in the namelist.
+
+  use_eos_coulomb = T
+
+/

@@ -5,7 +5,6 @@
 
 static int         do_reflux;
 static int         maestro_verbose;
-static std::string probin_file;
 static std::string model_file;
 static bool        perturb_model;
 static bool        print_init_hse_diag;

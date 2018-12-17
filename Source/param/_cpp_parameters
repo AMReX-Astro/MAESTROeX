@@ -32,9 +32,6 @@ maestro_verbose                     int         1       y
 # category: problem initialization
 #-----------------------------------------------------------------------------
 
-# input probin file
-probin_file                         string      ""
-
 # input model file
 model_file                          string      ""             y
 
