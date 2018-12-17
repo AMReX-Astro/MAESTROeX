@@ -2,7 +2,7 @@
 !! second-order Taylor expansion in space (through dx/2) and time
 !! (though dt/2) (if ppm_type = 0) or using PPM (for ppm_type = 1,2).
 !!
-! We use only MAC-projected edge velocities in this prediction.
+!! We use only MAC-projected edge velocities in this prediction.
 !!
 !! We are computing all edge states for each variable.  This is what is
 !! done for the final updates of the state variables and velocity.  For
