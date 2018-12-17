@@ -5,7 +5,6 @@
 
 int         Maestro::do_reflux = 1;
 int         Maestro::maestro_verbose = 1;
-std::string Maestro::probin_file = "";
 std::string Maestro::model_file = "";
 bool        Maestro::perturb_model = false;
 bool        Maestro::print_init_hse_diag = false;

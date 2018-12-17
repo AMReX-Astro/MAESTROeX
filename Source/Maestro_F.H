@@ -366,7 +366,7 @@ extern "C"
     // in maestro_init.f90
 
     void maestro_network_init();
-    void maestro_extern_init(const int* name, const int* namlen);
+    void maestro_extern_init();
     void get_num_spec(int* nspec);
     void get_spec_names(int* spec_names, int* ispec, int* len);
     void get_spec_az(const int* ispec, amrex::Real* A, amrex::Real* Z);
@@ -1047,7 +1047,16 @@ extern "C"
                      const int* tagval, const int* clearval,
                      const int* lo, const int* hi,
                      const amrex::Real* dx,
-                     const amrex::Real* time, const amrex::Real* tag_err);
+                     const amrex::Real* time,
+		     amrex::Real* tag_err,
+		     int* tag_array);
+
+    void tag_boxes(int* tag, const int* tag_lo, const int* tag_hi,
+		   const int* tagval, const int* clearval,
+		   const int* lo, const int* hi,
+		   const amrex::Real* dx,
+		   const amrex::Real* time,
+		   const int* tag_array);
     //////////////////////
 
     //////////////////////

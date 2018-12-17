@@ -108,7 +108,7 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     // rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
     // X (NumSpec)
     // rho' and rhoh' (2)
-    // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
+    // rho0, rhoh0, p0, w0, MachNumber (4+AMREX_SPACEDIM)
     int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
 
     // MultiFab to hold plotfile data
@@ -228,6 +228,14 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
     }
     dest_comp += 3;
 
+    // w0
+    Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
+    for (int i = 0; i <= finest_level; ++i) {
+        plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
+    }
+    dest_comp += AMREX_SPACEDIM;
+    
+    // spherical w0mac needed for Mach number computation
     if (spherical == 1) {
         Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
         Vector<MultiFab> w0r_cart(finest_level+1);
@@ -253,20 +261,16 @@ Maestro::PlotFileMF (const Vector<MultiFab>& rho0_cart,
             MakeW0mac(w0mac);
             Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
         }
-
         // Mach number
         MachfromRhoHSphr(s_in,u_in,p0_in,w0r_cart,tempmf);
     } else {
         // Mach number
         MachfromRhoH(s_in,u_in,p0_in,tempmf);
     }
-
-    // w0
-    Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
+        plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
     }
-    dest_comp += AMREX_SPACEDIM;
+    ++dest_comp;
 
     // add plot_mf_data[i] to plot_mf
     for (int i = 0; i <= finest_level; ++i) {
@@ -286,10 +290,10 @@ Maestro::PlotFileVarNames () const
     BL_PROFILE_VAR("Maestro::PlotFileVarNames()",PlotFileVarNames);
 
     // velocities (AMREX_SPACEDIM)
-    // rho, rhoh, rhoX, tfromp, tfromh, deltaT Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
+    // rho, rhoh, rhoX, tfromp, tfromh, deltaT, Pi (Nscal+2 -- the extra 2 are tfromh and deltaT)
     // X (NumSpec)
     // rho' and rhoh' (2)
-    // rho0, rhoh0, p0, w0 (3+AMREX_SPACEDIM)
+    // rho0, rhoh0, p0, MachNumber, w0 (4+AMREX_SPACEDIM)
     int nPlot = 2*AMREX_SPACEDIM + Nscal + NumSpec + 8;
     Vector<std::string> names(nPlot);
 
@@ -358,7 +362,6 @@ Maestro::PlotFileVarNames () const
     names[cnt++] = "rho0";
     names[cnt++] = "rhoh0";
     names[cnt++] = "p0";
-    names[cnt++] = "MachNumber";
 
     // add w0
     for (int i=0; i<AMREX_SPACEDIM; ++i) {
@@ -366,6 +369,8 @@ Maestro::PlotFileVarNames () const
         x += (120+i);
         names[cnt++] = x;
     }
+    
+    names[cnt++] = "MachNumber";
 
     return names;
 }

@@ -132,7 +132,7 @@ Maestro::Setup ()
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
     w0        .resize( (max_radial_level+1)*(nr_fine+1) );
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
-
+    
     // diag file data arrays
     diagfile_data.resize(diag_buf_size*12);
 
@@ -211,18 +211,27 @@ Maestro::Setup ()
 
     // tagging criteria
     tag_err.resize(max_level);
+    
+    // tagged box array for multilevel (planar)
+    tag_array.resize(max_level);
+    
     for (int lev=0; lev<max_level; ++lev) {
 	tag_err[lev].resize(2);
 	tag_err[lev].shrink_to_fit();
+	tag_array[lev].resize(nr_fine);
+	tag_array[lev].shrink_to_fit();
     }
     tag_err.shrink_to_fit();
+    tag_array.shrink_to_fit();
 
     // combine tagging criteria
     for (int lev=0; lev<max_level; ++lev) {
         if (temperr.size() > lev)
-		      tag_err[lev][0] = temperr[lev];
+	    tag_err[lev][0] = temperr[lev];
         if (denserr.size() > lev)
-    		tag_err[lev][1] = denserr[lev];
+	    tag_err[lev][1] = denserr[lev];
+
+	std::fill(tag_array[lev].begin(), tag_array[lev].end(), 0);
     }
 
 }
@@ -309,13 +318,7 @@ Maestro::ExternInit ()
     std::cout << "reading extern runtime parameters ..." << std::endl;
   }
 
-  const int probin_file_length = probin_file.length();
-  Vector<int> probin_file_name(probin_file_length);
-
-  for (int i = 0; i < probin_file_length; i++)
-    probin_file_name[i] = probin_file[i];
-
-  maestro_extern_init(probin_file_name.dataPtr(),&probin_file_length);
+  maestro_extern_init();
 }
 
 // set up BCRec definitions for BC types

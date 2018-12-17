@@ -5,7 +5,6 @@
 
 pp.query("do_reflux", do_reflux);
 pp.query("maestro_verbose", maestro_verbose);
-pp.query("probin_file", probin_file);
 pp.query("model_file", model_file);
 pp.query("perturb_model", perturb_model);
 pp.query("print_init_hse_diag", print_init_hse_diag);

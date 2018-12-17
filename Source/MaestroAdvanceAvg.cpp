@@ -280,7 +280,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // Sbar = (1 / gamma1bar * p0) * dp/dt
     if (evolve_base_state) {
 	for (int i=0; i<Sbar.size(); ++i) {
-	    Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
+    	    Sbar[i] = psi[i]/(gamma1bar_old[i]*p0_old[i]);
+	    // Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
 	}
     } else {
 	// these should have no effect if evolve_base_state = false
@@ -350,6 +351,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
+    
     // update grav_cell_new
     if (evolve_base_state) {
 	make_grav_cell(grav_cell_new.dataPtr(),
@@ -378,8 +384,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// // set psi to dpdt
-	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// set psi to dpdt = etarho * grav_cell
+	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
+	
     }
     else {
 	p0_new = p0_old;
@@ -573,11 +580,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // no need to advect the base state density
-    // simply average the density
-    // if (evolve_base_state) {
-    // 	Average(s2, rho0_new, Rho);
-    // 	compute_cutoff_coords(rho0_new.dataPtr());
-    // }
+    rho0_new = rho0_old;
 
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
@@ -593,14 +596,17 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
 
-    // no need to compute etarho
     if (evolve_base_state) {
 	// correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
 	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
-
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
+    
     // update grav_cell_new, rho0_nph, grav_cell_nph
     if (evolve_base_state) {
 	make_grav_cell(grav_cell_new.dataPtr(),
@@ -637,8 +643,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// // set psi to dpdt
-	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// set psi to dpdt = etarho * grav_const
+	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
     }
 
     // base state enthalpy averaging
@@ -749,8 +755,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // FIXME - I think this should be
     // (1.0/(gamma1bar_new[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
     if (evolve_base_state) {
-	// Average(S_cc_new,Sbar,0);
-
+	
 	// for (int i=0; i<Sbar.size(); ++i) {
 	//     Sbar[i] += (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
 	// }

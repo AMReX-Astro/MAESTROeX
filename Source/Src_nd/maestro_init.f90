@@ -36,7 +36,7 @@ contains
     integer, intent(in) :: namlen
     integer, intent(in) :: name(namlen)
     !
-    call runtime_init(name,namlen)
+    call runtime_init()
 
   end subroutine maestro_extern_init
 
