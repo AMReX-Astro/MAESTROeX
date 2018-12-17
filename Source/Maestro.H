@@ -33,40 +33,45 @@ public:
     */
 
     ///
-    /// constructor and destructor
+    /// constructor
     ///
     Maestro ();
+
+    ///
+    /// destructor
+    ///
     virtual ~Maestro ();
 
     ///
-    /// in MaestroSetup.cpp
-    /// read in C++/F90 parameters
-    /// define global C++/F90 variables and initialize network
-    /// set up boundary conditions
-    /// initialize base state geometry parameters
-    /// set istep, t_new, t_old
-    /// allocate MultiFabs and base state arrays
+    /// in ``MaestroSetup.cpp``
+    ///     - read in C++/F90 parameters
+    ///     - define global C++/F90 variables and initialize network
+    ///     - set up boundary conditions
+    ///     - initialize base state geometry parameters
+    ///     - set ``istep``, ``t_new``, ``t_old``
+    ///     - allocate MultiFabs and base state arrays
     ///
     void Setup ();
 
     ///
-    /// in MaestroInit.cpp
-    /// initialize multifab and base state data
-    /// perform initial projection
-    /// perform divu iters
-    /// perform initial (pressure) iterations
+    /// in ``MaestroInit.cpp``
+    ///     - initialize multifab and base state data
+    ///     - perform initial projection
+    ///     - perform divu iters
+    ///     - perform initial (pressure) iterations
     ///
     void Init ();
 
     ///
-    /// in MaestroEvolve.cpp
+    /// in ``MaestroEvolve.cpp``
+    ///
     /// advance solution to final time
     ///
     void Evolve ();
 
 
 ///
-/// for keeping track of the amount of CPU time used -- this will persist
+/// for keeping track of the amount of CPU time used - this will persist
 /// after restarts
 ///
     static amrex::Real      previousCPUTimeUsed;
@@ -86,14 +91,12 @@ private:
 ///
 /// advance solution at all levels for a single time step
 ///
-///
 /// @param is_initIter
 ///
     void AdvanceTimeStep (bool is_initIter);
 
 ///
 /// advance solution for a single time step with irregular base state spacing
-///
 ///
 /// @param is_initIter
 ///
@@ -113,6 +116,8 @@ private:
     ////////////
     // MaestroAdvection.cpp functions
 
+///
+/// compute unprojected mac velocities
 ///
 /// @param umac
 /// @param w0mac
@@ -275,11 +280,13 @@ private:
     // MaestroAverage.cpp functions
 
 ///
-/// compute the radial average of a quantity
+/// Given a multifab of data (``mf``), average down to a base state quantity, ``phibar``.
+/// If we are in plane-parallel, the averaging is at constant height.
+/// If we are spherical, then the averaging is done at constant radius.
 ///
-/// @param mf
-/// @param phibar
-/// @param comp
+/// @param mf       Multifab of data to be averaged
+/// @param phibar   Averaged, base state quantity
+/// @param comp     Component of ``mf`` to be averaged
 ///
     void Average (const amrex::Vector<amrex::MultiFab>& mf,
                   amrex::Vector<amrex::Real>& phibar,
@@ -297,6 +304,8 @@ private:
     void WriteCheckPoint (int step);
     int ReadCheckPoint ();
 
+///
+/// utility to skip to next line in Header
 ///
 /// @param is
 ///
@@ -488,19 +497,17 @@ private:
                     const amrex::Vector<amrex::BCRec>& bcs_in);
 
 ///
-/// compute a new multifab by coping in phi from valid region and filling ghost cells
-/// works for single level and 2-level cases
+/// Compute a new multifab by coping in phi from valid region and filling ghost cells.
+/// Works for single level and 2-level cases,
 /// (fill fine grid ghost by interpolating from coarse)
-/// scomp of the source component
-/// dcomp is the destination component AND the bc component
 ///
 /// @param lev
 /// @param time
 /// @param mf
 /// @param mf_old
 /// @param mf_new
-/// @param srccomp
-/// @param destcomp
+/// @param srccomp      the source component
+/// @param destcomp     the destination component AND the bc component
 /// @param ncomp
 /// @param startbccomp
 /// @param bcs_in
@@ -513,18 +520,16 @@ private:
                     const amrex::Vector<amrex::BCRec>& bcs_in);
 
 ///
-/// fill an entire multifab by interpolating from the coarser level
-/// this comes into play when a new level of refinement appears
-/// scomp of the source component
-/// dcomp is the destination component AND the bc component
+/// fill an entire multifab by interpolating from the coarser level.
+/// This comes into play when a new level of refinement appears
 ///
 /// @param lev
 /// @param time
 /// @param mf
 /// @param mf_old
 /// @param mf_new
-/// @param srccomp
-/// @param destcomp
+/// @param srccomp      the source component
+/// @param destcomp     the destination component AND the bc component
 /// @param ncomp
 /// @param bcs
 ///
@@ -535,12 +540,12 @@ private:
                           const amrex::Vector<amrex::BCRec>& bcs);
 
 ///
-/// utility to copy in data from mf_old and/or mf_new into mf
-/// if time=t_old we copy mf_old into mf
-/// if time=t_new we copy mf_new into mf
-/// otherwise copy copy in both mf_old and mf_new into mf and the fillpatch
-/// routines know to interpolate in time.  However in MAESTRO since we don't
-/// subcycle I'm not sure if we need this capability?
+/// Utility to copy in data from ``mf_old`` and/or ``mf_new`` into ``mf``
+///     - if ``time``=``t_old``, we copy ``mf_old`` into ``mf``
+///     - if ``time``=``t_new``, we copy ``mf_new`` into ``mf``
+///     - otherwise copy both ``mf_old`` and ``mf_new`` into ``mf`` and the fillpatch
+///       routines know to interpolate in time.  However in MAESTRO since we don't
+///       subcycle I'm not sure if we need this capability?
 ///
 /// @param lev
 /// @param time
@@ -768,10 +773,15 @@ private:
 
 
 ///
+/// ``umac`` enters with face-centered, time-centered Utilde^* and should leave with Utilde
+/// ``macphi`` is the solution to the elliptic solve and
+//   enters as either zero, or the solution to the predictor MAC projection
+/// ``macrhs`` enters as beta0*(S-Sbar)
+///
 /// @param umac
 /// @param macphi
 /// @param macrhs
-/// @param beta0
+/// @param beta0        a 1d cell-centered array
 /// @param is_predictor
 ///
     void MacProj (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
@@ -781,7 +791,7 @@ private:
                   const int& is_predictor);
 
 ///
-/// multiply (or divide) face-data by beta0
+/// multiply (or divide) face-data by ``beta0``
 ///
 /// @param edge
 /// @param beta0
@@ -814,7 +824,7 @@ private:
 			   const amrex::Vector<amrex::MultiFab>& rhocc);
 
 ///
-/// set boundaries for LABecLaplacian to solve -div(B grad) phi = RHS
+/// set boundaries for ``LABecLaplacian`` to solve \f$-\nabla\cdot(B \nabla) \phi = RHS\f$
 ///
 /// @param mlabec
 ///
@@ -826,6 +836,8 @@ private:
     ////////////
     // MaestroMakeEta.cpp functions
 
+///
+/// compute eta_rho at edge- and cell-centers
 ///
 /// @param etarho_edge
 /// @param etarho_cell
@@ -856,7 +868,7 @@ private:
     // MaestroMakeS.cpp functions
 
 ///
-/// compute S at cell-centers
+/// compute ``S`` at cell-centers
 ///
 /// @param S_cc
 /// @param delta_gamma1_term
@@ -952,6 +964,16 @@ private:
 ///
 /// perform a nodal projection
 ///
+/// Given a cell-centered velocity field Vproj (assembled in CreateUvecForProj),
+/// Vproj can decomposed into Vproj = Utilde + sig grad phi,
+/// where Utilde satisfies the constraint div(beta0*Utilde) = beta0*(S-Sbar).
+/// Depending on proj_type we use different values of Vproj, sig, and beta0
+/// to solve for phi we use div sigma grad phi = div(beta*Vproj) - beta0*(S-Sbar)
+/// where sigma = beta0 or beta0/rho depending on proj_type
+/// then solve for Utilde, pi, and grad(pi) based on proj_type.
+/// rhcc should enter as beta0*(S-Sbar) so we need to multiply by -1 in this routine
+/// the projection (done below)
+///
 /// @param proj_type
 /// @param rhcc
 /// @param istep_divu_iter
@@ -961,15 +983,15 @@ private:
                     int istep_divu_iter=0);
 ///
 /// fill in Vproj
-/// initial_projection_comp: Utilde^0                        -- uold
-/// divu_iters_comp:         Utilde^0                        -- uold
-/// pressure_iters_comp:     (Utilde^n+1,* - Utilde^n)/dt    -- (unew-uold)/dt
-/// regular_timestep_comp:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
-// sig contains rhohalf if proj_type == regular_timestep_comp
+///
+/// - ``initial_projection_comp``: Utilde^0                        -- uold
+/// - ``divu_iters_comp``:         Utilde^0                        -- uold
+/// - ``pressure_iters_comp``:     (Utilde^n+1,* - Utilde^n)/dt    -- (unew-uold)/dt
+/// - ``regular_timestep_comp``:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
 ///
 /// @param proj_type
 /// @param Vproj
-/// @param sig
+/// @param sig      contains rhohalf if proj_type == regular_timestep_comp
 ///
     void CreateUvecForProj (int proj_type,
                             amrex::Vector<amrex::MultiFab>& Vproj,
@@ -977,12 +999,19 @@ private:
 
 
 ///
+/// 1) At non-inflow faces, the normal component of velocity will be completely zero'd
+///
+/// 2) If a face is an inflow face, then the normal velocity at corners just outside inflow faces
+///                                will be zero'd outside of Neumann boundaries
+///                                (slipWall, noSlipWall, Symmetry)
+///                                BUT will retain non-zero values at periodic corners
+///
 /// @param vel
 ///
     void SetBoundaryVelocity(amrex::Vector<amrex::MultiFab>& vel);
 
 ///
-/// given a nodal phi, compute grad(phi) at cell centers
+/// given a nodal ``phi``, compute grad(phi) at cell centers
 ///
 /// @param phi
 /// @param gphi
@@ -991,7 +1020,7 @@ private:
                         amrex::Vector<amrex::MultiFab>& gphi);
 
 ///
-/// average nodal pi to cell-centers and put in the Pi component of snew
+/// average nodal pi to cell-centers and put in the Pi component of ``snew``
 ///
 /// @param beta0_cart
 ///
@@ -1063,8 +1092,8 @@ private:
     // MaestroReact.cpp functions
 
 ///
-/// compute heating term, rho_Hext, then
-/// react the state over dt_react and update rho_omegadot, rho_Hnuc
+/// compute heating term, ``rho_Hext``, then
+/// react the state over ``dt_react`` and update ``rho_omegadot``, ``rho_Hnuc``
 ///
 /// @param s_in
 /// @param s_out
@@ -1101,7 +1130,7 @@ private:
                 const amrex::Real dt_react);
 
 ///
-/// compute heating term, rho_Hext
+/// compute heating term, ``rho_Hext``
 ///
 /// @param rho_Hext
 /// @param scal
@@ -1120,7 +1149,7 @@ private:
     void Regrid ();
 
 ///
-/// tag all cells for refinement
+/// tag all cells for refinement,
 /// overrides the pure virtual function in AmrCore
 ///
 /// @param lev
@@ -1134,7 +1163,7 @@ private:
                            int ng) override;
 
 ///
-/// within a call to AmrCore::regrid, this function fills in data at a level
+/// Within a call to ``AmrCore::regrid``, this function fills in data at a level
 /// that existed before, using pre-existing fine and interpolated coarse data
 /// overrides the pure virtual function in AmrCore
 ///
@@ -1149,7 +1178,7 @@ private:
                               const amrex::DistributionMapping& dm) override;
 
 ///
-/// within a call to AmrCore::regrid, this function fills in data at a level
+/// Within a call to ``AmrCore::regrid``, this function fills in data at a level
 /// that did NOT exist before, using interpolated coarse data
 /// overrides the pure virtual function in AmrCore
 ///
@@ -1164,7 +1193,7 @@ private:
                                          const amrex::DistributionMapping& dm) override;
 
 ///
-/// within a call to AmrCore::regrid, this function deletes all data
+/// within a call to ``AmrCore::regrid``, this function deletes all data
 /// at a level of refinement that is no longer needed
 /// overrides the pure virtual function in AmrCore
 ///
@@ -1179,6 +1208,8 @@ private:
     // MaestroRhoHT.cpp functions
 
 ///
+/// Calculate the temperature T given the density and enthalpy
+///
 /// @param scal
 /// @param p0
 ///
@@ -1186,6 +1217,8 @@ private:
                     const amrex::Vector<amrex::Real>& p0);
 
 
+///
+/// Calculate the temperature T given the density and pressure
 ///
 /// @param scal
 /// @param p0
@@ -1197,6 +1230,8 @@ private:
 
 
 ///
+/// Calculate the pressure given the density and enthalpy
+///
 /// @param state
 /// @param s_old
 /// @param peos
@@ -1206,6 +1241,8 @@ private:
 		    amrex::Vector<amrex::MultiFab>& peos);
 
 
+///
+/// Calculate the Mach number given the density and enthalpy
 ///
 /// @param scal
 /// @param vel
@@ -1265,6 +1302,12 @@ private:
     // MaestroThermal.cpp functions
 
 ///
+/// Compute the quantity: thermal = del dot kappa grad T
+///
+/// - if temp_diffusion_formulation = 1, then we compute this directly.
+/// - if temp_diffusion_formulation = 2, then we compute the algebraically
+///     equivalent form with grad h - grad X_k - grad p_0 formulation
+///
 /// @param thermal
 /// @param scal
 /// @param Tcoeff
@@ -1285,6 +1328,11 @@ private:
 
 
 ///
+/// Use apply() to construct the form of the conduction term.
+/// apply() forms the generic quantity:
+/// \f[
+///   (\alpha A - \beta \nabla \cdot B \nabla) \phi = RHS
+/// \f]
 /// @param mlabec
 /// @param thermalout
 /// @param coeff
@@ -1301,6 +1349,9 @@ private:
 
 
 ///
+/// create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
+/// for the thermal diffusion term in the enthalpy equation.
+///
 /// @param scal
 /// @param Tcoeff
 /// @param hcoeff
@@ -1314,6 +1365,10 @@ private:
 			   amrex::Vector<amrex::MultiFab>& pcoeff);
 
 
+///
+/// ThermalConduct implements thermal diffusion in the enthalpy equation.
+/// This is an implicit solve, using the multigrid solver.  This updates
+/// the enthalpy only.
 ///
 /// @param s1
 /// @param s2
@@ -1368,52 +1423,72 @@ private:
 #include <maestro_params.H>
     ////////////////
 
-    /// these are defined in VariableSetup()
-    ///
+///
+/// @name Variables
+/// these are defined in VariableSetup()
+/// @{
     static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi, Nscal;
     static int ng_s; // number of ghost cells for sold/new and uold/new
-
+/// @}
+///
 
 ///
-/// these are defined in Maestro.cpp
+/// @name Nodal projections
+/// these are defined in ``Maestro.cpp``,
 /// these represent the four types of nodal projections
-///
+/// @{
     static int initial_projection_comp;
     static int divu_iters_comp;
     static int pressure_iters_comp;
     static int regular_timestep_comp;
+/// @}
+///
 
-    /// these are defined in Maestro.cpp
-    /// density and enthalpy edge state prediction
+
+///
+/// @name Edge state prediction
+/// these are defined in ``Maestro.cpp``,
+/// density and enthalpy edge state prediction
+/// @{
     static int predict_rhoprime_and_X, predict_rhoX, predict_rho_and_X;
     static int predict_rhoh, predict_rhohprime, predict_h;
     static int predict_T_then_rhohprime, predict_T_then_h;
     static int predict_hprime, predict_Tprime_then_h;
+/// @}
+///
 
 
 ///
+/// @name Nodal flags
 /// these are defined in Maestro.cpp
-///
+/// @{
     static amrex::IntVect nodal_flag;
     static amrex::IntVect nodal_flag_x;
     static amrex::IntVect nodal_flag_y;
     static amrex::IntVect nodal_flag_z;
+/// @}
+///
 
 
 ///
-/// which step?
-///
+/// @name which step?
+/// @{
     int istep;
     int start_step;
+/// @}
+///
 
 
 ///
+/// @name time
 /// keep track of old time, new time, and time step at each level
-///
+/// @{
     amrex::Real t_new;
     amrex::Real t_old;
     amrex::Real dt;
     amrex::Real dtold;
+/// @}
+///
 
 
 ///
@@ -1423,16 +1498,18 @@ private:
 
 
 ///
-/// array of multifabs to store the solution at each level of refinement
+/// @name  array of multifabs to store the solution at each level of refinement
 /// after advancing a level we use "swap" to change pointers to old/new
 /// to avoid a copy.  These MultiFabs go through the regridding process
-///
+/// @{
     amrex::Vector<amrex::MultiFab> sold;
     amrex::Vector<amrex::MultiFab> snew;
     amrex::Vector<amrex::MultiFab> uold;
     amrex::Vector<amrex::MultiFab> unew;
     amrex::Vector<amrex::MultiFab> S_cc_old;
     amrex::Vector<amrex::MultiFab> S_cc_new;
+/// @}
+///
 
 
 ///
@@ -1461,27 +1538,31 @@ private:
 
 
 ///
-/// stores domain boundary conditions
-/// these muse be vectors (rather than arrays) so we can ParmParse them
+/// stores domain boundary conditions.
+/// These muse be vectors (rather than arrays) so we can ParmParse them
 ///
     amrex::Vector<int> phys_bc;
 
 
 ///
-/// boundary condition objects needed for FillPatch routines
+/// @name boundary condition objects needed for FillPatch routines
+///
 /// this is essentially an array (over components)
 /// of 2*DIM integer arrays storing the physical boundary
 /// condition types at the lo/hi walls in each direction
-///
+/// @{
     amrex::Vector<amrex::BCRec> bcs_s;  // for sold/snew
     amrex::Vector<amrex::BCRec> bcs_u;  // for uold/unew
     amrex::Vector<amrex::BCRec> bcs_f;  // "first-order extrap" used for S_cc, gpi, dSdt
+/// @}
+///
 
 
 ///
-/// vectors store the multilevel 1D states as one very long array
-/// these are cell-centered
-///
+/// @name Multilevel 1d states
+/// vectors store the multilevel 1D states as one very long array.
+/// These are cell-centered
+/// @{
     amrex::Vector<amrex::Real> s0_init;
     amrex::Vector<amrex::Real> p0_init;
     amrex::Vector<amrex::Real> rho0_old;
@@ -1501,6 +1582,8 @@ private:
     amrex::Vector<amrex::Real> grav_cell_old;
     amrex::Vector<amrex::Real> grav_cell_new;
     amrex::Vector<amrex::Real> r_cc_loc;
+/// @}
+///
 
 ///
 /// p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
@@ -1509,24 +1592,29 @@ private:
 
 
 ///
-/// vectors store the multilevel 1D states as one very long array
-/// these are edge-centered
-///
+/// @name 1D states
+/// vectors store the multilevel 1D states as one very long array.
+/// These are edge-centered
+/// @{
     amrex::Vector<amrex::Real> w0;
     amrex::Vector<amrex::Real> etarho_ec;
     amrex::Vector<amrex::Real> r_edge_loc;
+/// @}
+///
 
 
 ///
-/// information for the base state
+/// @name information for the base state
 /// we also store these (except for the large arrays)
-/// in base_state.f90 in a fortran module for convenience
-///
+/// in ``base_state.f90`` in a fortran module for convenience
+/// @{
     int max_radial_level;
     int finest_radial_level;
     int nr_fine;
     amrex::Real dr_fine;
     int nr_irreg;
+/// @}
+///
 
 
 ///
@@ -1538,10 +1626,11 @@ private:
 
 
 ///
-/// tagging criteria
-///
+/// @name tagging criteria
+/// @{
     amrex::Vector<amrex::Real> temperr;
     amrex::Vector<amrex::Real> denserr;
+/// @}
 
 ///
 /// currently has 2 possible criterias
@@ -1556,15 +1645,18 @@ private:
 
 
 ///
+/// @name interface fluxes
 /// stores fluxes at coarse-fine interface for synchronization
 /// this will be sized "max_level+1"
-/// NOTE: the flux register associated with flux_reg[lev] is associated
+///
+/// @note the flux register associated with flux_reg[lev] is associated
 /// with the lev/lev-1 interface (and has grid spacing associated with lev-1)
 /// therefore flux_reg[0] and flux_reg[max_level] are never actually
 /// used in the reflux operation
-///
+/// @{
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
+/// @}
 
 };
 
