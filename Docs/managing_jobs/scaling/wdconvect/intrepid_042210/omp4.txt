@@ -1,5 +1,0 @@
-PROC    AVG   MIN   MAX (excludes pressure init time step)
-2048  211.5 210.4 213.2
-6912   70.6  69.5  72.2
-16384  35.1  34.7  35.7
-55296  46.4  46.0  47.0
