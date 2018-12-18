@@ -70,10 +70,10 @@ echo "doing git add/commit/push"
 git add --all
 
 # Exit if there are no docs changes
-#if git diff --staged --quiet; then
-#   echo "exiting with no docs changes"
-#   exit 0
-#fi
+if git diff --staged --quiet; then
+   echo "exiting with no docs changes"
+   exit 0
+fi
 
 # Otherwise, commit and push
 git commit -m "Deploy to GitHub Pages: ${SHA}"
