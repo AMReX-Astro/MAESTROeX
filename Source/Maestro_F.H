@@ -1054,6 +1054,12 @@ extern "C"
     //////////////////////
     
     //////////////////////
+    // in regrid.f90
+    void regrid_base_state_cc(amrex::Real* state_cc);
+    void regrid_base_state_edge(amrex::Real* state_ec);
+    //////////////////////
+
+    //////////////////////
     // in rhoh_vs_t.F90
     void makeTfromRhoH (const int* lev, const int* lo, const int* hi,
                         amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
