@@ -509,12 +509,14 @@ already setup, and the build system looks at the machine hostname to
 set the proper libraries. For other machines, you may need to edit
 the GMake.MPI file in the AMReX&nbsp;build files. See
 §&nbsp;<a class="reference external" href="#ch:make">[ch:make]</a> for more details.</p>
-<p>OpenMP can be used to parallelize on shared-memory machines (i.e.&nbsp;within a node). OpenMP support is accomplished through the compiler.
-Setting OMP := t in the GNUmakefile will enable the proper
-compiler flags to build with OpenMP. Note: not all MAESTROeX&nbsp;modules
-have OpenMP support. Microphysics routines need to be written in a
-threadsafe manner. This can be tested via the test_react unit
-test (see &nbsp;§&nbsp;<a class="reference external" href="#chapter:unit_tests">[chapter:unit_tests]</a>).</p>
+<p>OpenMP can be used to parallelize on shared-memory machines
+(i.e. within a node). OpenMP support is accomplished through the
+compiler.  Setting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_OMP</span> <span class="o">=</span> <span class="n">TRUE</span>
+</pre></div>
+</div>
+<p>in the <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> will enable the proper compiler flags to build
+with OpenMP. Note: not all MAESTROeX modules have OpenMP support.</p>
 <table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
