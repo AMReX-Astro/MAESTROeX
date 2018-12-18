@@ -2,7 +2,7 @@ module tagging_module
 
   use parallel, only: parallel_IOProcessor
   use meth_params_module, only: temp_comp, nscal
-  use base_state_geometry_module, only: nr_fine
+  use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
 
@@ -31,8 +31,8 @@ contains
        state,state_lo,state_hi, &
        set,clear,&
        lo,hi,&
-       dx,time,&
-       tag_err,tag_array) bind(C, name="state_error")
+       dx,time,tag_err,&
+       lev,tag_array) bind(C, name="state_error")
 
     integer          :: lo(3),hi(3)
     integer          :: state_lo(3),state_hi(3)
@@ -43,8 +43,8 @@ contains
     integer          :: tag(tag_lo(1):tag_hi(1),tag_lo(2):tag_hi(2),tag_lo(3):tag_hi(3))
     double precision :: dx(3),time
     double precision :: tag_err(2)
-    integer          :: tag_array(0:nr_fine-1)
-    integer          :: set,clear
+    integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
+    integer          :: set,clear,lev
 
     ! local
     integer          :: i, j, k, r
@@ -78,7 +78,7 @@ contains
 #else
           r = i
 #endif
-          tag_array(r) = set
+          tag_array(lev,r) = set
        endif
     enddo
     enddo
@@ -90,14 +90,14 @@ contains
                         set,clear,&
                         lo,hi,&
                         dx,time,&
-                        tag_array) bind(C, name="tag_boxes")
+                        lev,tag_array) bind(C, name="tag_boxes")
 
     integer          :: lo(3),hi(3)
     integer          :: tag_lo(3),tag_hi(3)
     integer          :: tag(tag_lo(1):tag_hi(1),tag_lo(2):tag_hi(2),tag_lo(3):tag_hi(3))
     double precision :: dx(3),time
-    integer          :: tag_array(0:nr_fine-1)
-    integer          :: set,clear
+    integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
+    integer          :: set,clear,lev
 
     ! local
     integer          :: i, j, k, r
@@ -115,7 +115,7 @@ contains
 #if (AMREX_SPACEDIM == 3) 
     do k = lo(3), hi(3)
        
-       if (tag_array(k) > 0) then
+       if (tag_array(lev,k) > 0) then
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
                 tag(i,j,k) = set
@@ -129,7 +129,7 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           
-          if (tag_array(j) > 0) then
+          if (tag_array(lev,j) > 0) then
              do i = lo(1), hi(1)
                 tag(i,j,k) = set
              enddo
@@ -143,7 +143,7 @@ contains
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
              
-             if (tag_array(i) > 0) then
+             if (tag_array(lev,i) > 0) then
                 tag(i,j,k) = set
              endif
              

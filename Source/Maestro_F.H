@@ -1052,7 +1052,7 @@ extern "C"
 #endif
 			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
     //////////////////////
-
+    
     //////////////////////
     // in rhoh_vs_t.F90
     void makeTfromRhoH (const int* lev, const int* lo, const int* hi,
@@ -1130,14 +1130,14 @@ extern "C"
                      const amrex::Real* dx,
                      const amrex::Real* time,
 		     amrex::Real* tag_err,
-		     int* tag_array);
+		     const int* lev, int* tag_array);
 
     void tag_boxes(int* tag, const int* tag_lo, const int* tag_hi,
 		   const int* tagval, const int* clearval,
 		   const int* lo, const int* hi,
 		   const amrex::Real* dx,
 		   const amrex::Real* time,
-		   const int* tag_array);
+		   const int* lev, const int* tag_array);
     //////////////////////
 
     //////////////////////
