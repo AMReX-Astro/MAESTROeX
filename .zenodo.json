@@ -1,0 +1,37 @@
+{
+    "creators": [
+        {
+            "affilition": "Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory",
+            "name": "Almgren, Ann"
+        },
+        {
+            "affilition": "Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory",
+            "name": "Bell, John"
+        },
+        {
+            "affilition": "Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory",
+            "name": "Fan, Doreen"
+        },
+        {
+            "affiliation": "Department of Physics and Astronomy, Stony Brook University",
+            "name": "Harpole, Alice",
+            "orcid": "0000-0002-1530-781X"
+        },
+        {
+            "affilition": "Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory",
+            "name": "Nonaka, Andy"
+        },
+        {
+            "affiliation": "Department of Physics and Astronomy, Stony Brook University",
+            "name": "Zingale, Michael",
+            "orcid": "0000-0001-8401-030X"
+        }
+    ],
+    "keywords": [
+        "astrophysics",
+        "hydrodynamics",
+        "adaptive mesh refinement"
+    ],
+    "license": "BSD",
+    "upload_type": "software"
+}

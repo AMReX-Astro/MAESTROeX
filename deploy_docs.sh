@@ -56,7 +56,7 @@ cd ../
 
 mkdir -p out/docs/
 mv sphinx_docs/build/html/* out/docs
-touch out/docs/.nojekyll
+touch out/.nojekyll
 
 # Now let's go have some fun with the cloned repo
 cd out
