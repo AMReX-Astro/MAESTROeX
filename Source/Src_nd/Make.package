@@ -14,6 +14,7 @@ f90EXE_sources += make_edge_state.f90
 f90EXE_sources += make_w0.f90
 f90EXE_sources += maestro_init.f90
 f90EXE_sources += rotation.f90
+f90EXE_sources += regrid.f90
 
 F90EXE_sources += advect_base.F90
 F90EXE_sources += bc_fill_nd.F90

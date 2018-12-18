@@ -1052,6 +1052,12 @@ extern "C"
 #endif
 			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
     //////////////////////
+    
+    //////////////////////
+    // in regrid.f90
+    void regrid_base_state_cc(amrex::Real* state_cc);
+    void regrid_base_state_edge(amrex::Real* state_ec);
+    //////////////////////
 
     //////////////////////
     // in rhoh_vs_t.F90
@@ -1130,14 +1136,14 @@ extern "C"
                      const amrex::Real* dx,
                      const amrex::Real* time,
 		     amrex::Real* tag_err,
-		     int* tag_array);
+		     const int* lev, int* tag_array);
 
     void tag_boxes(int* tag, const int* tag_lo, const int* tag_hi,
 		   const int* tagval, const int* clearval,
 		   const int* lo, const int* hi,
 		   const amrex::Real* dx,
 		   const amrex::Real* time,
-		   const int* tag_array);
+		   const int* lev, const int* tag_array);
     //////////////////////
 
     //////////////////////

@@ -62,7 +62,6 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    .. namespacelist
 
 .. toctree::
-
    references
 
 Indices and tables
