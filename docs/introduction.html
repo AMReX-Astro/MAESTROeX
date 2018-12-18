@@ -413,7 +413,7 @@ are:</p>
 \[\begin{split}\begin{aligned}
 \Ub_t &amp;=&amp; -\Ub \cdot \nabla \Ub + \nabla p \label{eq:incompressible_u} \\
 \nabla \cdot \Ub &amp;=&amp; 0\end{aligned}\end{split}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(\Ub\)</span> represents the velocity vector <a class="footnote-reference" href="#id34" id="id13">[1]</a> and <span class="math notranslate nohighlight">\(p\)</span> is
+<p>Here, <span class="math notranslate nohighlight">\(\Ub\)</span> represents the velocity vector <a class="footnote-reference" href="#id18" id="id13">[1]</a> and <span class="math notranslate nohighlight">\(p\)</span> is
 the dynamical pressure. The time-evolution equation for the velocity
 (Eq.&nbsp;<a class="reference external" href="#eq:incompressible_u">[eq:incompressible_u]</a>) can be solved
 using techniques similar to those developed for compressible
@@ -470,7 +470,191 @@ frequently-used quantities and provides their units. Additionally,
 for any quantity <span class="math notranslate nohighlight">\(\phi\)</span>, we denote the average of <span class="math notranslate nohighlight">\(\phi\)</span> over a layer
 at constaint radius (or height for plane-parallel simulations) as
 <span class="math notranslate nohighlight">\(\overline{\phi}\)</span>.</p>
-<table class="docutils footnote" frame="void" id="id34" rules="none">
+<table border="1" class="docutils" id="id19">
+<caption><span class="caption-text">Definition of symbols.</span><a class="headerlink" href="#id19" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="17%" />
+<col width="54%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">symbol</th>
+<th class="head">description</th>
+<th class="head">units</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(c_p\)</span></td>
+<td>specific heat at
+constant pressure
+(<span class="math notranslate nohighlight">\(c_p \equiv \partial h / \partial T |_{p, X_k}\)</span>)</td>
+<td>erg g <span class="math notranslate nohighlight">\(^{-1}\)</span> K <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(f\)</span></td>
+<td>volume discrepancy
+factor
+(<span class="math notranslate nohighlight">\(0 \le f \le 1\)</span>)</td>
+<td>–</td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(g\)</span></td>
+<td>gravitational
+acceleration</td>
+<td>cm s  <span class="math notranslate nohighlight">\(^{-2}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(h\)</span></td>
+<td>specific enthalpy</td>
+<td>erg g <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\Hext\)</span></td>
+<td>external heating
+energy generation  rate</td>
+<td>erg g <span class="math notranslate nohighlight">\(^{-1}\)</span> s <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\Hnuc\)</span></td>
+<td>nuclear energy
+generation rate</td>
+<td>erg g <span class="math notranslate nohighlight">\(^{-1}\)</span>
+s:math:<cite>^{-1}</cite></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(h_p\)</span></td>
+<td><span class="math notranslate nohighlight">\(h_p \equiv \partial h/\partial p |_{T,X_k}\)</span></td>
+<td>cm  <span class="math notranslate nohighlight">\(^{3}\)</span> g:math:<cite>^{-1}</cite></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\kth\)</span></td>
+<td>thermal conductivity</td>
+<td>erg cm <span class="math notranslate nohighlight">\(^{-1}\)</span>
+s <span class="math notranslate nohighlight">\(^{-1}\)</span> K <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(p_0\)</span></td>
+<td>base state pressure</td>
+<td>erg cm  <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(p_T\)</span></td>
+<td><span class="math notranslate nohighlight">\(p_T \equiv \partial p / \partial T |_{\rho,X_k}\)</span></td>
+<td>erg cm <span class="math notranslate nohighlight">\(^{-3}\)</span> K <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(p_{X_k}\)</span></td>
+<td><span class="math notranslate nohighlight">\(p_{X_k}\equiv\partial p/\partial X_k|_{p,T,X_{j,j\ne k}}\)</span></td>
+<td>erg cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(p_\rho\)</span></td>
+<td><span class="math notranslate nohighlight">\(p_\rho \equiv \partial p/\partial \rho |_{T,X_k}\)</span></td>
+<td>erg g <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(q_k\)</span></td>
+<td>specific nuclear
+binding energy</td>
+<td>erg&nbsp;g<span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(r\)</span></td>
+<td>radial coordinate (direction of gravity)</td>
+<td>cm</td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(s\)</span></td>
+<td>specific entropy</td>
+<td>erg g <span class="math notranslate nohighlight">\(^{-1}\)</span> K <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(S\)</span></td>
+<td>source term to the
+divergence constraint</td>
+<td>s <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(t\)</span></td>
+<td>time</td>
+<td>s</td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(T\)</span></td>
+<td>temperature</td>
+<td>K</td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\Ub\)</span></td>
+<td>total velocity
+(<span class="math notranslate nohighlight">\(\Ub = \Ubt + w_0 \eb_r\)</span></td>
+<td>cm s <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\Ubt\)</span></td>
+<td>local velocity</td>
+<td>cm s <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\uadv\)</span></td>
+<td>advective velocity
+(edge-centered)</td>
+<td>cm s <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(w_0\)</span></td>
+<td>base state expansion
+velocity</td>
+<td>cm&nbsp;s<span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(X_k\)</span></td>
+<td>mass fraction of the
+species
+(<span class="math notranslate nohighlight">\(\sum_k X_k = 1\)</span>)</td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\beta_0\)</span></td>
+<td>coefficient to velocity in velocity constraint equation</td>
+<td>g cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\Gamma_1\)</span></td>
+<td>first adiabatic exponent
+(<span class="math notranslate nohighlight">\(\Gamma_1 \equiv d\log p/d\log \rho|_s\)</span>)</td>
+<td>–</td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\etarho\)</span></td>
+<td><span class="math notranslate nohighlight">\(\etarho \equiv \overline{(\rho' \Ub \cdot \eb_r)}\)</span></td>
+<td>g cm <span class="math notranslate nohighlight">\(^{-2}\)</span> s <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\xi_k\)</span></td>
+<td><span class="math notranslate nohighlight">\(\xi_k \equiv \partial h / \partial X_k |_{p,T,X_{j,j\ne k}}\)</span></td>
+<td>erg g <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\pi\)</span></td>
+<td>dynamic pressure</td>
+<td>erg cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\pizero\)</span></td>
+<td>base state dynamic pressure</td>
+<td>erg cm  <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\rho\)</span></td>
+<td>mass density</td>
+<td>g cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\rho_0\)</span></td>
+<td>base state mass density</td>
+<td>g cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\rho'\)</span></td>
+<td>perturbational density
+(<span class="math notranslate nohighlight">\(\rho' = \rho - \rho_0\)</span>)</td>
+<td>g cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\((\rho h)_0\)</span></td>
+<td>base state enthalpy density</td>
+<td>erg cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\((\rho h)'\)</span></td>
+<td>perturbational enthalpy density
+<span class="math notranslate nohighlight">\(\left [(\rho h)' = \rho h - (\rho h)_0 \right ]\)</span></td>
+<td>erg cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\sigma\)</span></td>
+<td><span class="math notranslate nohighlight">\(\sigma \equiv p_T/(\rho c_p p_\rho)\)</span></td>
+<td>erg <span class="math notranslate nohighlight">\(^{-1}\)</span> g</td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(\psi\)</span></td>
+<td><span class="math notranslate nohighlight">\(\psi \equiv D_0 p_0/Dt = \ptl p_0/\ptl t + w_0\ptl p_0/\ptl r\)</span></td>
+<td>erg cm <span class="math notranslate nohighlight">\(^{-3}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(\omegadot_k\)</span></td>
+<td>creation rate for species <span class="math notranslate nohighlight">\(k\)</span>
+(<span class="math notranslate nohighlight">\(\omegadot_k \equiv DX_k/Dt\)</span>)</td>
+<td>s <span class="math notranslate nohighlight">\(^{-1}\)</span></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id18" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id13">[1]</a></td><td>Here we see an unfortunate conflict
