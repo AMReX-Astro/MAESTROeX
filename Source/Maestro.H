@@ -644,6 +644,9 @@ private:
     // check to see if we need to regrid, then regrid
     void Regrid ();
 
+    // set tagging array to include buffer zones for multilevel
+    void TagArray ();
+    
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
     virtual void ErrorEst (int lev,

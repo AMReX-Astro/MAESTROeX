@@ -195,6 +195,9 @@ Maestro::InitData ()
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);
 
+    // reset tagging array to include buffer zones
+    TagArray();
+
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(tag_array.dataPtr(),&finest_level);
