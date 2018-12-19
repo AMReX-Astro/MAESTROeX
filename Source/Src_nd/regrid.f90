@@ -72,7 +72,7 @@ contains
   subroutine regrid_base_state_edge(state_ec) &
        bind(C, name="regrid_base_state_edge")
 
-    double precision, intent(inout) :: state_ec(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) :: state_ec(0:max_radial_level,0:nr_fine)
 
     ! Local variables
     integer :: r,n,i
