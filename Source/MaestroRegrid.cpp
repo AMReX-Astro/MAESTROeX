@@ -63,6 +63,7 @@ Maestro::Regrid ()
     regrid(0, t_new);
     
     // Redefine numdisjointchunks, r_start_coord, r_end_coord
+    TagArray();
     init_multilevel(tag_array.dataPtr(),&finest_level);
 	
     if (spherical == 1) {
@@ -127,6 +128,39 @@ Maestro::Regrid ()
         Print() << "Time to regrid: " << end_total << '\n';
     }
 
+}
+
+// set tagging array to include buffer zones for multilevel
+void
+Maestro::TagArray ()
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::TagArray()",TagArray);
+
+    const int clearval = TagBox::CLEAR;
+    const int   tagval = TagBox::SET;
+    
+    for (int lev=1; lev<=max_radial_level; ++lev) {
+	
+	const MultiFab& state = sold[lev];
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+    {
+        Vector<int>  itags;
+
+        for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
+        {
+            const Box& tilebox  = mfi.tilebox();
+
+            // retag refined cells to include cells in buffered regions
+            retag_array(&tagval,&clearval, 
+			ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+			&lev, tag_array.dataPtr());
+        }
+    }
+    }
 }
 
 // tag all cells for refinement

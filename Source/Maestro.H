@@ -1039,25 +1039,28 @@ private:
 ///
     std::string PlotFileName (int lev) const;
 
-<<<<<<< HEAD
+
 ///
 /// put together an array of multifabs for writing
 ///
+/// @param nPlot
+/// @param t_in
+/// @param dt_in
 /// @param rho0_cart
 /// @param rhoh0_cart
 /// @param p0_cart
+/// @param gamma1bar_cart
 /// @param u_in
 /// @param s_in
 /// @param p0_in
+/// @param gamma1bar_in
+/// @param S_cc_in
 ///
-    amrex::Vector<const amrex::MultiFab*> PlotFileMF (const amrex::Vector<amrex::MultiFab>& rho0_cart,
-=======
-    // put together an array of multifabs for writing
+
     amrex::Vector<const amrex::MultiFab*> PlotFileMF (const int nPlot,
                                                       const amrex::Real t_in,
                                                       const amrex::Real dt_in,
                                                       const amrex::Vector<amrex::MultiFab>& rho0_cart,
->>>>>>> 6ff3a5e1e9c753865e7da74efae2a6550fa9aa68
                                                       const amrex::Vector<amrex::MultiFab>& rhoh0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& p0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
@@ -1067,14 +1070,12 @@ private:
                                                       const amrex::Vector<amrex::Real>& gamma1bar_in,
                                                       const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
-<<<<<<< HEAD
-    /// set plotfile variables names
-    ///
-    amrex::Vector<std::string> PlotFileVarNames () const;
-=======
-    // set plotfile variables names
+///
+/// set plotfile variables names
+///
+/// @param nPlot
+///
     amrex::Vector<std::string> PlotFileVarNames (int * nPlot) const;
->>>>>>> 6ff3a5e1e9c753865e7da74efae2a6550fa9aa68
 
 ///
 /// write plotfile to disk
@@ -1194,6 +1195,10 @@ private:
     /// check to see if we need to regrid, then regrid
     ///
     void Regrid ();
+
+    /// set tagging array to include buffer zones for multilevel
+    ///
+    void TagArray ();
 
 ///
 /// tag all cells for refinement,

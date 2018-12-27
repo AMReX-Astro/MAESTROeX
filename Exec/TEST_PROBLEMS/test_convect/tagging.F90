@@ -136,4 +136,34 @@ contains
        
   end subroutine tag_boxes
   
+  subroutine retag_array(set,clear,&
+                          lo,hi,&
+                          lev,tag_array) bind(C, name="retag_array")
+
+    integer          :: lo(3),hi(3)
+    integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
+    integer          :: set,clear,lev
+
+    ! local
+    integer          :: i, j, k, r
+
+    ! Tag on regions including buffer cells
+    do k = lo(3), hi(3)
+    do j = lo(2), hi(2)
+    do i = lo(1), hi(1)
+
+#if (AMREX_SPACEDIM == 3)
+          r = k/2
+#elif (AMREX_SPACEDIM == 2)
+          r = j/2
+#else
+          r = i/2
+#endif
+          tag_array(lev-1,r) = set
+    enddo
+    enddo
+    enddo
+       
+  end subroutine retag_array
+  
 end module tagging_module

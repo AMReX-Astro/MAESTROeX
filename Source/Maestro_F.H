@@ -1144,6 +1144,10 @@ extern "C"
 		   const amrex::Real* dx,
 		   const amrex::Real* time,
 		   const int* lev, const int* tag_array);
+
+    void retag_array(const int* tagval, const int* clearval,
+		     const int* lo, const int* hi,
+		     const int* lev, const int* tag_array);
     //////////////////////
 
     //////////////////////

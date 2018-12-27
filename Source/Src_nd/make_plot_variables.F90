@@ -1061,7 +1061,7 @@ contains
 
     integer, intent (in) :: lev, lo(3), hi(3)
     integer, intent (in) :: d_lo(3), d_hi(3)
-    double precision, intent (in) :: w0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent (in) :: dx(3)
     double precision, intent (inout) :: divw0(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
 

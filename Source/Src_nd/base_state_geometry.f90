@@ -410,7 +410,7 @@ contains
                 numdisjointchunks(n) = numdisjointchunks(n) + 1
                 r_start_coord(n,numdisjointchunks(n)) = 2*r
              elseif (tag_array(n-1,r).eq.0 .AND. chunk_start) then
-                r_end_coord(n,numdisjointchunks(n)) = 2*r+1
+                r_end_coord(n,numdisjointchunks(n)) = 2*r-1
                 chunk_start = .false.
              elseif (r.eq.nr(n-1)-1 .AND. chunk_start) then
                 ! if last chunk is at the end of array
