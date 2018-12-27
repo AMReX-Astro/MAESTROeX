@@ -1,4 +1,4 @@
-!> Compute \f $\eta_\rho = \mathbf{Avg} { \rho' \mathbf{U} \cdot \mathbf{e}_r } \f$  (see paper III, Eq. 30)
+!> Compute \f$ \eta_\rho = \mathrm{\bf Avg} \left( \rho' \mathbf{U} \cdot \mathbf{e}_r \right) \f$  (see paper III, Eq. 30)
 !!
 !! We make three quantities here:
 !! - ``etarho``     is edge-centered
@@ -9,7 +9,7 @@
 !! from ``etarho``.
 !!
 !! For spherical geometries,
-!!      we construct a multifab containing ``{rho' (U dot e_r)}`` and
+!!      we construct a multifab containing \f$ \rho' \mathbf{U} \cdot \mathbf{e}_r \f$ and
 !!      use the average routine to put it in cell-centers
 !!      on the base state to get ``etarho_cc``.  We compute ``etarh``o from these
 !!      cell-centered quantites by averaging to the center.
@@ -169,7 +169,8 @@ contains
   !---------------------------------------------------------------------------
   ! spherical routines
   !---------------------------------------------------------------------------
-
+!> @brief Construct eta on cartesian grid
+!!
   subroutine construct_eta_cart(lo, hi, &
        rho_old, ro_lo, ro_hi, &
        rho_new, rn_lo, rn_hi, &

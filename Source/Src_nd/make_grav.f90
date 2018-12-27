@@ -19,7 +19,7 @@ contains
 
 
 !> @brief compute the base state gravitational acceleration at the cell
-!! centers.  The base state uses 0-based indexing, so grav_cell
+!! centers.  The base state uses 0-based indexing, so ``grav_cell``
 !! does too.
 !!
 !! @note Binds to C function ``make_grav_cell``
@@ -241,7 +241,7 @@ contains
 
 
 !> @brief compute the base state gravity at the cell edges.
-!! grav_edge(0) is the gravitational acceleration at the left edge of zone 0).
+!! ``grav_edge(0)`` is the gravitational acceleration at the left edge of zone 0.
 !! The base state uses 0-based indexing, so grav_edge does too.
 !!
 !! @note Binds to C function ``make_grav_edge``

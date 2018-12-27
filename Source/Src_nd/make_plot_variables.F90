@@ -1,3 +1,6 @@
+!> Contains routines to calculate variables output in plotfiles.
+!!
+
 #include "AMReX_BC_TYPES.H"
 
 module plot_variables_module

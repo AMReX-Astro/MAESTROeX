@@ -16,8 +16,13 @@ module make_explicit_thermal_module
 contains
 
 
-!> @brief create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
+!> @brief create the coefficients for \f$ \nabla T \f$, \f$ \nabla h \f$, \f$ \nabla X_k \f$, and \f$ \nabla p_0 \f$
 !! for the thermal diffusion term in the enthalpy equation.
+!!
+!! We calculate the coefficients as ``Tcoeff = -kth``,
+!!        ``hcoeff = -kth/cp``,
+!!       ``Xkcoeff = xik*kth/cp``,
+!!        ``pcoeff = hp*kth/cp``
 !!
 !! @note we explicitly fill the ghostcells by looping over them directly
 !!

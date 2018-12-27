@@ -22,8 +22,8 @@ module make_w0_module
 contains
 
 
-!> @brief compute w0 -- the base state velocity.  This is based on the average
-!! heating in a layer (Sbar) and the mixing (the eta quantities).  The
+!> @brief compute w0 - the base state velocity.  This is based on the average
+!! heating in a layer (``Sbar``) and the mixing (the eta quantities).  The
 !! computation of w0 for plane-parallel atmospheres was first described
 !! in paper II, with modifications due to mixing in paper III.  For
 !! spherical geometry, it was first described in paper III.
@@ -134,7 +134,8 @@ contains
 
 
 
-!>
+!> @brief Make w0 in planar geometry
+!!
 !! @param[out] w0 double precision
 !! @param[in] w0_old double precision
 !! @param[in] Sbar_in double precision
@@ -562,7 +563,8 @@ contains
   end subroutine make_w0_planar_var_g
 
 
-!>
+!> Make w0 in spherical geometry
+!!
 !! @param[out] w0 double precision
 !! @param[in] w0_old double precision
 !! @param[in] Sbar_in double precision

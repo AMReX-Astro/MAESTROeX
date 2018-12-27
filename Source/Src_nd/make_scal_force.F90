@@ -11,7 +11,7 @@ module make_scal_force_module
 
 contains
 
-  !> @brief compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
+  !> @brief compute the source terms for the non-reactive part of the enthalpy equation \f$ w dp_0/dr \f$
   !!
   subroutine mkrhohforce(lev, lo, hi, &
        rhoh_force, f_lo, f_hi, &
@@ -159,6 +159,8 @@ contains
 
   end subroutine mkrhohforce
 
+  !> @brief compute the source terms for the non-reactive part of the enthalpy equation \f$ w dp_0/dr \f$ in spherical geometry
+  !!
   subroutine mkrhohforce_sphr(lo, hi, &
        rhoh_force, f_lo, f_hi, &
        umac, u_lo, u_hi, &

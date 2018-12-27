@@ -1,4 +1,4 @@
-!> Create the psi term, where psi = D_0 p_0/Dt
+!> Create the psi term, where \f$ \psi = D_0 p_0/Dt \f$
 !!
 
 module make_psi_module

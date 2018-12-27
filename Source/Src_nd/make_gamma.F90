@@ -70,6 +70,8 @@ contains
 
   end subroutine make_gamma
 
+  !> @brief  compute gamma1 for the full state in spherical geometry
+  !!
   subroutine make_gamma_sphr(lo, hi, &
        gamma, g_lo, g_hi, &
        scal,  s_lo, s_hi, nc_s, &
