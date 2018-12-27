@@ -17,7 +17,7 @@ module advect_base_module
 contains
 
 
-!>
+!> Advect the base state density
 !! @note Binds to C function ``advect_base_dens``
 !!
 !! @param[in] w0 double precision
@@ -54,7 +54,8 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-!>
+!> Advect the base state density in planar geometry
+!!
 !! @param[in] w0 double precision
 !! @param[in] rho0_old double precision
 !! @param[out] rho0_new double precision
@@ -111,7 +112,8 @@ contains
   end subroutine advect_base_dens_planar
 
 
-!>
+!> Advect the base state density in spherical geometry
+!!
 !! @param[in] w0 double precision
 !! @param[in] rho0_old double precision
 !! @param[out] rho0_new double precision
@@ -168,7 +170,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-!>
+!> Advect base state enthalpy
 !! @note Binds to C function ``advect_base_enthalpy``
 !!
 !! @param[in] w0 double precision
@@ -210,7 +212,8 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-!>
+!> Advect base state enthalpy in planar geometry
+!!
 !! @param[in] w0 double precision
 !! @param[in] rho0_old double precision
 !! @param[in] rhoh0_old double precision
@@ -269,7 +272,8 @@ contains
   end subroutine advect_base_enthalpy_planar
 
 
-!>
+!> Advect base state enthalpy in spherical geometry
+!!
 !! @param[in] w0 double precision
 !! @param[in] rho0_old double precision
 !! @param[in] rhoh0_old double precision

@@ -56,7 +56,7 @@ contains
   ! :::
 
 
-!>
+!> @brief Returns the number of species
 !! @note Binds to C function ``get_num_spec``
 !!
 !! @param[out] nspec_out integer
@@ -74,7 +74,7 @@ contains
   ! :::
 
 
-!>
+!> @brief Returns species names
 !! @note Binds to C function ``get_spec_names``
 !!
 !! @param[in] ispec integer
@@ -103,7 +103,7 @@ contains
   ! :::
 
 
-!>
+!> @brief Returns the mass number (A) and atomic number (Z) of species with index ``ispec``
 !! @note Binds to C function ``get_spec_az``
 !!
 !! @param[in] ispec integer
@@ -210,7 +210,7 @@ contains
   ! :::
 
 
-!>
+!> @brief Set the relative tolerance
 !! @note Binds to C function ``set_rel_eps``
 !!
 !! @param[in] rel_eps_in double precision
@@ -228,7 +228,7 @@ contains
   ! :::
 
 
-!>
+!> @brief Return the relative tolerance
 !! @note Binds to C function ``get_rel_eps``
 !!
 !! @param[inout] rel_eps_in double precision

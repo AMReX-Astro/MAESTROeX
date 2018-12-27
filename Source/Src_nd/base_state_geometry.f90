@@ -1,7 +1,7 @@
 !> a module for storing the geometric information so we don't have to pass it
 !!
 !! This module provides the coordinate value for the left edge of a base-state
-!! zone (r_edge_loc) and the zone center (r_cc_loc).  As always, it is assumed that
+!! zone (``r_edge_loc``) and the zone center (``r_cc_loc``).  As always, it is assumed that
 !! the base state arrays begin with index 0, not 1.
 
 module base_state_geometry_module
@@ -567,6 +567,8 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+!> @brief Deallocate base state geometry arrays
+!!
   subroutine destroy_base_state_geometry() bind(C, name="destroy_base_state_geometry")
 
     call bl_deallocate(dr)

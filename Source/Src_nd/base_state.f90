@@ -267,7 +267,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-!>
+!> @brief Similar to ``init_base_state`` but for irregular base state
 !! @note Binds to C function ``init_base_state_irreg``
 !!
 !! @param[inout] s0_init double precision

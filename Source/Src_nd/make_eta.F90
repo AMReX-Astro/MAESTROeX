@@ -1,17 +1,17 @@
-!> Compute eta_rho = Avg { rho' U dot e_r }  (see paper III, Eq. 30)
+!> Compute \f $\eta_\rho = \mathbf{Avg} { \rho' \mathbf{U} \cdot \mathbf{e}_r } \f$  (see paper III, Eq. 30)
 !!
-!! We keep make three quantities here:
-!!    etarho     is edge-centered
-!!    etarho_cc  is cell-centered
+!! We make three quantities here:
+!! - ``etarho``     is edge-centered
+!! - ``etarho_cc``  is cell-centered
 !!
-!! For plane-parallel geometries, we compute etarho by averaging up
-!! interface fluxes (etarho_flux) created in mkflux.  We compute etarho_cc
-!! from etarho.
+!! For plane-parallel geometries, we compute ``etarho`` by averaging up
+!! interface fluxes (``etarho_flux``) created in ``mkflux``.  We compute ``etarho_cc``
+!! from ``etarho``.
 !!
 !! For spherical geometries,
-!!      We construct a multifab containing {rho' (U dot e_r)} and
+!!      we construct a multifab containing ``{rho' (U dot e_r)}`` and
 !!      use the average routine to put it in cell-centers
-!!      on the base state to get etarho_cc.  We compute etarho from these
+!!      on the base state to get ``etarho_cc``.  We compute ``etarh``o from these
 !!      cell-centered quantites by averaging to the center.
 !!
 
