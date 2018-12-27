@@ -120,7 +120,7 @@ private:
 /// compute unprojected mac velocities
 ///
 /// @param umac
-/// @param w0mac
+/// @param w0mac            MAC base state velocity
 /// @param w0_force
 /// @param w0_force_cart
 ///
@@ -131,10 +131,12 @@ private:
 
 
 ///
-/// @param utilde
-/// @param ufull
-/// @param utrans
-/// @param w0mac
+/// Compute the transverse velocity components.
+///
+/// @param utilde       Perturbational velocity
+/// @param ufull        Full velocity
+/// @param utrans       Transverse velocity
+/// @param w0mac        Base state MAC velocity
 ///
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
@@ -143,11 +145,13 @@ private:
 
 
 ///
-/// @param utilde
-/// @param ufull
-/// @param utrans
-/// @param umac
-/// @param w0mac
+/// Predict the normal velocities to the interfaces.
+///
+/// @param utilde   Perturbational velocity
+/// @param ufull    Full velocity
+/// @param utrans   Transverse velocity
+/// @param umac     MAC velocity
+/// @param w0mac    Base state MAC velocity
 /// @param force
 ///
     void VelPred (const amrex::Vector<amrex::MultiFab>& utilde,
@@ -159,16 +163,18 @@ private:
 
 
 ///
-/// @param state
-/// @param sedge
-/// @param umac
+/// Predict scalars to edges
+///
+/// @param state            Cell-centered state
+/// @param sedge            Edge-based scalars
+/// @param umac             MAC velocity
 /// @param force
 /// @param is_vel
-/// @param bcs
-/// @param nbccomp
-/// @param start_scomp
-/// @param start_bccomp
-/// @param num_comp
+/// @param bcs              Boundary conditions
+/// @param nbccomp          Number of components of `bcs` to use
+/// @param start_scomp      Component of `state` to start with
+/// @param start_bccomp     Component of `bcs` to start with
+/// @param num_comp         Number of `state` components to predict
 /// @param is_conservative
 ///
     void MakeEdgeScal (const amrex::Vector<amrex::MultiFab>& state,
@@ -180,12 +186,14 @@ private:
 
 
 ///
-/// @param state
-/// @param sflux
+/// Make the conservative flux for the species evolution equation
+///
+/// @param state        State
+/// @param sflux        Flux
 /// @param etarhoflux
-/// @param sedge
-/// @param umac
-/// @param w0mac
+/// @param sedge        Edge-based state
+/// @param umac         MAC velocity
+/// @param w0mac        MAC base state velocity
 /// @param r0_old
 /// @param r0_edge_old
 /// @param r0mac_old
@@ -193,8 +201,8 @@ private:
 /// @param r0_edge_new
 /// @param r0mac_new
 /// @param r0_predicted_edge
-/// @param start_comp
-/// @param num_comp
+/// @param start_comp   Component of state to begin with
+/// @param num_comp     Number of components to use
 ///
     void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
@@ -213,11 +221,13 @@ private:
 
 
 ///
-/// @param state
-/// @param sflux
-/// @param sedge
-/// @param umac
-/// @param w0mac
+/// Make the conservative flux for the enthalpy equation
+///
+/// @param state            State
+/// @param sflux            Flux
+/// @param sedge            Edge-based state
+/// @param umac             MAC velocity
+/// @param w0mac            MAC base state velocity
 /// @param r0_old
 /// @param r0_edge_old
 /// @param r0mac_old
@@ -253,6 +263,18 @@ private:
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_old,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_new);
 
+///
+/// Advance scalars to new timestep
+///
+/// @param stateold     State at old timestep
+/// @param statenew     State at new timestep
+/// @param sflux        Flux
+/// @param force
+/// @param start_scomp  Index of first scalar component
+/// @param num_comp     Number of scalar components
+/// @param p0           Base state pressure
+/// @param p0_cart      Base state pressure on cartesian grid
+///
     void UpdateScal (const amrex::Vector<amrex::MultiFab>& stateold,
 		     amrex::Vector<amrex::MultiFab>& statenew,
 		     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
@@ -263,11 +285,13 @@ private:
 
 
 ///
-/// @param umac
-/// @param uedge
+/// Advance velocity to new timestep
+///
+/// @param umac     MAC velocity
+/// @param uedge    Edge-based velocity
 /// @param force
 /// @param sponge
-/// @param w0mac
+/// @param w0mac    MAC base state velocity
 ///
     void UpdateVel (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
@@ -307,7 +331,7 @@ private:
 ///
 /// utility to skip to next line in Header
 ///
-/// @param is
+/// @param is   std::istream object
 ///
     void GotoNextLine (std::istream& is);
     ////////////
@@ -316,12 +340,15 @@ private:
     // MaestroConvert.cpp functions
 
 ///
-/// @param scal
-/// @param s0
-/// @param comp
-/// @param bccomp
-/// @param bcs_in
-/// @param flag
+/// Given a scalar, subtract/add the base state (``flag == true/false``) to
+/// return the perturbed/full state.
+///
+/// @param scal     MultiFab containing scalar
+/// @param s0       Base state scalar
+/// @param comp     Component of ``scal`` to use
+/// @param bccomp   Component of ``bcs_in`` to use
+/// @param bcs_in   Boundary conditions
+/// @param flag     Should we subtract (true) or add (false) the base state?
 ///
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
                         const amrex::Vector<amrex::Real>& s0,
@@ -331,16 +358,24 @@ private:
 
 
 ///
-/// @param scal
-/// @param flag
+/// Given the conserved species mass fraction, \f$ \rho X \f$, return the
+/// primitive species fraction \f$ X \f$. If flag is set to ``false``, then this
+/// does the inverse, multiplying \f$ X \f$ by the density to return \f$ \rho X \f$
+///
+/// @param scal     MultiFab of scalars
+/// @param flag     Should we divide (true) or multiply (false) by rho?
 ///
     void ConvertRhoXToX (amrex::Vector<amrex::MultiFab>& scal,
                          bool flag);
 
 
 ///
-/// @param scal
-/// @param flag
+/// Given the conserved variable \f$ \rho h \f$, divides by the density to return
+/// the primitive enthalpy \f$ h \f$. If the flag is set to ``false``, it does
+/// the inverse, instead multiplying by the density.
+///
+/// @param scal     MultiFab of scalars
+/// @param flag     Should we divide (true) or multiply (false) by rho?
 ///
     void ConvertRhoHToH (amrex::Vector<amrex::MultiFab>& scal,
                          bool flag);
@@ -350,17 +385,17 @@ private:
     // MaestroDebug.cpp functions
 
 ///
-/// print out the contents of a Vector of MultiFabs
+/// print out the contents of a Vector of MultiFabs. Assumes the data is cell-centered.
 ///
-/// @param CC
+/// @param CC   Vector of MultiFabs to print
 ///
     void PrintMF   (amrex::Vector<amrex::MultiFab>& CC);
 
 ///
 /// print out the contents of a Vector of edge-based MultiFabs
 ///
-/// @param EDGE
-/// @param dir
+/// @param EDGE     Vector of edge-based MultiFabs
+/// @param dir      direction along which data has been predicted to edges
 ///
     void PrintEdge (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir);
@@ -368,8 +403,8 @@ private:
 ///
 /// utility to write out a multilevel multifab to a plotfile
 ///
-/// @param mf
-/// @param name
+/// @param mf       MultiFab to print
+/// @param name     directory in which to print
 ///
     void WriteMF   (amrex::Vector<amrex::MultiFab>& mf,
                     std::string name);
@@ -379,16 +414,18 @@ private:
     // MaestroDensityAdvance.cpp functions
 
 ///
-/// @param which_step
-/// @param scalold
-/// @param scalnew
-/// @param sedge
-/// @param sflux
+/// Advance the density by ``dt``
+///
+/// @param which_step           is this is predictor (1) or corrector (2) step?
+/// @param scalold              Scalars at old timestep
+/// @param scalnew              Scalars at new timestep
+/// @param sedge                Edge based scalars
+/// @param sflux                Scalar flux
 /// @param scal_force
 /// @param etarhoflux
-/// @param umac
-/// @param w0mac
-/// @param rho0_predicted_edge
+/// @param umac                 MAC velocity
+/// @param w0mac                MAC base velocity
+/// @param rho0_predicted_edge  base state density predicted to edges
 ///
     void DensityAdvance (int which_step,
                          amrex::Vector<amrex::MultiFab>& scalold,
@@ -414,12 +451,12 @@ private:
 ///
 /// write plotfile to disk
 ///
-/// @param step
-/// @param dt_in
-/// @param rho0_in
-/// @param p0_in
-/// @param u_in
-/// @param s_in
+/// @param step      Index of current timestep
+/// @param dt_in     Timestep
+/// @param rho0_in   Base state density
+/// @param p0        Base state pressure
+/// @param u_in      Velocity
+/// @param s_in      Scalars
 /// @param index
 ///
     void DiagFile (const int step,
@@ -452,15 +489,17 @@ private:
     // MaestroEnthalpyAdvance.cpp functions
 
 ///
-/// @param which_step
-/// @param scalold
-/// @param scalnew
-/// @param sedge
-/// @param sflux
-/// @param scal_force
-/// @param umac
-/// @param w0mac
-/// @param thermal
+/// Advance enthalpy by ``dt`` to new time
+///
+/// @param which_step   Is the this predictor step (1) or the corrector step (2)?
+/// @param scalold      Old scalars
+/// @param scalnew      New scalars
+/// @param sedge        Edge-based scalars
+/// @param sflux        Scalar flux
+/// @param scal_force   Scalar force terms
+/// @param umac         MAC velocity
+/// @param w0mac        MAC base velocity
+/// @param thermal      Thermal terms
 ///
     void EnthalpyAdvance (int which_step,
                           amrex::Vector<amrex::MultiFab>& scalold,
@@ -479,15 +518,15 @@ private:
 ///
 /// call FillPatch for all levels
 ///
-/// @param time
+/// @param time         Current time
 /// @param mf
 /// @param mf_old
 /// @param mf_new
-/// @param srccomp
-/// @param destcomp
-/// @param ncomp
+/// @param srccomp      the source component
+/// @param destcomp     the destination component AND the bc component
+/// @param ncomp        Number of components
 /// @param startbccomp
-/// @param bcs_in
+/// @param bcs_in       boundary conditions
 ///
     void FillPatch (amrex::Real time,
                     amrex::Vector<amrex::MultiFab>& mf,
@@ -502,15 +541,15 @@ private:
 /// (fill fine grid ghost by interpolating from coarse)
 ///
 /// @param lev
-/// @param time
+/// @param time         Current time
 /// @param mf
 /// @param mf_old
 /// @param mf_new
 /// @param srccomp      the source component
 /// @param destcomp     the destination component AND the bc component
-/// @param ncomp
+/// @param ncomp        Number of components
 /// @param startbccomp
-/// @param bcs_in
+/// @param bcs_in       boundary conditions
 ///
     void FillPatch (int lev, amrex::Real time,
                     amrex::MultiFab& mf,
@@ -524,14 +563,14 @@ private:
 /// This comes into play when a new level of refinement appears
 ///
 /// @param lev
-/// @param time
+/// @param time         Current time
 /// @param mf
 /// @param mf_old
 /// @param mf_new
 /// @param srccomp      the source component
 /// @param destcomp     the destination component AND the bc component
-/// @param ncomp
-/// @param bcs
+/// @param ncomp        Number of components
+/// @param bcs          boundary conditions
 ///
     void FillCoarsePatch (int lev, amrex::Real time, amrex::MultiFab& mf,
                           amrex::Vector<amrex::MultiFab>& mf_old,
@@ -548,7 +587,7 @@ private:
 ///       subcycle I'm not sure if we need this capability?
 ///
 /// @param lev
-/// @param time
+/// @param time    Current time
 /// @param mf
 /// @param mftime
 /// @param mf_old
@@ -563,9 +602,9 @@ private:
 ///
 /// set covered coarse cells to be the average of overlying fine cells
 ///
-/// @param mf
-/// @param comp
-/// @param ncomp
+/// @param mf       MultiFab to average
+/// @param comp     Index of first component to average down
+/// @param ncomp    Number of components to average down
 ///
     void AverageDown (amrex::Vector<amrex::MultiFab>& mf,
                       int comp,
@@ -574,7 +613,7 @@ private:
 ///
 /// set covered faces to be the average of overlying fine faces
 ///
-/// @param edge
+/// @param edge     MultiFab of edge-based data to average down
 ///
     void AverageDownFaces (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge);
 
@@ -582,7 +621,7 @@ private:
 /// fill in ONE ghost cell for all components of a face-centered (MAC) velocity
 /// field behind physical boundaries.  Does not modify the velocities on the boundary
 ///
-/// @param umac
+/// @param umac     MAC velocity
 /// @param level
 ///
     void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
@@ -591,7 +630,7 @@ private:
 ///
 /// fill in all ghost cells for an edge-based MAC velocity field
 ///
-/// @param uedge
+/// @param uedge        edge-based MAC velocity field
 ///
     void FillPatchUedge(amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge);
 
@@ -610,8 +649,8 @@ private:
 
 
 ///
-/// @param uedge
-/// @param w0mac
+/// @param uedge    edge-based MAC velocity field
+/// @param w0mac    MAC base state velocity
 /// @param mult
 ///
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
@@ -620,30 +659,36 @@ private:
 
 
 ///
-/// @param w0mac
+/// @param w0mac    MAC base state velocity
 ///
     void MakeW0mac (amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac);
 
 
 ///
-/// @param s0
-/// @param s0mac
+/// @param s0       Base state scalars
+/// @param s0mac    MAC base state scalars
 ///
     void MakeS0mac (const amrex::Vector<amrex::Real>& s0,
 		    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
+/// Computes ``normal`` on all levels.
+///
     void MakeNormal ();
 
 
 ///
-/// @param s_cc
-/// @param face
-/// @param harmonic_avg
+/// Predict cell-centered data to faces
+///
+/// @param s_cc         Cell-centered data
+/// @param face         Edge-based data
+/// @param harmonic_avg If (1), use harmonic average on faces, otherwise use mean
 ///
     void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc,
 			amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM >>& face,
 			int harmonic_avg);
 
+/// map cell centers to base state indices
+///
     void MakeCCtoRadii ();
     // end MaestroFill3dData.cpp functions
     ////////////
@@ -652,11 +697,13 @@ private:
     // MaestroForce.cpp functions
 
 ///
-/// @param vel_force
-/// @param uedge
-/// @param rho
-/// @param rho0
-/// @param grav
+/// Make force terms for momentum equation
+///
+/// @param vel_force            Velocity force terms
+/// @param uedge                edge-based MAC velocity field
+/// @param rho                  Density
+/// @param rho0                 Base state density
+/// @param grav                 Gravitational acceleration
 /// @param w0_force
 /// @param w0_force_cart
 /// @param do_add_utilde_force
@@ -672,15 +719,17 @@ private:
 
 
 ///
-/// @param scal_force
-/// @param state
-/// @param umac
-/// @param s0
-/// @param s0_edge
-/// @param s0_cart
-/// @param comp
-/// @param bcs
-/// @param fullform
+/// Add velocity divergence terms to scalar force
+///
+/// @param scal_force       Scalar force terms
+/// @param state            Scalar
+/// @param umac             MAC velocity
+/// @param s0               Base state
+/// @param s0_edge          Base state predicted to edges
+/// @param s0_cart          Base state on cartesian grid
+/// @param comp             Component of state/scalar force to use
+/// @param bcs              Boundary conditions
+/// @param fullform         Use full scalar (1) or do perturbed and base components separately
 ///
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
 			 const amrex::Vector<amrex::MultiFab>& state,
@@ -694,12 +743,14 @@ private:
 
 
 ///
-/// @param scal_force
-/// @param is_prediction
-/// @param thermal
-/// @param umac
-/// @param add_thermal
-/// @param &which_step
+/// Compute the source terms for the non-reactive part of the enthalpy equation \f$ w dp_0/dr \f$
+///
+/// @param scal_force       Force terms
+/// @param is_prediction    Predictor step (1) or final update (0)?
+/// @param thermal          Thermal term
+/// @param umac             MAC velocity
+/// @param add_thermal      Do we add the thermal term (1)?
+/// @param which_step
 ///
     void MakeRhoHForce (amrex::Vector<amrex::MultiFab>& scal_force,
                         int is_prediction,
@@ -714,9 +765,11 @@ private:
 
 
 ///
-/// @param scal
-/// @param gamma1bar
-/// @param p0
+/// Compute gamma1 for the full state then average to create gamma1bar
+///
+/// @param scal         Scalar state
+/// @param gamma1bar    Gamma1bar
+/// @param p0           Base state pressure
 ///
     void MakeGamma1bar (const amrex::Vector<amrex::MultiFab>& scal,
                         amrex::Vector<amrex::Real>& gamma1bar,
@@ -740,10 +793,10 @@ private:
 /// level that did not exist before by interpolating from the coarser level
 /// overrides the pure virtual function in AmrCore
 ///
-/// @param lev
-/// @param time
-/// @param ba
-/// @param dm
+/// @param lev     AMR level index
+/// @param time    Current time
+/// @param ba      ``BoxArray``
+/// @param dm      ``DistributionMapping``
 ///
     virtual void MakeNewLevelFromScratch (int lev,
                                           amrex::Real time,
@@ -761,7 +814,7 @@ private:
 ///
     void DivuIter (int istep_divu_iter);
 
-    /// init iter to initialize gradpi
+    /// initial iteration to initialize gradpi
     ///
     void InitIter ();
 
@@ -778,11 +831,11 @@ private:
 //   enters as either zero, or the solution to the predictor MAC projection
 /// ``macrhs`` enters as beta0*(S-Sbar)
 ///
-/// @param umac
-/// @param macphi
-/// @param macrhs
+/// @param umac         MAC velocity
+/// @param macphi       MAC phi
+/// @param macrhs       MAC rhs
 /// @param beta0        a 1d cell-centered array
-/// @param is_predictor
+/// @param is_predictor Predictor step (1) or corrector step (0)?
 ///
     void MacProj (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                   amrex::Vector<amrex::MultiFab>& macphi,
@@ -791,12 +844,12 @@ private:
                   const int& is_predictor);
 
 ///
-/// multiply (or divide) face-data by ``beta0``
+/// Multiply (or divide) face-data by ``beta0``
 ///
-/// @param edge
-/// @param beta0
-/// @param beta0_edge
-/// @param mult_or_div
+/// @param edge             Edge-based (face) data
+/// @param beta0            cell-centered beta0
+/// @param beta0_edge       edge-centered beta0
+/// @param mult_or_div      Multiply (1) or divide (0)?
 ///
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
                            const amrex::Vector<amrex::Real>& beta0,
@@ -804,11 +857,11 @@ private:
                            const int& mult_or_div);
 
 ///
-/// compute the RHS for the solve, RHS = macrhs - div(beta0*umac)
+/// Compute the RHS for the solve, RHS = macrhs - div(beta0*umac)
 ///
-/// @param solverrhs
-/// @param macrhs
-/// @param umac
+/// @param solverrhs    RHS
+/// @param macrhs       MAC rhs
+/// @param umac         MAC velocity
 ///
     void ComputeMACSolverRHS (amrex::Vector<amrex::MultiFab>& solverrhs,
                               const amrex::Vector<amrex::MultiFab>& macrhs,
@@ -817,16 +870,16 @@ private:
 ///
 /// Average bcoefs at faces using inverse of rho
 ///
-/// @param facebcoef
-/// @param rhocc
+/// @param facebcoef    ``bcoefs`` averaged at faces
+/// @param rhocc        cell-centered rho
 ///
     void AvgFaceBcoeffsInv(amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM > >& facebcoef,
 			   const amrex::Vector<amrex::MultiFab>& rhocc);
 
 ///
-/// set boundaries for ``LABecLaplacian`` to solve \f$-\nabla\cdot(B \nabla) \phi = RHS\f$
+/// Set boundaries for ``LABecLaplacian`` to solve \f$-\nabla\cdot(B \nabla) \phi = \mathrm{RHS}\f$
 ///
-/// @param mlabec
+/// @param mlabec   pointer to ``amrex::MLABecLaplacian``
 ///
     void SetMacSolverBCs(amrex::MLABecLaplacian& mlabec);
 
@@ -837,11 +890,11 @@ private:
     // MaestroMakeEta.cpp functions
 
 ///
-/// compute eta_rho at edge- and cell-centers
+/// Compute ``eta_rho`` at edge- and cell-centers
 ///
-/// @param etarho_edge
-/// @param etarho_cell
-/// @param etarho_flux
+/// @param etarho_edge      ``eta_rho`` at edges
+/// @param etarho_cell      ``eta_rho`` at cell-centers
+/// @param etarho_flux      ``eta_rho`` flux
 ///
     void MakeEtarho (amrex::Vector<amrex::Real>& etarho_edge,
 		     amrex::Vector<amrex::Real>& etarho_cell,
@@ -849,12 +902,14 @@ private:
 
 
 ///
-/// @param scal_old
-/// @param scal_new
-/// @param umac
-/// @param w0mac
-/// @param etarho_edge
-/// @param etarho_cell
+/// Compute ``eta_rho`` at edge- and cell-centers in spherical coordinates
+///
+/// @param scal_old     Old scalars
+/// @param scal_new     New scalars
+/// @param umac         MAC velocity
+/// @param w0mac        MAC base state velocity
+/// @param etarho_edge  ``eta_rho`` at edges
+/// @param etarho_cell  ``eta_rho`` at cell-centers
 ///
     void MakeEtarhoSphr (const amrex::Vector<amrex::MultiFab>& scal_old,
 			 const amrex::Vector<amrex::MultiFab>& scal_new,
@@ -870,19 +925,19 @@ private:
 ///
 /// compute ``S`` at cell-centers
 ///
-/// @param S_cc
-/// @param delta_gamma1_term
-/// @param delta_gamma1
-/// @param scal
-/// @param u
-/// @param rho_omegadot
-/// @param rho_Hnuc
-/// @param rho_Hext
-/// @param thermal
-/// @param p0
-/// @param gamma1bar
-/// @param delta_gamma1_termbar
-/// @param psi
+/// @param S_cc                 cell-centered S
+/// @param delta_gamma1_term    delta gamma1 term
+/// @param delta_gamma1         delta gamma1
+/// @param scal                 Scalars
+/// @param u                    Velocity
+/// @param rho_omegadot         product of density and species creation rates
+/// @param rho_Hnuc             product of density and nuclear energy release
+/// @param rho_Hext             product of density and external energy source
+/// @param thermal              Thermal source term
+/// @param p0                   Base state pressure
+/// @param gamma1bar            gamma1bar
+/// @param delta_gamma1_termbar delta gamma1bar term
+/// @param psi                  psi
 ///
     void Make_S_cc (amrex::Vector<amrex::MultiFab>& S_cc,
                     amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
@@ -899,13 +954,15 @@ private:
                     const amrex::Vector<amrex::Real>& psi);
 
 ///
-/// compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
+/// Compute \f[
+/// \textrm{rhcc} = \beta_0(S_{cc}-\overline{S}) + \beta_0\delta\chi
+/// \f]
 ///
-/// @param rhcc
-/// @param S_cc
-/// @param Sbar
-/// @param beta0
-/// @param delta_gamma1_term
+/// @param rhcc                 rhs cell-centered source term
+/// @param S_cc                 cell-centered source term
+/// @param Sbar                 average source term
+/// @param beta0                beta0
+/// @param delta_gamma1_term    delta gamma1 term
 ///
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
                                const amrex::Vector<amrex::MultiFab>& S_cc,
@@ -914,19 +971,21 @@ private:
                                const amrex::Vector<amrex::MultiFab>& delta_gamma1_term);
 
 ///
-/// compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
+/// Compute \f[
+/// \textrm{rhcc} = \beta_0(S_{cc}-\overline{S}) + \beta_0\delta\chi
+/// \f]
 ///
-/// @param rhcc
-/// @param rho0
-/// @param S_cc
-/// @param Sbar
-/// @param beta0
-/// @param delta_gamma1_term
-/// @param gamma1bar
-/// @param p0
-/// @param delta_p_term
-/// @param delta_chi
-/// @param is_predictor
+/// @param rhcc                 rhs cell-centered source term
+/// @param rho0                 Base state density
+/// @param S_cc                 cell-centered source term
+/// @param Sbar                 average source term
+/// @param beta0                beta0
+/// @param delta_gamma1_term    delta gamma1 term
+/// @param gamma1bar            gamma1bar
+/// @param p0                   Base state pressure
+/// @param delta_p_term         delta p term
+/// @param delta_chi            delta chi
+/// @param is_predictor         Is this the predictor step (1) or corrector step (0)?
 ///
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
 			                       const amrex::Vector<amrex::Real>& rho0,
@@ -942,11 +1001,11 @@ private:
 
 
 ///
-/// @param rhcc
-/// @param rho0
+/// @param rhcc         cell-centered rhs
+/// @param rho0         base state density
 /// @param beta0
 /// @param gamma1bar
-/// @param p0
+/// @param p0           Base state pressure
 /// @param delta_p_term
 ///
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
@@ -962,42 +1021,50 @@ private:
     // MaestroNodalProj.cpp functions
 
 ///
-/// perform a nodal projection
+/// Perform a nodal projection
 ///
-/// Given a cell-centered velocity field Vproj (assembled in CreateUvecForProj),
-/// Vproj can decomposed into Vproj = Utilde + sig grad phi,
-/// where Utilde satisfies the constraint div(beta0*Utilde) = beta0*(S-Sbar).
-/// Depending on proj_type we use different values of Vproj, sig, and beta0
-/// to solve for phi we use div sigma grad phi = div(beta*Vproj) - beta0*(S-Sbar)
-/// where sigma = beta0 or beta0/rho depending on proj_type
-/// then solve for Utilde, pi, and grad(pi) based on proj_type.
-/// rhcc should enter as beta0*(S-Sbar) so we need to multiply by -1 in this routine
+/// Given a cell-centered velocity field ``Vproj`` \f$ V^\star \f$ (assembled in CreateUvecForProj()),
+/// \f$ V^\star \f$ can decomposed into \f[
+/// V^\star = \tilde{U} + \sigma \nabla \Phi,
+/// \f]
+/// where ``Utilde`` \f$ \tilde{U} \f$ satisfies the constraint \f[
+/// \nabla \cdot \left(\beta_0\tilde{U}\right) = \beta_0(S-\overline{S}).
+/// \f]
+/// Depending on ``proj_type`` we use different values of \f$ V^\star \f$,\f$ \sigma \f$, and \f$ \beta_0 \f$
+/// to solve for \f$ \Phi \f$ we use \f[
+/// \nabla \cdot \sigma \nabla \Phi = \nabla \cdot(\beta_0 V^\star) - \beta_0(S-\overline{S})
+/// \f]
+/// where \f$ \sigma = \beta_0 \f$ or \f$ \beta_0/\rho \f$ depending on ``proj_type``
+/// then solve for\f$ \tilde{U} \f$, \f$ \pi \f$, and \f$ \nabla \pi \f$ based on ``proj_type``.
+/// rhcc should enter as \f$ \beta_0(S-\overline{S}) \f$ so we need to multiply by -1 in this routine
 /// the projection (done below)
 ///
-/// @param proj_type
-/// @param rhcc
+/// @param proj_type        Projection type
+/// @param rhcc             rhcc
 /// @param istep_divu_iter
 ///
     void NodalProj (int proj_type,
                     amrex::Vector<amrex::MultiFab>& rhcc,
                     int istep_divu_iter=0);
 ///
-/// fill in Vproj
+/// Fill in ``Vproj``
 ///
-/// - ``initial_projection_comp``: Utilde^0                        -- uold
-/// - ``divu_iters_comp``:         Utilde^0                        -- uold
-/// - ``pressure_iters_comp``:     (Utilde^n+1,* - Utilde^n)/dt    -- (unew-uold)/dt
-/// - ``regular_timestep_comp``:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
+/// - ``initial_projection_comp``: \f$ \tilde{U}^0 \f$, ``uold``
+/// - ``divu_iters_comp``:         \f$ \tilde{U}^0 \f$, ``uold``
+/// - ``pressure_iters_comp``:     \f$ (\tilde{U}^{n+1,*} - \tilde{U}^n)/dt\f$, ``(unew-uold)/dt``
+/// - ``regular_timestep_comp``:  \f$ (\tilde{U}^{n+1,*} + dt \nabla \pi/\rho^{n+1/2})\f$,  ``u_new + dt*gpi/rhohalf``
 ///
-/// @param proj_type
+/// @param proj_type        Projection type
 /// @param Vproj
-/// @param sig      contains rhohalf if proj_type == regular_timestep_comp
+/// @param sig              contains rhohalf if ``proj_type == regular_timestep_comp``
 ///
     void CreateUvecForProj (int proj_type,
                             amrex::Vector<amrex::MultiFab>& Vproj,
                             const amrex::Vector<amrex::MultiFab>& sig);
 
 
+///
+/// Sets the velocity at the boundaries
 ///
 /// 1) At non-inflow faces, the normal component of velocity will be completely zero'd
 ///
@@ -1006,23 +1073,23 @@ private:
 ///                                (slipWall, noSlipWall, Symmetry)
 ///                                BUT will retain non-zero values at periodic corners
 ///
-/// @param vel
+/// @param vel  Velocity
 ///
     void SetBoundaryVelocity(amrex::Vector<amrex::MultiFab>& vel);
 
 ///
-/// given a nodal ``phi``, compute grad(phi) at cell centers
+/// Given a nodal ``phi``, compute \f$ \nabla \Phi \f$ at cell centers
 ///
-/// @param phi
-/// @param gphi
+/// @param phi      phi
+/// @param gphi     gradphi
 ///
     void ComputeGradPhi(amrex::Vector<amrex::MultiFab>& phi,
                         amrex::Vector<amrex::MultiFab>& gphi);
 
 ///
-/// average nodal pi to cell-centers and put in the Pi component of ``snew``
+/// Average nodal \f$ \pi \f$ to cell-centers and put in the Pi component of ``snew``
 ///
-/// @param beta0_cart
+/// @param beta0_cart       beta0 on cartesian grid
 ///
     void MakePiCC(const amrex::Vector<amrex::MultiFab>& beta0_cart);
 
@@ -1041,18 +1108,18 @@ private:
 
 
 ///
-/// put together an array of multifabs for writing
+/// Put together an array of multifabs for writing
 ///
 /// @param nPlot
 /// @param t_in
 /// @param dt_in
 /// @param rho0_cart
 /// @param rhoh0_cart
-/// @param p0_cart
+/// @param p0    Base state pressure_cart
 /// @param gamma1bar_cart
 /// @param u_in
 /// @param s_in
-/// @param p0_in
+/// @param p0    Base state pressure_in
 /// @param gamma1bar_in
 /// @param S_cc_in
 ///
@@ -1071,20 +1138,20 @@ private:
                                                       const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
 ///
-/// set plotfile variables names
+/// Set plotfile variables' names
 ///
 /// @param nPlot
 ///
     amrex::Vector<std::string> PlotFileVarNames (int * nPlot) const;
 
 ///
-/// write plotfile to disk
+/// Write plotfile to disk
 ///
 /// @param step
 /// @param dt_in
 /// @param rho0_in
 /// @param rhoh0_in
-/// @param p0_in
+/// @param p0    Base state pressure_in
 /// @param u_in
 /// @param s_in
 ///
@@ -1148,7 +1215,7 @@ private:
 /// @param rho_Hext
 /// @param rho_omegadot
 /// @param rho_Hnuc
-/// @param p0
+/// @param p0    Base state pressure
 /// @param dt_react
 ///
     void React (const amrex::Vector<amrex::MultiFab>& s_in,
@@ -1166,7 +1233,7 @@ private:
 /// @param rho_Hext
 /// @param rho_omegadot
 /// @param rho_Hnuc
-/// @param p0
+/// @param p0    Base state pressure
 /// @param dt_react
 ///
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
@@ -1178,7 +1245,7 @@ private:
                 const amrex::Real dt_react);
 
 ///
-/// compute heating term, ``rho_Hext``
+/// Compute heating term, ``rho_Hext``
 ///
 /// @param rho_Hext
 /// @param scal
@@ -1206,8 +1273,8 @@ private:
 ///
 /// @param lev
 /// @param tags
-/// @param time
-/// @param ng
+/// @param time     Current time
+/// @param ng       Number of ghost cells
 ///
     virtual void ErrorEst (int lev,
                            amrex::TagBoxArray& tags,
@@ -1217,10 +1284,10 @@ private:
 ///
 /// Within a call to ``AmrCore::regrid``, this function fills in data at a level
 /// that existed before, using pre-existing fine and interpolated coarse data
-/// overrides the pure virtual function in AmrCore
+/// overrides the pure virtual function in ``AmrCore``
 ///
 /// @param lev
-/// @param time
+/// @param time    Current time
 /// @param ba
 /// @param dm
 ///
@@ -1232,10 +1299,10 @@ private:
 ///
 /// Within a call to ``AmrCore::regrid``, this function fills in data at a level
 /// that did NOT exist before, using interpolated coarse data
-/// overrides the pure virtual function in AmrCore
+/// overrides the pure virtual function in ``AmrCore``
 ///
 /// @param lev
-/// @param time
+/// @param time    Current time
 /// @param ba
 /// @param dm
 ///
@@ -1247,7 +1314,7 @@ private:
 ///
 /// within a call to ``AmrCore::regrid``, this function deletes all data
 /// at a level of refinement that is no longer needed
-/// overrides the pure virtual function in AmrCore
+/// overrides the pure virtual function in ``AmrCore``
 ///
 /// @param lev
 ///
@@ -1263,7 +1330,7 @@ private:
 /// Calculate the temperature T given the density and enthalpy
 ///
 /// @param scal
-/// @param p0
+/// @param p0    Base state pressure
 ///
     void TfromRhoH (amrex::Vector<amrex::MultiFab>& scal,
                     const amrex::Vector<amrex::Real>& p0);
@@ -1273,7 +1340,7 @@ private:
 /// Calculate the temperature T given the density and pressure
 ///
 /// @param scal
-/// @param p0
+/// @param p0    Base state pressure
 /// @param updateRhoH
 ///
     void TfromRhoP (amrex::Vector<amrex::MultiFab>& scal,
@@ -1298,7 +1365,7 @@ private:
 ///
 /// @param scal
 /// @param vel
-/// @param p0
+/// @param p0    Base state pressure
 /// @param mach
 ///
     void MachfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
@@ -1310,7 +1377,7 @@ private:
 ///
 /// @param scal
 /// @param vel
-/// @param p0
+/// @param p0    Base state pressure
 /// @param w0cart
 /// @param mach
 ///
@@ -1339,7 +1406,7 @@ private:
     ///
     void VariableSetup ();
 
-    /// set up BCRec definitions for BC types
+    /// set up ``BCRec`` definitions for BC types
     ///
     void BCSetup ();
 
@@ -1359,11 +1426,11 @@ private:
     // MaestroThermal.cpp functions
 
 ///
-/// Compute the quantity: thermal = del dot kappa grad T
+/// Compute the quantity: ``thermal = del dot kappa grad T``
 ///
-/// - if temp_diffusion_formulation = 1, then we compute this directly.
-/// - if temp_diffusion_formulation = 2, then we compute the algebraically
-///     equivalent form with grad h - grad X_k - grad p_0 formulation
+/// - if ``temp_diffusion_formulation = 1``, then we compute this directly.
+/// - if ``temp_diffusion_formulation = 2``, then we compute the algebraically
+///     equivalent form with ``grad h - grad X_k - grad p_0`` formulation
 ///
 /// @param thermal
 /// @param scal
@@ -1371,7 +1438,7 @@ private:
 /// @param hcoeff
 /// @param Xkcoeff
 /// @param pcoeff
-/// @param p0
+/// @param p0    Base state pressure
 /// @param temp_formulation
 ///
     void MakeExplicitThermal (amrex::Vector<amrex::MultiFab>& thermal,
@@ -1388,7 +1455,7 @@ private:
 /// Use apply() to construct the form of the conduction term.
 /// apply() forms the generic quantity:
 /// \f[
-///   (\alpha A - \beta \nabla \cdot B \nabla) \phi = RHS
+///   (\alpha A - \beta \nabla \cdot B \nabla) \phi = \textrm{RHS}.
 /// \f]
 /// @param mlabec
 /// @param thermalout
@@ -1452,7 +1519,7 @@ private:
 ///
 /// @param rhohalf
 /// @param umac
-/// @param w0mac
+/// @param w0mac            MAC base state velocity
 /// @param w0_force
 /// @param w0_force_cart
 /// @param rho0_nph
@@ -1485,7 +1552,7 @@ private:
 /// these are defined in VariableSetup()
 /// @{
     static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi, Nscal;
-    static int ng_s; // number of ghost cells for sold/new and uold/new
+    static int ng_s; //< number of ghost cells for sold/new and uold/new
 /// @}
 ///
 
@@ -1570,7 +1637,7 @@ private:
 
 
 ///
-/// these MultiFabs are persistant and need to be regridded as well
+/// these `MultiFab`s are persistant and need to be regridded as well
 ///
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
@@ -1579,7 +1646,7 @@ private:
 
 ///
 /// this only needs to persist leading into the initial pressure iters
-/// since we project (beta0^nph S^1 - beta0 S^0) / dt
+/// since we project ``(beta0^nph S^1 - beta0 S^0) / dt``
 /// during a regular time step we overwrite this
 ///
     amrex::Vector<amrex::MultiFab> rhcc_for_nodalproj;
@@ -1605,7 +1672,7 @@ private:
 /// @name boundary condition objects needed for FillPatch routines
 ///
 /// this is essentially an array (over components)
-/// of 2*DIM integer arrays storing the physical boundary
+/// of ``2*DIM`` integer arrays storing the physical boundary
 /// condition types at the lo/hi walls in each direction
 /// @{
     amrex::Vector<amrex::BCRec> bcs_s;  // for sold/snew
@@ -1643,7 +1710,7 @@ private:
 ///
 
 ///
-/// p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
+/// \f$ p_0^{n-1} \f$ needed to compute \f$ d(p_0)/dt \f$ for nonuniform grid spacing
 ///
     amrex::Vector<amrex::Real> p0_nm1;
 
@@ -1710,9 +1777,9 @@ private:
 /// stores fluxes at coarse-fine interface for synchronization
 /// this will be sized "max_level+1"
 ///
-/// @note the flux register associated with flux_reg[lev] is associated
-/// with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-/// therefore flux_reg[0] and flux_reg[max_level] are never actually
+/// @note the flux register associated with ``flux_reg[lev]`` is associated
+/// with the ``lev/lev-1`` interface (and has grid spacing associated with ``lev-1``)
+/// therefore ``flux_reg[0]`` and ``flux_reg[max_level]`` are never actually
 /// used in the reflux operation
 /// @{
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;

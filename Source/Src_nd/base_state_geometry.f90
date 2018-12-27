@@ -146,6 +146,8 @@ contains
 
   end subroutine init_base_state_geometry
 
+!> map cell centers to base state indices
+!!
   subroutine init_base_state_map_sphr(cc_to_r, lo, hi, &
        dx_fine, dx_lev) &
        bind(C, name="init_base_state_map_sphr")
@@ -359,7 +361,7 @@ contains
     ! to use for allocating r_start_coord and r_end_coord
     maxchunks = 1
     do n=1,finest_radial_level
-       
+
        ! initialize variables
        chunk_start = .false.
        nchunks = 0
@@ -378,16 +380,16 @@ contains
        maxchunks = max(nchunks,maxchunks)
 
     end do
-    
+
     if (associated(r_start_coord)) then
        call bl_deallocate(r_start_coord)
     end if
-    call bl_allocate(r_start_coord,0,finest_radial_level,1,maxchunks) 
+    call bl_allocate(r_start_coord,0,finest_radial_level,1,maxchunks)
 
     if (associated(r_end_coord)) then
        call bl_deallocate(r_end_coord)
     end if
-    call bl_allocate(r_end_coord,0,finest_radial_level,1,maxchunks) 
+    call bl_allocate(r_end_coord,0,finest_radial_level,1,maxchunks)
 
     if (spherical .eq. 0) then
 
@@ -418,7 +420,7 @@ contains
              end if
           end do
        end do
-       
+
     else
 
        numdisjointchunks(0) = 1
@@ -429,7 +431,7 @@ contains
 
 !!$    print *,"hack,",numdisjointchunks
 !!$    print *,"hack,",r_start_coord(1,:),r_end_coord(1,:)
-    
+
   end subroutine init_multilevel
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
