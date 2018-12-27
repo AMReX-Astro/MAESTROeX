@@ -291,7 +291,7 @@ module make_beta0_module
   !! @param[in] gamma1bar
   !! @param[in] grav_cell
   !! @param[in] r_cc_loc
-  !! @param[in] r+edge_loc
+  !! @param[in] r_edge_loc
   !!
   subroutine make_beta0_irreg(beta0,rho0,p0,gamma1bar,grav_cell, &
                                r_cc_loc,r_edge_loc) &

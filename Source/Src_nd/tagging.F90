@@ -14,15 +14,18 @@ contains
   !> This routine will tag high error cells based on the state
   !!
   !! @param[inout] tag       integer tag array
-  !! @param[in] tag_lo,hi    index extent of tag array
+  !! @param[in] tag_lo       lower index extent of tag array
+  !! @param[in] tag_hi       upper index extent of tag array
   !! @param[in] state        state array
-  !! @param[in] state_lo,hi  index extent of state array
+  !! @param[in] state_lo     lower index extent of state array
+  !! @param[in] state_hi     upper index extent of state array
   !! @param[in] set          integer value to tag cell for refinement
   !! @param[in] clear        integer value to untag cell
-  !! @param[in] lo,hi        work region we are allowed to change
+  !! @param[in] lo           lower extent of work region we are allowed to change
+  !! @param[in] hi           upper extent of work region we are allowed to change
   !! @param[in] dx           cell size
   !! @param[in] time         problem evolution time
-  !! @param[in] level        refinement level of this array
+  !! @param[in] lev          refinement level of this array
   !! -----------------------------------------------------------
 
   subroutine state_error(tag,tag_lo,tag_hi, &
