@@ -646,7 +646,7 @@ private:
 
     // set tagging array to include buffer zones for multilevel
     void TagArray ();
-    
+
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
     virtual void ErrorEst (int lev,
