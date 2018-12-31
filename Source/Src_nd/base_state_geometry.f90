@@ -362,7 +362,7 @@ contains
        
        ! initialize variables
        chunk_start = .false.
-       nchunks = 1
+       nchunks = 0
 
        ! increment nchunks at beginning of each chunk
        ! (ex. when the tagging index changes from 0 to 1)
@@ -427,6 +427,9 @@ contains
 
     end if
 
+!!$    print *,"hack,",numdisjointchunks
+!!$    print *,"hack,",r_start_coord(1,:),r_end_coord(1,:)
+    
   end subroutine init_multilevel
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

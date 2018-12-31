@@ -279,14 +279,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // Sbar = (1 / gamma1bar * p0) * dp/dt
     if (evolve_base_state) {
-
-	// Sbar = dp/dt
-	// make_psi_irreg(Sbar.dataPtr(),p0_nm1.dataPtr(),p0_old.dataPtr(),&dtold);
-
-	// divide Sbar by coefficient
+	// divide dp/dt approximation by coefficient
 	for (int i=0; i<Sbar.size(); ++i) {
 	    Sbar[i] = psi[i]/(gamma1bar_old[i]*p0_old[i]);
-	    // Sbar[i] = 1.0/(gamma1bar_old[i]*dtold)*(1.0-p0_nm1[i]/p0_old[i]);
 	}
     } else {
 	// these should have no effect if evolve_base_state = false
@@ -391,9 +386,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// // set psi to dpdt
-	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
-	
     }
     else {
 	p0_new = p0_old;
@@ -405,7 +397,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	Average(s1, rhoh0_old, RhoH);
 	// Average(s2, rhoh0_new, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
 
-	// add psi to rhoh0_new
+	// add dp/dt to rhoh0_new
 	for (int i=0; i<rhoh0_old.size(); ++i) {
 	    // rhoh0_new[i] = rhoh0_old[i] + dt*psi[i];
 	    rhoh0_new[i] = rhoh0_old[i] + (p0_new[i] - p0_old[i]);
@@ -558,12 +550,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // compute Sbar
     if (evolve_base_state) {
 	
-	// Sbar = dp/dt
-	// make_psi_irreg(Sbar.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
-
 	// Sbar = 1/(gamma1bar*p0) * dp/dt
 	for (int i=0; i<Sbar.size(); ++i) {
-	    // Sbar[i] = psi[i]/(gamma1bar_new[i]*p0_new[i]);
 	    Sbar[i] = 1.0/(gamma1bar_new[i]*dt)*(1.0-p0_old[i]/p0_new[i]);
 	}
 
@@ -659,14 +647,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	for (int i=0; i<p0_nph.size(); ++i) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
-
-	// // set psi to dpdt
-	// make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
 	
     }
 
     // base state enthalpy averaging
-    // add new psi to rhoh0_new
+    // add new dp/dt term to rhoh0_new
     if (evolve_base_state) {
 	// Average(s2, rhoh0_new, RhoH);
 	for (int i=0; i<rhoh0_old.size(); ++i) {

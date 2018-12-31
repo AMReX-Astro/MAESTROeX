@@ -24,6 +24,10 @@ Maestro::Init ()
         InitData();
 
         if (plot_int > 0) {
+
+	    // Need to fill normal vector to compute velrc in plotfile 
+	    if (spherical) { MakeNormal(); }
+	    
             Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
             WritePlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
         }
@@ -190,6 +194,9 @@ Maestro::InitData ()
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);
+
+    // reset tagging array to include buffer zones
+    TagArray();
 
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
