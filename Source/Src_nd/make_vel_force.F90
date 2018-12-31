@@ -176,7 +176,7 @@ contains
     double precision, pointer :: grav_cart(:,:,:,:)
 
     double precision :: rhopert
-    double precision :: xx, yy, zz
+    double precision :: xx, yy, zz, radius
 
     real(kind=dp_t) :: Ut_dot_er
 

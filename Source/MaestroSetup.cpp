@@ -42,6 +42,8 @@ Maestro::Setup ()
 
     burner_init();
 
+    rotation_init();
+
     const Real* probLo = geom[0].ProbLo();
     const Real* probHi = geom[0].ProbHi();
 
@@ -132,10 +134,10 @@ Maestro::Setup ()
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
     w0        .resize( (max_radial_level+1)*(nr_fine+1) );
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
-    
+
     // tagged box array for multilevel (planar)
     tag_array .resize( (max_radial_level+1)*nr_fine );
-    
+
     // diag file data arrays
     diagfile_data.resize(diag_buf_size*12);
 
@@ -171,7 +173,7 @@ Maestro::Setup ()
 			     r_edge_loc.dataPtr(),
 			     geom[max_level].CellSize(),
 			     &nr_irreg);
-    
+
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
@@ -215,10 +217,10 @@ Maestro::Setup ()
     }
 
     std::fill(tag_array.begin(), tag_array.end(), 0);
-    
+
     // tagging criteria
     tag_err.resize(max_level);
-    
+
     for (int lev=0; lev<max_level; ++lev) {
 	tag_err[lev].resize(2);
 	tag_err[lev].shrink_to_fit();

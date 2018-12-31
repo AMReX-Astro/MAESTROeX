@@ -638,7 +638,7 @@ contains
 
                    radius = sqrt(x**2 + y**2 + z**2)
                    delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * &
-                        rho0_cart(i,j,k,1) * omega**2 * normal(i,j,k,:) * radius / &
+                        rho0_cart(i,j,k,1) * omega**2 * radius / &
                         (dt*gamma1bar_cart(i,j,k,1)*p0_cart(i,j,k,1))
 #endif
                    rhcc(i,j,k) = rhcc(i,j,k) + div_cart(i,j,k,1) * delta_chi(i,j,k)

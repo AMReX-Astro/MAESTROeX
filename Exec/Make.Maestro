@@ -49,6 +49,11 @@ Bdirs 	:= Source \
 Bpack	+= $(foreach dir, $(Bdirs), $(TOP)/$(dir)/Make.package)
 Blocs   += $(foreach dir, $(Bdirs), $(TOP)/$(dir))
 
+ifeq ($(USE_ROTATION), TRUE)
+  Bdirs += Source/rotation
+  DEFINES += -DROTATION
+endif
+
 #------------------------------------------------------------------------------
 # AMReX
 #------------------------------------------------------------------------------

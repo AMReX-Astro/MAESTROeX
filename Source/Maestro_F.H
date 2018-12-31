@@ -1052,7 +1052,7 @@ extern "C"
 #endif
 			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
     //////////////////////
-    
+
     //////////////////////
     // in regrid.f90
     void regrid_base_state_cc(amrex::Real* state_cc);
@@ -1112,6 +1112,11 @@ extern "C"
                           const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
                           const amrex::Real* p0cart, const int* p_lo, const int* p_hi,
                           amrex::Real* cs, const int* c_lo, const int* c_hi);
+    //////////////////////
+
+    //////////////////////
+    // in rotation.f90
+    void rotation_init();
     //////////////////////
 
     //////////////////////
