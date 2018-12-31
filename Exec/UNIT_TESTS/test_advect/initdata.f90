@@ -7,7 +7,6 @@ module initdata_module
   use base_state_geometry_module, only: nr_fine, max_radial_level, center
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
        prob_lo, prob_hi, base_cutoff_density
-  use probin_module, only: dir
 
   implicit none
 
@@ -59,57 +58,9 @@ contains
 
              scal(i,j,k,spec_comp) = scal(i,j,k,rho_comp)
 
-             select case (dir)
-
-             case(-1)
-                 vel(i,j,k,1) = -1.0d0
-
-             case(1)
-                 vel(i,j,k,1) = 1.0d0
-
-             case(-2)
-                 vel(i,j,k,2) = -1.0d0
-
-             case(2)
-                 vel(i,j,k,2) = 1.0d0
-
-             case(-3)
-                 vel(i,j,k,3) = -1.0d0
-
-             case(3)
-                 vel(i,j,k,3) = 1.0d0
-
-             end select
-
           end do
        end do
     end do
-
-    ! do k=lo(3),hi(3)
-    !    do j=lo(2),hi(2)
-    !       do i=lo(1),hi(1)
-    !
-    !          if (amrex_spacedim .eq. 1) then
-    !             r = i
-    !          else if (amrex_spacedim .eq. 2) then
-    !             r = j
-    !          else if (amrex_spacedim .eq. 3) then
-    !             r = k
-    !          end if
-    !
-    !          ! set scalars using s0
-    !          scal(i,j,k,rho_comp)  = s0_init(lev,r,rho_comp)
-    !          scal(i,j,k,rhoh_comp) = s0_init(lev,r,rhoh_comp)
-    !          scal(i,j,k,temp_comp) = s0_init(lev,r,temp_comp)
-    !          scal(i,j,k,spec_comp:spec_comp+nspec-1) = &
-    !               s0_init(lev,r,spec_comp:spec_comp+nspec-1)
-    !
-    !          ! initialize pi to zero for now
-    !          scal(i,j,k,pi_comp) = 0.d0
-    !
-    !       end do
-    !    end do
-    ! end do
 
   end subroutine initdata
 

@@ -26,19 +26,6 @@ Maestro::Evolve ()
 
             // Print() << "density = " << sold[0].norm2() << std::endl;
 
-			// set the velocity
-			for (int lev=0; lev<=finest_level; ++lev) {
-				for (int d=0; d < AMREX_SPACEDIM; ++d) {
-					if (d == i) {
-						uold[lev][d].setVal(double(j));
-					} else {
-						uold[lev][d].setVal(0.0);
-					}
-				}
-			}
-
-            Print() << "j = " << double(j) << std::endl;;
-
 			// advance solution to final time
 			// Print() << "Calling Evolve()" << std::endl;
 
@@ -81,6 +68,7 @@ Maestro::Evolve ()
 				error[lev].define(grids[lev], dmap[lev],   1, ng_s);
 				error[lev].setVal(0.);
 				scal_force[lev].define(grids[lev], dmap[lev],   Nscal,    1);
+				scal_force[lev].setVal(0.);
 
 				AMREX_D_TERM(etarhoflux[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
 				             etarhoflux[lev].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
@@ -98,8 +86,12 @@ Maestro::Evolve ()
 				             sflux[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0); );
 
 				// initialize umac
-				for (int d=0; d < AMREX_SPACEDIM; ++d)
+				for (int d=0; d < AMREX_SPACEDIM; ++d) {
 					umac[lev][d].setVal(0.);
+					etarhoflux[lev][d].setVal(0.);
+					sedge[lev][d].setVal(0.);
+					sflux[lev][d].setVal(0.);
+                }
 			}
 
 #if (AMREX_SPACEDIM == 3)
@@ -128,10 +120,11 @@ Maestro::Evolve ()
 #endif
 
 			std::fill(w0_force.begin(), w0_force.end(), 0.);
+            std::fill(rho0_predicted_edge.begin(), rho0_predicted_edge.end(), 0.);
 
 			// Store the initial density here
 			for (int lev=0; lev<=finest_level; ++lev)
-				MultiFab::Copy(s_orig[lev],sold[lev],Rho,0,1,ng_s);
+				MultiFab::Copy(s_orig[lev],sold[lev],Rho,0,1,0);
 
 			const Real* dx = geom[finest_level].CellSize();
 
@@ -143,27 +136,25 @@ Maestro::Evolve ()
 
 			for (int lev=0; lev<=finest_level; ++lev) {
 				for (int d=0; d < AMREX_SPACEDIM; ++d)
-					umac[lev][d].setVal(uold[lev].min(d));
+					umac[lev][d].setVal(0.0);
+
+                umac[lev][i].setVal(double(j));
 			}
+
+            AverageDownFaces(umac);
 
             // Print() << "start_step = " << start_step << std::endl;
 
-            Print() << "original density = " << s_orig[0].norm2() << std::endl;
+            // Print() << "original density = " << s_orig[0].norm2() << std::endl;
 
 			for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
 			{
-
-				// Print() << uold[0].norm2(Rho) << std::endl;
 
 				// Print() << "Evolving step " << istep << std::endl;
 
 				t_old = t_new;
 
 				DensityAdvance(1,sold,snew,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
-
-				rho0_old = rho0_new;
-
-				t_new = t_old + dt;
 
 				// move new state into old state by swapping pointers
 				for (int lev=0; lev<=finest_level; ++lev) {
@@ -180,6 +171,11 @@ Maestro::Evolve ()
 					std::swap(gamma1bar_old,gamma1bar_new);
 					std::swap(grav_cell_old,grav_cell_new);
 				}
+
+				t_new = t_old + dt;
+
+                if (t_new + dt > stop_time)
+                    dt = stop_time - t_new;
 
 			}
 
@@ -206,8 +202,4 @@ Maestro::Evolve ()
 
 		}
 	}
-
-
-
-
 }

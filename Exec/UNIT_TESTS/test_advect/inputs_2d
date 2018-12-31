@@ -1,24 +1,22 @@
 # INITIAL MODEL
-maestro.ppm_type = 0
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
 amr.n_cell             = 128 128
 amr.max_grid_size      = 64
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
-
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0
 geometry.prob_hi     =  1.0d0    1.0d0
 
 maestro.do_sponge = 0
 
-maestro.base_cutoff_density = 1.e-10
-
 maestro.max_step  = 1000
+maestro.evolve_base_state = false
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0
 maestro.init_iter             = 0
+maestro.use_thermal_diffusion = false
 
 maestro.stop_time = 1.
 
@@ -71,8 +69,22 @@ maestro.eps_hg_max         = 1.e-9
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
+# HYDRODYNAMICS options
+maestro.anelastic_cutoff = 1.e-10
+maestro.base_cutoff_density = 1.e-10
+maestro.grav_const = 0.0e0
+maestro.beta0_type = 3
+maestro.do_smallscale = false
+maestro.ppm_type = 0
+
+# EOS parameters
+maestro.small_temp = 1.e-10
+maestro.small_dens = 1.e-10
+
+# BURNING parameters
+maestro.do_burning = false
+
 &probin
- !test_set = "gr0_2d"
 
  do_bds = .true.
 
