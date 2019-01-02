@@ -183,8 +183,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
               MultiFab& umac_mf    = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         const MultiFab& utrans_mf  = utrans[lev][0];
+#if (AMREX_SPACEDIM >= 2)
         const MultiFab& vtrans_mf  = utrans[lev][1];
               MultiFab& vmac_mf    = umac[lev][1];
 #if (AMREX_SPACEDIM == 3)
