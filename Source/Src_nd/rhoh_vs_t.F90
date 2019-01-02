@@ -482,7 +482,7 @@ contains
                 ! vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 1)
                 r = i
-                vel = sqrt( (u(i,j,k,1) + 0.5d0*(w0cart(i,j,k,1) + wcart(i,j,k,1)) )**2 )
+                vel = sqrt( (u(i,j,k,1) + 0.5d0*(w0cart(i,j,k,1) + w0cart(i,j,k,1)) )**2 )
 #elif (AMREX_SPACEDIM == 2)
                 r = j
                 vel = sqrt(  u(i,j,k,1)**2 + &
