@@ -12,29 +12,43 @@ Maestro::Evolve ()
 		for (auto j = -1; j <= 1; j+=2) {
 
 			t_old = 0.0;
-            t_new = 0.0;
-            istep = 0;
+			t_new = 0.0;
+			istep = 0;
 
 			// reset the density
 			InitFromScratch(t_old);
 
-            // average down data and fill ghost cells
-            AverageDown(sold,0,Nscal);
-            FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
-            AverageDown(uold,0,AMREX_SPACEDIM);
-            FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u);
+			// average down data and fill ghost cells
+			AverageDown(sold,0,Nscal);
+			FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
+			AverageDown(uold,0,AMREX_SPACEDIM);
+			FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u);
 
-            // Print() << "density = " << sold[0].norm2() << std::endl;
+			compute_cutoff_coords(rho0_old.dataPtr());
+
+			std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
+			std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
+
+			// set tempbar to be the average
+			Average(sold,tempbar,Temp);
+			for (int i=0; i<tempbar.size(); ++i) {
+				tempbar_init[i] = tempbar[i];
+			}
+
+			// set p0^{-1} = p0_old
+			for (int i=0; i<p0_old.size(); ++i) {
+				p0_nm1[i] = p0_old[i];
+			}
 
 			// advance solution to final time
 			// Print() << "Calling Evolve()" << std::endl;
 
-            Print() << "\nInitial velocity = ";
-            if (i == 0) {
-                Print() << "(" << j << ", 0)" << std::endl;
-            } else {
-                Print() << "(0, " << j << ")" << std::endl;
-            }
+			Print() << "\nInitial velocity = ";
+			if (i == 0) {
+				Print() << "(" << j << ", 0)" << std::endl;
+			} else {
+				Print() << "(0, " << j << ")" << std::endl;
+			}
 
 			// check to make sure spherical is only used for 3d
 			if (spherical == 1 && AMREX_SPACEDIM != 3) {
@@ -91,7 +105,7 @@ Maestro::Evolve ()
 					etarhoflux[lev][d].setVal(0.);
 					sedge[lev][d].setVal(0.);
 					sflux[lev][d].setVal(0.);
-                }
+				}
 			}
 
 #if (AMREX_SPACEDIM == 3)
@@ -120,7 +134,7 @@ Maestro::Evolve ()
 #endif
 
 			std::fill(w0_force.begin(), w0_force.end(), 0.);
-            std::fill(rho0_predicted_edge.begin(), rho0_predicted_edge.end(), 0.);
+			std::fill(rho0_predicted_edge.begin(), rho0_predicted_edge.end(), 0.);
 
 			// Store the initial density here
 			for (int lev=0; lev<=finest_level; ++lev)
@@ -130,31 +144,43 @@ Maestro::Evolve ()
 
 			dt = cfl * dx[0];
 
-			// AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
-
-			// Print() << uold[0].min(0) << std::endl;
-
 			for (int lev=0; lev<=finest_level; ++lev) {
 				for (int d=0; d < AMREX_SPACEDIM; ++d)
 					umac[lev][d].setVal(0.0);
 
-                umac[lev][i].setVal(double(j));
+				umac[lev][i].setVal(double(j));
 			}
 
-            AverageDownFaces(umac);
+			AverageDownFaces(umac);
 
-            // Print() << "start_step = " << start_step << std::endl;
-
-            // Print() << "original density = " << s_orig[0].norm2() << std::endl;
+			Print() << "original density = " << s_orig[0].norm2() << std::endl;
 
 			for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
 			{
 
 				// Print() << "Evolving step " << istep << std::endl;
 
+				// check to see if we need to regrid, then regrid
+				if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0)
+					Regrid();
+
 				t_old = t_new;
 
+                // set etarhoflux to zero
+                for (int lev=0; lev<=finest_level; ++lev) {
+                    etarhoflux[lev].setVal(0.);
+                }
+                // set sedge and sflux to zero
+                for (int lev=0; lev<=finest_level; ++lev) {
+                    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+                        sedge[lev][idim].setVal(0.);
+                        sflux[lev][idim].setVal(0.);
+                    }
+                }
+
 				DensityAdvance(1,sold,snew,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
+
+                p0_new = p0_old;
 
 				// move new state into old state by swapping pointers
 				for (int lev=0; lev<=finest_level; ++lev) {
@@ -174,8 +200,8 @@ Maestro::Evolve ()
 
 				t_new = t_old + dt;
 
-                if (t_new + dt > stop_time)
-                    dt = stop_time - t_new;
+				if (t_new + dt > stop_time)
+					dt = stop_time - t_new;
 
 			}
 
@@ -183,7 +209,7 @@ Maestro::Evolve ()
 			for (int lev=0; lev<=finest_level; ++lev)
 				MultiFab::Copy(s_final[lev],snew[lev],Rho,0,1,0);
 
-            Print() << "final density = " << s_final[0].norm2() << std::endl;
+			Print() << "final density = " << s_final[0].norm2() << std::endl;
 
 			// compare the initial and final density
 			for (int lev=0; lev<=finest_level; ++lev) {
