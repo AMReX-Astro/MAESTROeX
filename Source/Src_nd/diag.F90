@@ -88,8 +88,8 @@ contains
 #if (AMREX_SPACEDIM == 1)
                 vel = sqrt( (u(i,j,k,1) + 0.5d0*(w0(lev,i) + w0(lev,i+1)) )**2 )
 #elif (AMREX_SPACEDIM == 2)
-                vel = sqrt(  u(i,j,1)**2 + &
-                     ( u(i,j,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
+                vel = sqrt(  u(i,j,k,1)**2 + &
+                     ( u(i,j,k,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
                 vel = sqrt(  u(i,j,k,1)**2 + &
                      u(i,j,k,2)**2 + &

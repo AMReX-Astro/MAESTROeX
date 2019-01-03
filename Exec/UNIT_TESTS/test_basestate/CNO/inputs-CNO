@@ -1,5 +1,5 @@
 # INITIAL MODEL
-maestro.model_file = "s15-hburn.hse.2218"
+maestro.model_file = "CNO/s15-hburn.hse.2218"
 maestro.stop_time = 2.e20
 maestro.max_step = 10000
 

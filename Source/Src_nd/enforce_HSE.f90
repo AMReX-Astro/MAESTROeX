@@ -3,7 +3,7 @@ module enforce_HSE_module
   use bl_constants_module
   use make_grav_module
   use base_state_geometry_module, only: nr_fine, dr, &
-                                        max_radial_level, nr, numdisjointchunks, & 
+                                        max_radial_level, nr, numdisjointchunks, &
                                         r_start_coord, r_end_coord, finest_radial_level, &
                                         restrict_base, fill_ghost_base, base_cutoff_density_coord
   use meth_params_module, only: do_planar_invsq_grav, do_2d_planar_octant, spherical, &
@@ -35,12 +35,12 @@ contains
     ! create a copy of the input pressure to help us with initial
     ! conditions
     p0_old = p0
-    
+
     ! zero the new pressure so we don't leave a non-zero pressure in
     ! fine radial regions that no longer have a corresponding full
     ! state
     p0 = 0.d0
-    
+
     ! integrate all of level 1 first
     ! use the old pressure at r=0 as a reference point
     p0(0,0) = p0_old(0,0)
@@ -65,7 +65,7 @@ contains
     end do
 
     if (spherical .eq. 0) then
-       
+
        do n=1,finest_radial_level
           do i=1,numdisjointchunks(n)
 
@@ -95,7 +95,7 @@ contains
                    ! assuming constant g here
                    p0(n,r_start_coord(n,i)) = p0(n-1,r_start_coord(n,i)/2-1) &
                         + (3.d0*grav_cell(1,0)*dr(n)/4.d0)* &
-                        (rho0(n-1,r_start_coord(n,i)/2-1)+rho0(n,r_start_coord(n,i)))                      
+                        (rho0(n-1,r_start_coord(n,i)/2-1)+rho0(n,r_start_coord(n,i)))
                 endif
              else
                 ! copy pressure from below
@@ -165,7 +165,6 @@ contains
 
     end if ! spherical
 
-    
     ! now compare pressure in the last cell and offset to make sure we
     ! are integrating "from the top"
     ! we use the coarsest level as the reference point

@@ -1,5 +1,5 @@
 # INITIAL MODEL
-maestro.model_file = "spherical.hse.640"
+maestro.model_file = "spherical/spherical.hse.640"
 maestro.stop_time = 2.e0
 maestro.max_step = 1000000
 

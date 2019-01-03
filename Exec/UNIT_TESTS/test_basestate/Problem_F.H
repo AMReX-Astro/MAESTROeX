@@ -29,6 +29,13 @@ void update_species(const amrex::Real* rho0, const amrex::Real* rho0_predicted_e
                     const amrex::Real* w0, const amrex::Real* r_cc_loc,
                     const amrex::Real* r_edge_loc, const amrex::Real dt);
 
+void set_initial_dt(amrex::Real* dt);
+
+void make_rhoX0(const amrex::Real* s0, amrex::Real* rhoX0);
+
+void check_hseness(const amrex::Real* rho0, const amrex::Real* p0,
+                   amrex::Real* max_hse_error);
+
 #ifdef __cplusplus
 }
 #endif

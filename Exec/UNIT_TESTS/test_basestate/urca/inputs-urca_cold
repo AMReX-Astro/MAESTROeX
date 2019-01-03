@@ -1,5 +1,5 @@
 # INITIAL MODEL
-maestro.model_file = "WD_urca_nuc_M-0.5_cold_002.hse.5120"
+maestro.model_file = "urca/WD_urca_nuc_M-0.5_cold_002.hse.5120"
 maestro.stop_time = 2.e0
 maestro.max_step = 1000000
 

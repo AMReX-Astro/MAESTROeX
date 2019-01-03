@@ -1,11 +1,11 @@
 # INITIAL MODEL
-maestro.model_file = "model.planar.768"
-maestro.stop_time = 5.0e0
-maestro.max_step = 1000000
+maestro.model_file = "planar/model.planar.768"
+maestro.stop_time = 5.0
+maestro.max_step = 10000
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
-amr.n_cell             = 768
+amr.n_cell             = 128
 amr.max_grid_size      = 64
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 maestro.spherical = 0
@@ -33,9 +33,6 @@ maestro.v              = 1       # verbosity
 # HYDRODYNAMICS
 maestro.anelastic_cutoff = 1.e5
 maestro.base_cutoff_density = 1.e5
-
-# EOS
-#maestro.small_temp = 5.e5
 
 &probin
 

@@ -1,5 +1,5 @@
 # INITIAL MODEL
-maestro.model_file = "kepler_new_6.25e8.hybrid.hse.1280"
+maestro.model_file = "wdconvect_paper/kepler_new_6.25e8.hybrid.hse.1280"
 maestro.stop_time = 10.e0
 maestro.max_step = 1000000
 

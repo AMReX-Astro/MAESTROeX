@@ -1,5 +1,5 @@
 DEBUG      = FALSE
-DIM        = 1
+DIM        = 2
 COMP	   = gnu
 USE_MPI    = FALSE
 USE_OMP    = TRUE
@@ -22,8 +22,6 @@ GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/$(NETWORK_DIR)/$(N
 
 Bpack   := ./Make.package
 Blocs   := .
-
-PROBIN_PARAMETER_DIRS := .
 
 # include the MAESTRO build stuff
 include $(MAESTROEX_HOME)/Exec/Make.Maestro

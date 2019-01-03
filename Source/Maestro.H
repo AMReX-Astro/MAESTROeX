@@ -870,6 +870,8 @@ private:
     amrex::Vector<amrex::Real> rho0_new;
     amrex::Vector<amrex::Real> rhoh0_old;
     amrex::Vector<amrex::Real> rhoh0_new;
+    amrex::Vector<amrex::Real> rhoX0_old;
+    amrex::Vector<amrex::Real> rhoX0_new;
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
     amrex::Vector<amrex::Real> tempbar;
