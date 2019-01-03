@@ -211,13 +211,33 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
                         ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                         ZFILL(dx), &time,
 			tag_err[lev].dataPtr(), &lev, tag_array.dataPtr());
+        }
 
-	    // for planar refinement, we need to gather tagged entries in arrays
-	    // from all processors and then re-tag tileboxes across each tagged
-	    // height
+        // for planar refinement, we need to gather tagged entries in arrays
+        // from all processors and then re-tag tileboxes across each tagged
+        // height
+        if (spherical == 0) {
+            ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
+        }
+        
+        for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
+        {
+            const Box& tilebox  = mfi.tilebox();
+
+            TagBox&     tagfab  = tags[mfi];
+
+            // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
+            // So we are going to get a temporary integer array.
+            // set itags initially to 'untagged' everywhere
+            // we define itags over the tilebox region
+            tagfab.get_itags(itags, tilebox);
+
+            // data pointer and index space
+            int*        tptr    = itags.dataPtr();
+            const int*  tlo     = tilebox.loVect();
+            const int*  thi     = tilebox.hiVect();
+            
 	    if (spherical == 0) {
-		ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
-
 		tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
 			  &tagval, &clearval,
 			  ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
