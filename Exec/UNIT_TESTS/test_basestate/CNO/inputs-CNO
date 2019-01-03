@@ -1,0 +1,45 @@
+# INITIAL MODEL
+maestro.model_file = "s15-hburn.hse.2218"
+maestro.stop_time = 2.e20
+maestro.max_step = 10000
+
+# GRIDDING AND REFINEMENT
+amr.max_level          = 0       # maximum level number allowed
+amr.n_cell             = 128
+amr.max_grid_size      = 64
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+maestro.spherical = 1
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0
+geometry.prob_hi     =  2.e11
+maestro.evolve_base_state = false
+maestro.do_initial_projection = false
+maestro.init_divu_iter        = 0
+maestro.init_iter             = 0
+maestro.cfl = 0.7e0
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 2 2
+maestro.hi_bc = 2 2
+geometry.is_periodic =  0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+
+# HYDRODYNAMICS
+maestro.anelastic_cutoff = 1.e-4
+maestro.base_cutoff_density = 1.e-4
+
+# EOS
+maestro.small_temp = 5.e5
+
+&probin
+
+ prob_type    = 2
+ initial_dt = 6.7e-1
+ use_eos_coulomb = T
+/

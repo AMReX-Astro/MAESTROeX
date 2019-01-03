@@ -1,0 +1,9 @@
+Here are the NETWORK_FILE compilation options for running these tests:
+
+For inputs-urca_hot and inputs-urca_cold:
+
+`make -j NDEBUG=t NETWORK_FILE=ignition_wdconvect_urca.net` 
+
+For inputs-uref:
+
+`make -j NDEBUG=t NETWORK_FILE=ignition_wdconvect.net`
