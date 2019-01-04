@@ -24,7 +24,7 @@ Maestro::Evolve ()
     {
 
         // check to see if we need to regrid, then regrid
-        if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0 && istep != 0) {
+        if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0 && istep != 1) {
             Regrid();
         }
 
