@@ -60,7 +60,7 @@ Maestro::Regrid ()
 
     // regrid could add newly refine levels (if finest_level < max_level)
     // so we save the previous finest level index
-    regrid(0, t_new);
+    regrid(0, t_old);
     
     // Redefine numdisjointchunks, r_start_coord, r_end_coord
     TagArray();
@@ -278,15 +278,18 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     MultiFab gpi_state     (ba, dm, AMREX_SPACEDIM, ng_g);
     MultiFab dSdt_state    (ba, dm,              1, ng_d);
 
-    FillPatch(lev, time, sold_state, sold, snew, 0, 0, Nscal, 0, bcs_s);
+    // FIXME - pi (nodal), rhcc_for_nodalproj
+    // FIXME - spherical normal and cell_cc_to_r, build here and recompute
+
+    FillPatch(lev, time, sold_state, sold, sold, 0, 0, Nscal, 0, bcs_s);
     std::swap(snew_state, snew[lev]);
     std::swap(sold_state, sold[lev]);
 
-    FillPatch(lev, time, uold_state, uold, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    FillPatch(lev, time, uold_state, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
     std::swap(unew_state, unew[lev]);
     std::swap(uold_state, uold[lev]);
 
-    FillPatch(lev, time, S_cc_old_state, S_cc_old, S_cc_new, 0, 0, 1, 0, bcs_f);
+    FillPatch(lev, time, S_cc_old_state, S_cc_old, S_cc_old, 0, 0, 1, 0, bcs_f);
     std::swap(S_cc_new_state, S_cc_new[lev]);
     std::swap(S_cc_old_state, S_cc_old[lev]);
 
@@ -295,9 +298,6 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 
     FillPatch(lev, time, dSdt_state, dSdt, dSdt, 0, 0, 1, 0, bcs_f);
     std::swap(dSdt_state, dSdt[lev]);
-
-    t_new = time;
-    t_old = time - 1.e200;
 
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
@@ -324,17 +324,17 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     gpi[lev].define     (ba, dm, AMREX_SPACEDIM, 0);
     dSdt[lev].define    (ba, dm,              1, 0);
 
-    t_new = time;
-    t_old = time - 1.e200;
-
+    // FIXME - pi (nodal), rhcc_for_nodalproj
+    // FIXME - spherical normal and cell_cc_to_r, build here and recompute
+    
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
-    FillCoarsePatch(lev, time,     snew[lev],     sold,     snew, 0, 0,          Nscal, bcs_s);
-    FillCoarsePatch(lev, time,     unew[lev],     uold,     unew, 0, 0, AMREX_SPACEDIM, bcs_u);
-    FillCoarsePatch(lev, time, S_cc_new[lev], S_cc_old, S_cc_new, 0, 0,              1, bcs_f);
+    FillCoarsePatch(lev, time,     sold[lev],     sold,     snew, 0, 0,          Nscal, bcs_s);
+    FillCoarsePatch(lev, time,     uold[lev],     uold,     unew, 0, 0, AMREX_SPACEDIM, bcs_u);
+    FillCoarsePatch(lev, time, S_cc_old[lev], S_cc_old, S_cc_new, 0, 0,              1, bcs_f);
     FillCoarsePatch(lev, time,      gpi[lev],      gpi,      gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
     FillCoarsePatch(lev, time,     dSdt[lev],     dSdt,     dSdt, 0, 0,              1, bcs_f);
 }
