@@ -282,8 +282,6 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     MultiFab dSdt_state              (ba, dm,              1, ng_d);
     MultiFab rhcc_for_nodalproj_state(ba, dm,              1, ng_r);
     MultiFab pi_state                (convert(ba,nodal_flag), dm, 1, ng_p);
-    MultiFab normal_state;
-    MultiFab cell_cc_to_r_state;
 
     FillPatch(lev, time, sold_state, sold, sold, 0, 0, Nscal, 0, bcs_s);
     std::swap(sold_state, sold[lev]);
@@ -309,9 +307,9 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     if (spherical == 1) {
         const int ng_n = normal[lev].nGrow();
         const int ng_c = cell_cc_to_r[lev].nGrow();
-        normal_state.define      (ba, dm, 3, ng_n);
-        cell_cc_to_r_state.define(ba, dm, 1, ng_c);
-        std::swap(normal_state,normal[lev]);
+        MultiFab normal_state(ba, dm, 3, ng_n);
+        MultiFab cell_cc_to_r_state(ba, dm, 1, ng_c);
+        std::swap(      normal_state,      normal[lev]);
         std::swap(cell_cc_to_r_state,cell_cc_to_r[lev]);
     }
     
