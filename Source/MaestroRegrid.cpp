@@ -68,6 +68,7 @@ Maestro::Regrid ()
 	
     if (spherical == 1) {
         MakeNormal();
+        Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical");
     }
     
     if (evolve_base_state) {
@@ -268,30 +269,33 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     const int ng_S = S_cc_new[lev].nGrow();
     const int ng_g = gpi[lev].nGrow();
     const int ng_d = dSdt[lev].nGrow();
+    const int ng_r = rhcc_for_nodalproj[lev].nGrow();
+    const int ng_p = pi[lev].nGrow();
 
-    MultiFab snew_state    (ba, dm,          Nscal, ng_s);
-    MultiFab sold_state    (ba, dm,          Nscal, ng_s);
-    MultiFab unew_state    (ba, dm, AMREX_SPACEDIM, ng_u);
-    MultiFab uold_state    (ba, dm, AMREX_SPACEDIM, ng_u);
-    MultiFab S_cc_new_state(ba, dm,              1, ng_S);
-    MultiFab S_cc_old_state(ba, dm,              1, ng_S);
-    MultiFab gpi_state     (ba, dm, AMREX_SPACEDIM, ng_g);
-    MultiFab dSdt_state    (ba, dm,              1, ng_d);
-
-    // FIXME - pi (nodal), rhcc_for_nodalproj
-    // FIXME - spherical normal and cell_cc_to_r, build here and recompute
+    MultiFab snew_state              (ba, dm,          Nscal, ng_s);
+    MultiFab sold_state              (ba, dm,          Nscal, ng_s);
+    MultiFab unew_state              (ba, dm, AMREX_SPACEDIM, ng_u);
+    MultiFab uold_state              (ba, dm, AMREX_SPACEDIM, ng_u);
+    MultiFab S_cc_new_state          (ba, dm,              1, ng_S);
+    MultiFab S_cc_old_state          (ba, dm,              1, ng_S);
+    MultiFab gpi_state               (ba, dm, AMREX_SPACEDIM, ng_g);
+    MultiFab dSdt_state              (ba, dm,              1, ng_d);
+    MultiFab rhcc_for_nodalproj_state(ba, dm,              1, ng_r);
+    MultiFab pi_state                (convert(ba,nodal_flag), dm, 1, ng_p);
+    MultiFab normal_state;
+    MultiFab cell_cc_to_r_state;
 
     FillPatch(lev, time, sold_state, sold, sold, 0, 0, Nscal, 0, bcs_s);
-    std::swap(snew_state, snew[lev]);
     std::swap(sold_state, sold[lev]);
+    std::swap(snew_state, snew[lev]);
 
     FillPatch(lev, time, uold_state, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
-    std::swap(unew_state, unew[lev]);
     std::swap(uold_state, uold[lev]);
+    std::swap(unew_state, unew[lev]);
 
     FillPatch(lev, time, S_cc_old_state, S_cc_old, S_cc_old, 0, 0, 1, 0, bcs_f);
-    std::swap(S_cc_new_state, S_cc_new[lev]);
     std::swap(S_cc_old_state, S_cc_old[lev]);
+    std::swap(S_cc_new_state, S_cc_new[lev]);
 
     FillPatch(lev, time, gpi_state, gpi, gpi, 0, 0, AMREX_SPACEDIM, 0, bcs_f);
     std::swap(gpi_state, gpi[lev]);
@@ -299,6 +303,18 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     FillPatch(lev, time, dSdt_state, dSdt, dSdt, 0, 0, 1, 0, bcs_f);
     std::swap(dSdt_state, dSdt[lev]);
 
+    std::swap(rhcc_for_nodalproj_state,rhcc_for_nodalproj[lev]);
+    std::swap(pi_state,pi[lev]);
+
+    if (spherical == 1) {
+        const int ng_n = normal[lev].nGrow();
+        const int ng_c = cell_cc_to_r[lev].nGrow();
+        normal_state.define      (ba, dm, 3, ng_n);
+        cell_cc_to_r_state.define(ba, dm, 1, ng_c);
+        std::swap(normal_state,normal[lev]);
+        std::swap(cell_cc_to_r_state,cell_cc_to_r[lev]);
+    }
+    
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
@@ -315,26 +331,31 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNewLevelFromCoarse()",MakeNewLevelFromCoarse);
 
-    snew[lev].define    (ba, dm,          Nscal, 0);
-    sold[lev].define    (ba, dm,          Nscal, 0);
-    unew[lev].define    (ba, dm, AMREX_SPACEDIM, 0);
-    uold[lev].define    (ba, dm, AMREX_SPACEDIM, 0);
-    S_cc_new[lev].define(ba, dm,              1, 0);
-    S_cc_old[lev].define(ba, dm,              1, 0);
-    gpi[lev].define     (ba, dm, AMREX_SPACEDIM, 0);
-    dSdt[lev].define    (ba, dm,              1, 0);
+    sold[lev].define              (ba, dm,          Nscal, 0);
+    snew[lev].define              (ba, dm,          Nscal, 0);
+    uold[lev].define              (ba, dm, AMREX_SPACEDIM, 0);
+    unew[lev].define              (ba, dm, AMREX_SPACEDIM, 0);
+    S_cc_old[lev].define          (ba, dm,              1, 0);
+    S_cc_new[lev].define          (ba, dm,              1, 0);
+    gpi[lev].define               (ba, dm, AMREX_SPACEDIM, 0);
+    dSdt[lev].define              (ba, dm,              1, 0);
+    rhcc_for_nodalproj[lev].define(ba, dm,              1, 1);
 
-    // FIXME - pi (nodal), rhcc_for_nodalproj
-    // FIXME - spherical normal and cell_cc_to_r, build here and recompute
+    pi[lev].define(convert(ba,nodal_flag), dm, 1, 0);     // nodal
+
+    if (spherical == 1) {
+        normal      [lev].define(ba, dm, 3, 1);
+        cell_cc_to_r[lev].define(ba, dm, 1, 0);
+    }
     
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
         flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
-    FillCoarsePatch(lev, time,     sold[lev],     sold,     snew, 0, 0,          Nscal, bcs_s);
-    FillCoarsePatch(lev, time,     uold[lev],     uold,     unew, 0, 0, AMREX_SPACEDIM, bcs_u);
-    FillCoarsePatch(lev, time, S_cc_old[lev], S_cc_old, S_cc_new, 0, 0,              1, bcs_f);
+    FillCoarsePatch(lev, time,     sold[lev],     sold,     sold, 0, 0,          Nscal, bcs_s);
+    FillCoarsePatch(lev, time,     uold[lev],     uold,     uold, 0, 0, AMREX_SPACEDIM, bcs_u);
+    FillCoarsePatch(lev, time, S_cc_old[lev], S_cc_old, S_cc_old, 0, 0,              1, bcs_f);
     FillCoarsePatch(lev, time,      gpi[lev],      gpi,      gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
     FillCoarsePatch(lev, time,     dSdt[lev],     dSdt,     dSdt, 0, 0,              1, bcs_f);
 }
@@ -350,16 +371,18 @@ Maestro::ClearLevel (int lev)
 
     sold[lev].clear();
     snew[lev].clear();
-
     uold[lev].clear();
     unew[lev].clear();
-
     S_cc_old[lev].clear();
     S_cc_new[lev].clear();
-
     gpi[lev].clear();
-
     dSdt[lev].clear();
+    rhcc_for_nodalproj[lev].clear();
+    pi[lev].clear();
+    if (spherical == 1) {
+        normal[lev].clear();
+        cell_cc_to_r[lev].clear();
+    }
 
     flux_reg_s[lev].reset(nullptr);
     flux_reg_u[lev].reset(nullptr);
