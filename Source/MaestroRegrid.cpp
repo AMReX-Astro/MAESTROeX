@@ -69,7 +69,7 @@ Maestro::Regrid ()
     if (spherical == 1) {
         MakeNormal();
     }
-
+    
     if (evolve_base_state) {
         // force rho0 to be the average of rho
         Average(sold,rho0_old,Rho);
@@ -278,15 +278,15 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     MultiFab gpi_state     (ba, dm, AMREX_SPACEDIM, ng_g);
     MultiFab dSdt_state    (ba, dm,              1, ng_d);
 
-    FillPatch(lev, time, snew_state, sold, snew, 0, 0, Nscal, 0, bcs_s);
+    FillPatch(lev, time, sold_state, sold, snew, 0, 0, Nscal, 0, bcs_s);
     std::swap(snew_state, snew[lev]);
     std::swap(sold_state, sold[lev]);
 
-    FillPatch(lev, time, unew_state, uold, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    FillPatch(lev, time, uold_state, uold, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
     std::swap(unew_state, unew[lev]);
     std::swap(uold_state, uold[lev]);
 
-    FillPatch(lev, time, S_cc_new_state, S_cc_old, S_cc_new, 0, 0, 1, 0, bcs_f);
+    FillPatch(lev, time, S_cc_old_state, S_cc_old, S_cc_new, 0, 0, 1, 0, bcs_f);
     std::swap(S_cc_new_state, S_cc_new[lev]);
     std::swap(S_cc_old_state, S_cc_old[lev]);
 
