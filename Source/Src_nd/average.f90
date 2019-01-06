@@ -1,7 +1,7 @@
 module average_module
 
   use base_state_geometry_module, only: max_radial_level, finest_radial_level, nr_fine, &
-       restrict_base, fill_ghost_base, center, nr_irreg, dr
+       restrict_base, fill_ghost_base, center, nr_irreg, dr, base_cutoff_density_coord
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, prob_lo, drdxfac
 
@@ -95,11 +95,11 @@ contains
 
     do n=0,max_radial_level
        do r=0,nr_fine-1
-          ! divide only if ncell>0,
-          ! else keep value constant b/c it is outside the cutoff coords
+          ! divide only if ncell>0
           if (ncell(n,r) > 0) then
              phisum(n,r) = phisum(n,r) / ncell(n,r)
           else
+             ! keep value constant if it is outside the cutoff coords
              phisum(n,r) = phisum(n,r-1)
           end if
        end do

@@ -1,9 +1,0 @@
-This directory will hold instructions on what is needed in order to 
-call MESA modules from an outside program.
-
-The instructions will deal primarily with the eos and net modules.
-
-The main TeX file depends on a few other Tex files which should be 
-located in the same directory. They include:
-	-hopper_compile.tex
-

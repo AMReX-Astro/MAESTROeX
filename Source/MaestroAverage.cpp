@@ -33,7 +33,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         for (int lev=0; lev<=finest_level; ++lev) {
 
             // Get the index space of the domain
-            const Box domainBox = geom[0].Domain();
+            const Box domainBox = geom[lev].Domain();
 
             // compute number of cells at any given height for each level
             if (AMREX_SPACEDIM==1) {

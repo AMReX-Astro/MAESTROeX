@@ -5,7 +5,6 @@
 
 int         Maestro::do_reflux = 1;
 int         Maestro::maestro_verbose = 1;
-std::string Maestro::probin_file = "";
 std::string Maestro::model_file = "";
 bool        Maestro::perturb_model = false;
 bool        Maestro::print_init_hse_diag = false;
@@ -79,6 +78,7 @@ amrex::Real Maestro::planar_invsq_mass = 0.0;
 bool        Maestro::evolve_base_state = true;
 bool        Maestro::use_exact_base_state = false;
 bool        Maestro::fix_base_state = false;
+bool        Maestro::average_base_state = false;
 bool        Maestro::do_smallscale = false;
 bool        Maestro::do_eos_h_above_cutoff = true;
 int         Maestro::enthalpy_pred_type = 1;

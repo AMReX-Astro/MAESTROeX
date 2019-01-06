@@ -24,7 +24,7 @@ Maestro::Evolve ()
     {
 
         // check to see if we need to regrid, then regrid
-        if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0) {
+        if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0 && istep != 1) {
             Regrid();
         }
 
@@ -76,6 +76,8 @@ Maestro::Evolve ()
         // advance the solution by dt
         if (use_exact_base_state) {
             AdvanceTimeStepIrreg(false);
+	} else if (average_base_state) {
+	    AdvanceTimeStepAverage(false);
         } else {
             AdvanceTimeStep(false);
         }
@@ -91,7 +93,7 @@ Maestro::Evolve ()
                               (istep == max_step) ) || (t_old >= stop_time) )
         {
             Print() << "\nWriting plotfile " << istep << std::endl;
-            WritePlotFile(istep,t_new,rho0_new,rhoh0_new,p0_new,unew,snew);
+            WritePlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,gamma1bar_new,unew,snew,S_cc_new);
         }
 
         if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )

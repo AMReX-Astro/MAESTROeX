@@ -1,0 +1,6 @@
+velpert_amplitude                   real               0.d0                
+velpert_radius                      real               0.75d8              
+velpert_scale                       real               0.8d8               
+velpert_steep                       real               1.d0
+velpert_min                         real               0.1d0
+

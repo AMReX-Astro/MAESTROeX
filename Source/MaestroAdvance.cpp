@@ -127,6 +127,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1,    0);
         rho_Hext    [lev].define(grids[lev], dmap[lev],       1,    0);
         s1          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
+        s1[lev].setVal(0.);
         s2          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
         s2star      [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
         delta_gamma1_term[lev].define(grids[lev], dmap[lev],  1,    0);
@@ -140,7 +141,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         hcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
         Xkcoeff2    [lev].define(grids[lev], dmap[lev], NumSpec,    1);
         pcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
-        scal_force  [lev].define(grids[lev], dmap[lev],   Nscal,    1);
+	if (ppm_trace_forces == 0) {
+	    scal_force  [lev].define(grids[lev], dmap[lev],   Nscal,    1);
+	} else {
+	    // we need more ghostcells if we are tracing the forces
+	    scal_force  [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
+	}
         delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
         sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
 
@@ -955,64 +961,5 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (maestro_verbose > 0) {
         Print() << "Time to advance time step: " << end_total << '\n';
     }
-
-#if 0
-// old code from a tutorial on advection with AMR
-    for (int lev=0; lev<=finest_level; ++lev)
-    {
-
-        MultiFab& S_new = snew[lev];
-
-        MultiFab fluxes[AMREX_SPACEDIM];
-        if (do_reflux)
-        {
-            for (int i = 0; i < AMREX_SPACEDIM; ++i)
-            {
-                BoxArray ba = grids[lev];
-                ba.surroundingNodes(i);
-                fluxes[i].define(ba, dmap[lev], S_new.nComp(), 0);
-            }
-        }
-
-        // advection
-
-        // increment or decrement the flux registers by area and time-weighted fluxes
-        // Note that the fluxes have already been scaled by dt and area
-        // In this example we are solving s_t = -div(+F)
-        // The fluxes contain, e.g., F_{i+1/2,j} = (s*u)_{i+1/2,j}
-        // Keep this in mind when considering the different sign convention for updating
-        // the flux registers from the coarse or fine grid perspective
-        // NOTE: the flux register associated with flux_reg_s[lev] is associated
-        // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-        if (do_reflux) {
-            if (lev < finest_level)
-            {
-                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                    // update the lev+1/lev flux register (index lev+1)
-                    flux_reg_s[lev+1]->CrseInit(fluxes[i],i,0,0,fluxes[i].nComp(), -1.0);
-                }
-            }
-            if (lev > 0)
-            {
-                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                    // update the lev/lev-1 flux register (index lev)
-                    flux_reg_s[lev]->FineAdd(fluxes[i],i,0,0,fluxes[i].nComp(), 1.0);
-                }
-            }
-        }
-
-
-    }     // end loop over levels
-
-    // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
-    for (int lev=finest_level-1; lev>=0; --lev) {
-        if (do_reflux) {
-            // update lev based on coarse-fine flux mismatch
-            flux_reg_s[lev+1]->Reflux(snew[lev], 1.0, 0, 0, snew[lev].nComp(), geom[lev]);
-        }
-    }
-    // average fine data onto coarser cells
-    AverageDown(snew,0,Nscal);
-#endif
 
 }

@@ -44,6 +44,7 @@ module runtime_init_module
   use amrex_fort_module, only : rt => amrex_real
   use probin_module
   use extern_probin_module
+  use amrex_parmparse_module
 
   implicit none
 
@@ -57,53 +58,27 @@ module runtime_init_module
 
 contains
 
-subroutine runtime_init(name,namlen)
+subroutine runtime_init()
 
   implicit none
 
-  integer :: namlen
-  integer :: name(namlen)
-
-  integer :: un, i, status
-
-  integer, parameter :: maxlen = 256
-  character (len=maxlen) :: probin_f
+  integer :: status
 
   @@defaults@@
 
 
-  ! create the filename
-  if (namlen > maxlen) then
-     print *, 'probin file name too long'
-     stop
-  endif
-
-  do i = 1, namlen
-     probin_f(i:i) = char(name(i))
-  end do
-
-
   ! read in the namelist
-  open (newunit=un, file=probin_f(1:namlen), status = 'old', action = 'read')
-  read (unit=un, nml=probin, iostat=status)
+  read (amrex_namelist, nml=probin, iostat=status)
 
-  if (status < 0) then
-     ! the namelist does not exist, so we just go with the defaults
-     continue
-
-  else if (status > 0) then
+  if (status .ne. 0) then
      ! some problem in the namelist
-     print *, 'ERROR: problem in the extern namelist'
+     print *, 'ERROR: problem in the namelist'
      stop
   endif
-
-  close (unit=un)
 
   @@acc@@
 
 end subroutine runtime_init
-
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -116,7 +91,8 @@ end subroutine runtime_init
   end subroutine runtime_close
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  subroutine runtime_pretty_print(unit) bind(C, name="runtime_pretty_print")
+
+subroutine runtime_pretty_print(unit) bind(C, name="runtime_pretty_print")
 
     use amrex_constants_module
     use probin_module

@@ -24,8 +24,12 @@ Maestro::Init ()
         InitData();
 
         if (plot_int > 0) {
+
+	    // Need to fill normal vector to compute velrc in plotfile 
+	    if (spherical) { MakeNormal(); }
+	    
             Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
-            WritePlotFile(9999999,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
+            WritePlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
         }
     }
     else {
@@ -53,14 +57,15 @@ Maestro::Init ()
                 cell_cc_to_r[lev].define(grids[lev], dmap[lev], 1, 0);
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);             // nodal
+	    
         }
-
-        // set finest_radial_level in fortran
-        // compute numdisjointchunks, r_start_coord, r_end_coord
-        init_multilevel(&finest_level);
         compute_cutoff_coords(rho0_old.dataPtr());
     }
 
+    // set finest_radial_level in fortran
+    // compute numdisjointchunks, r_start_coord, r_end_coord
+    init_multilevel(tag_array.dataPtr(),&finest_level);
+	    
     if (spherical == 1) {
         MakeNormal();
         MakeCCtoRadii();
@@ -109,7 +114,7 @@ Maestro::Init ()
 
             if (plot_int > 0) {
                 Print() << "\nWriting plotfile plt_after_InitProj after InitProj" << std::endl;
-                WritePlotFile(9999998,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
+                WritePlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
             }
         }
 
@@ -125,7 +130,7 @@ Maestro::Init ()
 
             if (plot_int > 0) {
                 Print() << "\nWriting plotfile plt_after_DivuIter after final DivuIter" << std::endl;
-                WritePlotFile(9999997,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
+                WritePlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
             }
         }
 
@@ -150,7 +155,7 @@ Maestro::Init ()
 
         if (plot_int > 0) {
             Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
-            WritePlotFile(0,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
+            WritePlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
         }
 
         if (chk_int > 0) {
@@ -179,6 +184,7 @@ Maestro::InitData ()
                               rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
                               tempbar_init.dataPtr(),
                               r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	std::fill(psi.begin(), psi.end(), 0.);
     } else {
         init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
                         rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
@@ -189,9 +195,12 @@ Maestro::InitData ()
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);
 
+    // reset tagging array to include buffer zones
+    TagArray();
+
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(&finest_level);
+    init_multilevel(tag_array.dataPtr(),&finest_level);
 
     // average down data and fill ghost cells
     AverageDown(sold,0,Nscal);
@@ -214,9 +223,11 @@ Maestro::InitData ()
                        r_edge_loc.dataPtr());
     }
     else {
-        if (do_smallscale) {
-            // first compute cutoff coordinates using initial density profile
-            compute_cutoff_coords(rho0_old.dataPtr());
+
+	// first compute cutoff coordinates using initial density profile
+	compute_cutoff_coords(rho0_old.dataPtr());
+
+	if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
             std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
             std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
@@ -409,7 +420,7 @@ void Maestro::InitProj ()
               rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
     // NOTE: not sure if valid for use_exact_base_state
-    if (evolve_base_state) {
+    if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
         // average S into Sbar
         Average(S_cc_old,Sbar,0);
     }
@@ -498,22 +509,28 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
-        Average(S_cc_old,Sbar,0);
+	if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
+	    for(int i=0; i<Sbar.size(); ++i) {
+		Sbar[i] += delta_gamma1_termbar[i];
+	    }
+	} else {
+	    Average(S_cc_old,Sbar,0);
 
-        // compute Sbar = Sbar + delta_gamma1_termbar
-        if (use_delta_gamma1_term) {
-            for(int i=0; i<Sbar.size(); ++i) {
-                Sbar[i] += delta_gamma1_termbar[i];
-            }
-        }
+	    // compute Sbar = Sbar + delta_gamma1_termbar
+	    if (use_delta_gamma1_term) {
+		for(int i=0; i<Sbar.size(); ++i) {
+		    Sbar[i] += delta_gamma1_termbar[i];
+		}
+	    }
 
-        int is_predictor = 1;
-        make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-                rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-                p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-                p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
-                etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-                r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+	    int is_predictor = 1;
+	    make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
+		    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+		    p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
+		    p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
+		    etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+		    r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+	}
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -562,6 +579,8 @@ void Maestro::InitIter ()
     // advance the solution by dt
     if (use_exact_base_state) {
         AdvanceTimeStepIrreg(true);
+    } else if (average_base_state) {
+	AdvanceTimeStepAverage(true);
     } else {
         AdvanceTimeStep(true);
     }

@@ -10,7 +10,7 @@ module velpred_module
   use amrex_constants_module
   use slope_module
   use ppm_module
-  use meth_params_module, only: ppm_type, rel_eps, spherical
+  use meth_params_module, only: ppm_type, rel_eps, spherical, ppm_trace_forces
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
@@ -24,7 +24,7 @@ contains
        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
        umac,   uu_lo, uu_hi, &
-       force,   f_lo,  f_hi, nc_f, &
+       force,   f_lo,  f_hi, nc_f, ng_f, &
        w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_1d")
 
     integer         , intent(in   ) :: lev, domlo(1), domhi(1), lo(1), hi(1)
@@ -34,6 +34,7 @@ contains
     integer, value,   intent(in   ) :: ng_uf
     integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
     integer         , intent(in   ) ::  f_lo(1),  f_hi(1), nc_f
+    integer, value,   intent(in   ) :: ng_f
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),nc_uf)
     double precision, intent(inout) :: umac(uu_lo(1):uu_hi(1))
@@ -81,7 +82,10 @@ contains
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_1d(utilde(:,1),ng_u,ufull(:,1),ng_uf,Ipu,Imu, &
             domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-
+       if (ppm_trace_forces .eq. 1) then
+          call ppm_1d(force(:,1),ng_f,ufull(:,1),ng_uf,Ipf,Imf, &
+               domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+       endif
     end if
 
     !******************************************************************
@@ -98,12 +102,21 @@ contains
                + dt2*force(i  )
        end do
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       do i=is,ie+1
-          ! extrapolate velocity to left face
-          umacl(i) = Ipu(i-1) + dt2*force(i-1)
-          ! extrapolate velocity to right face
-          umacr(i) = Imu(i  ) + dt2*force(i  )
-       end do
+       if (ppm_trace_forces .eq. 0) then
+          do i=is,ie+1
+             ! extrapolate velocity to left face
+             umacl(i) = Ipu(i-1) + dt2*force(i-1)
+             ! extrapolate velocity to right face
+             umacr(i) = Imu(i  ) + dt2*force(i  )
+          end do
+       else
+          do i=is,ie+1
+             ! extrapolate velocity to left face
+             umacl(i) = Ipu(i-1) + dt2*Ipf(i-1)
+             ! extrapolate velocity to right face
+             umacr(i) = Imu(i  ) + dt2*Imf(i  )
+          end do
+       endif
     end if
 
     do i=is,ie+1
@@ -167,7 +180,7 @@ contains
        vtrans, uv_lo, uv_hi, &
        umac  , mu_lo, mu_hi, &
        vmac  , mv_lo, mv_hi, &
-       force,   f_lo,  f_hi, nc_f, &
+       force,   f_lo,  f_hi, nc_f, ng_f, &
        w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_2d")
 
     integer         , intent(in   ) :: lev, domlo(2), domhi(2), lo(2), hi(2)
@@ -180,6 +193,7 @@ contains
     integer         , intent(in   ) :: mu_lo(2), mu_hi(2)
     integer         , intent(in   ) :: mv_lo(2), mv_hi(2)
     integer         , intent(in   ) ::  f_lo(2),  f_hi(2), nc_f
+    integer, value,   intent(in   ) :: ng_f
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2))
@@ -263,6 +277,19 @@ contains
        call ppm_2d(utilde(:,:,2),ng_ut, &
             ufull(:,:,1),ufull(:,:,2),ng_uf, &
             Ipv,Imv,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+
+       ! trace forces, if necessary.  Note by default the ppm routines
+       ! will trace each component to each interface in all coordinate
+       ! directions, but we really only need the force traced along
+       ! its respective dimension.  This should be simplified later.
+       if (ppm_trace_forces .eq. 1) then
+          call ppm_2d(force(:,:,1),ng_f, &
+               ufull(:,:,1),ufull(:,:,2),ng_uf, &
+               Ipfx,Imfx,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+          call ppm_2d(force(:,:,2),ng_f, &
+               ufull(:,:,1),ufull(:,:,2),ng_uf, &
+               Ipfy,Imfy,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+       endif
     end if
 
     !******************************************************************
@@ -437,8 +464,9 @@ contains
 
     do j=js,je
        do i=is,ie+1
-          fl = force(i-1,j,1)
-          fr = force(i,j  ,1)
+          ! use the traced force if ppm_trace_forces = 1
+          fl = merge(force(i-1,j,1), Ipfx(i-1,j,1), ppm_trace_forces == 0)
+          fr = merge(force(i,j  ,1), Imfx(i,  j,1), ppm_trace_forces == 0)
 
           ! extrapolate to edges
           umacl(i,j) = ulx(i,j,1) &
@@ -490,8 +518,9 @@ contains
 
     do j=js,je+1
        do i=is,ie
-          fl = force(i,j-1,2)
-          fr = force(i,j  ,2)
+          ! use the traced force if ppm_trace_forces = 1
+          fl = merge(force(i,j-1,2), Ipfy(i,j-1,2), ppm_trace_forces == 0)
+          fr = merge(force(i,j  ,2), Imfy(i,j  ,2), ppm_trace_forces == 0)
 
           ! extrapolate to edges
           vmacl(i,j) = uly(i,j,2) &
@@ -583,7 +612,7 @@ contains
        w0macx, wx_lo, wx_hi, &
        w0macy, wy_lo, wy_hi, &
        w0macz, wz_lo, wz_hi, &
-       force,   f_lo,  f_hi, nc_f, &
+       force,   f_lo,  f_hi, nc_f, ng_f, &
        w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_3d")
 
     integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
@@ -601,6 +630,7 @@ contains
     integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
     integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
     integer         , intent(in   ) ::  f_lo(3),  f_hi(3), nc_f
+    integer, value,   intent(in   ) :: ng_f
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
@@ -682,12 +712,12 @@ contains
     call bl_allocate(Ipw,lo-1,hi+1,3)
     call bl_allocate(Imw,lo-1,hi+1,3)
 
-    ! call bl_allocate(Ipfx,lo-1,hi+1,3)
-    ! call bl_allocate(Imfx,lo-1,hi+1,3)
-    ! call bl_allocate(Ipfy,lo-1,hi+1,3)
-    ! call bl_allocate(Imfy,lo-1,hi+1,3)
-    ! call bl_allocate(Ipfz,lo-1,hi+1,3)
-    ! call bl_allocate(Imfz,lo-1,hi+1,3)
+    call bl_allocate(Ipfx,lo-1,hi+1,3)
+    call bl_allocate(Imfx,lo-1,hi+1,3)
+    call bl_allocate(Ipfy,lo-1,hi+1,3)
+    call bl_allocate(Imfy,lo-1,hi+1,3)
+    call bl_allocate(Ipfz,lo-1,hi+1,3)
+    call bl_allocate(Imfz,lo-1,hi+1,3)
 
     is = lo(1)
     ie = hi(1)
@@ -720,6 +750,22 @@ contains
        call ppm_3d(utilde(:,:,:,3),ng_ut, &
             ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
             Ipw,Imw,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
+
+       ! trace forces, if necessary.  Note by default the ppm routines
+       ! will trace each component to each interface in all coordinate
+       ! directions, but we really only need the force traced along
+       ! its respective dimension.  This should be simplified later.
+       if (ppm_trace_forces .eq. 1) then
+          call ppm_3d(force(:,:,:,1),ng_f, &
+               ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+               Ipfx,Imfx,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+          call ppm_3d(force(:,:,:,2),ng_f, &
+               ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+               Ipfy,Imfy,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+          call ppm_3d(force(:,:,:,3),ng_f, &
+               ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
+               Ipfz,Imfz,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
+       endif
     end if
 
     !******************************************************************
@@ -1503,8 +1549,9 @@ contains
     do k=ks,ke
        do j=js,je
           do i=is,ie+1
-             fl = force(i-1,j,k,1)
-             fr = force(i,j  ,k,1)
+             ! use the traced force if ppm_trace_forces = 1
+             fl = merge(force(i-1,j,k,1), Ipfx(i-1,j,k,1), ppm_trace_forces == 0)
+             fr = merge(force(i  ,j,k,1), Imfx(i  ,j,k,1), ppm_trace_forces == 0)
 
              ! extrapolate to edges
              umacl(i,j,k) = ulx(i,j,k,1) &
@@ -1603,8 +1650,9 @@ contains
     do k=ks,ke
        do j=js,je+1
           do i=is,ie
-             fl = force(i,j-1,k,2)
-             fr = force(i,j  ,k,2)
+             ! use the traced force if ppm_trace_forces = 1
+             fl = merge(force(i,j-1,k,2), Ipfy(i,j-1,k,2), ppm_trace_forces == 0)
+             fr = merge(force(i,j  ,k,2), Imfy(i,j  ,k,2), ppm_trace_forces == 0)
 
              ! extrapolate to edges
              vmacl(i,j,k) = uly(i,j,k,2) &
@@ -1703,8 +1751,9 @@ contains
     do k=ks,ke+1
        do j=js,je
           do i=is,ie
-             fl = force(i,j,k-1,3)
-             fr = force(i,j,k  ,3)
+             ! use the traced force if ppm_trace_forces = 1
+             fl = merge(force(i,j,k-1,3), Ipfz(i,j,k-1,3), ppm_trace_forces == 0)
+             fr = merge(force(i,j,k  ,3), Imfz(i,j,k  ,3), ppm_trace_forces == 0)
 
              ! extrapolate to edges
              wmacl(i,j,k) = ulz(i,j,k,3) &
@@ -1795,6 +1844,13 @@ contains
 
     call bl_deallocate(wmacl)
     call bl_deallocate(wmacr)
+
+    call bl_deallocate(Ipfx)
+    call bl_deallocate(Imfx)
+    call bl_deallocate(Ipfy)
+    call bl_deallocate(Imfy)
+    call bl_deallocate(Ipfz)
+    call bl_deallocate(Imfz)
 
   end subroutine velpred_3d
 #endif
