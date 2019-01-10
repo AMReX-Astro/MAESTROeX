@@ -166,6 +166,7 @@ module eos_type_module
     real(rt) :: dedA
     real(rt) :: dedZ
 
+    real(rt) :: conductivity
   end type eos_t
 
 contains

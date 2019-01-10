@@ -42,7 +42,6 @@ contains
     ! Local
     integer :: i,j,k,comp
     type (eos_t) :: eos_state
-    double precision :: conductivity
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ! create Tcoeff = -kth,
@@ -55,7 +54,6 @@ contains
 
     k = lo(3)
     j = lo(2)
-    !$OMP PARALLEL DO PRIVATE(i,j,k,comp,eos_state,conductivity)
 #if (AMREX_SPACEDIM == 3)
     do k=lo(3)-1,hi(3)+1
 #endif
@@ -81,17 +79,17 @@ contains
                 eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
                 ! dens, temp, and xmass are inputs
-                call conducteos(eos_input_rt, eos_state, conductivity)
+                call conducteos(eos_input_rt, eos_state)
 
-                Tcoeff(i,j,k) = -conductivity
-                hcoeff(i,j,k) = -conductivity/eos_state%cp
-                pcoeff(i,j,k) = (conductivity/eos_state%cp)* &
+                Tcoeff(i,j,k) = -eos_state % conductivity
+                hcoeff(i,j,k) = -eos_state % conductivity/eos_state%cp
+                pcoeff(i,j,k) = (eos_state % conductivity/eos_state%cp)* &
                      ((1.0d0/eos_state%rho)* &
                      (1.0d0-eos_state%p/(eos_state%rho*eos_state%dpdr))+ &
                      eos_state%dedr/eos_state%dpdr)
 
                 do comp=1,nspec
-                   Xkcoeff(i,j,k,comp) = (conductivity/eos_state%cp)*eos_state%dhdX(comp)
+                   Xkcoeff(i,j,k,comp) = (eos_state % conductivity/eos_state%cp)*eos_state%dhdX(comp)
                 enddo
 
              endif
@@ -103,7 +101,6 @@ contains
 #if (AMREX_SPACEDIM == 3)
     enddo
 #endif
-    !$OMP END PARALLEL DO
 
   end subroutine make_thermal_coeffs
 

@@ -5,8 +5,8 @@ using namespace amrex;
 
 // call FillPatch for all levels
 void
-Maestro::FillPatch (Real time, 
-                    Vector<MultiFab>& mf, 
+Maestro::FillPatch (Real time,
+                    Vector<MultiFab>& mf,
                     Vector<MultiFab>& mf_old,
                     Vector<MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
@@ -16,7 +16,7 @@ Maestro::FillPatch (Real time,
     BL_PROFILE_VAR("Maestro::FillPatch()",FillPatch);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        FillPatch(lev, time, mf[lev], mf_old, mf_new, srccomp, destcomp, ncomp, 
+        FillPatch(lev, time, mf[lev], mf_old, mf_new, srccomp, destcomp, ncomp,
                   startbccomp, bcs_in);
     }
 }
@@ -27,7 +27,7 @@ Maestro::FillPatch (Real time,
 // srccomp of the source component
 // destcomp is the destination component AND the bc component
 void
-Maestro::FillPatch (int lev, Real time, MultiFab& mf, 
+Maestro::FillPatch (int lev, Real time, MultiFab& mf,
                     Vector<MultiFab>& mf_old,
                     Vector<MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
@@ -42,26 +42,26 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         Vector<Real> stime;
         GetData(0, time, smf, stime, mf_old, mf_new);
 
-        PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFunctBase(phifill));
+        PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFuncArray(phifill));
         FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
-                             geom[lev], physbc);
+                             geom[lev], physbc, 0);
     }
     else
     {
         Vector<MultiFab*> cmf, fmf;
         Vector<Real> ctime, ftime;
         GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
-        GetData(lev  , time, fmf, ftime, mf_old, mf_new);
+        GetData(lev, time, fmf, ftime, mf_old, mf_new);
 
-        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
-        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
+        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
+        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
 
         Interpolater* mapper = &cell_cons_interp;
 
         FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
                            srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                           cphysbc, fphysbc, refRatio(lev-1),
-                           mapper, bcs);
+                           cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+                           mapper, bcs, 0);
     }
 }
 
@@ -84,18 +84,18 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
     Vector<MultiFab*> cmf;
     Vector<Real> ctime;
     GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
-    
+
     if (cmf.size() != 1) {
         Abort("FillCoarsePatch: how did this happen?");
     }
 
-    PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFunctBase(phifill));
-    PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFunctBase(phifill));
+    PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
+    PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
 
     Interpolater* mapper = &cell_cons_interp;
     InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                          cphysbc, fphysbc, refRatio(lev-1),
-                          mapper, bcs);
+                          cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+                          mapper, bcs, 0);
 }
 
 // utility to copy in data from mf_old and/or mf_new into mf
@@ -105,7 +105,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
 // routines know to interpolate in time.  However in MAESTRO since we don't
 // subcycle I'm not sure if we need this capability?
 void
-Maestro::GetData (int lev, Real time, 
+Maestro::GetData (int lev, Real time,
                   Vector<MultiFab*>& mf,
                   Vector<Real>& mftime,
                   Vector<MultiFab>& mf_old,
@@ -165,7 +165,7 @@ Maestro::AverageDownFaces (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge
 
         Vector<const MultiFab*> edge_f(AMREX_SPACEDIM);
         Vector<      MultiFab*> edge_c(AMREX_SPACEDIM);
-        
+
         for (int dir=0; dir<AMREX_SPACEDIM; ++dir) {
             edge_f[dir] = &(edge[lev+1][dir]);
             edge_c[dir] = &(edge[lev  ][dir]);
@@ -203,20 +203,23 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         const Box& domainBox = geom[lev].Domain();
 
         // get references to the MultiFabs at level lev
-        MultiFab& sold_mf = sold[lev];  // need a cell-centered MF for the MFIter        
+        MultiFab& sold_mf = sold[lev];         // need a cell-centered MF for the MFIter
         MultiFab& umacx_mf = umac[lev][0];
         MultiFab& umacy_mf = umac[lev][1];
 #if (AMREX_SPACEDIM == 3)
         MultiFab& umacz_mf = umac[lev][2];
 #endif
 
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+        // DO NOT TILE THIS SUBROUTINE
+        // this just filling ghost cells so the fortran logic has to be reworked
+        // to properly capture the corner terms
+        for ( MFIter mfi(sold_mf, false); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid (cell-centered) region
-            const Box& validBox = mfi.validbox();
+            const Box& tilebox = mfi.tilebox();
 
             fill_umac_ghost(ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                            ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                            ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                             BL_TO_FORTRAN_3D(umacx_mf[mfi]),
                             BL_TO_FORTRAN_3D(umacy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
@@ -238,18 +241,18 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
     // in IAMR and original MAESTRO this routine was called "create_umac_grown"
 
     int nGrow = uedge[0][0].nGrow();
-    
+
     for (int lev=0; lev<= finest_level; ++lev) {
 
         // for refined levels we need to "fillpatch" the MAC velocity field
         if (lev > 0) {
 
-            // create a BoxArray whose boxes include only the cell-centered ghost cells 
+            // create a BoxArray whose boxes include only the cell-centered ghost cells
             // associated with the fine grids
             BoxList f_bndry_bl = amrex::GetBndryCells(grids[lev],nGrow);
             BoxArray f_bndry_ba(std::move(f_bndry_bl));
             f_bndry_ba.maxSize(32);
-            
+
             // create a coarsened version of the fine ghost cell BoxArray
             BoxArray c_bndry_ba = f_bndry_ba;
             c_bndry_ba.coarsen(refRatio(lev-1));
@@ -306,7 +309,7 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
 #pragma omp parallel
 #endif
                 for (MFIter mfi(crse_src); mfi.isValid(); ++mfi) {
-                    const int  nComp = 1;
+                    const int nComp = 1;
                     const Box& box   = crse_src[mfi].box();
                     IntVect rr = refRatio(lev-1);
                     const int* rat = rr.getVect();
@@ -333,12 +336,12 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
 #pragma omp parallel
 #endif
                 for (MFIter mfi(fine_src); mfi.isValid(); ++mfi) {
-                    const int  nComp = 1;
+                    const int nComp = 1;
                     const Box& fbox  = fine_src[mfi].box();
                     IntVect rr = refRatio(lev-1);
                     const int* rat = rr.getVect();
                     // Do linear in dir, pc transverse to dir, leave alone the fine values
-                    // lining up with coarse edges--assume these have been set to hold the 
+                    // lining up with coarse edges--assume these have been set to hold the
                     // values you want to interpolate to the rest.
                     EDGE_INTERP(fbox.loVect(), fbox.hiVect(), &nComp, rat, &dir,
                                 BL_TO_FORTRAN_FAB(fine_src[mfi]));
@@ -356,16 +359,16 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                 uedge[lev][dir].copy(uedge_f_save);
             }
 
-        } // end if
+        }         // end if
 
-	// fill periodic ghost cells
-	for (int d=0; d<AMREX_SPACEDIM; ++d) {
-	    uedge[lev][d].FillBoundary(geom[lev].periodicity());
-	}
-	
-	// fill ghost cells behind physical boundaries
-	FillUmacGhost(uedge,lev);
+        // fill periodic ghost cells
+        for (int d=0; d<AMREX_SPACEDIM; ++d) {
+            uedge[lev][d].FillBoundary(geom[lev].periodicity());
+        }
 
-    } // end loop over levels
+        // fill ghost cells behind physical boundaries
+        FillUmacGhost(uedge,lev);
+
+    }     // end loop over levels
 
 }
