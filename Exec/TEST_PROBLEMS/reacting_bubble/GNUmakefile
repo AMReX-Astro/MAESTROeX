@@ -1,9 +1,16 @@
 DEBUG      = FALSE
 DIM        = 3
-COMP	   = gnu
-USE_MPI    = TRUE
+#COMP	   = gnu
+#USE_MPI    = TRUE
 USE_OMP    = FALSE
 USE_REACT  = FALSE
+# for GPU compiling
+COMP     = PGI
+USE_AMREX_CUDA = TRUE
+USE_GPU_PRAGMA = TRUE
+CUDA_ARCH=60
+COMPILE_CUDA_PATH=/usr/local/cuda-9.2
+USE_MPI  = FALSE
 
 TINY_PROFILE = FALSE
 PROFILE      = FALSE # TRUE overrides TINY_PROFILE
