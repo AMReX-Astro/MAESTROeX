@@ -5,15 +5,15 @@ maestro.max_step = 1000000
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
-amr.n_cell             = 512
+amr.n_cell             = 512 512
 amr.max_grid_size      = 64
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 maestro.spherical = 1
 
 # PROBLEM SIZE
-geometry.prob_lo     =  0.e8
-geometry.prob_hi     =  5.e8
-maestro.evolve_base_state = false
+geometry.prob_lo     =  0.0     0.0
+geometry.prob_hi     =  5.e8    5.e8
+maestro.evolve_base_state = true
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0
 maestro.init_iter             = 0
@@ -29,6 +29,8 @@ geometry.is_periodic =  0 0
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
+maestro.plot_int        = -1
+maestro.chk_int         = -1
 
 # HYDRODYNAMICS
 maestro.anelastic_cutoff = 1.e6

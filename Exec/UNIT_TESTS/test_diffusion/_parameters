@@ -1,0 +1,26 @@
+# t0 used in the initialization of Gaussian pulse (c.f. Swesty \& Myra, ApJSS 181, 1-52 (2009))
+t0                                  real               1.d-9
+
+# peak temperature
+peak_h                              real               1.d7
+
+# ambient temp
+ambient_h                           real               1.d6
+
+# ambient density
+ambient_dens                        real               1.d5
+
+# ambient helium mass fraction
+ambient_he4                         real               1.d0
+
+# ambient carbon mass fraction
+ambient_c12                         real               0.d0
+
+# ambient iron mass fraction
+ambient_fe56                        real               0.d0
+
+# multiplier for the explicit timestep value
+dt_mult_factor                      real               1.d0
+
+# output file name for gnuplot file containing the analytic solution
+outputfile                  character          "params.out"
