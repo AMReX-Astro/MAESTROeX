@@ -1,5 +1,5 @@
 # INITIAL MODEL
-maestro.max_step = 60
+maestro.max_step = 1 # 60
 maestro.stop_time = 2.5
 
 # GRIDDING AND REFINEMENT
@@ -14,7 +14,6 @@ geometry.prob_hi     =  2.0e0    2.0e0
 
 maestro.do_sponge = 0
 
-maestro.max_step  = 1000
 maestro.evolve_base_state = false
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0

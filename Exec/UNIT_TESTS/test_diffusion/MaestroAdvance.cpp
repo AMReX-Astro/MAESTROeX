@@ -36,9 +36,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		Xkcoeff2    [lev].define(grids[lev], dmap[lev], NumSpec,    1);
 		pcoeff1     [lev].define(grids[lev], dmap[lev],       1,    1);
 		pcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
-		analytic    [lev].define(grids[lev], dmap[lev],       1,    1);
-		analytic[lev].setVal(0.);
-		error       [lev].define(grids[lev], dmap[lev],       1,    1);
+		analytic    [lev].define(grids[lev], dmap[lev],       1,    0);
+		error       [lev].define(grids[lev], dmap[lev],       1,    0);
 		Tcoeff1[lev].setVal(0.);
 		Tcoeff2[lev].setVal(0.);
 		hcoeff1[lev].setVal(0.);
@@ -47,6 +46,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		Xkcoeff2[lev].setVal(0.);
 		pcoeff1[lev].setVal(0.);
 		pcoeff2[lev].setVal(0.);
+		analytic[lev].setVal(0.);
 		error[lev].setVal(0.);
 	}
 
@@ -84,14 +84,14 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 		}
 	}
 
-	MultiFab::Copy(error[finest_level],snew[finest_level],0,RhoH,1,0);
-	MultiFab::Divide(error[finest_level],snew[finest_level],0,Rho,1,0);
+	MultiFab::Copy(error[finest_level],snew[finest_level],RhoH,0,1,0);
+	MultiFab::Divide(error[finest_level],snew[finest_level],Rho,0,1,0);
 	MultiFab::Subtract(error[finest_level],analytic[finest_level],0,0,1,0);
 
 	Real L1norm = error[finest_level].norm1() / analytic[finest_level].norm1();
 	Real L2norm = error[finest_level].norm2() / analytic[finest_level].norm2();
 
-	Print() << "\nTime = " << t_new << ", L1norm = " << L1norm << ", L2norm = " << L2norm << std::endl;
+	Print() << "\nTime = " << t_new << ", L1norm = " << L1norm << ", L2norm = " << L2norm << '\n' << std::endl;
 
 
 }

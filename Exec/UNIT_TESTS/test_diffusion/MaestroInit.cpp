@@ -136,9 +136,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		         ZFILL(dx));
 	}
 
-    for (int lev=0; lev<=finest_level; ++lev) {
-        for (int n=Rho; n < Nscal; n++)
-            MultiFab::Copy(snew[lev],sold[lev],n,n,1,ng_s);
-    }
+	for (int lev=0; lev<=finest_level; ++lev)
+		MultiFab::Copy(snew[lev],sold[lev],0,0,Nscal,ng_s);
+
 
 }

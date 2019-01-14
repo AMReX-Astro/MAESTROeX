@@ -14,9 +14,9 @@ Maestro::EstDt ()
     if (fixed_dt != -1.0) {
 		// fixed dt
 		dt = fixed_dt;
-		if (maestro_verbose > 0) {
+		if (maestro_verbose > 0)
 			Print() << "Setting fixed dt = " << dt << std::endl;
-		}
+
         return;
 	}
 

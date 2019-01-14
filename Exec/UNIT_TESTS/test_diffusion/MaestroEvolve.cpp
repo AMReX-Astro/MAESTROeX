@@ -43,13 +43,6 @@ Maestro::Evolve ()
 				dt = max_dt;
 			}
 
-			if (fixed_dt != -1.) {
-				dt = fixed_dt;
-				if (maestro_verbose > 0) {
-					Print() << "Setting fixed dt = " << dt;
-				}
-			}
-
 			if (stop_time >= 0. && t_old+dt > stop_time) {
 				dt = std::min(dt,stop_time-t_old);
 				Print() << "Stop time limits dt = " << dt << std::endl;
@@ -64,7 +57,8 @@ Maestro::Evolve ()
 
 		// move new state into old state by swapping pointers
 		for (int lev=0; lev<=finest_level; ++lev)
-			std::swap(    sold[lev],     snew[lev]);
+			// std::swap(    sold[lev],     snew[lev]);
+			MultiFab::Copy(sold[lev],snew[lev],0,0,Nscal,ng_s);
 
 	}
 }
