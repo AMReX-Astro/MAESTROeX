@@ -24,3 +24,5 @@ dt_mult_factor                      real               1.d0
 
 # output file name for gnuplot file containing the analytic solution
 outputfile                  character          "params.out"
+
+diffusion_coefficient               real               1.d0

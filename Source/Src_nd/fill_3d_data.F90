@@ -12,7 +12,7 @@ module fill_3d_data_module
 
   private
 
-  public :: put_1d_array_on_cart_sphr, quad_interp
+  public :: put_1d_array_on_cart_sphr, quad_interp, put_1d_array_on_cart
 
 contains
 

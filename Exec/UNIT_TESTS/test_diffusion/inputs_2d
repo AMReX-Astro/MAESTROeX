@@ -19,7 +19,6 @@ maestro.evolve_base_state = false
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0
 maestro.init_iter             = 0
-maestro.use_thermal_diffusion = false
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
@@ -57,6 +56,10 @@ maestro.mg_bottom_solver = 4
 maestro.hg_bottom_solver = 4
 maestro.max_mg_bottom_nlevels = 4
 
+maestro.small_temp = 1.e-10
+maestro.small_dens = 1.e-10
+maestro.small_dt = 1.e-10
+
 
 &probin
  const_conductivity = 1.d7
@@ -75,7 +78,6 @@ maestro.max_mg_bottom_nlevels = 4
  ambient_he4 = 0.5d0
  ambient_c12 = 0.25d0
  ambient_fe56 = 0.25d0
-
 
 
 /

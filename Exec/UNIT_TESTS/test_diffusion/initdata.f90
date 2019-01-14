@@ -7,11 +7,12 @@ module initdata_module
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, &
        spec_comp, pi_comp, prob_lo
   use probin_module, only: ambient_h, ambient_dens, &
-       ambient_he4, ambient_c12, ambient_fe56, peak_h, t0
+       ambient_he4, ambient_c12, ambient_fe56, peak_h, t0, diffusion_coefficient
   use eos_module
   use eos_type_module
   use extern_probin_module, only: const_conductivity
   use amrex_constants_module
+  use fill_3d_data_module, only: put_1d_array_on_cart
 
   implicit none
 
@@ -19,7 +20,7 @@ module initdata_module
 
 contains
 
-  subroutine initdata(lev, diffusion_coefficient, lo, hi, &
+  subroutine initdata(lev, time, lo, hi, &
        scal, scal_lo, scal_hi, nc_s, &
        vel, vel_lo, vel_hi, nc_v, &
        s0_init, p0_init, dx) bind(C, name="initdata")
@@ -27,20 +28,20 @@ contains
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
     integer         , intent(in   ) :: vel_lo(3), vel_hi(3), nc_v
-    double precision, intent(in   ) :: diffusion_coefficient
+    double precision, intent(in   ) :: time
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
          scal_lo(2):scal_hi(2), &
          scal_lo(3):scal_hi(3), 1:nc_s)
     double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
          vel_lo(2):vel_hi(2), &
          vel_lo(3):vel_hi(3), 1:nc_v)
-    double precision, intent(in   ) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
+    double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(in   ) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
 
     integer          :: i,j,k,r,iter
     integer, parameter :: max_iter = 50
-    double precision, parameter :: tol = 1.e-12
+    double precision, parameter :: tol = 1.d-12
     double precision :: x,y,dist2,dens_zone,temp_zone,del_dens, del_temp
     double precision :: pres_zone, del_pres
     double precision :: h_zone, dhdt
@@ -48,11 +49,16 @@ contains
     double precision :: dens_pert, rhoh_pert, temp_pert
     double precision :: rhoX_pert(nspec)
     type (eos_t) :: eos_state
+    double precision :: s0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nscal)
 
     ! set velocity to zero
     vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v) = ZERO
 
     scal(scal_lo(1):scal_hi(1), scal_lo(2):scal_hi(2), scal_lo(3):scal_hi(3), 1:nc_s) = ZERO
+
+    do i = 1, nscal
+        call put_1d_array_on_cart(lev, lo, hi, s0_cart(:,:,:,i), lo, hi, 1, s0_init(:,:,i), 0, 0)
+    enddo
 
     ! initialize the scalars
     do k=lo(3),hi(3)
@@ -70,14 +76,16 @@ contains
              h_zone = (peak_h - ambient_h) * &
                   exp(-dist2/(4.0d0*diffusion_coefficient*t0)) + ambient_h
 
-             temp_zone = s0_init(0,j,temp_comp)
+             temp_zone = s0_cart(i,j,k,temp_comp)
 
-             eos_state%xn(1:nspec) = s0_init(0,j,spec_comp:spec_comp+nspec-1) / &
-                  s0_init(0,j,rho_comp)
+             eos_state%xn(1:nspec) = s0_cart(i,j,k,spec_comp:spec_comp+nspec-1) / &
+                  s0_cart(i,j,k,rho_comp)
 
-             eos_state%rho = s0_init(0,j,rho_comp)
+             eos_state%rho = s0_cart(i,j,k,rho_comp)
 
              converged = .false.
+
+             eos_state%T = temp_zone
 
              do iter = 1, max_iter
                 eos_state%T = temp_zone

@@ -20,7 +20,7 @@ module base_state_module
        rhoh_comp, spec_comp, temp_comp
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
   use probin_module, only: ambient_h, ambient_dens, &
-       ambient_he4, ambient_c12, ambient_fe56
+       ambient_he4, ambient_c12, ambient_fe56, diffusion_coefficient
   use extern_probin_module, only: const_conductivity
 
   implicit none
@@ -43,10 +43,9 @@ contains
     ! local variables
     integer :: ihe4, ic12, ife56
     integer :: n,r
-    double precision :: diffusion_coefficient
     type (eos_t) :: eos_state
 
-    call network_init()
+    ! call network_init()
 
     ihe4  = network_species_index("helium-4")
     ic12  = network_species_index("carbon-12")
@@ -68,7 +67,6 @@ contains
     call eos(eos_input_rh, eos_state)
 
     diffusion_coefficient = const_conductivity / (eos_state%cp * ambient_dens)
-    tempbar(0:max_radial_level,0:nr_fine-1) = diffusion_coefficient
 
     do n=0,max_radial_level
 
@@ -82,11 +80,16 @@ contains
 
        end do
 
-
-       ! initialize any inlet BC parameters
-       call set_inlet_bcs()
-
     end do ! end loop over levels
+
+    rho0 = s0_init(:,:,rho_comp)
+    rhoh0 = s0_init(:,:,rhoh_comp)
+    tempbar = s0_init(:,:,temp_comp)
+    tempbar_init = s0_init(:,:,temp_comp)
+    p0 = p0_init
+
+    ! initialize any inlet BC parameters
+    call set_inlet_bcs()
 
   end subroutine init_base_state
 
