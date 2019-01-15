@@ -24,36 +24,41 @@ Maestro::Evolve ()
 	auto dbo = do_burning;
 	auto dho = do_heating;
 
+	Vector<Real> dummy;
+
 	// Mode 1: No burning, no heating
 	do_burning = false;
 	do_heating = false;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
-	// write
+	WritePlotFile(-1,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);
 
 	// Mode 2: Burning without heating
 	do_burning = true;
 	do_heating = false;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
-	// write
+	WritePlotFile(-2,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);
 
 	// Mode 3: Heating without burning
 	do_burning = false;
 	do_heating = true;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
-	// write
+	WritePlotFile(-3,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);
 
 	// Mode 4: Burning and heating
 	do_burning = true;
 	do_heating = true;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
-	// write
+	WritePlotFile(-4,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);
 
 	// Explore ten orders of magnitude of the time domain using user inputs.
 	do_burning = dbo;
 	do_heating = dho;
+	int react_its = 0;
+	get_react_its(&react_its);
+	
 	for (auto i=0; i < react_its; ++i) {
 		React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
-		// write
+		WritePlotFile(i,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);
 	}
 
 }

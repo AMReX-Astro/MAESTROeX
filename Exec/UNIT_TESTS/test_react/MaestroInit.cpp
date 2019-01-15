@@ -1,6 +1,7 @@
 
 #include <Maestro.H>
 #include <AMReX_VisMF.H>
+#include <Problem_F.H>
 using namespace amrex;
 
 
@@ -26,7 +27,8 @@ Maestro::Init ()
 	init_multilevel(tag_array.dataPtr(),&finest_level);
 
 	// compute initial time step
-	FirstDt();
+	// FirstDt();
+    get_min_timestep(&dt);
 
 	if (stop_time >= 0. && t_old+dt > stop_time) {
 		dt = std::min(dt,stop_time-t_old);
@@ -128,6 +130,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	MultiFab& scal = sold[lev];
 	MultiFab& vel = uold[lev];
 
+    const Box& domainBox = geom[lev].Domain();
+
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -138,15 +142,10 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		const int* lo  = tilebox.loVect();
 		const int* hi  = tilebox.hiVect();
 
-		initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+		initdata_thermal(ARLIM_3D(lo), ARLIM_3D(hi),
 		         BL_TO_FORTRAN_FAB(scal[mfi]),
-		         BL_TO_FORTRAN_FAB(vel[mfi]),
+		         ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
 		         s0_init.dataPtr(), p0_init.dataPtr(),
 		         ZFILL(dx));
-	}
-
-	if (lev > 0 && do_reflux) {
-		flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
-		flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
 	}
 }
