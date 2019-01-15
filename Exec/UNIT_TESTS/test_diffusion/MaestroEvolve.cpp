@@ -112,31 +112,31 @@ Maestro::Evolve ()
 
 			// now update temperature
 			TfromRhoH(snew,p0_old);
-
-			// calculate analytic solution
-			for (int lev = 0; lev <= finest_level; ++lev) {
-
-				MultiFab& analytic_mf = analytic[lev];
-
-				for ( MFIter mfi(analytic_mf, true); mfi.isValid(); ++mfi ) {
-
-					const Box& tileBox = mfi.tilebox();
-					const Real* dx = geom[lev].CellSize();
-
-					make_analytic_solution(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()), BL_TO_FORTRAN_3D(analytic_mf[mfi]), ZFILL(dx), t_new);
-				}
-			}
-
-			// calculate the error
-			MultiFab::Copy(error[finest_level],snew[finest_level],RhoH,0,1,0);
-			MultiFab::Divide(error[finest_level],snew[finest_level],Rho,0,1,0);
-			MultiFab::Subtract(error[finest_level],analytic[finest_level],0,0,1,0);
-
-			Real L1norm = error[finest_level].norm1() / analytic[finest_level].norm1();
-			Real L2norm = error[finest_level].norm2() / analytic[finest_level].norm2();
-
-			Print() << "\nTime = " << t_new << ", L1norm = " << L1norm << ", L2norm = " << L2norm << '\n' << std::endl;
 		}
+
+		// calculate analytic solution
+		for (int lev = 0; lev <= finest_level; ++lev) {
+
+			MultiFab& analytic_mf = analytic[lev];
+
+			for ( MFIter mfi(analytic_mf, true); mfi.isValid(); ++mfi ) {
+
+				const Box& tileBox = mfi.tilebox();
+				const Real* dx = geom[lev].CellSize();
+
+				make_analytic_solution(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()), BL_TO_FORTRAN_3D(analytic_mf[mfi]), ZFILL(dx), t_new);
+			}
+		}
+
+		// calculate the error
+		MultiFab::Copy(error[finest_level],snew[finest_level],RhoH,0,1,0);
+		MultiFab::Divide(error[finest_level],snew[finest_level],Rho,0,1,0);
+		MultiFab::Subtract(error[finest_level],analytic[finest_level],0,0,1,0);
+
+		Real L1norm = error[finest_level].norm1() / analytic[finest_level].norm1();
+		Real L2norm = error[finest_level].norm2() / analytic[finest_level].norm2();
+
+		Print() << "\nTime = " << t_new << ", L1norm = " << L1norm << ", L2norm = " << L2norm << '\n' << std::endl;
 
 		t_old = t_new;
 

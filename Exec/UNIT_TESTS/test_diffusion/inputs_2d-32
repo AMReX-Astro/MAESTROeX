@@ -1,10 +1,10 @@
 # INITIAL MODEL
-maestro.max_step =  60
-maestro.stop_time = 2.5
+maestro.max_step =  1000
+maestro.stop_time = 0.02
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
-amr.n_cell             = 128 128
+amr.n_cell             = 32 32
 amr.max_grid_size      = 64
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
@@ -28,7 +28,7 @@ maestro.check_base_name = chk
 maestro.chk_int         = -1
 
 # TIME STEPPING
-maestro.fixed_dt = 1.e-3
+maestro.fixed_dt = 2.e-3
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -61,6 +61,7 @@ maestro.small_dt = 1.e-10
 
 
 &probin
+
  const_conductivity = 1.d7
 
  dt_mult_factor = 1.0d0
