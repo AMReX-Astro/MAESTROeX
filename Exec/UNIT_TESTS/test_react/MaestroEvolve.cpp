@@ -26,25 +26,30 @@ Maestro::Evolve ()
 
 	Vector<Real> dummy;
 
-	// Mode 1: No burning, no heating
+	// Model 1: No burning, no heating
+	Print() << "\nModel 1: No burning, no heating\n";
 	do_burning = false;
 	do_heating = false;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
 	WritePlotFile(-1,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);
 
-	// Mode 2: Burning without heating
+	// Model 2: Burning without heating
+	Print() << "\nModel 2: Burning without heating\n";
 	do_burning = true;
 	do_heating = false;
+	for (int lev=0; lev<=finest_level; ++lev) rho_Hext[lev].setVal(0.);
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
 	WritePlotFile(-2,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);
 
-	// Mode 3: Heating without burning
+	// Model 3: Heating without burning
+	Print() << "\nModel 3: Heating without burning\n";
 	do_burning = false;
 	do_heating = true;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
 	WritePlotFile(-3,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);
 
-	// Mode 4: Burning and heating
+	// Model 4: Burning and heating
+	Print() << "\nModel 4: Burning and heating\n";
 	do_burning = true;
 	do_heating = true;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
@@ -55,7 +60,7 @@ Maestro::Evolve ()
 	do_heating = dho;
 	int react_its = 0;
 	get_react_its(&react_its);
-	
+
 	for (auto i=0; i < react_its; ++i) {
 		React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
 		WritePlotFile(i,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,rho_Hnuc,rho_Hext);

@@ -2,13 +2,13 @@
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
-amr.n_cell             = 128 128
+amr.n_cell             = 16 16 16
 amr.max_grid_size      = 64
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
 # PROBLEM SIZE
-geometry.prob_lo     =  0.0    0.0
-geometry.prob_hi     =  2.0e0    2.0e0
+geometry.prob_lo     =  0.0    0.0 0.0
+geometry.prob_hi     =  1.0e0  1.0e0 1.0e0
 
 maestro.do_sponge = 0
 

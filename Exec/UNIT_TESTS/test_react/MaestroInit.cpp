@@ -76,32 +76,13 @@ Maestro::InitData ()
 	std::swap(s0_swap,s0_init);
 	std::swap(p0_swap,p0_init);
 
-	if (do_smallscale) {
-		// set rho0_old = rhoh0_old = 0.
-		std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
-		std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
-	}
-	else {
-		// set rho0 to be the average
-		Average(sold,rho0_old,Rho);
-
-		// call eos with r,p as input to recompute T,h
-		TfromRhoP(sold,p0_old,1);
-
-		// set rhoh0 to be the average
-		Average(sold,rhoh0_old,RhoH);
-	}
-
 	// set tempbar to be the average
 	Average(sold,tempbar,Temp);
-	for (int i=0; i<tempbar.size(); ++i) {
+	for (int i=0; i<tempbar.size(); ++i)
 		tempbar_init[i] = tempbar[i];
-	}
 
-	// set p0^{-1} = p0_old
-	for (int i=0; i<p0_old.size(); ++i) {
-		p0_nm1[i] = p0_old[i];
-	}
+    for (int lev=0; lev<=finest_level; ++lev)
+		MultiFab::Copy(snew[lev],sold[lev],0,0,Nscal,ng_s);
 
 }
 
@@ -119,7 +100,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 	sold              [lev].define(ba, dm,          Nscal, ng_s);
 	snew              [lev].define(ba, dm,          Nscal, ng_s);
-	uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
 
 	sold              [lev].setVal(0.);
 	snew              [lev].setVal(0.);
@@ -128,7 +108,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	const Real* dx_fine = geom[max_level].CellSize();
 
 	MultiFab& scal = sold[lev];
-	MultiFab& vel = uold[lev];
 
     const Box& domainBox = geom[lev].Domain();
 

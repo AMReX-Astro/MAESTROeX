@@ -10,6 +10,7 @@ module initdata_module
   use eos_module
   use eos_type_module
   use amrex_constants_module
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   ! use fill_3d_data_module, only: put_1d_array_on_cart
 
   implicit none
@@ -40,27 +41,31 @@ contains
     double precision, intent(in   ) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
 
-    integer          :: i,j,k
+    integer          :: i,j,k,xn_hi
     double precision :: temp_zone, dens_zone
     double precision :: dlogrho, dlogT
-    double precision :: xn_zone(nspec, 0:(domhi(3)-domlo(3)))
+    double precision, pointer :: xn_zone(:, :)
     type (eos_t) :: eos_state
+
+    xn_hi = domhi(3)-domlo(3)
+
+    call bl_allocate(xn_zone, 1, nspec, 0, xn_hi)
 
     scal(scal_lo(1):scal_hi(1), scal_lo(2):scal_hi(2), scal_lo(3):scal_hi(3), 1:nc_s) = ZERO
 
     dlogrho = (log10(dens_max) - log10(dens_min)) / (domhi(1) - domlo(1))
     dlogT = (log10(temp_max) - log10(temp_min)) / (domhi(2) - domlo(2))
-    call get_xn(xn_zone, domlo(3), domhi(3))
+    call get_xn(xn_zone, 0, xn_hi)
 
     ! initialize the scalars
     do k=lo(3),hi(3)
        do j = lo(2), hi(2)
           ! Set the temperature
-          temp_zone = 10.d0**(log10(temp_min) + dble(j)*dlogT)
+          temp_zone = (10.d0)**(log10(temp_min) + dble(j)*dlogT)
 
           do i = lo(1), hi(1)
              ! Set the density
-             dens_zone = 10.d0**(log10(dens_min) + dble(j)*dlogrho)
+             dens_zone = (10.d0)**(log10(dens_min) + dble(i)*dlogrho)
 
              ! Call the EoS w/ rho, temp, & X as inputs
              eos_state%T = temp_zone
@@ -80,18 +85,19 @@ contains
        enddo
     enddo
 
+    call bl_deallocate(xn_zone)
+
   end subroutine initdata
 
-  subroutine get_xn(xn_zone, lo, hi)
+  subroutine get_xn(xn_zone, x_lo, x_hi)
     !=== Data ===
     !Modules
     use network,       only: nspec, spec_names
     use probin_module, only: xin_file
-    use bl_IO_module, only: unit_new
 
     !Args
-    double precision, intent(  out) :: xn_zone(:,:)
-    integer,         intent(in   ) :: lo, hi
+    integer,         intent(in   ) :: x_lo, x_hi
+    double precision, intent(  out) :: xn_zone(1:nspec,x_lo:x_hi)
 
     !Local data
     integer         :: un
@@ -119,8 +125,9 @@ contains
        ! read in an inputs file containing the mass fractions.
        ! each species is on its own line.
        ! Allow for comment lines with '#' in the first column
-       un = unit_new()
-       open(unit=un, file=xin_file, status='old')
+       ! un = unit_new()
+       un = 1
+       open(unit=un, file=xin_file, status='old', action='read')
 
        summ = ZERO
 
