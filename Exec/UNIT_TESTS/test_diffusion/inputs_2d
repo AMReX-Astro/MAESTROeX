@@ -1,5 +1,5 @@
 # INITIAL MODEL
-maestro.max_step = 1 # 60
+maestro.max_step =  6000000
 maestro.stop_time = 2.5
 
 # GRIDDING AND REFINEMENT

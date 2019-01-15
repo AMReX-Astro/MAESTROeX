@@ -90,6 +90,11 @@ Maestro::InitData ()
 		Average(sold,rhoh0_old,RhoH);
 	}
 
+    p0_new = p0_old;
+
+    for (int lev=0; lev<=finest_level; ++lev)
+		MultiFab::Copy(snew[lev],sold[lev],0,0,Nscal,ng_s);
+
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
