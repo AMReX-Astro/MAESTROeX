@@ -96,7 +96,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
+	for (MFIter mfi(vel, true); mfi.isValid(); ++mfi)
 	{
 		const Box& tilebox = mfi.tilebox();
 		const int* lo  = tilebox.loVect();

@@ -16,6 +16,7 @@ contains
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: vel_lo(3), vel_hi(3), nc_v
     double precision, intent(in   ) :: dx(3)
+    double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v)
 
     integer          :: i,j,k
     double precision :: x, y, z
