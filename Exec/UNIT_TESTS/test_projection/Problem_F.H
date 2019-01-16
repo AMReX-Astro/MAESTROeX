@@ -10,7 +10,15 @@ extern "C" {
 
 void init_vel(const int* lo, const int* hi,
               amrex::Real* vel, const int* v_lo, const int* v_hi,
-              const int* nc_v, const amrex::Real* dx);
+              const amrex::Real* dx);
+
+void init_mac_vel(const int* lo, const int*hi,
+                  amrex::Real* umac, const int* u_lo, const int* u_hi,
+                  amrex::Real* vmac, const int* v_lo, const int* v_hi,
+#if (AMREX_SPACEDIM==3)
+                  amrex::Real* wmac, const int* w_lo, const int* w_hi,
+#endif
+                  const amrex ::Real* dx);
 
 void get_project_type(int* project_type);
 

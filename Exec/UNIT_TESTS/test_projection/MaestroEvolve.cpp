@@ -57,6 +57,34 @@ Maestro::Evolve ()
 		}
 	}
 
+	if (project_type == 2) {
+		// need to initialize the mac velocity
+		for (int lev=0; lev<=finest_level; ++lev) {
+			MultiFab& umac_mf = umac_old[lev][0];
+			MultiFab& vmac_mf = umac_old[lev][1];
+			MultiFab& wmac_mf = umac_old[lev][2];
+			const Real* dx = geom[lev].CellSize();
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi)
+			{
+				const Box& tilebox = mfi.tilebox();
+				const int* lo  = tilebox.loVect();
+				const int* hi  = tilebox.hiVect();
+
+				init_mac_vel(ARLIM_3D(lo), ARLIM_3D(hi),
+				             BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				             BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM==3)
+				             BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+				             ZFILL(dx));
+			}
+		}
+	}
+
 	//--------------------------------------------------------------------------
 	// 'pollute' the velocity field by adding the gradient of a scalar
 	//--------------------------------------------------------------------------

@@ -70,40 +70,46 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeNewLevelFromScratch()",MakeNewLevelFromScratch);
 
-    sold              [lev].define(ba, dm,          Nscal, ng_s);
-    snew              [lev].define(ba, dm,          Nscal, ng_s);
+	sold              [lev].define(ba, dm,          Nscal, ng_s);
+	snew              [lev].define(ba, dm,          Nscal, ng_s);
 	uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
 	unew              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
 	gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    1);
-    rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
+	rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 
-    pi[lev].define(convert(ba,nodal_flag), dm, 1, 1);     // nodal
+	pi[lev].define(convert(ba,nodal_flag), dm, 1, 1); // nodal
 
-    sold              [lev].setVal(0.);
-    snew              [lev].setVal(0.);
+	sold              [lev].setVal(0.);
+	snew              [lev].setVal(0.);
 	uold              [lev].setVal(0.);
 	unew              [lev].setVal(0.);
 	gpi               [lev].setVal(0.);
-    rhcc_for_nodalproj[lev].setVal(0.);
-    pi                [lev].setVal(0.);
+	rhcc_for_nodalproj[lev].setVal(0.);
+	pi                [lev].setVal(0.);
 
 	const Real* dx = geom[lev].CellSize();
 	const Real* dx_fine = geom[max_level].CellSize();
 
-	MultiFab& vel = uold[lev];
+	int project_type;
+	get_project_type(&project_type);
 
-	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+	if (project_type == 1) {
+
+		MultiFab& vel = uold[lev];
+
+		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(vel, true); mfi.isValid(); ++mfi)
-	{
-		const Box& tilebox = mfi.tilebox();
-		const int* lo  = tilebox.loVect();
-		const int* hi  = tilebox.hiVect();
+		for (MFIter mfi(vel, true); mfi.isValid(); ++mfi)
+		{
+			const Box& tilebox = mfi.tilebox();
+			const int* lo  = tilebox.loVect();
+			const int* hi  = tilebox.hiVect();
 
-		init_vel(ARLIM_3D(lo), ARLIM_3D(hi),
-		         BL_TO_FORTRAN_FAB(vel[mfi]),
-		         ZFILL(dx));
+			init_vel(ARLIM_3D(lo), ARLIM_3D(hi),
+			         BL_TO_FORTRAN_3D(vel[mfi]),
+			         ZFILL(dx));
+		}
 	}
 }

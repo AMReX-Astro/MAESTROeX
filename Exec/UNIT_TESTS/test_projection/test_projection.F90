@@ -13,6 +13,130 @@ module test_projection_module
 
 contains
 
+  subroutine init_vel(lo, hi, &
+       vel, vel_lo, vel_hi, dx) bind(C, name="init_vel")
+
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: vel_lo(3), vel_hi(3)
+    double precision, intent(in   ) :: dx(3)
+    double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:amrex_spacedim)
+
+    integer          :: i,j,k
+    double precision :: x, y, z
+
+    ! set velocity to zero
+    vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:amrex_spacedim) = 0.d0
+
+    do k=lo(3),hi(3)
+       z = (dble(k)+0.5d0)*dx(3) + prob_lo(3)
+       do j=lo(2),hi(2)
+          y = (dble(j)+0.5d0)*dx(2) + prob_lo(2)
+          do i=lo(1),hi(1)
+             x = (dble(i)+0.5d0)*dx(1) + prob_lo(1)
+
+#if (AMREX_SPACEDIM==2)
+             vel(i,j,k,1) = -sin(M_PI*x)**2 * sin(TWO*M_PI*y)
+             vel(i,j,k,2) =  sin(M_PI*y)**2 * sin(TWO*M_PI*x)
+#else
+             vel(i,j,k,1) = TWO*M_PI*sin(FOUR*M_PI*x)*cos( TWO*M_PI*y) - &
+                  FOUR*M_PI*sin( TWO*M_PI*x)*cos(FOUR*M_PI*z)
+             vel(i,j,k,2) = TWO*M_PI*sin(FOUR*M_PI*y)*cos( TWO*M_PI*z) - &
+                  FOUR*M_PI*cos(FOUR*M_PI*x)*sin( TWO*M_PI*y)
+             vel(i,j,k,3) = TWO*M_PI*cos( TWO*M_PI*x)*sin(FOUR*M_PI*z) - &
+                  FOUR*M_PI*cos(FOUR*M_PI*y)*sin( TWO*M_PI*z)
+#endif
+
+          end do
+       end do
+    end do
+
+  end subroutine init_vel
+
+  subroutine init_mac_vel(lo, hi, &
+       umac, u_lo, u_hi, &
+       vmac, v_lo, v_hi, &
+#if (AMREX_SPACEDIM==3)
+       wmac, w_lo, w_hi, &
+#endif
+       dx) bind(C, name="init_mac_vel")
+
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer         , intent(in   ) :: u_lo(3), u_hi(3)
+    integer         , intent(in   ) :: v_lo(3), v_hi(3)
+#if (AMREX_SPACEDIM==3)
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
+#endif
+    double precision, intent(in   ) :: dx(3)
+    double precision, intent(inout) :: umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
+    double precision, intent(inout) :: vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
+#if (AMREX_SPACEDIM==3)
+    double precision, intent(inout) :: wmac(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
+#endif
+
+    integer          :: i,j,k
+    double precision :: x, y, z
+
+    ! set velocity to zero
+    umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3)) = 0.d0
+    vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3)) = 0.d0
+#if (AMREX_SPACEDIM==3)
+    wmac(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3)) = 0.d0
+#endif
+
+    ! x-velocity  (x are edges, y and z are centers)
+    do k=lo(3),hi(3)
+       z = (dble(k)+0.5d0)*dx(3) + prob_lo(3)
+       do j=lo(2),hi(2)
+          y = (dble(j)+0.5d0)*dx(2) + prob_lo(2)
+          do i=lo(1),hi(1)+1
+             x = dble(i)*dx(1) + prob_lo(1)
+#if (AMREX_SPACEDIM==2)
+             umac(i,j,k) = -sin(M_PI*x)**2 * sin(TWO*M_PI*y)
+#else
+             umac(i,j,k) = TWO*M_PI*sin(FOUR*M_PI*x)*cos( TWO*M_PI*y) - &
+                  FOUR*M_PI*sin( TWO*M_PI*x)*cos(FOUR*M_PI*z)
+#endif
+          end do
+       end do
+    end do
+
+    ! y-velocity  (x and z are centers, y are edges)
+    do k=lo(3),hi(3)
+       z = (dble(k)+0.5d0)*dx(3) + prob_lo(3)
+       do j=lo(2),hi(2)+1
+          y = dble(j)*dx(2) + prob_lo(2)
+          do i=lo(1),hi(1)
+             x = (dble(i)+0.5d0)*dx(1) + prob_lo(1)
+#if (AMREX_SPACEDIM==2)
+             vmac(i,j,k) = sin(M_PI*y)**2 * sin(TWO*M_PI*x)
+#else
+
+             vmac(i,j,k) = TWO*M_PI*sin(FOUR*M_PI*y)*cos( TWO*M_PI*z) - &
+                  FOUR*M_PI*cos(FOUR*M_PI*x)*sin( TWO*M_PI*y)
+#endif
+          end do
+       end do
+    end do
+
+#if (AMREX_SPACEDIM==3)
+    ! z-velocity  (x and y are centers, z are edges)
+    do k=lo(3),hi(3)+1
+       z = dble(k)*dx(3) + prob_lo(3)
+       do j=lo(2),hi(2)
+          y = (dble(j)+0.5d0)*dx(2) + prob_lo(2)
+          do i=lo(1),hi(1)
+             x = (dble(i)+0.5d0)*dx(1) + prob_lo(1)
+
+             wmac(i,j,k) = TWO*M_PI*cos( TWO*M_PI*x)*sin(FOUR*M_PI*z) - &
+                  FOUR*M_PI*cos(FOUR*M_PI*y)*sin( TWO*M_PI*z)
+
+          end do
+       end do
+    end do
+#endif
+
+  end subroutine init_mac_vel
+
   !===========================================================================
   ! subroutine init_mac_velocity(umac, dx, mla, the_bc_level)
   !
@@ -228,11 +352,15 @@ contains
 
                 gphi(i,j,k,1) =  160.0d0*x*(ONE - x)
                 gphi(i,j,k,2) =  160.0d0*y*(ONE - y)
+#if (AMREX_SPACEDIM==3)
                 gphi(i,j,k,3) =  160.0d0*z*(ONE - z)
+#endif
 
                 U(i,j,k,1) = U(i,j,k,1) + gphi(i,j,k,1)
                 U(i,j,k,2) = U(i,j,k,2) + gphi(i,j,k,2)
+#if (AMREX_SPACEDIM==3)
                 U(i,j,k,3) = U(i,j,k,3) + gphi(i,j,k,3)
+#endif
 
              enddo
           enddo
@@ -277,11 +405,15 @@ contains
 
                 gphi(i,j,k,1) =  (phi(i+1,j,k)-phi(i-1,j,k))/(2.d0*dx(1))
                 gphi(i,j,k,2) =  (phi(i,j+1,k)-phi(i,j-1,k))/(2.d0*dx(2))
+#if (AMREX_SPACEDIM==3)
                 gphi(i,j,k,3) =  (phi(i,j,k+1)-phi(i,j,k-1))/(2.d0*dx(3))
+#endif
 
                 U(i,j,k,1) = U(i,j,k,1) + gphi(i,j,k,1)
                 U(i,j,k,2) = U(i,j,k,2) + gphi(i,j,k,2)
+#if (AMREX_SPACEDIM==3)
                 U(i,j,k,3) = U(i,j,k,3) + gphi(i,j,k,3)
+#endif
 
              enddo
           enddo
