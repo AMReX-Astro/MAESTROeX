@@ -217,66 +217,66 @@ Maestro::Evolve ()
 			}
 		}
 
-		// cannot write out a MAC field -- convert to cell-centered
-		for (int lev=0; lev<=finest_level; ++lev) {
-			MultiFab& umac_mid_mf = umac_mid[lev][0];
-			MultiFab& vmac_mid_mf = umac_mid[lev][1];
-#if (AMREX_SPACEDIM==3)
-			MultiFab& wmac_mid_mf = umac_mid[lev][2];
-#endif
-			MultiFab& utemp_mf = utemp[lev];
-			const Real* dx = geom[lev].CellSize();
-
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-			for (MFIter mfi(umac_mid_mf, true); mfi.isValid(); ++mfi)
-			{
-				const Box& tilebox = mfi.tilebox();
-				const int* lo  = tilebox.loVect();
-				const int* hi  = tilebox.hiVect();
-
-				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-				                  BL_TO_FORTRAN_3D(umac_mid_mf[mfi]),
-				                  BL_TO_FORTRAN_3D(vmac_mid_mf[mfi]),
-#if (AMREX_SPACEDIM==3)
-				                  BL_TO_FORTRAN_3D(wmac_mid_mf[mfi]),
-#endif
-				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
-
-			}
-		}
+// 		// cannot write out a MAC field -- convert to cell-centered
+// 		for (int lev=0; lev<=finest_level; ++lev) {
+// 			MultiFab& umac_mid_mf = umac_mid[lev][0];
+// 			MultiFab& vmac_mid_mf = umac_mid[lev][1];
+// #if (AMREX_SPACEDIM==3)
+// 			MultiFab& wmac_mid_mf = umac_mid[lev][2];
+// #endif
+// 			MultiFab& utemp_mf = utemp[lev];
+// 			const Real* dx = geom[lev].CellSize();
+//
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+// 			for (MFIter mfi(umac_mid_mf, true); mfi.isValid(); ++mfi)
+// 			{
+// 				const Box& tilebox = mfi.tilebox();
+// 				const int* lo  = tilebox.loVect();
+// 				const int* hi  = tilebox.hiVect();
+//
+// 				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+// 				                  BL_TO_FORTRAN_3D(umac_mid_mf[mfi]),
+// 				                  BL_TO_FORTRAN_3D(vmac_mid_mf[mfi]),
+// #if (AMREX_SPACEDIM==3)
+// 				                  BL_TO_FORTRAN_3D(wmac_mid_mf[mfi]),
+// #endif
+// 				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+//
+// 			}
+// 		}
 
 		// write utemp
 
-		for (int lev=0; lev<=finest_level; ++lev) {
-			MultiFab& gphix_mac_mf = gphi_mac[lev][0];
-			MultiFab& gphiy_mac_mf = gphi_mac[lev][1];
-#if (AMREX_SPACEDIM==3)
-			MultiFab& gphiz_mac_mf = gphi_mac[lev][2];
-#endif
-			MultiFab& utemp_mf = utemp[lev];
-			const Real* dx = geom[lev].CellSize();
-
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-			for (MFIter mfi(gphix_mac_mf, true); mfi.isValid(); ++mfi)
-			{
-				const Box& tilebox = mfi.tilebox();
-				const int* lo  = tilebox.loVect();
-				const int* hi  = tilebox.hiVect();
-
-				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-				                  BL_TO_FORTRAN_3D(gphix_mac_mf[mfi]),
-				                  BL_TO_FORTRAN_3D(gphiy_mac_mf[mfi]),
-#if (AMREX_SPACEDIM==3)
-				                  BL_TO_FORTRAN_3D(gphiz_mac_mf[mfi]),
-#endif
-				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
-
-			}
-		}
+// 		for (int lev=0; lev<=finest_level; ++lev) {
+// 			MultiFab& gphix_mac_mf = gphi_mac[lev][0];
+// 			MultiFab& gphiy_mac_mf = gphi_mac[lev][1];
+// #if (AMREX_SPACEDIM==3)
+// 			MultiFab& gphiz_mac_mf = gphi_mac[lev][2];
+// #endif
+// 			MultiFab& utemp_mf = utemp[lev];
+// 			const Real* dx = geom[lev].CellSize();
+//
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+// 			for (MFIter mfi(gphix_mac_mf, true); mfi.isValid(); ++mfi)
+// 			{
+// 				const Box& tilebox = mfi.tilebox();
+// 				const int* lo  = tilebox.loVect();
+// 				const int* hi  = tilebox.hiVect();
+//
+// 				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+// 				                  BL_TO_FORTRAN_3D(gphix_mac_mf[mfi]),
+// 				                  BL_TO_FORTRAN_3D(gphiy_mac_mf[mfi]),
+// #if (AMREX_SPACEDIM==3)
+// 				                  BL_TO_FORTRAN_3D(gphiz_mac_mf[mfi]),
+// #endif
+// 				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+//
+// 			}
+// 		}
 
 		// write utemp
 
@@ -322,8 +322,8 @@ Maestro::Evolve ()
 		// write unew
 
 		// I think now can compare to uold and see if it's the same?
-		Print() << '\n';
-		for (int lev=0; lev<=finest_level; ++lev) {
+		{
+			int lev = finest_level;
 			Real norm = 0.;
 			umid[lev].setVal(0.);
 
@@ -333,7 +333,7 @@ Maestro::Evolve ()
 			for (auto comp=0; comp < AMREX_SPACEDIM; ++comp)
 				norm += umid[lev].norm2(comp) / uold[lev].norm2(comp);
 
-			Print() << "Norm on level " << lev << " is " << norm << std::endl;
+			Print() << "\nRelative error = " << norm << std::endl;
 		}
 
 	} else {
@@ -365,8 +365,8 @@ Maestro::Evolve ()
 		MacProj(umac_new,macpi,macrhs,beta0_old,is_predictor);
 
 		// I think now can compare to umac_old and see if it's the same?
-		Print() << '\n';
-		for (int lev=0; lev<=finest_level; ++lev) {
+		{
+			int lev = finest_level;
 			Real norm = 0.;
 			for (auto comp=0; comp < AMREX_SPACEDIM; ++comp) {
 				umac_mid[lev][comp].setVal(0.);
@@ -375,38 +375,38 @@ Maestro::Evolve ()
 
 				norm += umac_mid[lev][comp].norm2() / umac_old[lev][comp].norm2();
 			}
-			Print() << "Norm on level " << lev << " is " << norm << std::endl;
+			Print() << "\nRelative error = " << norm << std::endl;
 		}
 
 		// convert to cell-centered for output
-		for (int lev=0; lev<=finest_level; ++lev) {
-			MultiFab& umac_new_mf = umac_new[lev][0];
-			MultiFab& vmac_new_mf = umac_new[lev][1];
-#if (AMREX_SPACEDIM==3)
-			MultiFab& wmac_new_mf = umac_new[lev][2];
-#endif
-			MultiFab& utemp_mf = utemp[lev];
-			const Real* dx = geom[lev].CellSize();
-
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-			for (MFIter mfi(umac_new_mf, true); mfi.isValid(); ++mfi)
-			{
-				const Box& tilebox = mfi.tilebox();
-				const int* lo  = tilebox.loVect();
-				const int* hi  = tilebox.hiVect();
-
-				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-				                  BL_TO_FORTRAN_3D(umac_new_mf[mfi]),
-				                  BL_TO_FORTRAN_3D(vmac_new_mf[mfi]),
-#if (AMREX_SPACEDIM==3)
-				                  BL_TO_FORTRAN_3D(wmac_v_mf[mfi]),
-#endif
-				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
-
-			}
-		}
+// 		for (int lev=0; lev<=finest_level; ++lev) {
+// 			MultiFab& umac_new_mf = umac_new[lev][0];
+// 			MultiFab& vmac_new_mf = umac_new[lev][1];
+// #if (AMREX_SPACEDIM==3)
+// 			MultiFab& wmac_new_mf = umac_new[lev][2];
+// #endif
+// 			MultiFab& utemp_mf = utemp[lev];
+// 			const Real* dx = geom[lev].CellSize();
+//
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+// 			for (MFIter mfi(umac_new_mf, true); mfi.isValid(); ++mfi)
+// 			{
+// 				const Box& tilebox = mfi.tilebox();
+// 				const int* lo  = tilebox.loVect();
+// 				const int* hi  = tilebox.hiVect();
+//
+// 				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+// 				                  BL_TO_FORTRAN_3D(umac_new_mf[mfi]),
+// 				                  BL_TO_FORTRAN_3D(vmac_new_mf[mfi]),
+// #if (AMREX_SPACEDIM==3)
+// 				                  BL_TO_FORTRAN_3D(wmac_v_mf[mfi]),
+// #endif
+// 				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+//
+// 			}
+// 		}
 
 		// write utemp
 
