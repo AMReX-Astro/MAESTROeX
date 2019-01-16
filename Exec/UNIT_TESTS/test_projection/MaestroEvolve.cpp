@@ -16,6 +16,12 @@ Maestro::Evolve ()
 	int project_type;
 	get_project_type(&project_type);
 
+	// -------------------------------------------------------------------------
+	//  allocate arrays
+	// -------------------------------------------------------------------------
+
+    Print() << "...allocate arrays" << std::endl;
+
 	Vector<MultiFab> umid(finest_level+1);
 	Vector<MultiFab> gphi(finest_level+1);
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > umac_old(finest_level+1);
@@ -32,6 +38,9 @@ Maestro::Evolve ()
 		}
 	} else {
 		// MAC projection.  Velocities are nodal in respective dimension
+
+        Print() << "...allocate arrays2" << std::endl;
+
 		for (int lev=0; lev<=finest_level; ++lev) {
 			AMREX_D_TERM(umac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1,     ng_s); ,
 			             umac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1,     ng_s); ,
@@ -46,16 +55,22 @@ Maestro::Evolve ()
 			             gphi_mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1,     ng_s); ,
 			             gphi_mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1,     ng_s); );
 
-			for (auto comp=0; comp <= AMREX_SPACEDIM; +comp) {
-				umac_old[lev][comp].setVal(0.);
-				umac_mid[lev][comp].setVal(0.);
-				umac_new[lev][comp].setVal(0.);
-				gphi_mac[lev][comp].setVal(0.);
+			for (int d=0; d < AMREX_SPACEDIM; ++d) {
+				umac_old[lev][d].setVal(0.);
+				umac_mid[lev][d].setVal(0.);
+				umac_new[lev][d].setVal(0.);
+				gphi_mac[lev][d].setVal(0.);
 			}
 			utemp[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
 			utemp[lev].setVal(0.);
 		}
 	}
+
+	// -------------------------------------------------------------------------
+	//  initialize velocity field
+	// -------------------------------------------------------------------------
+
+    Print() << "...initialize velocity field" << std::endl;
 
 	if (project_type == 2) {
 		// need to initialize the mac velocity
@@ -83,11 +98,50 @@ Maestro::Evolve ()
 				             ZFILL(dx));
 			}
 		}
+
+        if (finest_level == 0) {
+            // fill periodic ghost cells
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                for (int d = 0; d < AMREX_SPACEDIM; ++d) {
+                    umac_old[lev][d].FillBoundary(geom[lev].periodicity());
+                }
+            }
+
+            // fill ghost cells behind physical boundaries
+            FillUmacGhost(umac_old);
+        } else {
+            // edge_restriction for velocities
+            AverageDownFaces(umac_old);
+
+            // fill level n ghost cells using interpolation from level n-1 data
+            FillPatchUedge(umac_old);
+        }
+	}
+
+	if (project_type == 1) {
+
+		// write uold
+
+		// copy the velocity field over to the intermediate state, umid
+		for (int lev=0; lev<=finest_level; ++lev)
+			MultiFab::Copy(umid[lev], uold[lev], 0, 0, AMREX_SPACEDIM, ng_s);
+	} else {
+		// convect MAC field to cell-centered
+		// write umac_old
+
+		// copy the velocity field over to the intermediate state, umid
+		for (int lev=0; lev<=finest_level; ++lev) {
+			for (auto comp=0; comp < AMREX_SPACEDIM; ++comp)
+				MultiFab::Copy(umac_mid[lev][comp], umac_old[lev][comp], 0, 0, 1, ng_s);
+		}
+
 	}
 
 	//--------------------------------------------------------------------------
 	// 'pollute' the velocity field by adding the gradient of a scalar
 	//--------------------------------------------------------------------------
+
+    Print() << "...pollute velocity field" << std::endl;
 
 	if (project_type == 1) {
 		// add_grad_scalar
@@ -114,7 +168,13 @@ Maestro::Evolve ()
 			}
 		}
 
-		// copy umid to unew
+		// write umid
+		// write gphi
+
+		// copy the velocity field over to the final state, unew
+		for (int lev=0; lev<=finest_level; ++lev)
+			MultiFab::Copy(unew[lev], umid[lev], 0, 0, AMREX_SPACEDIM, ng_s);
+
 	} else {
 		for (int lev=0; lev<=finest_level; ++lev) {
 			MultiFab& gphix_mac_mf = gphi_mac[lev][0];
@@ -156,6 +216,7 @@ Maestro::Evolve ()
 			}
 		}
 
+		// cannot write out a MAC field -- convert to cell-centered
 		for (int lev=0; lev<=finest_level; ++lev) {
 			MultiFab& umac_mid_mf = umac_mid[lev][0];
 			MultiFab& vmac_mid_mf = umac_mid[lev][1];
@@ -184,6 +245,8 @@ Maestro::Evolve ()
 
 			}
 		}
+
+		// write utemp
 
 		for (int lev=0; lev<=finest_level; ++lev) {
 			MultiFab& gphix_mac_mf = gphi_mac[lev][0];
@@ -214,6 +277,9 @@ Maestro::Evolve ()
 			}
 		}
 
+		// write utemp
+
+		// copy the velocity field over to the final state, unew
 		for (int lev=0; lev<=finest_level; ++lev) {
 			for (auto comp=0; comp < AMREX_SPACEDIM; ++comp)
 				MultiFab::Copy(umac_new[lev][comp], umac_mid[lev][comp], 0, 0, 1,
@@ -224,6 +290,8 @@ Maestro::Evolve ()
 	//--------------------------------------------------------------------------
 	// project out the divergent portion of the velocity field
 	//--------------------------------------------------------------------------
+
+    Print() << "...projection" << std::endl;
 
 	if (project_type == 1) {
 		// hgprojection -- here pi is nodal and u is cell-centered
@@ -247,6 +315,8 @@ Maestro::Evolve ()
 
 		// hgproject
 		NodalProj(initial_projection_comp, rhcc_for_nodalproj);
+
+		// write uold (as initial_projection_comp updates uold, not unew)
 
 	} else {
 		// mac projection -- here pi is cell-centered and u is MAC
@@ -276,6 +346,7 @@ Maestro::Evolve ()
 		auto is_predictor = 0;
 		MacProj(umac_new,macpi,macrhs,beta0_old,is_predictor);
 
+		// convert to cell-centered for output
 		for (int lev=0; lev<=finest_level; ++lev) {
 			MultiFab& umac_new_mf = umac_new[lev][0];
 			MultiFab& vmac_new_mf = umac_new[lev][1];
@@ -304,6 +375,8 @@ Maestro::Evolve ()
 
 			}
 		}
+
+		// write utemp
 
 	}
 

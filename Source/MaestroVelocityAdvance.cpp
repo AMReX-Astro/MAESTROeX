@@ -15,6 +15,11 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelocityAdvance()",VelocityAdvance);
+    
+    // allocate a dummy beta0 and set equal to zero
+    Vector<Real> beta0_dummy( (max_radial_level+1)*nr_fine );
+    beta0_dummy.shrink_to_fit();
+    std::fill(beta0_dummy.begin(),beta0_dummy.end(), 0.);
 
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -37,7 +42,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Create the velocity forcing term at time n using rho 
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,1);
+    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,beta0_dummy,0,1);
     
     //////////////////////////////////
     // Add w0 to MAC velocities
@@ -61,7 +66,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Now create the force at half-time using rhohalf 
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,1);
+    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,beta0_dummy,0,1);
 
     //////////////////////////////////
     // Update the velocity with convective differencing

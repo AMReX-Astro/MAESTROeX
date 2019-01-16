@@ -85,7 +85,9 @@ private:
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const amrex::Vector<amrex::Real>& w0_force,
-			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
+			const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+			const amrex::Vector<amrex::Real>& beta0, 
+			const int is_predictor);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
@@ -362,6 +364,8 @@ private:
                        const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
 		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+		       const amrex::Vector<amrex::Real>& beta0,
+		       const int is_predictor,
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
@@ -887,6 +891,7 @@ private:
     amrex::Vector<amrex::Real> r_cc_loc;
     // p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
     amrex::Vector<amrex::Real> p0_nm1;
+    amrex::Vector<amrex::Real> beta0_nm1;
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered

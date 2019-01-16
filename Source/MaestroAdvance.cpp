@@ -309,7 +309,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
+    is_predictor = 1;
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart,beta0_nm1,is_predictor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -318,7 +319,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    is_predictor = 1;
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
                        gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
 
@@ -641,11 +641,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
-
+    is_predictor = 0;
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart,beta0_nm1,is_predictor);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    is_predictor = 0;
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
                        gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
@@ -712,7 +711,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
 
-        for(int i=0; i<beta0_nph.size(); ++i) {
+        for(int i=0; i<rho0_nph.size(); ++i) {
             rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
         }
 
@@ -934,6 +933,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
+
+    
+    for(int i=0; i<beta0_nm1.size(); ++i) {
+        beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+    }
 
     if (!is_initIter) {
         if (!fix_base_state) {

@@ -8,7 +8,9 @@ void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const Vector<Real>& w0_force,
-                        const Vector<MultiFab>& w0_force_cart)
+                        const Vector<MultiFab>& w0_force_cart,
+			const Vector<Real>& beta0,
+			const int is_predictor)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
@@ -67,7 +69,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 	int do_add_utilde_force = 1;
 	MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
-	             w0_force,w0_force_cart,do_add_utilde_force);
+	             w0_force,w0_force_cart,beta0,is_predictor,do_add_utilde_force);
 
 	// add w0 to trans velocities
 	Addw0 (utrans,w0mac,1.);
