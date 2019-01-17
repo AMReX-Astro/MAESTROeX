@@ -22,7 +22,6 @@ Maestro::Evolve ()
 		error[lev].setVal(0.);
 	}
 
-
 	// do the tests
 	for (int lev=0; lev<=finest_level; ++lev) {
 

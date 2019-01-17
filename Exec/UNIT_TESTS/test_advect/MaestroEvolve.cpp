@@ -8,6 +8,10 @@ void
 Maestro::Evolve ()
 {
 
+	// -------------------------------------------------------------------------
+	//  loop over all possible directions and all ppm_types
+	// -------------------------------------------------------------------------
+
 	for (auto i = 0; i < AMREX_SPACEDIM; i++) {
 		for (auto j = -1; j <= 1; j+=2) {
 
@@ -26,6 +30,7 @@ Maestro::Evolve ()
 
 			compute_cutoff_coords(rho0_old.dataPtr());
 
+			// the base state will not carry any information in this test problem
 			std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
 			std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
 
@@ -39,9 +44,6 @@ Maestro::Evolve ()
 			for (int i=0; i<p0_old.size(); ++i) {
 				p0_nm1[i] = p0_old[i];
 			}
-
-			// advance solution to final time
-			// Print() << "Calling Evolve()" << std::endl;
 
 			Print() << "\nInitial velocity = ";
 			if (i == 0) {
@@ -99,10 +101,12 @@ Maestro::Evolve ()
 				             sflux[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], Nscal, 0); ,
 				             sflux[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0); );
 
+
+				etarhoflux[lev].setVal(0.);
+
 				// initialize umac
 				for (int d=0; d < AMREX_SPACEDIM; ++d) {
 					umac[lev][d].setVal(0.);
-					etarhoflux[lev][d].setVal(0.);
 					sedge[lev][d].setVal(0.);
 					sflux[lev][d].setVal(0.);
 				}
@@ -144,6 +148,9 @@ Maestro::Evolve ()
 
 			dt = cfl * dx[0];
 
+			// initialize the velocity field -- it is unity in the
+			// direction of propagation a negative itest_dir indicates
+			// negative velocity
 			for (int lev=0; lev<=finest_level; ++lev) {
 				for (int d=0; d < AMREX_SPACEDIM; ++d)
 					umac[lev][d].setVal(0.0);
@@ -155,32 +162,27 @@ Maestro::Evolve ()
 
 			Print() << "original density = " << s_orig[0].norm2() << std::endl;
 
+			// advance the density using the constant velocity field
 			for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
 			{
 
-				// Print() << "Evolving step " << istep << std::endl;
-
-				// check to see if we need to regrid, then regrid
-				if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0)
-					Regrid();
-
 				t_old = t_new;
 
-                // set etarhoflux to zero
-                for (int lev=0; lev<=finest_level; ++lev) {
-                    etarhoflux[lev].setVal(0.);
-                }
-                // set sedge and sflux to zero
-                for (int lev=0; lev<=finest_level; ++lev) {
-                    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-                        sedge[lev][idim].setVal(0.);
-                        sflux[lev][idim].setVal(0.);
-                    }
-                }
+				// set etarhoflux to zero
+				for (int lev=0; lev<=finest_level; ++lev)
+					etarhoflux[lev].setVal(0.);
+
+				// set sedge and sflux to zero
+				for (int lev=0; lev<=finest_level; ++lev) {
+					for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+						sedge[lev][idim].setVal(0.);
+						sflux[lev][idim].setVal(0.);
+					}
+				}
 
 				DensityAdvance(1,sold,snew,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
-                p0_new = p0_old;
+				p0_new = p0_old;
 
 				// move new state into old state by swapping pointers
 				for (int lev=0; lev<=finest_level; ++lev) {
@@ -212,6 +214,7 @@ Maestro::Evolve ()
 			Print() << "final density = " << s_final[0].norm2() << std::endl;
 
 			// compare the initial and final density
+			// compute dens_final - dens_orig
 			for (int lev=0; lev<=finest_level; ++lev) {
 				MultiFab::Copy(error[lev],s_final[lev],0,0,1,0);
 				MultiFab::Subtract(error[lev],s_orig[lev],0,0,1,0);

@@ -9,13 +9,13 @@ maestro.init_iter             = 0
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
-amr.n_cell             = 128 128
+amr.n_cell             = 64 64 64
 amr.max_grid_size      = 64
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
 # PROBLEM SIZE
-geometry.prob_lo     =  0.0    0.0
-geometry.prob_hi     =  1.0e0    1.0e0
+geometry.prob_lo     =  0.0    0.0    0.0
+geometry.prob_hi     =  1.0e0  1.0e0  1.0e0
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
@@ -36,9 +36,9 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
-maestro.lo_bc = 0 0
-maestro.hi_bc = 0 0
-geometry.is_periodic =  1 1
+maestro.lo_bc = 0 0 0
+maestro.hi_bc = 0 0 0
+geometry.is_periodic =  1 1 1
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
@@ -49,10 +49,7 @@ maestro.ppm_type = 0
 
 &probin
 
- do_bds = .true.
+ advect_test_tol = 5.d-14
 
- advect_test_tol = 5.d-13
-
- dir = 1
 
 /
