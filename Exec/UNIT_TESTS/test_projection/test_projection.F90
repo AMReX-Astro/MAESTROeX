@@ -24,9 +24,6 @@ contains
     integer          :: i,j,k
     double precision :: x, y, z
 
-    ! set velocity to zero
-    vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:amrex_spacedim) = 0.d0
-
     do k=lo(3),hi(3)
        z = (dble(k)+0.5d0)*dx(3) + prob_lo(3)
        do j=lo(2),hi(2)
@@ -75,13 +72,6 @@ contains
 
     integer          :: i,j,k
     double precision :: x, y, z
-
-    ! set velocity to zero
-    umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3)) = 0.d0
-    vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3)) = 0.d0
-#if (AMREX_SPACEDIM==3)
-    wmac(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3)) = 0.d0
-#endif
 
     ! x-velocity  (x are edges, y and z are centers)
     do k=lo(3),hi(3)
@@ -350,9 +340,12 @@ contains
              do i = lo(1), hi(1)
                 x = (dble(i)+0.5d0)*dx(1) + prob_lo(1)
 
+#if (AMREX_SPACEDIM==2)
+                gphi(i,j,k,1) =  FOUR*x*(ONE - x)
+                gphi(i,j,k,2) =  FOUR*y*(ONE - y)
+#else
                 gphi(i,j,k,1) =  160.0d0*x*(ONE - x)
                 gphi(i,j,k,2) =  160.0d0*y*(ONE - y)
-#if (AMREX_SPACEDIM==3)
                 gphi(i,j,k,3) =  160.0d0*z*(ONE - z)
 #endif
 
@@ -378,18 +371,24 @@ contains
             domain_phys_bc(3,2) .eq. Interior) then
 #endif
 
-
-       do k = lo(3), hi(3)
+#if (AMREX_SPACEDIM==2)
+       do k = lo(3), lo(3)
+#else
+       do k = lo(3)-1, hi(3)+1
+#endif
           z = (dble(k)+0.5d0)*dx(3) + prob_lo(3)
 
-          do j = lo(2), hi(2)
+          do j = lo(2)-1, hi(2)+1
              y = (dble(j)+0.5d0)*dx(2) + prob_lo(2)
 
-             do i = lo(1), hi(1)
+             do i = lo(1)-1, hi(1)+1
                 x = (dble(i)+0.5d0)*dx(1) + prob_lo(1)
 
+#if (AMREX_SPACEDIM==2)
+                phi(i,j,k) = 0.1d0 * cos(2.d0*M_PI*y)*cos(2.d0*M_PI*x)
+#else
                 phi(i,j,k) = 5.0d0 * cos(2.d0*M_PI*y)*cos(2.d0*M_PI*x)*cos(2.d0*M_PI*z)
-
+#endif
              enddo
           enddo
        enddo
@@ -476,7 +475,7 @@ contains
          domain_phys_bc(2,2) .eq. SlipWall &
 #if (AMREX_SPACEDIM==2)
          ) then
-#elif (AMREX_SPACEDIM==3)
+#else
        .and. &
             domain_phys_bc(3,1) .eq. SlipWall .and. &
             domain_phys_bc(3,2) .eq. SlipWall) then
@@ -494,8 +493,11 @@ contains
 
              do i = lo(1), hi(1)+1
                 x = (dble(i))*dx(1) + prob_lo(1)
-
+#if (AMREX_SPACEDIM==2)
+                gphix_mac(i,j,k) =  FOUR*x*(ONE - x)
+#else
                 gphix_mac(i,j,k) =  160.0d0*x*(ONE - x)
+#endif
                 umac(i,j,k) = umac(i,j,k) + gphix_mac(i,j,k)
 
              enddo
@@ -511,8 +513,11 @@ contains
 
              do i = lo(1), hi(1)
                 x = (dble(i)+HALF)*dx(1) + prob_lo(1)
-
+#if (AMREX_SPACEDIM==2)
+                gphiy_mac(i,j,k) =  FOUR*y*(ONE - y)
+#else
                 gphiy_mac(i,j,k) =  160.0d0*y*(ONE - y)
+#endif
                 vmac(i,j,k) = vmac(i,j,k) + gphiy_mac(i,j,k)
 
              enddo
@@ -550,8 +555,11 @@ contains
             domain_phys_bc(3,2) .eq. Interior) then
 #endif
 
-
+#if (AMREX_SPACEDIM==2)
+       do k = lo(3), lo(3)
+#else
        do k = lo(3)-1, hi(3)+1
+#endif
           z = (dble(k)+HALF)*dx(3) + prob_lo(3)
 
           do j = lo(2)-1, hi(2)+1
@@ -559,8 +567,11 @@ contains
 
              do i = lo(1)-1, hi(1)+1
                 x = (dble(i)+HALF)*dx(1) + prob_lo(1)
-
+#if (AMREX_SPACEDIM==2)
+                phi(i,j,k) = 0.1d0 * cos(2.d0*M_PI*y)*cos(2.d0*M_PI*x)
+#else
                 phi(i,j,k) = 5.0d0 * cos(2.d0*M_PI*y)*cos(2.d0*M_PI*x)*cos(2.d0*M_PI*z)
+#endif
              enddo
           enddo
        enddo

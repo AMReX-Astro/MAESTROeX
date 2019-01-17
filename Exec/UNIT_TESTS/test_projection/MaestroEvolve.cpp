@@ -35,6 +35,9 @@ Maestro::Evolve ()
 		for (int lev=0; lev<=finest_level; ++lev) {
 			umid[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
 			gphi[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+
+            umid[lev].setVal(0.);
+            gphi[lev].setVal(0.);
 		}
 	} else {
 		// MAC projection.  Velocities are nodal in respective dimension
@@ -69,7 +72,34 @@ Maestro::Evolve ()
 
 	Print() << "...initialize velocity field" << std::endl;
 
-	if (project_type == 2) {
+	if (project_type == 1) {
+
+		for (int lev=0; lev<=finest_level; ++lev) {
+
+			MultiFab& vel = uold[lev];
+			const Real* dx = geom[lev].CellSize();
+
+			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for (MFIter mfi(vel, true); mfi.isValid(); ++mfi)
+			{
+				const Box& tilebox = mfi.tilebox();
+				const int* lo  = tilebox.loVect();
+				const int* hi  = tilebox.hiVect();
+
+				init_vel(ARLIM_3D(lo), ARLIM_3D(hi),
+				         BL_TO_FORTRAN_3D(vel[mfi]),
+				         ZFILL(dx));
+			}
+		}
+
+        AverageDown(uold,0,AMREX_SPACEDIM);
+    	FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u);
+
+	} else {
+
 		// need to initialize the mac velocity
 		for (int lev=0; lev<=finest_level; ++lev) {
 			MultiFab& umac_mf = umac_old[lev][0];
@@ -160,7 +190,6 @@ Maestro::Evolve ()
 				                BL_TO_FORTRAN_FAB(gphi_mf[mfi]),
 				                BL_TO_FORTRAN_FAB(umid_mf[mfi]),
 				                phys_bc.dataPtr(), ZFILL(dx));
-
 			}
 		}
 
@@ -172,7 +201,7 @@ Maestro::Evolve ()
 			MultiFab::Copy(unew[lev], umid[lev], 0, 0, AMREX_SPACEDIM, ng_s);
 
 			// swap pointers so NodalProj works properly
-			std::swap(    uold[lev],     unew[lev]);
+			std::swap(uold[lev], unew[lev]);
 		}
 
 
@@ -217,66 +246,66 @@ Maestro::Evolve ()
 			}
 		}
 
-// 		// cannot write out a MAC field -- convert to cell-centered
-// 		for (int lev=0; lev<=finest_level; ++lev) {
-// 			MultiFab& umac_mid_mf = umac_mid[lev][0];
-// 			MultiFab& vmac_mid_mf = umac_mid[lev][1];
+//              // cannot write out a MAC field -- convert to cell-centered
+//              for (int lev=0; lev<=finest_level; ++lev) {
+//                      MultiFab& umac_mid_mf = umac_mid[lev][0];
+//                      MultiFab& vmac_mid_mf = umac_mid[lev][1];
 // #if (AMREX_SPACEDIM==3)
-// 			MultiFab& wmac_mid_mf = umac_mid[lev][2];
+//                      MultiFab& wmac_mid_mf = umac_mid[lev][2];
 // #endif
-// 			MultiFab& utemp_mf = utemp[lev];
-// 			const Real* dx = geom[lev].CellSize();
+//                      MultiFab& utemp_mf = utemp[lev];
+//                      const Real* dx = geom[lev].CellSize();
 //
 // #ifdef _OPENMP
 // #pragma omp parallel
 // #endif
-// 			for (MFIter mfi(umac_mid_mf, true); mfi.isValid(); ++mfi)
-// 			{
-// 				const Box& tilebox = mfi.tilebox();
-// 				const int* lo  = tilebox.loVect();
-// 				const int* hi  = tilebox.hiVect();
+//                      for (MFIter mfi(umac_mid_mf, true); mfi.isValid(); ++mfi)
+//                      {
+//                              const Box& tilebox = mfi.tilebox();
+//                              const int* lo  = tilebox.loVect();
+//                              const int* hi  = tilebox.hiVect();
 //
-// 				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-// 				                  BL_TO_FORTRAN_3D(umac_mid_mf[mfi]),
-// 				                  BL_TO_FORTRAN_3D(vmac_mid_mf[mfi]),
+//                              convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+//                                                BL_TO_FORTRAN_3D(umac_mid_mf[mfi]),
+//                                                BL_TO_FORTRAN_3D(vmac_mid_mf[mfi]),
 // #if (AMREX_SPACEDIM==3)
-// 				                  BL_TO_FORTRAN_3D(wmac_mid_mf[mfi]),
+//                                                BL_TO_FORTRAN_3D(wmac_mid_mf[mfi]),
 // #endif
-// 				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+//                                                BL_TO_FORTRAN_3D(utemp_mf[mfi]));
 //
-// 			}
-// 		}
+//                      }
+//              }
 
 		// write utemp
 
-// 		for (int lev=0; lev<=finest_level; ++lev) {
-// 			MultiFab& gphix_mac_mf = gphi_mac[lev][0];
-// 			MultiFab& gphiy_mac_mf = gphi_mac[lev][1];
+//              for (int lev=0; lev<=finest_level; ++lev) {
+//                      MultiFab& gphix_mac_mf = gphi_mac[lev][0];
+//                      MultiFab& gphiy_mac_mf = gphi_mac[lev][1];
 // #if (AMREX_SPACEDIM==3)
-// 			MultiFab& gphiz_mac_mf = gphi_mac[lev][2];
+//                      MultiFab& gphiz_mac_mf = gphi_mac[lev][2];
 // #endif
-// 			MultiFab& utemp_mf = utemp[lev];
-// 			const Real* dx = geom[lev].CellSize();
+//                      MultiFab& utemp_mf = utemp[lev];
+//                      const Real* dx = geom[lev].CellSize();
 //
 // #ifdef _OPENMP
 // #pragma omp parallel
 // #endif
-// 			for (MFIter mfi(gphix_mac_mf, true); mfi.isValid(); ++mfi)
-// 			{
-// 				const Box& tilebox = mfi.tilebox();
-// 				const int* lo  = tilebox.loVect();
-// 				const int* hi  = tilebox.hiVect();
+//                      for (MFIter mfi(gphix_mac_mf, true); mfi.isValid(); ++mfi)
+//                      {
+//                              const Box& tilebox = mfi.tilebox();
+//                              const int* lo  = tilebox.loVect();
+//                              const int* hi  = tilebox.hiVect();
 //
-// 				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-// 				                  BL_TO_FORTRAN_3D(gphix_mac_mf[mfi]),
-// 				                  BL_TO_FORTRAN_3D(gphiy_mac_mf[mfi]),
+//                              convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+//                                                BL_TO_FORTRAN_3D(gphix_mac_mf[mfi]),
+//                                                BL_TO_FORTRAN_3D(gphiy_mac_mf[mfi]),
 // #if (AMREX_SPACEDIM==3)
-// 				                  BL_TO_FORTRAN_3D(gphiz_mac_mf[mfi]),
+//                                                BL_TO_FORTRAN_3D(gphiz_mac_mf[mfi]),
 // #endif
-// 				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+//                                                BL_TO_FORTRAN_3D(utemp_mf[mfi]));
 //
-// 			}
-// 		}
+//                      }
+//              }
 
 		// write utemp
 
@@ -312,12 +341,18 @@ Maestro::Evolve ()
 
 		t_new = t_old + 1.;
 
+		// NodalProj is going to operate on unew, where we've temporarily stored the initial data. Let's instead copy this initial data to umid.
+		for (int lev=0; lev<=finest_level; ++lev)
+			std::swap(umid[lev], unew[lev]);
+
 		// hgproject
 		NodalProj(initial_projection_comp, rhcc_for_nodalproj);
 
-		// swap pointers
-		for (int lev=0; lev<=finest_level; ++lev)
-			std::swap(uold[lev], unew[lev]);
+		// swap pointers to restore initial data to uold and new data to unew
+		for (int lev=0; lev<=finest_level; ++lev) {
+			std::swap(uold[lev], umid[lev]);
+			std::swap(umid[lev], unew[lev]);
+		}
 
 		// write unew
 
@@ -334,6 +369,13 @@ Maestro::Evolve ()
 				norm += umid[lev].norm2(comp) / uold[lev].norm2(comp);
 
 			Print() << "\nRelative error = " << norm << std::endl;
+
+			norm = 0.;
+			for (auto comp=0; comp < AMREX_SPACEDIM; ++comp) {
+				norm = umid[lev].norm0(comp);
+
+				Print() << "\nAbsolute error, dim " << comp << " = " << norm << std::endl;
+			}
 		}
 
 	} else {
@@ -379,34 +421,34 @@ Maestro::Evolve ()
 		}
 
 		// convert to cell-centered for output
-// 		for (int lev=0; lev<=finest_level; ++lev) {
-// 			MultiFab& umac_new_mf = umac_new[lev][0];
-// 			MultiFab& vmac_new_mf = umac_new[lev][1];
+//              for (int lev=0; lev<=finest_level; ++lev) {
+//                      MultiFab& umac_new_mf = umac_new[lev][0];
+//                      MultiFab& vmac_new_mf = umac_new[lev][1];
 // #if (AMREX_SPACEDIM==3)
-// 			MultiFab& wmac_new_mf = umac_new[lev][2];
+//                      MultiFab& wmac_new_mf = umac_new[lev][2];
 // #endif
-// 			MultiFab& utemp_mf = utemp[lev];
-// 			const Real* dx = geom[lev].CellSize();
+//                      MultiFab& utemp_mf = utemp[lev];
+//                      const Real* dx = geom[lev].CellSize();
 //
 // #ifdef _OPENMP
 // #pragma omp parallel
 // #endif
-// 			for (MFIter mfi(umac_new_mf, true); mfi.isValid(); ++mfi)
-// 			{
-// 				const Box& tilebox = mfi.tilebox();
-// 				const int* lo  = tilebox.loVect();
-// 				const int* hi  = tilebox.hiVect();
+//                      for (MFIter mfi(umac_new_mf, true); mfi.isValid(); ++mfi)
+//                      {
+//                              const Box& tilebox = mfi.tilebox();
+//                              const int* lo  = tilebox.loVect();
+//                              const int* hi  = tilebox.hiVect();
 //
-// 				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-// 				                  BL_TO_FORTRAN_3D(umac_new_mf[mfi]),
-// 				                  BL_TO_FORTRAN_3D(vmac_new_mf[mfi]),
+//                              convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+//                                                BL_TO_FORTRAN_3D(umac_new_mf[mfi]),
+//                                                BL_TO_FORTRAN_3D(vmac_new_mf[mfi]),
 // #if (AMREX_SPACEDIM==3)
-// 				                  BL_TO_FORTRAN_3D(wmac_v_mf[mfi]),
+//                                                BL_TO_FORTRAN_3D(wmac_v_mf[mfi]),
 // #endif
-// 				                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+//                                                BL_TO_FORTRAN_3D(utemp_mf[mfi]));
 //
-// 			}
-// 		}
+//                      }
+//              }
 
 		// write utemp
 

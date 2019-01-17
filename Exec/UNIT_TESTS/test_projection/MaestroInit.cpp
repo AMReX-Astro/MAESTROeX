@@ -21,11 +21,6 @@ Maestro::Init ()
 
 	// fill in multifab and base state data
 	InitData();
-
-	// set finest_radial_level in fortran
-	// compute numdisjointchunks, r_start_coord, r_end_coord
-	init_multilevel(tag_array.dataPtr(),&finest_level);
-
 }
 
 // fill in multifab and base state data
@@ -52,9 +47,6 @@ Maestro::InitData ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
-
-	AverageDown(uold,0,AMREX_SPACEDIM);
-	FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u);
 
 }
 
@@ -87,29 +79,4 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	rhcc_for_nodalproj[lev].setVal(0.);
 	pi                [lev].setVal(0.);
 
-	const Real* dx = geom[lev].CellSize();
-	const Real* dx_fine = geom[max_level].CellSize();
-
-	int project_type;
-	get_project_type(&project_type);
-
-	if (project_type == 1) {
-
-		MultiFab& vel = uold[lev];
-
-		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-		for (MFIter mfi(vel, true); mfi.isValid(); ++mfi)
-		{
-			const Box& tilebox = mfi.tilebox();
-			const int* lo  = tilebox.loVect();
-			const int* hi  = tilebox.hiVect();
-
-			init_vel(ARLIM_3D(lo), ARLIM_3D(hi),
-			         BL_TO_FORTRAN_3D(vel[mfi]),
-			         ZFILL(dx));
-		}
-	}
 }
