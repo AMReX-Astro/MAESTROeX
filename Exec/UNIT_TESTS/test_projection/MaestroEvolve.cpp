@@ -133,13 +133,11 @@ Maestro::Evolve ()
 					umac_old[lev][d].FillBoundary(geom[lev].periodicity());
 				}
 			}
-
 			// fill ghost cells behind physical boundaries
 			FillUmacGhost(umac_old);
 		} else {
 			// edge_restriction for velocities
 			AverageDownFaces(umac_old);
-
 			// fill level n ghost cells using interpolation from level n-1 data
 			FillPatchUedge(umac_old);
 		}
@@ -193,6 +191,10 @@ Maestro::Evolve ()
 			}
 		}
 
+        // fill ghosts and boundary
+        AverageDown(umid,0,AMREX_SPACEDIM);
+    	FillPatch(t_old,umid,umid,umid,0,0,AMREX_SPACEDIM,0,bcs_u);
+
 		// write umid
 		// write gphi
 
@@ -228,7 +230,8 @@ Maestro::Evolve ()
 				const int* hi  = tilebox.hiVect();
 
 				// NOTE: I have no idea what 'box_phys_bc' is in MAESTROeX, so am
-				// just going to pass in phys_bc again
+				// just going to pass in bcs_u[0].data, as is used for velpred
+                // and mkutrans
 
 				add_grad_scalar_mac(ARLIM_3D(lo), ARLIM_3D(hi),
 				                    BL_TO_FORTRAN_3D(gphix_mac_mf[mfi]),
@@ -241,71 +244,27 @@ Maestro::Evolve ()
 #if (AMREX_SPACEDIM==3)
 				                    BL_TO_FORTRAN_3D(wmac_mid_mf[mfi]),
 #endif
-				                    phys_bc.dataPtr(), phys_bc.dataPtr(), ZFILL(dx));
+				                    phys_bc.dataPtr(), bcs_u[0].data(), ZFILL(dx));
 
 			}
 		}
 
-//              // cannot write out a MAC field -- convert to cell-centered
-//              for (int lev=0; lev<=finest_level; ++lev) {
-//                      MultiFab& umac_mid_mf = umac_mid[lev][0];
-//                      MultiFab& vmac_mid_mf = umac_mid[lev][1];
-// #if (AMREX_SPACEDIM==3)
-//                      MultiFab& wmac_mid_mf = umac_mid[lev][2];
-// #endif
-//                      MultiFab& utemp_mf = utemp[lev];
-//                      const Real* dx = geom[lev].CellSize();
-//
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-//                      for (MFIter mfi(umac_mid_mf, true); mfi.isValid(); ++mfi)
-//                      {
-//                              const Box& tilebox = mfi.tilebox();
-//                              const int* lo  = tilebox.loVect();
-//                              const int* hi  = tilebox.hiVect();
-//
-//                              convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-//                                                BL_TO_FORTRAN_3D(umac_mid_mf[mfi]),
-//                                                BL_TO_FORTRAN_3D(vmac_mid_mf[mfi]),
-// #if (AMREX_SPACEDIM==3)
-//                                                BL_TO_FORTRAN_3D(wmac_mid_mf[mfi]),
-// #endif
-//                                                BL_TO_FORTRAN_3D(utemp_mf[mfi]));
-//
-//                      }
-//              }
-
-		// write utemp
-
-//              for (int lev=0; lev<=finest_level; ++lev) {
-//                      MultiFab& gphix_mac_mf = gphi_mac[lev][0];
-//                      MultiFab& gphiy_mac_mf = gphi_mac[lev][1];
-// #if (AMREX_SPACEDIM==3)
-//                      MultiFab& gphiz_mac_mf = gphi_mac[lev][2];
-// #endif
-//                      MultiFab& utemp_mf = utemp[lev];
-//                      const Real* dx = geom[lev].CellSize();
-//
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-//                      for (MFIter mfi(gphix_mac_mf, true); mfi.isValid(); ++mfi)
-//                      {
-//                              const Box& tilebox = mfi.tilebox();
-//                              const int* lo  = tilebox.loVect();
-//                              const int* hi  = tilebox.hiVect();
-//
-//                              convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-//                                                BL_TO_FORTRAN_3D(gphix_mac_mf[mfi]),
-//                                                BL_TO_FORTRAN_3D(gphiy_mac_mf[mfi]),
-// #if (AMREX_SPACEDIM==3)
-//                                                BL_TO_FORTRAN_3D(gphiz_mac_mf[mfi]),
-// #endif
-//                                                BL_TO_FORTRAN_3D(utemp_mf[mfi]));
-//
-//                      }
-//              }
+        // average down and do boundaries
+        if (finest_level == 0) {
+			// fill periodic ghost cells
+			for (int lev = 0; lev <= finest_level; ++lev) {
+				for (int d = 0; d < AMREX_SPACEDIM; ++d) {
+					umac_mid[lev][d].FillBoundary(geom[lev].periodicity());
+				}
+			}
+			// fill ghost cells behind physical boundaries
+			FillUmacGhost(umac_mid);
+		} else {
+			// edge_restriction for velocities
+			AverageDownFaces(umac_mid);
+			// fill level n ghost cells using interpolation from level n-1 data
+			FillPatchUedge(umac_mid);
+		}
 
 		// write utemp
 
@@ -419,36 +378,6 @@ Maestro::Evolve ()
 			}
 			Print() << "\nRelative error = " << norm << std::endl;
 		}
-
-		// convert to cell-centered for output
-//              for (int lev=0; lev<=finest_level; ++lev) {
-//                      MultiFab& umac_new_mf = umac_new[lev][0];
-//                      MultiFab& vmac_new_mf = umac_new[lev][1];
-// #if (AMREX_SPACEDIM==3)
-//                      MultiFab& wmac_new_mf = umac_new[lev][2];
-// #endif
-//                      MultiFab& utemp_mf = utemp[lev];
-//                      const Real* dx = geom[lev].CellSize();
-//
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-//                      for (MFIter mfi(umac_new_mf, true); mfi.isValid(); ++mfi)
-//                      {
-//                              const Box& tilebox = mfi.tilebox();
-//                              const int* lo  = tilebox.loVect();
-//                              const int* hi  = tilebox.hiVect();
-//
-//                              convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-//                                                BL_TO_FORTRAN_3D(umac_new_mf[mfi]),
-//                                                BL_TO_FORTRAN_3D(vmac_new_mf[mfi]),
-// #if (AMREX_SPACEDIM==3)
-//                                                BL_TO_FORTRAN_3D(wmac_v_mf[mfi]),
-// #endif
-//                                                BL_TO_FORTRAN_3D(utemp_mf[mfi]));
-//
-//                      }
-//              }
 
 		// write utemp
 

@@ -127,183 +127,7 @@ contains
 
   end subroutine init_mac_vel
 
-  !===========================================================================
-  ! subroutine init_mac_velocity(umac, dx, mla, the_bc_level)
-  !
-  !   integer :: n, i, ng, dm, nlevs
-  !
-  !   type(multifab) , intent(inout) :: umac(:,:)
-  !   real(kind=dp_t), intent(in   ) :: dx(:,:)
-  !   type(ml_layout)   , intent(inout) :: mla
-  !   type(bc_level)    , intent(in   ) :: the_bc_level(:)
-  !
-  !   integer :: lo(get_dim(umac(1,1))), hi(get_dim(umac(1,1)))
-  !
-  !   real(kind=dp_t), pointer :: ump(:,:,:,:), vmp(:,:,:,:), wmp(:,:,:,:)
-  !
-  !   nlevs = size(umac(:,1))
-  !   dm = get_dim(umac(1,1))
-  !
-  !   ng = nghost(umac(1,1))
-  !
-  !   do n=1,nlevs
-  !      do i = 1, nfabs(umac(n,1))
-  !         ump => dataptr(umac(n,1), i)
-  !         vmp => dataptr(umac(n,2), i)
-  !
-  !         lo = lwb(get_box(umac(n,1), i))
-  !         hi = upb(get_box(umac(n,1), i))
-  !
-  !         select case (dm)
-  !         case (2)
-  !            call init_mac_velocity_2d(ump(:,:,1,1), vmp(:,:,1,1), ng, &
-  !                 lo, hi, dx(n,:))
-  !
-  !         case (3)
-  !            wmp => dataptr(umac(n,3), i)
-  !            call init_mac_velocity_3d(ump(:,:,:,1), vmp(:,:,:,1), wmp(:,:,:,1), ng, &
-  !                 lo, hi, dx(n,:))
-  !
-  !         end select
-  !      end do
-  !   end do
-  !
-  !   ! make edge states consistent across levels
-  !   do n = nlevs,2,-1
-  !      do i = 1, dm
-  !         call ml_edge_restriction_c(umac(n-1,i),1,umac(n,i),1,mla%mba%rr(n-1,:),i,1)
-  !      enddo
-  !   enddo
-  !
-  ! end subroutine init_mac_velocity
-  !
-  ! subroutine init_mac_velocity_2d(umac, vmac, ng, lo, hi, dx)
-  !
-  !   ! initialize the velocity field to a divergence-free field.  This
-  !   ! velocity field comes from Almgren, Bell, and Szymczak 1996.
-  !
-  !   use probin_module, only: prob_lo
-  !
-  !   integer         , intent(in   ) :: lo(:), hi(:), ng
-  !   real (kind=dp_t), intent(inout) :: umac(lo(1)-ng:,lo(2)-ng:)
-  !   real (kind=dp_t), intent(inout) :: vmac(lo(1)-ng:,lo(2)-ng:)
-  !   real (kind=dp_t), intent(in   ) :: dx(:)
-  !
-  !   ! Local variables
-  !   integer :: i, j
-  !   real (kind=dp_t) :: x, y
-  !
-  !   ! x-velocity  (x are edges, y are centers)
-  !   do j = lo(2), hi(2)
-  !      y = (dble(j)+HALF)*dx(2) + prob_lo(2)
-  !
-  !      do i = lo(1), hi(1)+1
-  !         x = (dble(i))*dx(1) + prob_lo(1)
-  !
-  !         umac(i,j) = -sin(M_PI*x)**2 * sin(TWO*M_PI*y)
-  !
-  !      enddo
-  !   enddo
-  !
-  !   ! y-velocity  (x are centers, y are edges)
-  !   do j = lo(2), hi(2)+1
-  !      y = (dble(j))*dx(2) + prob_lo(2)
-  !
-  !      do i = lo(1), hi(1)
-  !         x = (dble(i)+HALF)*dx(1) + prob_lo(1)
-  !
-  !         vmac(i,j) =  sin(M_PI*y)**2 * sin(TWO*M_PI*x)
-  !
-  !      enddo
-  !   enddo
-  !
-  ! end subroutine init_mac_velocity_2d
-  !
-  !
-  ! subroutine init_mac_velocity_3d(umac, vmac, wmac, ng, lo, hi, dx)
-  !
-  !   ! initialize the velocity field to a divergence-free field.  This
-  !   ! velocity field comes from the idea that the curl of any vector
-  !   ! is divergence-free.
-  !   !
-  !   ! we take: Phi = (alpha, beta, gamma) as our initial vector, with:
-  !   !
-  !   !   alpha = sin 4pi y  sin 2pi z
-  !   !   beta  = sin 2pi x  sin 4pi z
-  !   !   gamma = sin 4pi x  sin 2pi y
-  !   !
-  !   ! (this is Interior and even in all directions)
-  !   !
-  !   ! then U = curl{Phi} gives our field
-  !
-  !   use probin_module, only: prob_lo
-  !
-  !   integer         , intent(in   ) :: lo(:), hi(:), ng
-  !   real (kind=dp_t), intent(inout) :: umac(lo(1)-ng:,lo(2)-ng:,lo(3)-ng:)
-  !   real (kind=dp_t), intent(inout) :: vmac(lo(1)-ng:,lo(2)-ng:,lo(3)-ng:)
-  !   real (kind=dp_t), intent(inout) :: wmac(lo(1)-ng:,lo(2)-ng:,lo(3)-ng:)
-  !   real (kind=dp_t), intent(in   ) :: dx(:)
-  !
-  !   ! Local variables
-  !   integer :: i, j, k
-  !   real (kind=dp_t) :: x, y, z
-  !
-  !   ! x-velocity  (x are edges, y and z are centers)
-  !   do k = lo(3), hi(3)
-  !      z = (dble(k)+HALF)*dx(3) + prob_lo(3)
-  !
-  !      do j = lo(2), hi(2)
-  !         y = (dble(j)+HALF)*dx(2) + prob_lo(2)
-  !
-  !         do i = lo(1), hi(1)+1
-  !            x = (dble(i))*dx(1) + prob_lo(1)
-  !
-  !            umac(i,j,k) = TWO*M_PI*sin(FOUR*M_PI*x)*cos( TWO*M_PI*y) - &
-  !                 FOUR*M_PI*sin( TWO*M_PI*x)*cos(FOUR*M_PI*z)
-  !
-  !         enddo
-  !      enddo
-  !   enddo
-  !
-  !   ! y-velocity  (x and z are centers, y are edges)
-  !   do k = lo(3), hi(3)
-  !      z = (dble(k)+HALF)*dx(3) + prob_lo(3)
-  !
-  !      do j = lo(2), hi(2)+1
-  !         y = (dble(j))*dx(2) + prob_lo(2)
-  !
-  !         do i = lo(1), hi(1)
-  !            x = (dble(i)+HALF)*dx(1) + prob_lo(1)
-  !
-  !            vmac(i,j,k) = TWO*M_PI*sin(FOUR*M_PI*y)*cos( TWO*M_PI*z) - &
-  !                 FOUR*M_PI*cos(FOUR*M_PI*x)*sin( TWO*M_PI*y)
-  !
-  !         enddo
-  !      enddo
-  !   enddo
-  !
-  !   ! z-velocity  (x and y are centers, z are edges)
-  !   do k = lo(3), hi(3)+1
-  !      z = (dble(k))*dx(3) + prob_lo(3)
-  !
-  !      do j = lo(2), hi(2)
-  !         y = (dble(j)+HALF)*dx(2) + prob_lo(2)
-  !
-  !         do i = lo(1), hi(1)
-  !            x = (dble(i)+HALF)*dx(1) + prob_lo(1)
-  !
-  !            wmac(i,j,k) = TWO*M_PI*cos( TWO*M_PI*x)*sin(FOUR*M_PI*z) - &
-  !                 FOUR*M_PI*cos(FOUR*M_PI*y)*sin( TWO*M_PI*z)
-  !
-  !
-  !         enddo
-  !      enddo
-  !   enddo
-  !
-  ! end subroutine init_mac_velocity_3d
 
-
-  !===========================================================================
   subroutine add_grad_scalar(lo, hi, gphi, g_lo, g_hi, nc_g, &
        U, u_lo, u_hi, nc_u, domain_phys_bc, dx)  bind(C, name="add_grad_scalar")
 
@@ -318,6 +142,9 @@ contains
     integer :: i, j, k
     double precision :: x, y, z
     double precision :: phi(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1)
+
+    ! write(*,*) "domain bc = ", domain_phys_bc
+    ! write(*,*) "SlipWall = ", SlipWall
 
     if (domain_phys_bc(1,1) .eq. SlipWall .and. &
          domain_phys_bc(1,2) .eq. SlipWall .and. &
@@ -452,7 +279,7 @@ contains
     integer, intent(in) :: w_lo(3), w_hi(3)
 #endif
     integer, intent(in) :: domain_phys_bc(amrex_spacedim,2)
-    integer, intent(in) :: box_phys_bc(amrex_spacedim,2)
+    integer, intent(in) :: box_phys_bc(amrex_spacedim,2,amrex_spacedim)
     double precision, intent(inout) :: gphix_mac(gx_lo(1):gx_hi(1),gx_lo(2):gx_hi(2),gx_lo(3):gx_hi(3))
     double precision, intent(inout) :: gphiy_mac(gy_lo(1):gy_hi(1),gy_lo(2):gy_hi(2),gy_lo(3):gy_hi(3))
 #if (AMREX_SPACEDIM==3)
@@ -632,10 +459,13 @@ contains
        call bl_error('Not set up for these boundary conditions')
     endif
 
+    ! write(*,*) "box_phys_bc = ", box_phys_bc
+    ! write(*,*) box_phys_bc(1,2,:)
+
     ! impose BCs
 
     ! x lo
-    select case (box_phys_bc(1,1))
+    select case (box_phys_bc(1,1,2))
     case (SlipWall)
        umac(lo(1),lo(2):hi(2),lo(3):hi(3)) = ZERO
     case (Interior)
@@ -644,7 +474,7 @@ contains
     end select
 
     ! x hi
-    select case(box_phys_bc(1,2))
+    select case(box_phys_bc(1,2,2))
     case (SlipWall)
        umac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = ZERO
     case (Interior)
@@ -653,7 +483,7 @@ contains
     end select
 
     ! y lo
-    select case (box_phys_bc(2,1))
+    select case (box_phys_bc(2,1,1))
     case (SlipWall)
        vmac(lo(1):hi(1),lo(2),lo(3):hi(3)) = ZERO
     case (Interior)
@@ -662,7 +492,7 @@ contains
     end select
 
     ! y hi
-    select case(box_phys_bc(2,2))
+    select case(box_phys_bc(2,2,1))
     case (SlipWall)
        vmac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = ZERO
     case (Interior)
@@ -672,7 +502,7 @@ contains
 
 #if (AMREX_SPACEDIM==3)
     ! z lo
-    select case (box_phys_bc(3,1))
+    select case (box_phys_bc(3,1,1))
     case (SlipWall)
        wmac(lo(1):hi(1),lo(2):hi(2),lo(3)) = ZERO
     case (Interior)
@@ -681,7 +511,7 @@ contains
     end select
 
     ! z hi
-    select case(box_phys_bc(3,2))
+    select case(box_phys_bc(3,2,1))
     case (SlipWall)
        wmac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = ZERO
     case (Interior)
