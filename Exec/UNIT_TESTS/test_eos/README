@@ -1,0 +1,10 @@
+This test problem creates a grid of rho, T, and X and calls the EOS.
+Various quantities are output to a plotfile.  Then we invert the EOS
+and make sure we recover the temperature again.
+
+This test uses only a small set of the MAESTRO routines.  It is setup
+as a UNIT_TEST in the GNUmakefile.  The GPackage.mak in this directory
+picks the few MAESTRO files we need.  There is a custom variables
+module that defines a different set of the quantities than normally
+used.
+
