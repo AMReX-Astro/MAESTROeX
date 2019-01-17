@@ -45,7 +45,7 @@ maestro.v              = 1       # verbosity
 
 # HYDRODYNAMICS options
 maestro.base_cutoff_density = 1.e-10
-maestro.ppm_type = 0
+maestro.ppm_type = 1
 
 &probin
 
