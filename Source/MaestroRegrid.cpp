@@ -174,6 +174,9 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 
     if (lev >= tag_err.size()) return;
 
+    // reset the tag_array (marks radii for planar tagging)
+    std::fill(tag_array.begin(), tag_array.end(), 0);
+    
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
 
