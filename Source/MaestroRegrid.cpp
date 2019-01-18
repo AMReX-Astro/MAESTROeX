@@ -36,6 +36,7 @@ Maestro::Regrid ()
 	    regrid_base_state_cc(psi.dataPtr());
 	    regrid_base_state_cc(etarho_cc.dataPtr());
 	    regrid_base_state_edge(etarho_ec.dataPtr());
+	    regrid_base_state_edge(w0.dataPtr());
 
         } else {
 	    // evolve_base_state == F and spherical == 0
