@@ -15,7 +15,9 @@ Maestro::DiagFile (const int step,
                    int& index)
 {
     if (spherical == 0) {
-	Warning("WARNING: WriteDiagFile() not written for non-spherical geometry");
+        if (ParallelDescriptor::IOProcessor()) {
+            Warning("WARNING: WriteDiagFile() not written for non-spherical geometry");
+        }
         return;
     }
 
