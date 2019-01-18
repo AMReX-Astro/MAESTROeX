@@ -118,7 +118,7 @@ min_eff                             Real               0.9
 
 # pass $T'$ into the tagging routines as the auxillary multifab instead
 # of the default $\rho H_\mathrm{nuc}$.
-use_tpert_in_tagging                bool            false
+use_tpert_in_tagging                bool            false     y
 
 
 #-----------------------------------------------------------------------------
