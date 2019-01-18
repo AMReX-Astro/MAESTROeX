@@ -1,11 +1,45 @@
 module debug_module
 
+  use base_state_geometry_module, only: max_radial_level, nr_fine, r_start_coord, &
+                                        r_end_coord, numdisjointchunks
 
   implicit none
 
   private
 
 contains
+
+  subroutine print_base_cc(base) bind(C, name="print_base_cc")
+
+    double precision, intent(in   ) :: base(0:max_radial_level,0:nr_fine-1)
+
+    integer :: n,i,r
+
+    do n=0,max_radial_level
+       do i=1,numdisjointchunks(n)
+          do r=r_start_coord(n,i),r_end_coord(n,i)
+             print*,'base lev,r',n,r,base(n,r)
+          end do
+       end do
+    end do    
+    
+  end subroutine print_base_cc
+
+  subroutine print_base_edge(base) bind(C, name="print_base_edge")
+
+    double precision, intent(in   ) :: base(0:max_radial_level,0:nr_fine)
+
+    integer :: n,i,r
+
+    do n=0,max_radial_level
+       do i=1,numdisjointchunks(n)
+          do r=r_start_coord(n,i),r_end_coord(n,i)+1
+             print*,'base lev,r',n,r,base(n,r)
+          end do
+       end do
+    end do    
+    
+  end subroutine print_base_edge
 
   subroutine print_mf(lev, lo, hi, mf, m_lo, m_hi, nc_m) bind (C,name="print_mf")
     

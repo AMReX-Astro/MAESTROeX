@@ -194,6 +194,9 @@ extern "C"
 
     //////////////////////
     // in debug.F90
+    void print_base_cc(const amrex::Real* base);
+    void print_base_edge(const amrex::Real* base);
+    
     void print_mf(const int* lev, const int* lo, const int* hi,
                   const amrex::Real* mf,
                   const int* m_lo, const int* m_hi, const int* nc_m);
