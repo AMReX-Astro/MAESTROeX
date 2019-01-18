@@ -1,5 +1,6 @@
 module debug_module
 
+  use parallel, only: parallel_IOProcessor
   use base_state_geometry_module, only: max_radial_level, nr_fine, r_start_coord, &
                                         r_end_coord, numdisjointchunks
 
@@ -15,13 +16,17 @@ contains
 
     integer :: n,i,r
 
-    do n=0,max_radial_level
-       do i=1,numdisjointchunks(n)
-          do r=r_start_coord(n,i),r_end_coord(n,i)
-             print*,'base lev,r',n,r,base(n,r)
+    if (parallel_IOProcessor()) then
+    
+       do n=0,max_radial_level
+          do i=1,numdisjointchunks(n)
+             do r=r_start_coord(n,i),r_end_coord(n,i)
+                print*,'base lev,r',n,r,base(n,r)
+             end do
           end do
        end do
-    end do    
+
+    end if
     
   end subroutine print_base_cc
 
@@ -31,13 +36,15 @@ contains
 
     integer :: n,i,r
 
-    do n=0,max_radial_level
-       do i=1,numdisjointchunks(n)
-          do r=r_start_coord(n,i),r_end_coord(n,i)+1
-             print*,'base lev,r',n,r,base(n,r)
+    if (parallel_IOProcessor()) then
+       do n=0,max_radial_level
+          do i=1,numdisjointchunks(n)
+             do r=r_start_coord(n,i),r_end_coord(n,i)+1
+                print*,'base lev,r',n,r,base(n,r)
+             end do
           end do
        end do
-    end do    
+    end if
     
   end subroutine print_base_edge
 
