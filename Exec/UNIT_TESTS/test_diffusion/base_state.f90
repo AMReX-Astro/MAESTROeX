@@ -69,7 +69,6 @@ contains
     diffusion_coefficient = const_conductivity / (eos_state%cp * ambient_dens)
 
     do n=0,max_radial_level
-
        do r=0,nr(n)-1
 
           s0_init(n,r,rho_comp) = eos_state%rho
@@ -79,7 +78,6 @@ contains
           s0_init(n,r,temp_comp) = eos_state%T
 
        end do
-
     end do ! end loop over levels
 
     rho0 = s0_init(:,:,rho_comp)
@@ -93,23 +91,4 @@ contains
 
   end subroutine init_base_state
 
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  subroutine init_base_state_irreg(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init, &
-       r_cc_loc, r_edge_loc) &
-       bind(C, name="init_base_state_irreg")
-
-    double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
-    double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) ::    rho0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) ::   rhoh0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) ::      p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) :: tempbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(inout) :: tempbar_init(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::   r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine  )
-
-
-  end subroutine init_base_state_irreg
 end module base_state_module

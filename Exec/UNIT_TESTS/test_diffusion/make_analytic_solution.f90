@@ -1,6 +1,5 @@
 module make_analytic_solution_module
 
-  use bl_types
   use bl_error_module
   use bl_constants_module
   use base_state_geometry_module, only: center
@@ -20,7 +19,6 @@ contains
     double precision, intent(inout) :: solution(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ), value :: time
-
 
     integer :: n, i, j, k
     double precision :: xx, yy, dist
@@ -55,6 +53,5 @@ contains
          exp(-x*x/(FOUR*diffusion_coefficient*(t+t0))) + ambient_h
 
   end function f
-
 
 end module make_analytic_solution_module

@@ -12,7 +12,6 @@ module initdata_module
   use eos_type_module
   use extern_probin_module, only: const_conductivity
   use amrex_constants_module
-  use fill_3d_data_module, only: put_1d_array_on_cart
 
   implicit none
 
@@ -20,23 +19,17 @@ module initdata_module
 
 contains
 
-  subroutine initdata(lev, time, lo, hi, &
+  subroutine initscaldata(lo, hi, &
        scal, scal_lo, scal_hi, nc_s, &
-       vel, vel_lo, vel_hi, nc_v, &
-       s0_init, p0_init, dx) bind(C, name="initdata")
+       s0_init, p0_init, dx) bind(C, name="initscaldata")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s
-    integer         , intent(in   ) :: vel_lo(3), vel_hi(3), nc_v
-    double precision, intent(in   ) :: time
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
          scal_lo(2):scal_hi(2), &
          scal_lo(3):scal_hi(3), 1:nc_s)
-    double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
-         vel_lo(2):vel_hi(2), &
-         vel_lo(3):vel_hi(3), 1:nc_v)
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
-    double precision, intent(in   ) :: p0_init(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
 
     integer          :: i,j,k,r,iter
@@ -49,16 +42,8 @@ contains
     double precision :: dens_pert, rhoh_pert, temp_pert
     double precision :: rhoX_pert(nspec)
     type (eos_t) :: eos_state
-    double precision :: s0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nscal)
 
-    ! set velocity to zero
-    vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v) = ZERO
-
-    scal(scal_lo(1):scal_hi(1), scal_lo(2):scal_hi(2), scal_lo(3):scal_hi(3), 1:nc_s) = ZERO
-
-    do i = 1, nscal
-        call put_1d_array_on_cart(lev, lo, hi, s0_cart(:,:,:,i), lo, hi, 1, s0_init(:,:,i), 0, 0)
-    enddo
+    scal(scal_lo(1):scal_hi(1),scal_lo(2):scal_hi(2),scal_lo(3):scal_hi(3),1:nc_s) = ZERO
 
     ! initialize the scalars
     do k=lo(3),hi(3)
@@ -76,12 +61,12 @@ contains
              h_zone = (peak_h - ambient_h) * &
                   exp(-dist2/(4.0d0*diffusion_coefficient*t0)) + ambient_h
 
-             temp_zone = s0_cart(i,j,k,temp_comp)
+             temp_zone = s0_init(max_radial_level,j,temp_comp)
 
-             eos_state%xn(1:nspec) = s0_cart(i,j,k,spec_comp:spec_comp+nspec-1) / &
-                  s0_cart(i,j,k,rho_comp)
+             eos_state%xn(1:nspec) = s0_init(max_radial_level,j,spec_comp:spec_comp+nspec-1) / &
+                  s0_init(max_radial_level,j,rho_comp)
 
-             eos_state%rho = s0_cart(i,j,k,rho_comp)
+             eos_state%rho = s0_init(max_radial_level,j,rho_comp)
 
              converged = .false.
 
@@ -118,10 +103,12 @@ contains
              scal(i,j,k,spec_comp:spec_comp+nspec-1) = &
                   eos_state%xn(1:nspec) * eos_state%rho
 
+             p0_init(max_radial_level,j) = eos_state%p
+
           enddo
        enddo
     enddo
 
-  end subroutine initdata
+  end subroutine initscaldata
 
 end module initdata_module

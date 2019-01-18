@@ -2,6 +2,7 @@
 #include <Maestro.H>
 #include <MaestroPlot.H>
 #include <AMReX_buildInfo.H>
+#include <Problem_F.H>
 
 using namespace amrex;
 
@@ -26,20 +27,26 @@ Maestro::WritePlotFile (const int step,
 
 	std::string plotfilename;
 
+	// get the run prefix
+	const int max_len = 100;
+	char run_prefix_arr[max_len];
+	get_run_prefix(run_prefix_arr, max_len);
+	std::string run_prefix(run_prefix_arr);
+
 	if (step == -1) {
-		plotfilename = "model1";
+		plotfilename = run_prefix + "model1";
 	}
 	else if (step == -2) {
-		plotfilename = "model2";
+		plotfilename = run_prefix + "model2";
 	}
 	else if (step == -3) {
-		plotfilename = "model3";
+		plotfilename = run_prefix + "model3";
 	}
 	else if (step == -4) {
-		plotfilename = "model4";
+		plotfilename = run_prefix + "model4";
 	}
 	else {
-		plotfilename = PlotFileName(step);
+		plotfilename = run_prefix + PlotFileName(step);
 	}
 
 	int nPlot = 0;

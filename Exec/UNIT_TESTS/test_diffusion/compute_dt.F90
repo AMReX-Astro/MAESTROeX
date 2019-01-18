@@ -1,14 +1,6 @@
 ! Compute the timestep
 module estdt_module
 
-  use bl_constants_module, only: HALF
-  use amrex_mempool_module, only : bl_allocate, bl_deallocate
-  use eos_type_module
-  use eos_module
-  use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, &
-       cfl, use_soundspeed_firstdt, use_divu_firstdt, &
-       use_exact_base_state
   use base_state_geometry_module, only:  max_radial_level, nr_fine, nr, dr
   use probin_module, only: diffusion_coefficient
 
@@ -17,7 +9,6 @@ module estdt_module
   private
 
 contains
-
 
   subroutine estdt(lev, dt, umax, lo, hi, dx, &
        scal,  s_lo, s_hi, nc_s, &

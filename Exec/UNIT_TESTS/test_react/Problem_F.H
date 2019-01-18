@@ -10,6 +10,7 @@ extern "C" {
 
 void get_min_timestep(amrex::Real* min_timestep);
 void get_react_its(int* react_its);
+void get_run_prefix(char* prefix, const int max_len);
 
 void initdata_thermal(const int* lo, const int* hi,
               const amrex::Real* scal, const int* scal_lo, const int* scal_hi, const int* nc_s,

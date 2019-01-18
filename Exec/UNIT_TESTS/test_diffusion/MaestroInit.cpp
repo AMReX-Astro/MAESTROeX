@@ -1,13 +1,10 @@
 
 #include <Maestro.H>
 #include <AMReX_VisMF.H>
+#include <Problem_F.H>
 using namespace amrex;
 
 
-// initialize AMR data
-// perform initial projection
-// perform divu iters
-// perform initial (pressure) iterations
 void
 Maestro::Init ()
 {
@@ -92,9 +89,6 @@ Maestro::InitData ()
 
     p0_new = p0_old;
 
-    for (int lev=0; lev<=finest_level; ++lev)
-		MultiFab::Copy(snew[lev],sold[lev],0,0,Nscal,ng_s);
-
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
@@ -111,18 +105,15 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 	sold              [lev].define(ba, dm,          Nscal, ng_s);
 	snew              [lev].define(ba, dm,          Nscal, ng_s);
-	uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
 	S_cc_old          [lev].define(ba, dm,              1,    0);
 
 	sold              [lev].setVal(0.);
 	snew              [lev].setVal(0.);
-	uold              [lev].setVal(0.);
 	S_cc_old          [lev].setVal(0.);
 
 	const Real* dx = geom[lev].CellSize();
 
 	MultiFab& scal = sold[lev];
-	MultiFab& vel = uold[lev];
 
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -134,15 +125,10 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		const int* lo  = tilebox.loVect();
 		const int* hi  = tilebox.hiVect();
 
-		initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+		initscaldata(ARLIM_3D(lo), ARLIM_3D(hi),
 		         BL_TO_FORTRAN_FAB(scal[mfi]),
-		         BL_TO_FORTRAN_FAB(vel[mfi]),
-		         s0_init.dataPtr(), p0_init.dataPtr(),
+		         s0_init.dataPtr(), p0_old.dataPtr(),
 		         ZFILL(dx));
 	}
-
-	for (int lev=0; lev<=finest_level; ++lev)
-		MultiFab::Copy(snew[lev],sold[lev],0,0,Nscal,ng_s);
-
 
 }
