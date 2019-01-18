@@ -36,6 +36,7 @@ Maestro::Regrid ()
 	    regrid_base_state_cc(psi.dataPtr());
 	    regrid_base_state_cc(etarho_cc.dataPtr());
 	    regrid_base_state_edge(etarho_ec.dataPtr());
+	    regrid_base_state_edge(w0.dataPtr());
 
         } else {
 	    // evolve_base_state == F and spherical == 0
@@ -174,6 +175,9 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 
     if (lev >= tag_err.size()) return;
 
+    // reset the tag_array (marks radii for planar tagging)
+    std::fill(tag_array.begin(), tag_array.end(), 0);
+    
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
 
