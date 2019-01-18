@@ -37,8 +37,10 @@ contains
 #else
              vel(i,j,k,1) = TWO*M_PI*sin(FOUR*M_PI*x)*cos( TWO*M_PI*y) - &
                   FOUR*M_PI*sin( TWO*M_PI*x)*cos(FOUR*M_PI*z)
+
              vel(i,j,k,2) = TWO*M_PI*sin(FOUR*M_PI*y)*cos( TWO*M_PI*z) - &
                   FOUR*M_PI*cos(FOUR*M_PI*x)*sin( TWO*M_PI*y)
+
              vel(i,j,k,3) = TWO*M_PI*cos( TWO*M_PI*x)*sin(FOUR*M_PI*z) - &
                   FOUR*M_PI*cos(FOUR*M_PI*y)*sin( TWO*M_PI*z)
 #endif
@@ -458,10 +460,7 @@ contains
           else
              call bl_error('Not set up for these boundary conditions')
           endif
-
-          ! write(*,*) "box_phys_bc = ", box_phys_bc
-          ! write(*,*) box_phys_bc(1,2,:)
-
+          
           ! impose BCs
 
           ! x lo
@@ -563,7 +562,6 @@ contains
                 enddo
              enddo
           enddo
-
 
         end subroutine convert_MAC_to_cc
 

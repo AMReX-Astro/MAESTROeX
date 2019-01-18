@@ -206,7 +206,6 @@ Maestro::Evolve ()
 			std::swap(uold[lev], unew[lev]);
 		}
 
-
 	} else {
 		for (int lev=0; lev<=finest_level; ++lev) {
 			MultiFab& gphix_mac_mf = gphi_mac[lev][0];
@@ -286,6 +285,8 @@ Maestro::Evolve ()
 		// hgprojection -- here pi is nodal and u is cell-centered
 
 		for (int lev=0; lev<=finest_level; ++lev) {
+			// build the density used in the projection -- we are just doing
+	        // constant density, so set it to 1
 			sold[lev].setVal(0.);
 			snew[lev].setVal(0.);
 			sold[lev].setVal(1., Rho, 1, 1);
@@ -295,6 +296,8 @@ Maestro::Evolve ()
 			rhcc_for_nodalproj[lev].setVal(0.);
 		}
 
+		// build the coefficient in the divergence.  We are doing
+        // divergence-free (incompressible), so set beta0 = 1
 		std::fill(beta0_old.begin(), beta0_old.end(), 1.);
 		std::fill(beta0_new.begin(), beta0_new.end(), 1.);
 
@@ -340,16 +343,14 @@ Maestro::Evolve ()
 	} else {
 		// mac projection -- here pi is cell-centered and u is MAC
 
-		Vector<MultiFab> rhohalf(finest_level+1);
 		Vector<MultiFab> macpi(finest_level+1);
 		Vector<MultiFab> macrhs(finest_level+1);
 
 		std::fill(beta0_old.begin(), beta0_old.end(), 1.);
+		std::fill(beta0_new.begin(), beta0_new.end(), 1.);
 
 		for (int lev=0; lev<=finest_level; ++lev) {
 			// cell-centered MultiFabs
-			rhohalf[lev].define(grids[lev], dmap[lev], Nscal,    1);
-			rhohalf[lev].setVal(1.);
 			macpi[lev].define(grids[lev], dmap[lev],       1,    1);
 			macpi[lev].setVal(0.);
 			macrhs[lev].define(grids[lev], dmap[lev],       1,    1);
