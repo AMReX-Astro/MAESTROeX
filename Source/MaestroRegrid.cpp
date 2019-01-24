@@ -224,10 +224,16 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
                         ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                         ZFILL(dx), &time,
 			tag_err[lev].dataPtr(), &lev, tag_array.dataPtr());
+
+	    //
+            // Now update the tags in the TagBox in the tilebox region
+            // to be equal to itags
+            //
+            tagfab.tags_and_untags(itags, tilebox);
         }
 
 	// convert back to full temperature states
-	// again may not be efficient 
+	// again, may not be efficient 
 	if (use_tpert_in_tagging) {
 	    PutInPertForm(sold,tempbar,Temp,Temp,bcs_s,false);
 	}
@@ -237,38 +243,36 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         // height
         if (spherical == 0) {
             ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
-        }
         
-        for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
-        {
-            const Box& tilebox  = mfi.tilebox();
+	    for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
+		{
+		    const Box& tilebox  = mfi.tilebox();
 
-            TagBox&     tagfab  = tags[mfi];
+		    TagBox&     tagfab  = tags[mfi];
 
-            // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
-            // So we are going to get a temporary integer array.
-            // set itags initially to 'untagged' everywhere
-            // we define itags over the tilebox region
-            tagfab.get_itags(itags, tilebox);
+		    // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
+		    // So we are going to get a temporary integer array.
+		    // set itags initially to 'untagged' everywhere
+		    // we define itags over the tilebox region
+		    tagfab.get_itags(itags, tilebox);
 
-            // data pointer and index space
-            int*        tptr    = itags.dataPtr();
-            const int*  tlo     = tilebox.loVect();
-            const int*  thi     = tilebox.hiVect();
-            
-	    if (spherical == 0) {
-		tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
-			  &tagval, &clearval,
-			  ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-			  ZFILL(dx), &time, &lev, tag_array.dataPtr());
-	    }
-	    
-            //
-            // Now update the tags in the TagBox in the tilebox region
-            // to be equal to itags
-            //
-            tagfab.tags_and_untags(itags, tilebox);
-        }
+		    // data pointer and index space
+		    int*        tptr    = itags.dataPtr();
+		    const int*  tlo     = tilebox.loVect();
+		    const int*  thi     = tilebox.hiVect();
+		    
+		    tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
+			      &tagval, &clearval,
+			      ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+			      ZFILL(dx), &time, &lev, tag_array.dataPtr());
+		    
+		    //
+		    // Now update the tags in the TagBox in the tilebox region
+		    // to be equal to itags
+		    //
+		    tagfab.tags_and_untags(itags, tilebox);
+		}
+	}
     }
 }
 
