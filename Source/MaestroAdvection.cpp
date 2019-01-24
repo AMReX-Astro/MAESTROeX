@@ -365,7 +365,7 @@ void
 
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
-    const int endcomp = startcomp + num_comp;
+    const int endcomp = startcomp + num_comp - 1;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
