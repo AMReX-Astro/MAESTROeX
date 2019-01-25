@@ -17,9 +17,9 @@
 # category: synchronization
 #-----------------------------------------------------------------------------
 
-# do we do the hyperbolic reflux at coarse-fine interfaces?
-do_reflux                           int         1
-
+# do we do the hyperbolic reflux at coarse-fine interfaces? (1)
+# or simply average-down the fluxes (0)
+do_reflux                           int         0
 
 #-----------------------------------------------------------------------------
 # category: general MAESTRO
