@@ -6,8 +6,8 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
-| ``do_reflux``                          | do we do the hyperbolic reflux at coarse-fine           | 1             |
-|                                        | interfaces?                                             |               |
+| ``do_reflux``                          | do we do the hyperbolic reflux at coarse-fine           | 0             |
+|                                        | interfaces? (1) or simply average-down the fluxes (0)   |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 
 
