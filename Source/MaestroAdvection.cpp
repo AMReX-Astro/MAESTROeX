@@ -500,8 +500,13 @@ void
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
+	    // NOTE: areas are different in DIM=2 and DIM=3
+#if (AMREX_SPACEDIM == 3) 
 	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
-
+#else
+	    const Real area[2] = {dx[1], dx[0]};
+#endif
+	    
 	    if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
