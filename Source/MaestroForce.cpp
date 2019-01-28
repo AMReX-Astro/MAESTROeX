@@ -119,7 +119,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 					&do_add_utilde_force);
 		}
 #else
-                // Abort("MakeVelForce: Spherical is not valid for DIM < 3");
+                Abort("MakeVelForce: Spherical is not valid for DIM < 3");
 #endif
             }
         }
