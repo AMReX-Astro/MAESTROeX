@@ -1,0 +1,49 @@
++Introduction
+-------------------------
+recon.py is designed to simplify the process of checking the consistency
+of reaction network data calculated by the test_react unit test.
+
+test_react outputs plotfiles of the results of calling MAESTRO's 
+react_state() routine on an initial 3D grid.  These results include
+consistency calculations (see the README in test_react's main directory).
+
+recon.py takes these plotfiles as arguments and prints out the maximum
+values of consistency data.  From this it can be quickly determined if the 
+reaction network being tested is outputting consistent data without
+having to tediously comb through the plotfiles using amrvis.
+
++Usage
+-------------------------
+First generate fsnapshot.so with a make call
+  'make'
+Now you can analyze plotfiles by calling
+  './recon.py plotfile' 
+from a terminal.  One can also pass multiple plotfies
+  './recon.py plotfile1 plotfile2 plotfile3 ...'
+
++Output
+-------------------------
+For each plotfile given, recon.py prints to the terminal the following:
+
++++
+Results for plotfile:
+-------------------- 
+-Omegadot max error for species 1: #.#
+-Omegadot max error for species 2: #.#
+...(repeat for all species)...
+-Enthalpy max error:         #.#
+-Max nuclear heating value:  #.#
+-Max external heating value: #.#
++++
+
+The omegadot max error for species * is the maximum value of the
+'* consistency' variable in the plotfile's 3D grid (see test_react's
+README for a description of '* consistency').
+
+Enthalpy max error is the maximum value of the 'Enthalpy consistency'
+variable in the plotfile's 3D grid.
+
+The maximum values of H_nuc and H_ext are also printed.  This allows one
+to quickly check that H_nuc is 0.0 everywhere if test_react was run with
+the do_burning parameter set to false, or that H_ext is 0.0 everywhere if 
+run with do_heating set to false.
