@@ -13,7 +13,8 @@ module make_analytic_solution_module
 
 contains
 
-  subroutine make_analytic_solution(lo, hi, solution, s_lo, s_hi, dx, time) bind(C, name="make_analytic_solution")
+  subroutine make_analytic_solution(lo, hi, solution, s_lo, s_hi, dx, time) &
+       bind(C, name="make_analytic_solution")
 
     integer, intent(in) :: lo(3), hi(3), s_lo(3), s_hi(3)
     double precision, intent(inout) :: solution(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
@@ -21,7 +22,7 @@ contains
     double precision, intent(in   ), value :: time
 
     integer :: n, i, j, k
-    double precision :: xx, yy, dist
+    double precision :: x, y, dist2
 
     solution(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3)) = ZERO
 
@@ -29,15 +30,15 @@ contains
 
        do j = lo(2), hi(2)
 
-          yy = prob_lo(2) + (dble(j)+HALF) * dx(2)
+          y = prob_lo(2) + (dble(j)+HALF) * dx(2) - center(2)
 
           do i = lo(1), hi(1)
 
-             xx = prob_lo(1) + (dble(i)+HALF) * dx(1)
+             x = prob_lo(1) + (dble(i)+HALF) * dx(1) - center(1)
 
-             dist = sqrt((xx-center(1))**2 + (yy-center(2))**2)
+             dist2 = x**2 + y**2
 
-             solution(i,j,k) = f(time,dist)
+             solution(i,j,k) = f(time,dist2)
 
           enddo
        enddo
@@ -49,8 +50,8 @@ contains
     double precision :: t, x
     double precision :: r
 
-    r = (peak_h-ambient_h)*(t0/(t+t0)) * &
-         exp(-x*x/(FOUR*diffusion_coefficient*(t+t0))) + ambient_h
+    r = (peak_h - ambient_h) * (t0 / (t+t0)) * &
+         exp(-x / (FOUR * diffusion_coefficient * (t+t0))) + ambient_h
 
   end function f
 

@@ -12,8 +12,8 @@ MAESTROEX_HOME  := ../../..
 MICROPHYSICS_HOME ?= ../../../../Microphysics
 
 # define the physics packages to build this problem
-EOS_DIR := gamma_law_general
-# EOS_DIR := helmholtz
+# EOS_DIR := gamma_law_general
+EOS_DIR := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR := general_null
 GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/$(NETWORK_DIR)/H_core.net

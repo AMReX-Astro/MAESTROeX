@@ -2,7 +2,7 @@
 module estdt_module
 
   use base_state_geometry_module, only:  max_radial_level, nr_fine, nr, dr
-  use probin_module, only: diffusion_coefficient
+  use probin_module, only: diffusion_coefficient, dt_mult_factor
 
   implicit none
 
@@ -37,7 +37,7 @@ contains
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
 
     ! calculate the timestep
-    dt = minval(dx*dx / diffusion_coefficient)
+    dt = dt_mult_factor * minval(dx*dx / diffusion_coefficient)
 
   end subroutine estdt
 
@@ -64,7 +64,7 @@ contains
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
 
     ! local variables
-    dt = minval(dx*dx / diffusion_coefficient)
+    dt = dt_mult_factor * minval(dx*dx / diffusion_coefficient)
 
   end subroutine firstdt
 

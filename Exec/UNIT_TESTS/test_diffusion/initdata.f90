@@ -49,17 +49,17 @@ contains
     do k=lo(3),hi(3)
        do j = lo(2), hi(2)
 
-          y = prob_lo(2) + (dble(j)+HALF) * dx(2)
+          y = prob_lo(2) + (dble(j)+HALF) * dx(2) - center(2)
 
           do i = lo(1), hi(1)
 
-             x = prob_lo(1) + (dble(i)+HALF) * dx(1)
+             x = prob_lo(1) + (dble(i)+HALF) * dx(1) - center(1)
 
              ! apply the guassian enthalpy pulse at constant density
-             dist2 = (center(1) - x)**2 + (center(2) - y)**2
+             dist2 = x**2 + y**2
 
              h_zone = (peak_h - ambient_h) * &
-                  exp(-dist2/(4.0d0*diffusion_coefficient*t0)) + ambient_h
+                  exp(-dist2/(FOUR * diffusion_coefficient * t0)) + ambient_h
 
              temp_zone = s0_init(max_radial_level,j,temp_comp)
 
@@ -70,14 +70,12 @@ contains
 
              converged = .false.
 
-             eos_state%T = temp_zone
-
              do iter = 1, max_iter
                 eos_state%T = temp_zone
 
                 call eos(eos_input_rt, eos_state)
 
-                dhdt = eos_state%cv + eos_state%dpdt/eos_state%rho
+                dhdt = eos_state%cv + eos_state%dpdt / eos_state%rho
 
                 del_temp = -(eos_state%h - h_zone) / dhdt
 

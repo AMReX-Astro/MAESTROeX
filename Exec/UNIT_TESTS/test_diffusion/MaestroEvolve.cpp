@@ -22,8 +22,8 @@ Maestro::Evolve ()
 	Vector<MultiFab>      hcoeff2(finest_level+1);
 	Vector<MultiFab>     Xkcoeff2(finest_level+1);
 	Vector<MultiFab>      pcoeff2(finest_level+1);
-	Vector<MultiFab>      analytic(finest_level+1);
-	Vector<MultiFab>      error(finest_level+1);
+	Vector<MultiFab>     analytic(finest_level+1);
+	Vector<MultiFab>        error(finest_level+1);
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 		// coefficients for diffusion

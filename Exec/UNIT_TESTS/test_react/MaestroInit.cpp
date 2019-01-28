@@ -5,10 +5,6 @@
 using namespace amrex;
 
 
-// initialize AMR data
-// perform initial projection
-// perform divu iters
-// perform initial (pressure) iterations
 void
 Maestro::Init ()
 {
@@ -28,7 +24,7 @@ Maestro::Init ()
 
 	// compute initial time step
 	// FirstDt();
-    get_min_timestep(&dt);
+	get_min_timestep(&dt);
 
 	if (stop_time >= 0. && t_old+dt > stop_time) {
 		dt = std::min(dt,stop_time-t_old);
@@ -81,7 +77,7 @@ Maestro::InitData ()
 	for (int i=0; i<tempbar.size(); ++i)
 		tempbar_init[i] = tempbar[i];
 
-    for (int lev=0; lev<=finest_level; ++lev)
+	for (int lev=0; lev<=finest_level; ++lev)
 		MultiFab::Copy(snew[lev],sold[lev],0,0,Nscal,ng_s);
 
 }
@@ -109,7 +105,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 	MultiFab& scal = sold[lev];
 
-    const Box& domainBox = geom[lev].Domain();
+	const Box& domainBox = geom[lev].Domain();
 
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -122,9 +118,9 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		const int* hi  = tilebox.hiVect();
 
 		initdata_thermal(ARLIM_3D(lo), ARLIM_3D(hi),
-		         BL_TO_FORTRAN_FAB(scal[mfi]),
-		         ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-		         s0_init.dataPtr(), p0_init.dataPtr(),
-		         ZFILL(dx));
+		                 BL_TO_FORTRAN_FAB(scal[mfi]),
+		                 ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
+		                 s0_init.dataPtr(), p0_init.dataPtr(),
+		                 ZFILL(dx));
 	}
 }

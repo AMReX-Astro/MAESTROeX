@@ -45,8 +45,6 @@ contains
     integer :: n,r
     type (eos_t) :: eos_state
 
-    ! call network_init()
-
     ihe4  = network_species_index("helium-4")
     ic12  = network_species_index("carbon-12")
     ife56 = network_species_index("iron-56")

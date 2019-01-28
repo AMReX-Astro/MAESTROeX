@@ -22,6 +22,11 @@ Maestro::Evolve ()
 
 	auto dbo = do_burning;
 	auto dho = do_heating;
+
+	// This problem uses a custom WritePlotFile, but as it's a member function of
+	// the Maestro class, it has to use the same prototype as the original.
+	// We shall therefore create a dummy variable to fill up all the variables
+	// passed into the function that won't be used.
 	Vector<Real> dummy;
 
 	// Model 1: No burning, no heating
@@ -33,13 +38,13 @@ Maestro::Evolve ()
 	              rho_Hnuc,rho_Hext);
 
 	// Model 2: Burning without heating
-	Print() << "\nModel 2: Burning without heating\n";
-	do_burning = true;
-	do_heating = false;
-	for (int lev=0; lev<=finest_level; ++lev) rho_Hext[lev].setVal(0.);
-	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
-	WritePlotFile(-2,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
-	              rho_Hnuc,rho_Hext);
+	// Print() << "\nModel 2: Burning without heating\n";
+	// do_burning = true;
+	// do_heating = false;
+	// // for (int lev=0; lev<=finest_level; ++lev) rho_Hext[lev].setVal(0.);
+	// React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
+	// WritePlotFile(-2,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
+	//               rho_Hnuc,rho_Hext);
 
 	// Model 3: Heating without burning
 	Print() << "\nModel 3: Heating without burning\n";

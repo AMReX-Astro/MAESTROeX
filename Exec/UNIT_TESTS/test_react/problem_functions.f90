@@ -1,8 +1,9 @@
+! Contains some getter routines for probin module variables
+
 module problem_functions_module
 
   use amrex_constants_module
   use probin_module, only: min_time_step, react_its, run_prefix
-  ! use meth_params_module, only: prob_lo
 
   implicit none
 
