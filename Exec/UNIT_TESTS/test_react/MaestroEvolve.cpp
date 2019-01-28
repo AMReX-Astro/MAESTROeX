@@ -38,13 +38,12 @@ Maestro::Evolve ()
 	              rho_Hnuc,rho_Hext);
 
 	// Model 2: Burning without heating
-	// Print() << "\nModel 2: Burning without heating\n";
-	// do_burning = true;
-	// do_heating = false;
-	// // for (int lev=0; lev<=finest_level; ++lev) rho_Hext[lev].setVal(0.);
-	// React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
-	// WritePlotFile(-2,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
-	//               rho_Hnuc,rho_Hext);
+	Print() << "\nModel 2: Burning without heating\n";
+	do_burning = true;
+	do_heating = false;
+	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt);
+	WritePlotFile(-2,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
+	              rho_Hnuc,rho_Hext);
 
 	// Model 3: Heating without burning
 	Print() << "\nModel 3: Heating without burning\n";

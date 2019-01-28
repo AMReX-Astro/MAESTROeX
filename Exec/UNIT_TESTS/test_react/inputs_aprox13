@@ -43,6 +43,7 @@ maestro.cg_verbose = 0
 
 # DIFFUSION parameters
 maestro.do_heating = false
+maestro.do_burning = true
 
 # GRAVITY parameters
 maestro.grav_const = 0.0e0
