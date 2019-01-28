@@ -42,8 +42,6 @@ maestro.cfl         = 0.9    # cfl number for hyperbolic system
 			     # time-dependent.  We could use 0.9 in
 			     # the 3D test, but need to use 0.7 in 2D
 			     # to satisfy CFL condition.
-# do we do the hyperbolic reflux at coarse-fine interfaces?
-maestro.do_reflux = 1
 maestro.init_shrink = 0.1e0
 
 # Tagging
@@ -63,7 +61,7 @@ maestro.evolve_base_state = true
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 1
 maestro.init_iter             = 1
-maestro.do_reflux             = 1 # do we do the hyperbolic reflux
+maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 
 maestro.do_sponge = 0
 maestro.sponge_center_density = 3.e6

@@ -3,19 +3,10 @@ maestro.model_file = "kepler_new_6.25e8.hybrid.hse.640"
 maestro.drdxfac = 5
 
 # GRIDDING AND REFINEMENT
-amr.max_level          = 1       # maximum level number allowed
-amr.n_cell             = 64 64 64
+amr.max_level          = 0       # maximum level number allowed
+amr.n_cell             = 128 128 128
 amr.max_grid_size      = 32
-maestro.regrid_int     = 0       # how often to regrid
-amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
-amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
-#amr.grid_eff           = 0.9     # larger number results in more smaller grids around tagged cells
-
-# TAGGING
-maestro.temperr = 6.0e8
-maestro.denserr = 1.0e8
-maestro.do_reflux = 0 # do we do the hyperbolic reflux
 
 maestro.anelastic_cutoff = 1.e6
 maestro.base_cutoff_density = 1.e5
@@ -32,14 +23,14 @@ geometry.prob_lo     =  0.0    0.0    0.0
 geometry.prob_hi     =  5.e8  5.e8   5.e8
 
 # TIME STEPPING
-maestro.max_step  = 100
+maestro.max_step  = 1000
 maestro.init_iter = 1
 
 maestro.stop_time = 30000.
 
 # PLOTFILES
 maestro.plot_file  = plt    # root name of plot file
-maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_int   = 10     # number of timesteps between plot files
 
 # CHECKPOINT
 maestro.check_base_name = chk
@@ -72,6 +63,8 @@ maestro.cg_verbose     = 0
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 2
 
+maestro.probin_file = "probin"
+
 maestro.do_burning = true
 
 maestro.evolve_base_state = true
@@ -98,33 +91,3 @@ maestro.eps_hg             = 1.e-11
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
-
-&probin
-
-  ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e5
-  velpert_radius = 2.e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
-  tag_density_1 = 5.e7
-  tag_density_2 = 1.e8
-  tag_density_3 = 1.e8
-  tag_density_3 = 1.e9
-  particle_temp_cutoff = 6.e8
-  particle_tpert_threshold = 2.e7
-
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  use_eos_coulomb = T
-
-/
-

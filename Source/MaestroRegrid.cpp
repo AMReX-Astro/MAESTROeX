@@ -62,7 +62,7 @@ Maestro::Regrid ()
     // regrid could add newly refine levels (if finest_level < max_level)
     // so we save the previous finest level index
     regrid(0, t_old);
-    
+
     // Redefine numdisjointchunks, r_start_coord, r_end_coord
     TagArray();
     init_multilevel(tag_array.dataPtr(),&finest_level);
@@ -177,6 +177,13 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 
     // reset the tag_array (marks radii for planar tagging)
     std::fill(tag_array.begin(), tag_array.end(), 0);
+
+    // convert temperature to perturbation values
+    // may not be efficient since this subroutine converts
+    // values at all levels of refinement
+    if (use_tpert_in_tagging) {
+	PutInPertForm(sold,tempbar,Temp,Temp,bcs_s,true);
+    }
     
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
@@ -184,7 +191,8 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     const Real* dx      = geom[lev].CellSize();
 
     const MultiFab& state = sold[lev];
-
+    
+	    
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -216,45 +224,55 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
                         ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                         ZFILL(dx), &time,
 			tag_err[lev].dataPtr(), &lev, tag_array.dataPtr());
+
+	    //
+            // Now update the tags in the TagBox in the tilebox region
+            // to be equal to itags
+            //
+            tagfab.tags_and_untags(itags, tilebox);
         }
+
+	// convert back to full temperature states
+	// again, may not be efficient 
+	if (use_tpert_in_tagging) {
+	    PutInPertForm(sold,tempbar,Temp,Temp,bcs_s,false);
+	}
 
         // for planar refinement, we need to gather tagged entries in arrays
         // from all processors and then re-tag tileboxes across each tagged
         // height
         if (spherical == 0) {
             ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
-        }
         
-        for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
-        {
-            const Box& tilebox  = mfi.tilebox();
+	    for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
+		{
+		    const Box& tilebox  = mfi.tilebox();
 
-            TagBox&     tagfab  = tags[mfi];
+		    TagBox&     tagfab  = tags[mfi];
 
-            // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
-            // So we are going to get a temporary integer array.
-            // set itags initially to 'untagged' everywhere
-            // we define itags over the tilebox region
-            tagfab.get_itags(itags, tilebox);
+		    // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
+		    // So we are going to get a temporary integer array.
+		    // set itags initially to 'untagged' everywhere
+		    // we define itags over the tilebox region
+		    tagfab.get_itags(itags, tilebox);
 
-            // data pointer and index space
-            int*        tptr    = itags.dataPtr();
-            const int*  tlo     = tilebox.loVect();
-            const int*  thi     = tilebox.hiVect();
-            
-	    if (spherical == 0) {
-		tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
-			  &tagval, &clearval,
-			  ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-			  ZFILL(dx), &time, &lev, tag_array.dataPtr());
-	    }
-	    
-            //
-            // Now update the tags in the TagBox in the tilebox region
-            // to be equal to itags
-            //
-            tagfab.tags_and_untags(itags, tilebox);
-        }
+		    // data pointer and index space
+		    int*        tptr    = itags.dataPtr();
+		    const int*  tlo     = tilebox.loVect();
+		    const int*  thi     = tilebox.hiVect();
+		    
+		    tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
+			      &tagval, &clearval,
+			      ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+			      ZFILL(dx), &time, &lev, tag_array.dataPtr());
+		    
+		    //
+		    // Now update the tags in the TagBox in the tilebox region
+		    // to be equal to itags
+		    //
+		    tagfab.tags_and_untags(itags, tilebox);
+		}
+	}
     }
 }
 
