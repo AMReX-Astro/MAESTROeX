@@ -41,7 +41,9 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+#if (AMREX_SPACEDIM >= 2)
 		utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+#endif
 #if (AMREX_SPACEDIM == 3)
 		utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif

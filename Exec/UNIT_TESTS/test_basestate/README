@@ -1,0 +1,69 @@
+** IMPORTANT: each of these tests requires a different network -- make
+   sure that the network is specified correctly in the GNUmakefile
+
+------------------------------------------------------------------------------
+spherical test problem from multilevel paper:
+
+  inputs-spherical_heat is the inputs file
+ 
+  This is a test problem for base-state expansion in a full
+  white-dwarf environment.  We have a gaussinan bump of heating at the
+  center of the star, and a null reaction network.
+
+  ** This needs to be compiled with ignition.net general_null network **
+  
+  This is a 1D version of spherical_heat.
+
+  Castro output is:
+
+    castro_2sec_den
+    castro_2sec_pres
+    castro_2sec_temp
+
+  run with the hydrostatic_adjust Castro setup.
+
+  Note that heating_time controls when the heating turns off, which
+  will result in w0 going to zero after heating_time seconds of the 
+  simulation. 
+
+  Note that total run time is set to a time > heating_time because 
+  CASTRO takes additional time to equilibrate after heating is shut off.
+
+
+------------------------------------------------------------------------------
+plane-parallel test problem:
+
+  inputs-planar approximates what was done in paper II, but this
+  should be revisited.
+
+  The original comparison was done with FLASH
+
+
+------------------------------------------------------------------------------
+analytical CNO cycle test problem:
+
+  make sure to change the nework in GNUmakefile to H_core_null
+
+
+------------------------------------------------------------------------------
+planar 1/r**2 gravity nova test problem
+
+   The initial model here was created using initial_models/toy_atm/
+   with _params.nova.invsq
+
+   Use the pphotcno network to get the required species
+
+   There is a CASTRO comparison: hydrostatic_adjust_planar_invsq
+
+
+------------------------------------------------------------------------------
+spherical for sub-Chandra
+
+   This is used to test base state expansion for the sub_chandra
+   problem.  The model comes from AstroDev/initial_models/sub_chandra.
+
+   This needs to be compiled with one of the triple_alpha networks.
+
+   Castro comparison output is provided: castro_hse_adjust_subchandra.out
+
+  

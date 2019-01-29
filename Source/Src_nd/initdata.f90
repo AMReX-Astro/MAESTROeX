@@ -18,7 +18,7 @@ contains
   subroutine initdata(lev, time, lo, hi, &
        scal, scal_lo, scal_hi, nc_s, &
        vel, vel_lo, vel_hi, nc_v, &
-       s0_init, p0_init) bind(C, name="initdata")
+       s0_init, p0_init, dx) bind(C, name="initdata")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: scal_lo(3), scal_hi(3), nc_s

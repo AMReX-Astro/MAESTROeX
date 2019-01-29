@@ -663,7 +663,7 @@ private:
 
     // set tagging array to include buffer zones for multilevel
     void TagArray ();
-    
+
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
     virtual void ErrorEst (int lev,
@@ -887,6 +887,8 @@ private:
     amrex::Vector<amrex::Real> rho0_new;
     amrex::Vector<amrex::Real> rhoh0_old;
     amrex::Vector<amrex::Real> rhoh0_new;
+    amrex::Vector<amrex::Real> rhoX0_old;
+    amrex::Vector<amrex::Real> rhoX0_new;
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
     amrex::Vector<amrex::Real> tempbar;

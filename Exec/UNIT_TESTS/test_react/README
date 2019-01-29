@@ -1,0 +1,114 @@
++Introduction
+-------------------------
+The test_react unit test serves both as a check of the consistency of a reaction network
+as well as a diagnostic tool for isolating and analyzing reaction network results.
+
+The basic algorithm:
+  1) Initialize a 3D grid of varying temperature, density, and mass fraction.
+  2) Write out a plotfile (plottable with amrvis) of the initial grid.
+  3) Call react_state() on the initial grid and output a plotfile for each of
+     the following cases:
+      1)Mode 1: No burning and no heating.  We should expect H_nuc and H_ext to be 
+                0 everywhere.
+      2)Mode 2: Burning is turned on and heating off.  We expect H_ext to be 0 everywhere.
+      3)Mode 3: Heating is turned on and burning off.  We expect H_nux to be 0 everywhere.
+                External heating is implemented as a simple Gaussian at the center of the
+                grid.
+      4)Mode 4: Burning and heating are both on.  H_nuc and H_ext should be non-zero.
+      5)Time domain: Based on user input, react_state() is called with successively larger
+                     dt values.  
+
++Usage (Brief summary)
+-------------------------
+1) Modify the 'NETWORK_DIR' variable in the GNUmakefile to point to the reaction network
+   you would like to test.
+
+2) Execute a 'make' call to generate an executable.
+
+3) Modify 'inputs_react' to suit your needs. (See the parameters section below)
+
+4) Run the executable generated in step 2 and pass it your 'inputs_react' file.  Runtime 
+   can be quite long depending on grid size and the efficiency of the network being tested.
+
+5) Analyze the generated plotfiles.  Several plotfiles should have been generated: 
+   one for each of the four modes (see +Introduction) and a user-specified number of varying 
+   values of the time step.
+
++test_react parameters
+-------------------------
+Parameters specific to test_react:
+  -dens_min,        real: The minimum density in the 3D grid. 
+  -dens_max,        real: The maximum density in the 3D grid. 
+  -temp_min,        real: The minimum temperature in the 3D grid. 
+  -temp_max,        real: The maximum temperature in the 3D grid. 
+  -min_time_step,   real: The smallest time step to be tested.
+  -react_its,    integer: How many orders of magnitude to explore in the time domain.  e.g. a
+                          value of '10' will result in calling react_state() ten times: first
+                          with a dt of 'min_time_step' and with each subsequent call being larger
+                          by an order of magnitude.
+  -xin_file,   character: The name of the file containing the desired initial set of mass fraction
+                          values.  If xin_file = "uniform", then all species in the given network
+                          will be given the same mass fraction, summing to 1.
+  -run_prefix, character: The text to be prepended to all output files.
+
++Output
+-------------------------
+The following amrvis plotfiles will be generated:
+  -run_prefix_mode1: Results of react_state() with no burning and no heating.
+  -run_prefix_mode2: Results of react_state() with burning but no heating.
+  -run_prefix_mode3: Results of react_state() with heating but no burning.
+  -run_prefix_mode4: Results of react_state() with both burning and heating.
+  -run_prefix_dtE+#: Results of react_state() called with a time step of 'min_time_step' * 10^#.
+
++Primary directory contents
+-------------------------
+test_react/
+  |
+  --> GNUmakefile      - Used to compile this unit test.
+  |
+  --> GPackage.mak     - Tells the compiler what source files to include.
+  |
+  --> gr0_3d           - File used to configure the 3D grid.
+  |
+  --> initialize.f90   - Custom implementation of MAESTRO initialization routines.
+  |
+  --> make_heating.f90 - Custom heating implementation.  Generates a central Gaussian external 
+  |                      heating profile.
+  |
+  --> varden.f90       - Custom implementation of MAESTRO varden routine.  This is the heart/driver 
+  |                      of the unit test.
+  |
+  --> varden_aux.f90   - Auxiliary source file containing various custom subroutines developed for
+  |                      this unit test.  The file was created instead of including these routines
+  |                      in varden.f90 in an attempt to keep varden.f90 readable and to break computational
+  |                      tasks down into small, readable subroutines.  I hope this makes the code easier
+  |                      to read and understand.
+  |
+  --> inputs_react     - This is the conventional MAESTRO input file allowing the user to set parameter 
+  |                      values.
+  |
+  --> _parameters      - Tells MAESTRO to add some custom parameter variables for this unit test.
+  |
+  --> README           - This very file!
+  |
+  --> scripts/         - Directory of utility scripts.
+  |
+  ----> GNUmakefile    - Used to compile python scripts which make use of Fortran code.
+  |
+  ----> fsnapshot.f90  - Modified versions of Fortran post-processing routines typically found in
+  |                      a AmrPostprocessing/ directory.  These routines are used to extract information
+  |                      from amrvis plotfiles.
+  |
+  ----> fsnapshot.so   - A python/Fortran interface generated by f2py.
+  |
+  ----> recon.py       - Python script that takes the plotfiles generated by test_react and outputs consistency data.
+  |                      This allows one to quickly check if the reaction network being tested generated results
+  |                      that are consistent with basic expectations for all reaction networks.
+  |
+  ----> xinGen.py      - Python script for generating mass fraction input files.  The generated file can be pointed
+                         to by setting the 'xin_file' parameter to the name of the file.
+
++TODO
+-------------------------
+- It would be nice to have this run with varying dimensionality and geometry.
+  Effectively, only one burner loop gets exercised as it currently stands.

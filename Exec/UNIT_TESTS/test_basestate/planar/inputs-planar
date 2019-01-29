@@ -1,0 +1,46 @@
+# INITIAL MODEL
+maestro.model_file = "planar/model.planar.768"
+maestro.stop_time = 5.0
+maestro.max_step = 10000
+
+# GRIDDING AND REFINEMENT
+amr.max_level          = 0       # maximum level number allowed
+amr.n_cell             = 128 128
+amr.max_grid_size      = 64
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+maestro.spherical = 0
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0 0.0
+geometry.prob_hi     =  3.e8 3.e8
+maestro.evolve_base_state = true
+maestro.do_initial_projection = false
+maestro.init_divu_iter        = 0
+maestro.init_iter             = 0
+maestro.cfl = 0.9e0
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 2 2
+maestro.hi_bc = 2 2
+geometry.is_periodic =  0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+maestro.plot_int        = -1
+maestro.chk_int         = -1
+
+# HYDRODYNAMICS
+maestro.anelastic_cutoff = 1.e5
+maestro.base_cutoff_density = 1.e5
+
+&probin
+
+ heating_peak = 1.e17
+ heating_time = 5.e0
+ heating_rad = 4.e7
+
+ use_eos_coulomb = T
+/

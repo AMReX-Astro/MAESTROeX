@@ -67,7 +67,7 @@ contains
     call bl_allocate(Ipf,lo(1)-1,hi(1)+1)
     call bl_allocate(Imf,lo(1)-1,hi(1)+1)
 
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1,1)
 
     ! Final edge states.
     ! lo:hi+1 in the normal direction
