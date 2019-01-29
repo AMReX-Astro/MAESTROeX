@@ -157,7 +157,7 @@ Maestro::TagArray ()
             const Box& tilebox  = mfi.tilebox();
 
             // retag refined cells to include cells in buffered regions
-            retag_array(&tagval,&clearval, 
+            retag_array(&tagval, &clearval, 
 			ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
 			&lev, tag_array.dataPtr());
         }
@@ -179,10 +179,8 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     std::fill(tag_array.begin(), tag_array.end(), 0);
 
     // convert temperature to perturbation values
-    // may not be efficient since this subroutine converts
-    // values at all levels of refinement
     if (use_tpert_in_tagging) {
-	PutInPertForm(sold,tempbar,Temp,Temp,bcs_s,true);
+	PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,true);
     }
     
     const int clearval = TagBox::CLEAR;
@@ -233,9 +231,8 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         }
 
 	// convert back to full temperature states
-	// again, may not be efficient 
 	if (use_tpert_in_tagging) {
-	    PutInPertForm(sold,tempbar,Temp,Temp,bcs_s,false);
+	    PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,false);
 	}
 
         // for planar refinement, we need to gather tagged entries in arrays

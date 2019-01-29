@@ -183,6 +183,12 @@ private:
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
+    
+    void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
+                        const amrex::Vector<amrex::Real>& s0,
+                        int comp, int bccomp,
+                        const amrex::Vector<amrex::BCRec>& bcs_in,
+                        bool flag);
 
     void ConvertRhoXToX (amrex::Vector<amrex::MultiFab>& scal,
                          bool flag);
@@ -330,6 +336,13 @@ private:
     // MaestroFill3dData.cpp functions
 
     void Put1dArrayOnCart (const amrex::Vector<amrex::Real>& s0,
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);
+    
+    void Put1dArrayOnCart (int level, const amrex::Vector<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
