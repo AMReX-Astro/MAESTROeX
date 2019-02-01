@@ -67,14 +67,21 @@ subroutine runtime_init()
   @@defaults@@
 
 
+!  print*, "amrex_namelist=\n", amrex_namelist
   ! read in the namelist
   read (amrex_namelist, nml=probin, iostat=status)
+ 
+!  print*, "xinlong1"
+!  print*, status
+!  print*, "amrex_namelist=\n", amrex_namelist
 
   if (status .ne. 0) then
      ! some problem in the namelist
      print *, 'ERROR: problem in the namelist'
      stop
   endif
+
+!  print*, "xinlong2"
 
   @@acc@@
 
