@@ -351,7 +351,7 @@ Maestro::PlotFileMF (const int nPlot,
 	std::fill(tempbar_plot.begin(), tempbar_plot.end(), 0.);
 
 	Average(s_in, tempbar_plot, Temp);
-	Put1dArrayOnCart(tempbar_plot,tempmf,1,0,bcs_u,0);
+	Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
 
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);

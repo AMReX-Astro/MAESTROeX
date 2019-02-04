@@ -1,0 +1,11 @@
+heating_time          real           0.5d0
+heating_rad           real           0.d0
+heating_peak          real           1.d16
+heating_sigma         real           1.d14
+cooling_rad           real           0.d0
+cooling_peak          real           -1.d16
+cooling_sigma         real           1.d14
+initial_dt            real           1.d-3
+
+prob_type             integer        1
+

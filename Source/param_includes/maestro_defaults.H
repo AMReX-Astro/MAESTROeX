@@ -3,7 +3,7 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-int         Maestro::do_reflux = 1;
+int         Maestro::do_reflux = 0;
 int         Maestro::maestro_verbose = 1;
 std::string Maestro::model_file = "";
 bool        Maestro::perturb_model = false;

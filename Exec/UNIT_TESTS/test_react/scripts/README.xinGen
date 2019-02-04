@@ -1,0 +1,49 @@
++Introduction
+-------------------------
+xinGen.py is a basic python script used to generate mass fraction input files
+for the test_react unit test.
+
++Usage
+-------------------------
+There are two basic ways to make use of xinGen:
+
+1) Interactive:
+     Simply execute './xinGen.py' in a terminal and answer the given prompts.
+     The prompts are as follows:
+        -How many species are in the network?
+        -What is the grid size?
+        -For each species:
+          -Select a mass fraction type
+            -Type A --> This species will have a uniform (the same for all cells) 
+                        solar hydrogen value
+            -Type B --> This species will have a uniform solar helium value
+            -Type C --> This species will have a uniform solar metallicity value
+            -Type D --> The user will be asked to provide a custom uniform value
+            -Type E --> The user will be asked to provide an initial value (the 
+                        mass fraction at cell 0) and a delta (a +/- value to be 
+                        added to the mass fraction for each subsequent cell) 
+
+2) File input:
+     To avoid the rather cumbersome answering of prompts, one can write a file
+     with the desired answers to the prompts and pipe it in.
+
+     For example, execute 'cat xinInput | ./xinGen.py' in a terminal where the
+     file 'xinInput' contains:
+     ---
+     3
+     64
+     a
+     b
+     c 
+     ---
+
++Output
+-------------------------
+The output file generated, 'xin', is very basic.  Each line contains data for
+one species (line 1 is species 1, line 2 species 2, etc...).  On each line
+are X data points where X is the grid size. 
+
+So, for example, the 5th data point on line 3 represents the mass fraction
+of species 3 at the 5th cell of the Z axis of the 3D grid (in test_react, 
+temperature is varied along one axis, density the other, and mass fraction
+the last).

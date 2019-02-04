@@ -56,7 +56,7 @@ contains
 #if (AMREX_SPACEDIM == 1)
   subroutine make_rhoX_flux_1d(lev, lo, hi, &
        sfluxx, fx_lo, fx_hi, nc_fx, &
-       etarhoflux, eta_lo, eta_hi, nc_eta, &
+       etarhoflux, eta_lo, eta_hi, &
        sedgex, x_lo, x_hi, nc_x, &
        umac,   u_lo, u_hi, &
        rho0_old, rho0_edge_old, &
@@ -1453,7 +1453,7 @@ contains
        ! enthalpy edge state is h'
        call bl_error("have_hprime not supported on irregular-spaced base state")
 
-       
+
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 

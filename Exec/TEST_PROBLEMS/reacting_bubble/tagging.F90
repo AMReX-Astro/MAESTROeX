@@ -1,7 +1,7 @@
 module tagging_module
 
-  use meth_params_module, only: temp_comp, nscal
-  use base_state_geometry_module, only: nr_fine, max_radial_level
+  use meth_params_module, only: temp_comp, nscal, use_tpert_in_tagging
+  use base_state_geometry_module, only: nr_fine, max_radial_level, dr
 
   implicit none
 
@@ -48,32 +48,69 @@ contains
     ! local
     integer          :: i, j, k, r
     double precision :: temperr, denserr
+    double precision :: height
     
     
     ! set temperature and density flags
     temperr = tag_err(1)
     denserr = tag_err(2)
 
-    ! Tag on regions of high temperature
-    do k = lo(3), hi(3)
-    do j = lo(2), hi(2)
-    do i = lo(1), hi(1)
-       if (state(i,j,k,temp_comp) .ge. temperr) then
-          tag(i,j,k) = set
+    if (use_tpert_in_tagging) then
+       ! Tag on regions with largest temperature perturbation
+       do k = lo(3),hi(3)
+          
+#if (AMREX_SPACEDIM == 3)          
+          height = (dble(k)+0.5d0)*dr(lev)
+#endif
+       
+       do j = lo(2),hi(2)
+
+#if (AMREX_SPACEDIM == 2)
+          height = (dble(j)+0.5d0)*dr(lev)
+#endif
+          
+       do i = lo(1),hi(1)
+          if (height > 5.4d7 .and. height < 1.8d8) then
+             if (abs(state(i,j,k,temp_comp)) > 3.d7) then
+                tag(i,j,k) = set
+                
+#if (AMREX_SPACEDIM == 3)
+                r = k
+#elif (AMREX_SPACEDIM == 2)
+                r = j
+#else
+                r = i
+#endif
+                tag_array(lev,r) = set
+             endif
+          endif
+
+       enddo
+       enddo
+       end do
+       
+    else 
+       ! Tag on regions of high temperature
+       do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+       do i = lo(1), hi(1)
+          if (state(i,j,k,temp_comp) .ge. temperr) then
+             tag(i,j,k) = set
 
 #if (AMREX_SPACEDIM == 3)
-          r = k
+             r = k
 #elif (AMREX_SPACEDIM == 2)
-          r = j
+             r = j
 #else
-          r = i
+             r = i
 #endif
-          tag_array(lev,r) = set
-       endif
-    enddo
-    enddo
-    enddo
-
+             tag_array(lev,r) = set
+          endif
+       enddo
+       enddo
+       enddo
+    endif
+       
   end subroutine state_error
 
   subroutine tag_boxes(tag,tag_lo,tag_hi, &

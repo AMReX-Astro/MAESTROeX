@@ -1,0 +1,62 @@
+This problem is designed to test the solver used in the conduction
+step of the main algorithm.
+
+We set up a 2d Gaussian enthalpy pulse and wish to see how this
+evolves in time.  An analog of this test problem for diffusion of
+energy is given in Swesty & Myra, ApJSS 181, 1-52 (2009) (SM).
+
+We make use of an analytic solution (e.g. SM) to the 2D time-dependent
+diffusion equation for a constant diffusion coefficient.  The enthalpy
+equation with only the thermal diffusion term is given by:
+
+  d(rhoh)/dt = del . (k_th grad T)
+
+In this problem we use the gamma_law_general ideal gas EOS and
+therefore we can relate the temperature and enthalpy by:
+
+ h = c_p * T
+
+where c_p is the (constant) specific heat at constant pressure.
+Furthermore, we assume that k_th, the thermal_conductivity, is
+constant.  If we do not allow the density to evolve, the diffusion
+equation above can be written in a more standard form:
+
+ dh / dt = { k_th / rho*c_p } del . grad h = D del . grad h
+
+where D is the (constant) diffusion_coefficient.
+
+The initial conditions are given as the Gaussian pulse plus a constant term:
+
+   h = (h_p - h_0) * exp( -|r - r_0|^2 / (4 * D * t_0)) + h_0
+
+where h_p is the peak enthalpy, r_0 is the location of the center
+of the peak, D is the diffusion coefficient and t_0 is the time from
+which the system is evolved.  The analytic solution is given by
+
+  h(t) = (h_p - h_0) * (t_0 / (t + t_0)) *
+            exp( -|r - r_0|^2 / (4 * D * (t + t_0))) + h_0
+
+
+OUTLINE:
+
+  To solve this problem we take the following steps:
+
+  1) initialize the state with the Gaussian pulse
+  2) calculate the explicit conduction timestep
+     dimensionally we have
+	| h / dt | = | D * h / dx^2 |
+     so we get
+        dt = dx^2 / D
+
+     more formally we find the timestep to be half that given above.
+
+     because we are not refining, the explicit timestep, dt, remains
+     constant throughout the simulation.  we multiply this quantity by a
+     dt_mult_factor b/c we are using an implicit solve to the diffusion
+     equation
+
+  3) build the coefficients used in the thermal_conduct routine
+  4) conduct for the timestep determined in 2)
+  5) update the temperature with a call to makeTfromRhoH
+  6) copy the new data into the old data and repeat steps 2) - 5) until we
+     reach the maximum time.

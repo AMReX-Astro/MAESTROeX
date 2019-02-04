@@ -1,0 +1,9 @@
+dens_min         real     1.d6
+dens_max         real     1.d9
+
+temp_min         real     1.d6
+temp_max         real     1.d9
+
+metalicity_max   real     0.1d0
+
+run_prefix   character   ""

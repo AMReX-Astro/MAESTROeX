@@ -47,7 +47,7 @@ maestro.evolve_base_state = false
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0
 maestro.init_iter             = 1
-maestro.do_reflux             = 1 # do we do the hyperbolic reflux
+maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 
 maestro.do_sponge = 0
 maestro.sponge_center_density = 3.e6

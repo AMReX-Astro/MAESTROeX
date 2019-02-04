@@ -105,14 +105,16 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     if (spherical == 0) {
         mult_or_div = 1;
         MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
-        if (use_alt_energy_fix) {
+        if (use_alt_energy_fix &&
+	    (is_predictor == 0 || (use_exact_base_state == 0 || average_base_state == 0)) ) {
             MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
         }
     } else {     //spherical == 1
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
                 MultiFab::Multiply(face_bcoef[lev][idim],beta0_cart_edge[lev][idim],0,0,1,0);
-                if (use_alt_energy_fix) {
+                if (use_alt_energy_fix &&
+		    (is_predictor == 0 || (use_exact_base_state == 0 || average_base_state == 0)) ) {
                     MultiFab::Multiply(face_bcoef[lev][idim],beta0_cart_edge[lev][idim],0,0,1,0);
                 }
             }

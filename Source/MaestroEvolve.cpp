@@ -24,7 +24,7 @@ Maestro::Evolve ()
     {
 
         // check to see if we need to regrid, then regrid
-        if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0) {
+        if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0 && istep != 1) {
             Regrid();
         }
 
@@ -113,16 +113,15 @@ Maestro::Evolve ()
             std::swap(    sold[lev],     snew[lev]);
             std::swap(    uold[lev],     unew[lev]);
             std::swap(S_cc_old[lev], S_cc_new[lev]);
-
-            std::swap( rho0_old, rho0_new);
-            std::swap(rhoh0_old,rhoh0_new);
-            std::swap(   p0_nm1,   p0_old);
-            std::swap(   p0_old,   p0_new);
-
-            std::swap(beta0_old,beta0_new);
-	    std::swap(gamma1bar_old,gamma1bar_new);
-            std::swap(grav_cell_old,grav_cell_new);
         }
 
+        std::swap( rho0_old, rho0_new);
+        std::swap(rhoh0_old,rhoh0_new);
+        std::swap(   p0_nm1,   p0_old);
+        std::swap(   p0_old,   p0_new);
+
+        std::swap(    beta0_old,    beta0_new);
+        std::swap(gamma1bar_old,gamma1bar_new);
+        std::swap(grav_cell_old,grav_cell_new);
     }
 }

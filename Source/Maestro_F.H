@@ -194,6 +194,9 @@ extern "C"
 
     //////////////////////
     // in debug.F90
+    void print_base_cc(const amrex::Real* base);
+    void print_base_edge(const amrex::Real* base);
+    
     void print_mf(const int* lev, const int* lo, const int* hi,
                   const amrex::Real* mf,
                   const int* m_lo, const int* m_hi, const int* nc_m);
@@ -957,6 +960,23 @@ extern "C"
 			     const amrex::Real* gradw0_cart, const int* gw_lo, const int* gw_hi,
 			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi, const int* nc_wf,
 			     const amrex::Real* rho0, const amrex::Real* grav,
+			     const amrex::Real* dx,
+			     const amrex::Real* r_cc_loc,
+			     const amrex::Real* r_edge_loc,
+			     const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi,
+			     const int* do_add_utilde_force);
+
+    void make_vel_force_noenergyfix_sphr(const int* lo, const int* hi,
+			     amrex::Real* vel_force, const int* f_lo, const int* f_hi, const int* nc_f,
+			     const amrex::Real* gpi, const int* g_lo, const int* g_hi, const int* nc_g,
+			     const amrex::Real* rho, const int* r_lo, const int* r_hi,
+			     const amrex::Real* uedge, const int* u_lo, const int* u_hi,
+			     const amrex::Real* vedge, const int* v_lo, const int* v_hi,
+			     const amrex::Real* wedge, const int* w_lo, const int* w_hi,
+			     const amrex::Real* normal, const int* n_lo, const int* n_hi, const int* nc_n,
+			     const amrex::Real* gradw0_cart, const int* gw_lo, const int* gw_hi,
+			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi, const int* nc_wf,
+			     const amrex::Real* rho0, const amrex::Real* grav, const amrex::Real* beta0, 
 			     const amrex::Real* dx,
 			     const amrex::Real* r_cc_loc,
 			     const amrex::Real* r_edge_loc,

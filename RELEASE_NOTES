@@ -42,3 +42,9 @@ Update interface to StarKiller Microphysics conductivity routine
  * Put conductivity in eos_type. Revise interface to conductivity routine
  * Update actual_conductivity interface in constant conductivity
  
+01-02-2019
+Add more plotfile variables
+Modification to dp0/dt treatment in new temporal algorithm
+Embed probin file at the bottom of inputs files
+Multilevel planar and spherical work/bug fixes
+Sphinx-based user's guide on website enabled

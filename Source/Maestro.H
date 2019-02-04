@@ -85,7 +85,9 @@ private:
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const amrex::Vector<amrex::Real>& w0_force,
-			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
+			const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+			const amrex::Vector<amrex::Real>& beta0, 
+			const int is_predictor);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
@@ -177,6 +179,12 @@ private:
     ////////////
     // MaestroConvert.cpp functions
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
+                        const amrex::Vector<amrex::Real>& s0,
+                        int comp, int bccomp,
+                        const amrex::Vector<amrex::BCRec>& bcs_in,
+                        bool flag);
+    
+    void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
                         const amrex::Vector<amrex::Real>& s0,
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
@@ -333,6 +341,13 @@ private:
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
+    
+    void Put1dArrayOnCart (int level, const amrex::Vector<amrex::Real>& s0,
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);
 
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
 		const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
@@ -362,6 +377,8 @@ private:
                        const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
 		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+		       const amrex::Vector<amrex::Real>& beta0,
+		       const int is_predictor,
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
@@ -646,7 +663,7 @@ private:
 
     // set tagging array to include buffer zones for multilevel
     void TagArray ();
-    
+
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
     virtual void ErrorEst (int lev,
@@ -870,6 +887,8 @@ private:
     amrex::Vector<amrex::Real> rho0_new;
     amrex::Vector<amrex::Real> rhoh0_old;
     amrex::Vector<amrex::Real> rhoh0_new;
+    amrex::Vector<amrex::Real> rhoX0_old;
+    amrex::Vector<amrex::Real> rhoX0_new;
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
     amrex::Vector<amrex::Real> tempbar;
@@ -885,6 +904,7 @@ private:
     amrex::Vector<amrex::Real> r_cc_loc;
     // p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
     amrex::Vector<amrex::Real> p0_nm1;
+    amrex::Vector<amrex::Real> beta0_nm1;
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
