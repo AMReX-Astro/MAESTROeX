@@ -36,6 +36,7 @@ module meth_params_module
   logical                       , save :: octant
   integer                       , save :: do_2d_planar_octant
   integer                       , save :: drdxfac
+  logical                       , save :: use_tpert_in_tagging
   logical                       , save :: do_sponge
   double precision              , save :: sponge_kappa
   double precision              , save :: sponge_center_density
@@ -105,6 +106,7 @@ contains
     octant = .false.;
     do_2d_planar_octant = 0;
     drdxfac = 1;
+    use_tpert_in_tagging = .false.;
     do_sponge = .false.;
     sponge_kappa = 10.d0;
     sponge_center_density = 3.d6;
@@ -162,6 +164,7 @@ contains
     call pp%query("octant", octant)
     call pp%query("do_2d_planar_octant", do_2d_planar_octant)
     call pp%query("drdxfac", drdxfac)
+    call pp%query("use_tpert_in_tagging", use_tpert_in_tagging)
     call pp%query("do_sponge", do_sponge)
     call pp%query("sponge_kappa", sponge_kappa)
     call pp%query("sponge_center_density", sponge_center_density)

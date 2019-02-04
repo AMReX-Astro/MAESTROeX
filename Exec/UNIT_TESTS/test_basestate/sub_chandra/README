@@ -1,0 +1,3 @@
+This is used to test base state expansion for the sub_chandra problem.
+The model comes from AstroDev/initial_models/sub_chandra.  This needs
+to be compiled with one of the triple_alpha networks.

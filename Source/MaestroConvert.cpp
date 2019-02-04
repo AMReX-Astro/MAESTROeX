@@ -39,6 +39,40 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
 }
 
 void
+Maestro::PutInPertForm(int level, 
+		       Vector<MultiFab>& scal, 
+		       const Vector<Real>& s0, 
+		       int comp, int bccomp, 
+                       const Vector<BCRec>& bcs,
+                       bool flag)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PutInPertForm_lev()",PutInPertForm);
+
+    // place 1d array onto a cartesian grid
+    Vector<MultiFab> s0_cart(finest_level+1);
+    s0_cart[level].define(grids[level], dmap[level], 1, 0);
+    
+    // s0 is not edge centered
+    // note that bcs parameter is not used
+    Put1dArrayOnCart(level,s0,s0_cart,0,0);
+
+    if (flag) {
+	MultiFab::Subtract(scal[level],s0_cart[level],0,comp,1,0);
+    } else {
+	MultiFab::Add(scal[level],s0_cart[level],0,comp,1,0);
+    }
+
+    if (level > 0) {
+	average_down(scal[level],scal[level-1],geom[level],geom[level-1],
+		     comp,1,refRatio(level-1));
+    }
+    
+    FillPatch(level,t_old,scal[level],scal,scal,comp,comp,1,bccomp,bcs);
+
+}
+
+void
 Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
                         bool flag)
 {

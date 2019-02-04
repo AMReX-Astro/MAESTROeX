@@ -292,7 +292,7 @@ module make_beta0_module
     double precision :: denom, coeff1, coeff2, coeff3
     double precision :: del,dpls,dmin,slim,sflag
     double precision :: offset
-    double precision :: dri, drc
+    double precision :: drp, drm, drc
 
     double precision, allocatable :: beta0_edge(:,:)
 
@@ -340,7 +340,8 @@ module make_beta0_module
                    
                 if (r < anelastic_cutoff_coord(n)) then
 
-                   dri = r_edge_loc(n,r+1) - r_edge_loc(n,r)
+                   drp = r_edge_loc(n,r+1) - r_edge_loc(n,r)
+                   drm = r_edge_loc(n,r) - r_edge_loc(n,r-1)
                    
                    if (r .eq. 0 .or. r .eq. nr(n)-1) then
                       
@@ -355,24 +356,24 @@ module make_beta0_module
                       ! piecewise linear reconstruction of rho0,
                       ! gamma1bar, and p0 -- see paper III, appendix C
                       del    =       (rho0(n,r+1) - rho0(n,r-1))/drc
-                      dpls   = TWO * (rho0(n,r+1) - rho0(n,r  ))/dri
-                      dmin   = TWO * (rho0(n,r  ) - rho0(n,r-1))/dri
+                      dpls   = TWO * (rho0(n,r+1) - rho0(n,r  ))/drp
+                      dmin   = TWO * (rho0(n,r  ) - rho0(n,r-1))/drm
                       slim   = min(abs(dpls), abs(dmin))
                       slim   = merge(slim, zero, dpls*dmin.gt.ZERO)
                       sflag  = sign(ONE,del)
                       lambda = sflag*min(slim,abs(del))
                       
                       del   =       (gamma1bar(n,r+1) - gamma1bar(n,r-1))/drc
-                      dpls  = TWO * (gamma1bar(n,r+1) - gamma1bar(n,r  ))/dri
-                      dmin  = TWO * (gamma1bar(n,r  ) - gamma1bar(n,r-1))/dri
+                      dpls  = TWO * (gamma1bar(n,r+1) - gamma1bar(n,r  ))/drp
+                      dmin  = TWO * (gamma1bar(n,r  ) - gamma1bar(n,r-1))/drm
                       slim  = min(abs(dpls), abs(dmin))
                       slim  = merge(slim, zero, dpls*dmin.gt.ZERO)
                       sflag = sign(ONE,del)
                       mu    = sflag*min(slim,abs(del))
                       
                       del   =       (p0(n,r+1) - p0(n,r-1))/drc
-                      dpls  = TWO * (p0(n,r+1) - p0(n,r  ))/dri
-                      dmin  = TWO * (p0(n,r  ) - p0(n,r-1))/dri
+                      dpls  = TWO * (p0(n,r+1) - p0(n,r  ))/drp
+                      dmin  = TWO * (p0(n,r  ) - p0(n,r-1))/drm
                       slim  = min(abs(dpls), abs(dmin))
                       slim  = merge(slim, zero, dpls*dmin.gt.ZERO)
                       sflag = sign(ONE,del)
@@ -380,28 +381,32 @@ module make_beta0_module
 
                    end if
 
+                   ! edge-to-cell-center spacings (~ dr/2)
+                   drp = r_edge_loc(n,r+1) - r_cc_loc(n,r)
+                   drm = r_cc_loc(n,r) - r_edge_loc(n,r)
+
                    if (nu .eq. ZERO .or. mu .eq. ZERO .or. &
                         (nu*gamma1bar(n,r) - mu*p0(n,r)) .eq. ZERO .or. &
-                        ((gamma1bar(n,r) + HALF*mu*dri)/ &
-                        (gamma1bar(n,r) - HALF*mu*dri)) .le. ZERO .or. &
-                        ((p0(n,r) + HALF*nu*dri)/ &
-                        (p0(n,r) - HALF*nu*dri)) .le. ZERO) then
+                        ((gamma1bar(n,r) + mu*drp)/ &
+                        (gamma1bar(n,r) - mu*drm)) .le. ZERO .or. &
+                        ((p0(n,r) + nu*drp)/ &
+                        (p0(n,r) - nu*drm)) .le. ZERO) then
                       
                       ! just do piecewise constant integration
-                      integral = abs(grav_cell(n,r))*rho0(n,r)*dri/(p0(n,r)*gamma1bar(n,r))
+                      integral = abs(grav_cell(n,r))*rho0(n,r)*(drp+drm)/(p0(n,r)*gamma1bar(n,r))
                       
                    else 
-
+                      
                       ! paper III, equation C2
                       denom = nu*gamma1bar(n,r) - mu*p0(n,r)
                       coeff1 = lambda*gamma1bar(n,r)/mu - rho0(n,r)
                       coeff2 = lambda*p0(n,r)/nu - rho0(n,r)
                       
                       integral = (abs(grav_cell(n,r))/denom)* &
-                           (coeff1*log( (gamma1bar(n,r) + HALF*mu*dri)/ &
-                                        (gamma1bar(n,r) - HALF*mu*dri)) - &
-                            coeff2*log( (p0(n,r) + HALF*nu*dri)/ &
-                                        (p0(n,r) - HALF*nu*dri)) )
+                           (coeff1*log( (gamma1bar(n,r) + mu*drp)/ &
+                                        (gamma1bar(n,r) - mu*drm)) - &
+                            coeff2*log( (p0(n,r) + nu*drp)/ &
+                                        (p0(n,r) - nu*drm)) )
 
                    endif
 

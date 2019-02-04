@@ -24,8 +24,12 @@ Maestro::Init ()
         InitData();
 
         if (plot_int > 0) {
+
+	    // Need to fill normal vector to compute velrc in plotfile 
+	    if (spherical) { MakeNormal(); }
+	    
             Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
-            WritePlotFile(9999999,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
+            WritePlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
         }
     }
     else {
@@ -53,14 +57,15 @@ Maestro::Init ()
                 cell_cc_to_r[lev].define(grids[lev], dmap[lev], 1, 0);
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);             // nodal
+	    
         }
-
-        // set finest_radial_level in fortran
-        // compute numdisjointchunks, r_start_coord, r_end_coord
-        init_multilevel(&finest_level);
         compute_cutoff_coords(rho0_old.dataPtr());
     }
 
+    // set finest_radial_level in fortran
+    // compute numdisjointchunks, r_start_coord, r_end_coord
+    init_multilevel(tag_array.dataPtr(),&finest_level);
+	    
     if (spherical == 1) {
         MakeNormal();
         MakeCCtoRadii();
@@ -102,6 +107,11 @@ Maestro::Init ()
                        grav_cell_old.dataPtr());
         }
 
+	// set beta0^{-1} = beta0_old
+        for (int i=0; i<beta0_old.size(); ++i) {
+            beta0_nm1[i] = beta0_old[i];
+	}
+	
         // initial projection
         if (do_initial_projection) {
             Print() << "Doing initial projection" << std::endl;
@@ -109,7 +119,7 @@ Maestro::Init ()
 
             if (plot_int > 0) {
                 Print() << "\nWriting plotfile plt_after_InitProj after InitProj" << std::endl;
-                WritePlotFile(9999998,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
+                WritePlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
             }
         }
 
@@ -125,7 +135,7 @@ Maestro::Init ()
 
             if (plot_int > 0) {
                 Print() << "\nWriting plotfile plt_after_DivuIter after final DivuIter" << std::endl;
-                WritePlotFile(9999997,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
+                WritePlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
             }
         }
 
@@ -150,7 +160,7 @@ Maestro::Init ()
 
         if (plot_int > 0) {
             Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
-            WritePlotFile(0,t_old,rho0_old,rhoh0_old,p0_old,uold,sold);
+            WritePlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
         }
 
         if (chk_int > 0) {
@@ -179,6 +189,7 @@ Maestro::InitData ()
                               rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
                               tempbar_init.dataPtr(),
                               r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+	std::fill(psi.begin(), psi.end(), 0.);
     } else {
         init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
                         rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
@@ -189,9 +200,12 @@ Maestro::InitData ()
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);
 
+    // reset tagging array to include buffer zones
+    TagArray();
+
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(&finest_level);
+    init_multilevel(tag_array.dataPtr(),&finest_level);
 
     // average down data and fill ghost cells
     AverageDown(sold,0,Nscal);
@@ -257,7 +271,7 @@ Maestro::InitData ()
         // set p0^{-1} = p0_old
         for (int i=0; i<p0_old.size(); ++i) {
             p0_nm1[i] = p0_old[i];
-        }
+	}
     }
 }
 

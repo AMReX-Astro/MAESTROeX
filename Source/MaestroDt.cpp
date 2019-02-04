@@ -28,22 +28,31 @@ Maestro::EstDt ()
     for (int lev=0; lev<=finest_level; ++lev) {
         umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
         umac_dummy[lev][0].setVal(0.);
+#if (AMREX_SPACEDIM >= 2)
         umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         umac_dummy[lev][1].setVal(0.);
+#endif
 #if (AMREX_SPACEDIM == 3)
 		umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 		umac_dummy[lev][2].setVal(0.);
 #endif
 	}
 
-	// face-centered
-	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+    // allocate a dummy beta0 and set equal to zero
+    Vector<Real> beta0_dummy( (max_radial_level+1)*nr_fine );
+    beta0_dummy.shrink_to_fit();
+    std::fill(beta0_dummy.begin(),beta0_dummy.end(), 0.);
+
+    // face-centered
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
     if (spherical == 1) {
         // initialize
         for (int lev=0; lev<=finest_level; ++lev) {
             w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+#if (AMREX_SPACEDIM >= 2)
             w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+#endif
 #if (AMREX_SPACEDIM == 3)
             w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
@@ -68,12 +77,13 @@ Maestro::EstDt ()
 
     int do_add_utilde_force = 0;
 	int is_final_update = 0;
+    int is_predictor = 0;
     MakeVelForce(vel_force,is_final_update,umac_dummy,sold,rho0_old,grav_cell_old,
                  w0_force_dummy,w0_force_cart_dummy,
 #ifdef ROTATION
 				 w0mac,
 #endif
-				 do_add_utilde_force);
+				 beta0_dummy,is_predictor,do_add_utilde_force);
 
     Real umax = 0.;
 
@@ -224,13 +234,20 @@ Maestro::FirstDt ()
     for (int lev=0; lev<=finest_level; ++lev) {
         umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
         umac_dummy[lev][0].setVal(0.);
+#if (AMREX_SPACEDIM >= 2)
         umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         umac_dummy[lev][1].setVal(0.);
+#endif
 #if (AMREX_SPACEDIM == 3)
 		umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 		umac_dummy[lev][2].setVal(0.);
 #endif
     }
+
+    // allocate a dummy beta0 and set equal to zero
+    Vector<Real> beta0_dummy( (max_radial_level+1)*nr_fine );
+    beta0_dummy.shrink_to_fit();
+    std::fill(beta0_dummy.begin(),beta0_dummy.end(), 0.);
 
     // build and compute vel_force
     Vector<MultiFab> vel_force(finest_level+1);
@@ -264,12 +281,13 @@ Maestro::FirstDt ()
 
     int do_add_utilde_force = 0;
 	int is_final_update = 0;
+    int is_predictor = 0;
     MakeVelForce(vel_force,is_final_update,umac_dummy,sold,rho0_old,grav_cell_old,
-	             w0_force_dummy,w0_force_cart_dummy,
+                 w0_force_dummy,w0_force_cart_dummy,
 #ifdef ROTATION
 				 w0mac,
 #endif
-				 do_add_utilde_force);
+				 beta0_dummy,is_predictor,do_add_utilde_force);
 
     Real umax = 0.;
 

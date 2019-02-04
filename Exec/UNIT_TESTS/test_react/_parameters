@@ -1,0 +1,10 @@
+dens_min      real       1.d6
+dens_max      real       1.d9
+temp_min      real       1.d6
+temp_max      real       1.d15
+
+min_time_step real       0.0001d0
+react_its     integer    10
+
+xin_file      character  "uniform"
+run_prefix    character  ""

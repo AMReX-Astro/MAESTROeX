@@ -269,7 +269,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+    is_predictor = 1;
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,beta0_nm1,is_predictor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 	delta_chi[lev].setVal(0.);
@@ -280,7 +281,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // Sbar = (1 / gamma1bar * p0) * dp/dt
     if (evolve_base_state) {
 	for (int i=0; i<Sbar.size(); ++i) {
-	    Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
+    	    Sbar[i] = psi[i]/(gamma1bar_old[i]*p0_old[i]);
+	    // Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
 	}
     } else {
 	// these should have no effect if evolve_base_state = false
@@ -288,7 +290,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
     
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    is_predictor = 1;
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
     
@@ -350,6 +351,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
+    
     // update grav_cell_new
     if (evolve_base_state) {
 	make_grav_cell(grav_cell_new.dataPtr(),
@@ -378,8 +384,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt
-	make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// set psi to dpdt = etarho * grav_cell
+	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
+	
     }
     else {
 	p0_new = p0_old;
@@ -538,7 +545,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+    is_predictor = 0;
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,beta0_nm1,is_predictor);
 
     // compute Sbar
     if (evolve_base_state) {
@@ -556,7 +564,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    is_predictor = 0;
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 		       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
@@ -573,11 +580,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // no need to advect the base state density
-    // simply average the density
-    // if (evolve_base_state) {
-    // 	Average(s2, rho0_new, Rho);
-    // 	compute_cutoff_coords(rho0_new.dataPtr());
-    // }
+    rho0_new = rho0_old;
 
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
@@ -593,14 +596,17 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
 
-    // no need to compute etarho
     if (evolve_base_state) {
 	// correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
 	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
-
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
+    
     // update grav_cell_new, rho0_nph, grav_cell_nph
     if (evolve_base_state) {
 	make_grav_cell(grav_cell_new.dataPtr(),
@@ -637,8 +643,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt
-	make_psi_irreg(psi.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),&dt);
+	// set psi to dpdt = etarho * grav_const
+	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
     }
 
     // base state enthalpy averaging
@@ -749,8 +755,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // FIXME - I think this should be
     // (1.0/(gamma1bar_new[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
     if (evolve_base_state) {
-	// Average(S_cc_new,Sbar,0);
-
+	
 	// for (int i=0; i<Sbar.size(); ++i) {
 	//     Sbar[i] += (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
 	// }
@@ -813,6 +818,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
+
+    
+    for(int i=0; i<beta0_nm1.size(); ++i) {
+        beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+    }
 
     if (!is_initIter) {
 	if (!fix_base_state) {

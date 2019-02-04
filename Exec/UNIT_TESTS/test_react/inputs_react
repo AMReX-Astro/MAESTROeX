@@ -1,0 +1,66 @@
+# INITIAL MODEL
+
+# GRIDDING AND REFINEMENT
+amr.max_level          = 0       # maximum level number allowed
+amr.n_cell             = 16 16 16
+amr.max_grid_size      = 64
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0    0.0 0.0
+geometry.prob_hi     =  1.0e0  1.0e0 1.0e0
+
+maestro.do_sponge = 0
+
+maestro.evolve_base_state = false
+maestro.do_initial_projection = false
+maestro.init_divu_iter        = 0
+maestro.init_iter             = 0
+
+# PLOTFILES
+maestro.plot_base_name  = plt    # root name of plot file
+maestro.plot_int   = -1   # number of timesteps between plot files
+
+# CHECKPOINT
+maestro.check_base_name = chk
+maestro.chk_int         = -1
+
+# TIME STEPPING
+maestro.fixed_dt = 1.e-3
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 0 0 0
+maestro.hi_bc = 0 0 0
+geometry.is_periodic =  1 1 1
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+maestro.mg_verbose = 0
+maestro.cg_verbose = 0
+
+# DIFFUSION parameters
+maestro.do_heating = false
+
+# GRAVITY parameters
+maestro.grav_const = 0.0e0
+
+maestro.small_temp = 1.e5
+maestro.small_dens = 1.e-10
+maestro.small_dt = 1.e-10
+
+&probin
+
+  dens_min   = 1.d7
+  dens_max   = 3.d9
+  temp_min   = 5.d8
+  temp_max   = 5.d9
+
+  min_time_step = 1.0d-10
+  react_its = 10
+
+  xin_file   = "xin"
+  run_prefix = "react_"
+/

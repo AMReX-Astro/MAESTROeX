@@ -309,7 +309,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
+    is_predictor = 1;
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart,beta0_nm1,is_predictor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -318,7 +319,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    is_predictor = 1;
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
                        gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
 
@@ -641,11 +641,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
-
+    is_predictor = 0;
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart,beta0_nm1,is_predictor);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    is_predictor = 0;
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
                        gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
@@ -712,7 +711,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
 
-        for(int i=0; i<beta0_nph.size(); ++i) {
+        for(int i=0; i<rho0_nph.size(); ++i) {
             rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
         }
 
@@ -935,6 +934,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
 
+    
+    for(int i=0; i<beta0_nm1.size(); ++i) {
+        beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+    }
+
     if (!is_initIter) {
         if (!fix_base_state) {
             // compute tempbar by "averaging"
@@ -961,64 +965,5 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (maestro_verbose > 0) {
         Print() << "Time to advance time step: " << end_total << '\n';
     }
-
-#if 0
-// old code from a tutorial on advection with AMR
-    for (int lev=0; lev<=finest_level; ++lev)
-    {
-
-        MultiFab& S_new = snew[lev];
-
-        MultiFab fluxes[AMREX_SPACEDIM];
-        if (do_reflux)
-        {
-            for (int i = 0; i < AMREX_SPACEDIM; ++i)
-            {
-                BoxArray ba = grids[lev];
-                ba.surroundingNodes(i);
-                fluxes[i].define(ba, dmap[lev], S_new.nComp(), 0);
-            }
-        }
-
-        // advection
-
-        // increment or decrement the flux registers by area and time-weighted fluxes
-        // Note that the fluxes have already been scaled by dt and area
-        // In this example we are solving s_t = -div(+F)
-        // The fluxes contain, e.g., F_{i+1/2,j} = (s*u)_{i+1/2,j}
-        // Keep this in mind when considering the different sign convention for updating
-        // the flux registers from the coarse or fine grid perspective
-        // NOTE: the flux register associated with flux_reg_s[lev] is associated
-        // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-        if (do_reflux) {
-            if (lev < finest_level)
-            {
-                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                    // update the lev+1/lev flux register (index lev+1)
-                    flux_reg_s[lev+1]->CrseInit(fluxes[i],i,0,0,fluxes[i].nComp(), -1.0);
-                }
-            }
-            if (lev > 0)
-            {
-                for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                    // update the lev/lev-1 flux register (index lev)
-                    flux_reg_s[lev]->FineAdd(fluxes[i],i,0,0,fluxes[i].nComp(), 1.0);
-                }
-            }
-        }
-
-
-    }     // end loop over levels
-
-    // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
-    for (int lev=finest_level-1; lev>=0; --lev) {
-        if (do_reflux) {
-            // update lev based on coarse-fine flux mismatch
-            flux_reg_s[lev+1]->Reflux(snew[lev], 1.0, 0, 0, snew[lev].nComp(), geom[lev]);
-        }
-    }
-    // average fine data onto coarser cells
-    AverageDown(snew,0,Nscal);
-#endif
 
 }
