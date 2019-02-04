@@ -3,6 +3,7 @@
 
 using namespace amrex;
 
+#ifdef ROTATION
 void
 Maestro::MakeAngularMomentum (const Vector<MultiFab>& state,
                               const Vector<MultiFab>& vel,
@@ -53,3 +54,4 @@ Maestro::MakeAngularMomentum (const Vector<MultiFab>& state,
 	          0,0,AMREX_SPACEDIM,0,bcs_u);
 
 }
+#endif
