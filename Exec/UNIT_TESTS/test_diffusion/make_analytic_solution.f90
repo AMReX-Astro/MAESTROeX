@@ -51,7 +51,7 @@ contains
     double precision :: r
 
     r = (peak_h - ambient_h) * (t0 / (t+t0)) * &
-         exp(-x / (FOUR * diffusion_coefficient * (t+t0))) + ambient_h
+         dexp(-x / (FOUR * diffusion_coefficient * (t+t0))) + ambient_h
 
   end function f
 
