@@ -141,7 +141,7 @@ Maestro::TagArray ()
 
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
-    
+            
     for (int lev=1; lev<=max_radial_level; ++lev) {
 	
 	const MultiFab& state = sold[lev];
@@ -149,20 +149,21 @@ Maestro::TagArray ()
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-    {
-        Vector<int>  itags;
-
-        for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
         {
-            const Box& tilebox  = mfi.tilebox();
+            Vector<int>  itags;
 
-            // retag refined cells to include cells in buffered regions
-            retag_array(&tagval, &clearval, 
-			ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-			&lev, tag_array.dataPtr());
+            for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
+            {
+                const Box& tilebox  = mfi.tilebox();
+
+                // retag refined cells to include cells in buffered regions
+                retag_array(&tagval, &clearval, 
+                            ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+                            &lev, tag_array.dataPtr());
+            }
         }
     }
-    }
+    ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
 }
 
 // tag all cells for refinement
