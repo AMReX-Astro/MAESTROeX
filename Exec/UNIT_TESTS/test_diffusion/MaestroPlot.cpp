@@ -53,6 +53,13 @@ Maestro::WritePlotFile (const int step,
 	                        error_varnames,
 	                        Geom(), t_in, step_array, refRatio());
 
+    for (int i = 0; i <= finest_level; ++i) {
+		delete state_mf[i];
+        delete analytic_mf[i];
+        delete error_mf[i];
+	}
+
+
 }
 
 

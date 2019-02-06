@@ -143,16 +143,45 @@ Maestro::Evolve ()
 		}
 	}
 
+	Vector<Real> dummy;
+
 	if (project_type == 1) {
 
 		// write uold
+		WritePlotFile(0,t_new,dt,dummy,dummy,dummy,dummy,uold,uold,uold);
 
 		// copy the velocity field over to the intermediate state, umid
 		for (int lev=0; lev<=finest_level; ++lev)
 			MultiFab::Copy(umid[lev], uold[lev], 0, 0, AMREX_SPACEDIM, ng_s);
 	} else {
 		// convect MAC field to cell-centered
+
+		for (int lev=0; lev<=finest_level; ++lev) {
+			MultiFab& umac_mf = umac_old[lev][0];
+			MultiFab& vmac_mf = umac_old[lev][1];
+			MultiFab& wmac_mf = umac_old[lev][2];
+			MultiFab& utemp_mf = utemp[lev];
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi)
+			{
+				const Box& tilebox = mfi.tilebox();
+				const int* lo  = tilebox.loVect();
+				const int* hi  = tilebox.hiVect();
+
+				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+				             BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				             BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM==3)
+				             BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+				             BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+			}
+		}
 		// write umac_old
+		WritePlotFile(0,t_new,dt,dummy,dummy,dummy,dummy,utemp,uold,uold);
 
 		// copy the velocity field over to the intermediate state, umid
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -196,7 +225,9 @@ Maestro::Evolve ()
     	FillPatch(t_old,umid,umid,umid,0,0,AMREX_SPACEDIM,0,bcs_u);
 
 		// write umid
+		WritePlotFile(1,t_new,dt,dummy,dummy,dummy,dummy,umid,uold,uold);
 		// write gphi
+		WritePlotFile(2,t_new,dt,dummy,dummy,dummy,dummy,gphi,uold,uold);
 
 		// copy the velocity field over to the final state, unew
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -265,7 +296,61 @@ Maestro::Evolve ()
 			FillPatchUedge(umac_mid);
 		}
 
-		// write utemp
+		// write umac_mid
+		for (int lev=0; lev<=finest_level; ++lev) {
+			MultiFab& umac_mf = umac_mid[lev][0];
+			MultiFab& vmac_mf = umac_mid[lev][1];
+			MultiFab& wmac_mf = umac_mid[lev][2];
+			MultiFab& utemp_mf = utemp[lev];
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi)
+			{
+				const Box& tilebox = mfi.tilebox();
+				const int* lo  = tilebox.loVect();
+				const int* hi  = tilebox.hiVect();
+
+				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+				             BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				             BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM==3)
+				             BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+				             BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+			}
+		}
+
+		WritePlotFile(1,t_new,dt,dummy,dummy,dummy,dummy,utemp,uold,uold);
+
+		// write gphi_mac
+		for (int lev=0; lev<=finest_level; ++lev) {
+			MultiFab& umac_mf = gphi_mac[lev][0];
+			MultiFab& vmac_mf = gphi_mac[lev][1];
+			MultiFab& wmac_mf = gphi_mac[lev][2];
+			MultiFab& utemp_mf = utemp[lev];
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi)
+			{
+				const Box& tilebox = mfi.tilebox();
+				const int* lo  = tilebox.loVect();
+				const int* hi  = tilebox.hiVect();
+
+				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+				             BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				             BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM==3)
+				             BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+				             BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+			}
+		}
+
+		WritePlotFile(2,t_new,dt,dummy,dummy,dummy,dummy,utemp,uold,uold);
 
 		// copy the velocity field over to the final state, unew
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -317,6 +402,7 @@ Maestro::Evolve ()
 		}
 
 		// write unew
+		WritePlotFile(3,t_new,dt,dummy,dummy,dummy,dummy,unew,uold,uold);
 
 		// I think now can compare to uold and see if it's the same?
 		{
@@ -380,7 +466,34 @@ Maestro::Evolve ()
 			Print() << "\nRelative error = " << norm << std::endl;
 		}
 
-		// write utemp
+		// write umac_new
+		for (int lev=0; lev<=finest_level; ++lev) {
+			MultiFab& umac_mf = umac_new[lev][0];
+			MultiFab& vmac_mf = umac_new[lev][1];
+			MultiFab& wmac_mf = umac_new[lev][2];
+			MultiFab& utemp_mf = utemp[lev];
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+			for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi)
+			{
+				const Box& tilebox = mfi.tilebox();
+				const int* lo  = tilebox.loVect();
+				const int* hi  = tilebox.hiVect();
+
+				convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
+				             BL_TO_FORTRAN_3D(umac_mf[mfi]),
+				             BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM==3)
+				             BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+#endif
+				             BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+			}
+		}
+
+		WritePlotFile(3,t_new,dt,dummy,dummy,dummy,dummy,utemp,uold,uold);
+
 
 	}
 
