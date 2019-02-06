@@ -22,26 +22,26 @@ module base_state_module
 contains
 
 
-!> @brief ``init_base_state`` is used to initialize the base state arrays from the
-!! model file.  The actual reading of the model file is handled by the
-!! ``model_parser_module`` in ``Util/``
-!!
-!! @note The initial base state quantities returned from this routine
-!! are only a temporary base state.  These quantities are mapped onto
-!! the full 2- or 3-d state in ``initscaldata.f9``0 and a new base state is
-!! created after initialization by averaging the density and calling
-!! enforce_HSE() in ``initialize.f90``.
-!!
-!! @note Binds to C function ``init_base_state``
-!!
-!! @param[inout] s0_init double precision
-!! @param[inout] p0_init double precision
-!! @param[inout] rho0 double precision
-!! @param[inout] rhoh0 double precision
-!! @param[inout] p0 double precision
-!! @param[inout] tempbar double precision
-!! @param[inout] tempbar_init double precision
-!!
+  !> @brief ``init_base_state`` is used to initialize the base state arrays from the
+  !! model file.  The actual reading of the model file is handled by the
+  !! ``model_parser_module`` in ``Util/``
+  !!
+  !! @note The initial base state quantities returned from this routine
+  !! are only a temporary base state.  These quantities are mapped onto
+  !! the full 2- or 3-d state in ``initscaldata.f9``0 and a new base state is
+  !! created after initialization by averaging the density and calling
+  !! enforce_HSE() in ``initialize.f90``.
+  !!
+  !! @note Binds to C function ``init_base_state``
+  !!
+  !! @param[inout] s0_init double precision
+  !! @param[inout] p0_init double precision
+  !! @param[inout] rho0 double precision
+  !! @param[inout] rhoh0 double precision
+  !! @param[inout] p0 double precision
+  !! @param[inout] tempbar double precision
+  !! @param[inout] tempbar_init double precision
+  !!
   subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init) &
        bind(C, name="init_base_state")
 
@@ -267,19 +267,19 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-!> @brief Similar to ``init_base_state`` but for irregular base state
-!! @note Binds to C function ``init_base_state_irreg``
-!!
-!! @param[inout] s0_init double precision
-!! @param[inout] p0_init double precision
-!! @param[inout] rho0 double precision
-!! @param[inout] rhoh0 double precision
-!! @param[inout] p0 double precision
-!! @param[inout] tempbar double precision
-!! @param[inout] tempbar_init double precision
-!! @param[in] r_cc_loc double precision
-!! @param[in] r_edge_loc double precision
-!!
+  !> @brief Similar to ``init_base_state`` but for irregular base state
+  !! @note Binds to C function ``init_base_state_irreg``
+  !!
+  !! @param[inout] s0_init double precision
+  !! @param[inout] p0_init double precision
+  !! @param[inout] rho0 double precision
+  !! @param[inout] rhoh0 double precision
+  !! @param[inout] p0 double precision
+  !! @param[inout] tempbar double precision
+  !! @param[inout] tempbar_init double precision
+  !! @param[in] r_cc_loc double precision
+  !! @param[in] r_edge_loc double precision
+  !!
   subroutine init_base_state_irreg(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init, &
                                      r_cc_loc, r_edge_loc) &
        bind(C, name="init_base_state_irreg")

@@ -146,8 +146,8 @@ contains
 
   end subroutine init_base_state_geometry
 
-!> map cell centers to base state indices
-!!
+  !> map cell centers to base state indices
+  !!
   subroutine init_base_state_map_sphr(cc_to_r, lo, hi, &
        dx_fine, dx_lev) &
        bind(C, name="init_base_state_map_sphr")
@@ -567,8 +567,8 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!> @brief Deallocate base state geometry arrays
-!!
+  !> @brief Deallocate base state geometry arrays
+  !!
   subroutine destroy_base_state_geometry() bind(C, name="destroy_base_state_geometry")
 
     call bl_deallocate(dr)

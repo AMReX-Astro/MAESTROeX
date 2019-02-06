@@ -16,30 +16,30 @@ module make_explicit_thermal_module
 contains
 
 
-!> @brief create the coefficients for \f$ \nabla T \f$, \f$ \nabla h \f$, \f$ \nabla X_k \f$, and \f$ \nabla p_0 \f$
-!! for the thermal diffusion term in the enthalpy equation.
-!!
-!! We calculate the coefficients as ``Tcoeff = -kth``,
-!!        ``hcoeff = -kth/cp``,
-!!       ``Xkcoeff = xik*kth/cp``,
-!!        ``pcoeff = hp*kth/cp``
-!!
-!! @note we explicitly fill the ghostcells by looping over them directly
-!!
-!! @note Binds to C function ``make_thermal_coeffs``
-!!
-!! @param[in] lo integer
-!! @param[in] s_lo integer
-!! @param[in] scal double precision
-!! @param[in] t_lo integer
-!! @param[inout] Tcoeff double precision
-!! @param[in] h_lo integer
-!! @param[inout] hcoeff double precision
-!! @param[in] xk_lo integer
-!! @param[inout] Xkcoeff double precision
-!! @param[in] p_lo integer
-!! @param[inout] pcoeff double precision
-!!
+  !> @brief create the coefficients for \f$ \nabla T \f$, \f$ \nabla h \f$, \f$ \nabla X_k \f$, and \f$ \nabla p_0 \f$
+  !! for the thermal diffusion term in the enthalpy equation.
+  !!
+  !! We calculate the coefficients as ``Tcoeff = -kth``,
+  !!        ``hcoeff = -kth/cp``,
+  !!       ``Xkcoeff = xik*kth/cp``,
+  !!        ``pcoeff = hp*kth/cp``
+  !!
+  !! @note we explicitly fill the ghostcells by looping over them directly
+  !!
+  !! @note Binds to C function ``make_thermal_coeffs``
+  !!
+  !! @param[in] lo integer
+  !! @param[in] s_lo integer
+  !! @param[in] scal double precision
+  !! @param[in] t_lo integer
+  !! @param[inout] Tcoeff double precision
+  !! @param[in] h_lo integer
+  !! @param[inout] hcoeff double precision
+  !! @param[in] xk_lo integer
+  !! @param[inout] Xkcoeff double precision
+  !! @param[in] p_lo integer
+  !! @param[inout] pcoeff double precision
+  !!
   subroutine make_thermal_coeffs(lo, hi, &
        scal, s_lo, s_hi, nc_s, &
        Tcoeff, t_lo, t_hi, &

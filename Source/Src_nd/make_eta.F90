@@ -169,8 +169,8 @@ contains
   !---------------------------------------------------------------------------
   ! spherical routines
   !---------------------------------------------------------------------------
-!> @brief Construct eta on cartesian grid
-!!
+  !> @brief Construct eta on cartesian grid
+  !!
   subroutine construct_eta_cart(lo, hi, &
        rho_old, ro_lo, ro_hi, &
        rho_new, rn_lo, rn_hi, &

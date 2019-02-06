@@ -12,14 +12,14 @@ module make_beta0_module
  contains
 
 
-!> @brief Compute beta0 on the edges and average to the center
-!!
-!! @param[out] beta0
-!! @param[in] rho0
-!! @param[in] p0
-!! @param[in] gamma1bar
-!! @param[in] grav_cell
-!!
+  !> @brief Compute beta0 on the edges and average to the center
+  !!
+  !! @param[out] beta0
+  !! @param[in] rho0
+  !! @param[in] p0
+  !! @param[in] gamma1bar
+  !! @param[in] grav_cell
+  !!
  subroutine make_beta0(beta0,rho0,p0,gamma1bar,grav_cell) bind(C, name="make_beta0")
 
     double precision, intent(  out) :: beta0    (0:max_radial_level,0:nr_fine-1)

@@ -22,35 +22,35 @@ module make_w0_module
 contains
 
 
-!> @brief compute w0 - the base state velocity.  This is based on the average
-!! heating in a layer (``Sbar``) and the mixing (the eta quantities).  The
-!! computation of w0 for plane-parallel atmospheres was first described
-!! in paper II, with modifications due to mixing in paper III.  For
-!! spherical geometry, it was first described in paper III.
-!!
-!! @note Binds to C function ``make_w0``
-!!
-!! @param[inout] w0 double precision
-!! @param[in] w0_old double precision
-!! @param[inout] w0_force double precision
-!! @param[in] Sbar_in double precision
-!! @param[in] rho0_old double precision
-!! @param[in] rho0_new double precision
-!! @param[in] p0_old double precision
-!! @param[in] p0_new double precision
-!! @param[in] gamma1bar_old double precision
-!! @param[in] gamma1bar_new double precision
-!! @param[in] p0_minus_peosbar double precision
-!! @param[in] psi double precision
-!! @param[in] etarho_ec double precision
-!! @param[in] etarho_cc double precision
-!! @param[inout] delta_chi_w0 double precision
-!! @param[in] r_cc_loc double precision
-!! @param[in] r_edge_loc double precision
-!! @param[in] dt double precision
-!! @param[in] dtold double precision
-!! @param[in] is_predictor integer
-!!
+  !> @brief compute w0 - the base state velocity.  This is based on the average
+  !! heating in a layer (``Sbar``) and the mixing (the eta quantities).  The
+  !! computation of w0 for plane-parallel atmospheres was first described
+  !! in paper II, with modifications due to mixing in paper III.  For
+  !! spherical geometry, it was first described in paper III.
+  !!
+  !! @note Binds to C function ``make_w0``
+  !!
+  !! @param[inout] w0 double precision
+  !! @param[in] w0_old double precision
+  !! @param[inout] w0_force double precision
+  !! @param[in] Sbar_in double precision
+  !! @param[in] rho0_old double precision
+  !! @param[in] rho0_new double precision
+  !! @param[in] p0_old double precision
+  !! @param[in] p0_new double precision
+  !! @param[in] gamma1bar_old double precision
+  !! @param[in] gamma1bar_new double precision
+  !! @param[in] p0_minus_peosbar double precision
+  !! @param[in] psi double precision
+  !! @param[in] etarho_ec double precision
+  !! @param[in] etarho_cc double precision
+  !! @param[inout] delta_chi_w0 double precision
+  !! @param[in] r_cc_loc double precision
+  !! @param[in] r_edge_loc double precision
+  !! @param[in] dt double precision
+  !! @param[in] dtold double precision
+  !! @param[in] is_predictor integer
+  !!
   subroutine make_w0(w0,w0_old,w0_force,Sbar_in, &
                      rho0_old,rho0_new,p0_old,p0_new, &
                      gamma1bar_old,gamma1bar_new,p0_minus_peosbar, &
@@ -134,23 +134,23 @@ contains
 
 
 
-!> @brief Make w0 in planar geometry
-!!
-!! @param[out] w0 double precision
-!! @param[in] w0_old double precision
-!! @param[in] Sbar_in double precision
-!! @param[in] p0_old double precision
-!! @param[in] p0_new double precision
-!! @param[in] gamma1bar_old double precision
-!! @param[in] gamma1bar_new double precision
-!! @param[in] p0_minus_peosbar double precision
-!! @param[in] psi double precision
-!! @param[out] w0_force double precision
-!! @param[inout] delta_chi_w0 double precision
-!! @param[in] dt double precision
-!! @param[in] dtold double precision
-!! @param[in] is_predictor integer
-!!
+  !> @brief Make w0 in planar geometry
+  !!
+  !! @param[out] w0 double precision
+  !! @param[in] w0_old double precision
+  !! @param[in] Sbar_in double precision
+  !! @param[in] p0_old double precision
+  !! @param[in] p0_new double precision
+  !! @param[in] gamma1bar_old double precision
+  !! @param[in] gamma1bar_new double precision
+  !! @param[in] p0_minus_peosbar double precision
+  !! @param[in] psi double precision
+  !! @param[out] w0_force double precision
+  !! @param[inout] delta_chi_w0 double precision
+  !! @param[in] dt double precision
+  !! @param[in] dtold double precision
+  !! @param[in] is_predictor integer
+  !!
   subroutine make_w0_planar(w0,w0_old,Sbar_in,p0_old,p0_new, &
                             gamma1bar_old,gamma1bar_new,p0_minus_peosbar, &
                             psi,w0_force,dt,dtold,delta_chi_w0,is_predictor)
@@ -306,24 +306,24 @@ contains
 
 
 
-!>
-!! @param[out] w0 double precision
-!! @param[in] w0_old double precision
-!! @param[in] Sbar_in double precision
-!! @param[in] rho0_old double precision
-!! @param[in] rho0_new double precision
-!! @param[in] p0_old double precision
-!! @param[in] p0_new double precision
-!! @param[in] gamma1bar_old double precision
-!! @param[in] gamma1bar_new double precision
-!! @param[in] p0_minus_peosbar double precision
-!! @param[in] etarho_cc double precision
-!! @param[out] w0_force double precision
-!! @param[in] r_cc_loc double precision
-!! @param[in] r_edge_loc double precision
-!! @param[in] dt double precision
-!! @param[in] dtold double precision
-!!
+  !>
+  !! @param[out] w0 double precision
+  !! @param[in] w0_old double precision
+  !! @param[in] Sbar_in double precision
+  !! @param[in] rho0_old double precision
+  !! @param[in] rho0_new double precision
+  !! @param[in] p0_old double precision
+  !! @param[in] p0_new double precision
+  !! @param[in] gamma1bar_old double precision
+  !! @param[in] gamma1bar_new double precision
+  !! @param[in] p0_minus_peosbar double precision
+  !! @param[in] etarho_cc double precision
+  !! @param[out] w0_force double precision
+  !! @param[in] r_cc_loc double precision
+  !! @param[in] r_edge_loc double precision
+  !! @param[in] dt double precision
+  !! @param[in] dtold double precision
+  !!
   subroutine make_w0_planar_var_g(w0,w0_old,Sbar_in, &
                                   rho0_old,rho0_new,p0_old,p0_new, &
                                   gamma1bar_old,gamma1bar_new, &
@@ -563,26 +563,26 @@ contains
   end subroutine make_w0_planar_var_g
 
 
-!> Make w0 in spherical geometry
-!!
-!! @param[out] w0 double precision
-!! @param[in] w0_old double precision
-!! @param[in] Sbar_in double precision
-!! @param[in] rho0_old double precision
-!! @param[in] rho0_new double precision
-!! @param[in] p0_old double precision
-!! @param[in] p0_new double precision
-!! @param[in] gamma1bar_old double precision
-!! @param[in] gamma1bar_new double precision
-!! @param[in] p0_minus_peosbar double precision
-!! @param[in] etarho_ec double precision
-!! @param[in] etarho_cc double precision
-!! @param[out] w0_force double precision
-!! @param[in] r_cc_loc double precision
-!! @param[in] r_edge_loc double precision
-!! @param[in] dt double precision
-!! @param[in] dtold double precision
-!!
+  !> Make w0 in spherical geometry
+  !!
+  !! @param[out] w0 double precision
+  !! @param[in] w0_old double precision
+  !! @param[in] Sbar_in double precision
+  !! @param[in] rho0_old double precision
+  !! @param[in] rho0_new double precision
+  !! @param[in] p0_old double precision
+  !! @param[in] p0_new double precision
+  !! @param[in] gamma1bar_old double precision
+  !! @param[in] gamma1bar_new double precision
+  !! @param[in] p0_minus_peosbar double precision
+  !! @param[in] etarho_ec double precision
+  !! @param[in] etarho_cc double precision
+  !! @param[out] w0_force double precision
+  !! @param[in] r_cc_loc double precision
+  !! @param[in] r_edge_loc double precision
+  !! @param[in] dt double precision
+  !! @param[in] dtold double precision
+  !!
   subroutine make_w0_spherical(w0,w0_old,Sbar_in, &
                                rho0_old,rho0_new,p0_old,p0_new, &
                                gamma1bar_old,gamma1bar_new, &
@@ -781,9 +781,14 @@ contains
   end subroutine prolong_base_to_uniform
 
 
-!>
-!! @param[in] n integer
-!!
+  !>
+  !! @param[in] a real
+  !! @param[in] b real
+  !! @param[in] c real
+  !! @param[in] r real
+  !! @param[inout] u real
+  !! @param[in] n integer
+  !!
   subroutine tridiag(a,b,c,r,u,n)
 
       integer           , intent(in   ) :: n
