@@ -64,12 +64,16 @@ Maestro::Regrid ()
     regrid(0, t_old);
 
     // Redefine numdisjointchunks, r_start_coord, r_end_coord
-    TagArray();
+    if (spherical == 0) {
+	TagArray();
+    }
     init_multilevel(tag_array.dataPtr(),&finest_level);
 	
     if (spherical == 1) {
         MakeNormal();
-        Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical");
+	if (use_exact_base_state) {
+	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
+	}
     }
     
     if (evolve_base_state) {
@@ -174,8 +178,6 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ErrorEst()",ErrorEst);
 
-    if (lev >= tag_err.size()) return;
-
     // reset the tag_array (marks radii for planar tagging)
     std::fill(tag_array.begin(), tag_array.end(), 0);
 
@@ -222,7 +224,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
                         &tagval, &clearval,
                         ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                         ZFILL(dx), &time,
-			tag_err[lev].dataPtr(), &lev, tag_array.dataPtr());
+			&lev, tag_array.dataPtr());
 
 	    //
             // Now update the tags in the TagBox in the tilebox region

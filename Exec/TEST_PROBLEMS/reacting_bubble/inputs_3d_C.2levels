@@ -33,7 +33,6 @@ amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
 # TAGGING
-maestro.temperr = 6.5e8 6.5e8
 maestro.use_tpert_in_tagging = true
 
 # TIME STEPPING

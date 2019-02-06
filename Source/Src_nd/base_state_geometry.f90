@@ -8,8 +8,8 @@ module base_state_geometry_module
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
-  use amrex_constants_module
   use parallel, only: parallel_IOProcessor
+  use amrex_constants_module
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, octant, anelastic_cutoff, base_cutoff_density, &
        burning_cutoff_density, prob_lo, prob_hi, &

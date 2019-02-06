@@ -219,24 +219,6 @@ Maestro::Setup ()
     }
 
     std::fill(tag_array.begin(), tag_array.end(), 0);
-
-    // tagging criteria
-    tag_err.resize(max_level);
-
-    for (int lev=0; lev<max_level; ++lev) {
-	tag_err[lev].resize(2);
-	tag_err[lev].shrink_to_fit();
-    }
-    tag_err.shrink_to_fit();
-
-    // combine tagging criteria
-    for (int lev=0; lev<max_level; ++lev) {
-        if (temperr.size() > lev)
-	    tag_err[lev][0] = temperr[lev];
-        if (denserr.size() > lev)
-	    tag_err[lev][1] = denserr[lev];
-    }
-
 }
 
 // read in some parameters from inputs file
@@ -268,19 +250,6 @@ Maestro::ReadParameters ()
         phys_bc[i]                = lo_bc[i];
         phys_bc[i+AMREX_SPACEDIM] = hi_bc[i];
     }
-
-    // read in tagging criteria
-    // temperature
-    int ntemp = pp.countval("temperr");
-    if (ntemp > 0) {
-        pp.getarr("temperr", temperr, 0, ntemp);
-    }
-    // density
-    int ndens = pp.countval("denserr");
-    if (ndens > 0) {
-        pp.getarr("denserr", denserr, 0, ndens);
-    }
-
 }
 
 // define variable mappings (Rho, RhoH, ..., Nscal, etc.)
