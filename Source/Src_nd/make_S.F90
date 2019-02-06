@@ -525,7 +525,7 @@ contains
        k = lo(3)
        j = lo(2)
        do i = lo(1),hi(1)
-          if (i .lt. base_cutoff_density_coord(n)) then
+          if (i .lt. base_cutoff_density_coord(lev)) then
              delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / &
                   (dt*gamma1bar(lev,i)*p0(lev,i))
              rhcc(i,j,k) = rhcc(i,j,k) + beta0(lev,i) * delta_chi(i,j,k)

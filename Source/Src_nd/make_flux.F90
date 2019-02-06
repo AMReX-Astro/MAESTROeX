@@ -56,7 +56,7 @@ contains
 #if (AMREX_SPACEDIM == 1)
   subroutine make_rhoX_flux_1d(lev, lo, hi, &
        sfluxx, fx_lo, fx_hi, nc_fx, &
-       etarhoflux, eta_lo, eta_hi, nc_eta, &
+       etarhoflux, eta_lo, eta_hi, &
        sedgex, x_lo, x_hi, nc_x, &
        umac,   u_lo, u_hi, &
        rho0_old, rho0_edge_old, &

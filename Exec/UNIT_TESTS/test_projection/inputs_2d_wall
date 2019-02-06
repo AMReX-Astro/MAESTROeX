@@ -1,0 +1,46 @@
+# GRIDDING AND REFINEMENT
+amr.max_level          = 0       # maximum level number allowed
+amr.n_cell             = 128 128
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0    0.0
+geometry.prob_hi     =  1.0e0    1.0e0
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 4 4
+maestro.hi_bc = 4 4
+geometry.is_periodic =  0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+
+# tolerances for the initial projection
+maestro.eps_init_proj_cart = 1.e-12
+maestro.eps_init_proj_sph  = 1.e-10
+
+# tolerances for the divu iterations
+maestro.eps_divu_cart      = 1.e-12
+maestro.eps_divu_sph       = 1.e-10
+maestro.divu_iter_factor   = 100.
+maestro.divu_level_factor  = 10.
+
+# tolerances for the MAC projection
+maestro.eps_mac            = 1.e-10
+maestro.eps_mac_max        = 1.e-8
+maestro.mac_level_factor   = 10.
+maestro.eps_mac_bottom     = 1.e-3
+
+# tolerances for the nodal projection
+maestro.eps_hg             = 1.e-10
+maestro.eps_hg_max         = 1.e-10
+maestro.hg_level_factor    = 10.
+maestro.eps_hg_bottom      = 1.e-4
+
+&probin
+
+ run_prefix = "wall_"
+
+/

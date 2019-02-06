@@ -416,7 +416,7 @@ contains
                 chunk_start = .false.
              elseif (r.eq.nr(n-1)-1 .AND. chunk_start) then
                 ! if last chunk is at the end of array
-                r_end_coord(n,numdisjointchunks(n)) = nr(n)-1
+                r_end_coord(n,numdisjointchunks(n)) = 2*r-1
              end if
           end do
        end do

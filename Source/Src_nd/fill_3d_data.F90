@@ -12,7 +12,7 @@ module fill_3d_data_module
 
   private
 
-  public :: put_1d_array_on_cart_sphr, quad_interp
+  public :: put_1d_array_on_cart_sphr, quad_interp, put_1d_array_on_cart
 
 contains
 
@@ -1136,7 +1136,7 @@ contains
                 x = prob_lo(1) + (dble(i)     )*dx(1) - center(1)
                 radius = sqrt(x**2 + y**2 + z**2)
                 index  = nint( (radius/dx(1))**2 - 0.375d0 )  ! closest radial index to edge-centered point
-                
+
                 if (radius .ge. r_cc_loc(0,index)) then
                    dri = r_cc_loc(0,index+1) - r_cc_loc(0,index)
                    if (index .ge. nr_fine-1) then
@@ -1464,6 +1464,7 @@ contains
        end do
 #endif
 
+#if (AMREX_SPACEDIM >= 2)
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
@@ -1474,6 +1475,7 @@ contains
           end do
 #if (AMREX_SPACEDIM == 3)
        end do
+#endif
 #endif
 
 #if (AMREX_SPACEDIM == 3)

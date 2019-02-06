@@ -9,7 +9,6 @@ module maestro_init_module
        nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
   use eos_module, only: eos_init
   use runtime_init_module
-
   implicit none
 
   private
@@ -17,12 +16,15 @@ module maestro_init_module
 contains
 
 
-!>
-!! @note Binds to C function ``maestro_network_init``
-!!
+  !>
+  !! @note Binds to C function ``maestro_network_init``
+  !!
   subroutine maestro_network_init() bind(C, name="maestro_network_init")
 
+    use actual_rhs_module, only: actual_rhs_init
+
     call network_init()
+    call actual_rhs_init()
 
   end subroutine maestro_network_init
 
@@ -31,16 +33,15 @@ contains
   ! :::
 
 
-!> @brief initialize the external runtime parameters in
-!! extern_probin_module
-!!
-!! @note Binds to C function ``maestro_extern_init``
-!!
-!! @param[in] namlen integer
-!! @param[in] name integer
-!!
+  !> @brief initialize the external runtime parameters in
+  !! extern_probin_module
+  !!
+  !! @note Binds to C function ``maestro_extern_init``
+  !!
+  !! @param[in] namlen integer
+  !! @param[in] name integer
+  !!
   subroutine maestro_extern_init(name,namlen) bind(C, name="maestro_extern_init")
-
 
     use amrex_fort_module, only: rt => amrex_real
 
@@ -56,11 +57,26 @@ contains
   ! :::
 
 
-!> @brief Returns the number of species
-!! @note Binds to C function ``get_num_spec``
-!!
-!! @param[out] nspec_out integer
-!!
+  !> @brief Initializes the conductivity
+  !! @note Binds to C function ``gmaestro_conductivity_init``
+  !!
+  subroutine maestro_conductivity_init() bind(C, name="maestro_conductivity_init")
+
+    use conductivity_module, only: conductivity_init
+
+    call conductivity_init()
+
+  end subroutine maestro_conductivity_init
+
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  !> @brief Returns the number of species
+  !! @note Binds to C function ``get_num_spec``
+  !!
+  !! @param[out] nspec_out integer
+  !!
   subroutine get_num_spec(nspec_out) bind(C, name="get_num_spec")
 
     integer, intent(out) :: nspec_out
@@ -74,13 +90,13 @@ contains
   ! :::
 
 
-!> @brief Returns species names
-!! @note Binds to C function ``get_spec_names``
-!!
-!! @param[in] ispec integer
-!! @param[inout] len integer
-!! @param[inout] spec_names integer
-!!
+  !> @brief Returns species names
+  !! @note Binds to C function ``get_spec_names``
+  !!
+  !! @param[in] ispec integer
+  !! @param[inout] len integer
+  !! @param[inout] spec_names integer
+  !!
   subroutine get_spec_names(spec_names,ispec,len) bind(C, name="get_spec_names")
 
     integer, intent(in   ) :: ispec
@@ -103,13 +119,13 @@ contains
   ! :::
 
 
-!> @brief Returns the mass number (A) and atomic number (Z) of species with index ``ispec``
-!! @note Binds to C function ``get_spec_az``
-!!
-!! @param[in] ispec integer
-!! @param[inout] A real(rt)
-!! @param[inout] Z real(rt)
-!!
+  !> @brief Returns the mass number (A) and atomic number (Z) of species with index ``ispec``
+  !! @note Binds to C function ``get_spec_az``
+  !!
+  !! @param[in] ispec integer
+  !! @param[inout] A real(rt)
+  !! @param[inout] Z real(rt)
+  !!
   subroutine get_spec_az(ispec,A,Z) bind(C, name="get_spec_az")
 
     use network, only: nspec, aion, zion
@@ -131,17 +147,17 @@ contains
   ! :::
 
 
-!>
-!! @note Binds to C function ``set_method_params``
-!!
-!! @param[in] Density integer
-!! @param[in] Enthalpy integer
-!! @param[in] FirstSpec integer
-!! @param[in] Temperature integer
-!! @param[in] Pressure integer
-!! @param[in] Nscalars integer
-!! @param[in] prob_lo_in double precision
-!!
+  !>
+  !! @note Binds to C function ``set_method_params``
+  !!
+  !! @param[in] Density integer
+  !! @param[in] Enthalpy integer
+  !! @param[in] FirstSpec integer
+  !! @param[in] Temperature integer
+  !! @param[in] Pressure integer
+  !! @param[in] Nscalars integer
+  !! @param[in] prob_lo_in double precision
+  !!
   subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature, &
        Pressure,Nscalars,prob_lo_in,prob_hi_in) &
        bind(C, name="set_method_params")
@@ -210,11 +226,11 @@ contains
   ! :::
 
 
-!> @brief Set the relative tolerance
-!! @note Binds to C function ``set_rel_eps``
-!!
-!! @param[in] rel_eps_in double precision
-!!
+  !> @brief Set the relative tolerance
+  !! @note Binds to C function ``set_rel_eps``
+  !!
+  !! @param[in] rel_eps_in double precision
+  !!
   subroutine set_rel_eps(rel_eps_in) bind(C,name="set_rel_eps")
 
     double precision, intent(in) :: rel_eps_in
@@ -228,11 +244,11 @@ contains
   ! :::
 
 
-!> @brief Return the relative tolerance
-!! @note Binds to C function ``get_rel_eps``
-!!
-!! @param[inout] rel_eps_in double precision
-!!
+  !> @brief Return the relative tolerance
+  !! @note Binds to C function ``get_rel_eps``
+  !!
+  !! @param[inout] rel_eps_in double precision
+  !!
   subroutine get_rel_eps(rel_eps_in) bind(C,name="get_rel_eps")
 
     double precision, intent(inout) :: rel_eps_in

@@ -107,6 +107,11 @@ Maestro::Init ()
                        grav_cell_old.dataPtr());
         }
 
+	// set beta0^{-1} = beta0_old
+        for (int i=0; i<beta0_old.size(); ++i) {
+            beta0_nm1[i] = beta0_old[i];
+	}
+	
         // initial projection
         if (do_initial_projection) {
             Print() << "Doing initial projection" << std::endl;
@@ -266,7 +271,7 @@ Maestro::InitData ()
         // set p0^{-1} = p0_old
         for (int i=0; i<p0_old.size(); ++i) {
             p0_nm1[i] = p0_old[i];
-        }
+	}
     }
 }
 

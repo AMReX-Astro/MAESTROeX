@@ -4,11 +4,11 @@ module eos_module
 
   public eos_init, eos
 
-  logical, save :: initialized = .false.  
+  logical, save :: initialized = .false.
 
 contains
 
-  ! EOS initialization routine: read in general EOS parameters, then 
+  ! EOS initialization routine: read in general EOS parameters, then
   ! call any specific initialization used by the EOS.
 
   subroutine eos_init(small_temp, small_dens)

@@ -78,9 +78,9 @@ contains
     hx = dx(1)
 
     if (ppm_type .eq. 0) then
-       call slopex_1d(utilde,slopex,domlo,domhi,lo,hi,ng_u,1,adv_bc)
+       call slopex_1d(utilde,slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_1d(utilde(:,1),ng_u,ufull(:,1),ng_uf,Ipu,Imu, &
+       call ppm_1d(utilde(:,1),ng_ut,ufull(:,1),ng_uf,Ipu,Imu, &
             domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
        if (ppm_trace_forces .eq. 1) then
           call ppm_1d(force(:,1),ng_f,ufull(:,1),ng_uf,Ipf,Imf, &
@@ -96,18 +96,18 @@ contains
        do i=is,ie+1
           ! extrapolate velocity to left face
           umacl(i) = utilde(i-1,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,1)))*slopex(i-1,1) &
-               + dt2*force(i-1)
+               + dt2*force(i-1,1)
           ! extrapolate velocity to right face
           umacr(i) = utilde(i  ,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,1)))*slopex(i  ,1) &
-               + dt2*force(i  )
+               + dt2*force(i,1)
        end do
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        if (ppm_trace_forces .eq. 0) then
           do i=is,ie+1
              ! extrapolate velocity to left face
-             umacl(i) = Ipu(i-1) + dt2*force(i-1)
+             umacl(i) = Ipu(i-1) + dt2*force(i-1,1)
              ! extrapolate velocity to right face
-             umacr(i) = Imu(i  ) + dt2*force(i  )
+             umacr(i) = Imu(i  ) + dt2*force(i  ,1)
           end do
        else
           do i=is,ie+1

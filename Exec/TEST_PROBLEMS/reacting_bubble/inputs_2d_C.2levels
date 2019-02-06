@@ -34,12 +34,13 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 
 # TAGGING
 maestro.temperr = 6.5e8 6.5e8
+maestro.use_tpert_in_tagging = true
 
 maestro.anelastic_cutoff = 3.e6
 maestro.base_cutoff_density = 3.e6
 
 # TIME STEPPING
-maestro.max_step  = 1000
+maestro.max_step  = 500
 maestro.stop_time = 2.5e0
 maestro.cfl       = 0.9    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -52,7 +53,7 @@ maestro.evolve_base_state = true
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 1
 maestro.init_iter             = 1
-maestro.do_reflux             = 1 # do we do the hyperbolic reflux
+maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 
 maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
@@ -63,7 +64,7 @@ maestro.use_thermal_diffusion = false
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
-maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_int   = 10      # number of timesteps between plot files
 maestro.plot_deltat = 1e0
 
 # CHECKPOINT

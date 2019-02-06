@@ -1,0 +1,46 @@
+Introduction
+
+  test_advect is a simple test of the advection scheme only.  In short
+  we:
+
+    -- set up a unit cube (or equivalent in lower dimensions) with 
+       periodic boundaries
+
+    -- initialize a constant velocity field in one of the coordinate
+       directions
+
+    -- initialize the density field to a gaussian
+
+    -- estimate a timestep
+
+    -- use density_advance to update the density field only.
+
+
+
+Computing the Norm of the Error
+
+  test_advect produces an output file at the start (dens_orig) and one
+  at the very end (dens_??_final), where ?? is one of
+  {xm,xp,ym,yp,zm,zp} indicating the coordinate direction of the
+  advection and whether it was `+' or `-'.
+
+  The fcompare tool (in fParallel/data_processing/) computes the L2
+  norm of the error and relative error of each variable in a plotfile
+  on a level-by-level basis.  It requires that the grids be identical.
+
+  To get the L2 error after advecting in the +X direction, we would
+  do:
+
+    fcompare.Linux.Intel.exe --infile1 dens_orig --infile2 dens_xp_final
+
+  which gives:
+
+    level =            1
+     density               5.621649219909652E-002   97.5143285214983     
+
+  Here, the only variable in the file, "density" is listed with two
+  numbers following, the L2 error and L2 relative-error.  In this
+  case, the relative error is likely set where the densities are tiny,
+  and is not too meaningful.
+
+ 

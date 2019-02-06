@@ -50,7 +50,7 @@ contains
 
     logical :: test
 
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1,1)
 
     call bl_allocate(ulx,lo(1),hi(1)+1)
     call bl_allocate(urx,lo(1),hi(1)+1)

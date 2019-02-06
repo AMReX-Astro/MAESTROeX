@@ -1,0 +1,97 @@
+Below I go through a complete, basic example
+of using test_react and analyzing the resulting data.
+---
+Legend:
+  <>  --> Comments
+  **  --> Actions
+  $   --> Terminal prompt commands / output
+  === --> Heading
+---
+
+< I want to test the triple alpha network, an excellent time to make use of
+  the test_react unit test!>
+
+=== STEP 1 - Edit GNUmakefile ===
+$ cd <some base directory>/MAESTRO/UNIT_TESTS/test_react
+* edit GNUmakefile by setting 'NETWORK_DIR := triple_alpha'*
+< WARNING: 
+    -make sure NETWORK_TOP_DIR is properly initialized
+    -make sure 'OMP := ' , NOT 'OMP := t' . triple_alpha is not currently thread safe,
+      so using MPI or OMP will likely result in errors. >
+
+=== STEP 2 - Compile ===
+$ make
+
+=== OPTIONAL STEP - Generate an xin file ===
+< Instead of setting 'xin_file = "uniform" ' in my input file, which gives all
+  species in the network equal and uniform mass fractions, I'd like to customize
+  my mass fractions.  Thus, I do the following. Alternatives, one can write their
+  own xin file without using the script.>
+$ ./scripts/xinGen.py
+$ How many species are in the network? 3
+$ What is the grid size (cells on a cide, e.g. 16, 32, or 64)? 16
+$ Select mass fraction type for species 1:
+$     A: Solar hydrogen value    [X=0.7393]
+$     B: Solar helium value      [Y=0.2485]
+$     C: Solar metallicity value [Z=0.0122]
+$     D: User-given uniform value
+$     E: User-given constant delta value
+$ Enter selection: e
+$ Enter initial value (value at cell 0): 1.0
+$ Enter delta value (change in X from xell i to cell i+1): -0.05
+$ Select mass fraction type for species 2:
+< ... >
+$ Enter selection: d
+$ Enter uniform value: 0.0
+$ Select mass fraction type for species 3:
+< ...>
+$ Enter selection: e
+$ Enter initial value (value at cell 0): 0.0
+$ Enter delta value (change in X from xell i to cell i+1): 0.05
+* file 'xin' is generated in the current working directory *
+$ mv xin xin.3alpha
+
+=== STEP 3 - Prepare input file ===
+* create file called 'inputs_3alpha' modelled off of 'inputs_react' *
+* Set 'test_set = "gr0_3d.small" ' *
+* Set dens_min, dens_max, temp_min, temp_max *
+* Set min_time_step *
+* Set 'react_its = 7' so that 7 orders of magnitude of time will be explored *
+* Set 'xin_file = "xin.3alpha" ' *
+* Set 'run_prefix = "react_3alpha_" ' *
+
+=== STEP 4 - Execute ===
+$ ./main.Linux.gfortran.exe inputs_3alpha 
+* The following plotfiles are generated:
+    -react_3alpha_initial [The initial 3D grid before calling react_state() ]
+    -react_3alpha_mode1   [Results of calling react_state() with no nuclear burning, no external heating, and 'min_time_step' as the time step]
+    -react_3alpha_mode2   [Results of calling react_state() with nuclear burning,    no external heating, and 'min_time_step' as the time step]
+    -react_3alpha_mode3   [Results of calling react_state() with no nuclear burning, external heating,    and 'min_time_step' as the time step]
+    -react_3alpha_mode4   [Results of calling react_state() with nuclear burning,    external heating,    and 'min_time_step' as the time step]
+    -react_3alpha_dtE+0   [Results of calling react_state() with a time step of min_time_step * 10^0      and user-given values for 'do_burning' and 'do_heating'
+    -react_3alpha_dtE+1   [Results of calling react_state() with a time step of min_time_step * 10^1      and user-given values for 'do_burning' and 'do_heating'
+    -react_3alpha_dtE+2   [Results of calling react_state() with a time step of min_time_step * 10^2      and user-given values for 'do_burning' and 'do_heating'
+    -etc... *
+
+=== STEP 5 - Analyze ===
+1) Manual analysis:
+* Use amrvis3d to review the generated plotfiles. *
+
+2) Automated consistency checks
+$ cd scripts
+$ make
+$ cd ..
+$ ./scripts/recon.py react_3alpha_dtE+0
+
+< Generates the following output: >
+$ Results for react_3alpha_dtE+0:
+$ --------------------
+$ -Omegadot max error for helium-4: 1.11022302876e-16
+$ -Omegadot max error for carbon-12: 6.93889390391e-17
+$ -Omegadot max error for iron-56: 0.0
+$ -Enthalpy max error:         64.0
+$ -Max nuclear heating value:  1.31005907934e+20
+$ -Max external heating value: 0.0
+< As desired, omegadot errors are numerically 0, enthalpy error          >
+< is negligible, and external heating is 0 since heating was turned off. >
+    

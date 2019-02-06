@@ -239,7 +239,7 @@ contains
              ! the corresponding point on level n-1
              offset = w0(n,r_end_coord(n,j)+1) - w0(n-1,(r_end_coord(n,j)+1)/2)
 
-             do i=n-1,1,-1
+             do i=n-1,0,-1
 
                 refrat = 2**(n-i)
 

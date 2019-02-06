@@ -78,7 +78,7 @@ contains
           gradp0 = ( p0(lev,i+1) - p0(lev,i) ) / dr(lev)
        end if
 
-       veladv = 0.5d0*(umac(i)+umac(i+1))
+       veladv = 0.5d0*(umac(i,j,k)+umac(i+1,j,k))
        rhoh_force(i,j,k) = veladv * gradp0
     enddo
 #elif (AMREX_SPACEDIM == 2)
