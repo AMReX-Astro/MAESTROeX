@@ -28,15 +28,12 @@ contains
   ! ::: ----------------------------------------------------------------
   ! :::
 
-  subroutine maestro_extern_init(name,namlen) bind(C, name="maestro_extern_init")
+  subroutine maestro_extern_init() bind(C, name="maestro_extern_init")
 
     ! initialize the external runtime parameters in
     ! extern_probin_module
 
     use amrex_fort_module, only: rt => amrex_real
-
-    integer, intent(in) :: namlen
-    integer, intent(in) :: name(namlen)
     !
     call runtime_init()
 
