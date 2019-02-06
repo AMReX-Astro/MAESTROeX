@@ -136,10 +136,16 @@ Maestro::Regrid ()
 
 }
 
-// set tagging array to include buffer zones for multilevel
+// re-compute tag_array since the actual grid structure changed due to buffering
+// this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
 void
 Maestro::TagArray ()
 {
+    // this routine is not required for spherical
+    if (spherical == 1) {
+        return;
+    }
+    
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagArray()",TagArray);
 
@@ -160,7 +166,8 @@ Maestro::TagArray ()
             {
                 const Box& tilebox  = mfi.tilebox();
 
-                // retag refined cells to include cells in buffered regions
+                // re-compute tag_array since the actual grid structure changed due to buffering
+                // this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
                 retag_array(&tagval, &clearval, 
                             ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                             &lev, tag_array.dataPtr());
@@ -193,7 +200,6 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 
     const MultiFab& state = sold[lev];
     
-	    
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -218,7 +224,8 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
             const int*  thi     = tilebox.hiVect();
 
             // tag cells for refinement
-	    // use row lev of tag_array to tag the correct elements
+	    // for planar problems, we keep track of when a cell at a particular
+            // latitude is tagged using tag_array
             state_error(tptr,  ARLIM_3D(tlo), ARLIM_3D(thi),
                         BL_TO_FORTRAN_3D(state[mfi]),
                         &tagval, &clearval,
@@ -260,7 +267,8 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 		    int*        tptr    = itags.dataPtr();
 		    const int*  tlo     = tilebox.loVect();
 		    const int*  thi     = tilebox.hiVect();
-		    
+
+                    // tag all cells at a given height if any cells at that height were tagged
 		    tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
 			      &tagval, &clearval,
 			      ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),

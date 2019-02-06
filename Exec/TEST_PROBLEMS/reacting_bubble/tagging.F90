@@ -48,6 +48,10 @@ contains
     integer          :: i, j, k, r
     double precision :: height
 
+    ! tag cells for refinement
+    ! for planar problems, we keep track of when a cell at a particular
+    ! latitude is tagged using tag_array
+    
     if (use_tpert_in_tagging) then
        ! Tag on regions with largest temperature perturbation
        do k = lo(3),hi(3)
@@ -122,7 +126,8 @@ contains
     ! local
     integer          :: i, j, k, r
 
-    ! Tag on regions of high temperature
+    ! tag all cells at a given height if any cells at that height were tagged
+    
 #if (AMREX_SPACEDIM == 3) 
     do k = lo(3), hi(3)
        
@@ -176,8 +181,9 @@ contains
 
     ! local
     integer          :: i, j, k, r
-    
-    ! Tag on regions including buffer cells
+
+    ! re-compute tag_array since the actual grid structure changed due to buffering
+    ! this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
     do k = lo(3), hi(3)
     do j = lo(2), hi(2)
     do i = lo(1), hi(1)
