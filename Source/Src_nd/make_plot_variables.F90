@@ -21,6 +21,19 @@ module plot_variables_module
 
 contains
 
+  !> Compute the adiabatic excess
+  !! @note Binds to C function ``make_ad_excess``
+  !!
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] state double precision
+  !! @param[in] s_lo integer
+  !! @param[in] s_hi integer
+  !! @param[in] nc_s integer
+  !! @param[inout] ad_excess double precision
+  !! @param[in] a_lo integer
+  !! @param[in] a_hi integer
+  !!
   subroutine make_ad_excess(lo,hi,state,s_lo,s_hi,nc_s,&
        ad_excess,a_lo,a_hi) bind(C, name="make_ad_excess")
 
@@ -129,6 +142,22 @@ contains
   end subroutine make_ad_excess
 
 
+  !> Compute the adiabatic excess in spherical coordinates
+  !! @note Binds to C function ``make_ad_excess_sphr``
+  !!
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] state double precision
+  !! @param[in] s_lo integer
+  !! @param[in] s_hi integer
+  !! @param[in] nc_s integer
+  !! @param[in] normal double precision
+  !! @param[in] n_lo integer
+  !! @param[in] n_hi integer
+  !! @param[inout] ad_excess double precision
+  !! @param[in] a_lo integer
+  !! @param[in] a_hi integer
+  !!
   subroutine make_ad_excess_sphr(lo,hi,state,s_lo,s_hi,nc_s,normal,n_lo,n_hi,&
        ad_excess,a_lo,a_hi) bind(C, name="make_ad_excess_sphr")
 
@@ -245,6 +274,20 @@ contains
   end subroutine make_ad_excess_sphr
 
 
+  !> Compute the vorticity
+  !! @note Binds to C function ``make_vorticity``
+  !!
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] vel double precision
+  !! @param[in] v_lo integer
+  !! @param[in] v_hi integer
+  !! @param[in] dx double precision
+  !! @param[inout] vort double precision
+  !! @param[in] d_lo integer
+  !! @param[in] d_hi integer
+  !! @param[in] bc integer
+  !!
   subroutine make_vorticity(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc) bind(C, name="make_vorticity")
 
     integer, intent(in) :: lo(3), hi(3)
@@ -269,6 +312,19 @@ contains
 
   end subroutine make_vorticity
 
+  !> Compute the vorticity in 2d
+  !!
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] vel double precision
+  !! @param[in] v_lo integer
+  !! @param[in] v_hi integer
+  !! @param[in] dx double precision
+  !! @param[inout] vort double precision
+  !! @param[in] d_lo integer
+  !! @param[in] d_hi integer
+  !! @param[in] bc integer
+  !!
   subroutine make_vorticity_2d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
 
     integer, intent(in) :: lo(3), hi(3)
@@ -332,6 +388,19 @@ contains
   end subroutine make_vorticity_2d
 
 
+  !> Compute the vorticity in 3d
+  !!
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] vel double precision
+  !! @param[in] v_lo integer
+  !! @param[in] v_hi integer
+  !! @param[in] dx double precision
+  !! @param[inout] vort double precision
+  !! @param[in] d_lo integer
+  !! @param[in] d_hi integer
+  !! @param[in] bc integer
+  !!
   subroutine make_vorticity_3d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
 
     integer, intent(in) :: lo(3), hi(3)
@@ -858,8 +927,20 @@ contains
   end subroutine make_vorticity_3d
 
 
-
-
+  !> Compute the magnitude of the velocity
+  !! @note Binds to C function ``make_magvel``
+  !!
+  !! @param[in] lev integer
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] vel double precision
+  !! @param[in] v_lo integer
+  !! @param[in] v_hi integer
+  !! @param[in] w0 double precision
+  !! @param[inout] magvel double precision
+  !! @param[in] m_lo integer
+  !! @param[in] m_hi integer
+  !!
   subroutine make_magvel(lev,lo,hi,vel,v_lo,v_hi,w0,magvel,m_lo,m_hi) bind(C, name="make_magvel")
 
     integer, intent(in) :: lev, lo(3), hi(3)
@@ -891,6 +972,28 @@ contains
 
   end subroutine make_magvel
 
+  !> Compute the magnitude of the velocity in spherical coordinates
+  !! @note Binds to C function ``make_magvel_sphr``
+  !!
+  !! @param[in] lev integer
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] vel double precision
+  !! @param[in] v_lo integer
+  !! @param[in] v_hi integer
+  !! @param[in] w0macx double precision
+  !! @param[in] x_lo integer
+  !! @param[in] x_hi integer
+  !! @param[in] w0macy double precision
+  !! @param[in] y_lo integer
+  !! @param[in] y_hi integer
+  !! @param[in] w0macz double precision
+  !! @param[in] z_lo integer
+  !! @param[in] z_hi integer
+  !! @param[inout] magvel double precision
+  !! @param[in] m_lo integer
+  !! @param[in] m_hi integer
+  !!
   subroutine make_magvel_sphr(lo,hi,vel,v_lo,v_hi, &
                               w0macx, x_lo, x_hi, &
                               w0macy, y_lo, y_hi, &
@@ -924,6 +1027,27 @@ contains
 
   end subroutine make_magvel_sphr
 
+  !> Compute the radial and circular velocity components
+  !! @note Binds to C function ``make_velrc``
+  !!
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] vel double precision
+  !! @param[in] v_lo integer
+  !! @param[in] v_hi integer
+  !! @param[in] w0rcart double precision
+  !! @param[in] w_lo integer
+  !! @param[in] w_hi integer
+  !! @param[in] normal double precision
+  !! @param[in] n_lo integer
+  !! @param[in] n_hi integer
+  !! @param[inout] radl_vel double precision
+  !! @param[in] r_lo integer
+  !! @param[in] r_hi integer
+  !! @param[inout] circ_vel double precision
+  !! @param[in] c_lo integer
+  !! @param[in] c_hi integer
+  !!
   subroutine make_velrc(lo,hi,vel,v_lo,v_hi,w0rcart,w_lo,w_hi,normal,n_lo,n_hi,&
        rad_vel,r_lo,r_hi,circ_vel,c_lo,c_hi) bind(C, name="make_velrc")
 
@@ -967,6 +1091,22 @@ contains
 
   end subroutine make_velrc
 
+  !> Compute delta gamma
+  !! @note Binds to C function ``make_deltagamma``
+  !!
+  !! @param[in] lev integer
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] state double precision
+  !! @param[in] s_lo integer
+  !! @param[in] s_hi integer
+  !! @param[in] nc_s integer
+  !! @param[in] p0 double precision
+  !! @param[in] gamma1bar double precision
+  !! @param[inout] deltagamma double precision
+  !! @param[in] d_lo integer
+  !! @param[in] d_hi integer
+  !!
   subroutine make_deltagamma(lev,lo,hi,state,s_lo,s_hi,nc_s,p0,gamma1bar,&
        deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma")
 
@@ -1016,6 +1156,26 @@ contains
 
   end subroutine make_deltagamma
 
+  !> Compute delta gamma in spherical coordinates
+  !! @note Binds to C function ``make_deltagamma_sphr``
+  !!
+  !! @param[in] lev integer
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] state double precision
+  !! @param[in] s_lo integer
+  !! @param[in] s_hi integer
+  !! @param[in] nc_s integer
+  !! @param[in] p0_cart double precision
+  !! @param[in] p_lo integer
+  !! @param[in] p_hi integer
+  !! @param[in] gamma1bar_cart double precision
+  !! @param[in] g_lo integer
+  !! @param[in] g_hi integer
+  !! @param[inout] deltagamma double precision
+  !! @param[in] d_lo integer
+  !! @param[in] d_hi integer
+  !!
   subroutine make_deltagamma_sphr(lo,hi,state,s_lo,s_hi,nc_s,&
        p0_cart,p_lo,p_hi,gamma1bar_cart,g_lo,g_hi,&
        deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma_sphr")
@@ -1060,6 +1220,18 @@ contains
 
   end subroutine make_deltagamma_sphr
 
+  !> Compute the divergence of the base state velocity
+  !! @note Binds to C function ``make_divw0``
+  !!
+  !! @param[in] lev integer
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] w0 double precision
+  !! @param[in] dx double precision
+  !! @param[inout] divw0 double precision
+  !! @param[in] d_lo integer
+  !! @param[in] d_hi integer
+  !!
   subroutine make_divw0(lev,lo,hi,w0,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
 
     integer, intent (in) :: lev, lo(3), hi(3)
@@ -1087,6 +1259,26 @@ contains
 
   end subroutine make_divw0
 
+  !> Compute the divergence of the base state velocity in spherical coordinates
+  !! @note Binds to C function ``make_divw0_sphr``
+  !!
+  !! @param[in] lev integer
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] w0macx double precision
+  !! @param[in] x_lo integer
+  !! @param[in] x_hi integer
+  !! @param[in] w0macy double precision
+  !! @param[in] y_lo integer
+  !! @param[in] y_hi integer
+  !! @param[in] w0macz double precision
+  !! @param[in] z_lo integer
+  !! @param[in] z_hi integer
+  !! @param[in] dx double precision
+  !! @param[inout] divw0 double precision
+  !! @param[in] d_lo integer
+  !! @param[in] d_hi integer
+  !!
   subroutine make_divw0_sphr(lo,hi,w0macx,x_lo,x_hi,w0macy,y_lo,y_hi,w0macz,z_lo,z_hi,&
        dx,divw0,d_lo,d_hi) bind(C,name="make_divw0_sphr")
 
@@ -1116,6 +1308,22 @@ contains
 
   end subroutine make_divw0_sphr
 
+  !> Compute pi div u
+  !! @note Binds to C function ``make_pidivu``
+  !!
+  !! @param[in] lo integer
+  !! @param[in] hi integer
+  !! @param[in] vel double precision
+  !! @param[in] v_lo integer
+  !! @param[in] v_hi integer
+  !! @param[in] dx double precision
+  !! @param[in] pi_cc double precision
+  !! @param[in] p_lo integer
+  !! @param[in] p_hi integer
+  !! @param[inout] pidivu double precision 
+  !! @param[in] d_lo integer
+  !! @param[in] d_hi integer
+  !!
   subroutine make_pidivu(lo,hi,vel,v_lo,v_hi,dx,pi_cc,p_lo,p_hi,nc,&
        pidivu,d_lo,d_hi) bind(C,name="make_pidivu")
 

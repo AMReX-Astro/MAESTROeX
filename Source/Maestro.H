@@ -119,10 +119,10 @@ private:
     ///
     /// compute unprojected mac velocities
     ///
-    /// @param umac
+    /// @param umac             MAC velocity
     /// @param w0mac            MAC base state velocity
-    /// @param w0_force
-    /// @param w0_force_cart
+    /// @param w0_force         forcing term in the base state velocity equation
+    /// @param w0_force_cart    ``w0_force`` on Cartesian grid
     ///
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
@@ -154,7 +154,7 @@ private:
     /// @param utrans   Transverse velocity
     /// @param umac     MAC velocity
     /// @param w0mac    Base state MAC velocity
-    /// @param force
+    /// @param force    forcing term in the momentum equation
     ///
     void VelPred (const amrex::Vector<amrex::MultiFab>& utilde,
                   const amrex::Vector<amrex::MultiFab>& ufull,
@@ -170,17 +170,17 @@ private:
     /// @param state            Cell-centered state
     /// @param sedge            Edge-based scalars
     /// @param umac             MAC velocity
-    /// @param force
-    /// @param is_vel
+    /// @param force            source terms for X and for tracers
+    /// @param is_vel           Is the variable the velocity (1 = yes, 0 = no)?
     /// @param bcs              Boundary conditions
     /// @param nbccomp          Number of components of `bcs` to use
     /// @param start_scomp      Component of `state` to start with
     /// @param start_bccomp     Component of `bcs` to start with
     /// @param num_comp         Number of `state` components to predict
-    /// @param is_conservative
+    /// @param is_conservative  Is the variable conservative (1) or primitive (0)?
     ///
     void MakeEdgeScal (const amrex::Vector<amrex::MultiFab>& state,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+		               amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<amrex::MultiFab>& force,
                        int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
@@ -196,13 +196,13 @@ private:
     /// @param sedge        Edge-based state
     /// @param umac         MAC velocity
     /// @param w0mac        MAC base state velocity
-    /// @param r0_old
-    /// @param r0_edge_old
-    /// @param r0mac_old
-    /// @param r0_new
-    /// @param r0_edge_new
-    /// @param r0mac_new
-    /// @param r0_predicted_edge
+    /// @param r0_old       rho0 at old timestep
+    /// @param r0_edge_old  rho0 predicted to edges at old timestep
+    /// @param r0mac_old    MAC-projected rho0 at old timestep
+    /// @param r0_new       rho0 at new timestep
+    /// @param r0_edge_new  rho0 predicted to edges at new timestep
+    /// @param r0mac_new    MAC-projected rho0 at new timestep
+    /// @param r0_predicted_edge    rho0 predicted to edges
     /// @param start_comp   Component of state to begin with
     /// @param num_comp     Number of components to use
     ///
@@ -230,20 +230,20 @@ private:
     /// @param sedge            Edge-based state
     /// @param umac             MAC velocity
     /// @param w0mac            MAC base state velocity
-    /// @param r0_old
-    /// @param r0_edge_old
-    /// @param r0mac_old
-    /// @param r0_new
-    /// @param r0_edge_new
-    /// @param r0mac_new
-    /// @param rh0_old
-    /// @param rh0_edge_old
-    /// @param rh0mac_old
-    /// @param rh0_new
-    /// @param rh0_edge_new
-    /// @param rh0mac_new
-    /// @param h0mac_old
-    /// @param h0mac_new
+    /// @param r0_old           rho0 at old timestep
+    /// @param r0_edge_old      rho0 predicted to edges at old timestep
+    /// @param r0mac_old        MAC-projected rho0 at old timestep
+    /// @param r0_new           rho0 at new timestep
+    /// @param r0_edge_new      rho0 predicted to edges at new timestep
+    /// @param r0mac_new        MAC-projected rho0 at new timestep
+    /// @param rh0_old          rhoh0 at old timestep
+    /// @param rh0_edge_old     rhoh0 predicted to edges at old timestep
+    /// @param rh0mac_old       MAC-projected rhoh0 at old timestep
+    /// @param rh0_new          rhoh0 at new timestep
+    /// @param rh0_edge_new     rhoh0 predicted to edges at new timestep
+    /// @param rh0mac_new       MAC-projected rhoh0 at new timestep
+    /// @param h0mac_old        MAC-projected h0 at old timestep
+    /// @param h0mac_new        MAC-projected h0 at new timestep
     ///
     void MakeRhoHFlux (const amrex::Vector<amrex::MultiFab>& state,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
@@ -271,7 +271,7 @@ private:
     /// @param stateold     State at old timestep
     /// @param statenew     State at new timestep
     /// @param sflux        Flux
-    /// @param force
+    /// @param force        source terms for X and for tracers
     /// @param start_scomp  Index of first scalar component
     /// @param num_comp     Number of scalar components
     /// @param p0           Base state pressure
@@ -291,7 +291,7 @@ private:
     ///
     /// @param umac     MAC velocity
     /// @param uedge    Edge-based velocity
-    /// @param force
+    /// @param force    forcing term in the momentum equation
     /// @param sponge
     /// @param w0mac    MAC base state velocity
     ///
@@ -325,9 +325,15 @@ private:
     // MaestroCheckpoint.cpp functions
 
     ///
+    /// Write checkpoint file at given step
+    ///
     /// @param step
     ///
     void WriteCheckPoint (int step);
+
+    ///
+    /// Read checkpoint file
+    ///
     int ReadCheckPoint ();
 
     ///
@@ -429,7 +435,7 @@ private:
     /// @param scalnew              Scalars at new timestep
     /// @param sedge                Edge based scalars
     /// @param sflux                Scalar flux
-    /// @param scal_force
+    /// @param scal_force           Scalar force term
     /// @param etarhoflux
     /// @param umac                 MAC velocity
     /// @param w0mac                MAC base velocity
@@ -527,9 +533,9 @@ private:
     /// call FillPatch for all levels
     ///
     /// @param time         Current time
-    /// @param mf
-    /// @param mf_old
-    /// @param mf_new
+    /// @param mf           MultiFab to save solution to
+    /// @param mf_old       Source MultiFab at old timestep
+    /// @param mf_new       Source MultiFab at new timestep
     /// @param srccomp      the source component
     /// @param destcomp     the destination component AND the bc component
     /// @param ncomp        Number of components
@@ -550,13 +556,13 @@ private:
     ///
     /// @param lev
     /// @param time         Current time
-    /// @param mf
-    /// @param mf_old
-    /// @param mf_new
+    /// @param mf           MultiFab to save solution to
+    /// @param mf_old       Source MultiFab at old timestep
+    /// @param mf_new       Source MultiFab at new timestep
     /// @param srccomp      the source component
     /// @param destcomp     the destination component AND the bc component
     /// @param ncomp        Number of components
-    /// @param startbccomp
+    /// @param startbccomp  index of first component of ``bcs_in`` to use
     /// @param bcs_in       boundary conditions
     ///
     void FillPatch (int lev, amrex::Real time,
@@ -572,9 +578,9 @@ private:
     ///
     /// @param lev
     /// @param time         Current time
-    /// @param mf
-    /// @param mf_old
-    /// @param mf_new
+    /// @param mf           MultiFab to save solution to
+    /// @param mf_old       Source MultiFab at old timestep
+    /// @param mf_new       Source MultiFab at new timestep
     /// @param srccomp      the source component
     /// @param destcomp     the destination component AND the bc component
     /// @param ncomp        Number of components
@@ -630,7 +636,7 @@ private:
     /// field behind physical boundaries.  Does not modify the velocities on the boundary
     ///
     /// @param umac     MAC velocity
-    /// @param level
+    /// @param level    Index of AMR level
     ///
     void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                         int level=-1);
@@ -648,6 +654,9 @@ private:
     ////////////////////////
     // MaestroFill3dData.cpp functions
 
+    ///
+    /// Put 1d array on Cartesian grid
+    ///
     void Put1dArrayOnCart (const amrex::Vector<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
@@ -673,6 +682,8 @@ private:
                 const amrex::Real& mult);
 
 
+    ///
+    /// Make the base state MAC velocity
     ///
     /// @param w0mac    MAC base state velocity
     ///
@@ -719,8 +730,8 @@ private:
     /// @param rho                  Density
     /// @param rho0                 Base state density
     /// @param grav                 Gravitational acceleration
-    /// @param w0_force
-    /// @param w0_force_cart
+    /// @param w0_force             forcing term in the base state velocity equation
+    /// @param w0_force_cart        ``w0_force`` on Cartesian grid
     /// @param do_add_utilde_force
     ///
     void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
@@ -729,9 +740,9 @@ private:
                        const amrex::Vector<amrex::Real>& rho0,
                        const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
-		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
-		       const amrex::Vector<amrex::Real>& beta0,
-		       const int is_predictor,
+        		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+        		       const amrex::Vector<amrex::Real>& beta0,
+        		       const int is_predictor,
                        int do_add_utilde_force);
 
 
@@ -749,11 +760,11 @@ private:
     /// @param fullform         Use full scalar (1) or do perturbed and base components separately
     ///
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
-			 const amrex::Vector<amrex::MultiFab>& state,
+			             const amrex::Vector<amrex::MultiFab>& state,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<amrex::Real>& s0,
                          const amrex::Vector<amrex::Real>& s0_edge,
-			 const amrex::Vector<amrex::MultiFab>& s0_cart,
+			             const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
                          const amrex::Vector<amrex::BCRec>& bcs,
                          int fullform);
@@ -1119,7 +1130,7 @@ private:
     ///
     /// get plotfile name
     ///
-    /// @param lev
+    /// @param lev  index of AMR level
     ///
     std::string PlotFileName (int lev) const;
 
@@ -1128,19 +1139,18 @@ private:
     /// Put together an array of multifabs for writing
     ///
     /// @param nPlot
-    /// @param t_in
-    /// @param dt_in
-    /// @param rho0_cart
-    /// @param rhoh0_cart
-    /// @param p0    Base state pressure_cart
-    /// @param gamma1bar_cart
-    /// @param u_in
-    /// @param s_in
-    /// @param p0    Base state pressure_in
-    /// @param gamma1bar_in
+    /// @param t_in             time
+    /// @param dt_in            timestep
+    /// @param rho0_cart        rho0 on Cartesian grid
+    /// @param rhoh0_cart       rhoh0 on Cartesian grid
+    /// @param p0               Base state pressure_cart
+    /// @param gamma1bar_cart   Gamma1bar on Cartesian grid
+    /// @param u_in             velocity
+    /// @param s_in             scalar variables
+    /// @param p0               Base state pressure_in
+    /// @param gamma1bar_in     Gamma1bar
     /// @param S_cc_in
     ///
-
     amrex::Vector<const amrex::MultiFab*> PlotFileMF (const int nPlot,
                                                       const amrex::Real t_in,
                                                       const amrex::Real dt_in,
@@ -1164,13 +1174,13 @@ private:
     ///
     /// Write plotfile to disk
     ///
-    /// @param step
-    /// @param dt_in
-    /// @param rho0_in
-    /// @param rhoh0_in
-    /// @param p0    Base state pressure_in
-    /// @param u_in
-    /// @param s_in
+    /// @param step     Current step number
+    /// @param dt_in    Timestep
+    /// @param rho0_in  Base state density
+    /// @param rhoh0_in Base state rhoh
+    /// @param p0       Base state pressure_in
+    /// @param u_in     Velocity
+    /// @param s_in     Scalar variables
     ///
     void WritePlotFile (const int step,
                         const amrex::Real t_in,
@@ -1189,20 +1199,56 @@ private:
     ///
     void WriteJobInfo (const std::string& dir) const;
 
+    ///
+    /// Computes the magnitude of the velocity
+    ///
+    /// @param vel      velocity
+    /// @param magvel   velocity magnitude
+    ///
     void MakeMagvel (const amrex::Vector<amrex::MultiFab>& vel,
                      amrex::Vector<amrex::MultiFab>& magvel);
 
+    ///
+    /// Computes the radial and circular velocity components
+    ///
+    /// @param          velocity
+    /// @param w0rcart  w0 on a Cartesian grid, cell-centered as a scalar
+    /// @param rad_vel  radial velocity component
+    /// @param circ_vel circular velocity component
+    ///
     void MakeVelrc (const amrex::Vector<amrex::MultiFab>& vel,
                     const amrex::Vector<amrex::MultiFab>& w0rcart,
                     amrex::Vector<amrex::MultiFab>& rad_vel,
                     amrex::Vector<amrex::MultiFab>& circ_vel);
 
+    ///
+    /// Computes the adiabatic excess, \f$\nabla - \nabla_{ad}\f$.
+    ///
+    /// @param state    state
+    /// @param ad_excess adiabatic excess
+    ///
     void MakeAdExcess (const amrex::Vector<amrex::MultiFab>& state,
                        amrex::Vector<amrex::MultiFab>& ad_excess);
 
+    ///
+    /// Computes the vorticity
+    ///
+    /// @param vel          velocity
+    /// @param vorticity    vorticity
+    ///
     void MakeVorticity (const amrex::Vector<amrex::MultiFab>& vel,
                         amrex::Vector<amrex::MultiFab>& vorticity);
 
+    ///
+    /// Computes the delta gamma term
+    ///
+    /// @param state            state
+    /// @param p0               base state pressure
+    /// @param p0_cart          base state pressure on Cartesian grid
+    /// @param gamma1bar        gamma1bar
+    /// @param gamma1bar_cart   gamma1bar on Cartesian grid
+    /// @param deltagamma       delta gamma term
+    ///
     void MakeDeltaGamma (const amrex::Vector<amrex::MultiFab>& state,
                          const amrex::Vector<amrex::Real>& p0,
                          const amrex::Vector<amrex::MultiFab>& p0_cart,
@@ -1210,9 +1256,23 @@ private:
                          const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
                          amrex::Vector<amrex::MultiFab>& deltagamma);
 
+    ///
+    /// Computes the radial derivative of the base state velocity
+    ///
+    /// @param w0mac    MAC base state velocity
+    /// @param divw0    div w0
+    ///
     void MakeDivw0 (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                     amrex::Vector<amrex::MultiFab>& divw0);
 
+    ///
+    /// Computes product of the pressure pertubation and the velocity divergence,
+    /// \f$\pi \nabla \cdot \mathbf{U} \f$.
+    ///
+    /// @param vel      Velocity
+    /// @param pi_cc    cell-centered pressure perturbation
+    /// @param pidivu   pi div U
+    ///
     void MakePiDivu (const amrex::Vector<amrex::MultiFab>& vel,
                    const amrex::Vector<amrex::MultiFab>& pi_cc,
                    amrex::Vector<amrex::MultiFab>& pidivu);
@@ -1227,13 +1287,13 @@ private:
     /// compute heating term, ``rho_Hext``, then
     /// react the state over ``dt_react`` and update ``rho_omegadot``, ``rho_Hnuc``
     ///
-    /// @param s_in
-    /// @param s_out
-    /// @param rho_Hext
+    /// @param s_in          Input state
+    /// @param s_out         Output state
+    /// @param rho_Hext      External heating term
     /// @param rho_omegadot
-    /// @param rho_Hnuc
-    /// @param p0    Base state pressure
-    /// @param dt_react
+    /// @param rho_Hnuc      nuclear heating term
+    /// @param p0            Base state pressure
+    /// @param dt_react      Reaction timestep
     ///
     void React (const amrex::Vector<amrex::MultiFab>& s_in,
                 amrex::Vector<amrex::MultiFab>& s_out,
@@ -1245,13 +1305,13 @@ private:
 
 
     ///
-    /// @param s_in
-    /// @param s_out
-    /// @param rho_Hext
+    /// @param s_in         Input state
+    /// @param s_out        Output state
+    /// @param rho_Hext     External heating term
     /// @param rho_omegadot
-    /// @param rho_Hnuc
-    /// @param p0    Base state pressure
-    /// @param dt_react
+    /// @param rho_Hnuc     nuclear heating term
+    /// @param p0           Base state pressure
+    /// @param dt_react     Reaction timestep
     ///
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
                 amrex::Vector<amrex::MultiFab>& s_out,
@@ -1264,8 +1324,8 @@ private:
     ///
     /// Compute heating term, ``rho_Hext``
     ///
-    /// @param rho_Hext
-    /// @param scal
+    /// @param rho_Hext     External heating
+    /// @param scal         Scalar variables
     ///
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
                       const amrex::Vector<amrex::MultiFab>& scal);
@@ -1288,7 +1348,7 @@ private:
     /// tag all cells for refinement,
     /// overrides the pure virtual function in AmrCore
     ///
-    /// @param lev
+    /// @param lev      Index of AMR level
     /// @param tags
     /// @param time     Current time
     /// @param ng       Number of ghost cells
@@ -1303,7 +1363,7 @@ private:
     /// that existed before, using pre-existing fine and interpolated coarse data
     /// overrides the pure virtual function in ``AmrCore``
     ///
-    /// @param lev
+    /// @param lev      Index of AMR level
     /// @param time    Current time
     /// @param ba
     /// @param dm
@@ -1318,7 +1378,7 @@ private:
     /// that did NOT exist before, using interpolated coarse data
     /// overrides the pure virtual function in ``AmrCore``
     ///
-    /// @param lev
+    /// @param lev     Index of AMR level
     /// @param time    Current time
     /// @param ba
     /// @param dm
@@ -1333,7 +1393,7 @@ private:
     /// at a level of refinement that is no longer needed
     /// overrides the pure virtual function in ``AmrCore``
     ///
-    /// @param lev
+    /// @param lev  Index of AMR level
     ///
     virtual void ClearLevel (int lev) override;
 
@@ -1346,7 +1406,7 @@ private:
     ///
     /// Calculate the temperature T given the density and enthalpy
     ///
-    /// @param scal
+    /// @param scal  Scalar variables
     /// @param p0    Base state pressure
     ///
     void TfromRhoH (amrex::Vector<amrex::MultiFab>& scal,
@@ -1356,7 +1416,7 @@ private:
     ///
     /// Calculate the temperature T given the density and pressure
     ///
-    /// @param scal
+    /// @param scal  Scalar variables
     /// @param p0    Base state pressure
     /// @param updateRhoH
     ///
@@ -1368,9 +1428,9 @@ private:
     ///
     /// Calculate the pressure given the density and enthalpy
     ///
-    /// @param state
-    /// @param s_old
-    /// @param peos
+    /// @param state    State variables
+    /// @param s_old    State at old timestep
+    /// @param peos     Pressure
     ///
     void PfromRhoH (const amrex::Vector<amrex::MultiFab>& state,
                     const amrex::Vector<amrex::MultiFab>& s_old,
@@ -1380,10 +1440,10 @@ private:
     ///
     /// Calculate the Mach number given the density and enthalpy
     ///
-    /// @param scal
-    /// @param vel
+    /// @param scal  Scalar variables
+    /// @param vel   Velocity
     /// @param p0    Base state pressure
-    /// @param mach
+    /// @param mach  Mach number
     ///
     void MachfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
                        const amrex::Vector<amrex::MultiFab>& vel,
@@ -1392,11 +1452,13 @@ private:
 
 
     ///
-    /// @param scal
-    /// @param vel
+    /// Calculate the Mach number given the density and enthalpy on spherical grid
+    ///
+    /// @param scal  Scalar variables
+    /// @param vel   Velocity
     /// @param p0    Base state pressure
-    /// @param w0cart
-    /// @param mach
+    /// @param w0cart   Base state velocity on Cartesian grid
+    /// @param mach  Mach number
     ///
     void MachfromRhoHSphr (const amrex::Vector<amrex::MultiFab>& scal,
                            const amrex::Vector<amrex::MultiFab>& vel,
@@ -1450,7 +1512,7 @@ private:
     ///     equivalent form with ``grad h - grad X_k - grad p_0`` formulation
     ///
     /// @param thermal
-    /// @param scal
+    /// @param scal     scalar variables
     /// @param Tcoeff
     /// @param hcoeff
     /// @param Xkcoeff
@@ -1534,11 +1596,11 @@ private:
     // MaestroVelocityAdvance.cpp functions
 
     ///
-    /// @param rhohalf
-    /// @param umac
+    /// @param rhohalf          density at half time
+    /// @param umac             MAC velocity
     /// @param w0mac            MAC base state velocity
-    /// @param w0_force
-    /// @param w0_force_cart
+    /// @param w0_force         forcing term in the base state velocity equation
+    /// @param w0_force_cart    ``w0_force`` on Cartesian grid
     /// @param rho0_nph
     /// @param grav_cell_nph
     /// @param sponge
