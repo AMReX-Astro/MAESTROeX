@@ -9,7 +9,6 @@ module maestro_init_module
        nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
   use eos_module, only: eos_init
   use runtime_init_module
-
   implicit none
 
   private
@@ -42,6 +41,21 @@ contains
     call runtime_init()
 
   end subroutine maestro_extern_init
+
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine maestro_conductivity_init() bind(C, name="maestro_conductivity_init")
+
+    ! initialize the external runtime parameters in
+    ! extern_probin_module
+
+    use conductivity_module, only: conductivity_init
+
+    call conductivity_init()
+
+  end subroutine maestro_conductivity_init
 
   ! :::
   ! ::: ----------------------------------------------------------------
