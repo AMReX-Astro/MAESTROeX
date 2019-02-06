@@ -64,12 +64,16 @@ Maestro::Regrid ()
     regrid(0, t_old);
 
     // Redefine numdisjointchunks, r_start_coord, r_end_coord
-    TagArray();
+    if (spherical == 0) {
+	TagArray();
+    }
     init_multilevel(tag_array.dataPtr(),&finest_level);
 	
     if (spherical == 1) {
         MakeNormal();
-        Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical");
+	if (use_exact_base_state) {
+	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
+	}
     }
     
     if (evolve_base_state) {
