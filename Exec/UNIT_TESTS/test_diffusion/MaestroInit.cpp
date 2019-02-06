@@ -45,7 +45,6 @@ Maestro::InitData ()
 	Print() << "Calling InitData()" << std::endl;
 
 	// read in model file and fill in s0_init and p0_init for all levels
-
 	init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
 	                rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
 	                tempbar_init.dataPtr());
@@ -70,22 +69,6 @@ Maestro::InitData ()
 	Vector<Real> s0_swap, p0_swap;
 	std::swap(s0_swap,s0_init);
 	std::swap(p0_swap,p0_init);
-
-	if (do_smallscale) {
-		// set rho0_old = rhoh0_old = 0.
-		std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
-		std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
-	}
-	else {
-		// set rho0 to be the average
-		Average(sold,rho0_old,Rho);
-
-		// call eos with r,p as input to recompute T,h
-		TfromRhoP(sold,p0_old,1);
-
-		// set rhoh0 to be the average
-		Average(sold,rhoh0_old,RhoH);
-	}
 
     p0_new = p0_old;
 

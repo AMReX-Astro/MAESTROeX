@@ -196,7 +196,7 @@ extern "C"
     // in debug.F90
     void print_base_cc(const amrex::Real* base);
     void print_base_edge(const amrex::Real* base);
-    
+
     void print_mf(const int* lev, const int* lo, const int* hi,
                   const amrex::Real* mf,
                   const int* m_lo, const int* m_hi, const int* nc_m);
@@ -371,6 +371,7 @@ extern "C"
 
     void maestro_network_init();
     void maestro_extern_init();
+    void maestro_conductivity_init();
     void get_num_spec(int* nspec);
     void get_spec_names(int* spec_names, int* ispec, int* len);
     void get_spec_az(const int* ispec, amrex::Real* A, amrex::Real* Z);
@@ -976,7 +977,7 @@ extern "C"
 			     const amrex::Real* normal, const int* n_lo, const int* n_hi, const int* nc_n,
 			     const amrex::Real* gradw0_cart, const int* gw_lo, const int* gw_hi,
 			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi, const int* nc_wf,
-			     const amrex::Real* rho0, const amrex::Real* grav, const amrex::Real* beta0, 
+			     const amrex::Real* rho0, const amrex::Real* grav, const amrex::Real* beta0,
 			     const amrex::Real* dx,
 			     const amrex::Real* r_cc_loc,
 			     const amrex::Real* r_edge_loc,
@@ -1072,7 +1073,7 @@ extern "C"
 #endif
 			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
     //////////////////////
-    
+
     //////////////////////
     // in regrid.f90
     void regrid_base_state_cc(amrex::Real* state_cc);
@@ -1155,7 +1156,6 @@ extern "C"
                      const int* lo, const int* hi,
                      const amrex::Real* dx,
                      const amrex::Real* time,
-		     amrex::Real* tag_err,
 		     const int* lev, int* tag_array);
 
     void tag_boxes(int* tag, const int* tag_lo, const int* tag_hi,
