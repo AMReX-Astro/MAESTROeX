@@ -156,20 +156,17 @@ Maestro::TagArray ()
 	
 	const MultiFab& state = sold[lev];
 
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
         {
             Vector<int>  itags;
 
-            for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
+            for (MFIter mfi(state); mfi.isValid(); ++mfi)
             {
-                const Box& tilebox  = mfi.tilebox();
+                const Box& validBox = mfi.validbox();
 
                 // re-compute tag_array since the actual grid structure changed due to buffering
                 // this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
                 retag_array(&tagval, &clearval, 
-                            ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+                            ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                             &lev, tag_array.dataPtr());
             }
         }
