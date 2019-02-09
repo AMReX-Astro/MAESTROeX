@@ -342,7 +342,6 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
-        flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 }
 
@@ -375,7 +374,6 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
-        flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
     }
 
     FillCoarsePatch(lev, time,     sold[lev],     sold,     sold, 0, 0,          Nscal, bcs_s);
@@ -410,5 +408,4 @@ Maestro::ClearLevel (int lev)
     }
 
     flux_reg_s[lev].reset(nullptr);
-    flux_reg_u[lev].reset(nullptr);
 }

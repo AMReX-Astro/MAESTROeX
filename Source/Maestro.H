@@ -938,7 +938,6 @@ private:
     // therefore flux_reg[0] and flux_reg[max_level] are never actually
     // used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
-    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
 
 };
 
