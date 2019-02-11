@@ -59,13 +59,14 @@ Maestro::Init ()
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);             // nodal
 	    
         }
-        compute_cutoff_coords(rho0_old.dataPtr());
     }
 
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(tag_array.dataPtr(),&finest_level);
-	    
+
+    compute_cutoff_coords(rho0_old.dataPtr());
+    
     if (spherical == 1) {
         MakeNormal();
         MakeCCtoRadii();
@@ -200,8 +201,10 @@ Maestro::InitData ()
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);
 
+    if (spherical == 0) {
     // reset tagging array to include buffer zones
-    TagArray();
+	TagArray();
+    }
 
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
@@ -261,17 +264,17 @@ Maestro::InitData ()
             // set rhoh0 to be the average
             Average(sold,rhoh0_old,RhoH);
         }
-
-        // set tempbar to be the average
-        Average(sold,tempbar,Temp);
-        for (int i=0; i<tempbar.size(); ++i) {
-            tempbar_init[i] = tempbar[i];
-        }
-
-        // set p0^{-1} = p0_old
-        for (int i=0; i<p0_old.size(); ++i) {
-            p0_nm1[i] = p0_old[i];
+	
+	// set tempbar to be the average
+	Average(sold,tempbar,Temp);
+	for (int i=0; i<tempbar.size(); ++i) {
+	    tempbar_init[i] = tempbar[i];
 	}
+    }
+
+    // set p0^{-1} = p0_old
+    for (int i=0; i<p0_old.size(); ++i) {
+	p0_nm1[i] = p0_old[i];
     }
 }
 
