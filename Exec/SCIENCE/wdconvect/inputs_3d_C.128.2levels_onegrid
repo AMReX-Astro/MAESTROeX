@@ -10,7 +10,7 @@ maestro.regrid_int     = 0       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
-amr.grid_eff           = 0.9     # larger number results in more smaller grids around tagged cells
+#amr.grid_eff           = 0.9     # larger number results in more smaller grids around tagged cells
 
 maestro.do_reflux = 0 # do we do the hyperbolic reflux
 
@@ -104,8 +104,9 @@ maestro.eps_hg_bottom      = 1.e-4
   velpert_scale = 1.e7
   velpert_steep = 1.e5
   tag_density_1 = 5.e7
-  tag_density_2 = 5.e7
-  tag_density_3 = 5.e7
+  tag_density_2 = 1.e8
+  tag_density_3 = 1.e8
+  tag_density_3 = 1.e9
   particle_temp_cutoff = 6.e8
   particle_tpert_threshold = 2.e7
 

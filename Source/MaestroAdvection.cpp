@@ -136,9 +136,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                         BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                        BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+                        BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+                        BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
 #endif
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
@@ -334,39 +334,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     dx, &dt, &is_vel, bcs[0].data(),
                     &nbccomp, &scomp, &bccomp, &is_conservative);
             } // end loop over components
-        } // end MFIter loop
-
-        // We use edge_restriction for the output velocity if is_vel == 1
-	// we do not use edge_restriction for scalars because instead we will use
-	// reflux on the fluxes in make_flux.
-	if (is_vel == 1) {
-	    if (do_reflux) {
-		// Get the grid size
-		const Real* dx = geom[lev].CellSize();
-		// NOTE: areas are different in DIM=2 and DIM=3
-#if (AMREX_SPACEDIM == 3) 
-		const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
-#else
-		const Real area[2] = {dx[1], dx[0]};
-#endif
-	    
-		if (flux_reg_u[lev+1])
-		{
-		    for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-			// update the lev+1/lev flux register (index lev+1)
-			flux_reg_u[lev+1]->CrseInit(sedge[lev][i],i,0,0,AMREX_SPACEDIM, -1.0*dt*area[i]);
-		    }
-		}
-		if (flux_reg_u[lev])
-		{
-		    for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-			// update the lev/lev-1 flux register (index lev)
-			flux_reg_u[lev]->FineAdd(sedge[lev][i],i,0,0,AMREX_SPACEDIM, 1.0*dt*area[i]);
-		    }
-		}
-	    } 
-	} // end loop over is_vel
-		
+        } // end MFIter loop		
     } // end loop over levels
 
     // We use edge_restriction for the output velocity if is_vel == 1
@@ -1035,13 +1003,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	    }
         } // end MFIter loop
     } // end loop over levels
-
-    if (do_reflux) {
-	for (int lev=finest_level-1; lev>=0; --lev) {
-	    // update lev based on coarse-fine flux mismatch
-	    flux_reg_u[lev+1]->Reflux(unew[lev], 1.0, 0, 0, AMREX_SPACEDIM, geom[lev]);
-	}
-    }
 	
     // average fine data onto coarser cells
     AverageDown(unew,0,AMREX_SPACEDIM);

@@ -208,7 +208,6 @@ Maestro::Setup ()
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] is never actually used in the reflux operation
     flux_reg_s.resize(max_level+2);
-    flux_reg_u.resize(max_level+2);
 
     // number of ghost cells needed for hyperbolic step
     if (ppm_type == 2 || bds_type == 1) {
