@@ -1,6 +1,6 @@
 
 # INITIAL MODEL
-maestro.model_file = "kepler_new_6.25e8.hybrid.hse.640.dx"
+maestro.model_file = "kepler_new_6.25e8.hybrid.hse.640"
 
 maestro.drdxfac = 5
 
