@@ -41,6 +41,7 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 		           # time-dependent.  We could use 0.9 in
 		           # the 3D test, but need to use 0.7 in 2D
 		           # to satisfy CFL condition.
+
 maestro.init_shrink = 0.1e0
 maestro.max_dt_growth = 1.1e0
 maestro.use_soundspeed_firstdt = true
@@ -100,7 +101,6 @@ maestro.eps_hg_bottom      = 1.e-4
   tag_density_1 = 5.e7
   tag_density_2 = 1.e8
   tag_density_3 = 1.e8
-  tag_density_3 = 1.e9
   particle_temp_cutoff = 6.e8
   particle_tpert_threshold = 2.e7
 
