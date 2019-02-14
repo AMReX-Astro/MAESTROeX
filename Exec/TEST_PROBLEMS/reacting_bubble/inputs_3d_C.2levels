@@ -67,7 +67,7 @@ maestro.use_thermal_diffusion = false
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
 maestro.plot_int   = 10      # number of timesteps between plot files
-maestro.plot_deltat = 0.5d0
+maestro.plot_deltat = 0.5e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
