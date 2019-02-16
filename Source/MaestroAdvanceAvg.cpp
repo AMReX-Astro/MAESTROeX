@@ -527,14 +527,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	}
     }
 
-    // if (evolve_base_state) {
-    //     // compute Sbar = average(S_cc_nph)
-    //     Average(S_cc_nph,Sbar,0);
-    // } else {
-	// these should have no effect if evolve_base_state = false
-	std::fill(Sbar.begin(), Sbar.end(), 0.);
-    // }
-
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 7 -- redo the construction of the advective velocity
@@ -551,7 +543,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // compute Sbar
     if (evolve_base_state) {
 	for (int i=0; i<Sbar.size(); ++i) {
-	    Sbar[i] += (1.0/(gamma1bar_nph[i]*p0_nph[i]))*(p0_new[i] - p0_old[i])/dt;
+	    Sbar[i] = (1.0/(gamma1bar_nph[i]*p0_nph[i]))*(p0_new[i] - p0_old[i])/dt;
 	}
 
 	// compute Sbar = Sbar + delta_gamma1_termbar
@@ -746,19 +738,14 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     VelocityAdvance(rhohalf,umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,
 		    rho0_nph,grav_cell_nph,sponge);
 
-
-    int proj_type;
-
-    // compute Sbar
-    std::fill(Sbar.begin(), Sbar.end(), 0.);
-    
     // FIXME - I think this should be
     // (1.0/(gamma1bar_new[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
     if (evolve_base_state) {
 	
-	// for (int i=0; i<Sbar.size(); ++i) {
-	//     Sbar[i] += (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
-	// }
+        for (int i=0; i<Sbar.size(); ++i) {
+            // Sbar[i] += (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
+            Sbar[i] = 0.;
+        }
 	
 	// compute Sbar = Sbar + delta_gamma1_termbar
 	if (use_delta_gamma1_term) {
@@ -768,6 +755,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	}
     }
 
+    int proj_type;
+    
     // Project the new velocity field
     if (is_initIter) {
 
