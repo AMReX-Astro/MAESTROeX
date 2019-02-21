@@ -2,7 +2,6 @@
 # INITIAL MODEL
 maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6144"
 #maestro.model_file = "../wdconvect/kepler_new_6.25e8.hybrid.hse.320"
-maestro.probin_file = "probin"
 maestro.perturb_model = false
 
 maestro.drdxfac = 5
@@ -28,8 +27,9 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
 #amr.n_cell             = 160 160 160
-amr.n_cell             = 64 64 64
+#amr.n_cell             = 64 64 64
 #amr.n_cell = 128 128 128
+amr.n_cell = 256 256 256
 amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -102,3 +102,32 @@ maestro.do_burning = false
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
 maestro.rotational_frequency = 1.e-3
 maestro.rotation_radius = 2.e8
+
+&probin
+
+  ! override the default values of the probin namelist values here
+  velpert_amplitude = 1.e5
+  velpert_radius = 2.e7
+  velpert_scale = 1.e7
+  velpert_steep = 1.e5
+  tag_density_1 = 1.e7
+  tag_density_2 = 1.e8
+  tag_density_3 = 1.e8
+  tag_density_3 = 1.e9
+  particle_temp_cutoff = 6.e8
+  particle_tpert_threshold = 2.e7
+
+  !extern
+
+  ! Note that some of the parameters in this
+  ! namelist are specific to the default EOS,
+  ! network, and/or integrator used in the
+  ! makefile. If you try a different set of
+  ! microphysics routines be sure to check that
+  ! the parameters in here are consistent, as
+  ! Fortran does not like seeing unknown variables
+  ! in the namelist.
+
+  use_eos_coulomb = T
+
+/
