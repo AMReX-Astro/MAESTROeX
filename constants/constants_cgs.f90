@@ -70,6 +70,6 @@ module fundamental_constants_module
   real(rt), parameter :: M_solar = 1.9884e33_rt
 
   ! solar radius
-  real(kind=dp_t), parameter :: R_solar = 6.957e10_dp_t
+  real(rt), parameter :: R_solar = 6.957e10_rt
 
 end module fundamental_constants_module
