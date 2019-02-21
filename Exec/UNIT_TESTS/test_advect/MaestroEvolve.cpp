@@ -190,9 +190,7 @@ Maestro::Evolve ()
 
 				abs_norm[lev] = error[lev].norm2();
 
-				MultiFab::Divide(error[lev],dens_orig[lev],0,0,1,0);
-
-				rel_norm[lev] = error[lev].norm2();
+				rel_norm[lev] = error[lev].norm2() / dens_orig[lev].norm2();
 
 				Print() << "\tAbs norm = " << abs_norm[lev] << "  Rel norm = " << rel_norm[lev] << std::endl;
 			}

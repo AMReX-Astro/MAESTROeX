@@ -14,6 +14,9 @@ maestro.lo_bc = 4 4
 maestro.hi_bc = 4 4
 geometry.is_periodic =  0 0
 
+# PLOTFILES
+maestro.plot_base_name  = mac_wall    # root name of plot file
+
 # VERBOSITY
 maestro.v              = 1       # verbosity
 

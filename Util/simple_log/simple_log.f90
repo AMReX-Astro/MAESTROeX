@@ -6,8 +6,7 @@
 
 module simple_log_module
 
-  use bl_types
-  use bl_error_module
+  use amrex_error_module
 
   implicit none
 
@@ -38,7 +37,7 @@ contains
   
   subroutine sd_log(str, d)
     character (len=*), intent(in) :: str    
-    real (kind=dp_t), intent(in) :: d
+    double precision, intent(in) :: d
 
     character (len=20) :: dstr
 
@@ -62,7 +61,7 @@ contains
     if (.not. initialized) call simple_log_init()
     
     if (log_lines > MAX_LINES-1) then
-       call bl_error("ERROR: log buffer exceeded in module simple_log")
+       call amrex_error("ERROR: log buffer exceeded in module simple_log")
     endif
 
     ! output to the screen
@@ -79,7 +78,7 @@ contains
 
   subroutine log_break()
     if (log_lines > MAX_LINES-1) then
-       call bl_error("ERROR: log buffer exceeded in module simple_log")
+       call amrex_error("ERROR: log buffer exceeded in module simple_log")
     endif
 
     log_lines = log_lines + 1

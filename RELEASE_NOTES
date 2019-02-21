@@ -48,3 +48,10 @@ Modification to dp0/dt treatment in new temporal algorithm
 Embed probin file at the bottom of inputs files
 Multilevel planar and spherical work/bug fixes
 Sphinx-based user's guide on website enabled
+
+02-04-2019
+Various planar multilevel bug fixes, and general multilevel bug fixes
+Switch to averaging down edge fluxes instead of using the refluxing routines
+New rotating star examples
+New unit tests: test_advect, test_eos, test_project, test_react, test_diffusion,
+test_basestate

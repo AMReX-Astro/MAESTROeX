@@ -9,7 +9,6 @@ module maestro_init_module
        nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
   use eos_module, only: eos_init
   use runtime_init_module
-
   implicit none
 
   private
@@ -18,7 +17,10 @@ contains
 
   subroutine maestro_network_init() bind(C, name="maestro_network_init")
 
+    use actual_rhs_module, only: actual_rhs_init
+
     call network_init()
+    call actual_rhs_init()
 
   end subroutine maestro_network_init
 
@@ -26,19 +28,31 @@ contains
   ! ::: ----------------------------------------------------------------
   ! :::
 
-  subroutine maestro_extern_init(name,namlen) bind(C, name="maestro_extern_init")
+  subroutine maestro_extern_init() bind(C, name="maestro_extern_init")
 
     ! initialize the external runtime parameters in
     ! extern_probin_module
 
     use amrex_fort_module, only: rt => amrex_real
-
-    integer, intent(in) :: namlen
-    integer, intent(in) :: name(namlen)
     !
     call runtime_init()
 
   end subroutine maestro_extern_init
+
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine maestro_conductivity_init() bind(C, name="maestro_conductivity_init")
+
+    ! initialize the external runtime parameters in
+    ! extern_probin_module
+
+    use conductivity_module, only: conductivity_init
+
+    call conductivity_init()
+
+  end subroutine maestro_conductivity_init
 
   ! :::
   ! ::: ----------------------------------------------------------------

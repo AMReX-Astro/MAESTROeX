@@ -46,6 +46,8 @@ Maestro::Setup ()
 
     burner_init();
 
+    maestro_conductivity_init();
+
     const Real* probLo = geom[0].ProbLo();
     const Real* probHi = geom[0].ProbHi();
 
@@ -137,10 +139,10 @@ Maestro::Setup ()
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
     w0        .resize( (max_radial_level+1)*(nr_fine+1) );
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
-    
+
     // tagged box array for multilevel (planar)
     tag_array .resize( (max_radial_level+1)*nr_fine );
-    
+
     // diag file data arrays
     diagfile_data.resize(diag_buf_size*12);
 
@@ -177,7 +179,7 @@ Maestro::Setup ()
 			     r_edge_loc.dataPtr(),
 			     geom[max_level].CellSize(),
 			     &nr_irreg);
-    
+
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
@@ -210,7 +212,6 @@ Maestro::Setup ()
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] is never actually used in the reflux operation
     flux_reg_s.resize(max_level+2);
-    flux_reg_u.resize(max_level+2);
 
     // number of ghost cells needed for hyperbolic step
     if (ppm_type == 2 || bds_type == 1) {
@@ -221,24 +222,6 @@ Maestro::Setup ()
     }
 
     std::fill(tag_array.begin(), tag_array.end(), 0);
-    
-    // tagging criteria
-    tag_err.resize(max_level);
-    
-    for (int lev=0; lev<max_level; ++lev) {
-	tag_err[lev].resize(2);
-	tag_err[lev].shrink_to_fit();
-    }
-    tag_err.shrink_to_fit();
-
-    // combine tagging criteria
-    for (int lev=0; lev<max_level; ++lev) {
-        if (temperr.size() > lev)
-	    tag_err[lev][0] = temperr[lev];
-        if (denserr.size() > lev)
-	    tag_err[lev][1] = denserr[lev];
-    }
-
 }
 
 // read in some parameters from inputs file
@@ -270,19 +253,6 @@ Maestro::ReadParameters ()
         phys_bc[i]                = lo_bc[i];
         phys_bc[i+AMREX_SPACEDIM] = hi_bc[i];
     }
-
-    // read in tagging criteria
-    // temperature
-    int ntemp = pp.countval("temperr");
-    if (ntemp > 0) {
-        pp.getarr("temperr", temperr, 0, ntemp);
-    }
-    // density
-    int ndens = pp.countval("denserr");
-    if (ndens > 0) {
-        pp.getarr("denserr", denserr, 0, ndens);
-    }
-
 }
 
 // define variable mappings (Rho, RhoH, ..., Nscal, etc.)

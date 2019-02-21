@@ -53,6 +53,31 @@ Maestro::Evolve ()
 	for (int lev=0; lev<=finest_level; ++lev)
 		MultiFab::Copy(snew[lev],sold[lev],0,0,Nscal,ng_s);
 
+	// calculate analytic solution
+	for (int lev = 0; lev <= finest_level; ++lev) {
+
+		MultiFab& analytic_mf = analytic[lev];
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+		for ( MFIter mfi(analytic_mf, true); mfi.isValid(); ++mfi ) {
+
+			const Box& tileBox = mfi.tilebox();
+			const Real* dx = geom[lev].CellSize();
+
+			make_analytic_solution(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()), BL_TO_FORTRAN_3D(analytic_mf[mfi]), ZFILL(dx), t_new);
+		}
+	}
+
+	// This problem uses a custom WritePlotFile, but as it's a member function of
+	// the Maestro class, it has to use the same prototype as the original.
+	// We shall therefore create a dummy variable to fill up all the variables
+	// passed into the function that won't be used.
+	Vector<Real> dummy;
+
+	// dump initial state
+	WritePlotFile(0,t_new,dt,dummy,dummy,dummy,dummy,sold,analytic,error);
+
 	for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
 	{
 
@@ -109,6 +134,15 @@ Maestro::Evolve ()
 		Real L2norm = error[finest_level].norm2() / analytic[finest_level].norm2();
 
 		Print() << "\nTime = " << t_new << ", L1norm = " << L1norm << ", L2norm = " << L2norm << '\n' << std::endl;
+
+		// write a plotfile
+        if (plot_int > 0 && ( (istep % plot_int == 0) ||
+                              (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
+                              (istep == max_step) ) || (t_old >= stop_time) )
+        {
+            Print() << "\nWriting plotfile " << istep << std::endl;
+            WritePlotFile(istep,t_new,dt,dummy,dummy,dummy,dummy,sold,analytic,error);
+        }
 
 		t_old = t_new;
 		p0_old = p0_new;

@@ -30,7 +30,7 @@ contains
                          state,state_lo,state_hi, &
                          set,clear,&
                          lo,hi,&
-                         dx,time,tag_err,&
+                         dx,time,&
                          lev,tag_array) bind(C, name="state_error")
 
     integer          :: lo(3),hi(3)
@@ -41,24 +41,17 @@ contains
                               state_lo(3):state_hi(3), 1:nscal)
     integer          :: tag(tag_lo(1):tag_hi(1),tag_lo(2):tag_hi(2),tag_lo(3):tag_hi(3))
     double precision :: dx(3),time
-    double precision :: tag_err(2)
     integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
     integer          :: set,clear,lev
 
     ! local
     integer          :: i, j, k, r
-    double precision :: temperr, denserr
-    
-    
-    ! set temperature and density flags
-    temperr = tag_err(1)
-    denserr = tag_err(2)
 
     ! Tag on regions of high temperature
     do k = lo(3), hi(3)
     do j = lo(2), hi(2)
     do i = lo(1), hi(1)
-       if (state(i,j,k,temp_comp) .ge. temperr) then
+       if (state(i,j,k,temp_comp) .ge. 6.5e8) then
           tag(i,j,k) = set
 
 #if (AMREX_SPACEDIM == 3)

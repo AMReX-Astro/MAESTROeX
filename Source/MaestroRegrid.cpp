@@ -64,12 +64,16 @@ Maestro::Regrid ()
 	regrid(0, t_old);
 
 	// Redefine numdisjointchunks, r_start_coord, r_end_coord
-	TagArray();
+	if (spherical == 0) {
+		TagArray();
+    }
 	init_multilevel(tag_array.dataPtr(),&finest_level);
 
 	if (spherical == 1) {
 		MakeNormal();
-		Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical");
+		if (use_exact_base_state) {
+			Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
+		}
 	}
 
 	if (evolve_base_state) {
@@ -132,10 +136,17 @@ Maestro::Regrid ()
 
 }
 
-// set tagging array to include buffer zones for multilevel
+// re-compute tag_array since the actual grid structure changed due to buffering
+// this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
 void
 Maestro::TagArray ()
 {
+
+	// this routine is not required for spherical
+	if (spherical == 1) {
+		return;
+	}
+
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::TagArray()",TagArray);
 
@@ -146,23 +157,23 @@ Maestro::TagArray ()
 
 		const MultiFab& state = sold[lev];
 
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
 		{
 			Vector<int>  itags;
 
-			for (MFIter mfi(state, true); mfi.isValid(); ++mfi)
+			for (MFIter mfi(state); mfi.isValid(); ++mfi)
 			{
-				const Box& tilebox  = mfi.tilebox();
+				const Box& validBox = mfi.validbox();
 
-				// retag refined cells to include cells in buffered regions
+				// re-compute tag_array since the actual grid structure changed due to buffering
+				// this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
 				retag_array(&tagval, &clearval,
-				            ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
+				            ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
 				            &lev, tag_array.dataPtr());
 			}
 		}
 	}
+	ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
+
 }
 
 // tag all cells for refinement
@@ -172,8 +183,6 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::ErrorEst()",ErrorEst);
-
-	if (lev >= tag_err.size()) return;
 
 	// reset the tag_array (marks radii for planar tagging)
 	std::fill(tag_array.begin(), tag_array.end(), 0);
@@ -189,7 +198,6 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 	const Real* dx      = geom[lev].CellSize();
 
 	const MultiFab& state = sold[lev];
-
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -215,24 +223,20 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 			const int*  thi     = tilebox.hiVect();
 
 			// tag cells for refinement
+			// for planar problems, we keep track of when a cell at a particular
 			// use row lev of tag_array to tag the correct elements
 			state_error(tptr,  ARLIM_3D(tlo), ARLIM_3D(thi),
 			            BL_TO_FORTRAN_3D(state[mfi]),
 			            &tagval, &clearval,
 			            ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
 			            ZFILL(dx), &time,
-			            tag_err[lev].dataPtr(), &lev, tag_array.dataPtr());
+			            &lev, tag_array.dataPtr());
 
 			//
 			// Now update the tags in the TagBox in the tilebox region
 			// to be equal to itags
 			//
 			tagfab.tags_and_untags(itags, tilebox);
-		}
-
-		// convert back to full temperature states
-		if (use_tpert_in_tagging) {
-			PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,false);
 		}
 
 		// for planar refinement, we need to gather tagged entries in arrays
@@ -258,6 +262,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 				const int*  tlo     = tilebox.loVect();
 				const int*  thi     = tilebox.hiVect();
 
+				// tag all cells at a given height if any cells at that height were tagged
 				tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
 				          &tagval, &clearval,
 				          ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
@@ -270,6 +275,11 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 				tagfab.tags_and_untags(itags, tilebox);
 			}
 		}
+	}
+
+	// convert back to full temperature states
+	if (use_tpert_in_tagging) {
+		PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,false);
 	}
 }
 
@@ -334,7 +344,6 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
 
 	if (lev > 0 && do_reflux) {
 		flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
-		flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
 	}
 }
 
@@ -367,7 +376,6 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
 
 	if (lev > 0 && do_reflux) {
 		flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
-		flux_reg_u[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, AMREX_SPACEDIM));
 	}
 
 	FillCoarsePatch(lev, time,     sold[lev],     sold,     sold, 0, 0,          Nscal, bcs_s);
@@ -402,5 +410,4 @@ Maestro::ClearLevel (int lev)
 	}
 
 	flux_reg_s[lev].reset(nullptr);
-	flux_reg_u[lev].reset(nullptr);
 }

@@ -371,6 +371,7 @@ extern "C"
 
     void maestro_network_init();
     void maestro_extern_init();
+    void maestro_conductivity_init();
     void get_num_spec(int* nspec);
     void get_spec_names(int* spec_names, int* ispec, int* len);
     void get_spec_az(const int* ispec, amrex::Real* A, amrex::Real* Z);
@@ -1182,7 +1183,6 @@ extern "C"
                      const int* lo, const int* hi,
                      const amrex::Real* dx,
                      const amrex::Real* time,
-		     amrex::Real* tag_err,
 		     const int* lev, int* tag_array);
 
     void tag_boxes(int* tag, const int* tag_lo, const int* tag_hi,

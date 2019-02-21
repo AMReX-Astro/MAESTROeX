@@ -8,7 +8,6 @@
 #include <AMReX_AmrCore.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
-#include <AMReX_FMultiGrid.H>
 #include <AMReX_MLABecLaplacian.H>
 #include <AMReX_MLMG.H>
 #include <AMReX_MultiFabUtil.H>
@@ -939,12 +938,6 @@ private:
     amrex::Vector<int> r_start_coord;
     amrex::Vector<int> r_end_coord;
 
-    // tagging criteria
-    amrex::Vector<amrex::Real> temperr;
-    amrex::Vector<amrex::Real> denserr;
-    // currently has 2 possible criterias
-    amrex::Vector< amrex::Vector<amrex::Real> > tag_err;
-
     // array of tagged boxes (planar)
     amrex::Vector<int> tag_array;
 
@@ -958,7 +951,6 @@ private:
     // therefore flux_reg[0] and flux_reg[max_level] are never actually
     // used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
-    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
 
 };
 
