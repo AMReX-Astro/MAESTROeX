@@ -347,6 +347,18 @@ any allocated memory, and gracefully exit. Be sure to remove the
 .abort_maestro file before restarting the code in the
 same directory.</p>
 </li>
+<li><p class="first"><em>When I run I get the error</em></p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">reading</span> <span class="n">extern</span> <span class="n">runtime</span> <span class="n">parameters</span> <span class="o">...</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">namelist</span>
+</pre></div>
+</div>
+<p>This error can occur when MAESTROeX reads in an extern runtime parameter it
+does not understand or is not expecting. A common example is if the problem
+is built with the helmholtz EoS, but the extern namelist has gamma law
+parameters.</p>
+</div></blockquote>
+</li>
 </ol>
 </div>
 <div class="section" id="debugging">
