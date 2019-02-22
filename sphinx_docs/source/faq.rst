@@ -64,7 +64,7 @@ Compiling
 
               .../BoxLib/Tools/F_mk/GMakeMPI.mak:40: Extraneous text after `else' directive
               .../BoxLib/Tools/F_mk/GMakeMPI.mak:47: *** only one `else' per conditional.  Stop
-             
+
 
    You need to use GNU make version 3.81 or later. Earlier versions do
    not support an *else-if* clause.
@@ -161,6 +161,18 @@ Running
    .abort_maestro file before restarting the code in the
    same directory.
 
+#. *When I run I get the error*
+
+    ::
+
+        reading extern runtime parameters ...
+        ERROR: problem in the namelist
+
+    This error can occur when MAESTROeX reads in an extern runtime parameter it
+    does not understand or is not expecting. A common example is if the problem
+    is built with the helmholtz EoS, but the extern namelist has gamma law
+    parameters.
+
 Debugging
 =========
 
@@ -182,7 +194,7 @@ Debugging
    ::
 
          call print(a)
-         
+
 
    where a is a multifab (single-level).
 
@@ -192,7 +204,7 @@ Debugging
 
    ::
 
-       mpiexec -n 4 xterm -e gdb ./main.Linux.gfortran.mpi.exe 
+       mpiexec -n 4 xterm -e gdb ./main.Linux.gfortran.mpi.exe
 
    where the executable needs to be created with the “-g” flag to
    the compiler. This will pop up multiple xterms with gdb running
