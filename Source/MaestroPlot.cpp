@@ -27,7 +27,7 @@ Maestro::WritePlotFile (const int step,
 	std::string plotfilename;
 
 	if (step == 9999999) {
-		if (plot_base_name.last() == '_') {
+		if (plot_base_name.back() == '_') {
 			plotfilename = plot_base_name + "InitData";
 		} else {
 			plotfilename = plot_base_name + "InitData";
@@ -35,14 +35,14 @@ Maestro::WritePlotFile (const int step,
 
 	}
 	else if (step == 9999998) {
-		if (plot_base_name.last() == '_') {
+		if (plot_base_name.back() == '_') {
 			plotfilename = plot_base_name + "after_InitProj";
 		} else {
 			plotfilename = plot_base_name + "_after_InitProj";
 		}
 	}
 	else if (step == 9999997) {
-		if (plot_base_name.last() == '_') {
+		if (plot_base_name.back() == '_') {
 			plotfilename = plot_base_name + "after_DivuIter";
 		} else {
 			plotfilename = plot_base_name + "_after_DivuIter";
