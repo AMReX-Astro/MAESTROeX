@@ -27,13 +27,26 @@ Maestro::WritePlotFile (const int step,
 	std::string plotfilename;
 
 	if (step == 9999999) {
-		plotfilename = "plt_InitData";
+		if (plot_base_name.last() == '_') {
+			plotfilename = plot_base_name + "InitData";
+		} else {
+			plotfilename = plot_base_name + "InitData";
+		}
+
 	}
 	else if (step == 9999998) {
-		plotfilename = "plt_after_InitProj";
+		if (plot_base_name.last() == '_') {
+			plotfilename = plot_base_name + "after_InitProj";
+		} else {
+			plotfilename = plot_base_name + "_after_InitProj";
+		}
 	}
 	else if (step == 9999997) {
-		plotfilename = "plt_after_DivuIter";
+		if (plot_base_name.last() == '_') {
+			plotfilename = plot_base_name + "after_DivuIter";
+		} else {
+			plotfilename = plot_base_name + "_after_DivuIter";
+		}
 	}
 	else {
 		plotfilename = PlotFileName(step);
@@ -974,17 +987,17 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeMagvel()",MakeMagvel);
 
-        Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
-	
+	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+
 #if (AMREX_SPACEDIM == 3)
-        if (spherical == 1) {
-            for (int lev=0; lev<=finest_level; ++lev) {
-                w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-                w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-                w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-            }
-            MakeW0mac(w0mac);
-        }
+	if (spherical == 1) {
+		for (int lev=0; lev<=finest_level; ++lev) {
+			w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+			w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+			w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+		}
+		MakeW0mac(w0mac);
+	}
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1022,10 +1035,10 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 
 				// Get the index space of the valid region
 				const Box& tileBox = mfi.tilebox();
-                                
-                                MultiFab& w0macx_mf = w0mac[lev][0];
-                                MultiFab& w0macy_mf = w0mac[lev][1];
-                                MultiFab& w0macz_mf = w0mac[lev][2];
+
+				MultiFab& w0macx_mf = w0mac[lev][0];
+				MultiFab& w0macy_mf = w0mac[lev][1];
+				MultiFab& w0macz_mf = w0mac[lev][2];
 
 				// call fortran subroutine
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -1033,9 +1046,9 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 				// We will also pass "validBox", which specifies the "valid" region.
 				make_magvel_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				                 BL_TO_FORTRAN_3D(vel_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+				                 BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+				                 BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+				                 BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 				                 BL_TO_FORTRAN_3D(magvel_mf[mfi]));
 			}
 		}
