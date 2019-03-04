@@ -22,9 +22,8 @@ module model_parser_module
   !
   ! composition is assumed to be in terms of mass fractions     
 
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use network
-  use bl_types
 
   implicit none
 
@@ -39,8 +38,8 @@ module model_parser_module
   integer, save :: npts_model
 
   ! arrays for storing the model data
-  real (kind=dp_t), allocatable, save :: model_state(:,:)
-  real (kind=dp_t), allocatable, save :: model_r(:)
+  double precision, allocatable, save :: model_state(:,:)
+  double precision, allocatable, save :: model_r(:)
 
   ! model_initialized will be .true. once the model is read in and the
   ! model data arrays are initialized and filled
@@ -54,8 +53,8 @@ contains
 
   subroutine read_model_file(model_file)
 
-    use bl_constants_module
-    use bl_error_module
+    use amrex_constants_module
+    use amrex_error_module
 
     character(len=*), intent(in   ) :: model_file
 
@@ -65,7 +64,7 @@ contains
 
     integer :: i, j, comp
 
-    real(kind=dp_t), allocatable :: vars_stored(:)
+    double precision, allocatable :: vars_stored(:)
     character(len=MAX_VARNAME_LENGTH), allocatable :: varnames_stored(:)
     logical :: found_model, found_dens, found_temp, found_pres
     logical :: found_spec(nspec)
@@ -78,7 +77,7 @@ contains
 
     if (ierr .ne. 0) then
        print *,'Couldnt open model_file: ',model_file
-       call bl_error('Aborting now -- please supply model_file')
+       call amrex_error('Aborting now -- please supply model_file')
     end if
 
     ! the first line has the number of points in the model
@@ -246,13 +245,13 @@ contains
     !
     ! Eventually, this should all be made a class.
 
-    real(kind=dp_t) :: interpolate
-    real(kind=dp_t), intent(in) :: r
+    double precision :: interpolate
+    double precision, intent(in) :: r
     integer, intent(in) :: ivar
     logical, intent(in), optional :: interpolate_top
 
-    real(kind=dp_t) :: slope
-    real(kind=dp_t) :: minvar, maxvar
+    double precision :: slope
+    double precision :: minvar, maxvar
 
     logical :: interp_top
 

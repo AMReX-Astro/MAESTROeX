@@ -1,7 +1,6 @@
 module burner_module
 
-  use bl_types
-  use bl_constants_module
+  use amrex_constants_module
   use network
   use eos_module
 #ifndef SDC
@@ -50,11 +49,11 @@ contains
 
 #ifndef ACC
     if (.NOT. network_initialized) then
-       call bl_error("ERROR in burner: must initialize network first.")
+       call amrex_error("ERROR in burner: must initialize network first.")
     endif
 
     if (.NOT. burner_initialized) then
-       call bl_error("ERROR in burner: must initialize burner first.")
+       call amrex_error("ERROR in burner: must initialize burner first.")
     endif
 #endif
 

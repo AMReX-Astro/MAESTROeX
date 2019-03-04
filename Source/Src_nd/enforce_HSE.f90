@@ -1,6 +1,6 @@
 module enforce_HSE_module
 
-  use bl_constants_module
+  use amrex_constants_module
   use make_grav_module
   use base_state_geometry_module, only: nr_fine, dr, &
                                         max_radial_level, nr, numdisjointchunks, &

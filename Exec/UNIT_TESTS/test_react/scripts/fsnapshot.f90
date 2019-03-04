@@ -282,7 +282,7 @@ end subroutine fplotfile_get_data_2d
 !------------------------------------------------------------------------------
 subroutine fplotfile_get_data_3d(pltfile, component, mydata, nx, ny, nz, ierr)
 
-  use bl_constants_module, ONLY: ZERO
+  use amrex_constants_module, ONLY: ZERO
   use bl_IO_module
   use plotfile_module
   use filler_module
@@ -300,7 +300,7 @@ subroutine fplotfile_get_data_3d(pltfile, component, mydata, nx, ny, nz, ierr)
 !f2py intent(hide) :: nx, ny, nz
 !f2py intent(out) :: ierr
 
-  real (kind=dp_t), allocatable :: slicedata(:,:,:)
+  double precision, allocatable :: slicedata(:,:,:)
 
   type(plotfile) :: pf
   integer ::unit

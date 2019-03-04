@@ -1,7 +1,7 @@
 
 module initdata_module
 
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use amrex_fort_module, only : amrex_spacedim, amrex_random
   use amrex_constants_module
   use network, only: nspec

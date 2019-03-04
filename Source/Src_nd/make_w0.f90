@@ -6,10 +6,10 @@
 
 module make_w0_module
 
-  use bl_constants_module
+  use amrex_constants_module
   use make_grav_module
   use amrex_error_module
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use fundamental_constants_module, only: Gconst
   use base_state_geometry_module, only: max_radial_level, finest_radial_level, nr_fine, &
                                         dr, r_start_coord, r_end_coord, restrict_base, nr, &
@@ -651,8 +651,8 @@ contains
   
   subroutine prolong_base_to_uniform(base_ml, base_fine)
 
-    real(kind=dp_t), intent(in   ) :: base_ml(0:max_radial_level,0:nr_fine)
-    real(kind=dp_t), intent(inout) :: base_fine(0:nr_fine)
+    double precision, intent(in   ) :: base_ml(0:max_radial_level,0:nr_fine)
+    double precision, intent(inout) :: base_fine(0:nr_fine)
 
     ! local
     integer :: n, j, r
@@ -698,12 +698,12 @@ contains
   subroutine tridiag(a,b,c,r,u,n)
 
       integer           , intent(in   ) :: n
-      real (kind = dp_t), intent(in   ) :: a(1:n), b(1:n), c(1:n), r(1:n)
-      real (kind = dp_t), intent(inout) :: u(1:n)
+      double precision, intent(in   ) :: a(1:n), b(1:n), c(1:n), r(1:n)
+      double precision, intent(inout) :: u(1:n)
 
       integer j
-      real (kind = dp_t), allocatable :: gam(:)
-      real (kind = dp_t) :: bet
+      double precision, allocatable :: gam(:)
+      double precision :: bet
 
       allocate(gam(n))
 

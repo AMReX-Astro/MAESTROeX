@@ -14,6 +14,7 @@
 
 module ppm_module
 
+  use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use meth_params_module, only: ppm_type, rel_eps
@@ -197,7 +198,7 @@ contains
        !----------------------------------------------------------------------
 
        if (ng_s .lt. 4) then
-          call bl_error("Need 4 ghost cells for ppm_type=2")
+          call amrex_error("Need 4 ghost cells for ppm_type=2")
        end if
 
        ! interpolate s to x-edges
@@ -752,7 +753,7 @@ contains
        !----------------------------------------------------------------------
 
        if (ng_s .lt. 4) then
-          call bl_error("Need 4 ghost cells for ppm_type=2")
+          call amrex_error("Need 4 ghost cells for ppm_type=2")
        end if
 
        ! interpolate s to x-edges
@@ -1878,7 +1879,7 @@ contains
        !----------------------------------------------------------------------
 
        if (ng_s .lt. 4) then
-          call bl_error("Need 4 ghost cells for ppm_type=2")
+          call amrex_error("Need 4 ghost cells for ppm_type=2")
        end if
 
        do k=lo(3)-1,hi(3)+1

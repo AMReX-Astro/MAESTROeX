@@ -248,7 +248,7 @@ contains
           enddo
 
        else
-          call bl_error('Not set up for these boundary conditions')
+          call amrex_error('Not set up for these boundary conditions')
 
        endif
 
@@ -458,7 +458,7 @@ contains
              enddo
 #endif
           else
-             call bl_error('Not set up for these boundary conditions')
+             call amrex_error('Not set up for these boundary conditions')
           endif
           
           ! impose BCs
@@ -469,7 +469,7 @@ contains
              umac(lo(1),lo(2):hi(2),lo(3):hi(3)) = ZERO
           case (Interior)
           case default
-             call bl_error("invalid x lo BC")
+             call amrex_error("invalid x lo BC")
           end select
 
           ! x hi
@@ -478,7 +478,7 @@ contains
              umac(hi(1)+1,lo(2):hi(2),lo(3):hi(3)) = ZERO
           case (Interior)
           case default
-             call bl_error("invalid x hi BC")
+             call amrex_error("invalid x hi BC")
           end select
 
           ! y lo
@@ -487,7 +487,7 @@ contains
              vmac(lo(1):hi(1),lo(2),lo(3):hi(3)) = ZERO
           case (Interior)
           case default
-             call bl_error("invalid y lo BC")
+             call amrex_error("invalid y lo BC")
           end select
 
           ! y hi
@@ -496,7 +496,7 @@ contains
              vmac(lo(1):hi(1),hi(2)+1,lo(3):hi(3)) = ZERO
           case (Interior)
           case default
-             call bl_error("invalid y hi BC")
+             call amrex_error("invalid y hi BC")
           end select
 
 #if (AMREX_SPACEDIM==3)
@@ -506,7 +506,7 @@ contains
              wmac(lo(1):hi(1),lo(2):hi(2),lo(3)) = ZERO
           case (Interior)
           case default
-             call bl_error("invalid z lo BC")
+             call amrex_error("invalid z lo BC")
           end select
 
           ! z hi
@@ -515,7 +515,7 @@ contains
              wmac(lo(1):hi(1),lo(2):hi(2),hi(3)+1) = ZERO
           case (Interior)
           case default
-             call bl_error("invalid z hi BC")
+             call amrex_error("invalid z hi BC")
           end select
 #endif
 

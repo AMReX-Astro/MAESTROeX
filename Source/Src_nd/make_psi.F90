@@ -2,7 +2,7 @@
 
 module make_psi_module
 
-  use bl_constants_module
+  use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, dr, &
                                         max_radial_level, numdisjointchunks, & 
                                         r_start_coord, r_end_coord, finest_radial_level, &
@@ -53,7 +53,7 @@ contains
     
     ! local variables
     integer :: r
-    real(kind=dp_t) :: div_w0_sph
+    double precision :: div_w0_sph
 
     psi = ZERO
 

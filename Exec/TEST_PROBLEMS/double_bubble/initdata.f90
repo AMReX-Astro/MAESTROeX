@@ -192,7 +192,7 @@ contains
     double precision, intent(out) :: dens_pert, rhoh_pert, temp_pert
     double precision, intent(out) :: rhoX_pert(1:nspec)
 
-    call bl_error("ERROR: perturb_3d not implemented")
+    call amrex_error("ERROR: perturb_3d not implemented")
 
   end subroutine perturb_3d
 
@@ -223,7 +223,7 @@ contains
     double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
          ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
-    call bl_error("ERROR: initdata_sphr not implemented")
+    call amrex_error("ERROR: initdata_sphr not implemented")
 
   end subroutine initdata_sphr
 
@@ -237,7 +237,7 @@ contains
     double precision, intent(out) :: dens_pert, rhoh_pert, temp_pert
     double precision, intent(out) :: rhoX_pert(nspec)
 
-    call bl_error("ERROR: perturb_3d_sphr not implemented")
+    call amrex_error("ERROR: perturb_3d_sphr not implemented")
 
   end subroutine perturb_3d_sphr
 

@@ -1,7 +1,7 @@
 module make_analytic_solution_module
 
-  use bl_error_module
-  use bl_constants_module
+  use amrex_error_module
+  use amrex_constants_module
   use base_state_geometry_module, only: center
   use probin_module, only: ambient_h, ambient_dens, &
        t0, peak_h, diffusion_coefficient

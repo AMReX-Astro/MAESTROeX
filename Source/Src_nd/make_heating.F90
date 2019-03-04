@@ -1,7 +1,7 @@
 module make_heating_module
 
-  use parallel, only: parallel_IOProcessor
-
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
+  
   implicit none
 
   private
@@ -25,7 +25,7 @@ contains
     end if
     
     ! abort program
-    call bl_error()
+    call abort()
       
   end subroutine make_heating
 

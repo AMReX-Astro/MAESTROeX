@@ -381,9 +381,9 @@ contains
         do n=1,finest_radial_level
            do i=1,numdisjointchunks(n)
               if (r_start_coord(n,i) .eq. 2) then
-                 call bl_error("make_edge_state assumes blocking_factor > 1 at lo boundary")
+                 call amrex_error("make_edge_state assumes blocking_factor > 1 at lo boundary")
               else if (r_end_coord(n,i) .eq. nr(n)-3) then
-                 call bl_error("make_edge_state assumes blocking_factor > 1 at hi boundary")
+                 call amrex_error("make_edge_state assumes blocking_factor > 1 at hi boundary")
               end if
            end do
         end do

@@ -47,21 +47,21 @@ contains
 
     ! local variables
     integer         :: i,j,n, r,comp
-    real(kind=dp_t) :: rloc,rmid
-    real(kind=dp_t) :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
+    double precision :: rloc,rmid
+    double precision :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
 
-    real(kind=dp_t) :: p0_light, p0_heavy, t_guess
-    real(kind=dp_t) :: xn_light(nspec), xn_heavy(nspec)
+    double precision :: p0_light, p0_heavy, t_guess
+    double precision :: xn_light(nspec), xn_heavy(nspec)
     integer :: ia, ib
 
-    real(kind=dp_t) :: min_dens, max_dens, min_temp, max_temp
+    double precision :: min_dens, max_dens, min_temp, max_temp
 
-    real(kind=dp_t), parameter :: TINY = 1.0d-10
+    double precision, parameter :: TINY = 1.0d-10
 
-    real(kind=dp_t) :: dpdr, rhog
-    real(kind=dp_t) :: max_hse_error
+    double precision :: dpdr, rhog
+    double precision :: max_hse_error
 
-    real(kind=dp_t), parameter :: SMALL = 1.d-12
+    double precision, parameter :: SMALL = 1.d-12
 
     type (eos_t) :: eos_state
 
@@ -70,7 +70,7 @@ contains
 889 format(a60)
 
     if (spherical .eq. 1) then
-       call bl_error("ERROR: rt base_state is not valid for spherical")
+       call amrex_error("ERROR: rt base_state is not valid for spherical")
     endif
 
     if ( parallel_IOProcessor()) then
@@ -90,7 +90,7 @@ contains
     min_dens = min(rho_1, rho_2)
 
     if (anelastic_cutoff > min_dens .or. base_cutoff_density > min_dens) then
-       call bl_error("ERROR: for the RT problem, the anelastic and base cutoff densities > min(rho)")
+       call amrex_error("ERROR: for the RT problem, the anelastic and base cutoff densities > min(rho)")
     endif
 
     if (min_dens < small_dens) then

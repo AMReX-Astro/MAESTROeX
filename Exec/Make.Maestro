@@ -167,7 +167,7 @@ VPATH_LOCATIONS   += $(Blocs)
 
 #include $(AMREX_HOME)/Src/LinearSolvers/C_to_F_MG/Make.package
 #include $(AMREX_HOME)/Src/LinearSolvers/F_MG/FParallelMG.mak
-include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
+#include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
 
 #------------------------------------------------------------------------------
 # runtime parameters

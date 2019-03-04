@@ -1,5 +1,6 @@
 module tagging_module
 
+  use amrex_error_module
   use meth_params_module, only: temp_comp, rho_comp, nscal
   use probin_module, only: tag_density_1
   use base_state_geometry_module, only: nr_fine, max_radial_level
@@ -74,7 +75,7 @@ contains
     integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
     integer          :: set,clear,lev
 
-    call bl_error("tag_boxes not needed for spherical")
+    call amrex_error("tag_boxes not needed for spherical")
        
   end subroutine tag_boxes
   
@@ -86,7 +87,7 @@ contains
     integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
     integer          :: set,clear,lev
 
-    call bl_error("retag_array not needed for spherical")
+    call amrex_error("retag_array not needed for spherical")
        
   end subroutine retag_array
   

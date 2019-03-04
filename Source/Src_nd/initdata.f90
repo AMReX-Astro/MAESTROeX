@@ -1,7 +1,7 @@
 
 module initdata_module
 
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use network, only: nspec
   use amrex_fort_module, only : amrex_spacedim
   use base_state_geometry_module, only: nr_fine, max_radial_level
@@ -42,7 +42,7 @@ contains
     end if
 
     ! abort program
-    call bl_error()
+    call amrex_error()
 
     ! set velocity to zero
     vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v) = 0.d0
@@ -114,7 +114,7 @@ contains
     end if
 
     ! abort program
-    call bl_error()
+    call amrex_error()
 
     ! set velocity to zero
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0

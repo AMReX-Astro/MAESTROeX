@@ -4,7 +4,7 @@ module make_vel_force_module
   use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, prob_lo
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, center
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
-  use bl_constants_module
+  use amrex_constants_module
 
   implicit none
 
@@ -177,7 +177,7 @@ contains
     double precision :: rhopert
     double precision :: xx, yy, zz
 
-    real(kind=dp_t) :: Ut_dot_er
+    double precision :: Ut_dot_er
 
     call bl_allocate(rho0_cart,lo,hi,1)
     call bl_allocate(grav_cart,lo,hi,3)
@@ -302,7 +302,7 @@ contains
     double precision :: rhopert
     double precision :: xx, yy, zz
 
-    real(kind=dp_t) :: Ut_dot_er
+    double precision :: Ut_dot_er
 
     call bl_allocate(rho0_cart,lo,hi,1)
     call bl_allocate(grav_cart,lo,hi,3)

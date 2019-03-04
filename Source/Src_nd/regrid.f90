@@ -9,7 +9,7 @@
 module regrid_base_module
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
-  use bl_constants_module
+  use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, dr, nr, &
        max_radial_level, numdisjointchunks, &
        r_start_coord, r_end_coord, finest_radial_level

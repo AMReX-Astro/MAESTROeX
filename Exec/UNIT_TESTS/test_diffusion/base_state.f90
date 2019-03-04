@@ -51,7 +51,7 @@ contains
 
     if (ihe4 < 0 .or. ic12 < 0 .or. ife56 < 0) then
        print *, ihe4, ic12, ife56
-       call bl_error("Invalid species in init_base_state.")
+       call amrex_error("Invalid species in init_base_state.")
     endif
 
     eos_state%h         = ambient_h

@@ -2,7 +2,7 @@
 module initdata_module
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
-  use bl_constants_module
+  use amrex_constants_module
   use eos_type_module
   use eos_module
   use network, only: nspec

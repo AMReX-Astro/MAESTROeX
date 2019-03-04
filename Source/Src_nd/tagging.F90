@@ -1,6 +1,6 @@
 module tagging_module
 
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use meth_params_module, only: temp_comp, nscal
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
@@ -54,7 +54,7 @@ contains
     end if
 
     ! abort program
-    call bl_error()
+    call amrex_error()
 
     ! Tag on regions of high temperature
     do k = lo(3), hi(3)
@@ -100,7 +100,7 @@ contains
     end if
 
     ! abort program
-    call bl_error()
+    call amrex_error()
 
 
     ! Tag on regions of high temperature
@@ -165,7 +165,7 @@ contains
     end if
 
     ! abort program
-    call bl_error()
+    call amrex_error()
 
     ! Tag on regions including buffer cells
     do k = lo(3), hi(3)

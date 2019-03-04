@@ -1,6 +1,6 @@
 module debug_module
 
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use base_state_geometry_module, only: max_radial_level, nr_fine, r_start_coord, &
                                         r_end_coord, numdisjointchunks
 

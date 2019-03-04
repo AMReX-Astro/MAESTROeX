@@ -37,7 +37,7 @@ contains
     length = len_trim(run_prefix)
 
     if (length > max_len-1) then
-       call bl_error("length of run_prefix is greater than the length of the character array you've given me")
+       call amrex_error("length of run_prefix is greater than the length of the character array you've given me")
     endif
 
     do i = 1, length

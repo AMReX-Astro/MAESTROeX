@@ -7,7 +7,7 @@
 ! the react_state() subroutine.
 module make_heating_module
 
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use amrex_constants_module
   use meth_params_module, only: prob_lo, rho_comp
 

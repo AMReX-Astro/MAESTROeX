@@ -2,7 +2,7 @@
 
 module advect_base_module
 
-  use bl_constants_module
+  use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, dr, &
        max_radial_level, numdisjointchunks, &
        r_start_coord, r_end_coord, &
