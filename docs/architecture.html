@@ -148,8 +148,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#amrex-helper-modules">AMReX&nbsp;Helper Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#bl-types">bl_types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#bl-constants">bl_constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#amrex-constants">amrex_constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#parallel">parallel</a></li>
 </ul>
 </li>
@@ -794,7 +793,7 @@ everywhere. This can be done (level-by-level) as</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">call</span> <span class="n">setval</span><span class="p">(</span><span class="n">mfab</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">ZERO</span><span class="p">,</span> <span class="nb">all</span><span class="o">=.</span><span class="n">true</span><span class="o">.</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>where ZERO is the constant 0.0 from bl_constants_module.</p>
+<p>where ZERO is the constant 0.0 from amrex_constants_module.</p>
 <p>The procedure for accessing the data in each grid managed by the
 multifab&nbsp;is shown in §&nbsp;<a class="reference external" href="#sec:example">[sec:example]</a>. Subroutines to add,
 multiply, or divide two multifabs exist, as do subroutines to copy
@@ -1119,15 +1118,10 @@ the plotfile.</p>
 <p>There are a large number of modules in amrex/ that provide
 the core functionality for managing grids. Here we describe
 the most popular such modules.</p>
-<div class="section" id="bl-types">
-<h3>bl_types<a class="headerlink" href="#bl-types" title="Permalink to this headline">¶</a></h3>
-<p>The main purpose of this module is to define the Fortran kind dp_t
-which is used throughout the code to declare double precision variables.</p>
-</div>
-<div class="section" id="bl-constants">
-<h3>bl_constants<a class="headerlink" href="#bl-constants" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="amrex-constants">
+<h3>amrex_constants<a class="headerlink" href="#amrex-constants" title="Permalink to this headline">¶</a></h3>
 <p>This module provides descriptive names for a number of common double precision
-numbers, e.g.&nbsp;ONE = 1.0_dp_t. This enhances the readability of
+numbers, e.g.&nbsp;ONE = 1.d0. This enhances the readability of
 the code.</p>
 </div>
 <div class="section" id="parallel">
@@ -1158,16 +1152,13 @@ work routines, example_2d or example_3d, depending on
 the dimensionality.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">subroutine</span> <span class="n">example</span><span class="p">(</span><span class="n">mla</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">umac</span><span class="p">,</span><span class="n">dx</span><span class="p">,</span><span class="n">dt</span><span class="p">)</span>
 
-  <span class="n">use</span> <span class="n">bl_types</span>
   <span class="n">use</span> <span class="n">multifab_module</span>
   <span class="n">use</span> <span class="n">ml_layout_module</span>
   <span class="n">use</span> <span class="n">variables</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">rho_comp</span>
 </pre></div>
 </div>
-<p>Here, the bl_types and multifab_module
-modules bring in the basic AMReX&nbsp;data types. Specifically, here,
-bl_types defines dp_t which is the kind used for
-declaring double precision data, and multifab_module defines
+<p>Here, the
+multifab_module defines
 the multifab&nbsp;data type. The ml_layout_module defines the
 datatype for a ml_layout—many routines will take an ml_layoutto
 allow us to fill ghostcells. The variables module is a
@@ -1175,10 +1166,10 @@ MAESTRO&nbsp;module that provides integer keys for indexing the state
 arrays. In this case the integer rho_comp refers to the
 location in the state array corresponding to density.</p>
 <p>Next we declare the subroutine arguments:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">ml_layout</span><span class="p">),</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span>   <span class="p">)</span> <span class="p">::</span> <span class="n">mla</span>
-<span class="nb">type</span><span class="p">(</span><span class="n">multifab</span><span class="p">)</span> <span class="p">,</span> <span class="n">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="p">::</span> <span class="n">s</span><span class="p">(:)</span>
-<span class="nb">type</span><span class="p">(</span><span class="n">multifab</span><span class="p">)</span> <span class="p">,</span> <span class="n">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="p">::</span> <span class="n">umac</span><span class="p">(:,:)</span>
-<span class="n">real</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="n">dp_t</span><span class="p">),</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span>   <span class="p">)</span> <span class="p">::</span> <span class="n">dx</span><span class="p">(:,:),</span><span class="n">dt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">ml_layout</span><span class="p">)</span> <span class="p">,</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span>   <span class="p">)</span> <span class="p">::</span> <span class="n">mla</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">multifab</span><span class="p">)</span>  <span class="p">,</span> <span class="n">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="p">::</span> <span class="n">s</span><span class="p">(:)</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">multifab</span><span class="p">)</span>  <span class="p">,</span> <span class="n">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="p">::</span> <span class="n">umac</span><span class="p">(:,:)</span>
+<span class="n">double</span> <span class="n">precision</span><span class="p">,</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span>   <span class="p">)</span> <span class="p">::</span> <span class="n">dx</span><span class="p">(:,:),</span><span class="n">dt</span>
 </pre></div>
 </div>
 <p>Here, s(:) is our multifab&nbsp;array that holds the state data.
@@ -1187,8 +1178,8 @@ velocities are held in the multifab umac, with the array
 indices referring to the AMR level and the component.</p>
 <p>Local variable declarations come next:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>! Local variables
-real(kind=dp_t), pointer :: sp(:,:,:,:)
-real(kind=dp_t), pointer :: ump(:,:,:,:), vmp(:,:,:,:), wmp(:,:,:,:)
+double precision, pointer :: sp(:,:,:,:)
+double precision, pointer :: ump(:,:,:,:), vmp(:,:,:,:), wmp(:,:,:,:)
 integer :: i,n,dm,nlevs,ng_sp,ng_um
 integer :: lo(mla%dim),hi(mla%dim)
 </pre></div>
@@ -1285,19 +1276,19 @@ the 2D function is:</p>
                         umac,vmac,ng_um, &amp;
                         lo,hi,dx,dt)
 
-    use bl_constants_module
+    use amrex_constants_module
     use probin_module, only: prob_lo
 
     integer        , intent(in) :: lo(:),hi(:), ng_sp, ng_um
-    real(kind=dp_t), intent(in) :: density(lo(1)-ng_sp:,lo(2)-ng_sp:)
-    real(kind=dp_t), intent(in) ::    umac(lo(1)-ng_um:,lo(2)-ng_um:)
-    real(kind=dp_t), intent(in) ::    vmac(lo(1)-ng_um:,lo(2)-ng_um:)
+    double precision, intent(in) :: density(lo(1)-ng_sp:,lo(2)-ng_sp:)
+    double precision, intent(in) ::    umac(lo(1)-ng_um:,lo(2)-ng_um:)
+    double precision, intent(in) ::    vmac(lo(1)-ng_um:,lo(2)-ng_um:)
 
-    real(kind=dp_t), intent(in) :: dx(:),dt
+    double precision, intent(in) :: dx(:),dt
 
     integer         :: i, j
-    real(kind=dp_t) :: x, y
-    real(kind=dp_t) :: dens, u, v
+    double precision :: x, y
+    double precision :: dens, u, v
 
     do j = lo(2), hi(2)
        y = prob_lo(2) + (dble(j) + HALF)*dx(2)
@@ -1328,7 +1319,7 @@ current box. Likewise, the MAC velocities refer to the ng_um
 ghostcells. The j and i loops loop over all the valid
 zones. Coordinate information is computed from dx and
 prob_lo which is the physical lower bound of the domain.
-bl_constants_module declares useful double-precision
+amrex_constants_module declares useful double-precision
 constants, like HALF (0.5). Here, we see how to access the
 density for the current zone and compute the cell-centered velocities
 from the MAC velocities. By convection, for a nodal array, the

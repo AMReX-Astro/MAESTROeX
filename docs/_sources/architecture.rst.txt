@@ -690,7 +690,7 @@ everywhere. This can be done (level-by-level) as
 
     call setval(mfab(n), ZERO, all=.true.)
 
-where ZERO is the constant 0.0 from bl_constants_module.
+where ZERO is the constant 0.0 from amrex_constants_module.
 
 The procedure for accessing the data in each grid managed by the
 multifab is shown in § \ `[sec:example] <#sec:example>`__. Subroutines to add,
@@ -1054,17 +1054,11 @@ There are a large number of modules in amrex/ that provide
 the core functionality for managing grids. Here we describe
 the most popular such modules.
 
-bl_types
---------
-
-The main purpose of this module is to define the Fortran kind dp_t
-which is used throughout the code to declare double precision variables.
-
-bl_constants
+amrex_constants
 ------------
 
 This module provides descriptive names for a number of common double precision
-numbers, e.g. ONE = 1.0_dp_t. This enhances the readability of
+numbers, e.g. ONE = 1.d0. This enhances the readability of
 the code.
 
 parallel
@@ -1102,15 +1096,12 @@ the dimensionality.
 
       subroutine example(mla,s,umac,dx,dt)
 
-        use bl_types
         use multifab_module
         use ml_layout_module
         use variables, only: rho_comp
 
-Here, the bl_types and multifab_module
-modules bring in the basic AMReX data types. Specifically, here,
-bl_types defines dp_t which is the kind used for
-declaring double precision data, and multifab_module defines
+Here, the
+multifab_module defines
 the multifab data type. The ml_layout_module defines the
 datatype for a ml_layout—many routines will take an ml_layoutto
 allow us to fill ghostcells. The variables module is a
@@ -1122,10 +1113,10 @@ Next we declare the subroutine arguments:
 
 ::
 
-        type(ml_layout), intent(in   ) :: mla
-        type(multifab) , intent(inout) :: s(:)
-        type(multifab) , intent(inout) :: umac(:,:)
-        real(kind=dp_t), intent(in   ) :: dx(:,:),dt
+        type(ml_layout) , intent(in   ) :: mla
+        type(multifab)  , intent(inout) :: s(:)
+        type(multifab)  , intent(inout) :: umac(:,:)
+        double precision, intent(in   ) :: dx(:,:),dt
 
 Here, s(:) is our multifab array that holds the state data.
 with the array index in s refers to the AMR level. The MAC
@@ -1137,8 +1128,8 @@ Local variable declarations come next:
 ::
 
         ! Local variables
-        real(kind=dp_t), pointer :: sp(:,:,:,:)
-        real(kind=dp_t), pointer :: ump(:,:,:,:), vmp(:,:,:,:), wmp(:,:,:,:)
+        double precision, pointer :: sp(:,:,:,:)
+        double precision, pointer :: ump(:,:,:,:), vmp(:,:,:,:), wmp(:,:,:,:)
         integer :: i,n,dm,nlevs,ng_sp,ng_um
         integer :: lo(mla%dim),hi(mla%dim)
 
@@ -1253,19 +1244,19 @@ the 2D function is:
                             umac,vmac,ng_um, &
                             lo,hi,dx,dt)
 
-        use bl_constants_module
+        use amrex_constants_module
         use probin_module, only: prob_lo
 
         integer        , intent(in) :: lo(:),hi(:), ng_sp, ng_um
-        real(kind=dp_t), intent(in) :: density(lo(1)-ng_sp:,lo(2)-ng_sp:)
-        real(kind=dp_t), intent(in) ::    umac(lo(1)-ng_um:,lo(2)-ng_um:)
-        real(kind=dp_t), intent(in) ::    vmac(lo(1)-ng_um:,lo(2)-ng_um:)
+        double precision, intent(in) :: density(lo(1)-ng_sp:,lo(2)-ng_sp:)
+        double precision, intent(in) ::    umac(lo(1)-ng_um:,lo(2)-ng_um:)
+        double precision, intent(in) ::    vmac(lo(1)-ng_um:,lo(2)-ng_um:)
 
-        real(kind=dp_t), intent(in) :: dx(:),dt
+        double precision, intent(in) :: dx(:),dt
 
         integer         :: i, j
-        real(kind=dp_t) :: x, y
-        real(kind=dp_t) :: dens, u, v
+        double precision :: x, y
+        double precision :: dens, u, v
 
         do j = lo(2), hi(2)
            y = prob_lo(2) + (dble(j) + HALF)*dx(2)
@@ -1295,7 +1286,7 @@ current box. Likewise, the MAC velocities refer to the ng_um
 ghostcells. The j and i loops loop over all the valid
 zones. Coordinate information is computed from dx and
 prob_lo which is the physical lower bound of the domain.
-bl_constants_module declares useful double-precision
+amrex_constants_module declares useful double-precision
 constants, like HALF (0.5). Here, we see how to access the
 density for the current zone and compute the cell-centered velocities
 from the MAC velocities. By convection, for a nodal array, the
