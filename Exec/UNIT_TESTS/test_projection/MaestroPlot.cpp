@@ -37,23 +37,35 @@ Maestro::WritePlotFile (const int step,
     }
 
 	int nPlot = 0;
-	const auto& varnames = PlotFileVarNames(&nPlot);
 
     // make plot mf
     const Vector<MultiFab> dummy;
-	const auto& mf = PlotFileMF(nPlot,t_in,dt_in,dummy,dummy,dummy,dummy,u_in,e,a,a, dummy);
 
 	// WriteMultiLevelPlotfile expects an array of step numbers
 	Vector<int> step_array;
 	step_array.resize(maxLevel()+1, step);
 
-	WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
-	                        Geom(), t_in, step_array, refRatio());
+    if (step == 2) {
+        const Vector<std::string> varnames = {"gphix", "gphiy", "gphiz"};
+        const auto& mf = PlotFileMF(nPlot,t_in,dt_in,dummy,dummy,dummy,dummy,u_in,e,a,a, dummy);
+        WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
+    	                        Geom(), t_in, step_array, refRatio());
 
-	for (int i = 0; i <= finest_level; ++i) {
-		delete mf[i];
-	}
+    	for (int i = 0; i <= finest_level; ++i) {
+    		delete mf[i];
+    	}
 
+    } else {
+    	const auto& varnames = PlotFileVarNames(&nPlot);
+        const auto& mf = PlotFileMF(nPlot,t_in,dt_in,dummy,dummy,dummy,dummy,u_in,e,a,a, dummy);
+
+        WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
+    	                        Geom(), t_in, step_array, refRatio());
+
+    	for (int i = 0; i <= finest_level; ++i) {
+    		delete mf[i];
+    	}
+    }
 }
 
 

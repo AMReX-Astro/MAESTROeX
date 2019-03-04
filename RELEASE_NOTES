@@ -55,3 +55,10 @@ Switch to averaging down edge fluxes instead of using the refluxing routines
 New rotating star examples
 New unit tests: test_advect, test_eos, test_project, test_react, test_diffusion,
 test_basestate
+
+03-01-2019
+Tagging changes for multilevel
+Planar multilevel now works
+Spherical multilevel works in limited capacity (still debugging)
+New input files and initial model files 
+Fix unit tests: test_advect, test_diffusion, test_projection
