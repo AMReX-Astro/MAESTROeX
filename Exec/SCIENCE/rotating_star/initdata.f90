@@ -2,8 +2,8 @@
 module initdata_module
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
-  use parallel, only: parallel_IOProcessor
-  use bl_constants_module
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
+  use amrex_constants_module
   use network, only: nspec
   use amrex_fort_module, only : amrex_spacedim, amrex_random
   use base_state_geometry_module, only: nr_fine, max_radial_level
@@ -47,7 +47,7 @@ contains
     end if
 
     ! abort program
-    call bl_error("Planar initdata not written")
+    call amrex_error("Planar initdata not written")
 
     ! set velocity to zero
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0

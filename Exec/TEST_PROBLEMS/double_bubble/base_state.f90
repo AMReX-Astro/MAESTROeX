@@ -47,14 +47,14 @@ contains
 
     ! local variables
     integer         :: n,r,j
-    real(kind=dp_t) :: H,z,z0, gamma_const
-    real(kind=dp_t) :: dens_zone, temp_zone
-    real(kind=dp_t) :: xn_zone(nspec)
+    double precision :: H,z,z0, gamma_const
+    double precision :: dens_zone, temp_zone
+    double precision :: xn_zone(nspec)
 
     type (eos_t) :: eos_state
 
     if (spherical .eq. 1) then
-       call bl_error("ERROR: rt base_state is not valid for spherical")
+       call amrex_error("ERROR: rt base_state is not valid for spherical")
     endif
 
     ! only initialize the first species

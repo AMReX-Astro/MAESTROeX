@@ -1,8 +1,8 @@
 module test_basestate_module
 
-  use bl_types
-  use bl_error_module
-  use bl_constants_module
+  use amrex_types
+  use amrex_error_module
+  use amrex_constants_module
   use probin_module, ONLY : heating_time, heating_rad, heating_peak, &
        heating_sigma, prob_type, &
        cooling_rad, cooling_peak, cooling_sigma, initial_dt
@@ -88,7 +88,7 @@ contains
              tmp1 =   2.7d-3 * T_6_third
              tmp2 = -7.78d-3 * T_6_third**2
              tmp3 = -1.49d-4 * T_6_third**3
-             g14 = 1.0_dp_t + tmp1 + tmp2 + tmp3
+             g14 = 1.0d0 + tmp1 + tmp2 + tmp3
              tmp1 = 8.67d27 * g14 * X_CNO * X_1 * rho / T_6_third**2
              tmp2 = dexp(-1.5228d2 / T_6_third)
              Hbar(n,r) = tmp1 * tmp2
@@ -111,7 +111,7 @@ contains
           do n=0,max_radial_level
              do r = 0, nr(n)-1
                 if (spherical .eq. 0) then
-                   ! call bl_error("ERROR: heating not supported")
+                   ! call amrex_error("ERROR: heating not supported")
 
                    Hbar(n,r) = fac * heating_peak * &
                         exp(-((r_cc_loc(n,r) - heating_rad)**2)/ heating_sigma)
@@ -160,7 +160,7 @@ contains
     else
 
        write(*,*) prob_type
-       call bl_error("prob_type not yet supported.")
+       call amrex_error("prob_type not yet supported.")
 
     endif
 

@@ -34,7 +34,7 @@ contains
     double precision, intent(inout) :: tempbar_init(0:max_radial_level,0:nr_fine-1)
 
     if (spherical .eq. 1) then
-       call bl_error("ERROR: test_advect base_state is not valid for spherical")
+       call amrex_error("ERROR: test_advect base_state is not valid for spherical")
     endif
 
     s0_init(0:max_radial_level,0:nr_fine-1,1:nscal) = 0.0d0

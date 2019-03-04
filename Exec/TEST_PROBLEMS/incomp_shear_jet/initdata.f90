@@ -1,7 +1,7 @@
 
 module initdata_module
 
-  use bl_constants_module, only: M_PI
+  use amrex_constants_module, only: M_PI
   use eos_type_module
   use eos_module
   use network, only: nspec
@@ -115,7 +115,7 @@ contains
     double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
          ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
-    call bl_error("ERROR: initdata_sphr not implemented")
+    call amrex_error("ERROR: initdata_sphr not implemented")
 
   end subroutine initdata_sphr
 

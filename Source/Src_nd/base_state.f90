@@ -49,14 +49,14 @@ contains
     double precision :: temp_above_cutoff
 
     integer         :: n,r,comp
-    real(kind=dp_t) :: rloc,model_dr,rmax,starting_rad,mod_dr
-    real(kind=dp_t) :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
-    real(kind=dp_t) :: sumX
+    double precision :: rloc,model_dr,rmax,starting_rad,mod_dr
+    double precision :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
+    double precision :: sumX
 
-    real(kind=dp_t), parameter :: TINY = 1.0d-10
+    double precision, parameter :: TINY = 1.0d-10
 
-    real(kind=dp_t) :: mencl, g, r_l, r_r, dpdr, rhog
-    real(kind=dp_t) :: max_hse_error
+    double precision :: mencl, g, r_l, r_r, dpdr, rhog
+    double precision :: max_hse_error
 
     type (eos_t) :: eos_state
 
@@ -276,17 +276,17 @@ contains
     double precision :: temp_above_cutoff
 
     integer         :: n,r,comp,i
-    real(kind=dp_t) :: rloc,rmax,starting_rad,mod_dr
-    real(kind=dp_t) :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
-    real(kind=dp_t) :: sumX
-    real(kind=dp_t) :: dr_irreg, rfrac
+    double precision :: rloc,rmax,starting_rad,mod_dr
+    double precision :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
+    double precision :: sumX
+    double precision :: dr_irreg, rfrac
 
-    real(kind=dp_t), allocatable :: model_dr(:)
+    double precision, allocatable :: model_dr(:)
 
-    real(kind=dp_t), parameter :: TINY = 1.0d-10
+    double precision, parameter :: TINY = 1.0d-10
 
-    real(kind=dp_t) :: mencl, g, r_l, r_r, dpdr, rhog
-    real(kind=dp_t) :: max_hse_error
+    double precision :: mencl, g, r_l, r_r, dpdr, rhog
+    double precision :: max_hse_error
 
     type (eos_t) :: eos_state
 
@@ -340,7 +340,7 @@ contains
        end if
 
        if (spherical .eq. 0) then
-          call bl_error('init_base_state_irreg() not valid for planar')
+          call amrex_error('init_base_state_irreg() not valid for planar')
        else
           starting_rad = ZERO
        endif

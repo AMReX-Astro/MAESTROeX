@@ -1,9 +1,10 @@
 
 module fill_3d_data_module
 
+  use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use base_state_geometry_module, only: nr_fine, max_radial_level, center, dr
-  use bl_constants_module
+  use amrex_constants_module
   use meth_params_module, only: prob_lo, spherical, s0_interp_type, w0_interp_type, &
        w0mac_interp_type, s0mac_interp_type, &
        use_exact_base_state
@@ -295,7 +296,7 @@ contains
              end do
 
           else
-             call bl_error('Error: w0_interp_type not defined')
+             call amrex_error('Error: w0_interp_type not defined')
           end if
 
        else
@@ -409,7 +410,7 @@ contains
                 end do
              end do
           else
-             call bl_error('Error: s0_interp_type not defined')
+             call amrex_error('Error: s0_interp_type not defined')
           end if
 
        end if  ! is_input_edge_centered
@@ -821,7 +822,7 @@ contains
        call bl_deallocate(w0_nodal)
 
     else
-       call bl_error('Error: w0mac_interp_type not defined')
+       call amrex_error('Error: w0mac_interp_type not defined')
     end if
 
   end subroutine make_w0mac_sphr
@@ -1062,7 +1063,7 @@ contains
 
     else
 
-       call bl_error('Error: s0mac_interp_type not defined')
+       call amrex_error('Error: s0mac_interp_type not defined')
 
     end if
 
@@ -1309,7 +1310,7 @@ contains
 
     else
 
-       call bl_error('Error: s0mac_interp_type not defined')
+       call amrex_error('Error: s0mac_interp_type not defined')
 
     end if
 
@@ -1352,7 +1353,7 @@ contains
        end do
 
     else
-       call bl_error('SHOULDNT CALL MAKE_3D_NORMAL WITH SPHERICAL = 0')
+       call amrex_error('SHOULDNT CALL MAKE_3D_NORMAL WITH SPHERICAL = 0')
     end if
 
   end subroutine make_normal

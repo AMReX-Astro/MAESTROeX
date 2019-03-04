@@ -16,7 +16,7 @@
 
 module actual_network
 
-  use bl_types
+  use amrex_types
 
   implicit none
 

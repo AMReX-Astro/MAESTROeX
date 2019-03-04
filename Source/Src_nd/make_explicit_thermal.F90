@@ -7,7 +7,7 @@ module make_explicit_thermal_module
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, &
        buoyancy_cutoff_factor, base_cutoff_density, &
        limit_conductivity
-  use bl_constants_module
+  use amrex_constants_module
 
   implicit none
 

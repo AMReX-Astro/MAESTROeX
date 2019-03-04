@@ -1,6 +1,6 @@
 module initdata_module
 
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use network, only: nspec
   use amrex_fort_module, only : amrex_spacedim
   use base_state_geometry_module, only: nr_fine, max_radial_level, center
@@ -88,7 +88,7 @@ contains
              enddo
 
              if (.not. converged) &
-                  call bl_error("iters did not converge in initscalars")
+                  call amrex_error("iters did not converge in initscalars")
 
              ! call eos one last time
              eos_state%T = temp_zone

@@ -1,7 +1,6 @@
 module sdc_type_module
 
   use actual_network, only: nspec
-  use bl_types, only: dp_t
 
   implicit none
 
@@ -25,8 +24,8 @@ module sdc_type_module
 
   type :: sdc_t
 
-     real(dp_t) :: y(SVAR)
-     real(dp_t) :: ydot_a(SVAR)
+     double precision :: y(SVAR)
+     double precision :: ydot_a(SVAR)
 
      logical :: T_from_eden
 

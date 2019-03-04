@@ -2,7 +2,8 @@
 #include "AMReX_BC_TYPES.H"
 
 module mkutrans_module
-
+  
+  use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use slope_module
@@ -104,7 +105,7 @@ contains
           urx(is) = ulx(is)
        case (Interior)
        case  default
-          call bl_error("mkutrans_1d: invalid boundary type phys_bc(1,1)")
+          call amrex_error("mkutrans_1d: invalid boundary type phys_bc(1,1)")
        end select
     end if
 
@@ -122,7 +123,7 @@ contains
           urx(ie+1) = ulx(ie+1)
        case (Interior)
        case  default
-          call bl_error("mkutrans_1d: invalid boundary type phys_bc(1,2)")
+          call amrex_error("mkutrans_1d: invalid boundary type phys_bc(1,2)")
        end select
     end if
 
@@ -249,7 +250,7 @@ contains
           urx(is,js:je) = ulx(is,js:je)
        case (Interior)
        case  default
-          call bl_error("mkutrans_2d: invalid boundary type phys_bc(1,1)")
+          call amrex_error("mkutrans_2d: invalid boundary type phys_bc(1,1)")
        end select
     end if
 
@@ -267,7 +268,7 @@ contains
           urx(ie+1,js:je) = ulx(ie+1,js:je)
        case (Interior)
        case  default
-          call bl_error("mkutrans_2d: invalid boundary type phys_bc(1,2)")
+          call amrex_error("mkutrans_2d: invalid boundary type phys_bc(1,2)")
        end select
     end if
 
@@ -324,7 +325,7 @@ contains
           vry(is:ie,js) = vly(is:ie,js)
        case (Interior)
        case  default
-          call bl_error("mkutrans_2d: invalid boundary type phys_bc(2,1)")
+          call amrex_error("mkutrans_2d: invalid boundary type phys_bc(2,1)")
        end select
     end if
 
@@ -342,7 +343,7 @@ contains
           vry(is:ie,je+1) = vly(is:ie,je+1)
        case (Interior)
        case  default
-          call bl_error("mkutrans_2d: invalid boundary type phys_bc(2,2)")
+          call amrex_error("mkutrans_2d: invalid boundary type phys_bc(2,2)")
        end select
     end if
 
@@ -503,7 +504,7 @@ contains
           urx(is,js:je,ks:ke) = ulx(is,js:je,ks:ke)
        case (Interior)
        case  default
-          call bl_error("mkutrans_3d: invalid boundary type phys_bc(1,1)")
+          call amrex_error("mkutrans_3d: invalid boundary type phys_bc(1,1)")
        end select
     end if
 
@@ -521,7 +522,7 @@ contains
           urx(ie+1,js:je,ks:ke) = ulx(ie+1,js:je,ks:ke)
        case (Interior)
        case  default
-          call bl_error("mkutrans_3d: invalid boundary type phys_bc(1,2)")
+          call amrex_error("mkutrans_3d: invalid boundary type phys_bc(1,2)")
        end select
     end if
 
@@ -610,7 +611,7 @@ contains
           vry(is:ie,js,ks:ke) = vly(is:ie,js,ks:ke)
        case (Interior)
        case  default
-          call bl_error("mkutrans_3d: invalid boundary type phys_bc(2,1)")
+          call amrex_error("mkutrans_3d: invalid boundary type phys_bc(2,1)")
        end select
     end if
 
@@ -628,7 +629,7 @@ contains
           vry(is:ie,je+1,ks:ke) = vly(is:ie,je+1,ks:ke)
        case (Interior)
        case  default
-          call bl_error("mkutrans_3d: invalid boundary type phys_bc(2,2)")
+          call amrex_error("mkutrans_3d: invalid boundary type phys_bc(2,2)")
        end select
     end if
 
@@ -719,7 +720,7 @@ contains
           wrz(is:ie,js:je,ks) = wlz(is:ie,js:je,ks)
        case (Interior)
        case  default
-          call bl_error("mkutrans_3d: invalid boundary type phys_bc(3,1)")
+          call amrex_error("mkutrans_3d: invalid boundary type phys_bc(3,1)")
        end select
     end if
 
@@ -737,7 +738,7 @@ contains
           wrz(is:ie,js:je,ke+1) = wlz(is:ie,js:je,ke+1)
        case (Interior)
        case  default
-          call bl_error("mkutrans_3d: invalid boundary type phys_bc(3,2)")
+          call amrex_error("mkutrans_3d: invalid boundary type phys_bc(3,2)")
        end select
     end if
 
