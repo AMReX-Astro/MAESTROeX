@@ -562,7 +562,7 @@ private:
     // MaestroPlot.cpp functions
 
     // get plotfile name
-    std::string PlotFileName (int lev) const;
+    void PlotFileName (const int lev, std::string* plotfilename);
 
     // put together an array of multifabs for writing
     amrex::Vector<const amrex::MultiFab*> PlotFileMF (const int nPlot,

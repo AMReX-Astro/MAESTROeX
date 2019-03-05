@@ -23,16 +23,22 @@ Maestro::Init ()
 		// fill in multifab and base state data
 		InitData();
 
-		if (plot_int > 0 || small_plot_int > 0) {
+		if (plot_int > 0) {
 
 			// Need to fill normal vector to compute velrc in plotfile
 			if (spherical) { MakeNormal(); }
 
 			Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
-			if (small_plot_int > 0 && plot_int <= 0)
-				WriteSmallPlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-			else
-				WritePlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+			WritePlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+
+		} else if (small_plot_int > 0) {
+
+			// Need to fill normal vector to compute velrc in plotfile
+			if (spherical) { MakeNormal(); }
+
+			Print() << "\nWriting small plotfile smallplt_InitData after InitData" << std::endl;
+			WriteSmallPlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+
 		}
 	}
 	else {
@@ -121,12 +127,15 @@ Maestro::Init ()
 			Print() << "Doing initial projection" << std::endl;
 			InitProj();
 
-			if (plot_int > 0 || small_plot_int > 0) {
+			if (plot_int > 0) {
 				Print() << "\nWriting plotfile plt_after_InitProj after InitProj" << std::endl;
-				if (small_plot_int > 0 && plot_int <= 0)
-					WriteSmallPlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-				else
-					WritePlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+
+				WritePlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+
+			} else if (small_plot_int > 0) {
+				Print() << "\nWriting small plotfile smallplt_after_InitProj after InitProj" << std::endl;
+
+				WriteSmallPlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
 		}
 
@@ -140,12 +149,12 @@ Maestro::Init ()
 				DivuIter(i);
 			}
 
-			if (plot_int > 0 || small_plot_int > 0) {
+			if (plot_int > 0) {
 				Print() << "\nWriting plotfile plt_after_DivuIter after final DivuIter" << std::endl;
-				if (small_plot_int > 0 && plot_int <= 0)
-					WriteSmallPlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-				else
-					WritePlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+				WritePlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+			} else if (small_plot_int > 0) {
+				Print() << "\nWriting small plotfile smallplt_after_DivuIter after final DivuIter" << std::endl;
+				WriteSmallPlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
 		}
 
@@ -168,12 +177,12 @@ Maestro::Init ()
 			InitIter();
 		}
 
-		if (plot_int > 0 || small_plot_int > 0) {
+		if (plot_int > 0) {
 			Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
-			if (small_plot_int > 0 && plot_int <= 0)
-				WriteSmallPlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-			else
-				WritePlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+			WritePlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+		} else if (small_plot_int > 0) {
+			Print() << "\nWriting small plotfile 0 after all initialization" << std::endl;
+			WriteSmallPlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 		}
 
 		if (chk_int > 0) {

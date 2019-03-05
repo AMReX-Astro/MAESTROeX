@@ -292,31 +292,6 @@ Maestro::ExternInit ()
   maestro_extern_init();
 }
 
-// // set up the plot variables
-// void
-// Maestro::PlotSetup()
-// {
-//     ParmParse pp("maestro");
-//     if (pp.contains("small_plot_vars"))
-//     {
-//         std::string nm;
-//
-//         int nPltVars = pp.countval("small_plot_vars");
-//
-//         for (int i = 0; i < nPltVars; i++)
-//         {
-//             pp.get("small_plot_vars", nm, i);
-//
-//             if (nm == "ALL")
-//                 parent->fillStateSmallPlotVarList();
-//             else if (nm == "NONE")
-//                 small_plot_variables.clear();
-//             else
-//                 parent->addStateSmallPlotVar(nm);
-//         }
-//     }
-// }
-
 // set up BCRec definitions for BC types
 void
 Maestro::BCSetup()

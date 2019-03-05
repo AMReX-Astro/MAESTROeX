@@ -43,30 +43,38 @@ Maestro::WritePlotFile (const int step,
 
 	std::string plotfilename;
 
+    if (!is_small) {
+        plotfilename = plot_base_name;
+    } else {
+        plotfilename = small_plot_base_name;
+    }
+
+    Print() << "plotfilename = " << plotfilename << std::endl;
+
 	if (step == 9999999) {
-		if (plot_base_name.back() == '_') {
-			plotfilename = plot_base_name + "InitData";
+		if (plotfilename.back() == '_') {
+			plotfilename += "InitData";
 		} else {
-			plotfilename = plot_base_name + "InitData";
+			plotfilename += + "_InitData";
 		}
 
 	}
 	else if (step == 9999998) {
-		if (plot_base_name.back() == '_') {
-			plotfilename = plot_base_name + "after_InitProj";
+		if (plotfilename.back() == '_') {
+			plotfilename += "after_InitProj";
 		} else {
-			plotfilename = plot_base_name + "_after_InitProj";
+			plotfilename += + "_after_InitProj";
 		}
 	}
 	else if (step == 9999997) {
-		if (plot_base_name.back() == '_') {
-			plotfilename = plot_base_name + "after_DivuIter";
+		if (plotfilename.back() == '_') {
+			plotfilename += "after_DivuIter";
 		} else {
-			plotfilename = plot_base_name + "_after_DivuIter";
+			plotfilename += + "_after_DivuIter";
 		}
 	}
 	else {
-		plotfilename = PlotFileName(step);
+		PlotFileName(step, &plotfilename);
 	}
 
 	// convert rho0 to multi-D MultiFab
@@ -146,10 +154,10 @@ Maestro::WritePlotFile (const int step,
 
 
 // get plotfile name
-std::string
-Maestro::PlotFileName (int lev) const
+void
+Maestro::PlotFileName (const int lev, std::string* plotfilename)
 {
-	return Concatenate(plot_base_name, lev, 7);
+	*plotfilename = Concatenate(*plotfilename, lev, 7);
 }
 
 // put together a vector of multifabs for writing

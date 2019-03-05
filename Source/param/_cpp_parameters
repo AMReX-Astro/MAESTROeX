@@ -133,7 +133,11 @@ small_plot_int                      int            0
 
 # rather than use a plot interval, plot a file after the solution has
 # advanced past plot\_deltat in time
-plot_deltat                         Real               -1.0
+plot_deltat                         Real           -1.0
+
+# rather than use a plot interval, plot a small plotfile after the solution has
+# advanced past small\_plot\_deltat in time
+small_plot_deltat                   Real           -1.0
 
 # Number of timesteps between writing a checkpoint file
 chk_int                             int            0
@@ -171,6 +175,9 @@ plot_cs                              bool            false
 
 # prefix to use in plotfile file names
 plot_base_name                      string          "plt"
+
+# prefix to use in small plotfile file names
+small_plot_base_name                string          "smallplt"
 
 # prefix to use in checkpoint file names
 check_base_name                     string          "chk"
