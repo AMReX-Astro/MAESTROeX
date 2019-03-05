@@ -16,8 +16,6 @@
 
 module actual_network
 
-  use amrex_types
-
   implicit none
 
   integer, parameter :: nspec = @@NSPEC@@
