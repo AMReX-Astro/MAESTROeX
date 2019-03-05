@@ -5,7 +5,6 @@
 
 module actual_eos_module
 
-  use amrex_types
   use amrex_error_module
   use amrex_constants_module
   use eos_type_module

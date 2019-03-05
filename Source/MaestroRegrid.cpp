@@ -7,11 +7,13 @@ using namespace amrex;
 void
 Maestro::Regrid ()
 {
+
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::Regrid()",Regrid);
 
 	// wallclock time
 	const Real strt_total = ParallelDescriptor::second();
+
 
 	Vector<Real> rho0_temp ( (max_radial_level+1)*nr_fine );
 	rho0_temp.shrink_to_fit();
@@ -57,6 +59,7 @@ Maestro::Regrid ()
 		// created, we need to initialize tempbar_init there, in
 		// case drive_initial_convection = T
 		regrid_base_state_cc(tempbar_init.dataPtr());
+
 	}
 
 	// regrid could add newly refine levels (if finest_level < max_level)
@@ -67,6 +70,7 @@ Maestro::Regrid ()
 	if (spherical == 0) {
 		TagArray();
     }
+
 	init_multilevel(tag_array.dataPtr(),&finest_level);
 
 	if (spherical == 1) {

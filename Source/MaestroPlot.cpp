@@ -5,6 +5,22 @@
 
 using namespace amrex;
 
+// write a small plotfile to disk
+void Maestro::WriteSmallPlotFile (const int step,
+                                  const Real t_in,
+                                  const Real dt_in,
+                                  const Vector<Real>& rho0_in,
+                                  const Vector<Real>& rhoh0_in,
+                                  const Vector<Real>& p0_in,
+                                  const Vector<Real>& gamma1bar_in,
+                                  const Vector<MultiFab>& u_in,
+                                  Vector<MultiFab>& s_in,
+                                  const Vector<MultiFab>& S_cc_in)
+{
+	WritePlotFile (step, t_in, dt_in, rho0_in, rhoh0_in, p0_in,
+	               gamma1bar_in, u_in, s_in, S_cc_in, true);
+}
+
 // write plotfile to disk
 void
 Maestro::WritePlotFile (const int step,
@@ -16,7 +32,8 @@ Maestro::WritePlotFile (const int step,
                         const Vector<Real>& gamma1bar_in,
                         const Vector<MultiFab>& u_in,
                         Vector<MultiFab>& s_in,
-                        const Vector<MultiFab>& S_cc_in)
+                        const Vector<MultiFab>& S_cc_in,
+                        const bool is_small)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
@@ -26,15 +43,31 @@ Maestro::WritePlotFile (const int step,
 
 	std::string plotfilename;
 
+    if (!is_small) {
+        plotfilename = plot_base_name;
+    } else {
+        plotfilename = small_plot_base_name;
+    }
+
+    Print() << "plotfilename = " << plotfilename << std::endl;
+
 	if (step == 9999999) {
+<<<<<<< HEAD
 		if (plot_base_name.back() == '_') {
 			plotfilename = plot_base_name + "InitData";
 		} else {
 			plotfilename = plot_base_name + "InitData";
+=======
+		if (plotfilename.back() == '_') {
+			plotfilename += "InitData";
+		} else {
+			plotfilename += + "_InitData";
+>>>>>>> 67a8082f03750baad78de4dbf591cc9f3f14a1bf
 		}
 
 	}
 	else if (step == 9999998) {
+<<<<<<< HEAD
 		if (plot_base_name.back() == '_') {
 			plotfilename = plot_base_name + "after_InitProj";
 		} else {
@@ -46,10 +79,23 @@ Maestro::WritePlotFile (const int step,
 			plotfilename = plot_base_name + "after_DivuIter";
 		} else {
 			plotfilename = plot_base_name + "_after_DivuIter";
+=======
+		if (plotfilename.back() == '_') {
+			plotfilename += "after_InitProj";
+		} else {
+			plotfilename += + "_after_InitProj";
+		}
+	}
+	else if (step == 9999997) {
+		if (plotfilename.back() == '_') {
+			plotfilename += "after_DivuIter";
+		} else {
+			plotfilename += + "_after_DivuIter";
+>>>>>>> 67a8082f03750baad78de4dbf591cc9f3f14a1bf
 		}
 	}
 	else {
-		plotfilename = PlotFileName(step);
+		PlotFileName(step, &plotfilename);
 	}
 
 	// convert rho0 to multi-D MultiFab
@@ -82,14 +128,33 @@ Maestro::WritePlotFile (const int step,
 
 	int nPlot = 0;
 	const auto& varnames = PlotFileVarNames(&nPlot);
-	const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho0_cart,rhoh0_cart,p0_cart,gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in, S_cc_in);
+
+	const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho0_cart,rhoh0_cart,p0_cart,
+	                            gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in,
+	                            S_cc_in);
 
 	// WriteMultiLevelPlotfile expects an array of step numbers
 	Vector<int> step_array;
 	step_array.resize(maxLevel()+1, step);
 
-	WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
-	                        Geom(), t_in, step_array, refRatio());
+	if (!is_small) {
+		WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
+		                        Geom(), t_in, step_array, refRatio());
+	} else {
+		int nSmallPlot = 0;
+		const auto& small_plot_varnames = SmallPlotFileVarNames(&nSmallPlot,
+		                                                        varnames);
+
+		const auto& small_mf = SmallPlotFileMF(nPlot, mf, varnames,
+		                                       small_plot_varnames);
+
+		WriteMultiLevelPlotfile(plotfilename, finest_level+1, small_mf,
+		                        small_plot_varnames, Geom(), t_in, step_array,
+		                        refRatio());
+
+		for (int i = 0; i <= finest_level; ++i)
+			delete small_mf[i];
+	}
 
 	WriteJobInfo(plotfilename);
 
@@ -110,10 +175,10 @@ Maestro::WritePlotFile (const int step,
 
 
 // get plotfile name
-std::string
-Maestro::PlotFileName (int lev) const
+void
+Maestro::PlotFileName (const int lev, std::string* plotfilename)
 {
-	return Concatenate(plot_base_name, lev, 7);
+	*plotfilename = Concatenate(*plotfilename, lev, 7);
 }
 
 // put together a vector of multifabs for writing
@@ -571,6 +636,54 @@ Maestro::PlotFileMF (const int nPlot,
 
 	return plot_mf;
 
+}
+
+
+// this takes the multifab of all variables and extracts those
+// required for the small plot file
+Vector<const MultiFab*>
+Maestro::SmallPlotFileMF(const int nPlot,
+                         Vector<const MultiFab*> mf,
+                         const Vector<std::string> varnames,
+                         const Vector<std::string> small_plot_varnames)
+{
+
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::SmallPlotFileMF()",SmallPlotFileMF);
+
+	// MultiFab to hold plotfile data
+	Vector<const MultiFab*> plot_mf;
+
+	// temporary MultiFabs to hold plotfile data
+	Vector<MultiFab*> plot_mf_data(finest_level+1);
+
+	int dest_comp = 0;
+
+	// build temporary MultiFab to hold plotfile data
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i] = new MultiFab(mf[i]->boxArray(),
+		                               mf[i]->DistributionMap(),nPlot,0);
+
+	}
+
+	for (auto it=small_plot_varnames.begin();
+	     it!=small_plot_varnames.end(); ++it) {
+
+		for (auto n = 0; n < nPlot; n++) {
+			if (*it == varnames[n]) {
+				for (int i = 0; i <= finest_level; ++i)
+					plot_mf_data[i]->copy(*(mf[i]), n, dest_comp, 1);
+				++dest_comp;
+				break;
+			}
+		}
+	}
+
+	// add plot_mf_data[i] to plot_mf
+	for (int i = 0; i <= finest_level; ++i)
+		plot_mf.push_back(plot_mf_data[i]);
+
+	return plot_mf;
 
 }
 
@@ -749,6 +862,55 @@ Maestro::PlotFileVarNames (int * nPlot) const
 			names[cnt++] = "sponge";
 		}
 	}
+
+	return names;
+
+}
+
+// set plotfile variable names
+Vector<std::string>
+Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::SmallPlotFileVarNames()",SmallPlotFileVarNames);
+
+	Vector<std::string> names(*nPlot);
+
+	ParmParse pp("maestro");
+	std::string nm;
+
+	int nPltVars = pp.countval("small_plot_vars");
+
+	int cnt = 0;
+
+	for (int i = 0; i < nPltVars; i++)
+	{
+		pp.get("small_plot_vars", nm, i);
+
+		if (nm == "ALL")
+			return varnames;
+		else if (nm == "NONE") {
+			names.clear();
+			return names;
+		} else {
+			// test to see if it's a valid varname by iterating over
+			// varnames
+			auto found_name = false;
+			for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
+				if (nm == *it) {
+					names.push_back(nm);
+					found_name = true;
+					cnt++;
+					break;
+				}
+			}
+
+            if (!found_name)
+                Print() << "Small plot file variable " << nm << " is invalid\n";
+		}
+	}
+
+	*nPlot = cnt;
 
 	return names;
 

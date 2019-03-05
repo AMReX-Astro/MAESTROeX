@@ -160,43 +160,30 @@ reduce file sizes.
 
 .. _vis:sec:miniplotfile:
 
-Mini vs. regular plotfiles
+Small vs. regular plotfiles
 --------------------------
 
 MAESTRO can manage two independent sets of plotfiles. This allows you to
 output the default plotfiles, which contain a lot of variables, sparsely,
-and output mini-plotfiles much more frequently. A mini-plotfile is controlled
+and output small-plotfiles much more frequently. A small-plotfile is controlled
 by the analogous runtime parameters as the main plotfiles:
 
--  mini_plot_int is the interval in steps between successive plotfiles
+-  ``small_plot_int`` is the interval in steps between successive plotfiles
 
--  mini_plot_deltat is the interval in time between successive plotfiles
+-  ``small_plot_deltat`` is the interval in time between successive plotfiles
 
--  mini_plot_base_name is the base name that prefixes the plotfiles. The
-   default is miniplt
+-  ``small_plot_base_name`` is the base name that prefixes the plotfiles. The
+   default is smallplt
 
-To set the fields that are stored in the mini plotfile, a second set
-of runtime parameters is used: mini_plot_var1,
-mini_plot_var2, :math:`\ldots`, mini_plot_var9. These can be set to
-any of the following:
+The fields that are stored in the small plotfiles is set by the runtime
+parameter ``small_plot_vars``. This should be a (space-separated) list of the
+parameter names to be included in the plot file.
 
--  "density"
-
--  "species": this gets all of the mass fractions
-
--  the name of an individual species in the network (like "helium-4")
-
--  "radvel": this gets both the radial and circumferential velocity
-
--  "velocity": all three componets
-
--  "temperature": this is either :math:`T(\rho,p_0)` or :math:`T(\rho,h)`, depending
-   on the value of use_tfromp
-
--  "enuc": the nuclear energy generation rate
-
--  "mach": the Mach number
-
+Note that if both normal plots and small plots are enabled, normal plots will
+have priority. For example, if ``plot_int = 50`` and ``small_plot_int = 10``,
+normal plots will be produced every 50 timesteps, and small plots will be
+produced every 10 timesteps *excluding* the 50th timesteps when a normal plot
+is produced instead. 
 
 Visualizing with Amrvis
 =======================
