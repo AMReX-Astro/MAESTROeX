@@ -43,55 +43,32 @@ Maestro::WritePlotFile (const int step,
 
 	std::string plotfilename;
 
-    if (!is_small) {
-        plotfilename = plot_base_name;
-    } else {
-        plotfilename = small_plot_base_name;
-    }
-
-    Print() << "plotfilename = " << plotfilename << std::endl;
+	if (!is_small) {
+		plotfilename = plot_base_name;
+	} else {
+		plotfilename = small_plot_base_name;
+	}
 
 	if (step == 9999999) {
-<<<<<<< HEAD
-		if (plot_base_name.back() == '_') {
-			plotfilename = plot_base_name + "InitData";
-		} else {
-			plotfilename = plot_base_name + "InitData";
-=======
 		if (plotfilename.back() == '_') {
 			plotfilename += "InitData";
 		} else {
-			plotfilename += + "_InitData";
->>>>>>> 67a8082f03750baad78de4dbf591cc9f3f14a1bf
+			plotfilename += +"_InitData";
 		}
 
 	}
 	else if (step == 9999998) {
-<<<<<<< HEAD
-		if (plot_base_name.back() == '_') {
-			plotfilename = plot_base_name + "after_InitProj";
-		} else {
-			plotfilename = plot_base_name + "_after_InitProj";
-		}
-	}
-	else if (step == 9999997) {
-		if (plot_base_name.back() == '_') {
-			plotfilename = plot_base_name + "after_DivuIter";
-		} else {
-			plotfilename = plot_base_name + "_after_DivuIter";
-=======
 		if (plotfilename.back() == '_') {
 			plotfilename += "after_InitProj";
 		} else {
-			plotfilename += + "_after_InitProj";
+			plotfilename += +"_after_InitProj";
 		}
 	}
 	else if (step == 9999997) {
 		if (plotfilename.back() == '_') {
 			plotfilename += "after_DivuIter";
 		} else {
-			plotfilename += + "_after_DivuIter";
->>>>>>> 67a8082f03750baad78de4dbf591cc9f3f14a1bf
+			plotfilename += +"_after_DivuIter";
 		}
 	}
 	else {
@@ -905,8 +882,8 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
 				}
 			}
 
-            if (!found_name)
-                Print() << "Small plot file variable " << nm << " is invalid\n";
+			if (!found_name)
+				Print() << "Small plot file variable " << nm << " is invalid\n";
 		}
 	}
 

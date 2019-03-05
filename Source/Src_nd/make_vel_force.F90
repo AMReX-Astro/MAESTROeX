@@ -67,7 +67,7 @@ contains
     double precision :: rhopert
 
 #if defined(ROTATION) && (AMREX_SPACEDIM == 3)
-    real(kind=dp_t) :: coriolis_term(3), centrifugal_term(3)
+    double precision :: coriolis_term(3), centrifugal_term(3)
 #endif
 
     vel_force(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_f) = 0.d0
