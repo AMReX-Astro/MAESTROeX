@@ -72,6 +72,7 @@ maestro.use_tfromp = true
 maestro.plot_base_name  = rot1e3_    # root name of plot file
 maestro.plot_int   = 20      # number of timesteps between plot files
 maestro.plot_deltat = 100.0e0
+amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 
 # CHECKPOINT
 maestro.check_base_name = chk

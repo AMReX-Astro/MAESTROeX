@@ -85,7 +85,7 @@ private:
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const amrex::Vector<amrex::Real>& w0_force,
 			const amrex::Vector<amrex::MultiFab>& w0_force_cart,
-			const amrex::Vector<amrex::Real>& beta0, 
+			const amrex::Vector<amrex::Real>& beta0,
 			const int is_predictor);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
@@ -182,7 +182,7 @@ private:
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
-    
+
     void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
                         const amrex::Vector<amrex::Real>& s0,
                         int comp, int bccomp,
@@ -340,7 +340,7 @@ private:
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
-    
+
     void Put1dArrayOnCart (int level, const amrex::Vector<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
@@ -578,8 +578,28 @@ private:
                                                       const amrex::Vector<amrex::Real>& gamma1bar_in,
                                                       const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
+    amrex::Vector<const amrex::MultiFab*> SmallPlotFileMF(const int nPlot,
+                           amrex::Vector<const amrex::MultiFab*> mf,
+                           const amrex::Vector<std::string> varnames,
+                           const amrex::Vector<std::string> small_plot_varnames);
+
     // set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames (int * nPlot) const;
+
+    // set small plotfile variables names
+    amrex::Vector<std::string> SmallPlotFileVarNames (int * nPlot, amrex::Vector<std::string> varnames) const;
+
+    // write a small plotfile to disk
+    void WriteSmallPlotFile (const int step,
+                        const amrex::Real t_in,
+                        const amrex::Real dt_in,
+                        const amrex::Vector<amrex::Real>& rho0_in,
+                        const amrex::Vector<amrex::Real>& rhoh0_in,
+                        const amrex::Vector<amrex::Real>& p0_in,
+                        const amrex::Vector<amrex::Real>& gamma1bar_in,
+                        const amrex::Vector<amrex::MultiFab>& u_in,
+                        amrex::Vector<amrex::MultiFab>& s_in,
+                        const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     // write plotfile to disk
     void WritePlotFile (const int step,
@@ -591,7 +611,8 @@ private:
                         const amrex::Vector<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in,
-                        const amrex::Vector<amrex::MultiFab>& S_cc_in);
+                        const amrex::Vector<amrex::MultiFab>& S_cc_in,
+                        const bool is_small = false);
 
     void WriteJobInfo (const std::string& dir) const;
 

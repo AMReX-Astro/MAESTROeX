@@ -29,6 +29,7 @@ int         Maestro::minwidth = 8;
 amrex::Real Maestro::min_eff = 0.9;
 bool        Maestro::use_tpert_in_tagging = false;
 int         Maestro::plot_int = 0;
+int         Maestro::small_plot_int = 0;
 amrex::Real Maestro::plot_deltat = -1.0;
 int         Maestro::chk_int = 0;
 bool        Maestro::plot_h_with_use_tfromp = true;
@@ -47,6 +48,9 @@ int         Maestro::diag_buf_size = 10;
 bool        Maestro::plot_ad_excess = false;
 bool        Maestro::plot_processors = false;
 bool        Maestro::plot_pidivu = false;
+#ifdef magvel"
+std::string Maestro::small_plot_vars = "rho;
+#endif
 int         Maestro::init_iter = 4;
 int         Maestro::init_divu_iter = 4;
 std::string Maestro::restart_file = "";

@@ -29,6 +29,7 @@ pp.query("minwidth", minwidth);
 pp.query("min_eff", min_eff);
 pp.query("use_tpert_in_tagging", use_tpert_in_tagging);
 pp.query("plot_int", plot_int);
+pp.query("small_plot_int", small_plot_int);
 pp.query("plot_deltat", plot_deltat);
 pp.query("chk_int", chk_int);
 pp.query("plot_h_with_use_tfromp", plot_h_with_use_tfromp);
@@ -47,6 +48,9 @@ pp.query("diag_buf_size", diag_buf_size);
 pp.query("plot_ad_excess", plot_ad_excess);
 pp.query("plot_processors", plot_processors);
 pp.query("plot_pidivu", plot_pidivu);
+#ifdef magvel"
+pp.query("small_plot_vars", small_plot_vars);
+#endif
 pp.query("init_iter", init_iter);
 pp.query("init_divu_iter", init_divu_iter);
 pp.query("restart_file", restart_file);

@@ -29,6 +29,7 @@ static int         minwidth;
 static amrex::Real min_eff;
 static bool        use_tpert_in_tagging;
 static int         plot_int;
+static int         small_plot_int;
 static amrex::Real plot_deltat;
 static int         chk_int;
 static bool        plot_h_with_use_tfromp;
@@ -47,6 +48,9 @@ static int         diag_buf_size;
 static bool        plot_ad_excess;
 static bool        plot_processors;
 static bool        plot_pidivu;
+#ifdef magvel"
+static std::string small_plot_vars;
+#endif
 static int         init_iter;
 static int         init_divu_iter;
 static std::string restart_file;

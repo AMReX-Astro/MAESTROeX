@@ -128,6 +128,9 @@ use_tpert_in_tagging                bool            false     y
 # plot interval
 plot_int                            int            0
 
+# small plot interval
+small_plot_int                      int            0
+
 # rather than use a plot interval, plot a file after the solution has
 # advanced past plot\_deltat in time
 plot_deltat                         Real               -1.0
@@ -184,6 +187,9 @@ plot_processors                     bool            false
 
 # plot pi * div(U) -- this is a measure of conservation of energy
 plot_pidivu                         bool            false
+
+# small plot file variables
+small_plot_vars                     string          "rho p0 magvel"
 
 #-----------------------------------------------------------------------------
 # category: algorithm initialization
@@ -302,9 +308,9 @@ use_exact_base_state                bool            false	y
 # initialization
 fix_base_state                      bool            false
 
-# turn on (true) or off (false) basestate evolution that uses averages  
+# turn on (true) or off (false) basestate evolution that uses averages
 # of cell-centered data instead of advecting
-average_base_state                  bool            false 
+average_base_state                  bool            false
 
 # force $\rho_0 = (\rho h)_0 = 0$, {\tt evolve\_base\_state = F}
 # and {\tt beta\_type} = 3
@@ -332,7 +338,7 @@ enthalpy_pred_type                  int            1            y
 species_pred_type                   int            1		y
 
 # turns on second order correction to delta gamma1 term
-use_delta_gamma1_term               bool            false        y 
+use_delta_gamma1_term               bool            false        y
 
 # turn on the etarho term as described in flow chart
 use_etarho                          bool            true
