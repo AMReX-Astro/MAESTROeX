@@ -49,8 +49,6 @@ Maestro::WritePlotFile (const int step,
         plotfilename = small_plot_base_name;
     }
 
-    Print() << "plotfilename = " << plotfilename << std::endl;
-
 	if (step == 9999999) {
 		if (plotfilename.back() == '_') {
 			plotfilename += "InitData";
