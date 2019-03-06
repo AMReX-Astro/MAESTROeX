@@ -43,11 +43,11 @@ Maestro::WritePlotFile (const int step,
 
 	std::string plotfilename;
 
-	if (!is_small) {
-		plotfilename = plot_base_name;
-	} else {
-		plotfilename = small_plot_base_name;
-	}
+    if (!is_small) {
+        plotfilename = plot_base_name;
+    } else {
+        plotfilename = small_plot_base_name;
+    }
 
 	if (step == 9999999) {
 		if (plotfilename.back() == '_') {
