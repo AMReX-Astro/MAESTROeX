@@ -124,7 +124,7 @@ Maestro::WritePlotFile (const int step,
 		const auto& small_plot_varnames = SmallPlotFileVarNames(&nSmallPlot,
 		                                                        varnames);
 
-		const auto& small_mf = SmallPlotFileMF(nPlot, mf, varnames,
+		const auto& small_mf = SmallPlotFileMF(nSmallPlot, mf, varnames,
 		                                       small_plot_varnames);
 
 		WriteMultiLevelPlotfile(plotfilename, finest_level+1, small_mf,
