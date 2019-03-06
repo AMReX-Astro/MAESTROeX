@@ -122,7 +122,7 @@ Maestro::WritePlotFile (const int step,
 		const auto& small_plot_varnames = SmallPlotFileVarNames(&nSmallPlot,
 		                                                        varnames);
 
-		const auto& small_mf = SmallPlotFileMF(nSmallPlot, mf, varnames,
+		const auto& small_mf = SmallPlotFileMF(nPlot, nSmallPlot, mf, varnames,
 		                                       small_plot_varnames);
 
 		WriteMultiLevelPlotfile(plotfilename, finest_level+1, small_mf,
@@ -619,7 +619,7 @@ Maestro::PlotFileMF (const int nPlot,
 // this takes the multifab of all variables and extracts those
 // required for the small plot file
 Vector<const MultiFab*>
-Maestro::SmallPlotFileMF(const int nPlot,
+Maestro::SmallPlotFileMF(const int nPlot, const int nSmallPlot,
                          Vector<const MultiFab*> mf,
                          const Vector<std::string> varnames,
                          const Vector<std::string> small_plot_varnames)
@@ -639,7 +639,7 @@ Maestro::SmallPlotFileMF(const int nPlot,
 	// build temporary MultiFab to hold plotfile data
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i] = new MultiFab(mf[i]->boxArray(),
-		                               mf[i]->DistributionMap(),nPlot,0);
+		                               mf[i]->DistributionMap(),nSmallPlot,0);
 
 	}
 

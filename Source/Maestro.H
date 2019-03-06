@@ -579,6 +579,7 @@ private:
                                                       const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     amrex::Vector<const amrex::MultiFab*> SmallPlotFileMF(const int nPlot,
+                           const int nSmallPlot,
                            amrex::Vector<const amrex::MultiFab*> mf,
                            const amrex::Vector<std::string> varnames,
                            const amrex::Vector<std::string> small_plot_varnames);
