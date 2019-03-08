@@ -327,17 +327,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	delta_gamma1_term[lev].setVal(0.);
     }
 
-    // // Sbar = (1 / gamma1bar * p0) * dp/dt
-    // if (evolve_base_state && t_old > 0.) {
-    // 	for (int i=0; i<Sbar.size(); ++i) {
-    // 	    Sbar[i] = psi[i]/(gamma1bar_old[i]*p0_old[i]);
-    // 	    // Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
-    // 	}
-    // } else {
-    // 	// these should have no effect if evolve_base_state = false
-    // 	std::fill(Sbar.begin(), Sbar.end(), 0.);
-    // }
-    
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
@@ -630,21 +619,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     is_predictor = 0;
     AdvancePremac(umac,w0mac,w0_force_dummy,w0_force_cart_dummy,beta0_old,is_predictor);
 
-    // // compute Sbar
-    // if (evolve_base_state) {
-    // 	for (int i=0; i<Sbar.size(); ++i) {
-    // 	    Sbar[i] = (1.0/(gamma1bar_new[i]*p0_new[i]))*(p0_new[i] - p0_old[i])/dt;
-    // 	}
-
-    // 	// compute Sbar = Sbar + delta_gamma1_termbar
-    // 	if (use_delta_gamma1_term) {
-    // 	    for(int i=0; i<Sbar.size(); ++i) {
-    // 		Sbar[i] += delta_gamma1_termbar[i];
-    // 	    }
-    // 	}
-
-    // }
-
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 		       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
@@ -867,9 +841,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
     
     if (spherical == 1) {
-	// subtract w0 from uold for nodal projection
+	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
+	    MultiFab::Subtract(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
 	}
     }
     
