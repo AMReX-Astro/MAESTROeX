@@ -28,9 +28,13 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     if (spherical == 1) {
         Vector<Real> gradw0( (max_radial_level+1)*nr_fine );
         gradw0.shrink_to_fit();
-
-        compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
-
+	
+	if (use_exact_base_state || average_base_state) {
+            std::fill(gradw0.begin(), gradw0.end(), 0.);
+	} else {
+	    compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
+	}
+	
         Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
     }
 
@@ -82,25 +86,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-		if ( (average_base_state || use_exact_base_state) && use_alt_energy_fix && is_predictor == 1) {
-		    make_vel_force_noenergyfix_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-					BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-					BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
-					BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
-					BL_TO_FORTRAN_3D(uedge_mf[mfi]),
-					BL_TO_FORTRAN_3D(vedge_mf[mfi]),
-					BL_TO_FORTRAN_3D(wedge_mf[mfi]),
-					BL_TO_FORTRAN_FAB(normal_mf[mfi]),
-					BL_TO_FORTRAN_3D(gradw0_mf[mfi]),
-					BL_TO_FORTRAN_FAB(w0force_mf[mfi]),
-					rho0.dataPtr(),
-					grav_cell.dataPtr(),
-					beta0.dataPtr(),
-					dx,
-					r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-					BL_TO_FORTRAN_3D(cc_to_r[mfi]),
-					&do_add_utilde_force);
-		} else {
 		    make_vel_force_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 					BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
 					BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
@@ -117,7 +102,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 					r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                                         BL_TO_FORTRAN_3D(cc_to_r[mfi]),
 					&do_add_utilde_force);
-		}
 #else
                 Abort("MakeVelForce: Spherical is not valid for DIM < 3");
 #endif
