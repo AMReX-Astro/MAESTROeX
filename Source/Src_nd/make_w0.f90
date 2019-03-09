@@ -79,7 +79,7 @@ contains
     else
 
        if (use_exact_base_state) then
-          call make_w0_spherical(w0(0,:),w0_old(0,:),Sbar_in(0,:), &
+          call make_w0_sphr_irreg(w0(0,:),w0_old(0,:),Sbar_in(0,:), &
                                  rho0_old(0,:),rho0_new(0,:), &
                                  p0_old(0,:),p0_new(0,:), &
                                  gamma1bar_old(0,:),gamma1bar_new(0,:), &
@@ -87,13 +87,13 @@ contains
                                  etarho_ec(0,:),etarho_cc(0,:),w0_force(0,:), &
                                  r_cc_loc,r_edge_loc,dt,dtold)
        else
-          call make_w0_sphr_irreg(w0(0,:),w0_old(0,:),Sbar_in(0,:), &
-                                  rho0_old(0,:),rho0_new(0,:), &
-                                  p0_old(0,:),p0_new(0,:), &
-                                  gamma1bar_old(0,:),gamma1bar_new(0,:), &
-                                  p0_minus_peosbar(0,:), &
-                                  etarho_ec(0,:),etarho_cc(0,:),w0_force(0,:), &
-                                  r_cc_loc,r_edge_loc,dt,dtold)
+          call make_w0_spherical(w0(0,:),w0_old(0,:),Sbar_in(0,:), &
+                                rho0_old(0,:),rho0_new(0,:), &
+                                p0_old(0,:),p0_new(0,:), &
+                                gamma1bar_old(0,:),gamma1bar_new(0,:), &
+                                p0_minus_peosbar(0,:), &
+                                etarho_ec(0,:),etarho_cc(0,:),w0_force(0,:), &
+                                r_cc_loc,r_edge_loc,dt,dtold)
        endif
           
     end if
