@@ -49,7 +49,7 @@ Maestro::WritePlotFile (const int step,
         plotfilename = small_plot_base_name;
     }
 
-	if (step == 9999999) {
+	if (step == plotInitData) {
 		if (plotfilename.back() == '_') {
 			plotfilename += "InitData";
 		} else {
@@ -57,14 +57,14 @@ Maestro::WritePlotFile (const int step,
 		}
 
 	}
-	else if (step == 9999998) {
+	else if (step == plotInitProj) {
 		if (plotfilename.back() == '_') {
 			plotfilename += "after_InitProj";
 		} else {
 			plotfilename += + "_after_InitProj";
 		}
 	}
-	else if (step == 9999997) {
+	else if (step == plotDivuIter) {
 		if (plotfilename.back() == '_') {
 			plotfilename += "after_DivuIter";
 		} else {
@@ -252,6 +252,14 @@ Maestro::PlotFileMF (const int nPlot,
 			}
 		}
 		dest_comp += NumSpec;
+
+        // abar
+		MakeAbar(s_in, tempmf);
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		}
+		++dest_comp;
+
 	}
 
 	Vector<MultiFab> stemp             (finest_level+1);
@@ -681,7 +689,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	// thermal, conductivity
 	(*nPlot) = 2*AMREX_SPACEDIM + Nscal + 21;
 
-	if (plot_spec) (*nPlot) += NumSpec; // X
+	if (plot_spec) (*nPlot) += NumSpec + 1; // X + 1 (abar)
 	if (plot_spec || plot_omegadot) (*nPlot) += NumSpec; // omegadot
 
 	if (plot_Hext) (*nPlot)++;
@@ -753,6 +761,8 @@ Maestro::PlotFileVarNames (int * nPlot) const
 
 			delete [] spec_name;
 		}
+
+        names[cnt++] = "abar";
 	}
 
 	if (plot_spec || plot_omegadot) {
@@ -1536,4 +1546,43 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 	// average down and fill ghost cells
 	AverageDown(pidivu,0,1);
 	FillPatch(t_old,pidivu,pidivu,pidivu,0,0,1,0,bcs_f);
+}
+
+void
+Maestro::MakeAbar (const Vector<MultiFab>& state,
+                   Vector<MultiFab>& abar)
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::MakePiDivu()",MakeAbar);
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+
+		// get references to the MultiFabs at level lev
+		const MultiFab& state_mf = state[lev];
+		MultiFab& abar_mf = abar[lev];
+
+		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+		for ( MFIter mfi(abar_mf, true); mfi.isValid(); ++mfi ) {
+
+			// Get the index space of the valid region
+			const Box& tileBox = mfi.tilebox();
+			const Real* dx = geom[lev].CellSize();
+
+			// call fortran subroutine
+			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+			// lo/hi coordinates (including ghost cells), and/or the # of components
+			// We will also pass "validBox", which specifies the "valid" region.
+			make_abar(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+			            BL_TO_FORTRAN_FAB(state_mf[mfi]),
+			            BL_TO_FORTRAN_3D(abar_mf[mfi]));
+		}
+
+	}
+
+	// average down and fill ghost cells
+	AverageDown(abar,0,1);
+	FillPatch(t_old,abar,abar,abar,0,0,1,0,bcs_f);
 }

@@ -1,6 +1,5 @@
 module test_basestate_module
 
-  use amrex_types
   use amrex_error_module
   use amrex_constants_module
   use probin_module, ONLY : heating_time, heating_rad, heating_peak, &
