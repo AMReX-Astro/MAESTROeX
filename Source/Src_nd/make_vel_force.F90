@@ -396,6 +396,7 @@ contains
   end subroutine make_vel_force_sphr
 
   subroutine make_vel_force_noenergyfix_sphr(lo, hi, &
+      is_final_update, &
        vel_force, f_lo, f_hi, nc_f, &
        gpi, g_lo, g_hi, nc_g, &
        rho, r_lo, r_hi, &
@@ -419,6 +420,7 @@ contains
        bind(C, name="make_vel_force_noenergyfix_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
+    integer         , intent (in   ) :: is_final_update
     integer         , intent (in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent (in   ) :: g_lo(3), g_hi(3), nc_g
     integer         , intent (in   ) :: r_lo(3), r_hi(3)

@@ -69,8 +69,8 @@ Maestro::WritePlotFile (const int step,
 			plotfilename += "after_DivuIter";
 		} else {
 			plotfilename += + "_after_DivuIter";
-	}
-	else {
+        }
+	} else {
 		PlotFileName(step, &plotfilename);
 	}
 
