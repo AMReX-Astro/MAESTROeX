@@ -26,13 +26,13 @@ Maestro::WritePlotFile (const int step,
 
 	std::string plotfilename;
 
-	if (step == 9999999) {
+	if (step == plotInitData) {
 		plotfilename = "plt_InitData";
 	}
-	else if (step == 9999998) {
+	else if (step == plotInitProj) {
 		plotfilename = "plt_after_InitProj";
 	}
-	else if (step == 9999997) {
+	else if (step == plotDivuIter) {
 		plotfilename = "plt_after_DivuIter";
 	}
 	else {
