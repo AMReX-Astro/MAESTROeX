@@ -708,10 +708,10 @@ contains
     w0(0) = 0.d0
 
     do r=1,base_cutoff_density_coord(0)+1
-       LHS = r_edge_loc(0,r)**2 / r_cc_loc(0,r-1)**2 + &
+       LHS = r_edge_loc(0,r)**2 / (dr(0)*r_cc_loc(0,r-1)**2) - &
             (rho0_nph(0,r-1)*grav_cell(0,r-1) / (2.d0*gamma1bar_nph(r-1)*p0_nph(r-1)) )
 
-       RHS = r_edge_loc(0,r-1)**2 / r_cc_loc(0,r-1)**2 - &
+       RHS = r_edge_loc(0,r-1)**2 / (dr(0)*r_cc_loc(0,r-1)**2) + &
             (rho0_nph(0,r-1)*grav_cell(0,r-1) / (2.d0*gamma1bar_nph(r-1)*p0_nph(r-1)) )
        RHS = RHS * w0(r-1)
        RHS = RHS + Sbar_in(r-1) - 1.d0 / (gamma1bar_nph(r-1)*p0_nph(r-1)) * etarho_cc(r-1)
