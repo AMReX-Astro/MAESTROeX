@@ -179,11 +179,6 @@ The fields that are stored in the small plotfiles is set by the runtime
 parameter ``small_plot_vars``. This should be a (space-separated) list of the
 parameter names to be included in the plot file.
 
-Note that if both normal plots and small plots are enabled, normal plots will
-have priority. For example, if ``plot_int = 50`` and ``small_plot_int = 10``,
-normal plots will be produced every 50 timesteps, and small plots will be
-produced every 10 timesteps *excluding* the 50th timesteps when a normal plot
-is produced instead. 
 
 Visualizing with Amrvis
 =======================
