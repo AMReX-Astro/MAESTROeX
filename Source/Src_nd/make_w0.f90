@@ -15,7 +15,7 @@ module make_w0_module
                                         dr, r_start_coord, r_end_coord, restrict_base, nr, &
                                         fill_ghost_base, base_cutoff_density_coord, numdisjointchunks
   use meth_params_module, only: spherical, maestro_verbose, do_planar_invsq_grav, do_2d_planar_octant, &
-                                dpdt_factor, base_cutoff_density, use_exact_base_state
+                                dpdt_factor, base_cutoff_density, use_exact_base_state, average_base_state
 
   implicit none
 
@@ -87,13 +87,23 @@ contains
                                  etarho_ec(0,:),etarho_cc(0,:),w0_force(0,:), &
                                  r_cc_loc,r_edge_loc,dt,dtold)
        else
-          call make_w0_spherical(w0(0,:),w0_old(0,:),Sbar_in(0,:), &
-                                rho0_old(0,:),rho0_new(0,:), &
-                                p0_old(0,:),p0_new(0,:), &
-                                gamma1bar_old(0,:),gamma1bar_new(0,:), &
-                                p0_minus_peosbar(0,:), &
-                                etarho_ec(0,:),etarho_cc(0,:),w0_force(0,:), &
-                                r_cc_loc,r_edge_loc,dt,dtold)
+          if (average_base_state) then
+             call make_w0_spherical_simple(w0(0,:),Sbar_in(0,:), &
+                                           rho0_old(0,:),rho0_new(0,:), &
+                                           p0_old(0,:),p0_new(0,:), &
+                                           gamma1bar_old(0,:),gamma1bar_new(0,:), &
+                                           etarho_cc(0,:), &
+                                           r_cc_loc,r_edge_loc,dt)
+
+          else
+             call make_w0_spherical(w0(0,:),w0_old(0,:),Sbar_in(0,:), &
+                                   rho0_old(0,:),rho0_new(0,:), &
+                                   p0_old(0,:),p0_new(0,:), &
+                                   gamma1bar_old(0,:),gamma1bar_new(0,:), &
+                                   p0_minus_peosbar(0,:), &
+                                   etarho_ec(0,:),etarho_cc(0,:),w0_force(0,:), &
+                                   r_cc_loc,r_edge_loc,dt,dtold)
+          end if
        endif
           
     end if
@@ -549,7 +559,7 @@ contains
 
     ! These need the extra dimension so we can call make_grav_edge
     double precision ::  rho0_nph(0:0,0:nr_fine-1)
-    double precision :: grav_edge(0:0,0:nr_fine-1)
+    double precision :: grav_edge(0:0,0:nr_fine  )
 
     ! create time-centered base-state quantities
     do r=0,nr_fine-1
@@ -658,6 +668,63 @@ contains
     end do
 
   end subroutine make_w0_spherical
+
+  subroutine make_w0_spherical_simple(w0,Sbar_in, &
+                                      rho0_old,rho0_new,p0_old,p0_new, &
+                                      gamma1bar_old,gamma1bar_new,etarho_cc, &
+                                      r_cc_loc,r_edge_loc,dt)
+
+    double precision, intent(  out) ::            w0(0:nr_fine  )
+    double precision, intent(in   ) ::       Sbar_in(0:nr_fine-1)
+    double precision, intent(in   ) ::      rho0_old(0:nr_fine-1)
+    double precision, intent(in   ) ::      rho0_new(0:nr_fine-1)
+    double precision, intent(in   ) ::        p0_old(0:nr_fine-1)
+    double precision, intent(in   ) ::        p0_new(0:nr_fine-1)
+    double precision, intent(in   ) :: gamma1bar_old(0:nr_fine-1)
+    double precision, intent(in   ) :: gamma1bar_new(0:nr_fine-1)
+    double precision, intent(in   ) ::     etarho_cc(0:nr_fine-1) ! store dp0dt here
+    double precision, intent(in   ) ::      r_cc_loc(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::    r_edge_loc(0:max_radial_level,0:nr_fine  )
+    double precision, intent(in   ) :: dt
+
+    ! Local variables
+    integer :: r
+    double precision :: LHS, RHS
+    
+    double precision ::      rho0_nph(0:0,0:nr_fine-1)
+    double precision :: gamma1bar_nph(0:nr_fine-1)
+    double precision ::        p0_nph(0:nr_fine-1)
+    
+    double precision ::     grav_cell(0:0,0:nr_fine-1)
+
+    do r=0,nr_fine-1
+       p0_nph(r)        = HALF*(p0_old(r)        + p0_new(r))
+       rho0_nph(0,r)    = HALF*(rho0_old(r)      + rho0_new(r))
+       gamma1bar_nph(r) = HALF*(gamma1bar_old(r) + gamma1bar_new(r))
+    end do
+    
+    call make_grav_cell(grav_cell,rho0_nph,r_cc_loc,r_edge_loc)
+    
+    w0(0) = 0.d0
+
+    do r=1,base_cutoff_density_coord(0)+1
+       LHS = r_edge_loc(0,r)**2 / r_cc_loc(0,r-1)**2 - &
+            (rho0_nph(0,r-1)*grav_cell(0,r-1) / (2.d0*gamma1bar_nph(r-1)*p0_nph(r-1)) )
+
+       RHS = r_edge_loc(0,r-1)**2 / r_cc_loc(0,r-1)**2 - &
+            (rho0_nph(0,r-1)*grav_cell(0,r-1) / (2.d0*gamma1bar_nph(r-1)*p0_nph(r-1)) )
+       RHS = RHS * w0(r-1)
+       RHS = RHS + Sbar_in(r-1) - 1.d0 / (gamma1bar_nph(r-1)*p0_nph(r-1)) * etarho_cc(r-1)
+
+       w0(r) = RHS / LHS
+    end do
+
+    do r=base_cutoff_density_coord(0)+2,nr_fine
+       w0(r) = w0(base_cutoff_density_coord(0)+1)&
+            *r_edge_loc(0,base_cutoff_density_coord(0)+1)**2/r_edge_loc(0,r)**2
+    end do
+
+  end subroutine make_w0_spherical_simple
   
   subroutine prolong_base_to_uniform(base_ml, base_fine)
 
@@ -777,7 +844,7 @@ contains
 
     ! These need the extra dimension so we can call make_grav_edge
     double precision ::  rho0_nph(0:0,0:nr_fine-1)
-    double precision :: grav_edge(0:0,0:nr_fine-1)
+    double precision :: grav_edge(0:0,0:nr_fine  )
 
     ! create time-centered base-state quantities
     do r=0,nr_fine-1
