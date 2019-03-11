@@ -739,6 +739,10 @@ extern "C"
                      const amrex::Real* dx,
                      const amrex::Real* pi_cc, const int* p_lo, const int* p_hi, const int* nc,
                      amrex::Real* pidivuw0, const int* d_lo, const int* d_hi);
+
+    void make_abar(const int* lo, const int* hi,
+                 const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
+                 amrex::Real* abar, const int* a_lo, const int* a_hi);
 /////////////////////
 
     //////////////////////

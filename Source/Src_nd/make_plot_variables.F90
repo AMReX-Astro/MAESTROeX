@@ -6,7 +6,7 @@ module plot_variables_module
   use amrex_fort_module, only: amrex_spacedim
   use eos_type_module
   use eos_module
-  use network, only: nspec
+  use network, only: nspec, aion
   use meth_params_module, only: spherical, rho_comp, rhoh_comp, temp_comp, spec_comp, &
        pi_comp, use_pprime_in_tfromp, base_cutoff_density
   ! , pi_comp, &
@@ -1147,5 +1147,34 @@ contains
 
 
   end subroutine make_pidivu
+
+
+  subroutine make_abar(lo,hi,state,s_lo,s_hi,nc_s,abar,a_lo,a_hi) &
+       bind(C,name="make_abar")
+    !
+    ! This routine derives the mass fractions of the species.
+    !
+    integer, intent (in) :: lo(3), hi(3)
+    integer, intent (in) :: s_lo(3), s_hi(3), nc_s
+    integer, intent (in) :: a_lo(3), a_hi(3)
+    double precision, intent(in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent (inout) :: abar(a_lo(1):a_hi(1),a_lo(2):a_hi(2),a_lo(3):a_hi(3))
+
+    ! Local variables
+    integer :: i, j, k
+    double precision :: xn(nspec)
+
+    do k=lo(3),hi(3)
+       do j=lo(2),hi(2)
+          do i=lo(1),hi(1)
+             xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/state(i,j,k,rho_comp)
+             abar(i,j,k) = 1.0d0/(sum(xn(:)/aion(:)))
+          enddo
+       enddo
+    enddo
+
+
+
+end subroutine make_abar
 
 end module plot_variables_module
