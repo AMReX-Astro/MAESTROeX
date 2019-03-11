@@ -649,6 +649,10 @@ private:
                    const amrex::Vector<amrex::MultiFab>& pi_cc,
                    amrex::Vector<amrex::MultiFab>& pidivu);
 
+    // mass fractions of the species
+    void MakeAbar(const amrex::Vector<amrex::MultiFab>& state,
+                amrex::Vector<amrex::MultiFab>& abar);
+
     // end MaestroPlot.cpp functions
     ////////////
 
@@ -973,6 +977,9 @@ private:
     // therefore flux_reg[0] and flux_reg[max_level] are never actually
     // used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
+
+    // flag for writing plotfiles
+    enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
 };
 

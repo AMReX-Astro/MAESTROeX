@@ -29,7 +29,8 @@ Maestro::Init ()
 			if (spherical) { MakeNormal(); }
 
 			Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
-			WritePlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+
+			WritePlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
 		} else if (small_plot_int > 0) {
 
@@ -37,7 +38,7 @@ Maestro::Init ()
 			if (spherical) { MakeNormal(); }
 
 			Print() << "\nWriting small plotfile smallplt_InitData after InitData" << std::endl;
-			WriteSmallPlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+			WriteSmallPlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
 		}
 	}
@@ -129,13 +130,10 @@ Maestro::Init ()
 
 			if (plot_int > 0) {
 				Print() << "\nWriting plotfile plt_after_InitProj after InitProj" << std::endl;
-
-				WritePlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-
+				WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			} else if (small_plot_int > 0) {
 				Print() << "\nWriting small plotfile smallplt_after_InitProj after InitProj" << std::endl;
-
-				WriteSmallPlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+				WriteSmallPlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
 		}
 
@@ -151,10 +149,10 @@ Maestro::Init ()
 
 			if (plot_int > 0) {
 				Print() << "\nWriting plotfile plt_after_DivuIter after final DivuIter" << std::endl;
-				WritePlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+				WritePlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			} else if (small_plot_int > 0) {
 				Print() << "\nWriting small plotfile smallplt_after_DivuIter after final DivuIter" << std::endl;
-				WriteSmallPlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+				WriteSmallPlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
 		}
 
