@@ -395,7 +395,6 @@ contains
 
   end subroutine make_vel_force_sphr
 
-
   subroutine make_vel_force_noenergyfix_sphr(lo, hi, &
        vel_force, f_lo, f_hi, nc_f, &
        gpi, g_lo, g_hi, nc_g, &
@@ -406,6 +405,12 @@ contains
        normal, n_lo, n_hi, nc_n, &
        gradw0_cart, gw_lo, gw_hi, &
        w0_force_cart, wf_lo, wf_hi, nc_wf, &
+#ifdef ROTATION
+       w0_cart, wc_lo, wc_hi, nc_wc, &
+       w0macx, w0x_lo, w0x_hi, &
+       w0macy, w0y_lo, w0y_hi, &
+       uold, uo_lo, uo_hi, nc_uo, &
+#endif
        rho0, grav, beta0, &
        dx, &
        r_cc_loc, r_edge_loc, &
@@ -423,6 +428,12 @@ contains
     integer         , intent (in   ) :: n_lo(3), n_hi(3), nc_n
     integer         , intent (in   ) :: gw_lo(3), gw_hi(3)
     integer         , intent (in   ) :: wf_lo(3), wf_hi(3), nc_wf
+#ifdef ROTATION
+    integer         , intent (in   ) :: wc_lo(3), wc_hi(3), nc_wc
+    integer         , intent (in   ) :: w0x_lo(3), w0x_hi(3)
+    integer         , intent (in   ) :: w0y_lo(3), w0y_hi(3)
+    integer         , intent (in   ) :: uo_lo(3), uo_hi(3), nc_uo
+#endif
     double precision, intent (inout) :: vel_force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent (in   ) ::       gpi(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),nc_g)
     double precision, intent (in   ) ::       rho(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
@@ -432,6 +443,12 @@ contains
     double precision, intent (in   ) ::    normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),nc_n)
     double precision, intent (in   ) :: gradw0_cart(gw_lo(1):gw_hi(1),gw_lo(2):gw_hi(2),gw_lo(3):gw_hi(3))
     double precision, intent (in   ) :: w0_force_cart(wf_lo(1):wf_hi(1),wf_lo(2):wf_hi(2),wf_lo(3):wf_hi(3),nc_wf)
+#ifdef ROTATION
+    double precision, intent (in   ) ::    w0_cart(wc_lo(1):wc_hi(1),wc_lo(2):wc_hi(2),wc_lo(3):wc_hi(3), nc_wc)
+    double precision, intent (in   ) :: w0macx(w0x_lo(1):w0x_hi(1),w0x_lo(2):w0x_hi(2),w0x_lo(3):w0x_hi(3))
+    double precision, intent (in   ) :: w0macy(w0y_lo(1):w0y_hi(1),w0y_lo(2):w0y_hi(2),w0y_lo(3):w0y_hi(3))
+    double precision, intent (in   ) ::    uold(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2),uo_lo(3):uo_hi(3),nc_uo)
+#endif
     double precision, intent (in   ) ::     rho0(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) ::     grav(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) ::    beta0(0:max_radial_level,0:nr_fine-1)
@@ -451,6 +468,9 @@ contains
 
     double precision :: rhopert
     double precision :: xx, yy, zz
+#ifdef ROTATION
+    double precision :: centrifugal_term(3), coriolis_term(3)
+#endif
 
     double precision :: Ut_dot_er
 
@@ -481,6 +501,57 @@ contains
                 rhopert = 0.d0
              end if
 
+#ifdef ROTATION
+             ! Coriolis and centrifugal forces.  We assume that the
+             ! rotation axis is the z direction, with angular velocity
+             ! omega
+
+             ! omega x (omega x r ) = - omega^2 x e_x  - omega^2 y e_y
+             ! (with omega = omega e_z)
+             centrifugal_term(1) = -omega * omega * xx
+             centrifugal_term(2) = -omega * omega * yy
+             centrifugal_term(3) = ZERO
+
+             ! cutoff the centrifugal term if we are outside the star
+             if (rho(i,j,k) .lt. buoyancy_cutoff_factor*base_cutoff_density) then
+                centrifugal_term(:) = 0.d0
+             end if
+
+             ! 2 omega x U = - 2 omega v e_x  + 2 omega u e_y
+             ! (with omega = omega e_z)
+             if (is_final_update .eq. 1) then
+
+                ! use uedge so we are time-centered
+                coriolis_term(1) = -2.0d0 * omega * &
+                     HALF*(vedge(i,j,k)   + w0macy(i,j,k) + &
+                     vedge(i,j+1,k) + w0macy(i,j+1,k))
+
+                coriolis_term(2) =  2.0d0 * omega * &
+                     HALF*(uedge(i,j,k)   + w0macx(i,j,k) + &
+                     uedge(i+1,j,k) + w0macx(i+1,j,k))
+
+                coriolis_term(3) = ZERO
+
+             else
+                coriolis_term(1) = -2.0d0 * omega * (uold(i,j,k,2) + w0_cart(i,j,k,2))
+                coriolis_term(2) =  2.0d0 * omega * (uold(i,j,k,1) + w0_cart(i,j,k,1))
+                coriolis_term(3) = ZERO
+             endif
+
+             ! F_Coriolis = -2 omega x U
+             ! F_centrifugal = - omega x (omega x r)
+
+             ! we just computed the absolute value of the forces above, so use
+             ! the right sign here
+
+             ! note: if use_alt_energy_fix = T, then gphi is already weighted
+             ! by beta0
+             vel_force(i,j,k,1:3) = -coriolis_term(:) - centrifugal_term(:) + &
+                  ( rhopert * grav_cart(i,j,k,1:3) - &
+                  gpi(i,j,k,1:3) / beta0_cart(i,j,k,1:3) ) / rho(i,j,k) &
+                  - w0_force_cart(i,j,k,1:3)
+#else
+
              ! assume use_alt_energy_fix = T, but want use_alt_energy_fix = F
              ! hence, need to weigh gphi by beta0
              vel_force(i,j,k,1) = ( rhopert * grav_cart(i,j,k,1) - gpi(i,j,k,1)/beta0_cart(i,j,k,1) ) / rho(i,j,k) &
@@ -491,6 +562,8 @@ contains
 
              vel_force(i,j,k,3) = ( rhopert * grav_cart(i,j,k,3) - gpi(i,j,k,3)/beta0_cart(i,j,k,1) ) / rho(i,j,k) &
                   - w0_force_cart(i,j,k,3)
+
+#endif
 
           end do
        end do
@@ -523,4 +596,5 @@ contains
     call bl_deallocate(beta0_cart)
 
   end subroutine make_vel_force_noenergyfix_sphr
+
 end module make_vel_force_module

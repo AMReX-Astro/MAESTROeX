@@ -39,6 +39,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     }
 #endif
 
+<<<<<<< HEAD
 	if (spherical == 1) {
 		Vector<Real> gradw0( (max_radial_level+1)*nr_fine );
 		gradw0.shrink_to_fit();
@@ -46,6 +47,20 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 		compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
 
 		Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
+=======
+    if (spherical == 1) {
+        Vector<Real> gradw0( (max_radial_level+1)*nr_fine );
+        gradw0.shrink_to_fit();
+	
+	if (use_exact_base_state || average_base_state) {
+            std::fill(gradw0.begin(), gradw0.end(), 0.);
+	} else {
+	    compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
+	}
+	
+        Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
+    }
+>>>>>>> ed06471b6d16c77bf36c6ddf10d5b3f6d031295d
 
 #ifdef ROTATION
 		Put1dArrayOnCart(w0,w0_cart,1,1,bcs_f,0);
@@ -109,6 +124,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 			} else {
 
 #if (AMREX_SPACEDIM == 3)
+<<<<<<< HEAD
 
 		if ( (average_base_state || use_exact_base_state) && use_alt_energy_fix && is_predictor == 1) {
 		    make_vel_force_noenergyfix_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
@@ -129,6 +145,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 					BL_TO_FORTRAN_3D(cc_to_r[mfi]),
 					&do_add_utilde_force);
 		} else {
+=======
+>>>>>>> ed06471b6d16c77bf36c6ddf10d5b3f6d031295d
 		    make_vel_force_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                     &is_final_update,
 					BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
@@ -152,7 +170,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 					r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                                         BL_TO_FORTRAN_3D(cc_to_r[mfi]),
 					&do_add_utilde_force);
-		}
 #else
 				Abort("MakeVelForce: Spherical is not valid for DIM < 3");
 #endif
