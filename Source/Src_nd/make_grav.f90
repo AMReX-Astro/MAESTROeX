@@ -341,7 +341,7 @@ contains
        grav_edge(0,0) = zero 
        mencl = ZERO
 
-       do r=1,nr_fine-1
+       do r=1,nr_fine
 
           ! only add to the enclosed mass if the density is 
           ! > base_cutoff_density
