@@ -25,11 +25,11 @@ Maestro::Init ()
 
         if (plot_int > 0) {
 
-	    // Need to fill normal vector to compute velrc in plotfile 
+	    // Need to fill normal vector to compute velrc in plotfile
 	    if (spherical) { MakeNormal(); }
-	    
+
             Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
-            WritePlotFile(9999999,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+            WritePlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
         }
     }
     else {
@@ -57,7 +57,7 @@ Maestro::Init ()
                 cell_cc_to_r[lev].define(grids[lev], dmap[lev], 1, 0);
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0);             // nodal
-	    
+
         }
     }
 
@@ -66,7 +66,7 @@ Maestro::Init ()
     init_multilevel(tag_array.dataPtr(),&finest_level);
 
     compute_cutoff_coords(rho0_old.dataPtr());
-    
+
     if (spherical == 1) {
         MakeNormal();
         MakeCCtoRadii();
@@ -112,7 +112,7 @@ Maestro::Init ()
         for (int i=0; i<beta0_old.size(); ++i) {
             beta0_nm1[i] = beta0_old[i];
 	}
-	
+
         // initial projection
         if (do_initial_projection) {
             Print() << "Doing initial projection" << std::endl;
@@ -120,7 +120,7 @@ Maestro::Init ()
 
             if (plot_int > 0) {
                 Print() << "\nWriting plotfile plt_after_InitProj after InitProj" << std::endl;
-                WritePlotFile(9999998,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+                WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
             }
         }
 
@@ -136,7 +136,7 @@ Maestro::Init ()
 
             if (plot_int > 0) {
                 Print() << "\nWriting plotfile plt_after_DivuIter after final DivuIter" << std::endl;
-                WritePlotFile(9999997,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+                WritePlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
             }
         }
 
@@ -264,7 +264,7 @@ Maestro::InitData ()
             // set rhoh0 to be the average
             Average(sold,rhoh0_old,RhoH);
         }
-	
+
 	// set tempbar to be the average
 	Average(sold,tempbar,Temp);
 	for (int i=0; i<tempbar.size(); ++i) {

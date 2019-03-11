@@ -85,7 +85,7 @@ private:
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const amrex::Vector<amrex::Real>& w0_force,
 			const amrex::Vector<amrex::MultiFab>& w0_force_cart,
-			const amrex::Vector<amrex::Real>& beta0, 
+			const amrex::Vector<amrex::Real>& beta0,
 			const int is_predictor);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
@@ -182,7 +182,7 @@ private:
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
-    
+
     void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
                         const amrex::Vector<amrex::Real>& s0,
                         int comp, int bccomp,
@@ -340,7 +340,7 @@ private:
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
-    
+
     void Put1dArrayOnCart (int level, const amrex::Vector<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
@@ -938,6 +938,9 @@ private:
     // therefore flux_reg[0] and flux_reg[max_level] are never actually
     // used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
+
+    // flag for writing plotfiles
+    enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
 };
 

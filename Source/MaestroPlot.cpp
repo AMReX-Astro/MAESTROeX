@@ -26,13 +26,13 @@ Maestro::WritePlotFile (const int step,
 
 	std::string plotfilename;
 
-	if (step == 9999999) {
+	if (step == plotInitData) {
 		plotfilename = "plt_InitData";
 	}
-	else if (step == 9999998) {
+	else if (step == plotInitProj) {
 		plotfilename = "plt_after_InitProj";
 	}
-	else if (step == 9999997) {
+	else if (step == plotDivuIter) {
 		plotfilename = "plt_after_DivuIter";
 	}
 	else {
@@ -975,7 +975,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 	BL_PROFILE_VAR("Maestro::MakeMagvel()",MakeMagvel);
 
         Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
-	
+
 #if (AMREX_SPACEDIM == 3)
         if (spherical == 1) {
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -1022,7 +1022,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 
 				// Get the index space of the valid region
 				const Box& tileBox = mfi.tilebox();
-                                
+
                                 MultiFab& w0macx_mf = w0mac[lev][0];
                                 MultiFab& w0macy_mf = w0mac[lev][1];
                                 MultiFab& w0macz_mf = w0mac[lev][2];
