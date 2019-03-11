@@ -432,9 +432,19 @@ multifab instead of the default $rho <a href="#id1"><span class="problematic" id
 <td>plot interval</td>
 <td>0</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_deltat</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">small_plot_int</span></code></td>
+<td>small plot interval</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_deltat</span></code></td>
 <td>rather than use a plot interval, plot a file after the
 solution has advanced past plot_deltat in time</td>
+<td>-1.0</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">small_plot_deltat</span></code></td>
+<td>rather than use a plot interval, plot a small plotfile
+after the solution has advanced past
+small_plot_deltat in time</td>
 <td>-1.0</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">chk_int</span></code></td>
@@ -487,29 +497,37 @@ p0 in plotfile</td>
 <td>prefix to use in plotfile file names</td>
 <td>“plt”</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">check_base_name</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">small_plot_base_name</span></code></td>
+<td>prefix to use in small plotfile file names</td>
+<td>“smallplt”</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">check_base_name</span></code></td>
 <td>prefix to use in checkpoint file names</td>
 <td>“chk”</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">diag_buf_size</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">diag_buf_size</span></code></td>
 <td>number of timesteps to buffer diagnostic output
 information before writing (note: not implemented for
 all problems)</td>
 <td>10</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_ad_excess</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_ad_excess</span></code></td>
 <td>plot the adiabatic excess</td>
 <td>false</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_processors</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_processors</span></code></td>
 <td>create a field in the plotfile storing the processor
 number for each zone</td>
 <td>false</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">plot_pidivu</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">plot_pidivu</span></code></td>
 <td>plot pi * div(U) – this is a measure of conservation
 of energy</td>
 <td>false</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">small_plot_vars</span></code></td>
+<td>small plot file variables</td>
+<td>“rho</td>
 </tr>
 </tbody>
 </table>

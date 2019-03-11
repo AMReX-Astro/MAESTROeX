@@ -106,7 +106,7 @@
 <li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Visualization</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#plotfiles">Plotfiles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#mini-vs-regular-plotfiles">Mini vs.&nbsp;regular plotfiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#small-vs-regular-plotfiles">Small vs.&nbsp;regular plotfiles</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-with-amrvis">Visualizing with Amrvis</a></li>
@@ -492,33 +492,21 @@ conservation)</td>
 </tr>
 </tbody>
 </table>
-<div class="section" id="mini-vs-regular-plotfiles">
-<span id="vis-sec-miniplotfile"></span><h3>Mini vs.&nbsp;regular plotfiles<a class="headerlink" href="#mini-vs-regular-plotfiles" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="small-vs-regular-plotfiles">
+<span id="vis-sec-miniplotfile"></span><h3>Small vs.&nbsp;regular plotfiles<a class="headerlink" href="#small-vs-regular-plotfiles" title="Permalink to this headline">¶</a></h3>
 <p>MAESTRO&nbsp;can manage two independent sets of plotfiles. This allows you to
 output the default plotfiles, which contain a lot of variables, sparsely,
-and output mini-plotfiles much more frequently. A mini-plotfile is controlled
+and output small-plotfiles much more frequently. A small-plotfile is controlled
 by the analogous runtime parameters as the main plotfiles:</p>
 <ul class="simple">
-<li>mini_plot_int is the interval in steps between successive plotfiles</li>
-<li>mini_plot_deltat is the interval in time between successive plotfiles</li>
-<li>mini_plot_base_name is the base name that prefixes the plotfiles. The
-default is miniplt</li>
+<li><code class="docutils literal notranslate"><span class="pre">small_plot_int</span></code> is the interval in steps between successive plotfiles</li>
+<li><code class="docutils literal notranslate"><span class="pre">small_plot_deltat</span></code> is the interval in time between successive plotfiles</li>
+<li><code class="docutils literal notranslate"><span class="pre">small_plot_base_name</span></code> is the base name that prefixes the plotfiles. The
+default is smallplt</li>
 </ul>
-<p>To set the fields that are stored in the mini plotfile, a second set
-of runtime parameters is used: mini_plot_var1,
-mini_plot_var2, <span class="math notranslate nohighlight">\(\ldots\)</span>, mini_plot_var9. These can be set to
-any of the following:</p>
-<ul class="simple">
-<li>“density”</li>
-<li>“species”: this gets all of the mass fractions</li>
-<li>the name of an individual species in the network (like “helium-4”)</li>
-<li>“radvel”: this gets both the radial and circumferential velocity</li>
-<li>“velocity”: all three componets</li>
-<li>“temperature”: this is either <span class="math notranslate nohighlight">\(T(\rho,p_0)\)</span> or <span class="math notranslate nohighlight">\(T(\rho,h)\)</span>, depending
-on the value of use_tfromp</li>
-<li>“enuc”: the nuclear energy generation rate</li>
-<li>“mach”: the Mach number</li>
-</ul>
+<p>The fields that are stored in the small plotfiles is set by the runtime
+parameter <code class="docutils literal notranslate"><span class="pre">small_plot_vars</span></code>. This should be a (space-separated) list of the
+parameter names to be included in the plot file.</p>
 </div>
 </div>
 <div class="section" id="visualizing-with-amrvis">
