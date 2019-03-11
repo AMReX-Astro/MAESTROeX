@@ -15,10 +15,10 @@ Maestro::Regrid ()
 
     Vector<Real> rho0_temp ( (max_radial_level+1)*nr_fine );
     rho0_temp.shrink_to_fit();
-    
+
     if (spherical == 0) {
         finest_radial_level = finest_level;
-	
+
         // look at MAESTRO/Source/varden.f90:750-1060
 	// Regrid psi, etarho_cc, etarho_ec, and w0.
 	// We do not regrid these in spherical since the base state array only
@@ -29,8 +29,8 @@ Maestro::Regrid ()
 
 	    // We must regrid psi, etarho_cc, etarho_ec, and w0
 	    // before we call init_multilevel or else we lose
-	    // track of where the old valid data was 
-	    
+	    // track of where the old valid data was
+
             // FIXME: may need if statement for irregularly-spaced base states
 
 	    regrid_base_state_cc(psi.dataPtr());
@@ -47,12 +47,12 @@ Maestro::Regrid ()
 	    for (int i=0; i<rho0_old.size(); ++i) {
 		rho0_temp[i] = rho0_old[i];
 	    }
-	    
+
 	    // We will copy rho0_temp back into the rho0 array after we regrid.
 	    regrid_base_state_cc(rho0_temp.dataPtr());
-	    
+
         }
-	
+
 	// regardless of evolve_base_state, if new grids were
 	// created, we need to initialize tempbar_init there, in
 	// case drive_initial_convection = T
@@ -68,14 +68,14 @@ Maestro::Regrid ()
 	TagArray();
     }
     init_multilevel(tag_array.dataPtr(),&finest_level);
-	
+
     if (spherical == 1) {
         MakeNormal();
 	if (use_exact_base_state) {
 	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
 	}
     }
-    
+
     if (evolve_base_state) {
         // force rho0 to be the average of rho
         Average(sold,rho0_old,Rho);
@@ -84,7 +84,7 @@ Maestro::Regrid ()
 	    rho0_old[i] = rho0_temp[i];
 	}
     }
-    
+
     // compute cutoff coordinates
     compute_cutoff_coords(rho0_old.dataPtr());
 
@@ -145,15 +145,15 @@ Maestro::TagArray ()
     if (spherical == 1) {
         return;
     }
-    
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagArray()",TagArray);
 
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
-            
+
     for (int lev=1; lev<=max_radial_level; ++lev) {
-	
+
 	const MultiFab& state = sold[lev];
 
         {
@@ -165,7 +165,7 @@ Maestro::TagArray ()
 
                 // re-compute tag_array since the actual grid structure changed due to buffering
                 // this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
-                retag_array(&tagval, &clearval, 
+                retag_array(&tagval, &clearval,
                             ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                             &lev, tag_array.dataPtr());
             }
@@ -189,14 +189,14 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     if (use_tpert_in_tagging) {
 	PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,true);
     }
-    
+
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
 
     const Real* dx      = geom[lev].CellSize();
 
     const MultiFab& state = sold[lev];
-    
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -204,7 +204,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         Vector<int>  itags;
 
         for (MFIter mfi(state, true); mfi.isValid(); ++mfi) {
-            
+
             const Box& tilebox  = mfi.tilebox();
 
             TagBox&     tagfab  = tags[mfi];
@@ -242,7 +242,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         // height
         if (spherical == 0) {
             ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
-        
+
 	    for (MFIter mfi(state, true); mfi.isValid(); ++mfi) {
 
                 const Box& tilebox  = mfi.tilebox();
@@ -265,7 +265,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
                           &tagval, &clearval,
                           ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                           ZFILL(dx), &time, &lev, tag_array.dataPtr());
-		    
+
                 //
                 // Now update the tags in the TagBox in the tilebox region
                 // to be equal to itags
@@ -274,7 +274,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
             }
 	}
     }
-    
+
     // convert back to full temperature states
     if (use_tpert_in_tagging) {
         PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,false);
@@ -339,7 +339,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
         std::swap(      normal_state,      normal[lev]);
         std::swap(cell_cc_to_r_state,cell_cc_to_r[lev]);
     }
-    
+
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
     }
@@ -371,7 +371,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
         normal      [lev].define(ba, dm, 3, 1);
         cell_cc_to_r[lev].define(ba, dm, 1, 0);
     }
-    
+
     if (lev > 0 && do_reflux) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
     }

@@ -562,7 +562,7 @@ private:
     // MaestroPlot.cpp functions
 
     // get plotfile name
-    std::string PlotFileName (int lev) const;
+    void PlotFileName (const int lev, std::string* plotfilename);
 
     // put together an array of multifabs for writing
     amrex::Vector<const amrex::MultiFab*> PlotFileMF (const int nPlot,
@@ -578,8 +578,29 @@ private:
                                                       const amrex::Vector<amrex::Real>& gamma1bar_in,
                                                       const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
+    amrex::Vector<const amrex::MultiFab*> SmallPlotFileMF(const int nPlot,
+                           const int nSmallPlot,
+                           amrex::Vector<const amrex::MultiFab*> mf,
+                           const amrex::Vector<std::string> varnames,
+                           const amrex::Vector<std::string> small_plot_varnames);
+
     // set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames (int * nPlot) const;
+
+    // set small plotfile variables names
+    amrex::Vector<std::string> SmallPlotFileVarNames (int * nPlot, amrex::Vector<std::string> varnames) const;
+
+    // write a small plotfile to disk
+    void WriteSmallPlotFile (const int step,
+                        const amrex::Real t_in,
+                        const amrex::Real dt_in,
+                        const amrex::Vector<amrex::Real>& rho0_in,
+                        const amrex::Vector<amrex::Real>& rhoh0_in,
+                        const amrex::Vector<amrex::Real>& p0_in,
+                        const amrex::Vector<amrex::Real>& gamma1bar_in,
+                        const amrex::Vector<amrex::MultiFab>& u_in,
+                        amrex::Vector<amrex::MultiFab>& s_in,
+                        const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     // write plotfile to disk
     void WritePlotFile (const int step,
@@ -591,7 +612,8 @@ private:
                         const amrex::Vector<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in,
-                        const amrex::Vector<amrex::MultiFab>& S_cc_in);
+                        const amrex::Vector<amrex::MultiFab>& S_cc_in,
+                        const bool is_small = false);
 
     void WriteJobInfo (const std::string& dir) const;
 

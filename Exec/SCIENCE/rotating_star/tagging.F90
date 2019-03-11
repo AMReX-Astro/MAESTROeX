@@ -1,7 +1,9 @@
 module tagging_module
 
+  use amrex_error_module
   use meth_params_module, only: temp_comp, rho_comp, nscal
   use probin_module, only: tag_density_3
+  use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
 
@@ -30,7 +32,8 @@ contains
        state,state_lo,state_hi, &
        set,clear,&
        lo,hi,&
-       dx,time) bind(C, name="state_error")
+       dx,time,&
+       lev,tag_array) bind(C, name="state_error")
 
     integer          :: lo(3),hi(3)
     integer          :: state_lo(3),state_hi(3)
@@ -40,7 +43,8 @@ contains
          state_lo(3):state_hi(3), 1:nscal)
     integer          :: tag(tag_lo(1):tag_hi(1),tag_lo(2):tag_hi(2),tag_lo(3):tag_hi(3))
     double precision :: dx(3),time
-    integer          :: set,clear
+    integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
+    integer          :: set,clear,lev
 
     ! local
     integer          :: i, j, k
@@ -57,5 +61,34 @@ contains
     enddo
 
   end subroutine state_error
+
+  subroutine tag_boxes(tag,tag_lo,tag_hi, &
+                        set,clear,&
+                        lo,hi,&
+                        dx,time,&
+                        lev,tag_array) bind(C, name="tag_boxes")
+
+    integer          :: lo(3),hi(3)
+    integer          :: tag_lo(3),tag_hi(3)
+    integer          :: tag(tag_lo(1):tag_hi(1),tag_lo(2):tag_hi(2),tag_lo(3):tag_hi(3))
+    double precision :: dx(3),time
+    integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
+    integer          :: set,clear,lev
+
+    call amrex_error("tag_boxes not needed for spherical")
+
+  end subroutine tag_boxes
+
+  subroutine retag_array(set,clear,&
+                          lo,hi,&
+                          lev,tag_array) bind(C, name="retag_array")
+
+    integer          :: lo(3),hi(3)
+    integer          :: tag_array(0:max_radial_level,0:nr_fine-1)
+    integer          :: set,clear,lev
+
+    call amrex_error("retag_array not needed for spherical")
+
+  end subroutine retag_array
 
 end module tagging_module
