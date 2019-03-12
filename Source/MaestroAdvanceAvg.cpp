@@ -447,8 +447,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt = etarho * grav_cell
-	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
+	// hold dp0/dt in psi for enthalpy advance
+	for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_old[i] - p0_nm1[i])/dtold;
+        }
 	
     }
     else {
@@ -740,8 +742,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt = etarho * grav_const
-	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
+	// hold dp0/dt in psi for enthalpy advance
+	for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
+        }
     }
 
     // base state enthalpy averaging

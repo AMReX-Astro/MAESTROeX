@@ -326,6 +326,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	delta_gamma1_term[lev].setVal(0.);
     }
 
+    // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
+    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
+		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
+    
     // subtract w0mac from umac
     for (int lev = 0; lev <= finest_level; ++lev) {
 	for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -333,10 +337,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	}
     }
  
-    // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
-		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
-    
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
@@ -433,9 +433,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	for (int i=0; i<p0_nph.size(); ++i) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
-
-	// set psi to dpdt = etarho * grav_cell
-	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
+	
+	// hold dp0/dt in psi for enthalpy advance
+	for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_old[i] - p0_nm1[i])/dtold;
+        }
 	
     }
     else {
@@ -717,9 +719,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 	
-	// set psi to dpdt = etarho * grav_const
-	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
-
+	// hold dp0/dt in psi for enthalpy advance
+	for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
+        }
     }
 
     // base state enthalpy averaging
