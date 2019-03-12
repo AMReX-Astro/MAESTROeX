@@ -900,17 +900,17 @@ contains
        dr3 = r_cc_loc(0,r) - r_cc_loc(0,r-1)
        
        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2
-       A(r) = A(r) / dr1**2
+       A(r) = A(r) / dr1 / dr3
 
-       B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2 / dr1**2 &
-                +gamma1bar_nph(r  ) * p0_nph(r  ) / r_cc_loc(0,r  )**2 / dr2**2 ) 
+       B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2 / dr1 &
+                +gamma1bar_nph(r  ) * p0_nph(r  ) / r_cc_loc(0,r  )**2 / dr2 ) / dr3 
 
        dpdr = (p0_nph(r)-p0_nph(r-1))/dr3
 
        B(r) = B(r) - four * dpdr / (r_edge_loc(0,r))**3
 
        C(r) = gamma1bar_nph(r) * p0_nph(r) / r_cc_loc(0,r)**2
-       C(r) = C(r) / dr2**2
+       C(r) = C(r) / dr2 / dr3
 
        F(r) = four * dpdr * w0_from_Sbar(r) / r_edge_loc(0,r) - &
               grav_edge(0,r) * (r_cc_loc(0,r  )**2 * etarho_cc(r  ) - &
@@ -957,7 +957,7 @@ contains
        div_avg = HALF * (dt * (w0_old(r+1)-w0_old(r)) + dtold * (w0(r+1)-w0(r))) / dt_avg
        w0_force(r) = (w0_new_cen(r)-w0_old_cen(r)) / dt_avg + w0_avg * div_avg / dr1
     end do
-
+    
   end subroutine make_w0_sphr_irreg
   
 end module make_w0_module

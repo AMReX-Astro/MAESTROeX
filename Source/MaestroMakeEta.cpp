@@ -143,8 +143,8 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 
 	double dr1, dr2;
 	for (int r=1; r<nr_fine; ++r) {
-	    dr1 = r_cc_loc[r] - r_edge_loc[r-1];
-	    dr2 = r_edge_loc[r-1] - r_cc_loc[r-1];
+	    dr1 = r_cc_loc[r] - r_edge_loc[r];
+	    dr2 = r_edge_loc[r] - r_cc_loc[r-1];
 	    etarho_edge[r] = (dr2*etarho_cell[r] + dr1*etarho_cell[r-1])/(dr1+dr2);
 	}
 
