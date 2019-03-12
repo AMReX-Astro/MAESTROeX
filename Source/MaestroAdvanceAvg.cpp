@@ -290,10 +290,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         // save old-time value
         w0_old = w0;
 
+        /*
         // hold dp0/dt in etarho_cc
 	for (int i=0; i<etarho_cc.size(); ++i) {
             etarho_cc[i] = (p0_old[i] - p0_nm1[i])/dtold;
         }
+        */
         
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
@@ -607,10 +609,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             }
         }
 
+        /*
         // hold dp0/dt in etarho_cc
 	for (int i=0; i<etarho_cc.size(); ++i) {
             etarho_cc[i] = (p0_new[i] - p0_old[i])/dt;
         }
+        */
         
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
@@ -835,10 +839,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             }
         }
 
+        /*
         // hold dp0/dt in etarho_cc
 	for (int i=0; i<etarho_cc.size(); ++i) {
             etarho_cc[i] = (p0_new[i] - p0_old[i])/dt;
         }
+        */
         
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
