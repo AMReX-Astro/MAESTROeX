@@ -955,7 +955,9 @@ private:
     amrex::Vector<int> tag_array;
 
     // diag file array buffers
-    amrex::Vector<amrex::Real> diagfile_data;
+    amrex::Vector<amrex::Real> diagfile1_data;
+    amrex::Vector<amrex::Real> diagfile2_data;
+    amrex::Vector<amrex::Real> diagfile3_data;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+1"

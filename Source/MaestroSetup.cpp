@@ -140,7 +140,9 @@ Maestro::Setup ()
     tag_array .resize( (max_radial_level+1)*nr_fine );
 
     // diag file data arrays
-    diagfile_data.resize(diag_buf_size*12);
+    diagfile1_data.resize(diag_buf_size*11);
+    diagfile2_data.resize(diag_buf_size*11);
+    diagfile3_data.resize(diag_buf_size*10);
 
     // make sure C++ is as efficient as possible with memory usage
     s0_init      .shrink_to_fit();
@@ -168,7 +170,9 @@ Maestro::Setup ()
     r_cc_loc     .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
     tag_array    .shrink_to_fit();
-    diagfile_data.shrink_to_fit();
+    diagfile1_data.shrink_to_fit();
+    diagfile2_data.shrink_to_fit();
+    diagfile3_data.shrink_to_fit();
 
     init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
 			     r_cc_loc.dataPtr(),
