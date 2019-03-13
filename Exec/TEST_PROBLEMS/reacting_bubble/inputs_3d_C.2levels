@@ -7,7 +7,7 @@ maestro.ppm_type = 1
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
-geometry.prob_hi     =  1.8e7  1.8e7  2.16e8
+geometry.prob_hi     =  3.6e7  3.6e7  2.88e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -24,7 +24,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 32 32 384
+amr.n_cell             = 32 32 256
 amr.max_grid_size      = 32
 amr.max_level          = 1       # maximum level number allowed
 maestro.regrid_int     = 4       # how often to regrid
