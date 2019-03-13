@@ -449,7 +449,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
 	// hold dp0/dt in psi for enthalpy advance
 	for (int i=0; i<p0_old.size(); ++i) {
-            psi[i] = (p0_old[i] - p0_nm1[i])/dtold;
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
         }
 	
     }
