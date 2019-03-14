@@ -123,6 +123,15 @@ endif
 table:
 	@if [ ! -f helm_table.dat ]; then echo Linking helm_table.dat; ln -s $(EOS_PATH)/helm_table.dat .;  fi
 
+# some networks have .dat files that need to be linked
+NET_DAT_FILES = $(wildcard $(NETWORK_PATH)/*.dat)
+ifneq ($(NET_DAT_FILES),)
+   all: net_dat
+endif
+
+net_dat:
+	$(foreach dat,$(NET_DAT_FILES),$(shell ln -s $(dat) .))
+
 EXTERN_CORE += $(NETWORK_HOME)
 EXTERN_CORE += $(NETWORK_PATH)
 
@@ -156,9 +165,9 @@ include $(Bpack)
 INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
 
-include $(AMREX_HOME)/Src/LinearSolvers/C_to_F_MG/Make.package
-include $(AMREX_HOME)/Src/LinearSolvers/F_MG/FParallelMG.mak
-include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
+#include $(AMREX_HOME)/Src/LinearSolvers/C_to_F_MG/Make.package
+#include $(AMREX_HOME)/Src/LinearSolvers/F_MG/FParallelMG.mak
+#include $(AMREX_HOME)/Src/F_BaseLib/FParallelMG.mak
 
 #------------------------------------------------------------------------------
 # runtime parameters

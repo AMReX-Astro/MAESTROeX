@@ -102,8 +102,8 @@ contains
 #if (AMREX_SPACEDIM == 3)
                   + wbar*(uedgez(i,j,k+1,2) - uedgez(i,j,k,2))/dx(3) &
 #endif
-#endif
                   )
+#endif
 
 #if (AMREX_SPACEDIM == 3)
              ugradw = ubar*(uedgex(i+1,j,k,3) - uedgex(i,j,k,3))/dx(1) &

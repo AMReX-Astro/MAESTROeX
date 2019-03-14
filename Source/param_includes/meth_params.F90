@@ -36,6 +36,7 @@ module meth_params_module
   logical                       , save :: octant
   integer                       , save :: do_2d_planar_octant
   integer                       , save :: drdxfac
+  logical                       , save :: use_tpert_in_tagging
   logical                       , save :: do_sponge
   double precision              , save :: sponge_kappa
   double precision              , save :: sponge_center_density
@@ -49,6 +50,7 @@ module meth_params_module
   double precision              , save :: planar_invsq_mass
   logical                       , save :: evolve_base_state
   logical                       , save :: use_exact_base_state
+  logical                       , save :: average_base_state
   logical                       , save :: do_eos_h_above_cutoff
   integer                       , save :: enthalpy_pred_type
   integer                       , save :: species_pred_type
@@ -104,6 +106,7 @@ contains
     octant = .false.;
     do_2d_planar_octant = 0;
     drdxfac = 1;
+    use_tpert_in_tagging = .false.;
     do_sponge = .false.;
     sponge_kappa = 10.d0;
     sponge_center_density = 3.d6;
@@ -117,6 +120,7 @@ contains
     planar_invsq_mass = 0.0d0;
     evolve_base_state = .true.;
     use_exact_base_state = .false.;
+    average_base_state = .false.;
     do_eos_h_above_cutoff = .true.;
     enthalpy_pred_type = 1;
     species_pred_type = 1;
@@ -160,6 +164,7 @@ contains
     call pp%query("octant", octant)
     call pp%query("do_2d_planar_octant", do_2d_planar_octant)
     call pp%query("drdxfac", drdxfac)
+    call pp%query("use_tpert_in_tagging", use_tpert_in_tagging)
     call pp%query("do_sponge", do_sponge)
     call pp%query("sponge_kappa", sponge_kappa)
     call pp%query("sponge_center_density", sponge_center_density)
@@ -173,6 +178,7 @@ contains
     call pp%query("planar_invsq_mass", planar_invsq_mass)
     call pp%query("evolve_base_state", evolve_base_state)
     call pp%query("use_exact_base_state", use_exact_base_state)
+    call pp%query("average_base_state", average_base_state)
     call pp%query("do_eos_h_above_cutoff", do_eos_h_above_cutoff)
     call pp%query("enthalpy_pred_type", enthalpy_pred_type)
     call pp%query("species_pred_type", species_pred_type)

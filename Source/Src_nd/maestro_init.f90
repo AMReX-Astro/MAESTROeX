@@ -1,15 +1,15 @@
 
 module maestro_init_module
 
+  use amrex_error_module
   use network, only: network_init, nspec, short_spec_names
-  use parallel, only: parallel_IOProcessor
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp, &
        nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
   use eos_module, only: eos_init
   use runtime_init_module
-
   implicit none
 
   private
@@ -18,7 +18,10 @@ contains
 
   subroutine maestro_network_init() bind(C, name="maestro_network_init")
 
+    use actual_rhs_module, only: actual_rhs_init
+
     call network_init()
+    call actual_rhs_init()
 
   end subroutine maestro_network_init
 
@@ -26,19 +29,31 @@ contains
   ! ::: ----------------------------------------------------------------
   ! :::
 
-  subroutine maestro_extern_init(name,namlen) bind(C, name="maestro_extern_init")
+  subroutine maestro_extern_init() bind(C, name="maestro_extern_init")
 
     ! initialize the external runtime parameters in
     ! extern_probin_module
 
     use amrex_fort_module, only: rt => amrex_real
-
-    integer, intent(in) :: namlen
-    integer, intent(in) :: name(namlen)
     !
-    call runtime_init(name,namlen)
+    call runtime_init()
 
   end subroutine maestro_extern_init
+
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine maestro_conductivity_init() bind(C, name="maestro_conductivity_init")
+
+    ! initialize the external runtime parameters in
+    ! extern_probin_module
+
+    use conductivity_module, only: conductivity_init
+
+    call conductivity_init()
+
+  end subroutine maestro_conductivity_init
 
   ! :::
   ! ::: ----------------------------------------------------------------
@@ -140,14 +155,14 @@ contains
 
     if (small_dens <= 0.d0) then
        if (ioproc == 1) then
-          call bl_warning("Warning:: small_dens has not been set, defaulting to 1.d-200.")
+          call amrex_warning("Warning:: small_dens has not been set, defaulting to 1.d-200.")
        endif
        small_dens = 1.d-200
     endif
 
     if (small_temp <= 0.d0) then
        if (ioproc == 1) then
-          call bl_warning("Warning:: small_temp has not been set, defaulting to 1.d-200.")
+          call amrex_warning("Warning:: small_temp has not been set, defaulting to 1.d-200.")
        endif
        small_temp = 1.d-200
     endif

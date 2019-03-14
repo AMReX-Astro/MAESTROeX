@@ -8,7 +8,6 @@
 #include <AMReX_AmrCore.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
-#include <AMReX_FMultiGrid.H>
 #include <AMReX_MLABecLaplacian.H>
 #include <AMReX_MLMG.H>
 #include <AMReX_MultiFabUtil.H>
@@ -85,7 +84,9 @@ private:
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const amrex::Vector<amrex::Real>& w0_force,
-			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
+			const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+			const amrex::Vector<amrex::Real>& beta0,
+			const int is_predictor);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
@@ -177,6 +178,12 @@ private:
     ////////////
     // MaestroConvert.cpp functions
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
+                        const amrex::Vector<amrex::Real>& s0,
+                        int comp, int bccomp,
+                        const amrex::Vector<amrex::BCRec>& bcs_in,
+                        bool flag);
+
+    void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
                         const amrex::Vector<amrex::Real>& s0,
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
@@ -334,6 +341,13 @@ private:
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
 
+    void Put1dArrayOnCart (int level, const amrex::Vector<amrex::Real>& s0,
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);
+
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
 		const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                 const amrex::Real& mult);
@@ -362,6 +376,8 @@ private:
                        const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
 		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+		       const amrex::Vector<amrex::Real>& beta0,
+		       const int is_predictor,
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
@@ -546,29 +562,92 @@ private:
     // MaestroPlot.cpp functions
 
     // get plotfile name
-    std::string PlotFileName (int lev) const;
+    void PlotFileName (const int lev, std::string* plotfilename);
 
     // put together an array of multifabs for writing
-    amrex::Vector<const amrex::MultiFab*> PlotFileMF (const amrex::Vector<amrex::MultiFab>& rho0_cart,
+    amrex::Vector<const amrex::MultiFab*> PlotFileMF (const int nPlot,
+                                                      const amrex::Real t_in,
+                                                      const amrex::Real dt_in,
+                                                      const amrex::Vector<amrex::MultiFab>& rho0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& rhoh0_cart,
                                                       const amrex::Vector<amrex::MultiFab>& p0_cart,
+                                                      const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
                                                       const amrex::Vector<amrex::MultiFab>& u_in,
                                                       amrex::Vector<amrex::MultiFab>& s_in,
-                                                      const amrex::Vector<amrex::Real>& p0_in);
+                                                      const amrex::Vector<amrex::Real>& p0_in,
+                                                      const amrex::Vector<amrex::Real>& gamma1bar_in,
+                                                      const amrex::Vector<amrex::MultiFab>& S_cc_in);
+
+    amrex::Vector<const amrex::MultiFab*> SmallPlotFileMF(const int nPlot,
+                           const int nSmallPlot,
+                           amrex::Vector<const amrex::MultiFab*> mf,
+                           const amrex::Vector<std::string> varnames,
+                           const amrex::Vector<std::string> small_plot_varnames);
 
     // set plotfile variables names
-    amrex::Vector<std::string> PlotFileVarNames () const;
+    amrex::Vector<std::string> PlotFileVarNames (int * nPlot) const;
 
-    // write plotfile to disk
-    void WritePlotFile (const int step,
+    // set small plotfile variables names
+    amrex::Vector<std::string> SmallPlotFileVarNames (int * nPlot, amrex::Vector<std::string> varnames) const;
+
+    // write a small plotfile to disk
+    void WriteSmallPlotFile (const int step,
+                        const amrex::Real t_in,
                         const amrex::Real dt_in,
                         const amrex::Vector<amrex::Real>& rho0_in,
                         const amrex::Vector<amrex::Real>& rhoh0_in,
                         const amrex::Vector<amrex::Real>& p0_in,
+                        const amrex::Vector<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
-                        amrex::Vector<amrex::MultiFab>& s_in);
+                        amrex::Vector<amrex::MultiFab>& s_in,
+                        const amrex::Vector<amrex::MultiFab>& S_cc_in);
+
+    // write plotfile to disk
+    void WritePlotFile (const int step,
+                        const amrex::Real t_in,
+                        const amrex::Real dt_in,
+                        const amrex::Vector<amrex::Real>& rho0_in,
+                        const amrex::Vector<amrex::Real>& rhoh0_in,
+                        const amrex::Vector<amrex::Real>& p0_in,
+                        const amrex::Vector<amrex::Real>& gamma1bar_in,
+                        const amrex::Vector<amrex::MultiFab>& u_in,
+                        amrex::Vector<amrex::MultiFab>& s_in,
+                        const amrex::Vector<amrex::MultiFab>& S_cc_in,
+                        const bool is_small = false);
 
     void WriteJobInfo (const std::string& dir) const;
+
+    void MakeMagvel (const amrex::Vector<amrex::MultiFab>& vel,
+                     amrex::Vector<amrex::MultiFab>& magvel);
+
+    void MakeVelrc (const amrex::Vector<amrex::MultiFab>& vel,
+                    const amrex::Vector<amrex::MultiFab>& w0rcart,
+                    amrex::Vector<amrex::MultiFab>& rad_vel,
+                    amrex::Vector<amrex::MultiFab>& circ_vel);
+
+    void MakeAdExcess (const amrex::Vector<amrex::MultiFab>& state,
+                       amrex::Vector<amrex::MultiFab>& ad_excess);
+
+    void MakeVorticity (const amrex::Vector<amrex::MultiFab>& vel,
+                        amrex::Vector<amrex::MultiFab>& vorticity);
+
+    void MakeDeltaGamma (const amrex::Vector<amrex::MultiFab>& state,
+                         const amrex::Vector<amrex::Real>& p0,
+                         const amrex::Vector<amrex::MultiFab>& p0_cart,
+                         const amrex::Vector<amrex::Real>& gamma1bar,
+                         const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
+                         amrex::Vector<amrex::MultiFab>& deltagamma);
+
+    void MakeDivw0 (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                    amrex::Vector<amrex::MultiFab>& divw0);
+
+    void MakePiDivu (const amrex::Vector<amrex::MultiFab>& vel,
+                   const amrex::Vector<amrex::MultiFab>& pi_cc,
+                   amrex::Vector<amrex::MultiFab>& pidivu);
+
+    // mass fractions of the species
+    void MakeAbar(const amrex::Vector<amrex::MultiFab>& state,
+                amrex::Vector<amrex::MultiFab>& abar);
 
     // end MaestroPlot.cpp functions
     ////////////
@@ -606,6 +685,9 @@ private:
 
     // check to see if we need to regrid, then regrid
     void Regrid ();
+
+    // set tagging array to include buffer zones for multilevel
+    void TagArray ();
 
     // tag all cells for refinement
     // overrides the pure virtual function in AmrCore
@@ -661,6 +743,11 @@ private:
                            const amrex::Vector<amrex::Real>& p0,
                            const amrex::Vector<amrex::MultiFab>& w0cart,
                            amrex::Vector<amrex::MultiFab>& mach);
+
+    void CsfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
+                     const amrex::Vector<amrex::Real>& p0,
+                     const amrex::Vector<amrex::MultiFab>& p0cart,
+                     amrex::Vector<amrex::MultiFab>& cs);
     ////////////
 
     ////////////
@@ -825,6 +912,8 @@ private:
     amrex::Vector<amrex::Real> rho0_new;
     amrex::Vector<amrex::Real> rhoh0_old;
     amrex::Vector<amrex::Real> rhoh0_new;
+    amrex::Vector<amrex::Real> rhoX0_old;
+    amrex::Vector<amrex::Real> rhoX0_new;
     amrex::Vector<amrex::Real> p0_old;
     amrex::Vector<amrex::Real> p0_new;
     amrex::Vector<amrex::Real> tempbar;
@@ -840,6 +929,7 @@ private:
     amrex::Vector<amrex::Real> r_cc_loc;
     // p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
     amrex::Vector<amrex::Real> p0_nm1;
+    amrex::Vector<amrex::Real> beta0_nm1;
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -861,14 +951,13 @@ private:
     amrex::Vector<int> r_start_coord;
     amrex::Vector<int> r_end_coord;
 
-    // tagging criteria
-    amrex::Vector<amrex::Real> temperr;
-    amrex::Vector<amrex::Real> denserr;
-    // currently has 2 possible criterias
-    amrex::Vector< amrex::Vector<amrex::Real> > tag_err;
+    // array of tagged boxes (planar)
+    amrex::Vector<int> tag_array;
 
     // diag file array buffers
-    amrex::Vector<amrex::Real> diagfile_data;
+    amrex::Vector<amrex::Real> diagfile1_data;
+    amrex::Vector<amrex::Real> diagfile2_data;
+    amrex::Vector<amrex::Real> diagfile3_data;
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+1"
@@ -877,7 +966,9 @@ private:
     // therefore flux_reg[0] and flux_reg[max_level] are never actually
     // used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_s;
-    amrex::Vector<std::unique_ptr<amrex::FluxRegister> > flux_reg_u;
+
+    // flag for writing plotfiles
+    enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
 };
 

@@ -63,7 +63,7 @@ contains
     type (eos_t) :: eos_state
 
     if (spherical .eq. 1) then
-       call bl_error("ERROR: Incompressible shear jet base_state is not valid for spherical")
+       call amrex_error("ERROR: Incompressible shear jet base_state is not valid for spherical")
     endif
 
     if ( parallel_IOProcessor()) then

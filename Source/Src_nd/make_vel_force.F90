@@ -4,7 +4,7 @@ module make_vel_force_module
   use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, prob_lo
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, center
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
-  use bl_constants_module
+  use amrex_constants_module
 
   implicit none
 
@@ -102,8 +102,10 @@ contains
                 else if (r .ge. nr(lev)) then
                    ! do not modify force since dw0/dr=0
                 else
-
-#if (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 1)
+                   vel_force(i,j,k,1) = vel_force(i,j,k,1) &
+                        - (uedge(i+1,j,k)+uedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
+#elif (AMREX_SPACEDIM == 2)
                    vel_force(i,j,k,2) = vel_force(i,j,k,2) &
                         - (vedge(i,j+1,k)+vedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
 
@@ -175,7 +177,7 @@ contains
     double precision :: rhopert
     double precision :: xx, yy, zz
 
-    real(kind=dp_t) :: Ut_dot_er
+    double precision :: Ut_dot_er
 
     call bl_allocate(rho0_cart,lo,hi,1)
     call bl_allocate(grav_cart,lo,hi,3)

@@ -1,0 +1,20 @@
+# variable dr, 64^3
+kepler_new_6.25e8.hybrid.hse.1488.dr
+
+# variable dr, 128^3
+kepler_new_6.25e8.hybrid.hse.6048.dr
+
+# variable dr, 256^3
+kepler_new_6.25e8.hybrid.hse.24384.dr
+
+# variable dr, 384^3
+kepler_new_6.25e8.hybrid.hse.55008.dr
+
+# variable dr, 512^3
+kepler_new_6.25e8.hybrid.hse.97920.dr
+
+# fixed dr, 64^3
+kepler_new_6.25e8.hybrid.hse.320
+
+# fixed dr, 128^3
+kepler_new_6.25e8.hybrid.hse.640

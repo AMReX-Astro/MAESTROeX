@@ -17,9 +17,9 @@
 # category: synchronization
 #-----------------------------------------------------------------------------
 
-# do we do the hyperbolic reflux at coarse-fine interfaces?
-do_reflux                           int         1
-
+# do we do the hyperbolic reflux at coarse-fine interfaces? (1)
+# or simply average-down the fluxes (0)
+do_reflux                           int         0
 
 #-----------------------------------------------------------------------------
 # category: general MAESTRO
@@ -31,9 +31,6 @@ maestro_verbose                     int         1       y
 #-----------------------------------------------------------------------------
 # category: problem initialization
 #-----------------------------------------------------------------------------
-
-# input probin file
-probin_file                         string      ""
 
 # input model file
 model_file                          string      ""             y
@@ -121,7 +118,7 @@ min_eff                             Real               0.9
 
 # pass $T'$ into the tagging routines as the auxillary multifab instead
 # of the default $\rho H_\mathrm{nuc}$.
-use_tpert_in_tagging                bool            false
+use_tpert_in_tagging                bool            false     y
 
 
 #-----------------------------------------------------------------------------
@@ -131,9 +128,16 @@ use_tpert_in_tagging                bool            false
 # plot interval
 plot_int                            int            0
 
+# small plot interval
+small_plot_int                      int            0
+
 # rather than use a plot interval, plot a file after the solution has
 # advanced past plot\_deltat in time
-plot_deltat                         Real               -1.0
+plot_deltat                         Real           -1.0
+
+# rather than use a plot interval, plot a small plotfile after the solution has
+# advanced past small\_plot\_deltat in time
+small_plot_deltat                   Real           -1.0
 
 # Number of timesteps between writing a checkpoint file
 chk_int                             int            0
@@ -172,6 +176,9 @@ plot_cs                              bool            false
 # prefix to use in plotfile file names
 plot_base_name                      string          "plt"
 
+# prefix to use in small plotfile file names
+small_plot_base_name                string          "smallplt"
+
 # prefix to use in checkpoint file names
 check_base_name                     string          "chk"
 
@@ -187,6 +194,9 @@ plot_processors                     bool            false
 
 # plot pi * div(U) -- this is a measure of conservation of energy
 plot_pidivu                         bool            false
+
+# small plot file variables
+small_plot_vars                     string          "rho p0 magvel"
 
 #-----------------------------------------------------------------------------
 # category: algorithm initialization
@@ -305,9 +315,9 @@ use_exact_base_state                bool            false	y
 # initialization
 fix_base_state                      bool            false
 
-# turn on (true) or off (false) basestate evolution that uses averages  
+# turn on (true) or off (false) basestate evolution that uses averages
 # of cell-centered data instead of advecting
-average_base_state                  bool            false 
+average_base_state                  bool            false       y
 
 # force $\rho_0 = (\rho h)_0 = 0$, {\tt evolve\_base\_state = F}
 # and {\tt beta\_type} = 3
@@ -335,7 +345,7 @@ enthalpy_pred_type                  int            1            y
 species_pred_type                   int            1		y
 
 # turns on second order correction to delta gamma1 term
-use_delta_gamma1_term               bool            false        y 
+use_delta_gamma1_term               bool            false        y
 
 # turn on the etarho term as described in flow chart
 use_etarho                          bool            true

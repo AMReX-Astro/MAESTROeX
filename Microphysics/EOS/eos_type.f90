@@ -1,11 +1,10 @@
 module eos_type_module
 
-  use bl_types, only: dp_t
   use network, only: nspec, naux
 
   implicit none
 
-  private :: dp_t, nspec, naux
+  private :: nspec, naux
 
   integer, parameter :: eos_input_rt = 1  ! rho, T are inputs
   integer, parameter :: eos_input_rh = 2  ! rho, h are inputs
@@ -41,22 +40,22 @@ module eos_type_module
 
   ! Minimum and maximum thermodynamic quantities permitted by the EOS.
 
-  real(dp_t), save :: mintemp = 1.d-200
-  real(dp_t), save :: maxtemp = 1.d200
-  real(dp_t), save :: mindens = 1.d-200
-  real(dp_t), save :: maxdens = 1.d200
-  real(dp_t), save :: minx    = 1.d-200
-  real(dp_t), save :: maxx    = 1.d0 + 1.d-12
-  real(dp_t), save :: minye   = 1.d-200
-  real(dp_t), save :: maxye   = 1.d0 + 1.d-12
-  real(dp_t), save :: mine    = 1.d-200
-  real(dp_t), save :: maxe    = 1.d200
-  real(dp_t), save :: minp    = 1.d-200
-  real(dp_t), save :: maxp    = 1.d200
-  real(dp_t), save :: mins    = 1.d-200
-  real(dp_t), save :: maxs    = 1.d200
-  real(dp_t), save :: minh    = 1.d-200
-  real(dp_t), save :: maxh    = 1.d200
+  double precision, save :: mintemp = 1.d-200
+  double precision, save :: maxtemp = 1.d200
+  double precision, save :: mindens = 1.d-200
+  double precision, save :: maxdens = 1.d200
+  double precision, save :: minx    = 1.d-200
+  double precision, save :: maxx    = 1.d0 + 1.d-12
+  double precision, save :: minye   = 1.d-200
+  double precision, save :: maxye   = 1.d0 + 1.d-12
+  double precision, save :: mine    = 1.d-200
+  double precision, save :: maxe    = 1.d200
+  double precision, save :: minp    = 1.d-200
+  double precision, save :: maxp    = 1.d200
+  double precision, save :: mins    = 1.d-200
+  double precision, save :: maxs    = 1.d200
+  double precision, save :: minh    = 1.d-200
+  double precision, save :: maxh    = 1.d200
 
   !$acc declare &
   !$acc create(mintemp, maxtemp, mindens, maxdens, minx, maxx, minye, maxye) &
@@ -103,51 +102,51 @@ module eos_type_module
 
   type :: eos_t
 
-    real(dp_t) :: rho
-    real(dp_t) :: T
-    real(dp_t) :: p
-    real(dp_t) :: e
-    real(dp_t) :: h
-    real(dp_t) :: s
-    real(dp_t) :: xn(nspec)
-    real(dp_t) :: aux(naux)
+    double precision :: rho
+    double precision :: T
+    double precision :: p
+    double precision :: e
+    double precision :: h
+    double precision :: s
+    double precision :: xn(nspec)
+    double precision :: aux(naux)
 
-    real(dp_t) :: dpdT
-    real(dp_t) :: dpdr
-    real(dp_t) :: dedT
-    real(dp_t) :: dedr
-    real(dp_t) :: dhdT
-    real(dp_t) :: dhdr
-    real(dp_t) :: dsdT
-    real(dp_t) :: dsdr
-    real(dp_t) :: dpde
-    real(dp_t) :: dpdr_e
+    double precision :: dpdT
+    double precision :: dpdr
+    double precision :: dedT
+    double precision :: dedr
+    double precision :: dhdT
+    double precision :: dhdr
+    double precision :: dsdT
+    double precision :: dsdr
+    double precision :: dpde
+    double precision :: dpdr_e
 
-    real(dp_t) :: cv
-    real(dp_t) :: cp
-    real(dp_t) :: xne
-    real(dp_t) :: xnp
-    real(dp_t) :: eta
-    real(dp_t) :: pele
-    real(dp_t) :: ppos
-    real(dp_t) :: mu
-    real(dp_t) :: mu_e
-    real(dp_t) :: y_e
-    real(dp_t) :: dedX(nspec)
-    real(dp_t) :: dpdX(nspec)
-    real(dp_t) :: dhdX(nspec)
-    real(dp_t) :: gam1
-    real(dp_t) :: cs
+    double precision :: cv
+    double precision :: cp
+    double precision :: xne
+    double precision :: xnp
+    double precision :: eta
+    double precision :: pele
+    double precision :: ppos
+    double precision :: mu
+    double precision :: mu_e
+    double precision :: y_e
+    double precision :: dedX(nspec)
+    double precision :: dpdX(nspec)
+    double precision :: dhdX(nspec)
+    double precision :: gam1
+    double precision :: cs
 
-    real(dp_t) :: abar
-    real(dp_t) :: zbar
-    real(dp_t) :: dpdA
+    double precision :: abar
+    double precision :: zbar
+    double precision :: dpdA
 
-    real(dp_t) :: dpdZ
-    real(dp_t) :: dedA
-    real(dp_t) :: dedZ
+    double precision :: dpdZ
+    double precision :: dedA
+    double precision :: dedZ
 
-    real(dp_t) :: conductivity
+    double precision :: conductivity
 
   end type eos_t
 
@@ -160,7 +159,7 @@ contains
 
     !$acc routine seq
 
-    use bl_constants_module, only: ONE
+    use amrex_constants_module, only: ONE
     use network, only: aion, aion_inv, zion
 
     implicit none
@@ -187,7 +186,7 @@ contains
 
     !$acc routine seq
 
-    use bl_constants_module, only: ZERO
+    use amrex_constants_module, only: ZERO
     use network, only: aion, aion_inv, zion
 
     implicit none
@@ -223,7 +222,7 @@ contains
 
     !$acc routine seq
 
-    use bl_constants_module, only: ONE
+    use amrex_constants_module, only: ONE
     use extern_probin_module, only: small_x
 
     implicit none
@@ -278,7 +277,7 @@ contains
 
     implicit none
 
-    real(dp_t), intent(out) :: small_temp_out
+    double precision, intent(out) :: small_temp_out
 
     small_temp_out = mintemp
 
@@ -292,7 +291,7 @@ contains
 
     implicit none
 
-    real(dp_t), intent(out) :: small_dens_out
+    double precision, intent(out) :: small_dens_out
 
     small_dens_out = mindens
 
@@ -306,7 +305,7 @@ contains
 
     implicit none
 
-    real(dp_t), intent(out) :: max_temp_out
+    double precision, intent(out) :: max_temp_out
 
     max_temp_out = maxtemp
 
@@ -320,7 +319,7 @@ contains
 
     implicit none
 
-    real(dp_t), intent(out) :: max_dens_out
+    double precision, intent(out) :: max_dens_out
 
     max_dens_out = maxdens
 

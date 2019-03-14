@@ -1,8 +1,8 @@
 
 module sponge_module
 
-  use bl_constants_module
-  use parallel, only: parallel_IOProcessor
+  use amrex_constants_module
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use base_state_geometry_module, only: dr, r_end_coord, max_radial_level, nr_fine, center
   use meth_params_module, only: maestro_verbose, sponge_start_factor, &
        sponge_center_density, sponge_kappa, spherical, &
@@ -169,11 +169,11 @@ contains
   subroutine mk_sponge(lo,hi,sponge,s_lo,s_hi,dx,dt) bind(C, name="mk_sponge")
 
     integer        , intent(in   ) :: lo(3),hi(3),s_lo(3),s_hi(3)
-    real(kind=dp_t), intent(inout) :: sponge(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
-    real(kind=dp_t), intent(in   ) :: dx(3),dt
+    double precision, intent(inout) :: sponge(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
+    double precision, intent(in   ) :: dx(3),dt
 
     integer         :: i,j,k
-    real(kind=dp_t) :: x,y,z,r,smdamp
+    double precision :: x,y,z,r,smdamp
 
     sponge(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = ONE
 

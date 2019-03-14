@@ -23,38 +23,8 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        MultiFab& s0_cart_mf = s0_cart[lev];
-        MultiFab& cc_to_r = cell_cc_to_r[lev];
-
-        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        for ( MFIter mfi(s0_cart_mf, true); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            if (spherical == 0) {
-                put_1d_array_on_cart(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                     BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-                                     s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
-            } else {
-                put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                          BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-                                          s0.dataPtr(), dx,
-                                          &is_input_edge_centered, &is_output_a_vector,
-                                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                          BL_TO_FORTRAN_3D(cc_to_r[mfi]));
-            }
-        }
+	Put1dArrayOnCart(lev,s0,s0_cart,is_input_edge_centered,
+			 is_output_a_vector,bcs,sbccomp);
     }
 
     int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;
@@ -66,6 +36,52 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
     if (ng > 0) {
         FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs);
     }
+}
+
+void
+Maestro::Put1dArrayOnCart (int level, 
+			   const Vector<Real>& s0,
+                           Vector<MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const Vector<BCRec>& bcs,
+                           int sbccomp)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()",Put1dArrayOnCart);
+    
+    // get references to the MultiFabs at level lev
+    MultiFab& s0_cart_mf = s0_cart[level];
+    MultiFab& cc_to_r = cell_cc_to_r[level];
+
+    // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+    for ( MFIter mfi(s0_cart_mf, true); mfi.isValid(); ++mfi ) {
+
+	// Get the index space of the valid region
+	const Box& tileBox = mfi.tilebox();
+	const Real* dx = geom[level].CellSize();
+
+	// call fortran subroutine
+	// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+	// lo/hi coordinates (including ghost cells), and/or the # of components
+	// We will also pass "validBox", which specifies the "valid" region.
+	if (spherical == 0) {
+	    put_1d_array_on_cart(&level,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				 BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+				 s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
+	} else {
+	    put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				      BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+				      s0.dataPtr(), dx,
+				      &is_input_edge_centered, &is_output_a_vector,
+				      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+				      BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+	}
+    }
+
 }
 
 

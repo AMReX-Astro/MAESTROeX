@@ -8,7 +8,9 @@ void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const Vector<Real>& w0_force,
-                        const Vector<MultiFab>& w0_force_cart)
+                        const Vector<MultiFab>& w0_force_cart,
+			const Vector<Real>& beta0,
+			const int is_predictor)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
@@ -39,7 +41,9 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+#if (AMREX_SPACEDIM >= 2)
 		utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+#endif
 #if (AMREX_SPACEDIM == 3)
 		utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
@@ -65,7 +69,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 	int do_add_utilde_force = 1;
 	MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
-	             w0_force,w0_force_cart,do_add_utilde_force);
+	             w0_force,w0_force_cart,beta0,is_predictor,do_add_utilde_force);
 
 	// add w0 to trans velocities
 	Addw0 (utrans,w0mac,1.);
@@ -132,9 +136,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                         BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-												BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                        BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+                        BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+                        BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
 #endif
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
@@ -183,8 +187,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
               MultiFab& umac_mf    = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         const MultiFab& utrans_mf  = utrans[lev][0];
+#if (AMREX_SPACEDIM >= 2)
         const MultiFab& vtrans_mf  = utrans[lev][1];
               MultiFab& vmac_mf    = umac[lev][1];
 #if (AMREX_SPACEDIM == 3)
@@ -330,40 +334,39 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     dx, &dt, &is_vel, bcs[0].data(),
                     &nbccomp, &scomp, &bccomp, &is_conservative);
             } // end loop over components
-        } // end MFIter loop
+        } // end MFIter loop		
     } // end loop over levels
 
     // We use edge_restriction for the output velocity if is_vel == 1
     // we do not use edge_restriction for scalars because instead we will use
     // reflux on the fluxes in make_flux.
-    if (is_vel == 1) {
+    if (is_vel == 1 && do_reflux == 0) {
 	AverageDownFaces(sedge);
     }
-
 }
 
 void
-    Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
-			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-			   Vector<MultiFab>& etarhoflux,
-			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-			   const Vector<Real>& r0_old,
-			   const Vector<Real>& r0_edge_old,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-			   const Vector<Real>& r0_new,
-			   const Vector<Real>& r0_edge_new,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-			   const Vector<Real>& r0_predicted_edge,
-			   int start_comp, int num_comp)
+Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
+                       Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+                       Vector<MultiFab>& etarhoflux,
+                       Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+                       const Vector<Real>& r0_old,
+                       const Vector<Real>& r0_edge_old,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
+                       const Vector<Real>& r0_new,
+                       const Vector<Real>& r0_edge_new,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
+                       const Vector<Real>& r0_predicted_edge,
+                       int start_comp, int num_comp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoXFlux()",MakeRhoXFlux);
 
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
-    const int endcomp = startcomp + num_comp;
+    const int endcomp = startcomp + num_comp - 1;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -498,8 +501,13 @@ void
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
+	    // NOTE: areas are different in DIM=2 and DIM=3
+#if (AMREX_SPACEDIM == 3) 
 	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
-
+#else
+	    const Real area[2] = {dx[1], dx[0]};
+#endif
+	    
 	    if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
@@ -526,30 +534,33 @@ void
 
     } // end loop over levels
 
+    if (do_reflux == 0) {
+	AverageDownFaces(sflux);
+    }
 
     // Something analogous to edge_restriction is done in UpdateScal()
 }
 
 void
-    Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
-			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-			   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-			   const Vector<Real>& r0_old,
-			   const Vector<Real>& r0_edge_old,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-			   const Vector<Real>& r0_new,
-			   const Vector<Real>& r0_edge_new,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-			   const Vector<Real>& rh0_old,
-			   const Vector<Real>& rh0_edge_old,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
-			   const Vector<Real>& rh0_new,
-			   const Vector<Real>& rh0_edge_new,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_old,
-			   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_new)
+Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
+                       Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+                       Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+                       const Vector<Real>& r0_old,
+                       const Vector<Real>& r0_edge_old,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
+                       const Vector<Real>& r0_new,
+                       const Vector<Real>& r0_edge_new,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
+                       const Vector<Real>& rh0_old,
+                       const Vector<Real>& rh0_edge_old,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
+                       const Vector<Real>& rh0_new,
+                       const Vector<Real>& rh0_edge_new,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_old,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_new)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHFlux()",MakeRhoHFlux);
@@ -716,7 +727,12 @@ void
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
+            	    // NOTE: areas are different in DIM=2 and DIM=3
+#if (AMREX_SPACEDIM == 3) 
 	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
+#else
+	    const Real area[2] = {dx[1], dx[0]};
+#endif
 
 	    if (flux_reg_s[lev+1])
             {
@@ -733,20 +749,23 @@ void
                 }
             }
         }
-
     } // end loop over levels
+
+    if (do_reflux == 0) {
+	AverageDownFaces(sflux);
+    }
 
     // Something analogous to edge_restriction is done in UpdateScal()
 
 }
 
 void
-    Maestro::UpdateScal(const Vector<MultiFab>& stateold,
-			Vector<MultiFab>& statenew,
-			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-			const Vector<MultiFab>& force,
-			int start_comp, int num_comp,
-			const Real* p0, const Vector<MultiFab>& p0_cart)
+Maestro::UpdateScal(const Vector<MultiFab>& stateold,
+                    Vector<MultiFab>& statenew,
+                    const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+                    const Vector<MultiFab>& force,
+                    int start_comp, int num_comp,
+                    const Real* p0, const Vector<MultiFab>& p0_cart)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateScal()",UpdateScal);
@@ -876,7 +895,6 @@ void
         }
     }
 
-
     // average fine data onto coarser cells
     AverageDown(statenew,start_comp,num_comp);
 
@@ -897,11 +915,11 @@ void
 }
 
 void
-    Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
-			const Vector<MultiFab>& force,
-			const Vector<MultiFab>& sponge,
-			const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
+Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                    const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
+                    const Vector<MultiFab>& force,
+                    const Vector<MultiFab>& sponge,
+                    const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
@@ -985,8 +1003,7 @@ void
 	    }
         } // end MFIter loop
     } // end loop over levels
-
-
+	
     // average fine data onto coarser cells
     AverageDown(unew,0,AMREX_SPACEDIM);
 

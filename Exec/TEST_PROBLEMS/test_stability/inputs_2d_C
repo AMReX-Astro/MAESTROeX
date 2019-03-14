@@ -1,7 +1,6 @@
 
 # INITIAL MODEL
 maestro.model_file = "model.hse"
-maestro.probin_file = "probin"
 
 maestro.ppm_type = 0
 
@@ -74,3 +73,27 @@ maestro.eps_hg             = 1.e-10
 maestro.eps_hg_max         = 1.e-9
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
+
+&probin
+
+  ! override the default values of the probin namelist values here
+  apply_vel_field = T
+  velpert_scale = 5.d6
+  velpert_amplitude = 1.d5
+  velpert_height_loc = 1.2e8
+  num_vortices = 2
+
+  !extern
+
+  ! Note that some of the parameters in this
+  ! namelist are specific to the default EOS,
+  ! network, and/or integrator used in the
+  ! makefile. If you try a different set of
+  ! microphysics routines be sure to check that
+  ! the parameters in here are consistent, as
+  ! Fortran does not like seeing unknown variables
+  ! in the namelist.
+
+  use_eos_coulomb = F
+
+/

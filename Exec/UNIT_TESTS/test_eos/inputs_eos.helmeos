@@ -1,0 +1,21 @@
+# GRIDDING AND REFINEMENT
+amr.max_level          = 0       # maximum level number allowed
+amr.n_cell             = 64 64 64
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0    0.0    0.0
+geometry.prob_hi     =  1.0e0  1.0e0  1.0e0
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 0 0 0
+maestro.hi_bc = 0 0 0
+geometry.is_periodic =  1 1 1
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+
+# EOS parameters
+maestro.small_temp = 1.e5

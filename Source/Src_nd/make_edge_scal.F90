@@ -12,6 +12,7 @@
 
 module make_edge_scal_module
 
+  use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use slope_module
@@ -67,7 +68,7 @@ contains
     call bl_allocate(Ipf,lo(1)-1,hi(1)+1)
     call bl_allocate(Imf,lo(1)-1,hi(1)+1)
 
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1)
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1,1)
 
     ! Final edge states.
     ! lo:hi+1 in the normal direction
@@ -155,7 +156,7 @@ contains
           sedgex(is,comp) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_1d: invalid boundary type adv_bc(1,1)")
+          call amrex_error("make_edge_scal_1d: invalid boundary type adv_bc(1,1)")
        end if
     end if
 
@@ -176,7 +177,7 @@ contains
           sedgex(ie+1,comp) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_1d: invalid boundary type adv_bc(1,2)")
+          call amrex_error("make_edge_scal_1d: invalid boundary type adv_bc(1,2)")
        end if
     end if
 
@@ -334,7 +335,7 @@ contains
           srx(ie+1,js-1:je+1) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
+          call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
        end if
     end if
 
@@ -356,7 +357,7 @@ contains
           srx(ie+1,js-1:je+1) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(1,2)")
+          call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,2)")
        end if
     end if
 
@@ -406,7 +407,7 @@ contains
           sry(is-1:ie+1,js) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
+          call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
        end if
     end if
 
@@ -428,7 +429,7 @@ contains
           sry(is-1:ie+1,je+1) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
+          call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
        end if
     end if
 
@@ -495,7 +496,7 @@ contains
           sedgex(is,js:je,comp) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
+          call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
        end if
     end if
 
@@ -516,7 +517,7 @@ contains
           sedgex(ie+1,js:je,comp) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(1,2)")
+          call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,2)")
        end if
     end if
 
@@ -570,7 +571,7 @@ contains
           sedgey(is:ie,js,comp) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
+          call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
        end if
     end if
 
@@ -591,7 +592,7 @@ contains
           sedgey(is:ie,je+1,comp) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
+          call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
        end if
     end if
 
@@ -801,7 +802,7 @@ contains
           srx(is,js-1:je+1,ks-1:ke+1) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
        end if
     end if
 
@@ -823,7 +824,7 @@ contains
           srx(ie+1,js-1:je+1,ks-1:ke+1) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
        end if
     end if
 
@@ -888,7 +889,7 @@ contains
           sry(is-1:ie+1,js,ks-1:ke+1) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
        end if
     end if
 
@@ -910,7 +911,7 @@ contains
           sry(is-1:ie+1,je+1,ks-1:ke+1) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
        end if
     end if
 
@@ -975,7 +976,7 @@ contains
           srz(is-1:ie+1,js-1:je+1,ks) = 0.d0
        else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
        end if
     end if
 
@@ -997,7 +998,7 @@ contains
           srz(is-1:ie+1,js-1:je+1,ke+1) = 0.d0
        else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
        end if
     end if
 
@@ -1075,7 +1076,7 @@ contains
           srxy(is,js:je,ks-1:ke+1) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
        end if
     end if
 
@@ -1097,7 +1098,7 @@ contains
           srxy(ie+1,js:je,ks-1:ke+1) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
        end if
     end if
 
@@ -1177,7 +1178,7 @@ contains
           srxz(is,js-1:je+1,ks:ke) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
        end if
     end if
 
@@ -1199,7 +1200,7 @@ contains
           srxz(ie+1,js-1:je+1,ks:ke) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
        end if
     end if
 
@@ -1279,7 +1280,7 @@ contains
           sryx(is:ie,js,ks-1:ke+1) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
        end if
     end if
 
@@ -1301,7 +1302,7 @@ contains
           sryx(is:ie,je+1,ks-1:ke+1) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
        end if
     end if
 
@@ -1381,7 +1382,7 @@ contains
           sryz(is-1:ie+1,js,ks:ke) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
        end if
     end if
 
@@ -1403,7 +1404,7 @@ contains
           sryz(is-1:ie+1,je+1,ks:ke) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
        end if
     end if
 
@@ -1484,7 +1485,7 @@ contains
           srzx(is:ie,js-1:je+1,ks) = 0.d0
        else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
        end if
     end if
 
@@ -1506,7 +1507,7 @@ contains
           srzx(is:ie,js-1:je+1,ke+1) = 0.d0
        else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
        end if
     end if
 
@@ -1587,7 +1588,7 @@ contains
           srzy(is-1:ie+1,js:je,ks) = 0.d0
        else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
        end if
     end if
 
@@ -1609,7 +1610,7 @@ contains
           srzy(is-1:ie+1,js:je,ke+1) = 0.d0
        else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
        end if
     end if
 
@@ -1723,7 +1724,7 @@ contains
           sedgex(is,js:je,ks:ke,comp) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
        end if
     end if
 
@@ -1744,7 +1745,7 @@ contains
           sedgex(ie+1,js:je,ks:ke,comp) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
        end if
     end if
 
@@ -1838,7 +1839,7 @@ contains
           sedgey(is:ie,js,ks:ke,comp) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
        end if
     end if
 
@@ -1859,7 +1860,7 @@ contains
           sedgey(is:ie,je+1,ks:ke,comp) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
        end if
     end if
 
@@ -1953,7 +1954,7 @@ contains
           sedgez(is:ie,js:je,ks,comp) = 0.d0
        else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
        end if
     end if
 
@@ -1974,7 +1975,7 @@ contains
           sedgez(is:ie,js:je,ke+1,comp) = 0.d0
        else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
        else
-          call bl_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+          call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
        end if
     end if
 

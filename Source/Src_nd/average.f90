@@ -1,7 +1,8 @@
 module average_module
 
   use base_state_geometry_module, only: max_radial_level, finest_radial_level, nr_fine, &
-       restrict_base, fill_ghost_base, center, nr_irreg, dr, base_cutoff_density_coord
+       restrict_base, fill_ghost_base, center, nr_irreg, dr, base_cutoff_density_coord, &
+       numdisjointchunks, r_start_coord, r_end_coord
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, prob_lo, drdxfac
 
@@ -41,10 +42,15 @@ contains
     double precision, intent(inout) :: phisum(0:max_radial_level,0:nr_fine-1)
     integer         , intent(in   ) ::  ncell(0:max_radial_level)
 
-    integer :: n
+    integer :: n,i,r
 
+    ! compute phibar by normalizing phisum
     do n=0,max_radial_level
-       phisum(n,:) = phisum(n,:) / ncell(n)
+       do i=1,numdisjointchunks(n)
+          do r=r_start_coord(n,i),r_end_coord(n,i)
+             phisum(n,r) = phisum(n,r) / dble(ncell(n))
+          end do
+       end do
     end do
 
     call restrict_base(phisum,1)

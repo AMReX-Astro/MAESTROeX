@@ -1,7 +1,6 @@
 module actual_burner_module
 
-  use bl_types
-  use bl_constants_module
+  use amrex_constants_module
   use network
   use burn_type_module
 

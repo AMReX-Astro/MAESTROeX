@@ -1,6 +1,6 @@
 module make_grav_module
 
-  use bl_constants_module
+  use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, &
                                         max_radial_level, nr, numdisjointchunks, & 
                                         r_start_coord, r_end_coord, finest_radial_level, &
@@ -244,8 +244,8 @@ contains
 
     ! Local variables
     integer                      :: r, n, i
-    real(kind=dp_t)              :: mencl
-    real(kind=dp_t), allocatable :: m(:,:)
+    double precision              :: mencl
+    double precision, allocatable :: m(:,:)
         
     if (spherical .eq. 0) then
 
@@ -341,7 +341,7 @@ contains
        grav_edge(0,0) = zero 
        mencl = ZERO
 
-       do r=1,nr_fine-1
+       do r=1,nr_fine
 
           ! only add to the enclosed mass if the density is 
           ! > base_cutoff_density

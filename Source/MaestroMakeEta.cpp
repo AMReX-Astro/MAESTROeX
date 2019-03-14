@@ -139,8 +139,19 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     // the 0th value of etarho = 0, since U dot . e_r must be
     // zero at the center (since e_r is not defined there)
     etarho_edge[0] = 0.0;
-    for (int r=1; r<nr_fine; ++r) {
-        etarho_edge[r] = 0.5*(etarho_cell[r] + etarho_cell[r-1]);
+    if (spherical == 1) {
+
+	double dr1, dr2;
+	for (int r=1; r<nr_fine; ++r) {
+	    dr1 = r_cc_loc[r] - r_edge_loc[r];
+	    dr2 = r_edge_loc[r] - r_cc_loc[r-1];
+	    etarho_edge[r] = (dr2*etarho_cell[r] + dr1*etarho_cell[r-1])/(dr1+dr2);
+	}
+
+    } else {
+	for (int r=1; r<nr_fine; ++r) {
+	    etarho_edge[r] = 0.5*(etarho_cell[r] + etarho_cell[r-1]);
+	}
     }
     // probably should do some better extrapolation here eventually
     etarho_edge[nr_fine] = etarho_cell[nr_fine-1];

@@ -1,0 +1,3 @@
+.. raw:: latex
+
+   \thispagestyle{empty}

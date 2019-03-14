@@ -1,0 +1,35 @@
+DEBUG      = FALSE
+DIM        = 3
+COMP	   = gnu
+USE_MPI    = FALSE
+USE_OMP    = TRUE
+USE_REACT  = TRUE
+USE_ROTATION = TRUE
+
+TINY_PROFILE = FALSE
+PROFILE      = FALSE # TRUE overrides TINY_PROFILE
+
+
+# define the location of the MAESTROEX home directory
+MAESTROEX_HOME  := ../../..
+
+# if not already defined, point to Microphysics
+MICROPHYSICS_HOME ?= ../../../../Microphysics
+
+# Set the EOS, conductivity, and network directories
+# We first check if these exist in $(MAESTROEX_HOME)/Microphysics/(EOS/conductivity/networks)
+# If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
+EOS_DIR          := helmholtz
+CONDUCTIVITY_DIR := stellar
+NETWORK_DIR      := general_null
+# NETWORK_DIR := ignition_chamulak
+#GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/aprox21.net
+GENERAL_NET_INPUTS = $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/ignition_wdconvect.net
+
+Bpack   := ./Make.package
+Blocs   := .
+PROBIN_PARAMETER_DIRS := .
+
+include $(MAESTROEX_HOME)/Exec/Make.Maestro
+
+USE_ROTATION=FALSE

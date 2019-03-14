@@ -29,6 +29,7 @@
 
 module make_flux_module
 
+  use amrex_error_module
   use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use network, only: nspec
@@ -56,7 +57,7 @@ contains
 #if (AMREX_SPACEDIM == 1)
   subroutine make_rhoX_flux_1d(lev, lo, hi, &
        sfluxx, fx_lo, fx_hi, nc_fx, &
-       etarhoflux, eta_lo, eta_hi, nc_eta, &
+       etarhoflux, eta_lo, eta_hi, &
        sedgex, x_lo, x_hi, nc_x, &
        umac,   u_lo, u_hi, &
        rho0_old, rho0_edge_old, &
@@ -595,7 +596,7 @@ contains
     else if (have_hprime) then
 
        ! enthalpy edge state is h'
-       call bl_error("make_rhoh_flux_1d : predict_hprime not coded yet")
+       call amrex_error("make_rhoh_flux_1d : predict_hprime not coded yet")
 
     else if (have_rhoh) then
 
@@ -611,7 +612,7 @@ contains
        end do
 
     else
-       call bl_error("make_rhoh_flux_1d : enthalpy_pred_type not recognized.")
+       call amrex_error("make_rhoh_flux_1d : enthalpy_pred_type not recognized.")
     end if
 
   end subroutine make_rhoh_flux_1d
@@ -696,7 +697,7 @@ contains
     else if (have_hprime) then
 
        ! enthalpy edge state is h'
-       call bl_error("make_rhoh_flux_2d : predict_hprime not coded yet")
+       call amrex_error("make_rhoh_flux_2d : predict_hprime not coded yet")
 
     else if (have_rhoh) then
 
@@ -716,7 +717,7 @@ contains
        end do
 
     else
-       call bl_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
+       call amrex_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
     end if
 
     ! create y-fluxes
@@ -748,7 +749,7 @@ contains
     else if (have_hprime) then
 
        ! enthalpy edge state is h'
-       call bl_error("make_rhoh_flux_2d : predict_hprime not coded yet")
+       call amrex_error("make_rhoh_flux_2d : predict_hprime not coded yet")
 
     else if (have_rhoh) then
 
@@ -768,7 +769,7 @@ contains
        end do
 
     else
-       call bl_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
+       call amrex_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
     end if
 
   end subroutine make_rhoh_flux_2d
@@ -883,7 +884,7 @@ contains
     else if (have_hprime) then
 
        ! enthalpy edge state is h'
-       call bl_error("make_rhoh_flux_3d : predict_hprime not coded yet")
+       call amrex_error("make_rhoh_flux_3d : predict_hprime not coded yet")
 
     else if (have_rhoh) then
 
@@ -920,7 +921,7 @@ contains
        end do
 
     else
-       call bl_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
+       call amrex_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
     end if
 
     ! create z-fluxes
@@ -958,7 +959,7 @@ contains
     else if (have_hprime) then
 
        ! enthalpy edge state is h'
-       call bl_error("make_rhoh_flux_3d : predict_hprime not coded yet")
+       call amrex_error("make_rhoh_flux_3d : predict_hprime not coded yet")
 
     else if (have_rhoh) then
 
@@ -984,7 +985,7 @@ contains
        end do
 
     else
-       call bl_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
+       call amrex_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
     end if
 
 
@@ -1123,11 +1124,11 @@ contains
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
 
        else if (species_pred_type == predict_rhoX) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rhoX and predict_hprime not supported together")
 
        endif
 
@@ -1225,11 +1226,11 @@ contains
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
 
        else if (species_pred_type == predict_rhoX) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rhoX and predict_hprime not supported together")
 
        endif
 
@@ -1328,11 +1329,11 @@ contains
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
 
        else if (species_pred_type == predict_rhoX) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rhoX and predict_hprime not supported together")
 
        endif
 
@@ -1437,7 +1438,7 @@ contains
     if (have_h) then
 
        ! enthalpy edge state is h
-       call bl_error("have_h not supported on irregular-spaced base state")
+       call amrex_error("have_h not supported on irregular-spaced base state")
 
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
@@ -1451,19 +1452,19 @@ contains
     else if (have_hprime) then
 
        ! enthalpy edge state is h'
-       call bl_error("have_hprime not supported on irregular-spaced base state")
+       call amrex_error("have_hprime not supported on irregular-spaced base state")
 
-       
+
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
 
        else if (species_pred_type == predict_rhoX) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rhoX and predict_hprime not supported together")
 
        endif
 
@@ -1506,7 +1507,7 @@ contains
     if (have_h) then
 
        ! enthalpy edge state is h
-       call bl_error("have_h not supported on irregular-spaced base state")
+       call amrex_error("have_h not supported on irregular-spaced base state")
 
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
@@ -1520,18 +1521,18 @@ contains
     else if (have_hprime) then
 
        ! enthalpy edge state is h'
-       call bl_error("have_hprime not supported on irregular-spaced base state")
+       call amrex_error("have_hprime not supported on irregular-spaced base state")
 
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
 
        else if (species_pred_type == predict_rhoX) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rhoX and predict_hprime not supported together")
 
        endif
 
@@ -1575,7 +1576,7 @@ contains
     if (have_h) then
 
        ! enthalpy edge state is h
-       call bl_error("have_h not supported on irregular-spaced base state")
+       call amrex_error("have_h not supported on irregular-spaced base state")
 
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
@@ -1589,18 +1590,18 @@ contains
     else if (have_hprime) then
 
        ! enthalpy edge state is h'
-       call bl_error("have_hprime not supported on irregular-spaced base state")
+       call amrex_error("have_hprime not supported on irregular-spaced base state")
 
        if (species_pred_type == predict_rhoprime_and_X) then
           ! density edge state is rho'
 
        else if (species_pred_type == predict_rho_and_X) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rho_and_X and predict_hprime not supported together")
 
        else if (species_pred_type == predict_rhoX) then
           ! density edge state is rho
-          call bl_error("ERROR: predict_rhoX and predict_hprime not supported together")
+          call amrex_error("ERROR: predict_rhoX and predict_hprime not supported together")
 
        endif
 

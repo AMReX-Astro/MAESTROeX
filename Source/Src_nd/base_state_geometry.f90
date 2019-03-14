@@ -8,8 +8,8 @@ module base_state_geometry_module
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
+  use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use amrex_constants_module
-  use parallel, only: parallel_IOProcessor
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, octant, anelastic_cutoff, base_cutoff_density, &
        burning_cutoff_density, prob_lo, prob_hi, &
@@ -332,18 +332,17 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  subroutine init_multilevel(finest_radial_level_in) bind(C, name="init_multilevel")
+  subroutine init_multilevel(tag_array, finest_radial_level_in) bind(C, name="init_multilevel")
 
     ! compute numdisjointchunks, r_start_coord, r_end_coord
     ! FIXME - right now there is one chunk at each level that spans the domain
 
+    integer, intent(in   ) :: tag_array(0:max_radial_level,0:nr_fine-1)
     integer, intent(in   ) :: finest_radial_level_in
 
-    integer :: n
-
-    if (finest_radial_level_in .gt. 0 .and. spherical .eq. 0) then
-       call amrex_abort("base_state_geomtry: init_multilevel not written yet for planar")
-    end if
+    integer :: n, r
+    integer :: nchunks, maxchunks
+    logical :: chunk_start
 
     if (spherical .eq. 1) then
        finest_radial_level = 0
@@ -356,25 +355,70 @@ contains
     end if
     call bl_allocate(numdisjointchunks,0,finest_radial_level)
 
+    ! loop through tag_array first to determine the maximum number of chunks
+    ! to use for allocating r_start_coord and r_end_coord
+    maxchunks = 1
+    do n=1,finest_radial_level
+       
+       ! initialize variables
+       chunk_start = .false.
+       nchunks = 0
+
+       ! increment nchunks at beginning of each chunk
+       ! (ex. when the tagging index changes from 0 to 1)
+       do r=0,nr(n-1)-1
+          if (tag_array(n-1,r).gt.0 .AND. .not.chunk_start) then
+             chunk_start = .true.
+             nchunks = nchunks + 1
+          elseif (tag_array(n-1,r).eq.0 .AND. chunk_start) then
+             chunk_start = .false.
+          end if
+       end do
+
+       maxchunks = max(nchunks,maxchunks)
+
+    end do
+    
     if (associated(r_start_coord)) then
        call bl_deallocate(r_start_coord)
     end if
-    call bl_allocate(r_start_coord,0,finest_radial_level,1,1) ! FIXME - for > 1 chunk case
+    call bl_allocate(r_start_coord,0,finest_radial_level,1,maxchunks) 
 
     if (associated(r_end_coord)) then
        call bl_deallocate(r_end_coord)
     end if
-    call bl_allocate(r_end_coord,0,finest_radial_level,1,1) ! FIXME - for > 1 chunk case
+    call bl_allocate(r_end_coord,0,finest_radial_level,1,maxchunks) 
 
     if (spherical .eq. 0) then
 
-       ! FIXME - needs lots of work
-       do n=0,finest_radial_level
-          numdisjointchunks(n) = 1
-          r_start_coord(n,1) = 0
-          r_end_coord(n,1) = nr(n)-1
-       end do
+       ! coarsest grid always has 1 chunk of data
+       numdisjointchunks(0) = 1
+       r_start_coord(0,1) = 0
+       r_end_coord(0,1) = nr(0)-1
 
+       ! for > 1 chunks (multilevel)
+       do n=1,finest_radial_level
+          ! initialize variables
+          chunk_start = .false.
+          numdisjointchunks(n) = 0
+
+          ! increment numdisjointchunks at beginning of each chunk
+          ! (ex. when the tagging index changes from 0 to 1)
+          do r=0,nr(n-1)-1
+             if (tag_array(n-1,r).gt.0 .AND. .not.chunk_start) then
+                chunk_start = .true.
+                numdisjointchunks(n) = numdisjointchunks(n) + 1
+                r_start_coord(n,numdisjointchunks(n)) = 2*r
+             elseif (tag_array(n-1,r).eq.0 .AND. chunk_start) then
+                r_end_coord(n,numdisjointchunks(n)) = 2*r-1
+                chunk_start = .false.
+             elseif (r.eq.nr(n-1)-1 .AND. chunk_start) then
+                ! if last chunk is at the end of array
+                r_end_coord(n,numdisjointchunks(n)) = 2*r-1
+             end if
+          end do
+       end do
+       
     else
 
        numdisjointchunks(0) = 1
@@ -383,6 +427,9 @@ contains
 
     end if
 
+!!$    print *,"hack,",numdisjointchunks
+!!$    print *,"hack,",r_start_coord(1,:),r_end_coord(1,:)
+    
   end subroutine init_multilevel
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

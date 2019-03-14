@@ -103,7 +103,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     int is_predictor;
 
     // wallclock time
-    const Real strt_total = ParallelDescriptor::second();
+    Real start_total = ParallelDescriptor::second();
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
@@ -198,7 +198,14 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
 
+    // wallclock time
+    Real start_total_react = ParallelDescriptor::second();
+    
     React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+
+    // wallclock time
+    Real end_total_react = ParallelDescriptor::second() - start_total_react;
+    ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- define average expansion at time n+1/2
@@ -309,7 +316,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
+    is_predictor = 1;
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart,beta0_nm1,is_predictor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -318,13 +326,19 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    is_predictor = 1;
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
                        gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
 
+    // wallclock time
+    Real start_total_macproj = ParallelDescriptor::second();
+    
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
+
+    // wallclock time
+    Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
+    ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the base state and full state through dt
@@ -519,8 +533,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
+    
+    // wallclock time
+    start_total_react = ParallelDescriptor::second();
 
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+
+    // wallclock time
+    end_total_react += ParallelDescriptor::second() - start_total_react;
+    ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
 
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
@@ -641,17 +662,23 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
-
+    is_predictor = 0;
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart,beta0_nm1,is_predictor);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    is_predictor = 0;
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
                        gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
-
+    
+    // wallclock time
+    start_total_macproj = ParallelDescriptor::second();
+    
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
+
+    // wallclock time
+    end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
+    ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the base state and full state through dt
@@ -712,7 +739,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
 
-        for(int i=0; i<beta0_nph.size(); ++i) {
+        for(int i=0; i<rho0_nph.size(); ++i) {
             rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
         }
 
@@ -812,9 +839,16 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
+    
+    // wallclock time
+    start_total_react = ParallelDescriptor::second();
 
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
 
+    // wallclock time
+    end_total_react += ParallelDescriptor::second() - start_total_react;
+    ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
+    
     if (evolve_base_state) {
         //compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
@@ -932,8 +966,19 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         }
     }
 
+    // wallclock time
+    const Real start_total_nodalproj = ParallelDescriptor::second();
+    
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
+
+    // wallclock time
+    Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
+    ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
+    
+    for(int i=0; i<beta0_nm1.size(); ++i) {
+        beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+    }
 
     if (!is_initIter) {
         if (!fix_base_state) {
@@ -954,12 +999,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             << " DT = " << dt << std::endl;
 
     // wallclock time
-    Real end_total = ParallelDescriptor::second() - strt_total;
-
-    // print wallclock time
+    Real end_total = ParallelDescriptor::second() - start_total;
     ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+    
+    // print wallclock time
     if (maestro_verbose > 0) {
         Print() << "Time to advance time step: " << end_total << '\n';
+        Print() << "Time to solve mac proj   : " << end_total_macproj << '\n';
+        Print() << "Time to solve nodal proj : " << end_total_nodalproj << '\n';
+        Print() << "Time to solve reactions  : " << end_total_react << '\n';
     }
 
 }

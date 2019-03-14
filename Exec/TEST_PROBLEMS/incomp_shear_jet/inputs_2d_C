@@ -1,6 +1,5 @@
 
 # INITIAL MODEL
-maestro.probin_file = "probin"
 maestro.perturb_model = true
 
 # PROBLEM SIZE
@@ -30,9 +29,6 @@ amr.ref_ratio          = 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
-# TAGGING
-maestro.temperr = 6.5e8 6.5e8
-
 # TIME STEPPING
 maestro.max_step  = 100000
 maestro.stop_time = 1.0
@@ -48,7 +44,7 @@ maestro.evolve_base_state = false
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0
 maestro.init_iter             = 1
-maestro.do_reflux             = 1 # do we do the hyperbolic reflux
+maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 
 maestro.do_sponge = 0
 maestro.sponge_center_density = 3.e6
@@ -58,7 +54,7 @@ maestro.sponge_kappa = 10.e0
 maestro.use_thermal_diffusion = false
 
 # PLOTFILES
-maestro.plot_base_name  = omp    # root name of plot file
+maestro.plot_base_name  = plt    # root name of plot file
 maestro.plot_int   = 500      # number of timesteps between plot files
 maestro.plot_deltat = 1
 
@@ -99,3 +95,26 @@ maestro.small_dens = 1.e-10
 
 # BURNING parameters
 maestro.do_burning = false
+
+&probin
+
+  ! override the default values of the probin namelist values here
+  yt = 0.0333333333333d0
+  delx = 0.05d0
+  rho_base = 1.0d0
+  p_base = 1.0d0
+
+  !extern
+
+  ! Note that some of the parameters in this
+  ! namelist are specific to the default EOS,
+  ! network, and/or integrator used in the
+  ! makefile. If you try a different set of
+  ! microphysics routines be sure to check that
+  ! the parameters in here are consistent, as
+  ! Fortran does not like seeing unknown variables
+  ! in the namelist.
+
+  !const_conductivity = 1.0d0
+
+/

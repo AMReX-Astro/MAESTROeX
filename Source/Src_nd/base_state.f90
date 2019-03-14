@@ -24,7 +24,7 @@ module base_state_module
                                 rhoh_comp, spec_comp, temp_comp, grav_const, &
                                 planar_invsq_mass, print_init_hse_diag, prob_lo
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
-  
+
   implicit none
 
   private
@@ -49,14 +49,14 @@ contains
     double precision :: temp_above_cutoff
 
     integer         :: n,r,comp
-    real(kind=dp_t) :: rloc,model_dr,rmax,starting_rad,mod_dr
-    real(kind=dp_t) :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
-    real(kind=dp_t) :: sumX
+    double precision :: rloc,model_dr,rmax,starting_rad,mod_dr
+    double precision :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
+    double precision :: sumX
 
-    real(kind=dp_t), parameter :: TINY = 1.0d-10
+    double precision, parameter :: TINY = 1.0d-10
 
-    real(kind=dp_t) :: mencl, g, r_l, r_r, dpdr, rhog
-    real(kind=dp_t) :: max_hse_error
+    double precision :: mencl, g, r_l, r_r, dpdr, rhog
+    double precision :: max_hse_error
 
     type (eos_t) :: eos_state
 
@@ -64,7 +64,7 @@ contains
 
     base_cutoff_density_loc = 1.d99
 
-    ! only need to read in the initial model once -- 
+    ! only need to read in the initial model once --
     ! model_parser_module stores the model data
     call read_model_file(model_file)
 
@@ -186,7 +186,7 @@ contains
        rhoh0 = s0_init(:,:,rhoh_comp)
        tempbar = s0_init(:,:,temp_comp)
        tempbar_init = s0_init(:,:,temp_comp)
-       p0 = p0_init       
+       p0 = p0_init
 
        ! check whether we are in HSE
 
@@ -252,7 +252,7 @@ contains
 
   end subroutine init_base_state
 
-  
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine init_base_state_irreg(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init, &
@@ -276,17 +276,17 @@ contains
     double precision :: temp_above_cutoff
 
     integer         :: n,r,comp,i
-    real(kind=dp_t) :: rloc,rmax,starting_rad,mod_dr
-    real(kind=dp_t) :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
-    real(kind=dp_t) :: sumX
-    real(kind=dp_t) :: dr_irreg, rfrac
-    
-    real(kind=dp_t), allocatable :: model_dr(:)
+    double precision :: rloc,rmax,starting_rad,mod_dr
+    double precision :: d_ambient,t_ambient,p_ambient,xn_ambient(nspec)
+    double precision :: sumX
+    double precision :: dr_irreg, rfrac
 
-    real(kind=dp_t), parameter :: TINY = 1.0d-10
+    double precision, allocatable :: model_dr(:)
 
-    real(kind=dp_t) :: mencl, g, r_l, r_r, dpdr, rhog
-    real(kind=dp_t) :: max_hse_error
+    double precision, parameter :: TINY = 1.0d-10
+
+    double precision :: mencl, g, r_l, r_r, dpdr, rhog
+    double precision :: max_hse_error
 
     type (eos_t) :: eos_state
 
@@ -294,20 +294,20 @@ contains
 
     base_cutoff_density_loc = 1.d99
 
-    ! only need to read in the initial model once -- 
+    ! only need to read in the initial model once --
     ! model_parser_module stores the model data
     call read_model_file(model_file)
 
     allocate (model_dr(0:npts_model-1))
-    
+
     model_dr(0) = model_r(1)
-    do i=1,npts_model-1 
-       model_dr(i) = (model_r(i+1) - model_r(i)) 
+    do i=1,npts_model-1
+       model_dr(i) = (model_r(i+1) - model_r(i))
     end do
     rmax = model_r(npts_model)
 
     do n=0,max_radial_level
-       
+
        if ( parallel_IOProcessor() ) then
           write (*,887)
           if (spherical .ne. 1) then
@@ -340,7 +340,7 @@ contains
        end if
 
        if (spherical .eq. 0) then
-          call bl_error('init_base_state_irreg() not valid for planar')
+          call amrex_error('init_base_state_irreg() not valid for planar')
        else
           starting_rad = ZERO
        endif
@@ -421,14 +421,14 @@ contains
        rhoh0 = s0_init(:,:,rhoh_comp)
        tempbar = s0_init(:,:,temp_comp)
        tempbar_init = s0_init(:,:,temp_comp)
-       p0 = p0_init       
+       p0 = p0_init
 
        ! check whether we are in HSE
 
        mencl = zero
 
        dr_irreg = r_edge_loc(n,1) - r_edge_loc(n,0)  ! edge-to-edge
-       
+
        if (spherical .eq. 1 .OR. do_2d_planar_octant .eq. 1) then
           mencl = four3rd*m_pi*dr_irreg**3*s0_init(n,0,rho_comp)
        endif
