@@ -404,7 +404,7 @@ contains
     do r=0,nr_irreg
        radii(lev,r) = sqrt(0.75d0+2.d0*r)*dx(1)
     end do
-    !$OMP END PARALLEL
+    !$OMP END PARALLEL DO
 
     radii(lev,nr_irreg+1) = 1.d99
     radii(lev,-1) = 0.d0
