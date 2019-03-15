@@ -20,7 +20,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR      := ECSN_weak
+NETWORK_DIR      := ECSN
 
 Bpack   := ./Make.package
 Blocs   := .
