@@ -561,11 +561,13 @@ contains
     double precision :: grav_edge(0:0,0:nr_fine  )
 
     ! create time-centered base-state quantities
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=0,nr_fine-1
        p0_nph(r)        = HALF*(p0_old(r)        + p0_new(r))
        rho0_nph(0,r)    = HALF*(rho0_old(r)      + rho0_new(r))
        gamma1bar_nph(r) = HALF*(gamma1bar_old(r) + gamma1bar_new(r))       
     enddo
+    !$OMP END PARALLEL DO
 
     ! NOTE: We first solve for the w0 resulting only from Sbar,
     !      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
@@ -586,9 +588,11 @@ contains
 
     end do
 
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=1,nr_fine
        w0_from_Sbar(r) = w0_from_Sbar(r) / r_edge_loc(0,r)**2
     end do
+    !$OMP END PARALLEL DO
 
     ! make the edge-centered gravity
     call make_grav_edge(grav_edge,rho0_nph,r_edge_loc)
@@ -607,6 +611,7 @@ contains
    
     ! Note that we are solving for (r^2 delta w0), not just w0. 
 
+    !$OMP PARALLEL DO PRIVATE(r,dpdr)
     do r=1,base_cutoff_density_coord(0)
        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2
        A(r) = A(r) / dr(0)**2
@@ -628,6 +633,7 @@ contains
               four * M_PI * Gconst * HALF * &
               (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec(r)
     end do
+    !$OMP END PARALLEL DO
 
     ! Lower boundary
     A(0) = zero
@@ -645,10 +651,12 @@ contains
     call tridiag(A, B, C, F, u, base_cutoff_density_coord(0)+2)
 
     w0(0) = ZERO + w0_from_Sbar(0)
-
+    
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=1,base_cutoff_density_coord(0)+1
        w0(r) = u(r) / r_edge_loc(0,r)**2 + w0_from_Sbar(r)
     end do
+    !$OMP END PARALLEL DO
 
     do r=base_cutoff_density_coord(0)+2,nr_fine
        w0(r) = w0(base_cutoff_density_coord(0)+1)&
@@ -658,6 +666,7 @@ contains
     ! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0 
     dt_avg = HALF * (dt + dtold)
 
+    !$OMP PARALLEL DO PRIVATE(r,w0_avg,div_avg)
     do r = 0,nr_fine-1
        w0_old_cen(r) = HALF * (w0_old(r) + w0_old(r+1))
        w0_new_cen(r) = HALF * (w0    (r) + w0    (r+1))
@@ -665,6 +674,7 @@ contains
        div_avg = HALF * (dt * (w0_old(r+1)-w0_old(r)) + dtold * (w0(r+1)-w0(r))) / dt_avg
        w0_force(r) = (w0_new_cen(r)-w0_old_cen(r)) / dt_avg + w0_avg * div_avg / dr(0)
     end do
+    !$OMP END PARALLEL DO    
 
   end subroutine make_w0_spherical
 
