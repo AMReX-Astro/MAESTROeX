@@ -1,4 +1,3 @@
-
 #include "AMReX_BC_TYPES.H"
 
 module slope_module

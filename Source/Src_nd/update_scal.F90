@@ -1,4 +1,3 @@
-
 module update_scal_module
 
   use amrex_constants_module

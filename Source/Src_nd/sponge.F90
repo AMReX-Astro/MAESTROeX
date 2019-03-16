@@ -29,7 +29,6 @@ module sponge_module
 contains
 
   subroutine init_sponge(rho0) bind(C, name="init_sponge")
-
     ! The sponge has a HALF * ( 1 - cos( (r - r_sp)/L)) profile, where
     ! the width, L, is r_tp - r_sp.
     !
@@ -95,9 +94,8 @@ contains
 
   end subroutine init_sponge
 
-  subroutine init_sponge_irreg(rho0,r_cc_loc,r_edge_loc) & 
+  subroutine init_sponge_irreg(rho0,r_cc_loc,r_edge_loc) &
     bind(C, name="init_sponge_irreg")
-
     ! The sponge has a HALF * ( 1 - cos( (r - r_sp)/L)) profile, where
     ! the width, L, is r_tp - r_sp.
     !
@@ -151,7 +149,7 @@ contains
     ! r_tp_outer = r_sp_outer + 4.0 * dx_fine
     if (spherical .eq. 1) then
        r_sp_outer = r_tp
-       r_tp_outer = r_sp_outer + 4.d0 * (2.d0/sqrt(3.d0) * r_cc_loc(0,0)) 
+       r_tp_outer = r_sp_outer + 4.d0 * (2.d0/sqrt(3.d0) * r_cc_loc(0,0))
     end if
 
     if (parallel_IOProcessor() .and. maestro_verbose .ge. 1) &
@@ -209,15 +207,15 @@ contains
 
        do k = lo(3),hi(3)
           z = prob_lo(3) + (dble(k)+HALF)*dx(3)
-          
+
           do j = lo(2),hi(2)
              y = prob_lo(2) + (dble(j)+HALF)*dx(2)
-             
+
              do i = lo(1),hi(1)
                 x = prob_lo(1) + (dble(i)+HALF)*dx(1)
-                
+
                 r = sqrt( (x-center(1))**2 + (y-center(2))**2 + (z-center(3))**2 )
-                
+
                 ! Inner sponge: damps velocities at edge of star
                 if (r >= r_sp) then
                    if (r < r_tp) then
@@ -227,7 +225,7 @@ contains
                    endif
                    sponge(i,j,k) = ONE / (ONE + dt * smdamp * sponge_kappa)
                 endif
-                
+
                 ! Outer sponge: damps velocities in the corners of the domain
                 if (r >= r_sp_outer) then
                    if (r < r_tp_outer) then
@@ -239,13 +237,13 @@ contains
                    sponge(i,j,k) = sponge(i,j,k) / &
                         (ONE + dt * smdamp * 10.d0 * sponge_kappa)
                 endif
-                
+
              end do
           end do
        end do
-       
+
     end if
-    
+
   end subroutine mk_sponge
-  
+
 end module sponge_module

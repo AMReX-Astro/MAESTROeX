@@ -1,7 +1,6 @@
-! make_edge_state is for reconstruction of the base state variables to
-! predict the time-centered edge states.
-
 module make_edge_state_module
+  ! make_edge_state is for reconstruction of the base state variables to
+  ! predict the time-centered edge states.
 
   use amrex_constants_module
   use amrex_error_module
@@ -10,7 +9,7 @@ module make_edge_state_module
                                             finest_radial_level, r_start_coord, r_end_coord
 
   implicit none
-  
+
 contains
 
   subroutine make_edge_state_1d(s,sedge,w0,force,dt)
@@ -88,7 +87,7 @@ contains
      hi = nr_fine-1
 
      if (ppm_type .eq. 0) then
-        
+
         ! compute slopes
         if (slope_order .eq. 0) then
 
@@ -119,7 +118,7 @@ contains
               dsscr(r,flag) = sign(ONE,dsscr(r,cen))
               dsscr(r,fromm)= dsscr(r,flag)*min(dsscr(r,lim),abs(dsscr(r,cen)))
            end do
-                 
+
            do r=lo,hi
               ! fourth-order limited slopes
               ds = FOURTHIRDS*dsscr(r,cen) - SIXTH*(dsscr(r+1,fromm)+dsscr(r-1,fromm))
@@ -162,7 +161,7 @@ contains
         end do
         !$OMP END PARALLEL DO
 
-        !$OMP PARALLEL DO PRIVATE(r)     
+        !$OMP PARALLEL DO PRIVATE(r)
         do r=lo,hi
 
            ! first copy sedgel into sp and sm
@@ -181,13 +180,13 @@ contains
 
         end do
         !$OMP END PARALLEL DO
-        
+
      else if (ppm_type .eq. 2) then
 
         ! interpolate s to radial edges, store these temporary values into sedgel
         !$OMP PARALLEL DO PRIVATE(r,D2,D2L,D2R,sgn,D2LIM)
         do r=lo-1,hi+2
-           
+
            ! fourth-order stencil
            sedgel(r) = (7.d0/12.d0)*(s_ghost(r-1)+s_ghost(r)) &
                 - (1.d0/12.d0)*(s_ghost(r-2)+s_ghost(r+1))
@@ -211,7 +210,7 @@ contains
         do r=lo,hi
 
            ! use Colella 2008 limiters
-           ! This is a new version of the algorithm 
+           ! This is a new version of the algorithm
            ! to eliminate sensitivity to roundoff.
            alphap = sedgel(r+1)-s_ghost(r)
            alpham = sedgel(r  )-s_ghost(r)
@@ -224,7 +223,7 @@ contains
            else if (bigp .or. bigm) then
               ! Possible extremum. We look at cell centered values and face
               ! centered values for a change in sign in the differences adjacent to
-              ! the cell. We use the pair of differences whose minimum magnitude is 
+              ! the cell. We use the pair of differences whose minimum magnitude is
               ! the largest, and thus least susceptible to sensitivity to roundoff.
               dafacem = sedgel(r) - sedgel(r-1)
               dafacep = sedgel(r+2) - sedgel(r+1)
@@ -260,7 +259,7 @@ contains
                  if (sgn*amax .ge. sgn*delam) then
                     if (sgn*(delam - alpham).ge.1.d-10) then
                        alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                    else 
+                    else
                        alphap = -TWO*alpham
                     endif
                  endif
@@ -284,7 +283,7 @@ contains
 
         end do ! loop over r
         !$OMP END PARALLEL DO
-        
+
      end if
 
      if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
@@ -334,18 +333,18 @@ contains
    end subroutine make_edge_state_1d_sphr
 
    subroutine make_edge_state_1d_planar(s,sedge,w0,force,dt)
-     
+
      double precision, intent(in   ) ::     s(0:max_radial_level,0:nr_fine-1)
      double precision, intent(inout) :: sedge(0:max_radial_level,0:nr_fine)
      double precision, intent(in   ) ::    w0(0:max_radial_level,0:nr_fine)
      double precision, intent(in   ) :: force(0:max_radial_level,0:nr_fine-1)
      double precision, intent(in   ) :: dt
-     
+
      double precision :: dmin,dpls,ds,del,slim,sflag,ubardth,dth,dtdr,savg,u
      double precision :: sigmap,sigmam,s6,D2,D2L,D2R,D2C,D2LIM,alphap,alpham,sgn
      double precision :: dafacem,dafacep,dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp
      double precision :: amax,delam,delap,D2ABS
-     
+
      integer :: r,lo,hi,n,i
 
      logical :: extremum, bigp, bigm
@@ -355,7 +354,7 @@ contains
 
      ! constant used in Colella 2008
      double precision, parameter :: C = 1.25d0
-        
+
      ! cell based indexing
      double precision :: slope(0:finest_radial_level,0:nr_fine-1)
      double precision :: dxscr(0:finest_radial_level,0:nr_fine-1,4)
@@ -364,11 +363,11 @@ contains
      double precision ::    sm(0:finest_radial_level,0:nr_fine-1)
      double precision ::    Ip(0:finest_radial_level,0:nr_fine-1)
      double precision ::    Im(0:finest_radial_level,0:nr_fine-1)
-     
+
      ! edge based indexing
      double precision :: sedgel(0:finest_radial_level,0:nr_fine)
      double precision :: sedger(0:finest_radial_level,0:nr_fine)
-     
+
      dth = HALF*dt
      dtdr = dt/dr(0)
 
@@ -390,7 +389,7 @@ contains
      end if
 
      if (ppm_type .eq. 0) then
-        
+
         ! compute slopes
         do n=0,finest_radial_level
            do i=1,numdisjointchunks(n)
@@ -490,7 +489,7 @@ contains
 
               lo = r_start_coord(n,i)
               hi = r_end_coord(n,i)
-        
+
               ! compute van Leer slopes
               !$OMP PARALLEL DO PRIVATE(r,del,dmin,dpls)
               do r=lo-1,hi+1
@@ -530,15 +529,15 @@ contains
 
            end do ! loop over disjointchunks
         end do ! loop over levels
-        
+
         ! copy sedgel into sp and sm
         do n=0,finest_radial_level
            do i=1,numdisjointchunks(n)
-              
+
               lo = r_start_coord(n,i)
               hi = r_end_coord(n,i)
 
-              !$OMP PARALLEL DO PRIVATE(r)     
+              !$OMP PARALLEL DO PRIVATE(r)
               do r=lo,hi
 
                  sp(n,r) = sedgel(n,r+1)
@@ -614,7 +613,7 @@ contains
         end do ! loop over levels
 
         ! use Colella 2008 limiters
-        ! This is a new version of the algorithm 
+        ! This is a new version of the algorithm
         ! to eliminate sensitivity to roundoff.
         do n=0,finest_radial_level
            do i=1,numdisjointchunks(n)
@@ -640,7 +639,7 @@ contains
                     else if (bigp .or. bigm) then
                        ! Possible extremum. We look at cell centered values and face
                        ! centered values for a change in sign in the differences adjacent to
-                       ! the cell. We use the pair of differences whose minimum magnitude is 
+                       ! the cell. We use the pair of differences whose minimum magnitude is
                        ! the largest, and thus least susceptible to sensitivity to roundoff.
                        dafacem = sedgel(n,r) - sedgel(n,r-1)
                        dafacep = sedgel(n,r+2) - sedgel(n,r+1)
@@ -676,7 +675,7 @@ contains
                           if (sgn*amax .ge. sgn*delam) then
                              if (sgn*(delam - alpham).ge.1.d-10) then
                                 alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                             else 
+                             else
                                 alphap = -TWO*alpham
                              endif
                           endif
@@ -694,7 +693,7 @@ contains
                           endif
                        end if
                     end if
-                    
+
                     sm(n,r) = s(n,r) + alpham
                     sp(n,r) = s(n,r) + alphap
 
@@ -715,7 +714,7 @@ contains
 
      ! compute Ip and Im
      if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-        
+
         do n=0,finest_radial_level
            do i=1,numdisjointchunks(n)
 
@@ -756,14 +755,14 @@ contains
            lo = r_start_coord(n,i)
            hi = r_end_coord(n,i)
 
-           ! if we are not at the finest level, copy in the sedger and sedgel states 
+           ! if we are not at the finest level, copy in the sedger and sedgel states
            ! from the next finer level at the c-f interface
            if (n .ne. finest_radial_level) then
               sedger(n,r_start_coord(n+1,i)/2) = sedger(n+1,r_start_coord(n+1,i))
               sedgel(n,(r_end_coord(n+1,i)+1)/2) = sedgel(n+1,r_end_coord(n+1,i)+1)
            end if
 
-           ! if we are not at the coarsest level, copy in the sedgel and sedger states 
+           ! if we are not at the coarsest level, copy in the sedgel and sedger states
            ! from the next coarser level at the c-f interface
            if (n .ne. 0) then
               sedgel(n,lo) = sedgel(n-1,lo/2)
@@ -801,5 +800,5 @@ contains
      end do ! loop over levels
 
    end subroutine make_edge_state_1d_planar
-   
+
  end module make_edge_state_module

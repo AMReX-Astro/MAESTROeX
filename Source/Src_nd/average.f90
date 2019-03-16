@@ -38,13 +38,14 @@ contains
   end subroutine average
 
   subroutine divide_phisum_by_ncell(phisum,ncell) bind (C,name="divide_phisum_by_ncell")
+    ! compute phibar by normalizing phisum
+
 
     double precision, intent(inout) :: phisum(0:max_radial_level,0:nr_fine-1)
     integer         , intent(in   ) ::  ncell(0:max_radial_level)
 
     integer :: n,i,r
 
-    ! compute phibar by normalizing phisum
     do n=0,max_radial_level
        do i=1,numdisjointchunks(n)
           do r=r_start_coord(n,i),r_end_coord(n,i)

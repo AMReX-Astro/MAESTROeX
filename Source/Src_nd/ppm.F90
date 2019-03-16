@@ -1,18 +1,17 @@
-! compute the PPM integrals, Ip and Im.  These are the integrals under
-! the parabolic profile of the reconstructed quantity over the domain
-! that can reach the interface over the timestep dt.
-!
-! Ip captures the amount of the state that can reach the right
-! interface of the cell and Im captures what can reach the left
-! interface of the cell over the step.
-!
-! There are cases here: one (originally called the 'fpu version') uses
-! the MAC velocity for the tracing while the non-fpu versions use the
-! cell-centered velocity.
-
 #include "AMReX_BC_TYPES.H"
 
 module ppm_module
+  ! compute the PPM integrals, Ip and Im.  These are the integrals under
+  ! the parabolic profile of the reconstructed quantity over the domain
+  ! that can reach the interface over the timestep dt.
+  !
+  ! Ip captures the amount of the state that can reach the right
+  ! interface of the cell and Im captures what can reach the left
+  ! interface of the cell over the step.
+  !
+  ! There are cases here: one (originally called the 'fpu version') uses
+  ! the MAC velocity for the tracing while the non-fpu versions use the
+  ! cell-centered velocity.
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
@@ -552,7 +551,6 @@ contains
   !===========================================================================
 
   subroutine ppm_2d(s,ng_s,u,v,ng_u,Ip,Im,domlo,domhi,lo,hi,adv_bc,dx,dt,is_umac)
-
     ! note that u,v here may be the normal cell-centered velocity,
     ! or the MAC velocity.  The is_umac argument tells us which it
     ! is.

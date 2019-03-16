@@ -11,22 +11,7 @@ module tagging_module
 
 contains
 
-  ! ::: -----------------------------------------------------------
-  ! ::: This routine will tag high error cells based on the state
-  ! :::
-  ! ::: INPUTS/OUTPUTS:
-  ! :::
-  ! ::: tag        <=  integer tag array
-  ! ::: tag_lo,hi   => index extent of tag array
-  ! ::: state       => state array
-  ! ::: state_lo,hi => index extent of state array
-  ! ::: set         => integer value to tag cell for refinement
-  ! ::: clear       => integer value to untag cell
-  ! ::: lo,hi       => work region we are allowed to change
-  ! ::: dx          => cell size
-  ! ::: time        => problem evolution time
-  ! ::: level       => refinement level of this array
-  ! ::: -----------------------------------------------------------
+
 
   subroutine state_error(tag,tag_lo,tag_hi, &
        state,state_lo,state_hi, &
@@ -34,6 +19,20 @@ contains
        lo,hi,&
        dx,time, &
        lev,tag_array) bind(C, name="state_error")
+    ! This routine will tag high error cells based on the state
+    !
+    ! INPUTS/OUTPUTS:
+    !
+    ! tag        <=  integer tag array
+    ! tag_lo,hi   => index extent of tag array
+    ! state       => state array
+    ! state_lo,hi => index extent of state array
+    ! set         => integer value to tag cell for refinement
+    ! clear       => integer value to untag cell
+    ! lo,hi       => work region we are allowed to change
+    ! dx          => cell size
+    ! time        => problem evolution time
+    ! level       => refinement level of this array
 
     integer          :: lo(3),hi(3)
     integer          :: state_lo(3),state_hi(3)
@@ -76,7 +75,7 @@ contains
     enddo
     enddo
     enddo
-       
+
   end subroutine state_error
 
   subroutine tag_boxes(tag,tag_lo,tag_hi, &
@@ -104,9 +103,9 @@ contains
     call abort()
 
     ! Tag on regions of high temperature
-#if (AMREX_SPACEDIM == 3) 
+#if (AMREX_SPACEDIM == 3)
     do k = lo(3), hi(3)
-       
+
        if (tag_array(lev,k) > 0) then
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
@@ -120,7 +119,7 @@ contains
 #elif (AMREX_SPACEDIM == 2)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
-          
+
           if (tag_array(lev,j) > 0) then
              do i = lo(1), hi(1)
                 tag(i,j,k) = set
@@ -134,17 +133,17 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             
+
              if (tag_array(lev,i) > 0) then
                 tag(i,j,k) = set
              endif
-             
+
           enddo
        enddo
     enddo
-    
+
 #endif
-       
+
   end subroutine tag_boxes
 
   subroutine retag_array(set,clear,&
@@ -183,7 +182,7 @@ contains
     enddo
     enddo
     enddo
-       
+
   end subroutine retag_array
-  
+
 end module tagging_module

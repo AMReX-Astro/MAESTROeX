@@ -1,4 +1,3 @@
-
 module fill_3d_data_module
 
   use amrex_error_module
@@ -147,7 +146,7 @@ contains
                       else
                          s0_cart(i,j,k,1) = s0_cart_val
                       end if
-                      
+
                    end do
                 end do
              end do

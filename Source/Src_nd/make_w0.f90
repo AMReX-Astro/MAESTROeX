@@ -1,10 +1,9 @@
-! compute w0 -- the base state velocity.  This is based on the average 
-! heating in a layer (Sbar) and the mixing (the eta quantities).  The
-! computation of w0 for plane-parallel atmospheres was first described
-! in paper II, with modifications due to mixing in paper III.  For 
-! spherical geometry, it was first described in paper III.
-
 module make_w0_module
+  ! compute w0 -- the base state velocity.  This is based on the average
+  ! heating in a layer (Sbar) and the mixing (the eta quantities).  The
+  ! computation of w0 for plane-parallel atmospheres was first described
+  ! in paper II, with modifications due to mixing in paper III.  For
+  ! spherical geometry, it was first described in paper III.
 
   use amrex_constants_module
   use make_grav_module
@@ -61,7 +60,7 @@ contains
     if (spherical .eq. 0) then
 
        if (do_planar_invsq_grav .OR. do_2d_planar_octant .eq. 1) then
-          
+
           call make_w0_planar_var_g(w0,w0_old,Sbar_in, &
                                     rho0_old,rho0_new,p0_old,p0_new, &
                                     gamma1bar_old,gamma1bar_new, &
@@ -104,7 +103,7 @@ contains
                                    r_cc_loc,r_edge_loc,dt,dtold)
 !          end if
        endif
-          
+
     end if
 
     if (maestro_verbose .ge. 2) then
@@ -158,7 +157,7 @@ contains
     ! do n=1,finest_radial_level
     !   Compute w0 on edges at level n
     !   Obtain the starting value of w0 from the coarser grid
-    !   if n>1, compare the difference between w0 at top of level n to the 
+    !   if n>1, compare the difference between w0 at top of level n to the
     !           corresponding point on level n-1
     !   do i=n-1,1,-1
     !     Restrict w0 from level n to level i
@@ -168,12 +167,12 @@ contains
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     w0 = ZERO
-    
+
     ! Compute w0 on edges at level n
     do n=0,max_radial_level
 
        do j=1,numdisjointchunks(n)
-          
+
           if (n .eq. 0) then
              ! Initialize new w0 at bottom of coarse base array to zero.
              w0(0,0) = ZERO
@@ -216,21 +215,21 @@ contains
              do i=n-1,0,-1
 
                 refrat = 2**(n-i)
-                
+
                 ! Restrict w0 from level n to level i
                 do r=r_start_coord(n,j),r_end_coord(n,j)+1
                    if (mod(r,refrat) .eq. 0) then
                       w0(i,r/refrat) = w0(n,r)
                    end if
                 end do
-                
+
                 ! Offset the w0 on level i above the top of level n
                 do r=(r_end_coord(n,j)+1)/refrat+1,nr(i)
                    w0(i,r) = w0(i,r) + offset
                 end do
-                
+
              end do
-             
+
           end if
 
        end do
@@ -269,7 +268,7 @@ contains
                   dtold * (w0(n,r+1)-w0(n,r))) / dt_avg
              w0_force(n,r) = (w0_new_cen(n,r)-w0_old_cen(n,r))/dt_avg + w0_avg*div_avg/dr(n)
           end do
-          
+
        end do
     end do
 
@@ -330,12 +329,12 @@ contains
     double precision :: w0_new_cen(0:finest_radial_level,0:nr(finest_radial_level)-1)
 
 
-    ! The planar 1/r**2 gravity constraint equation is solved 
-    ! by calling the tridiagonal solver, just like spherical.  
+    ! The planar 1/r**2 gravity constraint equation is solved
+    ! by calling the tridiagonal solver, just like spherical.
     ! This is accomplished by putting all the requisite data
     ! on the finest basestate grid, solving for w0, and then
     ! restricting w0 back down to the coarse grid.
-    
+
 
     ! 1) allocate the finely-gridded temporary basestate arrays
     allocate(              w0_fine(0:nr(finest_radial_level)))
@@ -371,7 +370,7 @@ contains
     do r=0,nr(finest_radial_level)-1
        p0_nph_fine(r)        = HALF*(p0_old_fine(r)        + p0_new_fine(r))
        rho0_nph_fine(r)      = HALF*(rho0_old_fine(r)      + rho0_new_fine(r))
-       gamma1bar_nph_fine(r) = HALF*(gamma1bar_old_fine(r) + gamma1bar_new_fine(r))       
+       gamma1bar_nph_fine(r) = HALF*(gamma1bar_old_fine(r) + gamma1bar_new_fine(r))
     enddo
 
     ! 3) solve to w0bar -- here we just take into account the Sbar and
@@ -392,7 +391,7 @@ contains
 
        w0bar_fine(r) =  w0bar_fine(r-1) + Sbar_in_fine(r-1) * dr(finest_radial_level) &
             - (volume_discrepancy / gamma1bar_p0_avg ) * dr(finest_radial_level)
-       
+
     enddo
 
     ! 4) get the edge-centered gravity on the uniformly-gridded
@@ -405,8 +404,8 @@ contains
     deltaw0_fine(:) = ZERO
 
     ! this takes the form of a tri-diagonal matrix:
-    ! A_j (dw_0)_{j-3/2} + 
-    ! B_j (dw_0)_{j-1/2} + 
+    ! A_j (dw_0)_{j-3/2} +
+    ! B_j (dw_0)_{j-1/2} +
     ! C_j (dw_0)_{j+1/2} = F_j
 
     allocate(A(0:nr(finest_radial_level)))
@@ -422,16 +421,16 @@ contains
     u   = ZERO
 
     do r=1,base_cutoff_density_coord(finest_radial_level)
-       A(r) = gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1) 
+       A(r) = gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1)
        A(r) = A(r) / dr(finest_radial_level)**2
 
        dpdr = (p0_nph_fine(r)-p0_nph_fine(r-1))/dr(finest_radial_level)
 
        B(r) = -(gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1) + &
-                gamma1bar_nph_fine(r  ) * p0_nph_fine(r  )) / dr(finest_radial_level)**2 
+                gamma1bar_nph_fine(r  ) * p0_nph_fine(r  )) / dr(finest_radial_level)**2
        B(r) = B(r) - TWO * dpdr / (r_edge_loc(finest_radial_level,r))
 
-       C(r) = gamma1bar_nph_fine(r) * p0_nph_fine(r) 
+       C(r) = gamma1bar_nph_fine(r) * p0_nph_fine(r)
        C(r) = C(r) / dr(finest_radial_level)**2
 
        F(r) = TWO * dpdr * w0bar_fine(r) / r_edge_loc(finest_radial_level,r) - &
@@ -508,7 +507,7 @@ contains
                   dtold * (w0(n,r+1)-w0(n,r))) / dt_avg
              w0_force(n,r) = (w0_new_cen(n,r)-w0_old_cen(n,r))/dt_avg + w0_avg*div_avg/dr(n)
           end do
-          
+
        end do
     end do
 
@@ -564,7 +563,7 @@ contains
     do r=0,nr_fine-1
        p0_nph(r)        = HALF*(p0_old(r)        + p0_new(r))
        rho0_nph(0,r)    = HALF*(rho0_old(r)      + rho0_new(r))
-       gamma1bar_nph(r) = HALF*(gamma1bar_old(r) + gamma1bar_new(r))       
+       gamma1bar_nph(r) = HALF*(gamma1bar_old(r) + gamma1bar_new(r))
     enddo
 
     ! NOTE: We first solve for the w0 resulting only from Sbar,
@@ -595,8 +594,8 @@ contains
 
     ! NOTE:  now we solve for the remainder, (r^2 * delta w0)
     ! this takes the form of a tri-diagonal matrix:
-    ! A_j (r^2 dw_0)_{j-3/2} + 
-    ! B_j (r^2 dw_0)_{j-1/2} + 
+    ! A_j (r^2 dw_0)_{j-3/2} +
+    ! B_j (r^2 dw_0)_{j-1/2} +
     ! C_j (r^2 dw_0)_{j+1/2} = F_j
 
     A   = ZERO
@@ -604,15 +603,15 @@ contains
     C   = ZERO
     F   = ZERO
     u   = ZERO
-   
-    ! Note that we are solving for (r^2 delta w0), not just w0. 
+
+    ! Note that we are solving for (r^2 delta w0), not just w0.
 
     do r=1,base_cutoff_density_coord(0)
        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2
        A(r) = A(r) / dr(0)**2
 
        B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2 &
-                +gamma1bar_nph(r  ) * p0_nph(r  ) / r_cc_loc(0,r  )**2 ) / dr(0)**2 
+                +gamma1bar_nph(r  ) * p0_nph(r  ) / r_cc_loc(0,r  )**2 ) / dr(0)**2
 
        dpdr = (p0_nph(r)-p0_nph(r-1))/dr(0)
 
@@ -655,7 +654,7 @@ contains
             *r_edge_loc(0,base_cutoff_density_coord(0)+1)**2/r_edge_loc(0,r)**2
     end do
 
-    ! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0 
+    ! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
     dt_avg = HALF * (dt + dtold)
 
     do r = 0,nr_fine-1
@@ -689,11 +688,11 @@ contains
     ! Local variables
     integer :: r
     double precision :: LHS, RHS
-    
+
     double precision ::      rho0_nph(0:0,0:nr_fine-1)
     double precision :: gamma1bar_nph(0:nr_fine-1)
     double precision ::        p0_nph(0:nr_fine-1)
-    
+
     double precision ::     grav_cell(0:0,0:nr_fine-1)
 
     do r=0,nr_fine-1
@@ -701,9 +700,9 @@ contains
        rho0_nph(0,r)    = HALF*(rho0_old(r)      + rho0_new(r))
        gamma1bar_nph(r) = HALF*(gamma1bar_old(r) + gamma1bar_new(r))
     end do
-    
+
     call make_grav_cell(grav_cell,rho0_nph,r_cc_loc,r_edge_loc)
-    
+
     w0(0) = 0.d0
 
     do r=1,base_cutoff_density_coord(0)+1
@@ -724,7 +723,7 @@ contains
     end do
 
   end subroutine make_w0_spherical_simple
-  
+
   subroutine prolong_base_to_uniform(base_ml, base_fine)
 
     double precision, intent(in   ) :: base_ml(0:max_radial_level,0:nr_fine)
@@ -753,17 +752,17 @@ contains
                  base_fine(r*r1:(r+1)*r1-1) = base_ml(n,r)
                 imask_fine(r*r1:(r+1)*r1-1) = .false.
              endif
-             
+
           enddo
        enddo
-       
+
        ! update r1 for the next coarsest level -- assume a jump by
        ! factor of 2
        r1 = r1*2
 
     enddo
 
-    ! check to make sure that no mask values are still true    
+    ! check to make sure that no mask values are still true
     if (any(imask_fine)) then
        call amrex_error("ERROR: unfilled cells in prolong_base_to_uniform")
     endif
@@ -849,7 +848,7 @@ contains
     do r=0,nr_fine-1
        p0_nph(r)        = HALF*(p0_old(r)        + p0_new(r))
        rho0_nph(0,r)    = HALF*(rho0_old(r)      + rho0_new(r))
-       gamma1bar_nph(r) = HALF*(gamma1bar_old(r) + gamma1bar_new(r))       
+       gamma1bar_nph(r) = HALF*(gamma1bar_old(r) + gamma1bar_new(r))
     enddo
 
     ! NOTE: We first solve for the w0 resulting only from Sbar,
@@ -881,8 +880,8 @@ contains
 
     ! NOTE:  now we solve for the remainder, (r^2 * delta w0)
     ! this takes the form of a tri-diagonal matrix:
-    ! A_j (r^2 dw_0)_{j-3/2} + 
-    ! B_j (r^2 dw_0)_{j-1/2} + 
+    ! A_j (r^2 dw_0)_{j-3/2} +
+    ! B_j (r^2 dw_0)_{j-1/2} +
     ! C_j (r^2 dw_0)_{j+1/2} = F_j
 
     A   = ZERO
@@ -890,19 +889,19 @@ contains
     C   = ZERO
     F   = ZERO
     u   = ZERO
-   
-    ! Note that we are solving for (r^2 delta w0), not just w0. 
+
+    ! Note that we are solving for (r^2 delta w0), not just w0.
 
     do r=1,base_cutoff_density_coord(0)
        dr1 = r_edge_loc(0,r) - r_edge_loc(0,r-1)
        dr2 = r_edge_loc(0,r+1) - r_edge_loc(0,r)
        dr3 = r_cc_loc(0,r) - r_cc_loc(0,r-1)
-       
+
        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2
        A(r) = A(r) / dr1 / dr3
 
        B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2 / dr1 &
-                +gamma1bar_nph(r  ) * p0_nph(r  ) / r_cc_loc(0,r  )**2 / dr2 ) / dr3 
+                +gamma1bar_nph(r  ) * p0_nph(r  ) / r_cc_loc(0,r  )**2 / dr2 ) / dr3
 
        dpdr = (p0_nph(r)-p0_nph(r-1))/dr3
 
@@ -945,7 +944,7 @@ contains
             *r_edge_loc(0,base_cutoff_density_coord(0)+1)**2/r_edge_loc(0,r)**2
     end do
 
-    ! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0 
+    ! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
     dt_avg = HALF * (dt + dtold)
 
     do r = 0,nr_fine-1
@@ -956,7 +955,7 @@ contains
        div_avg = HALF * (dt * (w0_old(r+1)-w0_old(r)) + dtold * (w0(r+1)-w0(r))) / dt_avg
        w0_force(r) = (w0_new_cen(r)-w0_old_cen(r)) / dt_avg + w0_avg * div_avg / dr1
     end do
-    
+
   end subroutine make_w0_sphr_irreg
-  
+
 end module make_w0_module

@@ -24,7 +24,6 @@ contains
        p0, rho0, grav, psi, &
        is_prediction, add_thermal) &
        bind(C,name="mkrhohforce")
-
     ! compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
 
     integer         , intent(in   ) :: lev,lo(3),hi(3)
@@ -174,7 +173,6 @@ contains
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) &
        bind(C,name="mkrhohforce_sphr")
-
     ! compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
 
     integer         , intent(in   ) :: lo(3),hi(3)

@@ -15,19 +15,28 @@ help:
 .PHONY: help Makefile
 
 clean:
-	rm -rf build doxy_files source/class source/file source/namespace
-	rm -f source/classlist.rst source/filelist.rst source/namespacelist.rst
+	rm -rf build doxy_files source/class source/file source/preprocessed_files
+	rm -f source/classlist.rst source/filelist.rst
 	rm -rf ../docs
+	rm -rf source/*_files.rst
 
 html:
 	./rp.py > source/runtime_parameters.rst
-	#doxygen Doxyfile
-	#breathe-apidoc --o source doxy_files/xml
+	python3 preprocess_files.py
+ifneq ($(NO_DOXYGEN),TRUE)
+	doxygen Doxyfile
+	breathe-apidoc --o source doxy_files/xml -g class,file
+endif
+	python make_api.py
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
+	python3 preprocess_files.py
+ifneq ($(NO_DOXYGEN),TRUE)
 	doxygen Doxyfile
-	breathe-apidoc --o source doxy_files/xml
+	breathe-apidoc --o source doxy_files/xml -g class,file
+endif
+	python make_api.py
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

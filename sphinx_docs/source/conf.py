@@ -55,13 +55,11 @@ extensions = ['sphinx.ext.autodoc',
     'sphinxcontrib.bibtex',
     'sphinx.ext.autosummary',
     'sphinx.ext.githubpages',
-    'breathe']
-
-breathe_projects = {
-    "maestroex":"../doxy_files/xml",
-    }
-
-breathe_default_project = "maestroex"
+    'numpydoc',
+    'sphinx.ext.githubpages',
+    'breathe',
+    'sphinxfortran.fortran_domain',
+    'sphinxfortran.fortran_autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -217,3 +215,26 @@ texinfo_documents = [
      author, 'MAESTROeX', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+# -- Options for breathe -------------------------------------------------
+
+
+
+breathe_projects = {
+"maestroex":"../doxy_files/xml",
+}
+
+breathe_default_project = "maestroex"
+
+breathe_default_members = ('members', 'undoc-members', 'protected-members',
+                           'private-members')
+
+breathe_doxygen_config_options = {'EXTRACT_ALL': 'YES',
+                                  'SHOW_USED_FILES': 'YES', 'RECURSIVE': 'YES'
+                                  }
+
+# -- Options for sphinx-fortran -----------------------------------------
+
+fortran_src = [os.path.abspath('preprocessed_files')]
+
+fortran_ext = ['f90', 'F90']

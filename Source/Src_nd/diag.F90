@@ -1,29 +1,29 @@
-! diag module for MAESTROeX. 
-! currently, there are 3 output files:
-!
-!   diag_enuc.out:
-!          peak nuc energy generation rate (erg / g / s)
-!          x/y/z location of peak enuc
-!          velocity components at location of peak enuc (including vr)
-!          radius of peak enuc
-!          total nuclear energy release (erg / s)
-!
-!   diag_temp.out:          
-!          peak temperature
-!          x/y/z location of peak temperature
-!          velocity components at location of peak temperature (including vr)
-!          radius of peak temperature
-!          central temperature
-!
-!   diag_vel.out:
-!          peak total velocity
-!          peak Mach number
-!          total kinetic energy
-!          gravitational potential energy
-!          total internal energy
-!          velocity components at the center of the star
-!
 module diag_module
+  ! diag module for MAESTROeX.
+  ! currently, there are 3 output files:
+  !
+  !   diag_enuc.out:
+  !          peak nuc energy generation rate (erg / g / s)
+  !          x/y/z location of peak enuc
+  !          velocity components at location of peak enuc (including vr)
+  !          radius of peak enuc
+  !          total nuclear energy release (erg / s)
+  !
+  !   diag_temp.out:
+  !          peak temperature
+  !          x/y/z location of peak temperature
+  !          velocity components at location of peak temperature (including vr)
+  !          radius of peak temperature
+  !          central temperature
+  !
+  !   diag_vel.out:
+  !          peak total velocity
+  !          peak Mach number
+  !          total kinetic energy
+  !          gravitational potential energy
+  !          total internal energy
+  !          velocity components at the center of the star
+  !
 
   use meth_params_module, only: rho_comp, spec_comp, temp_comp, prob_lo, &
        sponge_start_factor, sponge_center_density, base_cutoff_density
@@ -277,7 +277,7 @@ contains
                    vel_enucmax(2)   = u(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k))
                    vel_enucmax(3)   = u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1))
                 end if
-                
+
                 ! call the EOS to get the sound speed and internal energy
                 eos_state%T     = scal(i,j,k,temp_comp)
                 eos_state%rho   = scal(i,j,k,rho_comp)
@@ -330,7 +330,7 @@ contains
        ! mass at the current center, we need to add the contribution
        ! of the upper half of the zone below us and the lower half of
        ! the current zone.
-       
+
        ! don't add any contributions from outside the star -- i.e.
        ! rho < base_cutoff_density
        if ( rho0(0,r-1) > base_cutoff_density ) then
@@ -348,14 +348,14 @@ contains
                (r_cc_loc(0,r) - r_edge_loc(0,r  )) * &
                (r_cc_loc(0,r)**2 + &
                 r_cc_loc(0,r)*r_edge_loc(0,r  ) + &
-                r_edge_loc(0,r  )**2)          
+                r_edge_loc(0,r  )**2)
        else
           term2 = ZERO
        endif
 
        m(r) = m(r-1) + term1 + term2
-          
-       ! dU = - G M dM / r;  
+
+       ! dU = - G M dM / r;
        ! dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
        grav_ener = grav_ener - &
             FOUR*M_PI*Gconst*m(r)*r_cc_loc(0,r)*rho0(0,r)*(r_edge_loc(0,r+1)-r_edge_loc(0,r))

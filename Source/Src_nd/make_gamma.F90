@@ -1,7 +1,5 @@
-! compute gamma1 for the full state.
-
-
 module make_gamma_module
+  ! compute gamma1 for the full state.
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use eos_type_module

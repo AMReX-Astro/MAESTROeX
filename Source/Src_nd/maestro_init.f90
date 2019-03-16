@@ -30,7 +30,6 @@ contains
   ! :::
 
   subroutine maestro_extern_init() bind(C, name="maestro_extern_init")
-
     ! initialize the external runtime parameters in
     ! extern_probin_module
 
@@ -45,7 +44,6 @@ contains
   ! :::
 
   subroutine maestro_conductivity_init() bind(C, name="maestro_conductivity_init")
-
     ! initialize the external runtime parameters in
     ! extern_probin_module
 

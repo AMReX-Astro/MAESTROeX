@@ -1,10 +1,9 @@
-! a module for storing the geometric information so we don't have to pass it
-!
-! This module provides the coordinate value for the left edge of a base-state
-! zone (r_edge_loc) and the zone center (r_cc_loc).  As always, it is assumed that
-! the base state arrays begin with index 0, not 1.
-
 module base_state_geometry_module
+  ! a module for storing the geometric information so we don't have to pass it
+  !
+  ! This module provides the coordinate value for the left edge of a base-state
+  ! zone (r_edge_loc) and the zone center (r_cc_loc).  As always, it is assumed that
+  ! the base state arrays begin with index 0, not 1.
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
@@ -333,7 +332,6 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine init_multilevel(tag_array, finest_radial_level_in) bind(C, name="init_multilevel")
-
     ! compute numdisjointchunks, r_start_coord, r_end_coord
     ! FIXME - right now there is one chunk at each level that spans the domain
 
@@ -359,7 +357,7 @@ contains
     ! to use for allocating r_start_coord and r_end_coord
     maxchunks = 1
     do n=1,finest_radial_level
-       
+
        ! initialize variables
        chunk_start = .false.
        nchunks = 0
@@ -378,16 +376,16 @@ contains
        maxchunks = max(nchunks,maxchunks)
 
     end do
-    
+
     if (associated(r_start_coord)) then
        call bl_deallocate(r_start_coord)
     end if
-    call bl_allocate(r_start_coord,0,finest_radial_level,1,maxchunks) 
+    call bl_allocate(r_start_coord,0,finest_radial_level,1,maxchunks)
 
     if (associated(r_end_coord)) then
        call bl_deallocate(r_end_coord)
     end if
-    call bl_allocate(r_end_coord,0,finest_radial_level,1,maxchunks) 
+    call bl_allocate(r_end_coord,0,finest_radial_level,1,maxchunks)
 
     if (spherical .eq. 0) then
 
@@ -418,7 +416,7 @@ contains
              end if
           end do
        end do
-       
+
     else
 
        numdisjointchunks(0) = 1
@@ -429,7 +427,7 @@ contains
 
 !!$    print *,"hack,",numdisjointchunks
 !!$    print *,"hack,",r_start_coord(1,:),r_end_coord(1,:)
-    
+
   end subroutine init_multilevel
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

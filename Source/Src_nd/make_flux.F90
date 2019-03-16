@@ -1,33 +1,32 @@
-! The make_flux routines take the predicted edges states of the scalars
-! and the MAC velocities and compute the fluxes through the
-! interfaces.
-
-! For the species fluxes, the construction of the fluxes depends on
-! what form the incoming edge states take.  This depends on
-! species_pred_type:
-!
-! predict_rhoprime_and_X:
-!    We have rho' and X, and need a edge-centered base state to
-!    make the final fluxes
-!
-! predict_rhoX:
-!    We use the (rho X) edge state directly to compute the fluxes.
-!    No base state input needed.
-!
-! predict_rho_and_X:
-!   The fluxes are computed from the product of the rho and X
-!   edge states, again, no base state input needed.
-!
-!
-! For enthalpy, there are a wide range of quantities that we predict,
-! but they fall into 2 categories.  The enthalpy edge states either
-! contain predictions of h or (rho h)'.  (There is limited support for
-! h' prediction, but it is not well tested).  If we have h, then we
-! construct a rho depending on the species states (i.e. species_pred_type).
-! If we have (rho h)', then we use the base state to make (rho h)_0 on
-! edges.
-
 module make_flux_module
+  ! The make_flux routines take the predicted edges states of the scalars
+  ! and the MAC velocities and compute the fluxes through the
+  ! interfaces.
+
+  ! For the species fluxes, the construction of the fluxes depends on
+  ! what form the incoming edge states take.  This depends on
+  ! species_pred_type:
+  !
+  ! predict_rhoprime_and_X:
+  !    We have rho' and X, and need a edge-centered base state to
+  !    make the final fluxes
+  !
+  ! predict_rhoX:
+  !    We use the (rho X) edge state directly to compute the fluxes.
+  !    No base state input needed.
+  !
+  ! predict_rho_and_X:
+  !   The fluxes are computed from the product of the rho and X
+  !   edge states, again, no base state input needed.
+  !
+  !
+  ! For enthalpy, there are a wide range of quantities that we predict,
+  ! but they fall into 2 categories.  The enthalpy edge states either
+  ! contain predictions of h or (rho h)'.  (There is limited support for
+  ! h' prediction, but it is not well tested).  If we have h, then we
+  ! construct a rho depending on the species states (i.e. species_pred_type).
+  ! If we have (rho h)', then we use the base state to make (rho h)_0 on
+  ! edges.
 
   use amrex_error_module
   use amrex_constants_module
