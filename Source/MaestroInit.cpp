@@ -604,6 +604,9 @@ void Maestro::InitIter ()
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::InitIter()",InitIter);
 
+        // wallclock time
+        Real start_total = ParallelDescriptor::second();
+                
 	// advance the solution by dt
 	if (use_exact_base_state) {
 		AdvanceTimeStepIrreg(true);
@@ -612,6 +615,12 @@ void Maestro::InitIter ()
 	} else {
 		AdvanceTimeStep(true);
 	}
+
+        // wallclock time
+        Real end_total = ParallelDescriptor::second() - start_total;
+        ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+    
+        Print() << "Time to advance time step: " << end_total << '\n';
 
 	// copy pi from snew to sold
 	for (int lev=0; lev<=finest_level; ++lev) {

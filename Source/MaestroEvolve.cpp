@@ -72,6 +72,9 @@ Maestro::Evolve ()
 
 			t_new = t_old + dt;
 		}
+    
+                // wallclock time
+                Real start_total = ParallelDescriptor::second();
 
 		// advance the solution by dt
 		if (use_exact_base_state) {
@@ -87,6 +90,12 @@ Maestro::Evolve ()
 		// save diag output into buffer
 		DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
 
+                // wallclock time
+                Real end_total = ParallelDescriptor::second() - start_total;
+                ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+    
+                Print() << "Time to advance time step: " << end_total << '\n';
+        
 		// write a plotfile
 		if (plot_int > 0 && ( (istep % plot_int == 0) ||
 		                      (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
