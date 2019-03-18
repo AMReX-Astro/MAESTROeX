@@ -47,7 +47,7 @@ contains
     double precision, pointer :: xn_zone(:, :)
     type (eos_t) :: eos_state
 
-    scal(scal_lo(1):scal_hi(1), scal_lo(2):scal_hi(2), scal_lo(3):scal_hi(3), 1:nc_s) = ZERO
+    scal(lo(1):hi(1), lo(2):hi(2), lo(3):hi(3), 1:nc_s) = ZERO
 
     xn_hi = domhi(3)-domlo(3)
 
