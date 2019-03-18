@@ -80,9 +80,9 @@ contains
     ! local
     integer          :: i,j,k,index
 
-    do i=lo(1),hi(1)
+    do k=lo(3),hi(3)
        do j=lo(2),hi(2)
-          do k=lo(3),hi(3)
+          do i=lo(1),hi(1)
              index = cc_to_r(i,j,k)
              phisum(lev,index) = phisum(lev,index) + phi(i,j,k)
              ncell(lev,index) = ncell(lev,index) + 1
@@ -157,6 +157,7 @@ contains
        rcoord(n) = 0
     end do
 
+    !$OMP PARALLEL DO PRIVATE(r,radius,n,j,min_all,min_lev) FIRSTPRIVATE(rcoord)
     do r=0,nr_fine-1
 
        radius = (dble(r)+0.5d0)*dr(0)
@@ -213,6 +214,7 @@ contains
        end do
 
     end do
+    !$OMP END PARALLEL DO
 
     ! squish the list at each level down to exclude points with no contribution
     do n=0,finest_level
@@ -244,6 +246,7 @@ contains
     ! compute phibar
     stencil_coord = 0
 
+    !$OMP PARALLEL DO PRIVATE(r,radius,j,limit) FIRSTPRIVATE(stencil_coord)
     do r=0,nr_fine-1
 
        radius = (dble(r)+0.5d0)*dr(0)
@@ -280,6 +283,7 @@ contains
             phisum(which_lev(r),stencil_coord(which_lev(r))+1), limit)
 
     end do
+    !$OMP END PARALLEL DO
 
   contains
 
@@ -397,9 +401,11 @@ contains
 
     integer :: r
 
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=0,nr_irreg
        radii(lev,r) = sqrt(0.75d0+2.d0*r)*dx(1)
     end do
+    !$OMP END PARALLEL DO
 
     radii(lev,nr_irreg+1) = 1.d99
     radii(lev,-1) = 0.d0

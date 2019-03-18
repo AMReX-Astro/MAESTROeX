@@ -238,6 +238,7 @@ contains
     call put_1d_array_on_cart_sphr(lo,hi,rho0_nph_cart,lo,hi,1,rho0_nph,dx,0,0, &
          r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,U_dot_er)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -256,6 +257,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(rho0_new_cart)
     call bl_deallocate(rho0_nph_cart)

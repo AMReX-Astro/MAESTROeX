@@ -17,7 +17,8 @@ Maestro::WritePlotFile (const int step,
                         const Vector<Real>& d,
                         const Vector<MultiFab>& rho_omegadot,
                         Vector<MultiFab>& rho_Hnuc,
-                        const Vector<MultiFab>& rho_Hext)
+                        const Vector<MultiFab>& rho_Hext,
+                        const bool is_small)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
@@ -46,7 +47,8 @@ Maestro::WritePlotFile (const int step,
 		plotfilename = run_prefix + "model4";
 	}
 	else {
-		plotfilename = run_prefix + PlotFileName(step);
+		plotfilename = run_prefix + plot_base_name;
+        PlotFileName(step, &plotfilename);
 	}
 
 	int nPlot = 0;
@@ -80,10 +82,10 @@ Maestro::WritePlotFile (const int step,
 
 
 // get plotfile name
-std::string
-Maestro::PlotFileName (int lev) const
+void
+Maestro::PlotFileName (const int lev, std::string* plotfilename)
 {
-	return Concatenate(plot_base_name, lev, 2);
+	*plotfilename = Concatenate(*plotfilename, lev, 2);
 }
 
 // put together a vector of multifabs for writing
