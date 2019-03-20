@@ -73,6 +73,7 @@ maestro.init_divu_iter        = 2
 maestro.do_burning = true
 
 maestro.evolve_base_state = true
+maestro.average_base_state = true
 
 maestro.dpdt_factor = 0.0e0
 

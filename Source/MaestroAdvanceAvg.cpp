@@ -98,9 +98,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     int is_predictor;
 
-    // wallclock time
-    const Real strt_total = ParallelDescriptor::second();
-
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
 	    << " DT = " << dt << std::endl << std::endl;
 
@@ -1020,13 +1017,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
 	    << " DT = " << dt << std::endl;
 
-    // wallclock time
-    Real end_total = ParallelDescriptor::second() - strt_total;
-    ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
-
     // print wallclock time
     if (maestro_verbose > 0) {
-	Print() << "Time to advance time step: " << end_total << '\n';
         Print() << "Time to solve mac proj   : " << end_total_macproj << '\n';
         Print() << "Time to solve nodal proj : " << end_total_nodalproj << '\n';
         Print() << "Time to solve reactions  : " << end_total_react << '\n';
