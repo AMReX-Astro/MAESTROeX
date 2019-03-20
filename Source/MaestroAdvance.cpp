@@ -198,6 +198,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     
     misc_time += ParallelDescriptor::second() - misc_time_start;
     ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 1 -- react the full state and then base state through dt/2
@@ -213,6 +214,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- define average expansion at time n+1/2
@@ -341,7 +343,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
-    
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
+
     macproj_time_start = ParallelDescriptor::second();
     
     // MAC projection
@@ -350,6 +353,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     macproj_time += ParallelDescriptor::second() - macproj_time_start;
     ParallelDescriptor::ReduceRealMax(macproj_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&macproj_time,1,ParallelDescriptor::IOProcessorNumber());
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the base state and full state through dt
@@ -506,6 +510,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -523,6 +528,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     thermal_time += ParallelDescriptor::second() - thermal_time_start;
     ParallelDescriptor::ReduceRealMax(thermal_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&thermal_time,1,ParallelDescriptor::IOProcessorNumber());
     
     misc_time_start = ParallelDescriptor::second();
     
@@ -551,6 +557,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     misc_time += ParallelDescriptor::second() - misc_time_start;
     ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 5 -- react the full state and then base state through dt/2
@@ -566,6 +573,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
     
     misc_time_start = ParallelDescriptor::second();
     
@@ -587,6 +595,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     misc_time += ParallelDescriptor::second() - misc_time_start;
     ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 6 -- define a new average expansion rate at n+1/2
@@ -702,6 +711,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
     
     macproj_time_start = ParallelDescriptor::second();
     
@@ -711,6 +721,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     macproj_time += ParallelDescriptor::second() - macproj_time_start;
     ParallelDescriptor::ReduceRealMax(macproj_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&macproj_time,1,ParallelDescriptor::IOProcessorNumber());
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the base state and full state through dt
@@ -839,6 +850,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -858,6 +870,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     thermal_time += ParallelDescriptor::second() - thermal_time_start;
     ParallelDescriptor::ReduceRealMax(thermal_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&thermal_time,1,ParallelDescriptor::IOProcessorNumber());
     
     misc_time_start = ParallelDescriptor::second();
     
@@ -878,6 +891,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     
     misc_time += ParallelDescriptor::second() - misc_time_start;
     ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 9 -- react the full state and then base state through dt/2
@@ -893,6 +907,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
 
     misc_time_start = ParallelDescriptor::second();
     
@@ -909,6 +924,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     
     misc_time += ParallelDescriptor::second() - misc_time_start;
     ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 10 -- compute S^{n+1} for the final projection
@@ -948,6 +964,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     ndproj_time += ParallelDescriptor::second() - ndproj_time_start;
     ParallelDescriptor::ReduceRealMax(ndproj_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&ndproj_time,1,ParallelDescriptor::IOProcessorNumber());
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 11 -- update the velocity
@@ -974,6 +991,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
     
     ndproj_time_start = ParallelDescriptor::second();
 
@@ -1036,7 +1054,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
     
     ndproj_time += ParallelDescriptor::second() - ndproj_time_start;
-    ParallelDescriptor::ReduceRealMax(ndproj_time,ParallelDescriptor::IOProcessorNumber());   
+    ParallelDescriptor::ReduceRealMax(ndproj_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&ndproj_time,1,ParallelDescriptor::IOProcessorNumber());
 
     misc_time_start = ParallelDescriptor::second();
     
@@ -1052,6 +1071,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     
     misc_time += ParallelDescriptor::second() - misc_time_start;
     ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
     
     // print wallclock time
     if (maestro_verbose > 0) {
