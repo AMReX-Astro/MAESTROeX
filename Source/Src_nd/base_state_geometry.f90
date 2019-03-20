@@ -194,6 +194,8 @@ contains
     integer :: i,n,r,which_lev
     logical :: found
 
+    call bl_proffortfuncstart("Maestro::compute_cutoff_coords")
+    
     ! compute the coordinates of the anelastic cutoff
     found = .false.
 
@@ -328,6 +330,8 @@ contains
     end do
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    call bl_proffortfuncstop("Maestro::compute_cutoff_coords")
+    
   end subroutine compute_cutoff_coords
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -343,7 +347,7 @@ contains
     integer :: n, r
     integer :: nchunks, maxchunks
     logical :: chunk_start
-
+    
     if (spherical .eq. 1) then
        finest_radial_level = 0
     else

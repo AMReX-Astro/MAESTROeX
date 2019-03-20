@@ -32,7 +32,6 @@ contains
                      r_cc_loc,r_edge_loc, &
                      dt,dtold,is_predictor) bind(C, name="make_w0")
 
-
     double precision, intent(inout) ::               w0(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::           w0_old(0:max_radial_level,0:nr_fine  )
     double precision, intent(inout) ::         w0_force(0:max_radial_level,0:nr_fine-1)
@@ -55,7 +54,9 @@ contains
 
     integer         :: r,n
     double precision :: max_w0
-
+    
+    call bl_proffortfuncstart("Maestro::make_w0")
+    
     w0_force = ZERO
 
     if (spherical .eq. 0) then
@@ -121,7 +122,9 @@ contains
           write(6,*) ''
        end if
     end if
-
+    
+    call bl_proffortfuncstop("Maestro::make_w0")
+    
   end subroutine make_w0
 
 
