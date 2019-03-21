@@ -317,7 +317,7 @@ fix_base_state                      bool            false
 
 # turn on (true) or off (false) basestate evolution that uses averages
 # of cell-centered data instead of advecting
-average_base_state                  bool            false
+average_base_state                  bool            false       y
 
 # force $\rho_0 = (\rho h)_0 = 0$, {\tt evolve\_base\_state = F}
 # and {\tt beta\_type} = 3

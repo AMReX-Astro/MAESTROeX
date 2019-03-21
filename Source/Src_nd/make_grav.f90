@@ -34,6 +34,8 @@ contains
     double precision, allocatable :: m(:,:)
     double precision              :: term1, term2
 
+    call bl_proffortfuncstart("Maestro::make_grav_cell")
+    
     if (spherical .eq. 0) then
 
        if (do_planar_invsq_grav)  then
@@ -229,6 +231,8 @@ contains
 
     end if
 
+    call bl_proffortfuncstop("Maestro::make_grav_cell")
+    
   end subroutine make_grav_cell
 
   subroutine make_grav_edge(grav_edge,rho0,r_edge_loc) &
@@ -247,6 +251,8 @@ contains
     double precision              :: mencl
     double precision, allocatable :: m(:,:)
         
+    call bl_proffortfuncstart("Maestro::make_grav_edge")
+    
     if (spherical .eq. 0) then
 
        if (do_planar_invsq_grav)  then       
@@ -341,7 +347,7 @@ contains
        grav_edge(0,0) = zero 
        mencl = ZERO
 
-       do r=1,nr_fine-1
+       do r=1,nr_fine
 
           ! only add to the enclosed mass if the density is 
           ! > base_cutoff_density
@@ -358,6 +364,7 @@ contains
        end do
        
     end if
+    call bl_proffortfuncstop("Maestro::make_grav_edge")
     
   end subroutine make_grav_edge
 

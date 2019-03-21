@@ -55,6 +55,8 @@ contains
     integer :: r
     double precision :: div_w0_sph
 
+    call bl_proffortfuncstart("Maestro::make_psi_spherical")
+    
     psi = ZERO
 
     !$OMP PARALLEL DO PRIVATE(r,div_w0_sph)
@@ -68,6 +70,8 @@ contains
 
     enddo
     !$OMP END PARALLEL DO
+    
+    call bl_proffortfuncstop("Maestro::make_psi_spherical")
 
   end subroutine make_psi_spherical
 
@@ -80,6 +84,8 @@ contains
     ! Local variables
     integer         :: r
    
+    call bl_proffortfuncstart("Maestro::make_psi_irreg")
+    
     psi = ZERO
 
     do r=0,base_cutoff_density_coord(0)
@@ -92,6 +98,8 @@ contains
     
     call restrict_base(psi,1)
     call fill_ghost_base(psi,1)
+    
+    call bl_proffortfuncstop("Maestro::make_psi_irreg")
     
   end subroutine make_psi_irreg
 

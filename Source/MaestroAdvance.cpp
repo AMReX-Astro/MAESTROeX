@@ -10,6 +10,25 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvanceTimeStep()",AdvanceTimeStep);
 
+    // timers
+    Real advect_time =0., advect_time_start;
+    Real macproj_time=0., macproj_time_start;
+    Real ndproj_time =0., ndproj_time_start;
+    Real thermal_time=0., thermal_time_start;
+    Real react_time  =0., react_time_start;
+    Real misc_time   =0., misc_time_start;
+    Real base_time   =0., base_time_start;
+
+// HACK
+    base_time_start = ParallelDescriptor::second();
+    
+    base_time += ParallelDescriptor::second() - base_time_start;
+    ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
+
+    
+    misc_time_start = ParallelDescriptor::second();
+
     // features to be added later:
     // -ppm
     // -dpdt_factor
@@ -60,7 +79,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
-
     // end spherical-only MultiFabs
     ////////////////////////
 
@@ -101,9 +119,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     rho0_predicted_edge.shrink_to_fit();
 
     int is_predictor;
-
-    // wallclock time
-    const Real strt_total = ParallelDescriptor::second();
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
@@ -189,21 +204,33 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         init_sponge(rho0_old.dataPtr());
         MakeSponge(sponge);
     }
+    
+    misc_time += ParallelDescriptor::second() - misc_time_start;
+    ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 1 -- react the full state and then base state through dt/2
     //////////////////////////////////////////////////////////////////////////////
 
+    react_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
 
     React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+    
+    react_time += ParallelDescriptor::second() - react_time_start;
+    ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- define average expansion at time n+1/2
     //////////////////////////////////////////////////////////////////////////////
 
+    advect_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 2 : make w0 >>>" << std::endl;
     }
@@ -276,6 +303,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // save old-time value
         w0_old = w0;
 
+        base_time_start = ParallelDescriptor::second();
+    
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
@@ -283,6 +312,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                 gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
                 psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         if (spherical == 1) {
             // put w0 on Cartesian edges
@@ -322,23 +355,43 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
                        gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
 
+
+    advect_time += ParallelDescriptor::second() - advect_time_start;
+    ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
+
+    macproj_time_start = ParallelDescriptor::second();
+    
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
 
+    macproj_time += ParallelDescriptor::second() - macproj_time_start;
+    ParallelDescriptor::ReduceRealMax(macproj_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&macproj_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the base state and full state through dt
     //////////////////////////////////////////////////////////////////////////////
 
+    advect_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 4 : advect base >>>" << std::endl;
     }
 
     // advect the base state density
     if (evolve_base_state) {
+        
+        base_time_start = ParallelDescriptor::second();
+
         advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
                          rho0_predicted_edge.dataPtr(), &dt,
                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         compute_cutoff_coords(rho0_new.dataPtr());
     }
@@ -386,42 +439,48 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
-    if (evolve_base_state && use_etarho) {
+    if (evolve_base_state) {
 
-        // compute the new etarho
-        if (spherical == 0) {
-            MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
-        } else {
-            MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+        if (use_etarho) {
+            // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+            }
+            
+            // correct the base state density by "averaging"
+            Average(s2, rho0_new, Rho);
+            compute_cutoff_coords(rho0_new.dataPtr());
         }
 
-        // correct the base state density by "averaging"
-        Average(s2, rho0_new, Rho);
-        compute_cutoff_coords(rho0_new.dataPtr());
-    }
+        // update grav_cell_new
+        base_time_start = ParallelDescriptor::second();
 
-    // update grav_cell_new
-    if (evolve_base_state) {
         make_grav_cell(grav_cell_new.dataPtr(),
                        rho0_new.dataPtr(),
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
-    }
-    else {
-        grav_cell_new = grav_cell_old;
-    }
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-    // base state pressure update
-    if (evolve_base_state) {
-
+        // base state pressure update
         // set new p0 through HSE
         p0_new = p0_old;
 
+        base_time_start = ParallelDescriptor::second();
+    
         enforce_HSE(rho0_new.dataPtr(),
                     p0_new.dataPtr(),
                     grav_cell_new.dataPtr(),
                     r_cc_loc.dataPtr(),
                     r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         // make psi
         if (spherical == 0) {
@@ -452,23 +511,26 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                                r_edge_loc.dataPtr());
 
         }
-    }
-    else {
-        p0_new = p0_old;
-    }
 
-    // base state enthalpy update
-    if (evolve_base_state) {
+        // base state enthalpy update
         // compute rhoh0_old by "averaging"
         Average(s1, rhoh0_old, RhoH);
 
+        base_time_start = ParallelDescriptor::second();
+    
         advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
                              rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
                              rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     }
     else {
         rhoh0_new = rhoh0_old;
+        grav_cell_new = grav_cell_old;
+        p0_new = p0_old;
     }
 
     if (maestro_verbose >= 1) {
@@ -477,10 +539,16 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
 
+    advect_time += ParallelDescriptor::second() - advect_time_start;
+    ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
     //////////////////////////////////////////////////////////////////////////////
 
+    thermal_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 4a: thermal conduct >>>" << std::endl;
     }
@@ -489,6 +557,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1);
     }
 
+    thermal_time += ParallelDescriptor::second() - thermal_time_start;
+    ParallelDescriptor::ReduceRealMax(thermal_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&thermal_time,1,ParallelDescriptor::IOProcessorNumber());
+    
+    misc_time_start = ParallelDescriptor::second();
+    
     // pass temperature through for seeding the temperature update eos call
     // pi goes along for the ride
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -512,21 +586,40 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         }
     }
 
+    misc_time += ParallelDescriptor::second() - misc_time_start;
+    ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 5 -- react the full state and then base state through dt/2
     //////////////////////////////////////////////////////////////////////////////
 
+    react_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
-
+    
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
 
+    react_time += ParallelDescriptor::second() - react_time_start;
+    ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
+    
+    misc_time_start = ParallelDescriptor::second();
+    
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
+        
+        base_time_start = ParallelDescriptor::second();
+
         make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
                    gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     }
     else {
         // Just pass beta0 and gamma1bar through if not evolving base state
@@ -538,10 +631,16 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
     }
 
+    misc_time += ParallelDescriptor::second() - misc_time_start;
+    ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 6 -- define a new average expansion rate at n+1/2
     //////////////////////////////////////////////////////////////////////////////
 
+    advect_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 6 : make new S and new w0 >>>" << std::endl;
     }
@@ -617,11 +716,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
+
+        base_time_start = ParallelDescriptor::second();
+        
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
                 psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         if (spherical == 1) {
             // put w0 on Cartesian edges
@@ -647,24 +753,42 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
                        gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
-
+    
+    advect_time += ParallelDescriptor::second() - advect_time_start;
+    ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
+    
+    macproj_time_start = ParallelDescriptor::second();
+    
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
 
+    macproj_time += ParallelDescriptor::second() - macproj_time_start;
+    ParallelDescriptor::ReduceRealMax(macproj_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&macproj_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the base state and full state through dt
     //////////////////////////////////////////////////////////////////////////////
 
+    advect_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 8 : advect base >>>" << std::endl;
     }
 
     // advect the base state density
     if (evolve_base_state) {
+        base_time_start = ParallelDescriptor::second();
+        
         advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
                          rho0_predicted_edge.dataPtr(), &dt,
                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         compute_cutoff_coords(rho0_new.dataPtr());
     }
@@ -688,24 +812,25 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
-    if (evolve_base_state && use_etarho) {
-
-        // compute the new etarho
-        if (spherical == 0) {
-            MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
-        } else {
-            MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
-        }
-
-        // correct the base state density by "averaging"
-        // call average(mla,s2,rho0_new,dx,rho_comp)
-        Average(s2, rho0_new, Rho);
-        compute_cutoff_coords(rho0_new.dataPtr());
-    }
-
-
-    // update grav_cell_new, rho0_nph, grav_cell_nph
     if (evolve_base_state) {
+
+        if (use_etarho) {
+            // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+            }
+
+            // correct the base state density by "averaging"
+            // call average(mla,s2,rho0_new,dx,rho_comp)
+            Average(s2, rho0_new, Rho);
+            compute_cutoff_coords(rho0_new.dataPtr());
+        }
+    
+        // update grav_cell_new, rho0_nph, grav_cell_nph
+        base_time_start = ParallelDescriptor::second();
+
         make_grav_cell(grav_cell_new.dataPtr(),
                        rho0_new.dataPtr(),
                        r_cc_loc.dataPtr(),
@@ -719,22 +844,26 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                        rho0_nph.dataPtr(),
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
-    } else {
-        rho0_nph = rho0_old;
-        grav_cell_nph = grav_cell_old;
-    }
-
-    // base state pressure update
-    if (evolve_base_state) {
-
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
+        
+        // base state pressure update
         // set new p0 through HSE
         p0_new = p0_old;
 
+        base_time_start = ParallelDescriptor::second();
+        
         enforce_HSE(rho0_new.dataPtr(),
                     p0_new.dataPtr(),
                     grav_cell_new.dataPtr(),
                     r_cc_loc.dataPtr(),
                     r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         for (int i=0; i<p0_nph.size(); ++i) {
             p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
@@ -748,6 +877,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // compute gamma1bar^{(2)} and store it in gamma1bar_temp2
             MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
 
+            base_time_start = ParallelDescriptor::second();
+            
             // compute gamma1bar^{nph} and store it in gamma1bar_temp2
             for (int i=0; i<gamma1bar_temp2.size(); ++i) {
                 gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
@@ -758,15 +889,27 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                                Sbar.dataPtr(),
                                r_cc_loc.dataPtr(),
                                r_edge_loc.dataPtr());
+    
+            base_time += ParallelDescriptor::second() - base_time_start;
+            ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+            ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
         }
-    }
+        
+        base_time_start = ParallelDescriptor::second();
 
-    // base state enthalpy update
-    if (evolve_base_state) {
+        // base state enthalpy update
         advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
                              rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
                              rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
+    }
+    else {
+        rho0_nph = rho0_old;
+        grav_cell_nph = grav_cell_old;
     }
 
     if (maestro_verbose >= 1) {
@@ -775,10 +918,16 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
 
+    advect_time += ParallelDescriptor::second() - advect_time_start;
+    ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)
     //////////////////////////////////////////////////////////////////////////////
 
+    thermal_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 8a: thermal conduct >>>" << std::endl;
     }
@@ -789,6 +938,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2);
     }
 
+    thermal_time += ParallelDescriptor::second() - thermal_time_start;
+    ParallelDescriptor::ReduceRealMax(thermal_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&thermal_time,1,ParallelDescriptor::IOProcessorNumber());
+    
+    misc_time_start = ParallelDescriptor::second();
+    
     // pass temperature through for seeding the temperature update eos call
     // pi goes along for the ride
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -803,32 +958,57 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     else {
         TfromRhoH(s2,p0_new);
     }
-
+    
+    misc_time += ParallelDescriptor::second() - misc_time_start;
+    ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 9 -- react the full state and then base state through dt/2
     //////////////////////////////////////////////////////////////////////////////
 
+    react_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
-
+    
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
 
+    react_time += ParallelDescriptor::second() - react_time_start;
+    ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
+
+    misc_time_start = ParallelDescriptor::second();
+    
     if (evolve_base_state) {
-        //compute beta0 and gamma1bar
+        // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
+
+        base_time_start = ParallelDescriptor::second();
+
         make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
                    gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     }
 
     for(int i=0; i<beta0_nph.size(); ++i) {
         beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
     }
+    
+    misc_time += ParallelDescriptor::second() - misc_time_start;
+    ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 10 -- compute S^{n+1} for the final projection
     //////////////////////////////////////////////////////////////////////////////
 
+    ndproj_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 10: make new S >>>" << std::endl;
     }
@@ -859,10 +1039,16 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         MultiFab::LinComb(dSdt[lev],-1./dt,S_cc_old[lev],0,1./dt,S_cc_new[lev],0,0,1,0);
     }
 
+    ndproj_time += ParallelDescriptor::second() - ndproj_time_start;
+    ParallelDescriptor::ReduceRealMax(ndproj_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&ndproj_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 11 -- update the velocity
     //////////////////////////////////////////////////////////////////////////////
 
+    advect_time_start = ParallelDescriptor::second();
+    
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 11: update and project new velocity >>>" << std::endl;
     }
@@ -879,6 +1065,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     int proj_type;
+    
+    advect_time += ParallelDescriptor::second() - advect_time_start;
+    ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
+    
+    ndproj_time_start = ParallelDescriptor::second();
 
     // Project the new velocity field
     if (is_initIter) {
@@ -934,36 +1126,42 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
 
-    
     for(int i=0; i<beta0_nm1.size(); ++i) {
         beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
     }
+    
+    ndproj_time += ParallelDescriptor::second() - ndproj_time_start;
+    ParallelDescriptor::ReduceRealMax(ndproj_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&ndproj_time,1,ParallelDescriptor::IOProcessorNumber());
 
+    misc_time_start = ParallelDescriptor::second();
+    
     if (!is_initIter) {
         if (!fix_base_state) {
             // compute tempbar by "averaging"
             Average(snew,tempbar,Temp);
         }
-
-        // output any runtime diagnostics
-        // pass in the new time value, time+dt
-        // call diag(time+dt,dt,dx,snew,rho_Hnuc2,rho_Hext,thermal2,rho_omegadot2,&
-        //          rho0_new,rhoh0_new,p0_new,tempbar, &
-        //          gamma1bar_new,beta0_new, &
-        //          unew,w0,normal, &
-        //          mla,the_bc_tower)
     }
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
             << " DT = " << dt << std::endl;
-
-    // wallclock time
-    Real end_total = ParallelDescriptor::second() - strt_total;
-
+    
+    misc_time += ParallelDescriptor::second() - misc_time_start;
+    ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&misc_time,1,ParallelDescriptor::IOProcessorNumber());
+    
     // print wallclock time
-    ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
     if (maestro_verbose > 0) {
-        Print() << "Time to advance time step: " << end_total << '\n';
+        Print() << "Timing summary:\n";
+        Print() << "Advection  :" << advect_time << " seconds\n";
+        Print() << "MAC Proj   :" << macproj_time << " seconds\n";
+        Print() << "Nodal Proj :" << ndproj_time << " seconds\n";
+        if (use_thermal_diffusion) {
+            Print() << "Thermal    :" << thermal_time << " seconds\n";
+        }
+        Print() << "Reactions  :" << react_time << " seconds\n";
+        Print() << "Misc       :" << misc_time << " seconds\n";
+        Print() << "Base State :" << base_time << " seconds\n";
     }
 
 }

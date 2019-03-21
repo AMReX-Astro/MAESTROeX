@@ -29,6 +29,8 @@ module make_beta0_module
 
     double precision, allocatable :: beta0_edge(:,:)
 
+    call bl_proffortfuncstart("Maestro::make_beta0")
+    
     allocate(beta0_edge(0:finest_radial_level,0:nr_fine))
 
     beta0 = 0.d0
@@ -271,6 +273,8 @@ module make_beta0_module
 
     deallocate(beta0_edge)
 
+    call bl_proffortfuncstop("Maestro::make_beta0")
+    
   end subroutine make_beta0
 
   subroutine make_beta0_irreg(beta0,rho0,p0,gamma1bar,grav_cell, &
@@ -296,6 +300,8 @@ module make_beta0_module
 
     double precision, allocatable :: beta0_edge(:,:)
 
+    call bl_proffortfuncstart("Maestro::make_beta0_irreg")
+    
     allocate(beta0_edge(0:finest_radial_level,0:nr_fine))
 
     beta0 = 0.d0
@@ -515,6 +521,8 @@ module make_beta0_module
     call fill_ghost_base(beta0,1)
 
     deallocate(beta0_edge)
+    
+    call bl_proffortfuncstop("Maestro::make_beta0_irreg")
 
   end subroutine make_beta0_irreg
   

@@ -21,11 +21,15 @@ contains
     double precision, intent(in   ) :: force(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dt
 
+    call bl_proffortfuncstart("Maestro::make_edge_state_1d")
+    
     if (spherical .eq. 1) then
        call make_edge_state_1d_sphr(s,sedge,w0,force,dt)
     else
        call make_edge_state_1d_planar(s,sedge,w0,force,dt)
     end if
+    
+    call bl_proffortfuncstop("Maestro::make_edge_state_1d")
 
   end subroutine make_edge_state_1d
 
