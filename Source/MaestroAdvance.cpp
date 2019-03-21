@@ -17,7 +17,16 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     Real thermal_time=0., thermal_time_start;
     Real react_time  =0., react_time_start;
     Real misc_time   =0., misc_time_start;
+    Real base_time   =0., base_time_start;
 
+// HACK
+    base_time_start = ParallelDescriptor::second();
+    
+    base_time += ParallelDescriptor::second() - base_time_start;
+    ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
+
+    
     misc_time_start = ParallelDescriptor::second();
 
     // features to be added later:
@@ -294,6 +303,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // save old-time value
         w0_old = w0;
 
+        base_time_start = ParallelDescriptor::second();
+    
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
@@ -301,6 +312,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                 gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
                 psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         if (spherical == 1) {
             // put w0 on Cartesian edges
@@ -367,9 +382,16 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // advect the base state density
     if (evolve_base_state) {
+        
+        base_time_start = ParallelDescriptor::second();
+
         advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
                          rho0_predicted_edge.dataPtr(), &dt,
                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         compute_cutoff_coords(rho0_new.dataPtr());
     }
@@ -417,42 +439,48 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
-    if (evolve_base_state && use_etarho) {
+    if (evolve_base_state) {
 
-        // compute the new etarho
-        if (spherical == 0) {
-            MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
-        } else {
-            MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+        if (use_etarho) {
+            // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+            }
+            
+            // correct the base state density by "averaging"
+            Average(s2, rho0_new, Rho);
+            compute_cutoff_coords(rho0_new.dataPtr());
         }
 
-        // correct the base state density by "averaging"
-        Average(s2, rho0_new, Rho);
-        compute_cutoff_coords(rho0_new.dataPtr());
-    }
+        // update grav_cell_new
+        base_time_start = ParallelDescriptor::second();
 
-    // update grav_cell_new
-    if (evolve_base_state) {
         make_grav_cell(grav_cell_new.dataPtr(),
                        rho0_new.dataPtr(),
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
-    }
-    else {
-        grav_cell_new = grav_cell_old;
-    }
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-    // base state pressure update
-    if (evolve_base_state) {
-
+        // base state pressure update
         // set new p0 through HSE
         p0_new = p0_old;
 
+        base_time_start = ParallelDescriptor::second();
+    
         enforce_HSE(rho0_new.dataPtr(),
                     p0_new.dataPtr(),
                     grav_cell_new.dataPtr(),
                     r_cc_loc.dataPtr(),
                     r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         // make psi
         if (spherical == 0) {
@@ -483,23 +511,26 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                                r_edge_loc.dataPtr());
 
         }
-    }
-    else {
-        p0_new = p0_old;
-    }
 
-    // base state enthalpy update
-    if (evolve_base_state) {
+        // base state enthalpy update
         // compute rhoh0_old by "averaging"
         Average(s1, rhoh0_old, RhoH);
 
+        base_time_start = ParallelDescriptor::second();
+    
         advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
                              rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
                              rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     }
     else {
         rhoh0_new = rhoh0_old;
+        grav_cell_new = grav_cell_old;
+        p0_new = p0_old;
     }
 
     if (maestro_verbose >= 1) {
@@ -580,8 +611,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
+        
+        base_time_start = ParallelDescriptor::second();
+
         make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
                    gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     }
     else {
         // Just pass beta0 and gamma1bar through if not evolving base state
@@ -678,11 +716,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
+
+        base_time_start = ParallelDescriptor::second();
+        
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
                 psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         if (spherical == 1) {
             // put w0 on Cartesian edges
@@ -735,9 +780,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // advect the base state density
     if (evolve_base_state) {
+        base_time_start = ParallelDescriptor::second();
+        
         advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
                          rho0_predicted_edge.dataPtr(), &dt,
                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         compute_cutoff_coords(rho0_new.dataPtr());
     }
@@ -761,24 +812,25 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
-    if (evolve_base_state && use_etarho) {
-
-        // compute the new etarho
-        if (spherical == 0) {
-            MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
-        } else {
-            MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
-        }
-
-        // correct the base state density by "averaging"
-        // call average(mla,s2,rho0_new,dx,rho_comp)
-        Average(s2, rho0_new, Rho);
-        compute_cutoff_coords(rho0_new.dataPtr());
-    }
-
-
-    // update grav_cell_new, rho0_nph, grav_cell_nph
     if (evolve_base_state) {
+
+        if (use_etarho) {
+            // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+            }
+
+            // correct the base state density by "averaging"
+            // call average(mla,s2,rho0_new,dx,rho_comp)
+            Average(s2, rho0_new, Rho);
+            compute_cutoff_coords(rho0_new.dataPtr());
+        }
+    
+        // update grav_cell_new, rho0_nph, grav_cell_nph
+        base_time_start = ParallelDescriptor::second();
+
         make_grav_cell(grav_cell_new.dataPtr(),
                        rho0_new.dataPtr(),
                        r_cc_loc.dataPtr(),
@@ -792,22 +844,26 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                        rho0_nph.dataPtr(),
                        r_cc_loc.dataPtr(),
                        r_edge_loc.dataPtr());
-    } else {
-        rho0_nph = rho0_old;
-        grav_cell_nph = grav_cell_old;
-    }
-
-    // base state pressure update
-    if (evolve_base_state) {
-
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
+        
+        // base state pressure update
         // set new p0 through HSE
         p0_new = p0_old;
 
+        base_time_start = ParallelDescriptor::second();
+        
         enforce_HSE(rho0_new.dataPtr(),
                     p0_new.dataPtr(),
                     grav_cell_new.dataPtr(),
                     r_cc_loc.dataPtr(),
                     r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         for (int i=0; i<p0_nph.size(); ++i) {
             p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
@@ -821,6 +877,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // compute gamma1bar^{(2)} and store it in gamma1bar_temp2
             MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
 
+            base_time_start = ParallelDescriptor::second();
+            
             // compute gamma1bar^{nph} and store it in gamma1bar_temp2
             for (int i=0; i<gamma1bar_temp2.size(); ++i) {
                 gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
@@ -831,15 +889,27 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                                Sbar.dataPtr(),
                                r_cc_loc.dataPtr(),
                                r_edge_loc.dataPtr());
+    
+            base_time += ParallelDescriptor::second() - base_time_start;
+            ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+            ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
         }
-    }
+        
+        base_time_start = ParallelDescriptor::second();
 
-    // base state enthalpy update
-    if (evolve_base_state) {
+        // base state enthalpy update
         advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
                              rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
                              rho0_predicted_edge.dataPtr(), psi.dataPtr(), &dt,
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
+    }
+    else {
+        rho0_nph = rho0_old;
+        grav_cell_nph = grav_cell_old;
     }
 
     if (maestro_verbose >= 1) {
@@ -912,10 +982,17 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     misc_time_start = ParallelDescriptor::second();
     
     if (evolve_base_state) {
-        //compute beta0 and gamma1bar
+        // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
+
+        base_time_start = ParallelDescriptor::second();
+
         make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
                    gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+    
+        base_time += ParallelDescriptor::second() - base_time_start;
+        ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     }
 
     for(int i=0; i<beta0_nph.size(); ++i) {
@@ -1084,6 +1161,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         }
         Print() << "Reactions  :" << react_time << " seconds\n";
         Print() << "Misc       :" << misc_time << " seconds\n";
+        Print() << "Base State :" << base_time << " seconds\n";
     }
 
 }
