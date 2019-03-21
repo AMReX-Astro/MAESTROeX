@@ -21,10 +21,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR      := general_null
-# NETWORK_DIR := ignition_chamulak
-#GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/aprox21.net
-GENERAL_NET_INPUTS = $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/ignition_wdconvect.net
+NETWORK_DIR      := aprox21
 
 Bpack   := ./Make.package
 Blocs   := .

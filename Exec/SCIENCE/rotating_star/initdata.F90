@@ -13,7 +13,7 @@ module initdata_module
   use eos_module
   use eos_type_module
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
-  use rotation_module, only: omega
+  ! use rotation_module, only: omega
 
   implicit none
 
