@@ -101,7 +101,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
         for ( MFIter mfi(scalold_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validbox = mfi.validbox();
+            const Box& validbox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
 
             construct_eta_cart( validbox.loVect(), validbox.hiVect(),

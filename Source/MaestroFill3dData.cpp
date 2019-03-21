@@ -114,8 +114,8 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        // NOTE: don't think this should be tiled
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+        // NOTE: not sure if this should be tiled
+        for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

@@ -247,8 +247,8 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        // NOTE: don't think this should be tiled?
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi) {
+        // NOTE: not sure if this should be tiled
+        for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tilebox = mfi.tilebox();
