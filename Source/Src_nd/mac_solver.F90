@@ -119,6 +119,7 @@ contains
 
 #elif (AMREX_SPACEDIM == 3)
        ! Use cell-centered beta0 to update u-velocity
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)+1
@@ -126,7 +127,9 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
        ! Use edge beta0 to update v-velocity
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)+1
              do i = lo(1),hi(1)
@@ -134,7 +137,9 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
        ! Use cell-centered beta0 to update w-velocity
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)+1
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
@@ -142,6 +147,7 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
 #endif
 
     else if (mult_or_div .eq. 0) then
@@ -171,6 +177,7 @@ contains
 
 #elif (AMREX_SPACEDIM == 3)
        ! Use cell-centered beta0 to update u-velocity
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)+1
@@ -178,7 +185,9 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
        ! Use edge beta0 to update v-velocity
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)+1
              do i = lo(1),hi(1)
@@ -186,7 +195,9 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
        ! Use cell-centered beta0 to update w-velocity
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k = lo(3),hi(3)+1
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
@@ -194,6 +205,7 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
 #endif
 
     end if
