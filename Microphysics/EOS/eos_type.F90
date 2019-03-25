@@ -1,10 +1,12 @@
 module eos_type_module
 
+  use amrex_error_module, only: amrex_error
+  use amrex_fort_module, only : rt => amrex_real
   use network, only: nspec, naux
 
   implicit none
 
-  private :: nspec, naux
+  private :: rt, nspec, naux
 
   integer, parameter :: eos_input_rt = 1  ! rho, T are inputs
   integer, parameter :: eos_input_rh = 2  ! rho, h are inputs
@@ -15,7 +17,7 @@ module eos_type_module
   integer, parameter :: eos_input_ph = 7  ! p, h are inputs
   integer, parameter :: eos_input_th = 8  ! T, h are inputs
 
-  ! these are used to allow for a generic interface to the 
+  ! these are used to allow for a generic interface to the
   ! root finding
   integer, parameter :: itemp = 1
   integer, parameter :: idens = 2
@@ -40,26 +42,45 @@ module eos_type_module
 
   ! Minimum and maximum thermodynamic quantities permitted by the EOS.
 
-  double precision, save :: mintemp = 1.d-200
-  double precision, save :: maxtemp = 1.d200
-  double precision, save :: mindens = 1.d-200
-  double precision, save :: maxdens = 1.d200
-  double precision, save :: minx    = 1.d-200
-  double precision, save :: maxx    = 1.d0 + 1.d-12
-  double precision, save :: minye   = 1.d-200
-  double precision, save :: maxye   = 1.d0 + 1.d-12
-  double precision, save :: mine    = 1.d-200
-  double precision, save :: maxe    = 1.d200
-  double precision, save :: minp    = 1.d-200
-  double precision, save :: maxp    = 1.d200
-  double precision, save :: mins    = 1.d-200
-  double precision, save :: maxs    = 1.d200
-  double precision, save :: minh    = 1.d-200
-  double precision, save :: maxh    = 1.d200
+  real(rt), allocatable :: mintemp
+  real(rt), allocatable :: maxtemp
+  real(rt), allocatable :: mindens
+  real(rt), allocatable :: maxdens
+  real(rt), allocatable :: minx
+  real(rt), allocatable :: maxx
+  real(rt), allocatable :: minye
+  real(rt), allocatable :: maxye
+  real(rt), allocatable :: mine
+  real(rt), allocatable :: maxe
+  real(rt), allocatable :: minp
+  real(rt), allocatable :: maxp
+  real(rt), allocatable :: mins
+  real(rt), allocatable :: maxs
+  real(rt), allocatable :: minh
+  real(rt), allocatable :: maxh
 
   !$acc declare &
   !$acc create(mintemp, maxtemp, mindens, maxdens, minx, maxx, minye, maxye) &
   !$acc create(mine, maxe, minp, maxp, mins, maxs, minh, maxh)
+
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: mintemp
+  attributes(managed) :: maxtemp
+  attributes(managed) :: mindens
+  attributes(managed) :: maxdens
+  attributes(managed) :: minx
+  attributes(managed) :: maxx
+  attributes(managed) :: minye
+  attributes(managed) :: maxye
+  attributes(managed) :: mine
+  attributes(managed) :: maxe
+  attributes(managed) :: minp
+  attributes(managed) :: maxp
+  attributes(managed) :: mins
+  attributes(managed) :: maxs
+  attributes(managed) :: minh
+  attributes(managed) :: maxh
+#endif
 
   ! A generic structure holding thermodynamic quantities and their derivatives,
   ! plus some other quantities of interest.
@@ -99,58 +120,128 @@ module eos_type_module
   ! dpdZ     -- d pressure/ d zbar
   ! dedA     -- d energy/ d abar
   ! dedZ     -- d energy/ d zbar
+  ! dpde     -- d pressure / d energy |_rho
+  ! dpdr_e   -- d pressure / d rho |_energy
+  ! conductivity -- thermal conductivity (in erg/cm/K/sec)
 
   type :: eos_t
 
-    double precision :: rho
-    double precision :: T
-    double precision :: p
-    double precision :: e
-    double precision :: h
-    double precision :: s
-    double precision :: xn(nspec)
-    double precision :: aux(naux)
+    real(rt) :: rho
+    real(rt) :: T
+    real(rt) :: p
+    real(rt) :: e
+    real(rt) :: h
+    real(rt) :: s
+    real(rt) :: xn(nspec)
+    real(rt) :: aux(naux)
 
-    double precision :: dpdT
-    double precision :: dpdr
-    double precision :: dedT
-    double precision :: dedr
-    double precision :: dhdT
-    double precision :: dhdr
-    double precision :: dsdT
-    double precision :: dsdr
-    double precision :: dpde
-    double precision :: dpdr_e
+    real(rt) :: dpdT
+    real(rt) :: dpdr
+    real(rt) :: dedT
+    real(rt) :: dedr
+    real(rt) :: dhdT
+    real(rt) :: dhdr
+    real(rt) :: dsdT
+    real(rt) :: dsdr
+    real(rt) :: dpde
+    real(rt) :: dpdr_e
 
-    double precision :: cv
-    double precision :: cp
-    double precision :: xne
-    double precision :: xnp
-    double precision :: eta
-    double precision :: pele
-    double precision :: ppos
-    double precision :: mu
-    double precision :: mu_e
-    double precision :: y_e
-    double precision :: dedX(nspec)
-    double precision :: dpdX(nspec)
-    double precision :: dhdX(nspec)
-    double precision :: gam1
-    double precision :: cs
+    real(rt) :: cv
+    real(rt) :: cp
+    real(rt) :: xne
+    real(rt) :: xnp
+    real(rt) :: eta
+    real(rt) :: pele
+    real(rt) :: ppos
+    real(rt) :: mu
+    real(rt) :: mu_e
+    real(rt) :: y_e
+#ifdef EXTRA_THERMO
+    real(rt) :: dedX(nspec)
+    real(rt) :: dpdX(nspec)
+    real(rt) :: dhdX(nspec)
+#endif
+    real(rt) :: gam1
+    real(rt) :: cs
 
-    double precision :: abar
-    double precision :: zbar
-    double precision :: dpdA
+    real(rt) :: abar
+    real(rt) :: zbar
 
-    double precision :: dpdZ
-    double precision :: dedA
-    double precision :: dedZ
+#ifdef EXTRA_THERMO
+    real(rt) :: dpdA
+    real(rt) :: dpdZ
+    real(rt) :: dedA
+    real(rt) :: dedZ
+#endif
 
-    double precision :: conductivity
+    real(rt) :: conductivity
 
   end type eos_t
 
 contains
+
+  ! Provides a copy subroutine for the eos_t type to
+  ! avoid derived type assignment (OpenACC and CUDA can't handle that)
+  subroutine copy_eos_t(to_eos, from_eos)
+
+    implicit none
+
+    type(eos_t) :: to_eos, from_eos
+
+    !$gpu
+
+    to_eos % rho = from_eos % rho
+    to_eos % T = from_eos % T
+    to_eos % p = from_eos % p
+    to_eos % e = from_eos % e
+    to_eos % h = from_eos % h
+    to_eos % s = from_eos % s
+    to_eos % xn(:) = from_eos % xn(:)
+    to_eos % aux(:) = from_eos % aux(:)
+
+    to_eos % dpdT = from_eos % dpdT
+    to_eos % dpdr = from_eos % dpdr
+    to_eos % dedT = from_eos % dedT
+    to_eos % dedr = from_eos % dedr
+    to_eos % dhdT = from_eos % dhdT
+    to_eos % dhdr = from_eos % dhdr
+    to_eos % dsdT = from_eos % dsdT
+    to_eos % dsdr = from_eos % dsdr
+    to_eos % dpde = from_eos % dpde
+    to_eos % dpdr_e = from_eos % dpdr_e
+
+    to_eos % cv = from_eos % cv
+    to_eos % cp = from_eos % cp
+    to_eos % xne = from_eos % xne
+    to_eos % xnp = from_eos % xnp
+    to_eos % eta = from_eos % eta
+    to_eos % pele = from_eos % pele
+    to_eos % ppos = from_eos % ppos
+    to_eos % mu = from_eos % mu
+    to_eos % mu_e = from_eos % mu_e
+    to_eos % y_e = from_eos % y_e
+
+    to_eos % gam1 = from_eos % gam1
+    to_eos % cs = from_eos % cs
+
+    to_eos % abar = from_eos % abar
+    to_eos % zbar = from_eos % zbar
+
+#ifdef EXTRA_THERMO
+    to_eos % dedX(:) = from_eos % dedX(:)
+    to_eos % dpdX(:) = from_eos % dpdX(:)
+    to_eos % dhdX(:) = from_eos % dhdX(:)
+    
+    to_eos % dpdA = from_eos % dpdA
+    to_eos % dpdZ = from_eos % dpdZ
+    to_eos % dedA = from_eos % dedA
+    to_eos % dedZ = from_eos % dedZ
+#endif
+
+    to_eos % conductivity = from_eos % conductivity
+
+  end subroutine copy_eos_t
+
 
   ! Given a set of mass fractions, calculate quantities that depend
   ! on the composition like abar and zbar.
@@ -166,6 +257,8 @@ contains
 
     type (eos_t), intent(inout) :: state
 
+    !$gpu
+
     ! Calculate abar, the mean nucleon number,
     ! zbar, the mean proton number,
     ! mu, the mean molecular weight,
@@ -180,11 +273,10 @@ contains
 
   end subroutine composition
 
+#ifdef EXTRA_THERMO
   ! Compute thermodynamic derivatives with respect to xn(:)
 
   subroutine composition_derivatives(state)
-
-    !$acc routine seq
 
     use amrex_constants_module, only: ZERO
     use network, only: aion, aion_inv, zion
@@ -192,6 +284,8 @@ contains
     implicit none
 
     type (eos_t), intent(inout) :: state
+
+    !$gpu
 
     state % dpdX(:) = state % dpdA * (state % abar * aion_inv(:))   &
                                    * (aion(:) - state % abar) &
@@ -212,15 +306,13 @@ contains
     endif
 
   end subroutine composition_derivatives
-
+#endif
 
 
   ! Normalize the mass fractions: they must be individually positive
   ! and less than one, and they must all sum to unity.
 
   subroutine normalize_abundances(state)
-
-    !$acc routine seq
 
     use amrex_constants_module, only: ONE
     use extern_probin_module, only: small_x
@@ -229,6 +321,8 @@ contains
 
     type (eos_t), intent(inout) :: state
 
+    !$gpu
+
     state % xn = max(small_x, min(ONE, state % xn))
 
     state % xn = state % xn / sum(state % xn)
@@ -236,16 +330,15 @@ contains
   end subroutine normalize_abundances
 
 
-
   ! Ensure that inputs are within reasonable limits.
 
   subroutine clean_state(state)
 
-    !$acc routine seq
-
     implicit none
 
     type (eos_t), intent(inout) :: state
+
+    !$gpu
 
     state % T = min(maxtemp, max(mintemp, state % T))
     state % rho = min(maxdens, max(mindens, state % rho))
@@ -270,14 +363,15 @@ contains
   end subroutine print_state
 
 
-
   subroutine eos_get_small_temp(small_temp_out)
 
     !$acc routine seq
 
     implicit none
 
-    double precision, intent(out) :: small_temp_out
+    real(rt), intent(out) :: small_temp_out
+
+    !$gpu
 
     small_temp_out = mintemp
 
@@ -291,7 +385,9 @@ contains
 
     implicit none
 
-    double precision, intent(out) :: small_dens_out
+    real(rt), intent(out) :: small_dens_out
+
+    !$gpu
 
     small_dens_out = mindens
 
@@ -305,7 +401,9 @@ contains
 
     implicit none
 
-    double precision, intent(out) :: max_temp_out
+    real(rt), intent(out) :: max_temp_out
+
+    !$gpu
 
     max_temp_out = maxtemp
 
@@ -319,10 +417,98 @@ contains
 
     implicit none
 
-    double precision, intent(out) :: max_dens_out
+    real(rt), intent(out) :: max_dens_out
+
+    !$gpu
 
     max_dens_out = maxdens
 
   end subroutine eos_get_max_dens
+
+
+  ! Check to see if variable ivar is a valid
+  ! independent variable for the given input
+  function eos_input_has_var(input, ivar) result(has)
+
+    implicit none
+
+    integer, intent(in) :: input, ivar
+    logical :: has
+
+    !$gpu
+
+    has = .false.
+    
+    select case (ivar)
+
+    case (itemp)
+
+       if (input == eos_input_rt .or. &
+           input == eos_input_tp .or. &
+           input == eos_input_th) then
+
+          has = .true.
+
+       endif
+
+    case (idens)
+
+       if (input == eos_input_rt .or. &
+           input == eos_input_rh .or. &
+           input == eos_input_rp .or. &
+           input == eos_input_re) then
+
+          has = .true.
+
+       endif
+
+    case (iener)
+
+       if (input == eos_input_re) then
+
+          has = .true.
+
+       endif
+       
+    case (ienth)
+
+       if (input == eos_input_rh .or. &
+           input == eos_input_ph .or. &
+           input == eos_input_th) then
+
+          has = .true.
+
+       endif
+
+    case (ientr)
+
+       if (input == eos_input_ps) then
+
+          has = .true.
+
+       endif
+
+    case (ipres)
+
+       if (input == eos_input_tp .or. &
+           input == eos_input_rp .or. &
+           input == eos_input_ps .or. &
+           input == eos_input_ph) then
+
+          has = .true.
+
+       endif
+
+    case default
+
+#ifdef AMREX_USE_CUDA
+       stop
+#else
+       call amrex_error("EOS: invalid independent variable")
+#endif
+
+    end select
+
+  end function eos_input_has_var
 
 end module eos_type_module
