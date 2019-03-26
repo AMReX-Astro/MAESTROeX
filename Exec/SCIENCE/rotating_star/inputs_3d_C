@@ -136,4 +136,6 @@ maestro.rotation_radius = 2.e8
   rtol_enuc = 1.e-5
   rtol_temp = 1.e-5
 
+  retry_burn = T
+
 /
