@@ -334,10 +334,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
     
-    // subtract w0mac from umac
-    for (int lev = 0; lev <= finest_level; ++lev) {
-	for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	    MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+    if (evolve_base_state && spherical == 1) {
+        // subtract w0mac from umac
+        for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+	        MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
 	}
     }
 
@@ -352,10 +354,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    // add w0mac back to umac
-    for (int lev = 0; lev <= finest_level; ++lev) {
-	for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	    MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+    if (evolve_base_state && spherical == 1) {
+        // add w0mac back to umac
+        for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+	        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
 	}
     }
     
@@ -647,10 +651,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 		       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
     
-    // subtract w0mac from umac
-    for (int lev = 0; lev <= finest_level; ++lev) {
-	for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	    MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+    if (evolve_base_state && spherical == 1) {
+        // subtract w0mac from umac
+        for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+	        MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
 	}
     }
     
@@ -665,10 +671,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    // add w0mac back to umac
-    for (int lev = 0; lev <= finest_level; ++lev) {
-	for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	    MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+    if (evolve_base_state && spherical == 1) {
+        // add w0mac back to umac
+        for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+	        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
 	}
     }
     
@@ -885,7 +893,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         w0 = w0_old;
     }
     
-    if (spherical == 1) {
+    if (evolve_base_state && spherical == 1) {
 	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
@@ -956,7 +964,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1) {
+    if (evolve_base_state && spherical == 1) {
 	// add w0 back to unew
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
