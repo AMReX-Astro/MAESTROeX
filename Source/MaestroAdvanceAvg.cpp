@@ -312,7 +312,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             }
         }
     }
-    
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 3 -- construct the advective velocity
     //////////////////////////////////////////////////////////////////////////////
@@ -341,7 +341,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
 
-    if (spherical == 1 && split_projection) {
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// subtract w0mac from umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -361,7 +361,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1 && split_projection) {
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// add w0mac back to umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -667,7 +667,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 		       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
-    if (spherical == 1 && split_projection) {
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// subtract w0mac from umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -687,7 +687,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1 && split_projection) {
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// add w0mac back to umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -913,8 +913,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         // throw away w0 by setting w0 = w0_old
         w0 = w0_old;
     }
-    
-    if (spherical == 1 && split_projection) {
+
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
@@ -926,7 +926,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             Sbar[i] = (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
         }
     }
-       
+
     int proj_type;
     
     // Project the new velocity field
@@ -982,7 +982,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // wallclock time
     const Real start_total_nodalproj = ParallelDescriptor::second();
-
+   
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
 
@@ -990,7 +990,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1 && split_projection) {
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// add w0 back to unew
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
@@ -998,7 +998,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	AverageDown(unew,0,AMREX_SPACEDIM);
 	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
     }
-    
+
     for(int i=0; i<beta0_nm1.size(); ++i) {
         beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
     }
@@ -1008,14 +1008,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    // compute tempbar by "averaging"
 	    Average(snew,tempbar,Temp);
 	}
-
-	// output any runtime diagnostics
-	// pass in the new time value, time+dt
-	// call diag(time+dt,dt,dx,snew,rho_Hnuc2,rho_Hext,thermal2,rho_omegadot2,&
-	//          rho0_new,rhoh0_new,p0_new,tempbar, &
-	//          gamma1bar_new,beta0_new, &
-	//          unew,w0,normal, &
-	//          mla,the_bc_tower)
     }
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
@@ -1027,20 +1019,5 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         Print() << "Time to solve nodal proj : " << end_total_nodalproj << '\n';
         Print() << "Time to solve reactions  : " << end_total_react << '\n';
     }
-
-    // // DEBUG
-    // for (int i=0; i<Sbar.size(); ++i) {
-    // 	Sbar[i] = 1.0/(gamma1bar_new[i]*p0_new[i]) * (p0_new[i] - p0_old[i])/dt;
-    // 	// Sbar[i] = (rho0_new[i] - rho0_old[i])/rho0_old[i];
-    // 	// Sbar[i] = (grav_cell_new[i] - grav_cell_old[i])/grav_cell_old[i];
-    // }
-    
-    // Vector<MultiFab> Sbar_cart(finest_level+1);
-    // for (int lev=0; lev<=finest_level; ++lev) {
-    // 	Sbar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-    // }
-    // Put1dArrayOnCart(Sbar,Sbar_cart,0,0,bcs_f,0);
-    // std::string Sbarfilename = Concatenate("a_dpnew",istep,3);
-    // VisMF::Write(Sbar_cart[0], Sbarfilename);
     
 }
