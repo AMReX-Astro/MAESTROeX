@@ -62,3 +62,9 @@ Planar multilevel now works
 Spherical multilevel works in limited capacity (still debugging)
 New input files and initial model files 
 Fix unit tests: test_advect, test_diffusion, test_projection
+
+04-01-2019
+New temporal algorithm is now implemented correctly by separating full velocity state into w0 and perturbational velocity during each projection solve
+Additional diagnostics and timing outputs
+New rotating star model files 
+Fix test_react unit tests
