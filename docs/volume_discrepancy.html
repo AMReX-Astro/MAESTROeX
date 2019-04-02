@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Volume Discrepancy Factor &mdash; MAESTROeX 19.03
+  <title>Volume Discrepancy Factor &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -218,7 +218,7 @@ has the effect of returning us to <span class="math notranslate nohighlight">\(p
 <p>In MAESTRO, we decomponse the velocity into a base state component
 and a local component. The base state constraint equation is simply
 the horizontal average of the full constraint. Starting with
-<span class="math notranslate nohighlight">\(\Ub = \Ubt + w_0 \er\)</span> in equation&nbsp;<a class="reference external" href="#eq:fullconstraint">[eq:fullconstraint]</a>, we have</p>
+<span class="math notranslate nohighlight">\(\Ub = \Ubt + w_0 \er\)</span> in equation <a class="reference external" href="#eq:fullconstraint">[eq:fullconstraint]</a>, we have</p>
 <div class="math notranslate nohighlight">
 \[\nablab \cdotb (\beta_0 w_0 \er) + \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right ) \enskip .
 \label{eq:fullconstraint2}\]</div>
@@ -232,7 +232,7 @@ yielding</p>
 \[\nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \overline{S} + \frac{f}{\gammabar p_0} \frac{p_\mathrm{EOS} - \overline{p_\mathrm{EOS}}}{\Delta t} \right ) \enskip .
 \label{eq:Utconstraint_vd}\]</div>
 <p>In solving the <span class="math notranslate nohighlight">\(w_0\)</span> evolution equation
-(Eq.&nbsp;[<a class="reference external" href="#eq:w0constraint_vd">[eq:w0constraint_vd]</a>]), we expand the divergence, giving</p>
+(Eq. [<a class="reference external" href="#eq:w0constraint_vd">[eq:w0constraint_vd]</a>]), we expand the divergence, giving</p>
 <div class="math notranslate nohighlight">
 \[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} -
 w_0 \er  \cdotb \frac{1}{\beta_0} \nablab \beta_0  - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \enskip .\]</div>
@@ -240,7 +240,7 @@ w_0 \er  \cdotb \frac{1}{\beta_0} \nablab \beta_0  - \frac{f}{\gammabar p_0} \fr
 <div class="math notranslate nohighlight">
 \[\frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r} =
  \frac{1}{\beta_0} \frac{\partial \beta_0}{\partial r}\]</div>
-<p>(see Paper&nbsp;I), and that <span class="math notranslate nohighlight">\(\psi \equiv D_0 p_0 / Dt \equiv \partial p_0 / \partial t +
+<p>(see Paper I), and that <span class="math notranslate nohighlight">\(\psi \equiv D_0 p_0 / Dt \equiv \partial p_0 / \partial t +
 w_0 \partial p_0 / \partial r\)</span>, we have</p>
 <div class="math notranslate nohighlight">
 \[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \psi -

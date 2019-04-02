@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MAESTROeX Build System &mdash; MAESTROeX 19.03
+  <title>MAESTROeX Build System &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -113,10 +113,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#files-created-at-compile-time">Files Created at Compile-time</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#maestro-problem-options">MAESTRO&nbsp;Problem Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#maestro-problem-options">MAESTRO Problem Options</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#problem-specific-files">Problem-specific Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#defining-eos-network-and-conductivity-routines">Defining EOS, Network, and Conductivity Routines</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#core-maestro-modules">Core MAESTRO&nbsp;modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core-maestro-modules">Core MAESTRO modules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#unit-tests">Unit Tests</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#amrex-only-tests">AMReX-only Tests</a></li>
 </ul>
@@ -233,39 +233,39 @@
 <h1>MAESTROeX Build System<a class="headerlink" href="#maestroex-build-system" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="build-process-overview">
 <h2>Build Process Overview<a class="headerlink" href="#build-process-overview" title="Permalink to this headline">¶</a></h2>
-<p>The MAESTRO&nbsp;build system uses features of GNU make (version 3.81 or
-later), which is typically the default on systems. The MAESTRO&nbsp;executable is built in the problem’s directory (one of the directories
+<p>The MAESTRO build system uses features of GNU make (version 3.81 or
+later), which is typically the default on systems. The MAESTRO executable is built in the problem’s directory (one of the directories
 under SCIENCE/, TEST_PROBLEMS, or UNIT_TESTS). This
 directory will contain a makefile, GNUmakefile, that includes
 all the necessary information to build the executable.</p>
 <p>The main macros that define the build process are split across several
 files. The 4 main files are:</p>
 <ul>
-<li><p class="first">${AMREX_HOME}/Tools/F_mk/GMakedefs.mak:</p>
+<li><p>${AMREX_HOME}/Tools/F_mk/GMakedefs.mak:</p>
 <p>This setups the basic macros, includes the options for the selected
 compiler, builds the list of object and source files, and defines
 the compile and link command lines.</p>
 </li>
-<li><p class="first">${AMREX_HOME}/Tools/F_mk/GMakeMPI.mak:</p>
+<li><p>${AMREX_HOME}/Tools/F_mk/GMakeMPI.mak:</p>
 <p>This implements any changes to the compiler names and library
 locations necessary to build a parallel executable with MPI.</p>
 </li>
-<li><p class="first">${AMREX_HOME}/Tools/F_mk/GMakerules.mak:</p>
+<li><p>${AMREX_HOME}/Tools/F_mk/GMakerules.mak:</p>
 <p>This creates the various build targets and specifies the rules for
 building the object files, the list of dependencies, and some other
 lesser-used targets (tags for editors, documentation, etc.)</p>
 </li>
-<li><p class="first">MAESTRO/GMaestro.mak:</p>
+<li><p>MAESTRO/GMaestro.mak:</p>
 <p>This is a MAESTRO-specific file that gathers all of the various
-modules that are used to build a typical MAESTRO&nbsp;application
-and integrates with the AMReX&nbsp;build system. Every MAESTRO&nbsp;problem’s GNUmakefile will include this file.</p>
+modules that are used to build a typical MAESTRO application
+and integrates with the AMReX build system. Every MAESTRO problem’s GNUmakefile will include this file.</p>
 </li>
 </ul>
-<p>MAESTRO&nbsp;gets the location of the AMReX&nbsp;library through the
+<p>MAESTRO gets the location of the AMReX library through the
 AMREX_HOME variable. This should be set as an environment
-variable in your shell start-up files (e.g.&nbsp;.bashrc or
+variable in your shell start-up files (e.g. .bashrc or
 .cshrc).</p>
-<p>The AMReX&nbsp;build system separates the compiler-specific information
+<p>The AMReX build system separates the compiler-specific information
 from the machine-specific information—this allows for reuse of the
 compiler information. The only machine-specific parts of the build system
 are for the MPI library locations, contained in GMakeMPI.mak.
@@ -283,11 +283,11 @@ where <em>OS</em> is the operating system detected by the build
 system, <em>COMP</em> is the compiler used, and <em>other</em>
 reflects any other build options (MPI, OpenMP, debugging, etc.) used.
 Separating each build into a separate subdirectory under the problem
-directory allows for multiple builds of MAESTRO&nbsp;to exist
+directory allows for multiple builds of MAESTRO to exist
 side-by-side in the problem directory.</p>
 <div class="section" id="finding-source-files">
 <h3>Finding Source Files<a class="headerlink" href="#finding-source-files" title="Permalink to this headline">¶</a></h3>
-<p>The MAESTRO&nbsp;executable is built from source distributed across a
+<p>The MAESTRO executable is built from source distributed across a
 number of directories. In each of these directories containing source
 files, there is a GPackage.mak file. This file has a number of
 lines of the form:</p>
@@ -298,7 +298,7 @@ lines of the form:</p>
 directory is added to the list of build directories. For old
 fixed-form Fortran files, the files should be added to the
 fsources variable instead of f90sources.</p>
-<p>The AMReX&nbsp;build system relies on the vpath functionality of
+<p>The AMReX build system relies on the vpath functionality of
 make. In a makefile, the vpath variable holds search path used
 to locate source files. When a particular file is needed, the
 directories listed in vpath are searched until the file is
@@ -310,7 +310,7 @@ version in the source path.</p>
 <p>In MAESTRO, the vpath variable is set using the macros defined
 in GMaestro.mak. A user does not need to set this variable
 explicitly. Additional source locations are added in the manner
-described below (see §&nbsp;<a class="reference external" href="#sec:make:otherfiles">2.1</a>).</p>
+described below (see § <a class="reference external" href="#sec:make:otherfiles">2.1</a>).</p>
 </div>
 <div class="section" id="dependencies">
 <h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
@@ -336,7 +336,7 @@ equation of state, this is done automatically in GMaestro.mak.</p>
 <h3>Files Created at Compile-time<a class="headerlink" href="#files-created-at-compile-time" title="Permalink to this headline">¶</a></h3>
 <p>Several files are created at build-time:</p>
 <ul>
-<li><p class="first">probin.f90:</p>
+<li><p>probin.f90:</p>
 <p>This is the module that controls runtime parameters. This is
 created by the script
 write_probin.py in ${AMREX_HOME}/Tools/F_scripts/. The
@@ -348,7 +348,7 @@ are parsed and the probin.f90 file is output containing the
 runtime parameters, their default values, and the logic for reading
 and interpreting the inputs file.</p>
 </li>
-<li><p class="first">build_info.f90:</p>
+<li><p>build_info.f90:</p>
 <p>This is a module that contains basic information about the build
 environment (compiler used, build machine, build directory, compiler
 flags, etc.). This is created by the script makebuildinfo.py
@@ -357,7 +357,7 @@ GMaestro.mak by passing in a number of makefile variables. This is
 rewritten everytime the code is compiled. The primary use of this
 module is writing out the job_info file in the plotfiles.</p>
 </li>
-<li><p class="first">(network.f90):</p>
+<li><p>(network.f90):</p>
 <p>This is generated at compile time <em>only</em> for the
 general_null network. The general_null network allows the
 user to define a list of non-reacting species builds the
@@ -371,7 +371,7 @@ outputs the network.f90.</p>
 </div>
 </div>
 <div class="section" id="maestro-problem-options">
-<h2>MAESTRO&nbsp;Problem Options<a class="headerlink" href="#maestro-problem-options" title="Permalink to this headline">¶</a></h2>
+<h2>MAESTRO Problem Options<a class="headerlink" href="#maestro-problem-options" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="problem-specific-files">
 <span id="sec-make-otherfiles"></span><h3>Problem-specific Files<a class="headerlink" href="#problem-specific-files" title="Permalink to this headline">¶</a></h3>
 <p>If a problem has a unique file that is needed as part of the build,
@@ -391,39 +391,39 @@ found first.</p>
 </div>
 <div class="section" id="defining-eos-network-and-conductivity-routines">
 <h3>Defining EOS, Network, and Conductivity Routines<a class="headerlink" href="#defining-eos-network-and-conductivity-routines" title="Permalink to this headline">¶</a></h3>
-<p>Each MAESTRO&nbsp;problem needs to define an equation of state, a
+<p>Each MAESTRO problem needs to define an equation of state, a
 reaction network, and a routine to compute the conductivities (for
 thermal diffusion). This is true even if the problem is not doing
 reactions of thermal diffusion. These definitions are specified
 in the problem’s GNUmakefile.</p>
 <ul>
-<li><p class="first">EOS_DIR:</p>
+<li><p>EOS_DIR:</p>
 <p>This variable points to the directory (by default, relative to
 Microphysics/EOS/) of the equation of state used for the build.
-Choices that work with MAESTRO&nbsp;are:</p>
+Choices that work with MAESTRO are:</p>
 <ul class="simple">
-<li>helmholtz</li>
-<li>gamma_law_general</li>
-<li>multigamma</li>
+<li><p>helmholtz</p></li>
+<li><p>gamma_law_general</p></li>
+<li><p>multigamma</p></li>
 </ul>
 <p>To use an EOS contained in a different location, set the variable
 EOS_TOP_DIR to point to the directory above the alternate EOS
 directory.</p>
 </li>
-<li><p class="first">CONDUCTIVITY_DIR:</p>
+<li><p>CONDUCTIVITY_DIR:</p>
 <p>This variable points to the conductivity routine used for the build
 (by default, relative to Microphysics/conductivity/). Choices
-that work with MAESTRO&nbsp;are:</p>
+that work with MAESTRO are:</p>
 <ul class="simple">
-<li>constant</li>
-<li>timmes_stellar</li>
+<li><p>constant</p></li>
+<li><p>timmes_stellar</p></li>
 </ul>
 <p>If diffusion is not being used for the problem, this should be set
 to constant. To use an alternate conductivity
 routine, set the variable CONDUCTIVITY_TOP_DIR to point
 to the directory above the alternate conductivity directory.</p>
 </li>
-<li><p class="first">NETWORK_DIR:</p>
+<li><p>NETWORK_DIR:</p>
 <p>This variable points to the reaction network used for the build (by
 default, relative to Microphysics/networks/). Several options
 are present in Microphysics/networks/. A network is required even
@@ -442,17 +442,17 @@ network.</p>
 </ul>
 </div>
 <div class="section" id="core-maestro-modules">
-<h3>Core MAESTRO&nbsp;modules<a class="headerlink" href="#core-maestro-modules" title="Permalink to this headline">¶</a></h3>
-<p>Several modules are included in all MAESTRO&nbsp;builds by default.
+<h3>Core MAESTRO modules<a class="headerlink" href="#core-maestro-modules" title="Permalink to this headline">¶</a></h3>
+<p>Several modules are included in all MAESTRO builds by default.
 From AMReX, we alway include:</p>
 <ul class="simple">
-<li>${AMREX_HOME}/Src/F_BaseLib</li>
-<li>${AMREX_HOME}/Src/LinearSolvers/F_MG</li>
+<li><p>${AMREX_HOME}/Src/F_BaseLib</p></li>
+<li><p>${AMREX_HOME}/Src/LinearSolvers/F_MG</p></li>
 </ul>
 <p>From Util, we always include</p>
 <ul class="simple">
-<li>Util/model_parser</li>
-<li>Util/random</li>
+<li><p>Util/model_parser</p></li>
+<li><p>Util/random</p></li>
 </ul>
 <p>The microphysics, as described above is also included. For the
 networks, we include a file called NETWORK_REQUIRES into
@@ -469,8 +469,8 @@ that for some systems, you should have the static BLAS libraries
 available.</p>
 <p>From MAESTRO/, we add</p>
 <ul class="simple">
-<li>MAESTRO/constants</li>
-<li>MAESTRO/Source</li>
+<li><p>MAESTRO/constants</p></li>
+<li><p>MAESTRO/Source</p></li>
 </ul>
 <p>(although see the unit tests section below regarding MAESTRO/Source.)</p>
 <p>Finally, any extra directories listed in the EXTRA_DIR
@@ -483,8 +483,8 @@ source files.</p>
 </div>
 <div class="section" id="unit-tests">
 <h3>Unit Tests<a class="headerlink" href="#unit-tests" title="Permalink to this headline">¶</a></h3>
-<p>Sometimes we only want to use a few of the standard MAESTRO&nbsp;routines, for example in a unit test where we are testing only a small
-part of the MAESTRO&nbsp;algorithm indepenedently. In this case, we
+<p>Sometimes we only want to use a few of the standard MAESTRO routines, for example in a unit test where we are testing only a small
+part of the MAESTRO algorithm indepenedently. In this case, we
 don’t want to comple all of the files in MAESTRO/Source. If we
 set UNIT_TEST := t in our problem’s GNUmakefile, then the
 GPackage.mak in MAESTRO/Source is not read, so those files
@@ -500,7 +500,7 @@ still be found as needed.</p>
 by setting AMREX_ONLY := t. This is like the unit test flag,
 but does not include MAESTRO/Source in the vpath search
 path for sources. So this is intended for cases where we don’t want
-to use any MAESTRO&nbsp;source files. Typically, this is used in the
+to use any MAESTRO source files. Typically, this is used in the
 small unit tests that live under the various microphysics solvers. If
 a probin.f90 is built for these tests, it will not include all
 the MAESTRO-specific parameters, but will include any parameters from
@@ -552,20 +552,20 @@ all builds—i.e., the entire t/ directory is removed.</p>
 </div>
 <div class="section" id="special-debugging-modes">
 <span id="ch-makefiles-special"></span><h2>Special Debugging Modes<a class="headerlink" href="#special-debugging-modes" title="Permalink to this headline">¶</a></h2>
-<p>AMReX&nbsp;has several options that produce executables that can help
+<p>AMReX has several options that produce executables that can help
 track down memory issues, uninitialized variables, NaNs, etc.</p>
 <ul>
-<li><p class="first">NDEBUG</p>
+<li><p>NDEBUG</p>
 <p>GNUmakefile:NDEBUG To generate an executable
 with debugging information included in the executable (e.g., to be
 interpreted by the debugger, gdb), compile with NDEBUG
-:=&nbsp;. This will usually add -g to the compile line and
+:= . This will usually add -g to the compile line and
 also lower the optimization. For gfortran it will add several
 options to catch uninitialize variables, bounds errors, etc.</p>
 </li>
-<li><p class="first">TEST</p>
+<li><p>TEST</p>
 <p>Setting TEST := tGNUmakefile:TEST will
-enable routines in AMReX&nbsp;initialize multifabs and arrays
+enable routines in AMReX initialize multifabs and arrays
 allowed via bl_allocate to signalliing NaNs. This behavior
 is the same as NDEBUG :=, but TEST := t uses the
 same compiler optimizations as a normal build.</p>
@@ -574,29 +574,29 @@ exceptions (FPEs), but checks on floating point exceptions can also
 be enabled through runtime parameters passed to AMReX’s
 backtrace functionlity:</p>
 <ul class="simple">
-<li>boxlib_fpe_invalid: enabling FPE trapping for
-invalid operations (e.g. 0 * inf, sqrt(-1))</li>
-<li>boxlib_fpe_zero: enable FPE trapping for
-divide-by-zero</li>
-<li>boxlib_fpe_overflow: enable FPE trapping for
-overflow</li>
+<li><p>boxlib_fpe_invalid: enabling FPE trapping for
+invalid operations (e.g. 0 * inf, sqrt(-1))</p></li>
+<li><p>boxlib_fpe_zero: enable FPE trapping for
+divide-by-zero</p></li>
+<li><p>boxlib_fpe_overflow: enable FPE trapping for
+overflow</p></li>
 </ul>
 </li>
-<li><p class="first">backtracing</p>
-<p>When exception trapping is enabled (either via AMReX&nbsp;or the
+<li><p>backtracing</p>
+<p>When exception trapping is enabled (either via AMReX or the
 compiler), the code will abort, and the backtrace information will
 be output to a file Backtrace.N, where N is the
-processor number. AMReX&nbsp;will also initialize multifabs with
+processor number. AMReX will also initialize multifabs with
 signaliing NaNs to help uncover any floating point issues.</p>
 <p>This is also useful to diagnose deadlocks in parallel regions.
 If the code is hanging, doing “control-C” will be intercepted
 and the code will generate a backtrace which will identify
 where in the code there was a deadlock.</p>
-<p>Behind the scenes, AMReX&nbsp;implements this capability via the
+<p>Behind the scenes, AMReX implements this capability via the
 Linux/Unix feenableexcept function (this is in
 backtrace_c.cpp in AMReX).</p>
 </li>
-<li><p class="first">FSANITIZER</p>
+<li><p>FSANITIZER</p>
 <p>For gfortran, gcc, g++, setting FSANITIZER :=
 tGNUmakefile:FSANITIZER will enable the
 address sanitizer support built into GCC. This is enabled through
@@ -623,7 +623,7 @@ compiler version for output into the job_info file at runtime.</p>
 <h3>Parallel (MPI) Builds<a class="headerlink" href="#parallel-mpi-builds" title="Permalink to this headline">¶</a></h3>
 <p>When building with MPI, the build system needs to know about the
 location of the MPI libraries. If your local MPI has the mpif90
-and mpicc wrappers installed and working, then MAESTRO&nbsp;will
+and mpicc wrappers installed and working, then MAESTRO will
 attempt to use these. Otherwise, you will need to edit
 GMakeMPI.mak and add a section specific to your machine with the
 compiler and library location. It is best to simply copy an existing

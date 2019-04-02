@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Modifications for a \(1/r^2\) Plane-Parallel Basestate &mdash; MAESTROeX 19.03
+  <title>Modifications for a \(1/r^2\) Plane-Parallel Basestate &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -233,13 +233,14 @@ t$ and $partial r$ where they appear in the same term, we get
 $$frac{partial}{partial r} left[ gammabar p_0 frac{partial delta w_0}{partial r} right] =</p>
 <blockquote>
 <div><ul class="simple">
-<li>frac{partial}{partial t} frac{partial p_0}{partial r} -  frac{partial}{partial r} left (w_0 frac{partial p_0}{partial r} right) .$$</li>
+<li><p>frac{partial}{partial t} frac{partial p_0}{partial r} -  frac{partial}{partial r} left (w_0 frac{partial p_0}{partial r} right) .$$</p></li>
 </ul>
 </div></blockquote>
 <p>We then substitute in the equation of hydrostatic equilibrium:
 $$frac{partial p_0}{partial r} = -rho_0 g quadquad mbox{where} quadquad</p>
 <blockquote>
-<div>g = frac{G m}{r^2}.$$</div></blockquote>
+<div><p>g = frac{G m}{r^2}.$$</p>
+</div></blockquote>
 <p>We will assume that the mass of the atmosphere is negligible relative to the
 mass of the core, which is outside of the simulation domain. This simplifies
 the equation by allowing us to assume that $m$, the enclosed mass, is constant.
@@ -250,41 +251,44 @@ $$frac{partial}{partial r} left[ gammabar p_0 frac{partial}{partial r}{({delta w
 = rho_0 left ({frac{partial}{partial t}{g} + w_0 frac{partial}{partial r}{g}} right )</p>
 <blockquote>
 <div><ul class="simple">
-<li>g left ({frac{partial}{partial t}{rho_0} + frac{partial}{partial r}{({w_0 rho_0})}} right ).$$</li>
+<li><p>g left ({frac{partial}{partial t}{rho_0} + frac{partial}{partial r}{({w_0 rho_0})}} right ).$$</p></li>
 </ul>
 </div></blockquote>
 </div></blockquote>
-<p>We now recall Equation&nbsp;29 from Paper III:
+<p>We now recall Equation 29 from Paper III:
 $$frac{partial}{partial t}{rho_0} = - nabla cdot ({w_0 rho_0 er})</p>
 <blockquote>
 <div><ul class="simple">
-<li>nabla cdot ({etarho er}),$$</li>
+<li><p>nabla cdot ({etarho er}),$$</p></li>
 </ul>
 </div></blockquote>
 <p>which is, in Cartesian geometry,
 $$frac{partial rho_0}{partial t} = - frac{partial}{partial r}{({w_0 rho_0})}</p>
 <blockquote>
 <div><ul class="simple">
-<li>frac{partial etarho}{partial r}.$$</li>
+<li><p>frac{partial etarho}{partial r}.$$</p></li>
 </ul>
 </div></blockquote>
 <p>Substituting this expression yields
 $$frac{partial}{partial r}{} left[ gammabar p_0 frac{partial}{partial r}{({delta w_0})} right]</p>
 <blockquote>
-<div>= rho_0 frac{D_0 g}{D t} + g left ({- frac{partial}{partial r}{({w_0 rho_0})} - frac{partial etarho}{partial r} + frac{partial}{partial r}{({w_0 rho_0})}} right)
-= rho_0 frac{D_0 g}{D t} - g frac{partial etarho}{partial r}.$$</div></blockquote>
+<div><p>= rho_0 frac{D_0 g}{D t} + g left ({- frac{partial}{partial r}{({w_0 rho_0})} - frac{partial etarho}{partial r} + frac{partial}{partial r}{({w_0 rho_0})}} right)
+= rho_0 frac{D_0 g}{D t} - g frac{partial etarho}{partial r}.$$</p>
+</div></blockquote>
 <p>We then differentiate the gravitational acceleration:
 $$begin{aligned}
 frac{D_0 g}{D t}</p>
 <blockquote>
-<div>&amp; = &amp; frac{D_0}{Dt} left ({frac{G m}{r^2}} right ) nonumber \
+<div><p>&amp; = &amp; frac{D_0}{Dt} left ({frac{G m}{r^2}} right ) nonumber \
 &amp; = &amp; G m left ({frac{partial}{partial t}{({r^{-2}})} + w_0 frac{partial}{partial r}{({r^{-2}})}} right ) nonumber \
 &amp; = &amp; - frac{2 G m w_0}{r^3} nonumber \
-&amp; = &amp; - frac{2 w_0 g}{r}.end{aligned}$$</div></blockquote>
+&amp; = &amp; - frac{2 w_0 g}{r}.end{aligned}$$</p>
+</div></blockquote>
 <p>Substituting in this expression gives our final result:
 $$frac{partial}{partial r}{} left[ gammabar p_0 frac{partial}{partial r}{({dw})} right]</p>
 <blockquote>
-<div>= - frac{2 w_0 rho_0 g}{r} - g frac{partial etarho}{partial r}$$</div></blockquote>
+<div><p>= - frac{2 w_0 rho_0 g}{r} - g frac{partial etarho}{partial r}$$</p>
+</div></blockquote>
 </div>
 <div class="section" id="uniform-dr-discretization">
 <h2>Uniform $dr$ Discretization<a class="headerlink" href="#uniform-dr-discretization" title="Permalink to this headline">¶</a></h2>
@@ -293,7 +297,7 @@ appears as:
 $$frac{partial}{partial r} left [ gammabar p_0 frac{partial dw}{partial r} right ]</p>
 <blockquote>
 <div><ul class="simple">
-<li>frac{2 rho_0 g dw}{r} = -frac{2 rho_0 g ow}{r} - g frac{partial etarho}{partial r}$$</li>
+<li><p>frac{2 rho_0 g dw}{r} = -frac{2 rho_0 g ow}{r} - g frac{partial etarho}{partial r}$$</p></li>
 </ul>
 </div></blockquote>
 <p>On a uniform mesh (constant $dr$, we would discretize this as:
@@ -303,7 +307,7 @@ frac{1}{dr} left { left [ gammabar p_0 frac{partial dw}{partial r} right ]_j</p>
 <div><blockquote>
 <div><blockquote>
 <div><ul class="simple">
-<li>left [ gammabar p_0 frac{partial dw}{partial r} right ]_{j-1}</li>
+<li><p>left [ gammabar p_0 frac{partial dw}{partial r} right ]_{j-1}</p></li>
 </ul>
 </div></blockquote>
 <p>right }</p>
@@ -312,7 +316,7 @@ frac{1}{dr} left { left [ gammabar p_0 frac{partial dw}{partial r} right ]_j</p>
 = &amp;-&amp; left [ frac{2 rho_0 g}{r} ow right ]_{j-half}</p>
 <blockquote>
 <div><ul class="simple">
-<li>frac{g_{j-half}}{dr} left [ {etarho}_j - {etarho}_{j-1} right ]end{aligned}$$</li>
+<li><p>frac{g_{j-half}}{dr} left [ {etarho}_j - {etarho}_{j-1} right ]end{aligned}$$</p></li>
 </ul>
 </div></blockquote>
 </div></blockquote>
@@ -323,21 +327,21 @@ frac{1}{(dr)^2} left { left [ (gammabar p_0)_j</p>
 <div><blockquote>
 <div><blockquote>
 <div><blockquote>
-<div>left ({dw}_{j+half} - {dw}_{j-half} right ) right ]</div></blockquote>
-<dl class="docutils">
-<dt>right . &amp;-&amp; left . left [ (gammabar p_0)_{j-1}</dt>
-<dd>left ({dw}_{j-half} - {dw}_{j-thalf} right ) right ]</dd>
+<div><p>left ({dw}_{j+half} - {dw}_{j-half} right ) right ]</p>
+</div></blockquote>
+<dl class="simple">
+<dt>right . &amp;-&amp; left . left [ (gammabar p_0)_{j-1}</dt><dd><p>left ({dw}_{j-half} - {dw}_{j-thalf} right ) right ]</p>
+</dd>
 </dl>
 </div></blockquote>
 <p>right }</p>
 </div></blockquote>
 <ul class="simple">
-<li>left [ frac{2 rho_0 g}{r} dw right ]_{j-half} nonumber \</li>
+<li><p>left [ frac{2 rho_0 g}{r} dw right ]_{j-half} nonumber \</p></li>
 </ul>
-<dl class="docutils">
-<dt>= &amp;-&amp; left [ frac{2 rho_0 g}{r} ow right ]_{j-half}</dt>
-<dd><ul class="first last simple">
-<li>frac{g_{j-half}}{dr} left [ {etarho}_j - {etarho}_{j-1} right ]end{aligned}$$</li>
+<dl class="simple">
+<dt>= &amp;-&amp; left [ frac{2 rho_0 g}{r} ow right ]_{j-half}</dt><dd><ul class="simple">
+<li><p>frac{g_{j-half}}{dr} left [ {etarho}_j - {etarho}_{j-1} right ]end{aligned}$$</p></li>
 </ul>
 </dd>
 </dl>
@@ -365,10 +369,11 @@ $$frac{partial}{partial r} left [ gammabar p_0 frac{partial dw}{partial r} right
 frac{1}{dr_c} left { frac{1}{2} left [</p>
 <blockquote>
 <div><blockquote>
-<div>left ( gammabar p_0 frac{partial dw}{partial r} right )_{j+1} +
-left ( gammabar p_0 frac{partial dw}{partial r} right )_{j} right ]</div></blockquote>
+<div><p>left ( gammabar p_0 frac{partial dw}{partial r} right )_{j+1} +
+left ( gammabar p_0 frac{partial dw}{partial r} right )_{j} right ]</p>
+</div></blockquote>
 <ul class="simple">
-<li>left ( gammabar p_0 frac{partial dw}{partial r} right )_{j-1}</li>
+<li><p>left ( gammabar p_0 frac{partial dw}{partial r} right )_{j-1}</p></li>
 </ul>
 </div></blockquote>
 <p>right }$$
@@ -379,8 +384,9 @@ $$begin{aligned}
 frac{partial}{partial r} left [ gammabar p_0 frac{partial dw}{partial r} right ]_{j-half} &amp;=&amp;
 frac{1}{dr_c} left {  frac{1}{2} left [</p>
 <blockquote>
-<div>left ( gammabar p_0 right )_{j+1} frac{(dw)_{j+thalf} - (dw)_{j+half}}{dr_f} +
-left ( gammabar p_0 right )_{j}   frac{(dw)_{j+half} - (dw)_{j-half}}{dr_f}  right ] right .  nonumber \</div></blockquote>
+<div><p>left ( gammabar p_0 right )_{j+1} frac{(dw)_{j+thalf} - (dw)_{j+half}}{dr_f} +
+left ( gammabar p_0 right )_{j}   frac{(dw)_{j+half} - (dw)_{j-half}}{dr_f}  right ] right .  nonumber \</p>
+</div></blockquote>
 <p>&amp;&amp; qquad left .  - left ( gammabar p_0 right )_{j-1} frac{(dw)_{j-half} - (dw)_{j-thalf}}{dr_c}
 right }end{aligned}$$
 which has terms proportional to $(dw)_{j-thalf}$, $(dw)_{j-half}$, $(dw)_{j+half}$, and $(dw)_{j+thalf}$</p>

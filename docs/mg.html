@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Multigrid &mdash; MAESTROeX 19.03
+  <title>Multigrid &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -125,7 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Multigrid</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#amrex-multigrid-philosophy">AMReX&nbsp;Multigrid Philosophy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#amrex-multigrid-philosophy">AMReX Multigrid Philosophy</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#data-structures">Data Structures</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#mg-tower">mg_tower</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#bndry-reg">bndry_reg</a></li>
@@ -229,16 +229,16 @@
   <div class="section" id="multigrid">
 <h1>Multigrid<a class="headerlink" href="#multigrid" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="amrex-multigrid-philosophy">
-<h2>AMReX&nbsp;Multigrid Philosophy<a class="headerlink" href="#amrex-multigrid-philosophy" title="Permalink to this headline">¶</a></h2>
-<p>Here we describe some of the general ideas behind the AMReX&nbsp;multigrid (MG).</p>
+<h2>AMReX Multigrid Philosophy<a class="headerlink" href="#amrex-multigrid-philosophy" title="Permalink to this headline">¶</a></h2>
+<p>Here we describe some of the general ideas behind the AMReX multigrid (MG).</p>
 <p>We solve MG on an AMR hierarchy, which means in places we will encounter
-C-F interfaces. The AMReX&nbsp;MG will modify the stencil for the Laplacian
+C-F interfaces. The AMReX MG will modify the stencil for the Laplacian
 at C-F interfaces to ensure the correct solution to the Poisson equation
 across these interfaces. There is no correction step needed in this
 case (this differs from <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{ricker:2008}`</span></a>).</p>
 <p>The MG solver always works with jumps of <span class="math notranslate nohighlight">\(2\times\)</span> between levels. In
 some codes (but not MAESTRO) we can have jumps of <span class="math notranslate nohighlight">\(4\times\)</span> between
-levels. AMReX&nbsp;uses a mini_cycle in these cases, effectively
+levels. AMReX uses a mini_cycle in these cases, effectively
 inserting a multigrid level between the two AMR levels and doing a mini
 V-cycle.</p>
 <p>The MG solvers are located in amrex/Src/LinearSolvers/F_MG/.
@@ -251,64 +251,59 @@ nd in their name.</p>
 <h3>Data Structures<a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="mg-tower">
 <h4>mg_tower<a class="headerlink" href="#mg-tower" title="Permalink to this headline">¶</a></h4>
-<p>The mg_tower&nbsp;is a special Fortran derived type that carries all the
-information required for a AMReX&nbsp;multigrid solve.</p>
+<p>The mg_tower is a special Fortran derived type that carries all the
+information required for a AMReX multigrid solve.</p>
 <p>The following parameters are specified when building the mg_tower:</p>
 <ul class="simple">
-<li>smoother: the type of smoother to use. Choices are listed
+<li><p>smoother: the type of smoother to use. Choices are listed
 in mg_tower.f90. Common options are
 MG_SMOOTHER_GS_RB for red-black Gauss-Seidel and
-MG_SMOOTHER_JACOBI for Jacobi.</li>
-<li>nu1: The number of smoothings at each level on the way down
-the V-cycle.</li>
-<li>nu2: The number of smoothings at each level on the way up
-the V-cycle.</li>
-<li>nub: The number of smoothing before and after the bottom solver.</li>
-<li>gamma:</li>
-<li>cycle_type: The type of multigrid to do, V-cycles (
+MG_SMOOTHER_JACOBI for Jacobi.</p></li>
+<li><p>nu1: The number of smoothings at each level on the way down
+the V-cycle.</p></li>
+<li><p>nu2: The number of smoothings at each level on the way up
+the V-cycle.</p></li>
+<li><p>nub: The number of smoothing before and after the bottom solver.</p></li>
+<li><p>gamma:</p></li>
+<li><p>cycle_type: The type of multigrid to do, V-cycles (
 MG_VCycle), W-cycles (MG_WCycle), full multigrid (
-MG_FCycle).</li>
-<li>omega:</li>
-<li>bottom_solver: the type of bottom solver to use. See the next
-section.</li>
-<li>bottom_max_iter: the maximum number of iterations for the
-bottom solver</li>
-<li>bottom_solver_eps: the tolerance used by the bottom
-solver. In MAESTRO, this is set via mg_eps_module.</li>
-<li>max_iter: the maximum number of multigrid cycles.</li>
-<li>max_bottom_nlevel: additional coarsening if you use
-bottom_solver type 4 (see below)</li>
-<li>min_width: minimum size of grid at coarsest multigrid level</li>
-<li>rel_solver_eps: the relative tolerance of the solver (in
-MAESTRO, this is set via mg_eps_module.</li>
-<li>abs_solver_eps: the absolute tolerance of the solver (in
-MAESTRO, this is set via mg_eps_module.</li>
-<li>verbose: the verbosity of the multigrid solver. In MAESTRO,
+MG_FCycle).</p></li>
+<li><p>omega:</p></li>
+<li><p>bottom_solver: the type of bottom solver to use. See the next
+section.</p></li>
+<li><p>bottom_max_iter: the maximum number of iterations for the
+bottom solver</p></li>
+<li><p>bottom_solver_eps: the tolerance used by the bottom
+solver. In MAESTRO, this is set via mg_eps_module.</p></li>
+<li><p>max_iter: the maximum number of multigrid cycles.</p></li>
+<li><p>max_bottom_nlevel: additional coarsening if you use
+bottom_solver type 4 (see below)</p></li>
+<li><p>min_width: minimum size of grid at coarsest multigrid level</p></li>
+<li><p>rel_solver_eps: the relative tolerance of the solver (in
+MAESTRO, this is set via mg_eps_module.</p></li>
+<li><p>abs_solver_eps: the absolute tolerance of the solver (in
+MAESTRO, this is set via mg_eps_module.</p></li>
+<li><p>verbose: the verbosity of the multigrid solver. In MAESTRO,
 this is set via the mg_verbose runtime parameter. Higher
-numbers give more verbosity.</li>
-<li>cg_verbose: the verbosity of the bottom solver. In MAESTRO,
+numbers give more verbosity.</p></li>
+<li><p>cg_verbose: the verbosity of the bottom solver. In MAESTRO,
 this is set via the cg_verbose runtime parameter. Higher
-numbers give more verbosity.</li>
+numbers give more verbosity.</p></li>
 </ul>
-<p>In addition to these parameters, the mg_tower&nbsp;carries a number of
+<p>In addition to these parameters, the mg_tower carries a number of
 multifabs that carry the solution and stencil for the multigrid
 solve.</p>
 <ul>
-<li><p class="first">ss: The stencil itself—for each zone, this gives the
+<li><p>ss: The stencil itself—for each zone, this gives the
 coefficients of the terms in the Laplacian, with the convention that
 the ‘0’ term is located in the current cell and the other terms are
-the <span class="math notranslate nohighlight">\(\pm 1\)</span> off the current cell in each direction.</p>
-</li>
-<li><p class="first">cc: scratch space (?)</p>
-</li>
-<li><p class="first">ff: The source (righthand side) of the elliptic equation
-we are solving.</p>
-</li>
-<li><p class="first">dd: The residual/defect, <span class="math notranslate nohighlight">\(f - L\phi\)</span></p>
-</li>
-<li><p class="first">uu: The solution variable (<span class="math notranslate nohighlight">\(\phi\)</span> when on the finest level)</p>
-</li>
-<li><p class="first">mm: For cell-centered, mm takes a direction and
+the <span class="math notranslate nohighlight">\(\pm 1\)</span> off the current cell in each direction.</p></li>
+<li><p>cc: scratch space (?)</p></li>
+<li><p>ff: The source (righthand side) of the elliptic equation
+we are solving.</p></li>
+<li><p>dd: The residual/defect, <span class="math notranslate nohighlight">\(f - L\phi\)</span></p></li>
+<li><p>uu: The solution variable (<span class="math notranslate nohighlight">\(\phi\)</span> when on the finest level)</p></li>
+<li><p>mm: For cell-centered, mm takes a direction and
 tells you whether we are at a Dirichlet or Neumann boundary, or if
 we are skewed in that direction.</p>
 <p>For nodal, mm simply tells us whether a point is Dirichlet
@@ -318,21 +313,21 @@ or Neumann. There is no skew in nodal.</p>
 </div>
 <div class="section" id="bndry-reg">
 <h4>bndry_reg<a class="headerlink" href="#bndry-reg" title="Permalink to this headline">¶</a></h4>
-<p>There are two types of bndry_reg&nbsp;objects, each of which is a set of
+<p>There are two types of bndry_reg objects, each of which is a set of
 dim multifabs. The first, which is built with the
 bndry_reg_build call, is defined on all cells immediately outside
-of each grid. Each multifab within the bndry_reg&nbsp;contains all the
+of each grid. Each multifab within the bndry_reg contains all the
 fabs on both the low and high faces for a given direction. In the
-context of multigrid, we fill the bndry_reg&nbsp;with coarse data before
+context of multigrid, we fill the bndry_reg with coarse data before
 interpolating the data to the correct locations to be used in the
-multigrid stencil. The second type of bndry_reg&nbsp;object is defined on
+multigrid stencil. The second type of bndry_reg object is defined on
 the coarse cells immediately outside each fine grid, and is defined
 with the bndry_reg_rr_build call, is defined on all cells
 immediately outside. For this latter type, the option is available
 to include only cells not covered by a different fine grid, but this
 is left as an option because it requires additional calculations of
 box intersections.</p>
-<p>In multigrid, we use the latter type of bndry_reg&nbsp;to calculate the
+<p>In multigrid, we use the latter type of bndry_reg to calculate the
 residual at coarse cells adjacent to fine grids that is used as the
 right hand side in the relaxation step at the coarse level on the way
 down the V-cycle (or other). The first type of bndry_regis used to
@@ -343,7 +338,7 @@ V-cycle.</p>
 first compute the pure coarse residual, then subtract the contribution
 from the coarse face underlying the coarse-fine interface, and add the
 contribution of the fine faces at the coarse-fine interface.
-The bndry_reg&nbsp;holds the cell-centered contribution from the
+The bndry_reg holds the cell-centered contribution from the
 difference of these edge fluxes and is added to the coarse residual
 multifab.</p>
 </div>
@@ -353,28 +348,28 @@ multifab.</p>
 <p>There are several different stencil types that we can use for
 the discretization. For cell-centered, these are:</p>
 <ul class="simple">
-<li>CC_CROSS_STENCIL: this is the standard cross-stencil—5 points
+<li><p>CC_CROSS_STENCIL: this is the standard cross-stencil—5 points
 in 2-d and 7 points in 3-d. For cell-centered MG, this is the default, and
-is usually the best choice.</li>
-<li>HO_CROSS_STENCIL: this is a cross-stencil that uses 9 points
+is usually the best choice.</p></li>
+<li><p>HO_CROSS_STENCIL: this is a cross-stencil that uses 9 points
 in 2-d and 11-points in 3-d. For instance, it will use <span class="math notranslate nohighlight">\((i,j)\)</span>;
 <span class="math notranslate nohighlight">\((i\pm1,j)\)</span>; <span class="math notranslate nohighlight">\((i\pm2,j)\)</span>; <span class="math notranslate nohighlight">\((i,j\pm1)\)</span>; <span class="math notranslate nohighlight">\((i,j\pm2)\)</span>. This is
-higher-order accurate that CC_CROSS_STENCIL.</li>
-<li>HO_DENSE_STENCIL: this is a dense-stencil—it uses all the
+higher-order accurate that CC_CROSS_STENCIL.</p></li>
+<li><p>HO_DENSE_STENCIL: this is a dense-stencil—it uses all the
 points (including corners) in <span class="math notranslate nohighlight">\((i\pm1,j\pm1)\)</span>, resulting in a 9-point stencil
-in 2-d and 27-point stencil in 3-d.</li>
+in 2-d and 27-point stencil in 3-d.</p></li>
 </ul>
 <p>For the nodal solver, the choices are:</p>
 <ul class="simple">
-<li>ND_CROSS_STENCIL: this is the standard cross-stencil.</li>
-<li>ND_DENSE_STENCIL: this is a dense stencil, using
+<li><p>ND_CROSS_STENCIL: this is the standard cross-stencil.</p></li>
+<li><p>ND_DENSE_STENCIL: this is a dense stencil, using
 all the points in <span class="math notranslate nohighlight">\((i\pm1,j\pm1)\)</span>. The
 derivation of this stencil is based on finite-element ideas, defining
 basis functions on the nodes. This is developed in 2-d in
-<a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{almgrenBellSzymczak:1996}`</span></a>.</li>
-<li>ND_VATER_STENCIL: this is an alternate dense stencil derived
+<a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{almgrenBellSzymczak:1996}`</span></a>.</p></li>
+<li><p>ND_VATER_STENCIL: this is an alternate dense stencil derived
 using a similar finite-element idea as above, but a different control
-volume.</li>
+volume.</p></li>
 </ul>
 <p>For the cell-centered solve, the coefficients for the stencil are computed
 once, at the beginning of the solve. For the nodal solver, the coefficients
@@ -385,12 +380,12 @@ are hard-coded into the smoothers.</p>
 <p>The following smoothers are available (but not necessarily for both the
 cell-centered and nodal solvers):</p>
 <ul class="simple">
-<li>MG_SMOOTHER_GS_RB: a red-black Gauss-Seidel smoother</li>
-<li>MG_SMOOTHER_JACOBI: a Jacobi smoother (not implemented for
-the dense nodal stencil)</li>
-<li>MG_SMOOTHER_MINION_CROSS</li>
-<li>MG_SMOOTHER_MINION_FULL</li>
-<li>MG_SMOOTHER_EFF_RB</li>
+<li><p>MG_SMOOTHER_GS_RB: a red-black Gauss-Seidel smoother</p></li>
+<li><p>MG_SMOOTHER_JACOBI: a Jacobi smoother (not implemented for
+the dense nodal stencil)</p></li>
+<li><p>MG_SMOOTHER_MINION_CROSS</p></li>
+<li><p>MG_SMOOTHER_MINION_FULL</p></li>
+<li><p>MG_SMOOTHER_EFF_RB</p></li>
 </ul>
 </div>
 <div class="section" id="cycling">
@@ -417,15 +412,15 @@ These are set through the mg_bottom_solver (MAC/cell-centered)
 and hg_bottom_solver (nodal) runtime parameters.
 The allowed values are:</p>
 <ul class="simple">
-<li>mg_bottom_solver / hg_bottom_solver = 0: smoothing only.</li>
-<li>mg_bottom_solver / hg_bottom_solver = 1: biconjugate
-gradient stabilized—this is the default.</li>
-<li>mg_bottom_solver / hg_bottom_solver = 2: conjugate
-gradient method</li>
-<li>mg_bottom_solver / hg_bottom_solver = 4: a special
+<li><p>mg_bottom_solver / hg_bottom_solver = 0: smoothing only.</p></li>
+<li><p>mg_bottom_solver / hg_bottom_solver = 1: biconjugate
+gradient stabilized—this is the default.</p></li>
+<li><p>mg_bottom_solver / hg_bottom_solver = 2: conjugate
+gradient method</p></li>
+<li><p>mg_bottom_solver / hg_bottom_solver = 4: a special
 bottom solver that extends the range of the multigrid coarsening
 by aggregrating coarse grids on the original mesh together and
-further coarsening.</li>
+further coarsening.</p></li>
 </ul>
 <p>You should use the special bottom solver (4) whenever possible, even
 if it means changing your gridding strategy (as discussed below) to
@@ -461,61 +456,64 @@ maximum value that <span class="math notranslate nohighlight">\(n\)</span> can h
 max_mg_bottom_nlevs equal to that value.</p>
 <p>Some grid examples help make this clear:</p>
 <ul class="simple">
-<li><strong>Example 1:</strong> A 3D problem with <span class="math notranslate nohighlight">\(384^3\)</span> cells divided into <span class="math notranslate nohighlight">\(32^3\)</span>
+<li><p><strong>Example 1:</strong> A 3D problem with <span class="math notranslate nohighlight">\(384^3\)</span> cells divided into <span class="math notranslate nohighlight">\(32^3\)</span>
 grids, i.e., there is a <span class="math notranslate nohighlight">\(12\times 12\times 12\)</span> block of <span class="math notranslate nohighlight">\(32^3\)</span> grids.
 The coarsest level of the multigrid V-cycle contains <span class="math notranslate nohighlight">\(12\times
 12\times 12\)</span> grids that have <span class="math notranslate nohighlight">\(2^3\)</span> cells, so the entire problem domain
 has <span class="math notranslate nohighlight">\(24^3\)</span> cells. We see that <span class="math notranslate nohighlight">\(n=3\)</span>, and create a new problem domain
 with a <span class="math notranslate nohighlight">\(3\times 3\times 3\)</span> block of <span class="math notranslate nohighlight">\(8^3\)</span> grids. The coarsest level
 of the multigrid V-cycle for the “new” problem will be a <span class="math notranslate nohighlight">\(3\times
-3\times 3\)</span> block of <span class="math notranslate nohighlight">\(2^3\)</span> grids.</li>
-<li><strong>Example 2:</strong> A 2D problem with <span class="math notranslate nohighlight">\(96\times 384\)</span> cells divided into
+3\times 3\)</span> block of <span class="math notranslate nohighlight">\(2^3\)</span> grids.</p></li>
+<li><p><strong>Example 2:</strong> A 2D problem with <span class="math notranslate nohighlight">\(96\times 384\)</span> cells divided into
 <span class="math notranslate nohighlight">\(48^2\)</span> grids, i.e., there is a <span class="math notranslate nohighlight">\(2\times 8\)</span> block of <span class="math notranslate nohighlight">\(48^2\)</span> grids. The
 coarsest level of the multigrid V-cycle contains <span class="math notranslate nohighlight">\(2\times 8\)</span> grids
 that have <span class="math notranslate nohighlight">\(3^2\)</span> cells, so the entire problem domain has <span class="math notranslate nohighlight">\(6\times 24\)</span>
 cells. We see that <span class="math notranslate nohighlight">\(n=0\)</span>, so the program aborts since this grid
-structure is not appropriate for the fancy bottom solver.</li>
+structure is not appropriate for the fancy bottom solver.</p></li>
 </ul>
 </div>
 </div>
 </div>
 <div class="section" id="flowchart">
 <h2>Flowchart<a class="headerlink" href="#flowchart" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO&nbsp;multigrid solves always involve the full AMR hierarchy.</p>
+<p>MAESTRO multigrid solves always involve the full AMR hierarchy.</p>
 <div class="section" id="cell-centered-mg">
 <h3>Cell-Centered MG<a class="headerlink" href="#cell-centered-mg" title="Permalink to this headline">¶</a></h3>
 <p>The flowchart below shows the structure of a cell-centered multigrid
 solve using pure V-cycles.</p>
 <ul class="simple">
-<li>stencil_fill_cc_all_mglevels / stencil_fill_cc:
+<li><p>stencil_fill_cc_all_mglevels / stencil_fill_cc:
 Compute all of the stencil coefficients
 for the Laplacian operator at all cells. At the C-F interfaces, the
-stencil coefficients are modified to know this.</li>
-<li>ml_cc: The main driver for the cell-centered multigrid.
+stencil coefficients are modified to know this.</p></li>
+<li><p>ml_cc: The main driver for the cell-centered multigrid.
 Among other things, this computes the norm that will be used
-for convergence testing.</li>
-<li>mg_tower_v_cycle (recursive):<ul>
-<li><em>recursively descend V-cycle</em><ul>
-<li>: Smooth the
-problem at the current MG level using the desired smoother.</li>
-<li>compute_defect: Construct <span class="math notranslate nohighlight">\(f - L\phi\)</span>.</li>
-<li>: Restrict
-the defect to the coarser level by conservative averaging.</li>
+for convergence testing.</p></li>
+<li><p>mg_tower_v_cycle (recursive):</p>
+<ul>
+<li><p><em>recursively descend V-cycle</em></p>
+<ul>
+<li><p>: Smooth the
+problem at the current MG level using the desired smoother.</p></li>
+<li><p>compute_defect: Construct <span class="math notranslate nohighlight">\(f - L\phi\)</span>.</p></li>
+<li><p>: Restrict
+the defect to the coarser level by conservative averaging.</p></li>
 </ul>
 </li>
-<li>mg_tower_bottom_solve: Solve the coarsened problem
-using the chosen bottom solver.</li>
-<li><em>ascend V-cycle</em><ul>
-<li>: Take the solution at level <span class="math notranslate nohighlight">\(n-1\)</span> and use it to
+<li><p>mg_tower_bottom_solve: Solve the coarsened problem
+using the chosen bottom solver.</p></li>
+<li><p><em>ascend V-cycle</em></p>
+<ul>
+<li><p>: Take the solution at level <span class="math notranslate nohighlight">\(n-1\)</span> and use it to
 correct the solution at level <span class="math notranslate nohighlight">\(n\)</span> by representing the data on the finer grid. This uses
-linear reconstruction for jumps by <span class="math notranslate nohighlight">\(2\times\)</span> and piecewise-constant otherwise.</li>
-<li>:</li>
+linear reconstruction for jumps by <span class="math notranslate nohighlight">\(2\times\)</span> and piecewise-constant otherwise.</p></li>
+<li><p>:</p></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>compute_defect: This is called multiple times, checking for
-convergence at each level.</li>
+<li><p>compute_defect: This is called multiple times, checking for
+convergence at each level.</p></li>
 </ul>
 </div>
 <div class="section" id="nodal-mg">
@@ -523,71 +521,72 @@ convergence at each level.</li>
 <p>The flowchart below shows the structure of a cell-centered multigrid
 solve using pure V-cycles.</p>
 <ul class="simple">
-<li>stencil_fill_cc_all_mglevels / stencil_fill_cc:
+<li><p>stencil_fill_cc_all_mglevels / stencil_fill_cc:
 For the nodal solver, this applies the weights to the
-coefficients.</li>
-<li>ml_nd: The main driver for the nodal multigrid.</li>
-<li>mg_tower_v_cycle (recursive):<ul>
-<li><em>recursively descend V-cycle</em><ul>
-<li>: Smooth the
-problem at the current MG level using the desired smoother.</li>
-<li>compute_defect: Construct <span class="math notranslate nohighlight">\(f - L\phi\)</span>.</li>
-<li>: Restrict
+coefficients.</p></li>
+<li><p>ml_nd: The main driver for the nodal multigrid.</p></li>
+<li><p>mg_tower_v_cycle (recursive):</p>
+<ul>
+<li><p><em>recursively descend V-cycle</em></p>
+<ul>
+<li><p>: Smooth the
+problem at the current MG level using the desired smoother.</p></li>
+<li><p>compute_defect: Construct <span class="math notranslate nohighlight">\(f - L\phi\)</span>.</p></li>
+<li><p>: Restrict
 the defect to the coarser level by simply taking the fine value that
-lies at the same place as the coarse data.</li>
+lies at the same place as the coarse data.</p></li>
 </ul>
 </li>
-<li>mg_tower_bottom_solve: Solve the coarsened problem
-using the chosen bottom solver.</li>
-<li><em>ascend V-cycle</em><ul>
-<li>: For nodal data, the fine grid
+<li><p>mg_tower_bottom_solve: Solve the coarsened problem
+using the chosen bottom solver.</p></li>
+<li><p><em>ascend V-cycle</em></p>
+<ul>
+<li><p>: For nodal data, the fine grid
 will have some points at exactly the same place as the coarse data—these are
-simply copied to the fine grid. The remain data is interpolated.</li>
-<li>:</li>
+simply copied to the fine grid. The remain data is interpolated.</p></li>
+<li><p>:</p></li>
 </ul>
 </li>
 </ul>
 </li>
-<li>compute_defect: This is called multiple times, checking for
-convergence at each level.</li>
+<li><p>compute_defect: This is called multiple times, checking for
+convergence at each level.</p></li>
 </ul>
 </div>
 </div>
 <div class="section" id="maestros-multigrid-use">
 <h2>MAESTRO’s Multigrid Use<a class="headerlink" href="#maestros-multigrid-use" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO&nbsp;uses multigrid to enforce the velocity constraint through
+<p>MAESTRO uses multigrid to enforce the velocity constraint through
 projections at the half-time (the MAC projection) and end of the time
 step (the HG projection). Two multigrid solvers are provided by
 AMReX—one for cell-centered data and one for node-centered (nodal)
 data. Both of these are used in MAESTRO.</p>
 <p>The MAC projection operates on the advective velocities predicted at
 the cell-interfaces at the half-time. The edge-centered velocities
-are shown in Figure&nbsp;<a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>. If we consider purely
+are shown in Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>. If we consider purely
 incompressible flow, the projection appears as:</p>
 <div class="math notranslate nohighlight">
 \[D G \phi = D U\]</div>
 <p>where <span class="math notranslate nohighlight">\(D\)</span> is the divergence operator and <span class="math notranslate nohighlight">\(G\)</span> is the gradient operator.
 In this discretization, <span class="math notranslate nohighlight">\(\phi\)</span> is cell-centered (see
-Figure&nbsp;<a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>). The remaining quantities are discretized as:</p>
+Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>). The remaining quantities are discretized as:</p>
 <ul>
-<li><p class="first"><span class="math notranslate nohighlight">\(DU\)</span> is cell-centered,</p>
+<li><p><span class="math notranslate nohighlight">\(DU\)</span> is cell-centered,</p>
 <div class="math notranslate nohighlight">
 \[(DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
                \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}\]</div>
 </li>
-<li><p class="first"><span class="math notranslate nohighlight">\(G\phi\)</span> is edge-centered, on the MAC grid, as shown in
-Figure&nbsp;<a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>.</p>
-</li>
-<li><p class="first"><span class="math notranslate nohighlight">\(DG\phi\)</span> is cell-centered, also shown in Figure&nbsp;<a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>,
-computed from <span class="math notranslate nohighlight">\(G\phi\)</span> using the same differencing as <span class="math notranslate nohighlight">\(DU\)</span>.</p>
-</li>
+<li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is edge-centered, on the MAC grid, as shown in
+Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(DG\phi\)</span> is cell-centered, also shown in Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>,
+computed from <span class="math notranslate nohighlight">\(G\phi\)</span> using the same differencing as <span class="math notranslate nohighlight">\(DU\)</span>.</p></li>
 </ul>
-<div class="figure" id="id11">
+<div class="figure align-center" id="id11">
 <a class="reference internal image-reference" href="mgfigpath/MAC_mg2"><img alt="[fig:mg:MAC] Data centerings for the MAC projection" src="mgfigpath/MAC_mg2" style="width: 5.5in;" /></a>
-<p class="caption"><span class="caption-text">[fig:mg:MAC] Data centerings for the MAC projection</span></p>
+<p class="caption"><span class="caption-text">[fig:mg:MAC] Data centerings for the MAC projection</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
 </div>
 <p>The HG projection projects the cell-centered velocities at the end of
-the timestep. Here, <span class="math notranslate nohighlight">\(\phi\)</span> is node-centered. Figure&nbsp;<a class="reference external" href="#fig:mg:HG">[fig:mg:HG]</a>
+the timestep. Here, <span class="math notranslate nohighlight">\(\phi\)</span> is node-centered. Figure <a class="reference external" href="#fig:mg:HG">[fig:mg:HG]</a>
 shows the locations of the various quantities involved in the HG
 projection. Again considering simple incompressible flow, we now
 solve:</p>
@@ -598,30 +597,29 @@ sense, the HG projection is an <em>approximate projection</em>, that is,
 <span class="math notranslate nohighlight">\(L \neq DG\)</span> (in discretized form). The various operations have the
 following centerings:</p>
 <ul>
-<li><p class="first"><span class="math notranslate nohighlight">\(DU\)</span> is node-centered. This is computed as:</p>
+<li><p><span class="math notranslate nohighlight">\(DU\)</span> is node-centered. This is computed as:</p>
 <div class="math notranslate nohighlight">
 \[(DU)_{i-1/2,j-1/2} = \frac{\frac{1}{2} (u_{i,j} + u_{i,j-1}) -
                              \frac{1}{2} (u_{i-1,j} + u_{i-1,j-1})}{\Delta x} +
                        \frac{\frac{1}{2} (v_{i,j} + v_{i-1,j}) -
                              \frac{1}{2} (v_{i,j-1} + v_{i-1,j-1})}{\Delta y}\]</div>
 </li>
-<li><p class="first"><span class="math notranslate nohighlight">\(G\phi\)</span> is cell-centered, as shown in Figure&nbsp;<a class="reference external" href="#fig:mg:HG">[fig:mg:HG]</a>.</p>
-</li>
-<li><p class="first"><span class="math notranslate nohighlight">\(L\phi\)</span> is node-centered. This is a direct discretization of
-the Laplacian operator. By default, MAESTRO&nbsp;uses a dense stencil
+<li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is cell-centered, as shown in Figure <a class="reference external" href="#fig:mg:HG">[fig:mg:HG]</a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(L\phi\)</span> is node-centered. This is a direct discretization of
+the Laplacian operator. By default, MAESTRO uses a dense stencil
 (9-points in 2-d, 27-points in 3-d). Alternately, a <em>cross</em>
 stencil can be used (by setting hg_dense_stencil = F). This
 uses 5-points in 2-d, 7-points in 3-d.</p>
-<div class="figure" id="id12">
+<div class="figure align-center" id="id12">
 <a class="reference internal image-reference" href="mgfigpath/HG_mg2"><img alt="[fig:mg:HG] Data centerings for the HG projection" src="mgfigpath/HG_mg2" style="width: 5.5in;" /></a>
-<p class="caption"><span class="caption-text">[fig:mg:HG] Data centerings for the HG projection</span></p>
+<p class="caption"><span class="caption-text">[fig:mg:HG] Data centerings for the HG projection</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
 </div>
 </li>
 </ul>
 </div>
 <div class="section" id="convergence-criteria">
 <h2>Convergence Criteria<a class="headerlink" href="#convergence-criteria" title="Permalink to this headline">¶</a></h2>
-<p>All MAESTRO&nbsp;multigrid solves consist of pure V-cycles.</p>
+<p>All MAESTRO multigrid solves consist of pure V-cycles.</p>
 <div class="section" id="multigrid-solver-tolerances">
 <span id="sec-mgtol"></span><h3>Multigrid Solver Tolerances<a class="headerlink" href="#multigrid-solver-tolerances" title="Permalink to this headline">¶</a></h3>
 <p>Beginning at the start of execution, there are several places where
@@ -634,43 +632,43 @@ problem directory.</p>
 <p>In the initialization, multigrid comes in during the initial projection
 and the “divu” iterations.</p>
 <ul>
-<li><p class="first"><em>initial projection</em> (initial_proj called from varden)</p>
+<li><p><em>initial projection</em> (initial_proj called from varden)</p>
 <p>The initial projection creates a first approximation to the velocity
 field by forcing the initial velocity field set by initveldata
 to satisfy the elliptic constraint equation. Since the initial
 velocity may be zero, there is no guarantee that a well-defined
 timestep can be computed at this point, so the source term, <span class="math notranslate nohighlight">\(S\)</span>,
 used here only involves thermal diffusion and any external heating
-term, <span class="math notranslate nohighlight">\(\Hext\)</span>—no reactions are included (see paper&nbsp;III, §3.3).</p>
+term, <span class="math notranslate nohighlight">\(\Hext\)</span>—no reactions are included (see paper III, §3.3).</p>
 <p>The initial projection can be disabled with the do_initial_projection
 runtime parameter.</p>
 <p>The tolerances, eps_init_proj_cart and eps_init_proj_sph
 (for Cartesian and spherical respectively) are set in mg_eps.f90
 and have the default values of:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="23%" />
-<col width="38%" />
-<col width="38%" />
+<col style="width: 23%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>Cartesian:</td>
-<td>eps_init_proj_cart</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></td>
+<tbody>
+<tr class="row-odd"><td><p>Cartesian:</p></td>
+<td><p>eps_init_proj_cart</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></p></td>
 </tr>
-<tr class="row-even"><td>spherical:</td>
-<td>eps_init_proj_sph</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></td>
+<tr class="row-even"><td><p>spherical:</p></td>
+<td><p>eps_init_proj_sph</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
 </tr>
 </tbody>
 </table>
 </li>
-<li><p class="first"><em>“divu” iterations</em> (divu_iter called from varden)</p>
+<li><p><em>“divu” iterations</em> (divu_iter called from varden)</p>
 <p>The “divu” iterations projects the velocity field from the initial
 projection to satisfy the full constraint (including reactions).
 This is an iterative process since the reactions depend on the
 timestep and the timestep depends on the velocity field (see
-paper&nbsp;III, §3.3). The number of iterations to take is set through
+paper III, §3.3). The number of iterations to take is set through
 the init_divu_iter runtime parameter.</p>
 <p>The overall tolerance, <span class="math notranslate nohighlight">\(\epsilon_\mathrm{divu}\)</span> depends on the iteration, <span class="math notranslate nohighlight">\(i\)</span>.
 We start with a loose tolerance and progressively get tighter. The
@@ -704,23 +702,23 @@ tolerances (set in divu_iter) are, for Cartesian:</p>
                   \right .\)</span></div>
 </div>
 <p>The various parameters are set in mg_eps.f90 and have the default values of:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="49%" />
-<col width="51%" />
+<col style="width: 49%" />
+<col style="width: 51%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>eps_divu_cart</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></td>
+<tbody>
+<tr class="row-odd"><td><p>eps_divu_cart</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></p></td>
 </tr>
-<tr class="row-even"><td>eps_divu_sph</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></td>
+<tr class="row-even"><td><p>eps_divu_sph</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td>divu_iter_factor</td>
-<td>= 100</td>
+<tr class="row-odd"><td><p>divu_iter_factor</p></td>
+<td><p>= 100</p></td>
 </tr>
-<tr class="row-even"><td>divu_level_factor</td>
-<td>= 10</td>
+<tr class="row-even"><td><p>divu_level_factor</p></td>
+<td><p>= 10</p></td>
 </tr>
 </tbody>
 </table>
@@ -729,7 +727,7 @@ tolerances (set in divu_iter) are, for Cartesian:</p>
 <p>In the main algorithm, mulitgrid solves come in during the two MAC projections,
 two (optional) thermal diffusion solves, and the final velocity projection.</p>
 <ul>
-<li><p class="first"><em>MAC projection</em></p>
+<li><p><em>MAC projection</em></p>
 <p>The MAC projection forces the edge-centered, half-time advective
 velocities to obey the elliptic constraint. This is done both in
 the predictor and corrector portions of the main algorithm.</p>
@@ -745,60 +743,59 @@ solver, :math:<a href="#id7"><span class="problematic" id="id8">`</span></a>epsi
 <div><p>mathtt{eps_mac_bottom}`. These parameters are set in</p>
 </div></blockquote>
 <p>mg_eps.f90 and have the default values:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="47%" />
-<col width="53%" />
+<col style="width: 47%" />
+<col style="width: 53%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>eps_mac</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></td>
+<tbody>
+<tr class="row-odd"><td><p>eps_mac</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
 </tr>
-<tr class="row-even"><td>eps_mac_max</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-8}\)</span></td>
+<tr class="row-even"><td><p>eps_mac_max</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-8}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td>mac_level_factor</td>
-<td>= 10</td>
+<tr class="row-odd"><td><p>mac_level_factor</p></td>
+<td><p>= 10</p></td>
 </tr>
-<tr class="row-even"><td>eps_mac_bottom</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-3}\)</span></td>
+<tr class="row-even"><td><p>eps_mac_bottom</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-3}\)</span></p></td>
 </tr>
 </tbody>
 </table>
 </li>
-<li><p class="first"><em>thermal diffusion</em></p>
+<li><p><em>thermal diffusion</em></p>
 <p>This uses the same mac_multigrid routine as the MAC
 projection, so it uses the same tolerances. The only difference is
 that the absolute tolerance is based on the norm of <span class="math notranslate nohighlight">\(h\)</span> now, instead
 of <span class="math notranslate nohighlight">\(U^\mathrm{ADV}\)</span>.</p>
 </li>
-<li><p class="first"><em>velocity projection</em></p>
-<dl class="docutils">
-<dt>The final velocity projection uses a tolerance of :math:<a href="#id9"><span class="problematic" id="id10">`</span></a>epsilon = min {</dt>
-<dd><p class="first last">mathtt{eps_hg_max}, mathtt{eps_hg} cdot mathtt{hg_level_factor}^{(mathtt{nlevs} - 1)} }`. This tolerance</p>
+<li><p><em>velocity projection</em></p>
+<dl class="simple">
+<dt>The final velocity projection uses a tolerance of :math:<a href="#id9"><span class="problematic" id="id10">`</span></a>epsilon = min {</dt><dd><p>mathtt{eps_hg_max}, mathtt{eps_hg} cdot mathtt{hg_level_factor}^{(mathtt{nlevs} - 1)} }`. This tolerance</p>
 </dd>
 </dl>
 <p>is set in hgproject using the parameter values specified in mg_eps.f90. A separate
 tolerance is used for the bottom
 solver, <span class="math notranslate nohighlight">\(\epsilon_\mathrm{bottom} = \mathtt{eps\_hg\_bottom}\)</span>.</p>
 <p>The default parameter values are:</p>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="46%" />
-<col width="54%" />
+<col style="width: 46%" />
+<col style="width: 54%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>eps_hg</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></td>
+<tbody>
+<tr class="row-odd"><td><p>eps_hg</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></p></td>
 </tr>
-<tr class="row-even"><td>eps_hg_max</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></td>
+<tr class="row-even"><td><p>eps_hg_max</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td>hg_level_factor</td>
-<td>= 10</td>
+<tr class="row-odd"><td><p>hg_level_factor</p></td>
+<td><p>= 10</p></td>
 </tr>
-<tr class="row-even"><td>eps_hg_bottom</td>
-<td>= <span class="math notranslate nohighlight">\(10^{-4}\)</span></td>
+<tr class="row-even"><td><p>eps_hg_bottom</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-4}\)</span></p></td>
 </tr>
 </tbody>
 </table>
@@ -808,7 +805,7 @@ solver, <span class="math notranslate nohighlight">\(\epsilon_\mathrm{bottom} = 
 </div>
 <div class="section" id="general-remarks">
 <h2>General Remarks<a class="headerlink" href="#general-remarks" title="Permalink to this headline">¶</a></h2>
-<p>If MAESTRO&nbsp;has trouble converging in the multigrid solves, try
+<p>If MAESTRO has trouble converging in the multigrid solves, try
 setting the verbosity mg_verbose or cg_verbose to
 higher values to get more information about the solve.</p>
 </div>

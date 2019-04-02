@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Modifications for a Spherical Self-Gravitating Star &mdash; MAESTROeX 19.03
+  <title>Modifications for a Spherical Self-Gravitating Star &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -228,8 +228,8 @@ and density decrease at the center in addition to the expansion of the
 outer layers (see Schwarzchild &amp; Harm, 1965, ApJ, 146, 855).</p>
 <p>We apply a heating function of the form:
 $$Hext = H_0 exp left [-(r-r_0)^2 / W^2 right ] enskip ,$$
-with $r_0 = 4times 10^7$&nbsp;cm, $W = 10^7$&nbsp;cm, and $H_0 = 1times
-10^{16}$&nbsp;erg&nbsp;g$^{-1}$&nbsp;s$^{-1}$. This is the same functional form as used
+with $r_0 = 4times 10^7$ cm, $W = 10^7$ cm, and $H_0 = 1times
+10^{16}$ erg g$^{-1}$ s$^{-1}$. This is the same functional form as used
 in the first test of paper II, but with a lower amplitude. Still, this
 heating rate is far higher than what is expected during the convective
 phase of Type Ia SNe. The heating term is added to the enthalpy
@@ -240,16 +240,16 @@ as well as $Ubt,$ are zero, so we are directly testing the computation of
 $w_0$ as and the base state update as described in
 the <strong>Advect Base</strong> procedure defined above.
 Both the PPM and low Mach calculation use 768 zones in a domain $5times
-10^8$&nbsp;cm high.</p>
-<p>Figure&nbsp;[[fig:spherical768]](#fig:spherical768){reference-type=”ref” reference=”fig:spherical768”} shows the structure of the star after
-heating for 10&nbsp;s. The gray line is the initial star before any
+10^8$ cm high.</p>
+<p>Figure [[fig:spherical768]](#fig:spherical768){reference-type=”ref” reference=”fig:spherical768”} shows the structure of the star after
+heating for 10 s. The gray line is the initial star before any
 heating.
 We see that the compressible and low Mach number models
 agree extremely well. Both capture the decrease in the density and
 pressure at the center of the star and the considerable expansion in
 radius. Only at the surface of the star do the temperatures differ slightly.
 In all calculations, we set the minimum temperature to $5times
-10^6$&nbsp;K. The PPM simulation required 13488 steps and the low Mach
+10^6$ K. The PPM simulation required 13488 steps and the low Mach
 (CFL $=0.5$) calculation needed 203. Over the course of the
 simulation, the Mach number of the flow remained less than $0.35$, with the
 maximum Mach number occurring at the surface of the star. This Mach
@@ -262,7 +262,8 @@ instead a “cutoff density” is applied, as in the case of the
 plane-parallel results presented in this paper. However, we expect
 the changes to the overall method shown here to be small.</p>
 <blockquote>
-<div>Add a figure showing that we retain the correct solution</div></blockquote>
+<div><p>Add a figure showing that we retain the correct solution</p>
+</div></blockquote>
 <p>even when we place higher density material outside the star.</p>
 <p>clearpage
 ![image](sphericalfigpath/spherical_adjust_768){width=”5.0in”}</p>

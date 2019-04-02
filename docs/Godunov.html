@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Godunov Interface States &mdash; MAESTROeX 19.03
+  <title>Godunov Interface States &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -124,7 +124,7 @@
 <li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Godunov Interface States</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#maestro-notation">MAESTRO&nbsp;Notation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#maestro-notation">MAESTRO Notation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#computing-ub-from-ubt">Computing <span class="math notranslate nohighlight">\(\Ub\)</span> From <span class="math notranslate nohighlight">\(\Ubt\)</span></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#computing-partial-w-0-partial-r">Computing <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span></a></li>
 </ul>
@@ -242,18 +242,18 @@
             
   <div class="section" id="godunov-interface-states">
 <h1>Godunov Interface States<a class="headerlink" href="#godunov-interface-states" title="Permalink to this headline">¶</a></h1>
-<p>These are working notes for the Godunov step in MAESTRO&nbsp;and VARDEN.</p>
+<p>These are working notes for the Godunov step in MAESTRO and VARDEN.</p>
 <div class="section" id="maestro-notation">
-<h2>MAESTRO&nbsp;Notation<a class="headerlink" href="#maestro-notation" title="Permalink to this headline">¶</a></h2>
+<h2>MAESTRO Notation<a class="headerlink" href="#maestro-notation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>For 2D, <span class="math notranslate nohighlight">\(\Ub = (u,w)\)</span> and <span class="math notranslate nohighlight">\(\Ubt = (\ut,\wt)\)</span>.
-Note that <span class="math notranslate nohighlight">\(u = \ut\)</span>. We will use the shorthand <span class="math notranslate nohighlight">\(\ib = (x,r)\)</span>.</li>
-<li>For 3D plane parallel, <span class="math notranslate nohighlight">\(\Ub = (u,v,w)\)</span>
+<li><p>For 2D, <span class="math notranslate nohighlight">\(\Ub = (u,w)\)</span> and <span class="math notranslate nohighlight">\(\Ubt = (\ut,\wt)\)</span>.
+Note that <span class="math notranslate nohighlight">\(u = \ut\)</span>. We will use the shorthand <span class="math notranslate nohighlight">\(\ib = (x,r)\)</span>.</p></li>
+<li><p>For 3D plane parallel, <span class="math notranslate nohighlight">\(\Ub = (u,v,w)\)</span>
 and <span class="math notranslate nohighlight">\(\Ubt = (\ut,\vt,\wt)\)</span>. Note that <span class="math notranslate nohighlight">\(u = \ut\)</span> and <span class="math notranslate nohighlight">\(v = \vt\)</span>.
-We will use the shorthand <span class="math notranslate nohighlight">\(\ib = (x,y,r)\)</span>.</li>
-<li>For 3D spherical, <span class="math notranslate nohighlight">\(\Ub = (u,v,w)\)</span>
+We will use the shorthand <span class="math notranslate nohighlight">\(\ib = (x,y,r)\)</span>.</p></li>
+<li><p>For 3D spherical, <span class="math notranslate nohighlight">\(\Ub = (u,v,w)\)</span>
 and <span class="math notranslate nohighlight">\(\Ubt = (\ut,\vt,\wt)\)</span>. We will use the shorthand
-<span class="math notranslate nohighlight">\(\ib = (x,y,z)\)</span>.</li>
+<span class="math notranslate nohighlight">\(\ib = (x,y,z)\)</span>.</p></li>
 </ul>
 <div class="section" id="computing-ub-from-ubt">
 <h3>Computing <span class="math notranslate nohighlight">\(\Ub\)</span> From <span class="math notranslate nohighlight">\(\Ubt\)</span><a class="headerlink" href="#computing-ub-from-ubt" title="Permalink to this headline">¶</a></h3>
@@ -396,10 +396,10 @@ and <span class="math notranslate nohighlight">\(\wt_{\ib-\half\eb_r}^{\trans}\)
 <div class="section" id="d-cartesian-case-2">
 <span id="id2"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-2" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
-<li>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to x-faces using a full-dimensional extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to r-faces using a full-dimensional extrapolation.</li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to x-faces using a full-dimensional extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to r-faces using a full-dimensional extrapolation.</p></li>
 </ol>
 <p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces using a 1D extrapolation:</p>
 <div class="math notranslate nohighlight">
@@ -463,21 +463,21 @@ and <span class="math notranslate nohighlight">\(\wt_{\ib-\half\eb_r}^{\trans}\)
 <p>This algorithm is more complicated than the 2D case since we include
 the effects of corner coupling.</p>
 <ol class="arabic simple">
-<li>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to x-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to r-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to y-faces using a 1D extrapolation.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces by accounting for <span class="math notranslate nohighlight">\(r\)</span>-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces by accounting for <span class="math notranslate nohighlight">\(y\)</span>-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(\vt\)</span> to x-faces by accounting for <span class="math notranslate nohighlight">\(r\)</span>-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(\vt\)</span> to r-faces by accounting for <span class="math notranslate nohighlight">\(x\)</span>-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces by accounting for <span class="math notranslate nohighlight">\(y\)</span>-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(\wt\)</span> to y-faces by accounting for <span class="math notranslate nohighlight">\(x\)</span>-derivatives.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to x-faces using a full-dimensional extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to y-faces using a full-dimensional extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to r-faces using a full-dimensional extrapolation.</li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to x-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to r-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to y-faces using a 1D extrapolation.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces by accounting for <span class="math notranslate nohighlight">\(r\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces by accounting for <span class="math notranslate nohighlight">\(y\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\vt\)</span> to x-faces by accounting for <span class="math notranslate nohighlight">\(r\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\vt\)</span> to r-faces by accounting for <span class="math notranslate nohighlight">\(x\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces by accounting for <span class="math notranslate nohighlight">\(y\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\wt\)</span> to y-faces by accounting for <span class="math notranslate nohighlight">\(x\)</span>-derivatives.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to x-faces using a full-dimensional extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to y-faces using a full-dimensional extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to r-faces using a full-dimensional extrapolation.</p></li>
 </ol>
 <div class="line-block">
 <div class="line">Predict <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces using a 1D extrapolation.</div>
@@ -576,11 +576,11 @@ The procedure is the same for each quantitiy, so we shall simply denote
 the scalar as <span class="math notranslate nohighlight">\(s\)</span>. We always need to compute <span class="math notranslate nohighlight">\(\rho'\)</span> and <span class="math notranslate nohighlight">\(X_k\)</span> to faces,
 and the choice of energy prediction is as follows:</p>
 <ul class="simple">
-<li>For enthalpy_pred_type = 1, we predict <span class="math notranslate nohighlight">\((\rho h)'\)</span> to faces.</li>
-<li>For enthalpy_pred_type = 2, we predict <span class="math notranslate nohighlight">\(h\)</span> to faces.</li>
-<li>For enthalpy_pred_type = 3 and 4, we predict <span class="math notranslate nohighlight">\(T\)</span> to faces.</li>
-<li>For enthalpy_pred_type = 5, we predict <span class="math notranslate nohighlight">\(h'\)</span> to faces.</li>
-<li>For enthalpy_pred_type = 6, we predict <span class="math notranslate nohighlight">\(T'\)</span> to faces.</li>
+<li><p>For enthalpy_pred_type = 1, we predict <span class="math notranslate nohighlight">\((\rho h)'\)</span> to faces.</p></li>
+<li><p>For enthalpy_pred_type = 2, we predict <span class="math notranslate nohighlight">\(h\)</span> to faces.</p></li>
+<li><p>For enthalpy_pred_type = 3 and 4, we predict <span class="math notranslate nohighlight">\(T\)</span> to faces.</p></li>
+<li><p>For enthalpy_pred_type = 5, we predict <span class="math notranslate nohighlight">\(h'\)</span> to faces.</p></li>
+<li><p>For enthalpy_pred_type = 6, we predict <span class="math notranslate nohighlight">\(T'\)</span> to faces.</p></li>
 </ul>
 <p>We are using enthalpy_pred_type = 1 for now. The equations
 of motion are:</p>
@@ -594,10 +594,10 @@ of motion are:</p>
 <div class="section" id="d-cartesian-case-4">
 <span id="id5"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-4" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a full-dimensional extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a full-dimensional extrapolation.</li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a full-dimensional extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a full-dimensional extrapolation.</p></li>
 </ol>
 <div class="line-block">
 <div class="line">Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation:</div>
@@ -737,18 +737,18 @@ u_{R,\ib-\half\eb_r}, &amp; w^{\mac}_{\ib-\half\eb_r} &lt; 0. \\
 <p>This algorithm is more complicated than the 2D case since we include
 the effects of corner coupling.</p>
 <ol class="arabic simple">
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a 1D extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to x-faces by accounting for y-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to x-faces by accounting for r-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to y-faces by accounting for x-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to y-faces by accounting for r-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for x-derivatives.</li>
-<li>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for y-derivatives.</li>
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a full-dimensional extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a full-dimensional extrapolation.</li>
-<li>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a full-dimensional extrapolation.</li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to x-faces by accounting for y-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to x-faces by accounting for r-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to y-faces by accounting for x-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to y-faces by accounting for r-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for x-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for y-derivatives.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a full-dimensional extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a full-dimensional extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a full-dimensional extrapolation.</p></li>
 </ol>
 <div class="line-block">
 <div class="line">Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</div>
@@ -931,8 +931,9 @@ coupling. We compute <span class="math notranslate nohighlight">\(\Ub_{\ib-\half
 \Ub_{\ib-\half\eb_y}^{1D}\)</span>, and <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_z}^{1D}\)</span> in an
 analogous manner as equations (<a class="reference external" href="#vardenU_L^1D">[varden U_L^1D]</a>)-(<a href="#id10"><span class="problematic" id="id11">`</span></a>[Transverse</p>
 <blockquote>
-<div>Velocity Riemann Problem] &lt;#Transverse
-Velocity Riemann Problem&gt;`__). Then we compute an intermediate state,</div></blockquote>
+<div><p>Velocity Riemann Problem] &lt;#Transverse
+Velocity Riemann Problem&gt;`__). Then we compute an intermediate state,</p>
+</div></blockquote>
 <p><span class="math notranslate nohighlight">\(u_{\ib-\half\eb_y}^{y|z}\)</span>, which is described as “state
 <span class="math notranslate nohighlight">\(u_{\ib-\half\eb_y}^{1D}\)</span> that has been updated to account for the
 transverse derivatives in the z direction”, using:</p>
@@ -968,10 +969,10 @@ obtain <span class="math notranslate nohighlight">\(v_{\ib-\half\eb_y}^{\mac,*}\
 </div>
 <div class="section" id="computing-ub-edge-and-rho-edge-in-varden">
 <h2>Computing <span class="math notranslate nohighlight">\(\Ub^{\edge}\)</span> and <span class="math notranslate nohighlight">\(\rho^{\edge}\)</span> in VARDEN<a class="headerlink" href="#computing-ub-edge-and-rho-edge-in-varden" title="Permalink to this headline">¶</a></h2>
-<p>To compute <span class="math notranslate nohighlight">\(\Ub^{\edge}\)</span>, VARDEN&nbsp;uses the exact same algorithm
+<p>To compute <span class="math notranslate nohighlight">\(\Ub^{\edge}\)</span>, VARDEN uses the exact same algorithm
 as the <span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in MAESTRO. The algorithm for
-<span class="math notranslate nohighlight">\(\rho^{\edge}\)</span> in VARDEN&nbsp;is slightly different than the
-<span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in MAESTRO&nbsp;since it uses a “conservative”
+<span class="math notranslate nohighlight">\(\rho^{\edge}\)</span> in VARDEN is slightly different than the
+<span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in MAESTRO since it uses a “conservative”
 formulation. Here, <span class="math notranslate nohighlight">\(s\)</span> is used in place of either <span class="math notranslate nohighlight">\(\rho, u, v\)</span>, or
 <span class="math notranslate nohighlight">\(w\)</span> (in 3D).</p>
 <div class="section" id="d-cartesian-case-8">
@@ -1183,22 +1184,21 @@ described before.</div>
 <div class="line">The PPM method is described in a series of papers:</div>
 </div>
 <ul class="simple">
-<li>Colella and Woodward 1984 - describes the basic method.</li>
-<li>Miller and Colella 2002 - describes how to apply PPM to a multidimensional
+<li><p>Colella and Woodward 1984 - describes the basic method.</p></li>
+<li><p>Miller and Colella 2002 - describes how to apply PPM to a multidimensional
 unsplit Godunov method and generalizes the characteristic tracing for more complicated
 systems. Note that we only need to upwind based on the fluid velocity, so we don’t
-need to use fancy characteristic tracing.</li>
-<li>Colella and Sekora 2008 - describes new fancy quadratic limiters. There are
+need to use fancy characteristic tracing.</p></li>
+<li><p>Colella and Sekora 2008 - describes new fancy quadratic limiters. There are
 several errors in the printed text, so we have implemented a corrected version from
-Phil Colella.</li>
+Phil Colella.</p></li>
 </ul>
 <p>Here are the steps for the <span class="math notranslate nohighlight">\(x\)</span>-direction. For simplicity, we replace the vector index notation with a simple scalar notation (<span class="math notranslate nohighlight">\(\ib+\eb_x \rightarrow i+1\)</span>, etc.).</p>
 <ul>
-<li><p class="first"><strong>Step 1:</strong> Compute <span class="math notranslate nohighlight">\(s_{i,+}\)</span> and <span class="math notranslate nohighlight">\(s_{i,-}\)</span>, which are spatial interpolations of
+<li><p><strong>Step 1:</strong> Compute <span class="math notranslate nohighlight">\(s_{i,+}\)</span> and <span class="math notranslate nohighlight">\(s_{i,-}\)</span>, which are spatial interpolations of
 <span class="math notranslate nohighlight">\(s\)</span> to the hi and lo faces of cell <span class="math notranslate nohighlight">\(i\)</span>, respectively. See Sections
-<a class="reference external" href="#Sec:ColellaWoodward">9.1</a> and <a class="reference external" href="#Sec:ColellaSekora">9.2</a> for the two options.</p>
-</li>
-<li><p class="first"><strong>Step 2:</strong> Construct a quadratic profile within each cell.</p>
+<a class="reference external" href="#Sec:ColellaWoodward">9.1</a> and <a class="reference external" href="#Sec:ColellaSekora">9.2</a> for the two options.</p></li>
+<li><p><strong>Step 2:</strong> Construct a quadratic profile within each cell.</p>
 <div class="math notranslate nohighlight">
 \[s_i^I(x) = s_{i,-} + \xi\left[s_{i,+} - s_{i,-} + s_{6,i}(1-\xi)\right],\label{Quadratic Interp}\]</div>
 <div class="math notranslate nohighlight">
@@ -1206,7 +1206,7 @@ Phil Colella.</li>
 <div class="math notranslate nohighlight">
 \[\xi = \frac{x - (i-\myhalf)h}{h}, ~ 0 \le \xi \le 1.\]</div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line"><strong>Step 3:</strong> Integrate quadratic profiles to get the average value swept over the face
 over time.</div>
 <div class="line">Define the following integrals, where <span class="math notranslate nohighlight">\(\sigma = |u|\Delta t/h\)</span>:</div>
@@ -1223,7 +1223,7 @@ over time.</div>
 \mathcal{I}_{i,-}(\sigma) &amp;=&amp; s_{j,-} + \frac{\sigma}{2}\left[s_{j,+}-s_{j,-}+\left(1-\frac{2}{3}\sigma\right)s_{6,i}\right].\end{aligned}\end{split}\]</div>
 </div></blockquote>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line"><strong>Step 4:</strong> Obtain 1D edge states.</div>
 <div class="line">Perform a 1D extrapolation, without source terms, to get
 left and right edge states. Add the source terms later if desired/necessary.</div>

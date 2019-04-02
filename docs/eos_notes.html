@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Equation of State Notes &mdash; MAESTROeX 19.03
+  <title>Equation of State Notes &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -219,157 +219,148 @@
 </div>
 <div class="section" id="advance-timestep">
 <h3>advance_timestep<a class="headerlink" href="#advance-timestep" title="Permalink to this headline">¶</a></h3>
-<dl class="docutils">
-<dt>Step 1.</dt>
-<dd><p class="first"><em>Define the average expansion at time :math:`t^nph` and the new :math:`w_0.`</em>
+<dl>
+<dt>Step 1.</dt><dd><p><em>Define the average expansion at time :math:`t^nph` and the new :math:`w_0.`</em>
 if dpdt_factor <span class="math notranslate nohighlight">\(&gt;\)</span> 0 then</p>
 <ul class="simple">
-<li>In makePfromRhoH, we compute a thermodynamic <span class="math notranslate nohighlight">\(p^n\)</span> for the volume discrepancy
-term using <span class="math notranslate nohighlight">\((\rho,h,X)^n\)</span>.</li>
+<li><p>In makePfromRhoH, we compute a thermodynamic <span class="math notranslate nohighlight">\(p^n\)</span> for the volume discrepancy
+term using <span class="math notranslate nohighlight">\((\rho,h,X)^n\)</span>.</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 2.</dt>
-<dd><em>Construct the provisional edge-based advective velocity, :math:`uadvone.`</em></dd>
-<dt>Step 3.</dt>
-<dd><p class="first"><em>React the full state and base state through the first time interval
+<dt>Step 2.</dt><dd><p><em>Construct the provisional edge-based advective velocity, :math:`uadvone.`</em></p>
+</dd>
+<dt>Step 3.</dt><dd><p><em>React the full state and base state through the first time interval
 of :math:`dt/2.`</em></p>
 <ul class="simple">
-<li>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
-for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^n\)</span>.</li>
-<li>In react_state, we compute <span class="math notranslate nohighlight">\(T^{(1)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(1)}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(1)}\)</span> and <span class="math notranslate nohighlight">\(p_0^n\)</span> (if use_tfromp = T)</li>
+<li><p>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
+for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^n\)</span>.</p></li>
+<li><p>In react_state, we compute <span class="math notranslate nohighlight">\(T^{(1)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(1)}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(1)}\)</span> and <span class="math notranslate nohighlight">\(p_0^n\)</span> (if use_tfromp = T)</p></li>
 </ul>
 <p>if evolve_base_state = T then</p>
 <ul class="simple">
-<li>In make_gamma, we compute <span class="math notranslate nohighlight">\(\Gamma_1\)</span> using <span class="math notranslate nohighlight">\((\rho,X)^{(1)}\)</span> and <span class="math notranslate nohighlight">\(p_0^n\)</span>.</li>
+<li><p>In make_gamma, we compute <span class="math notranslate nohighlight">\(\Gamma_1\)</span> using <span class="math notranslate nohighlight">\((\rho,X)^{(1)}\)</span> and <span class="math notranslate nohighlight">\(p_0^n\)</span>.</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 4.</dt>
-<dd><div class="first line-block">
+<dt>Step 4.</dt><dd><div class="line-block">
 <div class="line"><em>Advect the base state, then the full state, through a time interval
 of :math:`dt.`</em></div>
 <div class="line">if use_thermal_diffusion = T then</div>
 </div>
 <ul class="simple">
-<li>In advance before make_explicit_thermal, we compute the coefficients for
-<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{(1)}\)</span>.</li>
-<li>In enthalpy_advance <span class="math notranslate nohighlight">\(\rightarrow\)</span> update_scal, we compute <span class="math notranslate nohighlight">\(h\)</span> above
-the base_cutoff_density using <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span>.</li>
-<li>In thermal_conduct, we compute <span class="math notranslate nohighlight">\(T^{(2),*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2),*}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</li>
+<li><p>In advance before make_explicit_thermal, we compute the coefficients for
+<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{(1)}\)</span>.</p></li>
+<li><p>In enthalpy_advance <span class="math notranslate nohighlight">\(\rightarrow\)</span> update_scal, we compute <span class="math notranslate nohighlight">\(h\)</span> above
+the base_cutoff_density using <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span>.</p></li>
+<li><p>In thermal_conduct, we compute <span class="math notranslate nohighlight">\(T^{(2),*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2),*}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</p></li>
 </ul>
 <p>else</p>
 <ul class="simple">
-<li>In enthalpy_advance <span class="math notranslate nohighlight">\(\rightarrow\)</span> update_scal, we compute <span class="math notranslate nohighlight">\(h\)</span> above
-the base_cutoff_density using <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span>.</li>
-<li>In enthalpy_advance, we compute <span class="math notranslate nohighlight">\(T^{(2),*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2),*}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</li>
+<li><p>In enthalpy_advance <span class="math notranslate nohighlight">\(\rightarrow\)</span> update_scal, we compute <span class="math notranslate nohighlight">\(h\)</span> above
+the base_cutoff_density using <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span>.</p></li>
+<li><p>In enthalpy_advance, we compute <span class="math notranslate nohighlight">\(T^{(2),*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2),*}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 5.</dt>
-<dd><p class="first"><em>React the full state through a second time interval of :math:`dt/2.`</em></p>
+<dt>Step 5.</dt><dd><p><em>React the full state through a second time interval of :math:`dt/2.`</em></p>
 <ul class="simple">
-<li>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
-for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2),*}\)</span>.</li>
-<li>In react_state, we compute <span class="math notranslate nohighlight">\(T^{n+1,*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1,*}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{n+1,*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</li>
+<li><p>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
+for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2),*}\)</span>.</p></li>
+<li><p>In react_state, we compute <span class="math notranslate nohighlight">\(T^{n+1,*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1,*}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{n+1,*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</p></li>
 </ul>
 <p>if evolve_base_state then</p>
 <ul class="simple">
-<li>In make_gamma, we compute <span class="math notranslate nohighlight">\(\Gamma_1\)</span> using <span class="math notranslate nohighlight">\((\rho,X)^{n+1,*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span>.</li>
+<li><p>In make_gamma, we compute <span class="math notranslate nohighlight">\(\Gamma_1\)</span> using <span class="math notranslate nohighlight">\((\rho,X)^{n+1,*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span>.</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 6.</dt>
-<dd><div class="first line-block">
+<dt>Step 6.</dt><dd><div class="line-block">
 <div class="line"><em>Define a new average expansion rate at time :math:`t^nph.`</em></div>
 <div class="line">if use_thermal_diffusion then</div>
 </div>
 <ul class="simple">
-<li>In advance before make_explicit_thermal, we compute the coefficients for
-<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1,*}\)</span>.</li>
+<li><p>In advance before make_explicit_thermal, we compute the coefficients for
+<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1,*}\)</span>.</p></li>
 </ul>
 <p>end if</p>
 <ul class="simple">
-<li>In make_S, we compute thermodynamic variables using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1,*}\)</span>.</li>
+<li><p>In make_S, we compute thermodynamic variables using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1,*}\)</span>.</p></li>
 </ul>
 <p>if dpdt_factor <span class="math notranslate nohighlight">\(&gt;\)</span> 0 then</p>
 <ul class="simple">
-<li>In makePfromRhoH, we compute a thermodynamic <span class="math notranslate nohighlight">\(p^{n+1,*}\)</span> for the volume
-discrepancy term using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1,*}\)</span>.</li>
+<li><p>In makePfromRhoH, we compute a thermodynamic <span class="math notranslate nohighlight">\(p^{n+1,*}\)</span> for the volume
+discrepancy term using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1,*}\)</span>.</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 7.</dt>
-<dd><em>Construct the final edge-based advective velocity, :math:`uadvtwo.`</em></dd>
-<dt>Step 8.</dt>
-<dd><div class="first line-block">
+<dt>Step 7.</dt><dd><p><em>Construct the final edge-based advective velocity, :math:`uadvtwo.`</em></p>
+</dd>
+<dt>Step 8.</dt><dd><div class="line-block">
 <div class="line"><em>Advect the base state, then the full state, through a time interval
 of :math:`dt.`</em></div>
 <div class="line">if use_thermal_diffusion = T then</div>
 </div>
 <ul class="simple">
-<li>In enthalpy_advance <span class="math notranslate nohighlight">\(\rightarrow\)</span> update_scal, we compute <span class="math notranslate nohighlight">\(h\)</span> above
-the base_cutoff_density using <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span>.</li>
-<li>In advance before thermal_conduct, we compute the coefficients for
-<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2),*}\)</span>.</li>
-<li>In thermal_conduct, we compute <span class="math notranslate nohighlight">\(T^{(2)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2)}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</li>
+<li><p>In enthalpy_advance <span class="math notranslate nohighlight">\(\rightarrow\)</span> update_scal, we compute <span class="math notranslate nohighlight">\(h\)</span> above
+the base_cutoff_density using <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span>.</p></li>
+<li><p>In advance before thermal_conduct, we compute the coefficients for
+<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2),*}\)</span>.</p></li>
+<li><p>In thermal_conduct, we compute <span class="math notranslate nohighlight">\(T^{(2)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2)}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</p></li>
 </ul>
 <p>else</p>
 <ul class="simple">
-<li>In enthalpy_advance <span class="math notranslate nohighlight">\(\rightarrow\)</span> update_scal, we compute <span class="math notranslate nohighlight">\(h\)</span> above
-the base_cutoff_density using <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span>.</li>
-<li>In enthalpy_advance, we compute <span class="math notranslate nohighlight">\(T^{(2)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2)}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</li>
+<li><p>In enthalpy_advance <span class="math notranslate nohighlight">\(\rightarrow\)</span> update_scal, we compute <span class="math notranslate nohighlight">\(h\)</span> above
+the base_cutoff_density using <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span>.</p></li>
+<li><p>In enthalpy_advance, we compute <span class="math notranslate nohighlight">\(T^{(2)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2)}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 9.</dt>
-<dd><p class="first"><em>React the full state and base state through a second time interval
+<dt>Step 9.</dt><dd><p><em>React the full state and base state through a second time interval
 of :math:`dt/2.`</em></p>
 <ul class="simple">
-<li>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
-for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2)}\)</span>.</li>
-<li>In react_state, we compute <span class="math notranslate nohighlight">\(T^{n+1}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{n+1}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</li>
+<li><p>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
+for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2)}\)</span>.</p></li>
+<li><p>In react_state, we compute <span class="math notranslate nohighlight">\(T^{n+1}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{n+1}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</p></li>
 </ul>
 <p>if evolve_base_state = T then</p>
 <ul class="simple">
-<li>In make_gamma, we compute <span class="math notranslate nohighlight">\(\Gamma_1\)</span> using <span class="math notranslate nohighlight">\((\rho,X)^{n+1}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span>.</li>
+<li><p>In make_gamma, we compute <span class="math notranslate nohighlight">\(\Gamma_1\)</span> using <span class="math notranslate nohighlight">\((\rho,X)^{n+1}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span>.</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 10.</dt>
-<dd><div class="first line-block">
+<dt>Step 10.</dt><dd><div class="line-block">
 <div class="line"><em>Compute :math:`S^{n+1}` for the final projection.</em></div>
 <div class="line">if make_explicit_thermal then</div>
 </div>
 <ul class="simple">
-<li>In advance before make_explicit_thermal, we compute the coefficients for
-<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1}\)</span>.</li>
+<li><p>In advance before make_explicit_thermal, we compute the coefficients for
+<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1}\)</span>.</p></li>
 </ul>
 <p>end if</p>
-<ul class="last simple">
-<li>In make_S, we compute thermodynamic variables using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1}\)</span>.</li>
+<ul class="simple">
+<li><p>In make_S, we compute thermodynamic variables using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1}\)</span>.</p></li>
 </ul>
 </dd>
-<dt>Step 11.</dt>
-<dd><div class="first line-block">
+<dt>Step 11.</dt><dd><div class="line-block">
 <div class="line"><em>Update the velocity.</em></div>
 <div class="line">if dpdt_factor <span class="math notranslate nohighlight">\(&gt;\)</span> 0 then</div>
 </div>
 <ul class="simple">
-<li>In makePfromRhoH, we compute a thermodynamic <span class="math notranslate nohighlight">\(p^{n+1}\)</span> for the volume
-discrepancy term using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1}\)</span>.</li>
+<li><p>In makePfromRhoH, we compute a thermodynamic <span class="math notranslate nohighlight">\(p^{n+1}\)</span> for the volume
+discrepancy term using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1}\)</span>.</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 12.</dt>
-<dd><em>Compute a new :math:`dt.`</em></dd>
+<dt>Step 12.</dt><dd><p><em>Compute a new :math:`dt.`</em></p>
+</dd>
 </dl>
 </div>
 <div class="section" id="make-plotfile">
@@ -380,112 +371,105 @@ discrepancy term using <span class="math notranslate nohighlight">\((\rho,h,X)^{
 <h2>Temperature Usage<a class="headerlink" href="#temperature-usage" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="advance-timestep-1">
 <span id="id1"></span><h3>advance_timestep<a class="headerlink" href="#advance-timestep-1" title="Permalink to this headline">¶</a></h3>
-<dl class="docutils">
-<dt>Step 1.</dt>
-<dd><em>Define the average expansion at time :math:`t^nph` and the new :math:`w_0.`</em></dd>
-<dt>Step 2.</dt>
-<dd><em>Construct the provisional edge-based advective velocity, :math:`uadvone.`</em></dd>
-<dt>Step 3.</dt>
-<dd><p class="first"><em>React the full state and base state through the first time interval
+<dl>
+<dt>Step 1.</dt><dd><p><em>Define the average expansion at time :math:`t^nph` and the new :math:`w_0.`</em></p>
+</dd>
+<dt>Step 2.</dt><dd><p><em>Construct the provisional edge-based advective velocity, :math:`uadvone.`</em></p>
+</dd>
+<dt>Step 3.</dt><dd><p><em>React the full state and base state through the first time interval
 of :math:`dt/2.`</em></p>
-<ul class="last simple">
-<li>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
-for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^n\)</span>.</li>
-<li>In react_state, we compute <span class="math notranslate nohighlight">\(T^{(1)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(1)}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(1)}\)</span> and <span class="math notranslate nohighlight">\(p_0^n\)</span> (if use_tfromp = T).</li>
+<ul class="simple">
+<li><p>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
+for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^n\)</span>.</p></li>
+<li><p>In react_state, we compute <span class="math notranslate nohighlight">\(T^{(1)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(1)}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(1)}\)</span> and <span class="math notranslate nohighlight">\(p_0^n\)</span> (if use_tfromp = T).</p></li>
 </ul>
 </dd>
-<dt>Step 4.</dt>
-<dd><div class="first line-block">
+<dt>Step 4.</dt><dd><div class="line-block">
 <div class="line"><em>Advect the base state, then the full state, through a time interval
 of :math:`dt.`</em></div>
 <div class="line">if use_thermal_diffusion = T then</div>
 </div>
 <ul class="simple">
-<li>In advance before make_explicit_thermal, we compute the coefficients for
-<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{(1)}\)</span>.</li>
-<li>In thermal_conduct, we compute <span class="math notranslate nohighlight">\(T^{(2),*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2),*}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</li>
+<li><p>In advance before make_explicit_thermal, we compute the coefficients for
+<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{(1)}\)</span>.</p></li>
+<li><p>In thermal_conduct, we compute <span class="math notranslate nohighlight">\(T^{(2),*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2),*}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</p></li>
 </ul>
 <p>else</p>
 <ul class="simple">
-<li>In enthalpy_advance, we compute <span class="math notranslate nohighlight">\(T^{(2),*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2),*}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</li>
+<li><p>In enthalpy_advance, we compute <span class="math notranslate nohighlight">\(T^{(2),*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2),*}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2),*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 5.</dt>
-<dd><p class="first"><em>React the full state through a second time interval of :math:`dt/2.`</em></p>
-<ul class="last simple">
-<li>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
-for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2),*}\)</span>.</li>
-<li>In react_state, we compute <span class="math notranslate nohighlight">\(T^{n+1,*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1,*}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{n+1,*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</li>
+<dt>Step 5.</dt><dd><p><em>React the full state through a second time interval of :math:`dt/2.`</em></p>
+<ul class="simple">
+<li><p>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
+for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2),*}\)</span>.</p></li>
+<li><p>In react_state, we compute <span class="math notranslate nohighlight">\(T^{n+1,*}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1,*}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{n+1,*}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1,*}\)</span> (if use_tfromp = T).</p></li>
 </ul>
 </dd>
-<dt>Step 6.</dt>
-<dd><div class="first line-block">
+<dt>Step 6.</dt><dd><div class="line-block">
 <div class="line"><em>Define a new average expansion rate at time :math:`t^nph.`</em></div>
 <div class="line">if use_thermal_diffusion = T then</div>
 </div>
 <ul class="simple">
-<li>In advance before make_explicit_thermal, we compute the coefficients for
-<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1,*}\)</span>.</li>
+<li><p>In advance before make_explicit_thermal, we compute the coefficients for
+<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1,*}\)</span>.</p></li>
 </ul>
 <p>end if</p>
-<ul class="last simple">
-<li>In make_S, we compute thermodynamic variables using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1,*}\)</span>.</li>
+<ul class="simple">
+<li><p>In make_S, we compute thermodynamic variables using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1,*}\)</span>.</p></li>
 </ul>
 </dd>
-<dt>Step 7.</dt>
-<dd><em>Construct the final edge-based advective velocity, :math:`uadvtwo.`</em></dd>
-<dt>Step 8.</dt>
-<dd><div class="first line-block">
+<dt>Step 7.</dt><dd><p><em>Construct the final edge-based advective velocity, :math:`uadvtwo.`</em></p>
+</dd>
+<dt>Step 8.</dt><dd><div class="line-block">
 <div class="line"><em>Advect the base state, then the full state, through a time interval
 of :math:`dt.`</em></div>
 <div class="line">if use_thermal_diffusion = T then</div>
 </div>
 <ul class="simple">
-<li>In advance before thermal_conduct, we compute the coefficients for
-<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2),*}\)</span>.</li>
-<li>In thermal_conduct, we compute <span class="math notranslate nohighlight">\(T^{(2)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2)}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</li>
+<li><p>In advance before thermal_conduct, we compute the coefficients for
+<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2),*}\)</span>.</p></li>
+<li><p>In thermal_conduct, we compute <span class="math notranslate nohighlight">\(T^{(2)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2)}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</p></li>
 </ul>
 <p>else</p>
 <ul class="simple">
-<li>In enthalpy_advance, we compute <span class="math notranslate nohighlight">\(T^{(2)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2)}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</li>
+<li><p>In enthalpy_advance, we compute <span class="math notranslate nohighlight">\(T^{(2)}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{(2)}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{(2)}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</p></li>
 </ul>
-<p class="last">end if</p>
+<p>end if</p>
 </dd>
-<dt>Step 9.</dt>
-<dd><p class="first"><em>React the full state and base state through a second time interval
+<dt>Step 9.</dt><dd><p><em>React the full state and base state through a second time interval
 of :math:`dt/2.`</em></p>
-<ul class="last simple">
-<li>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
-for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2)}\)</span>.</li>
-<li>In react_state, we compute <span class="math notranslate nohighlight">\(T^{n+1}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1}\)</span>
-(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{n+1}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</li>
+<ul class="simple">
+<li><p>In react_state <span class="math notranslate nohighlight">\(\rightarrow\)</span> burner, we compute <span class="math notranslate nohighlight">\(c_p\)</span> and <span class="math notranslate nohighlight">\(\xi_k\)</span>
+for inputs to VODE using <span class="math notranslate nohighlight">\((\rho,T,X)^{(2)}\)</span>.</p></li>
+<li><p>In react_state, we compute <span class="math notranslate nohighlight">\(T^{n+1}\)</span> using <span class="math notranslate nohighlight">\((\rho,h,X)^{n+1}\)</span>
+(if use_tfromp = F) or <span class="math notranslate nohighlight">\((\rho,X)^{n+1}\)</span> and <span class="math notranslate nohighlight">\(p_0^{n+1}\)</span> (if use_tfromp = T).</p></li>
 </ul>
 </dd>
-<dt>Step 10.</dt>
-<dd><div class="first line-block">
+<dt>Step 10.</dt><dd><div class="line-block">
 <div class="line"><em>Compute :math:`S^{n+1}` for the final projection.</em></div>
 <div class="line">if make_explicit_thermal then</div>
 </div>
 <ul class="simple">
-<li>In advance before make_explicit_thermal, we compute the coefficients for
-<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1}\)</span>.</li>
+<li><p>In advance before make_explicit_thermal, we compute the coefficients for
+<span class="math notranslate nohighlight">\(\nabla\cdot(\kth/c_p)\nabla h + \cdots\)</span> using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1}\)</span>.</p></li>
 </ul>
 <p>end if</p>
-<ul class="last simple">
-<li>In make_S, we compute thermodynamic variables using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1}\)</span>.</li>
+<ul class="simple">
+<li><p>In make_S, we compute thermodynamic variables using <span class="math notranslate nohighlight">\((\rho,T,X)^{n+1}\)</span>.</p></li>
 </ul>
 </dd>
-<dt>Step 11.</dt>
-<dd><em>Update the velocity.</em></dd>
-<dt>Step 12.</dt>
-<dd><em>Compute a new :math:`dt.`</em></dd>
+<dt>Step 11.</dt><dd><p><em>Update the velocity.</em></p>
+</dd>
+<dt>Step 12.</dt><dd><p><em>Compute a new :math:`dt.`</em></p>
+</dd>
 </dl>
 </div>
 </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Initial Models &mdash; MAESTROeX 19.03
+  <title>Initial Models &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -209,12 +209,12 @@
   <div class="section" id="initial-models">
 <h1>Initial Models<a class="headerlink" href="#initial-models" title="Permalink to this headline">¶</a></h1>
 <p>Here we briefly describe the various routines for generating initial models
-for the main MAESTRO&nbsp;problems and how the initial model is used to initialize
+for the main MAESTRO problems and how the initial model is used to initialize
 both the base state and the full Cartesian state.</p>
 <div class="section" id="creating-the-model-data-from-raw-data">
 <span id="sec-creating-the-model-data-from-raw-data"></span><h2>Creating the Model Data from Raw Data<a class="headerlink" href="#creating-the-model-data-from-raw-data" title="Permalink to this headline">¶</a></h2>
 <p>[sec:initial_models_main]</p>
-<p>We have found that for the best performance, the MAESTRO&nbsp;initialization procedure should be given model data with the same
+<p>We have found that for the best performance, the MAESTRO initialization procedure should be given model data with the same
 resolution as the base state resolution, <span class="math notranslate nohighlight">\(\Delta r\)</span>. For planar
 problems, <span class="math notranslate nohighlight">\(\Delta r = \Delta x\)</span>. For multilevel planar problems, we
 use <span class="math notranslate nohighlight">\(\Delta r\)</span> equal to <span class="math notranslate nohighlight">\(\Delta x\)</span> at the finest resolution. For
@@ -232,7 +232,7 @@ data file for each test problem:</p>
 to interpolate the raw data, yielding the model data, <span class="math notranslate nohighlight">\(\rho^{\model},
 T^{\model}, p^{\model}\)</span>, and <span class="math notranslate nohighlight">\(X^{\model}\)</span>. The fortran subroutine
 then uses an iterative procedure to modify the model data so that it
-is thermodynamically consistent with the MAESTRO&nbsp;equation of
+is thermodynamically consistent with the MAESTRO equation of
 state (EOS), and also satisfies our chosen hydrostatic equilibrium
 (HSE) discretization,</p>
 <div class="math notranslate nohighlight">
@@ -245,7 +245,7 @@ state (EOS), and also satisfies our chosen hydrostatic equilibrium
 {\tt wdconvect} &amp; \rightarrow &amp; none\footnotemark \nonumber \\
 {\tt spherical\_heat} &amp; \rightarrow &amp; {\tt Util/initial\_models/spherical/init\_1d.f90} \nonumber \\\end{aligned}\end{split}\]</div>
 <p>The model data is not generated at run-time—it must be generated in
-advance of running any MAESTRO&nbsp;examples. The inputs file should point
+advance of running any MAESTRO examples. The inputs file should point
 to the file containing the model data.</p>
 </div>
 <div class="section" id="creating-the-initial-data-from-the-model-data">
@@ -261,13 +261,14 @@ we overwrite the existing value of <span class="math notranslate nohighlight">\(
 the value since we called
 <span class="math notranslate nohighlight">\(p^{\model} = p^{\model}(\rho^{\model},T^{\model},X^{\model})\)</span> at the end of the
 initial model generation routines in
-§&nbsp;<a class="reference external" href="#Sec:CreatingtheModelDatafromRawData">1</a>.</p>
+§ <a class="reference external" href="#Sec:CreatingtheModelDatafromRawData">1</a>.</p>
 <p>For multilevel planar problems, we generate
 initial data at the non-finest levels by using linear interpolation
 from the two nearest model points (see Figure <a href="#id1"><span class="problematic" id="id2">`</span></a>[Fig:Multilevel</p>
 <blockquote>
-<div>Initialization] &lt;#Fig:Multilevel
-Initialization&gt;`__). Note that the initial data is not in HSE nor is</div></blockquote>
+<div><p>Initialization] &lt;#Fig:Multilevel
+Initialization&gt;`__). Note that the initial data is not in HSE nor is</p>
+</div></blockquote>
 <p>it thermodynamically consistent on non-finest cells. We will enforce
 these on the base state and full state later.</p>
 <p>[Fig:Multilevel Initialization]</p>
@@ -288,29 +289,29 @@ simply a direct copy of the initial model data, since we require that
 be HSE according to equation (<a class="reference external" href="#HSEDiscretization">[HSE Discretization]</a>), and that the full
 state is thermodynamically consistent with <span class="math notranslate nohighlight">\(p_0\)</span>. Overall we do:</p>
 <ol class="arabic simple">
-<li>Fill <span class="math notranslate nohighlight">\(\rho^{\init}, h^{\init}, X^{\init}\)</span>, and <span class="math notranslate nohighlight">\(T^{\init}\)</span> onto a
-multifab to obtain the full state <span class="math notranslate nohighlight">\(\rho, h, X\)</span>, and <span class="math notranslate nohighlight">\(T\)</span>.</li>
-<li>If perturb_model = T, a user-defined perturbation is
+<li><p>Fill <span class="math notranslate nohighlight">\(\rho^{\init}, h^{\init}, X^{\init}\)</span>, and <span class="math notranslate nohighlight">\(T^{\init}\)</span> onto a
+multifab to obtain the full state <span class="math notranslate nohighlight">\(\rho, h, X\)</span>, and <span class="math notranslate nohighlight">\(T\)</span>.</p></li>
+<li><p>If perturb_model = T, a user-defined perturbation is
 added. This routine should make sure that the EOS is called so that
-there is some sense of thermodynamic consistency.</li>
-<li>Set <span class="math notranslate nohighlight">\(\rho_0 = \overline\rho\)</span>.</li>
-<li>Compute <span class="math notranslate nohighlight">\(p_0\)</span> using enforce_HSE.</li>
-<li>Compute <span class="math notranslate nohighlight">\(T,h = T,h(\rho,p_0,X_k)\)</span>.</li>
-<li>Set <span class="math notranslate nohighlight">\((\rho h)_0 = \overline{(\rho h)}\)</span>.</li>
-<li>Compute <span class="math notranslate nohighlight">\(\overline{T}\)</span>. Note that we only use <span class="math notranslate nohighlight">\(\overline{T}\)</span> as
-a diagnostic and as a seed for EOS calls.</li>
+there is some sense of thermodynamic consistency.</p></li>
+<li><p>Set <span class="math notranslate nohighlight">\(\rho_0 = \overline\rho\)</span>.</p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\(p_0\)</span> using enforce_HSE.</p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\(T,h = T,h(\rho,p_0,X_k)\)</span>.</p></li>
+<li><p>Set <span class="math notranslate nohighlight">\((\rho h)_0 = \overline{(\rho h)}\)</span>.</p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\(\overline{T}\)</span>. Note that we only use <span class="math notranslate nohighlight">\(\overline{T}\)</span> as
+a diagnostic and as a seed for EOS calls.</p></li>
 </ol>
 <p>Now <span class="math notranslate nohighlight">\(\rho_0 = \overline\rho\)</span>, the base state is in HSE, and the full
 state is thermodynamically consistent with <span class="math notranslate nohighlight">\(p_0\)</span>.</p>
 <div class="section" id="coarse-fine-enforce-hse-discretization">
 <span id="sec-coarse-fine-hse-discretization"></span><h3>Coarse-Fine enforce_HSE Discretization<a class="headerlink" href="#coarse-fine-enforce-hse-discretization" title="Permalink to this headline">¶</a></h3>
 <p>When integrating the HSE discretization upward, we must use a different
-differencing procedure at coarse-fine interfaces. Figure&nbsp;<a class="reference external" href="#fig:ctof">[fig:ctof]</a> shows
+differencing procedure at coarse-fine interfaces. Figure <a class="reference external" href="#fig:ctof">[fig:ctof]</a> shows
 the transition from coarse (level <span class="math notranslate nohighlight">\(l-1\)</span>) to fine (level <span class="math notranslate nohighlight">\(l\)</span>), with the zone
 center indices noted.</p>
-<div class="figure" id="id3">
+<div class="figure align-center" id="id3">
 <a class="reference internal image-reference" href="figpath/ctof"><img alt="[fig:ctof] A coarse-fine interface in the 1-d base state" src="figpath/ctof" style="width: 2.5in;" /></a>
-<p class="caption"><span class="caption-text">[fig:ctof] A coarse-fine interface in the 1-d base state</span></p>
+<p class="caption"><span class="caption-text">[fig:ctof] A coarse-fine interface in the 1-d base state</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
 <p>To find the zone-centered pressure in the first fine zone, <span class="math notranslate nohighlight">\(p_r^l\)</span>, from
 the zone-centered pressure in the coarse zone just below the coarse-fine interface,
@@ -369,10 +370,10 @@ p_r^l = p_{\sfrac{r}{2}-1}^{l-1} &amp;+&amp;
 <div class="math notranslate nohighlight">
 \[p_r^l = p_{\sfrac{r}{2}-1}^{l-1} +
   \frac{3\Delta r^l g}{4}\left(\rho_{\sfrac{r}{2}-1}^{l-1} + \rho_r^l\right).\label{Coarse-Fine Stencil}\]</div>
-<p>When integrating across a fine-coarse interface (see Figure&nbsp;<a class="reference external" href="#fig:ftoc">[fig:ftoc]</a>), the proceduce is similar.</p>
-<div class="figure" id="id4">
+<p>When integrating across a fine-coarse interface (see Figure <a class="reference external" href="#fig:ftoc">[fig:ftoc]</a>), the proceduce is similar.</p>
+<div class="figure align-center" id="id4">
 <a class="reference internal image-reference" href="figpath/ftoc"><img alt="[fig:ftoc] A fine-coarse interface in the 1-d base state" src="figpath/ftoc" style="width: 2.5in;" /></a>
-<p class="caption"><span class="caption-text">[fig:ftoc] A fine-coarse interface in the 1-d base state</span></p>
+<p class="caption"><span class="caption-text">[fig:ftoc] A fine-coarse interface in the 1-d base state</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </div>
 <p>The expression for general gravity becomes:</p>
 <div class="math notranslate nohighlight">

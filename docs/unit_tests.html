@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Unit Tests &mdash; MAESTROeX 19.03
+  <title>Unit Tests &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -210,12 +210,12 @@
             
   <div class="section" id="unit-tests">
 <h1>Unit Tests<a class="headerlink" href="#unit-tests" title="Permalink to this headline">¶</a></h1>
-<p>In addition to the MAESTRO&nbsp;science problems, which use the full
+<p>In addition to the MAESTRO science problems, which use the full
 capabilities of MAESTRO, there are a number of unit tests that
-exercise only specific components of the MAESTRO&nbsp;solvers. These
+exercise only specific components of the MAESTRO solvers. These
 tests have their own drivers (a custom varden.f90) that
 initialize only the data needed for the specific test and call
-specific MAESTRO&nbsp;routines directly.</p>
+specific MAESTRO routines directly.</p>
 <div class="section" id="test-advect">
 <h2>test_advect<a class="headerlink" href="#test-advect" title="Permalink to this headline">¶</a></h2>
 <p>This test initializes a Gaussian density field (no other scalar
@@ -232,7 +232,7 @@ ensure that the error does not show any directional bias.</p>
 independent of the advection direction—small differences can
 arise. What’s happening here is that within each cell BDS is trying
 to define a tri-linear profile for rho subject to the constrants in
-the BDS paper&nbsp;<a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{bds3d}`</span></a> (constraints 1 and 2 on p.&nbsp;2044 after eq. 3.4). We
+the BDS paper <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{bds3d}`</span></a> (constraints 1 and 2 on p. 2044 after eq. 3.4). We
 do not solve the L2 minimization problem exactly so we iterate up to
 3 times using a simple heuristic algorithm designed to work toward
 the constraint. The iteration will give different results depending
@@ -279,7 +279,7 @@ for a spherical, self-gravitating star in <a href="#id7"><span class="problemati
 <div class="section" id="test-diffusion">
 <h2>test_diffusion<a class="headerlink" href="#test-diffusion" title="Permalink to this headline">¶</a></h2>
 <p>This test initializes a Gaussian temperature profile and calls
-the thermal diffusion routines in MAESTRO&nbsp;to evolve the state
+the thermal diffusion routines in MAESTRO to evolve the state
 considering only diffusion. The driver estimates a timestep
 based on the explicit thermal diffusion timescale and loops
 over calls to the thermal diffusion solver. A Gaussian remains
@@ -315,7 +315,7 @@ particle files can be processed and the particle data plotted
 using the python routines in data_processing/python/.</p>
 <p>The output from this test can be visualized with the script
 plot.py in the test directory. The output shows the particle
-paths (see figure&nbsp;<a class="reference external" href="#fig:unit:particles">[fig:unit:particles]</a>).</p>
+paths (see figure <a class="reference external" href="#fig:unit:particles">[fig:unit:particles]</a>).</p>
 </div>
 <div class="section" id="test-projection">
 <h2>test_projection<a class="headerlink" href="#test-projection" title="Permalink to this headline">¶</a></h2>
@@ -326,7 +326,7 @@ paths (see figure&nbsp;<a class="reference external" href="#fig:unit:particles">
 scalar differs depending on the boundary conditions (wall and
 periodic are supported currently). Finally, the hgproject routine
 is called to recover the initial divergence-free field.
-Figure&nbsp;<a class="reference external" href="#fig:unit:projtest">[fig:unit:projtest]</a> shows the initial field, polluted
+Figure <a class="reference external" href="#fig:unit:projtest">[fig:unit:projtest]</a> shows the initial field, polluted
 field, and result of the projection for the hgproject case.</p>
 <p><a href="#id17"><span class="problematic" id="id18">|[fig:unit:projtest]
 Initial divergence free velocity field (x-component; left); Velocity
@@ -353,7 +353,7 @@ coarse, and the hgprojection tested.|</span></a></p>
 <div class="section" id="test-react">
 <h2>test_react<a class="headerlink" href="#test-react" title="Permalink to this headline">¶</a></h2>
 <p>This simply tests the reaction network by calling
-the MAESTRO&nbsp;react_state routine directly. The network is
+the MAESTRO react_state routine directly. The network is
 selected in the GNUmakefile by setting the NETWORK_DIR
 variable. A 3d cube is setup with density varying on one axis,
 temperature varying on another, and the composition varying on the
@@ -372,42 +372,33 @@ advecting to the right for one period (center); absolute error
 between the final and initial density fields, showing the error in
 the advection scheme (right).| image:: unitfigpath/dens_2d_orig_density</p>
 <blockquote>
-<div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">height:</th><td class="field-body">1.9in</td>
-</tr>
-</tbody>
-</table>
+<div><dl class="field-list simple">
+<dt class="field-odd">height</dt>
+<dd class="field-odd"><p>1.9in</p>
+</dd>
+</dl>
 </div></blockquote>
 <p>Initial Gaussian density profile (left); density profile after
 advecting to the right for one period (center); absolute error
 between the final and initial density fields, showing the error in
 the advection scheme (right).| image:: unitfigpath/dens_2d_ppm1_xp_final_density</p>
 <blockquote>
-<div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">height:</th><td class="field-body">1.9in</td>
-</tr>
-</tbody>
-</table>
+<div><dl class="field-list simple">
+<dt class="field-odd">height</dt>
+<dd class="field-odd"><p>1.9in</p>
+</dd>
+</dl>
 </div></blockquote>
 <p>Initial Gaussian density profile (left); density profile after
 advecting to the right for one period (center); absolute error
 between the final and initial density fields, showing the error in
 the advection scheme (right).| image:: unitfigpath/dens_2d_ppm1_xp_final_abserror</p>
 <blockquote>
-<div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">height:</th><td class="field-body">1.9in</td>
-</tr>
-</tbody>
-</table>
+<div><dl class="field-list simple">
+<dt class="field-odd">height</dt>
+<dd class="field-odd"><p>1.9in</p>
+</dd>
+</dl>
 </div></blockquote>
 <p>Initial divergence free velocity field (x-component; left); Velocity
 field plus gradient of a scalar (x-component; center); and resulting
@@ -416,14 +407,11 @@ velocity after projecting out the non-divergence free portion
 all sides, a 2-level grid with the left half refined and right half
 coarse, and the hgprojection tested.| image:: unitfigpath/wall_u_init_x-velocity</p>
 <blockquote>
-<div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">height:</th><td class="field-body">1.9in</td>
-</tr>
-</tbody>
-</table>
+<div><dl class="field-list simple">
+<dt class="field-odd">height</dt>
+<dd class="field-odd"><p>1.9in</p>
+</dd>
+</dl>
 </div></blockquote>
 <p>Initial divergence free velocity field (x-component; left); Velocity
 field plus gradient of a scalar (x-component; center); and resulting
@@ -432,14 +420,11 @@ velocity after projecting out the non-divergence free portion
 all sides, a 2-level grid with the left half refined and right half
 coarse, and the hgprojection tested.| image:: unitfigpath/wall_u_plus_grad_phi_x-velocity</p>
 <blockquote>
-<div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">height:</th><td class="field-body">1.9in</td>
-</tr>
-</tbody>
-</table>
+<div><dl class="field-list simple">
+<dt class="field-odd">height</dt>
+<dd class="field-odd"><p>1.9in</p>
+</dd>
+</dl>
 </div></blockquote>
 <p>Initial divergence free velocity field (x-component; left); Velocity
 field plus gradient of a scalar (x-component; center); and resulting
@@ -448,14 +433,11 @@ velocity after projecting out the non-divergence free portion
 all sides, a 2-level grid with the left half refined and right half
 coarse, and the hgprojection tested.| image:: unitfigpath/wall_u_new_x-velocity</p>
 <blockquote>
-<div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">height:</th><td class="field-body">1.9in</td>
-</tr>
-</tbody>
-</table>
+<div><dl class="field-list simple">
+<dt class="field-odd">height</dt>
+<dd class="field-odd"><p>1.9in</p>
+</dd>
+</dl>
 </div></blockquote>
 </div>
 </div>

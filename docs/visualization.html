@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Visualization &mdash; MAESTROeX 19.03
+  <title>Visualization &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -106,7 +106,7 @@
 <li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Visualization</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#plotfiles">Plotfiles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#small-vs-regular-plotfiles">Small vs.&nbsp;regular plotfiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#small-vs-regular-plotfiles">Small vs. regular plotfiles</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-with-amrvis">Visualizing with Amrvis</a></li>
@@ -228,281 +228,281 @@ in creating the plotfile.</p>
 is set in the inputs file, then the data is
 converted to single precision before outputting—this is done to
 reduce file sizes.</p>
-<table border="1" class="docutils" id="id2">
+<table class="docutils align-center" id="id2">
 <caption><span class="caption-text">Plotfile quantities</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col width="25%" />
-<col width="44%" />
-<col width="31%" />
+<col style="width: 25%" />
+<col style="width: 44%" />
+<col style="width: 31%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">plotfile variable
-name</th>
-<th class="head">description</th>
-<th class="head">runtime parameter
-controlling output</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>plotfile variable
+name</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"><p>runtime parameter
+controlling output</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>x_vel</td>
-<td><span class="math notranslate nohighlight">\(\ut\)</span></td>
-<td>–</td>
+<tbody>
+<tr class="row-even"><td><p>x_vel</p></td>
+<td><p><span class="math notranslate nohighlight">\(\ut\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-odd"><td>y_vel</td>
-<td><span class="math notranslate nohighlight">\(\vt\)</span></td>
-<td>–</td>
+<tr class="row-odd"><td><p>y_vel</p></td>
+<td><p><span class="math notranslate nohighlight">\(\vt\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-even"><td>z_vel</td>
-<td><span class="math notranslate nohighlight">\(\wt\)</span></td>
-<td>3-d runs only</td>
+<tr class="row-even"><td><p>z_vel</p></td>
+<td><p><span class="math notranslate nohighlight">\(\wt\)</span></p></td>
+<td><p>3-d runs only</p></td>
 </tr>
-<tr class="row-odd"><td>density</td>
-<td><span class="math notranslate nohighlight">\(\rho\)</span></td>
-<td>–</td>
+<tr class="row-odd"><td><p>density</p></td>
+<td><p><span class="math notranslate nohighlight">\(\rho\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-even"><td>rhoh</td>
-<td><span class="math notranslate nohighlight">\((\rho h)\)</span></td>
-<td>use_tfromp = F or
+<tr class="row-even"><td><p>rhoh</p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho h)\)</span></p></td>
+<td><p>use_tfromp = F or
 (use_tfromp = T and
 plot_h_with_use_tfromp
-= T)</td>
+= T)</p></td>
 </tr>
-<tr class="row-odd"><td>h</td>
-<td><span class="math notranslate nohighlight">\((\rho h)/\rho\)</span></td>
-<td>use_tfromp = F or
+<tr class="row-odd"><td><p>h</p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho h)/\rho\)</span></p></td>
+<td><p>use_tfromp = F or
 (use_tfromp = T and
 plot_h_with_use_tfromp
-= T)</td>
+= T)</p></td>
 </tr>
-<tr class="row-even"><td>X(*)</td>
-<td><span class="math notranslate nohighlight">\((\rho X_k)/\rho\)</span></td>
-<td>plot_spec</td>
+<tr class="row-even"><td><p>X(*)</p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho X_k)/\rho\)</span></p></td>
+<td><p>plot_spec</p></td>
 </tr>
-<tr class="row-odd"><td>tracer</td>
-<td>tracers</td>
-<td>plot_trac</td>
+<tr class="row-odd"><td><p>tracer</p></td>
+<td><p>tracers</p></td>
+<td><p>plot_trac</p></td>
 </tr>
-<tr class="row-even"><td>w0_x</td>
-<td><span class="math notranslate nohighlight">\(w_0 \er \cdot \ex\)</span></td>
-<td>plot_base</td>
+<tr class="row-even"><td><p>w0_x</p></td>
+<td><p><span class="math notranslate nohighlight">\(w_0 \er \cdot \ex\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-odd"><td>w0_y</td>
-<td><span class="math notranslate nohighlight">\(w_0 \er \cdot \ey\)</span></td>
-<td>plot_base</td>
+<tr class="row-odd"><td><p>w0_y</p></td>
+<td><p><span class="math notranslate nohighlight">\(w_0 \er \cdot \ey\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-even"><td>w0_z</td>
-<td><span class="math notranslate nohighlight">\(w_0 \er \cdot \ez\)</span></td>
-<td>plot_base</td>
+<tr class="row-even"><td><p>w0_z</p></td>
+<td><p><span class="math notranslate nohighlight">\(w_0 \er \cdot \ez\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-odd"><td>divw0</td>
-<td><span class="math notranslate nohighlight">\(\nabla \cdot w_0\)</span></td>
-<td>plot_base</td>
+<tr class="row-odd"><td><p>divw0</p></td>
+<td><p><span class="math notranslate nohighlight">\(\nabla \cdot w_0\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-even"><td>rho0</td>
-<td><span class="math notranslate nohighlight">\(\rho_0\)</span></td>
-<td>plot_base</td>
+<tr class="row-even"><td><p>rho0</p></td>
+<td><p><span class="math notranslate nohighlight">\(\rho_0\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-odd"><td>rhoh0</td>
-<td><span class="math notranslate nohighlight">\((\rho h)_0\)</span></td>
-<td>plot_base</td>
+<tr class="row-odd"><td><p>rhoh0</p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho h)_0\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-even"><td>h0</td>
-<td><span class="math notranslate nohighlight">\((\rho h)_0/\rho_0\)</span></td>
-<td>plot_base</td>
+<tr class="row-even"><td><p>h0</p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho h)_0/\rho_0\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-odd"><td>p0</td>
-<td><span class="math notranslate nohighlight">\(p_0\)</span></td>
-<td>plot_base</td>
+<tr class="row-odd"><td><p>p0</p></td>
+<td><p><span class="math notranslate nohighlight">\(p_0\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-even"><td>radial_velocity</td>
-<td><span class="math notranslate nohighlight">\(\Ubt \cdot \er + w_0\)</span></td>
-<td>spherical == 1</td>
+<tr class="row-even"><td><p>radial_velocity</p></td>
+<td><p><span class="math notranslate nohighlight">\(\Ubt \cdot \er + w_0\)</span></p></td>
+<td><p>spherical == 1</p></td>
 </tr>
-<tr class="row-odd"><td>circum_velocity</td>
-<td><span class="math notranslate nohighlight">\(|\Ubt - (\Ubt \cdot \er) \er |\)</span></td>
-<td>spherical == 1</td>
+<tr class="row-odd"><td><p>circum_velocity</p></td>
+<td><p><span class="math notranslate nohighlight">\(|\Ubt - (\Ubt \cdot \er) \er |\)</span></p></td>
+<td><p>spherical == 1</p></td>
 </tr>
-<tr class="row-even"><td>magvel</td>
-<td><span class="math notranslate nohighlight">\(| \Ubt + w_0 \er |\)</span></td>
-<td><ul class="first last simple">
+<tr class="row-even"><td><p>magvel</p></td>
+<td><p><span class="math notranslate nohighlight">\(| \Ubt + w_0 \er |\)</span></p></td>
+<td><ul class="simple">
 <li></li>
 </ul>
 </td>
 </tr>
-<tr class="row-odd"><td>momentum</td>
-<td><span class="math notranslate nohighlight">\(\rho | \Ubt + w_0 \er |\)</span></td>
-<td><ul class="first last simple">
+<tr class="row-odd"><td><p>momentum</p></td>
+<td><p><span class="math notranslate nohighlight">\(\rho | \Ubt + w_0 \er |\)</span></p></td>
+<td><ul class="simple">
 <li></li>
 </ul>
 </td>
 </tr>
-<tr class="row-even"><td>vort</td>
-<td><span class="math notranslate nohighlight">\(| \nabla \times \Ubt |\)</span></td>
-<td><ul class="first last simple">
+<tr class="row-even"><td><p>vort</p></td>
+<td><p><span class="math notranslate nohighlight">\(| \nabla \times \Ubt |\)</span></p></td>
+<td><ul class="simple">
 <li></li>
 </ul>
 </td>
 </tr>
-<tr class="row-odd"><td>S</td>
-<td><span class="math notranslate nohighlight">\(S\)</span></td>
-<td>–</td>
+<tr class="row-odd"><td><p>S</p></td>
+<td><p><span class="math notranslate nohighlight">\(S\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-even"><td>rhopert</td>
-<td><span class="math notranslate nohighlight">\(\rho - \rho_0\)</span></td>
-<td>–</td>
+<tr class="row-even"><td><p>rhopert</p></td>
+<td><p><span class="math notranslate nohighlight">\(\rho - \rho_0\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-odd"><td>rhohpert</td>
-<td><span class="math notranslate nohighlight">\((\rho h) - (\rho h)_0\)</span></td>
-<td>use_tfromp = F or
+<tr class="row-odd"><td><p>rhohpert</p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho h) - (\rho h)_0\)</span></p></td>
+<td><p>use_tfromp = F or
 (use_tfromp = T and
 plot_h_with_use_tfromp
-= T)</td>
+= T)</p></td>
 </tr>
-<tr class="row-even"><td>tfromp</td>
-<td><span class="math notranslate nohighlight">\(T(\rho, p_0, X_k)\)</span></td>
-<td>–</td>
+<tr class="row-even"><td><p>tfromp</p></td>
+<td><p><span class="math notranslate nohighlight">\(T(\rho, p_0, X_k)\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-odd"><td>tfromh</td>
-<td><span class="math notranslate nohighlight">\(T(\rho, h, X_k)\)</span></td>
-<td>use_tfromp = F or
+<tr class="row-odd"><td><p>tfromh</p></td>
+<td><p><span class="math notranslate nohighlight">\(T(\rho, h, X_k)\)</span></p></td>
+<td><p>use_tfromp = F or
 (use_tfromp = T and
 plot_h_with_use_tfromp
-= T)</td>
+= T)</p></td>
 </tr>
-<tr class="row-even"><td>deltaT</td>
-<td><span class="math notranslate nohighlight">\([T(\rho, h, X_k) -\)</span>
+<tr class="row-even"><td><p>deltaT</p></td>
+<td><p><span class="math notranslate nohighlight">\([T(\rho, h, X_k) -\)</span>
 <span class="math notranslate nohighlight">\(T(\rho, p_0, X_k)]\)</span>
-<span class="math notranslate nohighlight">\(/T(\rho, h, X_k)\)</span></td>
-<td>use_tfromp = F or
+<span class="math notranslate nohighlight">\(/T(\rho, h, X_k)\)</span></p></td>
+<td><p>use_tfromp = F or
 (use_tfromp = T and
 plot_h_with_use_tfromp
-= T)</td>
+= T)</p></td>
 </tr>
-<tr class="row-odd"><td>deltap</td>
-<td><span class="math notranslate nohighlight">\(|p(\rho,h,X_k)-p_0|/p_0\)</span></td>
-<td>use_tfromp = F or
+<tr class="row-odd"><td><p>deltap</p></td>
+<td><p><span class="math notranslate nohighlight">\(|p(\rho,h,X_k)-p_0|/p_0\)</span></p></td>
+<td><p>use_tfromp = F or
 (use_tfromp = T and
 plot_h_with_use_tfromp
-= T)</td>
+= T)</p></td>
 </tr>
-<tr class="row-even"><td>tpert</td>
-<td><span class="math notranslate nohighlight">\(T(\rho,h,X_k)-\overline{T}\)</span>
+<tr class="row-even"><td><p>tpert</p></td>
+<td><p><span class="math notranslate nohighlight">\(T(\rho,h,X_k)-\overline{T}\)</span>
 if use_tfromp = F;
 <span class="math notranslate nohighlight">\(T(\rho,p_0,X_k)-\overline{T}\)</span>
-otherwise</td>
-<td>–</td>
+otherwise</p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-odd"><td>Machnumber</td>
-<td><span class="math notranslate nohighlight">\(|\Ubt+w_0\er |/c(\rho,p_0,X_k)\)</span></td>
-<td>–</td>
+<tr class="row-odd"><td><p>Machnumber</p></td>
+<td><p><span class="math notranslate nohighlight">\(|\Ubt+w_0\er |/c(\rho,p_0,X_k)\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-even"><td>soundspeed</td>
-<td><span class="math notranslate nohighlight">\(c(\rho,p_0,X_k)\)</span></td>
-<td>plot_cs</td>
+<tr class="row-even"><td><p>soundspeed</p></td>
+<td><p><span class="math notranslate nohighlight">\(c(\rho,p_0,X_k)\)</span></p></td>
+<td><p>plot_cs</p></td>
 </tr>
-<tr class="row-odd"><td>deltagamma</td>
-<td><span class="math notranslate nohighlight">\(\Gamma_1-\gammabar\)</span></td>
-<td>–</td>
+<tr class="row-odd"><td><p>deltagamma</p></td>
+<td><p><span class="math notranslate nohighlight">\(\Gamma_1-\gammabar\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-even"><td>entropy</td>
-<td><span class="math notranslate nohighlight">\(s(\rho,p_0,X_k)\)</span></td>
-<td>–</td>
+<tr class="row-even"><td><p>entropy</p></td>
+<td><p><span class="math notranslate nohighlight">\(s(\rho,p_0,X_k)\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-odd"><td>entropypert</td>
-<td><span class="math notranslate nohighlight">\([s(\rho,p_0,X_k) -\)</span>
-<span class="math notranslate nohighlight">\(\overline{s}]/\overline{s}\)</span></td>
-<td>–</td>
+<tr class="row-odd"><td><p>entropypert</p></td>
+<td><p><span class="math notranslate nohighlight">\([s(\rho,p_0,X_k) -\)</span>
+<span class="math notranslate nohighlight">\(\overline{s}]/\overline{s}\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-even"><td>sponge or
-sponge_fdamp</td>
-<td><span class="math notranslate nohighlight">\(1/(1+\Delta t\kappa \fdamp)\)</span>
+<tr class="row-even"><td><p>sponge or
+sponge_fdamp</p></td>
+<td><p><span class="math notranslate nohighlight">\(1/(1+\Delta t\kappa \fdamp)\)</span>
 by default;
 <span class="math notranslate nohighlight">\(\fdamp\)</span>
-if plot_sponge_fdamp = T</td>
-<td>–</td>
+if plot_sponge_fdamp = T</p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-odd"><td>pi</td>
-<td><span class="math notranslate nohighlight">\(\pi\)</span></td>
-<td>–</td>
+<tr class="row-odd"><td><p>pi</p></td>
+<td><p><span class="math notranslate nohighlight">\(\pi\)</span></p></td>
+<td><p>–</p></td>
 </tr>
-<tr class="row-even"><td>gpi_x</td>
-<td><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ex\)</span></td>
-<td>plot_gpi</td>
+<tr class="row-even"><td><p>gpi_x</p></td>
+<td><p><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ex\)</span></p></td>
+<td><p>plot_gpi</p></td>
 </tr>
-<tr class="row-odd"><td>gpi_y</td>
-<td><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ey\)</span></td>
-<td>plot_gpi</td>
+<tr class="row-odd"><td><p>gpi_y</p></td>
+<td><p><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ey\)</span></p></td>
+<td><p>plot_gpi</p></td>
 </tr>
-<tr class="row-even"><td>gpi_z</td>
-<td><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ez\)</span></td>
-<td>plot_gpi</td>
+<tr class="row-even"><td><p>gpi_z</p></td>
+<td><p><span class="math notranslate nohighlight">\(\nabla \pi \cdot \ez\)</span></p></td>
+<td><p>plot_gpi</p></td>
 </tr>
-<tr class="row-odd"><td>pioverp0</td>
-<td><span class="math notranslate nohighlight">\(\pi / p_0\)</span></td>
-<td>plot_base</td>
+<tr class="row-odd"><td><p>pioverp0</p></td>
+<td><p><span class="math notranslate nohighlight">\(\pi / p_0\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-even"><td>p0pluspi</td>
-<td><span class="math notranslate nohighlight">\(p_0 + \pi\)</span></td>
-<td>plot_base</td>
+<tr class="row-even"><td><p>p0pluspi</p></td>
+<td><p><span class="math notranslate nohighlight">\(p_0 + \pi\)</span></p></td>
+<td><p>plot_base</p></td>
 </tr>
-<tr class="row-odd"><td>omegadot(*)</td>
-<td><span class="math notranslate nohighlight">\(\dot{\omega}_k\)</span></td>
-<td>plot_omegadot</td>
+<tr class="row-odd"><td><p>omegadot(*)</p></td>
+<td><p><span class="math notranslate nohighlight">\(\dot{\omega}_k\)</span></p></td>
+<td><p>plot_omegadot</p></td>
 </tr>
-<tr class="row-even"><td>enucdot</td>
-<td><span class="math notranslate nohighlight">\((\rho \Hnuc)/\rho\)</span></td>
-<td>plot_Hnuc</td>
+<tr class="row-even"><td><p>enucdot</p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho \Hnuc)/\rho\)</span></p></td>
+<td><p>plot_Hnuc</p></td>
 </tr>
-<tr class="row-odd"><td>Hext</td>
-<td><span class="math notranslate nohighlight">\((\rho \Hext)/\rho\)</span></td>
-<td>plot_Hext</td>
+<tr class="row-odd"><td><p>Hext</p></td>
+<td><p><span class="math notranslate nohighlight">\((\rho \Hext)/\rho\)</span></p></td>
+<td><p>plot_Hext</p></td>
 </tr>
-<tr class="row-even"><td>eta_rho</td>
-<td><span class="math notranslate nohighlight">\(\etarho\)</span></td>
-<td>plot_eta</td>
+<tr class="row-even"><td><p>eta_rho</p></td>
+<td><p><span class="math notranslate nohighlight">\(\etarho\)</span></p></td>
+<td><p>plot_eta</p></td>
 </tr>
-<tr class="row-odd"><td>thermal</td>
-<td><span class="math notranslate nohighlight">\(\nabla \cdot \kappa\nabla T\)</span></td>
-<td>use_thermal_diffusion</td>
+<tr class="row-odd"><td><p>thermal</p></td>
+<td><p><span class="math notranslate nohighlight">\(\nabla \cdot \kappa\nabla T\)</span></p></td>
+<td><p>use_thermal_diffusion</p></td>
 </tr>
-<tr class="row-even"><td>conductivity</td>
-<td><span class="math notranslate nohighlight">\(\kappa(\rho, T,X_k)\)</span></td>
-<td>use_thermal_diffusion</td>
+<tr class="row-even"><td><p>conductivity</p></td>
+<td><p><span class="math notranslate nohighlight">\(\kappa(\rho, T,X_k)\)</span></p></td>
+<td><p>use_thermal_diffusion</p></td>
 </tr>
-<tr class="row-odd"><td>ad_excess</td>
-<td><span class="math notranslate nohighlight">\(\nabla - \nabla_\mathrm{ad}\)</span></td>
-<td>plot_ad_excess</td>
+<tr class="row-odd"><td><p>ad_excess</p></td>
+<td><p><span class="math notranslate nohighlight">\(\nabla - \nabla_\mathrm{ad}\)</span></p></td>
+<td><p>plot_ad_excess</p></td>
 </tr>
-<tr class="row-even"><td>particle_count</td>
-<td>number of particles
-in a cell</td>
-<td>use_particles</td>
+<tr class="row-even"><td><p>particle_count</p></td>
+<td><p>number of particles
+in a cell</p></td>
+<td><p>use_particles</p></td>
 </tr>
-<tr class="row-odd"><td>processor_number</td>
-<td>processor number
+<tr class="row-odd"><td><p>processor_number</p></td>
+<td><p>processor number
 containing the cell’s
-data</td>
-<td>plot_processors</td>
+data</p></td>
+<td><p>plot_processors</p></td>
 </tr>
-<tr class="row-even"><td>pi_divu</td>
-<td><span class="math notranslate nohighlight">\(\pi \nabla \cdot\tilde{\Ub}\)</span>
+<tr class="row-even"><td><p>pi_divu</p></td>
+<td><p><span class="math notranslate nohighlight">\(\pi \nabla \cdot\tilde{\Ub}\)</span>
 (a measure of energy
-conservation)</td>
-<td>plot_pidivu</td>
+conservation)</p></td>
+<td><p>plot_pidivu</p></td>
 </tr>
 </tbody>
 </table>
 <div class="section" id="small-vs-regular-plotfiles">
-<span id="vis-sec-miniplotfile"></span><h3>Small vs.&nbsp;regular plotfiles<a class="headerlink" href="#small-vs-regular-plotfiles" title="Permalink to this headline">¶</a></h3>
-<p>MAESTRO&nbsp;can manage two independent sets of plotfiles. This allows you to
+<span id="vis-sec-miniplotfile"></span><h3>Small vs. regular plotfiles<a class="headerlink" href="#small-vs-regular-plotfiles" title="Permalink to this headline">¶</a></h3>
+<p>MAESTRO can manage two independent sets of plotfiles. This allows you to
 output the default plotfiles, which contain a lot of variables, sparsely,
 and output small-plotfiles much more frequently. A small-plotfile is controlled
 by the analogous runtime parameters as the main plotfiles:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">small_plot_int</span></code> is the interval in steps between successive plotfiles</li>
-<li><code class="docutils literal notranslate"><span class="pre">small_plot_deltat</span></code> is the interval in time between successive plotfiles</li>
-<li><code class="docutils literal notranslate"><span class="pre">small_plot_base_name</span></code> is the base name that prefixes the plotfiles. The
-default is smallplt</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">small_plot_int</span></code> is the interval in steps between successive plotfiles</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">small_plot_deltat</span></code> is the interval in time between successive plotfiles</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">small_plot_base_name</span></code> is the base name that prefixes the plotfiles. The
+default is smallplt</p></li>
 </ul>
 <p>The fields that are stored in the small plotfiles is set by the runtime
 parameter <code class="docutils literal notranslate"><span class="pre">small_plot_vars</span></code>. This should be a (space-separated) list of the
@@ -512,12 +512,12 @@ parameter names to be included in the plot file.</p>
 <div class="section" id="visualizing-with-amrvis">
 <h2>Visualizing with Amrvis<a class="headerlink" href="#visualizing-with-amrvis" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
-<div class="line">Amrvis&nbsp;is a tool developed together with AMReX&nbsp;to visualize datasets
-from codes built around the AMReX&nbsp;library. You can download the
-Amrvis&nbsp;source from:</div>
+<div class="line">Amrvis is a tool developed together with AMReX to visualize datasets
+from codes built around the AMReX library. You can download the
+Amrvis source from:</div>
 <div class="line"><a class="reference external" href="https://ccse.lbl.gov/Downloads/downloadAmrvis.html">https://ccse.lbl.gov/Downloads/downloadAmrvis.html</a></div>
-<div class="line">Amrvis&nbsp;exists in the C++ AMReX&nbsp;framework, so the build system is
-slightly different. A different executable is needed for 2- vs.&nbsp;3-d
+<div class="line">Amrvis exists in the C++ AMReX framework, so the build system is
+slightly different. A different executable is needed for 2- vs. 3-d
 datasets. Edit the GNUmakefile and set the compilers (probably
 g++ and gfortran) and the dimensionality, and turn off any
 of the volume rendering options. You will need to have the Motif library
@@ -532,7 +532,7 @@ variables can be selected from the drop down menu at the top. Middle
 and right clicking in 3-d select the slice planes, and shift + middle
 or right will extract 1-d lines through the data. In 2-d, middle and
 right clicking alone extract 1-d lines.</p>
-<p>If Amrvis&nbsp;cannot find the Palette file, then the plots will be
+<p>If Amrvis cannot find the Palette file, then the plots will be
 in grayscale. To fix this, copy the amrvis.defaults and
 Palette files to your home directory and edit amrvis.defaults so that
 the palette line points to the Palette file, e.g.:</p>
@@ -546,8 +546,8 @@ the palette line points to the Palette file, e.g.:</p>
 <div class="section" id="python-visualization-scripts">
 <span id="sec-vis-python"></span><h2>Python visualization scripts<a class="headerlink" href="#python-visualization-scripts" title="Permalink to this headline">¶</a></h2>
 <p>AmrPostprocessing/python provides some simple commandline
-tools for doing visualizations of AMReX&nbsp;plotfiles (note: a subset
-of these are distributed directly with AMReX&nbsp;in amrex/Tools/Py_util/). The main drivers
+tools for doing visualizations of AMReX plotfiles (note: a subset
+of these are distributed directly with AMReX in amrex/Tools/Py_util/). The main drivers
 are written in python and use a set of Fortran routines, compiled with
 f2py to interface with the plotfile data. To use the routine,
 you will need to have matplotlib and f2py installed. On a
@@ -570,14 +570,14 @@ installing the lyx-fonts package and deleting your
 .matplotlib directory, and trying again.</p>
 <div class="section" id="plotsinglevar-py">
 <h3>plotsinglevar.py<a class="headerlink" href="#plotsinglevar-py" title="Permalink to this headline">¶</a></h3>
-<p>plotsinglevar.py does visualizations of 2-d AMReX&nbsp;plotfiles,
-and slices through 3-d AMReX&nbsp;plotfiles. A simple plot can be made
+<p>plotsinglevar.py does visualizations of 2-d AMReX plotfiles,
+and slices through 3-d AMReX plotfiles. A simple plot can be made
 via:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">log</span> <span class="o">-</span><span class="n">o</span> <span class="n">test</span><span class="o">.</span><span class="n">png</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span>
 </pre></div>
 </div>
 <p>This will make a plot of “tfromp” from the plotfile plt00000 with log scaling,
-and store the output in test.png. See Figure&nbsp;<a class="reference external" href="#fig:python">[fig:python]</a>.
+and store the output in test.png. See Figure <a class="reference external" href="#fig:python">[fig:python]</a>.
 If you don’t do ‘-o’, then a default output filename consisting of the
 plotfile name + component will be used.</p>
 <p>If you list 2 different variables after the plotfile name, then they
@@ -585,7 +585,7 @@ will be plotted side-by-side in a single figure. For example,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span> <span class="n">enucdot</span>
 </pre></div>
 </div>
-<p>produces the output shown in figure&nbsp;<a class="reference external" href="#fig:python_two">[fig:python_two]</a>.</p>
+<p>produces the output shown in figure <a class="reference external" href="#fig:python_two">[fig:python_two]</a>.</p>
 <p>Additional options include ‘-m’ to specify the minimum data
 value, ‘-M’ to specify the maximum data value, and ‘–eps’
 to make an EPS plot instead of PNG. Running the script with no parameters
@@ -613,7 +613,7 @@ plt00000 and other_plt00000 shown on the same axes.</p>
 <p>The runtimevis.py script is designed to be run from a submission
 script to produce plots from plotfiles as they are produced. This is
 accomplished by hooking it into the process scripts described in
-Chapter&nbsp;<a class="reference external" href="#ch:managingjobs">[ch:managingjobs]</a>.</p>
+Chapter <a class="reference external" href="#ch:managingjobs">[ch:managingjobs]</a>.</p>
 <p>The script itself reads in an inputs file, vis.in, that
 describes the variables to plot. From 1 to 6 variables can be
 plotting from a plotfile. The script does its best to organize them
@@ -640,7 +640,7 @@ log is taken of the data before plotting. The script is then run as:</p>
 and understand that AMReX data from MAESTROeX and CASTRO (along
 with many other simulation codes). For more
 information, see the yt homepage at <a class="reference external" href="http://yt-project.org/">http://yt-project.org/</a> and
-[yt].</p>
+<span>[yt]</span>.</p>
 <p>Some sample scripts that use yt with MAESTRO data are contained in
 <code class="docutils literal notranslate"><span class="pre">MAESTROeX/Util/yt/</span></code>.</p>
 </div>

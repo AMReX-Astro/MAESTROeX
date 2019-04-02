@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MAESTROeX Flowchart &mdash; MAESTROeX 19.03
+  <title>MAESTROeX Flowchart &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -94,7 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">MAESTROeX Flowchart</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#summary-of-the-maestroex-equation-set">Summary of the MAESTROeX&nbsp;Equation Set</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#summary-of-the-maestroex-equation-set">Summary of the MAESTROeX Equation Set</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#base-state">Base State</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#continuity">Continuity</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#constraint">Constraint</a></li>
@@ -118,7 +118,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#changes-from-earlier-implementations">Changes from Earlier Implementations</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#changes-between-paper-3-and-paper-4">Changes Between Paper 3 and Paper 4</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#changes-between-paper-4-and-the-multilevel-paper">Changes Between Paper 4 and the Multilevel Paper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#changes-between-the-multilevel-paper-and-paper-5-raw-latex-cite-wdconvect">Changes Between the Multilevel Paper and Paper 5&nbsp;:raw-latex:`\cite{wdconvect}`</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changes-between-the-multilevel-paper-and-paper-5-raw-latex-cite-wdconvect">Changes Between the Multilevel Paper and Paper 5 :raw-latex:`\cite{wdconvect}`</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#changes-between-paper-5-and-the-xrb-paper">Changes Between Paper 5 and the XRB Paper</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#changes-since-the-xrb-paper">Changes Since the XRB Paper</a></li>
 </ul>
@@ -232,20 +232,20 @@
             
   <div class="section" id="maestroex-flowchart">
 <h1>MAESTROeX Flowchart<a class="headerlink" href="#maestroex-flowchart" title="Permalink to this headline">¶</a></h1>
-<p>The equation set and solution procedure used by MAESTROeX&nbsp;has evolved
+<p>The equation set and solution procedure used by MAESTROeX has evolved
 over time. In this chapter, we outline the algorithm currently
 implemented in the code. The latest published reference for MAESTROeX
 is the multilevel paper <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{multilevel}`</span></a>. In this description, we
-make frequent reference to paper&nbsp;I <a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{lowMach}`</span></a>,
-paper&nbsp;II <a href="#id5"><span class="problematic" id="id6">:raw-latex:`\cite{lowMach2}`</span></a>, paper&nbsp;III <a href="#id7"><span class="problematic" id="id8">:raw-latex:`\cite{lowMach3}`</span></a>, and
-paper&nbsp;IV <a href="#id9"><span class="problematic" id="id10">:raw-latex:`\cite{lowMach4}`</span></a>.</p>
+make frequent reference to paper I <a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{lowMach}`</span></a>,
+paper II <a href="#id5"><span class="problematic" id="id6">:raw-latex:`\cite{lowMach2}`</span></a>, paper III <a href="#id7"><span class="problematic" id="id8">:raw-latex:`\cite{lowMach3}`</span></a>, and
+paper IV <a href="#id9"><span class="problematic" id="id10">:raw-latex:`\cite{lowMach4}`</span></a>.</p>
 <div class="section" id="summary-of-the-maestroex-equation-set">
-<h2>Summary of the MAESTROeX&nbsp;Equation Set<a class="headerlink" href="#summary-of-the-maestroex-equation-set" title="Permalink to this headline">¶</a></h2>
+<h2>Summary of the MAESTROeX Equation Set<a class="headerlink" href="#summary-of-the-maestroex-equation-set" title="Permalink to this headline">¶</a></h2>
 <p>Here we summarize the equations solved by MAESTROeX. We refer the reader
-to papers&nbsp;I through IV and the multilevel paper for the derivation
+to papers I through IV and the multilevel paper for the derivation
 and motivation of the equation set. (Note: this ‘traditional’ algorithm
 uses Strang-splitting for the reactions. An alternate implementation, using
-spectral deferred corrections is outlined in Chapter&nbsp;<a class="reference external" href="#ch:sdc">[ch:sdc]</a>.)</p>
+spectral deferred corrections is outlined in Chapter <a class="reference external" href="#ch:sdc">[ch:sdc]</a>.)</p>
 <div class="section" id="base-state">
 <h3>Base State<a class="headerlink" href="#base-state" title="Permalink to this headline">¶</a></h3>
 <p>The stratified atmosphere is characterized by a one-dimensional
@@ -333,7 +333,7 @@ term is only present if we are using thermal diffusion (use_thermal_diffusion = 
 here makes it possible to cast the constraint as a
 divergence. <a href="#id11"><span class="problematic" id="id12">:raw-latex:`\cite{KP:2012}`</span></a> discuss the general case where we want to
 keep the local variations of <span class="math notranslate nohighlight">\(\Gamma_1\)</span> (and we explored this in paper
-III). We also look at this in §&nbsp;<a class="reference external" href="#sec:flow:gamma1vary">[sec:flow:gamma1vary]</a>.</p>
+III). We also look at this in § <a class="reference external" href="#sec:flow:gamma1vary">[sec:flow:gamma1vary]</a>.</p>
 </div>
 <div class="section" id="momentum">
 <h3>Momentum<a class="headerlink" href="#momentum" title="Permalink to this headline">¶</a></h3>
@@ -369,7 +369,7 @@ by use_alt_energy_fix.</p>
 \[\Ub = w_0(r,t)\eb_r + \Ubt(\xb,t).\]</div>
 <p>with
 <span class="math notranslate nohighlight">\(\overline{(\Ubt\cdot\eb_r)} = 0\)</span> and
-<span class="math notranslate nohighlight">\(w_0 = \overline{(\Ub\cdot\eb_r)}\)</span>—the motivation for this splitting was given in paper&nbsp;II.
+<span class="math notranslate nohighlight">\(w_0 = \overline{(\Ub\cdot\eb_r)}\)</span>—the motivation for this splitting was given in paper II.
 The velocity evolution equations are then</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
@@ -424,8 +424,8 @@ but it becomes convenient at times to define the temperature.</p>
 <div class="math notranslate nohighlight">
 \[\psi \equiv \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r}\]</div>
 <p>When we are using thermal diffusion, there will be an additional term in
-the enthalpy equation (see §&nbsp;<a class="reference external" href="#sec:flow:diffusion">2.5</a>).</p>
-<p>In paper&nbsp;III, we showed that for a plane-parallel atmosphere with
+the enthalpy equation (see § <a class="reference external" href="#sec:flow:diffusion">2.5</a>).</p>
+<p>In paper III, we showed that for a plane-parallel atmosphere with
 constant gravity, <span class="math notranslate nohighlight">\(\psi = \etarho g\)</span></p>
 <p>At times, we will define a temperature equation by writing <span class="math notranslate nohighlight">\(h = h(T,p,X_k)\)</span>
 and differentiating:</p>
@@ -436,7 +436,7 @@ and differentiating:</p>
  - \sum_k \rho \xi_k {\omegadot}_k
  + \rho \Hnuc + \rho \Hext \right \} \enskip  .\]</div>
 <p>The base state evolution equations for density and enthalpy can be
-found by averaging Eq&nbsp;<a class="reference external" href="#eq:flow:enthalpy">[eq:flow:enthalpy]</a>
+found by averaging Eq <a class="reference external" href="#eq:flow:enthalpy">[eq:flow:enthalpy]</a>
 over a layer of constant radius, resulting in</p>
 <div class="math notranslate nohighlight">
 \[\begin{aligned}
@@ -461,18 +461,18 @@ step.</p>
 <div class="section" id="definitions">
 <h3>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h3>
 <p>Below we define operations that will be referenced in
-§&nbsp;<a class="reference external" href="#sec:flow:singlestep">[sec:flow:singlestep]</a>.</p>
-<dl class="docutils">
-<dt><strong>React State</strong>:math:<a href="#id15"><span class="problematic" id="id16">`</span></a>[rho^{inp},(rho h)^{inp},X_k^{inp},T^{inp}, (rhoHext)^{inp},</dt>
-<dd>p_0^{inp}] rightarrow [rho^{outp}, (rho h)^{outp}, X_k^{outp},
-T^{outp}, (rho omegadot_k)^{outp}, (rhoHnuc)^{outp}]`</dd>
+§ <a class="reference external" href="#sec:flow:singlestep">[sec:flow:singlestep]</a>.</p>
+<dl class="simple">
+<dt><strong>React State</strong>:math:<a href="#id15"><span class="problematic" id="id16">`</span></a>[rho^{inp},(rho h)^{inp},X_k^{inp},T^{inp}, (rhoHext)^{inp},</dt><dd><p>p_0^{inp}] rightarrow [rho^{outp}, (rho h)^{outp}, X_k^{outp},
+T^{outp}, (rho omegadot_k)^{outp}, (rhoHnuc)^{outp}]`</p>
+</dd>
 </dl>
 <p>evolves the species and enthalpy due to reactions through
 <span class="math notranslate nohighlight">\(\Delta t/2\)</span> according to:</p>
 <div class="math notranslate nohighlight">
 \[\frac{dX_k}{dt} = \omegadot_k(\rho,X_k,T) ; \qquad
 \frac{dT}{dt}   = \frac{1}{c_p} \left ( -\sum_k \xi_k  \omegadot_k  + \Hnuc \right ).\]</div>
-<p>Here the temperature equation comes from Eq.&nbsp;<a class="reference external" href="#eq:flow:temp">[eq:flow:temp]</a> with <span class="math notranslate nohighlight">\(Dp_0/Dt = 0\)</span> for
+<p>Here the temperature equation comes from Eq. <a class="reference external" href="#eq:flow:temp">[eq:flow:temp]</a> with <span class="math notranslate nohighlight">\(Dp_0/Dt = 0\)</span> for
 the burning part of the evolution.</p>
 <p>Full details of the
 solution procedure can be found in Paper III. We then define:</p>
@@ -488,16 +488,15 @@ controlled by use_tfromp.
 Note that the density remains unchanged within <strong>React State</strong>, i.e.,
 <span class="math notranslate nohighlight">\(\rho^{\outp} = \rho^{\inp}\)</span>.</p>
 <p>The source code for this operation can be found in react_state.f90.</p>
-<dl class="docutils">
-<dt><strong>Advect Base Density</strong>:math:<a href="#id17"><span class="problematic" id="id18">`</span></a>[rho_0^inp,w_0^inp] rightarrow</dt>
-<dd>[rho_0^outp, rho_0^{outp,nph}]` is the process by which we</dd>
+<dl class="simple">
+<dt><strong>Advect Base Density</strong>:math:<a href="#id17"><span class="problematic" id="id18">`</span></a>[rho_0^inp,w_0^inp] rightarrow</dt><dd><p>[rho_0^outp, rho_0^{outp,nph}]` is the process by which we</p>
+</dd>
 </dl>
 <p>update the base state density through <span class="math notranslate nohighlight">\(\dt\)</span> in time. We keep the
 time-centered edge states, <span class="math notranslate nohighlight">\(\rho_0^{\outp,\nph}\)</span>,
 since they are used later in discretization of <span class="math notranslate nohighlight">\(\etarho\)</span> for planar problems.</p>
-<dl class="docutils">
-<dt>planar:</dt>
-<dd><p class="first">We discretize equation (<a class="reference external" href="#eq:flow:base_density">[eq:flow:base_density]</a>) to
+<dl>
+<dt>planar:</dt><dd><p>We discretize equation (<a class="reference external" href="#eq:flow:base_density">[eq:flow:base_density]</a>) to
 compute the new base state density,</p>
 <div class="math notranslate nohighlight">
 \[\rho_{0,j}^{\outp} = \rho_{0,j}^{\inp} - \frac{\dt}{\dr} \left [ \left( \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j+\myhalf} - \left( \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j-\myhalf} \right ].\]</div>
@@ -505,24 +504,23 @@ compute the new base state density,</p>
 by discretizing an expanded form of equation (<a class="reference external" href="#eq:flow:base_density">[eq:flow:base_density]</a>):</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial \rho_0}{\partial t} + w_0 \frac{\partial \rho_0}{\partial r} = - \rho_0 \frac{\partial w_0}{\partial r},\]</div>
-<p class="last">where the right hand side is used as the force term.</p>
+<p>where the right hand side is used as the force term.</p>
 </dd>
-<dt>spherical:</dt>
-<dd><p class="first">The base state density update now includes the area factors in the
+<dt>spherical:</dt><dd><p>The base state density update now includes the area factors in the
 divergences:</p>
 <div class="math notranslate nohighlight">
 \[\rho_{0,j}^{\outp} = \rho_{0,j}^{\inp} - \frac{1}{r_j^2} \frac{\dt}{\dr} \left [ \left( r^2 \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j+\myhalf} - \left( r^2 \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j-\myhalf} \right].\]</div>
 <p>In order to compute the time-centered edge states, an additional geometric
 term is added to the forcing, due to the spherical discretization of
 (<a class="reference external" href="#eq:flow:base_density">[eq:flow:base_density]</a>):</p>
-<div class="last math notranslate nohighlight">
+<div class="math notranslate nohighlight">
 \[\frac{\partial \rho_0}{\partial t} + w_0 \frac{\partial \rho_0}{\partial r} = - \rho_0 \frac{\partial w_0}{\partial r} - \frac{2 \rho_0 w_0}{r}.\]</div>
 </dd>
 </dl>
 <p>The source code for this operation can be found in advect_base.f90.</p>
-<dl class="docutils">
-<dt><strong>Enforce HSE</strong>:math:<a href="#id19"><span class="problematic" id="id20">`</span></a>[p_0^{inp},rho_0^{inp}]</dt>
-<dd>rightarrow [p_0^{outp}]` has replaced <strong>Advect Base Pressure</strong></dd>
+<dl class="simple">
+<dt><strong>Enforce HSE</strong>:math:<a href="#id19"><span class="problematic" id="id20">`</span></a>[p_0^{inp},rho_0^{inp}]</dt><dd><p>rightarrow [p_0^{outp}]` has replaced <strong>Advect Base Pressure</strong></p>
+</dd>
 </dl>
 <p>from Paper III as the process by which we update the base state
 pressure. Rather than discretizing the evolution equation for
@@ -540,19 +538,17 @@ We are effectively using the location where the <span class="math notranslate no
 <p>The source code for this operation can be found in enforce_HSE.f90.</p>
 <p><strong>Advect Base Enthalpy</strong><span class="math notranslate nohighlight">\([(\rho h)_0^\inp,w_0^\inp,\psi^\inp] \rightarrow [(\rho h)_0^\outp]\)</span>
 is the process by which we update the base state enthalpy through <span class="math notranslate nohighlight">\(\dt\)</span> in time.</p>
-<dl class="docutils">
-<dt>planar:</dt>
-<dd><p class="first">We discretize equation (<a class="reference external" href="#eq:flow:enthalpy_base">[eq:flow:enthalpy_base]</a>), neglecting reaction
+<dl>
+<dt>planar:</dt><dd><p>We discretize equation (<a class="reference external" href="#eq:flow:enthalpy_base">[eq:flow:enthalpy_base]</a>), neglecting reaction
 source terms, to compute the new base state enthalpy,</p>
 <div class="math notranslate nohighlight">
 \[(\rho h)_{0,j}^{\outp} = (\rho h)_{0,j}^{\inp} - \frac{\dt}{\Delta r} \left\{ \left[ (\rho h)_0^{\nph} w_0^{\inp}\right]_{j+\myhalf} - \left[ (\rho h)_0^{\nph} w_0^{\inp}\right]_{j-\myhalf} \right\} + \dt\psi_j^{\inp}.\]</div>
 <p>We compute the time-centered edge states, <span class="math notranslate nohighlight">\((\rho h)_0^{\nph}\)</span>, by discretizing
 an expanded form of equation (<a class="reference external" href="#eq:flow:enthalpy_base">[eq:flow:enthalpy_base]</a>):</p>
-<div class="last math notranslate nohighlight">
+<div class="math notranslate nohighlight">
 \[\frac{\partial (\rho h)_0}{\partial t} + w_0 \frac{\partial (\rho h)_0}{\partial r} = -(\rho h)_0 \frac{\partial w_0}{\partial r} + \psi.\]</div>
 </dd>
-<dt>spherical:</dt>
-<dd><p class="first">The base state enthalpy update now includes the area factors
+<dt>spherical:</dt><dd><p>The base state enthalpy update now includes the area factors
 in the divergences:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
@@ -561,7 +557,7 @@ in the divergences:</p>
 <p>In order to compute the time-centered edge states, an additional geometric
 term is added to the forcing, due to the spherical discretization of
 (<a class="reference external" href="#eq:flow:enthalpy_base">[eq:flow:enthalpy_base]</a>):</p>
-<div class="last math notranslate nohighlight">
+<div class="math notranslate nohighlight">
 \[\frac{\partial (\rho h)_0}{\partial t} + w_0 \frac{\partial (\rho h)_0}{\partial r} = -(\rho h)_0 \frac{\partial w_0}{\partial r} - \frac{2 (\rho h)_0 w_0}{r} + \psi.\]</div>
 </dd>
 </dl>
@@ -572,15 +568,16 @@ are different for planar and spherical geometries.</p>
 <p><strong>Compute</strong> <span class="math notranslate nohighlight">\(w_0\)</span> <strong>Planar</strong>
 <span class="math notranslate nohighlight">\([\Sbar^{\inp},\gammabar^{\inp}, p_0^{\inp},\psi^{\inp}]\rightarrow [w_0^{\outp}]\)</span>:</p>
 <p>In Paper III, we showed that <span class="math notranslate nohighlight">\(\psi=\etarho g\)</span> for planar geometries,
-and derived derived Eq.&nbsp;<a class="reference external" href="#eq:flow:dw0dr_planar">[eq:flow:dw0dr_planar]</a> as an alternate
-expression for Eq.&nbsp;<a class="reference external" href="#eq:w0divergence">[eq:w0 divergence]</a>. We discretize this as:</p>
+and derived derived Eq. <a class="reference external" href="#eq:flow:dw0dr_planar">[eq:flow:dw0dr_planar]</a> as an alternate
+expression for Eq. <a class="reference external" href="#eq:w0divergence">[eq:w0 divergence]</a>. We discretize this as:</p>
 <div class="math notranslate nohighlight">
 \[\frac{w_{0,j+\myhalf}^\outp-w_{0,j-\myhalf}^\outp}{\Delta r} = \left(\Sbar^{\inp} - \frac{1}{\gammabar^{\inp} p_0^{\inp}}\psi^{\inp}\right)_j,\]</div>
 <p>with <span class="math notranslate nohighlight">\(w_{0,-\myhalf}=0\)</span>.</p>
 <p><strong>Compute</strong> <span class="math notranslate nohighlight">\(w_0\)</span> <strong>Spherical</strong>
 :math:<a href="#id21"><span class="problematic" id="id22">`</span></a>[Sbar^{inp},gammabar^{inp},rho_0^{inp},p_0^{inp},etarho^{inp}]</p>
 <blockquote>
-<div>rightarrow[w_0^{outp}]`:</div></blockquote>
+<div><p>rightarrow[w_0^{outp}]`:</p>
+</div></blockquote>
 <p>We begin with equation (<a class="reference external" href="#eq:w0divergence">[eq:w0 divergence]</a>) written in spherical coordinates:</p>
 <div class="math notranslate nohighlight">
 \[\frac{1}{r^2}\frac{\partial}{\partial r} \left (r^2 \beta_0 w_0 \right ) = \beta_0 \left ( \Sbar - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right ).\]</div>
@@ -590,7 +587,7 @@ expression for Eq.&nbsp;<a class="reference external" href="#eq:w0divergence">[e
 <p>giving:</p>
 <div class="math notranslate nohighlight">
 \[\frac{1}{r^2} \frac{\partial}{\partial r} \left (r^2 w_0 \right ) = \Sbar - \frac{1}{\gammabar p_0} \underbrace{\left( \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r} \right)}_{\psi}.\label{eq:psi def}\]</div>
-<p>We solve this equation for <span class="math notranslate nohighlight">\(w_0\)</span> as described in Appendix&nbsp;B of the multilevel paper.</p>
+<p>We solve this equation for <span class="math notranslate nohighlight">\(w_0\)</span> as described in Appendix B of the multilevel paper.</p>
 <p>The source code for this operation can be found in make_w0.f90.</p>
 </div>
 <div class="section" id="sec-flow-singlestep-single-step">
@@ -607,16 +604,16 @@ values for <span class="math notranslate nohighlight">\(w_0^{-\myhalf}, \etarho^
 \pi^{-\myhalf}, S^0\)</span>, and <span class="math notranslate nohighlight">\(S^1\)</span> come from a preliminary pass through
 the algorithm.</p>
 <p><em>React the full state through the first time interval of :math:`dt / 2.`</em></p>
-<dl class="docutils">
-<dt>Call <strong>React State</strong>:math:<a href="#id23"><span class="problematic" id="id24">`</span></a>[rho^n, (rho h)^n, X_k^n, T^n, (rhoHext)^n, p_0^n]</dt>
-<dd>rightarrow [rho^{(1)},(rho h)^{(1)},X_k^{(1)},T^{(1)},(rho omegadot_k)^{(1)},(rho Hnuc)^{(1)}]`.</dd>
+<dl class="simple">
+<dt>Call <strong>React State</strong>:math:<a href="#id23"><span class="problematic" id="id24">`</span></a>[rho^n, (rho h)^n, X_k^n, T^n, (rhoHext)^n, p_0^n]</dt><dd><p>rightarrow [rho^{(1)},(rho h)^{(1)},X_k^{(1)},T^{(1)},(rho omegadot_k)^{(1)},(rho Hnuc)^{(1)}]`.</p>
+</dd>
 </dl>
 <p><em>Compute the provisional time-centered expansion,
 :math:`S^{nph,starstar}`, provisional base state velocity,
 :math:`w_0^{nph,star}`, and provisional base state velocity forcing.</em></p>
 <p>Compute <span class="math notranslate nohighlight">\(S^{\nph,\star\star}\)</span>. We compute an estimate for the
 time-centered expansion term in the velocity divergence constraint,
-as given in Eq.&nbsp;<a class="reference external" href="#eq:flow:S">[eq:flow:S]</a>. For the first time step (<span class="math notranslate nohighlight">\(n=0\)</span>),
+as given in Eq. <a class="reference external" href="#eq:flow:S">[eq:flow:S]</a>. For the first time step (<span class="math notranslate nohighlight">\(n=0\)</span>),
 we set</p>
 <div class="math notranslate nohighlight">
 \[S^{n+\myhalf,\star\star} = \frac{S^0 + S^1}{2},\]</div>
@@ -639,7 +636,7 @@ time levels</p>
 <div class="line"><strong>Compute</strong> <span class="math notranslate nohighlight">\(w_0\)</span> <strong>Spherical</strong><span class="math notranslate nohighlight">\([\overline{S^{\nph,\star\star}},\overline{\Gamma_1^n},\rho_0^n,p_0^n,\etarho^{n-\myhalf}] \rightarrow [w_0^{\nph,\star}]\)</span>.</div>
 </div>
 <p>Compute the provisional base state velocity forcing, using equation (38)
-from paper&nbsp;III,</p>
+from paper III,</p>
 <div class="math notranslate nohighlight">
 \[-\frac{\beta_0}{\rho_0} \frac{\partial (\pi_0/\beta_0)}{\partial r} = \frac{\partial w_0}{\partial t} + w_0 \frac{\partial w_0}{\partial r}, \label{eq:pizero}\]</div>
 <p>with the following discretization:</p>
@@ -653,7 +650,7 @@ w_0^{n,\star} &amp;=&amp; \frac{\dt^{n} w_0^{\nmh} + \dt^{n-1} w_0^{\nph,\star}}
 <p>If <span class="math notranslate nohighlight">\(n=0\)</span>, we use <span class="math notranslate nohighlight">\(\dt^{-1} = \dt^0\)</span>.</p>
 <p><em>Construct the provisional time-centered advective velocity on
 edges, :math:`uadvone`.</em></p>
-<p>The local velocity field is described by Eq.&nbsp;<a class="reference external" href="#eq:flow:utildeupd">[eq:flow:utildeupd]</a>.
+<p>The local velocity field is described by Eq. <a class="reference external" href="#eq:flow:utildeupd">[eq:flow:utildeupd]</a>.
 From this, we compute time-centered edge
 velocities, <span class="math notranslate nohighlight">\(\uadvonedag\)</span>, using
 <span class="math notranslate nohighlight">\(\Ub = \Ubt^n + w_0^{\nph,\star}\)</span>. The <span class="math notranslate nohighlight">\(\dagger\)</span> superscript refers to the
@@ -673,18 +670,18 @@ constructing <span class="math notranslate nohighlight">\(\beta_0\)</span> is en
 <p>Update <span class="math notranslate nohighlight">\(\rho_0\)</span>, saving the time-centered density at radial edges by calling</p>
 <p><strong>Advect Base Density</strong><span class="math notranslate nohighlight">\([\rho_0^{n},w_0^{\nph,\star}] \rightarrow [\rho_0^{(2a),\star}, \rho_0^{\nph,\star,\pred}]\)</span>.</p>
 <p>Update <span class="math notranslate nohighlight">\((\rho X_k)\)</span> using a discretized version of the species
-continuity equation, Eq.&nbsp;<a class="reference external" href="#eq:flow:rhoX">[eq:flow:rhoX]</a>, where we omit the
+continuity equation, Eq. <a class="reference external" href="#eq:flow:rhoX">[eq:flow:rhoX]</a>, where we omit the
 reaction terms, which were already accounted for in <strong>React State</strong>:</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial (\rho X_k)}{\partial t} + \nabla \cdot (\Ub \rho X_k) = 0 \enskip .
 \label{eq:species}\]</div>
 <p>The update consists of two steps:</p>
 <ol class="arabic">
-<li><p class="first">Compute the time-centered species edge states, <span class="math notranslate nohighlight">\((\rho X_k)^{\nph,\star,\pred}\)</span>,
+<li><p>Compute the time-centered species edge states, <span class="math notranslate nohighlight">\((\rho X_k)^{\nph,\star,\pred}\)</span>,
 for the conservative update of <span class="math notranslate nohighlight">\((\rho X_k)^{(1)}\)</span>.</p>
 <div class="line-block">
 <div class="line">There are a variety of choices of quantities to predict to the
-edges (controlled by species_pred_type—see Chapter&nbsp;<a class="reference external" href="#ch:pert">[ch:pert]</a>).
+edges (controlled by species_pred_type—see Chapter <a class="reference external" href="#ch:pert">[ch:pert]</a>).
 By default, we use the equations</div>
 </div>
 <blockquote>
@@ -710,7 +707,7 @@ Then,</p>
 <div class="line"><span class="math notranslate nohighlight">\((\rho X_k)^{\nph,\star,\pred} = \rho^{\nph,\star,\pred} \, X_k^{\nph,\star,\pred}\)</span>.</div>
 </div>
 </li>
-<li><p class="first">Evolve <span class="math notranslate nohighlight">\((\rho X_k)^{(1)} \rightarrow (\rho X_k)^{(2),\star}\)</span> using</p>
+<li><p>Evolve <span class="math notranslate nohighlight">\((\rho X_k)^{(1)} \rightarrow (\rho X_k)^{(2),\star}\)</span> using</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 (\rho X_k)^{(2),\star} &amp;=&amp; (\rho X_k)^{(1)} \nonumber \\
@@ -721,7 +718,7 @@ Then,</p>
 X_k^{(2),\star} = (\rho X_k)^{(2),\star} / \rho^{(2),\star}.\]</div>
 </li>
 </ol>
-<p>Define a radial edge-centered <span class="math notranslate nohighlight">\(\etarho^{\nph,\star}\)</span> (Eq.&nbsp;<a class="reference external" href="#eq:flow:etarho">[eq:flow:etarho]</a>).</p>
+<p>Define a radial edge-centered <span class="math notranslate nohighlight">\(\etarho^{\nph,\star}\)</span> (Eq. <a class="reference external" href="#eq:flow:etarho">[eq:flow:etarho]</a>).</p>
 <p>For planar geometry, since <span class="math notranslate nohighlight">\(\etarho = \overline{\rho'(\Ub\cdot\eb_r)} = \overline{\rho(\Ub\cdot\eb_r)}-\overline{\rho_0(\Ub\cdot\eb_r}) = \overline{\rho(\Ub\cdot\eb_r)} - \rho_0w_0\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
@@ -766,7 +763,7 @@ Then, call</div>
 <div class="line"><strong>Advect Base Enthalpy</strong><span class="math notranslate nohighlight">\([(\rho h)_0^{n}, w_0^{\nph,\star}, \psi^{\nph,\star}] \rightarrow [(\rho h)_0^{n+1,\star}]\)</span>.</div>
 </div>
 <p>Update the enthalpy using a discretized version of the enthalpy
-evolution equation (Eq.&nbsp;<a class="reference external" href="#eq:flow:enthalpy">[eq:flow:enthalpy]</a>), again omitting the reaction and heating terms
+evolution equation (Eq. <a class="reference external" href="#eq:flow:enthalpy">[eq:flow:enthalpy]</a>), again omitting the reaction and heating terms
 since we already accounted for
 them in <strong>React State</strong>. This equation takes the form:</p>
 <div class="math notranslate nohighlight">
@@ -781,8 +778,8 @@ equilibrium. The update consists of two steps:</p>
 for the conservative update of <span class="math notranslate nohighlight">\((\rho h)^{(1)}\)</span>. There are a
 variety of quantities that we can predict to the interfaces here
 (controlled by enthalpy_pred_type—see
-Chapter&nbsp;<a class="reference external" href="#ch:pert">[ch:pert]</a>). For the default case, we use the
-perturbational enthalpy equation, Eq.&nbsp;<a class="reference external" href="#eq:flow:rhohprime">[eq:flow:rhohprime]</a>, neglecting reactions,</p>
+Chapter <a class="reference external" href="#ch:pert">[ch:pert]</a>). For the default case, we use the
+perturbational enthalpy equation, Eq. <a class="reference external" href="#eq:flow:rhohprime">[eq:flow:rhohprime]</a>, neglecting reactions,</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial(\rho h)'}{\partial t} = -\Ub\cdot\nabla(\rho h)' -
    (\rho h)'\nabla\cdot\Ub - \nabla\cdot\left[(\rho h)_0\Ubt\right] + \Ubt\cdot\nabla p_0
@@ -823,10 +820,11 @@ we recompute enthalpy using</p>
 <p>Update the temperature using the equation of state:
 :math:<a href="#id27"><span class="problematic" id="id28">`</span></a>T^{(2),star} =</p>
 <blockquote>
-<div>T(rho^{(2),star}, h^{(2),star}, X_k^{(2),star})` (planar geometry) or</div></blockquote>
-<dl class="docutils">
-<dt>:math:<a href="#id29"><span class="problematic" id="id30">`</span></a>T^{(2),star} =</dt>
-<dd>T(rho^{(2),star}, p_0^{n+1,star}, X_k^{(2),star})` (spherical geometry).</dd>
+<div><p>T(rho^{(2),star}, h^{(2),star}, X_k^{(2),star})` (planar geometry) or</p>
+</div></blockquote>
+<dl class="simple">
+<dt>:math:<a href="#id29"><span class="problematic" id="id30">`</span></a>T^{(2),star} =</dt><dd><p>T(rho^{(2),star}, p_0^{n+1,star}, X_k^{(2),star})` (spherical geometry).</p>
+</dd>
 </dl>
 <p>As before, this behavior is controlled by use_tfromp.</p>
 <p><em>React the full state through a second time interval of :math:`dt / 2.`</em></p>
@@ -842,9 +840,9 @@ velocity, :math:`w_0^{nph}`, and base state velocity forcing.</em></p>
 \[S^{n+1,\star} =  -\sigma  \sum_k  \xi_k  (\omegadot_k)^{(2),\star}  +
    \frac{1}{\rho^{n+1,\star} p_\rho} \sum_k p_{X_k}  ({\omegadot}_k)^{(2),\star} +
    \sigma \Hnuc^{(2),\star} + \sigma \Hext^{(2),\star},\]</div>
-<dl class="docutils">
-<dt>where :math:<a href="#id31"><span class="problematic" id="id32">`</span></a>(omegadot_k)^{(2),star} = (rho omegadot_k)^{(2),star} /</dt>
-<dd>rho^{(2),star}` and the thermodynamic quantities are defined using</dd>
+<dl class="simple">
+<dt>where :math:<a href="#id31"><span class="problematic" id="id32">`</span></a>(omegadot_k)^{(2),star} = (rho omegadot_k)^{(2),star} /</dt><dd><p>rho^{(2),star}` and the thermodynamic quantities are defined using</p>
+</dd>
 </dl>
 <p><span class="math notranslate nohighlight">\(\rho^{n+1,\star}, X_k^{n+1,\star},\)</span> and <span class="math notranslate nohighlight">\(T^{n+1,\star}\)</span> as inputs to
 the equation of state. If we are using diffusion then we would include the diffusion
@@ -902,7 +900,7 @@ and <span class="math notranslate nohighlight">\(\pi_0^{n,\star}\)</span>. We no
 the updated values <span class="math notranslate nohighlight">\(w_0^{\nph}, \uadvtwo\)</span>, and <span class="math notranslate nohighlight">\(\rho_0^{(2a)}\)</span> rather than
 <span class="math notranslate nohighlight">\(w_0^{\nph,\star}, \uadvone\)</span>, and <span class="math notranslate nohighlight">\(\rho_0^{(2a),\star}\)</span>. In particular:</p>
 <ol class="arabic">
-<li><p class="first">Compute the time-centered species edge states, <span class="math notranslate nohighlight">\((\rho X_k)^{\nph,\pred}\)</span>,
+<li><p>Compute the time-centered species edge states, <span class="math notranslate nohighlight">\((\rho X_k)^{\nph,\pred}\)</span>,
 for the conservative update of <span class="math notranslate nohighlight">\((\rho X_k)^{(1)}\)</span>. We use equations
 (<a class="reference external" href="#eq:PerturbationalDensity">[eq:Perturbational Density]</a>) and (<a class="reference external" href="#eq:PrimitiveSpecies">[eq:Primitive Species]</a>) to
 predict <span class="math notranslate nohighlight">\(\rho^{'(1)} = \rho^{(1)} - \rho_0^n\)</span> and
@@ -914,7 +912,7 @@ We convert the perturbational density to a full state density using</p>
 \[\rho^{\nph,\pred} = \rho^{'\nph,\pred} + \frac{\rho_0^n + \rho_0^{(2a)}}{2}.\]</div>
 <p>Then, <span class="math notranslate nohighlight">\((\rho X_k)^{\nph,\pred} = \rho^{\nph,\pred} \, X_k^{\nph,\pred}\)</span>.</p>
 </li>
-<li><p class="first">Evolve <span class="math notranslate nohighlight">\((\rho X_k)^{(1)} \rightarrow (\rho X_k)^{(2)}\)</span> using</p>
+<li><p>Evolve <span class="math notranslate nohighlight">\((\rho X_k)^{(1)} \rightarrow (\rho X_k)^{(2)}\)</span> using</p>
 <div class="math notranslate nohighlight">
 \[(\rho X_k)^{(2)} = (\rho X_k)^{(1)}
 - \dt \left\{ \nabla \cdot \left[\left(\uadvtwo+w_0^{\nph} \eb_r\right)
@@ -998,10 +996,11 @@ We convert the perturbational enthalpy to a full state enthalpy using</p>
 <p>Update the temperature using the equation of state:
 :math:<a href="#id33"><span class="problematic" id="id34">`</span></a>T^{(2)} =</p>
 <blockquote>
-<div>T(rho^{(2)}, h^{(2)}, X_k^{(2)})` (planar geometry) or</div></blockquote>
-<dl class="docutils">
-<dt>:math:<a href="#id35"><span class="problematic" id="id36">`</span></a>T^{(2)} =</dt>
-<dd>T(rho^{(2)}, p_0^{n+1}, X_k^{(2)})` (spherical geometry).</dd>
+<div><p>T(rho^{(2)}, h^{(2)}, X_k^{(2)})` (planar geometry) or</p>
+</div></blockquote>
+<dl class="simple">
+<dt>:math:<a href="#id35"><span class="problematic" id="id36">`</span></a>T^{(2)} =</dt><dd><p>T(rho^{(2)}, p_0^{n+1}, X_k^{(2)})` (spherical geometry).</p>
+</dd>
 </dl>
 <p>Again, the actual inputs depend of use_tfromp.</p>
 <p><em>React the full state through a second time interval of :math:`dt / 2.`</em></p>
@@ -1011,7 +1010,7 @@ We convert the perturbational enthalpy to a full state enthalpy using</p>
 </div>
 <p><em>Define the new time expansion, :math:`S^{n+1}`, and :math:`overline{Gamma_1^{n+1}}`.</em></p>
 <ol class="arabic">
-<li><p class="first">Define</p>
+<li><p>Define</p>
 <div class="math notranslate nohighlight">
 \[S^{n+1} =  -\sigma  \sum_k  \xi_k (\omegadot_k)^{(2)}  + \sigma \Hnuc^{(2)} +
   \frac{1}{\rho^{n+1} p_\rho} \sum_k p_{X_k}  ({\omegadot}_k)^{(2)}
@@ -1025,7 +1024,7 @@ Then, compute</p>
 <div class="math notranslate nohighlight">
 \[\overline{S^{n+1}} = {\mathrm{\bf Avg}} (S^{n+1}).\]</div>
 </li>
-<li><p class="first">Define</p>
+<li><p>Define</p>
 <div class="math notranslate nohighlight">
 \[\overline{\Gamma_1^{n+1}} = {\rm{\bf Avg}}\left[\Gamma_1\left(\rho^{n+1}, p_0^{n+1},
 X_k^{n+1}\right) \right].\]</div>
@@ -1071,36 +1070,36 @@ as computed in <strong>Step 11</strong>.</p>
 </div>
 <div class="section" id="volume-discrepancy-changes">
 <h3>Volume Discrepancy Changes<a class="headerlink" href="#volume-discrepancy-changes" title="Permalink to this headline">¶</a></h3>
-<p>Chapter&nbsp;<a class="reference external" href="#ch:volume">[ch:volume]</a> describes the reasoning behind the volume discrepancy
+<p>Chapter <a class="reference external" href="#ch:volume">[ch:volume]</a> describes the reasoning behind the volume discrepancy
 term—a forcing term added to the constraint equation to bring us back to
 the equation of state. This addition of this term (enabled with dpdt_factor= T) modifies our
 equation set in the following way:</p>
 <ul>
-<li><p class="first">In <strong>Step 2B</strong>, to compute <span class="math notranslate nohighlight">\(w_0\)</span>, we need to account for the volume discrepancy
+<li><p>In <strong>Step 2B</strong>, to compute <span class="math notranslate nohighlight">\(w_0\)</span>, we need to account for the volume discrepancy
 term by first defining <span class="math notranslate nohighlight">\(p_{\rm EOS}^n = \overline{p(\rho,h,X_k)^n}\)</span>, and then using:</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial w_0^{\nph,\star}}{\partial r} = \overline{S^{\nph,\star\star}} - \frac{1}{\overline{\Gamma_1^n}p_0^n}\psi^{\nmh} - \underbrace{\frac{f}{\overline{\Gamma_1^n}p_0^n}\left(\frac{p_0^n-\overline{p_{\rm EOS}^n}}{\Delta t}\right)}_{\delta\chi_{w_0}}.\]</div>
 </li>
-<li><p class="first">In <strong>Step 3</strong>, the MAC projection should account for the volume discrepancy term:</p>
+<li><p>In <strong>Step 3</strong>, the MAC projection should account for the volume discrepancy term:</p>
 <div class="math notranslate nohighlight">
 \[\nabla \cdot \left(\beta_0^n \uadvone\right) =
 \beta_0^n \left[ \left(S^{\nph,\star\star} - \overline{S^{\nph,\star\star}}\right)
 + \underbrace{\frac{f}{\gammabar^n p_0^n}
 \left(\frac{p_{\rm EOS}^n - \overline{p_{\rm EOS}^n}}{\Delta t^n}\right)}_{\delta\chi}\right].\]</div>
 </li>
-<li><p class="first">In <strong>Step 6B</strong>, to compute <span class="math notranslate nohighlight">\(w_0\)</span>, we need to account for the volume discrepancy
+<li><p>In <strong>Step 6B</strong>, to compute <span class="math notranslate nohighlight">\(w_0\)</span>, we need to account for the volume discrepancy
 term by first defining <span class="math notranslate nohighlight">\(p_{\rm EOS}^{n+1,\star} = p(\rho,h,X_k)^{n+1,\star}\)</span>,
 <span class="math notranslate nohighlight">\(\overline{\Gamma_1^{\nph,\star}} = (\overline{\Gamma_1^{n}}+\overline{\Gamma_1^{n+1,\star}})/2\)</span>,
 and <span class="math notranslate nohighlight">\(p^{\nph,\star} = (p^{n}+p^{n+1,\star})/2\)</span>, and then using:</p>
 <div class="math notranslate nohighlight">
 \[\frac{\partial w_0^{\nph}}{\partial r} = \overline{S^{\nph,\star}} - \frac{1}{\overline{\Gamma_1^{\nph,\star}}p_0^{\nph,\star}}\psi^{\nph,\star} - \frac{f}{\overline{\Gamma_1^{n+1,\star}}p_0^{n+1,\star}}\left(\frac{p_0^{n+1,\star}-\overline{p_{\rm EOS}^{n+1,\star}}}{\Delta t}\right) - \delta\chi_{w_0}\]</div>
 </li>
-<li><p class="first">In <strong>Step 7</strong>, the MAC projection should account for the volume discrepancy term:</p>
+<li><p>In <strong>Step 7</strong>, the MAC projection should account for the volume discrepancy term:</p>
 <div class="math notranslate nohighlight">
 \[\nabla \cdot \left(\beta_0^{\nph,\star} \uadvtwo\right) = \beta_0^{\nph,\star}\left[\left(S^{\nph,\star} - \overline{S^{\nph,\star}}\right) + \frac{f}{\overline{\Gamma_1^{n+1,\star}} p_0^{n+1,\star}} \left(\frac{p_{\rm EOS}^{n+1,\star} - \overline{p_{\rm EOS}^{n+1,\star}}}{\Delta t^n}\right) + \delta\chi\right],\]</div>
 <p>where <span class="math notranslate nohighlight">\(p(\rho,h,X_k)^{\nph,\star} = \left[p(\rho,h,X_k)^n +p(\rho,h,X_k)^{n+1,\star}\right]/2\)</span>.</p>
 </li>
-<li><p class="first">In <strong>Step 11</strong>, the approximate projection should account for the volume
+<li><p>In <strong>Step 11</strong>, the approximate projection should account for the volume
 discrepancy term:</p>
 <div class="math notranslate nohighlight">
 \[\nabla \cdot \left(\beta_0^{\nph} \Ubt^{n+1} \right)  = \beta_0^{\nph}\left\{  \left(S^{n+1} - \overline{S^{n+1}} \right)
@@ -1115,8 +1114,8 @@ discrepancy term:</p>
 the background hydrostatic pressure takes the form:</p>
 <div class="math notranslate nohighlight">
 \[\nablab \cdotb \Ub + \frac{1}{\Gamma_1 p_0} \frac{Dp_0}{Dt} = S \enskip .\]</div>
-<p>The default MAESTROeX&nbsp;algorithm replaces <span class="math notranslate nohighlight">\(\Gamma_1\)</span> with <span class="math notranslate nohighlight">\(\gammabar\)</span>,
-allowing us to write this as a divergence constraint. In paper&nbsp;III,
+<p>The default MAESTROeX algorithm replaces <span class="math notranslate nohighlight">\(\Gamma_1\)</span> with <span class="math notranslate nohighlight">\(\gammabar\)</span>,
+allowing us to write this as a divergence constraint. In paper III,
 we explored the effects of localized variations in <span class="math notranslate nohighlight">\(\Gamma_1\)</span> by
 writing <span class="math notranslate nohighlight">\(\Gamma_1 = \gammabar + \delta \Gamma_1\)</span>. This gives us:</p>
 <div class="math notranslate nohighlight">
@@ -1141,7 +1140,7 @@ have</p>
             \left [ \frac{\partial p_0}{\partial t} + \Ub \cdotb \nablab p_0 \right ]}_{\mbox{second order corrections}} \enskip , \label{eq:gammafull}\]</div>
 <div class="section" id="keeping-to-first-order-in-delta-gamma-1">
 <h4>Keeping to First Order in <span class="math notranslate nohighlight">\(\delta\Gamma_1\)</span><a class="headerlink" href="#keeping-to-first-order-in-delta-gamma-1" title="Permalink to this headline">¶</a></h4>
-<p>The base state evolution equation is the average of Eq.&nbsp;<a class="reference external" href="#eq:gammafull">[eq:gammafull]</a> over a layer</p>
+<p>The base state evolution equation is the average of Eq. <a class="reference external" href="#eq:gammafull">[eq:gammafull]</a> over a layer</p>
 <div class="math notranslate nohighlight">
 \[\nablab \cdot w_0 \er + \frac{1}{\gammabar p_0} w_0 \er \cdotb \nablab p_0 =
 \Sbar - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} + \overline{
@@ -1160,7 +1159,7 @@ Subtracting this from equation (<a class="reference external" href="#eq:gammaful
 \overline{ \left ( \frac{\delta \Gamma_1}{\gammabar^2 p_0} \Ubt \cdotb \nablab
   p_0 \right ) } \enskip , \label{eq:base_w0_with_dgamma1}\]</div>
 <p>for plane-parallel geometries (analogous to
-Eq.&nbsp;<a class="reference external" href="#eq:flow:dw0dr_planar">[eq:flow:dw0dr_planar]</a>), and</p>
+Eq. <a class="reference external" href="#eq:flow:dw0dr_planar">[eq:flow:dw0dr_planar]</a>), and</p>
 <div class="math notranslate nohighlight">
 \[\nablab \cdotb (\beta_0 \Ubt) = \beta_0 \left [ S - \Sbar + \frac{\delta
     \Gamma_1}{\gammabar^2 p_0} \psi + \frac{\delta \Gamma_1}{\gammabar^2 p_0}
@@ -1169,16 +1168,15 @@ Eq.&nbsp;<a class="reference external" href="#eq:flow:dw0dr_planar">[eq:flow:dw0
  \enskip ,  \label{eq:constraint_with_delta_gamma}\]</div>
 <p>This constraint is not in a form that can be projected. To solve this
 form, we need to use a lagged <span class="math notranslate nohighlight">\(\Ubt\)</span> in the righthand side.</p>
-<p>This change comes into MAESTROeX&nbsp;in a variety of steps, summarized here.
+<p>This change comes into MAESTROeX in a variety of steps, summarized here.
 To enable this portion of the algorithm, set use_delta_gamma1_term = T.</p>
 <ul>
-<li><p class="first">In <strong>Step 3</strong>, we are doing the “predictor” portion of the
-MAESTROeX&nbsp;algorithm, getting the MAC velocity that satisfies the constraint,
+<li><p>In <strong>Step 3</strong>, we are doing the “predictor” portion of the
+MAESTROeX algorithm, getting the MAC velocity that satisfies the constraint,
 so we do not try to incorporate the <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> effect. We set
 all the <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> terms in
-Eq.&nbsp;<a class="reference external" href="#eq:constraint_with_delta_gamma">[eq:constraint_with_delta_gamma]</a> to zero.</p>
-</li>
-<li><p class="first">In <strong>Step 6</strong>, we are computing the new time-centered source,
+Eq. <a class="reference external" href="#eq:constraint_with_delta_gamma">[eq:constraint_with_delta_gamma]</a> to zero.</p></li>
+<li><p>In <strong>Step 6</strong>, we are computing the new time-centered source,
 <span class="math notranslate nohighlight">\(S^{\nph,\star}\)</span> and the base state velocity, <span class="math notranslate nohighlight">\(w_0^\nph\)</span>. Now we can
 incorporate the <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> effect. First we construct:</p>
 <div class="math notranslate nohighlight">
@@ -1196,7 +1194,7 @@ to include this average:</p>
 \[\overline{S^{\nph,\star}} \leftarrow \overline{S^{\nph,\star}} +
    \overline{\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0}\]</div>
 </li>
-<li><p class="first">In <strong>Step 7</strong>, we now include the <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> term in the righthand
+<li><p>In <strong>Step 7</strong>, we now include the <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> term in the righthand
 side for the constraint by solving:</p>
 <div class="math notranslate nohighlight">
 \[\nabla \cdot \left(\beta_0^{\nph,\star} \uadvtwo\right) =
@@ -1206,10 +1204,10 @@ side for the constraint by solving:</p>
          (\psi^{\nph,\star} + \Ubt^n \cdotb \nablab p_0^n)
 \right)\]</div>
 <p>We note that this includes the average of the correction term as shown
-in Eq.&nbsp;<a class="reference external" href="#eq:constraint_with_delta_gamma">[eq:constraint_with_delta_gamma]</a> because we modified
+in Eq. <a class="reference external" href="#eq:constraint_with_delta_gamma">[eq:constraint_with_delta_gamma]</a> because we modified
 <span class="math notranslate nohighlight">\(\bar{S}\)</span> to include this already.</p>
 </li>
-<li><p class="first">In <strong>Step 10</strong>, we do a construction much like that done in <strong>Step 6</strong>,
+<li><p>In <strong>Step 10</strong>, we do a construction much like that done in <strong>Step 6</strong>,
 but with the time-centerings of some of the quantities changed.
 First we construct:</p>
 <div class="math notranslate nohighlight">
@@ -1226,7 +1224,7 @@ First we construct:</p>
 \[\overline{S^{n+1}} \leftarrow \overline{S^{n+1}} +
    \overline{\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0}\]</div>
 </li>
-<li><p class="first">In <strong>Step 11</strong>, we modify the source of the constraint to include the
+<li><p>In <strong>Step 11</strong>, we modify the source of the constraint to include the
 <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> information. In particular, we solve:</p>
 <div class="math notranslate nohighlight">
 \[\nabla \cdot \left(\beta_0^{\nph} \Ubt^{n+1} \right)
@@ -1241,7 +1239,7 @@ First we construct:</p>
 </div>
 <div class="section" id="thermal-diffusion-changes">
 <span id="sec-flow-diffusion"></span><h3>Thermal Diffusion Changes<a class="headerlink" href="#thermal-diffusion-changes" title="Permalink to this headline">¶</a></h3>
-<p>Thermal diffusion was introduced in the XRB paper&nbsp;<a href="#id37"><span class="problematic" id="id38">:raw-latex:`\cite{xrb}`</span></a>. This
+<p>Thermal diffusion was introduced in the XRB paper <a href="#id37"><span class="problematic" id="id38">:raw-latex:`\cite{xrb}`</span></a>. This
 introduces a new term to <span class="math notranslate nohighlight">\(S\)</span> as well as the enthalpy equation.
 Treating the enthalpy equation now requires a parabolic solve. We describe
 that process here.</p>
@@ -1323,7 +1321,7 @@ determine <span class="math notranslate nohighlight">\((\rho h)^{\initp}\)</span
 the initial data. The next part of the initialization process
 proceeds as follows.</p>
 <ol class="arabic">
-<li><p class="first"><em>Initial Projection</em>: if do_initial_projection = T, then we
+<li><p><em>Initial Projection</em>: if do_initial_projection = T, then we
 first project the velocity field with <span class="math notranslate nohighlight">\(\rho = 1\)</span> and <span class="math notranslate nohighlight">\(\beta_0^0\)</span>.
 The initial projection does not see reactions
 or external heating, and thus we set <span class="math notranslate nohighlight">\(\dot\omega = \Hnuc = \Hext = 0\)</span> in <span class="math notranslate nohighlight">\(S\)</span>.
@@ -1337,27 +1335,22 @@ The elliptic equation we solve is</p>
 <p>This <span class="math notranslate nohighlight">\(\phi\)</span> is then used to correct the velocity field to obtain <span class="math notranslate nohighlight">\(\Ub^{0,0}\)</span>.
 If do_initial_projection = F, set <span class="math notranslate nohighlight">\(\Ub^{0,0} = \Ub^{\initp}\)</span>.</p>
 </li>
-<li><p class="first"><em>“Divu” iterations</em>: Next we do init_divu_iter iterations
+<li><p><em>“Divu” iterations</em>: Next we do init_divu_iter iterations
 to project the velocity field using a constraint that sees reactions
 and external heating.
 The initial timestep estimate is provided by firstdt and
 <span class="math notranslate nohighlight">\(\Ub^{0,0}\)</span>, to allow us to compute the effect of reactions over <span class="math notranslate nohighlight">\(\Delta t/2\)</span>.</p>
 <p><strong>Do</strong> <span class="math notranslate nohighlight">\(\nu = 1,...,N_{\rm iters}^{S}\)</span>.</p>
 <ol class="arabic">
-<li><p class="first">Estimate <span class="math notranslate nohighlight">\(\Delta t^\nu\)</span> using <span class="math notranslate nohighlight">\(\Ub^{0,\nu-1}\)</span> and <span class="math notranslate nohighlight">\(w_0^{\nu-1}.\)</span></p>
-</li>
-<li><p class="first"><strong>React State</strong><span class="math notranslate nohighlight">\([ \rho^{\initp},(\rho h)^{\initp}, X_k^{\initp}, T^{\initp},
+<li><p>Estimate <span class="math notranslate nohighlight">\(\Delta t^\nu\)</span> using <span class="math notranslate nohighlight">\(\Ub^{0,\nu-1}\)</span> and <span class="math notranslate nohighlight">\(w_0^{\nu-1}.\)</span></p></li>
+<li><p><strong>React State</strong><span class="math notranslate nohighlight">\([ \rho^{\initp},(\rho h)^{\initp}, X_k^{\initp}, T^{\initp},
 (\rho^{\initp} \Hext), p_0^{\initp}] \rightarrow [\rho^{\outp}, (\rho h)^{\outp},
-X_k^{\outp}, T^{\outp}, (\rho \omegadot_k)^{0,\nu} ].\)</span></p>
-</li>
-<li><p class="first">Compute <span class="math notranslate nohighlight">\(S^{0,\nu}\)</span> from equation (<a class="reference external" href="#eq:defineS">[eq:defineS]</a>)
-using <span class="math notranslate nohighlight">\((\rho \omegadot_k)^{0,\nu}\)</span> and the initial data.</p>
-</li>
-<li><p class="first">Compute <span class="math notranslate nohighlight">\(\overline{S^{0,\nu}} = {\mathrm{\bf Avg}} (S^{0,\nu}).\)</span></p>
-</li>
-<li><p class="first">Compute <span class="math notranslate nohighlight">\(w_0^{\nu}\)</span> as in <strong>Step 2B</strong> using <span class="math notranslate nohighlight">\(\overline{S^{0,\nu}}\)</span> and <span class="math notranslate nohighlight">\(\psi=0\)</span>.</p>
-</li>
-<li><p class="first">Project <span class="math notranslate nohighlight">\(\Ub^{0,\nu-1}\)</span> using <span class="math notranslate nohighlight">\(\beta_0^0\)</span> and
+X_k^{\outp}, T^{\outp}, (\rho \omegadot_k)^{0,\nu} ].\)</span></p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\(S^{0,\nu}\)</span> from equation (<a class="reference external" href="#eq:defineS">[eq:defineS]</a>)
+using <span class="math notranslate nohighlight">\((\rho \omegadot_k)^{0,\nu}\)</span> and the initial data.</p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\(\overline{S^{0,\nu}} = {\mathrm{\bf Avg}} (S^{0,\nu}).\)</span></p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\(w_0^{\nu}\)</span> as in <strong>Step 2B</strong> using <span class="math notranslate nohighlight">\(\overline{S^{0,\nu}}\)</span> and <span class="math notranslate nohighlight">\(\psi=0\)</span>.</p></li>
+<li><p>Project <span class="math notranslate nohighlight">\(\Ub^{0,\nu-1}\)</span> using <span class="math notranslate nohighlight">\(\beta_0^0\)</span> and
 <span class="math notranslate nohighlight">\((S^{0,\nu} - \overline{S^{0,\nu}})\)</span> as the source term.
 This yields <span class="math notranslate nohighlight">\(\Ub^{0,\nu}.\)</span> In this projection, again the density is
 set to 1, and the elliptic equation we solve is:</p>
@@ -1374,11 +1367,11 @@ set to 1, and the elliptic equation we solve is:</p>
 and <span class="math notranslate nohighlight">\(\pi^{-\myhalf}\)</span>. As initial approximations, set
 <span class="math notranslate nohighlight">\(\etarho^{-\myhalf}=0, \psi^{-\myhalf}=0, S^{1,0}=S^0\)</span>, and <span class="math notranslate nohighlight">\(\pi^{-\myhalf}=0.\)</span></p>
 <ol class="arabic">
-<li><p class="first"><em>Pressure iterations</em>: Here we do init_iter iterations to get an
+<li><p><em>Pressure iterations</em>: Here we do init_iter iterations to get an
 approximation for the lagged pressure:</p>
 <p><strong>Do</strong> <span class="math notranslate nohighlight">\(\nu = 1,...,N_{\rm iters}^{\pi}\)</span>.</p>
 <ol class="arabic">
-<li><p class="first">Perform <strong>Steps 1-11</strong> as described above, using
+<li><p>Perform <strong>Steps 1-11</strong> as described above, using
 <span class="math notranslate nohighlight">\(S^{\myhalf,\star\star} = (S^0 + S^{1,\nu-1})/2\)</span> in <strong>Step 2</strong> as described.
 The only other difference in the time advancement is that in <strong>Step 11</strong>
 we define <span class="math notranslate nohighlight">\({\bf V} = (\Ubt^{1,\star} - \Ubt^0)\)</span> and solve</p>
@@ -1393,41 +1386,40 @@ we discard, and new values for <span class="math notranslate nohighlight">\(\eta
 <span class="math notranslate nohighlight">\(\psi^{\myhalf}\)</span> (<strong>Step 8F</strong>),
 <span class="math notranslate nohighlight">\(S^{1,\nu}\)</span> (<strong>Step 10A</strong>), and <span class="math notranslate nohighlight">\(\pi^{\myhalf}\)</span> (<strong>Step 11</strong>), which we keep.</p>
 </li>
-<li><p class="first">Set <span class="math notranslate nohighlight">\(\pi^{-\myhalf} = \pi^{\myhalf}\)</span>, <span class="math notranslate nohighlight">\(\etarho^{-\myhalf} = \etarho^{\myhalf}\)</span>,
-and <span class="math notranslate nohighlight">\(\psi^{-\myhalf} = \psi^{\myhalf}\)</span>.</p>
-</li>
+<li><p>Set <span class="math notranslate nohighlight">\(\pi^{-\myhalf} = \pi^{\myhalf}\)</span>, <span class="math notranslate nohighlight">\(\etarho^{-\myhalf} = \etarho^{\myhalf}\)</span>,
+and <span class="math notranslate nohighlight">\(\psi^{-\myhalf} = \psi^{\myhalf}\)</span>.</p></li>
 </ol>
 <p><strong>End do.</strong></p>
 <p>Finally, we define <span class="math notranslate nohighlight">\(S^1 = S^{1,N_{\rm iters}^\pi}.\)</span></p>
 </li>
 </ol>
-<p>The tolerances for these elliptic solves are described in §&nbsp;<a class="reference external" href="#sec:mgtol">[sec:mgtol]</a>.</p>
+<p>The tolerances for these elliptic solves are described in § <a class="reference external" href="#sec:mgtol">[sec:mgtol]</a>.</p>
 </div>
 <div class="section" id="changes-from-earlier-implementations">
 <h2>Changes from Earlier Implementations<a class="headerlink" href="#changes-from-earlier-implementations" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="changes-between-paper-3-and-paper-4">
 <h3>Changes Between Paper 3 and Paper 4<a class="headerlink" href="#changes-between-paper-3-and-paper-4" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
-<li>We defined the mapping of data between a 1D radial array and the 3D Cartesian
-grid for spherical problems (which we improve upon in the multilevel paper).</li>
-<li>We update <span class="math notranslate nohighlight">\(T\)</span> after the call to <strong>React State</strong>.</li>
-<li>We have created a burning_cutoff_density, where the burning does
-not happen below this density. It is presently set to base_cutoff_density.</li>
-<li>Use corner coupling in advection.</li>
-<li>We have an option, controlled by use_tfromp, to update temperature
+<li><p>We defined the mapping of data between a 1D radial array and the 3D Cartesian
+grid for spherical problems (which we improve upon in the multilevel paper).</p></li>
+<li><p>We update <span class="math notranslate nohighlight">\(T\)</span> after the call to <strong>React State</strong>.</p></li>
+<li><p>We have created a burning_cutoff_density, where the burning does
+not happen below this density. It is presently set to base_cutoff_density.</p></li>
+<li><p>Use corner coupling in advection.</p></li>
+<li><p>We have an option, controlled by use_tfromp, to update temperature
 using <span class="math notranslate nohighlight">\(T=T(\rho,X_k,p_0)\)</span> rather than <span class="math notranslate nohighlight">\(T=T(\rho,h,X_k)\)</span>. The former completely
 decouples enthalpy from our system. For spherical problems, we use
-use_tfromp = TRUE, for planar problems, we use use_tfromp = FALSE.</li>
-<li>For spherical problems, we have changed the discretization of
+use_tfromp = TRUE, for planar problems, we use use_tfromp = FALSE.</p></li>
+<li><p>For spherical problems, we have changed the discretization of
 <span class="math notranslate nohighlight">\(\Ubt\cdot\nabla p_0\)</span> in the enthalpy update to
-<span class="math notranslate nohighlight">\(\nabla\cdot(\Ubt p_0) - p_0\nabla\cdot\Ubt\)</span>.</li>
-<li>In paper III we discretized the enthalpy evolution equation in
+<span class="math notranslate nohighlight">\(\nabla\cdot(\Ubt p_0) - p_0\nabla\cdot\Ubt\)</span>.</p></li>
+<li><p>In paper III we discretized the enthalpy evolution equation in
 terms of <span class="math notranslate nohighlight">\(T\)</span>. Since then we have discovered that
 discretizing the enthalpy evolution in perturbational form, <span class="math notranslate nohighlight">\((\rho h)'\)</span>,
 leads to better numerical properties. We use enthalpy_pred_type= 1.
-This is more like paper II.</li>
-<li>We have turned off the evolution of <span class="math notranslate nohighlight">\(h\)</span> above the atmosphere and instead
-compute <span class="math notranslate nohighlight">\(h\)</span> with the EOS using do_eos_h_above_cutoff = T.</li>
+This is more like paper II.</p></li>
+<li><p>We have turned off the evolution of <span class="math notranslate nohighlight">\(h\)</span> above the atmosphere and instead
+compute <span class="math notranslate nohighlight">\(h\)</span> with the EOS using do_eos_h_above_cutoff = T.</p></li>
 </ol>
 </div>
 <div class="section" id="changes-between-paper-4-and-the-multilevel-paper">
@@ -1435,44 +1427,44 @@ compute <span class="math notranslate nohighlight">\(h\)</span> with the EOS usi
 <p>See the multilevel paper for the latest.</p>
 </div>
 <div class="section" id="changes-between-the-multilevel-paper-and-paper-5-raw-latex-cite-wdconvect">
-<h3>Changes Between the Multilevel Paper and Paper 5&nbsp;<a href="#id41"><span class="problematic" id="id42">:raw-latex:`\cite{wdconvect}`</span></a><a class="headerlink" href="#changes-between-the-multilevel-paper-and-paper-5-raw-latex-cite-wdconvect" title="Permalink to this headline">¶</a></h3>
+<h3>Changes Between the Multilevel Paper and Paper 5 <a href="#id41"><span class="problematic" id="id42">:raw-latex:`\cite{wdconvect}`</span></a><a class="headerlink" href="#changes-between-the-multilevel-paper-and-paper-5-raw-latex-cite-wdconvect" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
-<li>Added rotation.</li>
+<li><p>Added rotation.</p></li>
 </ol>
 </div>
 <div class="section" id="changes-between-paper-5-and-the-xrb-paper">
 <h3>Changes Between Paper 5 and the XRB Paper<a class="headerlink" href="#changes-between-paper-5-and-the-xrb-paper" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
-<li>We have added thermal diffusion, controlled by use_thermal_diffusion,
-temp_diffusion_formulation, and thermal_diffusion_type.</li>
-<li>We added the volume discrepancy term to the velocity constraint equation,
-controlled by the input parameter, dpdt_factor.</li>
-<li>For certain problems, we need to set do_eos_h_above_cutoff = F
-to prevent large, unphysical velocities from appearing near the edge of the star.</li>
+<li><p>We have added thermal diffusion, controlled by use_thermal_diffusion,
+temp_diffusion_formulation, and thermal_diffusion_type.</p></li>
+<li><p>We added the volume discrepancy term to the velocity constraint equation,
+controlled by the input parameter, dpdt_factor.</p></li>
+<li><p>For certain problems, we need to set do_eos_h_above_cutoff = F
+to prevent large, unphysical velocities from appearing near the edge of the star.</p></li>
 </ol>
 </div>
 <div class="section" id="changes-since-the-xrb-paper">
 <h3>Changes Since the XRB Paper<a class="headerlink" href="#changes-since-the-xrb-paper" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
-<li>We switched to the new form of the momentum equation to
-Eq.&nbsp;<a class="reference external" href="#eq:flow:newmomentum">[eq:flow:newmomentum]</a> to conserve the low-Mach number form of
-energy.</li>
-<li>We changed the form of the volume discrepancy term to get better
-agreement between the two temperatures.</li>
+<li><p>We switched to the new form of the momentum equation to
+Eq. <a class="reference external" href="#eq:flow:newmomentum">[eq:flow:newmomentum]</a> to conserve the low-Mach number form of
+energy.</p></li>
+<li><p>We changed the form of the volume discrepancy term to get better
+agreement between the two temperatures.</p></li>
 </ol>
 </div>
 </div>
 <div class="section" id="future-considerations">
 <h2>Future Considerations<a class="headerlink" href="#future-considerations" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Should we use a predictor-corrector for updating the full-state density?
+<li><p>Should we use a predictor-corrector for updating the full-state density?
 Specifically, after calling <strong>Correct Base</strong>, should we do a full-state density
-advance and <strong>Correct Base</strong> using the more accurate estimate of <span class="math notranslate nohighlight">\(\rho_0^{n+1}\)</span>?</li>
-<li>We are still exploring the effects of use_tfromp = F for spherical
+advance and <strong>Correct Base</strong> using the more accurate estimate of <span class="math notranslate nohighlight">\(\rho_0^{n+1}\)</span>?</p></li>
+<li><p>We are still exploring the effects of use_tfromp = F for spherical
 problems. We would eventually like to run in this mode, but <span class="math notranslate nohighlight">\(T=T(\rho,X_k,p_0)\)</span>
 and <span class="math notranslate nohighlight">\(T=T(\rho,h,X_k)\)</span> drift away from each other more than we would like. Our
 attempts at incorporating a dpdt_factor for spherical problems have not
-been successful.</li>
+been successful.</p></li>
 </ul>
 </div>
 </div>

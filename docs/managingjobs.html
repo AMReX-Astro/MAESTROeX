@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Managing Jobs &mdash; MAESTROeX 19.03
+  <title>Managing Jobs &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -124,12 +124,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#target-metrics">Target Metrics</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#batch-submission-of-yt-visualization-scripts">Batch Submission of yt&nbsp;Visualization Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#batch-submission-of-yt-visualization-scripts">Batch Submission of yt Visualization Scripts</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#rheapreferred-method">Rhea—preferred method</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#titan">Titan</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#remote-visit-visualization-on-lens">Remote VisIt&nbsp;Visualization on Lens</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#remote-visit-visualization-on-lens">Remote VisIt Visualization on Lens</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#working-at-nersc">Working at NERSC</a><ul>
@@ -246,21 +246,21 @@
 <p>All plotfile directories have a job_info file which lists as
 host of parameters about the simulation, including:</p>
 <ul class="simple">
-<li>A descriptive name for the simulation (the job_name runtime
-parameter</li>
-<li>The number of MPI tasks and OpenMP threads</li>
-<li>The total amount of CPU-hours used up to this point</li>
-<li>The data and time of the plotfile creation and the directory it was written to.</li>
-<li>The build date, machine, and directory</li>
-<li>The MAESTRO, AMReX, and other relevant git hashes for the source</li>
-<li>The directories used in the build</li>
-<li>The compilers used and compilation flags</li>
-<li>The number of levels and boxes for the grid</li>
-<li>The properties of the species carried</li>
-<li>The tolerances for the MG solves</li>
-<li>Any warnings from the initialization procedure (note: these are not currently stored on restart).</li>
-<li>The value of all runtime parameters (even those that were not explicitly set in the inputs file), along with an indicator showing if the default value
-was overridden.</li>
+<li><p>A descriptive name for the simulation (the job_name runtime
+parameter</p></li>
+<li><p>The number of MPI tasks and OpenMP threads</p></li>
+<li><p>The total amount of CPU-hours used up to this point</p></li>
+<li><p>The data and time of the plotfile creation and the directory it was written to.</p></li>
+<li><p>The build date, machine, and directory</p></li>
+<li><p>The MAESTRO, AMReX, and other relevant git hashes for the source</p></li>
+<li><p>The directories used in the build</p></li>
+<li><p>The compilers used and compilation flags</p></li>
+<li><p>The number of levels and boxes for the grid</p></li>
+<li><p>The properties of the species carried</p></li>
+<li><p>The tolerances for the MG solves</p></li>
+<li><p>Any warnings from the initialization procedure (note: these are not currently stored on restart).</p></li>
+<li><p>The value of all runtime parameters (even those that were not explicitly set in the inputs file), along with an indicator showing if the default value
+was overridden.</p></li>
 </ul>
 <p>This file makes it easy to understand how to recreate the run that
 produced the plotfile.</p>
@@ -272,7 +272,7 @@ produced the plotfile.</p>
 <p>gfortran is probably the best-supported compiler for MAESTRO. Here are some
 version-specific notes:</p>
 <ul>
-<li><p class="first"><em>gfortran 4.8.x</em>: This typically works well, but sometimes we get
+<li><p><em>gfortran 4.8.x</em>: This typically works well, but sometimes we get
 an error allocating memory in cluster_f.f90. This
 is a compiler bug (affecting atleast 4.8.2 and 4.8.3):</p>
 <p>The code runs without any problem if it is compiled with -O2
@@ -287,18 +287,16 @@ Perform partial redundancy elimination (PRE) on trees. This flag is enabled by d
 </div></blockquote>
 <p>gfortran 4.8.5 appears to work without issues</p>
 </li>
-<li><p class="first"><em>gfortran 5.1.1</em>: These compilers have no known issues.</p>
-</li>
-<li><p class="first"><em>gfortran 5.3.x</em>: These compilers have no known issues.</p>
-</li>
-<li><p class="first"><em>gfortran 6.2</em>: These compilers work without any known issues.</p>
+<li><p><em>gfortran 5.1.1</em>: These compilers have no known issues.</p></li>
+<li><p><em>gfortran 5.3.x</em>: These compilers have no known issues.</p></li>
+<li><p><em>gfortran 6.2</em>: These compilers work without any known issues.</p>
 <p>gfortran 6.2.1 is used for nightly regression testing.</p>
 </li>
 </ul>
 </div>
 <div class="section" id="pgi-compilers">
 <h3>PGI compilers<a class="headerlink" href="#pgi-compilers" title="Permalink to this headline">¶</a></h3>
-<p>The AMReX&nbsp;floating point exception trapping is disabled with PGI
+<p>The AMReX floating point exception trapping is disabled with PGI
 compilers earlier than version 16, due to problems with PGI using the
 system header files. From version 16 onward, things should work.</p>
 <p>There are no known issues with PGI 16.5 compilers—these are used
@@ -321,12 +319,12 @@ overview of the usage.</p>
 <h3>Automatic Restarting and Archiving of Data<a class="headerlink" href="#automatic-restarting-and-archiving-of-data" title="Permalink to this headline">¶</a></h3>
 <p>The submission script titan.run and shell script
 process.titan in Util/job_scripts/titan/
-are designed to allow you to run MAESTRO&nbsp;with minimal interaction,
+are designed to allow you to run MAESTRO with minimal interaction,
 while being assured that the data is archived to HPSS on the OLCF
 machines.</p>
 <p>To use the scripts, first create a directory in HPSS that has the same
 name as the directory on lustre you are running in (just the directory
-name, not the full path). E.g.&nbsp;if you are running in a directory
+name, not the full path). E.g. if you are running in a directory
 call wdconvect_run, then do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hsi</span>
 <span class="n">mkdir</span> <span class="n">wdconvect_run</span>
@@ -367,7 +365,7 @@ automatically queue up:</p>
 </div>
 <p>where is the id number of the job that must complete
 before the new submission runs and QSUB SCRIPT is the submission
-script (e.g.&nbsp;titan.run). This way you can queue up a bunch of
+script (e.g. titan.run). This way you can queue up a bunch of
 runs and literally leave things alone and it will restart from the
 right place automatically and store the data as it is generated.</p>
 <p>When process.titan is running, it creates a lockfile (called
@@ -401,7 +399,7 @@ Score-P. The Score-P module is designed to detect the loaded
 environment and will configure itself based on that. These tools have been
 tested with the PGI 16.3.0 compilers, and we will use them in our examples.
 One possible set of module loads is</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ module load PrgEnv-pgi
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ module load PrgEnv-pgi
 $ module swap pgi/15.7.0 pgi/16.3.0
 $ module load cudatoolkit
 $ module load scorep/3.0-rc1
@@ -412,10 +410,10 @@ support for analyzing OpenACC code. The next step is to compile. You
 essentially preface your normal compile (and link) line with the Score-P
 executable and options. As an example using the Fortran wrapper required on
 Titan, we have</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ scorep --cuda --openacc -v ftn gpuprogram.f90
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ scorep --cuda --openacc -v ftn gpuprogram.f90
 </pre></div>
 </div>
-<p>One way to achieve this in MAESTRO&nbsp;is to modify the appropriate make file. For
+<p>One way to achieve this in MAESTRO is to modify the appropriate make file. For
 PGI, this would be $AMREX_HOME/Tools/F_mk/comps/Linux_pgi.mak. If
 this proves useful, it may be worth it to build Score-P into the build
 infrastructure.</p>
@@ -425,17 +423,17 @@ and tracing. Profiling generates a timing (or perhaps other metric) summary of
 the entire program’s execution while tracing produces a timeline of the
 execution. Score-P’s analysis is configured with environment variables.
 Some of the key configuration variables used in testing include</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">SCOREP_ENABLE_PROFILING</span><span class="o">=</span><span class="n">yes</span>
-<span class="n">export</span> <span class="n">SCOREP_ENABLE_TRACING</span><span class="o">=</span><span class="n">yes</span>
-<span class="n">export</span> <span class="n">SCOREP_EXPERIMENT_DIRECTORY</span><span class="o">=</span><span class="n">profile</span><span class="o">-</span><span class="n">trace</span>
-<span class="n">export</span> <span class="n">SCOREP_CUDA_ENABLE</span><span class="o">=</span><span class="n">yes</span><span class="p">,</span><span class="n">kernel_counter</span><span class="p">,</span><span class="n">flushatexit</span>
-<span class="n">export</span> <span class="n">SCOREP_CUDA_BUFFER</span><span class="o">=</span><span class="mi">200</span><span class="n">M</span>
-<span class="n">export</span> <span class="n">SCOREP_TOTAL_MEMORY</span><span class="o">=</span><span class="mi">1</span><span class="n">G</span>
-<span class="n">export</span> <span class="n">SCOREP_OPENACC_ENABLE</span><span class="o">=</span><span class="n">yes</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">SCOREP_ENABLE_PROFILING</span><span class="o">=</span>yes
+<span class="nb">export</span> <span class="nv">SCOREP_ENABLE_TRACING</span><span class="o">=</span>yes
+<span class="nb">export</span> <span class="nv">SCOREP_EXPERIMENT_DIRECTORY</span><span class="o">=</span>profile-trace
+<span class="nb">export</span> <span class="nv">SCOREP_CUDA_ENABLE</span><span class="o">=</span>yes,kernel_counter,flushatexit
+<span class="nb">export</span> <span class="nv">SCOREP_CUDA_BUFFER</span><span class="o">=</span>200M
+<span class="nb">export</span> <span class="nv">SCOREP_TOTAL_MEMORY</span><span class="o">=</span>1G
+<span class="nb">export</span> <span class="nv">SCOREP_OPENACC_ENABLE</span><span class="o">=</span>yes
 </pre></div>
 </div>
 <p>For a full listing and definition of configuration variables, execute</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ scorep-info config-vars --full
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ scorep-info config-vars --full
 </pre></div>
 </div>
 <p>Except for very simple codes, you will never want to enable both tracing and
@@ -454,19 +452,19 @@ will see a file like profile.cubex. This can be opened with cube
 (module load cube).</p>
 <p>As mentioned, the profiling data can be used to get recommended settings for
 tracing. Running</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ scorep-score -r profile.cubex
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ scorep-score -r profile.cubex
 </pre></div>
 </div>
-<p>will yield output showing estimated sizes for e.g.&nbsp;SCOREP_TOTAL_MEMORY.
+<p>will yield output showing estimated sizes for e.g. SCOREP_TOTAL_MEMORY.
 It also list functions that are called many times. If you don’t care about
 them and they’re slowing Score-P down (or making an outrageously large output
 file), you can configure Score-P to ignore them in its analysis. To filter a set
 of functions, you need to provide a filter file, for example</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ export SCOREP_FILTERING_FILE=scorep.filter
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">SCOREP_FILTERING_FILE</span><span class="o">=</span>scorep.filter
 </pre></div>
 </div>
 <p>where</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat scorep.filter
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cat scorep.filter
 SCOREP_REGION_NAMES_BEGIN
  EXCLUDE
    matmul_sub
@@ -499,11 +497,11 @@ executing to load the modules used at compile-time. Executing nvprof on
 Titan’s compute nodes requires some unexpected options having to do with how
 aprun and nvprof interact.</p>
 <p>To get a basic overview printed to the terminal on Titan’s compute node, execute</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ aprun -b nvprof --profile-child-processes ./gpuprogram.exe arg1 arg2...
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ aprun -b nvprof --profile-child-processes ./gpuprogram.exe arg1 arg2...
 </pre></div>
 </div>
 <p>To generate tracing data for nvvp, execute</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ aprun -b nvprof --profile-child-processes -o nvprof.timeline.out%p
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ aprun -b nvprof --profile-child-processes -o nvprof.timeline.out%p
   ./gpuprogram.exe arg1 arg2...
 </pre></div>
 </div>
@@ -512,7 +510,7 @@ aprun and nvprof interact.</p>
 the output file’s name or the code will crash, even if you’re not running a
 multi-process code.</p>
 <p>To generate profile-like metric data for nvvp, execute</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ aprun -b nvprof --profile-child-processes --analysis-metrics
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ aprun -b nvprof --profile-child-processes --analysis-metrics
   -o nvprof.metrics.out%p ./gpuprogram.exe arg1 arg2...
 </pre></div>
 </div>
@@ -524,10 +522,10 @@ multi-process code.</p>
 this section is to note different metrics and reasonable targets for them.
 Note that these may be specific to the k20x hardware in Titan.</p>
 <ul class="simple">
-<li>Threads per block: 256-512. Note that if your code requires many
-registers per thread, then this will limit the number of threads per block.</li>
-<li>Occupancy: 60% is a reasonable target. We have had success with codes
-even achieving only 23% occupancy.</li>
+<li><p>Threads per block: 256-512. Note that if your code requires many
+registers per thread, then this will limit the number of threads per block.</p></li>
+<li><p>Occupancy: 60% is a reasonable target. We have had success with codes
+even achieving only 23% occupancy.</p></li>
 </ul>
 <p>One very useful tool for determining target metrics and what is limiting your
 performance is a spreadsheet developed by NVIDIA to calculate occupancy. Every
@@ -542,13 +540,14 @@ found here:
 </div>
 </div>
 <div class="section" id="batch-submission-of-yt-visualization-scripts">
-<h3>Batch Submission of yt&nbsp;Visualization Scripts<a class="headerlink" href="#batch-submission-of-yt-visualization-scripts" title="Permalink to this headline">¶</a></h3>
+<h3>Batch Submission of yt Visualization Scripts<a class="headerlink" href="#batch-submission-of-yt-visualization-scripts" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="rheapreferred-method">
 <h4>Rhea—preferred method<a class="headerlink" href="#rheapreferred-method" title="Permalink to this headline">¶</a></h4>
 <blockquote>
-<div>this section needs to be updated. See the titan section</div></blockquote>
+<div><p>this section needs to be updated. See the titan section</p>
+</div></blockquote>
 <p>The best way to do visualization is to use rhea, the OLCF vis machine.
-You need to build yt&nbsp;via the install_script.sh script <em>on
+You need to build yt via the install_script.sh script <em>on
 rhea</em>. It also must be on a <em>Lustre filesystem</em>, so it is seen by
 the compute node. It is best to build it in your $PROJWORK directory,
 since that has a longer time between purges. Once the installation is
@@ -567,34 +566,33 @@ of how many processors are in use. When processors free, the next
 file in the list is processed, and so on, until there are no more
 plotfiles left to process. If a .png file matching the
 plotfile prefix is found, then that plotfile is skipped.</p>
-<p>Note: the line in parallel-yt-rhea that sources the yt&nbsp;activate script may need to be modified to point to the
-correct yt&nbsp;installation path.</p>
+<p>Note: the line in parallel-yt-rhea that sources the yt activate script may need to be modified to point to the
+correct yt installation path.</p>
 </div>
 <div class="section" id="titan">
 <h4>Titan<a class="headerlink" href="#titan" title="Permalink to this headline">¶</a></h4>
-<p>You can run yt&nbsp;python scripts in the titan batch queues to do your
-visualization. You need to install yt&nbsp;and all its dependencies
+<p>You can run yt python scripts in the titan batch queues to do your
+visualization. You need to install yt and all its dependencies
 manually somewhere on a <em>Lustre filesystem</em>—this ensures that the
 compute nodes can see it. A good choice is the project space, since
 that has a longer purge window. The following procedure will setup
-the development version of yt&nbsp;(from source)</p>
+the development version of yt (from source)</p>
 <ul>
-<li><p class="first">create a directory in your $PROJWORK directory named yt/</p>
-</li>
-<li><p class="first">in yt/, down load the yt&nbsp;install script:</p>
+<li><p>create a directory in your $PROJWORK directory named yt/</p></li>
+<li><p>in yt/, down load the yt install script:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">bitbucket</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">yt_analysis</span><span class="o">/</span><span class="n">yt</span><span class="o">/</span><span class="n">raw</span><span class="o">/</span><span class="n">yt</span><span class="o">/</span><span class="n">doc</span><span class="o">/</span><span class="n">install_script</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">edit the script to use Conda to get the necessary dependencies
-and to build yt&nbsp;from source. This is accomplished by setting the
+<li><p>edit the script to use Conda to get the necessary dependencies
+and to build yt from source. This is accomplished by setting the
 following variables near the top of the script:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INST_CONDA</span><span class="o">=</span><span class="mi">1</span>
 <span class="n">INST_YT_SOURCE</span><span class="o">=</span><span class="mi">1</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">run the script:</p>
+<li><p>run the script:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="n">install_script</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
 </div>
@@ -613,7 +611,7 @@ how to do a simple visualization in the batch queue using yt. Note
 that vol.py is executable, and that we run it via aprun to
 ensure that it is launched on the compute node.</p>
 <p>The scripts vis-titan.run and parallel-yt-new in that
-same directorywill manage the yt&nbsp;jobs by calling a
+same directorywill manage the yt jobs by calling a
 python script for each file that matches a pattern.
 Note that the actual visualization command itself is launched by
 parallel-yt-new, again using the aprun command. But
@@ -623,11 +621,11 @@ this reason, running on rhea is preferred.</p>
 </div>
 </div>
 <div class="section" id="remote-visit-visualization-on-lens">
-<h3>Remote VisIt&nbsp;Visualization on Lens<a class="headerlink" href="#remote-visit-visualization-on-lens" title="Permalink to this headline">¶</a></h3>
+<h3>Remote VisIt Visualization on Lens<a class="headerlink" href="#remote-visit-visualization-on-lens" title="Permalink to this headline">¶</a></h3>
 <p><em>Note: this information may be out-of-date. It is recommended that
-yt&nbsp;be used instead.</em></p>
-<p>For large data files, visualization with VisIt&nbsp;should be done with
-a client running on your local machine interfacing with VisIt&nbsp;running
+yt be used instead.</em></p>
+<p>For large data files, visualization with VisIt should be done with
+a client running on your local machine interfacing with VisIt running
 on the remote machine. For the lens machine at NCCS, the proper setup
 is described below.</p>
 <p>First, on lens, in your .bashrc, add:</p>
@@ -637,34 +635,36 @@ is described below.</p>
 <p>(you would think that you could just add module load visit but this
 does not seem to work with VisIt.</p>
 <p>On your local machine, launch VisIt. Note: this procedure seems to
-work with VisIt&nbsp;2.4.2, but not VisIt&nbsp;2.5.0 for some reason.</p>
+work with VisIt 2.4.2, but not VisIt 2.5.0 for some reason.</p>
 <ul class="simple">
-<li>First we setup a new host<ul>
-<li>From the menu, select <em>options :math:`rightarrow` host profiles</em></li>
-<li>Create a new host by clicking on the <em>New Host</em> button.</li>
-<li>Enter the <em>Host nickname</em> as lens</li>
-<li>Enter the <em>Remote host name</em> as lens.ccs.ornl.gov</li>
-<li>Enter the <em>Path to Visit installation</em> as /sw/analysis-x64/visit (not sure if this is needed)</li>
-<li>Make sure that your <em>username</em> is correct</li>
-<li>Check <em>Tunnel data connections through SSH</em></li>
+<li><p>First we setup a new host</p>
+<ul>
+<li><p>From the menu, select <em>options :math:`rightarrow` host profiles</em></p></li>
+<li><p>Create a new host by clicking on the <em>New Host</em> button.</p></li>
+<li><p>Enter the <em>Host nickname</em> as lens</p></li>
+<li><p>Enter the <em>Remote host name</em> as lens.ccs.ornl.gov</p></li>
+<li><p>Enter the <em>Path to Visit installation</em> as /sw/analysis-x64/visit (not sure if this is needed)</p></li>
+<li><p>Make sure that your <em>username</em> is correct</p></li>
+<li><p>Check <em>Tunnel data connections through SSH</em></p></li>
 </ul>
 </li>
-<li>Setup the <em>Launch Profiles</em><ul>
-<li>Click on the <em>Launch Profiles</em> tab</li>
-<li>Click on the <em>New Profile</em> button</li>
-<li>Enter the <em>Profile name</em> as parallel</li>
-<li>Click on the <em>Parallel</em> tab</li>
-<li>Check <em>Launch parallel engine</em></li>
-<li>Select the <em>Parallel launch method</em> as qsub/mpirun</li>
-<li>Set the <em>Partition / Pool / Queue</em> to computation</li>
-<li>Change the <em>Default number of processors</em> to 8</li>
-<li>Set the <em>Default number of nodes</em> to 2</li>
-<li>Set the <em>Default Bank / Account</em> to AST006</li>
-<li>Set the <em>Default Time Limit</em> to 00:30:00</li>
+<li><p>Setup the <em>Launch Profiles</em></p>
+<ul>
+<li><p>Click on the <em>Launch Profiles</em> tab</p></li>
+<li><p>Click on the <em>New Profile</em> button</p></li>
+<li><p>Enter the <em>Profile name</em> as parallel</p></li>
+<li><p>Click on the <em>Parallel</em> tab</p></li>
+<li><p>Check <em>Launch parallel engine</em></p></li>
+<li><p>Select the <em>Parallel launch method</em> as qsub/mpirun</p></li>
+<li><p>Set the <em>Partition / Pool / Queue</em> to computation</p></li>
+<li><p>Change the <em>Default number of processors</em> to 8</p></li>
+<li><p>Set the <em>Default number of nodes</em> to 2</p></li>
+<li><p>Set the <em>Default Bank / Account</em> to AST006</p></li>
+<li><p>Set the <em>Default Time Limit</em> to 00:30:00</p></li>
 </ul>
 </li>
-<li>Click on <em>Apply</em> and <em>Post</em></li>
-<li>Save your changes by selecting <em>Options :math:`rightarrow` Save Settings</em></li>
+<li><p>Click on <em>Apply</em> and <em>Post</em></p></li>
+<li><p>Save your changes by selecting <em>Options :math:`rightarrow` Save Settings</em></p></li>
 </ul>
 <p>To do remote visualization, select <em>File :math:`rightarrow` Open</em>.
 From the drop down list at the top, select lens. You will be
@@ -672,9 +672,8 @@ prompted for your password. After that, you can navigate to the
 directory on lens with the data.</p>
 <p>To make a movie (output sequence of images):</p>
 <ul>
-<li><p class="first">save a view in VisIt&nbsp;you like as a session file (File <span class="math notranslate nohighlight">\(\rightarrow\)</span> Save session).</p>
-</li>
-<li><p class="first">On lens, create a file called files.visit which lists all
+<li><p>save a view in VisIt you like as a session file (File <span class="math notranslate nohighlight">\(\rightarrow\)</span> Save session).</p></li>
+<li><p>On lens, create a file called files.visit which lists all
 of the files you want to visualize, one per line, with /Header
 after the filename. This can be done simply as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ls</span> <span class="o">-</span><span class="mi">1</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="n">processed</span> <span class="o">|</span> <span class="n">awk</span> <span class="s1">&#39;{print $1&quot;/Header&quot;}&#39;</span> <span class="o">&gt;</span> <span class="n">files</span><span class="o">.</span><span class="n">visit</span>
@@ -683,27 +682,24 @@ after the filename. This can be done simply as:</p>
 <p>(note: the processed bit is for when you used the script above to
 automatically archive the data).</p>
 </li>
-<li><p class="first">Edit the session file, searching for the name of the plotfile you
+<li><p>Edit the session file, searching for the name of the plotfile you
 originally visualized, and change it to read files.visit. Make
-sure that the path is correct. This may appear multiple times.</p>
-</li>
-<li><p class="first">Relaunch VisIt&nbsp;locally and restore the session (File <span class="math notranslate nohighlight">\(\rightarrow\)</span> Restore session). It will render the first image. Then reopen (File <span class="math notranslate nohighlight">\(\rightarrow\)</span> ReOpen file). After this is done, the buttons that allow you to move through the files should become active (black).</p>
-</li>
-<li><p class="first">Resave the session file</p>
-</li>
-<li><p class="first">To generate the frames, you have 2 options:</p>
+sure that the path is correct. This may appear multiple times.</p></li>
+<li><p>Relaunch VisIt locally and restore the session (File <span class="math notranslate nohighlight">\(\rightarrow\)</span> Restore session). It will render the first image. Then reopen (File <span class="math notranslate nohighlight">\(\rightarrow\)</span> ReOpen file). After this is done, the buttons that allow you to move through the files should become active (black).</p></li>
+<li><p>Resave the session file</p></li>
+<li><p>To generate the frames, you have 2 options:</p>
 <ol class="arabic">
-<li><p class="first">File <span class="math notranslate nohighlight">\(\rightarrow\)</span> Save movie. Pick <em>New simple movie</em>,
+<li><p>File <span class="math notranslate nohighlight">\(\rightarrow\)</span> Save movie. Pick <em>New simple movie</em>,
 then set the format to <em>PNG</em> and add this to the output box by
 clicking the right arrow, then in the very last screen, select:
 Later, tell me the command to run.</p>
-<p>VisIt&nbsp;will pop up a box showing the command to run. Trying to
-get the currently running session of VisIt&nbsp;to generate the frames
+<p>VisIt will pop up a box showing the command to run. Trying to
+get the currently running session of VisIt to generate the frames
 seems problamatic. Note: you will probably want to edit out the
 -v x.x.x argument in the commandline to not have it force
 to use a specific version.</p>
 </li>
-<li><p class="first">If the session file successfully does the remote visualization
+<li><p>If the session file successfully does the remote visualization
 as desired, you can run the movie via the commandline with something like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">visit</span> <span class="o">-</span><span class="n">movie</span> <span class="o">-</span><span class="nb">format</span> <span class="n">png</span> <span class="o">-</span><span class="n">geometry</span> <span class="mi">1080</span><span class="n">x1080</span> <span class="o">-</span><span class="n">output</span> <span class="n">subchandra_cutoff3_</span> \
     <span class="o">-</span><span class="n">start</span> <span class="mi">0</span> <span class="o">-</span><span class="n">end</span> <span class="mi">44</span> <span class="o">-</span><span class="n">sessionfile</span> <span class="n">subchandra_radvel</span><span class="o">.</span><span class="n">session</span>
@@ -722,10 +718,10 @@ as desired, you can run the movie via the commandline with something like:</p>
 <p>The default compilers on edison are the Intel compilers, but
 PGI and Cray also work well</p>
 <ul class="simple">
-<li>Intel 15.0.1 works well on edison/NERSC with MPI/OpenMP</li>
-<li>Intel 16.0.2 works fine.</li>
-<li>Cray 8.4.x has worked in the past, but it has not been used
-at NERSC in a while.</li>
+<li><p>Intel 15.0.1 works well on edison/NERSC with MPI/OpenMP</p></li>
+<li><p>Intel 16.0.2 works fine.</p></li>
+<li><p>Cray 8.4.x has worked in the past, but it has not been used
+at NERSC in a while.</p></li>
 </ul>
 <p>Note: in order to compile, you will need to ensure that both the
 python and python_base modules are loaded (via the
@@ -799,7 +795,7 @@ for titan above.</p>
 </div>
 <div class="section" id="batch-visualization-using-yt">
 <h3>Batch visualization using yt<a class="headerlink" href="#batch-visualization-using-yt" title="Permalink to this headline">¶</a></h3>
-<p>yt&nbsp;can be built using the install_script.sh. It has been
+<p>yt can be built using the install_script.sh. It has been
 tested using the build of yt from source and dependencies via conda,
 by setting:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INST_CONDA</span><span class="o">=</span><span class="mi">1</span>
@@ -811,21 +807,21 @@ by setting:</p>
 </pre></div>
 </div>
 <p>Note: installation was done in the home directory.</p>
-<p>This way of building yt&nbsp;installs it’s own python and support
+<p>This way of building yt installs it’s own python and support
 libraries in a directory, yt-conda. <strong>Important:</strong> You need
 to make sure that your start-up files (typically .bashrc.ext at
 NERSC) don’t module load python or any python libraries, as this
 will interfere with the conda installation. The install script will
 direct you to add the install location to your path.</p>
 <p>The scripts parallel-yt and process-edison.slurm in
-Util/job_scripts/edison show how to invoke yt&nbsp;to loop over a
+Util/job_scripts/edison show how to invoke yt to loop over a
 series of plotfiles and do visualization. A number of tasks are run
 at once on the node, each operating on a separate file. The
 parallel-yt script then calls vol.py to do the volume
 rendering with yt. Note: it is important that srun be used to
-launch the yt&nbsp;script to ensure that it is run on the compute node.</p>
+launch the yt script to ensure that it is run on the compute node.</p>
 <p>A simple test-yt.slurm script shows how to just call the
-yt&nbsp;python script directly, using one node and 24 threads, again
+yt python script directly, using one node and 24 threads, again
 using srun to execute on the compute node.</p>
 <p>If you want to keep up with the development version of yt, then you
 can update the source in yt-conda/bin/src/yt-hg, using:</p>
@@ -862,9 +858,9 @@ the python_plotfile directory, e.g.:</p>
 </div>
 <div class="section" id="remote-visualization-on-hopper">
 <h3>Remote visualization on hopper<a class="headerlink" href="#remote-visualization-on-hopper" title="Permalink to this headline">¶</a></h3>
-<p>VisIt&nbsp;is already configured to work with hopper. If the host does not appear
+<p>VisIt is already configured to work with hopper. If the host does not appear
 in your local version of visit, copy the host_nersc_hopper.xml file
-from the .visit/allhosts/ directory under the system’s VisIt&nbsp;install path
+from the .visit/allhosts/ directory under the system’s VisIt install path
 to your <span class="math notranslate nohighlight">\(\mathtt{\sim}\)</span>/.visit/hosts/ directory.</p>
 </div>
 </div>

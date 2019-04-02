@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Analysis &mdash; MAESTROeX 19.03
+  <title>Analysis &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -212,7 +212,7 @@
 <span id="sec-analysis"></span><h2>The Postprocessing Routines<a class="headerlink" href="#the-postprocessing-routines" title="Permalink to this headline">¶</a></h2>
 <p>The BoxLib/Tools/Postprocessing/F_Src/ directory contains a large
 number of Fortran-based analysis routines for BoxLib datasets. Many
-of these can be used with both MAESTRO&nbsp;and the compressible
+of these can be used with both MAESTRO and the compressible
 astrophysics code, CASTRO.</p>
 <p>To compile any of the individual routines, edit the GNUmakefile
 add uncomment the line beginning with ‘programs +=’ containing
@@ -223,16 +223,16 @@ the routine you want to build.</p>
 plotfile. Typing the executable names without any arguments will
 provide usage examples.</p>
 <ul>
-<li><p class="first">faverage.f90</p>
+<li><p>faverage.f90</p>
 <p>Laterally average each of the variables in a plotfile (works for
-both 2-d and 3-d). This is written with MAESTRO&nbsp;plane-parallel geometry plotfiles in mind, and the averaging is done
+both 2-d and 3-d). This is written with MAESTRO plane-parallel geometry plotfiles in mind, and the averaging is done
 over the coordinate direction(s) perpendicular to gravity.</p>
 </li>
-<li><p class="first">fboxinfo.f90</p>
+<li><p>fboxinfo.f90</p>
 <p>Print out some basic information about the number of boxes on each
 refinement level and (optionally) the bounds of each of the boxes.</p>
 </li>
-<li><p class="first">fcompare.f90</p>
+<li><p>fcompare.f90</p>
 <div class="line-block">
 <div class="line">Compare two plotfiles, zone-by-zone to machine precision, and report
 the L2-norm of the error (both absolute and relative) for each
@@ -244,7 +244,7 @@ for the zone where var has the largest error.</div>
 <p>This is used by in the regression test suite in
 Parallel/util/regtests/.</p>
 </li>
-<li><p class="first">fextract.f90</p>
+<li><p>fextract.f90</p>
 <p>Extract a 1-d line through a dataset (1-, 2-, or 3-d). This works
 with both uniformly-gridded or AMR datasets. For multi-dimensional
 datasets, the coordinate direction to extract along can be specified.
@@ -252,19 +252,19 @@ The line is always taken through the center of the domain. Either
 a single variable or all variables, along with the coordinate
 information, are output to a file.</p>
 </li>
-<li><p class="first">fextrema.f90</p>
+<li><p>fextrema.f90</p>
 <p>Report the min and max of each variable (or only a single variable)
 in one or more plotfiles.</p>
 </li>
-<li><p class="first">fsnapshot2d.f90, fsnapshot3d.f90</p>
+<li><p>fsnapshot2d.f90, fsnapshot3d.f90</p>
 <p>Create an image (PPM file) of a single variable in a plotfile. For
 3-d, the slice plane through the center of the domain is specified.
 Separate routines exist for 2-d and 3-d datasets.</p>
 </li>
-<li><p class="first">ftime.f90</p>
+<li><p>ftime.f90</p>
 <p>For each plotfile, simply print the simulation time.</p>
 </li>
-<li><p class="first">fvarnames.f90</p>
+<li><p>fvarnames.f90</p>
 <p>Simply print out the list of variables stored in a plotfile.</p>
 </li>
 </ul>
@@ -273,7 +273,7 @@ Separate routines exist for 2-d and 3-d datasets.</p>
 <h3>Data Processing Example<a class="headerlink" href="#data-processing-example" title="Permalink to this headline">¶</a></h3>
 <p>The routine fspeciesmass2d.f90 in
 F_src/tutorial serves as a well-commented example of how
-to work with MAESTRO&nbsp;plotfile data. This routine simply computes
+to work with MAESTRO plotfile data. This routine simply computes
 the total mass of a particular species on the entire domain for a 2-d
 dataset. It is written to understand a multilevel (AMR) dataset, and
 only considers the finest-available data at any physical location in
@@ -284,14 +284,14 @@ writing a new analysis routine for BoxLib data.</p>
 <div class="section" id="particle-routines">
 <span id="analysis-sec-particles"></span><h3>Particle routines<a class="headerlink" href="#particle-routines" title="Permalink to this headline">¶</a></h3>
 <p>The parseparticles.py routine in the python/ subdirectory
-can read in MAESTRO&nbsp;particle files containing particle histories
+can read in MAESTRO particle files containing particle histories
 (usually named <a href="#id1"><span class="problematic" id="id2">timestamp_</span></a>??). See the discussion in
-§&nbsp;<a class="reference external" href="#arch:sec:particles">[arch:sec:particles]</a> for details on initializing particles in
+§ <a class="reference external" href="#arch:sec:particles">[arch:sec:particles]</a> for details on initializing particles in
 MAESTRO. The driver test_parseparticles.py shows shows how to
 use this module to plot particle histories. Additional documentation
 is available from the module itself. In the python environment,
 type:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">parseparticles</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">parseparticles</span>
 <span class="n">help</span><span class="p">(</span><span class="n">parseparticles</span><span class="p">)</span>
 </pre></div>
 </div>

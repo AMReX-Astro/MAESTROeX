@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Low Density Cutoffs &mdash; MAESTROeX 19.03
+  <title>Low Density Cutoffs &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -220,46 +220,46 @@ In low density regions, we modify the behavior of the algorithm. Here
 is a summary of some parameters, and a brief description of what they
 do.</p>
 <ul>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">base_cutoff_density, <span class="math notranslate nohighlight">\(\rho_{\rm base}\)</span>, (real):</div>
 <div class="line">Essentially controls the lowest density allowed in the simulation and modifies the behavior
 of several modules.</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">base_cutoff_density_coord(:) (integer array):</div>
 <div class="line">For each level in the radial base state array, this is the coordinate of the first cell
 where <span class="math notranslate nohighlight">\(\rho_0 &lt; \rho_{\rm base}\)</span>. Slightly more complicated for multilevel problems.</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">anelastic_cutoff, <span class="math notranslate nohighlight">\(\rho_{\rm anelastic}\)</span>, (real):</div>
 <div class="line">If <span class="math notranslate nohighlight">\(\rho_0 &lt; \rho_{\rm anelastic}\)</span>, we modify the computation of <span class="math notranslate nohighlight">\(\beta_0\)</span> in the
 divergence constraint.</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">anelastic_cutoff_coord(:) (integer array):</div>
 <div class="line">Anelastic cutoff analogy of base_cutoff_density_coord(:).</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">burning_cutoff_density, <span class="math notranslate nohighlight">\(\rho_{\rm burning}\)</span>, (real):</div>
 <div class="line">If <span class="math notranslate nohighlight">\(\rho &lt; \rho_{\rm burning}\)</span>, don’t call the burner in this cell.</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">burning_cutoff_density_coord(:) (integer array):</div>
 <div class="line">Burning cutoff analogy of base_cutoff_density_coord(:).</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">buoyancy_cutoff_factor (real):</div>
 <div class="line">When computing velocity forcing, set the buoyance term (<span class="math notranslate nohighlight">\(\rho-\rho_0\)</span>) to 0 if
 <span class="math notranslate nohighlight">\(\rho &lt;\)</span> buoyancy_cutoff_factor * base_cutoff_density.</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">do_eos_h_above_cutoff (logical):</div>
 <div class="line">If true, at the end of the advection step, for each cell where
 <span class="math notranslate nohighlight">\(\rho &lt; \rho_{\rm base}\)</span>, recompute <span class="math notranslate nohighlight">\(h = h(\rho,p_0,X)\)</span>.</div>
@@ -290,13 +290,13 @@ different grid spacing. Refer to Figure <a class="reference external" href="#Fig
 The guiding principle is to check whether <span class="math notranslate nohighlight">\(\rho_0\)</span> falls below <span class="math notranslate nohighlight">\(\rho_{\rm cutoff}\)</span> on the finest
 grid first. If not, check the next coarser level. Continue until you reach the base grid.
 Some examples are in order:</p>
-<div class="figure" id="id3">
+<div class="figure align-center" id="id3">
 <a class="reference internal image-reference" href="lodensfigpath/cutoff_multi"><img alt="Multilevel cutoff density example." src="lodensfigpath/cutoff_multi" style="width: 2in;" /></a>
-<p class="caption"><span class="caption-text">Multilevel cutoff density example.</span></p>
+<p class="caption"><span class="caption-text">Multilevel cutoff density example.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
 <p>[Fig:Cutoff_Multi]</p>
 <ul>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line"><strong>Example 1:</strong> <span class="math notranslate nohighlight">\(\rho_{0,104} &gt; \rho_{\rm cutoff}\)</span> and <span class="math notranslate nohighlight">\(\rho_{0,105} &lt; \rho_{\rm cutoff}\)</span>.</div>
 <div class="line">cutoff_density_coord(1) = 105</div>
 <div class="line">cutoff_density_coord(2) = 210</div>
@@ -306,7 +306,7 @@ In this case, the cutoff coordinates at the finer levels are simply propagated f
 coarsest level, even though they do not correspond to a valid region.</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line"><strong>Example 2:</strong> <span class="math notranslate nohighlight">\(\rho_{0,403} &gt; \rho_{\rm cutoff}\)</span> and <span class="math notranslate nohighlight">\(\rho_{0,404} &lt; \rho_{\rm cutoff}\)</span>.</div>
 <div class="line">cutoff_density_coord(1) = 101</div>
 <div class="line">cutoff_density_coord(2) = 202</div>
@@ -316,7 +316,7 @@ transition occurs at a location where there is a common grid boundary between al
 Therefore, we simply propagate the cutoff density coordinate from the finest level downward.</div>
 </div>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line"><strong>Example 3:</strong> <span class="math notranslate nohighlight">\(\rho_{0,404} &gt; \rho_{\rm cutoff}\)</span> and <span class="math notranslate nohighlight">\(\rho_{0,405} &lt; \rho_{\rm cutoff}\)</span>.</div>
 <div class="line">cutoff_density_coord(1) = 102</div>
 <div class="line">cutoff_density_coord(2) = 203</div>
@@ -338,13 +338,13 @@ coordinate to the coarser levels.</p>
 <p>At several points in the algorithm, we compute anelastic_cutoff_coord(:),
 base_cutoff_density_coord(:), and burning_cutoff_density_coord(:):</p>
 <ul class="simple">
-<li>After we call initialize in varden.</li>
-<li>After reading the base state from a checkpoint file when restarting.</li>
-<li>After regridding.</li>
-<li>After advancing <span class="math notranslate nohighlight">\(\rho_0\)</span> with advect_base_dens.</li>
-<li>After advancing <span class="math notranslate nohighlight">\(\rho\)</span> and setting <span class="math notranslate nohighlight">\(\rho_0 = \overline{\rho}\)</span>.</li>
-<li>At the beginning of the second-half of the algorithm (<strong>Step 6</strong>), we reset
-the coordinates to the base-time values using <span class="math notranslate nohighlight">\(\rho_0^n\)</span>.</li>
+<li><p>After we call initialize in varden.</p></li>
+<li><p>After reading the base state from a checkpoint file when restarting.</p></li>
+<li><p>After regridding.</p></li>
+<li><p>After advancing <span class="math notranslate nohighlight">\(\rho_0\)</span> with advect_base_dens.</p></li>
+<li><p>After advancing <span class="math notranslate nohighlight">\(\rho\)</span> and setting <span class="math notranslate nohighlight">\(\rho_0 = \overline{\rho}\)</span>.</p></li>
+<li><p>At the beginning of the second-half of the algorithm (<strong>Step 6</strong>), we reset
+the coordinates to the base-time values using <span class="math notranslate nohighlight">\(\rho_0^n\)</span>.</p></li>
 </ul>
 </div>
 <div class="section" id="usage-of-cutoff-densities">
@@ -353,47 +353,47 @@ the coordinates to the base-time values using <span class="math notranslate nohi
 <span id="sec-anelastic-cutoff"></span><h3>anelastic_cutoff<a class="headerlink" href="#anelastic-cutoff" title="Permalink to this headline">¶</a></h3>
 <p>The anelastic_cutoff is the density below which we modify the constraint.</p>
 <ul class="simple">
-<li>In probin, anelastic_cutoff is set to <span class="math notranslate nohighlight">\(3\times 10^6\)</span> by default.</li>
-<li>In make_div_coeff, for
+<li><p>In probin, anelastic_cutoff is set to <span class="math notranslate nohighlight">\(3\times 10^6\)</span> by default.</p></li>
+<li><p>In make_div_coeff, for
 <span class="math notranslate nohighlight">\(r \ge {\tt anelastic\_cutoff\_coord}\)</span>, we set
-<span class="math notranslate nohighlight">\({\tt div\_coeff}(n,r) = {\tt div\_coeff}(n,r-1) * \rho_0(n,r)/\rho_0(n,r-1)\)</span>.</li>
-<li>in make_S, we set delta_gamma1_term and delta_gamma1
+<span class="math notranslate nohighlight">\({\tt div\_coeff}(n,r) = {\tt div\_coeff}(n,r-1) * \rho_0(n,r)/\rho_0(n,r-1)\)</span>.</p></li>
+<li><p>in make_S, we set delta_gamma1_term and delta_gamma1
 to zero for <span class="math notranslate nohighlight">\(r \ge {\tt anelastic\_cutoff\_coord}\)</span>. This is only relevant
-if you are running with use_delta_gamma1_term = T.</li>
-<li>Some versions of sponge, use anelastic_cutoff in a problem dependent way.</li>
+if you are running with use_delta_gamma1_term = T.</p></li>
+<li><p>Some versions of sponge, use anelastic_cutoff in a problem dependent way.</p></li>
 </ul>
 </div>
 <div class="section" id="base-cutoff-density">
 <span id="sec-base-cutoff-density"></span><h3>base_cutoff_density<a class="headerlink" href="#base-cutoff-density" title="Permalink to this headline">¶</a></h3>
 <p>The base_cutoff_density is the lowest density that we model.</p>
 <ul class="simple">
-<li>In probin, base_cutoff_density is set to <span class="math notranslate nohighlight">\(3\times 10^6\)</span> by default.</li>
-<li>In base_state, we compute a physical cutoff location,
+<li><p>In probin, base_cutoff_density is set to <span class="math notranslate nohighlight">\(3\times 10^6\)</span> by default.</p></li>
+<li><p>In base_state, we compute a physical cutoff location,
 base_cutoff_density_loc, which is defined as the physical
 location of the first cell-center at the coarsest level for which
 <span class="math notranslate nohighlight">\(\rho_0 \le {\tt base\_cutoff\_density}\)</span>. This is a trick used for making
 the data consistent for multiple level problems. When we are generating the
 initial background/base state, if we are above base_cutoff_density_loc,
 just use the values for <span class="math notranslate nohighlight">\(\rho,T\)</span>, and <span class="math notranslate nohighlight">\(p\)</span> at base_cutoff_density_loc.
-When we check whether we are in HSE, we use base_cutoff_density_loc.</li>
-<li>In make_S_nodal, make_macrhs, and make_w0,
+When we check whether we are in HSE, we use base_cutoff_density_loc.</p></li>
+<li><p>In make_S_nodal, make_macrhs, and make_w0,
 we only add the volume discrepancy for <span class="math notranslate nohighlight">\(r &lt; {\tt base\_cutoff\_density\_coord}\)</span>
 (in plane parallel) and if <span class="math notranslate nohighlight">\(\rho_0^{\rm cart} &gt; {\tt base\_cutoff\_density}\)</span>
-(in spherical).</li>
-<li>In mkrhohforce for plane-parallel, for
+(in spherical).</p></li>
+<li><p>In mkrhohforce for plane-parallel, for
 <span class="math notranslate nohighlight">\(r \ge {\tt base\_cutoff\_density\_coord}\)</span>, we
 compute <span class="math notranslate nohighlight">\(\nabla p_0\)</span> with a difference stencil instead of simply
-setting it to <span class="math notranslate nohighlight">\(\rho_0 g\)</span>.</li>
-<li>In update_scal, if <span class="math notranslate nohighlight">\(\rho \le {\tt base\_cutoff\_density}\)</span>
-and do_eos_h_above_cutoff, we call the EOS to compute <span class="math notranslate nohighlight">\(h\)</span>.</li>
-<li>In update_scal, if <span class="math notranslate nohighlight">\(\rho \le {\tt base\_cutoff\_density}/2\)</span>
-we set it to <span class="math notranslate nohighlight">\({\tt base\_cutoff\_density}/2\)</span>.</li>
-<li>In make_grav for spherical, we only add the enclosed mass if
-<span class="math notranslate nohighlight">\(\rho_0 &gt; {\tt base\_cutoff\_density}\)</span>.</li>
-<li>In enforce_HSE, we set <span class="math notranslate nohighlight">\(p_0(r+1) = p_0(r)\)</span> for
-<span class="math notranslate nohighlight">\(r \ge {\tt base\_cutoff\_density\_coord}\)</span>.</li>
-<li>In make_psi for plane-parallel, we only compute <span class="math notranslate nohighlight">\(\psi\)</span> for
-<span class="math notranslate nohighlight">\(r &lt; {\tt base\_cutoff\_density\_coord}\)</span>.</li>
+setting it to <span class="math notranslate nohighlight">\(\rho_0 g\)</span>.</p></li>
+<li><p>In update_scal, if <span class="math notranslate nohighlight">\(\rho \le {\tt base\_cutoff\_density}\)</span>
+and do_eos_h_above_cutoff, we call the EOS to compute <span class="math notranslate nohighlight">\(h\)</span>.</p></li>
+<li><p>In update_scal, if <span class="math notranslate nohighlight">\(\rho \le {\tt base\_cutoff\_density}/2\)</span>
+we set it to <span class="math notranslate nohighlight">\({\tt base\_cutoff\_density}/2\)</span>.</p></li>
+<li><p>In make_grav for spherical, we only add the enclosed mass if
+<span class="math notranslate nohighlight">\(\rho_0 &gt; {\tt base\_cutoff\_density}\)</span>.</p></li>
+<li><p>In enforce_HSE, we set <span class="math notranslate nohighlight">\(p_0(r+1) = p_0(r)\)</span> for
+<span class="math notranslate nohighlight">\(r \ge {\tt base\_cutoff\_density\_coord}\)</span>.</p></li>
+<li><p>In make_psi for plane-parallel, we only compute <span class="math notranslate nohighlight">\(\psi\)</span> for
+<span class="math notranslate nohighlight">\(r &lt; {\tt base\_cutoff\_density\_coord}\)</span>.</p></li>
 </ul>
 </div>
 <div class="section" id="burning-cutoff">
@@ -402,11 +402,11 @@ we set it to <span class="math notranslate nohighlight">\({\tt base\_cutoff\_den
 get the nuclear energy generation rate and composition changes. For
 densities below the burning cutoff, we do not call the network.</p>
 <ul class="simple">
-<li>In probin, burning_cutoff_density is set to
+<li><p>In probin, burning_cutoff_density is set to
 base_cutoff_density. There is no option to set
-burning_cutoff_density using the inputs file.</li>
-<li>In react_state, we only call the burner if
-<span class="math notranslate nohighlight">\(\rho &gt;\)</span> burning_cutoff_density.</li>
+burning_cutoff_density using the inputs file.</p></li>
+<li><p>In react_state, we only call the burner if
+<span class="math notranslate nohighlight">\(\rho &gt;\)</span> burning_cutoff_density.</p></li>
 </ul>
 </div>
 <div class="section" id="buoyancy-cutoff-factor">
@@ -414,22 +414,20 @@ burning_cutoff_density using the inputs file.</li>
 <p>The buoyancy_cutoff_factor is used to zero out the forcing terms
 to the velocity equation at low densities.</p>
 <ul>
-<li><p class="first">In init_base_state we print out the value of the
+<li><p>In init_base_state we print out the value of the
 the density at which the buoyancy cutoff would take effect,
-buoyancy_cutoff_factor * base_cutoff_density.</p>
-</li>
-<li><p class="first">In mk_vel_force, we zero out rhopert, the
+buoyancy_cutoff_factor * base_cutoff_density.</p></li>
+<li><p>In mk_vel_force, we zero out rhopert, the
 perturbational density used in computing the buoyancy force,
-if <span class="math notranslate nohighlight">\(\rho &lt; \mathtt{buoyancy\_cutoff\_factor * base\_cutoff\_density}\)</span>.</p>
-</li>
-<li><p class="first">In mk_vel_force, for spherical problems, we
+if <span class="math notranslate nohighlight">\(\rho &lt; \mathtt{buoyancy\_cutoff\_factor * base\_cutoff\_density}\)</span>.</p></li>
+<li><p>In mk_vel_force, for spherical problems, we
 zero out centrifugal_term, the centrifugal force for
 rotating stars, if :math:<a href="#id1"><span class="problematic" id="id2">`</span></a>rho &lt; mathtt{buoyancy_cutoff_factor *</p>
 <blockquote>
 <div><p>base_cutoff_density}`.</p>
 </div></blockquote>
 </li>
-<li><div class="first line-block">
+<li><div class="line-block">
 <div class="line">In make_explicit_thermal, if limit_conductivity = T, then for
 <span class="math notranslate nohighlight">\(\rho &lt; \mathtt{buoyancy\_cutoff\_factor}\)</span></div>
 <div class="line"><span class="math notranslate nohighlight">\(* \mathtt{base\_cutoff\_density}\)</span>, we

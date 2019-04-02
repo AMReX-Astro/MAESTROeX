@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Spectral Deferred Corrections &mdash; MAESTROeX 19.03
+  <title>Spectral Deferred Corrections &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -221,7 +221,7 @@ the thermodynamic variables, <span class="math notranslate nohighlight">\((\rho 
 been shown to be more accurate and efficient than Strang splitting in a
 terrestrial, non-stratified, low Mach number reacting flow solver <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{Non11}`</span></a>,
 so we would like to develop an SDC version of MAESTRO.</p>
-<p>MAESTRO&nbsp;integrates the following system of equations:</p>
+<p>MAESTRO integrates the following system of equations:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 \frac{\partial\Ub}{\partial t} &amp;=&amp;
@@ -233,7 +233,7 @@ so we would like to develop an SDC version of MAESTRO.</p>
     -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt}
     + \rho\Hnuc + \nabla\cdot k_{\rm th}\nabla T,\label{eq:enthalpy}\end{aligned}\end{split}\]</div>
 <p>together with base state evolution equations and a constraint equation.
-By default, MAESTRO&nbsp;advances the thermodynamic variables by coupling
+By default, MAESTRO advances the thermodynamic variables by coupling
 the different physical processes together (advection, diffusion, reactions) using
 Strang splitting. Specifically, we integrate the reaction terms
 over half a time step ignoring contributions from advection and diffusion,
@@ -263,7 +263,7 @@ processes operate independent of one-another. The species and
 enthalpy equations are integrated over <span class="math notranslate nohighlight">\(\Delta t\)</span> using the following
 sequence:</p>
 <ul>
-<li><p class="first">React for <span class="math notranslate nohighlight">\(\Delta t/2\)</span>:</p>
+<li><p>React for <span class="math notranslate nohighlight">\(\Delta t/2\)</span>:</p>
 <p>In the Strang splitting version of MAESTRO, the reaction network solves just
 the reaction portion of the species evolution equations along with a
 temperature evolution equation. This is done using a standard stiff ODE solver
@@ -283,7 +283,7 @@ update the enthalpy at the end of the integration as:</p>
 <div class="math notranslate nohighlight">
 \[h^\mathrm{new} = h^\mathrm{old} + \frac{\Delta t}{2} \Hnuc.\]</div>
 </li>
-<li><p class="first">Advect for <span class="math notranslate nohighlight">\(\Delta t\)</span>:</p>
+<li><p>Advect for <span class="math notranslate nohighlight">\(\Delta t\)</span>:</p>
 <p>Beginning with the results from the previous reaction half time step, we integrate
 that state using the equations</p>
 <div class="math notranslate nohighlight">
@@ -296,12 +296,12 @@ that state using the equations</p>
 takes place using the state updated from the reaction step, the effect
 of the reactions is implicitly contained in the advective update.</p>
 </li>
-<li><p class="first">React for <span class="math notranslate nohighlight">\(\Delta t/2\)</span>:</p>
+<li><p>React for <span class="math notranslate nohighlight">\(\Delta t/2\)</span>:</p>
 <p>Finally, we react again, starting with the state left by the advection
 step.</p>
 </li>
 </ul>
-<p>Note that MAESTRO&nbsp;uses a predictor-corrector approach. After integrating <span class="math notranslate nohighlight">\((\rho X_k,\rho h)\)</span> over
+<p>Note that MAESTRO uses a predictor-corrector approach. After integrating <span class="math notranslate nohighlight">\((\rho X_k,\rho h)\)</span> over
 the time step, we use this time-advanced state to get a better estimate of a time-centered <span class="math notranslate nohighlight">\(\beta_0\)</span>
 and <span class="math notranslate nohighlight">\(S\)</span>. We re-compute the advective velocities using an updated divergence constraint and repeat
 the thermodynamic variable advance.</p>
@@ -320,9 +320,9 @@ the physical processes. In particular, our system now looks like:</p>
 <p>Here, <span class="math notranslate nohighlight">\(A_{\rho X_k}\)</span> and <span class="math notranslate nohighlight">\(A_{\rho h}\)</span> are piecewise-constant (in time)
 approximations to the change in <span class="math notranslate nohighlight">\({\rho X_k}\)</span> and <span class="math notranslate nohighlight">\({\rho h}\)</span> (respectively)
 due to the advection. These are constructed by calling density_advance
-and enthalpy_advance in MAESTRO&nbsp;and passed into the network solver
-during the reaction step. A flowchart of the MAESTRO&nbsp;SDC algorithm is
-shown in figure&nbsp;<a class="reference external" href="#fig:sdc:flowchart">[fig:sdc:flowchart]</a>.</p>
+and enthalpy_advance in MAESTRO and passed into the network solver
+during the reaction step. A flowchart of the MAESTRO SDC algorithm is
+shown in figure <a class="reference external" href="#fig:sdc:flowchart">[fig:sdc:flowchart]</a>.</p>
 <div class="section" id="advective-update">
 <h3>Advective Update<a class="headerlink" href="#advective-update" title="Permalink to this headline">¶</a></h3>
 <p>In the advective update, our goal is to compute <span class="math notranslate nohighlight">\(A_{\rho X_k}\)</span> and
@@ -353,7 +353,7 @@ are running with use_tfromp = T, then we do</p>
 <p>Note that in contrast to the Strang splitting version, here we call the EOS
 every time we enter the RHS routine, but here we call the EOS to compute temperature
 rather than thermodynamic coefficients.</p>
-<p>Finally we integrate the ODE system (Eqs.&nbsp;<a class="reference external" href="#eq:sdc:rhoX">[eq:sdc:rhoX]</a> and <a class="reference external" href="#eq:sdc:rhoh">[eq:sdc:rhoh]</a>).
+<p>Finally we integrate the ODE system (Eqs. <a class="reference external" href="#eq:sdc:rhoX">[eq:sdc:rhoX]</a> and <a class="reference external" href="#eq:sdc:rhoh">[eq:sdc:rhoh]</a>).
 At the end of the integration, we define <span class="math notranslate nohighlight">\(I_{\rho X_k}\)</span> and <span class="math notranslate nohighlight">\(I_{\rho h}\)</span>. The actual
 form of these depends on what quantities we predict to edges during
 the construction of the advective fluxes.
@@ -370,7 +370,7 @@ species_pred_type (see §<a class="reference external" href="#sec:pred:density">
 We note that there is no <span class="math notranslate nohighlight">\(I\)</span> term for <span class="math notranslate nohighlight">\(\rho\)</span> or <span class="math notranslate nohighlight">\(\rho'\)</span> prediction, since
 the density evolution equation does not have a reaction source term.</p>
 <ul>
-<li><p class="first">species_pred_type = 1 (predict_rhoprime_and_X)
+<li><p>species_pred_type = 1 (predict_rhoprime_and_X)
 or 3 (predict_rho_and_X)</p>
 <div class="math notranslate nohighlight">
 \[I_{X_k} = \frac{1}{\rho^{n+\myhalf}} \left [
@@ -391,7 +391,7 @@ X_k^\mathrm{new} = (\rho X_k)^\mathrm{new} / \sum_k (\rho X_k)^\mathrm{new},\]</
 <div class="math notranslate nohighlight">
 \[\frac{X^{(1)} - X^\mathrm{old}}{\Delta t}= A_{X_k}.\]</div>
 </li>
-<li><p class="first">species_pred_type = 2 (predict_rhoX)</p>
+<li><p>species_pred_type = 2 (predict_rhoX)</p>
 <div class="math notranslate nohighlight">
 \[I_{\rho X_k} = \frac{(\rho X_k)^\mathrm{new} - (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}.
 \label{eq:sdc:Irhoo}\]</div>
@@ -402,13 +402,13 @@ X_k^\mathrm{new} = (\rho X_k)^\mathrm{new} / \sum_k (\rho X_k)^\mathrm{new},\]</
 <h3>Enthalpy Source Terms.<a class="headerlink" href="#enthalpy-source-terms" title="Permalink to this headline">¶</a></h3>
 <p>The appropriate constructions are:</p>
 <ul>
-<li><p class="first">enthalpy_pred_type = 0 (predict_rhoh)</p>
+<li><p>enthalpy_pred_type = 0 (predict_rhoh)</p>
 <div class="math notranslate nohighlight">
 \[I_{\rho h} = \frac{(\rho h)^{\rm new} - (\rho h)^{\rm old}}{\Delta t} - A_{\rho h}.\]</div>
 </li>
-<li><p class="first">enthalpy_pred_type = 1 (predict_rhohprime, not implemented yet)</p>
+<li><p>enthalpy_pred_type = 1 (predict_rhohprime, not implemented yet)</p>
 <p>(Andy’s Idea) Here we need an <span class="math notranslate nohighlight">\(I_{\rho h}\)</span> term for the <span class="math notranslate nohighlight">\((\rho h)'\)</span> evolution
-equation (see Eq.&nbsp;<a class="reference external" href="#rhohprimeequation">[rhohprime equation]</a>). In this case we will use
+equation (see Eq. <a class="reference external" href="#rhohprimeequation">[rhohprime equation]</a>). In this case we will use
 <span class="math notranslate nohighlight">\(I_{(\rho h)'} = I_{\rho h}\)</span>. Since we are not evolving the base state, the PDE
 for <span class="math notranslate nohighlight">\((\rho h)_0\)</span> is simply <span class="math notranslate nohighlight">\(\partial(\rho h)_0/\partial t = 0\)</span>, and thus the
 evolution equation for <span class="math notranslate nohighlight">\((\rho h)'\)</span> is the same as the evolution equation
@@ -418,7 +418,7 @@ evolution equation may need to know about the <span class="math notranslate nohi
 In particular, should <span class="math notranslate nohighlight">\((\rho h)_0\)</span> see a <span class="math notranslate nohighlight">\(\overline{(\rho \Hnuc)}\)</span> term?
 what about an average thermal diffusion?</p>
 </li>
-<li><p class="first">enthalpy_pred_type = 2 (predict_h )</p>
+<li><p>enthalpy_pred_type = 2 (predict_h )</p>
 <p>This is the most straightforward prediction type. The SDC solver
 integrates the equation for <span class="math notranslate nohighlight">\((\rho h)\)</span>:</p>
 <div class="math notranslate nohighlight">
@@ -445,7 +445,7 @@ we see:</p>
 <div class="math notranslate nohighlight">
 \[I_h = \frac{h^{(1)} - h^\mathrm{old}}{\Delta t} = A_h.\]</div>
 </li>
-<li><p class="first">enthalpy_pred_type = 3 (predict_T_then_rhoprime) or
+<li><p>enthalpy_pred_type = 3 (predict_T_then_rhoprime) or
 enthalpy_pred_type = 4 (predict_T_then_h )</p>
 <p>Both of these enthalpy_pred_types predict temperature. Expressing
 <span class="math notranslate nohighlight">\(h = h(p_0,T,X_k)\)</span> and differentiating along particle paths:</p>
@@ -456,13 +456,13 @@ enthalpy_pred_type = 4 (predict_T_then_h )</p>
            \sum_k \left . \frac{\partial h}{\partial X_k} \right |_{p,T} \frac{DX_k}{Dt} \\
               &amp;=&amp; c_p \frac{DT}{Dt} + h_p  \frac{Dp_0}{Dt} + \sum_k \xi_k \omegadot_k\end{aligned}\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(c_p\)</span>, <span class="math notranslate nohighlight">\(h_p\)</span>, and <span class="math notranslate nohighlight">\(\xi_k\)</span> are as defined in the table of symbols
-(Table&nbsp;<a class="reference external" href="#table:sym">[table:sym]</a>), and we substitute <span class="math notranslate nohighlight">\(DX_k/Dt = \omegadot_k\)</span> (from the species
-continuity equation, Eq.&nbsp;<a class="reference external" href="#speciesequation">[species equation]</a>). Using Eq.&nbsp;<a class="reference external" href="#eq:sdc:h">[eq:sdc:h]</a>, we have
+(Table <a class="reference external" href="#table:sym">[table:sym]</a>), and we substitute <span class="math notranslate nohighlight">\(DX_k/Dt = \omegadot_k\)</span> (from the species
+continuity equation, Eq. <a class="reference external" href="#speciesequation">[species equation]</a>). Using Eq. <a class="reference external" href="#eq:sdc:h">[eq:sdc:h]</a>, we have
 the familiar temperature evolution equation:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\rho c_p \frac{DT}{Dt} = \underbrace{(1 - \rho h_p) \frac{Dp_0}{Dt}}_{\begin{smallmatrix}\text{already~accounted~for} \\ \text{in~T~prediction}\end{smallmatrix}} - \sum_k \xi_k \rho \omegadot_k + \rho \Hnuc\end{split}\]</div>
 <p>where the underbraced term is already present in mktempforce. Recognizing that
-Eq.&nbsp;<a class="reference external" href="#eq:sdc:Irhoh">[eq:sdc:Irhoh]</a> is the SDC approximation to <span class="math notranslate nohighlight">\((\rho \Hnuc)\)</span> and Eq.&nbsp;<a class="reference external" href="#eq:sdc:Irhoo">[eq:sdc:Irhoo]</a> is the
+Eq. <a class="reference external" href="#eq:sdc:Irhoh">[eq:sdc:Irhoh]</a> is the SDC approximation to <span class="math notranslate nohighlight">\((\rho \Hnuc)\)</span> and Eq. <a class="reference external" href="#eq:sdc:Irhoo">[eq:sdc:Irhoo]</a> is the
 SDC approximation to <span class="math notranslate nohighlight">\((\rho \omegadot_k)\)</span>, we can define</p>
 <div class="math notranslate nohighlight">
 \[I_T = \frac{1}{\rho^{n+\myhalf} c_p^{n+\myhalf}} \left \{
@@ -486,7 +486,7 @@ and <span class="math notranslate nohighlight">\(h^{(1)}\)</span> (or <span clas
 <div class="section" id="implementation">
 <h3>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h3>
 <p>This is done in advance.f90 just after the call to react_state,
-stored in the multifab&nbsp;called intra.
+stored in the multifab called intra.
 These terms are used as the source terms for the
 advection step in the next SDC iteration.</p>
 </div>
@@ -647,7 +647,7 @@ I_{\rho h}^{(j)} &amp;=&amp; \frac{(\rho h)^{n+1,(j)} - (\rho h)^n}{\Delta t} - 
 </div></blockquote>
 <div class="line-block">
 <div class="line"><strong>Step 5:</strong> (<em>Advance velocity and dynamic pressure</em>)</div>
-<div class="line">Similar to the original MAESTRO&nbsp;algorithm, more to come.</div>
+<div class="line">Similar to the original MAESTRO algorithm, more to come.</div>
 </div>
 </div>
 </div>

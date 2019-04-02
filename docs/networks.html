@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reaction Networks &mdash; MAESTROeX 19.03
+  <title>Reaction Networks &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -116,7 +116,7 @@
 <li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reaction Networks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#introduction-to-maestro-networks">Introduction to MAESTRO&nbsp;Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#introduction-to-maestro-networks">Introduction to MAESTRO Networks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#notes-of-specific-networks">Notes of Specific Networks</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#general-null">general_null</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#ignition-chamulak">ignition_chamulak</a></li>
@@ -211,16 +211,16 @@
   <div class="section" id="reaction-networks">
 <h1>Reaction Networks<a class="headerlink" href="#reaction-networks" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction-to-maestro-networks">
-<h2>Introduction to MAESTRO&nbsp;Networks<a class="headerlink" href="#introduction-to-maestro-networks" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO&nbsp;models multiple species, described by the mass density of
+<h2>Introduction to MAESTRO Networks<a class="headerlink" href="#introduction-to-maestro-networks" title="Permalink to this headline">¶</a></h2>
+<p>MAESTRO models multiple species, described by the mass density of
 the fluid, <span class="math notranslate nohighlight">\(\rho\)</span>, and the mass fraction of the species, <span class="math notranslate nohighlight">\(X_k \equiv
 \rho_k/\rho\)</span>, where <span class="math notranslate nohighlight">\(\rho_k\)</span> is the mass density of species <span class="math notranslate nohighlight">\(k\)</span>. All
-MAESTRO&nbsp;problems, regardless of whether they model reactions, need a
+MAESTRO problems, regardless of whether they model reactions, need a
 network. In its most basic form, the network supplies the properties
 of the species (atomic mass, atomic number) that are interpreted by
 the equation of state to compute.</p>
-<p>Additional networks will be made available in the Microphysics&nbsp;repo <a class="footnote-reference" href="#id16" id="id1">[1]</a>. These
-will have interfaces for both MAESTRO&nbsp;and CASTRO.</p>
+<p>Additional networks will be made available in the Microphysics repo <a class="footnote-reference brackets" href="#id16" id="id1">1</a>. These
+will have interfaces for both MAESTRO and CASTRO.</p>
 </div>
 <div class="section" id="notes-of-specific-networks">
 <h2>Notes of Specific Networks<a class="headerlink" href="#notes-of-specific-networks" title="Permalink to this headline">¶</a></h2>
@@ -251,7 +251,7 @@ extern/networks/general_null/GPackage.mak)</p>
 <div class="section" id="ignition-chamulak">
 <h3>ignition_chamulak<a class="headerlink" href="#ignition-chamulak" title="Permalink to this headline">¶</a></h3>
 <p>This network was introduced in our paper on convection in white dwarfs
-as a model of Type Ia supernovae&nbsp;<a href="#id2"><span class="problematic" id="id3">:raw-latex:`\cite{wdconvect}`</span></a>. It models
+as a model of Type Ia supernovae <a href="#id2"><span class="problematic" id="id3">:raw-latex:`\cite{wdconvect}`</span></a>. It models
 carbon burning in a regime appropriate for a simmering white dwarf,
 and captures the effects of a much larger network by setting the ash
 state and energetics to the values suggested in <a href="#id4"><span class="problematic" id="id5">:raw-latex:`\cite{chamulak:2008}`</span></a>.</p>
@@ -259,24 +259,23 @@ state and energetics to the values suggested in <a href="#id4"><span class="prob
 <div class="section" id="ignition-simple">
 <h3>ignition_simple<a class="headerlink" href="#ignition-simple" title="Permalink to this headline">¶</a></h3>
 <p>This is the original network used in our white dwarf convection
-studies&nbsp;<a href="#id6"><span class="problematic" id="id7">:raw-latex:`\cite{lowMach4}`</span></a>. It includes a single reaction,
+studies <a href="#id6"><span class="problematic" id="id7">:raw-latex:`\cite{lowMach4}`</span></a>. It includes a single reaction,
 <span class="math notranslate nohighlight">\(^{12}\mathrm{C}({}^{12}\mathrm{C},\gamma){}^{24}\mathrm{Mg}\)</span>, using
-the rate from Caughlin and Fowler&nbsp;<a href="#id8"><span class="problematic" id="id9">:raw-latex:`\cite{caughlan-fowler:1988}`</span></a>.</p>
+the rate from Caughlin and Fowler <a href="#id8"><span class="problematic" id="id9">:raw-latex:`\cite{caughlan-fowler:1988}`</span></a>.</p>
 </div>
 <div class="section" id="rprox">
 <h3>rprox<a class="headerlink" href="#rprox" title="Permalink to this headline">¶</a></h3>
 <p>This is a network introduced in a paper modeling mixed H/He X-ray
-bursts&nbsp;<a href="#id10"><span class="problematic" id="id11">:raw-latex:`\cite{xrb2}`</span></a>. rprox that has 10 species approximates hit
+bursts <a href="#id10"><span class="problematic" id="id11">:raw-latex:`\cite{xrb2}`</span></a>. rprox that has 10 species approximates hit
 CNO burning, triple-<span class="math notranslate nohighlight">\(\alpha\)</span>, and rp-process breakout up through
-<span class="math notranslate nohighlight">\(^{56}\mathrm{Ni}\)</span>. Updated rates from ReacLib&nbsp;<a href="#id12"><span class="problematic" id="id13">:raw-latex:`\cite{ReacLib}`</span></a> are
+<span class="math notranslate nohighlight">\(^{56}\mathrm{Ni}\)</span>. Updated rates from ReacLib <a href="#id12"><span class="problematic" id="id13">:raw-latex:`\cite{ReacLib}`</span></a> are
 used. The overall ideas in this network are based on Appendix C of
 <a href="#id14"><span class="problematic" id="id15">:raw-latex:`\cite{wallacewoosley:1981}`</span></a>.</p>
-<table class="docutils footnote" frame="void" id="id16" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="https://github.com/starkiller-astro/Microphysics">https://github.com/starkiller-astro/Microphysics</a></td></tr>
-</tbody>
-</table>
+<dl class="footnote brackets">
+<dt class="label" id="id16"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/starkiller-astro/Microphysics">https://github.com/starkiller-astro/Microphysics</a></p>
+</dd>
+</dl>
 </div>
 </div>
 </div>

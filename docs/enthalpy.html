@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Notes on Enthalpy &mdash; MAESTROeX 19.03
+  <title>Notes on Enthalpy &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -419,7 +419,7 @@ instead of <span class="math notranslate nohighlight">\(h\)</span>. This is equi
 \frac{\partial(\rho e)}{\partial t} &amp;=&amp;
  -\nabla\cdot(\rho e\Ub) - p_0 \nabla\cdot\Ub + \rho\Hnuc  \nonumber\end{aligned}\end{split}\]</div>
 <p>which is identical to solving the energy equation with <span class="math notranslate nohighlight">\(p\to p_0\)</span>.
-This option is enabled in MAESTRO&nbsp;via
+This option is enabled in MAESTRO via
 use_eos_e_instead_of_h = T.</p>
 <div class="section" id="constant-gamma-gas">
 <h3>Constant <span class="math notranslate nohighlight">\(\gamma\)</span> Gas<a class="headerlink" href="#constant-gamma-gas" title="Permalink to this headline">¶</a></h3>
@@ -442,19 +442,19 @@ to</p>
 <a class="reference external" href="#eq:e:pressureevolution">[eq:e:pressure evolution]</a> gives</p>
 <div class="math notranslate nohighlight">
 \[\frac{Dp}{Dt} = \frac{\gamma-1}{\gamma}\left(1-\frac{p}{p_0}\right)\rho H. \label{eq:pressure evolution constant gamma}\]</div>
-<dl class="docutils">
-<dt>If <span class="math notranslate nohighlight">\(p_0\)</span> is assumed constant and using <a href="#id1"><span class="problematic" id="id2">`</span></a>[eq:div constraint for</dt>
-<dd>constant gamma] &lt;#eq:div constraint for
-constant gamma&gt;`__, the difference between the enthalpy equation and</dd>
+<dl class="simple">
+<dt>If <span class="math notranslate nohighlight">\(p_0\)</span> is assumed constant and using <a href="#id1"><span class="problematic" id="id2">`</span></a>[eq:div constraint for</dt><dd><p>constant gamma] &lt;#eq:div constraint for
+constant gamma&gt;`__, the difference between the enthalpy equation and</p>
+</dd>
 </dl>
 <p>the energy equation, <a class="reference external" href="#eq:differencebetweenhandeequations">[eq:difference between h and e equations]</a>,
 can be rewritten as</p>
 <div class="math notranslate nohighlight">
 \[-\frac{Dp}{Dt} - \frac{\gamma}{\gamma-1}\left(1-\frac{p}{p_0}\right)\rho H = 0,\]</div>
-<dl class="docutils">
-<dt>where the equality holds from <a href="#id3"><span class="problematic" id="id4">`</span></a>[eq:pressure evolution constant</dt>
-<dd>gamma] &lt;#eq:pressure evolution constant
-gamma&gt;`__. In other words, for the constant <span class="math notranslate nohighlight">\(\gamma\)</span> gas we have</dd>
+<dl class="simple">
+<dt>where the equality holds from <a href="#id3"><span class="problematic" id="id4">`</span></a>[eq:pressure evolution constant</dt><dd><p>gamma] &lt;#eq:pressure evolution constant
+gamma&gt;`__. In other words, for the constant <span class="math notranslate nohighlight">\(\gamma\)</span> gas we have</p>
+</dd>
 </dl>
 <p><span class="math notranslate nohighlight">\(p=p_0\)</span> as expected.</p>
 </div>
@@ -462,19 +462,18 @@ gamma&gt;`__. In other words, for the constant <span class="math notranslate noh
 <div class="section" id="outstanding-questions">
 <h2>Outstanding Questions<a class="headerlink" href="#outstanding-questions" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Why do we want to start with enthalpy instead of internal energy?</p>
+<li><p>Why do we want to start with enthalpy instead of internal energy?</p>
 <p>We believe that the original desire stems from our experience with
 smallscale combustion. There, stratification is not important and
 <span class="math notranslate nohighlight">\(Dp_0/Dt = 0\)</span>, so the enthalpy equation becomes a conservation
 equation for <span class="math notranslate nohighlight">\((\rho h)\)</span>.</p>
 </li>
-<li><dl class="first docutils">
-<dt>Should we call the EOS with <span class="math notranslate nohighlight">\(h\)</span> as is, or call the EOS with :math:<a href="#id5"><span class="problematic" id="id6">`</span></a>e =</dt>
-<dd><p class="first last">h - p_0 / rho`?</p>
+<li><dl class="simple">
+<dt>Should we call the EOS with <span class="math notranslate nohighlight">\(h\)</span> as is, or call the EOS with :math:<a href="#id5"><span class="problematic" id="id6">`</span></a>e =</dt><dd><p>h - p_0 / rho`?</p>
 </dd>
 </dl>
 </li>
-<li><p class="first">When we stay on the constraint, i.e. <span class="math notranslate nohighlight">\(p_{EOS} = p_0\)</span>, then the
+<li><p>When we stay on the constraint, i.e. <span class="math notranslate nohighlight">\(p_{EOS} = p_0\)</span>, then the
 equations for <span class="math notranslate nohighlight">\(e\)</span> and for <span class="math notranslate nohighlight">\(h\)</span> are identical. However, once we are
 off the constraint, do the terms in the current evolution equation
 for <span class="math notranslate nohighlight">\(h\)</span> serve to drive us back to the constraint? Recall our
@@ -489,15 +488,13 @@ the r.h.s. of the constraint:</p>
        \frac{\partial p_0}{\partial t} - \frac{f}{\overline{\Gamma_1} p_0}
        \frac{p_0-p_\text{EOS}}{\dt}\right)\]</div>
 </li>
-<li><p class="first">Suppose we corrected the <span class="math notranslate nohighlight">\(h\)</span> (or <span class="math notranslate nohighlight">\(e\)</span> equation) by using the full
+<li><p>Suppose we corrected the <span class="math notranslate nohighlight">\(h\)</span> (or <span class="math notranslate nohighlight">\(e\)</span> equation) by using the full
 <span class="math notranslate nohighlight">\(p\)</span> instead of <span class="math notranslate nohighlight">\(p_0\)</span>? Would this be more or less consistent (one
 could imagine doing this as a correction after solving for <span class="math notranslate nohighlight">\(\pi\)</span>
-earlier in the timestep).</p>
-</li>
-<li><p class="first">In computing the thermodynamic coefficients in <span class="math notranslate nohighlight">\(S\)</span> for the
+earlier in the timestep).</p></li>
+<li><p>In computing the thermodynamic coefficients in <span class="math notranslate nohighlight">\(S\)</span> for the
 projection, don’t we need these to be in terms of <span class="math notranslate nohighlight">\(p_0\)</span> instead of
-<span class="math notranslate nohighlight">\(p(h,\rho)\)</span>?</p>
-</li>
+<span class="math notranslate nohighlight">\(p(h,\rho)\)</span>?</p></li>
 </ol>
 </div>
 </div>

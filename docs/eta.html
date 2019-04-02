@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Mixing Term, \(\etarho\) &mdash; MAESTROeX 19.03
+  <title>The Mixing Term, \(\etarho\) &mdash; MAESTROeX 19.04
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.03
+                19.04
 
               </div>
             
@@ -240,8 +240,8 @@ w_0 &amp;=&amp; \ow + \delta w_0 \\
 \frac{1}{r^2} \frac{\partial}{\partial r} \left (r^2 \ow \right ) &amp;=&amp; \Sbar \\
 \frac{\partial}{\partial r} \left[ \frac{\gammabar p_0}{r^2} \frac{\partial}{\partial r} (r^2 \dw) \right] &amp;=&amp; - \frac{g}{r^2} \frac{\partial (r^2 \etarho)}{\partial r} - \frac{4 (\ow + \dw) \rho_0 g}{r}
 - 4 \pi G \rho_0 \etarho \label{eq:dw0constraint}\end{aligned}\end{split}\]</div>
-<p>In paper&nbsp;III, we introduced a mixing term, <span class="math notranslate nohighlight">\(\etarho\)</span>, to the density
-evolution equation (eq.&nbsp;[<a class="reference external" href="#eq:rho0upd_new">[eq:rho0upd_new]</a>]), with the objective of
+<p>In paper III, we introduced a mixing term, <span class="math notranslate nohighlight">\(\etarho\)</span>, to the density
+evolution equation (eq. [<a class="reference external" href="#eq:rho0upd_new">[eq:rho0upd_new]</a>]), with the objective of
 keeping the base state density equal to the average of the density
 over a layer. For a spherical base state, it is best to define the
 average in terms of spherical coordinates,</p>
@@ -295,13 +295,13 @@ with the Cartesian grid boundaries.</p>
 constructing the quantity <span class="math notranslate nohighlight">\(\rhop \Ubt \cdot \er\)</span> in each cell, and then
 use our average routine to construct a 1-d, cell-centered
 <span class="math notranslate nohighlight">\(\eta_{\rho,r}\)</span> (this is essentially numerically solving the integral
-in Eq.&nbsp;[<a class="reference external" href="#eq:eta">[eq:eta]</a>]). The edge-centered values of <span class="math notranslate nohighlight">\(\etarho\)</span>,
+in Eq. [<a class="reference external" href="#eq:eta">[eq:eta]</a>]). The edge-centered values of <span class="math notranslate nohighlight">\(\etarho\)</span>,
 <span class="math notranslate nohighlight">\(\eta_{\rho,r+1/2}\)</span> are then constructed by simple
 averaging:</p>
 <div class="math notranslate nohighlight">
 \[\eta_{\rho,r+1/2} = \frac{\eta_{\rho,r} + \eta_{\rho,r+1}}{2} \enskip .\]</div>
 <p>Instead of differencing <span class="math notranslate nohighlight">\(\eta_{\rho,r+1/2}\)</span> to construct the
-divergence, we instead use equation&nbsp;(<a class="reference external" href="#eq:rhopbar">[eq:rhopbar]</a>) directly, by writing:</p>
+divergence, we instead use equation (<a class="reference external" href="#eq:rhopbar">[eq:rhopbar]</a>) directly, by writing:</p>
 <div class="math notranslate nohighlight">
 \[\left [ \nabla \cdot (\etarho \er ) \right ]^{n+1/2}
 = - \frac{\overline{\rhop^{n+1}} - \overline{\rhop^n}}{\Delta t}
@@ -311,15 +311,15 @@ divergence, we instead use equation&nbsp;(<a class="reference external" href="#e
 <div class="section" id="eta-flow-chart">
 <h1><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart<a class="headerlink" href="#eta-flow-chart" title="Permalink to this headline">¶</a></h1>
 <ol class="arabic simple">
-<li>Enter advance_timestep with <span class="math notranslate nohighlight">\([\etarhoec, \etarhocc]^{n-\myhalf}\)</span>.</li>
-<li>Call make_w0. The spherical version uses uses <span class="math notranslate nohighlight">\(\etarho^{{\rm ec},n-\myhalf}\)</span> and <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n-\myhalf}\)</span>.</li>
-<li>Call density_advance. The plane-parallel version computes <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf,*}\)</span>.</li>
-<li>Call make_etarho to compute <span class="math notranslate nohighlight">\([\etarhoec, \etarhocc]^{n+\myhalf,*}\)</span>. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf,*}\)</span>.</li>
-<li>Call make_psi. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n+\myhalf,*}\)</span>.</li>
-<li>Call make_w0. The spherical version uses uses <span class="math notranslate nohighlight">\(\etarho^{{\rm ec},n+\myhalf,*}\)</span> and <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n+\myhalf,*}\)</span>.</li>
-<li>Call density_advance. The plane-parallel version computes <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf}\)</span>.</li>
-<li>Call make_etarho to compute <span class="math notranslate nohighlight">\([\etarhoec, \etarhocc]^{n+\myhalf}\)</span>. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf}\)</span>.</li>
-<li>Call make_psi. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n+\myhalf}\)</span>.</li>
+<li><p>Enter advance_timestep with <span class="math notranslate nohighlight">\([\etarhoec, \etarhocc]^{n-\myhalf}\)</span>.</p></li>
+<li><p>Call make_w0. The spherical version uses uses <span class="math notranslate nohighlight">\(\etarho^{{\rm ec},n-\myhalf}\)</span> and <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n-\myhalf}\)</span>.</p></li>
+<li><p>Call density_advance. The plane-parallel version computes <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf,*}\)</span>.</p></li>
+<li><p>Call make_etarho to compute <span class="math notranslate nohighlight">\([\etarhoec, \etarhocc]^{n+\myhalf,*}\)</span>. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf,*}\)</span>.</p></li>
+<li><p>Call make_psi. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n+\myhalf,*}\)</span>.</p></li>
+<li><p>Call make_w0. The spherical version uses uses <span class="math notranslate nohighlight">\(\etarho^{{\rm ec},n+\myhalf,*}\)</span> and <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n+\myhalf,*}\)</span>.</p></li>
+<li><p>Call density_advance. The plane-parallel version computes <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf}\)</span>.</p></li>
+<li><p>Call make_etarho to compute <span class="math notranslate nohighlight">\([\etarhoec, \etarhocc]^{n+\myhalf}\)</span>. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf}\)</span>.</p></li>
+<li><p>Call make_psi. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n+\myhalf}\)</span>.</p></li>
 </ol>
 </div>
 <div class="section" id="computing-etarhoec-and-etarhocc">
