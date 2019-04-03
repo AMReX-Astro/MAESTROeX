@@ -8,41 +8,41 @@ Controlling Timestepping and Output
 Parameters that set the maximum time for the simulation to run
 include:
 
--  stop_time is the maximum simulation time, in seconds,
+-  ``stop_time`` is the maximum simulation time, in seconds,
    to evolve the system for.
 
--  max_step is the maximum number of steps to take.
+-  ``max_step`` is the maximum number of steps to take.
 
 Parameters affecting the size of the timestep include:
 
--  cflfac is a multiplicative factor (:math:`\le 1`)
+-  ``cflfac`` is a multiplicative factor (:math:`\le 1`)
    applied to the advective CFL timestep
 
--  init_shrink is the factor (:math:`\le 1`) by which to reduce
+-  ``init_shrink`` is the factor (:math:`\le 1`) by which to reduce
    the initial timestep from the estimated first timestep.
 
 Parameters affecting output and restart include:
 
--  restart tells MAESTROeX to restart from a checkpoint. The
+-  ``restart`` tells MAESTROeX to restart from a checkpoint. The
    value of this parameter should be the file number to restart from.
    For example, to restart from the checkpoint file chk00010,
-   you would set restart = 10.
+   you would set ``restart = 10``.
 
--  plot_int is the number of steps to take between
+-  ``plot_int`` is the number of steps to take between
    outputting a plotfile
 
--  plot_deltat is the simulation time to evolve between
+-  ``plot_deltat`` is the simulation time to evolve between
    outputting a plotfile. Note: to output only based on simulation
-   time, set plot_int = -1.
+   time, set ``plot_int = -1``.
 
--  check_int is the number of steps to take between
+-  ``check_int`` is the number of steps to take between
    outputting a checkpoint.
 
--  plot_base_name is the basename to use for the
+-  ``plot_base_name`` is the basename to use for the
    plotfile filename. The step number will be appended to
    this name.
 
-Note that in addition to the normal plotfiles, there are *mini* plotfiles
+Note that in addition to the normal plotfiles, there are *small* plotfiles
 that store a small subset of the fields, intended to be output more frequently.
 These are described in § \ `[vis:sec:miniplotfile] <#vis:sec:miniplotfile>`__.
 
@@ -52,28 +52,28 @@ Defining the Grid and Boundary Conditions
 Parameters that determine the spatial extent of the grid,
 the types of boundaries, and the number of computational cells include:
 
--  max_levs is the maximum number of grid levels in the AMR
-   hierarchy to use. max_levs = 1 indicates running with only a
+-  ``max_levs`` is the maximum number of grid levels in the AMR
+   hierarchy to use. ``max_levs = 1`` indicates running with only a
    single level spanning the whole domain.
 
--  n_cellx, n_celly, n_cellz the size of
+-  ``n_cellx``, ``n_celly``, ``n_cellz`` the size of
    base level in terms of number of cells, in the :math:`x`, :math:`y`, and :math:`z`
    coordinate directions.
 
--  max_grid_size the maximum extend of a grid, in any
+-  ``max_grid_size`` the maximum extend of a grid, in any
    coordinate direction, as measured in terms of number of cells.
 
-   For multilevel problems, the parameter max_grid_size_1
+   For multilevel problems, the parameter ``max_grid_size_1``
    controls the maximum extent on level 1 (the base
-   grid), max_grid_size_2 controls the maximum extent on
-   level 2, and max_grid_size_3 controls the maximum extent on
+   grid), ``max_grid_size_2`` controls the maximum extent on
+   level 2, and ``max_grid_size_3`` controls the maximum extent on
    levels 3 and higher.
 
--  prob_lo_x, prob_lo_y, prob_lo_z is
+-  ``prob_lo_x``, ``prob_lo_y``, ``prob_lo_z`` is
    the physical coordinate of the lower extent of the domain boundary
    in the :math:`x`, :math:`y`, and :math:`z` coordinate directions.
 
--  prob_hi_x, prob_hi_y, prob_hi_z is
+-  ``prob_hi_x``, ``prob_hi_y``, ``prob_hi_z`` is
    the physical coordinate of the upper extent of the domain boundary
    in the :math:`x`, :math:`y`, and :math:`z` coordinate directions.
 
@@ -82,8 +82,8 @@ the types of boundaries, and the number of computational cells include:
    then they will override the integer quantities in determining
    the boundary conditions.
 
-   -  bcx_lo, bcy_lo, bcz_lo
-      , bcx_hi, bcy_hi, bcz_hi are the
+   -  ``bcx_lo``, ``bcy_lo``, ``bcz_lo``
+      , ``bcx_hi``, ``bcy_hi``, ``bcz_hi`` are the
       boundary condition types at the lower (‘lo’) and upper
       (‘hi’) domain boundaries in the :math:`x`, :math:`y`, and :math:`z`
       coordinate directions. The different types are set via integer
@@ -107,7 +107,7 @@ the types of boundaries, and the number of computational cells include:
          | no-slip wall         | :math:`15`   |
          +----------------------+--------------+
 
-   -  xlo_boundary_type, ylo_boundary_type, zlo_boundary_type, xhi_boundary_type, yhi_boundary_type, zhi_boundary_type
+   -  ``xlo_boundary_type``, ``ylo_boundary_type``, ``zlo_boundary_type``, ``xhi_boundary_type``, ``yhi_boundary_type``, ``zhi_boundary_type``
       are the boundary condition types at the lower and upper domain
       boundaries in the :math:`x`, :math:`y`, and :math:`z` coordinate directions. The
       boundary type is set by providing a string name—valid values are
