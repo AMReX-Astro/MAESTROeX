@@ -12,10 +12,10 @@ shown here (where :math:`p = p_0 + \pi`).
 .. math::
 
    \begin{aligned}
-   \frac{\partial(\rho X_k)}{\partial t} &=& -\nabla\cdot(\rho X_k\Ub) + 
+   \frac{\partial(\rho X_k)}{\partial t} &=& -\nabla\cdot(\rho X_k\Ub) +
    \rho\omegadot_k,\label{enth:eq:species}\\
-   \frac{\partial\Ub}{\partial t} &=& -\Ub\cdot\nabla\Ub  - 
-     \frac{1}{\rho}\nabla\pi - 
+   \frac{\partial\Ub}{\partial t} &=& -\Ub\cdot\nabla\Ub  -
+     \frac{1}{\rho}\nabla\pi -
      \frac{\rho-\rho_0}{\rho} g\eb_r,\label{eq:momentum}\end{aligned}
 
 In the compressible formulation we complete the system with an energy
@@ -31,7 +31,7 @@ these two equations are analytically equivalent.
 .. math::
 
    \begin{aligned}
-   \frac{\partial(\rho h)}{\partial t} + \nabla\cdot(\rho h\Ub) 
+   \frac{\partial(\rho h)}{\partial t} + \nabla\cdot(\rho h\Ub)
     &=& \frac{Dp}{Dt} + \rho\Hnuc \nonumber \\
    %
    \frac{\partial(\rho e)}{\partial t} + \nabla\cdot(\rho e \Ub)
@@ -53,10 +53,10 @@ Then, by rearranging the terms, we get
 
 .. math::
 
-   \frac{D \rho}{Dt}  = -\rho \nabla \cdot \Ub = 
+   \frac{D \rho}{Dt}  = -\rho \nabla \cdot \Ub =
        \frac{1}{p_\rho}
        \left( \frac{D p}{Dt} - p_T \frac{D T}{Dt}
-                             - \sum_k p_{X_k} {\omegadot}_k \right) \enskip ,
+                             - \sum_k p_{X_k} {\omegadot}_k \right)  ,
 
 with :math:`p_\rho = \left.\partial p/\partial \rho\right|_{X_k,T}`,
 :math:`p_{X_k} = \left.\partial p/\partial X_k \right|_{T,\rho,(X_j,j\ne k)}`,
@@ -78,7 +78,7 @@ we can express :math:`DT/Dt` in terms of
 .. math::
 
    \frac{DT}{Dt} = \frac{1}{\rho c_p} \left( (1 - \rho h_p) \frac{D p}{D t}
-   - \sum_k \rho \xi_k \omegadot_k + \rho \Hnuc \right) \enskip , \label{eq:dTdt}
+   - \sum_k \rho \xi_k \omegadot_k + \rho \Hnuc \right)  , \label{eq:dTdt}
 
 where :math:`c_p = \left.\partial h/\partial T\right|_{p,X_k}` is the
 specific heat at constant pressure,
@@ -98,7 +98,7 @@ We could then write,
      \left( \frac{p_T}{\rho c_p}(1  - \rho h_p) - 1 \right) \frac{D p}{D t}
     + \frac{1}{\rho p_\rho} \left(
      \frac{p_T}{\rho c_p} (\rho \Hnuc - \rho \sum_k \xi_k   \omegadot_k)
-                                  + \sum_k p_{X_k} \omegadot_k \right) \enskip .\end{aligned}
+                                  + \sum_k p_{X_k} \omegadot_k \right)  .\end{aligned}
 
 When we derived this expression we explicitly retained the dependence
 of :math:`h` on :math:`p`, as shown by the presence of the :math:`h_p` term.
@@ -112,14 +112,14 @@ Then, replacing :math:`p` by :math:`p_0(r)`, :math:`Dp/Dt` becomes :math:`\Ub \c
    \frac{1}{\rho p_\rho} \left(
       \frac{p_T}{\rho c_p} \left(
      - \sum_k\rho  \xi_k \omegadot_k + \rho \Hnuc \right)
-    + \sum_k p_{X_k} \omegadot_k \right)  \equiv \tilde{S} \enskip \label{eq:full_divu_constraint} ,
+    + \sum_k p_{X_k} \omegadot_k \right)  \equiv \tilde{S}  \label{eq:full_divu_constraint} ,
 
 where we define
 
 .. math::
 
    \alpha(\rho,T) \equiv - \left( \frac{(1 - \rho h_p )p_T - \rho c_p}{\rho^2
-     c_p p_\rho} \right) \enskip . \label{eq:alphadef}
+     c_p p_\rho} \right)  . \label{eq:alphadef}
 
 Using the Energy Equation
 -------------------------
@@ -148,24 +148,24 @@ Then
 
 .. math::
 
-   -\rho \nabla \cdot \Ub = 
-       \frac{1}{p_\rho} \left( \frac{D p}{Dt} 
+   -\rho \nabla \cdot \Ub =
+       \frac{1}{p_\rho} \left( \frac{D p}{Dt}
        - \frac{p_T}{\rho e_T} \left(
                     -p \nabla \cdot \Ub + \rho \Hnuc
                     - \rho e_p \frac{D p}{Dt}
                     - \rho \sum_k e_{X_k} \omegadot_k   \right)
-       - \sum_k p_{X_k} {\omegadot}_k \right) \enskip ,
+       - \sum_k p_{X_k} {\omegadot}_k \right)  ,
 
 which leads to
 
 .. math::
 
-   \left(-\rho -  \frac{p p_T}{\rho e_T p_\rho} \right) \nabla \cdot \Ub = 
-       \frac{1}{p_\rho} \left( (1 + \frac{e_p p_T}{e_T}) \frac{D p}{Dt} 
+   \left(-\rho -  \frac{p p_T}{\rho e_T p_\rho} \right) \nabla \cdot \Ub =
+       \frac{1}{p_\rho} \left( (1 + \frac{e_p p_T}{e_T}) \frac{D p}{Dt}
                               - \frac{p_T}{\rho e_T} \left(
                                            \rho \Hnuc
                                            - \rho \sum_k e_{X_k} \omegadot_k   \right)
-       - \sum_k p_{X_k} {\omegadot}_k \right) \enskip ,
+       - \sum_k p_{X_k} {\omegadot}_k \right)  ,
 
 Note that we can replace :math:`p` by :math:`p_0` in the coefficient on the
 l.h.s. as well as on the r.h.s.
@@ -186,7 +186,7 @@ and the constraint derived using :math:`e` can be written
 
 .. math::
 
-   \nabla \cdot \Ub 
+   \nabla \cdot \Ub
    + \left( \frac{\rho e_T + \rho e_p p_T}{\rho^2 e_T p_\rho + p p_T} \right) \frac{D p_0}{D t} = 0
 
 We note that if we evaluate both constraints for :math:`p = \rho R T,` with
@@ -202,7 +202,7 @@ The full enthalpy equation, with no approximations, appears as:
 
 .. math::
 
-   \frac{\partial(\rho h)}{\partial t} = -\nabla\cdot(\rho h\Ub) + 
+   \frac{\partial(\rho h)}{\partial t} = -\nabla\cdot(\rho h\Ub) +
      \frac{Dp}{Dt} + \rho\Hnuc \label{eq:enthalpy}
 
 Here, :math:`h = e + p/\rho` is the specific enthalpy, with :math:`e` the specific
@@ -223,14 +223,14 @@ enthalpy equation, where we replace :math:`p` with :math:`p_0` in the :math:`Dp/
 .. math::
 
    \begin{aligned}
-   \frac{\partial(\rho h)}{\partial t} &=& -\nabla\cdot(\rho h\Ub) + 
+   \frac{\partial(\rho h)}{\partial t} &=& -\nabla\cdot(\rho h\Ub) +
      \frac{Dp_0}{Dt} + \rho\Hnuc \nonumber \\
    %
    \frac{\partial(\rho e)}{\partial t} + \frac{\partial p}{\partial t} &=&
     -\nabla\cdot(\rho e\Ub) -\nabla\cdot(p\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc \nonumber \\
    %
    \frac{\partial(\rho e)}{\partial t} &=&
-    -\nabla\cdot(\rho e\Ub) - p\nabla\cdot\Ub + \rho\Hnuc + 
+    -\nabla\cdot(\rho e\Ub) - p\nabla\cdot\Ub + \rho\Hnuc +
      \left \{ \frac{Dp_0}{Dt} - \frac{Dp}{Dt} \right \} \nonumber \end{aligned}
 
 However, if we solve the evolution equation for :math:`e` we would
@@ -241,7 +241,7 @@ for :math:`h` then we effectively are solving
 .. math::
 
    \frac{\partial(\rho e)}{\partial t} +
-     \nabla\cdot(\rho e\Ub) = -p \; \nabla\cdot\Ub + \rho\Hnuc + 
+     \nabla\cdot(\rho e\Ub) = -p \; \nabla\cdot\Ub + \rho\Hnuc +
      \left \{ \frac{Dp_0}{Dt} - \frac{Dp}{Dt} \right \} \nonumber
 
 but if we solve the evolution equation for :math:`e` we are effectively solving

@@ -511,12 +511,12 @@ need to evolve <span class="math notranslate nohighlight">\(p_0\)</span> in the 
 <p>We now include thermal diffusion and assume the base state is constant in time but not space:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
-\frac{\partial\Ub}{\partial t} &amp;=&amp;
+\frac{\partial\Ub}{\partial t} =&amp;
     -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi
     - \frac{\rho-\rho_0}{\rho} g\eb_r,\\
-\frac{\partial(\rho X_k)}{\partial t} &amp;=&amp;
+\frac{\partial(\rho X_k)}{\partial t} =&amp;
     -\nabla\cdot(\rho X_k\Ub) + \rho\omegadot_k,\label{eq:sdc species}\\
-\frac{\partial(\rho h)}{\partial t} &amp;=&amp;
+\frac{\partial(\rho h)}{\partial t} =&amp;
     -\nabla\cdot(\rho h\Ub) + \underbrace{\Ub\cdot\nabla p_0}_{Dp_0/Dt}
     + \rho\Hnuc
     + \underbrace{\nabla\cdot\frac{\kth}{c_p}\nabla h - \sum_k\nabla\cdot\frac{\xi_k k_{\rm th}}{c_p}\nabla X_k - \nabla\cdot\frac{h_p k_{\rm th}}{c_p}\nabla p_0}_{\nabla\cdot k_{\rm th}\nabla T}.\nonumber\\
@@ -558,16 +558,16 @@ A_{\rho h}^{(0)} &amp;=&amp; -\nabla\cdot\left[\left(\rho h\right)^{n+\myhalf,(0
 <blockquote>
 <div><div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
-\frac{\rho^{n+1}\widehat{h}^{n+1,(0)} - (\rho h)^n}{\Delta t} &amp;=&amp; A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged}\nonumber\\
-&amp;&amp; + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n + \nabla\cdot\frac{\kth^n}{c_p^n}\nabla \widehat{h}^{n+1,(0)}\right)\nonumber\\
-&amp;&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
-&amp;&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right),\label{eq:sdc enthalpy 2}\end{aligned}\end{split}\]</div>
+\frac{\rho^{n+1}\widehat{h}^{n+1,(0)} - (\rho h)^n}{\Delta t} =&amp; A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged}\nonumber\\
+&amp; + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n + \nabla\cdot\frac{\kth^n}{c_p^n}\nabla \widehat{h}^{n+1,(0)}\right)\nonumber\\
+&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
+&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right),\label{eq:sdc enthalpy 2}\end{aligned}\end{split}\]</div>
 <p>which is equivalent to</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
-\left(\rho^{n+1} - \frac{\Delta t}{2}\nabla\cdot\frac{k_{\rm th}^n}{c_p^n}\nabla\right)\widehat{h}^{n+1,(0)} &amp;=&amp; (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged} + \left(\half\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n\right)\nonumber\\
-&amp;&amp;\hspace{0.85in} - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
-&amp;&amp;\hspace{0.85in} - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right)\Bigg].\end{aligned}\end{split}\]</div>
+\left(\rho^{n+1} - \frac{\Delta t}{2}\nabla\cdot\frac{k_{\rm th}^n}{c_p^n}\nabla\right)\widehat{h}^{n+1,(0)} =&amp; (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged} + \left(\half\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n\right)\nonumber\\
+&amp;\hspace{0.85in} - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
+&amp;\hspace{0.85in} - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right)\Bigg].\end{aligned}\end{split}\]</div>
 </div></blockquote>
 <div class="line-block">
 <div class="line"><strong>Step 2C:</strong> (<em>Advance thermodynamic variables</em>)</div>
@@ -617,17 +617,17 @@ A_{\rho h}^{(j)} &amp;=&amp; -\nabla\cdot\left[\left(\rho h\right)^{n+\myhalf,(j
 <blockquote>
 <div><div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
-\frac{\rho^{n+1}\widehat{h}^{n+1,(j)} - (\rho h)^n}{\Delta t} &amp;=&amp; A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)}\nonumber\\
-&amp;&amp; + \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{h}^{n+1,(j)} + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
-&amp;&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
-&amp;&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right),\label{eq:sdc enthalpy 3}\end{aligned}\end{split}\]</div>
+\frac{\rho^{n+1}\widehat{h}^{n+1,(j)} - (\rho h)^n}{\Delta t} =&amp; A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)}\nonumber\\
+&amp; + \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{h}^{n+1,(j)} + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
+&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
+&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right),\label{eq:sdc enthalpy 3}\end{aligned}\end{split}\]</div>
 <p>which is equivalent to</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
-\left(\rho^{n+1} - \Delta t\nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\right)\widehat{h}^{n+1,(j)} &amp;=&amp; (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)} \nonumber\\
-&amp;&amp; + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
-&amp;&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
-&amp;&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right)\Bigg].\end{aligned}\end{split}\]</div>
+\left(\rho^{n+1} - \Delta t\nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\right)\widehat{h}^{n+1,(j)} =&amp; (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)} \nonumber\\
+&amp; + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
+&amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
+&amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right)\Bigg].\end{aligned}\end{split}\]</div>
 </div></blockquote>
 <div class="line-block">
 <div class="line"><strong>Step 4C:</strong> (<em>Advance thermodynamic variables</em>)</div>

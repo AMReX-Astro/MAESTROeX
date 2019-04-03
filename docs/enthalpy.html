@@ -257,7 +257,7 @@ p(\rho,T,X_k),\)</span> along particle paths, we can write</p>
 \[\frac{D \rho}{Dt}  = -\rho \nabla \cdot \Ub =
     \frac{1}{p_\rho}
     \left( \frac{D p}{Dt} - p_T \frac{D T}{Dt}
-                          - \sum_k p_{X_k} {\omegadot}_k \right) \enskip ,\]</div>
+                          - \sum_k p_{X_k} {\omegadot}_k \right)  ,\]</div>
 <p>with <span class="math notranslate nohighlight">\(p_\rho = \left.\partial p/\partial \rho\right|_{X_k,T}\)</span>,
 <span class="math notranslate nohighlight">\(p_{X_k} = \left.\partial p/\partial X_k \right|_{T,\rho,(X_j,j\ne k)}\)</span>,
 and <span class="math notranslate nohighlight">\(p_T = \left.\partial p/\partial T\right|_{\rho,X_k}\)</span>.</p>
@@ -271,7 +271,7 @@ enthalpy evolution equation:</p>
 <p>we can express <span class="math notranslate nohighlight">\(DT/Dt\)</span> in terms of</p>
 <div class="math notranslate nohighlight">
 \[\frac{DT}{Dt} = \frac{1}{\rho c_p} \left( (1 - \rho h_p) \frac{D p}{D t}
-- \sum_k \rho \xi_k \omegadot_k + \rho \Hnuc \right) \enskip , \label{eq:dTdt}\]</div>
+- \sum_k \rho \xi_k \omegadot_k + \rho \Hnuc \right)  , \label{eq:dTdt}\]</div>
 <p>where <span class="math notranslate nohighlight">\(c_p = \left.\partial h/\partial T\right|_{p,X_k}\)</span> is the
 specific heat at constant pressure,
 <span class="math notranslate nohighlight">\(\xi_k = \left.\partial h/\partial X_k \right|_{p,T}\)</span>,
@@ -287,7 +287,7 @@ and <span class="math notranslate nohighlight">\(h_p = \left.\partial h/\partial
   \left( \frac{p_T}{\rho c_p}(1  - \rho h_p) - 1 \right) \frac{D p}{D t}
  + \frac{1}{\rho p_\rho} \left(
   \frac{p_T}{\rho c_p} (\rho \Hnuc - \rho \sum_k \xi_k   \omegadot_k)
-                               + \sum_k p_{X_k} \omegadot_k \right) \enskip .\end{aligned}\end{split}\]</div>
+                               + \sum_k p_{X_k} \omegadot_k \right)  .\end{aligned}\end{split}\]</div>
 <p>When we derived this expression we explicitly retained the dependence
 of <span class="math notranslate nohighlight">\(h\)</span> on <span class="math notranslate nohighlight">\(p\)</span>, as shown by the presence of the <span class="math notranslate nohighlight">\(h_p\)</span> term.</p>
 <p>Then, replacing <span class="math notranslate nohighlight">\(p\)</span> by <span class="math notranslate nohighlight">\(p_0(r)\)</span>, <span class="math notranslate nohighlight">\(Dp/Dt\)</span> becomes <span class="math notranslate nohighlight">\(\Ub \cdot
@@ -297,11 +297,11 @@ of <span class="math notranslate nohighlight">\(h\)</span> on <span class="math 
 \frac{1}{\rho p_\rho} \left(
    \frac{p_T}{\rho c_p} \left(
   - \sum_k\rho  \xi_k \omegadot_k + \rho \Hnuc \right)
- + \sum_k p_{X_k} \omegadot_k \right)  \equiv \tilde{S} \enskip \label{eq:full_divu_constraint} ,\]</div>
+ + \sum_k p_{X_k} \omegadot_k \right)  \equiv \tilde{S}  \label{eq:full_divu_constraint} ,\]</div>
 <p>where we define</p>
 <div class="math notranslate nohighlight">
 \[\alpha(\rho,T) \equiv - \left( \frac{(1 - \rho h_p )p_T - \rho c_p}{\rho^2
-  c_p p_\rho} \right) \enskip . \label{eq:alphadef}\]</div>
+  c_p p_\rho} \right)  . \label{eq:alphadef}\]</div>
 </div>
 <div class="section" id="using-the-energy-equation">
 <h3>Using the Energy Equation<a class="headerlink" href="#using-the-energy-equation" title="Permalink to this headline">¶</a></h3>
@@ -327,7 +327,7 @@ Then</p>
                  -p \nabla \cdot \Ub + \rho \Hnuc
                  - \rho e_p \frac{D p}{Dt}
                  - \rho \sum_k e_{X_k} \omegadot_k   \right)
-    - \sum_k p_{X_k} {\omegadot}_k \right) \enskip ,\]</div>
+    - \sum_k p_{X_k} {\omegadot}_k \right)  ,\]</div>
 <p>which leads to</p>
 <div class="math notranslate nohighlight">
 \[\left(-\rho -  \frac{p p_T}{\rho e_T p_\rho} \right) \nabla \cdot \Ub =
@@ -335,7 +335,7 @@ Then</p>
                            - \frac{p_T}{\rho e_T} \left(
                                         \rho \Hnuc
                                         - \rho \sum_k e_{X_k} \omegadot_k   \right)
-    - \sum_k p_{X_k} {\omegadot}_k \right) \enskip ,\]</div>
+    - \sum_k p_{X_k} {\omegadot}_k \right)  ,\]</div>
 <p>Note that we can replace <span class="math notranslate nohighlight">\(p\)</span> by <span class="math notranslate nohighlight">\(p_0\)</span> in the coefficient on the
 l.h.s. as well as on the r.h.s.</p>
 </div>

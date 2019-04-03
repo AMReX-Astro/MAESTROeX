@@ -16,13 +16,13 @@ MAESTRO integrates the following system of equations:
 .. math::
 
    \begin{aligned}
-   \frac{\partial\Ub}{\partial t} &=& 
-       -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi 
+   \frac{\partial\Ub}{\partial t} &=&
+       -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi
        - \frac{\rho-\rho_0}{\rho} g\eb_r,\label{eq:momentum}\\
-   \frac{\partial(\rho X_k)}{\partial t} &=& 
+   \frac{\partial(\rho X_k)}{\partial t} &=&
        -\nabla\cdot(\rho X_k\Ub) + \rho\omegadot_k,\label{eq:species}\\
-   \frac{\partial(\rho h)}{\partial t} &=& 
-       -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} 
+   \frac{\partial(\rho h)}{\partial t} &=&
+       -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt}
        + \rho\Hnuc + \nabla\cdot k_{\rm th}\nabla T,\label{eq:enthalpy}\end{aligned}
 
 together with base state evolution equations and a constraint equation.
@@ -70,7 +70,7 @@ sequence:
 
       \begin{aligned}
       \frac{dX_k}{dt} &=& \omegadot_k(\rho,X_k,T), \\
-      \frac{dT}{dt}   &=& 
+      \frac{dT}{dt}   &=&
           \frac{1}{c_p} \left ( -\sum_k \xi_k  \omegadot_k  + \Hnuc \right ).\end{aligned}
 
    Here, :math:`T` is evolved solely to evaluate the reaction rates,
@@ -91,9 +91,9 @@ sequence:
    .. math::
 
       \begin{aligned}
-      \frac{\partial(\rho X_k)}{\partial t} &=& 
+      \frac{\partial(\rho X_k)}{\partial t} &=&
           -\nabla\cdot(\rho X_k\Ub), \\
-      \frac{\partial(\rho h)}{\partial t} &=& 
+      \frac{\partial(\rho h)}{\partial t} &=&
           -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt}.\end{aligned}
 
    Note that no reaction terms appear here. Since the advection
@@ -219,8 +219,8 @@ the density evolution equation does not have a reaction source term.
 
    .. math::
 
-      I_{X_k} = \frac{1}{\rho^{n+\myhalf}} \left [ 
-            \frac{(\rho X_k)^\mathrm{new} - 
+      I_{X_k} = \frac{1}{\rho^{n+\myhalf}} \left [
+            \frac{(\rho X_k)^\mathrm{new} -
                   (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}  \right ].
 
    (Andy’s Idea) Define :math:`I_{X_k}` using
@@ -235,8 +235,8 @@ the density evolution equation does not have a reaction source term.
 
    .. math::
 
-      X_k^{(1)} = (\rho X_k)^{(1)} / \sum_k (\rho X_k)^{(1)}, \quad 
-      X_k^\mathrm{old} = (\rho X_k)^\mathrm{old} / \sum_k (\rho X_k)^\mathrm{old}, \quad 
+      X_k^{(1)} = (\rho X_k)^{(1)} / \sum_k (\rho X_k)^{(1)}, \quad
+      X_k^\mathrm{old} = (\rho X_k)^\mathrm{old} / \sum_k (\rho X_k)^\mathrm{old}, \quad
       X_k^\mathrm{new} = (\rho X_k)^\mathrm{new} / \sum_k (\rho X_k)^\mathrm{new},
 
    and finally define :math:`A_{X_k}` using
@@ -338,7 +338,7 @@ The appropriate constructions are:
 
       I_T = \frac{1}{\rho^{n+\myhalf} c_p^{n+\myhalf}} \left \{
         \left [ \frac{(\rho h)^\mathrm{new} - (\rho h)^\mathrm{old}}{\Delta t} - A_{\rho h} \right ]
-        - \sum_k \xi_k^{n+\myhalf} \left [      \frac{(\rho X_k)^\mathrm{new} - 
+        - \sum_k \xi_k^{n+\myhalf} \left [      \frac{(\rho X_k)^\mathrm{new} -
                   (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}  \right ] \right \}
 
    (Andy’s Idea) The idea is to advance the species and enthalpy with advection
@@ -389,12 +389,12 @@ We now include thermal diffusion and assume the base state is constant in time b
 .. math::
 
    \begin{aligned}
-   \frac{\partial\Ub}{\partial t} &=& 
-       -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi 
+   \frac{\partial\Ub}{\partial t} =&
+       -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi
        - \frac{\rho-\rho_0}{\rho} g\eb_r,\\
-   \frac{\partial(\rho X_k)}{\partial t} &=& 
+   \frac{\partial(\rho X_k)}{\partial t} =&
        -\nabla\cdot(\rho X_k\Ub) + \rho\omegadot_k,\label{eq:sdc species}\\
-   \frac{\partial(\rho h)}{\partial t} &=&
+   \frac{\partial(\rho h)}{\partial t} =&
        -\nabla\cdot(\rho h\Ub) + \underbrace{\Ub\cdot\nabla p_0}_{Dp_0/Dt}
        + \rho\Hnuc
        + \underbrace{\nabla\cdot\frac{\kth}{c_p}\nabla h - \sum_k\nabla\cdot\frac{\xi_k k_{\rm th}}{c_p}\nabla X_k - \nabla\cdot\frac{h_p k_{\rm th}}{c_p}\nabla p_0}_{\nabla\cdot k_{\rm th}\nabla T}.\nonumber\\
@@ -435,19 +435,19 @@ We now include thermal diffusion and assume the base state is constant in time b
   .. math::
 
      \begin{aligned}
-     \frac{\rho^{n+1}\widehat{h}^{n+1,(0)} - (\rho h)^n}{\Delta t} &=& A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged}\nonumber\\
-     && + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n + \nabla\cdot\frac{\kth^n}{c_p^n}\nabla \widehat{h}^{n+1,(0)}\right)\nonumber\\
-     && - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
-     && - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right),\label{eq:sdc enthalpy 2}\end{aligned}
+     \frac{\rho^{n+1}\widehat{h}^{n+1,(0)} - (\rho h)^n}{\Delta t} =& A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged}\nonumber\\
+     & + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n + \nabla\cdot\frac{\kth^n}{c_p^n}\nabla \widehat{h}^{n+1,(0)}\right)\nonumber\\
+     & - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
+     & - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right),\label{eq:sdc enthalpy 2}\end{aligned}
 
   which is equivalent to
 
   .. math::
 
      \begin{aligned}
-     \left(\rho^{n+1} - \frac{\Delta t}{2}\nabla\cdot\frac{k_{\rm th}^n}{c_p^n}\nabla\right)\widehat{h}^{n+1,(0)} &=& (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged} + \left(\half\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n\right)\nonumber\\
-     &&\hspace{0.85in} - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
-     &&\hspace{0.85in} - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right)\Bigg].\end{aligned}
+     \left(\rho^{n+1} - \frac{\Delta t}{2}\nabla\cdot\frac{k_{\rm th}^n}{c_p^n}\nabla\right)\widehat{h}^{n+1,(0)} =& (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged} + \left(\half\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n\right)\nonumber\\
+     &\hspace{0.85in} - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
+     &\hspace{0.85in} - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right)\Bigg].\end{aligned}
 
 | **Step 2C:** (*Advance thermodynamic variables*)
 | Define :math:`Q_{\rho X_k}^{(0)}` as the right hand side of (`[eq:sdc species 2] <#eq:sdc species 2>`__) without the :math:`I_{\rho X_k}^{\rm lagged}` term, and define :math:`Q_{\rho h}^{(0)}` as the right hand side of (`[eq:sdc enthalpy 2] <#eq:sdc enthalpy 2>`__) without the :math:`I_{\rho h}^{\rm lagged}` term. Use VODE to integerate (`[eq:sdc species] <#eq:sdc species>`__) and (`[eq:sdc enthalpy] <#eq:sdc enthalpy>`__) over :math:`\Delta t` to advance :math:`(\rho X_k, \rho h)^n` to :math:`(\rho X_k, \rho h)^{n+1,(0)}` using the piecewise-constant advection and diffusion source terms:
@@ -496,20 +496,20 @@ We now include thermal diffusion and assume the base state is constant in time b
   .. math::
 
      \begin{aligned}
-     \frac{\rho^{n+1}\widehat{h}^{n+1,(j)} - (\rho h)^n}{\Delta t} &=& A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)}\nonumber\\
-     && + \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{h}^{n+1,(j)} + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
-     && - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
-     && - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right),\label{eq:sdc enthalpy 3}\end{aligned}
+     \frac{\rho^{n+1}\widehat{h}^{n+1,(j)} - (\rho h)^n}{\Delta t} =& A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)}\nonumber\\
+     & + \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{h}^{n+1,(j)} + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
+     & - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
+     & - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right),\label{eq:sdc enthalpy 3}\end{aligned}
 
   which is equivalent to
 
   .. math::
 
      \begin{aligned}
-     \left(\rho^{n+1} - \Delta t\nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\right)\widehat{h}^{n+1,(j)} &=& (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)} \nonumber\\
-     && + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
-     && - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
-     && - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right)\Bigg].\end{aligned}
+     \left(\rho^{n+1} - \Delta t\nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\right)\widehat{h}^{n+1,(j)} =& (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)} \nonumber\\
+     & + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
+     & - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
+     & - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right)\Bigg].\end{aligned}
 
 | **Step 4C:** (*Advance thermodynamic variables*)
 | Define :math:`Q_{\rho X_k}^{(j)}` as the right hand side of (`[eq:sdc species 3] <#eq:sdc species 3>`__) without the :math:`I_{\rho X_k}^{(j-1)}` term, and define :math:`Q_{\rho h}^{(j)}` as the right hand side of (`[eq:sdc enthalpy 3] <#eq:sdc enthalpy 3>`__) without the :math:`I_{\rho h}^{(j-1)}` term. Use VODE to integerate (`[eq:sdc species] <#eq:sdc species>`__) and (`[eq:sdc enthalpy] <#eq:sdc enthalpy>`__) over :math:`\Delta t` to advance :math:`(\rho X_k, \rho h)^n` to :math:`(\rho X_k, \rho h)^{n+1,(j)}` using the piecewise-constant advection and diffusion source terms:

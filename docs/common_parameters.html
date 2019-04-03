@@ -209,35 +209,35 @@
 <p>Parameters that set the maximum time for the simulation to run
 include:</p>
 <ul class="simple">
-<li><p>stop_time is the maximum simulation time, in seconds,
+<li><p><code class="docutils literal notranslate"><span class="pre">stop_time</span></code> is the maximum simulation time, in seconds,
 to evolve the system for.</p></li>
-<li><p>max_step is the maximum number of steps to take.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_step</span></code> is the maximum number of steps to take.</p></li>
 </ul>
 <p>Parameters affecting the size of the timestep include:</p>
 <ul class="simple">
-<li><p>cflfac is a multiplicative factor (<span class="math notranslate nohighlight">\(\le 1\)</span>)
+<li><p><code class="docutils literal notranslate"><span class="pre">cflfac</span></code> is a multiplicative factor (<span class="math notranslate nohighlight">\(\le 1\)</span>)
 applied to the advective CFL timestep</p></li>
-<li><p>init_shrink is the factor (<span class="math notranslate nohighlight">\(\le 1\)</span>) by which to reduce
+<li><p><code class="docutils literal notranslate"><span class="pre">init_shrink</span></code> is the factor (<span class="math notranslate nohighlight">\(\le 1\)</span>) by which to reduce
 the initial timestep from the estimated first timestep.</p></li>
 </ul>
 <p>Parameters affecting output and restart include:</p>
 <ul class="simple">
-<li><p>restart tells MAESTROeX to restart from a checkpoint. The
+<li><p><code class="docutils literal notranslate"><span class="pre">restart</span></code> tells MAESTROeX to restart from a checkpoint. The
 value of this parameter should be the file number to restart from.
 For example, to restart from the checkpoint file chk00010,
-you would set restart = 10.</p></li>
-<li><p>plot_int is the number of steps to take between
+you would set <code class="docutils literal notranslate"><span class="pre">restart</span> <span class="pre">=</span> <span class="pre">10</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plot_int</span></code> is the number of steps to take between
 outputting a plotfile</p></li>
-<li><p>plot_deltat is the simulation time to evolve between
+<li><p><code class="docutils literal notranslate"><span class="pre">plot_deltat</span></code> is the simulation time to evolve between
 outputting a plotfile. Note: to output only based on simulation
-time, set plot_int = -1.</p></li>
-<li><p>check_int is the number of steps to take between
+time, set <code class="docutils literal notranslate"><span class="pre">plot_int</span> <span class="pre">=</span> <span class="pre">-1</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check_int</span></code> is the number of steps to take between
 outputting a checkpoint.</p></li>
-<li><p>plot_base_name is the basename to use for the
+<li><p><code class="docutils literal notranslate"><span class="pre">plot_base_name</span></code> is the basename to use for the
 plotfile filename. The step number will be appended to
 this name.</p></li>
 </ul>
-<p>Note that in addition to the normal plotfiles, there are <em>mini</em> plotfiles
+<p>Note that in addition to the normal plotfiles, there are <em>small</em> plotfiles
 that store a small subset of the fields, intended to be output more frequently.
 These are described in § <a class="reference external" href="#vis:sec:miniplotfile">[vis:sec:miniplotfile]</a>.</p>
 </div>
@@ -246,24 +246,24 @@ These are described in § <a class="reference external" href="#vis:sec:miniplot
 <p>Parameters that determine the spatial extent of the grid,
 the types of boundaries, and the number of computational cells include:</p>
 <ul>
-<li><p>max_levs is the maximum number of grid levels in the AMR
-hierarchy to use. max_levs = 1 indicates running with only a
+<li><p><code class="docutils literal notranslate"><span class="pre">max_levs</span></code> is the maximum number of grid levels in the AMR
+hierarchy to use. <code class="docutils literal notranslate"><span class="pre">max_levs</span> <span class="pre">=</span> <span class="pre">1</span></code> indicates running with only a
 single level spanning the whole domain.</p></li>
-<li><p>n_cellx, n_celly, n_cellz the size of
+<li><p><code class="docutils literal notranslate"><span class="pre">n_cellx</span></code>, <code class="docutils literal notranslate"><span class="pre">n_celly</span></code>, <code class="docutils literal notranslate"><span class="pre">n_cellz</span></code> the size of
 base level in terms of number of cells, in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>
 coordinate directions.</p></li>
-<li><p>max_grid_size the maximum extend of a grid, in any
+<li><p><code class="docutils literal notranslate"><span class="pre">max_grid_size</span></code> the maximum extend of a grid, in any
 coordinate direction, as measured in terms of number of cells.</p>
-<p>For multilevel problems, the parameter max_grid_size_1
+<p>For multilevel problems, the parameter <code class="docutils literal notranslate"><span class="pre">max_grid_size_1</span></code>
 controls the maximum extent on level 1 (the base
-grid), max_grid_size_2 controls the maximum extent on
-level 2, and max_grid_size_3 controls the maximum extent on
+grid), <code class="docutils literal notranslate"><span class="pre">max_grid_size_2</span></code> controls the maximum extent on
+level 2, and <code class="docutils literal notranslate"><span class="pre">max_grid_size_3</span></code> controls the maximum extent on
 levels 3 and higher.</p>
 </li>
-<li><p>prob_lo_x, prob_lo_y, prob_lo_z is
+<li><p><code class="docutils literal notranslate"><span class="pre">prob_lo_x</span></code>, <code class="docutils literal notranslate"><span class="pre">prob_lo_y</span></code>, <code class="docutils literal notranslate"><span class="pre">prob_lo_z</span></code> is
 the physical coordinate of the lower extent of the domain boundary
 in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span> coordinate directions.</p></li>
-<li><p>prob_hi_x, prob_hi_y, prob_hi_z is
+<li><p><code class="docutils literal notranslate"><span class="pre">prob_hi_x</span></code>, <code class="docutils literal notranslate"><span class="pre">prob_hi_y</span></code>, <code class="docutils literal notranslate"><span class="pre">prob_hi_z</span></code> is
 the physical coordinate of the upper extent of the domain boundary
 in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span> coordinate directions.</p></li>
 <li><p>There are two ways to specify boundary conditions—via integer flags
@@ -271,8 +271,8 @@ or descriptive string names. If the string names are present,
 then they will override the integer quantities in determining
 the boundary conditions.</p>
 <ul>
-<li><p>bcx_lo, bcy_lo, bcz_lo
-, bcx_hi, bcy_hi, bcz_hi are the
+<li><p><code class="docutils literal notranslate"><span class="pre">bcx_lo</span></code>, <code class="docutils literal notranslate"><span class="pre">bcy_lo</span></code>, <code class="docutils literal notranslate"><span class="pre">bcz_lo</span></code>
+, <code class="docutils literal notranslate"><span class="pre">bcx_hi</span></code>, <code class="docutils literal notranslate"><span class="pre">bcy_hi</span></code>, <code class="docutils literal notranslate"><span class="pre">bcz_hi</span></code> are the
 boundary condition types at the lower (‘lo’) and upper
 (‘hi’) domain boundaries in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>
 coordinate directions. The different types are set via integer
@@ -310,7 +310,7 @@ flags listed in table <a class="reference external" href="#gs:table:bcflags">[g
 </tbody>
 </table>
 </li>
-<li><p>xlo_boundary_type, ylo_boundary_type, zlo_boundary_type, xhi_boundary_type, yhi_boundary_type, zhi_boundary_type
+<li><p><code class="docutils literal notranslate"><span class="pre">xlo_boundary_type</span></code>, <code class="docutils literal notranslate"><span class="pre">ylo_boundary_type</span></code>, <code class="docutils literal notranslate"><span class="pre">zlo_boundary_type</span></code>, <code class="docutils literal notranslate"><span class="pre">xhi_boundary_type</span></code>, <code class="docutils literal notranslate"><span class="pre">yhi_boundary_type</span></code>, <code class="docutils literal notranslate"><span class="pre">zhi_boundary_type</span></code>
 are the boundary condition types at the lower and upper domain
 boundaries in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span> coordinate directions. The
 boundary type is set by providing a string name—valid values are

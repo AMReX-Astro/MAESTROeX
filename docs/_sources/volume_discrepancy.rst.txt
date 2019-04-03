@@ -8,7 +8,7 @@ constraint equation as
 
 .. math::
 
-   \nablab \cdotb (\beta_0 \Ub)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right ) \enskip .
+   \nablab \cdotb (\beta_0 \Ub)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .
    \label{eq:fullconstraint}
 
 Here, :math:`f` is the volume discrepancy factor and ranges from 0 to 1, and
@@ -29,7 +29,7 @@ the horizontal average of the full constraint. Starting with
 
 .. math::
 
-   \nablab \cdotb (\beta_0 w_0 \er) + \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right ) \enskip .
+   \nablab \cdotb (\beta_0 w_0 \er) + \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .
    \label{eq:fullconstraint2}
 
 Averaging this over a layer, we note that :math:`\overline{\nablab \cdotb (\beta_0 \Ubt)} = 0`,
@@ -37,14 +37,14 @@ yielding
 
 .. math::
 
-   \nablab \cdotb (\beta_0 w_0 \er)  = \beta_0 \left(\overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \right ) 
+   \nablab \cdotb (\beta_0 w_0 \er)  = \beta_0 \left(\overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \right )
    \label{eq:w0constraint_vd}
 
 and
 
 .. math::
 
-   \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \overline{S} + \frac{f}{\gammabar p_0} \frac{p_\mathrm{EOS} - \overline{p_\mathrm{EOS}}}{\Delta t} \right ) \enskip .
+   \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \overline{S} + \frac{f}{\gammabar p_0} \frac{p_\mathrm{EOS} - \overline{p_\mathrm{EOS}}}{\Delta t} \right )  .
    \label{eq:Utconstraint_vd}
 
 In solving the :math:`w_0` evolution equation
@@ -52,22 +52,22 @@ In solving the :math:`w_0` evolution equation
 
 .. math::
 
-   \nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - 
-   w_0 \er  \cdotb \frac{1}{\beta_0} \nablab \beta_0  - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \enskip .
+   \nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} -
+   w_0 \er  \cdotb \frac{1}{\beta_0} \nablab \beta_0  - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t}  .
 
 Recalling that
 
 .. math::
 
-   \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r} = 
+   \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r} =
     \frac{1}{\beta_0} \frac{\partial \beta_0}{\partial r}
 
-(see Paper I), and that :math:`\psi \equiv D_0 p_0 / Dt \equiv \partial p_0 / \partial t + 
+(see Paper I), and that :math:`\psi \equiv D_0 p_0 / Dt \equiv \partial p_0 / \partial t +
 w_0 \partial p_0 / \partial r`, we have
 
 .. math::
 
    \nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \psi -
-    \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \enskip .
+    \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t}  .
 
-This is the form that is solved in make_w0.
+This is the form that is solved in ``make_w0``.

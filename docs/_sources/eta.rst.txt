@@ -11,18 +11,18 @@ The density evolution is governed by
 
 .. math::
 
-   \begin{aligned}
-   \frac{\partial \rho_0}{\partial t} &=& - 
+
+   \frac{\partial \rho_0}{\partial t} = -
     \nablab \cdotb \left( \rho_0 w_0 \er \right)
-   - \nablab \cdotb \left( \etarho \er \right) \enskip ,
-   \label{eq:rho0upd_new}\end{aligned}
+   - \nablab \cdotb \left( \etarho \er \right)  ,
+   \label{eq:rho0upd_new}
 
 with
 
 .. math::
 
-   \etarho(r) = \overline{\left(\rhop \Ubt \cdot \er \right)} = \frac{1}{A(\Omega_H)} 
-    \int_{\Omega_H}  (\rhop \Ubt \cdot \er ) \; dA \enskip , \label{eq:eta}
+   \etarho(r) = \overline{\left(\rhop \Ubt \cdot \er \right)} = \frac{1}{A(\Omega_H)}
+    \int_{\Omega_H}  (\rhop \Ubt \cdot \er ) \; dA  , \label{eq:eta}
 
 designed to keep the average value of the full density, :math:`\rho`, over a
 layer of constant radius in the star equal to :math:`\rho_0`. To complete
@@ -34,9 +34,9 @@ the multilevel paper, resulting in the following system
 .. math::
 
    \begin{aligned}
-   w_0 &=& \ow + \delta w_0 \\
-   \frac{1}{r^2} \frac{\partial}{\partial r} \left (r^2 \ow \right ) &=& \Sbar \\
-   \frac{\partial}{\partial r} \left[ \frac{\gammabar p_0}{r^2} \frac{\partial}{\partial r} (r^2 \dw) \right] &=& - \frac{g}{r^2} \frac{\partial (r^2 \etarho)}{\partial r} - \frac{4 (\ow + \dw) \rho_0 g}{r} 
+   w_0 &= \ow + \delta w_0 \\
+   \frac{1}{r^2} \frac{\partial}{\partial r} \left (r^2 \ow \right ) &= \Sbar \\
+   \frac{\partial}{\partial r} \left[ \frac{\gammabar p_0}{r^2} \frac{\partial}{\partial r} (r^2 \dw) \right] &= - \frac{g}{r^2} \frac{\partial (r^2 \etarho)}{\partial r} - \frac{4 (\ow + \dw) \rho_0 g}{r}
    - 4 \pi G \rho_0 \etarho \label{eq:dw0constraint}\end{aligned}
 
 In paper III, we introduced a mixing term, :math:`\etarho`, to the density
@@ -64,10 +64,10 @@ volume, which is :math:`\sim 4\pi r_0^2  2h` for small :math:`h`, to obtain:
 .. math::
 
    \begin{aligned}
-   \frac{1}{4\pi r_0^2 2h}\int_{r_0-h}^{r_0+h}r^2 dr\int_{\Omega_H}\left[\frac{\partial\rho'}{\partial t} + \nabla\cdot\left(\rho'\Ub\right)\right]d\Omega 
-   &=& - \frac{1}{4\pi r_0^2 2h}\int_{r_0-h}^{r_0+h}r^2 dr\int_{\Omega_H}\nabla\cdot\left(\rho_0\Ubt\right)d\Omega \nonumber \\
-   &=& \left. -\frac{1}{4\pi r_0^2 2h}\int_{\Omega_H}\left[\rho_0\left(\Ubt\cdot\eb_r\right)\right]r^2 d\Omega\right|_{r_0-h}^{r_0+h} \nonumber \\
-   &=& 0,\end{aligned}
+   \frac{1}{4\pi r_0^2 2h}\int_{r_0-h}^{r_0+h}r^2 dr\int_{\Omega_H}\left[\frac{\partial\rho'}{\partial t} + \nabla\cdot\left(\rho'\Ub\right)\right]d\Omega
+   =& - \frac{1}{4\pi r_0^2 2h}\int_{r_0-h}^{r_0+h}r^2 dr\int_{\Omega_H}\nabla\cdot\left(\rho_0\Ubt\right)d\Omega \nonumber \\
+   =& \left. -\frac{1}{4\pi r_0^2 2h}\int_{\Omega_H}\left[\rho_0\left(\Ubt\cdot\eb_r\right)\right]r^2 d\Omega\right|_{r_0-h}^{r_0+h} \nonumber \\
+   =& 0,\end{aligned}
 
 where we have used the divergence theorem in spherical coordinates to transform
 the volume integral on the right hand side into an area integral over :math:`\Omega_H`.
@@ -79,12 +79,12 @@ of :math:`\Ubt`. Now, expanding the remaining terms and taking the limit as
 .. math::
 
    \begin{aligned}
-   0 &=& \lim_{h\rightarrow 0} \frac{1}{4\pi r_0^2 2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H} \left[\frac{\partial \rho'}{\partial t} + \nabla\cdot(\rho'\Ub)\right] d\Omega \nonumber \\
-   &=& \frac{\partial}{\partial t} \left( \lim_{h\rightarrow 0} \frac{1}{4\pi r_0^2} \frac{1}{2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H}  \rho' d\Omega \right) + \lim_{h\rightarrow 0} \left[\frac{1}{4\pi r_0^2  2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H}  \nabla \cdot ( \rho' \Ub )  d\Omega\right] \nonumber \\
-   &=& \frac{\partial}{\partial t} \left(\frac{1}{4\pi} \int_{\Omega_H}  \rho'  d\Omega \right) + \lim_{h\rightarrow 0} \left\{\left.\frac{1}{r_0^2 2h}\left[\frac{1}{4\pi}\int_{\Omega_H} \rho' (\Ub \cdot \eb_r)  d\Omega  \right]  r^2 \right |_{r_0-h}^{r_0+h} \right\} \nonumber  \\
-   &=&  \frac{\partial}{\partial t} \overline{\rho'} + \lim_{h\rightarrow 0} \left\{ \left .  \frac{1}{r_0^2  2h} \left[ \overline{\rho' (\Ub \cdot \eb_r)} \right]  r^2  \right |_{r_0-h}^{r_0+h} \right\} \nonumber  \\
-   &=&  \frac{\partial}{\partial t} \overline{\rho'} + \lim_{h\rightarrow 0} \frac{1}{r_0^2 2h} \int_{r_0-h}^{r_0+h} \nabla \cdot \left[\overline{\rho' (\Ub \cdot \eb_r)} \eb_r \right]  r^2  dr \nonumber \\
-   &=&  \frac{\partial}{\partial t} \overline{\rho'} + \nabla \cdot \left[ \overline{\rho' (\Ub \cdot \eb_r)} \eb_r \right]\end{aligned}
+   0 =& \lim_{h\rightarrow 0} \frac{1}{4\pi r_0^2 2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H} \left[\frac{\partial \rho'}{\partial t} + \nabla\cdot(\rho'\Ub)\right] d\Omega \nonumber \\
+   =& \frac{\partial}{\partial t} \left( \lim_{h\rightarrow 0} \frac{1}{4\pi r_0^2} \frac{1}{2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H}  \rho' d\Omega \right) + \lim_{h\rightarrow 0} \left[\frac{1}{4\pi r_0^2  2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H}  \nabla \cdot ( \rho' \Ub )  d\Omega\right] \nonumber \\
+   =& \frac{\partial}{\partial t} \left(\frac{1}{4\pi} \int_{\Omega_H}  \rho'  d\Omega \right) + \lim_{h\rightarrow 0} \left\{\left.\frac{1}{r_0^2 2h}\left[\frac{1}{4\pi}\int_{\Omega_H} \rho' (\Ub \cdot \eb_r)  d\Omega  \right]  r^2 \right |_{r_0-h}^{r_0+h} \right\} \nonumber  \\
+   =&  \frac{\partial}{\partial t} \overline{\rho'} + \lim_{h\rightarrow 0} \left\{ \left .  \frac{1}{r_0^2  2h} \left[ \overline{\rho' (\Ub \cdot \eb_r)} \right]  r^2  \right |_{r_0-h}^{r_0+h} \right\} \nonumber  \\
+   =&  \frac{\partial}{\partial t} \overline{\rho'} + \lim_{h\rightarrow 0} \frac{1}{r_0^2 2h} \int_{r_0-h}^{r_0+h} \nabla \cdot \left[\overline{\rho' (\Ub \cdot \eb_r)} \eb_r \right]  r^2  dr \nonumber \\
+   =&  \frac{\partial}{\partial t} \overline{\rho'} + \nabla \cdot \left[ \overline{\rho' (\Ub \cdot \eb_r)} \eb_r \right]\end{aligned}
 
 again using the divergence theorem, extracting the time derivative from the spatial integral,
 and switching the order of operations as appropriate.
@@ -111,7 +111,7 @@ in Eq. [`[eq:eta] <#eq:eta>`__]). The edge-centered values of :math:`\etarho`,
 :math:`\eta_{\rho,r+1/2}` are then constructed by simple
 averaging:
 
-.. math:: \eta_{\rho,r+1/2} = \frac{\eta_{\rho,r} + \eta_{\rho,r+1}}{2} \enskip .
+.. math:: \eta_{\rho,r+1/2} = \frac{\eta_{\rho,r} + \eta_{\rho,r+1}}{2}  .
 
 Instead of differencing :math:`\eta_{\rho,r+1/2}` to construct the
 divergence, we instead use equation (\ `[eq:rhopbar] <#eq:rhopbar>`__) directly, by writing:
@@ -120,35 +120,35 @@ divergence, we instead use equation (\ `[eq:rhopbar] <#eq:rhopbar>`__) directly
 
    \left [ \nabla \cdot (\etarho \er ) \right ]^{n+1/2}
    = - \frac{\overline{\rhop^{n+1}} - \overline{\rhop^n}}{\Delta t}
-   = - \frac{\overline{\rhop^{n+1}}}{\Delta t} \enskip ,
+   = - \frac{\overline{\rhop^{n+1}}}{\Delta t}  ,
 
 where we have made use of the fact that :math:`\overline{\rhop^n} = 0` by construction.
 
 :math:`\eta` Flow Chart
 =======================
 
-#. Enter advance_timestep with :math:`[\etarhoec, \etarhocc]^{n-\myhalf}`.
+#. Enter ``advance_timestep`` with :math:`[\etarhoec, \etarhocc]^{n-\myhalf}`.
 
-#. Call make_w0. The spherical version uses uses :math:`\etarho^{{\rm ec},n-\myhalf}` and :math:`\etarho^{{\rm cc},n-\myhalf}`.
+#. Call ``make_w0``. The spherical version uses uses :math:`\etarho^{{\rm ec},n-\myhalf}` and :math:`\etarho^{{\rm cc},n-\myhalf}`.
 
-#. Call density_advance. The plane-parallel version computes :math:`\etarho^{{\rm flux},n+\myhalf,*}`.
+#. Call ``density_advance``. The plane-parallel version computes :math:`\etarho^{{\rm flux},n+\myhalf,*}`.
 
-#. Call make_etarho to compute :math:`[\etarhoec, \etarhocc]^{n+\myhalf,*}`. The plane-parallel version uses :math:`\etarho^{{\rm flux},n+\myhalf,*}`.
+#. Call ``make_etarho`` to compute :math:`[\etarhoec, \etarhocc]^{n+\myhalf,*}`. The plane-parallel version uses :math:`\etarho^{{\rm flux},n+\myhalf,*}`.
 
-#. Call make_psi. The plane-parallel version uses :math:`\etarho^{{\rm cc},n+\myhalf,*}`.
+#. Call ``make_psi``. The plane-parallel version uses :math:`\etarho^{{\rm cc},n+\myhalf,*}`.
 
-#. Call make_w0. The spherical version uses uses :math:`\etarho^{{\rm ec},n+\myhalf,*}` and :math:`\etarho^{{\rm cc},n+\myhalf,*}`.
+#. Call ``make_w0``. The spherical version uses uses :math:`\etarho^{{\rm ec},n+\myhalf,*}` and :math:`\etarho^{{\rm cc},n+\myhalf,*}`.
 
-#. Call density_advance. The plane-parallel version computes :math:`\etarho^{{\rm flux},n+\myhalf}`.
+#. Call ``density_advance``. The plane-parallel version computes :math:`\etarho^{{\rm flux},n+\myhalf}`.
 
-#. Call make_etarho to compute :math:`[\etarhoec, \etarhocc]^{n+\myhalf}`. The plane-parallel version uses :math:`\etarho^{{\rm flux},n+\myhalf}`.
+#. Call ``make_etarho`` to compute :math:`[\etarhoec, \etarhocc]^{n+\myhalf}`. The plane-parallel version uses :math:`\etarho^{{\rm flux},n+\myhalf}`.
 
-#. Call make_psi. The plane-parallel version uses :math:`\etarho^{{\rm cc},n+\myhalf}`.
+#. Call ``make_psi``. The plane-parallel version uses :math:`\etarho^{{\rm cc},n+\myhalf}`.
 
 Computing :math:`\etarhoec` and :math:`\etarhocc`
 =================================================
 
-This is done in make_eta.f90.
+This is done in ``make_eta.f90``.
 
 Plane-Parallel
 --------------
@@ -204,7 +204,7 @@ NOT USED.
 Spherical
 ---------
 
-In make_w0, :math:`\etarhoec` is used in the construction of the RHS
+In ``make_w0``, :math:`\etarhoec` is used in the construction of the RHS
 for the :math:`\delta w_0` equation.
 
 Using :math:`\etarhocc`
@@ -215,12 +215,12 @@ Using :math:`\etarhocc`
 Plane-Parallel
 --------------
 
-In make_psi, :math:`\psi = \etarhocc g`.
+In ``make_psi``, :math:`\psi = \etarhocc g`.
 
 .. _spherical-1:
 
 Spherical
 ---------
 
-In make_w0, :math:`\etarhocc` is used in the construction of the RHS
+In ``make_w0``, :math:`\etarhocc` is used in the construction of the RHS
 for the :math:`\delta w_0` equation.

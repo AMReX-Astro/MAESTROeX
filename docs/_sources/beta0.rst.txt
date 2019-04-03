@@ -29,11 +29,11 @@ and the definition of :math:`\Gamma_1`,
 So, at constant entropy, from the definition of :math:`\Gamma_1`, it must hold
 that
 
-.. math:: \frac{1}{\rho} \frac{d \rho}{dr} = \frac{1}{\Gamma_1 p} \frac{d p}{dz} \enskip .
+.. math:: \frac{1}{\rho} \frac{d \rho}{dr} = \frac{1}{\Gamma_1 p} \frac{d p}{dz}  .
 
 Comparing to the defintion of :math:`\beta_0` then
 
-.. math:: \frac{1}{\beta_0} \frac{\beta_0}{dr} =\frac{1}{\gammabar p_0}\frac{dp_0}{dr} = \frac{1}{\rho_0} \frac{d\rho_0}{dr}  \enskip .
+.. math:: \frac{1}{\beta_0} \frac{\beta_0}{dr} =\frac{1}{\gammabar p_0}\frac{dp_0}{dr} = \frac{1}{\rho_0} \frac{d\rho_0}{dr}   .
 
 Therefore, :math:`\beta_0 = \rho_0`.
 
@@ -104,7 +104,7 @@ analysis in paper I that reduced `[eq:alpha] <#eq:alpha>`__ to
 
 .. math::
 
-   \label{eq:alpha_simp_no_rxn} 
+   \label{eq:alpha_simp_no_rxn}
    \alpha = \frac{1}{\Gamma_1p_0}
 
 used CG’s discussion of the various adiabatic :math:`\Gamma`\ ’s. However,
@@ -155,14 +155,14 @@ and therefore
 
 .. math::
 
-   d\ln p = \chi_\rho \ d\ln\rho + \chi_T \ d\ln T + \sum_i \chi_{X_i}\ 
+   d\ln p = \chi_\rho \ d\ln\rho + \chi_T \ d\ln T + \sum_i \chi_{X_i}\
    d\ln X_i.
 
 From here we get the general statement
 
 .. math::
 
-   \frac{\partial\ln p}{\partial \ln \rho} = \chi_\rho + 
+   \frac{\partial\ln p}{\partial \ln \rho} = \chi_\rho +
    \chi_T\frac{\partial \ln T}{\partial\ln \rho} +
    \sum_i\chi_{X_i}\frac{\partial\ln X_i}{\partial\ln \rho}
 
@@ -171,7 +171,7 @@ which must hold for an adiabatic process as well, and therefore we have
 .. math::
 
    \label{eq:gamma1}
-     \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right) 
+     \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right)
      + \sum_i\chi_{X_i}\Gamma_{4,i}
 
 where we use CG’s definition of :math:`\Gamma_1` and :math:`\Gamma_3` and introduce a
@@ -217,7 +217,7 @@ we then have
 
    dq = c_vdT +
    \left[\left(\frac{\partial e}{\partial \rho}\right)_{T,X} -\frac{p}{\rho^2}
-     \right]d\rho + 
+     \right]d\rho +
    \sum_i\left[
      \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)} -
      \left(\frac{\partial e}{\partial X_i}
@@ -231,12 +231,12 @@ and
    \label{eq:gamma3_first}
    \left(\frac{d\ln T}{d\ln\rho}\right)_\text{AD} \equiv \Gamma_3-1
    &= \frac{1}{c_vT}\left[
-   \frac{p}{\rho} - \left(\frac{\partial e}{\partial\ln\rho}\right)_{T,X} + 
+   \frac{p}{\rho} - \left(\frac{\partial e}{\partial\ln\rho}\right)_{T,X} +
    \right.{}\nonumber\\
    &\qquad\qquad  \left.\sum_i \left[
        \left(
-       \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)} 
-       - 
+       \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+       -
        \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}
        \right]X_i\Gamma_{4,i}\right]\end{aligned}
 
@@ -258,7 +258,7 @@ differential (i.e. mixed derivatives are equal) we have
      -\frac{1}{T^2}\left(\frac{\partial e}{\partial\rho}\right)_{T,X} +
      \frac{1}{T}\left(\frac{\partial}{\partial T}\left(
      \frac{\partial e}{\partial\rho}\right)_{T,X}\right)_{\rho,X}
-     +\frac{p}{T^2\rho^2} - 
+     +\frac{p}{T^2\rho^2} -
      \frac{1}{T\rho^2}\left(\frac{\partial p}{\partial T}\right)_{\rho,X}
      {}\nonumber\\
      \therefore\quad \left(\frac{\partial e}{\partial\ln \rho}\right)_{T,X} &=
@@ -281,17 +281,17 @@ respect to composition
      \frac{1}{T}\left(\frac{\partial }{\partial X_i}\left(
      \frac{\partial e}{\partial T}\right)_{\rho,X}\right)_{\rho,T,(X_j,j\neq i)}
      &= \frac{1}{T^2}\left[\left(\frac{\partial e}{\partial X_i}
-       \right)_{\rho,\text{AD},(X_j,j\neq i)} - 
+       \right)_{\rho,\text{AD},(X_j,j\neq i)} -
        \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}
        \right] + \\
      &\ \ \ \ \ \frac{1}{T}\left[
        \left(\frac{\partial}{\partial T}\left(
        \frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}
-       \right)_{\rho,X} - 
+       \right)_{\rho,X} -
        \left(\frac{\partial }{\partial T}\left(
        \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
        \right)_{\rho,X}\right]\\
-     \therefore\quad 
+     \therefore\quad
      \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)} &=
      \left(\frac{\partial e}{\partial X_i}
      \right)_{\rho,\text{AD},(X_j,j\neq i)} - \left(
@@ -347,11 +347,11 @@ The first term on the rhs can be obtained from writing :math:`e=e(p,T,X)` and
      \sum_i \left(\frac{\partial e}{\partial X_i}\right)_{p,T,(X_j,j\neq i)}
      dX_i\\
      dp &= \left(\frac{\partial p}{\partial \rho}\right)_{T,X}d\rho +
-     \left(\frac{\partial p}{\partial T}\right)_{\rho,X}dT + \sum_i 
+     \left(\frac{\partial p}{\partial T}\right)_{\rho,X}dT + \sum_i
      \left(\frac{\partial p}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}dX_i\\
-     \therefore \ \left(\frac{\partial e}{\partial T}\right)_{\rho,X} &= 
+     \therefore \ \left(\frac{\partial e}{\partial T}\right)_{\rho,X} &=
      \left(\frac{\partial e}{\partial p}\right)_{T,X}
-     \left(\frac{\partial p}{\partial T}\right)_{\rho,X} + 
+     \left(\frac{\partial p}{\partial T}\right)_{\rho,X} +
      \left(\frac{\partial e}{\partial T}\right)_{p,X}\\
      \Rightarrow \ \left(\frac{\partial e}{\partial T}\right)_{p,X} &= c_v -
      \left(\frac{\partial e}{\partial \rho}\right)_{T,X}
@@ -390,7 +390,7 @@ Dividing this by `[eq:cv] <#eq:cv>`__ and using the relation between the
        \frac{\partial}{\partial \ln T}\left(
        \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
        \right)_{\rho,X}X_i\Gamma_{4,i}}{}\nonumber\\
-     \Rightarrow p\chi_\rho &= \frac{1}{\chi_T\gamma}\left[p\chi_T\Gamma_1 + 
+     \Rightarrow p\chi_\rho &= \frac{1}{\chi_T\gamma}\left[p\chi_T\Gamma_1 +
        \sum_i \left[\rho\chi_\rho\left(1-\gamma\right)\left(
          \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
          \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - p\chi_T
@@ -407,7 +407,7 @@ partial derivative of :math:`e` with the help of `[eq:dedlnrho] <#eq:dedlnrho>`_
    &=\frac{\gamma}{c_p}\frac{c_p\chi_T + \left(\rho
      \left(\frac{\partial e}{\partial\ln\rho}\right)_{T,X}-p\right)
      \frac{\chi_T^2}{T\rho\chi_\rho}}
-   {p\chi_T\Gamma_1 + 
+   {p\chi_T\Gamma_1 +
        \sum_i \left[\rho\chi_\rho\left(1-\gamma\right)\left(
          \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
          \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - p\chi_T
@@ -417,13 +417,13 @@ partial derivative of :math:`e` with the help of `[eq:dedlnrho] <#eq:dedlnrho>`_
      {1 + \sum_i \left[\frac{\rho\chi_\rho}{p\chi_T}
          \left(1-\gamma\right)\left(
          \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
-         \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - 
+         \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i -
          \chi_{X_i}\right]\frac{\Gamma_{4,i}}{\Gamma_1}}\right]\\
    &=\left(\frac{1}{\Gamma_1p}\right)
    \left[1 + \sum_i \left[\frac{\rho\chi_\rho}{p\chi_T}
        \left(1-\gamma\right)\left(
        \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
-       \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - 
+       \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i -
        \chi_{X_i}\right]\frac{\Gamma_{4,i}}{\Gamma_1}\right]^{-1}\\\end{aligned}
 
 .. math::
@@ -431,7 +431,7 @@ partial derivative of :math:`e` with the help of `[eq:dedlnrho] <#eq:dedlnrho>`_
    \boxed{
      \alpha = \frac{1}{\Gamma_1p}\left[1 + \sum_i\left[\frac{\rho^2p_\rho}
          {pp_T}(1-\gamma)\frac{N_\text{A}}{A_i}
-         \left(\frac{\partial\mu_i}{\partial T}\right)_{\rho,X}X_i - 
+         \left(\frac{\partial\mu_i}{\partial T}\right)_{\rho,X}X_i -
          \chi_{X_i}\right]\frac{\Gamma_{4,i}}{\Gamma_1}\right]^{-1}
    }
 
