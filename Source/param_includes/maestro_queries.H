@@ -50,7 +50,9 @@ pp.query("diag_buf_size", diag_buf_size);
 pp.query("plot_ad_excess", plot_ad_excess);
 pp.query("plot_processors", plot_processors);
 pp.query("plot_pidivu", plot_pidivu);
+#ifdef magvel"
 pp.query("small_plot_vars", small_plot_vars);
+#endif
 pp.query("init_iter", init_iter);
 pp.query("init_divu_iter", init_divu_iter);
 pp.query("restart_file", restart_file);

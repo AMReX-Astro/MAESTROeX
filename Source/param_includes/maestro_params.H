@@ -50,7 +50,9 @@ static int         diag_buf_size;
 static bool        plot_ad_excess;
 static bool        plot_processors;
 static bool        plot_pidivu;
+#ifdef magvel"
 static std::string small_plot_vars;
+#endif
 static int         init_iter;
 static int         init_divu_iter;
 static std::string restart_file;

@@ -50,7 +50,9 @@ int         Maestro::diag_buf_size = 10;
 bool        Maestro::plot_ad_excess = false;
 bool        Maestro::plot_processors = false;
 bool        Maestro::plot_pidivu = false;
-std::string Maestro::small_plot_vars = "rho p0 magvel";
+#ifdef magvel"
+std::string Maestro::small_plot_vars = "rho;
+#endif
 int         Maestro::init_iter = 4;
 int         Maestro::init_divu_iter = 4;
 std::string Maestro::restart_file = "";
