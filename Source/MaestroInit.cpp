@@ -257,6 +257,16 @@ Maestro::InitData ()
 		compute_cutoff_coords(rho0_old.dataPtr());
 
 		if (do_smallscale) {
+
+      // check beta0_type = 3 and evolve_base_state = T 
+      if (beta0_type != 3 || evolve_base_state) {
+        Print() << "Error: do_smallscale = T requires beta0_type = 3 and evolve_base_state = F" << std::endl;
+        Print() << "    do_smallscale = " << do_smallscale << std::endl;
+        Print() << "    beta0_type = " << beta0_type << std::endl;
+        Print() << "    evolve_base_state = " << evolve_base_state << std::endl;
+        Abort(); 
+      }
+
 			// set rho0_old = rhoh0_old = 0.
 			std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
 			std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
