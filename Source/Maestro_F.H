@@ -730,6 +730,11 @@ extern "C"
                             const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
                             const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
                             amrex::Real* deltagamma, const int* d_lo, const int* d_hi);
+                            
+    void make_entropy(const int* lev, const int* lo, const int* hi,
+                     const amrex::Real* state, const int* s_lo, const int* s_hi,
+                     const int* nc_s,
+                     amrex::Real* entropy, const int* e_lo, const int* e_hi);
 
     void make_divw0(const int* lev, const int* lo, const int* hi,
                     const amrex::Real* w0, const amrex::Real* dx,
