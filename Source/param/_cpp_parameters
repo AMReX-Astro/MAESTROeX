@@ -321,7 +321,7 @@ average_base_state                  bool            false       y
 
 # force $\rho_0 = (\rho h)_0 = 0$, {\tt evolve\_base\_state = F}
 # and {\tt beta\_type} = 3
-do_smallscale                       bool            false
+do_smallscale                       bool            false       y
 
 # After the advective enthalpy update, recompute the enthalpy if we are
 # below the base cutoff density.

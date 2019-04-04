@@ -32,7 +32,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // features to be added later:
     // -ppm
     // -dpdt_factor
-    // -do_smallscale
 
     // cell-centered MultiFabs needed within the AdvanceTimeStep routine
     Vector<MultiFab>      rhohalf(finest_level+1);
