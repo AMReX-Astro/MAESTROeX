@@ -530,14 +530,7 @@ Maestro::PlotFileMF (const int nPlot,
     // processor number of each tile
     if (plot_processors) {
         for (int i = 0; i <= finest_level; ++i) {
-    		MultiFab& plot_mf_data_mf = *plot_mf_data[i];
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-    		for ( MFIter mfi(plot_mf_data_mf, true); mfi.isValid(); ++mfi ) {
-                const Box& tilebox  = mfi.tilebox();
-    			plot_mf_data_mf[mfi].setVal(ParallelDescriptor::MyProc(), tilebox);
-    		}
+            (*plot_mf_data[i]).setVal(ParallelDescriptor::MyProc());
     	}
         ++dest_comp;
     }
