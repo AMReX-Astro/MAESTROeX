@@ -226,7 +226,7 @@ Maestro::Setup ()
 
     // if do_smallscale check other parameters for consistency
 
-    if (beta0_type != 3 || evolve_base_state) {
+    if (do_smallscale && (beta0_type != 3 || evolve_base_state)) {
       std::cerr << "Error: do_smallscale = T requires beta0_type = 3 and evolve_base_state = F" << std::endl;
       std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
       std::cerr << "    beta0_type = " << beta0_type << std::endl;
