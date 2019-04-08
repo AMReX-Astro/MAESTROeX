@@ -92,7 +92,7 @@ extern "C"
     void phifill (amrex::Real* phi, const int* phi_lo, const int* phi_hi,
 		  const int* domlo, const int* domhi,
 		  const amrex::Real* dx, const amrex::Real* gridlo,
-		  const amrex::Real* time, const int* bc);
+		  const amrex::Real* time, const int* bc, const int icomp);
 
     //////////////////////
 
