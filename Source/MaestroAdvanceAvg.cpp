@@ -58,7 +58,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac_dummy(finest_level+1);
 
-
     // end spherical-only MultiFabs
     ////////////////////////
 
@@ -98,8 +97,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     int is_predictor;
 
-    // wallclock time
-    const Real strt_total = ParallelDescriptor::second();
+    bool split_projection = true;
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
 	    << " DT = " << dt << std::endl << std::endl;
@@ -205,12 +203,13 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 #endif
 
+    // initialize to zero
     std::fill(Sbar.begin(), Sbar.end(), 0.);
+    std::fill(w0.begin()  , w0.end()  , 0.);
 
     // set dummy variables to zero
-    std::fill(w0_force_dummy.begin(), w0_force_dummy.end(), 0.);
+    std::fill(w0_force_dummy.begin()      , w0_force_dummy.end()      , 0.);
     std::fill(rho0_pred_edge_dummy.begin(), rho0_pred_edge_dummy.end(), 0.);
-    std::fill(w0.begin(), w0.end(), 0.);
 
     // make the sponge for all levels
     if (do_sponge) {
@@ -226,7 +225,14 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
 
+    // wallclock time
+    Real start_total_react = ParallelDescriptor::second();
+
     React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+
+    // wallclock time
+    Real end_total_react = ParallelDescriptor::second() - start_total_react;
+    ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- define average expansion at time n+1/2
@@ -284,31 +290,29 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     if (evolve_base_state) {
 
-        // compute Sbar = average(S_cc_nph)
-        Average(S_cc_nph,Sbar,0);
+        if (split_projection) {
+        
+            // compute Sbar = average(S_cc_nph)
+            Average(S_cc_nph,Sbar,0);
 
-        // save old-time value
-        w0_old = w0;
+            // save old-time value
+            w0_old = w0;
 
-        // compute w0, w0_force, and delta_chi_w0
-        is_predictor = 1;
-        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
-                gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+            // compute w0, w0_force, and delta_chi_w0
+            is_predictor = 1;
+            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
+                    rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
+                    gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
+                    psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
-        if (spherical == 1) {
-            // put w0 on Cartesian edges
-            MakeW0mac(w0mac);
+            if (spherical == 1) {
+                // put w0 on Cartesian edges
+                MakeW0mac(w0mac);
+            }
         }
+    }
 
-    }
-    else {
-        // these should have no effect if evolve_base_state = false
-        std::fill(Sbar.begin(), Sbar.end(), 0.);
-    }
-    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 3 -- construct the advective velocity
     //////////////////////////////////////////////////////////////////////////////
@@ -319,7 +323,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 1;
-    AdvancePremac(umac,w0mac,w0_force_dummy,w0_force_cart_dummy,beta0_old,is_predictor);
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,beta0_old,is_predictor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 	delta_chi[lev].setVal(0.);
@@ -327,15 +331,37 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	delta_gamma1_term[lev].setVal(0.);
     }
 
+    if (evolve_base_state && !split_projection) {
+	for (int i=0; i<Sbar.size(); ++i) {
+            Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
+	}
+    }
+
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
+
+    if (evolve_base_state && spherical == 1 && split_projection) {
+	// subtract w0mac from umac
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+		MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
+	}
+    }
+
+    // wallclock time
+    Real start_total_macproj = ParallelDescriptor::second();
     
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
 
-    if (spherical == 1) {
+    // wallclock time
+    Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
+    ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
+
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// add w0mac back to umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -431,8 +457,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt = etarho * grav_cell
-	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
+	// hold dp0/dt in psi for enthalpy advance
+	for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
+        }
 	
     }
     else {
@@ -497,8 +525,15 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (maestro_verbose >= 1) {
 	Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
+    
+    // wallclock time
+    start_total_react = ParallelDescriptor::second();
 
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+
+    // wallclock time
+    end_total_react += ParallelDescriptor::second() - start_total_react;
+    ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
 
     if (evolve_base_state) {
 	// compute beta0 and gamma1bar
@@ -583,27 +618,30 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     if (evolve_base_state) {
 
-        // compute Sbar = average(S_cc_nph)
-        Average(S_cc_nph,Sbar,0);
+        if (split_projection) {
+        
+            // compute Sbar = average(S_cc_nph)
+            Average(S_cc_nph,Sbar,0);
 
-        // compute Sbar = Sbar + delta_gamma1_termbar
-        if (use_delta_gamma1_term) {
-            for(int i=0; i<Sbar.size(); ++i) {
-                Sbar[i] += delta_gamma1_termbar[i];
+            // compute Sbar = Sbar + delta_gamma1_termbar
+            if (use_delta_gamma1_term) {
+                for(int i=0; i<Sbar.size(); ++i) {
+                    Sbar[i] += delta_gamma1_termbar[i];
+                }
             }
-        }
 
-        // compute w0, w0_force, and delta_chi_w0
-        is_predictor = 0;
-        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
-                gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
-
-        if (spherical == 1) {
-            // put w0 on Cartesian edges
-            MakeW0mac(w0mac);
+            // compute w0, w0_force, and delta_chi_w0
+            is_predictor = 0;
+            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
+                    rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
+                    gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
+                    psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+            
+            if (spherical == 1) {
+                // put w0 on Cartesian edges
+                MakeW0mac(w0mac);
+            }
         }
     }
 
@@ -617,17 +655,39 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 0;
-    AdvancePremac(umac,w0mac,w0_force_dummy,w0_force_cart_dummy,beta0_old,is_predictor);
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,beta0_old,is_predictor);
 
+    if (evolve_base_state && !split_projection) {
+	for (int i=0; i<Sbar.size(); ++i) {
+	    Sbar[i] = (1.0/(gamma1bar_nph[i]*p0_nph[i]))*(p0_new[i] - p0_old[i])/dt;
+	}
+    }
+    
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 		       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
+    if (evolve_base_state && spherical == 1 && split_projection) {
+	// subtract w0mac from umac
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+		MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
+	}
+    }
+    
+    // wallclock time
+    start_total_macproj = ParallelDescriptor::second();
+    
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
 
-    if (spherical == 1) {
+    // wallclock time
+    end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
+    ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
+
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// add w0mac back to umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -708,8 +768,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
 	}
 
-	// set psi to dpdt = etarho * grav_const
-	make_psi_irreg(etarho_cc.dataPtr(),grav_cell_new.dataPtr(),psi.dataPtr());
+	// hold dp0/dt in psi for enthalpy advance
+	for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
+        }
     }
 
     // base state enthalpy averaging
@@ -760,8 +822,15 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (maestro_verbose >= 1) {
 	Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
+    
+    // wallclock time
+    start_total_react = ParallelDescriptor::second();
 
     React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+
+    // wallclock time
+    end_total_react += ParallelDescriptor::second() - start_total_react;
+    ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
 
     if (evolve_base_state) {
 	//compute beta0 and gamma1bar
@@ -798,26 +867,31 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     if (evolve_base_state) {
-        Average(S_cc_new,Sbar,0);
 
-        // compute Sbar = Sbar + delta_gamma1_termbar
-        if (use_delta_gamma1_term) {
-            for(int i=0; i<Sbar.size(); ++i) {
-                Sbar[i] += delta_gamma1_termbar[i];
+        if (split_projection) {
+            
+            // compute Sbar = average(S_cc_new)
+            Average(S_cc_new,Sbar,0);
+
+            // compute Sbar = Sbar + delta_gamma1_termbar
+            if (use_delta_gamma1_term) {
+                for(int i=0; i<Sbar.size(); ++i) {
+                    Sbar[i] += delta_gamma1_termbar[i];
+                }
             }
-        }
-	
-        // compute w0, w0_force, and delta_chi_w0
-        is_predictor = 0;
-        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                rho0_new.dataPtr(),rho0_new.dataPtr(),p0_new.dataPtr(),p0_new.dataPtr(),
-                gamma1bar_new.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
-        if (spherical == 1) {
-            // put w0 on Cartesian cell-centers
-            Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0); 
+            // compute w0, w0_force, and delta_chi_w0
+            is_predictor = 0;
+            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
+                    rho0_new.dataPtr(),rho0_new.dataPtr(),p0_new.dataPtr(),p0_new.dataPtr(),
+                    gamma1bar_new.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
+                    psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+            
+            if (spherical == 1) {
+                // put w0 on Cartesian cell-centers
+                Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0); 
+            }
         }
     }
 
@@ -839,15 +913,20 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         // throw away w0 by setting w0 = w0_old
         w0 = w0_old;
     }
-    
-    if (spherical == 1) {
+
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
 	    MultiFab::Subtract(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
 	}
     }
-    
+    if (evolve_base_state && !split_projection) {
+        for (int i=0; i<Sbar.size(); ++i) {
+            Sbar[i] = (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
+        }
+    }
+
     int proj_type;
     
     // Project the new velocity field
@@ -901,10 +980,17 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	}
     }
 
+    // wallclock time
+    const Real start_total_nodalproj = ParallelDescriptor::second();
+   
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
 
-    if (spherical == 1) {
+    // wallclock time
+    Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
+    ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
+
+    if (evolve_base_state && spherical == 1 && split_projection) {
 	// add w0 back to unew
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
@@ -912,7 +998,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	AverageDown(unew,0,AMREX_SPACEDIM);
 	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
     }
-    
+
     for(int i=0; i<beta0_nm1.size(); ++i) {
         beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
     }
@@ -922,41 +1008,16 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    // compute tempbar by "averaging"
 	    Average(snew,tempbar,Temp);
 	}
-
-	// output any runtime diagnostics
-	// pass in the new time value, time+dt
-	// call diag(time+dt,dt,dx,snew,rho_Hnuc2,rho_Hext,thermal2,rho_omegadot2,&
-	//          rho0_new,rhoh0_new,p0_new,tempbar, &
-	//          gamma1bar_new,beta0_new, &
-	//          unew,w0,normal, &
-	//          mla,the_bc_tower)
     }
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
 	    << " DT = " << dt << std::endl;
 
-    // wallclock time
-    Real end_total = ParallelDescriptor::second() - strt_total;
-
     // print wallclock time
-    ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
     if (maestro_verbose > 0) {
-	Print() << "Time to advance time step: " << end_total << '\n';
+        Print() << "Time to solve mac proj   : " << end_total_macproj << '\n';
+        Print() << "Time to solve nodal proj : " << end_total_nodalproj << '\n';
+        Print() << "Time to solve reactions  : " << end_total_react << '\n';
     }
-
-    // // DEBUG
-    // for (int i=0; i<Sbar.size(); ++i) {
-    // 	Sbar[i] = 1.0/(gamma1bar_new[i]*p0_new[i]) * (p0_new[i] - p0_old[i])/dt;
-    // 	// Sbar[i] = (rho0_new[i] - rho0_old[i])/rho0_old[i];
-    // 	// Sbar[i] = (grav_cell_new[i] - grav_cell_old[i])/grav_cell_old[i];
-    // }
-    
-    // Vector<MultiFab> Sbar_cart(finest_level+1);
-    // for (int lev=0; lev<=finest_level; ++lev) {
-    // 	Sbar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-    // }
-    // Put1dArrayOnCart(Sbar,Sbar_cart,0,0,bcs_f,0);
-    // std::string Sbarfilename = Concatenate("a_dpnew",istep,3);
-    // VisMF::Write(Sbar_cart[0], Sbarfilename);
     
 }

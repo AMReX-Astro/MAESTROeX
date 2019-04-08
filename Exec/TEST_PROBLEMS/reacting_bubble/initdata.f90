@@ -188,11 +188,11 @@ contains
 
     t0 = s0_init(temp_comp)
 
-    x0 = 0.9d7
-    y0 = 0.9d7
+    x0 = 1.8d7
+    y0 = 1.8d7
     z0 = 8.5d7
 
-    r0 = sqrt( (x-x0)**2 + (y-y0)**2 + (z-z0)**2 ) / 1.25d6
+    r0 = sqrt( (x-x0)**2 + (y-y0)**2 + (z-z0)**2 ) / 2.5d6
 
     temp = t0 * (1.d0 + 2.d0 * (0.15d0 * (1.d0 + tanh((2.d0-r0)))))
 

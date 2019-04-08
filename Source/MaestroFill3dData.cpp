@@ -111,14 +111,11 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 		MultiFab& sold_mf = sold[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        // NOTE: don't think this should be tiled
+        // NOTE: don't use tiling - put OpenMP into F90
         for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
+            const Box& validBox = mfi.validbox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -126,7 +123,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
 
-                addw0(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                addw0(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                       BL_TO_FORTRAN_3D(uedge_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
                       BL_TO_FORTRAN_3D(vedge_mf[mfi]),
@@ -139,7 +136,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-                addw0_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                addw0_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
                            BL_TO_FORTRAN_3D(uedge_mf[mfi]),
                            BL_TO_FORTRAN_3D(vedge_mf[mfi]),
                            BL_TO_FORTRAN_3D(wedge_mf[mfi]),

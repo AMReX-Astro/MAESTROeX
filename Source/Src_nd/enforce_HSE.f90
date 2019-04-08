@@ -28,6 +28,8 @@ contains
     double precision :: grav_edge(0:max_radial_level,0:nr_fine  )
     double precision ::    p0_old(0:max_radial_level,0:nr_fine-1)
 
+    call bl_proffortfuncstart("Maestro::enforce_HSE")
+    
     offset = 0.d0
 
     call make_grav_edge(grav_edge,rho0,r_edge_loc)
@@ -200,6 +202,8 @@ contains
     call restrict_base(p0,1)
     call fill_ghost_base(p0,1)
 
+    call bl_proffortfuncstop("Maestro::enforce_HSE")
+    
   end subroutine enforce_HSE
 
 end module enforce_HSE_module

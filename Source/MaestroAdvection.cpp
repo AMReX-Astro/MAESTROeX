@@ -112,10 +112,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-		// NOTE: don't tile
+
+	// NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -207,10 +205,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-		// NOTE: don't think this should be tiled
+
+	// NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -292,10 +288,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-// NOTE: don't think this should be tiled (or at least causes errors in 3D)
+
+	// NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -411,11 +405,11 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-		// NOTE: don't think this should be tiled
-        for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+		// NOTE: not sure if this should be tiled
+        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -626,6 +620,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
+	        // NOTE: not sure if this should be tiled (see make_rhoX_flux above)
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region

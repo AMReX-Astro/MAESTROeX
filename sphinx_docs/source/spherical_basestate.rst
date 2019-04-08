@@ -23,27 +23,29 @@ The initial conditions for the white dwarf are those described in
 Section 4.1 of paper III for the central region.
 
 In the expansion of a plane-parallel atmosphere, heating at a
-height $r$ above the base does not affect the pressure or density
+height :math:`r` above the base does not affect the pressure or density
 below that height. By contrast, in a spherical symmetric
-self-gravitating star, heating at a radius $r$ will lead to a pressure
+self-gravitating star, heating at a radius :math:`r` will lead to a pressure
 and density decrease at the center in addition to the expansion of the
 outer layers (see Schwarzchild & Harm, 1965, ApJ, 146, 855).
 
 We apply a heating function of the form:
-$$\Hext = H_0 \exp \left [-(r-r_0)^2 / W^2 \right ] \enskip ,$$
-with $r_0 = 4\times 10^7$ cm, $W = 10^7$ cm, and $H_0 = 1\times
-10^{16}$ erg g$^{-1}$ s$^{-1}$. This is the same functional form as used
+
+.. math::
+    \Hext = H_0 \exp \left [-(r-r_0)^2 / W^2 \right ] ,
+
+with :math:`r_0 = 4\times 10^7` cm, :math:`W = 10^7` cm, and :math:`H_0 = 1\times 10^{16}` 
+erg g :math:`^{-1}` s :math:`^{-1}`. This is the same functional form as used
 in the first test of paper II, but with a lower amplitude. Still, this
 heating rate is far higher than what is expected during the convective
 phase of Type Ia SNe. The heating term is added to the enthalpy
 equation in the low Mach number equations in the same fashion as
 described in paper II. In this test, we do not consider reactions.
 Since this is a one-dimensional test all perturbational quantities,
-as well as $\Ubt,$ are zero, so we are directly testing the computation of
-$w_0$ as and the base state update as described in
+as well as :math:`\Ubt`, are zero, so we are directly testing the computation of
+:math:`w_0` as and the base state update as described in
 the **Advect Base** procedure defined above.
-Both the PPM and low Mach calculation use 768 zones in a domain $5\times
-10^8$ cm high.
+Both the PPM and low Mach calculation use 768 zones in a domain :math:`5\times 10^8` cm high.
 
 Figure [\[fig:spherical768\]](#fig:spherical768){reference-type="ref" reference="fig:spherical768"} shows the structure of the star after
 heating for 10 s. The gray line is the initial star before any
@@ -52,10 +54,9 @@ We see that the compressible and low Mach number models
 agree extremely well. Both capture the decrease in the density and
 pressure at the center of the star and the considerable expansion in
 radius. Only at the surface of the star do the temperatures differ slightly.
-In all calculations, we set the minimum temperature to $5\times
-10^6$ K. The PPM simulation required 13488 steps and the low Mach
-(CFL $=0.5$) calculation needed 203. Over the course of the
-simulation, the Mach number of the flow remained less than $0.35$, with the
+In all calculations, we set the minimum temperature to :math:`5\times 10^6` K. The PPM simulation required 13488 steps and the low Mach
+(CFL :math:`=0.5`) calculation needed 203. Over the course of the
+simulation, the Mach number of the flow remained less than :math:`0.35`, with the
 maximum Mach number occurring at the surface of the star. This Mach
 number pushes the limits of validity of the low Mach number model; a
 smaller perturbation amplitude would result in a smaller Mach number.

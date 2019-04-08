@@ -22,7 +22,6 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := aprox21
-# GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/aprox21.net/
 
 Bpack   := ./Make.package
 Blocs   := .

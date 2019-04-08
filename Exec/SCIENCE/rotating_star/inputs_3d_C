@@ -1,22 +1,21 @@
 
 # INITIAL MODEL
-maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6144"
-#maestro.model_file = "../wdconvect/kepler_new_6.25e8.hybrid.hse.320"
+maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6400"
 maestro.perturb_model = false
 
 maestro.drdxfac = 5
 #maestro.ppm_type = 1
 
 # PROBLEM SIZE
-geometry.prob_lo     =  -5.e8  -5.e8  -5.e8
+geometry.prob_lo     =  0.0e0   0.0e0  0.0e0
 geometry.prob_hi     =   5.e8   5.e8   5.e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
-maestro.lo_bc = 2 2 2
-maestro.hi_bc = 2 2 2
+maestro.lo_bc = 3 3 3
+maestro.hi_bc = 3 3 3
 geometry.is_periodic =  0 0 0
 
 # VERBOSITY
@@ -29,17 +28,18 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 #amr.n_cell             = 160 160 160
 #amr.n_cell             = 64 64 64
 #amr.n_cell = 128 128 128
-amr.n_cell = 256 256 256
-amr.max_grid_size      = 32
+#amr.n_cell = 384 384 384
+amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+maestro.octant = true
 
 # TIME STEPPING
-maestro.max_step  = 2000
-maestro.stop_time = 30000.
+maestro.max_step  = 200000
+maestro.stop_time = 300000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
@@ -62,11 +62,12 @@ maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 3.333e0
 maestro.sponge_kappa = 10.e0
 
-maestro.init_shrink = 0.1e0
+maestro.init_shrink = 0.01e0
 maestro.use_soundspeed_firstdt = true
 maestro.use_divu_firstdt = true
 
 maestro.use_tfromp = true
+maestro.use_exact_base_state = false
 
 # PLOTFILES
 maestro.plot_base_name  = rot1e3_    # root name of plot file
@@ -97,7 +98,7 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
-maestro.do_burning = false
+maestro.do_burning = true
 
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
@@ -130,5 +131,11 @@ maestro.rotation_radius = 2.e8
   ! in the namelist.
 
   use_eos_coulomb = T
+
+  rtol_spec = 1.e-6
+  rtol_enuc = 1.e-5
+  rtol_temp = 1.e-5
+
+  retry_burn = T
 
 /

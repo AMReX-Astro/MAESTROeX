@@ -306,7 +306,7 @@ Maestro::FirstDt ()
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
 
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;

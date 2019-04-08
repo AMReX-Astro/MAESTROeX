@@ -465,6 +465,7 @@ contains
     call bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke
           do j=js,je
              do i=is,ie+1
@@ -476,6 +477,7 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks,ke
           do j=js,je
@@ -527,6 +529,7 @@ contains
     end if
 
     if (spherical .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke
           do j=js,je
              do i=is,ie+1
@@ -540,7 +543,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke
           do j=js,je
              do i=is,ie+1
@@ -553,6 +558,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     end if
 
     call bl_deallocate(ulx)
@@ -572,6 +578,7 @@ contains
     call bl_allocate(vry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke
           do j=js,je+1
              do i=is,ie
@@ -583,6 +590,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks,ke
           do j=js,je+1
@@ -634,6 +642,7 @@ contains
     end if
 
     if (spherical .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke
           do j=js,je+1
              do i=is,ie
@@ -647,7 +656,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke
           do j=js,je+1
              do i=is,ie
@@ -660,6 +671,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     end if
 
     call bl_deallocate(vly)
@@ -679,6 +691,7 @@ contains
     call bl_allocate(wrz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke+1
           do j=js,je
              do i=is,ie
@@ -690,6 +703,7 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks,ke+1
           do j=js,je
@@ -743,6 +757,7 @@ contains
     end if
 
     if (spherical .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke+1
           do j=js,je
              do i=is,ie
@@ -756,7 +771,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke+1
           do j=js,je
              do i=is,ie
@@ -769,6 +786,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     end if
 
     call bl_deallocate(wlz)

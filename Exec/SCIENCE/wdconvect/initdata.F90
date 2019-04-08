@@ -14,6 +14,7 @@ module initdata_module
   use eos_module
   use eos_type_module
   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+  ! use rotation_module, only: omega
 
   implicit none
 
@@ -48,7 +49,7 @@ contains
     end if
 
     ! abort program
-    call amrex_error("Planar initdata not written")
+    call bl_error("Planar initdata not written")
 
     ! set velocity to zero
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
@@ -114,22 +115,7 @@ contains
     type (eos_t) :: eos_state
     integer :: pt_index(3)
 
-    double precision :: rand
-
-    ! random numbers between -1 and 1
-    double precision :: alpha(3,3,3), beta(3,3,3), gamma(3,3,3)
-
-    ! random numbers between 0 and 2*pi
-    double precision :: phix(3,3,3), phiy(3,3,3), phiz(3,3,3)
-
-    ! L2 norm of k
-    double precision :: normk(3,3,3)
-
     integer :: iloc, jloc, kloc
-
-    ! cos and sin of (2*pi*kx/L + phix), etc
-    double precision :: cx(3,3,3), cy(3,3,3), cz(3,3,3)
-    double precision :: sx(3,3,3), sy(3,3,3), sz(3,3,3)
 
     ! location of center of star
     double precision :: xc(3)
@@ -139,9 +125,6 @@ contains
 
     ! the point we're at
     double precision :: xloc(3)
-
-    ! perturbational velocity to add
-    double precision :: vpert(3)
 
 
     ! initialize the domain with the base state
@@ -205,128 +188,46 @@ contains
 
     ! initialize the velocity to zero everywhere
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
-
-    ! generate random numbers
-    ! random numbers are not currently supported
-    ! use functions that result in numbers between (-1,1)
-    ! do i=1,3
-    !    do j=1,3
-    !       do k=1,3
-    !          rand = amrex_random()
-    !          rand = 2.0d0*rand - 1.0d0
-    !          ! rand = (.5)**i * (.7)**j * (.3)**k * (-1.)**i
-    !          alpha(i,j,k) = rand
-    !          rand = amrex_random()
-    !          rand = 2.0d0*rand - 1.0d0
-    !          ! rand = (.5)**i * (.3)**j * (.7)**k * (-1.)**j
-    !          beta(i,j,k) = rand
-    !          rand = amrex_random()
-    !          rand = 2.0d0*rand - 1.0d0
-    !          ! rand = (.3)**i * (.5)**j * (.7)**k * (-1.)**k
-    !          gamma(i,j,k) = rand
-    !          rand = amrex_random()
-    !          ! rand = (.3)**i * (.7)**j * (.5)**k
-    !          rand = 2.0d0*M_PI*rand
-    !          phix(i,j,k) = rand
-    !          rand = amrex_random()
-    !          ! rand = (.7)**i * (.3)**j * (.5)**k
-    !          rand = 2.0d0*M_PI*rand
-    !          phiy(i,j,k) = rand
-    !          rand = amrex_random()
-    !          ! rand = (.7)**i * (.5)**j * (.3)**k
-    !          rand = 2.0d0*M_PI*rand
-    !          phiz(i,j,k) = rand
-    !       enddo
-    !    enddo
-    ! enddo
     !
-    ! ! compute the norm of k
-    ! do i=1,3
-    !    do j=1,3
-    !       do k=1,3
-    !          normk(i,j,k) = sqrt(dble(i)**2+dble(j)**2+dble(k)**2)
-    !       enddo
-    !    enddo
-    ! enddo
+    ! #ifdef ROTATION
     !
-    ! ! define where center of star is
-    ! ! this currently assumes the star is at the center of the domain
-    ! xc(1) = 0.5d0*(prob_lo(1)+prob_hi(1))
-    ! xc(2) = 0.5d0*(prob_lo(2)+prob_hi(2))
-    ! xc(3) = 0.5d0*(prob_lo(3)+prob_hi(3))
+    !     ! initialize solid body rotation
     !
-    ! ! now do the big loop over all points in the domain
-    ! do iloc = lo(1),hi(1)
-    !    do jloc = lo(2),hi(2)
-    !       do kloc = lo(3),hi(3)
+    !     ! define where center of star is
+    !     ! this currently assumes the star is at the center of the domain
+    !     xc(1) = 0.5d0*(prob_lo(1)+prob_hi(1))
+    !     xc(2) = 0.5d0*(prob_lo(2)+prob_hi(2))
+    !     xc(3) = 0.5d0*(prob_lo(3)+prob_hi(3))
     !
-    !          ! set perturbational velocity to zero
-    !          vpert = ZERO
+    !     ! now do the big loop over all points in the domain
+    !     do iloc = lo(1),hi(1)
+    !        do jloc = lo(2),hi(2)
+    !           do kloc = lo(3),hi(3)
     !
-    !          ! compute where we physically are
-    !          xloc(1) = prob_lo(1) + (dble(iloc)+0.5d0)*dx(1)
-    !          xloc(2) = prob_lo(2) + (dble(jloc)+0.5d0)*dx(2)
-    !          xloc(3) = prob_lo(3) + (dble(kloc)+0.5d0)*dx(3)
+    !              ! compute where we physically are
+    !              xloc(1) = prob_lo(1) + (dble(iloc)+0.5d0)*dx(1)
+    !              xloc(2) = prob_lo(2) + (dble(jloc)+0.5d0)*dx(2)
+    !              xloc(3) = prob_lo(3) + (dble(kloc)+0.5d0)*dx(3)
     !
-    !          ! compute distance to the center of the star
-    !          rloc = ZERO
-    !          do i=1,3
-    !             rloc = rloc + (xloc(i) - xc(i))**2
-    !          enddo
-    !          rloc = sqrt(rloc)
+    !              ! compute perpendicular distance to the rotation axis
+    !              rloc = sqrt(sum(xloc(1:2) - xc(1:2))**2)
     !
-    !          ! loop over the 27 combinations of fourier components
-    !          do i=1,3
-    !             do j=1,3
-    !                do k=1,3
-    !                   ! compute cosines and sines
-    !                   cx(i,j,k) = cos(2.0d0*M_PI*dble(i)*xloc(1)/velpert_scale + phix(i,j,k))
-    !                   cy(i,j,k) = cos(2.0d0*M_PI*dble(j)*xloc(2)/velpert_scale + phiy(i,j,k))
-    !                   cz(i,j,k) = cos(2.0d0*M_PI*dble(k)*xloc(3)/velpert_scale + phiz(i,j,k))
-    !                   sx(i,j,k) = sin(2.0d0*M_PI*dble(i)*xloc(1)/velpert_scale + phix(i,j,k))
-    !                   sy(i,j,k) = sin(2.0d0*M_PI*dble(j)*xloc(2)/velpert_scale + phiy(i,j,k))
-    !                   sz(i,j,k) = sin(2.0d0*M_PI*dble(k)*xloc(3)/velpert_scale + phiz(i,j,k))
-    !                enddo
-    !             enddo
-    !          enddo
+    !              ! write(*,*) "omega =", omega, "rloc =", rloc
     !
-    !          ! loop over the 27 combinations of fourier components
-    !          do i=1,3
-    !             do j=1,3
-    !                do k=1,3
-    !                   ! compute contribution from perturbation velocity from each mode
-    !                   vpert(1) = vpert(1) + &
-    !                        (-gamma(i,j,k)*dble(j)*cx(i,j,k)*cz(i,j,k)*sy(i,j,k) &
-    !                        +beta(i,j,k)*dble(k)*cx(i,j,k)*cy(i,j,k)*sz(i,j,k)) &
-    !                        / normk(i,j,k)
+    !              ! vx = -2 pi r omega sin(theta)
+    !              ! vx = -2 pi r omega cos(theta)
+    !              ! sin(theta) = y/r, cos(theta) = x/r
+    !              if (rloc > 0.0d0) then
+    !                 vel(iloc,jloc,kloc,1) = -2 * M_PI * rloc * omega * xloc(2) / rloc
+    !                 vel(iloc,jloc,kloc,2) = 2 * M_PI * rloc * omega * xloc(1) / rloc
+    !              endif
     !
-    !                   vpert(2) = vpert(2) + &
-    !                        (gamma(i,j,k)*dble(i)*cy(i,j,k)*cz(i,j,k)*sx(i,j,k) &
-    !                        -alpha(i,j,k)*dble(k)*cx(i,j,k)*cy(i,j,k)*sz(i,j,k)) &
-    !                        / normk(i,j,k)
+    !           enddo
+    !        enddo
+    !     enddo
     !
-    !                   vpert(3) = vpert(3) + &
-    !                        ( -beta(i,j,k)*dble(i)*cy(i,j,k)*cz(i,j,k)*sx(i,j,k) &
-    !                        +alpha(i,j,k)*dble(j)*cx(i,j,k)*cz(i,j,k)*sy(i,j,k)) &
-    !                        / normk(i,j,k)
-    !                enddo
-    !             enddo
-    !          enddo
     !
-    !          ! apply the cutoff function to the perturbational velocity
-    !          do i=1,3
-    !             vpert(i) = velpert_amplitude*vpert(i) &
-    !                  *(0.5d0+0.5d0*tanh((velpert_radius-rloc)/velpert_steep))
-    !          enddo
-    !
-    !          ! add perturbational velocity to background velocity
-    !          do i=1,3
-    !             vel(iloc,jloc,kloc,i) = vel(iloc,jloc,kloc,i) + vpert(i)
-    !          enddo
-    !
-    !       enddo
-    !    enddo
-    ! enddo
+    ! #endif
 
   end subroutine initdata_sphr
 

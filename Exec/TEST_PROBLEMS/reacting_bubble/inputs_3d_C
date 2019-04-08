@@ -7,7 +7,7 @@ maestro.ppm_type = 1
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
-geometry.prob_hi     =  2.7e7  2.7e7  3.24e8
+geometry.prob_hi     =  3.6e7  3.6e7  2.88e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -24,16 +24,19 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 48 48 576
-amr.max_grid_size      = 576
+amr.n_cell             = 64 64 512
+amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
-maestro.regrid_int     = 2       # how often to regrid
+maestro.regrid_int     = 4       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
+# TAGGING
+maestro.use_tpert_in_tagging = true
+
 # TIME STEPPING
-maestro.max_step  = 10
+maestro.max_step  = 500
 maestro.stop_time = 2.5
 maestro.cfl       = 0.9    # cfl number for hyperbolic system
                            # In this test problem, the velocity is

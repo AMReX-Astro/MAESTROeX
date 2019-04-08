@@ -117,43 +117,112 @@ contains
 
        if (is_input_edge_centered .eq. 1) then
 
-          ! we currently do not need edge interpolation,
-          ! but from previous experience, we implemented
-          ! three different ideas for computing s0_cart,
+          ! we implemented three different ideas for computing s0_cart,
           ! where s0 is edge-centered.
           ! 1.  Piecewise constant
           ! 2.  Piecewise linear
           ! 3.  Quadratic
-          ! we will only implement (1) below
+          if (w0_interp_type .eq. 1) then
+             do k = lo(3),hi(3)
+                z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
+                do j = lo(2),hi(2)
+                   y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
+                   do i = lo(1),hi(1)
+                      x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
+                      radius = sqrt(x**2 + y**2 + z**2)
+                      index = cc_to_r(i,j,k)
 
-          do k = lo(3),hi(3)
-             z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
-             do j = lo(2),hi(2)
-                y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
-                do i = lo(1),hi(1)
-                   x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
-                   radius = sqrt(x**2 + y**2 + z**2)
-                   index  = cc_to_r(i,j,k)
+                      rfac = (radius - r_edge_loc(0,index+1)) / (r_cc_loc(0,index+1) - r_cc_loc(0,index))
 
-                   rfac = (radius - r_cc_loc(0,index)) / (r_edge_loc(0,index+1) - r_edge_loc(0,index))
+                      if (rfac .gt. 0.5d0) then
+                         s0_cart_val = s0(0,index+1)
+                      else
+                         s0_cart_val = s0(0,index)
+                      end if
 
-                   if (rfac .gt. 0.5d0) then
-                      s0_cart_val = s0(0,index+1)
-                   else
-                      s0_cart_val = s0(0,index)
-                   end if
-
-                   if (is_output_a_vector .eq. 1) then
-                      s0_cart(i,j,k,1) = s0_cart_val * x * (ONE / radius)
-                      s0_cart(i,j,k,2) = s0_cart_val * y * (ONE / radius)
-                      s0_cart(i,j,k,3) = s0_cart_val * z * (ONE / radius)
-                   else
-                      s0_cart(i,j,k,1) = s0_cart_val
-                   end if
-
+                      if (is_output_a_vector .eq. 1) then
+                         s0_cart(i,j,k,1) = s0_cart_val * x * (ONE / radius)
+                         s0_cart(i,j,k,2) = s0_cart_val * y * (ONE / radius)
+                         s0_cart(i,j,k,3) = s0_cart_val * z * (ONE / radius)
+                      else
+                         s0_cart(i,j,k,1) = s0_cart_val
+                      end if
+                      
+                   end do
                 end do
              end do
-          end do
+          else if (w0_interp_type .eq. 2) then
+
+             do k = lo(3),hi(3)
+                z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
+                do j = lo(2),hi(2)
+                   y = prob_lo(2) +(dble(j)+HALF)*dx(2) - center(2)
+                   do i = lo(1),hi(1)
+                      x = prob_lo(1) +(dble(i)+HALF)*dx(1) - center(1)
+                      radius = sqrt(x**2 + y**2 + z**2)
+                      index  = cc_to_r(i,j,k)
+
+                      rfac = (radius - r_edge_loc(0,index+1)) / (r_cc_loc(0,index+1) - r_cc_loc(0,index))
+
+                      if (index .lt. nr_fine) then
+                         s0_cart_val = rfac * s0(0,index+1) + (ONE-rfac) * s0(0,index)
+                      else
+                         s0_cart_val = s0(0,nr_fine)
+                      end if
+
+                      if (is_output_a_vector .eq. 1) then
+                         s0_cart(i,j,k,1) = s0_cart_val * x * (ONE / radius)
+                         s0_cart(i,j,k,2) = s0_cart_val * y * (ONE / radius)
+                         s0_cart(i,j,k,3) = s0_cart_val * z * (ONE / radius)
+                      else
+                         s0_cart(i,j,k,1) = s0_cart_val
+                      end if
+
+                   end do
+                end do
+             end do
+
+          else if (w0_interp_type .eq. 3) then
+
+             do k = lo(3),hi(3)
+                z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
+                do j = lo(2),hi(2)
+                   y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
+                   do i = lo(1),hi(1)
+                      x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
+                      radius = sqrt(x**2 + y**2 + z**2)
+                      index  = cc_to_r(i,j,k) + 1
+
+                      ! index refers to the lo point in the quadratic stencil
+                      if (index .le. 0) then
+                         index = 0
+                      else if (index .ge. nr_fine-1) then
+                         index = nr_fine-2
+                      else if (radius-r_edge_loc(0,index) .lt. r_edge_loc(0,index+1)) then
+                         index = index-1
+                      end if
+
+                      call quad_interp(radius, &
+                           r_edge_loc(0,index),r_edge_loc(0,index+1), &
+                           r_edge_loc(0,index+2), &
+                           s0_cart_val, &
+                           s0(0,index),s0(0,index+1),s0(0,index+2))
+
+                      if (is_output_a_vector .eq. 1) then
+                         s0_cart(i,j,k,1) = s0_cart_val * x * (ONE / radius)
+                         s0_cart(i,j,k,2) = s0_cart_val * y * (ONE / radius)
+                         s0_cart(i,j,k,3) = s0_cart_val * z * (ONE / radius)
+                      else
+                         s0_cart(i,j,k,1) = s0_cart_val
+                      end if
+
+                   end do
+                end do
+             end do
+
+          else
+             call amrex_error('Error: w0_interp_type not defined')
+          end if
 
        else
 
@@ -474,6 +543,7 @@ contains
        end do
     end do
 #elif (AMREX_SPACEDIM == 3)
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k = lo(3),hi(3)+1
        do j = lo(2)-1,hi(2)+1
           do i = lo(1)-1,hi(1)+1
@@ -481,6 +551,7 @@ contains
           end do
        end do
     end do
+    !$OMP END PARALLEL DO
 
 #endif
 
@@ -513,6 +584,7 @@ contains
     ! local variable
     integer :: i,j,k
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)+1
@@ -520,7 +592,9 @@ contains
           end do
        end do
     end do
+    !$OMP END PARALLEL DO
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)+1
           do i = lo(1),hi(1)
@@ -528,7 +602,9 @@ contains
           end do
        end do
     end do
+    !$OMP END PARALLEL DO
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k = lo(3),hi(3)+1
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -536,6 +612,7 @@ contains
           end do
        end do
     end do
+    !$OMP END PARALLEL DO
 
   end subroutine addw0_sphr
 

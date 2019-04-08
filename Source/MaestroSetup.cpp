@@ -222,7 +222,147 @@ Maestro::Setup ()
 		ng_adv = 3;
 	}
 
-	std::fill(tag_array.begin(), tag_array.end(), 0);
+    }
+    else {
+        // compute max_radial_level
+        max_radial_level = max_level;
+
+        // compute dr_fine
+        dr_fine = dxFine[AMREX_SPACEDIM-1];
+
+        // compute nr_fine
+        nr_fine = domainBoxFine.bigEnd()[AMREX_SPACEDIM-1] + 1;
+    }
+
+    // vectors store the multilevel 1D states as one very long array
+    // these are cell-centered
+    // base states are stored
+    s0_init      .resize( (max_radial_level+1)*nr_fine*Nscal );
+    p0_init      .resize( (max_radial_level+1)*nr_fine );
+    rho0_old     .resize( (max_radial_level+1)*nr_fine );
+    rho0_new     .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_old    .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_new    .resize( (max_radial_level+1)*nr_fine );
+    p0_old       .resize( (max_radial_level+1)*nr_fine );
+    p0_new       .resize( (max_radial_level+1)*nr_fine );
+    p0_nm1       .resize( (max_radial_level+1)*nr_fine );
+    tempbar      .resize( (max_radial_level+1)*nr_fine );
+    tempbar_init .resize( (max_radial_level+1)*nr_fine );
+    beta0_old    .resize( (max_radial_level+1)*nr_fine );
+    beta0_new    .resize( (max_radial_level+1)*nr_fine );
+    beta0_nm1    .resize( (max_radial_level+1)*nr_fine );
+    gamma1bar_old.resize( (max_radial_level+1)*nr_fine );
+    gamma1bar_new.resize( (max_radial_level+1)*nr_fine );
+    grav_cell_old.resize( (max_radial_level+1)*nr_fine );
+    grav_cell_new.resize( (max_radial_level+1)*nr_fine );
+    r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
+    etarho_cc    .resize( (max_radial_level+1)*nr_fine );
+    psi          .resize( (max_radial_level+1)*nr_fine );
+
+    // vectors store the multilevel 1D states as one very long array
+    // these are edge-centered
+    r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
+    w0        .resize( (max_radial_level+1)*(nr_fine+1) );
+    etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
+
+    // tagged box array for multilevel (planar)
+    tag_array .resize( (max_radial_level+1)*nr_fine );
+
+    // diag file data arrays
+    diagfile1_data.resize(diag_buf_size*11);
+    diagfile2_data.resize(diag_buf_size*11);
+    diagfile3_data.resize(diag_buf_size*10);
+
+    // make sure C++ is as efficient as possible with memory usage
+    s0_init      .shrink_to_fit();
+    p0_init      .shrink_to_fit();
+    rho0_old     .shrink_to_fit();
+    rho0_new     .shrink_to_fit();
+    rhoh0_old    .shrink_to_fit();
+    rhoh0_new    .shrink_to_fit();
+    p0_old       .shrink_to_fit();
+    p0_new       .shrink_to_fit();
+    p0_nm1       .shrink_to_fit();
+    tempbar      .shrink_to_fit();
+    tempbar_init .shrink_to_fit();
+    beta0_old    .shrink_to_fit();
+    beta0_new    .shrink_to_fit();
+    beta0_nm1    .shrink_to_fit();
+    gamma1bar_old.shrink_to_fit();
+    gamma1bar_new.shrink_to_fit();
+    grav_cell_old.shrink_to_fit();
+    grav_cell_new.shrink_to_fit();
+    w0           .shrink_to_fit();
+    etarho_cc    .shrink_to_fit();
+    psi          .shrink_to_fit();
+    etarho_ec    .shrink_to_fit();
+    r_cc_loc     .shrink_to_fit();
+    r_edge_loc   .shrink_to_fit();
+    tag_array    .shrink_to_fit();
+    diagfile1_data.shrink_to_fit();
+    diagfile2_data.shrink_to_fit();
+    diagfile3_data.shrink_to_fit();
+
+    init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
+			     r_cc_loc.dataPtr(),
+			     r_edge_loc.dataPtr(),
+			     geom[max_level].CellSize(),
+			     &nr_irreg);
+
+    if (use_exact_base_state) average_base_state = 1;
+
+    // No valid BoxArray and DistributionMapping have been defined.
+    // But the arrays for them have been resized.
+
+    istep = 0;
+
+    t_new = 1.e99;
+    t_old = 0.0;
+
+    // set this to a large number so change_max doesn't affect the first time step
+    dt = 1.e100;
+    dtold = 1.e100;
+
+    sold              .resize(max_level+1);
+    snew              .resize(max_level+1);
+    uold              .resize(max_level+1);
+    unew              .resize(max_level+1);
+    S_cc_old          .resize(max_level+1);
+    S_cc_new          .resize(max_level+1);
+    gpi               .resize(max_level+1);
+    dSdt              .resize(max_level+1);
+    pi                .resize(max_level+1);
+    rhcc_for_nodalproj.resize(max_level+1);
+    normal            .resize(max_level+1);
+    cell_cc_to_r      .resize(max_level+1);
+
+    // stores fluxes at coarse-fine interface for synchronization
+    // this will be sized "max_level+2"
+    // NOTE: the flux register associated with flux_reg[lev] is associated
+    // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
+    // therefore flux_reg[0] is never actually used in the reflux operation
+    flux_reg_s.resize(max_level+2);
+
+    // number of ghost cells needed for hyperbolic step
+    if (ppm_type == 2 || bds_type == 1) {
+        ng_adv = 4;
+    }
+    else {
+        ng_adv = 3;
+    }
+
+    std::fill(tag_array.begin(), tag_array.end(), 0);
+
+    // if do_smallscale check other parameters for consistency
+
+    if (do_smallscale && (beta0_type != 3 || evolve_base_state)) {
+      std::cerr << "Error: do_smallscale = T requires beta0_type = 3 and evolve_base_state = F" << std::endl;
+      std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
+      std::cerr << "    beta0_type = " << beta0_type << std::endl;
+      std::cerr << "    evolve_base_state = " << evolve_base_state << std::endl;
+      Error();
+    }
+
 }
 
 // read in some parameters from inputs file

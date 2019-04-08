@@ -177,7 +177,7 @@ coarse-fine interface from the coarse-cell center as:
 
 .. math::
 
-   \frac{p_{r-\myhalf}^l - p_{\sfrac{r}{2}-1}^{l-1}}{\Delta r^{l-1}/2} = 
+   \frac{p_{r-\myhalf}^l - p_{\sfrac{r}{2}-1}^{l-1}}{\Delta r^{l-1}/2} =
      \frac{\rho_{r-\myhalf}^l + \rho_{\sfrac{r}{2}-1}^{l-1}}{2}  \,
      \frac{g_{r-\myhalf}^l + g_{\sfrac{r}{2}-1}^{l-1}}{2}
 
@@ -194,7 +194,7 @@ Next we integrate up from the coarse-fine interface to the fine-cell center:
 
 .. math::
 
-   \frac{p_r^l - p_{r-\myhalf}^l}{\Delta r^l/2} = 
+   \frac{p_r^l - p_{r-\myhalf}^l}{\Delta r^l/2} =
      \frac{\rho_r^l + \rho_{r-\myhalf}^l}{2} \,
      \frac{g_r^l + g_{r-\myhalf}^l}{2}
 
@@ -212,7 +212,7 @@ Combining equations `[eq:ctoi] <#eq:ctoi>`__ and `[eq:itof] <#eq:itof>`__ gives
 .. math::
 
    \begin{aligned}
-   p_r^l = p_{\sfrac{r}{2}-1}^{l-1} &+& 
+   p_r^l = p_{\sfrac{r}{2}-1}^{l-1} &+&
         \frac{\Delta r^{l-1}}{8} \left(\rho_{r-\myhalf}^l + \rho_{\sfrac{r}{2}-1}^{l-1}\right)
                                    \left(   g_{r-\myhalf}^l +    g_{\sfrac{r}{2}-1}^{l-1}\right) \nonumber \\
     &+& \frac{\Delta r^l}{8} \left(\rho_r^l + \rho_{r-\myhalf}^l\right)
@@ -233,19 +233,19 @@ Simplifying, we have
 .. math::
 
    \begin{aligned}
-   p_r^l = p_{\sfrac{r}{2}-1}^{l-1} &+& 
-      \frac{\Delta r^l}{4}\left(\frac{2}{3}\rho_r^l + 
+   p_r^l = p_{\sfrac{r}{2}-1}^{l-1} &+&
+      \frac{\Delta r^l}{4}\left(\frac{2}{3}\rho_r^l +
                                 \frac{4}{3}\rho_{\sfrac{r}{2}-1}^{l-1} \right)
                           \left(   g_{r-\myhalf}^l +    g_{\sfrac{r}{2}-1}^{l-1}\right) \nonumber \\
-     &+& \frac{\Delta r^l}{8}\left(\frac{5}{3}\rho_r^l + 
-                                     \frac{1}{3}\rho_{\sfrac{r}{2}-1}^{l-1}\right) 
-                          \left(   g_r^l +    g_{r-\myhalf}^l\right) \enskip .\end{aligned}
+     &+& \frac{\Delta r^l}{8}\left(\frac{5}{3}\rho_r^l +
+                                     \frac{1}{3}\rho_{\sfrac{r}{2}-1}^{l-1}\right)
+                          \left(   g_r^l +    g_{r-\myhalf}^l\right)  .\end{aligned}
 
 Finally, we note for constant :math:`g`, this simplifies to:
 
 .. math::
 
-   p_r^l = p_{\sfrac{r}{2}-1}^{l-1} + 
+   p_r^l = p_{\sfrac{r}{2}-1}^{l-1} +
      \frac{3\Delta r^l g}{4}\left(\rho_{\sfrac{r}{2}-1}^{l-1} + \rho_r^l\right).\label{Coarse-Fine Stencil}
 
 When integrating across a fine-coarse interface (see Figure \ `[fig:ftoc] <#fig:ftoc>`__), the proceduce is similar.
@@ -266,12 +266,12 @@ The expression for general gravity becomes:
 
    \begin{aligned}
    p_{(r+1)/2}^{l-1} = p_{r}^l &+&
-      \frac{\Delta r^l}{4}\left(\frac{2}{3}\rho_r^l + 
+      \frac{\Delta r^l}{4}\left(\frac{2}{3}\rho_r^l +
                                 \frac{4}{3}\rho_{(r+1)/2}^{l-1} \right)
                           \left(   g_{(r+1)/2 -\myhalf}^{l-1} +    g_{(r+1)/2}^{l-1}\right) \nonumber \\
-     &+& \frac{\Delta r^l}{8}\left(\frac{5}{3}\rho_r^l + 
-                                     \frac{1}{3}\rho_{(r+1)/2}^{l-1}\right) 
-                          \left(   g_r^l +    g_{(r+1)/2 -\myhalf}^{l-1} \right) \enskip .\end{aligned}
+     &+& \frac{\Delta r^l}{8}\left(\frac{5}{3}\rho_r^l +
+                                     \frac{1}{3}\rho_{(r+1)/2}^{l-1}\right)
+                          \left(   g_r^l +    g_{(r+1)/2 -\myhalf}^{l-1} \right)  .\end{aligned}
 
 and for spatially-constant gravity, it simplifies to:
 
