@@ -8,8 +8,8 @@ module inlet_bc_module
 
   use amrex_constants_module
   use network
-  use eos_module, only: eos, eos_input_rp
   use eos_type_module
+  use eos_module
 
   implicit none
 

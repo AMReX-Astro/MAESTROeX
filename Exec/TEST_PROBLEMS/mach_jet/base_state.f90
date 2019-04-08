@@ -2,7 +2,7 @@ module base_state_module
 
   use model_parser_module
   use eos_type_module
-  use eos_module, only: eos, eos_input_rp
+  use eos_module
   use amrex_constants_module
   use amrex_error_module
   use simple_log_module
@@ -95,7 +95,7 @@ contains
           xn_zone(:) = ZERO
           xn_zone(1) = 1.d0
 
-          p0_init(0) = pres_zone
+          p0_init(n, 0) = pres_zone
 
           ! H = pres_base / dens_base / abs(grav_const)
           H = 1.d6 / 1.d-3 / abs(grav_const)
@@ -117,19 +117,19 @@ contains
                 dens_zone = 1.d-3*exp(-z/H)
              end if
 
-             s0_init(j, rho_comp) = dens_zone
+             s0_init(n, j, rho_comp) = dens_zone
 
              if (j.eq.0) then
-                p0_init(j) = p0_init(j) - &
-                     dr(1) * HALF * s0_init(j,rho_comp) * &
+                p0_init(n, j) = p0_init(n, j) - &
+                     dr(n) * HALF * s0_init(n, j,rho_comp) * &
                      abs(grav_const)
              else if (j.gt.0) then
-                p0_init(j) = p0_init(j-1) - &
-                     dr(1) * HALF * (s0_init(j,rho_comp) + s0_init(j-1,rho_comp)) * &
+                p0_init(n, j) = p0_init(n, j-1) - &
+                     dr(n) * HALF * (s0_init(n, j,rho_comp) + s0_init(n, j-1,rho_comp)) * &
                      abs(grav_const)
              end if
 
-             pres_zone = p0_init(j)
+             pres_zone = p0_init(n, j)
 
              ! use the EOS to make the state consistent
              eos_state%rho   = dens_zone
@@ -140,14 +140,14 @@ contains
              ! (rho,p) --> T, h
              call eos(eos_input_rp, eos_state)
 
-             s0_init(j, rho_comp) = dens_zone
-             s0_init(j,rhoh_comp) = dens_zone*eos_state%h
+             s0_init(n, j, rho_comp) = dens_zone
+             s0_init(n, j,rhoh_comp) = dens_zone*eos_state%h
 
-             s0_init(j,spec_comp:spec_comp-1+nspec) = ZERO
-             s0_init(j,spec_comp) = dens_zone
+             s0_init(n, j,spec_comp:spec_comp-1+nspec) = ZERO
+             s0_init(n, j,spec_comp) = dens_zone
 
-             s0_init(j,temp_comp) = eos_state%T
-             s0_init(j,trac_comp) = ZERO
+             s0_init(n, j,temp_comp) = eos_state%T
+             ! s0_init(n, j,trac_comp) = ZERO
 
           end do
 
@@ -162,13 +162,13 @@ contains
           ! (rho,p) --> T, h
           call eos(eos_input_rp, eos_state)
 
-          s0_init(0:nr(n)-1, rho_comp) = eos_state%rho
-          s0_init(0:nr(n)-1,rhoh_comp) = eos_state%rho * eos_state%h
-          s0_init(0:nr(n)-1,spec_comp) = eos_state%rho
-          s0_init(0:nr(n)-1,temp_comp) = eos_state%T
-          s0_init(0:nr(n)-1,trac_comp) = ZERO
+          s0_init(n, 0:nr(n)-1, rho_comp) = eos_state%rho
+          s0_init(n, 0:nr(n)-1,rhoh_comp) = eos_state%rho * eos_state%h
+          s0_init(n, 0:nr(n)-1,spec_comp) = eos_state%rho
+          s0_init(n, 0:nr(n)-1,temp_comp) = eos_state%T
+          ! s0_init(n, 0:nr(n)-1,trac_comp) = ZERO
 
-          p0_init(0:nr(n)-1) = eos_state%p
+          p0_init(n, 0:nr(n)-1) = eos_state%p
 
        end if
 
