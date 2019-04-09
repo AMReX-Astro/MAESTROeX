@@ -89,18 +89,23 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
         Abort("FillCoarsePatch: how did this happen?");
     }
 
+    Interpolater* mapper = &cell_cons_interp;
+
     if (is_vel){
         PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(velfill));
         PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(velfill));
+        
+        InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
+                              cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+                              mapper, bcs, 0);
     } else {
         PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
         PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
-    }
 
-    Interpolater* mapper = &cell_cons_interp;
-    InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                          cphysbc, 0, fphysbc, 0, refRatio(lev-1),
-                          mapper, bcs, 0);
+        InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
+                              cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+                              mapper, bcs, 0);
+    }
 }
 
 // utility to copy in data from mf_old and/or mf_new into mf

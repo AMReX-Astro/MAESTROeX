@@ -298,7 +298,7 @@ private:
                           amrex::Vector<amrex::MultiFab>& mf_old,
                           amrex::Vector<amrex::MultiFab>& mf_new,
                           int srccomp, int destcomp, int ncomp,
-                          const amrex::Vector<amrex::BCRec>& bcs);
+                          const amrex::Vector<amrex::BCRec>& bcs, bool is_vel=false);
 
     // utility to copy in data from mf_old and/or mf_new into mf
     // if time=t_old we copy mf_old into mf

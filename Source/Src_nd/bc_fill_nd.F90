@@ -25,5 +25,24 @@ contains
 #endif
 
   end subroutine phifill
-  
+
+  subroutine velfill(vel,vel_lo,vel_hi,domlo,domhi,dx,gridlo,time,bc) &
+       bind(C, name="velfill")
+
+    integer      :: vel_lo(3),vel_hi(3)
+    integer      :: bc(AMREX_SPACEDIM,2)
+    integer      :: domlo(3), domhi(3)
+    double precision :: dx(3), gridlo(3), time
+    double precision :: vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3))
+
+#if (AMREX_SPACEDIM == 1)
+       call filcc(vel,vel_lo(1),vel_hi(1),domlo,domhi,dx,gridlo,bc)
+#elif (AMREX_SPACEDIM == 2)
+       call filcc(vel,vel_lo(1),vel_lo(2),vel_hi(1),vel_hi(2),domlo,domhi,dx,gridlo,bc)
+#else
+       call filcc(vel,vel_lo(1),vel_lo(2),vel_lo(3),vel_hi(1),vel_hi(2),vel_hi(3),domlo,domhi,dx,gridlo,bc)
+#endif
+
+end subroutine velfill
+
 end module bc_fill_module

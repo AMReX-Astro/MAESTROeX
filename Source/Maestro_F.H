@@ -94,6 +94,11 @@ extern "C"
 		  const amrex::Real* dx, const amrex::Real* gridlo,
 		  const amrex::Real* time, const int* bc, const int icomp);
 
+    void velfill (amrex::Real* vel, const int* vel_lo, const int* vel_hi,
+    	  const int* domlo, const int* domhi,
+    	  const amrex::Real* dx, const amrex::Real* gridlo,
+    	  const amrex::Real* time, const int* bc, const int icomp);
+
     //////////////////////
 
     //////////////////////
