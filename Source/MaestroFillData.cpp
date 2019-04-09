@@ -74,7 +74,7 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
                           Vector<MultiFab>& mf_old,
                           Vector<MultiFab>& mf_new,
                           int srccomp, int destcomp, int ncomp,
-                          const Vector<BCRec>& bcs)
+                          const Vector<BCRec>& bcs, bool is_vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillCoarsePatch()",FillCoarsePatch);
@@ -89,8 +89,13 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
         Abort("FillCoarsePatch: how did this happen?");
     }
 
-    PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
-    PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
+    if (is_vel){
+        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(velfill));
+        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(velfill));
+    } else {
+        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
+        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
+    }
 
     Interpolater* mapper = &cell_cons_interp;
     InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
