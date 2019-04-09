@@ -7,14 +7,15 @@ module bc_fill_module
 
 contains
 
-  subroutine phifill(phi,phi_lo,phi_hi,domlo,domhi,dx,gridlo,time,bc) &
+  subroutine phifill(phi,phi_lo,phi_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
        bind(C, name="phifill")
 
-    integer      :: phi_lo(3),phi_hi(3)
-    integer      :: bc(AMREX_SPACEDIM,2)
-    integer      :: domlo(3), domhi(3)
-    double precision :: dx(3), gridlo(3), time
-    double precision :: phi(phi_lo(1):phi_hi(1),phi_lo(2):phi_hi(2),phi_lo(3):phi_hi(3))
+    integer, intent(in)      :: phi_lo(3),phi_hi(3)
+    integer, intent(in)      :: bc(AMREX_SPACEDIM,2)
+    integer, intent(in)      :: domlo(3), domhi(3)
+    double precision, intent(in) :: dx(3), gridlo(3), time
+    double precision, intent(inout) :: phi(phi_lo(1):phi_hi(1),phi_lo(2):phi_hi(2),phi_lo(3):phi_hi(3))
+    integer, value, intent(in) :: icomp
 
 #if (AMREX_SPACEDIM == 1)
     call filcc(phi,phi_lo(1),phi_hi(1),domlo,domhi,dx,gridlo,bc)
@@ -24,18 +25,19 @@ contains
     call filcc(phi,phi_lo(1),phi_lo(2),phi_lo(3),phi_hi(1),phi_hi(2),phi_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
 
-    call fill_ext_bc(phi_lo,phi_hi,phi,phi_lo,phi_hi,domlo,domhi,bc)
+    call fill_scalar_ext_bc(phi_lo,phi_hi,phi,phi_lo,phi_hi,domlo,domhi,bc)
 
   end subroutine phifill
 
-  subroutine velfill(vel,vel_lo,vel_hi,domlo,domhi,dx,gridlo,time,bc) &
+  subroutine velfill(vel,vel_lo,vel_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
        bind(C, name="velfill")
 
-    integer      :: vel_lo(3),vel_hi(3)
-    integer      :: bc(AMREX_SPACEDIM,2)
-    integer      :: domlo(3), domhi(3)
-    double precision :: dx(3), gridlo(3), time
-    double precision :: vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3))
+    integer, intent(in)      :: vel_lo(3),vel_hi(3)
+    integer, intent(in)      :: bc(AMREX_SPACEDIM,2)
+    integer, intent(in)      :: domlo(3), domhi(3)
+    double precision, intent(in) :: dx(3), gridlo(3), time
+    double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3))
+    integer, value, intent(in) :: icomp
 
 #if (AMREX_SPACEDIM == 1)
     call filcc(vel,vel_lo(1),vel_hi(1),domlo,domhi,dx,gridlo,bc)
@@ -45,18 +47,18 @@ contains
     call filcc(vel,vel_lo(1),vel_lo(2),vel_lo(3),vel_hi(1),vel_hi(2),vel_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
 
-    call fill_ext_bc(phi_lo,phi_hi,phi,phi_lo,phi_hi,domlo,domhi,bc)
+    call fill_vel_ext_bc(vel_lo,vel_hi,vel,vel_lo,vel_hi,domlo,domhi,bc)
 
   end subroutine velfill
 
-  subroutine fill_ext_bc(lo,hi,q,q_lo,q_hi,domlo,domhi,bc)
+  subroutine fill_scalar_ext_bc(lo,hi,q,q_lo,q_hi,domlo,domhi,bc,icomp)
 
     integer, intent(in   ) :: lo(3), hi(3)
     integer, intent(in   ) :: q_lo(3),q_hi(3)
     integer, intent(in   ) :: bc(AMREX_SPACEDIM,2)
     integer, intent(in   ) :: domlo(3), domhi(3)
-    double precision, intent(in   ) :: dx(3)
     double precision, intent(inout) :: q(q_lo(1):q_hi(1),q_lo(2):q_hi(2),q_lo(3):q_hi(3))
+    integer, value, intent(in) :: icomp
 
     integer :: ilo, ihi, jlo, jhi, klo, khi
     integer :: is, ie, js, je, ks, ke
@@ -65,7 +67,7 @@ contains
 
     ! do nothing if there are no exterior boundaries
     if (.not. any(bc .eq. amrex_bc_ext_dir)) then
-        return
+       return
     endif
 
     is = max(q_lo(1), domlo(1))
@@ -195,6 +197,19 @@ contains
     end if
 #endif
 
-  end subroutine fill_ext_bc
+  end subroutine fill_scalar_ext_bc
+
+  subroutine fill_vel_ext_bc(lo,hi,v,v_lo,v_hi,domlo,domhi,bc,icomp)
+
+    integer, intent(in   ) :: lo(3), hi(3)
+    integer, intent(in   ) :: v_lo(3),v_hi(3)
+    integer, intent(in   ) :: bc(AMREX_SPACEDIM,2)
+    integer, intent(in   ) :: domlo(3), domhi(3)
+    double precision, intent(inout) :: v(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
+    integer, value, intent(in) :: icomp
+
+    call fill_scalar_ext_bc(lo,hi,v,v_lo,v_hi,domlo,domhi,bc,icomp)
+
+  end subroutine fill_vel_ext_bc
 
 end module bc_fill_module

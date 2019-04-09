@@ -26,15 +26,17 @@ contains
     integer, value, intent(in) :: icomp
 
 #if (AMREX_SPACEDIM == 1)
-    call amrex_error("physbc_1d not written")
+    call filcc(phi,phi_lo(1),phi_hi(1),domlo,domhi,dx,gridlo,bc)
 #elif (AMREX_SPACEDIM == 2)
-    call physbc_2d(phi,phi_lo,phi_hi,domlo,domhi,dx,&
-         gridlo,bc,icomp)
+    call filcc(phi,phi_lo(1),phi_lo(2),phi_hi(1),phi_hi(2),domlo,domhi,dx,gridlo,bc)
 #else
-    call amrex_error("physbc_3d not written")
+    call filcc(phi,phi_lo(1),phi_lo(2),phi_lo(3),phi_hi(1),phi_hi(2),phi_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
 
+    call fill_scalar_ext_bc(phi_lo,phi_hi,phi,phi_lo,phi_hi,domlo,domhi,bc)
+
   end subroutine phifill
+
 
   subroutine velfill(vel,vel_lo,vel_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
        bind(C, name="velfill")
@@ -47,243 +49,330 @@ contains
     integer, value, intent(in) :: icomp
 
 #if (AMREX_SPACEDIM == 1)
-    call amrex_error("velphysbc_1d not written")
+    call filcc(vel,vel_lo(1),vel_hi(1),domlo,domhi,dx,gridlo,bc)
 #elif (AMREX_SPACEDIM == 2)
-    call velphysbc_2d(vel,vel_lo,vel_hi,domlo,domhi,dx,&
-         gridlo,bc,icomp)
+    call filcc(vel,vel_lo(1),vel_lo(2),vel_hi(1),vel_hi(2),domlo,domhi,dx,gridlo,bc)
 #else
-    call amrex_error("velphysbc_3d not written")
+    call filcc(vel,vel_lo(1),vel_lo(2),vel_lo(3),vel_hi(1),vel_hi(2),vel_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
+
+    call fill_vel_ext_bc(vel_lo,vel_hi,vel,vel_lo,vel_hi,domlo,domhi,bc)
 
   end subroutine velfill
 
-  subroutine physbc_2d(phi,phi_lo,phi_hi,domlo,domhi,dx,gridlo,bc,icomp)
 
-    ! use geometry, only: dr_fine
-    ! use probin_module, only: inlet_mach
+  subroutine fill_scalar_ext_bc(lo,hi,v,v_lo,v_hi,domlo,domhi,bc,icomp)
 
-    integer, intent(in)      :: phi_lo(3),phi_hi(3)
-    integer, intent(in)      :: bc(AMREX_SPACEDIM,2)
-    integer, intent(in)      :: domlo(3), domhi(3)
-    double precision, intent(in) :: dx(3), gridlo(3)
-    double precision, intent(inout) :: phi(phi_lo(1):phi_hi(1),phi_lo(2):phi_hi(2),phi_lo(3):phi_hi(3))
+    integer, intent(in   ) :: lo(3), hi(3)
+    integer, intent(in   ) :: q_lo(3),q_hi(3)
+    integer, intent(in   ) :: bc(AMREX_SPACEDIM,2)
+    integer, intent(in   ) :: domlo(3), domhi(3)
+    double precision, intent(inout) :: q(q_lo(1):q_hi(1),q_lo(2):q_hi(2),q_lo(3):q_hi(3))
     integer, value, intent(in) :: icomp
 
-    !     Local variables
-    integer :: i
-    double precision :: A,B,x
+    integer :: ilo, ihi, jlo, jhi, klo, khi
+    integer :: is, ie, js, je, ks, ke
+    integer :: i, j, k, n
+    integer :: imin, imax, jmin, jmax, kmin, kmax
 
-    integer :: lo(3), hi(3)
-    integer :: is, ie, js, je
-    ! integer :: i, j, k, n
-    integer :: jmin, jmax
+    ! do nothing if there are no exterior boundaries
+    if (.not. any(bc .eq. amrex_bc_ext_dir)) then
+       return
+    endif
 
-    lo(:) = phi_lo(:)
-    hi(:) = phi_hi(:)
+    is = max(q_lo(1), domlo(1))
+    ie = min(q_hi(1), domhi(1))
+    ilo = domlo(1)
+    ihi = domhi(1)
 
-    A = 4.5d-2
-    B = 1.d2
+#if AMREX_SPACEDIM >= 2
+    js = max(q_lo(2), domlo(2))
+    je = min(q_hi(2), domhi(2))
+    jlo = domlo(2)
+    jhi = domhi(2)
+#endif
 
-    ! if (ng == 0) return
+#if AMREX_SPACEDIM == 3
+    ks = max(q_lo(3), domlo(3))
+    ke = min(q_hi(3), domhi(3))
+    klo = domlo(3)
+    khi = domhi(3)
+#endif
 
-    !--------------------------------------------------------------------------
-    ! lower X
-    !--------------------------------------------------------------------------
-    if (bc(1,1) .eq. amrex_bc_int_dir) then
-       ! nothing to do - these ghost cells are filled with either
-       ! multifab_fill_boundary or multifab_fill_ghost_cells
-    else
-       call amrex_error("physbc_2d: bc(1,1) not yet supported")
-    end if
+    if (lo(1) < ilo) then
+       imin = lo(1)
+       imax = ilo-1
 
-    !--------------------------------------------------------------------------
-    ! upper X
-    !--------------------------------------------------------------------------
-    if (bc(1,2) .eq. amrex_bc_int_dir) then
-       ! nothing to do - these ghost cells are filled with either
-       ! multifab_fill_boundary or multifab_fill_ghost_cells
-    else
-       call amrex_error("physbc_2d: bc(1,2) not yet supported")
-    end if
+       if (bc(1,1) .eq. amrex_bc_ext_dir) then
 
-    !--------------------------------------------------------------------------
-    ! lower Y
-    !--------------------------------------------------------------------------
-
-    jmin = domlo(2)
-    jmax = min(domhi(2),domlo(2)-1)
-
-    if (bc(2,1) .eq. amrex_bc_ext_dir) then
-       ! rho
-       if (icomp .eq. rho_comp) then
-          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
-          ! rhoh
-       else if (icomp .eq. rhoh_comp) then
-          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHOH
-          ! species
-       else if (icomp .eq. spec_comp) then
-          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
-          ! temperature
-       else if (icomp .eq. temp_comp) then
-          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_TEMP
-       else
-          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.0d0
-       endif
-       ! tracer
-       ! if (icomp .eq. 7) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.d0
-    else if (bc(2,1) .eq. amrex_bc_foextrap) then
-       do i=lo(1),hi(1)
-          phi(i,jmin:jmax,lo(3):hi(3)) = phi(i,lo(2),lo(3))
-       end do
-    else if (bc(2,1) .eq. amrex_bc_int_dir) then
-       ! nothing to do - these ghost cells are filled with either
-       ! multifab_fill_boundary or multifab_fill_ghost_cells
-    else
-       call amrex_error("physbc_2d: bc(2,1) not yet supported")
-    end if
-
-    !--------------------------------------------------------------------------
-    ! upper Y
-    !--------------------------------------------------------------------------
-
-    jmin = max(domlo(2),domhi(2)+1)
-    jmax = domhi(2)
-
-    ! write(*,*) "bc(2,1) =, ", bc(2,1), "bc(2,2) = ", bc(2,2), "foextrap = ", amrex_bc_foextrap
-
-    if (bc(2,2) .eq. amrex_bc_foextrap) then
-       do i=lo(1),hi(1)
-          phi(i,jmin:jmax,lo(3):hi(3)) = phi(i,hi(2),lo(3))
-       end do
-    else if (bc(2,2) .eq. amrex_bc_hoextrap) then
-       do i=lo(1),hi(1)
-          phi(i,jmin:jmax,lo(3):hi(3)) = &
-               ( 15.d0 * phi(i,jmax  ,lo(3)) &
-               -10.d0 * phi(i,jmax-1,lo(3)) &
-               + 3.d0 * phi(i,jmax-2,lo(3)) ) * EIGHTH
-       end do
-    else if ((bc(2,2) .eq. amrex_bc_int_dir)) then
-       ! nothing to do - these ghost cells are filled with either
-       ! multifab_fill_boundary or multifab_fill_ghost_cells
-    else
-       write(*,*) "comp = ", icomp, "bc(2,2) = ", bc(2,2)
-       call amrex_error("physbc_2d: bc(2,2) not yet supported")
-    end if
-
-  end subroutine physbc_2d
-
-  subroutine velphysbc_2d(phi,phi_lo,phi_hi,domlo,domhi,dx,gridlo,bc,icomp)
-
-    ! use geometry, only: dr_fine
-    ! use probin_module, only: inlet_mach
-
-    integer, intent(in)      :: phi_lo(3),phi_hi(3)
-    integer, intent(in)      :: bc(AMREX_SPACEDIM,2)
-    integer, intent(in)      :: domlo(3), domhi(3)
-    double precision, intent(in) :: dx(3), gridlo(3)
-    double precision, intent(inout) :: phi(phi_lo(1):phi_hi(1),phi_lo(2):phi_hi(2),phi_lo(3):phi_hi(3))
-    integer, value, intent(in) :: icomp
-
-    !     Local variables
-    integer :: i
-    double precision :: A,B,x
-
-    integer :: lo(3), hi(3)
-    integer :: is, ie, js, je
-    ! integer :: i, j, k, n
-    integer :: jmin, jmax
-
-    lo(:) = phi_lo(:)
-    hi(:) = phi_hi(:)
-
-    A = 4.5d-2
-    B = 1.d2
-
-    ! if (ng == 0) return
-
-    !--------------------------------------------------------------------------
-    ! lower X
-    !--------------------------------------------------------------------------
-    if (bc(1,1) .eq. amrex_bc_int_dir) then
-       ! nothing to do - these ghost cells are filled with either
-       ! multifab_fill_boundary or multifab_fill_ghost_cells
-    else
-       call amrex_error("velphysbc_2d: bc(1,1) not yet supported")
-    end if
-
-    !--------------------------------------------------------------------------
-    ! upper X
-    !--------------------------------------------------------------------------
-    if (bc(1,2) .eq. amrex_bc_int_dir) then
-       ! nothing to do - these ghost cells are filled with either
-       ! multifab_fill_boundary or multifab_fill_ghost_cells
-    else
-       call amrex_error("velphysbc_2d: bc(1,2) not yet supported")
-    end if
-
-    !--------------------------------------------------------------------------
-    ! lower Y
-    !--------------------------------------------------------------------------
-
-    jmin = domlo(2)
-    jmax = min(domhi(2),domlo(2)-1)
-
-    if (bc(2,1) .eq. amrex_bc_ext_dir) then
-       ! xvel
-       if (icomp .eq. 0) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.d0
-       ! yvel
-       if (icomp .eq. 1) then
-          do i=lo(1),hi(1)
-             x = (dble(i)+0.5d0)*dr_fine
-             ! inflow is Mach number 0.01 front with a Mach number 0.1 bump in the middle
-             phi(i,jmin:jmax,lo(3):hi(3)) = (inlet_mach/1.d-1)* &
-                  INLET_CS*(1.d-2 + A*(tanh(B*(x-0.40d0)) + tanh(B*(0.6d0-x))))
+          do k = lo(3), hi(3)
+             do j = lo(2), hi(2)
+                do i = imin, imax
+                   q(i,j,k) = 0.d0
+                end do
+             end do
           end do
+
        end if
-
-    else if (bc(2,1) .eq. amrex_bc_foextrap) then
-       do i=lo(1),hi(1)
-          phi(i,jmin:jmax,lo(3):hi(3)) = phi(i,lo(2),lo(3))
-       end do
-    else if (bc(2,1) .eq. amrex_bc_int_dir) then
-       ! nothing to do - these ghost cells are filled with either
-       ! multifab_fill_boundary or multifab_fill_ghost_cells
-    else
-       call amrex_error("velphysbc_2d: bc(2,1) not yet supported")
     end if
 
-    !--------------------------------------------------------------------------
-    ! upper Y
-    !--------------------------------------------------------------------------
+    if (hi(1) > ihi) then
+       imin = ihi+1
+       imax = hi(1)
 
-    jmin = max(domlo(2),domhi(2)+1)
-    jmax = domhi(2)
+       if (bc(1,2) .eq. amrex_bc_ext_dir) then
 
-    ! write(*,*) "bc(2,1) =, ", bc(2,1), "bc(2,2) = ", bc(2,2), "foextrap = ", amrex_bc_foextrap
+          do k = lo(3), hi(3)
+             do j = lo(2), hi(2)
+                do i = imin, imax
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
 
-    if (bc(2,2) .eq. amrex_bc_foextrap) then
-       do i=lo(1),hi(1)
-          phi(i,jmin:jmax,lo(3):hi(3)) = phi(i,hi(2),lo(3))
-       end do
-    else if (bc(2,2) .eq. amrex_bc_hoextrap) then
-       do i=lo(1),hi(1)
-          phi(i,jmin:jmax,lo(3):hi(3)) = &
-               ( 15.d0 * phi(i,jmax  ,lo(3)) &
-               -10.d0 * phi(i,jmax-1,lo(3)) &
-               + 3.d0 * phi(i,jmax-2,lo(3)) ) * EIGHTH
-       end do
-    else if ((bc(2,2) .eq. amrex_bc_int_dir)) then
-       ! nothing to do - these ghost cells are filled with either
-       ! multifab_fill_boundary or multifab_fill_ghost_cells
-    else
-       do i=lo(1),hi(1)
-          phi(i,jmin:jmax,lo(3):hi(3)) = phi(i,hi(2),lo(3))
-       end do
-       !  write(*,*) "bcs = ", bc
-       !  write(*,*) "comp = ", icomp, "bc(2,2) = ", bc(2,2)
-       ! call amrex_error("velphysbc_2d: bc(2,2) not yet supported")
+       end if
     end if
 
-  end subroutine velphysbc_2d
+#if AMREX_SPACEDIM >= 2
+
+    if (lo(2) < jlo) then
+       jmin = lo(2)
+       jmax = jlo-1
+
+       if (bc(2,1) .eq. amrex_bc_ext_dir) then
+
+          ! rho
+          if (icomp .eq. rho_comp) then
+             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
+             ! rhoh
+          else if (icomp .eq. rhoh_comp) then
+             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHOH
+             ! species
+          else if (icomp .eq. spec_comp) then
+             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
+             ! temperature
+          else if (icomp .eq. temp_comp) then
+             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_TEMP
+          else
+             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.0d0
+          endif
+
+       end if
+    end if
+
+    if (hi(2) > jhi) then
+       jmin = jhi+1
+       jmax = hi(2)
+
+       if (bc(2,2) .eq. amrex_bc_ext_dir) then
+
+          do k = lo(3), hi(3)
+             do j = jmin, jmax
+                do i = lo(1), hi(1)
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
+
+       end if
+    end if
+#endif
+
+#if AMREX_SPACEDIM == 3
+
+    if (lo(3) < klo) then
+       kmin = lo(3)
+       kmax = klo-1
+
+       if (bc(3,1) .eq. amrex_bc_ext_dir) then
+
+          do k = kmin, kmax
+             do j = lo(2), hi(2)
+                do i = lo(1), hi(1)
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
+
+       end if
+    end if
+
+    if (hi(3) > khi) then
+       kmin = khi+1
+       kmax = hi(3)
+
+       if (bc(3,2) .eq. amrex_bc_ext_dir) then
+
+          do k = kmin, kmax
+             do j = lo(2), hi(2)
+                do i = lo(1), hi(1)
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
+
+       end if
+    end if
+#endif
+
+  end subroutine fill_scalar_ext_bc
+
+
+  subroutine fill_vel_ext_bc(vel_lo,vel_hi,vel,vel_lo,vel_hi,domlo,domhi,bc)
+
+    integer, intent(in   ) :: lo(3), hi(3)
+    integer, intent(in   ) :: q_lo(3),q_hi(3)
+    integer, intent(in   ) :: bc(AMREX_SPACEDIM,2)
+    integer, intent(in   ) :: domlo(3), domhi(3)
+    double precision, intent(inout) :: q(q_lo(1):q_hi(1),q_lo(2):q_hi(2),q_lo(3):q_hi(3))
+    integer, value, intent(in) :: icomp
+
+    !     Local variables
+    integer :: ilo, ihi, jlo, jhi, klo, khi
+    integer :: is, ie, js, je, ks, ke
+    integer :: i, j, k, n
+    integer :: imin, imax, jmin, jmax, kmin, kmax
+    double precision :: A,B,x
+
+    A = 4.5d-2
+    B = 1.d2
+
+    ! do nothing if there are no exterior boundaries
+    if (.not. any(bc .eq. amrex_bc_ext_dir)) then
+       return
+    endif
+
+    is = max(q_lo(1), domlo(1))
+    ie = min(q_hi(1), domhi(1))
+    ilo = domlo(1)
+    ihi = domhi(1)
+
+#if AMREX_SPACEDIM >= 2
+    js = max(q_lo(2), domlo(2))
+    je = min(q_hi(2), domhi(2))
+    jlo = domlo(2)
+    jhi = domhi(2)
+#endif
+
+#if AMREX_SPACEDIM == 3
+    ks = max(q_lo(3), domlo(3))
+    ke = min(q_hi(3), domhi(3))
+    klo = domlo(3)
+    khi = domhi(3)
+#endif
+
+    if (lo(1) < ilo) then
+       imin = lo(1)
+       imax = ilo-1
+
+       if (bc(1,1) .eq. amrex_bc_ext_dir) then
+
+          do k = lo(3), hi(3)
+             do j = lo(2), hi(2)
+                do i = imin, imax
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
+
+       end if
+    end if
+
+    if (hi(1) > ihi) then
+       imin = ihi+1
+       imax = hi(1)
+
+       if (bc(1,2) .eq. amrex_bc_ext_dir) then
+
+          do k = lo(3), hi(3)
+             do j = lo(2), hi(2)
+                do i = imin, imax
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
+
+       end if
+    end if
+
+#if AMREX_SPACEDIM >= 2
+
+    if (lo(2) < jlo) then
+       jmin = lo(2)
+       jmax = jlo-1
+
+       if (bc(2,1) .eq. amrex_bc_ext_dir) then
+
+          ! xvel
+          if (icomp .eq. 0) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.d0
+          ! yvel
+          if (icomp .eq. 1) then
+             do i=lo(1),hi(1)
+                x = (dble(i)+0.5d0)*dr_fine
+                ! inflow is Mach number 0.01 front with a Mach number 0.1 bump in the middle
+                phi(i,jmin:jmax,lo(3):hi(3)) = (inlet_mach/1.d-1)* &
+                     INLET_CS*(1.d-2 + A*(tanh(B*(x-0.40d0)) + tanh(B*(0.6d0-x))))
+             end do
+          end if
+
+       end if
+    end if
+
+    if (hi(2) > jhi) then
+       jmin = jhi+1
+       jmax = hi(2)
+
+       if (bc(2,2) .eq. amrex_bc_ext_dir) then
+
+          do k = lo(3), hi(3)
+             do j = jmin, jmax
+                do i = lo(1), hi(1)
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
+
+       end if
+    end if
+#endif
+
+#if AMREX_SPACEDIM == 3
+
+    if (lo(3) < klo) then
+       kmin = lo(3)
+       kmax = klo-1
+
+       if (bc(3,1) .eq. amrex_bc_ext_dir) then
+
+          do k = kmin, kmax
+             do j = lo(2), hi(2)
+                do i = lo(1), hi(1)
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
+
+       end if
+    end if
+
+    if (hi(3) > khi) then
+       kmin = khi+1
+       kmax = hi(3)
+
+       if (bc(3,2) .eq. amrex_bc_ext_dir) then
+
+          do k = kmin, kmax
+             do j = lo(2), hi(2)
+                do i = lo(1), hi(1)
+                   q(i,j,k) = 0.d0
+                end do
+             end do
+          end do
+
+       end if
+    end if
+#endif
+
+  end subroutine fill_vel_ext_bc
 
 end module bc_fill_module
