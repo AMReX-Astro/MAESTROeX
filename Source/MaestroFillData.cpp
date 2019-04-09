@@ -10,14 +10,14 @@ Maestro::FillPatch (Real time,
                     Vector<MultiFab>& mf_old,
                     Vector<MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
-                    const Vector<BCRec>& bcs_in)
+                    const Vector<BCRec>& bcs_in, bool is_vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillPatch()",FillPatch);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         FillPatch(lev, time, mf[lev], mf_old, mf_new, srccomp, destcomp, ncomp,
-                  startbccomp, bcs_in);
+                  startbccomp, bcs_in, is_vel);
     }
 }
 
@@ -31,38 +31,54 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
                     Vector<MultiFab>& mf_old,
                     Vector<MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
-                    const Vector<BCRec>& bcs_in)
+                    const Vector<BCRec>& bcs_in, bool is_vel)
 {
 
-    Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
+	Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
 
-    if (lev == 0)
-    {
-        Vector<MultiFab*> smf;
-        Vector<Real> stime;
-        GetData(0, time, smf, stime, mf_old, mf_new);
+	if (lev == 0)
+	{
+		Vector<MultiFab*> smf;
+		Vector<Real> stime;
+		GetData(0, time, smf, stime, mf_old, mf_new);
 
-        PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFuncArray(phifill));
-        FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
-                             geom[lev], physbc, 0);
-    }
-    else
-    {
-        Vector<MultiFab*> cmf, fmf;
-        Vector<Real> ctime, ftime;
-        GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
-        GetData(lev, time, fmf, ftime, mf_old, mf_new);
+		if (is_vel) {
+			PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFuncArray(velfill));
+			FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
+			                     geom[lev], physbc, 0);
+		} else {
+			PhysBCFunctMaestro physbc(geom[lev],bcs,BndryFuncArray(phifill));
+			FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
+			                     geom[lev], physbc, 0);
+		}
+	}
+	else
+	{
+		Vector<MultiFab*> cmf, fmf;
+		Vector<Real> ctime, ftime;
+		GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
+		GetData(lev, time, fmf, ftime, mf_old, mf_new);
 
-        PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
-        PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
+		Interpolater* mapper = &cell_cons_interp;
 
-        Interpolater* mapper = &cell_cons_interp;
+		if (is_vel) {
+			PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(velfill));
+			PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(velfill));
 
-        FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
-                           srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                           cphysbc, 0, fphysbc, 0, refRatio(lev-1),
-                           mapper, bcs, 0);
-    }
+			FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
+			                   srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
+			                   cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+			                   mapper, bcs, 0);
+		} else {
+			PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
+			PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
+
+			FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
+			                   srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
+			                   cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+			                   mapper, bcs, 0);
+		}
+	}
 }
 
 // fill an entire multifab by interpolating from the coarser level
@@ -94,13 +110,14 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
     if (is_vel){
         PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(velfill));
         PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(velfill));
-        
+
         InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
                               cphysbc, 0, fphysbc, 0, refRatio(lev-1),
                               mapper, bcs, 0);
     } else {
         PhysBCFunctMaestro cphysbc(geom[lev-1],bcs,BndryFuncArray(phifill));
         PhysBCFunctMaestro fphysbc(geom[lev  ],bcs,BndryFuncArray(phifill));
+        Print() << "ncomp = " << ncomp << std::endl;
 
         InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
                               cphysbc, 0, fphysbc, 0, refRatio(lev-1),

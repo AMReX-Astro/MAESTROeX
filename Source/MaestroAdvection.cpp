@@ -22,7 +22,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 		utilde[lev].setVal(0.);
 	}
 
-	FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+	FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, true);
 
 	// create a MultiFab to hold uold + w0
 	Vector<MultiFab>      ufull(finest_level+1);
@@ -32,7 +32,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	}
 
 	// create ufull = uold + w0
-	Put1dArrayOnCart(w0,ufull,1,1,bcs_u,0);
+	Put1dArrayOnCart(w0,ufull,1,1,bcs_u,0,true);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
 	}
@@ -328,7 +328,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     dx, &dt, &is_vel, bcs[0].data(),
                     &nbccomp, &scomp, &bccomp, &is_conservative);
             } // end loop over components
-        } // end MFIter loop		
+        } // end MFIter loop
     } // end loop over levels
 
     // We use edge_restriction for the output velocity if is_vel == 1
@@ -496,12 +496,12 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
 	    // NOTE: areas are different in DIM=2 and DIM=3
-#if (AMREX_SPACEDIM == 3) 
+#if (AMREX_SPACEDIM == 3)
 	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
 #else
 	    const Real area[2] = {dx[1], dx[0]};
 #endif
-	    
+
 	    if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
@@ -723,7 +723,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
             	    // NOTE: areas are different in DIM=2 and DIM=3
-#if (AMREX_SPACEDIM == 3) 
+#if (AMREX_SPACEDIM == 3)
 	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
 #else
 	    const Real area[2] = {dx[1], dx[0]};
@@ -998,11 +998,11 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	    }
         } // end MFIter loop
     } // end loop over levels
-	
+
     // average fine data onto coarser cells
     AverageDown(unew,0,AMREX_SPACEDIM);
 
     // fill ghost cells
-    FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, true);
 
 }

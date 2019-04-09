@@ -115,13 +115,20 @@ contains
 
     if (bc(2,1) .eq. amrex_bc_ext_dir) then
        ! rho
-       if (icomp .eq. rho_comp) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
-       ! rhoh
-       if (icomp .eq. rhoh_comp) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHOH
-       ! species
-       if (icomp .eq. spec_comp) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
-       ! temperature
-       if (icomp .eq. temp_comp) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_TEMP
+       if (icomp .eq. rho_comp) then
+          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
+          ! rhoh
+       else if (icomp .eq. rhoh_comp) then
+          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHOH
+          ! species
+       else if (icomp .eq. spec_comp) then
+          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
+          ! temperature
+       else if (icomp .eq. temp_comp) then
+          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_TEMP
+       else
+          phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.0d0
+       endif
        ! tracer
        ! if (icomp .eq. 7) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.d0
     else if (bc(2,1) .eq. amrex_bc_foextrap) then
@@ -159,6 +166,7 @@ contains
        ! nothing to do - these ghost cells are filled with either
        ! multifab_fill_boundary or multifab_fill_ghost_cells
     else
+       write(*,*) "comp = ", icomp, "bc(2,2) = ", bc(2,2)
        call amrex_error("physbc_2d: bc(2,2) not yet supported")
     end if
 
@@ -268,9 +276,14 @@ contains
        ! nothing to do - these ghost cells are filled with either
        ! multifab_fill_boundary or multifab_fill_ghost_cells
     else
-       call amrex_error("velphysbc_2d: bc(2,2) not yet supported")
+       do i=lo(1),hi(1)
+          phi(i,jmin:jmax,lo(3):hi(3)) = phi(i,hi(2),lo(3))
+       end do
+       !  write(*,*) "bcs = ", bc
+       !  write(*,*) "comp = ", icomp, "bc(2,2) = ", bc(2,2)
+       ! call amrex_error("velphysbc_2d: bc(2,2) not yet supported")
     end if
 
-end subroutine velphysbc_2d
+  end subroutine velphysbc_2d
 
 end module bc_fill_module

@@ -62,7 +62,7 @@ Maestro::DiagFile (const int step,
 
         // put w0 in Cartesian cell-centers as a scalar (the radial
         // expansion velocity)
-        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0);
+        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,true);
 
 	// compute rho_Hext and rho_Hnuc
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -102,7 +102,7 @@ Maestro::DiagFile (const int step,
     Real Rloc_enucmax, vr_enucmax;
     Real nuc_ener=0.0;
 
-    
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // diagnosis variables at each level
@@ -126,7 +126,7 @@ Maestro::DiagFile (const int step,
 	Vector<Real> vel_enucmax_local(AMREX_SPACEDIM,0.0);
 	Real nuc_ener_level=0.0;
 
-	
+
         // get references to the MultiFabs at level lev
         const MultiFab& sin_mf = s_in[lev];
         const MultiFab& uin_mf = u_in[lev];
@@ -157,7 +157,7 @@ Maestro::DiagFile (const int step,
             const Box& tileBox = mfi.tilebox();
 
             int use_mask = !(lev==finest_level);
-            
+
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
@@ -178,7 +178,7 @@ Maestro::DiagFile (const int step,
 		      &enuc_max_local, coord_enucmax_local.dataPtr(), vel_enucmax_local.dataPtr(),
 		      &kin_ener_level, &int_ener_level, &nuc_ener_level,
 		      &U_max_level, &Mach_max_level,
-                      &ncenter_level, &T_center_level, vel_center_level.dataPtr(), 
+                      &ncenter_level, &T_center_level, vel_center_level.dataPtr(),
                       BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);
         }
 
@@ -194,7 +194,7 @@ Maestro::DiagFile (const int step,
         ParallelDescriptor::ReduceRealMax(U_max_level);
         ParallelDescriptor::ReduceRealMax(Mach_max_level);
 
-	
+
         // for T_max, we want to know where the hot spot is, so we do a
         // gather on the temperature and find the index corresponding to
         // the maxiumum.  We then pack the coordinates and velocities
@@ -268,7 +268,7 @@ Maestro::DiagFile (const int step,
                 index_max = ip;
             }
         }
-	
+
         Vector<Real> enuc_max_coords(2*AMREX_SPACEDIM);
         for (int i=0; i<AMREX_SPACEDIM; ++i) {
             enuc_max_coords[i] = coord_enucmax_local[i];
@@ -293,8 +293,8 @@ Maestro::DiagFile (const int step,
             coord_enucmax_level[i] = enuc_max_coords_level[2*AMREX_SPACEDIM*index_max+i];
             vel_enucmax_level[i] = enuc_max_coords_level[2*AMREX_SPACEDIM*index_max+i+3];
         }
-	
-	
+
+
         //
         // reduce the current level's data with the global data
         //
@@ -303,15 +303,15 @@ Maestro::DiagFile (const int step,
 	    kin_ener = kin_ener + kin_ener_level;
 	    int_ener = int_ener + int_ener_level;
 	    nuc_ener = nuc_ener + nuc_ener_level;
-	    
+
 	    U_max = max(U_max, U_max_level);
 	    Mach_max = max(Mach_max, Mach_max_level);
-	    
+
 	    // compute center of domain
 	    Vector<Real> center(3, 0.0);
 	    const Real* probLo = geom[0].ProbLo();
 	    const Real* probHi = geom[0].ProbHi();
-	    
+
 	    for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
 		center[idim] = 0.5*(*(probLo+idim) + *(probHi+idim));
 	    }
@@ -336,7 +336,7 @@ Maestro::DiagFile (const int step,
                           ((coord_Tmax[1] - center[1])/Rloc_Tmax)*vel_Tmax[1] +
                           ((coord_Tmax[2] - center[2])/Rloc_Tmax)*vel_Tmax[2];
             }
-	    
+
 	    // if enuc_max_level is the new max, then copy the location as well
 	    if ( enuc_max_level > enuc_max ) {
 		enuc_max = enuc_max_level;
@@ -345,20 +345,20 @@ Maestro::DiagFile (const int step,
                     coord_enucmax[i] = coord_enucmax_level[i];
                     vel_enucmax[i] = vel_enucmax_level[i];
                 }
-		    
+
 		// compute the radius of the bubble from the center
 		Rloc_enucmax = sqrt( (coord_enucmax[0] - center[0])*(coord_enucmax[0] - center[0]) +
 				     (coord_enucmax[1] - center[1])*(coord_enucmax[1] - center[1]) +
 				     (coord_enucmax[2] - center[2])*(coord_enucmax[2] - center[2]) );
-		    
+
 		// use the coordinates of the hot spot and the velocity components
 		// to compute the radial velocity at the hotspot
 		vr_enucmax = ((coord_enucmax[0] - center[0])/Rloc_enucmax)*vel_enucmax[0] +
 		             ((coord_enucmax[1] - center[1])/Rloc_enucmax)*vel_enucmax[1] +
 		             ((coord_enucmax[2] - center[2])/Rloc_enucmax)*vel_enucmax[2];
-		    
+
 	    }
-					       
+
             T_center = T_center + T_center_level;
 	    for (int i=0; i<AMREX_SPACEDIM; ++i) {
 		vel_center[i] = vel_center[i] + vel_center_level[i];
@@ -370,7 +370,7 @@ Maestro::DiagFile (const int step,
     // compute the graviational potential energy too
     Real grav_ener=0.0;
     diag_grav_energy(&grav_ener, rho0_in.dataPtr(), r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-    
+
     // normalize
     if (ParallelDescriptor::IOProcessor()) {
 
@@ -383,7 +383,7 @@ Maestro::DiagFile (const int step,
 	    int_ener *= *(dx+idim);
 	    nuc_ener *= *(dx+idim);
 	}
-	    
+
         // for a full star ncenter should be 8 -- there are only 8 zones
         // that have a vertex at the center of the star.  For an octant,
         // ncenter should be 1
@@ -440,10 +440,10 @@ Maestro::DiagFile (const int step,
             diagfile1 << std::setw(20) << std::left << Rloc_Tmax;
             diagfile1 << std::setw(20) << std::left << vr_Tmax;
             diagfile1 << std::setw(20) << std::left << T_center << std::endl;
-	    
+
 	    // close files
 	    diagfile1.close();
-	
+
 	    // diag_enuc.out
             diagfile2.open(diagfilename2, std::ofstream::out |
                           std::ofstream::trunc | std::ofstream::binary);
@@ -477,7 +477,7 @@ Maestro::DiagFile (const int step,
 
 	    // close file
 	    diagfile2.close();
-	
+
 	    // diag_vel.out
             diagfile3.open(diagfilename3, std::ofstream::out |
                           std::ofstream::trunc | std::ofstream::binary);
@@ -509,11 +509,11 @@ Maestro::DiagFile (const int step,
 
 	    // close file
 	    diagfile3.close();
-	    
+
         } else {
 
             // store variable values in data array to be written later
-	    
+
 	    // temp
             diagfile1_data[index*11  ] = t_in;
             diagfile1_data[index*11+1] = T_max;
@@ -551,10 +551,10 @@ Maestro::DiagFile (const int step,
             diagfile3_data[index*10+7] = vel_center[1];
             diagfile3_data[index*10+8] = vel_center[2];
             diagfile3_data[index*10+9] = dt;
-	    
+
             index += 1;
         }
-	
+
     }
 }
 
@@ -616,7 +616,7 @@ Maestro::WriteDiagFile (int& index)
         // close file
         diagfile2.close();
 
-	
+
         const std::string& diagfilename3 = "diag_vel.out";
         std::ofstream diagfile3(diagfilename3, std::ofstream::out |
                                std::ofstream::app | std::ofstream::binary);
@@ -640,7 +640,7 @@ Maestro::WriteDiagFile (int& index)
 
         // close file
         diagfile3.close();
-	
+
         // reset buffer array
         index = 0;
     }

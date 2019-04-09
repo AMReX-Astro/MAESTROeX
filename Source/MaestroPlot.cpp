@@ -463,7 +463,7 @@ Maestro::PlotFileMF (const int nPlot,
 
 		if (evolve_base_state == 1) {
 			MakeW0mac(w0mac);
-			Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
+			Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,true);
 		}
 
 		// Mach number
@@ -526,7 +526,7 @@ Maestro::PlotFileMF (const int nPlot,
 	}
 
 	// w0
-	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
+	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0,true);
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
 	}

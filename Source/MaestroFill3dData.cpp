@@ -12,7 +12,7 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const Vector<BCRec>& bcs,
-                           int sbccomp)
+                           int sbccomp, bool is_vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()",Put1dArrayOnCart);
@@ -34,12 +34,12 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 
     // fill ghost cells using first-order extrapolation
     if (ng > 0) {
-        FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs);
+        FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs, is_vel);
     }
 }
 
 void
-Maestro::Put1dArrayOnCart (int level, 
+Maestro::Put1dArrayOnCart (int level,
 			   const Vector<Real>& s0,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
@@ -49,7 +49,7 @@ Maestro::Put1dArrayOnCart (int level,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()",Put1dArrayOnCart);
-    
+
     // get references to the MultiFabs at level lev
     MultiFab& s0_cart_mf = s0_cart[level];
     MultiFab& cc_to_r = cell_cc_to_r[level];
@@ -190,7 +190,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     }
 
     if (w0mac_interp_type == 1) {
-        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0);
+        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, true);
     }
 
     if (w0mac[0][0].nGrow() != 1) {

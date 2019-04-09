@@ -276,7 +276,7 @@ private:
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
-                    const amrex::Vector<amrex::BCRec>& bcs_in);
+                    const amrex::Vector<amrex::BCRec>& bcs_in, bool is_vel=false);
 
     // compute a new multifab by coping in phi from valid region and filling ghost cells
     // works for single level and 2-level cases
@@ -288,7 +288,7 @@ private:
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
-                    const amrex::Vector<amrex::BCRec>& bcs_in);
+                    const amrex::Vector<amrex::BCRec>& bcs_in, bool is_vel=false);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
@@ -339,7 +339,7 @@ private:
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0);
+                           int sbccomp = 0, bool is_vel=false);
 
     void Put1dArrayOnCart (int level, const amrex::Vector<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
