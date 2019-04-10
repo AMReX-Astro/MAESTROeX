@@ -172,6 +172,13 @@ contains
 
        end if
 
+       ! copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
+       rho0 = s0_init(:,:,rho_comp)
+       rhoh0 = s0_init(:,:,rhoh_comp)
+       tempbar = s0_init(:,:,temp_comp)
+       tempbar_init = s0_init(:,:,temp_comp)
+       p0 = p0_init
+
        call set_inlet_bcs()
 
     end do ! end loop over levels
