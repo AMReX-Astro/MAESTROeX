@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <PhysBCFunctMaestro.H>
 
 using namespace amrex;
 
@@ -10,7 +11,7 @@ Maestro::FillPatch (Real time,
                     Vector<MultiFab>& mf_old,
                     Vector<MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
-                    const Vector<BCRec>& bcs_in, bool variable_type)
+                    const Vector<BCRec>& bcs_in, int variable_type)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillPatch()",FillPatch);
@@ -45,9 +46,9 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         PhysBCFunctMaestro physbc;
 
 		if (variable_type == 1) { // velocity
-			physbc.define(geom[lev],bcs,BndryFuncArray(velfill));
+			physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(velfill));
 		} else { // scalar
-			physbc.define(geom[lev],bcs,BndryFuncArray(phifill));
+			physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(scalarfill));
 		}
 
         FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
@@ -64,11 +65,11 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
 		PhysBCFunctMaestro fphysbc;
 
 		if (variable_type == 1) { // velocity
-			cphysbc.define(geom[lev-1],bcs,BndryFuncArray(velfill));
-			fphysbc.define(geom[lev  ],bcs,BndryFuncArray(velfill));
+			cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(velfill));
+			fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(velfill));
 		} else { // scalar
-			cphysbc.define(geom[lev-1],bcs,BndryFuncArray(phifill));
-			fphysbc.define(geom[lev  ],bcs,BndryFuncArray(phifill));
+			cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(scalarfill));
+			fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(scalarfill));
 		}
 
 		Interpolater* mapper = &cell_cons_interp;
@@ -107,18 +108,18 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
     PhysBCFunctMaestro fphysbc;
 
     if (variable_type == 1) { // velocity
-        cphysbc.define(geom[lev-1],bcs,BndryFuncArray(velfill));
-        fphysbc.define(geom[lev  ],bcs,BndryFuncArray(velfill));
+        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(velfill));
+        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(velfill));
     } else { // scalar
-        cphysbc.define(geom[lev-1],bcs,BndryFuncArray(phifill));
-        fphysbc.define(geom[lev  ],bcs,BndryFuncArray(phifill));
+        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(scalarfill));
+        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(scalarfill));
     }
+
+    Interpolater* mapper = &cell_cons_interp;
 
     InterpFromCoarseLevel(mf, time, *cmf[0], srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
                           cphysbc, 0, fphysbc, 0, refRatio(lev-1),
                           mapper, bcs, 0);
-
-    Interpolater* mapper = &cell_cons_interp;
 }
 
 // utility to copy in data from mf_old and/or mf_new into mf
