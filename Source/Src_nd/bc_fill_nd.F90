@@ -25,7 +25,7 @@ contains
     call filcc(scal,scal_lo(1),scal_lo(2),scal_lo(3),scal_hi(1),scal_hi(2),scal_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
 
-    call fill_scalar_ext_bc(scal_lo,scal_hi,scal,scal_lo,scal_hi,domlo,domhi,bc)
+    call fill_scalar_ext_bc(scal_lo,scal_hi,scal,scal_lo,scal_hi,domlo,domhi,bc,icomp)
 
   end subroutine scalarfill
 
@@ -47,7 +47,7 @@ contains
     call filcc(vel,vel_lo(1),vel_lo(2),vel_lo(3),vel_hi(1),vel_hi(2),vel_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
 
-    call fill_vel_ext_bc(vel_lo,vel_hi,vel,vel_lo,vel_hi,domlo,domhi,bc)
+    call fill_vel_ext_bc(vel_lo,vel_hi,vel,vel_lo,vel_hi,domlo,domhi,bc,icomp)
 
   end subroutine velfill
 
