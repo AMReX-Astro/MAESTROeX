@@ -871,7 +871,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
 	// put w0 on Cartesian cell-centers
-	Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0, true);
+	Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0, 1);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -970,7 +970,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
 	}
 	AverageDown(unew,0,AMREX_SPACEDIM);
-	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, true);
+	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
     }
 
     for(int i=0; i<beta0_nm1.size(); ++i) {

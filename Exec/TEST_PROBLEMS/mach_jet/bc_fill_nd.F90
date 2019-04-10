@@ -15,27 +15,27 @@ module bc_fill_module
 
 contains
 
-  subroutine phifill(phi,phi_lo,phi_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
-       bind(C, name="phifill")
+  subroutine scalarfill(scal,scal_lo,scal_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
+       bind(C, name="scalarfill")
 
-    integer, intent(in)      :: phi_lo(3),phi_hi(3)
+    integer, intent(in)      :: scal_lo(3),scal_hi(3)
     integer, intent(in)      :: bc(AMREX_SPACEDIM,2)
     integer, intent(in)      :: domlo(3), domhi(3)
     double precision, intent(in) :: dx(3), gridlo(3), time
-    double precision, intent(inout) :: phi(phi_lo(1):phi_hi(1),phi_lo(2):phi_hi(2),phi_lo(3):phi_hi(3))
+    double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1),scal_lo(2):scal_hi(2),scal_lo(3):scal_hi(3))
     integer, value, intent(in) :: icomp
 
 #if (AMREX_SPACEDIM == 1)
-    call filcc(phi,phi_lo(1),phi_hi(1),domlo,domhi,dx,gridlo,bc)
+    call filcc(scal,scal_lo(1),scal_hi(1),domlo,domhi,dx,gridlo,bc)
 #elif (AMREX_SPACEDIM == 2)
-    call filcc(phi,phi_lo(1),phi_lo(2),phi_hi(1),phi_hi(2),domlo,domhi,dx,gridlo,bc)
+    call filcc(scal,scal_lo(1),scal_lo(2),scal_hi(1),scal_hi(2),domlo,domhi,dx,gridlo,bc)
 #else
-    call filcc(phi,phi_lo(1),phi_lo(2),phi_lo(3),phi_hi(1),phi_hi(2),phi_hi(3),domlo,domhi,dx,gridlo,bc)
+    call filcc(scal,scal_lo(1),scal_lo(2),scal_lo(3),scal_hi(1),scal_hi(2),scal_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
 
-    call fill_scalar_ext_bc(phi_lo,phi_hi,phi,phi_lo,phi_hi,domlo,domhi,bc)
+    call fill_scalar_ext_bc(scal_lo,scal_hi,scal,scal_lo,scal_hi,domlo,domhi,bc)
 
-  end subroutine phifill
+  end subroutine scalarfill
 
 
   subroutine velfill(vel,vel_lo,vel_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
@@ -61,7 +61,7 @@ contains
   end subroutine velfill
 
 
-  subroutine fill_scalar_ext_bc(lo,hi,v,v_lo,v_hi,domlo,domhi,bc,icomp)
+  subroutine fill_scalar_ext_bc(lo,hi,q,q_lo,q_hi,domlo,domhi,bc,icomp)
 
     integer, intent(in   ) :: lo(3), hi(3)
     integer, intent(in   ) :: q_lo(3),q_hi(3)
@@ -143,18 +143,18 @@ contains
 
           ! rho
           if (icomp .eq. rho_comp) then
-             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
+             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
              ! rhoh
           else if (icomp .eq. rhoh_comp) then
-             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHOH
+             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHOH
              ! species
           else if (icomp .eq. spec_comp) then
-             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
+             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
              ! temperature
           else if (icomp .eq. temp_comp) then
-             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_TEMP
+             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_TEMP
           else
-             phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.0d0
+             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.0d0
           endif
 
        end if
@@ -218,7 +218,7 @@ contains
   end subroutine fill_scalar_ext_bc
 
 
-  subroutine fill_vel_ext_bc(vel_lo,vel_hi,vel,vel_lo,vel_hi,domlo,domhi,bc)
+  subroutine fill_vel_ext_bc(lo,hi,q,q_lo,q_hi,domlo,domhi,bc)
 
     integer, intent(in   ) :: lo(3), hi(3)
     integer, intent(in   ) :: q_lo(3),q_hi(3)
@@ -304,13 +304,13 @@ contains
        if (bc(2,1) .eq. amrex_bc_ext_dir) then
 
           ! xvel
-          if (icomp .eq. 0) phi(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.d0
+          if (icomp .eq. 0) q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.d0
           ! yvel
           if (icomp .eq. 1) then
              do i=lo(1),hi(1)
                 x = (dble(i)+0.5d0)*dr_fine
                 ! inflow is Mach number 0.01 front with a Mach number 0.1 bump in the middle
-                phi(i,jmin:jmax,lo(3):hi(3)) = (inlet_mach/1.d-1)* &
+                q(i,jmin:jmax,lo(3):hi(3)) = (inlet_mach/1.d-1)* &
                      INLET_CS*(1.d-2 + A*(tanh(B*(x-0.40d0)) + tanh(B*(0.6d0-x))))
              end do
           end if

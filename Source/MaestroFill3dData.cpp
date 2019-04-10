@@ -12,7 +12,7 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const Vector<BCRec>& bcs,
-                           int sbccomp, bool is_vel)
+                           int sbccomp, int variable_type)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()",Put1dArrayOnCart);
@@ -34,13 +34,14 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 
     // fill ghost cells using first-order extrapolation
     if (ng > 0) {
-        FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs, is_vel);
+        FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs,
+                  variable_type);
     }
 }
 
 void
 Maestro::Put1dArrayOnCart (int level,
-			   const Vector<Real>& s0,
+                           const Vector<Real>& s0,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
@@ -60,26 +61,27 @@ Maestro::Put1dArrayOnCart (int level,
 #endif
     for ( MFIter mfi(s0_cart_mf, true); mfi.isValid(); ++mfi ) {
 
-	// Get the index space of the valid region
-	const Box& tileBox = mfi.tilebox();
-	const Real* dx = geom[level].CellSize();
+    	// Get the index space of the valid region
+    	const Box& tileBox = mfi.tilebox();
+    	const Real* dx = geom[level].CellSize();
 
-	// call fortran subroutine
-	// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-	// lo/hi coordinates (including ghost cells), and/or the # of components
-	// We will also pass "validBox", which specifies the "valid" region.
-	if (spherical == 0) {
-	    put_1d_array_on_cart(&level,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				 BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-				 s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
-	} else {
-	    put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				      BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-				      s0.dataPtr(), dx,
-				      &is_input_edge_centered, &is_output_a_vector,
-				      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				      BL_TO_FORTRAN_3D(cc_to_r[mfi]));
-	}
+    	// call fortran subroutine
+    	// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+    	// lo/hi coordinates (including ghost cells), and/or the # of components
+    	// We will also pass "validBox", which specifies the "valid" region.
+    	if (spherical == 0) {
+    	    put_1d_array_on_cart(&level,ARLIM_3D(tileBox.loVect()),
+                     ARLIM_3D(tileBox.hiVect()),
+    				 BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+    				 s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
+    	} else {
+    	    put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+    				      BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+    				      s0.dataPtr(), dx,
+    				      &is_input_edge_centered, &is_output_a_vector,
+    				      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+    				      BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+    	}
     }
 
 }
@@ -190,7 +192,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     }
 
     if (w0mac_interp_type == 1) {
-        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, true);
+        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
     }
 
     if (w0mac[0][0].nGrow() != 1) {

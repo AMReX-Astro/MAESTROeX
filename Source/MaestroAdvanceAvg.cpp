@@ -103,10 +103,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    << " DT = " << dt << std::endl << std::endl;
 
     if (maestro_verbose > 0) {
-	Print() << "Cell Count:" << std::endl;
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    Print() << "Level " << lev << ", " << CountCells(lev) << " cells" << std::endl;
-	}
+    	Print() << "Cell Count:" << std::endl;
+    	for (int lev=0; lev<=finest_level; ++lev) {
+    	    Print() << "Level " << lev << ", " << CountCells(lev) << " cells" << std::endl;
+    	}
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -890,7 +890,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
             if (spherical == 1) {
                 // put w0 on Cartesian cell-centers
-                Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0, true);
+                Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0, 1);
             }
         }
     }
@@ -991,12 +991,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
     if (evolve_base_state && spherical == 1 && split_projection) {
-	// add w0 back to unew
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
-	}
-	AverageDown(unew,0,AMREX_SPACEDIM);
-	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, true);
+    	// add w0 back to unew
+    	for (int lev = 0; lev <= finest_level; ++lev) {
+    	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
+    	}
+    	AverageDown(unew,0,AMREX_SPACEDIM);
+    	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
     }
 
     for(int i=0; i<beta0_nm1.size(); ++i) {

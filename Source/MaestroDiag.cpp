@@ -62,7 +62,7 @@ Maestro::DiagFile (const int step,
 
         // put w0 in Cartesian cell-centers as a scalar (the radial
         // expansion velocity)
-        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,true);
+        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,1);
 
 	// compute rho_Hext and rho_Hnuc
 	for (int lev=0; lev<=finest_level; ++lev) {

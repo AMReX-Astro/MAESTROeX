@@ -7,27 +7,27 @@ module bc_fill_module
 
 contains
 
-  subroutine phifill(phi,phi_lo,phi_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
-       bind(C, name="phifill")
+  subroutine scalarfill(scal,scal_lo,scal_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
+       bind(C, name="scalarfill")
 
-    integer, intent(in)      :: phi_lo(3),phi_hi(3)
+    integer, intent(in)      :: scal_lo(3),scal_hi(3)
     integer, intent(in)      :: bc(AMREX_SPACEDIM,2)
     integer, intent(in)      :: domlo(3), domhi(3)
     double precision, intent(in) :: dx(3), gridlo(3), time
-    double precision, intent(inout) :: phi(phi_lo(1):phi_hi(1),phi_lo(2):phi_hi(2),phi_lo(3):phi_hi(3))
+    double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1),scal_lo(2):scal_hi(2),scal_lo(3):scal_hi(3))
     integer, value, intent(in) :: icomp
 
 #if (AMREX_SPACEDIM == 1)
-    call filcc(phi,phi_lo(1),phi_hi(1),domlo,domhi,dx,gridlo,bc)
+    call filcc(scal,scal_lo(1),scal_hi(1),domlo,domhi,dx,gridlo,bc)
 #elif (AMREX_SPACEDIM == 2)
-    call filcc(phi,phi_lo(1),phi_lo(2),phi_hi(1),phi_hi(2),domlo,domhi,dx,gridlo,bc)
+    call filcc(scal,scal_lo(1),scal_lo(2),scal_hi(1),scal_hi(2),domlo,domhi,dx,gridlo,bc)
 #else
-    call filcc(phi,phi_lo(1),phi_lo(2),phi_lo(3),phi_hi(1),phi_hi(2),phi_hi(3),domlo,domhi,dx,gridlo,bc)
+    call filcc(scal,scal_lo(1),scal_lo(2),scal_lo(3),scal_hi(1),scal_hi(2),scal_hi(3),domlo,domhi,dx,gridlo,bc)
 #endif
 
-    call fill_scalar_ext_bc(phi_lo,phi_hi,phi,phi_lo,phi_hi,domlo,domhi,bc)
+    call fill_scalar_ext_bc(scal_lo,scal_hi,scal,scal_lo,scal_hi,domlo,domhi,bc)
 
-  end subroutine phifill
+  end subroutine scalarfill
 
   subroutine velfill(vel,vel_lo,vel_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
        bind(C, name="velfill")

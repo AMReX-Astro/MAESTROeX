@@ -404,8 +404,8 @@ Maestro::NodalProj (int proj_type,
     AverageDown(gpi,0,AMREX_SPACEDIM);
 
     // fill ghost cells
-    FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, true);
-    FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, true);
+    FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+    FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
     if (proj_type == pressure_iters_comp ||
         proj_type == regular_timestep_comp) {
@@ -475,7 +475,7 @@ Maestro::CreateUvecForProj (int proj_type,
 
     // fill ghost cells
     AverageDown(Vproj,0,AMREX_SPACEDIM);
-    FillPatch(time, Vproj, Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u, true);
+    FillPatch(time, Vproj, Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
 }
 

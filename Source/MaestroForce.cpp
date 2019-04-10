@@ -11,8 +11,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<Real>& grav_cell,
                        const Vector<Real>& w0_force,
                        const Vector<MultiFab>& w0_force_cart,
-		       const Vector<Real>& beta0,
-		       const int is_predictor,
+        		       const Vector<Real>& beta0,
+        		       const int is_predictor,
                        int do_add_utilde_force)
 {
     // timer for profiling
@@ -115,7 +115,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     // note - we need to reconsider the bcs type here
     // it matches fortran MAESTRO but is that correct?
     FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0,
-              bcs_u, true);
+              bcs_u, 1);
 
 }
 
