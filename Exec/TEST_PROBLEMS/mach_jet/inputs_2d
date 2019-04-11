@@ -35,17 +35,17 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.regrid_int      = 2       # how often to regrid
 
 # TIME STEP CONTROL
-maestro.cfl         = 0.9    # cfl number for hyperbolic system
+maestro.cfl         = 0.5    # cfl number for hyperbolic system
                              # In this test problem, the velocity is
 			     # time-dependent.  We could use 0.9 in
 			     # the 3D test, but need to use 0.7 in 2D
 			     # to satisfy CFL condition.
-maestro.init_shrink = 0.1e0
+maestro.init_shrink = 1.0
 
 # PLOTFILES
 maestro.plot_base_name  = omp    # root name of plot file
-maestro.plot_int   = 10
-maestro.plot_deltat = 1e-5
+maestro.plot_int   = 10000
+maestro.plot_deltat = 1.e-5
 
 # CHECKPOINT
 maestro.check_base_name = chk
@@ -117,7 +117,7 @@ system.regtest_reduction = 1
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  eos_gamma = 5.0d0/3.0d0
+  eos_gamma = 1.666666666666666d0
   !eos_assume_neutral = T
   !const_conductivity = 1.0d0
 
