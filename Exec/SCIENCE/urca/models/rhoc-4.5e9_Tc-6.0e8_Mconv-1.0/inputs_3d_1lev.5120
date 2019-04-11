@@ -1,12 +1,14 @@
 # INITIAL MODEL
 maestro.model_file = "WD_urca_nuc_M-1.0_rc4.5e9_Tc6.0e8_speceq.hse.5120"
-maestro.drdxfac = 40
+maestro.drdxfac = 5
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
-#amr.n_cell             = 1024 1024 1024
-amr.n_cell             = 128 128 128
+
+# with 2048 MPI ranks, this is 2 grids per rank
+amr.n_cell             = 1024 1024 1024
 amr.max_grid_size      = 64
+
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
 maestro.anelastic_cutoff = 1.e6
@@ -24,15 +26,15 @@ geometry.prob_lo     =  0.0    0.0    0.0
 geometry.prob_hi     =  5.12e8  5.12e8   5.12e8
 
 # TIME STEPPING
-maestro.max_step  = 1000
+maestro.max_step  = 1000000
 maestro.init_iter = 1
 
-maestro.stop_time = 30000.
+maestro.stop_time = 36000.
 
 # PLOTFILES
 maestro.plot_file  = plt    # root name of plot file
 #maestro.plot_int   = 100    # number of timesteps between plot files
-maestro.plot_int   = 10    # number of timesteps between plot files
+maestro.plot_deltat = 5.0
 
 # CHECKPOINT
 maestro.check_base_name = chk
