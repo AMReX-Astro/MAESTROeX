@@ -3,12 +3,12 @@ module bc_fill_module
   ! since this is a .F90 file (instead of .f90) we run this through a C++ preprocessor
   ! for e.g., #if (AMREX_SPACEDIM == 1) statements.
 
-  use amrex_fort_module, only : amrex_real, amrex_spacedim, amrex_get_loop_bounds
+  use amrex_error_module
   use amrex_bc_types_module
-  use amrex_constants_module
+  
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp
-  use inlet_bc_module
-  use base_state_geometry_module, only: dr_fine, dr, nr, max_radial_level
+  use inlet_bc_module, only: INLET_RHO, INLET_RHOH, INLET_TEMP, INLET_CS
+  use base_state_geometry_module, only: dr_fine
   use probin_module, only: inlet_mach
 
   implicit none
@@ -37,7 +37,6 @@ contains
 
   end subroutine scalarfill
 
-
   subroutine velfill(vel,vel_lo,vel_hi,domlo,domhi,dx,gridlo,time,bc,icomp) &
        bind(C, name="velfill")
 
@@ -59,7 +58,6 @@ contains
     call fill_vel_ext_bc(vel_lo,vel_hi,vel,vel_lo,vel_hi,domlo,domhi,bc,icomp)
 
   end subroutine velfill
-
 
   subroutine fill_scalar_ext_bc(lo,hi,q,q_lo,q_hi,domlo,domhi,bc,icomp)
 
@@ -105,6 +103,8 @@ contains
 
        if (bc(1,1) .eq. amrex_bc_ext_dir) then
 
+          call amrex_error("bc_fill_nd.F90 bc(1,1) - must supply Dirichlet boundary conditions for scalars")
+
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
                 do i = imin, imax
@@ -121,6 +121,8 @@ contains
        imax = hi(1)
 
        if (bc(1,2) .eq. amrex_bc_ext_dir) then
+
+          call amrex_error("bc_fill_nd.F90 bc(1,2) - must supply Dirichlet boundary conditions for scalars")
 
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
@@ -166,6 +168,8 @@ contains
 
        if (bc(2,2) .eq. amrex_bc_ext_dir) then
 
+          call amrex_error("bc_fill_nd.F90 bc(2,2) - must supply Dirichlet boundary conditions for scalars")
+
           do k = lo(3), hi(3)
              do j = jmin, jmax
                 do i = lo(1), hi(1)
@@ -186,6 +190,8 @@ contains
 
        if (bc(3,1) .eq. amrex_bc_ext_dir) then
 
+          call amrex_error("bc_fill_nd.F90 bc(3,1) - must supply Dirichlet boundary conditions for scalars")
+
           do k = kmin, kmax
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
@@ -203,6 +209,8 @@ contains
 
        if (bc(3,2) .eq. amrex_bc_ext_dir) then
 
+          call amrex_error("bc_fill_nd.F90 bc(3,2) - must supply Dirichlet boundary conditions for scalars")
+
           do k = kmin, kmax
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
@@ -216,7 +224,6 @@ contains
 #endif
 
   end subroutine fill_scalar_ext_bc
-
 
   subroutine fill_vel_ext_bc(lo,hi,q,q_lo,q_hi,domlo,domhi,bc,icomp)
 
@@ -267,6 +274,8 @@ contains
 
        if (bc(1,1) .eq. amrex_bc_ext_dir) then
 
+          call amrex_error("bc_fill_nd.F90 bc(1,1) - must supply Dirichlet boundary conditions for vel")
+
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
                 do i = imin, imax
@@ -283,6 +292,8 @@ contains
        imax = hi(1)
 
        if (bc(1,2) .eq. amrex_bc_ext_dir) then
+
+          call amrex_error("bc_fill_nd.F90 bc(1,2) - must supply Dirichlet boundary conditions for vel")
 
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
@@ -324,6 +335,8 @@ contains
 
        if (bc(2,2) .eq. amrex_bc_ext_dir) then
 
+          call amrex_error("bc_fill_nd.F90 bc(2,2) - must supply Dirichlet boundary conditions for vel")
+
           do k = lo(3), hi(3)
              do j = jmin, jmax
                 do i = lo(1), hi(1)
@@ -344,6 +357,8 @@ contains
 
        if (bc(3,1) .eq. amrex_bc_ext_dir) then
 
+          call amrex_error("bc_fill_nd.F90 bc(3,1) - must supply Dirichlet boundary conditions for vel")
+
           do k = kmin, kmax
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
@@ -360,6 +375,8 @@ contains
        kmax = hi(3)
 
        if (bc(3,2) .eq. amrex_bc_ext_dir) then
+
+          call amrex_error("bc_fill_nd.F90 bc(3,2) - must supply Dirichlet boundary conditions for vel")
 
           do k = kmin, kmax
              do j = lo(2), hi(2)
