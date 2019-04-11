@@ -162,17 +162,15 @@ Maestro::NodalProj (int proj_type,
         else {
             if (phys_bc[idim] == Outflow) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-            } else if (phys_bc[idim] == Inflow) {
-                mlmg_lobc[idim] = LinOpBCType::inflow;
-            } else {
+            }
+            else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
 
             if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } else if (phys_bc[AMREX_SPACEDIM+idim] == Inflow) {
-                mlmg_hibc[idim] = LinOpBCType::inflow;
-            } else {
+            } 
+            else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }
         }
