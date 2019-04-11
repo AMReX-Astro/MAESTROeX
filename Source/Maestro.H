@@ -276,7 +276,7 @@ private:
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
-                    const amrex::Vector<amrex::BCRec>& bcs_in);
+                    const amrex::Vector<amrex::BCRec>& bcs_in, int variable_type=0);
 
     // compute a new multifab by coping in phi from valid region and filling ghost cells
     // works for single level and 2-level cases
@@ -288,7 +288,7 @@ private:
                     amrex::Vector<amrex::MultiFab>& mf_old,
                     amrex::Vector<amrex::MultiFab>& mf_new,
                     int srccomp, int destcomp, int ncomp, int startbccomp,
-                    const amrex::Vector<amrex::BCRec>& bcs_in);
+                    const amrex::Vector<amrex::BCRec>& bcs_in, int variable_type=0);
 
     // fill an entire multifab by interpolating from the coarser level
     // this comes into play when a new level of refinement appears
@@ -298,7 +298,7 @@ private:
                           amrex::Vector<amrex::MultiFab>& mf_old,
                           amrex::Vector<amrex::MultiFab>& mf_new,
                           int srccomp, int destcomp, int ncomp,
-                          const amrex::Vector<amrex::BCRec>& bcs);
+                          const amrex::Vector<amrex::BCRec>& bcs, int variable_type=0);
 
     // utility to copy in data from mf_old and/or mf_new into mf
     // if time=t_old we copy mf_old into mf
@@ -339,7 +339,7 @@ private:
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0);
+                           int sbccomp = 0, int variable_type=0);
 
     void Put1dArrayOnCart (int level, const amrex::Vector<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
