@@ -8,7 +8,7 @@ import yt
 from yt import derived_field
 import numpy as np
 import argparse
-from yt_urca_fields import UrcaShellFields
+from UrcaAnalysis import UrcaShellFields
 
 parser = argparse.ArgumentParser()
 parser.add_argument('infile', type=str, help='Name of input plotfile.')
