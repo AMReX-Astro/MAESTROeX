@@ -5,9 +5,9 @@
 /
 
 
-&params 
+&params
 
- nx = 10240
+ nx = 5120
  dens_base = 4.5d9
  temp_base = 6.0d8
 
