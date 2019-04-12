@@ -305,9 +305,9 @@ contains
        if (bc(2,1) .eq. amrex_bc_ext_dir) then
 
           ! xvel
-          if (icomp .eq. 0) q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.d0
+          if (icomp .eq. 1) q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.d0
           ! yvel
-          if (icomp .eq. 1) then
+          if (icomp .eq. 2) then
              do i=lo(1),hi(1)
                 x = (dble(i)+0.5d0)*dr_fine
                 ! inflow is Mach number 0.01 front with a Mach number 0.1 bump in the middle

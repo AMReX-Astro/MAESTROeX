@@ -61,12 +61,14 @@ public:
     		if (m_func != nullptr) {
     			m_func(data,AMREX_ARLIM(lo),AMREX_ARLIM(hi),
     			       dom_lo,dom_hi,
-    			       dx,grd_lo,&time,bcr[bcomp+icomp].vect(),dcomp+icomp);
+    			       dx,grd_lo,&time,bcr[bcomp+icomp].vect(),dcomp+icomp+1);
+                        // pass in +1 for the component since fortran uses 1-based component index
     		} else {
     			m_func3D(data,AMREX_ARLIM_3D(lo),AMREX_ARLIM_3D(hi),
     			         AMREX_ARLIM_3D(dom_lo),AMREX_ARLIM_3D(dom_hi),
     			         AMREX_ZFILL(dx),AMREX_ZFILL(grd_lo),&time,bcr[bcomp+icomp].vect(),
-    			         dcomp+icomp);
+    			         dcomp+icomp+1);
+                        // pass in +1 for the component since fortran uses 1-based component index
     		}
     	}
     }
