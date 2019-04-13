@@ -371,11 +371,13 @@ contains
     call prolong_base_to_uniform(Sbar_in,Sbar_in_fine)
 
     ! create time-centered base-state quantities
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=0,nr(finest_radial_level)-1
        p0_nph_fine(r)        = HALF*(p0_old_fine(r)        + p0_new_fine(r))
        rho0_nph_fine(r)      = HALF*(rho0_old_fine(r)      + rho0_new_fine(r))
        gamma1bar_nph_fine(r) = HALF*(gamma1bar_old_fine(r) + gamma1bar_new_fine(r))       
     enddo
+    !$OMP END PARALLEL DO
 
     ! 3) solve to w0bar -- here we just take into account the Sbar and
     !    volume discrepancy terms
@@ -424,6 +426,7 @@ contains
     F   = ZERO
     u   = ZERO
 
+    !$OMP PARALLEL DO PRIVATE(r,dpdr)   
     do r=1,base_cutoff_density_coord(finest_radial_level)
        A(r) = gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1) 
        A(r) = A(r) / dr(finest_radial_level)**2
@@ -441,7 +444,8 @@ contains
               grav_edge_fine(r) * (etarho_cc_fine(r) - etarho_cc_fine(r-1)) / &
               dr(finest_radial_level)
     end do
-
+    !$OMP END PARALLEL DO
+    
     ! Lower boundary
     A(0) = zero
     B(0) = one
@@ -736,6 +740,12 @@ contains
             *r_edge_loc(0,base_cutoff_density_coord(0)+1)**2/r_edge_loc(0,r)**2
     end do
 
+!!$    ! DEBUG - output to file
+!!$    open(unit=1234, file="w0_simple.out")
+!!$    do r=0,nr_fine
+!!$       write(1234,*) r_edge_loc(0,r),w0(r)
+!!$    end do
+!!$    close(1234)
   end subroutine make_w0_spherical_simple
   
   subroutine prolong_base_to_uniform(base_ml, base_fine)
@@ -859,11 +869,13 @@ contains
     double precision :: grav_edge(0:0,0:nr_fine  )
 
     ! create time-centered base-state quantities
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=0,nr_fine-1
        p0_nph(r)        = HALF*(p0_old(r)        + p0_new(r))
        rho0_nph(0,r)    = HALF*(rho0_old(r)      + rho0_new(r))
        gamma1bar_nph(r) = HALF*(gamma1bar_old(r) + gamma1bar_new(r))       
     enddo
+    !$OMP END PARALLEL DO
 
     ! NOTE: We first solve for the w0 resulting only from Sbar,
     !      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
@@ -885,10 +897,12 @@ contains
 
     end do
 
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=1,nr_fine
        w0_from_Sbar(r) = w0_from_Sbar(r) / r_edge_loc(0,r)**2
     end do
-
+    !$OMP END PARALLEL DO
+    
     ! make the edge-centered gravity
     call make_grav_edge(grav_edge,rho0_nph,r_edge_loc)
 
@@ -906,6 +920,7 @@ contains
    
     ! Note that we are solving for (r^2 delta w0), not just w0. 
 
+    !$OMP PARALLEL DO PRIVATE(r,dpdr)
     do r=1,base_cutoff_density_coord(0)
        dr1 = r_edge_loc(0,r) - r_edge_loc(0,r-1)
        dr2 = r_edge_loc(0,r+1) - r_edge_loc(0,r)
@@ -931,7 +946,8 @@ contains
               four * M_PI * Gconst * HALF * &
               (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec(r)
     end do
-
+    !$OMP END PARALLEL DO
+    
     ! Lower boundary
     A(0) = zero
     B(0) = one
@@ -949,9 +965,11 @@ contains
 
     w0(0) = ZERO + w0_from_Sbar(0)
 
+    !$OMP PARALLEL DO PRIVATE(r)
     do r=1,base_cutoff_density_coord(0)+1
        w0(r) = u(r) / r_edge_loc(0,r)**2 + w0_from_Sbar(r)
     end do
+    !$OMP END PARALLEL DO
 
     do r=base_cutoff_density_coord(0)+2,nr_fine
        w0(r) = w0(base_cutoff_density_coord(0)+1)&
@@ -961,6 +979,7 @@ contains
     ! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0 
     dt_avg = HALF * (dt + dtold)
 
+    !$OMP PARALLEL DO PRIVATE(r,w0_avg,div_avg)
     do r = 0,nr_fine-1
        dr1 = r_edge_loc(0,r+1) - r_edge_loc(0,r)
        w0_old_cen(r) = HALF * (w0_old(r) + w0_old(r+1))
@@ -969,6 +988,7 @@ contains
        div_avg = HALF * (dt * (w0_old(r+1)-w0_old(r)) + dtold * (w0(r+1)-w0(r))) / dt_avg
        w0_force(r) = (w0_new_cen(r)-w0_old_cen(r)) / dt_avg + w0_avg * div_avg / dr1
     end do
+    !$OMP END PARALLEL DO
     
   end subroutine make_w0_sphr_irreg
   
