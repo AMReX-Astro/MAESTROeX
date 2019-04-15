@@ -235,7 +235,7 @@ Maestro::InitData ()
 	AverageDown(sold,0,Nscal);
 	FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
 	AverageDown(uold,0,AMREX_SPACEDIM);
-	FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u);
+	FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u,1);
 
 	// free memory in s0_init and p0_init by swapping it
 	// with an empty vector that will go out of scope
@@ -606,7 +606,7 @@ void Maestro::InitIter ()
 
         // wallclock time
         Real start_total = ParallelDescriptor::second();
-                
+
 	// advance the solution by dt
 	if (use_exact_base_state) {
 		AdvanceTimeStepIrreg(true);
@@ -619,7 +619,7 @@ void Maestro::InitIter ()
         // wallclock time
         Real end_total = ParallelDescriptor::second() - start_total;
         ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
-    
+
         Print() << "Time to advance time step: " << end_total << '\n';
 
 	// copy pi from snew to sold
