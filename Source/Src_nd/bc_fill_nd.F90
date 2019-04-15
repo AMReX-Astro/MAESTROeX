@@ -5,6 +5,7 @@ module bc_fill_module
 
   use amrex_error_module
   use amrex_bc_types_module
+  use meth_params_module, only: pi_comp
   
   implicit none
 
@@ -97,15 +98,19 @@ contains
        imax = ilo-1
 
        if (bc(1,1) .eq. amrex_bc_ext_dir) then
-
-          do k = lo(3), hi(3)
-             do j = lo(2), hi(2)
-                do i = imin, imax
-                   q(i,j,k) = 0.d0
+          
+          if (icomp .eq. pi_comp) then
+             do k = lo(3), hi(3)
+                do j = lo(2), hi(2)
+                   do i = imin, imax
+                      q(i,j,k) = 0.d0
+                   end do
                 end do
              end do
-          end do
-
+          else
+             call amrex_error("bc_fill_nd.F90 bc(1,1) - must supply Dirichlet boundary conditions for scalar")
+          end if
+          
        end if
     end if
 
@@ -115,14 +120,18 @@ contains
 
        if (bc(1,2) .eq. amrex_bc_ext_dir) then
 
-          do k = lo(3), hi(3)
-             do j = lo(2), hi(2)
-                do i = imin, imax
-                   q(i,j,k) = 0.d0
+          if (icomp .eq. pi_comp) then
+             do k = lo(3), hi(3)
+                do j = lo(2), hi(2)
+                   do i = imin, imax
+                      q(i,j,k) = 0.d0
+                   end do
                 end do
              end do
-          end do
-
+          else
+             call amrex_error("bc_fill_nd.F90 bc(1,2) - must supply Dirichlet boundary conditions for scalar")
+          end if
+          
        end if
     end if
 
@@ -134,14 +143,18 @@ contains
 
        if (bc(2,1) .eq. amrex_bc_ext_dir) then
 
-          do k = lo(3), hi(3)
-             do j = jmin, jmax
-                do i = lo(1), hi(1)
-                   q(i,j,k) = 0.d0
+          if (icomp .eq. pi_comp) then
+             do k = lo(3), hi(3)
+                do j = jmin, jmax
+                   do i = lo(1), hi(1)
+                      q(i,j,k) = 0.d0
+                   end do
                 end do
              end do
-          end do
-
+          else
+             call amrex_error("bc_fill_nd.F90 bc(2,1) - must supply Dirichlet boundary conditions for scalar")
+          end if
+          
        end if
     end if
 
@@ -151,13 +164,17 @@ contains
 
        if (bc(2,2) .eq. amrex_bc_ext_dir) then
 
-          do k = lo(3), hi(3)
-             do j = jmin, jmax
-                do i = lo(1), hi(1)
-                   q(i,j,k) = 0.d0
+          if (icomp .eq. pi_comp) then
+             do k = lo(3), hi(3)
+                do j = jmin, jmax
+                   do i = lo(1), hi(1)
+                      q(i,j,k) = 0.d0
+                   end do
                 end do
              end do
-          end do
+          else
+             call amrex_error("bc_fill_nd.F90 bc(2,2) - must supply Dirichlet boundary conditions for scalar")
+          end if
 
        end if
     end if
@@ -171,14 +188,18 @@ contains
 
        if (bc(3,1) .eq. amrex_bc_ext_dir) then
 
-          do k = kmin, kmax
-             do j = lo(2), hi(2)
-                do i = lo(1), hi(1)
-                   q(i,j,k) = 0.d0
+          if (icomp .eq. pi_comp) then
+             do k = kmin, kmax
+                do j = lo(2), hi(2)
+                   do i = lo(1), hi(1)
+                      q(i,j,k) = 0.d0
+                   end do
                 end do
              end do
-          end do
-
+          else
+             call amrex_error("bc_fill_nd.F90 bc(3,1) - must supply Dirichlet boundary conditions for scalar")
+          end if
+          
        end if
     end if
 
@@ -188,14 +209,18 @@ contains
 
        if (bc(3,2) .eq. amrex_bc_ext_dir) then
 
-          do k = kmin, kmax
-             do j = lo(2), hi(2)
-                do i = lo(1), hi(1)
-                   q(i,j,k) = 0.d0
+          if (icomp .eq. pi_comp) then
+             do k = kmin, kmax
+                do j = lo(2), hi(2)
+                   do i = lo(1), hi(1)
+                      q(i,j,k) = 0.d0
+                   end do
                 end do
              end do
-          end do
-
+          else
+             call amrex_error("bc_fill_nd.F90 bc(3,2) - must supply Dirichlet boundary conditions for scalar")
+          end if
+          
        end if
     end if
 #endif
@@ -247,8 +272,6 @@ contains
 
        if (bc(1,1) .eq. amrex_bc_ext_dir) then
 
-          call amrex_error("bc_fill_nd.F90 bc(1,1) - must supply Dirichlet boundary conditions for vel")
-
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
                 do i = imin, imax
@@ -265,8 +288,6 @@ contains
        imax = hi(1)
 
        if (bc(1,2) .eq. amrex_bc_ext_dir) then
-
-          call amrex_error("bc_fill_nd.F90 bc(1,2) - must supply Dirichlet boundary conditions for vel")
 
           do k = lo(3), hi(3)
              do j = lo(2), hi(2)
@@ -287,8 +308,6 @@ contains
 
        if (bc(2,1) .eq. amrex_bc_ext_dir) then
 
-          call amrex_error("bc_fill_nd.F90 bc(2,1) - must supply Dirichlet boundary conditions for vel")
-
           do k = lo(3), hi(3)
              do j = jmin, jmax
                 do i = lo(1), hi(1)
@@ -305,8 +324,6 @@ contains
        jmax = hi(2)
 
        if (bc(2,2) .eq. amrex_bc_ext_dir) then
-
-          call amrex_error("bc_fill_nd.F90 bc(2,2) - must supply Dirichlet boundary conditions for vel")
 
           do k = lo(3), hi(3)
              do j = jmin, jmax
@@ -328,8 +345,6 @@ contains
 
        if (bc(3,1) .eq. amrex_bc_ext_dir) then
 
-          call amrex_error("bc_fill_nd.F90 bc(3,1) - must supply Dirichlet boundary conditions for vel")
-
           do k = kmin, kmax
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
@@ -346,8 +361,6 @@ contains
        kmax = hi(3)
 
        if (bc(3,2) .eq. amrex_bc_ext_dir) then
-
-          call amrex_error("bc_fill_nd.F90 bc(3,2) - must supply Dirichlet boundary conditions for vel")
 
           do k = kmin, kmax
              do j = lo(2), hi(2)
