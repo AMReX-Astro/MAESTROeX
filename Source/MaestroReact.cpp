@@ -99,7 +99,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
             // do the burning, update rho_omegadot and rho_Hnuc
             // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
-            Burner(state_in_temp,state_out_temp,rho_Hext_temp,rho_omegadot_temp,rho_Hnuc_temp,p0,dt_in);
+            Burner(state_in_temp,state_out_temp,rho_Hext_temp,rho_omegadot_temp,rho_Hnuc_temp,weights_temp,p0,dt_in);
 
             // pass temperature through for seeding the temperature update eos call
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -111,7 +111,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
             // do the burning, update rho_omegadot and rho_Hnuc
             // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
-            Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in);
+            Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,weights,p0,dt_in);
 
             // pass temperature through for seeding the temperature update eos call
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -189,6 +189,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot,
                      Vector<MultiFab>& rho_Hnuc,
+                     Vector<MultiFab>& weights,
                      const Vector<Real>& p0,
                      const Real dt_in)
 {
@@ -218,6 +219,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
         const MultiFab&     rho_Hext_mf =     rho_Hext[lev];
         MultiFab&       rho_omegadot_mf = rho_omegadot[lev];
         MultiFab&           rho_Hnuc_mf =     rho_Hnuc[lev];
+        MultiFab&            weights_mf =      weights[lev];
         const MultiFab& tempbar_cart_mf = tempbar_init_cart[lev];
 
         // create mask assuming refinement ratio = 2
@@ -226,7 +228,6 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
         const BoxArray& fba = s_in[finelev].boxArray();
         const iMultiFab& mask = makeFineMask(s_in_mf, fba, IntVect(2));
-
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -250,6 +251,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                                  BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
                                  BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
                                  BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+                                 BL_TO_FORTRAN_3D(weights_mf[mfi]),
                                  BL_TO_FORTRAN_3D(tempbar_cart_mf[mfi]), &dt_in,
                                  BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);
             } else {
@@ -259,6 +261,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                             BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
                             BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
                             BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+                            BL_TO_FORTRAN_3D(weights_mf[mfi]),
                             tempbar_init.dataPtr(), &dt_in,
                             BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);
             }

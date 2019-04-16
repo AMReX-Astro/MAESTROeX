@@ -7,7 +7,7 @@ module burner_loop_module
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, &
        pi_comp, burner_threshold_cutoff, burner_threshold_species, &
        burning_cutoff_density, reaction_sum_tol, &
-       drive_initial_convection
+       drive_initial_convection, use_custom_knapsack_weights
   use base_state_geometry_module, only: max_radial_level, nr_fine
 
   implicit none
@@ -26,6 +26,7 @@ contains
        rho_Hext, e_lo, e_hi, &
        rho_odot, r_lo, r_hi, nc_r, &
        rho_Hnuc, n_lo, n_hi, &
+       weights,  w_lo, w_hi, &
        tempbar_init_in, dt_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
@@ -36,12 +37,14 @@ contains
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
+    integer         , intent (in   ) :: w_lo(3), w_hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3)
     double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
     double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
     double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
+    double precision, intent (inout) :: weights(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent (in   ) :: tempbar_init_in(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: dt_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
@@ -157,6 +160,16 @@ contains
                 s_out(i,j,k,rhoh_comp) = s_in(i,j,k,rhoh_comp) &
                      + dt_in*rho_Hnuc(i,j,k) + dt_in*rho_Hext(i,j,k)
 
+                 ! Insert weights for these burns.
+                 if (use_custom_knapsack_weights .and. &
+                     (i .ge. w_lo(1) .and. i .le. w_hi(1) .and. &
+                      j .ge. w_lo(2) .and. j .le. w_hi(2) .and. &
+                      k .ge. w_lo(3) .and. k .le. w_hi(3))) then
+
+                    weights(i,j,k) = max(ONE, dble(state_out % n_rhs + 2 * state_out % n_jac))
+
+                 endif
+
              endif
           enddo
        enddo
@@ -170,6 +183,7 @@ contains
        rho_Hext, e_lo, e_hi, &
        rho_odot, r_lo, r_hi, nc_r, &
        rho_Hnuc, n_lo, n_hi, &
+       weights,  w_lo, w_hi, &
        tempbar_init_cart, t_lo, t_hi, dt_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop_sphr")
@@ -180,12 +194,14 @@ contains
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
+    integer         , intent (in   ) :: w_lo(3), w_hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3)
     double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
     double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
     double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
+    double precision, intent (inout) :: weights(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (in   ) :: tempbar_init_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, intent (in   ) :: dt_in
@@ -303,6 +319,16 @@ contains
                 ! update the enthalpy -- include the change due to external heating
                 s_out(i,j,k,rhoh_comp) = s_in(i,j,k,rhoh_comp) &
                      + dt_in*rho_Hnuc(i,j,k) + dt_in*rho_Hext(i,j,k)
+
+                ! Insert weights for these burns.
+                if (use_custom_knapsack_weights .and. &
+                    (i .ge. w_lo(1) .and. i .le. w_hi(1) .and. &
+                     j .ge. w_lo(2) .and. j .le. w_hi(2) .and. &
+                     k .ge. w_lo(3) .and. k .le. w_hi(3))) then
+
+                    weights(i,j,k) = max(ONE, dble(state_out % n_rhs + 2 * state_out % n_jac))
+
+                endif
 
              endif
           enddo
