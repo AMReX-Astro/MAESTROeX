@@ -100,12 +100,24 @@ Maestro::React (const Vector<MultiFab>& s_in,
             // do the burning, update rho_omegadot and rho_Hnuc
             // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
             Burner(state_in_temp,state_out_temp,rho_Hext_temp,rho_omegadot_temp,rho_Hnuc_temp,p0,dt_in);
+
+            // pass temperature through for seeding the temperature update eos call
+            for (int lev=0; lev<=finest_level; ++lev) {
+                MultiFab::Copy(state_out_temp[lev],state_in_temp[lev],Temp,Temp,1,0);
+            }
+
         }
         else {
 
             // do the burning, update rho_omegadot and rho_Hnuc
             // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
             Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in);
+
+            // pass temperature through for seeding the temperature update eos call
+            for (int lev=0; lev<=finest_level; ++lev) {
+                MultiFab::Copy(s_out[lev],s_in[lev],Temp,Temp,1,0);
+            }
+
         }
 
     }
@@ -148,7 +160,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
                               weights_temp[lev].nGrow(), weights_temp[lev].nGrow());
             rho_omegadot[lev].copy(rho_omegadot_temp[lev], 0, 0, NumSpec, 0, 0);
             rho_Hnuc[lev].copy(rho_Hnuc_temp[lev], 0, 0, 1, 0, 0);
-            rho_Hext[lev].copy(rho_Hnuc_temp[lev], 0, 0, 1, 0, 0);
+            rho_Hext[lev].copy(rho_Hext_temp[lev], 0, 0, 1, 0, 0);
         }
 
     } else {
@@ -161,11 +173,6 @@ Maestro::React (const Vector<MultiFab>& s_in,
         AverageDown(rho_omegadot,0,NumSpec);
         AverageDown(rho_Hnuc,0,1);
 
-    }
-
-    // pass temperature through for seeding the temperature update eos call
-    for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(s_out[lev],s_in[lev],Temp,Temp,1,0);
     }
 
     // now update temperature
