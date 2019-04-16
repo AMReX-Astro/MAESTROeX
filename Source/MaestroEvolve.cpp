@@ -101,27 +101,28 @@ Maestro::Evolve ()
                 Print() << "Diagnostic :" << diag_end_total << " seconds\n\n";
                 Print() << "Time to advance time step: " << end_total << '\n';
 
-		// write a plotfile
         if ( (plot_int > 0 && istep % plot_int == 0) ||
              (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
              (istep == max_step) || (t_old >= stop_time) )
 		{
+            // write a plotfile
 			Print() << "\nWriting plotfile " << istep << std::endl;
 			WritePlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
 			              gamma1bar_new,unew,snew,S_cc_new);
 		}
 
-        // write a small plotfile
         if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
              (small_plot_deltat > 0 && std::fmod(t_new, small_plot_deltat) < dt) ||
              (istep == max_step)  || (t_old >= stop_time) )
 		{
+            // write a small plotfile
 			Print() << "\nWriting small plotfile " << istep << std::endl;
 			WriteSmallPlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
 			                   gamma1bar_new,unew,snew,S_cc_new);
 		}
 
-		if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )
+		if ( (chk_int > 0 && istep % chk_int == 0) ||
+             (istep == max_step) || (t_new >= stop_time) )
 		{
 			// write a checkpoint file
 			Print() << "\nWriting checkpoint" << istep << std::endl;
