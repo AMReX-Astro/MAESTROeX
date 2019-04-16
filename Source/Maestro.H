@@ -898,6 +898,9 @@ private:
     // these muse be vectors (rather than arrays) so we can ParmParse them
     amrex::Vector<int> phys_bc;
 
+    // stores the weights for load balancing reactions
+    amrex::Vector<amrex::MultiFab> weights;
+
     // boundary condition objects needed for FillPatch routines
     // this is essentially an array (over components)
     // of 2*DIM integer arrays storing the physical boundary

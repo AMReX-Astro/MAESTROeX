@@ -320,6 +320,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
 	dSdt              [lev].define(ba, dm,              1,    0);
 	rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
+	weights           [lev].define(ba, dm,              1,    0);
 
 	pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
 
@@ -333,6 +334,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	dSdt              [lev].setVal(0.);
 	rhcc_for_nodalproj[lev].setVal(0.);
 	pi                [lev].setVal(0.);
+	weights           [lev].setVal(0.);
 
 	if (spherical == 1) {
 		normal      [lev].define(ba, dm, 3, 1);
@@ -478,7 +480,6 @@ void Maestro::DivuIter (int istep_divu_iter)
 	Vector<MultiFab> pcoeff            (finest_level+1);
 	Vector<MultiFab> delta_gamma1      (finest_level+1);
 	Vector<MultiFab> delta_gamma1_term (finest_level+1);
-	Vector<MultiFab> weights           (finest_level+1);
 
 	Vector<Real> Sbar                  ( (max_radial_level+1)*nr_fine );
 	Vector<Real> w0_force              ( (max_radial_level+1)*nr_fine );
@@ -513,11 +514,9 @@ void Maestro::DivuIter (int istep_divu_iter)
 		pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
 		delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
 		delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
-		weights           [lev].define(grids[lev], dmap[lev],       1, 1);
 
 		// divu_iters do not use density weighting
 		rhohalf[lev].setVal(1.);
-        weights[lev].setVal(0.);
 	}
 
 	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,weights,p0_old,0.5*dt);

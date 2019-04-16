@@ -179,7 +179,7 @@ Maestro::Setup ()
 			     r_edge_loc.dataPtr(),
 			     geom[max_level].CellSize(),
 			     &nr_irreg);
-    
+
     if (use_exact_base_state) average_base_state = 1;
 
     // No valid BoxArray and DistributionMapping have been defined.
@@ -206,6 +206,7 @@ Maestro::Setup ()
     rhcc_for_nodalproj.resize(max_level+1);
     normal            .resize(max_level+1);
     cell_cc_to_r      .resize(max_level+1);
+    weights           .resize(max_level+1);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+2"
@@ -231,7 +232,7 @@ Maestro::Setup ()
       std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
       std::cerr << "    beta0_type = " << beta0_type << std::endl;
       std::cerr << "    evolve_base_state = " << evolve_base_state << std::endl;
-      Error(); 
+      Error();
     }
 
 }

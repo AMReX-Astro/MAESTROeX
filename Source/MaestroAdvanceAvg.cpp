@@ -39,7 +39,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Vector<MultiFab>    delta_chi(finest_level+1);
     Vector<MultiFab>       sponge(finest_level+1);
     Vector<MultiFab>         w0cc(finest_level+1);
-    Vector<MultiFab>      weights(finest_level+1);
 
     // face-centered in the dm-direction (planar only)
     Vector<MultiFab> etarhoflux_dummy(finest_level+1);
@@ -145,9 +144,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
 	sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
 	w0cc    [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
-	weights     [lev].define(grids[lev], dmap[lev],       1,    0);
-
-    weights[lev].setVal(1.);
 
 	// face-centered in the dm-direction (planar only)
 	AMREX_D_TERM(etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,

@@ -90,11 +90,6 @@ Maestro::React (const Vector<MultiFab>& s_in,
     // apply burning term
     if (do_burning) {
 
-        // Use managed arrays so that we don't have to worry about
-        // deleting things at the end.
-
-        // Vector<std::unique_ptr<MultiFab> > temp_data;
-
         if (use_custom_knapsack_weights) {
 
             // do the burning, update rho_omegadot and rho_Hnuc
