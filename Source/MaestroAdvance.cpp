@@ -166,7 +166,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
         weights     [lev].define(grids[lev], dmap[lev],       1,    0);
 
-        weights[lev].setVal(1.);
+        weights[lev].setVal(0.);
 
         // face-centered in the dm-direction (planar only)
         AMREX_D_TERM(etarhoflux[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
