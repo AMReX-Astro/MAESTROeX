@@ -458,6 +458,9 @@ do_subgrid_burning                  bool            false
 # we abort)
 reaction_sum_tol                    Real               1.e-10   y
 
+# should we have state data for custom load-balancing weighting?
+use_custom_knapsack_weights         bool              false     y
+
 #-----------------------------------------------------------------------------
 # category: EOS
 #-----------------------------------------------------------------------------

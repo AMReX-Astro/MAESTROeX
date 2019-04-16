@@ -113,6 +113,7 @@ static std::string burner_threshold_species;
 static amrex::Real burner_threshold_cutoff;
 static bool        do_subgrid_burning;
 static amrex::Real reaction_sum_tol;
+static bool        use_custom_knapsack_weights;
 static amrex::Real small_temp;
 static amrex::Real small_dens;
 static bool        use_tfromp;

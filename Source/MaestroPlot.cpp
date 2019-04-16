@@ -266,18 +266,22 @@ Maestro::PlotFileMF (const int nPlot,
 	Vector<MultiFab> rho_Hext          (finest_level+1);
 	Vector<MultiFab> rho_omegadot      (finest_level+1);
 	Vector<MultiFab> rho_Hnuc          (finest_level+1);
+	Vector<MultiFab> weights           (finest_level+1);
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 		stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
 		rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
 		rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
 		rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+		weights           [lev].define(grids[lev], dmap[lev],       1, 0);
+
+        weights[lev].setVal(1.);
 	}
 
 	if (dt_in < small_dt) {
-		React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt);
+		React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, weights, p0_in, small_dt);
 	} else {
-		React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in*0.5);
+		React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, weights, p0_in, dt_in*0.5);
 	}
 
 	if (plot_spec || plot_omegadot) {

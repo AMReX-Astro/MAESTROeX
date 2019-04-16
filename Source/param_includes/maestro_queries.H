@@ -113,6 +113,7 @@ pp.query("burner_threshold_species", burner_threshold_species);
 pp.query("burner_threshold_cutoff", burner_threshold_cutoff);
 pp.query("do_subgrid_burning", do_subgrid_burning);
 pp.query("reaction_sum_tol", reaction_sum_tol);
+pp.query("use_custom_knapsack_weights", use_custom_knapsack_weights);
 pp.query("small_temp", small_temp);
 pp.query("small_dens", small_dens);
 pp.query("use_tfromp", use_tfromp);

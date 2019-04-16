@@ -113,6 +113,7 @@ std::string Maestro::burner_threshold_species = "";
 amrex::Real Maestro::burner_threshold_cutoff = 1.e-10;
 bool        Maestro::do_subgrid_burning = false;
 amrex::Real Maestro::reaction_sum_tol = 1.e-10;
+bool        Maestro::use_custom_knapsack_weights = false;
 amrex::Real Maestro::small_temp = 5.e6;
 amrex::Real Maestro::small_dens = 1.e-5;
 bool        Maestro::use_tfromp = false;

@@ -72,6 +72,7 @@ module meth_params_module
   character (len=:), allocatable, save :: burner_threshold_species
   double precision              , save :: burner_threshold_cutoff
   double precision              , save :: reaction_sum_tol
+  logical                       , save :: use_custom_knapsack_weights
   double precision              , save :: small_temp
   double precision              , save :: small_dens
   logical                       , save :: use_eos_e_instead_of_h
@@ -144,6 +145,7 @@ contains
     burner_threshold_species = "";
     burner_threshold_cutoff = 1.d-10;
     reaction_sum_tol = 1.d-10;
+    use_custom_knapsack_weights = .false.;
     small_temp = 5.d6;
     small_dens = 1.d-5;
     use_eos_e_instead_of_h = .false.;
@@ -202,6 +204,7 @@ contains
     call pp%query("burner_threshold_species", burner_threshold_species)
     call pp%query("burner_threshold_cutoff", burner_threshold_cutoff)
     call pp%query("reaction_sum_tol", reaction_sum_tol)
+    call pp%query("use_custom_knapsack_weights", use_custom_knapsack_weights)
     call pp%query("small_temp", small_temp)
     call pp%query("small_dens", small_dens)
     call pp%query("use_eos_e_instead_of_h", use_eos_e_instead_of_h)

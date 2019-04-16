@@ -662,6 +662,7 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_Hext,
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+                amrex::Vector<amrex::MultiFab>& weights,
                 const amrex::Vector<amrex::Real>& p0,
                 const amrex::Real dt_react);
 

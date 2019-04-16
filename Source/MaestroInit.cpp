@@ -478,6 +478,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 	Vector<MultiFab> pcoeff            (finest_level+1);
 	Vector<MultiFab> delta_gamma1      (finest_level+1);
 	Vector<MultiFab> delta_gamma1_term (finest_level+1);
+	Vector<MultiFab> weights           (finest_level+1);
 
 	Vector<Real> Sbar                  ( (max_radial_level+1)*nr_fine );
 	Vector<Real> w0_force              ( (max_radial_level+1)*nr_fine );
@@ -512,12 +513,14 @@ void Maestro::DivuIter (int istep_divu_iter)
 		pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
 		delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
 		delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
+		weights           [lev].define(grids[lev], dmap[lev],       1, 1);
 
 		// divu_iters do not use density weighting
 		rhohalf[lev].setVal(1.);
+        weights[lev].setVal(0.);
 	}
 
-	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,weights,p0_old,0.5*dt);
 
 	if (use_thermal_diffusion) {
 		MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);

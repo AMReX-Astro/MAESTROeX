@@ -39,6 +39,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Vector<MultiFab>    delta_chi(finest_level+1);
     Vector<MultiFab>       sponge(finest_level+1);
     Vector<MultiFab>         w0cc(finest_level+1);
+    Vector<MultiFab>      weights(finest_level+1);
 
     // face-centered in the dm-direction (planar only)
     Vector<MultiFab> etarhoflux_dummy(finest_level+1);
@@ -143,6 +144,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
 	sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
 	w0cc    [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
+	weights     [lev].define(grids[lev], dmap[lev],       1,    0);
+
+    weights[lev].setVal(1.);
 
 	// face-centered in the dm-direction (planar only)
 	AMREX_D_TERM(etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -226,7 +230,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
 
-    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,weights,p0_old,0.5*dt);
 
     // wallclock time
     Real end_total_react = ParallelDescriptor::second() - start_total_react;
@@ -521,7 +525,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,weights,p0_new,0.5*dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
@@ -811,7 +815,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,weights,p0_new,0.5*dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
