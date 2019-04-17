@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash -l
 #PBS -A ast106
 #PBS -N urca_rhoc-4.5_Tc-6.0_2019-04-10
 #PBS -j oe
@@ -28,7 +28,7 @@ trap 'kill -s TERM $PID' EXIT TERM HUP XCPU KILL
 
 # find the latest restart file -- first look for one with 7 digits then fall
 # back to 6
-restartFile=$(find . -maxdepth 1 -type d -name "*chk???????" -print | sort | tail -1)
+restartFile=$(find . -maxdepth 1 -type d -name "*chk???????" -print | sort | tail -1 | cut -c 3-)
 
 # the Header is the last thing written -- check if it's there, otherwise,
 # fall back to the second-to-last check file written
@@ -36,7 +36,7 @@ if [ ! -f ${restartFile}/Header ]; then
   # how many *chk??????? files are there? if only one, then skip
   nl=$(find . -maxdepth 1 -type d -name "*chk???????" -print | sort | wc -l)
   if [ $nl -gt 1 ]; then
-	  restartFile=$(find . -maxdepth 1 -type d -name "*chk???????" -print | sort | tail -2 | head -1)    
+	  restartFile=$(find . -maxdepth 1 -type d -name "*chk???????" -print | sort | tail -2 | head -1 | cut -c 3-)    
   else
 	  restartFile=""
   fi
@@ -45,7 +45,7 @@ fi
 # if the above checks failed, then there are no valid 7-digit chk files, so
 # check the 6-digit ones
 if [ "${restartFile}" = "" ]; then
-  restartFile=$(find . -maxdepth 1 -type d -name "*chk??????" -print | sort | tail -1)
+  restartFile=$(find . -maxdepth 1 -type d -name "*chk??????" -print | sort | tail -1 | cut -c 3-)
 
   # make sure the Header was written, otherwise, check the second-to-last
   # file
@@ -53,22 +53,18 @@ if [ "${restartFile}" = "" ]; then
     # how many *chk?????? files are there? if only one, then skip
     nl=$(find . -maxdepth 1 -type d -name "*chk??????" -print | sort | wc -l)
     if [ $nl -gt 1 ]; then
-	    restartFile=$(find . -maxdepth 1 -type d -name "*chk??????" -print | sort | tail -2 | head -1)    
+	    restartFile=$(find . -maxdepth 1 -type d -name "*chk??????" -print | sort | tail -2 | head -1 | cut -c 3-)    
     else
 	    restartFile=""
     fi
   fi
 fi
 
-# cut out the numerical part of the *chkXXXXXX file, here we use the 'k' in 
-# 'chk' as the delimiter
-restartNum=`echo ${restartFile} | cut -d'k' -f2`  
-
-# restartString will be empty if no chk files are found -- i.e. new run
-if [ "${restartNum}" = "" ]; then
+# restartFile will be empty if no chk files are found -- i.e. new run
+if [ "${restartFile}" = "" ]; then
     restartString=""
 else
-    restartString="--restart ${restartNum}"
+    restartString="amr.restart=${restartFile}"
     echo "Restarting with: " ${restartString}
 fi
 
@@ -81,6 +77,6 @@ fi
 #   This can boost performance by preventing costly remote memory I/O, though 
 #   it also restricts the amount of memory available to MPI tasks.
 
-aprun -n 2048 -S 2 -d 4 -ss ./Maestro3d.cray.interlagos.MPI.OMP.ex inputs_3d_1lev.5120 ${restartString}
+aprun -n 2048 -S 2 -d 4 -ss ./Maestro3d.gnu.interlagos.MPI.OMP.ex inputs_3d_1lev.5120 ${restartString}
 
 rm -f process.pid
