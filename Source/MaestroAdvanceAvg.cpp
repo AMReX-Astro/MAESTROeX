@@ -422,11 +422,15 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	// correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
 	compute_cutoff_coords(rho0_new.dataPtr());
-    }
 
-    // compute the new etarho
-    if (evolve_base_state && use_etarho) {
-	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+	if (use_etarho) {
+            // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+            }
+	}
     }
 
     // update grav_cell_new
@@ -725,11 +729,15 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	// correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
 	compute_cutoff_coords(rho0_new.dataPtr());
-    }
 
-    // compute the new etarho
-    if (evolve_base_state && use_etarho) {
-	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+	if (use_etarho) {
+	    // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+            }
+	}
     }
 
     // update grav_cell_new, rho0_nph, grav_cell_nph
