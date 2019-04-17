@@ -43,9 +43,9 @@ maestro.cfl         = 0.5    # cfl number for hyperbolic system
 maestro.init_shrink = 1.0
 
 # PLOTFILES
-maestro.plot_base_name  = omp    # root name of plot file
+maestro.plot_base_name  = mach_jet    # root name of plot file
 maestro.plot_int   = 10000
-maestro.plot_deltat = 1.e-5
+maestro.plot_deltat = 1.e-4
 
 # CHECKPOINT
 maestro.check_base_name = chk

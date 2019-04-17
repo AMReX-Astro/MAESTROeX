@@ -5,7 +5,7 @@ module bc_fill_module
 
   use amrex_error_module
   use amrex_bc_types_module
-  
+
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp
   use inlet_bc_module, only: INLET_RHO, INLET_RHOH, INLET_TEMP, INLET_CS
   use base_state_geometry_module, only: dr_fine
@@ -72,11 +72,15 @@ contains
     integer :: is, ie, js, je, ks, ke
     integer :: i, j, k, n
     integer :: imin, imax, jmin, jmax, kmin, kmax
+    double precision :: A, B, x, vy
 
     ! do nothing if there are no exterior boundaries
     if (.not. any(bc .eq. amrex_bc_ext_dir)) then
        return
     endif
+
+    A = 4.5d-2
+    B = 1.d2
 
     is = max(q_lo(1), domlo(1))
     ie = min(q_hi(1), domhi(1))
@@ -139,22 +143,32 @@ contains
 
        if (bc(2,1) .eq. amrex_bc_ext_dir) then
 
-          ! rho
-          if (icomp .eq. rho_comp) then
-             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
-             ! rhoh
-          else if (icomp .eq. rhoh_comp) then
-             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHOH
-             ! species
-          else if (icomp .eq. spec_comp) then
-             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_RHO
-             ! temperature
-          else if (icomp .eq. temp_comp) then
-             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = INLET_TEMP
-          else
-             q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.0d0
-          endif
+           ! we only want to apply the BCs where the y-velocity is non-zero
+           do i=lo(1),hi(1)
+              x = (dble(i)+0.5d0)*dr_fine
+              vy = (inlet_mach/1.d-1)* &
+                   INLET_CS*(1.d-2 + A*(tanh(B*(x-0.40d0)) + tanh(B*(0.6d0-x))))
 
+              if (vy .ne. 0.0d0) then
+                  ! rho
+                  if (icomp .eq. rho_comp) then
+                     q(i,jmin:jmax,lo(3):hi(3)) = INLET_RHO
+                     ! rhoh
+                  else if (icomp .eq. rhoh_comp) then
+                     q(i,jmin:jmax,lo(3):hi(3)) = INLET_RHOH
+                     ! species
+                  else if (icomp .eq. spec_comp) then
+                     q(i,jmin:jmax,lo(3):hi(3)) = INLET_RHO
+                     ! temperature
+                  else if (icomp .eq. temp_comp) then
+                     q(i,jmin:jmax,lo(3):hi(3)) = INLET_TEMP
+                  else
+                     q(i,jmin:jmax,lo(3):hi(3)) = 0.0d0
+                  endif
+              else
+                  q(lo(1):hi(1),jmin:jmax,lo(3):hi(3)) = 0.0d0
+              endif
+           end do
        end if
     end if
 
