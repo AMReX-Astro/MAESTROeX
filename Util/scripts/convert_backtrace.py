@@ -37,7 +37,7 @@ def convert_backtrace(filename):
 
         firstline = b.match(m.group(0)).group(0)
 
-        bashCommand = f"addr2line -Cfie {executable} {address}"
+        bashCommand = "addr2line -Cfie {} {}".format(executable, address)
 
         process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
