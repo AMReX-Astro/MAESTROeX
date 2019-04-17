@@ -555,7 +555,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 			make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
 			        rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
 			        p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-			        p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
+			        p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
 			        etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
 			        r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
 		}

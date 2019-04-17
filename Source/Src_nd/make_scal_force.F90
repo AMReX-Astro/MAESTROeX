@@ -126,6 +126,9 @@ contains
     ! psi should always be in the force if we are doing the final update
     ! For prediction, it should not be in the force if we are predicting
     ! (rho h)', but should be there if we are predicting h or rhoh
+    !
+    ! If average_base_state is on, psi is instead dpdt term
+    !
     if ((is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_h) .OR. &
          (is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_rhoh) .OR. &
          (is_prediction .eq. 0)) then
@@ -244,8 +247,7 @@ contains
     ! For prediction, it should not be in the force if we are predicting
     ! (rho h)', but should be there if we are predicting h or rhoh
     !
-    ! If use_exact_base_state is on, psi is instead dpdt term, which
-    ! should always be included in the force.
+    ! If use_exact_base_state or average_base_state is on, psi is instead dpdt term
     !
     if ((is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_h) .OR. &
          (is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_rhoh) .OR. &
