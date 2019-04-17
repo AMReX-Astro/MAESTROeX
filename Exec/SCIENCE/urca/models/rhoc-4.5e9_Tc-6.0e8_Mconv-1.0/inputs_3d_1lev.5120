@@ -32,13 +32,16 @@ maestro.init_iter = 1
 maestro.stop_time = 36000.
 
 # PLOTFILES
-maestro.plot_file  = plt    # root name of plot file
-#maestro.plot_int   = 100    # number of timesteps between plot files
+maestro.plot_file  = plt     # root name of plot file
+maestro.plot_int   = 1000000 # number of timesteps between plot files
 maestro.plot_deltat = 5.0
+
+# Write out plotfile data in single precision
+fab.format = NATIVE_32
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = 1000
+maestro.chk_int         = 50
 
 maestro.cfl       = 0.8    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -66,7 +69,7 @@ maestro.cg_verbose     = 0
 
 # ALGORITHMIC OPTIONS
 maestro.do_initial_projection = true
-maestro.init_divu_iter        = 2
+maestro.init_divu_iter        = 3
 
 maestro.do_burning = true
 
@@ -90,8 +93,8 @@ maestro.eps_mac_max        = 1.e-8
 maestro.mac_level_factor   = 10.
 maestro.eps_mac_bottom     = 1.e-3
 # tolerances for the nodal projection
-maestro.eps_hg             = 1.e-11
-maestro.eps_hg_max         = 1.e-10
+maestro.eps_hg             = 1.e-10
+maestro.eps_hg_max         = 1.e-9
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
