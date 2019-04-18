@@ -175,7 +175,9 @@ contains
     
     ! Compute w0 on edges at level n
     do n=0,max_radial_level
-
+       
+       psi_planar = ZERO
+       
        do j=1,numdisjointchunks(n)
           
           if (n .eq. 0) then
@@ -187,7 +189,6 @@ contains
           end if
 
           ! compute psi for level n
-          psi_planar = ZERO
           do r = r_start_coord(n,j), r_end_coord(n,j)
              if (r .lt. base_cutoff_density_coord(n)) then
                 psi_planar(r) = etarho_cc(n,r) * abs(grav_const)
