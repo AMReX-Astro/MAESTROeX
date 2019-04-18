@@ -179,7 +179,7 @@ Maestro::Setup ()
 			     r_edge_loc.dataPtr(),
 			     geom[max_level].CellSize(),
 			     &nr_irreg);
-    
+
     if (use_exact_base_state) average_base_state = 1;
 
     // No valid BoxArray and DistributionMapping have been defined.
@@ -231,7 +231,7 @@ Maestro::Setup ()
       std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
       std::cerr << "    beta0_type = " << beta0_type << std::endl;
       std::cerr << "    evolve_base_state = " << evolve_base_state << std::endl;
-      Error(); 
+      Error();
     }
 
 }

@@ -1,10 +1,9 @@
 DEBUG      = FALSE
-DIM        = 3
+DIM        = 2
 COMP	   = gnu
 USE_MPI    = TRUE
 USE_OMP    = FALSE
 USE_REACT  = TRUE
-USE_ROTATION = TRUE
 
 TINY_PROFILE = FALSE
 PROFILE      = FALSE # TRUE overrides TINY_PROFILE
@@ -21,12 +20,10 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR      := aprox21
+NETWORK_DIR      := ignition_simple
 
 Bpack   := ./Make.package
 Blocs   := .
 PROBIN_PARAMETER_DIRS := .
 
 include $(MAESTROEX_HOME)/Exec/Make.Maestro
-
-USE_ROTATION=FALSE
