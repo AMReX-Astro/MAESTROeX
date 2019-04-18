@@ -341,7 +341,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
 
-    if (evolve_base_state && split_projection) {
+    if (spherical == 1 && evolve_base_state && split_projection) {
 	// subtract w0mac from umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -361,7 +361,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && split_projection) {
+    if (spherical == 1 && evolve_base_state && split_projection) {
 	// add w0mac back to umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -456,20 +456,14 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 		    r_cc_loc.dataPtr(),
 		    r_edge_loc.dataPtr());
 
-	// make psi
-        if (spherical == 0) {
-            make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
-
-        } else {
-	    // compute p0_nph
-	    for (int i=0; i<p0_nph.size(); ++i) {
-		p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-	    }
-
-	    // hold dp0/dt in psi for enthalpy advance
-	    for (int i=0; i<p0_old.size(); ++i) {
-		psi[i] = (p0_new[i] - p0_old[i])/dt;
-	    }
+	// compute p0_nph
+	for (int i=0; i<p0_nph.size(); ++i) {
+	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	}
+	
+	// hold dp0/dt in psi for enthalpy advance
+	for (int i=0; i<p0_old.size(); ++i) {
+	    psi[i] = (p0_new[i] - p0_old[i])/dt;
 	}
 
     }
@@ -677,7 +671,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 		       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
-    if (evolve_base_state && split_projection) {
+    if (spherical == 1 && evolve_base_state && split_projection) {
 	// subtract w0mac from umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -697,7 +691,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && split_projection) {
+    if (spherical == 1 && evolve_base_state && split_projection) {
 	// add w0mac back to umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -928,7 +922,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         w0 = w0_old;
     }
 
-    if (evolve_base_state && split_projection) {
+    if (spherical == 1 && evolve_base_state && split_projection) {
 	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
@@ -1004,7 +998,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && split_projection) {
+    if (spherical == 1 && evolve_base_state && split_projection) {
     	// add w0 back to unew
     	for (int lev = 0; lev <= finest_level; ++lev) {
     	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
