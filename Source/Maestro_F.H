@@ -992,7 +992,7 @@ extern "C"
                  const amrex::Real* rho0_old, const amrex::Real* rho0_new,
                  const amrex::Real* p0_old, const amrex::Real* p0_new,
                  const amrex::Real* gamma1bar_old, const amrex::Real* gamma1bar_new,
-                 const amrex::Real* p0_minus_peosbar, const amrex::Real* psi,
+                 const amrex::Real* p0_minus_peosbar, 
                  const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
                  const amrex::Real* delta_chi_w0, const amrex::Real* r_cc_loc,
                  const amrex::Real* r_edge_loc, const amrex::Real* dt,

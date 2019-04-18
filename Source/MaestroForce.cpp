@@ -305,7 +305,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             if (spherical == 1) {
                 const Real* dx = geom[lev].CellSize();
 #if (AMREX_SPACEDIM == 3)
-		// if use_exact_base_state, psi is set to dpdt in advance subroutine
+		// if use_exact_base_state or average_base_state,
+		// psi is set to dpdt in advance subroutine
 		mkrhohforce_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				 scal_force_mf[mfi].dataPtr(RhoH),
 				 ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
@@ -325,6 +326,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                 Abort("MakeRhoHForce: Spherical is not valid for DIM < 3");
 #endif
             } else {
+		// if average_base_state, psi is set to dpdt in advance subroutine
                 mkrhohforce(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                             scal_force_mf[mfi].dataPtr(RhoH),
                             ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),

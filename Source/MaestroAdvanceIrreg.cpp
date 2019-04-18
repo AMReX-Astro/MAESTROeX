@@ -298,7 +298,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
         if (spherical == 1) {
@@ -626,7 +626,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
         if (spherical == 1) {
@@ -867,7 +867,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
                 rho0_new.dataPtr(),rho0_new.dataPtr(),p0_new.dataPtr(),p0_new.dataPtr(),
                 gamma1bar_new.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
 	// put w0 on Cartesian cell-centers
@@ -939,7 +939,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	    // compute peosbar = Avg(peos_new)
             Average(delta_p_term,peosbar,0);
 
-	    // no need to compute peosbar, p0_minus_peosbar since make_w0 is not called
+	    // no need to compute p0_minus_peosbar since make_w0 is not called after here
 
 	    // compute peosbar_cart from peosbar
             Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);

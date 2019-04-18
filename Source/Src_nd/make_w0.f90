@@ -15,7 +15,8 @@ module make_w0_module
                                         dr, r_start_coord, r_end_coord, restrict_base, nr, &
                                         fill_ghost_base, base_cutoff_density_coord, numdisjointchunks
   use meth_params_module, only: spherical, maestro_verbose, do_planar_invsq_grav, do_2d_planar_octant, &
-                                dpdt_factor, base_cutoff_density, use_exact_base_state, average_base_state
+                               dpdt_factor, base_cutoff_density, grav_const, &
+                               use_exact_base_state, average_base_state
 
   implicit none
 
@@ -28,7 +29,7 @@ contains
   subroutine make_w0(w0,w0_old,w0_force,Sbar_in, &
                      rho0_old,rho0_new,p0_old,p0_new, &
                      gamma1bar_old,gamma1bar_new,p0_minus_peosbar, &
-                     psi,etarho_ec,etarho_cc,delta_chi_w0, &
+                     etarho_ec,etarho_cc,delta_chi_w0, &
                      r_cc_loc,r_edge_loc, &
                      dt,dtold,is_predictor) bind(C, name="make_w0")
 
@@ -43,7 +44,6 @@ contains
     double precision, intent(in   ) ::    gamma1bar_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::    gamma1bar_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: p0_minus_peosbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::              psi(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::        etarho_ec(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::        etarho_cc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(inout) ::     delta_chi_w0(0:max_radial_level,0:nr_fine-1)
@@ -72,7 +72,7 @@ contains
        else
           call make_w0_planar(w0,w0_old,Sbar_in, &
                               p0_old,p0_new,gamma1bar_old,gamma1bar_new, &
-                              p0_minus_peosbar,psi,w0_force, &
+                              p0_minus_peosbar,etarho_cc,w0_force, &
                               dt,dtold,delta_chi_w0,is_predictor)
        endif
 
@@ -130,7 +130,7 @@ contains
 
   subroutine make_w0_planar(w0,w0_old,Sbar_in,p0_old,p0_new, &
                             gamma1bar_old,gamma1bar_new,p0_minus_peosbar, &
-                            psi,w0_force,dt,dtold,delta_chi_w0,is_predictor)
+                            etarho_cc,w0_force,dt,dtold,delta_chi_w0,is_predictor)
 
     double precision, intent(  out) ::               w0(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::           w0_old(0:max_radial_level,0:nr_fine  )
@@ -140,7 +140,7 @@ contains
     double precision, intent(in   ) ::    gamma1bar_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::    gamma1bar_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: p0_minus_peosbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::              psi(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) ::        etarho_cc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) ::         w0_force(0:max_radial_level,0:nr_fine-1)
     double precision, intent(inout) ::     delta_chi_w0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dt,dtold
@@ -150,6 +150,7 @@ contains
     integer         :: r, n, i, j, refrat
     double precision :: w0_old_cen(0:max_radial_level,0:nr_fine-1)
     double precision :: w0_new_cen(0:max_radial_level,0:nr_fine-1)
+    double precision :: psi_planar(0:nr_fine-1)
     double precision :: w0_avg, div_avg, dt_avg, gamma1bar_p0_avg
     double precision :: offset
 
@@ -185,6 +186,14 @@ contains
              w0(n,r_start_coord(n,j)) = w0(n-1,r_start_coord(n,j)/2)
           end if
 
+          ! compute psi for level n
+          psi_planar = ZERO
+          do r = r_start_coord(n,j), r_end_coord(n,j)
+             if (r .lt. base_cutoff_density_coord(n)) then
+                psi_planar(r) = etarho_cc(n,r) * abs(grav_const)
+             end if
+          end do
+          
           do r=r_start_coord(n,j)+1,r_end_coord(n,j)+1
 
              gamma1bar_p0_avg = (gamma1bar_old(n,r-1)+gamma1bar_new(n,r-1)) * &
@@ -205,7 +214,7 @@ contains
              end if
 
              w0(n,r) = w0(n,r-1) + Sbar_in(n,r-1) * dr(n) &
-                  - psi(n,r-1) / gamma1bar_p0_avg * dr(n) &
+                  - psi_planar(r-1) / gamma1bar_p0_avg * dr(n) &
                   - delta_chi_w0(n,r-1) * dr(n)
 
           end do

@@ -309,7 +309,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
+                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
     
         base_time += ParallelDescriptor::second() - base_time_start;
@@ -721,7 +721,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
+                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
     
         base_time += ParallelDescriptor::second() - base_time_start;
