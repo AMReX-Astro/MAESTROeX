@@ -28,7 +28,7 @@ Maestro::Init ()
 			// Need to fill normal vector to compute velrc in plotfile
 			if (spherical) { MakeNormal(); }
 
-			Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
+			Print() << "\nWriting plotfile "<< plot_base_name << "InitData after InitData" << std::endl;
 			WritePlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
 		} else if (small_plot_int > 0) {
@@ -36,7 +36,7 @@ Maestro::Init ()
 			// Need to fill normal vector to compute velrc in plotfile
 			if (spherical) { MakeNormal(); }
 
-			Print() << "\nWriting small plotfile smallplt_InitData after InitData" << std::endl;
+			Print() << "\nWriting small plotfile "<< small_plot_base_name << "InitData after InitData" << std::endl;
 			WriteSmallPlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
 		}
@@ -128,12 +128,12 @@ Maestro::Init ()
 			InitProj();
 
 			if (plot_int > 0) {
-				Print() << "\nWriting plotfile plt_after_InitProj after InitProj" << std::endl;
+				Print() << "\nWriting plotfile " << plot_base_name << "after_InitProj after InitProj" << std::endl;
 
 				WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
 			} else if (small_plot_int > 0) {
-				Print() << "\nWriting small plotfile smallplt_after_InitProj after InitProj" << std::endl;
+				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_InitProj after InitProj" << std::endl;
 
 				WriteSmallPlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
@@ -150,10 +150,10 @@ Maestro::Init ()
 			}
 
 			if (plot_int > 0) {
-				Print() << "\nWriting plotfile plt_after_DivuIter after final DivuIter" << std::endl;
+				Print() << "\nWriting plotfile " << plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
 				WritePlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			} else if (small_plot_int > 0) {
-				Print() << "\nWriting small plotfile smallplt_after_DivuIter after final DivuIter" << std::endl;
+				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
 				WriteSmallPlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
 		}
