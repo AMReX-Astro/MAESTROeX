@@ -125,7 +125,7 @@ Maestro::Evolve ()
              (istep == max_step) || (t_new >= stop_time) )
 		{
 			// write a checkpoint file
-			Print() << "\nWriting checkpoint" << istep << std::endl;
+			Print() << "\nWriting checkpoint " << istep << std::endl;
 			WriteCheckPoint(istep);
 		}
 

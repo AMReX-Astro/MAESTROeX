@@ -23,7 +23,7 @@ Maestro::Init ()
 		// fill in multifab and base state data
 		InitData();
 
-		if (plot_int > 0) {
+		if (plot_int > 0 || plot_deltat > 0) {
 
 			// Need to fill normal vector to compute velrc in plotfile
 			if (spherical) { MakeNormal(); }
@@ -31,7 +31,7 @@ Maestro::Init ()
 			Print() << "\nWriting plotfile "<< plot_base_name << "InitData after InitData" << std::endl;
 			WritePlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
-		} else if (small_plot_int > 0) {
+		} else if (small_plot_int > 0 || small_plot_deltat > 0) {
 
 			// Need to fill normal vector to compute velrc in plotfile
 			if (spherical) { MakeNormal(); }
@@ -127,12 +127,12 @@ Maestro::Init ()
 			Print() << "Doing initial projection" << std::endl;
 			InitProj();
 
-			if (plot_int > 0) {
+			if (plot_int > 0 || plot_deltat > 0) {
 				Print() << "\nWriting plotfile " << plot_base_name << "after_InitProj after InitProj" << std::endl;
 
 				WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
-			} else if (small_plot_int > 0) {
+			} else if (small_plot_int > 0 || small_plot_deltat > 0) {
 				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_InitProj after InitProj" << std::endl;
 
 				WriteSmallPlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
@@ -149,10 +149,10 @@ Maestro::Init ()
 				DivuIter(i);
 			}
 
-			if (plot_int > 0) {
+			if (plot_int > 0 || plot_deltat > 0) {
 				Print() << "\nWriting plotfile " << plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
 				WritePlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-			} else if (small_plot_int > 0) {
+			} else if (small_plot_int > 0 || small_plot_deltat > 0) {
 				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
 				WriteSmallPlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
@@ -177,10 +177,10 @@ Maestro::Init ()
 			InitIter();
 		}
 
-		if (plot_int > 0) {
+		if (plot_int > 0 || plot_deltat > 0) {
 			Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
 			WritePlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-		} else if (small_plot_int > 0) {
+		} else if (small_plot_int > 0 || small_plot_deltat > 0) {
 			Print() << "\nWriting small plotfile 0 after all initialization" << std::endl;
 			WriteSmallPlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 		}
@@ -601,29 +601,29 @@ void Maestro::DivuIter (int istep_divu_iter)
 
 void Maestro::InitIter ()
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::InitIter()",InitIter);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::InitIter()",InitIter);
 
-        // wallclock time
-        Real start_total = ParallelDescriptor::second();
+    // wallclock time
+    Real start_total = ParallelDescriptor::second();
 
-	// advance the solution by dt
-	if (use_exact_base_state) {
-		AdvanceTimeStepIrreg(true);
-	} else if (average_base_state) {
-		AdvanceTimeStepAverage(true);
-	} else {
-		AdvanceTimeStep(true);
-	}
+    // advance the solution by dt
+    if (use_exact_base_state) {
+        AdvanceTimeStepIrreg(true);
+    } else if (average_base_state) {
+        AdvanceTimeStepAverage(true);
+    } else {
+        AdvanceTimeStep(true);
+    }
 
-        // wallclock time
-        Real end_total = ParallelDescriptor::second() - start_total;
-        ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+    // wallclock time
+    Real end_total = ParallelDescriptor::second() - start_total;
+    ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
 
-        Print() << "Time to advance time step: " << end_total << '\n';
+    Print() << "Time to advance time step: " << end_total << '\n';
 
-	// copy pi from snew to sold
-	for (int lev=0; lev<=finest_level; ++lev) {
-		MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1,ng_s);
-	}
+    // copy pi from snew to sold
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1,ng_s);
+    }
 }
