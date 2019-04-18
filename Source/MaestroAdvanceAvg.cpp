@@ -103,10 +103,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    << " DT = " << dt << std::endl << std::endl;
 
     if (maestro_verbose > 0) {
-	Print() << "Cell Count:" << std::endl;
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    Print() << "Level " << lev << ", " << CountCells(lev) << " cells" << std::endl;
-	}
+    	Print() << "Cell Count:" << std::endl;
+    	for (int lev=0; lev<=finest_level; ++lev) {
+    	    Print() << "Level " << lev << ", " << CountCells(lev) << " cells" << std::endl;
+    	}
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -144,7 +144,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
 	sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
 	w0cc     [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
-	
+
 	// face-centered in the dm-direction (planar only)
 	AMREX_D_TERM(etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
 		     etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
@@ -216,7 +216,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	init_sponge(rho0_old.dataPtr());
 	MakeSponge(sponge);
     }
-    
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 1 -- react the full state and then base state through dt/2
     //////////////////////////////////////////////////////////////////////////////
@@ -291,7 +291,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state) {
 
         if (split_projection) {
-        
+
             // compute Sbar = average(S_cc_nph)
             Average(S_cc_nph,Sbar,0);
 
@@ -303,7 +303,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
                     rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
                     gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-                    psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                     r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
             if (spherical == 1) {
@@ -341,7 +341,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
 
-    if (evolve_base_state && spherical == 1 && split_projection) {
+    if (evolve_base_state && split_projection) {
 	// subtract w0mac from umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -352,7 +352,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // wallclock time
     Real start_total_macproj = ParallelDescriptor::second();
-    
+
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
@@ -361,7 +361,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && spherical == 1 && split_projection) {
+    if (evolve_base_state && split_projection) {
 	// add w0mac back to umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -380,7 +380,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // no need to advect the base state density
     rho0_new = rho0_old;
-	
+
     // thermal is the forcing for rhoh or temperature
     if (use_thermal_diffusion) {
 	MakeThermalCoeffs(s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1);
@@ -422,13 +422,17 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	// correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
 	compute_cutoff_coords(rho0_new.dataPtr());
+
+	if (use_etarho) {
+            // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+            }
+	}
     }
 
-    // compute the new etarho
-    if (evolve_base_state && use_etarho) {
-	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
-    }
-    
     // update grav_cell_new
     if (evolve_base_state) {
 	make_grav_cell(grav_cell_new.dataPtr(),
@@ -451,17 +455,23 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 		    grav_cell_new.dataPtr(),
 		    r_cc_loc.dataPtr(),
 		    r_edge_loc.dataPtr());
- 
-	// compute p0_nph
-	for (int i=0; i<p0_nph.size(); ++i) {
-	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+
+	// make psi
+        if (spherical == 0) {
+            make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
+
+        } else {
+	    // compute p0_nph
+	    for (int i=0; i<p0_nph.size(); ++i) {
+		p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	    }
+
+	    // hold dp0/dt in psi for enthalpy advance
+	    for (int i=0; i<p0_old.size(); ++i) {
+		psi[i] = (p0_new[i] - p0_old[i])/dt;
+	    }
 	}
 
-	// hold dp0/dt in psi for enthalpy advance
-	for (int i=0; i<p0_old.size(); ++i) {
-            psi[i] = (p0_new[i] - p0_old[i])/dt;
-        }
-	
     }
     else {
 	p0_new = p0_old;
@@ -525,7 +535,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (maestro_verbose >= 1) {
 	Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
-    
+
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
@@ -594,7 +604,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
 	// compute peosbar = Avg(peos_new)
         Average(delta_p_term,peosbar,0);
-	
+
 	// compute p0_minus_peosbar = p0_new - peosbar
         for (int i=0; i<p0_minus_peosbar.size(); ++i) {
             p0_minus_peosbar[i] = p0_new[i] - peosbar[i];
@@ -619,7 +629,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state) {
 
         if (split_projection) {
-        
+
             // compute Sbar = average(S_cc_nph)
             Average(S_cc_nph,Sbar,0);
 
@@ -635,9 +645,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
                     rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
                     gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                    psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                     r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
-            
+
             if (spherical == 1) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);
@@ -662,12 +672,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    Sbar[i] = (1.0/(gamma1bar_nph[i]*p0_nph[i]))*(p0_new[i] - p0_old[i])/dt;
 	}
     }
-    
+
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 		       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
-    if (evolve_base_state && spherical == 1 && split_projection) {
+    if (evolve_base_state && split_projection) {
 	// subtract w0mac from umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -675,10 +685,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    }
 	}
     }
-    
+
     // wallclock time
     start_total_macproj = ParallelDescriptor::second();
-    
+
     // MAC projection
     // includes spherical option in C++ function
     MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
@@ -687,7 +697,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && spherical == 1 && split_projection) {
+    if (evolve_base_state && split_projection) {
 	// add w0mac back to umac
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
@@ -695,7 +705,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    }
 	}
     }
-    
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the full state through dt
     //////////////////////////////////////////////////////////////////////////////
@@ -725,13 +735,17 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	// correct the base state density by "averaging"
 	Average(s2, rho0_new, Rho);
 	compute_cutoff_coords(rho0_new.dataPtr());
+
+	if (use_etarho) {
+	    // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+            }
+	}
     }
 
-    // compute the new etarho
-    if (evolve_base_state && use_etarho) {
-	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
-    }
-    
     // update grav_cell_new, rho0_nph, grav_cell_nph
     if (evolve_base_state) {
 	make_grav_cell(grav_cell_new.dataPtr(),
@@ -776,7 +790,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // base state enthalpy averaging
     if (evolve_base_state) {
-    	Average(s2, rhoh0_new, RhoH); 
+    	Average(s2, rhoh0_new, RhoH);
     }
 
     // base state enthalpy update
@@ -822,7 +836,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (maestro_verbose >= 1) {
 	Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
-    
+
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
@@ -860,7 +874,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
 	      rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
-    
+
     // define dSdt = (S_cc_new - S_cc_old) / dt
     for (int lev=0; lev<=finest_level; ++lev) {
 	MultiFab::LinComb(dSdt[lev],-1./dt,S_cc_old[lev],0,1./dt,S_cc_new[lev],0,0,1,0);
@@ -869,7 +883,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state) {
 
         if (split_projection) {
-            
+
             // compute Sbar = average(S_cc_new)
             Average(S_cc_new,Sbar,0);
 
@@ -885,12 +899,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
                     rho0_new.dataPtr(),rho0_new.dataPtr(),p0_new.dataPtr(),p0_new.dataPtr(),
                     gamma1bar_new.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                    psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                     r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
-            
+
             if (spherical == 1) {
                 // put w0 on Cartesian cell-centers
-                Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0); 
+                Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0, 1);
             }
         }
     }
@@ -908,13 +922,13 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     VelocityAdvance(rhohalf,umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,
 		    rho0_nph,grav_cell_nph,sponge);
-    
+
     if (evolve_base_state && is_initIter) {
         // throw away w0 by setting w0 = w0_old
         w0 = w0_old;
     }
 
-    if (evolve_base_state && spherical == 1 && split_projection) {
+    if (evolve_base_state && split_projection) {
 	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
@@ -928,7 +942,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     int proj_type;
-    
+
     // Project the new velocity field
     if (is_initIter) {
 
@@ -964,8 +978,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
 	    // compute peosbar = Avg(peos_new)
             Average(delta_p_term,peosbar,0);
-	    
-	    // no need to compute peosbar, p0_minus_peosbar since make_w0 is not called
+
+	    // no need to compute p0_minus_peosbar since make_w0 is not called after here
 
 	    // compute peosbar_cart from peosbar
             Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
@@ -982,7 +996,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // wallclock time
     const Real start_total_nodalproj = ParallelDescriptor::second();
-   
+
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
 
@@ -990,13 +1004,13 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && spherical == 1 && split_projection) {
-	// add w0 back to unew
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
-	}
-	AverageDown(unew,0,AMREX_SPACEDIM);
-	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    if (evolve_base_state && split_projection) {
+    	// add w0 back to unew
+    	for (int lev = 0; lev <= finest_level; ++lev) {
+    	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
+    	}
+    	AverageDown(unew,0,AMREX_SPACEDIM);
+    	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
     }
 
     for(int i=0; i<beta0_nm1.size(); ++i) {
@@ -1019,5 +1033,5 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         Print() << "Time to solve nodal proj : " << end_total_nodalproj << '\n';
         Print() << "Time to solve reactions  : " << end_total_react << '\n';
     }
-    
+
 }

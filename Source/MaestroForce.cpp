@@ -147,9 +147,10 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 	// average fine data onto coarser cells
 	AverageDown(vel_force,0,AMREX_SPACEDIM);
 
-	// note - we need to reconsider the bcs type here
-	// it matches fortran MAESTRO but is that correct?
-	FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    // note - we need to reconsider the bcs type here
+    // it matches fortran MAESTRO but is that correct?
+    FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0,
+              bcs_u, 1);
 
 }
 
@@ -339,8 +340,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 			if (spherical == 1) {
 				const Real* dx = geom[lev].CellSize();
 #if (AMREX_SPACEDIM == 3)
-
-		// if use_exact_base_state, psi is set to dpdt in advance subroutine
+		// if use_exact_base_state or average_base_state,
+		// psi is set to dpdt in advance subroutine
 		mkrhohforce_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				 scal_force_mf[mfi].dataPtr(RhoH),
 				 ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
@@ -359,10 +360,11 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 #else
 				Abort("MakeRhoHForce: Spherical is not valid for DIM < 3");
 #endif
-			} else {
-				mkrhohforce(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				            scal_force_mf[mfi].dataPtr(RhoH),
-				            ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
+            } else {
+                // if average_base_state, psi is set to dpdt in advance subroutine
+                mkrhohforce(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                            scal_force_mf[mfi].dataPtr(RhoH),
+                            ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
 #if (AMREX_SPACEDIM == 1)
 				            BL_TO_FORTRAN_3D(umac_mf[mfi]),
 #elif (AMREX_SPACEDIM == 2)

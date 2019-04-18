@@ -28,8 +28,7 @@ Maestro::Init ()
 			// Need to fill normal vector to compute velrc in plotfile
 			if (spherical) { MakeNormal(); }
 
-			Print() << "\nWriting plotfile plt_InitData after InitData" << std::endl;
-
+			Print() << "\nWriting plotfile "<< plot_base_name << "InitData after InitData" << std::endl;
 			WritePlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
 		} else if (small_plot_int > 0) {
@@ -37,7 +36,7 @@ Maestro::Init ()
 			// Need to fill normal vector to compute velrc in plotfile
 			if (spherical) { MakeNormal(); }
 
-			Print() << "\nWriting small plotfile smallplt_InitData after InitData" << std::endl;
+			Print() << "\nWriting small plotfile "<< small_plot_base_name << "InitData after InitData" << std::endl;
 			WriteSmallPlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
 		}
@@ -129,10 +128,13 @@ Maestro::Init ()
 			InitProj();
 
 			if (plot_int > 0) {
-				Print() << "\nWriting plotfile plt_after_InitProj after InitProj" << std::endl;
+
+				Print() << "\nWriting plotfile " << plot_base_name << "after_InitProj after InitProj" << std::endl;
 				WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+
 			} else if (small_plot_int > 0) {
-				Print() << "\nWriting small plotfile smallplt_after_InitProj after InitProj" << std::endl;
+                
+				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_InitProj after InitProj" << std::endl;
 				WriteSmallPlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
 		}
@@ -148,10 +150,10 @@ Maestro::Init ()
 			}
 
 			if (plot_int > 0) {
-				Print() << "\nWriting plotfile plt_after_DivuIter after final DivuIter" << std::endl;
+				Print() << "\nWriting plotfile " << plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
 				WritePlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			} else if (small_plot_int > 0) {
-				Print() << "\nWriting small plotfile smallplt_after_DivuIter after final DivuIter" << std::endl;
+				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
 				WriteSmallPlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}
 		}
@@ -233,7 +235,7 @@ Maestro::InitData ()
 	AverageDown(sold,0,Nscal);
 	FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
 	AverageDown(uold,0,AMREX_SPACEDIM);
-	FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u);
+	FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u,1);
 
 	// free memory in s0_init and p0_init by swapping it
 	// with an empty vector that will go out of scope
@@ -553,7 +555,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 			make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
 			        rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
 			        p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-			        p0_minus_peosbar.dataPtr(), psi.dataPtr(), etarho_ec.dataPtr(),
+			        p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
 			        etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
 			        r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
 		}
@@ -604,7 +606,7 @@ void Maestro::InitIter ()
 
         // wallclock time
         Real start_total = ParallelDescriptor::second();
-                
+
 	// advance the solution by dt
 	if (use_exact_base_state) {
 		AdvanceTimeStepIrreg(true);
@@ -617,7 +619,7 @@ void Maestro::InitIter ()
         // wallclock time
         Real end_total = ParallelDescriptor::second() - start_total;
         ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
-    
+
         Print() << "Time to advance time step: " << end_total << '\n';
 
 	// copy pi from snew to sold

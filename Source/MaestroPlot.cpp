@@ -2,6 +2,7 @@
 #include <Maestro.H>
 #include <MaestroPlot.H>
 #include <AMReX_buildInfo.H>
+#include <iterator>     // std::istream_iterator
 
 using namespace amrex;
 
@@ -312,7 +313,7 @@ Maestro::PlotFileMF (const int nPlot,
 
 	if (plot_eta) {
 		// eta_rho
-		Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0);
+		Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0,1);
 		for (int i = 0; i <= finest_level; ++i) {
 			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
 		}
@@ -462,7 +463,7 @@ Maestro::PlotFileMF (const int nPlot,
 
 		if (evolve_base_state == 1) {
 			MakeW0mac(w0mac);
-			Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
+			Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,1);
 		}
 
 		// Mach number
@@ -525,7 +526,7 @@ Maestro::PlotFileMF (const int nPlot,
 	}
 
 	// w0
-	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
+	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0,1);
 	for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
 	}
@@ -857,49 +858,71 @@ Maestro::PlotFileVarNames (int * nPlot) const
 Vector<std::string>
 Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::SmallPlotFileVarNames()",SmallPlotFileVarNames);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::SmallPlotFileVarNames()",SmallPlotFileVarNames);
 
-	Vector<std::string> names(*nPlot);
+    Vector<std::string> names(*nPlot);
 
-	ParmParse pp("maestro");
-	std::string nm;
+    ParmParse pp("maestro");
 
-	int nPltVars = pp.countval("small_plot_vars");
+    int nPltVars = pp.countval("small_plot_vars");
 
-	int cnt = 0;
+    if (nPltVars > 0) { // small_plot_vars defined in inputs file
 
-	for (int i = 0; i < nPltVars; i++)
-	{
-		pp.get("small_plot_vars", nm, i);
+        std::string nm;
 
-		if (nm == "ALL")
-			return varnames;
-		else if (nm == "NONE") {
-			names.clear();
-			return names;
-		} else {
-			// test to see if it's a valid varname by iterating over
-			// varnames
-			auto found_name = false;
-			for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
-				if (nm == *it) {
-					names.push_back(nm);
-					found_name = true;
-					cnt++;
-					break;
-				}
-			}
+        for (int i = 0; i < nPltVars; i++)
+        {
+            pp.get("small_plot_vars", nm, i);
+
+            if (nm == "ALL")
+                return varnames;
+            else if (nm == "NONE") {
+                names.clear();
+                return names;
+            } else {
+                // test to see if it's a valid varname by iterating over
+                // varnames
+                auto found_name = false;
+                for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
+                    if (nm == *it) {
+                        names.push_back(nm);
+                        found_name = true;
+                        break;
+                    }
+                }
+
+                if (!found_name)
+                    Print() << "Small plot file variable " << nm << " is invalid\n";
+            }
+        }
+    } else {
+        // use default value of small_plot_vars which is a string that needs to be split
+        std::stringstream sstream(small_plot_vars);
+        std::string nm;
+
+        while (sstream >> nm) {
+            // test to see if it's a valid varname by iterating over
+            // varnames
+            auto found_name = false;
+            for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
+                if (nm == *it) {
+                    names.push_back(nm);
+                    found_name = true;
+                    break;
+                }
+            }
 
 
             if (!found_name)
                 Print() << "Small plot file variable " << nm << " is invalid\n";
-		}
-	}
+        }
+    }
 
-	*nPlot = cnt;
+    names.shrink_to_fit();
+    *nPlot = names.size();
 
-	return names;
+    return names;
 
 }
 

@@ -1,0 +1,30 @@
+# For a simple laminar flame setup we define the fuel and ash state.  The
+# fuel parameters will be used to define the inflow boundary condition.
+# the fuel and ash will be in pressure equilibrium, so the ash density
+# will be found via the EOS.  The ash composition will be set by simply
+# turning all the fuel into ash.
+
+dens_fuel               real                 1.d8
+temp_fuel               real                 1.d8
+xc12_fuel               real                 0.5d0
+vel_fuel                real                 1.d6
+
+temp_ash                real                 3.d9
+
+# fraction of the domain height to put the fuel/ash interface
+interface_pos_frac      real                 0.5
+
+# fraction of the domain height to set the smooothing length for
+# the interface between the fuel and ash
+smooth_len_frac         real                 0.025
+
+# minimum X(C12) that should trigger refinement
+XC12_ref_threshold      real                 1.d-3
+
+# do the burning only once for each vertical coordinate
+do_average_burn         logical              .false.
+
+# acceptable relative error for a cell compared to the average
+# at that vertical coord if do_average_burn = T (should be smaller
+# than the EOS tolerance).
+transverse_tol          real                 1.d-7

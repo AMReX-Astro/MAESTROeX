@@ -178,65 +178,65 @@ Maestro::Setup ()
     diagfile2_data.shrink_to_fit();
     diagfile3_data.shrink_to_fit();
 
-	init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
-	                         r_cc_loc.dataPtr(),
-	                         r_edge_loc.dataPtr(),
-	                         geom[max_level].CellSize(),
-	                         &nr_irreg);
+    init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
+			     r_cc_loc.dataPtr(),
+			     r_edge_loc.dataPtr(),
+			     geom[max_level].CellSize(),
+			     &nr_irreg);
 
-	if (use_exact_base_state) average_base_state = 1;
+    if (use_exact_base_state) average_base_state = 1;
 
-	// No valid BoxArray and DistributionMapping have been defined.
-	// But the arrays for them have been resized.
+    // No valid BoxArray and DistributionMapping have been defined.
+    // But the arrays for them have been resized.
 
-	istep = 0;
+    istep = 0;
 
-	t_new = 1.e99;
-	t_old = 0.0;
+    t_new = 1.e99;
+    t_old = 0.0;
 
-	// set this to a large number so change_max doesn't affect the first time step
-	dt = 1.e100;
-	dtold = 1.e100;
+    // set this to a large number so change_max doesn't affect the first time step
+    dt = 1.e100;
+    dtold = 1.e100;
 
-	sold.resize(max_level+1);
-	snew.resize(max_level+1);
-	uold.resize(max_level+1);
-	unew.resize(max_level+1);
-	S_cc_old.resize(max_level+1);
-	S_cc_new.resize(max_level+1);
-	gpi.resize(max_level+1);
-	dSdt.resize(max_level+1);
-	pi.resize(max_level+1);
-	rhcc_for_nodalproj.resize(max_level+1);
-	normal.resize(max_level+1);
-	cell_cc_to_r.resize(max_level+1);
+    sold              .resize(max_level+1);
+    snew              .resize(max_level+1);
+    uold              .resize(max_level+1);
+    unew              .resize(max_level+1);
+    S_cc_old          .resize(max_level+1);
+    S_cc_new          .resize(max_level+1);
+    gpi               .resize(max_level+1);
+    dSdt              .resize(max_level+1);
+    pi                .resize(max_level+1);
+    rhcc_for_nodalproj.resize(max_level+1);
+    normal            .resize(max_level+1);
+    cell_cc_to_r      .resize(max_level+1);
 
-	// stores fluxes at coarse-fine interface for synchronization
-	// this will be sized "max_level+2"
-	// NOTE: the flux register associated with flux_reg[lev] is associated
-	// with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-	// therefore flux_reg[0] is never actually used in the reflux operation
-	flux_reg_s.resize(max_level+2);
+    // stores fluxes at coarse-fine interface for synchronization
+    // this will be sized "max_level+2"
+    // NOTE: the flux register associated with flux_reg[lev] is associated
+    // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
+    // therefore flux_reg[0] is never actually used in the reflux operation
+    flux_reg_s.resize(max_level+2);
 
-	// number of ghost cells needed for hyperbolic step
-	if (ppm_type == 2 || bds_type == 1) {
-		ng_adv = 4;
-	}
-	else {
-		ng_adv = 3;
-	}
+    // number of ghost cells needed for hyperbolic step
+    if (ppm_type == 2 || bds_type == 1) {
+        ng_adv = 4;
+    }
+    else {
+        ng_adv = 3;
+    }
 
-	std::fill(tag_array.begin(), tag_array.end(), 0);
+    std::fill(tag_array.begin(), tag_array.end(), 0);
 
-	// if do_smallscale check other parameters for consistency
+    // if do_smallscale check other parameters for consistency
 
-	if (do_smallscale && (beta0_type != 3 || evolve_base_state)) {
-		std::cerr << "Error: do_smallscale = T requires beta0_type = 3 and evolve_base_state = F" << std::endl;
-		std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
-		std::cerr << "    beta0_type = " << beta0_type << std::endl;
-		std::cerr << "    evolve_base_state = " << evolve_base_state << std::endl;
-		Error();
-	}
+    if (do_smallscale && (beta0_type != 3 || evolve_base_state)) {
+      std::cerr << "Error: do_smallscale = T requires beta0_type = 3 and evolve_base_state = F" << std::endl;
+      std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
+      std::cerr << "    beta0_type = " << beta0_type << std::endl;
+      std::cerr << "    evolve_base_state = " << evolve_base_state << std::endl;
+      Error();
+    }
 
 }
 
