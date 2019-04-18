@@ -1,0 +1,50 @@
+&PROBIN
+
+ use_eos_coulomb = T
+ 
+/
+
+
+&params
+
+ nx = 5120
+ dens_base = 5.5d9
+ temp_base = 6.0d8
+
+ dens_conv_zone = -1.0
+ M_conv_zone = 1.0d0
+
+ low_density_cutoff = 5.d-2
+ temp_fluff = 1.8d7
+
+ fluff_type = "continuous"
+
+ test_hse_convergence = T
+ TOL = 3.d-10
+ MAX_ITER = 10000000
+ dtol_fac = 1.0d-6
+
+ xmin = 0.0
+ xmax = 5.12d8
+
+! in/out relative to urca threshold density
+! which atm assumes ye = 0.5 throughout
+! O16 0.6 in - 2.5e-4, 0.5 out - 1e-4
+! C12 0.4 in - 2.5e-4, 0.5 out - 1e-4
+! Ne23 5e-4 in, 0 out
+! Na23 0    in, 2e-4 out
+
+ c12_in   = 0.39975d0
+ o16_in   = 0.59975d0
+ ne23_in  = 5.00000d-4
+ na23_in  = 0.00000d0
+
+! Parameters controlling the species gradients near the urca shell
+ urca_shell_type  = "equilibrium"
+ na_ne_23 = 5.00000d-4
+
+ prefix = "WD_urca_nuc_M-1.0_rc5.5e9_Tc6.0e8_speceq"
+
+/
+
+  
