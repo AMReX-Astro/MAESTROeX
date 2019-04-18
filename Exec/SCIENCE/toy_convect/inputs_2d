@@ -77,7 +77,7 @@ maestro.plot_base_name  = toy_convect_    # root name of plot file
 maestro.plot_int   = -1      # number of timesteps between plot files
 maestro.plot_deltat = 100.e0
 maestro.small_plot_base_name = smalltoy_convect_
-maestro.small_deltat = 1.e0
+maestro.small_plot_deltat = 5.e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
