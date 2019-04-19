@@ -1,0 +1,51 @@
+flame/
+
+   A combustion-mode problem where we model a thermonuclear flame in a
+   small domain.  This enforces the low Mach combustion constraint
+   div{U} = S.  Hot ash and cool fuel are put into contact and a flame
+   will ignite and propagate across the grid.  Inflow boundary
+   conditions are used to allow for an inflow velocity to be set to
+   keep the laminar flame stationary.
+
+   An old/react_state.f90 exists in this problem averages the state
+   laterally and calls the burner only on this 1-d average state.
+   Since the flame is (should be) laterially invariant, this is an
+   optimization to speed things up.
+
+   Currently this problem has issues with high densities (> 5.e7
+   g/cc).  Reducing the CFL number (to 0.1) helps.  Experiments with
+   the SNe code show that SDC can overcome these problems.
+
+
+sub_chandra/
+
+   Surpise! We're modelling convection.  This time in 3D spherical
+   in the helium shell on the surface of a sub-Chandrasekhar mass
+   carbon/oxygen white dwarf.  Such systems can potentially yield
+   a variety of explosive outcomes.  This setup is the basis for
+   Zingale et al. 2013 (ApJ, 764, 97) and
+   Jacobs et al. 2015 (ApJ, submitted)
+
+
+toy_convect/
+
+   A nova-like problem for studying convection.  This problem has seen
+   extensive use in understanding which prediction types are the best
+   when we have sharp species gradients.  See Mike Z or Ryan for
+   details.
+
+
+wdconvect/
+
+   Model convection leading up to ignition in the Chandraseskhar-mass
+   SNe Ia progenitor model.  This setup was the basis for Zingale et
+   al. 2009 (ApJ, 704, 196), Zingale et al. 2011 (ApJ, 740, 8), and
+   Nonaka et al. 2012 (ApJ, 745, 73).
+
+
+xrb_mixed/
+
+   Model convection in a H/He layer on a neutron star -- the early
+   stages of a type I X-ray burst.  This setup was the basis for
+   Malone et al. 2014 (ApJ, 788, 115) and Zingale et al. 2015 (ApJ,
+   807, 60).
