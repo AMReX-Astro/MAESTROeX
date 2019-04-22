@@ -179,7 +179,7 @@ Maestro::Setup ()
 			     r_edge_loc.dataPtr(),
 			     geom[max_level].CellSize(),
 			     &nr_irreg);
-    
+
     if (use_exact_base_state) average_base_state = 1;
 
     // No valid BoxArray and DistributionMapping have been defined.
@@ -223,6 +223,17 @@ Maestro::Setup ()
     }
 
     std::fill(tag_array.begin(), tag_array.end(), 0);
+
+    // if do_smallscale check other parameters for consistency
+
+    if (do_smallscale && (beta0_type != 3 || evolve_base_state)) {
+      std::cerr << "Error: do_smallscale = T requires beta0_type = 3 and evolve_base_state = F" << std::endl;
+      std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
+      std::cerr << "    beta0_type = " << beta0_type << std::endl;
+      std::cerr << "    evolve_base_state = " << evolve_base_state << std::endl;
+      Error();
+    }
+
 }
 
 // read in some parameters from inputs file

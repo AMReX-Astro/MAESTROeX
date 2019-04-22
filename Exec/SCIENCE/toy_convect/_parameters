@@ -1,0 +1,21 @@
+# Velocity field initialization
+apply_vel_field                     logical            .false.
+
+# Initial velocity field vortex scale
+velpert_scale                       real               1.0d2
+
+# Initial velocity field vortex amplitude
+velpert_amplitude                   real               1.0d2
+
+# Initial velocity field vortex height location
+velpert_height_loc                  real               6.5d3
+
+# number of vortices
+num_vortices                        integer            1
+
+# add a particle randomly if the temperature is above this threshold
+particle_temp_threshold             real               4.d7
+
+# probability of initializing a particle if it meets the temperature
+# threshold
+particle_probability                real               0.1

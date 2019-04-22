@@ -324,7 +324,7 @@ def write_meth_module(plist, meth_template):
 #            mo.write("  !$acc create(")
 #
 #            for n, p in enumerate(params):
-#                if p.f90_dtype == "string": 
+#                if p.f90_dtype == "string":
 #                    print("warning: string parameter {} will not be available on the GPU".format(p.name),
 #                          file=sys.stderr)
 #                    continue
@@ -357,7 +357,7 @@ def write_meth_module(plist, meth_template):
                     mo.write(p.get_query_string("F90"))
 
                 mo.write('    call amrex_parmparse_destroy(pp)\n')
-                
+
                 mo.write("\n\n")
 
             # Now do the OpenACC device updates
@@ -386,7 +386,7 @@ def write_meth_module(plist, meth_template):
                 mo.write("    if (allocated({})) then\n".format(p.f90_name))
                 mo.write("        deallocate({})\n".format(p.f90_name))
                 mo.write("    end if\n")
-                
+
             mo.write("\n\n")
 
 
@@ -441,7 +441,7 @@ def parse_params(infile, meth_template):
 
         # this splits the line into separate fields.  A field is a
         # single word or a pair in parentheses like "(a, b)"
-        fields = re.findall(r'[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
+        fields = re.findall(r'".+"|[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
 
         name = fields[0]
         if name[0] == "(":

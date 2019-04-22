@@ -51,7 +51,7 @@ contains
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     if (amrex_spacedim .ne. 2 .and. apply_vel_field) then
-       call amrex_error("apply_vel_field only supposed for 2d")
+       call amrex_error("apply_vel_field only supported for 2d")
     end if
 
     if (apply_vel_field) then
