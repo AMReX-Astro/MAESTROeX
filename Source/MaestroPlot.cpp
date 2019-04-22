@@ -212,6 +212,13 @@ Maestro::PlotFileMF (const int nPlot,
 	}
 	++dest_comp;
 
+	// momentum
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		MultiFab::Multiply(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
+	}
+	++dest_comp;
+
 	// vorticity
 	MakeVorticity(u_in, tempmf);
 	for (int i = 0; i <= finest_level; ++i) {
@@ -681,14 +688,14 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	BL_PROFILE_VAR("Maestro::PlotFileVarNames()",PlotFileVarNames);
 
 	// velocities (AMREX_SPACEDIM)
-	// magvel
+	// magvel, momentum
 	// rho, rhoh, h, rhoX, tfromp, tfromh, deltap, deltaT Pi (Nscal+4 -- the extra 4 are h, tfromh, deltap and deltaT)
 	// rho' and rhoh' and t' (3)
 	// rho0, rhoh0, h0, p0, w0 (4+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
 	// MachNumber, deltagamma, divw0, S
 	// thermal, conductivity
-	(*nPlot) = 2*AMREX_SPACEDIM + Nscal + 21;
+	(*nPlot) = 2*AMREX_SPACEDIM + Nscal + 22;
 
 	if (plot_spec) (*nPlot) += NumSpec + 1; // X + 1 (abar)
 	if (plot_spec || plot_omegadot) (*nPlot) += NumSpec; // omegadot
@@ -715,6 +722,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	}
 
 	names[cnt++] = "magvel";
+        names[cnt++] = "momentum";
 	names[cnt++] = "vort";
 
 	// density and enthalpy
