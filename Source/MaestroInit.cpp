@@ -128,12 +128,10 @@ Maestro::Init ()
 			InitProj();
 
 			if (plot_int > 0 || plot_deltat > 0) {
-
 				Print() << "\nWriting plotfile " << plot_base_name << "after_InitProj after InitProj" << std::endl;
 				WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
 			} else if (small_plot_int > 0 || small_plot_deltat > 0) {
-
 				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_InitProj after InitProj" << std::endl;
 				WriteSmallPlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 			}

@@ -17,7 +17,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<Real>& p0,
                     const Vector<Real>& gamma1bar,
                     Vector<Real>& delta_gamma1_termbar,
-                    const Vector<Real>& psi)
+                    const Vector<Real>& psi_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()",Make_S_cc);
@@ -118,7 +118,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                                                              ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                                                              BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
                                                              BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
-                                                             gamma1bar.dataPtr(), psi.dataPtr(),
+                                                             gamma1bar.dataPtr(), psi_in.dataPtr(),
                                                              p0.dataPtr(), dx,
                                                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                                                              BL_TO_FORTRAN_3D(cc_to_r[mfi]));
@@ -127,7 +127,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                                                         ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                                                         BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
                                                         BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
-                                                        gamma1bar.dataPtr(), psi.dataPtr(), p0.dataPtr());
+                                                        gamma1bar.dataPtr(), psi_in.dataPtr(), p0.dataPtr());
 
                 }
             }
