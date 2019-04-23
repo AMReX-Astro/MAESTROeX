@@ -8,7 +8,7 @@ maestro.drdxfac = 5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0e0   0.0e0  0.0e0
-geometry.prob_hi     =   5.e8   5.e8   5.e8
+geometry.prob_hi     =  5.e9    5.e9   5.e9
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -29,7 +29,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 amr.n_cell             = 64 64 64
 #amr.n_cell = 128 128 128
 #amr.n_cell = 384 384 384
-amr.max_grid_size      = 64
+amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
@@ -71,9 +71,10 @@ maestro.use_exact_base_state = false
 
 # PLOTFILES
 maestro.plot_base_name  = rot1e3_    # root name of plot file
-maestro.plot_int   = 50      # number of timesteps between plot files
+maestro.plot_int   = -1      # number of timesteps between plot files
 maestro.plot_deltat = 100.0e0
-amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
+maestro.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
+maestro.small_plot_int = 1
 
 # CHECKPOINT
 maestro.check_base_name = chk
@@ -131,11 +132,10 @@ maestro.rotation_radius = 2.e8
   ! in the namelist.
 
   use_eos_coulomb = T
-
   rtol_spec = 1.e-6
   rtol_enuc = 1.e-5
   rtol_temp = 1.e-5
 
-  !retry_burn = T
+  retry_burn = T
 
 /

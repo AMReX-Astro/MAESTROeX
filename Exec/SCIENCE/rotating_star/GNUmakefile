@@ -22,6 +22,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := aprox21
+INTEGRATOR_DIR   := BS
 
 Bpack   := ./Make.package
 Blocs   := .

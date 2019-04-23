@@ -79,6 +79,16 @@ maestro.dpdt_factor = 0.0e0
 
 maestro.use_tfromp = true
 
+# use average down instead of refluxing at C-F interfaces
+# per Andy's recommendation to avoid issues
+maestro.do_reflux = 0
+
+# trace forces to the interfaces per Mike's recommendation
+maestro.ppm_trace_forces = 1
+
+# Andy and Mike recommend predicting rho and X separately
+maestro.species_pred_type = 3
+
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
 maestro.eps_init_proj_sph  = 1.e-10
