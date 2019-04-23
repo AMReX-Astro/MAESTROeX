@@ -40,7 +40,7 @@ static bool        plot_Hext;
 static bool        plot_Hnuc;
 static bool        plot_eta;
 static bool        plot_trac;
-static bool        plot_base;
+static bool        plot_base_state;
 static bool        plot_gpi;
 static bool        plot_cs;
 static std::string plot_base_name;

@@ -40,7 +40,7 @@ pp.query("plot_Hext", plot_Hext);
 pp.query("plot_Hnuc", plot_Hnuc);
 pp.query("plot_eta", plot_eta);
 pp.query("plot_trac", plot_trac);
-pp.query("plot_base", plot_base);
+pp.query("plot_base_state", plot_base_state);
 pp.query("plot_gpi", plot_gpi);
 pp.query("plot_cs", plot_cs);
 pp.query("plot_base_name", plot_base_name);
