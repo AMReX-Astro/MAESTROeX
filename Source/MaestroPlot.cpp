@@ -429,12 +429,13 @@ Maestro::PlotFileMF (const int nPlot,
 	}
 	++dest_comp;
 
-	// rho0, rhoh0, h0 and p0
-	for (int i = 0; i <= finest_level; ++i) {
+        if (plot_base_state) {
+            // rho0, rhoh0, h0 and p0
+            for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy( rho0_cart[i],0,dest_comp,1);
 		plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+1,1);
 		plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+2,1);
-
+                
 		// we have to use protected_divide here to guard against division by zero
 		// in the case that there are zeros rho0
 		MultiFab& plot_mf_data_mf = *plot_mf_data[i];
@@ -442,12 +443,13 @@ Maestro::PlotFileMF (const int nPlot,
 #pragma omp parallel
 #endif
 		for ( MFIter mfi(plot_mf_data_mf, true); mfi.isValid(); ++mfi ) {
-			plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
+                    plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
 		}
-
+                
 		plot_mf_data[i]->copy(p0_cart[i],0,dest_comp+3,1);
-	}
-	dest_comp += 4;
+            }
+            dest_comp += 4;
+        }
 
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 	Vector<MultiFab> w0r_cart(finest_level+1);
@@ -560,19 +562,21 @@ Maestro::PlotFileMF (const int nPlot,
 		++dest_comp;
 	}
 
-	// w0
-	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0,1);
-	for (int i = 0; i <= finest_level; ++i) {
+        if (plot_base_state) {
+            // w0
+            Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0,1);
+            for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,AMREX_SPACEDIM);
-	}
-	dest_comp += AMREX_SPACEDIM;
+            }
+            dest_comp += AMREX_SPACEDIM;
 
-	// divw0
-	MakeDivw0(w0mac, tempmf);
-	for (int i = 0; i <= finest_level; ++i) {
+            // divw0
+            MakeDivw0(w0mac, tempmf);
+            for (int i = 0; i <= finest_level; ++i) {
 		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
-	}
-	dest_comp++;
+            }
+            dest_comp++;
+        }
 
 	// thermal
 	Vector<MultiFab> Tcoeff            (finest_level+1);
@@ -718,12 +722,11 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	// magvel, momentum
 	// rho, rhoh, h, rhoX, tfromp, tfromh, deltap, deltaT Pi (Nscal+4 -- the extra 4 are h, tfromh, deltap and deltaT)
 	// rho' and rhoh' and t' (3)
-	// rho0, rhoh0, h0, p0, w0 (4+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
-	// MachNumber, deltagamma, entropy, entropypert, divw0, S
+	// MachNumber, deltagamma, entropy, entropypert, S
 	// thermal, conductivity
 
-	(*nPlot) = 2*AMREX_SPACEDIM + Nscal + 24;
+	(*nPlot) = AMREX_SPACEDIM + Nscal + 19;
 
 	if (plot_spec) (*nPlot) += NumSpec + 1; // X + 1 (abar)
 	if (plot_spec || plot_omegadot) (*nPlot) += NumSpec; // omegadot
@@ -732,6 +735,8 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	if (plot_Hnuc) (*nPlot)++;
 	if (plot_eta) (*nPlot)++;
 	if (plot_gpi) (*nPlot) += AMREX_SPACEDIM;
+	// rho0, rhoh0, h0, p0, w0, divw0 (5+AMREX_SPACEDIM)
+        if (plot_base_state) (*nPlot) += AMREX_SPACEDIM + 5;
 	if (plot_cs) (*nPlot)++;
 	if (plot_ad_excess) (*nPlot)++;
 	if (plot_pidivu) (*nPlot)++;
@@ -851,11 +856,12 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	names[cnt++] = "rhopert";
 	names[cnt++] = "rhohpert";
 	names[cnt++] = "tpert";
-
-	names[cnt++] = "rho0";
-	names[cnt++] = "rhoh0";
-	names[cnt++] = "h0";
-	names[cnt++] = "p0";
+        if (plot_base_state) {
+            names[cnt++] = "rho0";
+            names[cnt++] = "rhoh0";
+            names[cnt++] = "h0";
+            names[cnt++] = "p0";
+        }
 	names[cnt++] = "MachNumber";
 	names[cnt++] = "deltagamma";
 	names[cnt++] = "entropy";
@@ -867,14 +873,15 @@ Maestro::PlotFileVarNames (int * nPlot) const
 
 	if (plot_cs) names[cnt++] = "soundspeed";
 
-	// add w0
-	for (int i=0; i<AMREX_SPACEDIM; ++i) {
+        if (plot_base_state) {
+            // w0 and divw0
+            for (int i=0; i<AMREX_SPACEDIM; ++i) {
 		std::string x = "w0";
 		x += (120+i);
 		names[cnt++] = x;
-	}
-
-	names[cnt++] = "divw0";
+            }
+            names[cnt++] = "divw0";
+        }
 
 	names[cnt++] = "thermal";
 	names[cnt++] = "conductivity";
