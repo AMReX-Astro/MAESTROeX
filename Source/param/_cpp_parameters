@@ -144,7 +144,6 @@ chk_int                             int            0
 
 # Turn on storing of enthalpy-based quantities in the plotfile
 # when we are running with {\tt use\_tfromp}
-# NOT IMPLEMENTED YET
 plot_h_with_use_tfromp              bool            true
 
 # plot species and omegadot in plotfile
@@ -163,11 +162,10 @@ plot_Hnuc                           bool            true
 plot_eta                            bool            false
 
 # plot tracers in plotfile
-# NOT IMPLEMENTED YET
 plot_trac                           bool            false
 
 # plot w0\_x, w0\_y, w0\_z, divw0, rho0, rhoh0, h0, and p0 in plotfile
-plot_base_state                     bool            true
+plot_base                           bool            false
 
 # plot pi and grad(pi)
 plot_gpi                             bool            true
