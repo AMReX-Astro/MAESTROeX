@@ -135,7 +135,8 @@ namespace: ``maestro``
 | ``chk_int``                            | Number of timesteps between writing a checkpoint file   | 0             |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``plot_h_with_use_tfromp``             | Turn on storing of enthalpy-based quantities in the     | true          |
-|                                        | plotfile when we are running with {\tt use\_tfromp}     |               |
+|                                        | plotfile when we are running with {\tt use\_tfromp} NOT |               |
+|                                        | IMPLEMENTED YET                                         |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``plot_spec``                          | plot species and omegadot in plotfile                   | true          |
 +----------------------------------------+---------------------------------------------------------+---------------+
@@ -147,9 +148,9 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``plot_eta``                           | plot $\etarho$ in plotfile                              | false         |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``plot_trac``                          | plot tracers in plotfile                                | false         |
+| ``plot_trac``                          | plot tracers in plotfile NOT IMPLEMENTED YET            | false         |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``plot_base``                          | plot w0\_x, w0\_y, w0\_z, divw0, rho0, rhoh0, h0, and   | false         |
+| ``plot_base_state``                    | plot w0\_x, w0\_y, w0\_z, divw0, rho0, rhoh0, h0, and   | true          |
 |                                        | p0 in plotfile                                          |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``plot_gpi``                           | plot pi and grad(pi)                                    | true          |
