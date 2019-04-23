@@ -1,9 +1,10 @@
 module tagging_module
 
   use amrex_error_module
-  use meth_params_module, only: temp_comp, rho_comp, nscal
-  use probin_module, only: tag_density_3
-  use base_state_geometry_module, only: nr_fine, max_radial_level
+  use amrex_constants_module, only: HALF
+  use meth_params_module, only: temp_comp, rho_comp, nscal, prob_lo
+  use probin_module, only: tag_density_1, tag_radius
+  use base_state_geometry_module, only: nr_fine, max_radial_level, center
 
   implicit none
 
@@ -48,13 +49,26 @@ contains
 
     ! local
     integer          :: i, j, k
+    double precision :: xloc(3), rloc
 
-    ! Tag on regions of high temperature
+    ! Tag on regions of high density
     do k = lo(3), hi(3)
+        xloc(3) = prob_lo(3) + (dble(k)+HALF)*dx(3)
        do j = lo(2), hi(2)
+           xloc(2) = prob_lo(2) + (dble(j)+HALF)*dx(2)
           do i = lo(1), hi(1)
-             if (state(i,j,k,rho_comp) .ge. tag_density_3) then
+              xloc(1) = prob_lo(1) + (dble(i)+HALF)*dx(1) 
+
+              rloc = sqrt(sum(xloc*xloc))
+
+             if (state(i,j,k,rho_comp) .ge. tag_density_1) then
                 tag(i,j,k) = set
+             endif
+
+             if (rloc .le. tag_radius) then
+
+                 ! write(*,*) "tag_radius = ", rloc
+                 tag(i,j,k) = set
              endif
           enddo
        enddo

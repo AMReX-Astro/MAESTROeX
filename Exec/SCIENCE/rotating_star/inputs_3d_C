@@ -8,7 +8,7 @@ maestro.drdxfac = 5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0e0   0.0e0  0.0e0
-geometry.prob_hi     =  5.e9    5.e9   5.e9
+geometry.prob_hi     =  1.e10    1.e10   1.e10
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -20,17 +20,18 @@ geometry.is_periodic =  0 0 0
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
+amr.v                  = 1
 
 # DEBUG FOR NAN
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
 #amr.n_cell             = 160 160 160
-amr.n_cell             = 64 64 64
-#amr.n_cell = 128 128 128
+#amr.n_cell             = 96 96 96
+amr.n_cell = 128 128 128
 #amr.n_cell = 384 384 384
 amr.max_grid_size      = 32
-amr.max_level          = 0       # maximum level number allowed
+amr.max_level          = 2       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
@@ -38,7 +39,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.octant = true
 
 # TIME STEPPING
-maestro.max_step  = 200000
+maestro.max_step  = 5
 maestro.stop_time = 300000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -73,12 +74,12 @@ maestro.use_exact_base_state = false
 maestro.plot_base_name  = rot1e3_    # root name of plot file
 maestro.plot_int   = -1      # number of timesteps between plot files
 maestro.plot_deltat = 100.0e0
-maestro.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
+maestro.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity abar
 maestro.small_plot_int = 1
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = 1000
+maestro.chk_int         = -1
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
@@ -104,7 +105,7 @@ maestro.do_burning = true
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
 maestro.rotational_frequency = 1.e-3
-maestro.rotation_radius = 2.e8
+maestro.rotation_radius = 1.e10
 
 &probin
 
@@ -113,12 +114,8 @@ maestro.rotation_radius = 2.e8
   velpert_radius = 2.e7
   velpert_scale = 1.e7
   velpert_steep = 1.e5
-  tag_density_1 = 1.e7
-  tag_density_2 = 1.e8
-  tag_density_3 = 1.e8
-  tag_density_3 = 1.e9
-  particle_temp_cutoff = 6.e8
-  particle_tpert_threshold = 2.e7
+  tag_density_1 = 1.4e9
+  tag_radius = 4.e8
 
   !extern
 
