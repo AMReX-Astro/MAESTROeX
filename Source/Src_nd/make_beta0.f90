@@ -171,13 +171,6 @@ module make_beta0_module
                    beta0(n,r) = HALF*(beta0_edge(n,r) + beta0_edge(n,r+1))
 
                 else ! r >= anelastic_cutoff
-
-                    write(*,*) "n,r = ", n, r, "rho0(r) = ", rho0(n,r), "rho0(r-1) = ", rho0(n,r-1)
-
-                    ! if (rho0(n,r) .eq. 0.d0) then
-                    !     write(*,*) rho0(0,:)
-                    ! endif
-
                    beta0(n,r) = beta0(n,r-1) * (rho0(n,r)/rho0(n,r-1))
                    beta0_edge(n,r+1) = 2.d0*beta0(n,r) - beta0_edge(n,r)
                 endif
