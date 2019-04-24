@@ -82,14 +82,14 @@ Maestro::Regrid ()
     	}
     }
 
-    if (evolve_base_state) {
-        // force rho0 to be the average of rho
-        Average(sold,rho0_old,Rho);
-    } else {
-    	for (int i=0; i<rho0_old.size(); ++i) {
-    	    rho0_old[i] = rho0_temp[i];
-    	}
-    }
+	if (evolve_base_state) {
+		// force rho0 to be the average of rho
+		Average(sold,rho0_old,Rho);
+	} else {
+		for (int i=0; i<rho0_old.size(); ++i) {
+			rho0_old[i] = rho0_temp[i];
+		}
+	}
 
 	// compute cutoff coordinates
 	compute_cutoff_coords(rho0_old.dataPtr());
