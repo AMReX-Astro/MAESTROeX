@@ -53,10 +53,17 @@ Maestro::Regrid ()
 
         }
 
-	// regardless of evolve_base_state, if new grids were
-	// created, we need to initialize tempbar_init there, in
-	// case drive_initial_convection = T
-	regrid_base_state_cc(tempbar_init.dataPtr());
+    	// regardless of evolve_base_state, if new grids were
+    	// created, we need to initialize tempbar_init there, in
+    	// case drive_initial_convection = T
+    	regrid_base_state_cc(tempbar_init.dataPtr());
+    } else {
+        // Here we want to fill in the rho0 array so there is
+        // valid data in any new grid locations that are created
+        // during the regrid.
+        for (int i=0; i<rho0_old.size(); ++i) {
+            rho0_temp[i] = rho0_old[i]; 
+        }
     }
 
     // regrid could add newly refine levels (if finest_level < max_level)
@@ -71,18 +78,18 @@ Maestro::Regrid ()
 
     if (spherical == 1) {
         MakeNormal();
-	if (use_exact_base_state) {
-	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
-	}
+    	if (use_exact_base_state) {
+    	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
+    	}
     }
 
     if (evolve_base_state) {
         // force rho0 to be the average of rho
         Average(sold,rho0_old,Rho);
     } else {
-	for (int i=0; i<rho0_old.size(); ++i) {
-	    rho0_old[i] = rho0_temp[i];
-	}
+    	for (int i=0; i<rho0_old.size(); ++i) {
+    	    rho0_old[i] = rho0_temp[i];
+    	}
     }
 
     // compute cutoff coordinates
