@@ -1057,6 +1057,47 @@ contains
 
   end subroutine make_deltagamma_sphr
 
+  subroutine make_entropy(lev,lo,hi,state,s_lo,s_hi,nc_s,&
+       entropy,d_lo,d_hi) bind(C,name="make_entropy")
+
+    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: d_lo(3), d_hi(3)
+    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent (inout) :: entropy(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+
+    ! Local variables
+    integer :: i, j, k, r
+    integer :: pt_index(3)
+    type (eos_t) :: eos_state
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+
+#if (AMREX_SPACEDIM == 1)
+             r = i
+#elif (AMREX_SPACEDIM == 2)
+             r = j
+#elif (AMREX_SPACEDIM == 3)
+             r = k
+#endif
+
+             eos_state%rho   = state(i,j,k,rho_comp)
+             eos_state%T     = state(i,j,k,temp_comp)
+             eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rt, eos_state, pt_index)
+
+             entropy(i,j,k) = eos_state%s
+          enddo
+       enddo
+    enddo
+
+  end subroutine make_entropy
+
   subroutine make_divw0(lev,lo,hi,w0,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
 
     integer, intent (in) :: lev, lo(3), hi(3)
