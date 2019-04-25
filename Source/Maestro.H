@@ -986,6 +986,9 @@ private:
     // flag for writing plotfiles
     enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
+    /* problem-specific includes */
+    #include <MaestroProblem.H>
+
 };
 
 #endif

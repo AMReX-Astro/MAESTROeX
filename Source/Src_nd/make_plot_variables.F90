@@ -950,7 +950,8 @@ contains
                   vel(i,j,k,3) * normal(i,j,k,3)
 
              do n = 1,3
-                circ_vel(i,j,k) = circ_vel(i,j,k) + (vel(i,j,k,n) - rad_vel(i,j,k) * normal(i,j,k,n))**2
+                circ_vel(i,j,k) = circ_vel(i,j,k) + &
+                    (vel(i,j,k,n) - rad_vel(i,j,k) * normal(i,j,k,n))**2
              enddo
 
              circ_vel(i,j,k) = sqrt(circ_vel(i,j,k))

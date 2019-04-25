@@ -149,5 +149,9 @@ Maestro::Evolve ()
 		std::swap(    beta0_old,    beta0_new);
 		std::swap(gamma1bar_old,gamma1bar_new);
 		std::swap(grav_cell_old,grav_cell_new);
+
+#ifdef DO_PROBLEM_POST_TIMESTEP
+        problem_post_timestep();
+#endif
 	}
 }
