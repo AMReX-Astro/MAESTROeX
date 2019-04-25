@@ -151,7 +151,9 @@ Maestro::Evolve ()
 		std::swap(grav_cell_old,grav_cell_new);
 
 #ifdef DO_PROBLEM_POST_TIMESTEP
-        problem_post_timestep();
+        if (ParallelDescriptor::IOProcessor()) {
+            problem_post_timestep();
+        }
 #endif
 	}
 }

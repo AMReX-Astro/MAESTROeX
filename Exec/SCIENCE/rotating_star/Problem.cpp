@@ -14,19 +14,21 @@ Maestro::problem_post_timestep() {
          (istep == max_step) || (t_old >= stop_time) )
     {
         // wrote a plotfile
-        std::string command = "bash " + script_name + ' ' + t_new + ' ' + istep + ' ' + plot_base_name;
+        std::string plotfilename = plot_base_name;
+        PlotFileName(istep, &plotfilename);
+        std::string command = "bash " + script_name + " " + std::to_string(t_new) + " " + std::to_string(istep) + " " + plotfilename;
 
-        system(command.c_str());
-    }
-
-    if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
+        std::system(command.c_str());
+    } else if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
          (small_plot_deltat > 0 && std::fmod(t_new, small_plot_deltat) < dt) ||
          (istep == max_step)  || (t_old >= stop_time) )
     {
         // wrote a small plotfile
-        std::string command = "bash " + script_name + ' ' + t_new + ' ' + istep + ' ' + small_plot_base_name;
+        std::string plotfilename = small_plot_base_name;
+        PlotFileName(istep, &plotfilename);
+        std::string command = "bash " + script_name + " " + std::to_string(t_new) + " " + std::to_string(istep) + " " + plotfilename;
 
-        system(command.c_str());
+        std::system(command.c_str());
     }
 }
 

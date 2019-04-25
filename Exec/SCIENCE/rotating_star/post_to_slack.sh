@@ -8,9 +8,7 @@
 #   export slack_channel="xxxxx"
 
 # slack details
-source slack_vars
-
-echo $slack_token
+source .slack_vars
 
 webhook_url="https://slack.com/api/files.upload"
 
@@ -22,12 +20,13 @@ plotfile=$3
 plotvar="magvel"
 
 # make plot and store plotname. For some reason yt is segfaulting on me at the end,
-# so I'm just going to redirect that error to null.
-plotname=$(python make_plot.py $plotfile $plotvar 2> :)
+# so I'm just going to redirect that error
+plotname=$(python make_plot.py $plotfile $plotvar 2> tmperr)
+rm -f tmperr
 
 text="Output plotfile \`$plotfile\` at timestep \`n=$istep\`, time \`t=$t_new\`. Plotting variable \`$plotvar\`."
 
-curl -F file=@${plotname} -F "initial_comment=${text}" -F "channels=${slack_channel}" -H "Authorization: Bearer $slack_token" $webhook_url
+curl -s -F file=@${plotname} -F "initial_comment=${text}" -F "channels=${slack_channel}" -H "Authorization: Bearer $slack_token" $webhook_url
 #
 # # delete plotfile
 rm $plotname
