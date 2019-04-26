@@ -1,0 +1,48 @@
+#!/bin/bash
+#PBS -A ast106
+#PBS -N rotstar
+#PBS -j oe
+#PBS -q batch
+#PBS -l walltime=06:00:00,nodes=128
+
+cd $PBS_O_WORKDIR
+
+export OMP_NUM_THREADS=4
+
+module load python_anaconda3
+
+export PATH=$MEMBERWORK/ast106/MAESTROeX/Exec/SCIENCE/rotating_star/yt-conda/bin:$PATH
+
+rm -f Backtrace.*
+
+# set job parameters
+output_location="$MEMBERWORK/ast106/MAESTROeX_output/rotating_star"
+plot_base_name="${output_location}/rot1e3_"
+check_base_name="${output_location}/chk_"
+small_plot_base_name="${output_location}/smallrot1e3_"
+
+# send a message to the 3ER when the job starts 
+source .slack_vars
+webhook_url="https://slack.com/api/chat.postMessage"
+
+text=":zap: Starting job $PBS_JOBID on titan in $PBS_O_WORKDIR"
+json="{\"channel\": \"${slack_channel}\", \"text\": \"${text}\"}"
+curl -X POST -H "Authorization: Bearer $slack_token" -H 'Content-type: application/json' --data "${json}" $webhook_url
+
+aprun -n 512 -S 2 -d 4 -ss -e LD_LIBRARY_PATH="${CONDALIBS}:${LD_LIBRARY_PATH}" ./Maestro3d.gnu.interlagos.MPI.OMP.ex inputs_3d_C maestro.plot_base_name=${plot_base_name} maestro.check_base_name=${check_base_name} maestro.small_plot_base_name=${small_plot_base_name}
+
+# send a message to the 3ER when the job finishes 
+# test if there were any backtrace files
+nbacktrace_files=$(ls -dl Backtrace.* | wc -l)
+
+if [ "$nbacktrace_files" -gt "0" ]; then
+    text="Job ${PBS_JOBID} on titan in ${PBS_O_WORKDIR} exited with an error!\nHere is the backtrace:\n\`\`\`\n$(python convert_backtrace.py $(ls -d1 Backtrace.* | head -1 ))\n\`\`\`"
+else
+    text=":boom: Job ${PBS_JOBID} on titan in ${PBS_O_WORKDIR} has finished!"
+fi
+
+json="{\"channel\": \"${slack_channel}\", \"text\": \"${text}\"}"
+curl -X POST -H "Authorization: Bearer $slack_token" -H 'Content-type: application/json' --data "${json}" $webhook_url
+
+
+
