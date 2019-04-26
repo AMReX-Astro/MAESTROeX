@@ -16,9 +16,12 @@ Maestro::problem_post_timestep() {
         // wrote a plotfile
         std::string plotfilename = plot_base_name;
         PlotFileName(istep, &plotfilename);
-        std::string command = "bash " + script_name + " " + std::to_string(t_new) + " " + std::to_string(istep) + " " + plotfilename;
+        // std::string command = "bash " + script_name + " " + std::to_string(t_new) + " " + std::to_string(istep) + " " + plotfilename + " &";
 
-        std::system(command.c_str());
+        // std::system(command.c_str());
+
+        Print() << "Output file " << plotfilename << " at time " << std::to_string(t_new) << " and step " << std::to_string(istep) << std::endl;
+
     } else if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
          (small_plot_deltat > 0 && std::fmod(t_new, small_plot_deltat) < dt) ||
          (istep == max_step)  || (t_old >= stop_time) )
@@ -26,9 +29,12 @@ Maestro::problem_post_timestep() {
         // wrote a small plotfile
         std::string plotfilename = small_plot_base_name;
         PlotFileName(istep, &plotfilename);
-        std::string command = "bash " + script_name + " " + std::to_string(t_new) + " " + std::to_string(istep) + " " + plotfilename;
 
-        std::system(command.c_str());
+        // std::string command = "bash " + script_name + " " + std::to_string(t_new) + " " + std::to_string(istep) + " " + plotfilename + " &";
+        //
+        // std::system(command.c_str());
+
+        Print() << "Output file " << plotfilename << " at time " << std::to_string(t_new) << " and step " << std::to_string(istep) << std::endl;
     }
 }
 

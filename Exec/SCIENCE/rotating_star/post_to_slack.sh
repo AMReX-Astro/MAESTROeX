@@ -12,6 +12,8 @@ source .slack_vars
 
 webhook_url="https://slack.com/api/files.upload"
 
+export PATH=$MEMBERWORK/ast106/MAESTROeX/Exec/SCIENCE/rotating_star/yt-conda/bin:$PATH
+
 # process script arguments
 t_new=$1
 istep=$2
@@ -26,7 +28,16 @@ rm -f tmperr
 
 text="Output plotfile \`$plotfile\` at timestep \`n=$istep\`, time \`t=$t_new\`. Plotting variable \`$plotvar\`."
 
-curl -s -F file=@${plotname} -F "initial_comment=${text}" -F "channels=${slack_channel}" -H "Authorization: Bearer $slack_token" $webhook_url
-#
-# # delete plotfile
-rm $plotname
+echo "Sending figure $plotname to slack"
+
+if [ -z "$plotname" ]; then
+    webhook_url="https://slack.com/api/chat.postMessage"
+    text="Output plotfile \`$plotfile\` at timestep \`n=$istep\`, time \`t=$t_new\` but there was an error generating plotfile :("
+    json="{\"channel\": \"${slack_channel}\", \"text\": \"${text}\"}"
+    curl -X POST -H "Authorization: Bearer $slack_token" -H 'Content-type: application/json' --data "${json}" $webhook_url
+else
+    curl -F file=@${plotname} -F "initial_comment=${text}" -F "channels=${slack_channel}" -H "Authorization: Bearer $slack_token" $webhook_url
+
+    # delete plotfile
+    rm $plotname
+fi

@@ -6,7 +6,7 @@ def plot_file(filename, var):
 
     ds = yt.load(filename)
     fig = yt.SlicePlot(ds, 'z', var, center=[ds.domain_center[0],ds.domain_center[1],0])
-    plotname = filename.split('/')[-1] + ".png"
+    plotname = filename.split('/')[-1] + "_{}.png".format(var)
 
     print(plotname)
 
