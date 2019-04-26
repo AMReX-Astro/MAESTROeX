@@ -123,6 +123,13 @@ contains
        end do
     end do ! end comp loop
 
+    ! compute the density fluxes by summing the species fluxes
+    
+    ! loop for x-fluxes
+    do i = lo(1), hi(1)+1
+       sfluxx(i,1) = sum(sfluxx(i,startcomp:endcomp))
+    end do
+
   end subroutine make_rhoX_flux_1d
 #endif
 
@@ -228,6 +235,22 @@ contains
                 end if
              endif  ! evolve_base_state
           end do
+       end do
+    end do
+
+    ! compute the density fluxes by summing the species fluxes
+    
+    ! loop for x-fluxes
+    do j = lo(2), hi(2)
+       do i = lo(1), hi(1)+1
+          sfluxx(i,j,1) = sum(sfluxx(i,j,startcomp:endcomp))
+       end do
+    end do
+
+    ! loop for y-fluxes
+    do j = lo(2), hi(2)+1
+       do i = lo(1), hi(1)
+          sfluxy(i,j,1) = sum(sfluxy(i,j,startcomp:endcomp))
        end do
     end do
 
@@ -380,6 +403,35 @@ contains
 
     end do
 
+    ! compute the density fluxes by summing the species fluxes
+    
+    ! loop for x-fluxes
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)+1
+             sfluxx(i,j,k,1) = sum(sfluxx(i,j,k,startcomp:endcomp))
+          end do
+       end do
+    end do
+
+    ! loop for y-fluxes
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)+1
+          do i = lo(1), hi(1)
+             sfluxy(i,j,k,1) = sum(sfluxy(i,j,k,startcomp:endcomp))
+          end do
+       end do
+    end do
+
+    ! loop for z-fluxes
+    do k = lo(3), hi(3)+1
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+             sfluxz(i,j,k,1) = sum(sfluxz(i,j,k,startcomp:endcomp))
+          end do
+       end do
+    end do
+    
   end subroutine make_rhoX_flux_3d
 
   !----------------------------------------------------------------------------
@@ -526,6 +578,35 @@ contains
 
     end do ! end loop over components
 
+    ! compute the density fluxes by summing the species fluxes
+    
+    ! loop for x-fluxes
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)+1
+             sfluxx(i,j,k,1) = sum(sfluxx(i,j,k,startcomp:endcomp))
+          end do
+       end do
+    end do
+
+    ! loop for y-fluxes
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)+1
+          do i = lo(1), hi(1)
+             sfluxy(i,j,k,1) = sum(sfluxy(i,j,k,startcomp:endcomp))
+          end do
+       end do
+    end do
+
+    ! loop for z-fluxes
+    do k = lo(3), hi(3)+1
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+             sfluxz(i,j,k,1) = sum(sfluxz(i,j,k,startcomp:endcomp))
+          end do
+       end do
+    end do
+    
   end subroutine make_rhoX_flux_3d_sphr
 #endif
 
