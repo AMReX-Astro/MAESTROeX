@@ -3,7 +3,7 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-pp.query("do_reflux", do_reflux);
+pp.query("reflux_type", reflux_type);
 pp.query("maestro_verbose", maestro_verbose);
 pp.query("model_file", model_file);
 pp.query("perturb_model", perturb_model);

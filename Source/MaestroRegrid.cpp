@@ -347,7 +347,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
         std::swap(cell_cc_to_r_state,cell_cc_to_r[lev]);
     }
 
-    if (lev > 0 && do_reflux) {
+    if (lev > 0 && reflux_type == 2) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
     }
 }
@@ -379,7 +379,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
         cell_cc_to_r[lev].define(ba, dm, 1, 0);
     }
 
-    if (lev > 0 && do_reflux) {
+    if (lev > 0 && reflux_type == 2) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
     }
 

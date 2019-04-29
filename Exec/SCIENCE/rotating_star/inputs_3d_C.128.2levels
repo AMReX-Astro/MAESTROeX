@@ -12,7 +12,6 @@ amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 #amr.grid_eff           = 0.9     # larger number results in more smaller grids around tagged cells
 
-maestro.do_reflux = 0 # do we do the hyperbolic reflux
 
 maestro.anelastic_cutoff = 1.e6
 maestro.base_cutoff_density = 1.e5

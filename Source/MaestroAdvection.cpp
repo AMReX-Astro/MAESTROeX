@@ -335,7 +335,9 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
     // we do not use edge_restriction for scalars because instead we will use
     // reflux on the fluxes in make_flux.
     if (is_vel == 1) {
-	AverageDownFaces(sedge);
+        if (reflux_type == 1 || reflux_type == 2) {
+            AverageDownFaces(sedge);
+        }
     }
 }
 
@@ -491,7 +493,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
         // the flux registers from the coarse or fine grid perspective
         // NOTE: the flux register associated with flux_reg_s[lev] is associated
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-        if (do_reflux) {
+        if (reflux_type == 2) {
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
@@ -528,7 +530,8 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
     } // end loop over levels
 
-    if (do_reflux == 0) {
+    // average down fluxes
+    if (reflux_type == 1) {
 	AverageDownFaces(sflux);
     }
 
@@ -718,7 +721,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         // the flux registers from the coarse or fine grid perspective
         // NOTE: the flux register associated with flux_reg_s[lev] is associated
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-        if (do_reflux) {
+        if (reflux_type == 2) {
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
@@ -746,7 +749,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         }
     } // end loop over levels
 
-    if (do_reflux == 0) {
+    if (reflux_type == 1) {
 	AverageDownFaces(sflux);
     }
 
@@ -881,29 +884,25 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 	} // end MFIter loop
     } // end loop over levels
 
-
     // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
-    if (do_reflux) {
+    if (reflux_type == 2) {
 	for (int lev=finest_level-1; lev>=0; --lev) {
             // update lev based on coarse-fine flux mismatch
             flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, start_comp, start_comp, num_comp, geom[lev]);
+            if (start_comp == FirstSpec) {
+                // do the same for density if we updated the species
+		flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1, geom[lev]);
+            }
         }
     }
 
     // average fine data onto coarser cells
-    AverageDown(statenew,start_comp,num_comp);
-
     // fill ghost cells
+    AverageDown(statenew,start_comp,num_comp);
     FillPatch(t_old, statenew, statenew, statenew, start_comp, start_comp, num_comp, start_comp, bcs_s);
 
     // do the same for density if we updated the species
     if (start_comp == FirstSpec) {
-	if (do_reflux) {
-	    for (int lev=finest_level-1; lev>=0; --lev) {
-		// update lev based on coarse-fine flux mismatch
-		flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1, geom[lev]);
-	    }
-	}
 	AverageDown(statenew,Rho,1);
 	FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
     }
