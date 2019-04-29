@@ -223,10 +223,12 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">do_reflux</span></code></p></td>
-<td><p>do we do the hyperbolic reflux at coarse-fine
-interfaces? (1) or simply average-down the fluxes (0)</p></td>
-<td><p>0</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">reflux_type</span></code></p></td>
+<td><p>Advective synchronization type 0 = do nothing 1 =
+average down the fluxes (thermo variables) and edge
+velocities 2 = use Reflux operations (thermo variables)
+and average down velocities</p></td>
+<td><p>1</p></td>
 </tr>
 </tbody>
 </table>

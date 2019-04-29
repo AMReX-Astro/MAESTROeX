@@ -6,8 +6,10 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
-| ``do_reflux``                          | do we do the hyperbolic reflux at coarse-fine           | 0             |
-|                                        | interfaces? (1) or simply average-down the fluxes (0)   |               |
+| ``reflux_type``                        | Advective synchronization type 0 = do nothing 1 =       | 1             |
+|                                        | average down the fluxes (thermo variables) and edge     |               |
+|                                        | velocities 2 = use Reflux operations (thermo variables) |               |
+|                                        | and average down velocities                             |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 
 
