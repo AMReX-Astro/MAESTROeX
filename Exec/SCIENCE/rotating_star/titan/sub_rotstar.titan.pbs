@@ -11,7 +11,7 @@ export OMP_NUM_THREADS=4
 
 module load python_anaconda3
 
-export PATH=$MEMBERWORK/ast106/MAESTROeX/Exec/SCIENCE/rotating_star/yt-conda/bin:$PATH
+export PATH=$MEMBERWORK/ast106/yt-conda/bin:$PATH
 
 rm -f Backtrace.*
 
@@ -29,7 +29,26 @@ text=":zap: Starting job $PBS_JOBID on titan in $PBS_O_WORKDIR"
 json="{\"channel\": \"${slack_channel}\", \"text\": \"${text}\"}"
 curl -X POST -H "Authorization: Bearer $slack_token" -H 'Content-type: application/json' --data "${json}" $webhook_url
 
-aprun -n 512 -S 2 -d 4 -ss -e LD_LIBRARY_PATH="${CONDALIBS}:${LD_LIBRARY_PATH}" ./Maestro3d.gnu.interlagos.MPI.OMP.ex inputs_3d_C maestro.plot_base_name=${plot_base_name} maestro.check_base_name=${check_base_name} maestro.small_plot_base_name=${small_plot_base_name}
+aprun -n 512 -S 2 -d 4 -ss -e LD_LIBRARY_PATH="${CONDALIBS}:${LD_LIBRARY_PATH}" ./Maestro3d.gnu.interlagos.MPI.OMP.ex inputs_3d_C maestro.plot_base_name=${plot_base_name} maestro.check_base_name=${check_base_name} maestro.small_plot_base_name=${small_plot_base_name} &
+
+# Monitor log file - if it sees that the plotfile has been output, then it will run the slack script to send a plot
+# this loop will continue until it sees a Backtrace mentioned or AMReX (xxx) finalized is printed.
+regex="Output\sfile\s(.*)\sat\stime\s([0-9.]+)\sand\sstep\s([0-9]+)"
+segex="Backtrace|AMReX\s.*\sfinalized"
+
+tail -n 0 -F ${PBS_JOBID}.OU | \
+while read LINE
+do 
+    if [[ "$LINE" =~ $regex ]]; then 
+        plotname=${BASH_REMATCH[1]}
+	plottime=${BASH_REMATCH[2]}
+	plotstep=${BASH_REMATCH[3]}
+
+	bash post_to_slack.sh $plottime $plotstep $plotname &
+    elif [[ "LINE" =~ $segex ]]; then 
+	break
+    fi
+done
 
 # send a message to the 3ER when the job finishes 
 # test if there were any backtrace files
