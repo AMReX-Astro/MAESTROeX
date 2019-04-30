@@ -17,9 +17,11 @@
 # category: synchronization
 #-----------------------------------------------------------------------------
 
-# do we do the hyperbolic reflux at coarse-fine interfaces? (1)
-# or simply average-down the fluxes (0)
-do_reflux                           int         0
+# Advective synchronization type
+# 0 = do nothing
+# 1 = average down the fluxes (thermo variables) and edge velocities
+# 2 = use Reflux operations (thermo variables) and average down velocities
+reflux_type                         int         1
 
 #-----------------------------------------------------------------------------
 # category: general MAESTRO

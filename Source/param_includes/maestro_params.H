@@ -3,7 +3,7 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-static int         do_reflux;
+static int         reflux_type;
 static int         maestro_verbose;
 static std::string model_file;
 static bool        perturb_model;

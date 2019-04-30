@@ -54,7 +54,6 @@ maestro.evolve_base_state = false
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
-maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 
 maestro.anelastic_cutoff = 1.e3
 maestro.base_cutoff_density = 1.e1
