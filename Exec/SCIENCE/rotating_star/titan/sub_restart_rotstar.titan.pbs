@@ -18,7 +18,7 @@ rm -f Backtrace.*
 
 # set job parameters
 output_location="$MEMBERWORK/ast106/MAESTROeX_output/rotating_star"
-restart_file="${output_location}/chk_0000250"
+restart_file="${output_location}/chk_0000480"
 plot_base_name="${output_location}/rot1e3_"
 check_base_name="${output_location}/chk_"
 small_plot_base_name="${output_location}/smallrot1e3_"
@@ -47,7 +47,7 @@ do
 	plottime=${BASH_REMATCH[2]}
 	plotstep=${BASH_REMATCH[3]}
 
-	./post_to_slack.sh $plottime $plotstep $plotname &
+	bash post_to_slack.sh $plottime $plotstep $plotname &
     elif [[ "LINE" =~ $segex ]]; then 
 	break
     fi
