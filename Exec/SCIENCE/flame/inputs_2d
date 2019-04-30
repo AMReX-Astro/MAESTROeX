@@ -53,6 +53,9 @@ maestro.init_iter             = 1
 maestro.do_smallscale = true
 maestro.beta0_type = 3
 
+maestro.anelastic_cutoff_density = 3.e6
+maestro.base_cutoff_density = 3.e6
+
 maestro.grav_const = 0.e0
 
 maestro.init_shrink = 0.1e0

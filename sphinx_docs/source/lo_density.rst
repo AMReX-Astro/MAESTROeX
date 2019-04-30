@@ -148,7 +148,8 @@ anelastic_cutoff_density
 
 The ``anelastic_cutoff_density`` is the density below which we modify the constraint.
 
--  In probin, ``anelastic_cutoff_density`` is set to :math:`3\times 10^6` by default.
+-  In probin, ``anelastic_cutoff_density`` is set to :math:`-1` by default.  The user
+   must supply a value in the inputs file or the code will abort.
 
 -  In ``make_div_coeff``, for
    :math:`r \ge {\tt anelastic\_cutoff\_coord}`, we set
@@ -167,7 +168,8 @@ base_cutoff_density
 
 The ``base_cutoff_density`` is the lowest density that we model.
 
--  In probin, ``base_cutoff_density`` is set to :math:`3\times 10^6` by default.
+-  In probin, ``base_cutoff_density`` is set to :math:`-1` by default. The user
+   must supply a value in the inputs file or the code will abort.
 
 -  In ``base_state``, we compute a physical cutoff location,
    ``base_cutoff_density_loc``, which is defined as the physical
@@ -211,8 +213,7 @@ get the nuclear energy generation rate and composition changes. For
 densities below the burning cutoff, we do not call the network.
 
 -  In ``probin``, ``burning_cutoff_density`` is set to
-   ``base_cutoff_density``. There is no option to set
-   ``burning_cutoff_density`` using the inputs file.
+   ``base_cutoff_density`` it no value is supplied.
 
 -  In ``react_state``, we only call the burner if
    :math:`\rho >` ``burning_cutoff_density``.

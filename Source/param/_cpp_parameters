@@ -287,14 +287,14 @@ plot_sponge_fdamp                   bool            false
 # the anelastic constraint, instead of the low Mach constraint.  This
 # prevents velocities from getting out of hand at the edge of the star.
 # Refer to Section \ref{Sec:Anelastic Cutoff}.
-anelastic_cutoff_density            Real               3.e6     y
+anelastic_cutoff_density            Real               -1.0     y
 
 # The density below which we keep the initial model constant.
 # Refer to Section \ref{Sec:Base Cutoff Density}
-base_cutoff_density                 Real               3.e6     y
+base_cutoff_density                 Real               -1.0     y
 
 # The density below which we disable burning
-burning_cutoff_density              Real               3.e6     y
+burning_cutoff_density              Real               -1.0     y
 
 # The multiplicative factor (over base\_cutoff\_density) below which we
 # do zero out the buoyancy term in the momentum equation.

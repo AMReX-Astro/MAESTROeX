@@ -19,6 +19,9 @@ maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 33.333
 maestro.sponge_kappa = 100.
 
+maestro.anelastic_cutoff_density = 3.e6
+maestro.base_cutoff_density = 3.e6
+
 maestro.max_step  = 1000
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 1
