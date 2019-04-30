@@ -15,11 +15,11 @@ do.
    | For each level in the radial base state array, this is the coordinate of the first cell
      where :math:`\rho_0 < \rho_{\rm base}`. Slightly more complicated for multilevel problems.
 
--  | ``anelastic_cutoff``, :math:`\rho_{\rm anelastic}`, (real):
+-  | ``anelastic_cutoff_density``, :math:`\rho_{\rm anelastic}`, (real):
    | If :math:`\rho_0 < \rho_{\rm anelastic}`, we modify the computation of :math:`\beta_0` in the
      divergence constraint.
 
--  | ``anelastic_cutoff_coord(:)`` (integer array):
+-  | ``anelastic_cutoff_density_coord(:)`` (integer array):
    | Anelastic cutoff analogy of ``base_cutoff_density_coord(:)``.
 
 -  | ``burning_cutoff_density``, :math:`\rho_{\rm burning}`, (real):
@@ -39,7 +39,7 @@ do.
 Computing the Cutoff Values
 ===========================
 
-We compute ``anelastic_cutoff_coord(:)``, ``base_cutoff_density_coord(:)``,
+We compute ``anelastic_cutoff_density_coord(:)``, ``base_cutoff_density_coord(:)``,
 and ``burning_cutoff_density_coord(:)`` in analogous fashion.
 
 Single-Level Planar or any Spherical
@@ -63,10 +63,10 @@ See Figure `[Fig:Cutoff] <#Fig:Cutoff>`__ for a graphical representation.
    are related for single-level planar and all spherical problems.
 
 Note that for single-level planar or any spherical problem, saying
-:math:`r\ge` ``anelastic_cutoff_coord`` is analogous to saying
-:math:`\rho_0(r)\le` ``anelastic_cutoff``. Also, saying :math:`r<`
-``anelastic_cutoff_coord`` is analogous to saying :math:`\rho_0(r)>`
-``anelastic_cutoff``. Ditto for ``base_cutoff_density`` and
+:math:`r\ge` ``anelastic_cutoff_density_coord`` is analogous to saying
+:math:`\rho_0(r)\le` ``anelastic_cutoff_density``. Also, saying :math:`r<`
+``anelastic_cutoff_density_coord`` is analogous to saying :math:`\rho_0(r)>`
+``anelastic_cutoff_density``. Ditto for ``base_cutoff_density`` and
 ``base_cutoff_density_coord``.
 
 Multilevel Planar
@@ -122,7 +122,7 @@ coordinate to the coarser levels.
 When are the Cutoff Coordinates Updated?
 ========================================
 
-At several points in the algorithm, we compute ``anelastic_cutoff_coord(:)``,
+At several points in the algorithm, we compute ``anelastic_cutoff_density_coord(:)``,
 ``base_cutoff_density_coord(:)``, and ``burning_cutoff_density_coord(:)``:
 
 -  After we call ``initialize`` in ``varden``.
@@ -143,12 +143,13 @@ Usage of Cutoff Densities
 
 .. _Sec:Anelastic Cutoff:
 
-anelastic_cutoff
+anelastic_cutoff_density
 ----------------
 
-The ``anelastic_cutoff`` is the density below which we modify the constraint.
+The ``anelastic_cutoff_density`` is the density below which we modify the constraint.
 
--  In probin, ``anelastic_cutoff`` is set to :math:`3\times 10^6` by default.
+-  In probin, ``anelastic_cutoff_density`` is set to :math:`-1` by default.  The user
+   must supply a value in the inputs file or the code will abort.
 
 -  In ``make_div_coeff``, for
    :math:`r \ge {\tt anelastic\_cutoff\_coord}`, we set
@@ -158,7 +159,7 @@ The ``anelastic_cutoff`` is the density below which we modify the constraint.
    to zero for :math:`r \ge {\tt anelastic\_cutoff\_coord}`. This is only relevant
    if you are running with ``use_delta_gamma1_term = T``.
 
--  Some versions of sponge, use ``anelastic_cutoff`` in a problem dependent way.
+-  Some versions of sponge, use ``anelastic_cutoff_density`` in a problem dependent way.
 
 .. _Sec:Base Cutoff Density:
 
@@ -167,7 +168,8 @@ base_cutoff_density
 
 The ``base_cutoff_density`` is the lowest density that we model.
 
--  In probin, ``base_cutoff_density`` is set to :math:`3\times 10^6` by default.
+-  In probin, ``base_cutoff_density`` is set to :math:`-1` by default. The user
+   must supply a value in the inputs file or the code will abort.
 
 -  In ``base_state``, we compute a physical cutoff location,
    ``base_cutoff_density_loc``, which is defined as the physical
@@ -211,8 +213,7 @@ get the nuclear energy generation rate and composition changes. For
 densities below the burning cutoff, we do not call the network.
 
 -  In ``probin``, ``burning_cutoff_density`` is set to
-   ``base_cutoff_density``. There is no option to set
-   ``burning_cutoff_density`` using the inputs file.
+   ``base_cutoff_density`` it no value is supplied.
 
 -  In ``react_state``, we only call the burner if
    :math:`\rho >` ``burning_cutoff_density``.

@@ -676,23 +676,23 @@ sponge_start_factor.</p></td>
 form 1/(1+dt*{tt sponge_kappa}*fdamp)</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code></p></td>
 <td><p>The density below which we modify the constraint to
 look like the anelastic constraint, instead of the low
 Mach constraint.  This prevents velocities from getting
 out of hand at the edge of the star. Refer to Section
 ref{Sec:Anelastic Cutoff}.</p></td>
-<td><p>3.e6</p></td>
+<td><p>-1.0</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code></p></td>
 <td><p>The density below which we keep the initial model
 constant. Refer to Section ref{Sec:Base Cutoff
 Density}</p></td>
-<td><p>3.e6</p></td>
+<td><p>-1.0</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">burning_cutoff_density</span></code></p></td>
 <td><p>The density below which we disable burning</p></td>
-<td><p>3.e6</p></td>
+<td><p>-1.0</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code></p></td>
 <td><p>The multiplicative factor (over base_cutoff_density)

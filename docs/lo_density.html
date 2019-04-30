@@ -120,7 +120,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#when-are-the-cutoff-coordinates-updated">When are the Cutoff Coordinates Updated?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#usage-of-cutoff-densities">Usage of Cutoff Densities</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#anelastic-cutoff">anelastic_cutoff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#anelastic-cutoff-density">anelastic_cutoff_density</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#base-cutoff-density">base_cutoff_density</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#burning-cutoff">burning_cutoff</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#buoyancy-cutoff-factor">buoyancy_cutoff_factor</a></li>
@@ -233,13 +233,13 @@ where <span class="math notranslate nohighlight">\(\rho_0 &lt; \rho_{\rm base}\)
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff</span></code>, <span class="math notranslate nohighlight">\(\rho_{\rm anelastic}\)</span>, (real):</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code>, <span class="math notranslate nohighlight">\(\rho_{\rm anelastic}\)</span>, (real):</div>
 <div class="line">If <span class="math notranslate nohighlight">\(\rho_0 &lt; \rho_{\rm anelastic}\)</span>, we modify the computation of <span class="math notranslate nohighlight">\(\beta_0\)</span> in the
 divergence constraint.</div>
 </div>
 </li>
 <li><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_coord(:)</span></code> (integer array):</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density_coord(:)</span></code> (integer array):</div>
 <div class="line">Anelastic cutoff analogy of <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_coord(:)</span></code>.</div>
 </div>
 </li>
@@ -268,7 +268,7 @@ divergence constraint.</div>
 </ul>
 <div class="section" id="computing-the-cutoff-values">
 <h2>Computing the Cutoff Values<a class="headerlink" href="#computing-the-cutoff-values" title="Permalink to this headline">¶</a></h2>
-<p>We compute <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_coord(:)</span></code>, <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_coord(:)</span></code>,
+<p>We compute <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density_coord(:)</span></code>, <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_coord(:)</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">burning_cutoff_density_coord(:)</span></code> in analogous fashion.</p>
 <div class="section" id="single-level-planar-or-any-spherical">
 <h3>Single-Level Planar or any Spherical<a class="headerlink" href="#single-level-planar-or-any-spherical" title="Permalink to this headline">¶</a></h3>
@@ -277,10 +277,10 @@ spacing <span class="math notranslate nohighlight">\(\Delta r\)</span>. Basicall
 as <span class="math notranslate nohighlight">\(\rho_0(r)\)</span> is less than or equal to that particular cutoff value.
 See Figure <a class="reference external" href="#Fig:Cutoff">[Fig:Cutoff]</a> for a graphical representation.</p>
 <p>Note that for single-level planar or any spherical problem, saying
-<span class="math notranslate nohighlight">\(r\ge\)</span> <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_coord</span></code> is analogous to saying
-<span class="math notranslate nohighlight">\(\rho_0(r)\le\)</span> <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff</span></code>. Also, saying <span class="math notranslate nohighlight">\(r&lt;\)</span>
-<code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_coord</span></code> is analogous to saying <span class="math notranslate nohighlight">\(\rho_0(r)&gt;\)</span>
-<code class="docutils literal notranslate"><span class="pre">anelastic_cutoff</span></code>. Ditto for <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> and
+<span class="math notranslate nohighlight">\(r\ge\)</span> <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density_coord</span></code> is analogous to saying
+<span class="math notranslate nohighlight">\(\rho_0(r)\le\)</span> <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code>. Also, saying <span class="math notranslate nohighlight">\(r&lt;\)</span>
+<code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density_coord</span></code> is analogous to saying <span class="math notranslate nohighlight">\(\rho_0(r)&gt;\)</span>
+<code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code>. Ditto for <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> and
 <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_coord</span></code>.</p>
 </div>
 <div class="section" id="multilevel-planar">
@@ -335,7 +335,7 @@ coordinate to the coarser levels.</p>
 </div>
 <div class="section" id="when-are-the-cutoff-coordinates-updated">
 <h2>When are the Cutoff Coordinates Updated?<a class="headerlink" href="#when-are-the-cutoff-coordinates-updated" title="Permalink to this headline">¶</a></h2>
-<p>At several points in the algorithm, we compute <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_coord(:)</span></code>,
+<p>At several points in the algorithm, we compute <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density_coord(:)</span></code>,
 <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_coord(:)</span></code>, and <code class="docutils literal notranslate"><span class="pre">burning_cutoff_density_coord(:)</span></code>:</p>
 <ul class="simple">
 <li><p>After we call <code class="docutils literal notranslate"><span class="pre">initialize</span></code> in <code class="docutils literal notranslate"><span class="pre">varden</span></code>.</p></li>
@@ -349,25 +349,27 @@ the coordinates to the base-time values using <span class="math notranslate nohi
 </div>
 <div class="section" id="usage-of-cutoff-densities">
 <h2>Usage of Cutoff Densities<a class="headerlink" href="#usage-of-cutoff-densities" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="anelastic-cutoff">
-<span id="sec-anelastic-cutoff"></span><h3>anelastic_cutoff<a class="headerlink" href="#anelastic-cutoff" title="Permalink to this headline">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff</span></code> is the density below which we modify the constraint.</p>
+<div class="section" id="anelastic-cutoff-density">
+<span id="sec-anelastic-cutoff"></span><h3>anelastic_cutoff_density<a class="headerlink" href="#anelastic-cutoff-density" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> is the density below which we modify the constraint.</p>
 <ul class="simple">
-<li><p>In probin, <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff</span></code> is set to <span class="math notranslate nohighlight">\(3\times 10^6\)</span> by default.</p></li>
+<li><p>In probin, <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> is set to <span class="math notranslate nohighlight">\(-1\)</span> by default.  The user
+must supply a value in the inputs file or the code will abort.</p></li>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">make_div_coeff</span></code>, for
 <span class="math notranslate nohighlight">\(r \ge {\tt anelastic\_cutoff\_coord}\)</span>, we set
 <span class="math notranslate nohighlight">\({\tt div\_coeff}(n,r) = {\tt div\_coeff}(n,r-1) * \rho_0(n,r)/\rho_0(n,r-1)\)</span>.</p></li>
 <li><p>in <code class="docutils literal notranslate"><span class="pre">make_S</span></code>, we set <code class="docutils literal notranslate"><span class="pre">delta_gamma1_term</span></code> and <code class="docutils literal notranslate"><span class="pre">delta_gamma1</span></code>
 to zero for <span class="math notranslate nohighlight">\(r \ge {\tt anelastic\_cutoff\_coord}\)</span>. This is only relevant
 if you are running with <code class="docutils literal notranslate"><span class="pre">use_delta_gamma1_term</span> <span class="pre">=</span> <span class="pre">T</span></code>.</p></li>
-<li><p>Some versions of sponge, use <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff</span></code> in a problem dependent way.</p></li>
+<li><p>Some versions of sponge, use <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> in a problem dependent way.</p></li>
 </ul>
 </div>
 <div class="section" id="base-cutoff-density">
 <span id="sec-base-cutoff-density"></span><h3>base_cutoff_density<a class="headerlink" href="#base-cutoff-density" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> is the lowest density that we model.</p>
 <ul class="simple">
-<li><p>In probin, <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> is set to <span class="math notranslate nohighlight">\(3\times 10^6\)</span> by default.</p></li>
+<li><p>In probin, <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> is set to <span class="math notranslate nohighlight">\(-1\)</span> by default. The user
+must supply a value in the inputs file or the code will abort.</p></li>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">base_state</span></code>, we compute a physical cutoff location,
 <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_loc</span></code>, which is defined as the physical
 location of the first cell-center at the coarsest level for which
@@ -403,8 +405,7 @@ get the nuclear energy generation rate and composition changes. For
 densities below the burning cutoff, we do not call the network.</p>
 <ul class="simple">
 <li><p>In <code class="docutils literal notranslate"><span class="pre">probin</span></code>, <code class="docutils literal notranslate"><span class="pre">burning_cutoff_density</span></code> is set to
-<code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code>. There is no option to set
-<code class="docutils literal notranslate"><span class="pre">burning_cutoff_density</span></code> using the inputs file.</p></li>
+<code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> it no value is supplied.</p></li>
 <li><p>In <code class="docutils literal notranslate"><span class="pre">react_state</span></code>, we only call the burner if
 <span class="math notranslate nohighlight">\(\rho &gt;\)</span> <code class="docutils literal notranslate"><span class="pre">burning_cutoff_density</span></code>.</p></li>
 </ul>

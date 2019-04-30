@@ -257,17 +257,17 @@ namespace: ``maestro``
 | ``plot_sponge_fdamp``                  | plot fdamp rather than sponge assumes sponge has the    | false         |
 |                                        | form 1/(1+dt*{\tt sponge\_kappa}*fdamp)                 |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``anelastic_cutoff``                   | The density below which we modify the constraint to     | 3.e6          |
+| ``anelastic_cutoff_density``           | The density below which we modify the constraint to     | -1.0          |
 |                                        | look like the anelastic constraint, instead of the low  |               |
 |                                        | Mach constraint.  This prevents velocities from getting |               |
 |                                        | out of hand at the edge of the star. Refer to Section   |               |
 |                                        | \ref{Sec:Anelastic Cutoff}.                             |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``base_cutoff_density``                | The density below which we keep the initial model       | 3.e6          |
+| ``base_cutoff_density``                | The density below which we keep the initial model       | -1.0          |
 |                                        | constant. Refer to Section \ref{Sec:Base Cutoff         |               |
 |                                        | Density}                                                |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``burning_cutoff_density``             | The density below which we disable burning              | 3.e6          |
+| ``burning_cutoff_density``             | The density below which we disable burning              | -1.0          |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``buoyancy_cutoff_factor``             | The multiplicative factor (over base\_cutoff\_density)  | 5.0           |
 |                                        | below which we do zero out the buoyancy term in the     |               |
