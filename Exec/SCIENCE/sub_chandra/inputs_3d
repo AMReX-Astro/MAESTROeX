@@ -65,7 +65,7 @@ maestro.evolve_base_state = true
 
 maestro.limit_conductivity = true
 
-maestro.anelastic_cutoff = 6.e4
+maestro.anelastic_cutoff_density = 6.e4
 maestro.base_cutoff_density = 1.e4
 maestro.buoyancy_cutoff_factor = 2.e0
 

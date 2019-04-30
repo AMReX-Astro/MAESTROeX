@@ -11,7 +11,7 @@ module base_state_geometry_module
   use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use amrex_constants_module
   use amrex_fort_module, only: amrex_spacedim
-  use meth_params_module, only: spherical, octant, anelastic_cutoff, base_cutoff_density, &
+  use meth_params_module, only: spherical, octant, anelastic_cutoff_density, base_cutoff_density, &
        burning_cutoff_density, prob_lo, prob_hi, &
        use_exact_base_state
 
@@ -42,7 +42,7 @@ module base_state_geometry_module
   integer         , pointer, save, public  :: r_start_coord(:,:)
   integer         , pointer, save, public  :: r_end_coord(:,:)
 
-  integer         , pointer, save, public  :: anelastic_cutoff_coord(:)
+  integer         , pointer, save, public  :: anelastic_cutoff_density_coord(:)
   integer         , pointer, save, public  :: base_cutoff_density_coord(:)
   integer         , pointer, save, public  :: burning_cutoff_density_coord(:)
 
@@ -140,7 +140,7 @@ contains
 
     end if
 
-    call bl_allocate(      anelastic_cutoff_coord,0,max_radial_level)
+    call bl_allocate(      anelastic_cutoff_density_coord,0,max_radial_level)
     call bl_allocate(   base_cutoff_density_coord,0,max_radial_level)
     call bl_allocate(burning_cutoff_density_coord,0,max_radial_level)
 
@@ -206,8 +206,8 @@ contains
 
           if (.not. found) then
              do r=r_start_coord(n,i),r_end_coord(n,i)
-                if (rho0(n,r) .le. anelastic_cutoff) then
-                   anelastic_cutoff_coord(n) = r
+                if (rho0(n,r) .le. anelastic_cutoff_density) then
+                   anelastic_cutoff_density_coord(n) = r
                    which_lev = n
                    found = .true.
                    exit
@@ -222,20 +222,20 @@ contains
     ! it to above the top of the domain on the finest level
     if (.not. found) then
        which_lev = finest_radial_level
-       anelastic_cutoff_coord(finest_radial_level) = nr(finest_radial_level)
+       anelastic_cutoff_density_coord(finest_radial_level) = nr(finest_radial_level)
     endif
 
     ! set the anelastic cutoff coordinate on the finer levels
     do n=which_lev+1,finest_radial_level
-       anelastic_cutoff_coord(n) = 2*anelastic_cutoff_coord(n-1)+1
+       anelastic_cutoff_density_coord(n) = 2*anelastic_cutoff_density_coord(n-1)+1
     end do
 
     ! set the anelastic cutoff coordinate on the coarser levels
     do n=which_lev-1,0,-1
-       if (mod(anelastic_cutoff_coord(n+1),2) .eq. 0) then
-          anelastic_cutoff_coord(n) = anelastic_cutoff_coord(n+1) / 2
+       if (mod(anelastic_cutoff_density_coord(n+1),2) .eq. 0) then
+          anelastic_cutoff_density_coord(n) = anelastic_cutoff_density_coord(n+1) / 2
        else
-          anelastic_cutoff_coord(n) = anelastic_cutoff_coord(n+1) / 2 + 1
+          anelastic_cutoff_density_coord(n) = anelastic_cutoff_density_coord(n+1) / 2 + 1
        end if
     end do
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -573,7 +573,7 @@ contains
 
     call bl_deallocate(dr)
     call bl_deallocate(nr)
-    call bl_deallocate(anelastic_cutoff_coord)
+    call bl_deallocate(anelastic_cutoff_density_coord)
     call bl_deallocate(base_cutoff_density_coord)
     call bl_deallocate(burning_cutoff_density_coord)
     call bl_deallocate(numdisjointchunks)

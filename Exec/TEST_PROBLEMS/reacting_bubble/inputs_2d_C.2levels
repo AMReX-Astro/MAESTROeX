@@ -35,7 +35,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 # TAGGING
 maestro.use_tpert_in_tagging = true
 
-maestro.anelastic_cutoff = 3.e6
+maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
 # TIME STEPPING

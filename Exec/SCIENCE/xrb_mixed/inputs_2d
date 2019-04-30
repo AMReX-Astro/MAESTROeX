@@ -61,7 +61,7 @@ maestro.species_pred_type = 3
 
 maestro.limit_conductivity = true
 
-maestro.anelastic_cutoff = 2.e3
+maestro.anelastic_cutoff_density = 2.e3
 maestro.base_cutoff_density = 2.e3
 
 maestro.do_sponge = true

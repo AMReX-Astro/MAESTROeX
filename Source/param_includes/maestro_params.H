@@ -72,7 +72,7 @@ static amrex::Real sponge_kappa;
 static amrex::Real sponge_center_density;
 static amrex::Real sponge_start_factor;
 static bool        plot_sponge_fdamp;
-static amrex::Real anelastic_cutoff;
+static amrex::Real anelastic_cutoff_density;
 static amrex::Real base_cutoff_density;
 static amrex::Real burning_cutoff_density;
 static amrex::Real buoyancy_cutoff_factor;

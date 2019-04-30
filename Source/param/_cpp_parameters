@@ -287,7 +287,7 @@ plot_sponge_fdamp                   bool            false
 # the anelastic constraint, instead of the low Mach constraint.  This
 # prevents velocities from getting out of hand at the edge of the star.
 # Refer to Section \ref{Sec:Anelastic Cutoff}.
-anelastic_cutoff                    Real               3.e6     y
+anelastic_cutoff_density            Real               3.e6     y
 
 # The density below which we keep the initial model constant.
 # Refer to Section \ref{Sec:Base Cutoff Density}

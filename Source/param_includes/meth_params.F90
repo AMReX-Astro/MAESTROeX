@@ -41,7 +41,7 @@ module meth_params_module
   double precision              , save :: sponge_kappa
   double precision              , save :: sponge_center_density
   double precision              , save :: sponge_start_factor
-  double precision              , save :: anelastic_cutoff
+  double precision              , save :: anelastic_cutoff_density
   double precision              , save :: base_cutoff_density
   double precision              , save :: burning_cutoff_density
   double precision              , save :: buoyancy_cutoff_factor
@@ -112,7 +112,7 @@ contains
     sponge_kappa = 10.d0;
     sponge_center_density = 3.d6;
     sponge_start_factor = 3.333d0;
-    anelastic_cutoff = 3.d6;
+    anelastic_cutoff_density = 3.d6;
     base_cutoff_density = 3.d6;
     burning_cutoff_density = 3.d6;
     buoyancy_cutoff_factor = 5.0d0;
@@ -171,7 +171,7 @@ contains
     call pp%query("sponge_kappa", sponge_kappa)
     call pp%query("sponge_center_density", sponge_center_density)
     call pp%query("sponge_start_factor", sponge_start_factor)
-    call pp%query("anelastic_cutoff", anelastic_cutoff)
+    call pp%query("anelastic_cutoff_density", anelastic_cutoff_density)
     call pp%query("base_cutoff_density", base_cutoff_density)
     call pp%query("burning_cutoff_density", burning_cutoff_density)
     call pp%query("buoyancy_cutoff_factor", buoyancy_cutoff_factor)

@@ -31,7 +31,7 @@ geometry.is_periodic =  0 0
 maestro.v              = 1       # verbosity
 
 # HYDRODYNAMICS
-maestro.anelastic_cutoff = 1.e6
+maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e5
 
 &probin

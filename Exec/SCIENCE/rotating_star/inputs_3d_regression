@@ -52,7 +52,7 @@ maestro.init_iter             = 1
 
 maestro.grav_const = -1.5e10
 
-maestro.anelastic_cutoff = 1.e6
+maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e5
 
 maestro.do_sponge = 1

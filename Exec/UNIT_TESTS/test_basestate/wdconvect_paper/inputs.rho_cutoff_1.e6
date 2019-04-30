@@ -33,7 +33,7 @@ maestro.plot_int        = -1
 maestro.chk_int         = -1
 
 # HYDRODYNAMICS
-maestro.anelastic_cutoff = 1.e6
+maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e6
 
 &probin
