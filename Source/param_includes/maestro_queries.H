@@ -72,7 +72,7 @@ pp.query("sponge_kappa", sponge_kappa);
 pp.query("sponge_center_density", sponge_center_density);
 pp.query("sponge_start_factor", sponge_start_factor);
 pp.query("plot_sponge_fdamp", plot_sponge_fdamp);
-pp.query("anelastic_cutoff", anelastic_cutoff);
+pp.query("anelastic_cutoff_density", anelastic_cutoff_density);
 pp.query("base_cutoff_density", base_cutoff_density);
 pp.query("burning_cutoff_density", burning_cutoff_density);
 pp.query("buoyancy_cutoff_factor", buoyancy_cutoff_factor);

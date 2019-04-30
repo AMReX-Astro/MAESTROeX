@@ -8,7 +8,7 @@ amr.n_cell             = 64 64 64
 amr.max_grid_size      = 32
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
-maestro.anelastic_cutoff = 1.e6
+maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e5
 
 maestro.do_sponge = 1

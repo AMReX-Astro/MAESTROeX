@@ -28,3 +28,6 @@ geometry.is_periodic =  0 0 0
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
+
+maestro.anelastic_cutoff_density = 3.e6
+maestro.base_cutoff_density = 3.e6

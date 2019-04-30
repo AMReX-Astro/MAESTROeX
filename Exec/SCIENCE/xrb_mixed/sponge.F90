@@ -7,7 +7,7 @@ module sponge_module
   use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use base_state_geometry_module, only: dr, r_end_coord, max_radial_level, nr_fine, center
   use meth_params_module, only: maestro_verbose, sponge_start_factor, &
-       sponge_center_density, prob_lo, anelastic_cutoff
+       sponge_center_density, prob_lo, anelastic_cutoff_density
   use probin_module, only: xrb_use_bottom_sponge, sponge_min
 
   implicit none
@@ -63,7 +63,7 @@ contains
     ! set topsponge_hi_r
     topsponge_hi_r = r_top
     do r=0,r_end_coord(0,1)
-       if (rho0(0,r) < anelastic_cutoff) then
+       if (rho0(0,r) < anelastic_cutoff_density) then
           topsponge_hi_r = prob_lo_r + (dble(r)+HALF) * dr(0)
           exit
        endif

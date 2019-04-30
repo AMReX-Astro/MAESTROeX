@@ -39,6 +39,9 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
+maestro.anelastic_cutoff_density = 3.e6
+maestro.base_cutoff_density = 3.e6
+
 
 &probin
 

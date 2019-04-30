@@ -13,7 +13,7 @@ amr.blocking_factor    = 8       # block factor in grid generation
 amr.grid_eff           = 0.9     # larger number results in more smaller grids around tagged cells
 
 
-maestro.anelastic_cutoff = 1.e6
+maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e5
 
 maestro.do_sponge = 1

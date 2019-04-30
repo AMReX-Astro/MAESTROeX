@@ -24,7 +24,7 @@ module base_state_module
        rhoh_comp, spec_comp, temp_comp, grav_const, &
        planar_invsq_mass, print_init_hse_diag, prob_lo, &
        prob_hi, small_dens, small_temp, &
-       anelastic_cutoff, buoyancy_cutoff_factor
+       anelastic_cutoff_density, buoyancy_cutoff_factor
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
   use probin_module, only: p0_base, rho_1, rho_2
 
@@ -83,13 +83,13 @@ contains
        write (*,888) '        (for zeroing rho - rho_0, centrifugal term) = ', &
             buoyancy_cutoff_factor*base_cutoff_density
        write (*,888) '    anelastic cutoff =                                ', &
-            anelastic_cutoff
+            anelastic_cutoff_density
        write (*,888) ' '
     end if
 
     min_dens = min(rho_1, rho_2)
 
-    if (anelastic_cutoff > min_dens .or. base_cutoff_density > min_dens) then
+    if (anelastic_cutoff_density > min_dens .or. base_cutoff_density > min_dens) then
        call amrex_error("ERROR: for the RT problem, the anelastic and base cutoff densities > min(rho)")
     endif
 

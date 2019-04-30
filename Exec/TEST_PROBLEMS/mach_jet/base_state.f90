@@ -14,7 +14,7 @@ module base_state_module
   use meth_params_module, only: nscal, spherical, base_cutoff_density, &
        rho_comp, rhoh_comp, spec_comp, temp_comp, grav_const, &
        prob_lo, prob_hi, small_dens, small_temp, &
-       anelastic_cutoff, buoyancy_cutoff_factor
+       anelastic_cutoff_density, buoyancy_cutoff_factor
   use probin_module, only:  do_stratified, do_isentropic
 
   implicit none
@@ -73,7 +73,7 @@ contains
        write (*,888) '        (for zeroing rho - rho_0, centrifugal term) = ', &
             buoyancy_cutoff_factor*base_cutoff_density
        write (*,888) '    anelastic cutoff =                                ', &
-            anelastic_cutoff
+            anelastic_cutoff_density
        write (*,888) ' '
     end if
 

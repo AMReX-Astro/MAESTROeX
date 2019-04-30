@@ -56,7 +56,7 @@ maestro.species_pred_type = 1 # predict rho' and X
 maestro.dpdt_factor = 0.0e0
 maestro.use_eos_coulomb = true
 
-maestro.anelastic_cutoff = 1.e6
+maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e5
 
 maestro.do_sponge = 1
