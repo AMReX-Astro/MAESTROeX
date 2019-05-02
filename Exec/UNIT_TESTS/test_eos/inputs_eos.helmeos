@@ -19,3 +19,6 @@ maestro.v              = 1       # verbosity
 
 # EOS parameters
 maestro.small_temp = 1.e5
+
+maestro.anelastic_cutoff_density = 3.e6
+maestro.base_cutoff_density = 3.e6

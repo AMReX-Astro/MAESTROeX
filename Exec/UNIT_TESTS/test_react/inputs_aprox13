@@ -53,6 +53,7 @@ maestro.small_dens = 1.e-10
 maestro.small_dt = 1.e-10
 
 maestro.base_cutoff_density = 1.e-5
+maestro.anelastic_cutoff_density = 1.e-5
 
 &probin
 

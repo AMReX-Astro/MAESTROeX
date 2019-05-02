@@ -2,7 +2,7 @@
 # model file computed with n_cell x 35 points out to 1.75e10 (i.e. so it
 # covers sqrt(3) * 1e10)
 # INITIAL MODEL
-maestro.model_file = "18m_500_s_rot_b_eq_1.hse.4480"
+maestro.model_file = "18m_500_s_rot_b_eq_1.hse.2240"
 
 maestro.drdxfac = 5
 #maestro.ppm_type = 1
@@ -29,7 +29,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 # GRIDDING AND REFINEMENT
 #amr.n_cell             = 160 160 160
 #amr.n_cell             = 96 96 96
-amr.n_cell = 128 128 128
+amr.n_cell = 64 64 64
 #amr.n_cell = 384 384 384
 amr.max_grid_size      = 32
 amr.max_level          = 2       # maximum level number allowed

@@ -68,3 +68,19 @@ New temporal algorithm is now implemented correctly by separating full velocity 
 Additional diagnostics and timing outputs
 New rotating star model files 
 Fix test_react unit tests
+
+05-01-2019
+Travis documentation updates
+Plotfile and small_plotfile logic fixed
+Additional variables in plotfiles
+Some progress toward the do_smallscale option
+Bugfix to parsing strings with spaces in parse_maestro_params.py
+Added mach_jet problem and inflow routine
+Added fill_ext_bc routines framework to local copies of bc_fill_nd.F90 to support Dirichlet boundary conditions
+Custom BndryFuncArrayMaestro that allows the bc fill routines to be component-aware
+MLMG boundary conditions fixes
+Started porting flame, xrb_mixed, sub_chandra problems
+Make ppm_trace_foces true by default
+Fixed refluxing bug, and implemented reflux_type (0=none, 1=average-down, 2=reflux); default is 1 for now
+Force the user to supply anelastic_cutoff_density and base_cutoff_density
+Set burning_cutoff_density to base_cutoff_density if not specified

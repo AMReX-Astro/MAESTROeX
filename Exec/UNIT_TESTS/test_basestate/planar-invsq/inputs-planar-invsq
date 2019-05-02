@@ -33,7 +33,7 @@ maestro.plot_int        = -1
 maestro.chk_int         = -1
 
 # HYDRODYNAMICS
-maestro.anelastic_cutoff = 1.e-4
+maestro.anelastic_cutoff_density = 1.e-4
 maestro.base_cutoff_density = 1.e-4
 maestro.do_planar_invsq_grav = true
 maestro.planar_invsq_mass = 2.38e33

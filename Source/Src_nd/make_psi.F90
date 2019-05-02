@@ -7,7 +7,7 @@ module make_psi_module
                                         max_radial_level, numdisjointchunks, & 
                                         r_start_coord, r_end_coord, finest_radial_level, &
                                         restrict_base, fill_ghost_base, &
-                                        base_cutoff_density_coord, anelastic_cutoff_coord
+                                        base_cutoff_density_coord, anelastic_cutoff_density_coord
   use meth_params_module, only: grav_const
 
   implicit none

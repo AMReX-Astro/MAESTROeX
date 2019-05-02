@@ -24,7 +24,7 @@ module base_state_module
        rhoh_comp, spec_comp, temp_comp, grav_const, &
        planar_invsq_mass, print_init_hse_diag, prob_lo, &
        prob_hi, small_dens, small_temp, &
-       anelastic_cutoff, buoyancy_cutoff_factor
+       anelastic_cutoff_density, buoyancy_cutoff_factor
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
   use probin_module, only: dens_base, pres_base, do_isentropic
 

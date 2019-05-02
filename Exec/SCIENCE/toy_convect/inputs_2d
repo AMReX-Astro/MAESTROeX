@@ -63,7 +63,7 @@ maestro.species_pred_type = 3
 maestro.do_burning = false
 maestro.do_heating = true
 
-maestro.anelastic_cutoff = 50.e0
+maestro.anelastic_cutoff_density = 50.e0
 maestro.base_cutoff_density = 25.e0
 maestro.buoyancy_cutoff_factor = 2.e0
 

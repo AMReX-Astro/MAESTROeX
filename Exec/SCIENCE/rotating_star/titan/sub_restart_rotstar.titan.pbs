@@ -23,7 +23,7 @@ plot_base_name="${output_location}/rot1e3_"
 check_base_name="${output_location}/chk_"
 small_plot_base_name="${output_location}/smallrot1e3_"
 
-# send a message to the 3ER when the job starts 
+# send a message to the 3ER when the job starts
 source .slack_vars
 webhook_url="https://slack.com/api/chat.postMessage"
 
@@ -41,14 +41,14 @@ segex="Backtrace|AMReX\s.*\sfinalized"
 
 tail -n 0 -F ${PBS_JOBID}.OU | \
 while read LINE
-do 
-    if [[ "$LINE" =~ $regex ]]; then 
+do
+    if [[ "$LINE" =~ $regex ]]; then
         plotname=${BASH_REMATCH[1]}
 	plottime=${BASH_REMATCH[2]}
 	plotstep=${BASH_REMATCH[3]}
 
 	bash post_to_slack.sh $plottime $plotstep $plotname &
-    elif [[ "LINE" =~ $segex ]]; then 
+    elif [[ "LINE" =~ $segex ]]; then
 	break
     fi
 done
@@ -58,10 +58,9 @@ done
 # test if there were any backtrace files
 nbacktrace_files=$(ls -dl Backtrace.* | wc -l)
 
-if [ "$nbacktrace_files" -gt "0" ]; then 
-    text="Job ${PBS_JOBID} on titan in ${PBS_O_WORKDIR} exited with an error!\nHere is the backtrace:\n\`\`\`\n$(python convert_backtrace.py $(ls -d1 Backtrace.* |
- head -1 ))\n\`\`\`"
-else 
+if [ "$nbacktrace_files" -gt "0" ]; then
+    text="Job ${PBS_JOBID} on titan in ${PBS_O_WORKDIR} exited with an error!\nHere is the backtrace:\n\`\`\`\n$(python convert_backtrace.py $(ls -d1 Backtrace.* | head -1 ))\n\`\`\`"
+else
     text=":boom: Job ${PBS_JOBID} on titan in ${PBS_O_WORKDIR} has finished!"
 fi
 
