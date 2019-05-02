@@ -2,7 +2,7 @@ module tagging_module
 
   use amrex_error_module
   use meth_params_module, only: temp_comp, rho_comp, nscal
-  use probin_module, only: tag_density_1
+  use probin_module, only: tag_density_1, tag_density_2
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
@@ -48,17 +48,31 @@ contains
 
     ! local
     integer          :: i, j, k, r
+    
 
     ! Tag on regions of high density
-    do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-          do i = lo(1), hi(1)
-             if (state(i,j,k,rho_comp) .ge. tag_density_1) then
-                tag(i,j,k) = set
-             endif
+    select case(lev)
+    case (0)
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+                if (state(i,j,k,rho_comp) .ge. tag_density_1) then
+                   tag(i,j,k) = set
+                endif
+             enddo
           enddo
        enddo
-    enddo
+    case (1)
+       do k = lo(3), hi(3)
+          do j = lo(2), hi(2)
+             do i = lo(1), hi(1)
+                if (state(i,j,k,rho_comp) .ge. tag_density_2) then
+                   tag(i,j,k) = set
+                endif
+             enddo
+          enddo
+       enddo
+    end select
 
   end subroutine state_error
 
