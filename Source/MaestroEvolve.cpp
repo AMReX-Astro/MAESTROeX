@@ -87,18 +87,27 @@ Maestro::Evolve ()
 
         t_old = t_new;
 
-        Real diag_start_total = ParallelDescriptor::second();
+        if ( (sum_interval > 0 && istep%sum_interval == 0) ||
+             (sum_per > 0 && std::fmod(t_new, sum_per) < dt) ||
+             ((sum_interval > 0 || sum_per > 0) && t_old >= stop_time))
+        {
 
-        // save diag output into buffer
-        DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
+            Real diag_start_total = ParallelDescriptor::second();
 
-        // wallclock time
-        Real diag_end_total = ParallelDescriptor::second() - diag_start_total;
-        ParallelDescriptor::ReduceRealMax(diag_end_total,ParallelDescriptor::IOProcessorNumber());
+            // save diag output into buffer
+            DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
+
+            // wallclock time
+            Real diag_end_total = ParallelDescriptor::second() - diag_start_total;
+            ParallelDescriptor::ReduceRealMax(diag_end_total,ParallelDescriptor::IOProcessorNumber());
+
+            Print() << "Diagnostic :" << diag_end_total << " seconds\n\n";
+        }
+
+
         Real end_total = ParallelDescriptor::second() - start_total;
         ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
 
-        Print() << "Diagnostic :" << diag_end_total << " seconds\n\n";
         Print() << "Time to advance time step: " << end_total << '\n';
 
         if ( (plot_int > 0 && istep % plot_int == 0) ||
