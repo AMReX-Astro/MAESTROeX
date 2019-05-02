@@ -107,6 +107,8 @@ maestro.use_custom_knapsack_weights = true
 maestro.small_dens = 1.e2
 maestro.small_temp = 1.e5
 maestro.burning_cutoff_density = 1.e2
+#maestro.burner_threshold_species = oxygen-16
+#maestro.burner_threshold_cutoff = 0.5
 
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
