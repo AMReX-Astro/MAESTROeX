@@ -1,3 +1,5 @@
+amrex.fpe_trap_invalid=1
+
 # INITIAL MODEL
 maestro.model_file = "WD_urca_nuc_M-1.0_rc5.5e9_Tc6.0e8_speceq.hse.5120"
 maestro.drdxfac = 40
