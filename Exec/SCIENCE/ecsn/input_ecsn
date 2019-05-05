@@ -1,12 +1,14 @@
 # INITIAL MODEL
 maestro.model_file = "ECSN-ONe6040-final.hse.20480"
-maestro.drdxfac = 80
+maestro.drdxfac = 5
 
 # GRIDDING AND REFINEMENT
-amr.max_level          = 0       # maximum level number allowed
+amr.max_level          = 2       # maximum level number allowed
 amr.n_cell             = 512 512 512
 amr.max_grid_size      = 32
-amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+#amr.ref_ratio          = 2 
+amr.refine_grid_layout = 1       # chop grids up into smaller grids
+if nprocs > ngrids
 
 maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e5
@@ -102,7 +104,7 @@ maestro.eps_hg_bottom      = 1.e-4
   velpert_radius = 2.e7
   velpert_scale = 1.e7
   velpert_steep = 1.e5
-  tag_density_1 = 5.e7
+  tag_density_1 = 6.8e9
   tag_density_2 = 1.e8
   tag_density_3 = 1.e8
   tag_density_3 = 1.e9
@@ -112,3 +114,4 @@ maestro.eps_hg_bottom      = 1.e-4
   use_eos_coulomb = T
 
 /
+
