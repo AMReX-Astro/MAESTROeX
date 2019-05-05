@@ -45,7 +45,6 @@ maestro.evolve_base_state = false
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 3
-maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 
 maestro.do_sponge = 0
 maestro.sponge_center_density = 3.0e6
@@ -82,7 +81,7 @@ maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
 # HYDRODYNAMICS options
-maestro.anelastic_cutoff = 1.e-10
+maestro.anelastic_cutoff_density = 1.e-10
 maestro.base_cutoff_density = 1.e-10
 maestro.grav_const = -1.0e9
 

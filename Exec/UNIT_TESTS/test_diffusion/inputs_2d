@@ -59,6 +59,9 @@ maestro.small_temp = 1.e-10
 maestro.small_dens = 1.e-10
 maestro.small_dt = 1.e-10
 
+maestro.anelastic_cutoff_density = 3.e6
+maestro.base_cutoff_density = 3.e6
+
 
 &probin
  const_conductivity = 1.d7

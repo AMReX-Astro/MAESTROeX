@@ -3,7 +3,7 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-static int         do_reflux;
+static int         reflux_type;
 static int         maestro_verbose;
 static std::string model_file;
 static bool        perturb_model;
@@ -40,7 +40,7 @@ static bool        plot_Hext;
 static bool        plot_Hnuc;
 static bool        plot_eta;
 static bool        plot_trac;
-static bool        plot_base;
+static bool        plot_base_state;
 static bool        plot_gpi;
 static bool        plot_cs;
 static std::string plot_base_name;
@@ -72,7 +72,7 @@ static amrex::Real sponge_kappa;
 static amrex::Real sponge_center_density;
 static amrex::Real sponge_start_factor;
 static bool        plot_sponge_fdamp;
-static amrex::Real anelastic_cutoff;
+static amrex::Real anelastic_cutoff_density;
 static amrex::Real base_cutoff_density;
 static amrex::Real burning_cutoff_density;
 static amrex::Real buoyancy_cutoff_factor;

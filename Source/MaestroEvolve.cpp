@@ -73,6 +73,9 @@ Maestro::Evolve ()
 			t_new = t_old + dt;
 		}
 
+                // wallclock time
+                Real start_total = ParallelDescriptor::second();
+
 		// advance the solution by dt
 		if (use_exact_base_state) {
 			AdvanceTimeStepIrreg(false);
@@ -84,33 +87,45 @@ Maestro::Evolve ()
 
 		t_old = t_new;
 
+                Real diag_start_total = ParallelDescriptor::second();
+
 		// save diag output into buffer
 		DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
 
-		// write a plotfile
-		if (plot_int > 0 && ( (istep % plot_int == 0) ||
-		                      (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
-		                      (istep == max_step) ) || (t_old >= stop_time) )
+                // wallclock time
+                Real diag_end_total = ParallelDescriptor::second() - diag_start_total;
+                ParallelDescriptor::ReduceRealMax(diag_end_total,ParallelDescriptor::IOProcessorNumber());
+                Real end_total = ParallelDescriptor::second() - start_total;
+                ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+
+                Print() << "Diagnostic :" << diag_end_total << " seconds\n\n";
+                Print() << "Time to advance time step: " << end_total << '\n';
+
+        if ( (plot_int > 0 && istep % plot_int == 0) ||
+             (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
+             (istep == max_step) || (t_old >= stop_time) )
 		{
+            // write a plotfile
 			Print() << "\nWriting plotfile " << istep << std::endl;
 			WritePlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
 			              gamma1bar_new,unew,snew,S_cc_new);
 		}
 
-        if (small_plot_int > 0 && ( (istep % small_plot_int == 0) ||
-		                                   (small_plot_deltat > 0 &&
-		                                    std::fmod(t_new, small_plot_deltat) < dt) ||
-		                                   (istep == max_step) ) || (t_old >= stop_time) )
+        if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
+             (small_plot_deltat > 0 && std::fmod(t_new, small_plot_deltat) < dt) ||
+             (istep == max_step)  || (t_old >= stop_time) )
 		{
+            // write a small plotfile
 			Print() << "\nWriting small plotfile " << istep << std::endl;
 			WriteSmallPlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
 			                   gamma1bar_new,unew,snew,S_cc_new);
 		}
 
-		if (chk_int > 0 && (istep % chk_int == 0 || t_new >= stop_time || istep == max_step) )
+		if ( (chk_int > 0 && istep % chk_int == 0) ||
+             (istep == max_step) || (t_new >= stop_time) )
 		{
 			// write a checkpoint file
-			Print() << "\nWriting checkpoint" << istep << std::endl;
+			Print() << "\nWriting checkpoint " << istep << std::endl;
 			WriteCheckPoint(istep);
 		}
 

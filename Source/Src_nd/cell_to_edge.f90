@@ -23,6 +23,8 @@ contains
     double precision :: s0min,s0max,tmp
     integer          ::  n,r,i
 
+    call bl_proffortfuncstart("Maestro::cell_to_edge")
+    
     if (spherical .eq. 1) then
        call amrex_error('calling cell_to_edge with spherical .eq. 1')
     end if
@@ -64,6 +66,8 @@ contains
     ! make the edge values synchronous across levels
     call restrict_base(s0_edge, 0)
 
+    call bl_proffortfuncstop("Maestro::cell_to_edge")
+    
   end subroutine cell_to_edge
   
 end module cell_to_edge_module

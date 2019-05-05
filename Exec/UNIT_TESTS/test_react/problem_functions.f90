@@ -3,6 +3,7 @@
 module problem_functions_module
 
   use amrex_constants_module
+  use amrex_error_module
   use probin_module, only: min_time_step, react_its, run_prefix
 
   implicit none

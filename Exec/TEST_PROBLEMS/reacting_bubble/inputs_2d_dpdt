@@ -45,11 +45,10 @@ maestro.cfl       = 0.9    # cfl number for hyperbolic system
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 1
 maestro.init_iter             = 1
-maestro.do_reflux             = 0 # do we do the hyperbolic reflux
 
 maestro.grav_const = -1.5e10
 
-maestro.anelastic_cutoff = 3.e6
+maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
 maestro.do_sponge = 1

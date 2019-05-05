@@ -17,9 +17,11 @@
 # category: synchronization
 #-----------------------------------------------------------------------------
 
-# do we do the hyperbolic reflux at coarse-fine interfaces? (1)
-# or simply average-down the fluxes (0)
-do_reflux                           int         0
+# Advective synchronization type
+# 0 = do nothing
+# 1 = average down the fluxes (thermo variables) and edge velocities
+# 2 = use Reflux operations (thermo variables) and average down velocities
+reflux_type                         int         1
 
 #-----------------------------------------------------------------------------
 # category: general MAESTRO
@@ -144,6 +146,7 @@ chk_int                             int            0
 
 # Turn on storing of enthalpy-based quantities in the plotfile
 # when we are running with {\tt use\_tfromp}
+# NOT IMPLEMENTED YET
 plot_h_with_use_tfromp              bool            true
 
 # plot species and omegadot in plotfile
@@ -162,10 +165,11 @@ plot_Hnuc                           bool            true
 plot_eta                            bool            false
 
 # plot tracers in plotfile
+# NOT IMPLEMENTED YET
 plot_trac                           bool            false
 
 # plot w0\_x, w0\_y, w0\_z, divw0, rho0, rhoh0, h0, and p0 in plotfile
-plot_base                           bool            false
+plot_base_state                     bool            true
 
 # plot pi and grad(pi)
 plot_gpi                             bool            true
@@ -283,14 +287,14 @@ plot_sponge_fdamp                   bool            false
 # the anelastic constraint, instead of the low Mach constraint.  This
 # prevents velocities from getting out of hand at the edge of the star.
 # Refer to Section \ref{Sec:Anelastic Cutoff}.
-anelastic_cutoff                    Real               3.e6     y
+anelastic_cutoff_density            Real               -1.0     y
 
 # The density below which we keep the initial model constant.
 # Refer to Section \ref{Sec:Base Cutoff Density}
-base_cutoff_density                 Real               3.e6     y
+base_cutoff_density                 Real               -1.0     y
 
 # The density below which we disable burning
-burning_cutoff_density              Real               3.e6     y
+burning_cutoff_density              Real               -1.0     y
 
 # The multiplicative factor (over base\_cutoff\_density) below which we
 # do zero out the buoyancy term in the momentum equation.
@@ -321,7 +325,7 @@ average_base_state                  bool            false       y
 
 # force $\rho_0 = (\rho h)_0 = 0$, {\tt evolve\_base\_state = F}
 # and {\tt beta\_type} = 3
-do_smallscale                       bool            false
+do_smallscale                       bool            false       y
 
 # After the advective enthalpy update, recompute the enthalpy if we are
 # below the base cutoff density.

@@ -41,7 +41,7 @@ module meth_params_module
   double precision              , save :: sponge_kappa
   double precision              , save :: sponge_center_density
   double precision              , save :: sponge_start_factor
-  double precision              , save :: anelastic_cutoff
+  double precision              , save :: anelastic_cutoff_density
   double precision              , save :: base_cutoff_density
   double precision              , save :: burning_cutoff_density
   double precision              , save :: buoyancy_cutoff_factor
@@ -51,6 +51,7 @@ module meth_params_module
   logical                       , save :: evolve_base_state
   logical                       , save :: use_exact_base_state
   logical                       , save :: average_base_state
+  logical                       , save :: do_smallscale
   logical                       , save :: do_eos_h_above_cutoff
   integer                       , save :: enthalpy_pred_type
   integer                       , save :: species_pred_type
@@ -88,6 +89,8 @@ contains
   subroutine read_method_params() bind(C, name="read_method_params")
 
     use amrex_parmparse_module, only: amrex_parmparse_build, amrex_parmparse_destroy, amrex_parmparse
+    use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
+    use amrex_error_module
 
     use amrex_fort_module, only : rt => amrex_real
     implicit none
@@ -111,9 +114,9 @@ contains
     sponge_kappa = 10.d0;
     sponge_center_density = 3.d6;
     sponge_start_factor = 3.333d0;
-    anelastic_cutoff = 3.d6;
-    base_cutoff_density = 3.d6;
-    burning_cutoff_density = 3.d6;
+    anelastic_cutoff_density = -1.0d0;
+    base_cutoff_density = -1.0d0;
+    burning_cutoff_density = -1.0d0;
     buoyancy_cutoff_factor = 5.0d0;
     dpdt_factor = 0.0d0;
     do_planar_invsq_grav = .false.;
@@ -121,6 +124,7 @@ contains
     evolve_base_state = .true.;
     use_exact_base_state = .false.;
     average_base_state = .false.;
+    do_smallscale = .false.;
     do_eos_h_above_cutoff = .true.;
     enthalpy_pred_type = 1;
     species_pred_type = 1;
@@ -169,7 +173,7 @@ contains
     call pp%query("sponge_kappa", sponge_kappa)
     call pp%query("sponge_center_density", sponge_center_density)
     call pp%query("sponge_start_factor", sponge_start_factor)
-    call pp%query("anelastic_cutoff", anelastic_cutoff)
+    call pp%query("anelastic_cutoff_density", anelastic_cutoff_density)
     call pp%query("base_cutoff_density", base_cutoff_density)
     call pp%query("burning_cutoff_density", burning_cutoff_density)
     call pp%query("buoyancy_cutoff_factor", buoyancy_cutoff_factor)
@@ -179,6 +183,7 @@ contains
     call pp%query("evolve_base_state", evolve_base_state)
     call pp%query("use_exact_base_state", use_exact_base_state)
     call pp%query("average_base_state", average_base_state)
+    call pp%query("do_smallscale", do_smallscale)
     call pp%query("do_eos_h_above_cutoff", do_eos_h_above_cutoff)
     call pp%query("enthalpy_pred_type", enthalpy_pred_type)
     call pp%query("species_pred_type", species_pred_type)
@@ -210,6 +215,23 @@ contains
     call pp%query("track_grid_losses", track_grid_losses)
     call amrex_parmparse_destroy(pp)
 
+
+
+    if (base_cutoff_density .eq. -1.d0) then
+       call amrex_error("must supply base_cutoff_density")
+    end if
+
+    if (anelastic_cutoff_density .eq. -1.d0) then
+       call amrex_error("must supply anelastic_cutoff_density")
+    end if
+
+    if (burning_cutoff_density .eq. -1.d0) then
+       if (parallel_IOProcessor()) then
+          print*,'WARNING: burning_cutoff_density not supplied in the inputs file'
+          print*,'WARNING: setting burning_cutoff_density = base_cutoff_density'
+       end if
+       burning_cutoff_density = base_cutoff_density
+    end if
 
 
   end subroutine read_method_params

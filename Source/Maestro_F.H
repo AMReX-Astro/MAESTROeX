@@ -9,7 +9,7 @@ extern "C"
 
     // these are interfaces to fortran subroutines
 
-    // void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
+    void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
 
     //////////////////////
     // in advect_base.F90
@@ -89,10 +89,15 @@ extern "C"
     //////////////////////
     // in bc_fill_nd.F90
 
-    void phifill (amrex::Real* phi, const int* phi_lo, const int* phi_hi,
+    void scalarfill (amrex::Real* phi, const int* phi_lo, const int* phi_hi,
 		  const int* domlo, const int* domhi,
 		  const amrex::Real* dx, const amrex::Real* gridlo,
-		  const amrex::Real* time, const int* bc);
+		  const amrex::Real* time, const int* bc, const int icomp);
+
+    void velfill (amrex::Real* vel, const int* vel_lo, const int* vel_hi,
+    	  const int* domlo, const int* domhi,
+    	  const amrex::Real* dx, const amrex::Real* gridlo,
+    	  const amrex::Real* time, const int* bc, const int icomp);
 
     //////////////////////
 
@@ -223,7 +228,7 @@ extern "C"
     void diag_sphr(const int* lev, const int* lo, const int* hi,
 		   const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
 		   const amrex::Real* rho_Hnuc, const int* hn_lo, const int* hn_hi,
-		   const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi, 
+		   const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi,
 		   const amrex::Real* u, const int* u_lo, const int* u_hi,
 		   const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
 		   const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
@@ -235,12 +240,12 @@ extern "C"
 		   amrex::Real* enuc_max, amrex::Real* coord_enucmax, amrex::Real* vel_enucmax,
 		   amrex::Real* kin_ener, amrex::Real* int_ener, amrex::Real* nuc_ener,
 		   amrex::Real* U_max, amrex::Real* Mach_max,
-		   int* ncenter, amrex::Real* T_center, amrex::Real* vel_center, 
+		   int* ncenter, amrex::Real* T_center, amrex::Real* vel_center,
                    const int* mask, const int* m_lo, const int* m_hi,
                    const int* use_mask);
 
     void diag_grav_energy(amrex::Real* grav_ener,
-			  const amrex::Real* rho0, 
+			  const amrex::Real* rho0,
                           const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
     //////////////////////
 
@@ -730,6 +735,11 @@ extern "C"
                             const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
                             const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
                             amrex::Real* deltagamma, const int* d_lo, const int* d_hi);
+                            
+    void make_entropy(const int* lev, const int* lo, const int* hi,
+                     const amrex::Real* state, const int* s_lo, const int* s_hi,
+                     const int* nc_s,
+                     amrex::Real* entropy, const int* e_lo, const int* e_hi);
 
     void make_divw0(const int* lev, const int* lo, const int* hi,
                     const amrex::Real* w0, const amrex::Real* dx,
@@ -987,7 +997,7 @@ extern "C"
                  const amrex::Real* rho0_old, const amrex::Real* rho0_new,
                  const amrex::Real* p0_old, const amrex::Real* p0_new,
                  const amrex::Real* gamma1bar_old, const amrex::Real* gamma1bar_new,
-                 const amrex::Real* p0_minus_peosbar, const amrex::Real* psi,
+                 const amrex::Real* p0_minus_peosbar, 
                  const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
                  const amrex::Real* delta_chi_w0, const amrex::Real* r_cc_loc,
                  const amrex::Real* r_edge_loc, const amrex::Real* dt,

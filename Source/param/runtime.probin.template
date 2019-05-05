@@ -66,8 +66,6 @@ subroutine runtime_init()
 
   @@defaults@@
 
-
-  ! read in the namelist
   read (amrex_namelist, nml=probin, iostat=status)
 
   if (status .ne. 0) then
@@ -92,21 +90,40 @@ end subroutine runtime_init
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine runtime_pretty_print(unit) bind(C, name="runtime_pretty_print")
+subroutine runtime_pretty_print(name, namlen) bind(C, name="runtime_pretty_print")
 
-    use amrex_constants_module
-    use probin_module
-    use extern_probin_module
+  use amrex_constants_module
+  use extern_probin_module
+  use amrex_error_module, only: amrex_error
 
-    integer, intent(in) :: unit
+  implicit none
 
-    logical :: ltest
+  integer :: unit, i
 
-    write (unit, *) "[*] indicates overridden default"
+  integer :: namlen
+  integer :: name(namlen)
 
-    @@printing@@
+  logical :: ltest
 
-  end subroutine runtime_pretty_print
+  integer, parameter :: maxlen = 256
+  character (len=maxlen) :: probin
+
+  if (namlen > maxlen) then
+     call amrex_error("probin file name too long")
+  endif
+
+  do i = 1, namlen
+     probin(i:i) = char(name(i))
+  end do
+
+  ! open the job info file in Fortran
+  open(newunit=unit, file=probin(1:namlen), status="old", position="append")
+
+  @@printing@@
+
+  close(unit=unit)
+
+end subroutine runtime_pretty_print
 
 
 end module runtime_init_module

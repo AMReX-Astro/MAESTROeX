@@ -53,10 +53,17 @@ Maestro::Regrid ()
 
         }
 
-	// regardless of evolve_base_state, if new grids were
-	// created, we need to initialize tempbar_init there, in
-	// case drive_initial_convection = T
-	regrid_base_state_cc(tempbar_init.dataPtr());
+    	// regardless of evolve_base_state, if new grids were
+    	// created, we need to initialize tempbar_init there, in
+    	// case drive_initial_convection = T
+    	regrid_base_state_cc(tempbar_init.dataPtr());
+    } else {
+        // Here we want to fill in the rho0 array so there is
+        // valid data in any new grid locations that are created
+        // during the regrid.
+        for (int i=0; i<rho0_old.size(); ++i) {
+            rho0_temp[i] = rho0_old[i]; 
+        }
     }
 
     // regrid could add newly refine levels (if finest_level < max_level)
@@ -71,18 +78,18 @@ Maestro::Regrid ()
 
     if (spherical == 1) {
         MakeNormal();
-	if (use_exact_base_state) {
-	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
-	}
+    	if (use_exact_base_state) {
+    	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
+    	}
     }
 
     if (evolve_base_state) {
         // force rho0 to be the average of rho
         Average(sold,rho0_old,Rho);
     } else {
-	for (int i=0; i<rho0_old.size(); ++i) {
-	    rho0_old[i] = rho0_temp[i];
-	}
+    	for (int i=0; i<rho0_old.size(); ++i) {
+    	    rho0_old[i] = rho0_temp[i];
+    	}
     }
 
     // compute cutoff coordinates
@@ -340,7 +347,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
         std::swap(cell_cc_to_r_state,cell_cc_to_r[lev]);
     }
 
-    if (lev > 0 && do_reflux) {
+    if (lev > 0 && reflux_type == 2) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
     }
 }
@@ -372,12 +379,12 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
         cell_cc_to_r[lev].define(ba, dm, 1, 0);
     }
 
-    if (lev > 0 && do_reflux) {
+    if (lev > 0 && reflux_type == 2) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
     }
 
     FillCoarsePatch(lev, time,     sold[lev],     sold,     sold, 0, 0,          Nscal, bcs_s);
-    FillCoarsePatch(lev, time,     uold[lev],     uold,     uold, 0, 0, AMREX_SPACEDIM, bcs_u);
+    FillCoarsePatch(lev, time,     uold[lev],     uold,     uold, 0, 0, AMREX_SPACEDIM, bcs_u, 1);
     FillCoarsePatch(lev, time, S_cc_old[lev], S_cc_old, S_cc_old, 0, 0,              1, bcs_f);
     FillCoarsePatch(lev, time,      gpi[lev],      gpi,      gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
     FillCoarsePatch(lev, time,     dSdt[lev],     dSdt,     dSdt, 0, 0,              1, bcs_f);

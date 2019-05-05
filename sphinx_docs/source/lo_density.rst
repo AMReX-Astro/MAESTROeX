@@ -7,40 +7,40 @@ In low density regions, we modify the behavior of the algorithm. Here
 is a summary of some parameters, and a brief description of what they
 do.
 
--  | base_cutoff_density, :math:`\rho_{\rm base}`, (real):
+-  | ``base_cutoff_density``, :math:`\rho_{\rm base}`, (real):
    | Essentially controls the lowest density allowed in the simulation and modifies the behavior
      of several modules.
 
--  | base_cutoff_density_coord(:) (integer array):
+-  | ``base_cutoff_density_coord(:)`` (integer array):
    | For each level in the radial base state array, this is the coordinate of the first cell
      where :math:`\rho_0 < \rho_{\rm base}`. Slightly more complicated for multilevel problems.
 
--  | anelastic_cutoff, :math:`\rho_{\rm anelastic}`, (real):
+-  | ``anelastic_cutoff_density``, :math:`\rho_{\rm anelastic}`, (real):
    | If :math:`\rho_0 < \rho_{\rm anelastic}`, we modify the computation of :math:`\beta_0` in the
      divergence constraint.
 
--  | anelastic_cutoff_coord(:) (integer array):
-   | Anelastic cutoff analogy of base_cutoff_density_coord(:).
+-  | ``anelastic_cutoff_density_coord(:)`` (integer array):
+   | Anelastic cutoff analogy of ``base_cutoff_density_coord(:)``.
 
--  | burning_cutoff_density, :math:`\rho_{\rm burning}`, (real):
+-  | ``burning_cutoff_density``, :math:`\rho_{\rm burning}`, (real):
    | If :math:`\rho < \rho_{\rm burning}`, don’t call the burner in this cell.
 
--  | burning_cutoff_density_coord(:) (integer array):
-   | Burning cutoff analogy of base_cutoff_density_coord(:).
+-  | ``burning_cutoff_density_coord(:)`` (integer array):
+   | Burning cutoff analogy of ``base_cutoff_density_coord(:)``.
 
--  | buoyancy_cutoff_factor (real):
+-  | ``buoyancy_cutoff_factor`` (real):
    | When computing velocity forcing, set the buoyance term (:math:`\rho-\rho_0`) to 0 if
-     :math:`\rho <` buoyancy_cutoff_factor \* base_cutoff_density.
+     :math:`\rho < \mathtt{buoyancy\_cutoff\_factor * base\_cutoff\_density}`.
 
--  | do_eos_h_above_cutoff (logical):
+-  | ``do_eos_h_above_cutoff`` (logical):
    | If true, at the end of the advection step, for each cell where
      :math:`\rho < \rho_{\rm base}`, recompute :math:`h = h(\rho,p_0,X)`.
 
 Computing the Cutoff Values
 ===========================
 
-We compute anelastic_cutoff_coord(:), base_cutoff_density_coord(:),
-and burning_cutoff_density_coord(:) in analogous fashion.
+We compute ``anelastic_cutoff_density_coord(:)``, ``base_cutoff_density_coord(:)``,
+and ``burning_cutoff_density_coord(:)`` in analogous fashion.
 
 Single-Level Planar or any Spherical
 ------------------------------------
@@ -63,11 +63,11 @@ See Figure `[Fig:Cutoff] <#Fig:Cutoff>`__ for a graphical representation.
    are related for single-level planar and all spherical problems.
 
 Note that for single-level planar or any spherical problem, saying
-:math:`r\ge` anelastic_cutoff_coord is analogous to saying
-:math:`\rho_0(r)\le` anelastic_cutoff. Also, saying :math:`r<`
-anelastic_cutoff_coord is analogous to saying :math:`\rho_0(r)>`
-anelastic_cutoff. Ditto for base_cutoff_density and
-base_cutoff_density_coord.
+:math:`r\ge` ``anelastic_cutoff_density_coord`` is analogous to saying
+:math:`\rho_0(r)\le` ``anelastic_cutoff_density``. Also, saying :math:`r<`
+``anelastic_cutoff_density_coord`` is analogous to saying :math:`\rho_0(r)>`
+``anelastic_cutoff_density``. Ditto for ``base_cutoff_density`` and
+``base_cutoff_density_coord``.
 
 Multilevel Planar
 -----------------
@@ -122,16 +122,16 @@ coordinate to the coarser levels.
 When are the Cutoff Coordinates Updated?
 ========================================
 
-At several points in the algorithm, we compute anelastic_cutoff_coord(:),
-base_cutoff_density_coord(:), and burning_cutoff_density_coord(:):
+At several points in the algorithm, we compute ``anelastic_cutoff_density_coord(:)``,
+``base_cutoff_density_coord(:)``, and ``burning_cutoff_density_coord(:)``:
 
--  After we call initialize in varden.
+-  After we call ``initialize`` in ``varden``.
 
 -  After reading the base state from a checkpoint file when restarting.
 
 -  After regridding.
 
--  After advancing :math:`\rho_0` with advect_base_dens.
+-  After advancing :math:`\rho_0` with ``advect_base_dens``.
 
 -  After advancing :math:`\rho` and setting :math:`\rho_0 = \overline{\rho}`.
 
@@ -143,64 +143,66 @@ Usage of Cutoff Densities
 
 .. _Sec:Anelastic Cutoff:
 
-anelastic_cutoff
+anelastic_cutoff_density
 ----------------
 
-The anelastic_cutoff is the density below which we modify the constraint.
+The ``anelastic_cutoff_density`` is the density below which we modify the constraint.
 
--  In probin, anelastic_cutoff is set to :math:`3\times 10^6` by default.
+-  In probin, ``anelastic_cutoff_density`` is set to :math:`-1` by default.  The user
+   must supply a value in the inputs file or the code will abort.
 
--  In make_div_coeff, for
+-  In ``make_div_coeff``, for
    :math:`r \ge {\tt anelastic\_cutoff\_coord}`, we set
    :math:`{\tt div\_coeff}(n,r) = {\tt div\_coeff}(n,r-1) * \rho_0(n,r)/\rho_0(n,r-1)`.
 
--  in make_S, we set delta_gamma1_term and delta_gamma1
+-  in ``make_S``, we set ``delta_gamma1_term`` and ``delta_gamma1``
    to zero for :math:`r \ge {\tt anelastic\_cutoff\_coord}`. This is only relevant
-   if you are running with use_delta_gamma1_term = T.
+   if you are running with ``use_delta_gamma1_term = T``.
 
--  Some versions of sponge, use anelastic_cutoff in a problem dependent way.
+-  Some versions of sponge, use ``anelastic_cutoff_density`` in a problem dependent way.
 
 .. _Sec:Base Cutoff Density:
 
 base_cutoff_density
 -------------------
 
-The base_cutoff_density is the lowest density that we model.
+The ``base_cutoff_density`` is the lowest density that we model.
 
--  In probin, base_cutoff_density is set to :math:`3\times 10^6` by default.
+-  In probin, ``base_cutoff_density`` is set to :math:`-1` by default. The user
+   must supply a value in the inputs file or the code will abort.
 
--  In base_state, we compute a physical cutoff location,
-   base_cutoff_density_loc, which is defined as the physical
+-  In ``base_state``, we compute a physical cutoff location,
+   ``base_cutoff_density_loc``, which is defined as the physical
    location of the first cell-center at the coarsest level for which
    :math:`\rho_0 \le {\tt base\_cutoff\_density}`. This is a trick used for making
    the data consistent for multiple level problems. When we are generating the
-   initial background/base state, if we are above base_cutoff_density_loc,
-   just use the values for :math:`\rho,T`, and :math:`p` at base_cutoff_density_loc.
-   When we check whether we are in HSE, we use base_cutoff_density_loc.
+   initial background/base state, if we are above ``base_cutoff_density_loc``,
+   just use the values for :math:`\rho,T`, and :math:`p` at ``base_cutoff_density_loc``.
+   When we check whether we are in HSE, we use ``base_cutoff_density_loc``.
 
--  In make_S_nodal, make_macrhs, and make_w0,
+-  In ``make_S_nodal``, ``make_macrhs``, and ``make_w0``,
    we only add the volume discrepancy for :math:`r < {\tt base\_cutoff\_density\_coord}`
    (in plane parallel) and if :math:`\rho_0^{\rm cart} > {\tt base\_cutoff\_density}`
    (in spherical).
 
--  In mkrhohforce for plane-parallel, for
+-  In ``mkrhohforce`` for plane-parallel, for
    :math:`r \ge {\tt base\_cutoff\_density\_coord}`, we
    compute :math:`\nabla p_0` with a difference stencil instead of simply
    setting it to :math:`\rho_0 g`.
 
--  In update_scal, if :math:`\rho \le {\tt base\_cutoff\_density}`
-   and do_eos_h_above_cutoff, we call the EOS to compute :math:`h`.
+-  In ``update_scal``, if :math:`\rho \le {\tt base\_cutoff\_density}`
+   and ``do_eos_h_above_cutoff``, we call the EOS to compute :math:`h`.
 
--  In update_scal, if :math:`\rho \le {\tt base\_cutoff\_density}/2`
+-  In ``update_scal``, if :math:`\rho \le {\tt base\_cutoff\_density}/2`
    we set it to :math:`{\tt base\_cutoff\_density}/2`.
 
--  In make_grav for spherical, we only add the enclosed mass if
+-  In ``make_grav`` for spherical, we only add the enclosed mass if
    :math:`\rho_0 > {\tt base\_cutoff\_density}`.
 
--  In enforce_HSE, we set :math:`p_0(r+1) = p_0(r)` for
+-  In ``enforce_HSE``, we set :math:`p_0(r+1) = p_0(r)` for
    :math:`r \ge {\tt base\_cutoff\_density\_coord}`.
 
--  In make_psi for plane-parallel, we only compute :math:`\psi` for
+-  In ``make_psi`` for plane-parallel, we only compute :math:`\psi` for
    :math:`r < {\tt base\_cutoff\_density\_coord}`.
 
 burning_cutoff
@@ -210,33 +212,31 @@ The burning cutoff determines where we call the reaction network to
 get the nuclear energy generation rate and composition changes. For
 densities below the burning cutoff, we do not call the network.
 
--  In probin, burning_cutoff_density is set to
-   base_cutoff_density. There is no option to set
-   burning_cutoff_density using the inputs file.
+-  In ``probin``, ``burning_cutoff_density`` is set to
+   ``base_cutoff_density`` it no value is supplied.
 
--  In react_state, we only call the burner if
-   :math:`\rho >` burning_cutoff_density.
+-  In ``react_state``, we only call the burner if
+   :math:`\rho >` ``burning_cutoff_density``.
 
 buoyancy_cutoff_factor
 ----------------------
 
-The buoyancy_cutoff_factor is used to zero out the forcing terms
+The ``buoyancy_cutoff_factor`` is used to zero out the forcing terms
 to the velocity equation at low densities.
 
--  In init_base_state we print out the value of the
+-  In ``init_base_state`` we print out the value of the
    the density at which the buoyancy cutoff would take effect,
-   buoyancy_cutoff_factor \* base_cutoff_density.
+   ``buoyancy_cutoff_factor`` \* ``base_cutoff_density``.
 
--  In mk_vel_force, we zero out rhopert, the
+-  In ``mk_vel_force``, we zero out ``rhopert``, the
    perturbational density used in computing the buoyancy force,
    if :math:`\rho < \mathtt{buoyancy\_cutoff\_factor * base\_cutoff\_density}`.
 
--  In mk_vel_force, for spherical problems, we
-   zero out centrifugal_term, the centrifugal force for
-   rotating stars, if :math:`\rho < \mathtt{buoyancy\_cutoff\_factor *
-      base\_cutoff\_density}`.
+-  In ``mk_vel_force``, for spherical problems, we
+   zero out ``centrifugal_term``, the centrifugal force for
+   rotating stars, if :math:`\rho < \mathtt{buoyancy\_cutoff\_factor * base\_cutoff\_density}`.
 
--  | In make_explicit_thermal, if limit_conductivity = T, then for
+-  | In ``make_explicit_thermal``, if ``limit_conductivity = T``, then for
      :math:`\rho < \mathtt{buoyancy\_cutoff\_factor}`
    | :math:`* \mathtt{base\_cutoff\_density}`, we
      zero out the thermal coefficients, effectively turning off thermal

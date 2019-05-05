@@ -11,8 +11,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<Real>& grav_cell,
                        const Vector<Real>& w0_force,
                        const Vector<MultiFab>& w0_force_cart,
-		       const Vector<Real>& beta0,
-		       const int is_predictor,
+        		       const Vector<Real>& beta0,
+        		       const int is_predictor,
                        int do_add_utilde_force)
 {
     // timer for profiling
@@ -28,13 +28,13 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     if (spherical == 1) {
         Vector<Real> gradw0( (max_radial_level+1)*nr_fine );
         gradw0.shrink_to_fit();
-	
+
 	if (use_exact_base_state || average_base_state) {
             std::fill(gradw0.begin(), gradw0.end(), 0.);
 	} else {
 	    compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
 	}
-	
+
         Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
     }
 
@@ -114,7 +114,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
     // note - we need to reconsider the bcs type here
     // it matches fortran MAESTRO but is that correct?
-    FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0,
+              bcs_u, 1);
 
 }
 
@@ -304,7 +305,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             if (spherical == 1) {
                 const Real* dx = geom[lev].CellSize();
 #if (AMREX_SPACEDIM == 3)
-		// if use_exact_base_state, psi is set to dpdt in advance subroutine
+		// if use_exact_base_state or average_base_state,
+		// psi is set to dpdt in advance subroutine
 		mkrhohforce_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				 scal_force_mf[mfi].dataPtr(RhoH),
 				 ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
@@ -324,6 +326,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                 Abort("MakeRhoHForce: Spherical is not valid for DIM < 3");
 #endif
             } else {
+		// if average_base_state, psi is set to dpdt in advance subroutine
                 mkrhohforce(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                             scal_force_mf[mfi].dataPtr(RhoH),
                             ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/AMReX-Astro/MAESTROeX.svg?branch=development)](https://travis-ci.org/AMReX-Astro/MAESTROeX)
+[![Build Status](https://travis-ci.com/AMReX-Astro/MAESTROeX.svg?branch=development)](https://travis-ci.com/AMReX-Astro/MAESTROeX)
 
 # MAESTROeX
 a C++/F90 low Mach number stellar hydrodynamics code

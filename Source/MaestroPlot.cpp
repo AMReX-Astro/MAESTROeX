@@ -1,7 +1,7 @@
-
 #include <Maestro.H>
 #include <MaestroPlot.H>
 #include <AMReX_buildInfo.H>
+#include <iterator>     // std::istream_iterator
 
 using namespace amrex;
 
@@ -43,17 +43,17 @@ Maestro::WritePlotFile (const int step,
 
 	std::string plotfilename;
 
-    if (!is_small) {
-        plotfilename = plot_base_name;
-    } else {
-        plotfilename = small_plot_base_name;
-    }
+	if (!is_small) {
+		plotfilename = plot_base_name;
+	} else {
+		plotfilename = small_plot_base_name;
+	}
 
 	if (step == plotInitData) {
 		if (plotfilename.back() == '_') {
 			plotfilename += "InitData";
 		} else {
-			plotfilename += + "_InitData";
+			plotfilename += +"_InitData";
 		}
 
 	}
@@ -61,14 +61,14 @@ Maestro::WritePlotFile (const int step,
 		if (plotfilename.back() == '_') {
 			plotfilename += "after_InitProj";
 		} else {
-			plotfilename += + "_after_InitProj";
+			plotfilename += +"_after_InitProj";
 		}
 	}
 	else if (step == plotDivuIter) {
 		if (plotfilename.back() == '_') {
 			plotfilename += "after_DivuIter";
 		} else {
-			plotfilename += + "_after_DivuIter";
+			plotfilename += +"_after_DivuIter";
 		}
 	}
 	else {
@@ -186,6 +186,9 @@ Maestro::PlotFileMF (const int nPlot,
 	Vector<MultiFab> tempmf(finest_level+1);
 	Vector<MultiFab> tempmf_scalar1(finest_level+1);
 	Vector<MultiFab> tempmf_scalar2(finest_level+1);
+	Vector<Real> tempbar_plot ((max_radial_level+1)*nr_fine);
+	tempbar_plot.shrink_to_fit();
+	std::fill(tempbar_plot.begin(), tempbar_plot.end(), 0.);
 
 	int dest_comp = 0;
 
@@ -200,63 +203,70 @@ Maestro::PlotFileMF (const int nPlot,
 
 	// velocity
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((u_in[i]),0,dest_comp,AMREX_SPACEDIM);
+		plot_mf_data[i]->copy(u_in[i],0,dest_comp,AMREX_SPACEDIM);
 	}
 	dest_comp += AMREX_SPACEDIM;
 
 	// magvel
 	MakeMagvel(u_in, tempmf);
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+	}
+	++dest_comp;
+
+	// momentum = magvel * rho
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+		MultiFab::Multiply(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
 	}
 	++dest_comp;
 
 	// vorticity
 	MakeVorticity(u_in, tempmf);
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 	}
 	++dest_comp;
 
 	// rho
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),Rho,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],Rho,dest_comp,1);
 	}
 	++dest_comp;
 
 	// rhoh
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),RhoH,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],RhoH,dest_comp,1);
 	}
 	++dest_comp;
 
 	// h
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),RhoH,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],RhoH,dest_comp,1);
 		MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
 	}
 	++dest_comp;
 
 	// rhoX
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),FirstSpec,dest_comp,NumSpec);
+		plot_mf_data[i]->copy(s_in[i],FirstSpec,dest_comp,NumSpec);
 	}
 	dest_comp += NumSpec;
 
 	if (plot_spec) {
 		// X
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((s_in[i]),FirstSpec,dest_comp,NumSpec);
+			plot_mf_data[i]->copy(s_in[i],FirstSpec,dest_comp,NumSpec);
 			for (int comp=0; comp<NumSpec; ++comp) {
 				MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
 			}
 		}
 		dest_comp += NumSpec;
 
-        // abar
+		// abar
 		MakeAbar(s_in, tempmf);
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 		}
 		++dest_comp;
 
@@ -284,7 +294,7 @@ Maestro::PlotFileMF (const int nPlot,
 		// omegadot
 		if (plot_omegadot) {
 			for (int i = 0; i <= finest_level; ++i) {
-				plot_mf_data[i]->copy((rho_omegadot[i]),0,dest_comp,NumSpec);
+				plot_mf_data[i]->copy(rho_omegadot[i],0,dest_comp,NumSpec);
 				for (int comp=0; comp<NumSpec; ++comp) {
 					MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
 				}
@@ -296,7 +306,7 @@ Maestro::PlotFileMF (const int nPlot,
 	if (plot_Hext) {
 		// Hext
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((rho_Hext[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy(rho_Hext[i],0,dest_comp,1);
 			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
 		}
 		++dest_comp;
@@ -305,7 +315,7 @@ Maestro::PlotFileMF (const int nPlot,
 	if (plot_Hnuc) {
 		// Hnuc
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((rho_Hnuc[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy(rho_Hnuc[i],0,dest_comp,1);
 			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
 		}
 		++dest_comp;
@@ -313,9 +323,9 @@ Maestro::PlotFileMF (const int nPlot,
 
 	if (plot_eta) {
 		// eta_rho
-		Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0);
+		Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0,1);
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 		}
 		++dest_comp;
 	}
@@ -324,7 +334,7 @@ Maestro::PlotFileMF (const int nPlot,
 	TfromRhoP(s_in,p0_in);
 	// tfromp
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
 	}
 	++dest_comp;
 
@@ -332,7 +342,7 @@ Maestro::PlotFileMF (const int nPlot,
 	TfromRhoH(s_in,p0_in);
 	for (int i = 0; i <= finest_level; ++i) {
 		// tfromh
-		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
 	}
 	++dest_comp;
 
@@ -341,7 +351,7 @@ Maestro::PlotFileMF (const int nPlot,
 	PfromRhoH(s_in,s_in,tempmf);
 	for (int i = 0; i <= finest_level; ++i) {
 		// tfromh
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 		MultiFab::Subtract(*plot_mf_data[i],p0_cart[i],0,dest_comp,1,0);
 	}
 	++dest_comp;
@@ -350,7 +360,7 @@ Maestro::PlotFileMF (const int nPlot,
 	// compute & copy tfromp
 	TfromRhoP(s_in,p0_in);
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
 	}
 	// compute tfromh
 	TfromRhoH(s_in,p0_in);
@@ -368,20 +378,20 @@ Maestro::PlotFileMF (const int nPlot,
 
 	// pi
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),Pi,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],Pi,dest_comp,1);
 	}
 	++dest_comp;
 
 	// pioverp0
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),Pi,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],Pi,dest_comp,1);
 		MultiFab::Divide(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
 	}
 	++dest_comp;
 
 	// p0pluspi
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),Pi,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],Pi,dest_comp,1);
 		MultiFab::Add(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
 	}
 	++dest_comp;
@@ -389,55 +399,58 @@ Maestro::PlotFileMF (const int nPlot,
 	if (plot_gpi) {
 		// gpi
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((gpi[i]),0,dest_comp,AMREX_SPACEDIM);
+			plot_mf_data[i]->copy(gpi[i],0,dest_comp,AMREX_SPACEDIM);
 		}
 		dest_comp += AMREX_SPACEDIM;
 	}
 
 	// rhopert
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),Rho,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],Rho,dest_comp,1);
 		MultiFab::Subtract(*plot_mf_data[i],rho0_cart[i],0,dest_comp,1,0);
 	}
 	++dest_comp;
 
 	// rhohpert
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),RhoH,dest_comp,1);
+		plot_mf_data[i]->copy(s_in[i],RhoH,dest_comp,1);
 		MultiFab::Subtract(*plot_mf_data[i],rhoh0_cart[i],0,dest_comp,1,0);
 	}
 	++dest_comp;
 
 	// tpert
-	Vector<Real> tempbar_plot ((max_radial_level+1)*nr_fine);
-	tempbar_plot.shrink_to_fit();
-	std::fill(tempbar_plot.begin(), tempbar_plot.end(), 0.);
+	{
+		Average(s_in, tempbar_plot, Temp);
+		Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
 
-	Average(s_in, tempbar_plot, Temp);
-	Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
-
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((s_in[i]),Temp,dest_comp,1);
-		MultiFab::Subtract(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
+			MultiFab::Subtract(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
+		}
 	}
 	++dest_comp;
 
-	// rho0, rhoh0, h0 and p0
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(( rho0_cart[i]),0,dest_comp,1);
-		plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+1,1);
-		plot_mf_data[i]->copy((rhoh0_cart[i]),0,dest_comp+2,1);
-
+        if (plot_base_state) {
+            // rho0, rhoh0, h0 and p0
+            for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy( rho0_cart[i],0,dest_comp,1);
+		plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+1,1);
+		plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+2,1);
+                
 		// we have to use protected_divide here to guard against division by zero
 		// in the case that there are zeros rho0
 		MultiFab& plot_mf_data_mf = *plot_mf_data[i];
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
 		for ( MFIter mfi(plot_mf_data_mf, true); mfi.isValid(); ++mfi ) {
-			plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
+                    plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
 		}
-
-		plot_mf_data[i]->copy((   p0_cart[i]),0,dest_comp+3,1);
-	}
-	dest_comp += 4;
+                
+		plot_mf_data[i]->copy(p0_cart[i],0,dest_comp+3,1);
+            }
+            dest_comp += 4;
+        }
 
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 	Vector<MultiFab> w0r_cart(finest_level+1);
@@ -463,7 +476,7 @@ Maestro::PlotFileMF (const int nPlot,
 
 		if (evolve_base_state == 1) {
 			MakeW0mac(w0mac);
-			Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_f,0);
+			Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,1);
 		}
 
 		// Mach number
@@ -475,69 +488,96 @@ Maestro::PlotFileMF (const int nPlot,
 
 	// MachNumber
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 	}
 	++dest_comp;
 
 	// deltagamma
 	MakeDeltaGamma(s_in, p0_in, p0_cart, gamma1bar_in, gamma1bar_cart, tempmf);
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+	}
+	++dest_comp;
+
+	// entropy
+	MakeEntropy(s_in, tempmf);
+	for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+	}
+	++dest_comp;
+
+	// entropypert = (entropy - entropybar) / entropybar
+	{
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+		}
+
+		Average(tempmf, tempbar_plot, 0);
+		Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
+
+		for (int i = 0; i <= finest_level; ++i) {
+			MultiFab::Subtract(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
+			MultiFab::Divide(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
+		}
 	}
 	++dest_comp;
 
 	if (plot_pidivu) {
 		// pidivu
-		// Vector<MultiFab> beta0_cart(finest_level+1);
-		// for (int lev=0; lev<=finest_level; ++lev) {
-		//     beta0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-		// }
-		// Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
-		// MakePiCC(beta0_cart);
 		MakePiDivu(u_in, s_in, tempmf);
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 		}
 		++dest_comp;
 	}
+
+    // processor number of each tile
+    if (plot_processors) {
+        for (int i = 0; i <= finest_level; ++i) {
+            (*plot_mf_data[i]).setVal(ParallelDescriptor::MyProc());
+    	}
+        ++dest_comp;
+    }
 
 	if (plot_ad_excess) {
 		// ad_excess
 		MakeAdExcess(s_in, tempmf);
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 		}
 		++dest_comp;
 	}
 
 	// S
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((S_cc_in[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy(S_cc_in[i],0,dest_comp,1);
 	}
 	++dest_comp;
 
+	// soundspeed
 	if (plot_cs) {
 		CsfromRhoH(s_in, p0_in, p0_cart, tempmf);
-		// soundspeed
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 		}
 		++dest_comp;
 	}
 
-	// w0
-	Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0);
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,AMREX_SPACEDIM);
-	}
-	dest_comp += AMREX_SPACEDIM;
+        if (plot_base_state) {
+            // w0
+            Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0,1);
+            for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,AMREX_SPACEDIM);
+            }
+            dest_comp += AMREX_SPACEDIM;
 
-	// divw0
-	MakeDivw0(w0mac, tempmf);
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
-	}
-	dest_comp++;
+            // divw0
+            MakeDivw0(w0mac, tempmf);
+            for (int i = 0; i <= finest_level; ++i) {
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+            }
+            dest_comp++;
+        }
 
 	// thermal
 	Vector<MultiFab> Tcoeff            (finest_level+1);
@@ -562,14 +602,14 @@ Maestro::PlotFileMF (const int nPlot,
 		}
 	}
 	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 	}
 	dest_comp++;
 
 	// conductivity
 	for (int i = 0; i <= finest_level; ++i) {
 		tempmf[i].setVal(0.);
-		plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 		MultiFab::Subtract(*plot_mf_data[i],Tcoeff[i],0,dest_comp,1,0);
 	}
 	dest_comp++;
@@ -578,8 +618,8 @@ Maestro::PlotFileMF (const int nPlot,
 	if (spherical == 1) {
 		MakeVelrc(u_in, w0r_cart, tempmf, tempmf_scalar1);
 		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
-			plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp+1,1);
+			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+			plot_mf_data[i]->copy(tempmf_scalar1[i],0,dest_comp+1,1);
 		}
 		dest_comp += 2;
 	}
@@ -597,7 +637,7 @@ Maestro::PlotFileMF (const int nPlot,
 				// scalar2 = dt * kappa
 				tempmf_scalar2[i].setVal(dt * sponge_kappa);
 				// plot_mf = 1
-				plot_mf_data[i]->copy((tempmf_scalar1[i]),0,dest_comp,1);
+				plot_mf_data[i]->copy(tempmf_scalar1[i],0,dest_comp,1);
 				// plot_mf = 1/sponge
 				MultiFab::Divide(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
 				// plot_mf = 1/sponge - 1
@@ -607,7 +647,7 @@ Maestro::PlotFileMF (const int nPlot,
 			}
 		} else {
 			for (int i = 0; i <= finest_level; ++i) {
-				plot_mf_data[i]->copy((tempmf[i]),0,dest_comp,1);
+				plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
 			}
 		}
 		dest_comp++;
@@ -680,14 +720,14 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	BL_PROFILE_VAR("Maestro::PlotFileVarNames()",PlotFileVarNames);
 
 	// velocities (AMREX_SPACEDIM)
-	// magvel
+	// magvel, momentum
 	// rho, rhoh, h, rhoX, tfromp, tfromh, deltap, deltaT Pi (Nscal+4 -- the extra 4 are h, tfromh, deltap and deltaT)
 	// rho' and rhoh' and t' (3)
-	// rho0, rhoh0, h0, p0, w0 (4+AMREX_SPACEDIM)
 	// pioverp0, p0pluspi (2)
-	// MachNumber, deltagamma, divw0, S
+	// MachNumber, deltagamma, entropy, entropypert, S
 	// thermal, conductivity
-	(*nPlot) = 2*AMREX_SPACEDIM + Nscal + 21;
+
+	(*nPlot) = AMREX_SPACEDIM + Nscal + 19;
 
 	if (plot_spec) (*nPlot) += NumSpec + 1; // X + 1 (abar)
 	if (plot_spec || plot_omegadot) (*nPlot) += NumSpec; // omegadot
@@ -696,9 +736,12 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	if (plot_Hnuc) (*nPlot)++;
 	if (plot_eta) (*nPlot)++;
 	if (plot_gpi) (*nPlot) += AMREX_SPACEDIM;
+	// rho0, rhoh0, h0, p0, w0, divw0 (5+AMREX_SPACEDIM)
+        if (plot_base_state) (*nPlot) += AMREX_SPACEDIM + 5;
 	if (plot_cs) (*nPlot)++;
 	if (plot_ad_excess) (*nPlot)++;
 	if (plot_pidivu) (*nPlot)++;
+    if (plot_processors) (*nPlot)++;
 	if (spherical == 1) (*nPlot) += 2; // radial_velocity, circ_velocity
 	if (do_sponge) (*nPlot)++;
 
@@ -714,6 +757,8 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	}
 
 	names[cnt++] = "magvel";
+	names[cnt++] = "momentum";
+
 	names[cnt++] = "vort";
 
 	// density and enthalpy
@@ -762,7 +807,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
 			delete [] spec_name;
 		}
 
-        names[cnt++] = "abar";
+		names[cnt++] = "abar";
 	}
 
 	if (plot_spec || plot_omegadot) {
@@ -812,27 +857,32 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	names[cnt++] = "rhopert";
 	names[cnt++] = "rhohpert";
 	names[cnt++] = "tpert";
-
-	names[cnt++] = "rho0";
-	names[cnt++] = "rhoh0";
-	names[cnt++] = "h0";
-	names[cnt++] = "p0";
+        if (plot_base_state) {
+            names[cnt++] = "rho0";
+            names[cnt++] = "rhoh0";
+            names[cnt++] = "h0";
+            names[cnt++] = "p0";
+        }
 	names[cnt++] = "MachNumber";
 	names[cnt++] = "deltagamma";
+	names[cnt++] = "entropy";
+	names[cnt++] = "entropypert";
 	if (plot_pidivu) names[cnt++] = "pi_divu";
+    if (plot_processors) names[cnt++] = "processor_number";
 	if (plot_ad_excess) names[cnt++] = "ad_excess";
 	names[cnt++] = "S";
 
 	if (plot_cs) names[cnt++] = "soundspeed";
 
-	// add w0
-	for (int i=0; i<AMREX_SPACEDIM; ++i) {
+        if (plot_base_state) {
+            // w0 and divw0
+            for (int i=0; i<AMREX_SPACEDIM; ++i) {
 		std::string x = "w0";
 		x += (120+i);
 		names[cnt++] = x;
-	}
-
-	names[cnt++] = "divw0";
+            }
+            names[cnt++] = "divw0";
+        }
 
 	names[cnt++] = "thermal";
 	names[cnt++] = "conductivity";
@@ -858,48 +908,70 @@ Maestro::PlotFileVarNames (int * nPlot) const
 Vector<std::string>
 Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::SmallPlotFileVarNames()",SmallPlotFileVarNames);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::SmallPlotFileVarNames()",SmallPlotFileVarNames);
 
-	Vector<std::string> names(*nPlot);
+    Vector<std::string> names(*nPlot);
 
-	ParmParse pp("maestro");
-	std::string nm;
+    ParmParse pp("maestro");
 
-	int nPltVars = pp.countval("small_plot_vars");
+    int nPltVars = pp.countval("small_plot_vars");
 
-	int cnt = 0;
+    if (nPltVars > 0) { // small_plot_vars defined in inputs file
 
-	for (int i = 0; i < nPltVars; i++)
-	{
-		pp.get("small_plot_vars", nm, i);
+        std::string nm;
 
-		if (nm == "ALL")
-			return varnames;
-		else if (nm == "NONE") {
-			names.clear();
-			return names;
-		} else {
-			// test to see if it's a valid varname by iterating over
-			// varnames
-			auto found_name = false;
-			for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
-				if (nm == *it) {
-					names.push_back(nm);
-					found_name = true;
-					cnt++;
-					break;
-				}
-			}
+        for (int i = 0; i < nPltVars; i++)
+        {
+            pp.get("small_plot_vars", nm, i);
 
-            if (!found_name)
-                Print() << "Small plot file variable " << nm << " is invalid\n";
+            if (nm == "ALL")
+                return varnames;
+            else if (nm == "NONE") {
+                names.clear();
+                return names;
+            } else {
+                // test to see if it's a valid varname by iterating over
+                // varnames
+                auto found_name = false;
+                for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
+                    if (nm == *it) {
+                        names.push_back(nm);
+                        found_name = true;
+                        break;
+                    }
+                }
+
+                if (!found_name)
+                    Print() << "Small plot file variable " << nm << " is invalid\n";
+            }
+        }
+    } else {
+        // use default value of small_plot_vars which is a string that needs to be split
+        std::stringstream sstream(small_plot_vars);
+        std::string nm;
+
+        while (sstream >> nm) {
+            // test to see if it's a valid varname by iterating over
+            // varnames
+            auto found_name = false;
+            for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
+                if (nm == *it) {
+                    names.push_back(nm);
+                    found_name = true;
+                    break;
+                }
+            }
+
+			if (!found_name)
+				Print() << "Small plot file variable " << nm << " is invalid\n";
 		}
 	}
 
-	*nPlot = cnt;
+    names.shrink_to_fit();
+    *nPlot = names.size();
 
-	return names;
+    return names;
 
 }
 
@@ -1125,7 +1197,7 @@ Maestro::WriteJobInfo (const std::string& dir) const
 		for (int i = 0; i < jobinfo_file_length; i++)
 			jobinfo_file_name[i] = FullPathJobInfoFile[i];
 
-		// runtime_pretty_print(jobinfo_file_name.dataPtr(), &jobinfo_file_length);
+		runtime_pretty_print(jobinfo_file_name.dataPtr(), &jobinfo_file_length);
 	}
 }
 
@@ -1434,6 +1506,45 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 }
 
 void
+Maestro::MakeEntropy (const Vector<MultiFab>& state,
+                      Vector<MultiFab>& entropy)
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::MakeEntropy()",MakeEntropy);
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+
+		// get references to the MultiFabs at level lev
+		const MultiFab& state_mf = state[lev];
+		MultiFab& entropy_mf = entropy[lev];
+
+		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+		for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+
+			// Get the index space of the valid region
+			const Box& tileBox = mfi.tilebox();
+
+			// call fortran subroutine
+			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+			// lo/hi coordinates (including ghost cells), and/or the # of components
+			// We will also pass "validBox", which specifies the "valid" region.
+			make_entropy(&lev,ARLIM_3D(tileBox.loVect()),
+			             ARLIM_3D(tileBox.hiVect()),
+			             BL_TO_FORTRAN_FAB(state_mf[mfi]),
+			             BL_TO_FORTRAN_3D(entropy_mf[mfi]));
+		}
+
+	}
+
+	// average down and fill ghost cells
+	AverageDown(entropy,0,1);
+	FillPatch(t_old,entropy,entropy,entropy,0,0,1,0,bcs_f);
+}
+
+void
 Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
                     Vector<MultiFab>& divw0)
 {
@@ -1576,8 +1687,8 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
 			make_abar(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			            BL_TO_FORTRAN_FAB(state_mf[mfi]),
-			            BL_TO_FORTRAN_3D(abar_mf[mfi]));
+			          BL_TO_FORTRAN_FAB(state_mf[mfi]),
+			          BL_TO_FORTRAN_3D(abar_mf[mfi]));
 		}
 
 	}

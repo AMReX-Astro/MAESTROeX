@@ -162,17 +162,15 @@ Maestro::NodalProj (int proj_type,
         else {
             if (phys_bc[idim] == Outflow) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-            } else if (phys_bc[idim] == Inflow) {
-                mlmg_lobc[idim] = LinOpBCType::inflow;
-            } else {
+            }
+            else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
 
             if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } else if (phys_bc[AMREX_SPACEDIM+idim] == Inflow) {
-                mlmg_hibc[idim] = LinOpBCType::inflow;
-            } else {
+            } 
+            else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }
         }
@@ -404,8 +402,8 @@ Maestro::NodalProj (int proj_type,
     AverageDown(gpi,0,AMREX_SPACEDIM);
 
     // fill ghost cells
-    FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
-    FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+    FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
     if (proj_type == pressure_iters_comp ||
         proj_type == regular_timestep_comp) {
@@ -475,7 +473,7 @@ Maestro::CreateUvecForProj (int proj_type,
 
     // fill ghost cells
     AverageDown(Vproj,0,AMREX_SPACEDIM);
-    FillPatch(time, Vproj, Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    FillPatch(time, Vproj, Vproj, Vproj, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
 }
 

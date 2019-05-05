@@ -1,7 +1,7 @@
 module make_beta0_module
 
     use amrex_constants_module
-    use base_state_geometry_module, only: nr_fine, dr, anelastic_cutoff_coord, &
+    use base_state_geometry_module, only: nr_fine, dr, anelastic_cutoff_density_coord, &
                                           r_start_coord, r_end_coord, &
                                           nr, numdisjointchunks, finest_radial_level, &
                                           max_radial_level, restrict_base, fill_ghost_base
@@ -29,6 +29,8 @@ module make_beta0_module
 
     double precision, allocatable :: beta0_edge(:,:)
 
+    call bl_proffortfuncstart("Maestro::make_beta0")
+    
     allocate(beta0_edge(0:finest_radial_level,0:nr_fine))
 
     beta0 = 0.d0
@@ -71,7 +73,7 @@ module make_beta0_module
 
              do r=r_start_coord(n,j),r_end_coord(n,j)
 
-                if (r < anelastic_cutoff_coord(n)) then
+                if (r < anelastic_cutoff_density_coord(n)) then
 
                    if (r .eq. 0 .or. r .eq. nr(n)-1) then
                       
@@ -168,7 +170,7 @@ module make_beta0_module
                    beta0_edge(n,r+1) = beta0_edge(n,r) * exp(-integral)
                    beta0(n,r) = HALF*(beta0_edge(n,r) + beta0_edge(n,r+1))
 
-                else ! r >= anelastic_cutoff
+                else ! r >= anelastic_cutoff_density
 
                    beta0(n,r) = beta0(n,r-1) * (rho0(n,r)/rho0(n,r-1))
                    beta0_edge(n,r+1) = 2.d0*beta0(n,r) - beta0_edge(n,r)
@@ -194,7 +196,7 @@ module make_beta0_module
                    end do
 
                    ! Redo the anelastic cutoff part
-                   do r=anelastic_cutoff_coord(i),nr(i)
+                   do r=anelastic_cutoff_density_coord(i),nr(i)
                       if (rho0(i,r-1) /= ZERO) then
                          beta0(i,r) = beta0(i,r-1) * (rho0(i,r)/rho0(i,r-1))
                       endif
@@ -205,9 +207,9 @@ module make_beta0_module
                    ! level i+1 to level i in the region between the anelastic cutoff and 
                    ! the top of grid n.  Then recompute beta0 at level i above the top 
                    ! of grid n.
-                   if (r_end_coord(n,j) .ge. anelastic_cutoff_coord(n)) then
+                   if (r_end_coord(n,j) .ge. anelastic_cutoff_density_coord(n)) then
 
-                      do r=anelastic_cutoff_coord(i),(r_end_coord(n,j)+1)/refrat-1
+                      do r=anelastic_cutoff_density_coord(i),(r_end_coord(n,j)+1)/refrat-1
                          beta0(i,r) = HALF*(beta0(i+1,2*r)+beta0(i+1,2*r+1))
                       end do
 
@@ -271,6 +273,8 @@ module make_beta0_module
 
     deallocate(beta0_edge)
 
+    call bl_proffortfuncstop("Maestro::make_beta0")
+    
   end subroutine make_beta0
 
   subroutine make_beta0_irreg(beta0,rho0,p0,gamma1bar,grav_cell, &
@@ -296,6 +300,8 @@ module make_beta0_module
 
     double precision, allocatable :: beta0_edge(:,:)
 
+    call bl_proffortfuncstart("Maestro::make_beta0_irreg")
+    
     allocate(beta0_edge(0:finest_radial_level,0:nr_fine))
 
     beta0 = 0.d0
@@ -338,7 +344,7 @@ module make_beta0_module
 
              do r=r_start_coord(n,j),r_end_coord(n,j)
                    
-                if (r < anelastic_cutoff_coord(n)) then
+                if (r < anelastic_cutoff_density_coord(n)) then
 
                    drp = r_edge_loc(n,r+1) - r_edge_loc(n,r)
                    drm = r_edge_loc(n,r) - r_edge_loc(n,r-1)
@@ -413,7 +419,7 @@ module make_beta0_module
                    beta0_edge(n,r+1) = beta0_edge(n,r) * exp(-integral)
                    beta0(n,r) = HALF*(beta0_edge(n,r) + beta0_edge(n,r+1))
 
-                else ! r >= anelastic_cutoff
+                else ! r >= anelastic_cutoff_density
                    
                    beta0(n,r) = beta0(n,r-1) * (rho0(n,r)/rho0(n,r-1))
                    beta0_edge(n,r+1) = 2.d0*beta0(n,r) - beta0_edge(n,r)
@@ -439,7 +445,7 @@ module make_beta0_module
                    end do
 
                    ! Redo the anelastic cutoff part
-                   do r=anelastic_cutoff_coord(i),nr(i)
+                   do r=anelastic_cutoff_density_coord(i),nr(i)
                       if (rho0(i,r-1) /= ZERO) then
                          beta0(i,r) = beta0(i,r-1) * (rho0(i,r)/rho0(i,r-1))
                       endif
@@ -450,9 +456,9 @@ module make_beta0_module
                    ! level i+1 to level i in the region between the anelastic cutoff and 
                    ! the top of grid n.  Then recompute beta0 at level i above the top 
                    ! of grid n.
-                   if (r_end_coord(n,j) .ge. anelastic_cutoff_coord(n)) then
+                   if (r_end_coord(n,j) .ge. anelastic_cutoff_density_coord(n)) then
 
-                      do r=anelastic_cutoff_coord(i),(r_end_coord(n,j)+1)/refrat-1
+                      do r=anelastic_cutoff_density_coord(i),(r_end_coord(n,j)+1)/refrat-1
                          beta0(i,r) = HALF*(beta0(i+1,2*r)+beta0(i+1,2*r+1))
                       end do
 
@@ -515,6 +521,8 @@ module make_beta0_module
     call fill_ghost_base(beta0,1)
 
     deallocate(beta0_edge)
+    
+    call bl_proffortfuncstop("Maestro::make_beta0_irreg")
 
   end subroutine make_beta0_irreg
   

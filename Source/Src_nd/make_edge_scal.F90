@@ -714,6 +714,7 @@ contains
     ke = hi(3)
 
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js-1,je+1
              do i=is-1,ie+1
@@ -723,6 +724,7 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     end if
 
     if (ppm_type .eq. 0) then
@@ -763,6 +765,7 @@ contains
 
     ! loop over appropriate x-faces
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js-1,je+1
              do i=is,ie+1
@@ -772,6 +775,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks-1,ke+1
           do j=js-1,je+1
@@ -828,6 +832,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks-1,ke+1
        do j=js-1,je+1
           do i=is,ie+1
@@ -838,6 +843,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(slopex)
 
@@ -850,6 +856,7 @@ contains
 
     ! loop over appropriate y-faces
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js,je+1
              do i=is-1,ie+1
@@ -859,6 +866,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks-1,ke+1
           do j=js,je+1
@@ -915,6 +923,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks-1,ke+1
        do j=js,je+1
           do i=is-1,ie+1
@@ -925,6 +934,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(slopey)
 
@@ -937,6 +947,7 @@ contains
 
     ! loop over appropriate z-faces
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke+1
           do j=js-1,je+1
              do i=is-1,ie+1
@@ -946,6 +957,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks,ke+1
           do j=js-1,je+1
@@ -1002,6 +1014,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks,ke+1
        do j=js-1,je+1
           do i=is-1,ie+1
@@ -1012,7 +1025,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(slopez)
 
     !******************************************************************
@@ -1025,6 +1039,7 @@ contains
 
     ! loop over appropriate xy faces
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js,je
              do i=is,ie+1
@@ -1042,7 +1057,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js,je
              do i=is,ie+1
@@ -1056,6 +1073,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     end if
 
     ! impose lo side bc's
@@ -1102,6 +1120,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks-1,ke+1
        do j=js,je
           do i=is,ie+1
@@ -1112,6 +1131,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(slxy)
     call bl_deallocate(srxy)
@@ -1127,6 +1147,7 @@ contains
     call bl_allocate(simhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke
           do j=js-1,je+1
              do i=is,ie+1
@@ -1144,7 +1165,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke
           do j=js-1,je+1
              do i=is,ie+1
@@ -1158,6 +1181,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     end if
 
     ! impose lo side bc's
@@ -1204,6 +1228,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks,ke
        do j=js-1,je+1
           do i=is,ie+1
@@ -1214,6 +1239,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(slxz)
     call bl_deallocate(srxz)
@@ -1229,6 +1255,7 @@ contains
     call bl_allocate(simhyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js,je+1
              do i=is,ie
@@ -1246,7 +1273,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks-1,ke+1
           do j=js,je+1
              do i=is,ie
@@ -1260,6 +1289,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     end if
 
     ! impose lo side bc's
@@ -1306,6 +1336,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks-1,ke+1
        do j=js,je+1
           do i=is,ie
@@ -1316,6 +1347,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(slyx)
     call bl_deallocate(sryx)
@@ -1331,6 +1363,7 @@ contains
     call bl_allocate(simhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
 
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke
           do j=js,je+1
              do i=is-1,ie+1
@@ -1348,7 +1381,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke
           do j=js,je+1
              do i=is-1,ie+1
@@ -1362,6 +1397,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     end if
 
     ! impose lo side bc's
@@ -1408,6 +1444,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks,ke
        do j=js,je+1
           do i=is-1,ie+1
@@ -1418,6 +1455,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(simhz)
     call bl_deallocate(slyz)
@@ -1434,6 +1472,7 @@ contains
     call bl_allocate(simhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke+1
           do j=js-1,je+1
              do i=is,ie
@@ -1451,7 +1490,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke+1
           do j=js-1,je+1
              do i=is,ie
@@ -1465,6 +1506,7 @@ contains
              enddo
           enddo
        end do
+       !$OMP END PARALLEL DO
     end if
 
     ! impose lo side bc's
@@ -1511,6 +1553,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks,ke+1
        do j=js-1,je+1
           do i=is,ie
@@ -1521,6 +1564,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(simhx)
     call bl_deallocate(slzx)
@@ -1537,6 +1581,7 @@ contains
     call bl_allocate(simhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
 
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke+1
           do j=js,je
              do i=is-1,ie+1
@@ -1554,7 +1599,9 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k)
        do k=ks,ke+1
           do j=js,je
              do i=is-1,ie+1
@@ -1568,6 +1615,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     end if
 
     ! impose lo side bc's
@@ -1614,6 +1662,7 @@ contains
        end if
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks,ke+1
        do j=js,je
           do i=is-1,ie+1
@@ -1624,6 +1673,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(simhy)
     call bl_deallocate(slzy)
@@ -1644,6 +1694,7 @@ contains
 
     ! loop over appropriate x-faces
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
        do k=ks,ke
           do j=js,je
              do i=is,ie+1
@@ -1669,7 +1720,9 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
        do k=ks,ke
           do j=js,je
              do i=is,ie+1
@@ -1693,8 +1746,10 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks,ke
        do j=js,je
           do i=is,ie+1
@@ -1706,6 +1761,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -1759,6 +1815,7 @@ contains
 
     ! loop over appropriate y-faces
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
        do k=ks,ke
           do j=js,je+1
              do i=is,ie
@@ -1784,7 +1841,9 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
        do k=ks,ke
           do j=js,je+1
              do i=is,ie
@@ -1808,8 +1867,10 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks,ke
        do j=js,je+1
           do i=is,ie
@@ -1821,6 +1882,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -1874,6 +1936,7 @@ contains
 
     ! loop over appropriate z-faces
     if (is_conservative .eq. 1) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
        do k=ks,ke+1
           do j=js,je
              do i=is,ie
@@ -1899,7 +1962,9 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     else
+       !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
        do k=ks,ke+1
           do j=js,je
              do i=is,ie
@@ -1923,8 +1988,10 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,savg)
     do k=ks,ke+1
        do j=js,je
           do i=is,ie
@@ -1936,6 +2003,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then

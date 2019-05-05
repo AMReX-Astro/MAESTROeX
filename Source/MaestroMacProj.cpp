@@ -244,17 +244,14 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
         MultiFab& sold_mf = sold[lev];
 
         // loop over boxes
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        // NOTE: don't think this should be tiled?
+        // NOTE: don't tile this - put OpenMP directly into F90
         for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
-            const Box& tilebox = mfi.tilebox();
+            const Box& validbox = mfi.validbox();
 
             // call fortran subroutine
-            mult_beta0(&lev,ARLIM_3D(tilebox.loVect()),ARLIM_3D(tilebox.hiVect()),
+            mult_beta0(&lev,ARLIM_3D(validbox.loVect()),ARLIM_3D(validbox.hiVect()),
                        BL_TO_FORTRAN_3D(xedge_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
                        BL_TO_FORTRAN_3D(yedge_mf[mfi]),
@@ -391,8 +388,6 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
             // lo-side BCs
             if (phys_bc[idim] == Outflow) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-            } else if (phys_bc[idim] == Inflow) {
-                mlmg_lobc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
@@ -400,8 +395,6 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
             // hi-side BCs
             if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } else if (phys_bc[AMREX_SPACEDIM+idim] == Inflow) {
-                mlmg_hibc[idim] = LinOpBCType::inflow;
             } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }

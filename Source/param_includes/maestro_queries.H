@@ -3,7 +3,7 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-pp.query("do_reflux", do_reflux);
+pp.query("reflux_type", reflux_type);
 pp.query("maestro_verbose", maestro_verbose);
 pp.query("model_file", model_file);
 pp.query("perturb_model", perturb_model);
@@ -40,7 +40,7 @@ pp.query("plot_Hext", plot_Hext);
 pp.query("plot_Hnuc", plot_Hnuc);
 pp.query("plot_eta", plot_eta);
 pp.query("plot_trac", plot_trac);
-pp.query("plot_base", plot_base);
+pp.query("plot_base_state", plot_base_state);
 pp.query("plot_gpi", plot_gpi);
 pp.query("plot_cs", plot_cs);
 pp.query("plot_base_name", plot_base_name);
@@ -72,7 +72,7 @@ pp.query("sponge_kappa", sponge_kappa);
 pp.query("sponge_center_density", sponge_center_density);
 pp.query("sponge_start_factor", sponge_start_factor);
 pp.query("plot_sponge_fdamp", plot_sponge_fdamp);
-pp.query("anelastic_cutoff", anelastic_cutoff);
+pp.query("anelastic_cutoff_density", anelastic_cutoff_density);
 pp.query("base_cutoff_density", base_cutoff_density);
 pp.query("burning_cutoff_density", burning_cutoff_density);
 pp.query("buoyancy_cutoff_factor", buoyancy_cutoff_factor);

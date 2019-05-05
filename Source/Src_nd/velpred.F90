@@ -736,10 +736,12 @@ contains
     hz = dx(3)
 
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(k)
        do k = lo(3)-1,hi(3)+1
           call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
           call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
        end do
+       !$OMP END PARALLEL DO
        call slopez_3d(utilde,slopez,domlo,domhi,lo,hi,ng_ut,3,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_3d(utilde(:,:,:,1),ng_ut, &
@@ -780,6 +782,7 @@ contains
     call bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,maxu,minu)
        do k=ks-1,ke+1
           do j=js-1,je+1
              do i=is,ie+1
@@ -798,6 +801,7 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks-1,ke+1
           do j=js-1,je+1
@@ -866,6 +870,7 @@ contains
 
     call bl_allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks-1,ke+1
        do j=js-1,je+1
           do i=is,ie+1
@@ -882,6 +887,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     ! normal predictor states
 
@@ -891,6 +897,7 @@ contains
     call bl_allocate(ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,minu,maxu)
        do k=ks-1,ke+1
           do j=js,je+1
              do i=is-1,ie+1
@@ -909,6 +916,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks-1,ke+1
           do j=js,je+1
@@ -977,6 +985,7 @@ contains
 
     call bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks-1,ke+1
        do j=js,je+1
           do i=is-1,ie+1
@@ -993,6 +1002,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     ! normal predictor states
     ! Allocated from lo:hi+1 in the normal direction
@@ -1001,6 +1011,7 @@ contains
     call bl_allocate(urz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
+       !$OMP PARALLEL DO PRIVATE(i,j,k,minu,maxu)
        do k=ks,ke+1
           do j=js-1,je+1
              do i=is-1,ie+1
@@ -1019,6 +1030,7 @@ contains
              end do
           end do
        end do
+       !$OMP END PARALLEL DO
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        do k=ks,ke+1
           do j=js-1,je+1
@@ -1093,6 +1105,7 @@ contains
 
     call bl_allocate(uimhz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke+1
        do j=js-1,je+1
           do i=is-1,ie+1
@@ -1109,6 +1122,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     !******************************************************************
     ! Create u_{\i-\half\e_y}^{y|z}, etc.
@@ -1123,6 +1137,7 @@ contains
     call bl_allocate(uimhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
 
     ! uimhyz loop
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k=ks,ke
        do j=js,je+1
           do i=is-1,ie+1
@@ -1134,7 +1149,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
        select case(phys_bc(2,1))
@@ -1168,7 +1184,8 @@ contains
           call amrex_error("velpred_3d: invalid boundary type phys_bc(2,2)")
        end select
     end if
-
+    
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke
        do j=js,je+1
           do i=is-1,ie+1
@@ -1179,7 +1196,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(ulyz)
     call bl_deallocate(uryz)
 
@@ -1192,6 +1210,7 @@ contains
     call bl_allocate(uimhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
 
     ! uimhzy loop
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k=ks,ke+1
        do j=js,je
           do i=is-1,ie+1
@@ -1203,7 +1222,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
        select case(phys_bc(3,1))
@@ -1238,6 +1258,7 @@ contains
        end select
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke+1
        do j=js,je
           do i=is-1,ie+1
@@ -1248,7 +1269,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(ulzy)
     call bl_deallocate(urzy)
 
@@ -1260,6 +1282,7 @@ contains
     call bl_allocate(vrxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
     ! vimhxz loop
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k=ks,ke
        do j=js-1,je+1
           do i=is,ie+1
@@ -1271,7 +1294,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(uimhz)
 
     ! impose lo side bc's
@@ -1310,6 +1334,7 @@ contains
 
     call bl_allocate(vimhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke
        do j=js-1,je+1
           do i=is,ie+1
@@ -1320,7 +1345,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(vlxz)
     call bl_deallocate(vrxz)
 
@@ -1333,6 +1359,7 @@ contains
     call bl_allocate(vimhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     ! vimhzx loop
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k=ks,ke+1
        do j=js-1,je+1
           do i=is,ie
@@ -1344,7 +1371,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
        select case(phys_bc(3,1))
@@ -1379,6 +1407,7 @@ contains
        end select
     end if
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke+1
        do j=js-1,je+1
           do i=is,ie
@@ -1389,7 +1418,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(vlzx)
     call bl_deallocate(vrzx)
 
@@ -1401,6 +1431,7 @@ contains
     call bl_allocate(wrxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
 
     ! wimhxy loop
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k=ks-1,ke+1
        do j=js,je
           do i=is,ie+1
@@ -1412,7 +1443,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(uimhy)
 
     ! impose lo side bc's
@@ -1451,6 +1483,7 @@ contains
 
     call bl_allocate(wimhxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks-1,ke+1
        do j=js,je
           do i=is,ie+1
@@ -1461,7 +1494,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(wlxy)
     call bl_deallocate(wrxy)
 
@@ -1473,6 +1507,7 @@ contains
     call bl_allocate(wryx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     ! wimhyx loop
+    !$OMP PARALLEL DO PRIVATE(i,j,k)
     do k=ks-1,ke+1
        do j=js,je+1
           do i=is,ie
@@ -1484,7 +1519,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(uimhx)
 
     ! impose lo side bc's
@@ -1523,6 +1559,7 @@ contains
 
     call bl_allocate(wimhyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks-1,ke+1
        do j=js,je+1
           do i=is,ie
@@ -1533,7 +1570,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(wlyx)
     call bl_deallocate(wryx)
 
@@ -1547,6 +1585,7 @@ contains
     call bl_allocate(umacl,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
     call bl_allocate(umacr,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
     do k=ks,ke
        do j=js,je
           do i=is,ie+1
@@ -1570,7 +1609,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(ulx)
     call bl_deallocate(urx)
     call bl_deallocate(uimhyz)
@@ -1578,6 +1618,7 @@ contains
 
     if (spherical .eq. 1) then
 
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke
           do j=js,je
              do i=is,ie+1
@@ -1591,9 +1632,11 @@ contains
              enddo
           enddo
        enddo
-
+       !$OMP END PARALLEL DO
+       
     else
 
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke
           do j=js,je
              do i=is,ie+1
@@ -1606,7 +1649,8 @@ contains
              enddo
           enddo
        enddo
-
+       !$OMP END PARALLEL DO
+       
     end if
 
     ! impose lo side bc's
@@ -1648,6 +1692,7 @@ contains
     call bl_allocate(vmacl,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
     call bl_allocate(vmacr,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
     do k=ks,ke
        do j=js,je+1
           do i=is,ie
@@ -1671,7 +1716,8 @@ contains
           enddo
        enddo
     enddo
-
+    !$OMP END PARALLEL DO
+    
     call bl_deallocate(uly)
     call bl_deallocate(ury)
     call bl_deallocate(vimhxz)
@@ -1679,6 +1725,7 @@ contains
 
     if (spherical .eq. 1) then
 
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke
           do j=js,je+1
              do i=is,ie
@@ -1692,9 +1739,11 @@ contains
              enddo
           enddo
        enddo
-
+       !$OMP END PARALLEL DO
+       
     else
 
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke
           do j=js,je+1
              do i=is,ie
@@ -1707,7 +1756,8 @@ contains
              enddo
           enddo
        enddo
-
+       !$OMP END PARALLEL DO
+       
     end if
 
     ! impose lo side bc's
@@ -1749,6 +1799,7 @@ contains
     call bl_allocate(wmacl,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
     call bl_allocate(wmacr,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
 
+    !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
     do k=ks,ke+1
        do j=js,je
           do i=is,ie
@@ -1772,6 +1823,7 @@ contains
           enddo
        enddo
     enddo
+    !$OMP END PARALLEL DO
 
     call bl_deallocate(ulz)
     call bl_deallocate(urz)
@@ -1780,6 +1832,7 @@ contains
 
     if (spherical .eq. 1) then
 
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke+1
           do j=js,je
              do i=is,ie
@@ -1793,9 +1846,11 @@ contains
              enddo
           enddo
        enddo
-
+       !$OMP END PARALLEL DO
+       
     else
 
+       !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
        do k=ks,ke+1
           do j=js,je
              do i=is,ie
@@ -1810,6 +1865,7 @@ contains
              enddo
           enddo
        enddo
+       !$OMP END PARALLEL DO
 
     end if
 

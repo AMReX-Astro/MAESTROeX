@@ -3,7 +3,7 @@
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh
 
-int         Maestro::do_reflux = 0;
+int         Maestro::reflux_type = 1;
 int         Maestro::maestro_verbose = 1;
 std::string Maestro::model_file = "";
 bool        Maestro::perturb_model = false;
@@ -40,7 +40,7 @@ bool        Maestro::plot_Hext = false;
 bool        Maestro::plot_Hnuc = true;
 bool        Maestro::plot_eta = false;
 bool        Maestro::plot_trac = false;
-bool        Maestro::plot_base = false;
+bool        Maestro::plot_base_state = true;
 bool        Maestro::plot_gpi = true;
 bool        Maestro::plot_cs = false;
 std::string Maestro::plot_base_name = "plt";
@@ -72,9 +72,9 @@ amrex::Real Maestro::sponge_kappa = 10.e0;
 amrex::Real Maestro::sponge_center_density = 3.e6;
 amrex::Real Maestro::sponge_start_factor = 3.333e0;
 bool        Maestro::plot_sponge_fdamp = false;
-amrex::Real Maestro::anelastic_cutoff = 3.e6;
-amrex::Real Maestro::base_cutoff_density = 3.e6;
-amrex::Real Maestro::burning_cutoff_density = 3.e6;
+amrex::Real Maestro::anelastic_cutoff_density = -1.0;
+amrex::Real Maestro::base_cutoff_density = -1.0;
+amrex::Real Maestro::burning_cutoff_density = -1.0;
 amrex::Real Maestro::buoyancy_cutoff_factor = 5.0;
 amrex::Real Maestro::dpdt_factor = 0.0;
 bool        Maestro::do_planar_invsq_grav = false;

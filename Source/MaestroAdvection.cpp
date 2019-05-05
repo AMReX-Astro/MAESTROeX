@@ -22,7 +22,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 		utilde[lev].setVal(0.);
 	}
 
-	FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+	FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
 	// create a MultiFab to hold uold + w0
 	Vector<MultiFab>      ufull(finest_level+1);
@@ -32,7 +32,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	}
 
 	// create ufull = uold + w0
-	Put1dArrayOnCart(w0,ufull,1,1,bcs_u,0);
+	Put1dArrayOnCart(w0,ufull,1,1,bcs_u,0,1);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
 	}
@@ -107,10 +107,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-		// NOTE: don't tile
+
+	// NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -202,10 +200,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-		// NOTE: don't think this should be tiled
+
+	// NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -287,10 +283,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-// NOTE: don't think this should be tiled (or at least causes errors in 3D)
+
+	// NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -334,14 +328,16 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     dx, &dt, &is_vel, bcs[0].data(),
                     &nbccomp, &scomp, &bccomp, &is_conservative);
             } // end loop over components
-        } // end MFIter loop		
+        } // end MFIter loop
     } // end loop over levels
 
     // We use edge_restriction for the output velocity if is_vel == 1
     // we do not use edge_restriction for scalars because instead we will use
     // reflux on the fluxes in make_flux.
-    if (is_vel == 1 && do_reflux == 0) {
-	AverageDownFaces(sedge);
+    if (is_vel == 1) {
+        if (reflux_type == 1 || reflux_type == 2) {
+            AverageDownFaces(sedge);
+        }
     }
 }
 
@@ -405,11 +401,11 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-		// NOTE: don't think this should be tiled
-        for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+		// NOTE: not sure if this should be tiled
+        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -497,17 +493,17 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
         // the flux registers from the coarse or fine grid perspective
         // NOTE: the flux register associated with flux_reg_s[lev] is associated
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-        if (do_reflux) {
+        if (reflux_type == 2) {
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
 	    // NOTE: areas are different in DIM=2 and DIM=3
-#if (AMREX_SPACEDIM == 3) 
+#if (AMREX_SPACEDIM == 3)
 	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
 #else
 	    const Real area[2] = {dx[1], dx[0]};
 #endif
-	    
+
 	    if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
@@ -534,7 +530,8 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
     } // end loop over levels
 
-    if (do_reflux == 0) {
+    // average down fluxes
+    if (reflux_type == 1) {
 	AverageDownFaces(sflux);
     }
 
@@ -620,6 +617,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
+	        // NOTE: not sure if this should be tiled (see make_rhoX_flux above)
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -723,12 +721,12 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         // the flux registers from the coarse or fine grid perspective
         // NOTE: the flux register associated with flux_reg_s[lev] is associated
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
-        if (do_reflux) {
+        if (reflux_type == 2) {
 
 	    // Get the grid size
 	    const Real* dx = geom[lev].CellSize();
             	    // NOTE: areas are different in DIM=2 and DIM=3
-#if (AMREX_SPACEDIM == 3) 
+#if (AMREX_SPACEDIM == 3)
 	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
 #else
 	    const Real area[2] = {dx[1], dx[0]};
@@ -751,7 +749,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         }
     } // end loop over levels
 
-    if (do_reflux == 0) {
+    if (reflux_type == 1) {
 	AverageDownFaces(sflux);
     }
 
@@ -886,29 +884,25 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 	} // end MFIter loop
     } // end loop over levels
 
-
     // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
-    if (do_reflux) {
+    if (reflux_type == 2) {
 	for (int lev=finest_level-1; lev>=0; --lev) {
             // update lev based on coarse-fine flux mismatch
             flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, start_comp, start_comp, num_comp, geom[lev]);
+            if (start_comp == FirstSpec) {
+                // do the same for density if we updated the species
+		flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1, geom[lev]);
+            }
         }
     }
 
     // average fine data onto coarser cells
-    AverageDown(statenew,start_comp,num_comp);
-
     // fill ghost cells
+    AverageDown(statenew,start_comp,num_comp);
     FillPatch(t_old, statenew, statenew, statenew, start_comp, start_comp, num_comp, start_comp, bcs_s);
 
     // do the same for density if we updated the species
     if (start_comp == FirstSpec) {
-	if (do_reflux) {
-	    for (int lev=finest_level-1; lev>=0; --lev) {
-		// update lev based on coarse-fine flux mismatch
-		flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1, geom[lev]);
-	    }
-	}
 	AverageDown(statenew,Rho,1);
 	FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
     }
@@ -1003,11 +997,11 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	    }
         } // end MFIter loop
     } // end loop over levels
-	
+
     // average fine data onto coarser cells
     AverageDown(unew,0,AMREX_SPACEDIM);
 
     // fill ghost cells
-    FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+    FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
 }
