@@ -1,4 +1,4 @@
-#!/bin/ksh -p
+#!/bin/bash -l
 
 #----------------------------------------------------------------------------
 # user modifiable variables:
@@ -23,7 +23,7 @@ HTAR=/sw/xk6/hsi/5.0.2.p1/sles11.5/bin/htar
 # listing the name of the plotfile and its simulation time.
 # note that the gfortran-compiled version of ftime will fail to run if either
 # the PrgEnv-gnu or gcc module isn't loaded (it needs some gcc libraries).
-FTIME_EXE=ftime.Linux.gfortran.exe
+FTIME_EXE=ftime.gnu.interlagos.ex
 
 
 #----------------------------------------------------------------------------
@@ -93,8 +93,9 @@ function process_files
   # htar commands.
   pltlist5=$(find . -maxdepth 1 -type d -name "${plt_prefix}?????" -print | sort | sed "s/\.\///")
   pltlist6=$(find . -maxdepth 1 -type d -name "${plt_prefix}??????" -print | sort | sed "s/\.\///")
+  pltlist7=$(find . -maxdepth 1 -type d -name "${plt_prefix}???????" -print | sort | sed "s/\.\///")
 
-  pltlist="$pltlist5 $pltlist6"
+  pltlist="$pltlist5 $pltlist6 $pltlist7"
 
   if [ "$pltlist" ]; then
     nl=$(echo "$pltlist" | wc -l)
@@ -164,8 +165,9 @@ function process_files
   # htar commands.
   chklist5=$(find . -maxdepth 1 -type d -name "${chk_prefix}?????" -print | sort | sed "s/\.\///")
   chklist6=$(find . -maxdepth 1 -type d -name "${chk_prefix}??????" -print | sort | sed "s/\.\///")
+  chklist7=$(find . -maxdepth 1 -type d -name "${chk_prefix}???????" -print | sort | sed "s/\.\///")
 
-  chklist="$chklist5 $chklist6"
+  chklist="$chklist5 $chklist6 $chklist7"
 
   if [ "$chklist" ]; then
     nl=$(echo "$chklist" | wc -l)
