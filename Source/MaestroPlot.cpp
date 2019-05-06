@@ -135,6 +135,57 @@ Maestro::WritePlotFile (const int step,
 
 	WriteJobInfo(plotfilename);
 
+	VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+	
+	// write out the cell-centered base state
+	if (ParallelDescriptor::IOProcessor()) {
+
+	  std::ofstream BaseCCFile;
+	  BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+	  std::string BaseCCFileName(plotfilename + "/BaseCC");
+	  BaseCCFile.open(BaseCCFileName.c_str(), std::ofstream::out   |
+			  std::ofstream::trunc |
+			  std::ofstream::binary);
+	  if( !BaseCCFile.good()) {
+	    amrex::FileOpenFailed(BaseCCFileName);
+	  }
+
+	  BaseCCFile.precision(17);
+
+	  BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar \n";
+
+	  for (int i=0; i<rho0_new.size(); ++i) {
+	    BaseCCFile << r_cc_loc[i] << " "
+		       << rho0_in[i] << " "
+		       << rhoh0_in[i] << " "
+		       << p0_in[i] << " "
+		       << gamma1bar_in[i] << "\n";
+	  }
+	}
+
+	// write out the face-centered base state
+	if (ParallelDescriptor::IOProcessor()) {
+
+	  std::ofstream BaseFCFile;
+	  BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+	  std::string BaseFCFileName(plotfilename + "/BaseFC");
+	  BaseFCFile.open(BaseFCFileName.c_str(), std::ofstream::out   |
+			  std::ofstream::trunc |
+			  std::ofstream::binary);
+	  if( !BaseFCFile.good()) {
+	    amrex::FileOpenFailed(BaseFCFileName);
+	  }
+
+	  BaseFCFile.precision(17);
+
+	  BaseFCFile << "r_edge  w0 \n";
+	  
+	  for (int i=0; i<w0.size(); ++i) {
+	    BaseFCFile << r_edge_loc[i] << " "
+		       << w0[i] << "\n";
+	  }
+	}
+
 	// wallclock time
 	Real end_total = ParallelDescriptor::second() - strt_total;
 
