@@ -188,9 +188,11 @@ PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(PROBIN_PARAMETER_DIRS))
 
 MANAGED_PROBIN_FLAG :=
-ifdef CUDA
-  ifeq ($(CUDA), t)
+ifdef USE_CUDA
+  ifeq ($(USE_CUDA), TRUE)
+    USE_GPU_PRAGMA = TRUE
     MANAGED_PROBIN_FLAG := --managed
+    DEFINES += -DCUDA 
   endif
 endif
 
