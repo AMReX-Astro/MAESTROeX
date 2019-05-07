@@ -57,7 +57,7 @@ contains
        do j = lo(2), hi(2)
            xloc(2) = prob_lo(2) + (dble(j)+HALF)*dx(2)
           do i = lo(1), hi(1)
-              xloc(1) = prob_lo(1) + (dble(i)+HALF)*dx(1) 
+              xloc(1) = prob_lo(1) + (dble(i)+HALF)*dx(1)
 
               rloc = sqrt(sum(xloc*xloc))
 
@@ -65,7 +65,7 @@ contains
                 tag(i,j,k) = set
              endif
 
-             if (rloc .le. tag_radius) then
+             if ((rloc .le. tag_radius) .and. (lev .eq. 0)) then
 
                  ! write(*,*) "tag_radius = ", rloc
                  tag(i,j,k) = set

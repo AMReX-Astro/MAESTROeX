@@ -34,118 +34,184 @@ Maestro::WritePlotFile (const int step,
                         Vector<MultiFab>& s_in,
                         const Vector<MultiFab>& S_cc_in,
                         const bool is_small)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
 
-    // wallclock time
-    const Real strt_total = ParallelDescriptor::second();
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
 
-    std::string plotfilename;
+	// wallclock time
+	const Real strt_total = ParallelDescriptor::second();
 
-    if (!is_small) {
-        plotfilename = plot_base_name;
-    } else {
-        plotfilename = small_plot_base_name;
-    }
+	std::string plotfilename;
 
-    if (step == plotInitData) {
-        if (plotfilename.back() == '_') {
-            plotfilename += "InitData";
-        } else {
-            plotfilename += +"_InitData";
-        }
+	if (!is_small) {
+		plotfilename = plot_base_name;
+	} else {
+		plotfilename = small_plot_base_name;
+	}
 
-    }
-    else if (step == plotInitProj) {
-        if (plotfilename.back() == '_') {
-            plotfilename += "after_InitProj";
-        } else {
-            plotfilename += +"_after_InitProj";
-        }
-    }
-    else if (step == plotDivuIter) {
-        if (plotfilename.back() == '_') {
-            plotfilename += "after_DivuIter";
-        } else {
-            plotfilename += +"_after_DivuIter";
-        }
-    } else {
-        PlotFileName(step, &plotfilename);
-    }
+	if (step == plotInitData) {
+		if (plotfilename.back() == '_') {
+			plotfilename += "InitData";
+		} else {
+			plotfilename += +"_InitData";
+		}
 
-    // convert rho0 to multi-D MultiFab
-    Vector<MultiFab> rho0_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-    }
-    Put1dArrayOnCart(rho0_in,rho0_cart,0,0);
+	}
+	else if (step == plotInitProj) {
+		if (plotfilename.back() == '_') {
+			plotfilename += "after_InitProj";
+		} else {
+			plotfilename += +"_after_InitProj";
+		}
+	}
+	else if (step == plotDivuIter) {
+		if (plotfilename.back() == '_') {
+			plotfilename += "after_DivuIter";
+		} else {
+			plotfilename += +"_after_DivuIter";
+		}
+	}
+	else {
+		PlotFileName(step, &plotfilename);
+	}
 
-    // convert rhoh0 to multi-D MultiFab
-    Vector<MultiFab> rhoh0_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        rhoh0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-    }
-    Put1dArrayOnCart(rhoh0_in,rhoh0_cart,0,0);
+	// convert rho0 to multi-D MultiFab
+	Vector<MultiFab> rho0_cart(finest_level+1);
+	for (int lev=0; lev<=finest_level; ++lev) {
+		rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+	}
+	Put1dArrayOnCart(rho0_in,rho0_cart,0,0);
 
-    // convert p0 to multi-D MultiFab
-    Vector<MultiFab> p0_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-    }
-    Put1dArrayOnCart(p0_in,p0_cart,0,0);
+	// convert rhoh0 to multi-D MultiFab
+	Vector<MultiFab> rhoh0_cart(finest_level+1);
+	for (int lev=0; lev<=finest_level; ++lev) {
+		rhoh0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+	}
+	Put1dArrayOnCart(rhoh0_in,rhoh0_cart,0,0);
 
-    // convert gamma1bar to multi-D MultiFab
-    Vector<MultiFab> gamma1bar_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-    }
-    Put1dArrayOnCart(gamma1bar_in,gamma1bar_cart,0,0);
+	// convert p0 to multi-D MultiFab
+	Vector<MultiFab> p0_cart(finest_level+1);
+	for (int lev=0; lev<=finest_level; ++lev) {
+		p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+	}
+	Put1dArrayOnCart(p0_in,p0_cart,0,0);
 
-    int nPlot = 0;
-    const auto& varnames = PlotFileVarNames(&nPlot);
+	// convert gamma1bar to multi-D MultiFab
+	Vector<MultiFab> gamma1bar_cart(finest_level+1);
+	for (int lev=0; lev<=finest_level; ++lev) {
+		gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+	}
+	Put1dArrayOnCart(gamma1bar_in,gamma1bar_cart,0,0);
 
-    const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho0_cart,rhoh0_cart,p0_cart,
-                                gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in,
-                                S_cc_in);
+	int nPlot = 0;
+	const auto& varnames = PlotFileVarNames(&nPlot);
 
-    // WriteMultiLevelPlotfile expects an array of step numbers
-    Vector<int> step_array;
-    step_array.resize(maxLevel()+1, step);
+	const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho0_cart,rhoh0_cart,p0_cart,
+	                            gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in,
+	                            S_cc_in);
 
-    if (!is_small) {
-        WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
-                                Geom(), t_in, step_array, refRatio());
-    } else {
-        int nSmallPlot = 0;
-        const auto& small_plot_varnames = SmallPlotFileVarNames(&nSmallPlot,
-                                                                varnames);
+	// WriteMultiLevelPlotfile expects an array of step numbers
+	Vector<int> step_array;
+	step_array.resize(maxLevel()+1, step);
 
-        const auto& small_mf = SmallPlotFileMF(nPlot, nSmallPlot, mf, varnames,
-                                               small_plot_varnames);
+	if (!is_small) {
+		WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
+		                        Geom(), t_in, step_array, refRatio());
+	} else {
+		int nSmallPlot = 0;
+		const auto& small_plot_varnames = SmallPlotFileVarNames(&nSmallPlot,
+		                                                        varnames);
 
-        WriteMultiLevelPlotfile(plotfilename, finest_level+1, small_mf,
-                                small_plot_varnames, Geom(), t_in, step_array,
-                                refRatio());
+		const auto& small_mf = SmallPlotFileMF(nPlot, nSmallPlot, mf, varnames,
+		                                       small_plot_varnames);
 
-        for (int i = 0; i <= finest_level; ++i)
-            delete small_mf[i];
-    }
+		WriteMultiLevelPlotfile(plotfilename, finest_level+1, small_mf,
+		                        small_plot_varnames, Geom(), t_in, step_array,
+		                        refRatio());
 
-    WriteJobInfo(plotfilename);
+		for (int i = 0; i <= finest_level; ++i)
+			delete small_mf[i];
+	}
 
-    // wallclock time
-    Real end_total = ParallelDescriptor::second() - strt_total;
+	WriteJobInfo(plotfilename);
 
-    // print wallclock time
-    ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
-    if (maestro_verbose > 0) {
-        Print() << "Time to write plotfile: " << end_total << '\n';
-    }
+	VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
 
-    for (int i = 0; i <= finest_level; ++i) {
-        delete mf[i];
-    }
+	// write out the cell-centered base state
+	if (ParallelDescriptor::IOProcessor()) {
+
+	  for (int lev=0; lev<=finest_level; ++lev) {
+
+	    std::ofstream BaseCCFile;
+	    BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+	    std::string BaseCCFileName(plotfilename + "/BaseCC_");
+	    std::string levStr = std::to_string(lev);
+	    BaseCCFileName.append(levStr);
+	    BaseCCFile.open(BaseCCFileName.c_str(), std::ofstream::out   |
+			    std::ofstream::trunc |
+			    std::ofstream::binary);
+	    if( !BaseCCFile.good()) {
+	      amrex::FileOpenFailed(BaseCCFileName);
+	    }
+
+	    BaseCCFile.precision(17);
+
+	    BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar \n";
+
+	    int nr = nr_fine / pow(2,(max_radial_level-lev));
+
+	    for (int i=0; i<nr; ++i) {
+	      BaseCCFile << r_cc_loc[lev+(max_radial_level+1)*i] << " "
+			 << rho0_in[lev+(max_radial_level+1)*i] << " "
+			 << rhoh0_in[lev+(max_radial_level+1)*i] << " "
+			 << p0_in[lev+(max_radial_level+1)*i] << " "
+			 << gamma1bar_in[lev+(max_radial_level+1)*i] << "\n";
+	    }
+	  }
+	}
+
+	// write out the face-centered base state
+	if (ParallelDescriptor::IOProcessor()) {
+
+	  for (int lev=0; lev<=finest_level; ++lev) {
+
+	    std::ofstream BaseFCFile;
+	    BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+	    std::string BaseFCFileName(plotfilename + "/BaseFC_");
+	    std::string levStr = std::to_string(lev);
+	    BaseFCFileName.append(levStr);
+	    BaseFCFile.open(BaseFCFileName.c_str(), std::ofstream::out   |
+			    std::ofstream::trunc |
+			    std::ofstream::binary);
+	    if( !BaseFCFile.good()) {
+	      amrex::FileOpenFailed(BaseFCFileName);
+	    }
+
+	    BaseFCFile.precision(17);
+
+	    BaseFCFile << "r_edge  w0 \n";
+
+	    int nr = nr_fine / pow(2,(max_radial_level-lev));
+
+	    for (int i=0; i<nr+1; ++i) {
+	      BaseFCFile << r_edge_loc[lev+(max_radial_level+1)*i] << " "
+			 << w0[lev+(max_radial_level+1)*i] << "\n";
+	    }
+	  }
+	}
+
+	// wallclock time
+	Real end_total = ParallelDescriptor::second() - strt_total;
+
+	// print wallclock time
+	ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+	if (maestro_verbose > 0) {
+		Print() << "Time to write plotfile: " << end_total << '\n';
+	}
+
+	for (int i = 0; i <= finest_level; ++i) {
+		delete mf[i];
+	}
 
 }
 
