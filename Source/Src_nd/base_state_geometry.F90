@@ -27,13 +27,13 @@ module base_state_geometry_module
   ! finest_radial_level is the current finest level index, which may be less than
   ! max_radial_level depending on the refinement criteria
 
-  integer         , save, public :: max_radial_level
-  integer         , save, public :: finest_radial_level
-  integer         , save, public :: nr_fine   ! number of zones associated with *max_radial_level*
-  double precision, save, public :: dr_fine   ! base state grid spacing associated with *max_radial_level*
+  integer         , allocatable, save, public :: max_radial_level
+  integer         , allocatable, save, public :: finest_radial_level
+  integer         , allocatable, save, public :: nr_fine   ! number of zones associated with *max_radial_level*
+  double precision, allocatable, save, public :: dr_fine   ! base state grid spacing associated with *max_radial_level*
 
-  integer         , save, public  :: nr_irreg
-  double precision, save, public  :: center(3)
+  integer         , allocatable, save, public  :: nr_irreg
+  double precision, allocatable, save, public  :: center(:)
 
   double precision, pointer, save, public  :: dr(:)
   integer         , pointer, save, public  :: nr(:)
@@ -45,6 +45,10 @@ module base_state_geometry_module
   integer         , pointer, save, public  :: anelastic_cutoff_density_coord(:)
   integer         , pointer, save, public  :: base_cutoff_density_coord(:)
   integer         , pointer, save, public  :: burning_cutoff_density_coord(:)
+
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine, nr_irreg, center
+#endif
 
 contains
 
@@ -68,6 +72,13 @@ contains
     if ( parallel_IOProcessor() ) then
        print*,'Calling init_base_state_geometry()'
     end if
+
+    allocate(max_radial_level)
+    allocate(finest_radial_level)
+    allocate(nr_fine)
+    allocate(dr_fine)
+    allocate(nr_irreg)
+    allocate(center(3))
 
     max_radial_level = max_radial_level_in
     nr_fine = nr_fine_in
