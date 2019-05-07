@@ -210,6 +210,8 @@ contains
 
     type (burn_t)    :: state_in, state_out
 
+    !$gpu
+
     if (firstCall) then
        ispec_threshold = network_species_index(burner_threshold_species)
        firstCall = .false.
