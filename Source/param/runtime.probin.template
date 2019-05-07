@@ -71,7 +71,7 @@ subroutine runtime_init()
   if (status .ne. 0) then
      ! some problem in the namelist
      print *, 'ERROR: problem in the namelist'
-     stop
+     !stop
   endif
 
   @@acc@@

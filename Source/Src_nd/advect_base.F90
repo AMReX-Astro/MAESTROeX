@@ -24,12 +24,12 @@ contains
     double precision, intent(in   ) ::            rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) ::            rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::                  dt
+    double precision, value, intent(in   ) ::                  dt
     double precision, intent(in   ) ::            r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::          r_edge_loc(0:max_radial_level,0:nr_fine  )
 
     call bl_proffortfuncstart("Maestro::advect_base_dens")
-    
+
     if (spherical .eq. 0) then
        call advect_base_dens_planar(w0,rho0_old,rho0_new,rho0_predicted_edge,dt)
        call restrict_base(rho0_new,1)
@@ -38,7 +38,7 @@ contains
        call advect_base_dens_spherical(w0,rho0_old,rho0_new,rho0_predicted_edge,dt, &
             r_cc_loc,r_edge_loc)
     end if
-    
+
     call bl_proffortfuncstop("Maestro::advect_base_dens")
 
   end subroutine advect_base_dens
@@ -52,7 +52,7 @@ contains
     double precision, intent(in   ) ::            rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) ::            rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::                  dt
+    double precision, value, intent(in   ) ::                  dt
 
     ! Local variables
     integer :: r, n, i
@@ -102,7 +102,7 @@ contains
     double precision, intent(in   ) ::            rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) ::            rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine  )
-    double precision, intent(in   ) ::                  dt
+    double precision, value, intent(in   ) ::                  dt
     double precision, intent(in   ) ::            r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::          r_edge_loc(0:max_radial_level,0:nr_fine  )
 
@@ -150,12 +150,12 @@ contains
     double precision, intent(  out) ::           rhoh0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::                 psi(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::                  dt
+    double precision, value, intent(in   ) ::                  dt
     double precision, intent(in   ) ::            r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::          r_edge_loc(0:max_radial_level,0:nr_fine  )
 
     call bl_proffortfuncstart("Maestro::advect_base_enthalpy")
-    
+
     if (spherical .eq. 0) then
        call advect_base_enthalpy_planar(w0,rho0_old,rhoh0_old,rhoh0_new, &
             rho0_predicted_edge,psi,dt)
@@ -166,7 +166,7 @@ contains
             rho0_predicted_edge,psi,dt, &
             r_cc_loc, r_edge_loc)
     end if
-    
+
     call bl_proffortfuncstop("Maestro::advect_base_enthalpy")
 
   end subroutine advect_base_enthalpy
@@ -182,7 +182,7 @@ contains
     double precision, intent(  out) ::           rhoh0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::                 psi(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::                  dt
+    double precision, value, intent(in   ) ::                  dt
 
     ! Local variables
     integer :: r, i, n
@@ -232,7 +232,7 @@ contains
     double precision, intent(  out) ::           rhoh0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::                 psi(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) ::                  dt
+    double precision, value, intent(in   ) ::                  dt
     double precision, intent(in   ) ::            r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::          r_edge_loc(0:max_radial_level,0:nr_fine  )
 

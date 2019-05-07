@@ -20,7 +20,8 @@ module burner_loop_module
 
 contains
 
-  subroutine burner_loop(lev, lo, hi, &
+  subroutine burner_loop(lo, hi, &
+       lev, &
        s_in,     i_lo, i_hi, nc_i, &
        s_out,    o_lo, o_hi, nc_o, &
        rho_Hext, e_lo, e_hi, &
@@ -30,7 +31,8 @@ contains
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer, value  , intent (in   ) :: lev
     integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
     integer         , intent (in   ) :: o_lo(3), o_hi(3), nc_o
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
@@ -43,9 +45,9 @@ contains
     double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: tempbar_init_in(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: dt_in
+    double precision, value, intent (in) :: dt_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
-    integer         , intent (in   ) :: use_mask
+    integer, value  , intent (in   ) :: use_mask
 
     ! local
     integer          :: i, j, k, n
@@ -60,6 +62,8 @@ contains
     double precision :: sumX
 
     type (burn_t)    :: state_in, state_out
+
+    !$gpu
 
     if (firstCall) then
        ispec_threshold = network_species_index(burner_threshold_species)
@@ -188,9 +192,9 @@ contains
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (in   ) :: tempbar_init_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
-    double precision, intent (in   ) :: dt_in
+    double precision, value, intent (in) :: dt_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
-    integer         , intent (in   ) :: use_mask
+    integer, value  , intent (in   ) :: use_mask
 
     ! local
     integer          :: i, j, k, n

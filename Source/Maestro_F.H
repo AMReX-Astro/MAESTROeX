@@ -17,7 +17,7 @@ extern "C"
 			  const amrex::Real* rho0_old,
 			        amrex::Real* rho0_new,
 			        amrex::Real* rho0_predicted_edge,
-			  const amrex::Real* dt,
+			  const amrex::Real dt,
 			  const amrex::Real* r_cc_loc,
 			  const amrex::Real* r_edge_loc);
 
@@ -27,7 +27,7 @@ extern "C"
 			            amrex::Real* rhoh0_new,
 			      const amrex::Real* rho0_predicted_edge,
 			      const amrex::Real* psi,
-			      const amrex::Real* dt,
+			      const amrex::Real dt,
 			      const amrex::Real* r_cc_loc,
 			      const amrex::Real* r_edge_loc);
     //////////////////////
@@ -108,16 +108,17 @@ extern "C"
 
     //////////////////////
     // in burner_loop.f90
-    void burner_loop(const int* lev, const int* lo, const int* hi,
+    void burner_loop(const int* lo, const int* hi,
+                     const int lev, 
                      const amrex::Real* s_in,     const int* i_lo, const int* i_hi, const int* nc_i,
                            amrex::Real* s_out,    const int* o_lo, const int* o_hi, const int* nc_o,
                      const amrex::Real* rho_Hext, const int* e_lo, const int* e_hi,
                            amrex::Real* rho_odot, const int* r_lo, const int* r_hi, const int* nc_r,
                            amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                      const amrex::Real* tempbar_init_in,
-                     const amrex::Real* dt_in,
+                     const amrex::Real dt_in,
                      const int* mask, const int* m_lo, const int* m_hi,
-                     const int* use_mask);
+                     const int use_mask);
 
     void burner_loop_sphr(const int* lo, const int* hi,
                           const amrex::Real* s_in,     const int* i_lo, const int* i_hi, const int* nc_i,
@@ -126,9 +127,9 @@ extern "C"
                                 amrex::Real* rho_odot, const int* r_lo, const int* r_hi, const int* nc_r,
                                 amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                           const amrex::Real* tempbar_init_cart, const int* t_lo, const int* t_hi,
-                          const amrex::Real* dt_in,
+                          const amrex::Real dt_in,
                           const int* mask, const int* m_lo, const int* m_hi,
-                          const int* use_mask);
+                          const int use_mask);
 
     //////////////////////
 
@@ -735,7 +736,7 @@ extern "C"
                             const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
                             const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
                             amrex::Real* deltagamma, const int* d_lo, const int* d_hi);
-                            
+
     void make_entropy(const int* lev, const int* lo, const int* hi,
                      const amrex::Real* state, const int* s_lo, const int* s_hi,
                      const int* nc_s,
@@ -997,7 +998,7 @@ extern "C"
                  const amrex::Real* rho0_old, const amrex::Real* rho0_new,
                  const amrex::Real* p0_old, const amrex::Real* p0_new,
                  const amrex::Real* gamma1bar_old, const amrex::Real* gamma1bar_new,
-                 const amrex::Real* p0_minus_peosbar, 
+                 const amrex::Real* p0_minus_peosbar,
                  const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
                  const amrex::Real* delta_chi_w0, const amrex::Real* r_cc_loc,
                  const amrex::Real* r_edge_loc, const amrex::Real* dt,

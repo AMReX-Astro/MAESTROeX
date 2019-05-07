@@ -12,6 +12,12 @@ int main(int argc, char* argv[])
 	// in AMReX.cpp
 	Initialize(argc,argv);
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU in main program
+    // only turn on GPU around appropriate subroutines
+    Cuda::setLaunchRegion(false);
+#endif
+
 	// Refuse to continue if we did not provide an inputs file.
 
 	if (argc <= 1) {
