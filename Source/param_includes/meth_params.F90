@@ -3,7 +3,7 @@
 ! or add runtime parameters, please edit _cpp_parameters and then run
 ! mk_params.sh
 
-! This module stores the runtime parameters and integer names for 
+! This module stores the runtime parameters and integer names for
 ! indexing arrays.
 !
 ! The Fortran-specific parameters are initialized in set_method_params(),
@@ -25,62 +25,121 @@ module meth_params_module
 
   ! Begin the declarations of the ParmParse parameters
 
-  integer                       , save :: maestro_verbose
+  integer          , allocatable, save :: maestro_verbose
   character (len=:), allocatable, save :: model_file
-  logical                       , save :: perturb_model
-  logical                       , save :: print_init_hse_diag
-  double precision              , save :: cfl
-  logical                       , save :: use_soundspeed_firstdt
-  logical                       , save :: use_divu_firstdt
-  integer                       , save :: spherical
-  logical                       , save :: octant
-  integer                       , save :: do_2d_planar_octant
-  integer                       , save :: drdxfac
-  logical                       , save :: use_tpert_in_tagging
-  logical                       , save :: do_sponge
-  double precision              , save :: sponge_kappa
-  double precision              , save :: sponge_center_density
-  double precision              , save :: sponge_start_factor
-  double precision              , save :: anelastic_cutoff_density
-  double precision              , save :: base_cutoff_density
-  double precision              , save :: burning_cutoff_density
-  double precision              , save :: buoyancy_cutoff_factor
-  double precision              , save :: dpdt_factor
-  logical                       , save :: do_planar_invsq_grav
-  double precision              , save :: planar_invsq_mass
-  logical                       , save :: evolve_base_state
-  logical                       , save :: use_exact_base_state
-  logical                       , save :: average_base_state
-  logical                       , save :: do_smallscale
-  logical                       , save :: do_eos_h_above_cutoff
-  integer                       , save :: enthalpy_pred_type
-  integer                       , save :: species_pred_type
-  logical                       , save :: use_delta_gamma1_term
-  integer                       , save :: slope_order
-  double precision              , save :: grav_const
-  integer                       , save :: ppm_type
-  integer                       , save :: ppm_trace_forces
-  integer                       , save :: beta0_type
-  logical                       , save :: use_linear_grav_in_beta0
-  double precision              , save :: rotational_frequency
-  double precision              , save :: co_latitude
-  logical                       , save :: drive_initial_convection
-  logical                       , save :: use_alt_energy_fix
-  integer                       , save :: temp_diffusion_formulation
-  integer                       , save :: thermal_diffusion_type
-  logical                       , save :: limit_conductivity
+  logical          , allocatable, save :: perturb_model
+  logical          , allocatable, save :: print_init_hse_diag
+  double precision , allocatable, save :: cfl
+  logical          , allocatable, save :: use_soundspeed_firstdt
+  logical          , allocatable, save :: use_divu_firstdt
+  integer          , allocatable, save :: spherical
+  logical          , allocatable, save :: octant
+  integer          , allocatable, save :: do_2d_planar_octant
+  integer          , allocatable, save :: drdxfac
+  logical          , allocatable, save :: use_tpert_in_tagging
+  logical          , allocatable, save :: do_sponge
+  double precision , allocatable, save :: sponge_kappa
+  double precision , allocatable, save :: sponge_center_density
+  double precision , allocatable, save :: sponge_start_factor
+  double precision , allocatable, save :: anelastic_cutoff_density
+  double precision , allocatable, save :: base_cutoff_density
+  double precision , allocatable, save :: burning_cutoff_density
+  double precision , allocatable, save :: buoyancy_cutoff_factor
+  double precision , allocatable, save :: dpdt_factor
+  logical          , allocatable, save :: do_planar_invsq_grav
+  double precision , allocatable, save :: planar_invsq_mass
+  logical          , allocatable, save :: evolve_base_state
+  logical          , allocatable, save :: use_exact_base_state
+  logical          , allocatable, save :: average_base_state
+  logical          , allocatable, save :: do_smallscale
+  logical          , allocatable, save :: do_eos_h_above_cutoff
+  integer          , allocatable, save :: enthalpy_pred_type
+  integer          , allocatable, save :: species_pred_type
+  logical          , allocatable, save :: use_delta_gamma1_term
+  integer          , allocatable, save :: slope_order
+  double precision , allocatable, save :: grav_const
+  integer          , allocatable, save :: ppm_type
+  integer          , allocatable, save :: ppm_trace_forces
+  integer          , allocatable, save :: beta0_type
+  logical          , allocatable, save :: use_linear_grav_in_beta0
+  double precision , allocatable, save :: rotational_frequency
+  double precision , allocatable, save :: co_latitude
+  logical          , allocatable, save :: drive_initial_convection
+  logical          , allocatable, save :: use_alt_energy_fix
+  integer          , allocatable, save :: temp_diffusion_formulation
+  integer          , allocatable, save :: thermal_diffusion_type
+  logical          , allocatable, save :: limit_conductivity
   character (len=:), allocatable, save :: burner_threshold_species
-  double precision              , save :: burner_threshold_cutoff
-  double precision              , save :: reaction_sum_tol
-  double precision              , save :: small_temp
-  double precision              , save :: small_dens
-  logical                       , save :: use_eos_e_instead_of_h
-  logical                       , save :: use_pprime_in_tfromp
-  integer                       , save :: s0_interp_type
-  integer                       , save :: w0_interp_type
-  integer                       , save :: s0mac_interp_type
-  integer                       , save :: w0mac_interp_type
-  integer                       , save :: track_grid_losses
+  double precision , allocatable, save :: burner_threshold_cutoff
+  double precision , allocatable, save :: reaction_sum_tol
+  double precision , allocatable, save :: small_temp
+  double precision , allocatable, save :: small_dens
+  logical          , allocatable, save :: use_eos_e_instead_of_h
+  logical          , allocatable, save :: use_pprime_in_tfromp
+  integer          , allocatable, save :: s0_interp_type
+  integer          , allocatable, save :: w0_interp_type
+  integer          , allocatable, save :: s0mac_interp_type
+  integer          , allocatable, save :: w0mac_interp_type
+  integer          , allocatable, save :: track_grid_losses
+
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: maestro_verbose
+
+  attributes(managed) :: perturb_model
+  attributes(managed) :: print_init_hse_diag
+  attributes(managed) :: cfl
+  attributes(managed) :: use_soundspeed_firstdt
+  attributes(managed) :: use_divu_firstdt
+  attributes(managed) :: spherical
+  attributes(managed) :: octant
+  attributes(managed) :: do_2d_planar_octant
+  attributes(managed) :: drdxfac
+  attributes(managed) :: use_tpert_in_tagging
+  attributes(managed) :: do_sponge
+  attributes(managed) :: sponge_kappa
+  attributes(managed) :: sponge_center_density
+  attributes(managed) :: sponge_start_factor
+  attributes(managed) :: anelastic_cutoff_density
+  attributes(managed) :: base_cutoff_density
+  attributes(managed) :: burning_cutoff_density
+  attributes(managed) :: buoyancy_cutoff_factor
+  attributes(managed) :: dpdt_factor
+  attributes(managed) :: do_planar_invsq_grav
+  attributes(managed) :: planar_invsq_mass
+  attributes(managed) :: evolve_base_state
+  attributes(managed) :: use_exact_base_state
+  attributes(managed) :: average_base_state
+  attributes(managed) :: do_smallscale
+  attributes(managed) :: do_eos_h_above_cutoff
+  attributes(managed) :: enthalpy_pred_type
+  attributes(managed) :: species_pred_type
+  attributes(managed) :: use_delta_gamma1_term
+  attributes(managed) :: slope_order
+  attributes(managed) :: grav_const
+  attributes(managed) :: ppm_type
+  attributes(managed) :: ppm_trace_forces
+  attributes(managed) :: beta0_type
+  attributes(managed) :: use_linear_grav_in_beta0
+  attributes(managed) :: rotational_frequency
+  attributes(managed) :: co_latitude
+  attributes(managed) :: drive_initial_convection
+  attributes(managed) :: use_alt_energy_fix
+  attributes(managed) :: temp_diffusion_formulation
+  attributes(managed) :: thermal_diffusion_type
+  attributes(managed) :: limit_conductivity
+
+  attributes(managed) :: burner_threshold_cutoff
+  attributes(managed) :: reaction_sum_tol
+  attributes(managed) :: small_temp
+  attributes(managed) :: small_dens
+  attributes(managed) :: use_eos_e_instead_of_h
+  attributes(managed) :: use_pprime_in_tfromp
+  attributes(managed) :: s0_interp_type
+  attributes(managed) :: w0_interp_type
+  attributes(managed) :: s0mac_interp_type
+  attributes(managed) :: w0mac_interp_type
+  attributes(managed) :: track_grid_losses
+#endif
 
   ! End the declarations of the ParmParse parameters
 
@@ -248,7 +307,7 @@ contains
     end if
 
 
-    
+
   end subroutine finalize_meth_params
 
 end module meth_params_module

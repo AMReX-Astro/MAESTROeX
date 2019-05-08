@@ -1,4 +1,4 @@
-! This module stores the runtime parameters and integer names for 
+! This module stores the runtime parameters and integer names for
 ! indexing arrays.
 !
 ! The Fortran-specific parameters are initialized in set_method_params(),
@@ -63,7 +63,7 @@ contains
     implicit none
 
     @@free_maestro_params@@
-    
+
   end subroutine finalize_meth_params
 
 end module meth_params_module

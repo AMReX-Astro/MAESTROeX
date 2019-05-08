@@ -31,10 +31,6 @@ module extern_probin_module
 
   @@declarationsB@@
 
-#ifdef AMREX_USE_CUDA
-  @@cudaattributesB@@
-#endif
-
 end module extern_probin_module
 
 
