@@ -204,6 +204,8 @@ class Param(object):
         # to 1, and the Fortran parmparse will resize
         if self.dtype == "string":
             ostr += "    allocate(character(len=1)::{})\n".format(name)
+        else:
+            ostr += "    allocate({})\n".format(name)
 
         if not self.debug_default is None:
             ostr += "#ifdef AMREX_DEBUG\n"
@@ -408,7 +410,7 @@ def write_meth_module(plist, meth_template):
 
         elif line.find("@@free_maestro_params@@") >= 0:
 
-            params_free = [q for q in params if q.in_fortran == 1 and q.f90_dtype == "string"]
+            params_free = [q for q in params if q.in_fortran == 1]
 
             for p in params_free:
                 mo.write("    if (allocated({})) then\n".format(p.f90_name))

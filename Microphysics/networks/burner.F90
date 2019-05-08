@@ -43,11 +43,13 @@ contains
 
     double precision :: time
 
+    !$gpu
+
     time = 0.d0
 
     ! Make sure the network and burner have been initialized.
 
-#ifndef ACC
+#if !defined(ACC) && !defined(AMREX_USE_CUDA)
     if (.NOT. network_initialized) then
        call amrex_error("ERROR in burner: must initialize network first.")
     endif

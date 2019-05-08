@@ -150,10 +150,10 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             if (spherical == 1) {
 #pragma gpu box(tileBox)
                 burner_loop_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                 BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
+                                 BL_TO_FORTRAN_FAB(s_in_mf[mfi]),
+                                 BL_TO_FORTRAN_FAB(s_out_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
+                                 BL_TO_FORTRAN_FAB(rho_omegadot_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]), dt_in,
                                  BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);

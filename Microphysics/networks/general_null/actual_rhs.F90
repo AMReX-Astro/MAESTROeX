@@ -23,6 +23,8 @@ contains
 
     type (burn_t) :: state
 
+    !$gpu
+
     ! Do nothing in this RHS.
 
     state % ydot = ZERO
@@ -42,6 +44,8 @@ contains
 
     type (burn_t) :: state
 
+    !$gpu
+
     ! Do nothing in this RHS.
 
     state % jac(:,:) = ZERO
@@ -59,6 +63,8 @@ contains
     implicit none
 
     type (burn_t)    :: state
+
+    !$gpu
 
   end subroutine update_unevolved_species
 

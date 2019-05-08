@@ -19,9 +19,11 @@ contains
   subroutine maestro_network_init() bind(C, name="maestro_network_init")
 
     use actual_rhs_module, only: actual_rhs_init
+    use burner_loop_module, only: burner_loop_init
 
     call network_init()
     call actual_rhs_init()
+    call burner_loop_init()
 
   end subroutine maestro_network_init
 
