@@ -503,7 +503,7 @@ extern "C"
 
     //////////////////////
     // in make_explicit_thermal.F90
-    void make_thermal_coeffs(const int* lo,  const int *hi,
+    void make_thermal_coeffs(const int* lo,  const int* hi,
 			     const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
 			     amrex::Real* Tcoeff, const int* t_lo, const int* t_hi,
 			     amrex::Real* hcoeff, const int* h_lo, const int* h_hi,

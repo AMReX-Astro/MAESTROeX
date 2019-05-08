@@ -22,7 +22,6 @@ module burner_loop_module
   attributes(managed) :: ispec_threshold
 #endif
 
-
 contains
 
   subroutine burner_loop_init()

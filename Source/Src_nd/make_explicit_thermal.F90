@@ -43,6 +43,8 @@ contains
     integer :: i,j,k,comp
     type (eos_t) :: eos_state
 
+    !$gpu
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ! create Tcoeff = -kth,
     !        hcoeff = -kth/cp,
@@ -51,16 +53,9 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !print *, "... Level ", lev, " create thermal coeffs:"
 
-
-    k = lo(3)
-    j = lo(2)
-#if (AMREX_SPACEDIM == 3)
-    do k=lo(3)-1,hi(3)+1
-#endif
-#if (AMREX_SPACEDIM >= 2)
-       do j=lo(2)-1,hi(2)+1
-#endif
-          do i=lo(1)-1,hi(1)+1
+    do k=lo(3),hi(3)
+       do j=lo(2),hi(2)
+          do i=lo(1),hi(1)
 
              ! if we are outside the star, turn off the conductivity
              if (limit_conductivity .and. &
@@ -95,12 +90,8 @@ contains
              endif
 
           enddo
-#if (AMREX_SPACEDIM >= 2)
        enddo
-#endif
-#if (AMREX_SPACEDIM == 3)
     enddo
-#endif
 
   end subroutine make_thermal_coeffs
 
