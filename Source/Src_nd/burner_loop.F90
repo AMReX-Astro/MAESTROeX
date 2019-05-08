@@ -2,7 +2,7 @@ module burner_loop_module
 
   use amrex_error_module
   use burner_module
-  use burn_type_module, only: burn_t
+  use burn_type_module, only: burn_t, copy_burn_t
   use network, only: nspec, network_species_index
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, &
        pi_comp, burner_threshold_cutoff, burner_threshold_species, &
@@ -12,15 +12,14 @@ module burner_loop_module
 
   implicit none
 
+  public :: burner_loop_init
+
   private
 
-  integer, allocatable, save :: ispec_threshold, burner_threshold_species_index
-  logical, allocatable, save :: firstCall != .true.
+  integer, allocatable, save :: ispec_threshold
 
 #ifdef AMREX_USE_CUDA
   attributes(managed) :: ispec_threshold
-  attributes(managed) :: burner_threshold_species_index
-  attributes(managed) :: firstCall
 #endif
 
 
@@ -29,11 +28,8 @@ contains
   subroutine burner_loop_init()
 
       allocate(ispec_threshold)
-      allocate(burner_threshold_species_index)
-      allocate(firstCall)
 
-      burner_threshold_species_index = network_species_index(burner_threshold_species)
-      firstCall = .true.
+      ispec_threshold = network_species_index(burner_threshold_species)
 
   end subroutine burner_loop_init
 
@@ -82,11 +78,6 @@ contains
 
     !$gpu
 
-    if (firstCall) then
-       ! ispec_threshold = network_species_index(burner_threshold_species)
-       firstCall = .false.
-    endif
-
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -131,7 +122,7 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
-                   state_out = state_in
+                   call copy_burn_t(state_out, state_in)
                    call burner(state_in, state_out, dt_in)
                    do n = 1, nspec
                       x_out(n) = state_out % xn(n)
@@ -231,11 +222,6 @@ contains
 
     !$gpu
 
-    if (firstCall) then
-       ! ispec_threshold = network_species_index(burner_threshold_species)
-       firstCall = .false.
-    endif
-
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -280,7 +266,7 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
-                   state_out = state_in
+                   call copy_burn_t(state_out, state_in)
                    call burner(state_in, state_out, dt_in)
                    do n = 1, nspec
                       x_out(n) = state_out % xn(n)
