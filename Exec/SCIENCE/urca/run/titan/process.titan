@@ -132,12 +132,12 @@ function process_files
 	      # The variable $? holds the exit status of the previous command
 	      if [ $? -eq 0 ]; then
 	          
-          # mark this file as processed so we skip it next time
-          date > ${dir}.processed
+                # mark this file as processed so we skip it next time
+		date > ${dir}.processed
 
 	        # output the plotfile name and simulation time to ftime.out
-	        if [ `command -v ${FTIME_EXE}` ] ; then
-	            ${FTIME_EXE} ${dir} >> ftime.out
+	        if [ -f "${FTIME_EXE}" ] ; then
+	            ./${FTIME_EXE} ${dir} >> ftime.out
 	        fi
 
 	        # remove the htar temporary file
@@ -149,11 +149,11 @@ function process_files
 	        # ..and the corresponding .processed file too.
 	        mv ${dir}.processed plotfiles/
 
-        fi
+              fi
       fi   # end test of whether plotfile already processed
     fi   # end test of whether plotfile is a directory (as it should be)
   done
-
+  
 
   # checkpoint files
 
@@ -191,26 +191,26 @@ function process_files
         # if they don't exist.
         ${HTAR} -P -H copies=2 -cvf ${HPSS_DIR}/${dir}.tar ${dir} > ${dir}.htar
 
-	      # Ordinarily, we'd check htar's exit status (0 = successful), but 
-	      # on some machines (like Atlas) htar doesn't return a valid exit
-	      # status.  Instead we'll grep for the success line at the end of 
-	      # htar's output (which we piped into a file) and check the output 
-	      # status of grep
+	# Ordinarily, we'd check htar's exit status (0 = successful), but 
+	# on some machines (like Atlas) htar doesn't return a valid exit
+	# status.  Instead we'll grep for the success line at the end of 
+	# htar's output (which we piped into a file) and check the output 
+	# status of grep
         grep "HTAR: HTAR SUCCESSFUL" ${dir}.htar >> /dev/null
 
-	      # The variable $? holds the exit status of the previous command
-	      if [ $? -eq 0 ]; then
+	# The variable $? holds the exit status of the previous command
+	if [ $? -eq 0 ]; then
           # mark this file as processed so we skip it next time
           date > ${dir}.processed
 
           # remove the htar temporary file
           rm ${dir}.htar
 
-	        # move the checkpoint file into the checkfiles directory
-	        mv ${dir} checkfiles/
+	  # move the checkpoint file into the checkfiles directory
+	  mv ${dir} checkfiles/
 
-	        # ..and the corresponding .processed file too.
-	        mv ${dir}.processed checkfiles/
+	  # ..and the corresponding .processed file too.
+	  mv ${dir}.processed checkfiles/
 
         fi
       fi
@@ -225,7 +225,7 @@ function process_files
 # archive any diagnostic files first -- give them a unique name, appending 
 # the date string, to make sure that we don't overwrite anything
 datestr=$(date +"%Y%m%d_%H%M_%S")
-diag_files=$(find . -maxdepth 1 -name "*_diag.out" -print)
+diag_files=$(find . -maxdepth 1 -name "diag_*.out" -print)
 ftime_files=$(find . -maxdepth 1 -name "ftime.out" -print)
 
 if [ "${diag_files}" ] || [ "${ftime_files}" ]; then
