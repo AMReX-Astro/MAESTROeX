@@ -61,7 +61,7 @@ contains
 
     ! Initialize the final state by assuming it does not change.
 
-    state_out = state_in
+    call copy_burn_t(state_out, state_in)
 
     ! Do the burning.
 

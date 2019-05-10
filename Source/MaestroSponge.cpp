@@ -9,6 +9,11 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeSponge()",MakeSponge);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -28,13 +33,19 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "tileBox", which specifies the "valid" region.
-            mk_sponge(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                      BL_TO_FORTRAN_3D(sponge_mf[mfi]),ZFILL(dx),&dt);
+#pragma gpu box(tileBox)
+            mk_sponge(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                      BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),AMREX_REAL_ANYD(dx),dt);
         }
 
     }
 
     // average fine data onto coarser cells
     AverageDown(sponge,0,1);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 }
