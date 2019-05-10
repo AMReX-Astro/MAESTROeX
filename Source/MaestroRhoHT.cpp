@@ -10,6 +10,11 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoH()",TfromRhoH);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -31,19 +36,26 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
-                makeTfromRhoH_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(tileBox)
+                makeTfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                                    BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                                   p0.dataPtr(), dx,
+                                   p0.dataPtr(), AMREX_REAL_ANYD(dx),
                                    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                                   BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
             } else {
-                makeTfromRhoH(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(tileBox)
+                makeTfromRhoH(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
                               BL_TO_FORTRAN_FAB(scal_mf[mfi]),
                               p0.dataPtr());
             }
         }
-        
+
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     // average down and fill ghost cells
     AverageDown(scal,Temp,1);
@@ -79,15 +91,18 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
-                makeTfromRhoP_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(tileBox)
+                makeTfromRhoP_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                                    BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                                   p0.dataPtr(), dx, &updateRhoH,
+                                   p0.dataPtr(), AMREX_REAL_ANYD(dx), updateRhoH,
                                    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                                   BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
             } else {
-                makeTfromRhoP(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(tileBox)
+                makeTfromRhoP(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                              lev,
                               BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                              p0.dataPtr(),&updateRhoH);
+                              p0.dataPtr(), updateRhoH);
             }
         }
 

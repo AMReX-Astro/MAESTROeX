@@ -75,7 +75,7 @@ Maestro::Put1dArrayOnCart (int level,
     				 BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
     				 s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
     	} else {
-    	    put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+    	    ca_put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
     				      BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
     				      s0.dataPtr(), dx,
     				      &is_input_edge_centered, &is_output_a_vector,
