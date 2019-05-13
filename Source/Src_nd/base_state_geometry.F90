@@ -36,18 +36,18 @@ module base_state_geometry_module
   double precision, allocatable, save, public  :: center(:)
 
   double precision, allocatable, save, public  :: dr(:)
-  integer         , pointer, save, public  :: nr(:)
+  integer         , allocatable, save, public  :: nr(:)
 
   integer         , pointer, save, public  :: numdisjointchunks(:)
   integer         , pointer, save, public  :: r_start_coord(:,:)
   integer         , pointer, save, public  :: r_end_coord(:,:)
 
   integer         , pointer, save, public  :: anelastic_cutoff_density_coord(:)
-  integer         , pointer, save, public  :: base_cutoff_density_coord(:)
+  integer         , allocatable, save, public  :: base_cutoff_density_coord(:)
   integer         , pointer, save, public  :: burning_cutoff_density_coord(:)
 
 #ifdef AMREX_USE_CUDA
-  attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine, nr_irreg, center, dr
+  attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine, nr_irreg, center, dr, nr, base_cutoff_density_coord
 #endif
 
 contains
@@ -80,6 +80,8 @@ contains
     allocate(nr_irreg)
     allocate(center(3))
     allocate(dr(0:max_radial_level))
+    allocate(nr(0:max_radial_level))
+    allocate(base_cutoff_density_coord(0:max_radial_level))
 
     max_radial_level = max_radial_level_in
     nr_fine = nr_fine_in
@@ -100,8 +102,8 @@ contains
        center = 0.5d0*(prob_lo + prob_hi)
     endif
 
-    ! allocate space for dr, nr
-    call bl_allocate(nr,0,max_radial_level)
+    ! ! allocate space for dr, nr
+    ! call bl_allocate(nr,0,max_radial_level)
 
     ! compute nr(:) and dr(:)
     nr(max_radial_level) = nr_fine
@@ -152,7 +154,7 @@ contains
     end if
 
     call bl_allocate(      anelastic_cutoff_density_coord,0,max_radial_level)
-    call bl_allocate(   base_cutoff_density_coord,0,max_radial_level)
+    ! call bl_allocate(   base_cutoff_density_coord,0,max_radial_level)
     call bl_allocate(burning_cutoff_density_coord,0,max_radial_level)
 
   end subroutine init_base_state_geometry
@@ -589,10 +591,10 @@ contains
     deallocate(nr_irreg)
     deallocate(center)
     deallocate(dr)
-    
-    call bl_deallocate(nr)
+
+    deallocate(nr)
     call bl_deallocate(anelastic_cutoff_density_coord)
-    call bl_deallocate(base_cutoff_density_coord)
+    deallocate(base_cutoff_density_coord)
     call bl_deallocate(burning_cutoff_density_coord)
     call bl_deallocate(numdisjointchunks)
     call bl_deallocate(r_start_coord)

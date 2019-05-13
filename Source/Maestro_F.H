@@ -645,7 +645,7 @@ extern "C"
 
     //////////////////////
     // in make_gamma.F90
-    void make_gamma(const int* lo, const int* hi, const int lev, 
+    void make_gamma(const int* lo, const int* hi, const int lev,
                           amrex::Real* gamma, const int* g_lo, const int* g_hi,
                     const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
                     const amrex::Real* p0);
@@ -927,7 +927,7 @@ extern "C"
 				const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 				const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void mkrhohforce(const int* lev, const int* lo, const int* hi,
+    void mkrhohforce(const int* lo, const int* hi, const int lev,
                      amrex::Real* rhoh_force, const int* f_lo, const int* f_hi,
 #if (AMREX_SPACEDIM == 1)
                      const amrex::Real* umac,  const int* u_lo, const int* u_hi,
@@ -938,7 +938,7 @@ extern "C"
 #endif
                      const amrex::Real* thermal, const int* t_lo, const int* t_hi,
                      const amrex::Real* p0, const amrex::Real* rho0, const amrex::Real* grav,
-                     const amrex::Real* psi, const int* is_prediction, const int* add_thermal);
+                     const amrex::Real* psi, const int is_prediction, const int add_thermal);
 
     void mkrhohforce_sphr(const int* lo, const int* hi,
 			  amrex::Real* rhoh_force, const int* f_lo, const int* f_hi,
@@ -951,7 +951,7 @@ extern "C"
 			  const amrex::Real* p0macy,  const int* y_lo, const int* y_hi,
 			  const amrex::Real* p0macz,  const int* z_lo, const int* z_hi,
 			  const amrex::Real* dx, const amrex::Real* psi,
-			  const int* is_prediction, const int* add_thermal,
+			  const int is_prediction, const int add_thermal,
 			  const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 			  const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
     //////////////////////

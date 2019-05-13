@@ -3,7 +3,6 @@ module make_scal_force_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, base_cutoff_density_coord
   use meth_params_module, only: enthalpy_pred_type, use_exact_base_state
-  use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
   implicit none
 
@@ -11,7 +10,7 @@ module make_scal_force_module
 
 contains
 
-  subroutine mkrhohforce(lev, lo, hi, &
+  subroutine mkrhohforce(lo, hi, lev, &
        rhoh_force, f_lo, f_hi, &
 #if (AMREX_SPACEDIM == 1)
        umac, u_lo, u_hi, &
@@ -27,7 +26,8 @@ contains
 
     ! compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
 
-    integer         , intent(in   ) :: lev,lo(3),hi(3)
+    integer         , intent(in   ) :: lo(3),hi(3)
+    integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: f_lo(3), f_hi(3)
     double precision, intent(inout) :: rhoh_force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3))
 #if (AMREX_SPACEDIM == 1)
@@ -46,7 +46,7 @@ contains
     double precision, intent(in   ) :: rho0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: grav(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::  psi(0:max_radial_level,0:nr_fine-1)
-    integer         ,  intent(in   ) :: is_prediction, add_thermal
+    integer  , value,  intent(in   ) :: is_prediction, add_thermal
 
     ! Local variable
     double precision :: gradp0,veladv
@@ -59,6 +59,8 @@ contains
     integer, parameter :: predict_T_then_h         = 4;
     integer, parameter :: predict_hprime           = 5;
     integer, parameter :: predict_Tprime_then_h    = 6;
+
+    !$gpu
 
     !
     ! Add wtilde d(p0)/dr
@@ -178,6 +180,8 @@ contains
        cc_to_r, ccr_lo, ccr_hi) &
        bind(C,name="mkrhohforce_sphr")
 
+    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+
     ! compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
 
     integer         , intent(in   ) :: lo(3),hi(3)
@@ -201,7 +205,7 @@ contains
     double precision, intent(in   ) ::  p0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: psi(0:max_radial_level,0:nr_fine-1)
-    integer         , intent(in   ) :: is_prediction, add_thermal
+    integer  , value, intent(in   ) :: is_prediction, add_thermal
     double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
@@ -209,7 +213,7 @@ contains
          ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local variable
-    double precision, pointer :: psi_cart(:,:,:,:)
+    double precision, allocatable :: psi_cart(:,:,:,:)
 
     double precision :: divup, p0divu
     integer          :: i,j,k
@@ -222,12 +226,14 @@ contains
     integer, parameter :: predict_hprime           = 5;
     integer, parameter :: predict_Tprime_then_h    = 6;
 
+    !$gpu
+
     !
     ! Here we make u grad p = div (u p) - p div (u)
     !
-    do k = lo(3),hi(3)
-       do j = lo(2),hi(2)
-          do i = lo(1),hi(1)
+    do k = lo(3)+1,hi(3)-1
+       do j = lo(2)+1,hi(2)-1
+          do i = lo(1)+1,hi(1)-1
 
              divup = (umac(i+1,j,k) * p0macx(i+1,j,k) - umac(i,j,k) * p0macx(i,j,k)) / dx(1) + &
                   (vmac(i,j+1,k) * p0macy(i,j+1,k) - vmac(i,j,k) * p0macy(i,j,k)) / dx(2) + &
@@ -253,25 +259,25 @@ contains
          (is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_rhoh) .OR. &
          (is_prediction .eq. 0)) then
 
-       call bl_allocate(psi_cart,lo,hi,1)
+       allocate(psi_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
 
        call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0, &
             r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
-       do k = lo(3),hi(3)
-          do j = lo(2),hi(2)
-             do i = lo(1),hi(1)
+        do k = lo(3)+1,hi(3)-1
+           do j = lo(2)+1,hi(2)-1
+              do i = lo(1)+1,hi(1)-1
                 rhoh_force(i,j,k) = rhoh_force(i,j,k) + psi_cart(i,j,k,1)
              enddo
           enddo
        enddo
-       call bl_deallocate(psi_cart)
+       deallocate(psi_cart)
     endif
 
     if (add_thermal .eq. 1) then
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+        do k = lo(3)+1,hi(3)-1
+           do j = lo(2)+1,hi(2)-1
+              do i = lo(1)+1,hi(1)-1
                 rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal(i,j,k)
              end do
           end do
@@ -382,6 +388,8 @@ contains
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) &
        bind(C,name="modify_scal_force_sphr")
+
+    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: f_lo(3), f_hi(3)

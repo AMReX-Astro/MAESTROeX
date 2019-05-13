@@ -295,51 +295,58 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 #endif
         for ( MFIter mfi(scal_force_mf, true); mfi.isValid(); ++mfi ) {
 
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
                 const Real* dx = geom[lev].CellSize();
+
+                // Get the index space of the valid region
+                const Box& gtbx = mfi.growntilebox(1);
 #if (AMREX_SPACEDIM == 3)
 		// if use_exact_base_state or average_base_state,
 		// psi is set to dpdt in advance subroutine
-		mkrhohforce_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(gtbx)
+		mkrhohforce_sphr(AMREX_INT_ANYD(gtbx.loVect()), AMREX_INT_ANYD(gtbx.hiVect()),
 				 scal_force_mf[mfi].dataPtr(RhoH),
-				 ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
-				 BL_TO_FORTRAN_3D(umac_mf[mfi]),
-				 BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-				 BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-				 BL_TO_FORTRAN_3D(thermal_mf[mfi]),
-				 BL_TO_FORTRAN_3D(p0cart_mf[mfi]),
-				 BL_TO_FORTRAN_3D(p0macx_mf[mfi]),
-				 BL_TO_FORTRAN_3D(p0macy_mf[mfi]),
-				 BL_TO_FORTRAN_3D(p0macz_mf[mfi]),
-				 dx, psi.dataPtr(),
-				 &is_prediction, &add_thermal,
+				 AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
+				 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(p0macx_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(p0macy_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(p0macz_mf[mfi]),
+				 AMREX_REAL_ANYD(dx), psi.dataPtr(),
+				 is_prediction, add_thermal,
 				 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				 BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+				 BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 #else
                 Abort("MakeRhoHForce: Spherical is not valid for DIM < 3");
 #endif
             } else {
+
+                // Get the index space of the valid region
+                const Box& tileBox = mfi.tilebox();
 		// if average_base_state, psi is set to dpdt in advance subroutine
-                mkrhohforce(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(tileBox)
+                mkrhohforce(AMREX_INT_ANYD(tileBox.loVect()),
+                            AMREX_INT_ANYD(tileBox.hiVect()),
+                            lev,
                             scal_force_mf[mfi].dataPtr(RhoH),
-                            ARLIM_3D(scal_force_mf[mfi].loVect()), ARLIM_3D(scal_force_mf[mfi].hiVect()),
+                            AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
 #if (AMREX_SPACEDIM == 1)
-                            BL_TO_FORTRAN_3D(umac_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
 #elif (AMREX_SPACEDIM == 2)
-                            BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
 #elif (AMREX_SPACEDIM == 3)
-                            BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
 #endif
-                            BL_TO_FORTRAN_3D(thermal_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
                             p0.dataPtr(), rho0.dataPtr(), grav.dataPtr(), psi.dataPtr(),
-                            &is_prediction, &add_thermal);
+                            is_prediction, add_thermal);
             }
         }
     }
