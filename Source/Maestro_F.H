@@ -288,7 +288,7 @@ extern "C"
                               const amrex::Real* s0, const int* is_input_edge_centered,
                               const int* is_output_a_vector);
 
-    void ca_put_1d_array_on_cart_sphr(const int* lo, const int* hi,
+    void put_1d_array_on_cart_sphr(const int* lo, const int* hi,
 				   amrex::Real* s0_cart,
 				   const int* s0_cart_lo, const int* s0_cart_hi, const int* nc_s,
 				   const amrex::Real* s0, const amrex::Real* dx,
@@ -1113,13 +1113,13 @@ extern "C"
 		       const amrex::Real* temp_old, const int* t_lo, const int* t_hi,
 		       amrex::Real* peos, const int* p_lo, const int* p_hi);
 
-    void makeMachfromRhoH (const int* lev, const int* lo, const int* hi,
+    void makeMachfromRhoH (const int* lo, const int* hi, const int lev,
                            const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
                            const amrex::Real* u, const int* u_lo, const int* u_hi,
                            const amrex::Real* p0, const amrex::Real* w0,
                            amrex::Real* mach, const int* m_lo, const int* m_hi);
 
-    void makeMachfromRhoH_sphr (const int* lev, const int* lo, const int* hi,
+    void makeMachfromRhoH_sphr (const int* lo, const int* hi, const int lev,
                                 const amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
                                 const amrex::Real* u, const int* u_lo, const int* u_hi,
                                 const amrex::Real* p0,
@@ -1130,7 +1130,7 @@ extern "C"
                                 const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
 
-    void makeCsfromRhoH (const int* lev, const int* lo, const int* hi,
+    void makeCsfromRhoH (const int* lo, const int* hi, const int lev,
                            const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
                            const amrex::Real* p0,
                            amrex::Real* cs, const int* c_lo, const int* c_hi);
