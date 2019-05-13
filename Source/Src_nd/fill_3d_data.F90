@@ -93,7 +93,7 @@ contains
        is_output_a_vector, &
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) &
-       bind(C, name="ca_put_1d_array_on_cart_sphr")
+       bind(C, name="put_1d_array_on_cart_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: s0_cart_lo(3), s0_cart_hi(3), nc_s
