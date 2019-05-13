@@ -645,7 +645,7 @@ extern "C"
 
     //////////////////////
     // in make_gamma.F90
-    void make_gamma(const int* lev, const int* lo, const int* hi,
+    void make_gamma(const int* lo, const int* hi, const int lev, 
                           amrex::Real* gamma, const int* g_lo, const int* g_hi,
                     const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
                     const amrex::Real* p0);

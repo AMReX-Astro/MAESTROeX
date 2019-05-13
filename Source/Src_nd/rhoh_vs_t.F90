@@ -1,6 +1,5 @@
 module rhoh_vs_t_module
 
-  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use eos_type_module
   use eos_module
   use network, only: nspec

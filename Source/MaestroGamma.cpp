@@ -17,6 +17,11 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
         gamma1[lev].define(grids[lev], dmap[lev], 1, 0);
     }
 
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -38,22 +43,30 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
-                make_gamma(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                           BL_TO_FORTRAN_3D(gamma1_mf[mfi]),
+#pragma gpu box(tileBox)
+                make_gamma(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                           lev,
+                           BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
                            BL_TO_FORTRAN_FAB(scal_mf[mfi]),
                            p0.dataPtr());
             } else {
                 const Real* dx = geom[lev].CellSize();
 
-                make_gamma_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                BL_TO_FORTRAN_3D(gamma1_mf[mfi]),
+#pragma gpu box(tileBox)
+                make_gamma_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                                BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
                                 BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                                p0.dataPtr(), dx,
+                                p0.dataPtr(), AMREX_REAL_ANYD(dx),
                                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                                BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
             }
         }
     }
+
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     // average fine data onto coarser cells
     AverageDown(gamma1,0,1);

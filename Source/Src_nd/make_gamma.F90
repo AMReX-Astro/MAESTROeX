@@ -3,28 +3,23 @@
 
 module make_gamma_module
 
-  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use eos_type_module
   use eos_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, pi_comp, use_pprime_in_tfromp
   use base_state_geometry_module, only: max_radial_level, nr_fine
-  use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
   implicit none
 
-  private
-
-  public :: make_gamma
-
 contains
 
-  subroutine make_gamma(lev, lo, hi, &
+  subroutine make_gamma(lo, hi, lev, &
        gamma, g_lo, g_hi, &
        scal,  s_lo, s_hi, nc_s, &
        p0) bind(C,name="make_gamma")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: g_lo(3), g_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
     double precision, intent (inout) :: gamma(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
@@ -36,6 +31,8 @@ contains
 
     integer :: pt_index(3)
     type (eos_t) :: eos_state
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -78,6 +75,8 @@ contains
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind(C, name="make_gamma_sphr")
 
+    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: g_lo(3), g_hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -94,12 +93,14 @@ contains
     ! local variables
     integer :: i, j, k
 
-    double precision, pointer :: p0_cart(:,:,:,:)
+    double precision, allocatable :: p0_cart(:,:,:,:)
 
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
-    call bl_allocate(p0_cart,lo,hi,1)
+    !$gpu
+
+    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
     call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
@@ -127,7 +128,7 @@ contains
        end do
     end do
 
-    call bl_deallocate(p0_cart)
+    deallocate(p0_cart)
 
   end subroutine make_gamma_sphr
 

@@ -369,7 +369,6 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 
             }
         }
-
     }
 
 #ifdef AMREX_USE_CUDA
