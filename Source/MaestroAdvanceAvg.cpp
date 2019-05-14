@@ -428,7 +428,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             if (spherical == 0) {
                 MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
             } else {
-                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+                MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
             }
 	}
     }
@@ -735,7 +735,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             if (spherical == 0) {
                 MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
             } else {
-                MakeEtarhoSphr(s1,s2,umac,w0mac,etarho_ec,etarho_cc);
+                MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
             }
 	}
     }
