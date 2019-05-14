@@ -342,7 +342,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 1;
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart,beta0_nm1,is_predictor);
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -747,7 +747,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 0;
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart,beta0_nm1,is_predictor);
+    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,

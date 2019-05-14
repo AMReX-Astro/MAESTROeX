@@ -125,6 +125,9 @@ contains
     ! the point we're at
     double precision :: xloc(3)
 
+    ! density pertubation and amplitude
+    double precision :: delta_rho
+    double precision, parameter :: amplitude = 2.d-4
 
     ! initialize the domain with the base state
     scal(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
@@ -151,6 +154,7 @@ contains
     end do
 
     ! initialize rho as sum of partial densities rho*X_i
+    ! add pertubation and renormalize partial densities
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -158,6 +162,16 @@ contains
              do comp = spec_comp, spec_comp+nspec-1
                 scal(i,j,k,rho_comp) = scal(i,j,k,rho_comp) + scal(i,j,k,comp)
              enddo
+
+             delta_rho = amrex_random()
+             delta_rho = amplitude * (2.0d0*delta_rho - 1.0d0)
+
+             do comp = spec_comp, spec_comp+nspec-1
+                scal(i,j,k,comp) = scal(i,j,k,comp)  * (scal(i,j,k,rho_comp) + delta_rho) / scal(i,j,k,rho_comp)
+             enddo
+
+             scal(i,j,k,rho_comp) = scal(i,j,k,rho_comp) + delta_rho
+
           enddo
        enddo
     enddo

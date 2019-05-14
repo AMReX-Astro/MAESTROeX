@@ -2,7 +2,7 @@ module tagging_module
 
   use amrex_error_module
   use meth_params_module, only: temp_comp, rho_comp, nscal
-  use probin_module, only: tag_density_1
+  use probin_module, only: tag_density_1, tag_density_2, tag_density_3
   use base_state_geometry_module, only: nr_fine, max_radial_level
 
   implicit none
@@ -53,9 +53,11 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             if (state(i,j,k,rho_comp) .ge. tag_density_1) then
+             if (((lev .eq. 0) .and. (state(i,j,k,rho_comp) .ge. tag_density_1)) .or. &
+	     	 ((lev .eq. 1) .and. (state(i,j,k,rho_comp) .ge. tag_density_2)) .or. &
+		 ((lev .eq. 2) .and. (state(i,j,k,rho_comp) .ge. tag_density_3))) then
                 tag(i,j,k) = set
-             endif
+	     end if	     
           enddo
        enddo
     enddo

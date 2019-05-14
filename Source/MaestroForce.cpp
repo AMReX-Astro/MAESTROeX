@@ -5,7 +5,6 @@ using namespace amrex;
 
 void
 Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
-                       int is_final_update,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                        const Vector<MultiFab>& rho,
                        const Vector<Real>& rho0,
@@ -15,8 +14,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 #ifdef ROTATION
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
 #endif
-        		       const Vector<Real>& beta0,
-        		       const int is_predictor,
                        int do_add_utilde_force)
 {
 	// timer for profiling
