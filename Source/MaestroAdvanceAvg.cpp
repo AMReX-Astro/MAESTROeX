@@ -323,7 +323,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 1;
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,beta0_old,is_predictor);
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 	delta_chi[lev].setVal(0.);
@@ -659,7 +659,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 0;
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,beta0_old,is_predictor);
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
 
     if (evolve_base_state && !split_projection) {
 	for (int i=0; i<Sbar.size(); ++i) {

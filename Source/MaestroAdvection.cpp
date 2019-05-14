@@ -8,9 +8,7 @@ void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const Vector<Real>& w0_force,
-                        const Vector<MultiFab>& w0_force_cart,
-			const Vector<Real>& beta0,
-			const int is_predictor)
+                        const Vector<MultiFab>& w0_force_cart)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);

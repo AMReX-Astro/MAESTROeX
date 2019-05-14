@@ -84,9 +84,7 @@ private:
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const amrex::Vector<amrex::Real>& w0_force,
-			const amrex::Vector<amrex::MultiFab>& w0_force_cart,
-			const amrex::Vector<amrex::Real>& beta0,
-			const int is_predictor);
+			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
