@@ -13,12 +13,12 @@
 module meth_params_module
 
   use amrex_fort_module, only : rt => amrex_real
+  use state_sizes_module, only: nscal
   implicit none
 
   ! variables in the module
 
   integer, allocatable, save :: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp
-  integer, allocatable, save :: nscal
   double precision, allocatable, save :: prob_lo(:), prob_hi(:)
   double precision, allocatable, save :: rel_eps
 
@@ -28,7 +28,6 @@ module meth_params_module
     attributes(managed) :: spec_comp
     attributes(managed) :: temp_comp
     attributes(managed) :: pi_comp
-    attributes(managed) :: nscal
     attributes(managed) :: prob_lo
     attributes(managed) :: prob_hi
     attributes(managed) :: rel_eps
@@ -169,7 +168,6 @@ contains
     type (amrex_parmparse) :: pp
 
     allocate(rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp)
-    allocate(nscal)
     allocate(prob_lo(3))
     allocate(prob_hi(3))
     allocate(rel_eps)
@@ -372,7 +370,6 @@ contains
     implicit none
 
     deallocate(rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp)
-    deallocate(nscal)
     deallocate(prob_lo, prob_hi)
     deallocate(rel_eps)
 

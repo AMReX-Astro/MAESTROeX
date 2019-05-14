@@ -3,3 +3,4 @@ CEXE_headers += maestro_queries.H
 CEXE_headers += maestro_defaults.H
 
 F90EXE_sources += meth_params.F90
+f90EXE_sources += state_sizes.f90

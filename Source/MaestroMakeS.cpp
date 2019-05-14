@@ -53,33 +53,37 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             // We will also pass "validBox", which specifies the "valid" region.
 
             if (spherical == 1) {
-                make_S_cc_sphr(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                               BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-                               BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
-                               BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
-                               BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                               BL_TO_FORTRAN_FAB(u_mf[mfi]),
-                               BL_TO_FORTRAN_FAB(rho_odot_mf[mfi]),
-                               BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                               BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-                               BL_TO_FORTRAN_3D(thermal_mf[mfi]),
-                               p0.dataPtr(),gamma1bar.dataPtr(), dx,
-                               BL_TO_FORTRAN_FAB(normal_mf[mfi]),
+#pragma gpu box(tileBox)
+                make_S_cc_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                               lev,
+                               BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(u_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(rho_odot_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
+                               p0.dataPtr(),gamma1bar.dataPtr(), AMREX_REAL_ANYD(dx),
+                               BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
                                r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                               BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                               BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 
             } else {
-                make_S_cc(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                          BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-                          BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
-                          BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
-                          BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                          BL_TO_FORTRAN_FAB(u_mf[mfi]),
-                          BL_TO_FORTRAN_FAB(rho_odot_mf[mfi]),
-                          BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                          BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-                          BL_TO_FORTRAN_3D(thermal_mf[mfi]),
-                          p0.dataPtr(),gamma1bar.dataPtr(), dx);
+#pragma gpu box(tileBox)
+                make_S_cc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                          lev,
+                          BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(u_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(rho_odot_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
+                          p0.dataPtr(), gamma1bar.dataPtr(), AMREX_REAL_ANYD(dx));
             }
         }
     }
