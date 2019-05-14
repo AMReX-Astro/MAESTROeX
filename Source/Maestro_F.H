@@ -1109,18 +1109,18 @@ extern "C"
 			     const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
     void makePfromRhoH(const int* lo, const int* hi,
-		       const amrex::Real* state, const int* s_lo, const int* s_hi, 
+		       const amrex::Real* state, const int* s_lo, const int* s_hi,
 		       const amrex::Real* temp_old, const int* t_lo, const int* t_hi,
 		       amrex::Real* peos, const int* p_lo, const int* p_hi);
 
     void makeMachfromRhoH (const int* lo, const int* hi, const int lev,
-                           const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
+                           const amrex::Real* state, const int* s_lo, const int* s_hi,
                            const amrex::Real* u, const int* u_lo, const int* u_hi,
                            const amrex::Real* p0, const amrex::Real* w0,
                            amrex::Real* mach, const int* m_lo, const int* m_hi);
 
     void makeMachfromRhoH_sphr (const int* lo, const int* hi, const int lev,
-                                const amrex::Real* state,  const int* s_lo, const int* s_hi, const int* nc_s,
+                                const amrex::Real* state,  const int* s_lo, const int* s_hi,
                                 const amrex::Real* u, const int* u_lo, const int* u_hi,
                                 const amrex::Real* p0,
                                 const amrex::Real* w0, const int* w_lo, const int* w_hi,
@@ -1131,12 +1131,12 @@ extern "C"
 
 
     void makeCsfromRhoH (const int* lo, const int* hi, const int lev,
-                           const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
+                           const amrex::Real* state, const int* s_lo, const int* s_hi,
                            const amrex::Real* p0,
                            amrex::Real* cs, const int* c_lo, const int* c_hi);
 
     void makeCsfromRhoH_sphr (const int* lo, const int* hi,
-                          const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
+                          const amrex::Real* state, const int* s_lo, const int* s_hi,
                           const amrex::Real* p0cart, const int* p_lo, const int* p_hi,
                           amrex::Real* cs, const int* c_lo, const int* c_hi);
     //////////////////////

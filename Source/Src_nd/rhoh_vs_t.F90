@@ -348,13 +348,13 @@ contains
 
   end subroutine makePfromRhoH
 
-  subroutine makeMachfromRhoH(lo,hi,lev,state,s_lo,s_hi,nc_s,u,u_lo,u_hi, &
+  subroutine makeMachfromRhoH(lo,hi,lev,state,s_lo,s_hi,u,u_lo,u_hi, &
        p0,w0,mach,m_lo,m_hi) bind(C,name="makeMachfromRhoH")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     integer         , intent (in   ) :: u_lo(3), u_hi(3)
     double precision, intent (in   ) ::  u(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),3)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
@@ -453,7 +453,7 @@ contains
 
   end subroutine makeMachfromRhoH
 
-  subroutine makeMachfromRhoH_sphr(lo,hi,lev,state,s_lo,s_hi,nc_s,u,u_lo,u_hi, &
+  subroutine makeMachfromRhoH_sphr(lo,hi,lev,state,s_lo,s_hi,u,u_lo,u_hi, &
        p0,w0cart,w_lo,w_hi,dx,mach,m_lo,m_hi,r_cc_loc,r_edge_loc, &
        cc_to_r,ccr_lo,ccr_hi) bind(C,name="makeMachfromRhoH_sphr")
 
@@ -461,8 +461,8 @@ contains
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     integer         , intent (in   ) :: u_lo(3), u_hi(3)
     double precision, intent (in   ) ::  u(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),3)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
@@ -575,13 +575,13 @@ contains
 
   end subroutine makeMachfromRhoH_sphr
 
-  subroutine makeCsfromRhoH(lo,hi,lev,state,s_lo,s_hi,nc_s,p0,cs,c_lo,c_hi) &
+  subroutine makeCsfromRhoH(lo,hi,lev,state,s_lo,s_hi,p0,cs,c_lo,c_hi) &
        bind(C,name="makeCsfromRhoH")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent (in   ) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    double precision, intent (in   ) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     double precision, intent (inout) :: cs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
@@ -662,17 +662,17 @@ contains
 
   end subroutine makeCsfromRhoH
 
-  subroutine makeCsfromRhoH_sphr(lo,hi,state,s_lo,s_hi,nc_s,p0cart,p_lo,p_hi,cs,c_lo,c_hi) &
+  subroutine makeCsfromRhoH_sphr(lo,hi,state,s_lo,s_hi,p0cart,p_lo,p_hi,cs,c_lo,c_hi) &
        bind(C,name="makeCsfromRhoH_sphr")
 
 
        use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: p_lo(3), p_hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
-    double precision, intent (in   ) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent (in   ) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent (in   ) :: p0cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3),1)
     double precision, intent (inout) :: cs(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
 

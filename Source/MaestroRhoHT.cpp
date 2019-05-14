@@ -218,7 +218,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
             // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
             makeMachfromRhoH(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),lev,
-                             BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                             BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                              BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
                              p0.dataPtr(),w0.dataPtr(),
                              BL_TO_FORTRAN_ANYD(mach_mf[mfi]));
@@ -278,7 +278,7 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
             makeMachfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()),
                                   AMREX_INT_ANYD(tileBox.hiVect()),
                                   lev,
-                                  BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                                  BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                   BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
                                   p0.dataPtr(),BL_TO_FORTRAN_ANYD(w0cart_mf[mfi]),
                                   AMREX_REAL_ANYD(dx),
@@ -338,7 +338,7 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
                 makeCsfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
                                AMREX_INT_ANYD(tileBox.hiVect()),
                                lev,
-                               BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                p0.dataPtr(),
                                BL_TO_FORTRAN_ANYD(cs_mf[mfi]));
             }
@@ -362,7 +362,7 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 #pragma gpu box(tileBox)
                 makeCsfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()),
                                     AMREX_INT_ANYD(tileBox.hiVect()),
-                                    BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                     BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
                                     BL_TO_FORTRAN_ANYD(cs_mf[mfi]));
 

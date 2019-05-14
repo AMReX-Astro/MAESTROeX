@@ -6,7 +6,7 @@ module make_gamma_module
   use eos_type_module
   use eos_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, pi_comp, use_pprime_in_tfromp
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, pi_comp, use_pprime_in_tfromp, nscal
   use base_state_geometry_module, only: max_radial_level, nr_fine
 
   implicit none
@@ -21,9 +21,9 @@ contains
     integer         , intent (in   ) :: lo(3), hi(3)
     integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: g_lo(3), g_hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
     double precision, intent (inout) :: gamma(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
-    double precision, intent (in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent (in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
 
     ! local variables
@@ -70,7 +70,7 @@ contains
 
   subroutine make_gamma_sphr(lo, hi, &
        gamma, g_lo, g_hi, &
-       scal,  s_lo, s_hi, nc_s, &
+       scal,  s_lo, s_hi, &
        p0, dx, &
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind(C, name="make_gamma_sphr")
@@ -79,9 +79,9 @@ contains
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: g_lo(3), g_hi(3)
-    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent(in   ) :: s_lo(3), s_hi(3)
     double precision, intent(inout) :: gamma(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
-    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)

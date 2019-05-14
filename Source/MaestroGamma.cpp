@@ -47,7 +47,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
                 make_gamma(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                            lev,
                            BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                            p0.dataPtr());
             } else {
                 const Real* dx = geom[lev].CellSize();
@@ -55,7 +55,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 #pragma gpu box(tileBox)
                 make_gamma_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                                 BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                 p0.dataPtr(), AMREX_REAL_ANYD(dx),
                                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                                 BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
