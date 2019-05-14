@@ -376,8 +376,6 @@ private:
                        const amrex::Vector<amrex::Real>& grav,
                        const amrex::Vector<amrex::Real>& w0_force,
 		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
-		       const amrex::Vector<amrex::Real>& beta0,
-		       const int is_predictor,
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
