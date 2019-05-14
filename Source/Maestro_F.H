@@ -735,7 +735,7 @@ extern "C"
                             const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
                             const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
                             amrex::Real* deltagamma, const int* d_lo, const int* d_hi);
-                            
+
     void make_entropy(const int* lev, const int* lo, const int* hi,
                      const amrex::Real* state, const int* s_lo, const int* s_hi,
                      const int* nc_s,
@@ -1008,7 +1008,7 @@ extern "C"
                  const amrex::Real* rho0_old, const amrex::Real* rho0_new,
                  const amrex::Real* p0_old, const amrex::Real* p0_new,
                  const amrex::Real* gamma1bar_old, const amrex::Real* gamma1bar_new,
-                 const amrex::Real* p0_minus_peosbar, 
+                 const amrex::Real* p0_minus_peosbar,
                  const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
                  const amrex::Real* delta_chi_w0, const amrex::Real* r_cc_loc,
                  const amrex::Real* r_edge_loc, const amrex::Real* dt,

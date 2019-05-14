@@ -71,7 +71,8 @@ Maestro::EstDt ()
     }
 
     int do_add_utilde_force = 0;
-    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
+    int is_final_update = 0;
+    MakeVelForce(vel_force,is_final_update,umac_dummy,sold,rho0_old,grav_cell_old,
                  w0_force_dummy,w0_force_cart_dummy,
 #ifdef ROTATION
 				 w0mac,
@@ -268,7 +269,8 @@ Maestro::FirstDt ()
 #endif
 
     int do_add_utilde_force = 0;
-    MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
+    int is_final_update = 0;
+    MakeVelForce(vel_force,is_final_update,umac_dummy,sold,rho0_old,grav_cell_old,
                  w0_force_dummy,w0_force_cart_dummy,
 #ifdef ROTATION
 				 w0mac,

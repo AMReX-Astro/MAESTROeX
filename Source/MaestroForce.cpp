@@ -5,6 +5,7 @@ using namespace amrex;
 
 void
 Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
+                        int is_final_update,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                        const Vector<MultiFab>& rho,
                        const Vector<Real>& rho0,

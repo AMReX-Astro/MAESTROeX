@@ -34,6 +34,7 @@ Maestro::WritePlotFile (const int step,
                         Vector<MultiFab>& s_in,
                         const Vector<MultiFab>& S_cc_in,
                         const bool is_small)
+{
 
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
@@ -141,7 +142,7 @@ Maestro::WritePlotFile (const int step,
 	if (ParallelDescriptor::IOProcessor()) {
 
 	  for (int lev=0; lev<=max_radial_level; ++lev) {
-          
+
 	    std::ofstream BaseCCFile;
 	    BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
 	    std::string BaseCCFileName(plotfilename + "/BaseCC_");

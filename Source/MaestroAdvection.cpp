@@ -66,7 +66,8 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	}
 
     int do_add_utilde_force = 1;
-    MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
+    int is_final_update = 0;
+    MakeVelForce(vel_force,is_final_update,utrans,sold,rho0_old,grav_cell_old,
                  w0_force,w0_force_cart,
     #ifdef ROTATION
                  w0mac,
