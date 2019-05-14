@@ -5,7 +5,7 @@ module burner_loop_module
   use burn_type_module, only: burn_t, copy_burn_t
   use network, only: nspec, network_species_index
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, &
-       pi_comp, burner_threshold_cutoff, burner_threshold_species, &
+       pi_comp, nscal, burner_threshold_cutoff, burner_threshold_species, &
        burning_cutoff_density, reaction_sum_tol, &
        drive_initial_convection
   use base_state_geometry_module, only: max_radial_level, nr_fine
@@ -34,10 +34,10 @@ contains
 
   subroutine burner_loop(lo, hi, &
        lev, &
-       s_in,     i_lo, i_hi, nc_i, &
-       s_out,    o_lo, o_hi, nc_o, &
+       s_in,     i_lo, i_hi, &
+       s_out,    o_lo, o_hi, &
        rho_Hext, e_lo, e_hi, &
-       rho_odot, r_lo, r_hi, nc_r, &
+       rho_odot, r_lo, r_hi, &
        rho_Hnuc, n_lo, n_hi, &
        tempbar_init_in, dt_in, &
        mask,     m_lo, m_hi, use_mask) &
@@ -45,16 +45,16 @@ contains
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer, value  , intent (in   ) :: lev
-    integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
-    integer         , intent (in   ) :: o_lo(3), o_hi(3), nc_o
+    integer         , intent (in   ) :: i_lo(3), i_hi(3)
+    integer         , intent (in   ) :: o_lo(3), o_hi(3)
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
-    integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
+    integer         , intent (in   ) :: r_lo(3), r_hi(3)
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3)
-    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
-    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
+    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nscal)
+    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nscal)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
-    double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
+    double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nspec)
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: tempbar_init_in(0:max_radial_level,0:nr_fine-1)
     double precision, value, intent (in) :: dt_in
@@ -178,26 +178,26 @@ contains
   end subroutine burner_loop
 
   subroutine burner_loop_sphr(lo, hi, &
-       s_in,     i_lo, i_hi, nc_i, &
-       s_out,    o_lo, o_hi, nc_o, &
+       s_in,     i_lo, i_hi, &
+       s_out,    o_lo, o_hi, &
        rho_Hext, e_lo, e_hi, &
-       rho_odot, r_lo, r_hi, nc_r, &
+       rho_odot, r_lo, r_hi, &
        rho_Hnuc, n_lo, n_hi, &
        tempbar_init_cart, t_lo, t_hi, dt_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
-    integer         , intent (in   ) :: o_lo(3), o_hi(3), nc_o
+    integer         , intent (in   ) :: i_lo(3), i_hi(3)
+    integer         , intent (in   ) :: o_lo(3), o_hi(3)
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
-    integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
+    integer         , intent (in   ) :: r_lo(3), r_hi(3)
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3)
-    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
-    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
+    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nscal)
+    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nscal)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
-    double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
+    double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nspec)
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (in   ) :: tempbar_init_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
