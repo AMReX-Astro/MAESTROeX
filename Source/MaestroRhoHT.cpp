@@ -38,14 +38,14 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             if (spherical == 1) {
 #pragma gpu box(tileBox)
                 makeTfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                   BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                    p0.dataPtr(), AMREX_REAL_ANYD(dx),
                                    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                                    BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
             } else {
 #pragma gpu box(tileBox)
                 makeTfromRhoH(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
-                              BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                               p0.dataPtr());
             }
         }
@@ -70,10 +70,10 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoP()",TfromRhoP);
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -98,7 +98,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             if (spherical == 1) {
 #pragma gpu box(tileBox)
                 makeTfromRhoP_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                   BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                    p0.dataPtr(), AMREX_REAL_ANYD(dx), updateRhoH,
                                    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                                    BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
@@ -106,17 +106,17 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 #pragma gpu box(tileBox)
                 makeTfromRhoP(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                               lev,
-                              BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                               p0.dataPtr(), updateRhoH);
             }
         }
 
     }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Cuda::setLaunchRegion(false);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     // average down and fill ghost cells (Temperature)
     AverageDown(scal,Temp,1);
@@ -164,7 +164,7 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
             // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
             makePfromRhoH(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                          BL_TO_FORTRAN_FAB(state_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(state_mf[mfi]),
                           sold_mf[mfi].dataPtr(Temp),
                           AMREX_INT_ANYD(sold_mf[mfi].loVect()), AMREX_INT_ANYD(sold_mf[mfi].hiVect()),
                           BL_TO_FORTRAN_ANYD(peos_mf[mfi]));

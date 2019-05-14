@@ -4,19 +4,19 @@ module rhoh_vs_t_module
   use eos_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp, &
-       use_eos_e_instead_of_h, use_pprime_in_tfromp
+       nscal, use_eos_e_instead_of_h, use_pprime_in_tfromp
   use base_state_geometry_module, only:  max_radial_level, nr_fine
 
   implicit none
 
 contains
 
-  subroutine makeTfromRhoH(lo,hi,lev,state,s_lo,s_hi,nc_s,p0) bind(C,name="makeTfromRhoH")
+  subroutine makeTfromRhoH(lo,hi,lev,state,s_lo,s_hi,p0) bind(C,name="makeTfromRhoH")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
 
     ! Local variables
@@ -96,14 +96,14 @@ contains
 
   end subroutine makeTfromRhoH
 
-  subroutine makeTfromRhoH_sphr(lo,hi,state,s_lo,s_hi,nc_s,p0,dx,r_cc_loc,r_edge_loc, &
+  subroutine makeTfromRhoH_sphr(lo,hi,state,s_lo,s_hi,p0,dx,r_cc_loc,r_edge_loc, &
        cc_to_r,ccr_lo,ccr_hi) &
        bind(C,name="makeTfromRhoH_sphr")
    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: dx(3)
     double precision, intent (in   ) ::   r_cc_loc(0:max_radial_level,0:nr_fine-1)
@@ -180,13 +180,13 @@ contains
 
   end subroutine makeTfromRhoH_sphr
 
-  subroutine makeTfromRhoP(lo,hi,lev,state,s_lo,s_hi,nc_s,p0,updateRhoH) &
+  subroutine makeTfromRhoP(lo,hi,lev,state,s_lo,s_hi,p0,updateRhoH) &
        bind(C,name="makeTfromRhoP")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
     integer  , value, intent (in   ) :: updateRhoH
 
@@ -237,7 +237,7 @@ contains
 
   end subroutine makeTfromRhoP
 
-  subroutine makeTfromRhoP_sphr(lo,hi,state,s_lo,s_hi,nc_s,p0,dx,updateRhoH, &
+  subroutine makeTfromRhoP_sphr(lo,hi,state,s_lo,s_hi,p0,dx,updateRhoH, &
        r_cc_loc, r_edge_loc, cc_to_r,ccr_lo,ccr_hi) &
        bind(C,name="makeTfromRhoP_sphr")
 
@@ -245,8 +245,8 @@ contains
    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: dx(3)
     integer ,  value, intent (in   ) :: updateRhoH
@@ -306,13 +306,13 @@ contains
   ! makePfromRhoH
   !----------------------------------------------------------------------------
   subroutine makePfromRhoH(lo, hi, &
-       state, s_lo, s_hi, nc_s, &
+       state, s_lo, s_hi,  &
        temp_old, t_lo, t_hi, &
        peos, p_lo, p_hi) bind(C,name="makePfromRhoH")
 
     integer         , intent(in   ) :: lo(3), hi(3)
-    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
-    double precision, intent(in   ) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    integer         , intent(in   ) :: s_lo(3), s_hi(3)
+    double precision, intent(in   ) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     integer         , intent(in   ) :: t_lo(3), t_hi(3)
     double precision, intent(in   ) :: temp_old(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     integer         , intent(in   ) :: p_lo(3), p_hi(3)
