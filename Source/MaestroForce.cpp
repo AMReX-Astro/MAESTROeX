@@ -268,6 +268,11 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                    r_cc_loc.dataPtr(),
                    r_edge_loc.dataPtr());
 
+//
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -329,7 +334,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             } else {
 
                 // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
+                const Box& tileBox = mfi.growntilebox(1);
 		// if average_base_state, psi is set to dpdt in advance subroutine
 #pragma gpu box(tileBox)
                 mkrhohforce(AMREX_INT_ANYD(tileBox.loVect()),
@@ -350,6 +355,11 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             }
         }
     }
+
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     // average down and fill ghost cells
     AverageDown(scal_force,RhoH,1);

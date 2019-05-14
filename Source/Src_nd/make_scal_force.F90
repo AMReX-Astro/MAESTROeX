@@ -66,8 +66,8 @@ contains
     ! Add wtilde d(p0)/dr
     !
 #if (AMREX_SPACEDIM == 1)
-    j = 0
-    k = 0
+    j = lo(2)
+    k = lo(3)
     do i = lo(1),hi(1)
 
        if (i .lt. base_cutoff_density_coord(lev)) then
@@ -84,7 +84,7 @@ contains
        rhoh_force(i,j,k) = veladv * gradp0
     enddo
 #elif (AMREX_SPACEDIM == 2)
-    k = 0
+    k = lo(3)
     do j = lo(2),hi(2)
 
        if (j .lt. base_cutoff_density_coord(lev)) then
