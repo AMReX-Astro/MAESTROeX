@@ -110,10 +110,10 @@ extern "C"
     // in burner_loop.f90
     void burner_loop(const int* lo, const int* hi,
                      const int lev,
-                     const amrex::Real* s_in,     const int* i_lo, const int* i_hi, const int* nc_i,
-                           amrex::Real* s_out,    const int* o_lo, const int* o_hi, const int* nc_o,
+                     const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
+                           amrex::Real* s_out,    const int* o_lo, const int* o_hi,
                      const amrex::Real* rho_Hext, const int* e_lo, const int* e_hi,
-                           amrex::Real* rho_odot, const int* r_lo, const int* r_hi, const int* nc_r,
+                           amrex::Real* rho_odot, const int* r_lo, const int* r_hi,
                            amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                      const amrex::Real* tempbar_init_in,
                      const amrex::Real dt_in,
@@ -121,10 +121,10 @@ extern "C"
                      const int use_mask);
 
     void burner_loop_sphr(const int* lo, const int* hi,
-                          const amrex::Real* s_in,     const int* i_lo, const int* i_hi, const int* nc_i,
-                                amrex::Real* s_out,    const int* o_lo, const int* o_hi, const int* nc_o,
+                          const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
+                                amrex::Real* s_out,    const int* o_lo, const int* o_hi,
                           const amrex::Real* rho_Hext, const int* e_lo, const int* e_hi,
-                                amrex::Real* rho_odot, const int* r_lo, const int* r_hi, const int* nc_r,
+                                amrex::Real* rho_odot, const int* r_lo, const int* r_hi,
                                 amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                           const amrex::Real* tempbar_init_cart, const int* t_lo, const int* t_hi,
                           const amrex::Real dt_in,
@@ -504,10 +504,10 @@ extern "C"
     //////////////////////
     // in make_explicit_thermal.F90
     void make_thermal_coeffs(const int* lo,  const int* hi,
-			     const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
+			     const amrex::Real* scal, const int* s_lo, const int* s_hi,
 			     amrex::Real* Tcoeff, const int* t_lo, const int* t_hi,
 			     amrex::Real* hcoeff, const int* h_lo, const int* h_hi,
-			     amrex::Real* Xkcoeff, const int* xk_lo, const int* xk_hi, const int* nc_xk,
+			     amrex::Real* Xkcoeff, const int* xk_lo, const int* xk_hi,
 			     amrex::Real* pcoeff, const int* p_lo, const int* p_hi);
     //////////////////////
 

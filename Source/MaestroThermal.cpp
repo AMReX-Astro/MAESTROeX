@@ -253,10 +253,10 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
             // call fortran subroutine
 #pragma gpu box(gtbx)
             make_thermal_coeffs(AMREX_INT_ANYD(gtbx.loVect()),AMREX_INT_ANYD(gtbx.hiVect()),
-                                BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(Tcoeff_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(hcoeff_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(Xkcoeff_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(Xkcoeff_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(pcoeff_mf[mfi]));
 
         }
