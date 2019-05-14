@@ -11,8 +11,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<Real>& grav_cell,
                        const Vector<Real>& w0_force,
                        const Vector<MultiFab>& w0_force_cart,
-        		       const Vector<Real>& beta0,
-        		       const int is_predictor,
                        int do_add_utilde_force)
 {
     // timer for profiling
