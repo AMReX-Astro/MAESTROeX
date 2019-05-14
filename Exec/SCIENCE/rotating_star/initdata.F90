@@ -164,7 +164,7 @@ contains
              enddo
 
              delta_rho = amrex_random()
-             delta_rho = amplitude * (2.0d0*delta_rho - 1.0d0)
+             delta_rho = amplitude * (2.0d0*delta_rho - 1.0d0) * scal(i,j,k,rho_comp)
 
              do comp = spec_comp, spec_comp+nspec-1
                 scal(i,j,k,comp) = scal(i,j,k,comp)  * (scal(i,j,k,rho_comp) + delta_rho) / scal(i,j,k,rho_comp)
