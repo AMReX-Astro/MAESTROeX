@@ -6,7 +6,7 @@ module make_gamma_module
   use eos_type_module
   use eos_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, pi_comp, use_pprime_in_tfromp, nscal
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, pi_comp, nscal, use_pprime_in_tfromp, nscal
   use base_state_geometry_module, only: max_radial_level, nr_fine
 
   implicit none
@@ -15,7 +15,7 @@ contains
 
   subroutine make_gamma(lo, hi, lev, &
        gamma, g_lo, g_hi, &
-       scal,  s_lo, s_hi, nc_s, &
+       scal,  s_lo, s_hi, &
        p0) bind(C,name="make_gamma")
 
     integer         , intent (in   ) :: lo(3), hi(3)

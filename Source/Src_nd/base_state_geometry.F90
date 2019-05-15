@@ -42,12 +42,12 @@ module base_state_geometry_module
   integer         , pointer, save, public  :: r_start_coord(:,:)
   integer         , pointer, save, public  :: r_end_coord(:,:)
 
-  integer         , pointer, save, public  :: anelastic_cutoff_density_coord(:)
+  integer         , allocatable, save, public  :: anelastic_cutoff_density_coord(:)
   integer         , allocatable, save, public  :: base_cutoff_density_coord(:)
   integer         , pointer, save, public  :: burning_cutoff_density_coord(:)
 
 #ifdef AMREX_USE_CUDA
-  attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine, nr_irreg, center, dr, nr, base_cutoff_density_coord
+  attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine, nr_irreg, center, dr, nr, base_cutoff_density_coord, anelastic_cutoff_density_coord
 #endif
 
 contains
@@ -82,6 +82,7 @@ contains
     allocate(dr(0:max_radial_level))
     allocate(nr(0:max_radial_level))
     allocate(base_cutoff_density_coord(0:max_radial_level))
+    allocate(anelastic_cutoff_density_coord(0:max_radial_level))
 
     max_radial_level = max_radial_level_in
     nr_fine = nr_fine_in
@@ -153,7 +154,6 @@ contains
 
     end if
 
-    call bl_allocate(      anelastic_cutoff_density_coord,0,max_radial_level)
     ! call bl_allocate(   base_cutoff_density_coord,0,max_radial_level)
     call bl_allocate(burning_cutoff_density_coord,0,max_radial_level)
 
@@ -593,7 +593,7 @@ contains
     deallocate(dr)
 
     deallocate(nr)
-    call bl_deallocate(anelastic_cutoff_density_coord)
+    deallocate(anelastic_cutoff_density_coord)
     deallocate(base_cutoff_density_coord)
     call bl_deallocate(burning_cutoff_density_coord)
     call bl_deallocate(numdisjointchunks)

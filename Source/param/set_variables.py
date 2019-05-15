@@ -1,41 +1,18 @@
 #!/usr/bin/env python3
 
 # parse the _variables file and write the set of functions that will
-# define the indices.  We write two files with the following functions:
-#
-# 1. set_indices.F90:
-#
-#    * ca_set_auxiliary_indices: the auxiliary state information
-#
-#    * ca_set_conserved_indices: the conserved state
-#
-#    * ca_set_godunov_indices: the interface state
-#
-#    * ca_set_primitive_indices: the primitive variable state
-#
-# 2. set_conserved.H, set_primitive.H, set_godunov.H
-#
-#    This simply sets the C++ indices
-#
+# define the indices.
 
 import argparse
 import os
 import re
 
-HEADER = """
-! DO NOT EDIT!!!
-
-! This file is automatically created by set_variables.py.  To update
-! or add variable indices, please edit _variables and then rerun the
-! script.
-
-"""
-
 
 def split_pair(pair_string):
     """given an option of the form "(val1, val2)", split it into val1 and
     val2"""
-    return pair_string.replace("(", "").replace(")", "").replace(" ","").split(",")
+    return pair_string.replace("(", "").replace(")", "").replace(" ", "").split(",")
+
 
 class Index(object):
     """an index that we want to set"""
@@ -93,7 +70,8 @@ class Index(object):
             sstr += "  {} = {}\n".format(self.f90_var, val)
 
         if self.cxx_var is not None:
-            sstr += "  call check_equal({},{}_in+1)\n".format(self.f90_var, self.cxx_var)
+            sstr += "  call check_equal({},{}_in+1)\n".format(
+                self.f90_var, self.cxx_var)
         if self.ifdef is not None:
             sstr += "#endif\n"
         sstr += "\n"
@@ -153,9 +131,10 @@ class Counter(object):
     def get_value(self, offset=0):
         """return the current value of the counter"""
         if len(self.strings) != 0:
-            val = "{} + {}".format(self.numeric-offset, " + ".join(self.strings))
+            val = "{} + {}".format(self.numeric - offset,
+                                   " + ".join(self.strings))
         else:
-            val = "{}".format(self.numeric-offset)
+            val = "{}".format(self.numeric - offset)
 
         return val
 
@@ -183,7 +162,8 @@ def doit(variables_file, odir, defines):
 
                 # this splits the line into separate fields.  A field is a
                 # single word or a pair in parentheses like "(a, b)"
-                fields = re.findall(r'[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
+                fields = re.findall(
+                    r'[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
 
                 name = fields[0]
                 cxx_var = fields[1]
@@ -213,7 +193,6 @@ def doit(variables_file, odir, defines):
                                      iset=current_set, also_adds_to=adds_to,
                                      count=count, cxx_var=cxx_var, ifdef=ifdef))
 
-
     # find the set of set names
     unique_sets = set([q.iset for q in indices])
 
@@ -228,7 +207,8 @@ def doit(variables_file, odir, defines):
         set_indices = [q for q in indices if q.iset == s]
 
         # add to
-        adds_to = set([q.adds_to for q in set_indices if q.adds_to is not None])
+        adds_to = set(
+            [q.adds_to for q in set_indices if q.adds_to is not None])
 
         # initialize the counters
         counter_main = Counter(default_set[s])

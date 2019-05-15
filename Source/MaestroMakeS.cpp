@@ -22,6 +22,11 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()",Make_S_cc);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -88,6 +93,11 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         }
     }
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
+
     // average fine data onto coarser cells
     AverageDown(S_cc,0,1);
 
@@ -95,6 +105,11 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
         // horizontal average of delta_gamma1_term
         Average(delta_gamma1_term,delta_gamma1_termbar,0);
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
         for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -118,24 +133,32 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
                 if (spherical == 1) {
-                    create_correction_delta_gamma1_term_sphr(&lev,
-                                                             ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                                             BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
-                                                             BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
+#pragma gpu box(tileBox)
+                    create_correction_delta_gamma1_term_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                                                             lev,
+                                                             BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
+                                                             BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
                                                              gamma1bar.dataPtr(), psi_in.dataPtr(),
-                                                             p0.dataPtr(), dx,
+                                                             p0.dataPtr(), AMREX_REAL_ANYD(dx),
                                                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                                             BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                                                             BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
                 } else {
-                    create_correction_delta_gamma1_term(&lev,
-                                                        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                                        BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
-                                                        BL_TO_FORTRAN_3D(delta_gamma1_mf[mfi]),
+#pragma gpu box(tileBox)
+                    create_correction_delta_gamma1_term(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                                                        lev,
+                                                        BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
+                                                        BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
                                                         gamma1bar.dataPtr(), psi_in.dataPtr(), p0.dataPtr());
 
                 }
             }
         }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
+
     }
 }
 
@@ -165,6 +188,11 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
         Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
     }
 
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // fill rhcc
@@ -190,21 +218,28 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
-                make_rhcc_for_nodalproj_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                             BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
-                                             BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
-                                             BL_TO_FORTRAN_3D(Sbar_mf[mfi]),
-                                             BL_TO_FORTRAN_3D(beta0_mf[mfi]),
-                                             BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]));
+#pragma gpu box(tileBox)
+                make_rhcc_for_nodalproj_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                                             BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
+                                             BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
+                                             BL_TO_FORTRAN_ANYD(Sbar_mf[mfi]),
+                                             BL_TO_FORTRAN_ANYD(beta0_mf[mfi]),
+                                             BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]));
             } else {
-                make_rhcc_for_nodalproj(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                        BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
-                                        BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
+#pragma gpu box(tileBox)
+                make_rhcc_for_nodalproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
+                                        BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
                                         Sbar.dataPtr(), beta0.dataPtr(),
-                                        BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]));
+                                        BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]));
             }
         }
     }
+
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     // averge down and fill ghost cells using first-order extrapolation
     AverageDown(rhcc,0,1);
@@ -253,6 +288,11 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
         Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
     }
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
         // get references to the MultiFabs at level lev
         const MultiFab& delta_p_mf = delta_p_term[lev];
@@ -276,22 +316,29 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
-                create_correction_cc_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                          BL_TO_FORTRAN_3D(correction_cc_mf[mfi]),
-                                          BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
-                                          BL_TO_FORTRAN_3D(beta0_mf[mfi]),
-                                          BL_TO_FORTRAN_3D(gamma1bar_mf[mfi]),
-                                          BL_TO_FORTRAN_3D(p0_mf[mfi]),
-                                          BL_TO_FORTRAN_3D(rho0_mf[mfi]), &dt);
+#pragma gpu box(tileBox)
+                create_correction_cc_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                                          BL_TO_FORTRAN_ANYD(correction_cc_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(delta_p_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(beta0_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(rho0_mf[mfi]), dt);
             } else {
-                create_correction_cc(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                     BL_TO_FORTRAN_3D(correction_cc_mf[mfi]),
-                                     BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
+#pragma gpu box(tileBox)
+                create_correction_cc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
+                                     BL_TO_FORTRAN_ANYD(correction_cc_mf[mfi]),
+                                     BL_TO_FORTRAN_ANYD(delta_p_mf[mfi]),
                                      beta0.dataPtr(), gamma1bar.dataPtr(),
-                                     p0.dataPtr(), &dt);
+                                     p0.dataPtr(), dt);
             }
         }
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     // average down and fill ghost cells using first-order extrapolation
     AverageDown(correction_cc,0,1);
@@ -320,6 +367,11 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()",MakeRHCCforMacProj);
 
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // fill rhcc
@@ -346,30 +398,37 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
                 const Real* dx = geom[lev].CellSize();
-
-                make_rhcc_for_macproj_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                           BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
+#pragma gpu box(tileBox)
+                make_rhcc_for_macproj_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                                           BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
                                            Sbar.dataPtr(), beta0.dataPtr(),
                                            rho0.dataPtr(), dx,
-                                           BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
                                            gamma1bar.dataPtr(), p0.dataPtr(),
-                                           BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(delta_chi_mf[mfi]),
-                                           &dt, &is_predictor,
+                                           BL_TO_FORTRAN_ANYD(delta_p_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(delta_chi_mf[mfi]),
+                                           dt, is_predictor,
                                            r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                           BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                                           BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
             } else {
-                make_rhcc_for_macproj(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                      BL_TO_FORTRAN_3D(rhcc_mf[mfi]),
-                                      BL_TO_FORTRAN_3D(S_cc_mf[mfi]),
+#pragma gpu box(tileBox)
+                make_rhcc_for_macproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),lev,
+                                      BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
+                                      BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
                                       Sbar.dataPtr(), beta0.dataPtr(),
-                                      BL_TO_FORTRAN_3D(delta_gamma1_term_mf[mfi]),
+                                      BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
                                       gamma1bar.dataPtr(), p0.dataPtr(),
-                                      BL_TO_FORTRAN_3D(delta_p_mf[mfi]),
-                                      BL_TO_FORTRAN_3D(delta_chi_mf[mfi]),
-                                      &dt, &is_predictor);
+                                      BL_TO_FORTRAN_ANYD(delta_p_mf[mfi]),
+                                      BL_TO_FORTRAN_ANYD(delta_chi_mf[mfi]),
+                                      dt, is_predictor);
             }
         }
     }
+
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
+
 }

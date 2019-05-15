@@ -5,7 +5,7 @@ module make_S_module
   use eos_type_module
   use eos_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, ncsal, dpdt_factor, base_cutoff_density, use_delta_gamma1_term
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, dpdt_factor, base_cutoff_density, use_delta_gamma1_term
   use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_density_coord, nr, dr
 
   implicit none
@@ -126,14 +126,14 @@ contains
        S_cc,  s_lo, s_hi, &
        delta_gamma1_term,  dg_lo, dg_hi, &
        delta_gamma1,  df_lo, df_hi, &
-       scal,  c_lo, c_hi, nc_c, &
-       u,  u_lo, u_hi, nc_u, &
-       rodot, r_lo, r_hi, nc_r, &
+       scal,  c_lo, c_hi, &
+       u,  u_lo, u_hi, &
+       rodot, r_lo, r_hi, &
        rHnuc, n_lo, n_hi, &
        rHext, e_lo, e_hi, &
        therm, t_lo, t_hi, &
        p0, gamma1bar, dx, &
-       normal, no_lo, no_hi, nc_no, &
+       normal, no_lo, no_hi, &
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="make_S_cc_sphr")
 
@@ -269,13 +269,14 @@ contains
 
   end subroutine make_S_cc_sphr
 
-  subroutine make_rhcc_for_nodalproj(lev, lo, hi, &
+  subroutine make_rhcc_for_nodalproj(lo, hi, lev, &
        rhcc, c_lo, c_hi, &
        S_cc,  s_lo, s_hi, &
        Sbar, beta0, &
        delta_gamma1_term, dg_lo, dg_hi) bind (C,name="make_rhcc_for_nodalproj")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
@@ -286,6 +287,8 @@ contains
     double precision, intent (in   ) :: delta_gamma1_term (dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
 
     integer i,j,k,r
+
+    !$gpu
 
     ! loop over the data
     do k = lo(3),hi(3)
@@ -330,6 +333,8 @@ contains
     ! Local variables
     integer :: i,j,k
 
+    !$gpu
+
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -340,14 +345,15 @@ contains
 
   end subroutine make_rhcc_for_nodalproj_sphr
 
-  subroutine create_correction_cc(lev, lo, hi, &
+  subroutine create_correction_cc(lo, hi, lev, &
        correction_cc, c_lo, c_hi, &
        delta_p_term, dp_lo, dp_hi, &
        beta0, gamma1bar, &
        p0, dt) &
        bind (C,name="create_correction_cc")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: c_lo(3), c_hi(3)
     double precision, intent(  out) :: correction_cc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     integer         , intent(in   ) :: dp_lo(3), dp_hi(3)
@@ -355,11 +361,13 @@ contains
     double precision, intent(in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: dt
+    double precision, value, intent(in   ) :: dt
 
     ! Local variables
     integer :: i, j, k
     double precision :: correction_factor
+
+    !$gpu
 
 #if (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
@@ -423,11 +431,13 @@ contains
     double precision, intent(in   ) :: p0_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
     integer         , intent(in   ) :: r_lo(3), r_hi(3)
     double precision, intent(in   ) :: rho0_cart(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
-    double precision, intent(in   ) :: dt
+    double precision, value, intent(in   ) :: dt
 
     ! Local variables
     integer :: i, j, k
     double precision :: correction_factor
+
+    !$gpu
 
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
@@ -445,7 +455,7 @@ contains
 
   end subroutine create_correction_cc_sphr
 
-  subroutine make_rhcc_for_macproj(lev, lo, hi, &
+  subroutine make_rhcc_for_macproj(lo, hi, lev, &
        rhcc, c_lo, c_hi, &
        S_cc,  s_lo, s_hi, &
        Sbar, beta0, &
@@ -455,7 +465,8 @@ contains
        delta_chi, dc_lo, dc_hi, &
        dt, is_predictor) bind (C,name="make_rhcc_for_macproj")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
@@ -470,11 +481,13 @@ contains
     double precision, intent (in   ) :: delta_p_term(dp_lo(1):dp_hi(1),dp_lo(2):dp_hi(2),dp_lo(3):dp_hi(3))
     integer         , intent (in   ) :: dc_lo(3), dc_hi(3)
     double precision, intent (inout) :: delta_chi(dc_lo(1):dc_hi(1),dc_lo(2):dc_hi(2),dc_lo(3):dc_hi(3))
-    double precision, intent (in   ) :: dt
-    integer         , intent (in   ) :: is_predictor
+    double precision, value, intent (in   ) :: dt
+    integer         , value, intent (in   ) :: is_predictor
 
     ! Local variables
     integer i,j,k,r
+
+    !$gpu
 
     ! loop over the data
     do k = lo(3),hi(3)
@@ -575,8 +588,8 @@ contains
     double precision, intent (in   ) :: delta_p_term(dp_lo(1):dp_hi(1),dp_lo(2):dp_hi(2),dp_lo(3):dp_hi(3))
     integer         , intent (in   ) :: dc_lo(3), dc_hi(3)
     double precision, intent (inout) :: delta_chi(dc_lo(1):dc_hi(1),dc_lo(2):dc_hi(2),dc_lo(3):dc_hi(3))
-    double precision, intent (in   ) :: dt
-    integer         , intent (in   ) :: is_predictor
+    double precision, value, intent (in   ) :: dt
+    integer         , value, intent (in   ) :: is_predictor
     double precision, intent (in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
     double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
@@ -585,17 +598,19 @@ contains
 
     !     Local variables
     integer :: i, j, k
-    double precision, pointer ::       div_cart(:,:,:,:)
-    double precision, pointer ::      Sbar_cart(:,:,:,:)
-    double precision, pointer :: gamma1bar_cart(:,:,:,:)
-    double precision, pointer ::        p0_cart(:,:,:,:)
-    double precision, pointer ::      rho0_cart(:,:,:,:)
+    double precision, allocatable ::       div_cart(:,:,:,:)
+    double precision, allocatable ::      Sbar_cart(:,:,:,:)
+    double precision, allocatable :: gamma1bar_cart(:,:,:,:)
+    double precision, allocatable ::        p0_cart(:,:,:,:)
+    double precision, allocatable ::      rho0_cart(:,:,:,:)
 
-    call bl_allocate(div_cart,lo,hi,1)
+    !$gpu
+
+    allocate(div_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
     call put_1d_array_on_cart_sphr(lo,hi,div_cart,lo,hi,1,beta0,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
 
-    call bl_allocate(Sbar_cart,lo,hi,1)
+    allocate(Sbar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
     call put_1d_array_on_cart_sphr(lo,hi,Sbar_cart,lo,hi,1,Sbar,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r, ccr_lo, ccr_hi)
 
@@ -607,19 +622,19 @@ contains
        end do
     end do
 
-    call bl_deallocate(Sbar_cart)
+    deallocate(Sbar_cart)
 
     if (dpdt_factor .gt. 0.0d0) then
 
-       call bl_allocate(gamma1bar_cart,lo,hi,1)
+       allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
        call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0, &
             r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
-       call bl_allocate(p0_cart,lo,hi,1)
+       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
        call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
-       call bl_allocate(rho0_cart,lo,hi,1)
+       allocate(rho0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
        call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
@@ -638,23 +653,24 @@ contains
           end do
        end do
 
-       call bl_deallocate(gamma1bar_cart)
-       call bl_deallocate(p0_cart)
-       call bl_deallocate(rho0_cart)
+       deallocate(gamma1bar_cart)
+       deallocate(p0_cart)
+       deallocate(rho0_cart)
 
     end if
 
-    call bl_deallocate(div_cart)
+    deallocate(div_cart)
 
   end subroutine make_rhcc_for_macproj_sphr
 
-  subroutine create_correction_delta_gamma1_term(lev, lo, hi, &
+  subroutine create_correction_delta_gamma1_term(lo, hi, lev, &
        delta_gamma1_term, dg_lo, dg_hi, &
        delta_gamma1, df_lo, df_hi, &
        gamma1bar, psi, &
        p0) bind (C,name="create_correction_delta_gamma1_term")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: dg_lo(3), dg_hi(3)
     double precision, intent(inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     integer         , intent(in   ) :: df_lo(3), df_hi(3)
@@ -665,6 +681,8 @@ contains
 
     ! Local variables
     integer :: i, j, k
+
+    !$gpu
 
     j = lo(2)
     k = lo(3)
@@ -687,7 +705,7 @@ contains
 
   end subroutine create_correction_delta_gamma1_term
 
-  subroutine create_correction_delta_gamma1_term_sphr(lev, lo, hi, &
+  subroutine create_correction_delta_gamma1_term_sphr(lo, hi, lev, &
        delta_gamma1_term, dg_lo, dg_hi, &
        delta_gamma1, df_lo, df_hi, &
        gamma1bar, psi, &
@@ -695,10 +713,10 @@ contains
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="create_correction_delta_gamma1_term_sphr")
 
-
     use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: dg_lo(3), dg_hi(3)
     double precision, intent(inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     integer         , intent(in   ) :: df_lo(3), df_hi(3)
@@ -715,13 +733,15 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    double precision, pointer :: gamma1bar_cart(:,:,:,:)
-    double precision, pointer ::        p0_cart(:,:,:,:)
-    double precision, pointer ::      psi_cart(:,:,:,:)
+    double precision, allocatable :: gamma1bar_cart(:,:,:,:)
+    double precision, allocatable ::        p0_cart(:,:,:,:)
+    double precision, allocatable ::      psi_cart(:,:,:,:)
 
-    call bl_allocate(gamma1bar_cart,lo,hi,1)
-    call bl_allocate(p0_cart,lo,hi,1)
-    call bl_allocate(psi_cart,lo,hi,1)
+    !$gpu
+
+    allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
+    allocate(psi_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
 
     call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
          cc_to_r,ccr_lo,ccr_hi)
@@ -749,9 +769,9 @@ contains
 #endif
 #endif
 
-    call bl_deallocate(gamma1bar_cart)
-    call bl_deallocate(p0_cart)
-    call bl_deallocate(psi_cart)
+    deallocate(gamma1bar_cart)
+    deallocate(p0_cart)
+    deallocate(psi_cart)
 
   end subroutine create_correction_delta_gamma1_term_sphr
 

@@ -70,10 +70,10 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoP()",TfromRhoP);
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Cuda::setLaunchRegion(true);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -113,10 +113,10 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    Cuda::setLaunchRegion(false);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     // average down and fill ghost cells (Temperature)
     AverageDown(scal,Temp,1);
