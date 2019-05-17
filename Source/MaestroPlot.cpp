@@ -140,7 +140,7 @@ Maestro::WritePlotFile (const int step,
 	// write out the cell-centered base state
 	if (ParallelDescriptor::IOProcessor()) {
 
-	  for (int lev=0; lev<=finest_level; ++lev) {
+	  for (int lev=0; lev<=max_radial_level; ++lev) {
 	  
 	    std::ofstream BaseCCFile;
 	    BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
@@ -173,7 +173,7 @@ Maestro::WritePlotFile (const int step,
 	// write out the face-centered base state
 	if (ParallelDescriptor::IOProcessor()) {
 
-	  for (int lev=0; lev<=finest_level; ++lev) {
+	  for (int lev=0; lev<=max_radial_level; ++lev) {
 
 	    std::ofstream BaseFCFile;
 	    BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
