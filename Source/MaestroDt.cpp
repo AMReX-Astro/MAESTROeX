@@ -1,7 +1,23 @@
 
 #include <Maestro.H>
 
+#ifdef AMREX_USE_CUDA
+#include <cuda_runtime_api.h>
+#include <AMReX_Arena.H>
+#endif
+
 using namespace amrex;
+
+// functions for offloading dt and umax to the device
+#ifdef AMREX_USE_CUDA
+    static void set_dt_launch_config();
+    static void clean_dt_launch_config();
+
+    // Return a pointer to dt valid for use in Fortran. For the CPU this is a no-op.
+    static Real* prepare_dt(const Real* dt, const int n_var = 1);
+
+    static void clean_dt(Real* dt_f);
+#endif
 
 void
 Maestro::EstDt ()
@@ -81,6 +97,8 @@ Maestro::EstDt ()
 
     Real umax = 0.;
 
+
+
     for (int lev = 0; lev <= finest_level; ++lev) {
         Real dt_lev = 1.e99;
         Real umax_lev = 0.;
@@ -104,8 +122,23 @@ Maestro::EstDt ()
 #endif
         for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
 
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
+
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
+
+#if AMREX_USE_CUDA
+            Real* dt_f = prepare_dt(&dt_grid);
+            Real* umax_f = prepare_dt(&umax_grid);
+
+            set_dt_launch_config();
+#else
+            Real* dt_f = &dt_grid;
+            Real* umax_f = &umax_grid;
+#endif
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -116,41 +149,54 @@ Maestro::EstDt ()
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
-                estdt(&lev,&dt_grid,&umax_grid,
-                      ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                      ZFILL(dx),
-                      BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                      BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                      BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                      BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                      BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
+#pragma gpu box(tileBox)
+                estdt(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                      lev,dt_f,umax_f,
+                      AMREX_REAL_ANYD(dx),
+                      BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
+                      BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
+                      BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
+                      BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+                      BL_TO_FORTRAN_ANYD(dSdt_mf[mfi]),
                       w0.dataPtr(),
                       p0_old.dataPtr(),
                       gamma1bar_old.dataPtr());
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-                estdt_sphr(&dt_grid,&umax_grid,
-                           ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                           ZFILL(dx),
-                           BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                           BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                           BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
+#pragma gpu box(tileBox)
+                estdt_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                           dt_f,umax_f,
+                           AMREX_REAL_ANYD(dx),
+                           BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(dSdt_mf[mfi]),
                            w0.dataPtr(),
-                           BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
                            p0_old.dataPtr(),
                            gamma1bar_old.dataPtr(),
                            r_cc_loc.dataPtr(),
                            r_edge_loc.dataPtr(),
-                           BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                           BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 #else
                 Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
             }
+
+#ifdef AMREX_USE_CUDA
+                clean_dt_launch_config();
+                clean_dt(dt_f);
+                clean_dt(umax_f);
+#endif
+
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
@@ -173,6 +219,7 @@ Maestro::EstDt ()
         dt = std::min(dt,dt_lev);
 
     }     // end loop over levels
+
 
     if (maestro_verbose > 0) {
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
@@ -272,8 +319,23 @@ Maestro::FirstDt ()
 #endif
         for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
 
+// #ifdef AMREX_USE_CUDA
+//             // turn on GPU
+//             Cuda::setLaunchRegion(true);
+// #endif
+
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
+
+#if AMREX_USE_CUDA
+            Real* dt_f = prepare_dt(&dt_grid);
+            Real* umax_f = prepare_dt(&umax_grid);
+
+            set_dt_launch_config();
+#else
+            Real* dt_f = &dt_grid;
+            Real* umax_f = &umax_grid;
+#endif
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -285,24 +347,26 @@ Maestro::FirstDt ()
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0 ) {
-                firstdt(&lev,&dt_grid,&umax_grid,
-                        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                        ZFILL(dx),
-                        BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                        BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+#pragma gpu box(tileBox)
+                firstdt(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                        lev,dt_f,umax_f,
+                        AMREX_REAL_ANYD(dx),
+                        BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
                         p0_old.dataPtr(),
                         gamma1bar_old.dataPtr());
             } else {
 #if (AMREX_SPACEDIM == 3)
-                firstdt_sphr(&dt_grid,&umax_grid,
-                             ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                             ZFILL(dx),
-                             BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                             BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+#pragma gpu box(tileBox)
+                firstdt_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                             dt_f,umax_f,
+                             AMREX_REAL_ANYD(dx),
+                             BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
+                             BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
+                             BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
+                             BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
                              p0_old.dataPtr(),
                              gamma1bar_old.dataPtr(),
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
@@ -311,6 +375,17 @@ Maestro::FirstDt ()
                 Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif
             }
+
+#ifdef AMREX_USE_CUDA
+            clean_dt_launch_config();
+            clean_dt(dt_f);
+            clean_dt(umax_f);
+#endif
+
+// #ifdef AMREX_USE_CUDA
+//             // turn off GPU
+//             Cuda::setLaunchRegion(false);
+// #endif
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
@@ -368,3 +443,31 @@ Maestro::FirstDt ()
     umax *= 1.e-8;
     set_rel_eps(&umax);
 }
+
+// functions for offloading dt and umax to the device
+#ifdef AMREX_USE_CUDA
+    static void set_dt_launch_config()
+    {
+        Gpu::Device::setNumThreadsMin(Maestro::minThreads(0), Maestro::minThreads(1), Maestro::minThreads(2));
+    }
+
+    static void clean_dt_launch_config()
+    {
+        Gpu::Device::setNumThreadsMin(1, 1, 1);
+    }
+
+    // Return a pointer to dt valid for use in Fortran. For the CPU this is a no-op.
+
+    static Real* prepare_dt(const Real* dt, const int n_var)
+    {
+        Real* dt_f = (Real*) The_Arena()->alloc(n_var * sizeof(Real));
+        AMREX_GPU_SAFE_CALL(cudaMemcpyAsync(dt_f, dt, n_var * sizeof(Real), cudaMemcpyHostToDevice, Gpu::Device::cudaStream()));
+        return dt_f;
+    }
+
+    static void clean_dt(Real* dt_f)
+    {
+        Gpu::Device::streamSynchronize();
+        The_Arena()->free(dt_f);
+    }
+#endif

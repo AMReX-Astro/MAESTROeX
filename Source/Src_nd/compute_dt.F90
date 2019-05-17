@@ -4,11 +4,10 @@ module compute_dt_module
   use eos_type_module
   use eos_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, &
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, &
        cfl, use_soundspeed_firstdt, use_divu_firstdt, &
        use_exact_base_state
   use base_state_geometry_module, only:  max_radial_level, nr_fine, nr, dr
-  use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
   implicit none
 
@@ -16,26 +15,28 @@ module compute_dt_module
 
 contains
 
-  subroutine estdt(lev, dt, umax, lo, hi, dx, &
-       scal,  s_lo, s_hi, nc_s, &
-       u,     u_lo, u_hi, nc_u, &
-       force, f_lo, f_hi, nc_f, &
+  subroutine estdt(lo, hi, lev, dt, umax, dx, &
+       scal,  s_lo, s_hi, &
+       u,     u_lo, u_hi, &
+       force, f_lo, f_hi, &
        divu,  d_lo, d_hi, &
        dSdt,  t_lo, t_hi, &
        w0, p0, gamma1bar) bind (C,name="estdt")
 
-    integer         , intent(in   ) :: lev
+    use amrex_fort_module, only: amrex_max, amrex_min
+
+    integer  , value, intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
-    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
-    integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
-    integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
+    integer         , intent(in   ) :: s_lo(3), s_hi(3)
+    integer         , intent(in   ) :: u_lo(3), u_hi(3)
+    integer         , intent(in   ) :: f_lo(3), f_hi(3)
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
     integer         , intent(in   ) :: t_lo(3), t_hi(3)
-    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
-    double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
-    double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
+    double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),AMREX_SPACEDIM)
+    double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
     double precision, intent(in   ) :: dSdt (t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, intent(in   ) :: w0       (0:max_radial_level,0:nr_fine)
@@ -49,6 +50,8 @@ contains
     double precision :: a, b, c
     integer          :: i,j,k,r
 
+    !$gpu
+
     rho_min = 1.d-20
 
     eps = 1.d-8
@@ -58,18 +61,19 @@ contains
     spdz    = 0.d0
     spdr    = 0.d0
     umax    = 0.d0
+
     !
     ! Limit dt based on velocity terms.
     !
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             spdx = max(spdx ,abs(u(i,j,k,1)))
+             call amrex_max(spdx ,abs(u(i,j,k,1)))
 #if (AMREX_SPACEDIM == 2)
-             spdy = max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0(lev,j)+w0(lev,j+1))))
+             call amrex_max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0(lev,j)+w0(lev,j+1))))
 #elif (AMREX_SPACEDIM == 3)
-             spdy = max(spdy ,abs(u(i,j,k,2)))
-             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0(lev,k)+w0(lev,k+1))))
+             call amrex_max(spdy ,abs(u(i,j,k,2)))
+             call amrex_max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0(lev,k)+w0(lev,k+1))))
 #endif
           enddo
        enddo
@@ -77,20 +81,23 @@ contains
 
 #if (AMREX_SPACEDIM == 2)
     do j = lo(2),hi(2)
-       spdr = max(spdr ,abs(w0(lev,j)))
+       call amrex_max(spdr ,abs(w0(lev,j)))
     enddo
 #elif (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
-       spdr = max(spdr ,abs(w0(lev,k)))
+       call amrex_max(spdr ,abs(w0(lev,k)))
     enddo
 #endif
 
-    umax = max(umax,spdx,spdy,spdz,spdr)
+    call amrex_max(umax,spdx)
+    call amrex_max(umax,spdy)
+    call amrex_max(umax,spdz)
+    call amrex_max(umax,spdr)
 
-    if (spdx > eps) dt = min(dt, dx(1)/spdx)
-    if (spdy > eps) dt = min(dt, dx(2)/spdy)
-    if (spdz > eps) dt = min(dt, dx(3)/spdz)
-    if (spdr > eps) dt = min(dt, dx(AMREX_SPACEDIM)/spdr)
+    if (spdx > eps) call amrex_min(dt, dx(1)/spdx)
+    if (spdy > eps) call amrex_min(dt, dx(2)/spdy)
+    if (spdz > eps) call amrex_min(dt, dx(3)/spdz)
+    if (spdr > eps) call amrex_min(dt, dx(AMREX_SPACEDIM)/spdr)
 
     dt = dt * cfl
     !
@@ -103,24 +110,24 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             fx = max(fx,abs(force(i,j,k,1)))
-             fy = max(fy,abs(force(i,j,k,2)))
+             call amrex_max(fx,abs(force(i,j,k,1)))
+             call amrex_max(fy,abs(force(i,j,k,2)))
 #if (AMREX_SPACEDIM == 3)
-             fz = max(fz,abs(force(i,j,k,3)))
+             call amrex_max(fz,abs(force(i,j,k,3)))
 #endif
           enddo
        enddo
     enddo
 
     if (fx > eps) &
-         dt = min(dt,sqrt(2.0d0*dx(1)/fx))
+         call amrex_min(dt,sqrt(2.0d0*dx(1)/fx))
 
     if (fy > eps) &
-         dt = min(dt,sqrt(2.0d0*dx(2)/fy))
+         call amrex_min(dt,sqrt(2.0d0*dx(2)/fy))
 
 #if (AMREX_SPACEDIM == 3)
     if (fz > eps) &
-         dt = min(dt,sqrt(2.0d0*dx(3)/fz))
+         call amrex_min(dt,sqrt(2.0d0*dx(3)/fz))
 #endif
 
     !
@@ -157,7 +164,7 @@ contains
              denom = divU(i,j,k) - u(i,j,k,AMREX_SPACEDIM)*gradp0/(gamma1bar(lev,r)*p0(lev,r))
 
              if (denom > 0.d0) then
-                dt = min(dt, 0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                call amrex_min(dt, 0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
              endif
 
           enddo
@@ -180,7 +187,7 @@ contains
                 a = 0.5d0*scal(i,j,k,rho_comp)*dSdt(i,j,k)
                 b = scal(i,j,k,rho_comp)*divU(i,j,k)
                 c = rho_min - scal(i,j,k,rho_comp)
-                dt = min(dt,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
+                call amrex_min(dt,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
              endif
 
           enddo
@@ -189,10 +196,10 @@ contains
 
   end subroutine estdt
 
-  subroutine estdt_sphr(dt, umax, lo, hi, dx, &
-       scal,  s_lo, s_hi, nc_s, &
-       u,     u_lo, u_hi, nc_u, &
-       force, f_lo, f_hi, nc_f, &
+  subroutine estdt_sphr(lo, hi, dt, umax, dx, &
+       scal,  s_lo, s_hi, &
+       u,     u_lo, u_hi,  &
+       force, f_lo, f_hi,  &
        divu,  d_lo, d_hi, &
        dSdt,  t_lo, t_hi, &
        w0, &
@@ -203,20 +210,23 @@ contains
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="estdt_sphr")
 
-    double precision, intent(inout) :: dt, umax
+    use amrex_fort_module, only: amrex_max, amrex_min
+    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+
     integer         , intent(in   ) :: lo(3), hi(3)
+    double precision, intent(inout) :: dt, umax
     double precision, intent(in   ) :: dx(3)
-    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
-    integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
-    integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
+    integer         , intent(in   ) :: s_lo(3), s_hi(3)
+    integer         , intent(in   ) :: u_lo(3), u_hi(3)
+    integer         , intent(in   ) :: f_lo(3), f_hi(3)
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
     integer         , intent(in   ) :: t_lo(3), t_hi(3)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     integer         , intent(in   ) :: y_lo(3), y_hi(3)
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
-    double precision, intent(in   ) :: scal  (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
-    double precision, intent(in   ) :: u     (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
-    double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    double precision, intent(in   ) :: scal  (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
+    double precision, intent(in   ) :: u     (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),AMREX_SPACEDIM)
+    double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: divu  (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
     double precision, intent(in   ) :: dSdt  (t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, intent(in   ) :: w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
@@ -231,7 +241,7 @@ contains
     double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
          ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
-    double precision, pointer :: gp0_cart(:,:,:,:)
+    double precision, allocatable :: gp0_cart(:,:,:,:)
 
     double precision :: gp0(0:max_radial_level,0:nr_fine)
 
@@ -240,7 +250,9 @@ contains
     double precision :: fx, fy, fz, eps, denom, a, b, c
     integer          :: i,j,k,r
 
-    call bl_allocate(gp0_cart,lo,hi,3)
+    !$gpu
+
+    allocate(gp0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),3))
 
     rho_min = 1.d-20
 
@@ -257,7 +269,7 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             spdx = max(spdx ,abs(u(i,j,k,1)+0.5d0*(w0macx(i,j,k)+w0macx(i+1,j,k))))
+             call amrex_max(spdx ,abs(u(i,j,k,1)+0.5d0*(w0macx(i,j,k)+w0macx(i+1,j,k))))
           enddo
        enddo
     enddo
@@ -265,7 +277,7 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             spdy = max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k))))
+             call amrex_max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k))))
           enddo
        enddo
     enddo
@@ -273,21 +285,24 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1))))
+             call amrex_max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1))))
           enddo
        enddo
     enddo
 
     do k=0,nr_fine
-       spdr = max(spdr ,abs(w0(0,k)))
+       call amrex_max(spdr ,abs(w0(0,k)))
     enddo
 
-    umax = max(umax,spdx,spdy,spdz,spdr)
+    call amrex_max(umax,spdx)
+    call amrex_max(umax,spdy)
+    call amrex_max(umax,spdz)
+    call amrex_max(umax,spdr)
 
-    if (spdx > eps) dt = min(dt, dx(1)/spdx)
-    if (spdy > eps) dt = min(dt, dx(2)/spdy)
-    if (spdz > eps) dt = min(dt, dx(3)/spdz)
-    if (spdr > eps) dt = min(dt, dr(0)/spdr)
+    if (spdx > eps) call amrex_min(dt, dx(1)/spdx)
+    if (spdy > eps) call amrex_min(dt, dx(2)/spdy)
+    if (spdz > eps) call amrex_min(dt, dx(3)/spdz)
+    if (spdr > eps) call amrex_min(dt, dr(0)/spdr)
 
     dt = dt * cfl
 
@@ -299,7 +314,7 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             fx = max(fx,abs(force(i,j,k,1)))
+             call amrex_max(fx,abs(force(i,j,k,1)))
           enddo
        enddo
     enddo
@@ -307,7 +322,7 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             fy = max(fy,abs(force(i,j,k,2)))
+             call amrex_max(fy,abs(force(i,j,k,2)))
           enddo
        enddo
     enddo
@@ -315,19 +330,19 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             fz = max(fz,abs(force(i,j,k,3)))
+             call amrex_max(fz,abs(force(i,j,k,3)))
           enddo
        enddo
     enddo
 
     if (fx > eps) &
-         dt = min(dt,sqrt(2.0D0*dx(1)/fx))
+         call amrex_min(dt,sqrt(2.0D0*dx(1)/fx))
 
     if (fy > eps) &
-         dt = min(dt,sqrt(2.0D0*dx(2)/fy))
+         call amrex_min(dt,sqrt(2.0D0*dx(2)/fy))
 
     if (fz > eps) &
-         dt = min(dt,sqrt(2.0D0*dx(3)/fz))
+         call amrex_min(dt,sqrt(2.0D0*dx(3)/fz))
 
     ! divU constraint
     if (use_exact_base_state) then
@@ -358,7 +373,7 @@ contains
              denom = divU(i,j,k) - gp_dot_u
 
              if (denom > 0.d0) then
-                dt = min(dt,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                call amrex_min(dt,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
              endif
              !
              ! An additional dS/dt timestep constraint originally
@@ -373,35 +388,37 @@ contains
                 a = 0.5d0*scal(i,j,k,rho_comp)*dSdt(i,j,k)
                 b = scal(i,j,k,rho_comp)*divU(i,j,k)
                 c = rho_min - scal(i,j,k,rho_comp)
-                dt = min(dt,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
+                call amrex_min(dt,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
              endif
 
           enddo
        enddo
     enddo
 
-    call bl_deallocate(gp0_cart)
+    deallocate(gp0_cart)
 
   end subroutine estdt_sphr
 
-  subroutine firstdt(lev, dt, umax, lo, hi, dx, &
-       scal,  s_lo, s_hi, nc_s, &
-       u,     u_lo, u_hi, nc_u, &
-       force, f_lo, f_hi, nc_f, &
+  subroutine firstdt(lo, hi, lev, dt, umax, dx, &
+       scal,  s_lo, s_hi, &
+       u,     u_lo, u_hi, &
+       force, f_lo, f_hi, &
        divu,  d_lo, d_hi, &
        p0, gamma1bar) bind (C,name="firstdt")
 
-    integer         , intent(in   ) :: lev
+    use amrex_fort_module, only: amrex_max, amrex_min
+
+    integer  , value, intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
-    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
-    integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
-    integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
+    integer         , intent(in   ) :: s_lo(3), s_hi(3)
+    integer         , intent(in   ) :: u_lo(3), u_hi(3)
+    integer         , intent(in   ) :: f_lo(3), f_hi(3)
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
-    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
-    double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
-    double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
+    double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),AMREX_SPACEDIM)
+    double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
     double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
@@ -413,6 +430,8 @@ contains
 
     integer :: pt_index(3)
     type(eos_t) :: eos_state
+
+    !$gpu
 
     eps = 1.d-8
 
@@ -446,17 +465,17 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state, pt_index)
 
-             spdx    = max(spdx,eos_state%cs)
-             ux      = max(ux,abs(u(i,j,k,1)))
-             pforcex = max(pforcex,abs(force(i,j,k,1)))
+             call amrex_max(spdx,eos_state%cs)
+             call amrex_max(ux,abs(u(i,j,k,1)))
+             call amrex_max(pforcex,abs(force(i,j,k,1)))
 #if (AMREX_SPACEDIM >= 2)
-             spdy    = max(spdy,eos_state%cs)
-             uy      = max(uy,abs(u(i,j,k,2)))
-             pforcey = max(pforcey,abs(force(i,j,k,2)))
+             call amrex_max(spdy,eos_state%cs)
+             call amrex_max(uy,abs(u(i,j,k,2)))
+             call amrex_max(pforcey,abs(force(i,j,k,2)))
 #if (AMREX_SPACEDIM == 3)
-             spdz    = max(spdz,eos_state%cs)
-             uz      = max(uz,abs(u(i,j,k,3)))
-             pforcez = max(pforcez,abs(force(i,j,k,3)))
+             call amrex_max(spdz,eos_state%cs)
+             call amrex_max(uz,abs(u(i,j,k,3)))
+             call amrex_max(pforcez,abs(force(i,j,k,3)))
 #endif
 #endif
 
@@ -464,7 +483,9 @@ contains
        enddo
     enddo
 
-    umax = max(umax,ux,uy,uz)
+    call amrex_max(umax,ux)
+    call amrex_max(umax,uy)
+    call amrex_max(umax,uz)
 
     ux = ux / dx(1)
     spdx = spdx / dx(1)
@@ -496,10 +517,10 @@ contains
     end if
 
     ! force constraints
-    if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
-    if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
+    if (pforcex > eps) call amrex_min(dt,sqrt(2.0D0*dx(1)/pforcex))
+    if (pforcey > eps) call amrex_min(dt,sqrt(2.0D0*dx(2)/pforcey))
 #if (AMREX_SPACEDIM == 3)
-    if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+    if (pforcez > eps) call amrex_min(dt,sqrt(2.0D0*dx(3)/pforcez))
 #endif
 
     ! divU constraint
@@ -521,7 +542,7 @@ contains
           do i = lo(1), hi(1)
              denom = divU(i,j,k) - u(i,j,k,2)*gradp0/(gamma1bar(lev,j)*p0(lev,j))
              if (denom > 0.d0) then
-                dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                call amrex_min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
              endif
           enddo
        enddo
@@ -542,7 +563,7 @@ contains
              do i = lo(1), hi(1)
                 denom = divU(i,j,k) - u(i,j,k,3)*gradp0/(gamma1bar(lev,k)*p0(lev,k))
                 if (denom > 0.d0) then
-                   dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                   call amrex_min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
                 endif
              enddo
           enddo
@@ -550,32 +571,34 @@ contains
 
 #endif
 
-       dt = min(dt,dt_divu)
+       call amrex_min(dt,dt_divu)
 
     end if
 
   end subroutine firstdt
 
-  subroutine firstdt_sphr(dt, umax, lo, hi, dx, &
-       scal,  s_lo, s_hi, nc_s, &
-       u,     u_lo, u_hi, nc_u, &
-       force, f_lo, f_hi, nc_f, &
+  subroutine firstdt_sphr(lo, hi, dt, umax, dx, &
+       scal,  s_lo, s_hi, &
+       u,     u_lo, u_hi, &
+       force, f_lo, f_hi, &
        divu,  d_lo, d_hi, &
        p0, gamma1bar, &
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
 
+    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+    use amrex_fort_module, only: amrex_max, amrex_min
 
-    double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
+    double precision, intent(inout) :: dt, umax
     double precision, intent(in   ) :: dx(3)
-    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
-    integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
-    integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
+    integer         , intent(in   ) :: s_lo(3), s_hi(3)
+    integer         , intent(in   ) :: u_lo(3), u_hi(3)
+    integer         , intent(in   ) :: f_lo(3), f_hi(3)
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
-    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
-    double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
-    double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
+    double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),AMREX_SPACEDIM)
+    double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
     double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
@@ -590,14 +613,16 @@ contains
     double precision :: gp_dot_u,gamma1bar_p_avg,eps,dt_divu,dt_sound,denom,rho_min
     integer          :: i,j,k,r
 
-    double precision, pointer :: gp0_cart(:,:,:,:)
+    double precision, allocatable :: gp0_cart(:,:,:,:)
 
     double precision :: gp0(0:max_radial_level,0:nr_fine)
 
     integer pt_index(3)
     type (eos_t) :: eos_state
 
-    call bl_allocate(gp0_cart,lo,hi,3)
+    !$gpu
+
+    allocate(gp0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),3))
 
     eps = 1.0d-8
 
@@ -630,21 +655,23 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state, pt_index)
 
-             spdx    = max(spdx,eos_state%cs)
-             spdy    = max(spdy,eos_state%cs)
-             spdz    = max(spdz,eos_state%cs)
-             pforcex = max(pforcex,abs(force(i,j,k,1)))
-             pforcey = max(pforcey,abs(force(i,j,k,2)))
-             pforcez = max(pforcez,abs(force(i,j,k,3)))
-             ux      = max(ux,abs(u(i,j,k,1)))
-             uy      = max(uy,abs(u(i,j,k,2)))
-             uz      = max(uz,abs(u(i,j,k,3)))
+             call amrex_max(spdx,eos_state%cs)
+             call amrex_max(spdy,eos_state%cs)
+             call amrex_max(spdz,eos_state%cs)
+             call amrex_max(pforcex,abs(force(i,j,k,1)))
+             call amrex_max(pforcey,abs(force(i,j,k,2)))
+             call amrex_max(pforcez,abs(force(i,j,k,3)))
+             call amrex_max(ux,abs(u(i,j,k,1)))
+             call amrex_max(uy,abs(u(i,j,k,2)))
+             call amrex_max(uz,abs(u(i,j,k,3)))
 
           enddo
        enddo
     enddo
 
-    umax = max(umax,ux,uy,uz)
+    call amrex_max(umax,ux)
+    call amrex_max(umax,uy)
+    call amrex_max(umax,uz)
 
     ux = ux / dx(1)
     uy = uy / dx(2)
@@ -668,13 +695,13 @@ contains
        else
           dt_sound = cfl / max(spdx,spdy,spdz)
        end if
-       dt = min(dt,dt_sound)
+       call amrex_min(dt,dt_sound)
     end if
 
     ! force constraints
-    if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
-    if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
-    if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+    if (pforcex > eps) call amrex_min(dt,sqrt(2.0D0*dx(1)/pforcex))
+    if (pforcey > eps) call amrex_min(dt,sqrt(2.0D0*dx(2)/pforcey))
+    if (pforcez > eps) call amrex_min(dt,sqrt(2.0D0*dx(3)/pforcez))
 
     ! divU constraint
     if (use_divu_firstdt) then
@@ -712,18 +739,18 @@ contains
                 denom = divU(i,j,k) - gp_dot_u
 
                 if (denom > 0.d0) then
-                   dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                   call amrex_min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
                 endif
 
              enddo
           enddo
        enddo
 
-       dt = min(dt,dt_divu)
+       call amrex_min(dt,dt_divu)
 
     end if
 
-    call bl_deallocate(gp0_cart)
+    deallocate(gp0_cart)
 
   end subroutine firstdt_sphr
 

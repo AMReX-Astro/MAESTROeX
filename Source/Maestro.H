@@ -57,6 +57,13 @@ public:
 
     static amrex::Real getCPUTime();
 
+#ifdef AMREX_USE_CUDA
+    // Minimum CUDA threadblock size.
+    static int numThreadsMin[3];
+
+    static int minThreads(int dir) { return numThreadsMin[dir]; }
+#endif
+
 private:
 
     /*

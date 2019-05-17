@@ -141,21 +141,21 @@ extern "C"
 
     //////////////////////
     // in compute_dt.F90
-    void estdt(const int* lev, amrex::Real* dt, amrex::Real* umax,
-               const int* lo, const int* hi,
+    void estdt(const int* lo, const int* hi,
+               const int lev, amrex::Real* dt, amrex::Real* umax,
                const amrex::Real* dx,
-               const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
-               const amrex::Real* u,     const int* u_lo, const int* u_hi, const int* nc_u,
-               const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
+               const amrex::Real* scal,  const int* s_lo, const int* s_hi,
+               const amrex::Real* u,     const int* u_lo, const int* u_hi,
+               const amrex::Real* force, const int* f_lo, const int* f_hi,
                const amrex::Real* divu,  const int* d_lo, const int* d_hi,
                const amrex::Real* dSdt,  const int* t_lo, const int* t_hi,
                const amrex::Real* w0, const amrex::Real* p0, const amrex::Real* gamma1bar);
 
-    void estdt_sphr(amrex::Real* dt, amrex::Real* umax,
-		    const int* lo, const int* hi, const amrex::Real* dx,
-		    const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
-		    const amrex::Real* u, const int* u_lo, const int* u_hi, const int* nc_u,
-		    const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
+    void estdt_sphr(const int* lo, const int* hi,
+            amrex::Real* dt, amrex::Real* umax, const amrex::Real* dx,
+		    const amrex::Real* scal, const int* s_lo, const int* s_hi,
+		    const amrex::Real* u, const int* u_lo, const int* u_hi,
+		    const amrex::Real* force, const int* f_lo, const int* f_hi,
 		    const amrex::Real* divu, const int* d_lo, const int* d_hi,
 		    const amrex::Real* dSdt, const int* t_lo, const int* t_hi,
 		    const amrex::Real* w0,
@@ -166,21 +166,20 @@ extern "C"
 		    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 		    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void firstdt(const int* lev, amrex::Real* dt, amrex::Real* umax,
-                 const int* lo, const int* hi,
+    void firstdt(const int* lo, const int* hi,
+                 const int lev, amrex::Real* dt, amrex::Real* umax,
                  const amrex::Real* dx,
-                 const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
-                 const amrex::Real* u,     const int* u_lo, const int* u_hi, const int* nc_u,
-                 const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
+                 const amrex::Real* scal,  const int* s_lo, const int* s_hi,
+                 const amrex::Real* u,     const int* u_lo, const int* u_hi,
+                 const amrex::Real* force, const int* f_lo, const int* f_hi,
                  const amrex::Real* divu,  const int* d_lo, const int* d_hi,
                  const amrex::Real* p0, const amrex::Real* gamma1bar);
 
-    void firstdt_sphr(amrex::Real* dt, amrex::Real* umax,
-		      const int* lo, const int* hi,
-		      const amrex::Real* dx,
-		      const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,
-		      const amrex::Real* u,     const int* u_lo, const int* u_hi, const int* nc_u,
-		      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
+    void firstdt_sphr(const int* lo, const int* hi,
+              amrex::Real* dt, amrex::Real* umax, const amrex::Real* dx,
+		      const amrex::Real* scal,  const int* s_lo, const int* s_hi,
+		      const amrex::Real* u,     const int* u_lo, const int* u_hi,
+		      const amrex::Real* force, const int* f_lo, const int* f_hi, 
 		      const amrex::Real* divu,  const int* d_lo, const int* d_hi,
 		      const amrex::Real* p0, const amrex::Real* gamma1bar,
 		      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
@@ -851,7 +850,7 @@ extern "C"
 				   const amrex::Real dt);
 
     // rhcc = beta0 * (S - Sbar) + beta0 * delta_chi
-    void make_rhcc_for_macproj(const int* lo, const int* hi, const int lev, 
+    void make_rhcc_for_macproj(const int* lo, const int* hi, const int lev,
                                amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
                                const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
                                const amrex::Real* Sbar,
@@ -879,14 +878,14 @@ extern "C"
 				    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 				    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void create_correction_delta_gamma1_term(const int* lo, const int* hi, const int lev, 
+    void create_correction_delta_gamma1_term(const int* lo, const int* hi, const int lev,
 				    amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
 				    const amrex::Real* delta_gamma1, const int* df_lo, const int* df_hi,
 			      const amrex::Real* gamma1bar,
 			      const amrex::Real* psi,
 			      const amrex::Real* p0);
 
-    void create_correction_delta_gamma1_term_sphr(const int* lo, const int* hi, const int lev, 
+    void create_correction_delta_gamma1_term_sphr(const int* lo, const int* hi, const int lev,
 				   amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
            const amrex::Real* delta_gamma1, const int* df_lo, const int* df_hi,
 				   const amrex::Real* gamma1bar,

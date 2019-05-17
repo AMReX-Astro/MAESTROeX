@@ -138,7 +138,7 @@ contains
     temp_comp = Temperature+1
     pi_comp   = Pressure+1
 
-    nscal = Nscalars
+    ! nscal = Nscalars
 
     prob_lo(1:3) = prob_lo_in(1:3)
     prob_hi(1:3) = prob_hi_in(1:3)

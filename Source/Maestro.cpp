@@ -58,6 +58,10 @@ Real Maestro::previousCPUTimeUsed = 0.0;
 
 Real Maestro::startCPUTime = 0.0;
 
+#ifdef AMREX_USE_CUDA
+int Maestro::numThreadsMin[3] = {1, 1, 1};
+#endif
+
 Maestro::Maestro ()
 {
 }
