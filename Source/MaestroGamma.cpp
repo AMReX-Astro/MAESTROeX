@@ -17,6 +17,11 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
         gamma1[lev].define(grids[lev], dmap[lev], 1, 0);
     }
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -29,11 +34,6 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 #pragma omp parallel
 #endif
         for ( MFIter mfi(gamma1_mf, true); mfi.isValid(); ++mfi ) {
-
-            #ifdef AMREX_USE_CUDA
-                // turn on GPU
-                Cuda::setLaunchRegion(true);
-            #endif
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -60,19 +60,19 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
                                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                                 BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 
-                                #ifdef AMREX_USE_CUDA
-                                    // turn off GPU
-                                    Cuda::setLaunchRegion(false);
-                                #endif
+
             }
         }
     }
-
-
 
     // average fine data onto coarser cells
     AverageDown(gamma1,0,1);
 
     // call average to create gamma1bar
     Average(gamma1,gamma1bar,0);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 }
