@@ -7,9 +7,9 @@ void
 Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                        const Vector<MultiFab>& rho,
-                       const Vector<Real>& rho0,
+                       const RealVector& rho0,
                        const Vector<Real>& grav_cell,
-                       const Vector<Real>& w0_force,
+                       const RealVector& w0_force,
                        const Vector<MultiFab>& w0_force_cart,
                        int do_add_utilde_force)
 {
@@ -24,14 +24,14 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     }
 
     if (spherical == 1) {
-        Vector<Real> gradw0( (max_radial_level+1)*nr_fine );
+        RealVector gradw0( (max_radial_level+1)*nr_fine );
         gradw0.shrink_to_fit();
 
-	if (use_exact_base_state || average_base_state) {
+        if (use_exact_base_state || average_base_state) {
             std::fill(gradw0.begin(), gradw0.end(), 0.);
-	} else {
-	    compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
-	}
+        } else {
+            compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
+        }
 
         Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
     }
@@ -84,22 +84,22 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-		    make_vel_force_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-					BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-					BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
-					BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
-					BL_TO_FORTRAN_3D(uedge_mf[mfi]),
-					BL_TO_FORTRAN_3D(vedge_mf[mfi]),
-					BL_TO_FORTRAN_3D(wedge_mf[mfi]),
-					BL_TO_FORTRAN_FAB(normal_mf[mfi]),
-					BL_TO_FORTRAN_3D(gradw0_mf[mfi]),
-					BL_TO_FORTRAN_FAB(w0force_mf[mfi]),
-					rho0.dataPtr(),
-					grav_cell.dataPtr(),
-					dx,
-					r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                        BL_TO_FORTRAN_3D(cc_to_r[mfi]),
-					&do_add_utilde_force);
+                make_vel_force_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                                    BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+                                    BL_TO_FORTRAN_FAB(gpi_mf[mfi]),
+                                    BL_TO_FORTRAN_N_3D(rho_mf[mfi],Rho),
+                                    BL_TO_FORTRAN_3D(uedge_mf[mfi]),
+                                    BL_TO_FORTRAN_3D(vedge_mf[mfi]),
+                                    BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+                                    BL_TO_FORTRAN_FAB(normal_mf[mfi]),
+                                    BL_TO_FORTRAN_3D(gradw0_mf[mfi]),
+                                    BL_TO_FORTRAN_FAB(w0force_mf[mfi]),
+                                    rho0.dataPtr(),
+                                    grav_cell.dataPtr(),
+                                    dx,
+                                    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+                                    BL_TO_FORTRAN_3D(cc_to_r[mfi]),
+                                    &do_add_utilde_force);
 #else
                 Abort("MakeVelForce: Spherical is not valid for DIM < 3");
 #endif
@@ -122,7 +122,7 @@ void
 Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                          const Vector<MultiFab>& state,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                         const Vector<Real>& s0,
+                         const RealVector& s0,
                          const Vector<Real>& s0_edge,
                          const Vector<MultiFab>& s0_cart,
                          int comp,
@@ -229,8 +229,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         Abort("ERROR: should only call mkrhohforce when predicting rhoh', h, or rhoh");
     }
 
-    Vector<Real> rho0( (max_radial_level+1)*nr_fine );
-    Vector<Real>   p0( (max_radial_level+1)*nr_fine );
+    RealVector rho0( (max_radial_level+1)*nr_fine );
+    RealVector   p0( (max_radial_level+1)*nr_fine );
     Vector<Real> grav( (max_radial_level+1)*nr_fine );
     rho0.shrink_to_fit();
     p0.shrink_to_fit();
@@ -298,6 +298,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 #endif
         for ( MFIter mfi(scal_force_mf, true); mfi.isValid(); ++mfi ) {
 
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
@@ -305,35 +308,31 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             if (spherical == 1) {
                 const Real* dx = geom[lev].CellSize();
 
-                // Get the index space of the valid region
-                const Box& gtbx = mfi.growntilebox(1);
 #if (AMREX_SPACEDIM == 3)
-		// if use_exact_base_state or average_base_state,
-		// psi is set to dpdt in advance subroutine
-#pragma gpu box(gtbx)
-		mkrhohforce_sphr(AMREX_INT_ANYD(gtbx.loVect()), AMREX_INT_ANYD(gtbx.hiVect()),
-				 scal_force_mf[mfi].dataPtr(RhoH),
-				 AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
-				 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(p0macx_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(p0macy_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(p0macz_mf[mfi]),
-				 AMREX_REAL_ANYD(dx), psi.dataPtr(),
-				 is_prediction, add_thermal,
-				 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-				 BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                // if use_exact_base_state or average_base_state,
+                // psi is set to dpdt in advance subroutine
+#pragma gpu box(tileBox)
+                mkrhohforce_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                                 scal_force_mf[mfi].dataPtr(RhoH),
+                                 AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
+                                 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                 BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                 BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                 BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
+                                 BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
+                                 BL_TO_FORTRAN_ANYD(p0macx_mf[mfi]),
+                                 BL_TO_FORTRAN_ANYD(p0macy_mf[mfi]),
+                                 BL_TO_FORTRAN_ANYD(p0macz_mf[mfi]),
+                                 AMREX_REAL_ANYD(dx), psi.dataPtr(),
+                                 is_prediction, add_thermal,
+                                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+                                 BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 #else
                 Abort("MakeRhoHForce: Spherical is not valid for DIM < 3");
 #endif
             } else {
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.growntilebox(1);
-		// if average_base_state, psi is set to dpdt in advance subroutine
+                // if average_base_state, psi is set to dpdt in advance subroutine
 #pragma gpu box(tileBox)
                 mkrhohforce(AMREX_INT_ANYD(tileBox.loVect()),
                             AMREX_INT_ANYD(tileBox.hiVect()),

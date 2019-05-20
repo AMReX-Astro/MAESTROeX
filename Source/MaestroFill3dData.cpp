@@ -7,7 +7,7 @@
 using namespace amrex;
 
 void
-Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
+Maestro::Put1dArrayOnCart (const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
@@ -41,7 +41,7 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 
 void
 Maestro::Put1dArrayOnCart (int level,
-                           const Vector<Real>& s0,
+                           const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
@@ -233,7 +233,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
 
 void
-Maestro::MakeS0mac (const Vector<Real>& s0,
+Maestro::MakeS0mac (const RealVector& s0,
                     Vector<std::array< MultiFab,AMREX_SPACEDIM > >& s0mac)
 {
     // timer for profiling

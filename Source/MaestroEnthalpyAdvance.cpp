@@ -18,8 +18,8 @@ Maestro::EnthalpyAdvance (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
 
     // Create cell-centered base state quantity
-    Vector<Real> h0_old( (max_radial_level+1)*nr_fine );
-    Vector<Real> h0_new( (max_radial_level+1)*nr_fine );
+    RealVector h0_old( (max_radial_level+1)*nr_fine );
+    RealVector h0_new( (max_radial_level+1)*nr_fine );
     h0_old.shrink_to_fit();
     h0_new.shrink_to_fit();
 
@@ -34,7 +34,7 @@ Maestro::EnthalpyAdvance (int which_step,
      rho0_edge_new.shrink_to_fit();
     rhoh0_edge_old.shrink_to_fit();
     rhoh0_edge_new.shrink_to_fit();
-    
+
     if (spherical == 0) {
         cell_to_edge( rho0_old.dataPtr(), rho0_edge_old.dataPtr());
         cell_to_edge( rho0_new.dataPtr(), rho0_edge_new.dataPtr());
@@ -61,12 +61,12 @@ Maestro::EnthalpyAdvance (int which_step,
 	rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    // compute forcing terms    
+    // compute forcing terms
     if (enthalpy_pred_type == predict_rhohprime) {
         // make force for (rho h)'
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
-	
-	Put1dArrayOnCart(rhoh0_old,rhoh0_old_cart,0,0,bcs_s,RhoH);
+
+	    Put1dArrayOnCart(rhoh0_old,rhoh0_old_cart,0,0,bcs_s,RhoH);
 
         ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,rhoh0_old_cart,RhoH,bcs_s,0);
 
@@ -75,14 +75,14 @@ Maestro::EnthalpyAdvance (int which_step,
              enthalpy_pred_type == predict_rhoh) {
         // make force for (rho h)
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
-	
+
 	// make force for h by calling mkrhohforce then dividing by rho
 	if (enthalpy_pred_type == predict_h) {
 	    for (int lev=0; lev<=finest_level; ++lev) {
 		MultiFab::Divide(scal_force[lev],scalold[lev],RhoH,Rho,1,1);
 	    }
 	}
-	
+
     }
     else if (enthalpy_pred_type == predict_hprime) {
         // first compute h0_old
@@ -95,7 +95,7 @@ Maestro::EnthalpyAdvance (int which_step,
         // make force for temperature
         Abort("MaestroEnthalpyAdvance forcing");
     }
-    
+
     //////////////////////////////////
     // Add w0 to MAC velocities
     //////////////////////////////////
@@ -103,7 +103,7 @@ Maestro::EnthalpyAdvance (int which_step,
     Addw0(umac,w0mac,1.);
 
     //////////////////////////////////
-    // Create the edge states of (rho h)' or h or T 
+    // Create the edge states of (rho h)' or h or T
     //////////////////////////////////
 
     if (enthalpy_pred_type == predict_rhohprime) {
@@ -120,7 +120,7 @@ Maestro::EnthalpyAdvance (int which_step,
         // convert T -> T'
         Abort("MaestroEnthalpyAdvance predict_Tprime_then_h");
     }
-    
+
     // predict either T, h, or (rho h)' at the edges
     int pred_comp;
     if ( enthalpy_pred_type == predict_T_then_rhohprime ||
@@ -169,13 +169,13 @@ Maestro::EnthalpyAdvance (int which_step,
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
         Abort("MaestroEnthalpyAdvance need makeHfromRhoT_edge");
     }
-   
+
     //////////////////////////////////
     // Subtract w0 from MAC velocities
     //////////////////////////////////
 
     Addw0(umac,w0mac,-1.);
-   
+
     //////////////////////////////////
     // Compute fluxes
     //////////////////////////////////
@@ -212,10 +212,10 @@ Maestro::EnthalpyAdvance (int which_step,
         }
 
         // compute enthalpy fluxes
-	MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac, 
-		     rho0_old,rho0_edge_old,rho0mac_old, 
+	MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
 		     rho0_old,rho0_edge_old,rho0mac_old,
-		     rhoh0_old,rhoh0_edge_old,rhoh0mac_old, 
+		     rho0_old,rho0_edge_old,rho0mac_old,
+		     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
 		     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
 		     h0mac_old,h0mac_old);
     }
@@ -269,10 +269,10 @@ Maestro::EnthalpyAdvance (int which_step,
 
         // compute enthalpy fluxes
 	MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
-		     rho0_old,rho0_edge_old,rho0mac_old, 
+		     rho0_old,rho0_edge_old,rho0mac_old,
 		     rho0_new,rho0_edge_new,rho0mac_new,
-		     rhoh0_old,rhoh0_edge_old,rhoh0mac_old, 
-		     rhoh0_new,rhoh0_edge_new,rhoh0mac_new, 
+		     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
+		     rhoh0_new,rhoh0_edge_new,rhoh0mac_new,
 		     h0mac_old,h0mac_new);
     }
 
@@ -283,7 +283,7 @@ Maestro::EnthalpyAdvance (int which_step,
     //**************************************************************************
     //     1) Create (rho h)' force at time n+1/2.
     //          (NOTE: we don't worry about filling ghost cells of the scal_force
-    //                 because we only need them in valid regions...)     
+    //                 because we only need them in valid regions...)
     //     2) Update (rho h) with conservative differencing.
     //**************************************************************************
 

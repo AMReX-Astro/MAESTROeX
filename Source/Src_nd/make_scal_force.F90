@@ -66,8 +66,8 @@ contains
     ! Add wtilde d(p0)/dr
     !
 #if (AMREX_SPACEDIM == 1)
-    j = lo(2)
-    k = lo(3)
+    j = 0
+    k = 0
     do i = lo(1),hi(1)
 
        if (i .lt. base_cutoff_density_coord(lev)) then
@@ -84,7 +84,7 @@ contains
        rhoh_force(i,j,k) = veladv * gradp0
     enddo
 #elif (AMREX_SPACEDIM == 2)
-    k = lo(3)
+    k = 0
     do j = lo(2),hi(2)
 
        if (j .lt. base_cutoff_density_coord(lev)) then
@@ -231,9 +231,9 @@ contains
     !
     ! Here we make u grad p = div (u p) - p div (u)
     !
-    do k = lo(3)+1,hi(3)-1
-       do j = lo(2)+1,hi(2)-1
-          do i = lo(1)+1,hi(1)-1
+    do k = lo(3),hi(3)
+       do j = lo(2),hi(2)
+          do i = lo(1),hi(1)
 
              divup = (umac(i+1,j,k) * p0macx(i+1,j,k) - umac(i,j,k) * p0macx(i,j,k)) / dx(1) + &
                   (vmac(i,j+1,k) * p0macy(i,j+1,k) - vmac(i,j,k) * p0macy(i,j,k)) / dx(2) + &
@@ -264,9 +264,9 @@ contains
        call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0, &
             r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
 
-        do k = lo(3)+1,hi(3)-1
-           do j = lo(2)+1,hi(2)-1
-              do i = lo(1)+1,hi(1)-1
+        do k = lo(3),hi(3)
+           do j = lo(2),hi(2)
+              do i = lo(1),hi(1)
                 rhoh_force(i,j,k) = rhoh_force(i,j,k) + psi_cart(i,j,k,1)
              enddo
           enddo
@@ -275,9 +275,9 @@ contains
     endif
 
     if (add_thermal .eq. 1) then
-        do k = lo(3)+1,hi(3)-1
-           do j = lo(2)+1,hi(2)-1
-              do i = lo(1)+1,hi(1)-1
+        do k = lo(3),hi(3)
+           do j = lo(2),hi(2)
+              do i = lo(1),hi(1)
                 rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal(i,j,k)
              end do
           end do

@@ -13,7 +13,7 @@ void
 Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   Vector<MultiFab>& macphi,
                   const Vector<MultiFab>& macrhs,
-                  const Vector<Real>& beta0,
+                  const RealVector& beta0,
                   const int& is_predictor)
 {
     // timer for profiling
@@ -221,7 +221,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 // multiply (or divide) face-data by beta0
 void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge,
-                                const Vector<Real>& beta0,
+                                const RealVector& beta0,
                                 const Vector<Real>& beta0_edge,
                                 const int& mult_or_div)
 {

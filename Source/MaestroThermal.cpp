@@ -18,7 +18,7 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
                              const Vector<MultiFab>& hcoeff,
                              const Vector<MultiFab>& Xkcoeff,
                              const Vector<MultiFab>& pcoeff,
-                             const Vector<Real>& p0,
+                             const RealVector& p0,
                              int temp_formulation) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeExplicitThermal()",MakeExplicitThermal);

@@ -12,7 +12,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 Vector<MultiFab>& rho_Hext,
                 Vector<MultiFab>& rho_omegadot,
                 Vector<MultiFab>& rho_Hnuc,
-                const Vector<Real>& p0,
+                const RealVector& p0,
                 const Real dt_in)
 {
     // timer for profiling
@@ -105,7 +105,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot,
                      Vector<MultiFab>& rho_Hnuc,
-                     const Vector<Real>& p0,
+                     const RealVector& p0,
                      const Real dt_in)
 {
     // timer for profiling

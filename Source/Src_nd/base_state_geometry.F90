@@ -38,7 +38,7 @@ module base_state_geometry_module
   double precision, allocatable, save, public  :: dr(:)
   integer         , allocatable, save, public  :: nr(:)
 
-  integer         , pointer, save, public  :: numdisjointchunks(:)
+  integer         , allocatable, save, public  :: numdisjointchunks(:)
   integer         , pointer, save, public  :: r_start_coord(:,:)
   integer         , pointer, save, public  :: r_end_coord(:,:)
 
@@ -47,7 +47,10 @@ module base_state_geometry_module
   integer         , pointer, save, public  :: burning_cutoff_density_coord(:)
 
 #ifdef AMREX_USE_CUDA
-  attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine, nr_irreg, center, dr, nr, base_cutoff_density_coord, anelastic_cutoff_density_coord
+  attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine
+  attributes(managed) ::  nr_irreg, center, dr, nr
+  attributes(managed) :: base_cutoff_density_coord, anelastic_cutoff_density_coord
+  attributes(managed) :: numdisjointchunks
 #endif
 
 contains
@@ -367,10 +370,10 @@ contains
        finest_radial_level = finest_radial_level_in
     end if
 
-    if (associated(numdisjointchunks)) then
-       call bl_deallocate(numdisjointchunks)
+    if (allocated(numdisjointchunks)) then
+       deallocate(numdisjointchunks)
     end if
-    call bl_allocate(numdisjointchunks,0,finest_radial_level)
+    allocate(numdisjointchunks(0:finest_radial_level))
 
     ! loop through tag_array first to determine the maximum number of chunks
     ! to use for allocating r_start_coord and r_end_coord
@@ -596,7 +599,7 @@ contains
     deallocate(anelastic_cutoff_density_coord)
     deallocate(base_cutoff_density_coord)
     call bl_deallocate(burning_cutoff_density_coord)
-    call bl_deallocate(numdisjointchunks)
+    deallocate(numdisjointchunks)
     call bl_deallocate(r_start_coord)
     call bl_deallocate(r_end_coord)
 

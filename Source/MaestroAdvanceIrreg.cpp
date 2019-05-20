@@ -65,20 +65,20 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     Vector<Real> grav_cell_nph   ( (max_radial_level+1)*nr_fine );
-    Vector<Real> rho0_nph        ( (max_radial_level+1)*nr_fine );
+    RealVector   rho0_nph        ( (max_radial_level+1)*nr_fine );
     Vector<Real> p0_nph          ( (max_radial_level+1)*nr_fine );
     Vector<Real> p0_minus_peosbar( (max_radial_level+1)*nr_fine );
-    Vector<Real> peosbar         ( (max_radial_level+1)*nr_fine );
-    Vector<Real> w0_force_dummy  ( (max_radial_level+1)*nr_fine );
-    Vector<Real> Sbar            ( (max_radial_level+1)*nr_fine );
-    Vector<Real> beta0_nph       ( (max_radial_level+1)*nr_fine );
-    Vector<Real> gamma1bar_nph   ( (max_radial_level+1)*nr_fine );
-    Vector<Real> delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
+    RealVector   peosbar         ( (max_radial_level+1)*nr_fine );
+    RealVector   w0_force_dummy  ( (max_radial_level+1)*nr_fine );
+    RealVector   Sbar            ( (max_radial_level+1)*nr_fine );
+    RealVector   beta0_nph       ( (max_radial_level+1)*nr_fine );
+    RealVector   gamma1bar_nph   ( (max_radial_level+1)*nr_fine );
+    RealVector   delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     Vector<Real> delta_chi_w0_dummy   ( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
+    RealVector   w0_old             ( (max_radial_level+1)*(nr_fine+1) );
     Vector<Real> rho0_pred_edge_dummy( (max_radial_level+1)*(nr_fine+1) );
 
     // make sure C++ is as efficient as possible with memory usage

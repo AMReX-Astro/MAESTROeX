@@ -28,7 +28,7 @@ Maestro::EstDt ()
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
-    Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
@@ -126,10 +126,19 @@ Maestro::EstDt ()
             Real umax_grid = 0.;
 
 #if AMREX_USE_CUDA
-            Real* dt_f = prepare_dt(&dt_grid);
-            Real* umax_f = prepare_dt(&umax_grid);
+            Real* dt_f;
+            Real* umax_f;
 
-            set_dt_launch_config();
+            if (Cuda::inLaunchRegion()) {
+                dt_f = prepare_dt(&dt_grid);
+                umax_f = prepare_dt(&umax_grid);
+
+                set_dt_launch_config();
+            } else {
+                dt_f = &dt_grid;
+                umax_f = &umax_grid;
+
+            }
 #else
             Real* dt_f = &dt_grid;
             Real* umax_f = &umax_grid;
@@ -183,9 +192,11 @@ Maestro::EstDt ()
             }
 
 #ifdef AMREX_USE_CUDA
+            if (Cuda::inLaunchRegion()) {
                 clean_dt_launch_config();
                 clean_dt(dt_f);
                 clean_dt(umax_f);
+            }
 #endif
 
 // #ifdef AMREX_USE_CUDA
@@ -254,7 +265,7 @@ Maestro::FirstDt ()
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
-    Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
@@ -317,11 +328,23 @@ Maestro::FirstDt ()
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
 
-#if AMREX_USE_CUDA
-            Real* dt_f = prepare_dt(&dt_grid);
-            Real* umax_f = prepare_dt(&umax_grid);
+            // TODO: Look at drive/Castro.cpp and how ca_estdt is called there.
 
-            set_dt_launch_config();
+#if AMREX_USE_CUDA
+
+            Real* dt_f;
+            Real* umax_f;
+
+            if (Cuda::inLaunchRegion()) {
+                dt_f = prepare_dt(&dt_grid);
+                umax_f = prepare_dt(&umax_grid);
+
+                set_dt_launch_config();
+            } else {
+                dt_f = &dt_grid;
+                umax_f = &umax_grid;
+
+            }
 #else
             Real* dt_f = &dt_grid;
             Real* umax_f = &umax_grid;
@@ -360,16 +383,18 @@ Maestro::FirstDt ()
                              p0_old.dataPtr(),
                              gamma1bar_old.dataPtr(),
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                             BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                             BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 #else
                 Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif
             }
 
 #ifdef AMREX_USE_CUDA
-            clean_dt_launch_config();
-            clean_dt(dt_f);
-            clean_dt(umax_f);
+            if (Cuda::inLaunchRegion()) {
+                clean_dt_launch_config();
+                clean_dt(dt_f);
+                clean_dt(umax_f);
+            }
 #endif
 
 // #ifdef AMREX_USE_CUDA

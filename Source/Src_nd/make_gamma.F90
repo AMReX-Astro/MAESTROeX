@@ -55,7 +55,7 @@ contains
              eos_state%T     = scal(i,j,k,temp_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
+             pt_index(1:3) = (/i, j, k/)
 
              ! dens, pres, and xmass are inputs
              call eos(eos_input_rp, eos_state, pt_index)

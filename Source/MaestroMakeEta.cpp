@@ -6,7 +6,7 @@ using namespace amrex;
 // compute eta_rho at edge- and cell-centers
 void
 Maestro::MakeEtarho (Vector<Real>& etarho_edge,
-                     Vector<Real>& etarho_cell,
+                     RealVector& etarho_cell,
                      const Vector<MultiFab>& etarho_flux)
 {
     // timer for profiling
@@ -70,7 +70,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                          Vector<Real>& etarho_edge,
-                         Vector<Real>& etarho_cell)
+                         RealVector& etarho_cell)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEtarhoSphr()",MakeEtarhoSphr);

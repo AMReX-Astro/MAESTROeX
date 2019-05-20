@@ -17,6 +17,17 @@
 #include <PhysBCFunctMaestro.H>
 #include <Maestro_F.H>
 
+#ifdef AMREX_USE_CUDA
+#include <AMReX_CudaAllocators.H>
+#endif
+
+// Define vector types for CUDA
+#ifdef AMREX_USE_CUDA
+typedef amrex::Vector< amrex::Real, amrex::CudaManagedAllocator<amrex::Real> > RealVector;
+#else
+typedef amrex::Vector< amrex::Real > RealVector;
+#endif
+
 class Maestro
     : public amrex::AmrCore
 {
@@ -90,7 +101,7 @@ private:
     // MaestroAdvection.cpp functions
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                        const amrex::Vector<amrex::Real>& w0_force,
+                        const RealVector& w0_force,
 			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
 
     void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
@@ -118,10 +129,10 @@ private:
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-		       const amrex::Vector<amrex::Real>& r0_old,
+		       const RealVector& r0_old,
 		       const amrex::Vector<amrex::Real>& r0_edge_old,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-		       const amrex::Vector<amrex::Real>& r0_new,
+		       const RealVector& r0_new,
 		       const amrex::Vector<amrex::Real>& r0_edge_new,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
 		       const amrex::Vector<amrex::Real>& r0_predicted_edge,
@@ -132,16 +143,16 @@ private:
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-		       const amrex::Vector<amrex::Real>& r0_old,
+		       const RealVector& r0_old,
 		       const amrex::Vector<amrex::Real>& r0_edge_old,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-		       const amrex::Vector<amrex::Real>& r0_new,
+		       const RealVector& r0_new,
 		       const amrex::Vector<amrex::Real>& r0_edge_new,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-		       const amrex::Vector<amrex::Real>& rh0_old,
+		       const RealVector& rh0_old,
 		       const amrex::Vector<amrex::Real>& rh0_edge_old,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
-		       const amrex::Vector<amrex::Real>& rh0_new,
+		       const RealVector& rh0_new,
 		       const amrex::Vector<amrex::Real>& rh0_edge_new,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_old,
@@ -167,7 +178,7 @@ private:
 
     // compute the radial average of a quantitiy
     void Average (const amrex::Vector<amrex::MultiFab>& mf,
-                  amrex::Vector<amrex::Real>& phibar,
+                  RealVector& phibar,
                   int comp);
 
     // end MaestroAverage.cpp functions
@@ -183,13 +194,13 @@ private:
     ////////////
     // MaestroConvert.cpp functions
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
-                        const amrex::Vector<amrex::Real>& s0,
+                        const RealVector& s0,
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
 
     void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
-                        const amrex::Vector<amrex::Real>& s0,
+                        const RealVector& s0,
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
@@ -239,8 +250,8 @@ private:
     // write plotfile to disk
     void DiagFile (const int step,
 		   const amrex::Real dt_in,
-		   const amrex::Vector<amrex::Real>& rho0_in,
-		   const amrex::Vector<amrex::Real>& p0_in,
+		   const RealVector& rho0_in,
+		   const RealVector& p0_in,
 		   const amrex::Vector<amrex::MultiFab>& u_in,
 		   const amrex::Vector<amrex::MultiFab>& s_in,
 		   int& index);
@@ -339,14 +350,14 @@ private:
     ////////////////////////
     // MaestroFill3dData.cpp functions
 
-    void Put1dArrayOnCart (const amrex::Vector<amrex::Real>& s0,
+    void Put1dArrayOnCart (const RealVector& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0, int variable_type=0);
 
-    void Put1dArrayOnCart (int level, const amrex::Vector<amrex::Real>& s0,
+    void Put1dArrayOnCart (int level, const RealVector& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
@@ -359,7 +370,7 @@ private:
 
     void MakeW0mac (amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac);
 
-    void MakeS0mac (const amrex::Vector<amrex::Real>& s0,
+    void MakeS0mac (const RealVector& s0,
 		    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
     void MakeNormal ();
@@ -377,16 +388,16 @@ private:
     void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                        const amrex::Vector<amrex::MultiFab>& rho,
-                       const amrex::Vector<amrex::Real>& rho0,
+                       const RealVector& rho0,
                        const amrex::Vector<amrex::Real>& grav,
-                       const amrex::Vector<amrex::Real>& w0_force,
+                       const RealVector& w0_force,
 		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
 			 const amrex::Vector<amrex::MultiFab>& state,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                         const amrex::Vector<amrex::Real>& s0,
+                         const RealVector& s0,
                          const amrex::Vector<amrex::Real>& s0_edge,
 			 const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
@@ -405,8 +416,8 @@ private:
     // MaestroGamma.cpp functions
 
     void MakeGamma1bar (const amrex::Vector<amrex::MultiFab>& scal,
-                        amrex::Vector<amrex::Real>& gamma1bar,
-                        const amrex::Vector<amrex::Real>& p0);
+                        RealVector& gamma1bar,
+                        const RealVector& p0);
 
     // end MaestroGamma.cpp functions
     ////////////
@@ -446,12 +457,12 @@ private:
     void MacProj (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                   amrex::Vector<amrex::MultiFab>& macphi,
                   const amrex::Vector<amrex::MultiFab>& macrhs,
-                  const amrex::Vector<amrex::Real>& beta0,
+                  const RealVector& beta0,
                   const int& is_predictor);
 
     // multiply (or divide) face-data by beta0
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
-                           const amrex::Vector<amrex::Real>& beta0,
+                           const RealVector& beta0,
                            const amrex::Vector<amrex::Real>& beta0_edge,
                            const int& mult_or_div);
 
@@ -473,7 +484,7 @@ private:
     ////////////
     // MaestroMakeEta.cpp functions
     void MakeEtarho (amrex::Vector<amrex::Real>& etarho_edge,
-		     amrex::Vector<amrex::Real>& etarho_cell,
+		     RealVector& etarho_cell,
 		     const amrex::Vector<amrex::MultiFab>& etarho_flux);
 
     void MakeEtarhoSphr (const amrex::Vector<amrex::MultiFab>& scal_old,
@@ -481,7 +492,7 @@ private:
 			 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
 			 amrex::Vector<amrex::Real>& etarho_edge,
-			 amrex::Vector<amrex::Real>& etarho_cell);
+			 RealVector& etarho_cell);
     ////////////
 
     ////////////
@@ -497,36 +508,36 @@ private:
                     const amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal,
-                    const amrex::Vector<amrex::Real>& p0,
-                    const amrex::Vector<amrex::Real>& gamma1bar,
-                    amrex::Vector<amrex::Real>& delta_gamma1_termbar,
+                    const RealVector& p0,
+                    const RealVector& gamma1bar,
+                    RealVector& delta_gamma1_termbar,
                     const amrex::Vector<amrex::Real>& psi_in);
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
                                const amrex::Vector<amrex::MultiFab>& S_cc,
-                               const amrex::Vector<amrex::Real>& Sbar,
-                               const amrex::Vector<amrex::Real>& beta0,
+                               const RealVector& Sbar,
+                               const RealVector& beta0,
                                const amrex::Vector<amrex::MultiFab>& delta_gamma1_term);
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
-			                       const amrex::Vector<amrex::Real>& rho0,
+			                 const RealVector& rho0,
                              const amrex::Vector<amrex::MultiFab>& S_cc,
-                             const amrex::Vector<amrex::Real>& Sbar,
-                             const amrex::Vector<amrex::Real>& beta0,
+                             const RealVector& Sbar,
+                             const RealVector& beta0,
                              const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
-                             const amrex::Vector<amrex::Real>& gamma1bar,
-			                       const amrex::Vector<amrex::Real>& p0,
+                             const RealVector& gamma1bar,
+			                 const RealVector& p0,
                              const amrex::Vector<amrex::MultiFab>& delta_p_term,
-			                       amrex::Vector<amrex::MultiFab>& delta_chi,
+			                 amrex::Vector<amrex::MultiFab>& delta_chi,
                              int is_predictor);
 
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
-				 const amrex::Vector<amrex::Real>& rho0,
-				 const amrex::Vector<amrex::Real>& beta0,
-				 const amrex::Vector<amrex::Real>& gamma1bar,
-				 const amrex::Vector<amrex::Real>& p0,
+				 const RealVector& rho0,
+				 const RealVector& beta0,
+				 const RealVector& gamma1bar,
+				 const RealVector& p0,
 				 const amrex::Vector<amrex::MultiFab>& delta_p_term);
     // end MaestroMakeS.cpp functions
     ////////////
@@ -577,8 +588,8 @@ private:
                                                       const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
                                                       const amrex::Vector<amrex::MultiFab>& u_in,
                                                       amrex::Vector<amrex::MultiFab>& s_in,
-                                                      const amrex::Vector<amrex::Real>& p0_in,
-                                                      const amrex::Vector<amrex::Real>& gamma1bar_in,
+                                                      const RealVector& p0_in,
+                                                      const RealVector& gamma1bar_in,
                                                       const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     amrex::Vector<const amrex::MultiFab*> SmallPlotFileMF(const int nPlot,
@@ -597,10 +608,10 @@ private:
     void WriteSmallPlotFile (const int step,
                         const amrex::Real t_in,
                         const amrex::Real dt_in,
-                        const amrex::Vector<amrex::Real>& rho0_in,
-                        const amrex::Vector<amrex::Real>& rhoh0_in,
-                        const amrex::Vector<amrex::Real>& p0_in,
-                        const amrex::Vector<amrex::Real>& gamma1bar_in,
+                        const RealVector& rho0_in,
+                        const RealVector& rhoh0_in,
+                        const RealVector& p0_in,
+                        const RealVector& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in,
                         const amrex::Vector<amrex::MultiFab>& S_cc_in);
@@ -609,10 +620,10 @@ private:
     void WritePlotFile (const int step,
                         const amrex::Real t_in,
                         const amrex::Real dt_in,
-                        const amrex::Vector<amrex::Real>& rho0_in,
-                        const amrex::Vector<amrex::Real>& rhoh0_in,
-                        const amrex::Vector<amrex::Real>& p0_in,
-                        const amrex::Vector<amrex::Real>& gamma1bar_in,
+                        const RealVector& rho0_in,
+                        const RealVector& rhoh0_in,
+                        const RealVector& p0_in,
+                        const RealVector& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in,
                         const amrex::Vector<amrex::MultiFab>& S_cc_in,
@@ -635,9 +646,9 @@ private:
                         amrex::Vector<amrex::MultiFab>& vorticity);
 
     void MakeDeltaGamma (const amrex::Vector<amrex::MultiFab>& state,
-                         const amrex::Vector<amrex::Real>& p0,
+                         const RealVector& p0,
                          const amrex::Vector<amrex::MultiFab>& p0_cart,
-                         const amrex::Vector<amrex::Real>& gamma1bar,
+                         const RealVector& gamma1bar,
                          const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
                          amrex::Vector<amrex::MultiFab>& deltagamma);
 
@@ -668,7 +679,7 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_Hext,
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                const amrex::Vector<amrex::Real>& p0,
+                const RealVector& p0,
                 const amrex::Real dt_react);
 
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
@@ -676,7 +687,7 @@ private:
                 const amrex::Vector<amrex::MultiFab>& rho_Hext,
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                const amrex::Vector<amrex::Real>& p0,
+                const RealVector& p0,
                 const amrex::Real dt_react);
 
     // compute heating term, rho_Hext
@@ -729,10 +740,10 @@ private:
     ////////////
     // MaestroRhoHT.cpp functions
     void TfromRhoH (amrex::Vector<amrex::MultiFab>& scal,
-                    const amrex::Vector<amrex::Real>& p0);
+                    const RealVector& p0);
 
     void TfromRhoP (amrex::Vector<amrex::MultiFab>& scal,
-                    const amrex::Vector<amrex::Real>& p0,
+                    const RealVector& p0,
                     int updateRhoH = 0);
 
     void PfromRhoH (const amrex::Vector<amrex::MultiFab>& state,
@@ -741,17 +752,17 @@ private:
 
     void MachfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
                        const amrex::Vector<amrex::MultiFab>& vel,
-                       const amrex::Vector<amrex::Real>& p0,
+                       const RealVector& p0,
                        amrex::Vector<amrex::MultiFab>& mach);
 
     void MachfromRhoHSphr (const amrex::Vector<amrex::MultiFab>& scal,
                            const amrex::Vector<amrex::MultiFab>& vel,
-                           const amrex::Vector<amrex::Real>& p0,
+                           const RealVector& p0,
                            const amrex::Vector<amrex::MultiFab>& w0cart,
                            amrex::Vector<amrex::MultiFab>& mach);
 
     void CsfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
-                     const amrex::Vector<amrex::Real>& p0,
+                     const RealVector& p0,
                      const amrex::Vector<amrex::MultiFab>& p0cart,
                      amrex::Vector<amrex::MultiFab>& cs);
     ////////////
@@ -786,7 +797,7 @@ private:
 			      const amrex::Vector<amrex::MultiFab>& hcoeff,
 			      const amrex::Vector<amrex::MultiFab>& Xkcoeff,
 			      const amrex::Vector<amrex::MultiFab>& pcoeff,
-			      const amrex::Vector<amrex::Real>& p0,
+			      const RealVector& p0,
 			      int temp_formulation);
 
     void ApplyThermal (amrex::MLABecLaplacian& mlabec,
@@ -817,9 +828,9 @@ private:
     void VelocityAdvance (const amrex::Vector<amrex::MultiFab>& rhohalf,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                          const amrex::Vector<amrex::Real>& w0_force,
+                          const RealVector& w0_force,
 			  const amrex::Vector<amrex::MultiFab>& w0_force_cart,
-                          const amrex::Vector<amrex::Real>& rho0_nph,
+                          const RealVector& rho0_nph,
                           const amrex::Vector<amrex::Real>& grav_cell_nph,
 			  const amrex::Vector<amrex::MultiFab>& sponge);
     ////////////////////////
@@ -912,34 +923,34 @@ private:
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    amrex::Vector<amrex::Real> s0_init;
-    amrex::Vector<amrex::Real> p0_init;
-    amrex::Vector<amrex::Real> rho0_old;
-    amrex::Vector<amrex::Real> rho0_new;
-    amrex::Vector<amrex::Real> rhoh0_old;
-    amrex::Vector<amrex::Real> rhoh0_new;
+    RealVector s0_init;
+    RealVector p0_init;
+    RealVector rho0_old;
+    RealVector rho0_new;
+    RealVector rhoh0_old;
+    RealVector rhoh0_new;
     amrex::Vector<amrex::Real> rhoX0_old;
     amrex::Vector<amrex::Real> rhoX0_new;
-    amrex::Vector<amrex::Real> p0_old;
-    amrex::Vector<amrex::Real> p0_new;
-    amrex::Vector<amrex::Real> tempbar;
-    amrex::Vector<amrex::Real> tempbar_init;
-    amrex::Vector<amrex::Real> beta0_old;
-    amrex::Vector<amrex::Real> beta0_new;
-    amrex::Vector<amrex::Real> gamma1bar_old;
-    amrex::Vector<amrex::Real> gamma1bar_new;
-    amrex::Vector<amrex::Real> etarho_cc;
+    RealVector p0_old;
+    RealVector p0_new;
+    RealVector tempbar;
+    RealVector tempbar_init;
+    RealVector beta0_old;
+    RealVector beta0_new;
+    RealVector gamma1bar_old;
+    RealVector gamma1bar_new;
+    RealVector etarho_cc;
     amrex::Vector<amrex::Real> psi;
     amrex::Vector<amrex::Real> grav_cell_old;
     amrex::Vector<amrex::Real> grav_cell_new;
     amrex::Vector<amrex::Real> r_cc_loc;
     // p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
-    amrex::Vector<amrex::Real> p0_nm1;
+    RealVector p0_nm1;
     amrex::Vector<amrex::Real> beta0_nm1;
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    amrex::Vector<amrex::Real> w0;
+    RealVector w0;
     amrex::Vector<amrex::Real> etarho_ec;
     amrex::Vector<amrex::Real> r_edge_loc;
 

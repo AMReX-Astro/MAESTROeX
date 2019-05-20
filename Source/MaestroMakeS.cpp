@@ -14,18 +14,18 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& rho_Hnuc,
                     const Vector<MultiFab>& rho_Hext,
                     const Vector<MultiFab>& thermal,
-                    const Vector<Real>& p0,
-                    const Vector<Real>& gamma1bar,
-                    Vector<Real>& delta_gamma1_termbar,
+                    const RealVector& p0,
+                    const RealVector& gamma1bar,
+                    RealVector& delta_gamma1_termbar,
                     const Vector<Real>& psi_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()",Make_S_cc);
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Cuda::setLaunchRegion(true);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -93,10 +93,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         }
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    Cuda::setLaunchRegion(false);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     // average fine data onto coarser cells
     AverageDown(S_cc,0,1);
@@ -106,10 +106,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         // horizontal average of delta_gamma1_term
         Average(delta_gamma1_term,delta_gamma1_termbar,0);
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Cuda::setLaunchRegion(true);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
 
         for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -154,10 +154,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             }
         }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    Cuda::setLaunchRegion(false);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     }
 }
@@ -166,8 +166,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 void
 Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
                                const Vector<MultiFab>& S_cc,
-                               const Vector<Real>& Sbar,
-                               const Vector<Real>& beta0,
+                               const RealVector& Sbar,
+                               const RealVector& beta0,
                                const Vector<MultiFab>& delta_gamma1_term)
 {
     // timer for profiling
@@ -248,10 +248,10 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 
 void
 Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
-                                 const Vector<Real>& rho0,
-                                 const Vector<Real>& beta0,
-                                 const Vector<Real>& gamma1bar,
-                                 const Vector<Real>& p0,
+                                 const RealVector& rho0,
+                                 const RealVector& beta0,
+                                 const RealVector& gamma1bar,
+                                 const RealVector& p0,
                                  const Vector<MultiFab>& delta_p_term)
 {
     // timer for profiling
@@ -288,10 +288,10 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
         Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Cuda::setLaunchRegion(true);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
         // get references to the MultiFabs at level lev
@@ -334,11 +334,11 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
             }
         }
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    Cuda::setLaunchRegion(false);
-#endif
+//
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     // average down and fill ghost cells using first-order extrapolation
     AverageDown(correction_cc,0,1);
@@ -353,13 +353,13 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
 void
 Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
-                             const Vector<Real>& rho0,
+                             const RealVector& rho0,
                              const Vector<MultiFab>& S_cc,
-                             const Vector<Real>& Sbar,
-                             const Vector<Real>& beta0,
+                             const RealVector& Sbar,
+                             const RealVector& beta0,
                              const Vector<MultiFab>& delta_gamma1_term,
-                             const Vector<Real>& gamma1bar,
-                             const Vector<Real>& p0,
+                             const RealVector& gamma1bar,
+                             const RealVector& p0,
                              const Vector<MultiFab>& delta_p_term,
                              Vector<MultiFab>& delta_chi,
                              int is_predictor)

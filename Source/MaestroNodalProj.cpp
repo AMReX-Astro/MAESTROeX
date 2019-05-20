@@ -90,7 +90,7 @@ Maestro::NodalProj (int proj_type,
         Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
     }
     else {
-        Vector<Real> beta0_nph( (max_radial_level+1)*nr_fine );
+        RealVector beta0_nph( (max_radial_level+1)*nr_fine );
         beta0_nph.shrink_to_fit();
         for(int i=0; i<beta0_nph.size(); ++i) {
             beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
@@ -169,7 +169,7 @@ Maestro::NodalProj (int proj_type,
 
             if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } 
+            }
             else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }
