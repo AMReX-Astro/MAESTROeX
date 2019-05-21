@@ -151,7 +151,7 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
 
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
     {
-        if (Geometry::isPeriodic(idim)) {
+        if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         }
         else {
@@ -357,7 +357,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
     {
-        if (Geometry::isPeriodic(idim)) {
+        if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         }
         else {
