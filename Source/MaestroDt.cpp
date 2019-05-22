@@ -8,17 +8,6 @@
 
 using namespace amrex;
 
-// functions for offloading dt and umax to the device
-#ifdef AMREX_USE_CUDA
-    static void set_dt_launch_config();
-    static void clean_dt_launch_config();
-
-    // Return a pointer to dt valid for use in Fortran. For the CPU this is a no-op.
-    static Real* prepare_dt(const Real* dt, const int n_var = 1);
-
-    static void clean_dt(Real* dt_f);
-#endif
-
 void
 Maestro::EstDt ()
 {
@@ -92,7 +81,10 @@ Maestro::EstDt ()
 
     Real umax = 0.;
 
-
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         Real dt_lev = 1.e99;
@@ -117,32 +109,8 @@ Maestro::EstDt ()
 #endif
         for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
-
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
-
-#if AMREX_USE_CUDA
-            Real* dt_f;
-            Real* umax_f;
-
-            if (Cuda::inLaunchRegion()) {
-                dt_f = prepare_dt(&dt_grid);
-                umax_f = prepare_dt(&umax_grid);
-
-                set_dt_launch_config();
-            } else {
-                dt_f = &dt_grid;
-                umax_f = &umax_grid;
-
-            }
-#else
-            Real* dt_f = &dt_grid;
-            Real* umax_f = &umax_grid;
-#endif
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -155,7 +123,9 @@ Maestro::EstDt ()
             if (spherical == 0) {
 #pragma gpu box(tileBox)
                 estdt(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                      lev,dt_f,umax_f,
+                      lev,
+                      AMREX_MFITER_REDUCE_MIN(&dt_grid),
+                      AMREX_MFITER_REDUCE_MAX(&umax_grid),
                       AMREX_REAL_ANYD(dx),
                       BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
                       BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
@@ -170,7 +140,8 @@ Maestro::EstDt ()
 #if (AMREX_SPACEDIM == 3)
 #pragma gpu box(tileBox)
                 estdt_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                           dt_f,umax_f,
+                           AMREX_MFITER_REDUCE_MIN(&dt_grid),
+                           AMREX_MFITER_REDUCE_MAX(&umax_grid),
                            AMREX_REAL_ANYD(dx),
                            BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
                            BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
@@ -190,19 +161,6 @@ Maestro::EstDt ()
                 Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
             }
-
-#ifdef AMREX_USE_CUDA
-            if (Cuda::inLaunchRegion()) {
-                clean_dt_launch_config();
-                clean_dt(dt_f);
-                clean_dt(umax_f);
-            }
-#endif
-
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Cuda::setLaunchRegion(false);
-// #endif
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
@@ -226,6 +184,10 @@ Maestro::EstDt ()
 
     }     // end loop over levels
 
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     if (maestro_verbose > 0) {
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
@@ -303,6 +265,11 @@ Maestro::FirstDt ()
 
     Real umax = 0.;
 
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
+
     for (int lev = 0; lev <= finest_level; ++lev) {
         Real dt_lev = 1.e99;
         Real umax_lev = 0.;
@@ -320,35 +287,8 @@ Maestro::FirstDt ()
 #endif
         for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
 
-// #ifdef AMREX_USE_CUDA
-//             // turn on GPU
-//             Cuda::setLaunchRegion(true);
-// #endif
-
             Real dt_grid = 1.e99;
             Real umax_grid = 0.;
-
-            // TODO: Look at drive/Castro.cpp and how ca_estdt is called there.
-
-#if AMREX_USE_CUDA
-
-            Real* dt_f;
-            Real* umax_f;
-
-            if (Cuda::inLaunchRegion()) {
-                dt_f = prepare_dt(&dt_grid);
-                umax_f = prepare_dt(&umax_grid);
-
-                set_dt_launch_config();
-            } else {
-                dt_f = &dt_grid;
-                umax_f = &umax_grid;
-
-            }
-#else
-            Real* dt_f = &dt_grid;
-            Real* umax_f = &umax_grid;
-#endif
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -361,8 +301,11 @@ Maestro::FirstDt ()
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0 ) {
 #pragma gpu box(tileBox)
-                firstdt(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                        lev,dt_f,umax_f,
+                firstdt(AMREX_INT_ANYD(tileBox.loVect()),
+                        AMREX_INT_ANYD(tileBox.hiVect()),
+                        lev,
+                        AMREX_MFITER_REDUCE_MIN(&dt_grid),
+                        AMREX_MFITER_REDUCE_MAX(&umax_grid),
                         AMREX_REAL_ANYD(dx),
                         BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
@@ -373,8 +316,10 @@ Maestro::FirstDt ()
             } else {
 #if (AMREX_SPACEDIM == 3)
 #pragma gpu box(tileBox)
-                firstdt_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                             dt_f,umax_f,
+                firstdt_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                             AMREX_INT_ANYD(tileBox.hiVect()),
+                             AMREX_MFITER_REDUCE_MIN(&dt_grid),
+                             AMREX_MFITER_REDUCE_MAX(&umax_grid),
                              AMREX_REAL_ANYD(dx),
                              BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
                              BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
@@ -388,19 +333,6 @@ Maestro::FirstDt ()
                 Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif
             }
-
-#ifdef AMREX_USE_CUDA
-            if (Cuda::inLaunchRegion()) {
-                clean_dt_launch_config();
-                clean_dt(dt_f);
-                clean_dt(umax_f);
-            }
-#endif
-
-// #ifdef AMREX_USE_CUDA
-//             // turn off GPU
-//             Cuda::setLaunchRegion(false);
-// #endif
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
@@ -431,6 +363,12 @@ Maestro::FirstDt ()
 
     }     // end loop over levels
 
+
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
+
     if (maestro_verbose > 0) {
         Print() << "Minimum firstdt over all levels = " << dt << std::endl;
     }
@@ -458,31 +396,3 @@ Maestro::FirstDt ()
     umax *= 1.e-8;
     set_rel_eps(&umax);
 }
-
-// functions for offloading dt and umax to the device
-#ifdef AMREX_USE_CUDA
-    static void set_dt_launch_config()
-    {
-        Gpu::Device::setNumThreadsMin(Maestro::minThreads(0), Maestro::minThreads(1), Maestro::minThreads(2));
-    }
-
-    static void clean_dt_launch_config()
-    {
-        Gpu::Device::setNumThreadsMin(1, 1, 1);
-    }
-
-    // Return a pointer to dt valid for use in Fortran. For the CPU this is a no-op.
-
-    static Real* prepare_dt(const Real* dt, const int n_var)
-    {
-        Real* dt_f = (Real*) The_Arena()->alloc(n_var * sizeof(Real));
-        AMREX_GPU_SAFE_CALL(cudaMemcpyAsync(dt_f, dt, n_var * sizeof(Real), cudaMemcpyHostToDevice, Gpu::Device::cudaStream()));
-        return dt_f;
-    }
-
-    static void clean_dt(Real* dt_f)
-    {
-        Gpu::Device::streamSynchronize();
-        The_Arena()->free(dt_f);
-    }
-#endif

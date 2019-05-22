@@ -22,10 +22,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()",Make_S_cc);
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -93,10 +93,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         }
     }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Cuda::setLaunchRegion(false);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     // average fine data onto coarser cells
     AverageDown(S_cc,0,1);
@@ -105,6 +105,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
         // horizontal average of delta_gamma1_term
         Average(delta_gamma1_term,delta_gamma1_termbar,0);
+
+        // FIXME: I think this GPU section isn't working because psi_in is a Vector<Real> rather than a RealVector
 
 // #ifdef AMREX_USE_CUDA
 //     // turn on GPU

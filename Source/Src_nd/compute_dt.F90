@@ -68,12 +68,12 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             call amrex_max(spdx ,abs(u(i,j,k,1)))
+             call amrex_max(spdx, abs(u(i,j,k,1)))
 #if (AMREX_SPACEDIM == 2)
-             call amrex_max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0(lev,j)+w0(lev,j+1))))
+             call amrex_max(spdy, abs(u(i,j,k,2)+0.5d0*(w0(lev,j)+w0(lev,j+1))))
 #elif (AMREX_SPACEDIM == 3)
-             call amrex_max(spdy ,abs(u(i,j,k,2)))
-             call amrex_max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0(lev,k)+w0(lev,k+1))))
+             call amrex_max(spdy, abs(u(i,j,k,2)))
+             call amrex_max(spdz, abs(u(i,j,k,3)+0.5d0*(w0(lev,k)+w0(lev,k+1))))
 #endif
           enddo
        enddo
@@ -81,11 +81,11 @@ contains
 
 #if (AMREX_SPACEDIM == 2)
     do j = lo(2),hi(2)
-       call amrex_max(spdr ,abs(w0(lev,j)))
+       call amrex_max(spdr, abs(w0(lev,j)))
     enddo
 #elif (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
-       call amrex_max(spdr ,abs(w0(lev,k)))
+       call amrex_max(spdr, abs(w0(lev,k)))
     enddo
 #endif
 

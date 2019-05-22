@@ -46,19 +46,19 @@ Maestro::React (const Vector<MultiFab>& s_in,
     // apply burning term
     if (do_burning) {
 
-// #ifdef AMREX_USE_CUDA
-//         // turn on GPU
-//         Cuda::setLaunchRegion(true);
-// #endif
+#ifdef AMREX_USE_CUDA
+        // turn on GPU
+        Cuda::setLaunchRegion(true);
+#endif
 
         // do the burning, update rho_omegadot and rho_Hnuc
         // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
         Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in);
 
-// #ifdef AMREX_USE_CUDA
-//         // turn off GPU
-//         Cuda::setLaunchRegion(false);
-// #endif
+#ifdef AMREX_USE_CUDA
+        // turn off GPU
+        Cuda::setLaunchRegion(false);
+#endif
 
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
