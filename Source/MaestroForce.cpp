@@ -8,7 +8,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                        const Vector<MultiFab>& rho,
                        const RealVector& rho0,
-                       const Vector<Real>& grav_cell,
+                       const RealVector& grav_cell,
                        const RealVector& w0_force,
                        const Vector<MultiFab>& w0_force_cart,
                        int do_add_utilde_force)
@@ -123,7 +123,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                          const Vector<MultiFab>& state,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                          const RealVector& s0,
-                         const Vector<Real>& s0_edge,
+                         const RealVector& s0_edge,
                          const Vector<MultiFab>& s0_cart,
                          int comp,
                          const Vector<BCRec>& bcs,
@@ -231,7 +231,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
     RealVector rho0( (max_radial_level+1)*nr_fine );
     RealVector   p0( (max_radial_level+1)*nr_fine );
-    Vector<Real> grav( (max_radial_level+1)*nr_fine );
+    RealVector grav( (max_radial_level+1)*nr_fine );
     rho0.shrink_to_fit();
     p0.shrink_to_fit();
     grav.shrink_to_fit();

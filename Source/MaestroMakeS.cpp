@@ -17,7 +17,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const RealVector& p0,
                     const RealVector& gamma1bar,
                     RealVector& delta_gamma1_termbar,
-                    const Vector<Real>& psi_in)
+                    const RealVector& psi_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()",Make_S_cc);

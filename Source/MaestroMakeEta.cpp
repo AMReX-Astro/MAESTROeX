@@ -5,7 +5,7 @@ using namespace amrex;
 
 // compute eta_rho at edge- and cell-centers
 void
-Maestro::MakeEtarho (Vector<Real>& etarho_edge,
+Maestro::MakeEtarho (RealVector& etarho_edge,
                      RealVector& etarho_cell,
                      const Vector<MultiFab>& etarho_flux)
 {
@@ -13,11 +13,11 @@ Maestro::MakeEtarho (Vector<Real>& etarho_edge,
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
 
     // Local variables
-    Vector<Real> etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0 );
+    RealVector etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0 );
     etarhosum.shrink_to_fit();
 
     // this stores how many cells there are laterally at each level
-    Vector<Real> ncell(max_radial_level+1);
+    RealVector ncell(max_radial_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -69,7 +69,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
                          const Vector<MultiFab>& scal_new,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-                         Vector<Real>& etarho_edge,
+                         RealVector& etarho_edge,
                          RealVector& etarho_cell)
 {
     // timer for profiling

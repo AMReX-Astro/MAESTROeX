@@ -27,7 +27,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // we also need beta0 at edges
     // allocate AND compute it here
-    Vector<Real> beta0_edge( (max_radial_level+1)*(nr_fine+1) );
+    RealVector beta0_edge( (max_radial_level+1)*(nr_fine+1) );
     beta0_edge.shrink_to_fit();
 
     Vector< std::array< MultiFab,AMREX_SPACEDIM > > beta0_cart_edge(finest_level+1);
@@ -222,7 +222,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 // multiply (or divide) face-data by beta0
 void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge,
                                 const RealVector& beta0,
-                                const Vector<Real>& beta0_edge,
+                                const RealVector& beta0_edge,
                                 const int& mult_or_div)
 {
     // timer for profiling

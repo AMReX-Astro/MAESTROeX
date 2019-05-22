@@ -130,12 +130,12 @@ private:
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
 		       const RealVector& r0_old,
-		       const amrex::Vector<amrex::Real>& r0_edge_old,
+		       const RealVector& r0_edge_old,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
 		       const RealVector& r0_new,
-		       const amrex::Vector<amrex::Real>& r0_edge_new,
+		       const RealVector& r0_edge_new,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-		       const amrex::Vector<amrex::Real>& r0_predicted_edge,
+		       const RealVector& r0_predicted_edge,
 		       int start_comp, int num_comp);
 
     void MakeRhoHFlux (const amrex::Vector<amrex::MultiFab>& state,
@@ -144,16 +144,16 @@ private:
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
 		       const RealVector& r0_old,
-		       const amrex::Vector<amrex::Real>& r0_edge_old,
+		       const RealVector& r0_edge_old,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
 		       const RealVector& r0_new,
-		       const amrex::Vector<amrex::Real>& r0_edge_new,
+		       const RealVector& r0_edge_new,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
 		       const RealVector& rh0_old,
-		       const amrex::Vector<amrex::Real>& rh0_edge_old,
+		       const RealVector& rh0_edge_old,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
 		       const RealVector& rh0_new,
-		       const amrex::Vector<amrex::Real>& rh0_edge_new,
+		       const RealVector& rh0_edge_new,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_old,
 		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_new);
@@ -239,7 +239,7 @@ private:
 			 amrex::Vector<amrex::MultiFab>& etarhoflux,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			 const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-			 const amrex::Vector<amrex::Real>& rho0_predicted_edge);
+			 const RealVector& rho0_predicted_edge);
     ////////////////////////
 
     ////////////
@@ -389,7 +389,7 @@ private:
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const RealVector& rho0,
-                       const amrex::Vector<amrex::Real>& grav,
+                       const RealVector& grav,
                        const RealVector& w0_force,
 		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                        int do_add_utilde_force);
@@ -398,7 +398,7 @@ private:
 			 const amrex::Vector<amrex::MultiFab>& state,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const RealVector& s0,
-                         const amrex::Vector<amrex::Real>& s0_edge,
+                         const RealVector& s0_edge,
 			 const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
                          const amrex::Vector<amrex::BCRec>& bcs,
@@ -463,7 +463,7 @@ private:
     // multiply (or divide) face-data by beta0
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
                            const RealVector& beta0,
-                           const amrex::Vector<amrex::Real>& beta0_edge,
+                           const RealVector& beta0_edge,
                            const int& mult_or_div);
 
     // compute the RHS for the solve, RHS = macrhs - div(beta0*umac)
@@ -483,7 +483,7 @@ private:
 
     ////////////
     // MaestroMakeEta.cpp functions
-    void MakeEtarho (amrex::Vector<amrex::Real>& etarho_edge,
+    void MakeEtarho (RealVector& etarho_edge,
 		     RealVector& etarho_cell,
 		     const amrex::Vector<amrex::MultiFab>& etarho_flux);
 
@@ -491,7 +491,7 @@ private:
 			 const amrex::Vector<amrex::MultiFab>& scal_new,
 			 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-			 amrex::Vector<amrex::Real>& etarho_edge,
+			 RealVector& etarho_edge,
 			 RealVector& etarho_cell);
     ////////////
 
@@ -511,7 +511,7 @@ private:
                     const RealVector& p0,
                     const RealVector& gamma1bar,
                     RealVector& delta_gamma1_termbar,
-                    const amrex::Vector<amrex::Real>& psi_in);
+                    const RealVector& psi_in);
 
     // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
@@ -831,7 +831,7 @@ private:
                           const RealVector& w0_force,
 			  const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                           const RealVector& rho0_nph,
-                          const amrex::Vector<amrex::Real>& grav_cell_nph,
+                          const RealVector& grav_cell_nph,
 			  const amrex::Vector<amrex::MultiFab>& sponge);
     ////////////////////////
 
@@ -929,8 +929,8 @@ private:
     RealVector rho0_new;
     RealVector rhoh0_old;
     RealVector rhoh0_new;
-    amrex::Vector<amrex::Real> rhoX0_old;
-    amrex::Vector<amrex::Real> rhoX0_new;
+    RealVector rhoX0_old;
+    RealVector rhoX0_new;
     RealVector p0_old;
     RealVector p0_new;
     RealVector tempbar;
@@ -940,19 +940,19 @@ private:
     RealVector gamma1bar_old;
     RealVector gamma1bar_new;
     RealVector etarho_cc;
-    amrex::Vector<amrex::Real> psi;
-    amrex::Vector<amrex::Real> grav_cell_old;
-    amrex::Vector<amrex::Real> grav_cell_new;
-    amrex::Vector<amrex::Real> r_cc_loc;
+    RealVector psi;
+    RealVector grav_cell_old;
+    RealVector grav_cell_new;
+    RealVector r_cc_loc;
     // p0^{n-1} needed to compute d(p0)/dt for nonuniform grid spacing
     RealVector p0_nm1;
-    amrex::Vector<amrex::Real> beta0_nm1;
+    RealVector beta0_nm1;
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     RealVector w0;
-    amrex::Vector<amrex::Real> etarho_ec;
-    amrex::Vector<amrex::Real> r_edge_loc;
+    RealVector etarho_ec;
+    RealVector r_edge_loc;
 
     // information for the base state
     // we also store these (except for the large arrays)

@@ -26,10 +26,10 @@ Maestro::EnthalpyAdvance (int which_step,
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    Vector<Real>  rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    Vector<Real>  rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    Vector<Real> rhoh0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    Vector<Real> rhoh0_edge_new( (max_radial_level+1)*(nr_fine+1) );
+    RealVector  rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
+    RealVector  rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
+    RealVector rhoh0_edge_old( (max_radial_level+1)*(nr_fine+1) );
+    RealVector rhoh0_edge_new( (max_radial_level+1)*(nr_fine+1) );
     rho0_edge_old.shrink_to_fit();
     rho0_edge_new.shrink_to_fit();
     rhoh0_edge_old.shrink_to_fit();
