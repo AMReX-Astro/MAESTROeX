@@ -481,8 +481,8 @@ void Maestro::DivuIter (int istep_divu_iter)
 
 	RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
 	RealVector w0_force              ( (max_radial_level+1)*nr_fine );
-	Vector<Real> p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
-	Vector<Real> delta_chi_w0          ( (max_radial_level+1)*nr_fine );
+	RealVector p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
+	RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
 	RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
 
 	Sbar.shrink_to_fit();

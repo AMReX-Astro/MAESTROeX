@@ -513,7 +513,7 @@ contains
        else
           dt_sound = cfl / max(spdx,spdy,spdz)
        end if
-       dt = min(dt,dt_sound)
+       call amrex_min(dt,dt_sound)
     end if
 
     ! force constraints

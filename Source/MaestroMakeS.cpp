@@ -93,11 +93,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         }
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    Cuda::setLaunchRegion(false);
-#endif
-
     // average fine data onto coarser cells
     AverageDown(S_cc,0,1);
 
@@ -105,13 +100,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
         // horizontal average of delta_gamma1_term
         Average(delta_gamma1_term,delta_gamma1_termbar,0);
-
-        // FIXME: I think this GPU section isn't working because psi_in is a Vector<Real> rather than a RealVector
-
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
 
         for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -156,12 +144,13 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             }
         }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Cuda::setLaunchRegion(false);
-// #endif
-
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
+
 }
 
 // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -190,10 +179,10 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
         Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
     }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -229,7 +218,8 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
                                              BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]));
             } else {
 #pragma gpu box(tileBox)
-                make_rhcc_for_nodalproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
+                make_rhcc_for_nodalproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), 
+                                        lev,
                                         BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
                                         BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
                                         Sbar.dataPtr(), beta0.dataPtr(),
@@ -238,10 +228,10 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
         }
     }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Cuda::setLaunchRegion(false);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     // averge down and fill ghost cells using first-order extrapolation
     AverageDown(rhcc,0,1);
@@ -290,10 +280,10 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
         Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
     }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
         // get references to the MultiFabs at level lev
@@ -336,11 +326,11 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
             }
         }
     }
-//
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Cuda::setLaunchRegion(false);
-// #endif
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     // average down and fill ghost cells using first-order extrapolation
     AverageDown(correction_cc,0,1);
@@ -369,10 +359,10 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()",MakeRHCCforMacProj);
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -428,9 +418,9 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
         }
     }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Cuda::setLaunchRegion(false);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 }

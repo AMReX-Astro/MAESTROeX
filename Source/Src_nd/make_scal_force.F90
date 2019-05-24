@@ -286,7 +286,7 @@ contains
 
   end subroutine mkrhohforce_sphr
 
-  subroutine modify_scal_force(lev, lo, hi, &
+  subroutine modify_scal_force(lo, hi, lev, &
        force, f_lo, f_hi, &
        scal,  s_lo, s_hi, &
        umac,  u_lo, u_hi, &
@@ -299,7 +299,8 @@ contains
        s0, s0_edge, w0, dx, do_fullform) &
        bind(C,name="modify_scal_force")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: f_lo(3), f_hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
@@ -322,11 +323,13 @@ contains
     double precision, intent(in   ) :: s0_edge(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: w0     (0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3)
-    integer         , intent(in   ) :: do_fullform
+    integer  , value, intent(in   ) :: do_fullform
 
     ! local
     integer :: i,j,k,r
     double precision :: divu,divs0u
+
+    !$gpu
 
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
@@ -406,7 +409,7 @@ contains
     double precision, intent(in   ) :: s0_cart(s0_lo(1):s0_hi(1),s0_lo(2):s0_hi(2),s0_lo(3):s0_hi(3))
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3)
-    integer         , intent(in   ) :: do_fullform
+    integer  , value, intent(in   ) :: do_fullform
     double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
@@ -421,9 +424,11 @@ contains
     double precision :: s0_zlo,s0_zhi
 
     double precision :: divu(0:max_radial_level,0:nr_fine-1)
-    double precision, pointer :: divu_cart(:,:,:,:)
+    double precision, allocatable :: divu_cart(:,:,:,:)
 
-    call bl_allocate(divu_cart,lo,hi,1)
+    !$gpu
+
+    allocate(divu_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
 
     if (use_exact_base_state) then
        divu(0,:) = 0.0d0
@@ -500,7 +505,7 @@ contains
        end do
     end do
 
-    call bl_deallocate(divu_cart)
+    deallocate(divu_cart)
 
   end subroutine modify_scal_force_sphr
 
