@@ -71,38 +71,23 @@ contains
   subroutine make_gamma_sphr(lo, hi, &
        gamma, g_lo, g_hi, &
        scal,  s_lo, s_hi, &
-       p0, dx, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) bind(C, name="make_gamma_sphr")
-
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+       p0_cart, p0_lo, p0_hi) bind(C, name="make_gamma_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: g_lo(3), g_hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
     double precision, intent(inout) :: gamma(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
-    double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: dx(3)
-    double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+    double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
 
     ! local variables
     integer :: i, j, k
-
-    double precision, allocatable :: p0_cart(:,:,:,:)
 
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
-
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -110,9 +95,9 @@ contains
 
              eos_state%rho   = scal(i,j,k,rho_comp)
              if (use_pprime_in_tfromp) then
-                eos_state%p     = p0_cart(i,j,k,1) + scal(i,j,k,pi_comp)
+                eos_state%p     = p0_cart(i,j,k) + scal(i,j,k,pi_comp)
              else
-                eos_state%p     = p0_cart(i,j,k,1)
+                eos_state%p     = p0_cart(i,j,k)
              endif
              eos_state%T     = scal(i,j,k,temp_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
@@ -127,8 +112,6 @@ contains
           end do
        end do
     end do
-
-    deallocate(p0_cart)
 
   end subroutine make_gamma_sphr
 

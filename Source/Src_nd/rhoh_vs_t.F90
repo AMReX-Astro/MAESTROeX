@@ -96,35 +96,23 @@ contains
 
   end subroutine makeTfromRhoH
 
-  subroutine makeTfromRhoH_sphr(lo,hi,state,s_lo,s_hi,p0,dx,r_cc_loc,r_edge_loc, &
-       cc_to_r,ccr_lo,ccr_hi) &
+  subroutine makeTfromRhoH_sphr(lo,hi,state,s_lo,s_hi,p0_cart,p0_lo,p0_hi) &
        bind(C,name="makeTfromRhoH_sphr")
-   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
     double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: dx(3)
-    double precision, intent (in   ) ::   r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+    double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
 
     ! Local variables
     integer :: i, j, k
-    double precision, allocatable :: p0_cart(:,:,:,:)
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
 
     if (use_eos_e_instead_of_h) then
-
-       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
 
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
@@ -138,7 +126,7 @@ contains
 
                 ! e = h - p/rho
                 eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
-                     p0_cart(i,j,k,1) / state(i,j,k,rho_comp)
+                     p0_cart(i,j,k) / state(i,j,k,rho_comp)
 
                 pt_index(:) = (/i, j, k/)
 
@@ -149,8 +137,6 @@ contains
              enddo
           enddo
        enddo
-
-       deallocate(p0_cart)
 
     else
 
@@ -237,36 +223,22 @@ contains
 
   end subroutine makeTfromRhoP
 
-  subroutine makeTfromRhoP_sphr(lo,hi,state,s_lo,s_hi,p0,dx,updateRhoH, &
-       r_cc_loc, r_edge_loc, cc_to_r,ccr_lo,ccr_hi) &
+  subroutine makeTfromRhoP_sphr(lo,hi,state,s_lo,s_hi,p0_cart,p0_lo,p0_hi,updateRhoH) &
        bind(C,name="makeTfromRhoP_sphr")
-
-
-   use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
     double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: dx(3)
+    double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
     integer ,  value, intent (in   ) :: updateRhoH
-    double precision, intent (in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local variables
     integer :: i, j, k
-    double precision, allocatable :: p0_cart(:,:,:,:)
     integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
-
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -277,9 +249,9 @@ contains
              eos_state%rho   = state(i,j,k,rho_comp)
              eos_state%T     = state(i,j,k,temp_comp)
              if (use_pprime_in_tfromp) then
-                eos_state%p     = p0_cart(i,j,k,1) + state(i,j,k,pi_comp)
+                eos_state%p     = p0_cart(i,j,k) + state(i,j,k,pi_comp)
              else
-                eos_state%p     = p0_cart(i,j,k,1)
+                eos_state%p     = p0_cart(i,j,k)
              endif
 
              eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
@@ -297,8 +269,6 @@ contains
           enddo
        enddo
     enddo
-
-    deallocate(p0_cart)
 
   end subroutine makeTfromRhoP_sphr
 
@@ -453,33 +423,22 @@ contains
 
   end subroutine makeMachfromRhoH
 
-  subroutine makeMachfromRhoH_sphr(lo,hi,lev,state,s_lo,s_hi,u,u_lo,u_hi, &
-       p0,w0cart,w_lo,w_hi,dx,mach,m_lo,m_hi,r_cc_loc,r_edge_loc, &
-       cc_to_r,ccr_lo,ccr_hi) bind(C,name="makeMachfromRhoH_sphr")
-
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+  subroutine makeMachfromRhoH_sphr(lo,hi,state,s_lo,s_hi,u,u_lo,u_hi, &
+       p0_cart,p0_lo,p0_hi,w0cart,w_lo,w_hi,mach,m_lo,m_hi) bind(C,name="makeMachfromRhoH_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
     double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     integer         , intent (in   ) :: u_lo(3), u_hi(3)
     double precision, intent (in   ) ::  u(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),3)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
+    integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
+    double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
     integer         , intent (in   ) :: w_lo(3), w_hi(3)
     double precision, intent (in   ) :: w0cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),1)
-    double precision, intent (in   ) :: dx(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3)
     double precision, intent (inout) :: mach(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
-    double precision, intent (in   ) ::   r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
-
     ! Local variables
     integer :: i, j, k, r
-    double precision, allocatable :: p0_cart(:,:,:,:)
     integer :: pt_index(3)
     double precision :: vel
     type (eos_t) :: eos_state
@@ -487,10 +446,6 @@ contains
     !$gpu
 
     if (use_eos_e_instead_of_h) then
-
-       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
 
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
@@ -519,7 +474,7 @@ contains
 
                 ! e = h - p/rho
                 eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
-                     p0_cart(i,j,k,1) / state(i,j,k,rho_comp)
+                     p0_cart(i,j,k) / state(i,j,k,rho_comp)
 
                 pt_index(:) = (/i, j, k/)
 
@@ -530,8 +485,6 @@ contains
              enddo
           enddo
        enddo
-
-       deallocate(p0_cart)
 
     else
 

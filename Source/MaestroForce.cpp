@@ -18,9 +18,19 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
     // For spherical case
     Vector<MultiFab> gradw0_cart(finest_level+1);
+    Vector<MultiFab> grav_cart(finest_level+1);
+    Vector<MultiFab> rho0_cart(finest_level+1);
+
     for (int lev=0; lev<=finest_level; ++lev) {
         gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         gradw0_cart[lev].setVal(0.);
+
+        grav_cart[lev].define(grids[lev], dmap[lev], 1, AMREX_SPACEDIM);
+        grav_cart[lev].setVal(0.);
+
+        rho0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        rho0_cart[lev].setVal(0.);
+
     }
 
     if (spherical == 1) {
@@ -34,6 +44,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         }
 
         Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(grav_cell,grav_cart,0,1,bcs_f,0);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -50,7 +62,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         const MultiFab& normal_mf = normal[lev];
         const MultiFab& w0force_mf = w0_force_cart[lev];
 #endif
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& grav_mf = grav_cart[lev];
+        const MultiFab& rho0_mf = rho0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -68,7 +81,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
 #pragma gpu box(tileBox)
-                make_vel_force(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
+                make_vel_force(AMREX_INT_ANYD(tileBox.loVect()),
+                               AMREX_INT_ANYD(tileBox.hiVect()), lev,
                                BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
                                BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
                                BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
@@ -86,7 +100,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
 #if (AMREX_SPACEDIM == 3)
 #pragma gpu box(tileBox)
-                make_vel_force_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                make_vel_force_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                    AMREX_INT_ANYD(tileBox.hiVect()),
                                     BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
                                     BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
                                     BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
@@ -96,11 +111,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                                     BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
                                     BL_TO_FORTRAN_ANYD(gradw0_mf[mfi]),
                                     BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
-                                    rho0.dataPtr(),
-                                    grav_cell.dataPtr(),
+                                    BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
                                     AMREX_REAL_ANYD(dx),
-                                    r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                    BL_TO_FORTRAN_ANYD(cc_to_r[mfi]),
                                     do_add_utilde_force);
 #else
                 Abort("MakeVelForce: Spherical is not valid for DIM < 3");
@@ -139,6 +152,30 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     Cuda::setLaunchRegion(true);
 #endif
 
+    RealVector divu;
+    Vector<MultiFab> divu_cart(finest_level+1);
+
+    if (spherical == 1) {
+        divu.resize((max_radial_level+1)*nr_fine);
+        std::fill(divu.begin(), divu.end(), 0.);
+
+        if (!use_exact_base_state) {
+            for (int lev=0; lev<=finest_level; ++lev) {
+                for (int r=1; r<nr_fine; ++r) {
+                    Real dr = r_edge_loc[r+1] - r_edge_loc[r];
+                    divu[lev*nr_fine + r] = (r_edge_loc[r+1]*r_edge_loc[r+1] * w0[r+1]
+                        - r_edge_loc[r] * r_edge_loc[r] * w0[r]) / (dr * r_cc_loc[r]*r_cc_loc[r]);
+                }
+            }
+        }
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            divu_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            divu_cart[lev].setVal(0.);
+        }
+        Put1dArrayOnCart(divu,divu_cart,0,0,bcs_f,0);
+    }
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get the index space and grid spacing of the domain
@@ -154,7 +191,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wmac_mf = umac[lev][2];
         const MultiFab& s0cart_mf = s0_cart[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& divu_mf = divu_cart[lev];
 #endif
 #endif
 
@@ -174,7 +211,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             if (spherical == 1) {
 #if (AMREX_SPACEDIM == 3)
 #pragma gpu box(tileBox)
-                modify_scal_force_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                modify_scal_force_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                       AMREX_INT_ANYD(tileBox.hiVect()),
                                        AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                                        scal_force_mf[mfi].dataPtr(comp),
                                        AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
@@ -185,8 +223,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                                        BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
                                        BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
                                        w0.dataPtr(), AMREX_REAL_ANYD(dx), fullform,
-                                       r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                       BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                                       BL_TO_FORTRAN_ANYD(divu_mf[mfi]));
 #else
                 Abort("ModifyScalForce: Spherical is not valid for DIM < 3");
 #endif
@@ -262,17 +299,21 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     Vector<MultiFab> p0_cart(finest_level+1);
+    Vector<MultiFab> psi_cart(finest_level+1);
     Vector< std::array< MultiFab, AMREX_SPACEDIM > > p0mac(finest_level+1);
     if (spherical == 1) {
         for (int lev=0; lev<=finest_level; ++lev) {
             p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+            psi_cart[lev].define(grids[lev], dmap[lev], 1, 1);
             AMREX_D_TERM(p0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
                          p0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
                          p0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
+            psi_cart[lev].setVal(0.);
         }
 
         Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
         MakeS0mac(p0, p0mac);
+        Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
     }
 
     make_grav_cell(grav.dataPtr(),
@@ -304,7 +345,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 #endif
 #endif
         const MultiFab& thermal_mf = thermal[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& psi_mf = psi_cart[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -314,21 +355,22 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
-                const Real* dx = geom[lev].CellSize();
-
 #if (AMREX_SPACEDIM == 3)
                 // if use_exact_base_state or average_base_state,
                 // psi is set to dpdt in advance subroutine
 #pragma gpu box(tileBox)
-                mkrhohforce_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                mkrhohforce_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                 AMREX_INT_ANYD(tileBox.hiVect()),
                                  scal_force_mf[mfi].dataPtr(RhoH),
-                                 AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
+                                 AMREX_INT_ANYD(scal_force_mf[mfi].loVect()),
+                                 AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
                                  BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
@@ -337,10 +379,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                                  BL_TO_FORTRAN_ANYD(p0macx_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(p0macy_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(p0macz_mf[mfi]),
-                                 AMREX_REAL_ANYD(dx), psi.dataPtr(),
-                                 is_prediction, add_thermal,
-                                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                 BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                                 BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
+                                 AMREX_REAL_ANYD(dx),
+                                 is_prediction, add_thermal);
 #else
                 Abort("MakeRhoHForce: Spherical is not valid for DIM < 3");
 #endif
@@ -352,7 +393,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                             AMREX_INT_ANYD(tileBox.hiVect()),
                             lev,
                             scal_force_mf[mfi].dataPtr(RhoH),
-                            AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
+                            AMREX_INT_ANYD(scal_force_mf[mfi].loVect()),
+                            AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
 #if (AMREX_SPACEDIM == 1)
                             BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
 #elif (AMREX_SPACEDIM == 2)

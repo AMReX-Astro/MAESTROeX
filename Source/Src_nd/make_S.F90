@@ -1,6 +1,5 @@
 module make_S_module
 
-  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_error_module
   use eos_type_module
   use eos_module
@@ -49,7 +48,6 @@ contains
     double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
-
 
     integer i,j,k,r
     integer pt_index(3)
@@ -122,7 +120,7 @@ contains
 
   end subroutine make_S_cc
 
-  subroutine make_S_cc_sphr(lo, hi, lev, &
+  subroutine make_S_cc_sphr(lo, hi, &
        S_cc,  s_lo, s_hi, &
        delta_gamma1_term,  dg_lo, dg_hi, &
        delta_gamma1,  df_lo, df_hi, &
@@ -137,7 +135,6 @@ contains
        gamma1bar_cart, g1_lo, g1_hi, &
        normal, no_lo, no_hi) bind (C,name="make_S_cc_sphr")
 
-    integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
@@ -161,9 +158,9 @@ contains
     double precision, intent (in   ) :: rHnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: rHext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
     double precision, intent (in   ) :: therm(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
-    double precision, intent (inout) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
-    double precision, intent (inout) :: gradp0_cart (gp0_lo(1):gp0_hi(1),gp0_lo(2):gp0_hi(2),gp0_lo(3):gp0_hi(3),1)
-    double precision, intent (inout) :: gamma1bar_cart (g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
+    double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
+    double precision, intent (in) :: gradp0_cart (gp0_lo(1):gp0_hi(1),gp0_lo(2):gp0_hi(2),gp0_lo(3):gp0_hi(3))
+    double precision, intent (in) :: gamma1bar_cart (g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
     double precision, intent (in   ) :: normal(no_lo(1):no_hi(1),no_lo(2):no_hi(2),no_lo(3):no_hi(3),3)
 
     integer i,j,k,r
@@ -629,50 +626,29 @@ contains
 
   end subroutine create_correction_delta_gamma1_term
 
-  subroutine create_correction_delta_gamma1_term_sphr(lo, hi, lev, &
+  subroutine create_correction_delta_gamma1_term_sphr(lo, hi, &
        delta_gamma1_term, dg_lo, dg_hi, &
        delta_gamma1, df_lo, df_hi, &
-       gamma1bar, psi, &
-       p0, dx, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) bind (C,name="create_correction_delta_gamma1_term_sphr")
-
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+       gamma1bar_cart, g1_lo, g1_hi, &
+       psi_cart, ps_lo, ps_hi, &
+       p0_cart, p0_lo, p0_hi) bind (C,name="create_correction_delta_gamma1_term_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
-    integer  , value, intent(in   ) :: lev
+    integer         , intent(in   ) :: p0_lo(3), p0_hi(3)
+    integer         , intent(in   ) :: ps_lo(3), ps_hi(3)
+    integer         , intent(in   ) :: g1_lo(3), g1_hi(3)
     integer         , intent(in   ) :: dg_lo(3), dg_hi(3)
     double precision, intent(inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     integer         , intent(in   ) :: df_lo(3), df_hi(3)
     double precision, intent(in   ) :: delta_gamma1(df_lo(1):df_hi(1),df_lo(2):df_hi(2),dg_lo(3):df_hi(3))
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: psi(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: dx(3)
-    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+    double precision, intent(in   ) :: gamma1bar_cart (g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
+    double precision, intent(in   ) :: psi_cart (ps_lo(1):ps_hi(1),ps_lo(2):ps_hi(2),ps_lo(3):ps_hi(3))
+    double precision, intent(in   ) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
 
     ! Local variables
     integer :: i, j, k
-    double precision, allocatable :: gamma1bar_cart(:,:,:,:)
-    double precision, allocatable ::        p0_cart(:,:,:,:)
-    double precision, allocatable ::      psi_cart(:,:,:,:)
 
     !$gpu
-
-    allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    allocate(psi_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-
-    call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
-    call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
 
     j = lo(2)
     k = lo(3)
@@ -684,7 +660,7 @@ contains
 #endif
           do i = lo(1),hi(1)
              delta_gamma1_term(i,j,k) = delta_gamma1_term(i,j,k) &
-                  + delta_gamma1(i,j,k)*psi_cart(i,j,k,1)/(gamma1bar_cart(i,j,k,1)**2*p0_cart(i,j,k,1))
+                  + delta_gamma1(i,j,k)*psi_cart(i,j,k)/(gamma1bar_cart(i,j,k)**2*p0_cart(i,j,k))
           end do
 #if (AMREX_SPACEDIM >=2)
        end do
@@ -692,10 +668,6 @@ contains
     end do
 #endif
 #endif
-
-    deallocate(gamma1bar_cart)
-    deallocate(p0_cart)
-    deallocate(psi_cart)
 
   end subroutine create_correction_delta_gamma1_term_sphr
 

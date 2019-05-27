@@ -12,9 +12,19 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
     BL_PROFILE_VAR("Maestro::MakeGamma1bar()",MakeGamma1bar);
 
     Vector<MultiFab> gamma1(finest_level+1);
+    Vector<MultiFab> p0_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         gamma1[lev].define(grids[lev], dmap[lev], 1, 0);
+    }
+
+    if (spherical == 1) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            p0_cart[lev].setVal(0.);
+        }
+
+        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
     }
 
 #ifdef AMREX_USE_CUDA
@@ -26,8 +36,8 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 
         // get references to the MultiFabs at level lev
         MultiFab& gamma1_mf = gamma1[lev];
-        const MultiFab&   scal_mf =   scal[lev];
-        const MultiFab&   cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& scal_mf = scal[lev];
+        const MultiFab& p0_mf = p0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -44,22 +54,20 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
 #pragma gpu box(tileBox)
-                make_gamma(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                make_gamma(AMREX_INT_ANYD(tileBox.loVect()),
+                           AMREX_INT_ANYD(tileBox.hiVect()),
                            lev,
                            BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                            p0.dataPtr());
             } else {
-                const Real* dx = geom[lev].CellSize();
 
 #pragma gpu box(tileBox)
-                make_gamma_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                make_gamma_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                AMREX_INT_ANYD(tileBox.hiVect()),
                                 BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                p0.dataPtr(), AMREX_REAL_ANYD(dx),
-                                r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
-
+                                BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
 
             }
         }

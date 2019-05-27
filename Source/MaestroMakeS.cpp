@@ -31,9 +31,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
     Vector<MultiFab> p0_cart(finest_level+1);
     Vector<MultiFab> gradp0_cart(finest_level+1);
+    Vector<MultiFab> psi_cart(finest_level+1);
 
     // calculate gradp0
-    RealVector gradp0(finest_level+1);
+    RealVector gradp0;
 
     if (spherical == 1) {
         gradp0.resize((max_radial_level+1)*nr_fine);
@@ -56,16 +57,19 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             gradp0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            psi_cart[lev].define(grids[lev], dmap[lev], 1, 0);
 
             gamma1bar_cart[lev].setVal(0.);
             p0_cart[lev].setVal(0.);
             gradp0_cart[lev].setVal(0.);
+            psi_cart[lev].setVal(0.);
         }
 
         if (use_delta_gamma1_term) {
             Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
             Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
             Put1dArrayOnCart(gradp0,gradp0_cart,0,0,bcs_f,0);
+            Put1dArrayOnCart(psi_in,psi_cart,0,0,bcs_f,0);
         }
     }
 
@@ -113,7 +117,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
 #pragma gpu box(tileBox)
                 make_S_cc_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                               lev,
                                BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
                                BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
                                BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
@@ -159,8 +162,11 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             // get references to the MultiFabs at level lev
             MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
             const MultiFab& delta_gamma1_mf = delta_gamma1[lev];
-            const MultiFab& cc_to_r = cell_cc_to_r[lev];
             const Real* dx = geom[lev].CellSize();
+
+            const MultiFab& p0_mf = p0_cart[lev];
+            const MultiFab& psi_mf = psi_cart[lev];
+            const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -178,13 +184,11 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 if (spherical == 1) {
 #pragma gpu box(tileBox)
                     create_correction_delta_gamma1_term_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                                             lev,
                                                              BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
                                                              BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
-                                                             gamma1bar.dataPtr(), psi_in.dataPtr(),
-                                                             p0.dataPtr(), AMREX_REAL_ANYD(dx),
-                                                             r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                                             BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                                                             BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
+                                                             BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
+                                                             BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
                 } else {
 #pragma gpu box(tileBox)
                     create_correction_delta_gamma1_term(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),

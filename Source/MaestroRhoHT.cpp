@@ -15,11 +15,22 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
     Cuda::setLaunchRegion(true);
 #endif
 
+    Vector<MultiFab> p0_cart(finest_level+1);
+
+    if (spherical == 1 && use_eos_e_instead_of_h) {
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            p0_cart[lev].setVal(0.);
+        }
+        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    }
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_mf = scal[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& p0_mf = p0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -29,7 +40,6 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -37,14 +47,14 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
 #pragma gpu box(tileBox)
-                makeTfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                makeTfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                   AMREX_INT_ANYD(tileBox.hiVect()),
                                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                   p0.dataPtr(), AMREX_REAL_ANYD(dx),
-                                   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                   BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                                   BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
             } else {
 #pragma gpu box(tileBox)
-                makeTfromRhoH(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
+                makeTfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
+                              AMREX_INT_ANYD(tileBox.hiVect()), lev,
                               BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                               p0.dataPtr());
             }
@@ -70,6 +80,17 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoP()",TfromRhoP);
 
+    Vector<MultiFab> p0_cart(finest_level+1);
+
+    if (spherical == 1) {
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            p0_cart[lev].setVal(0.);
+        }
+        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    }
+
 #ifdef AMREX_USE_CUDA
     // turn on GPU
     Cuda::setLaunchRegion(true);
@@ -79,7 +100,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_mf = scal[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& p0_mf = p0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -89,7 +110,6 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -97,14 +117,14 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
 #pragma gpu box(tileBox)
-                makeTfromRhoP_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                makeTfromRhoP_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                   AMREX_INT_ANYD(tileBox.hiVect()),
                                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                   p0.dataPtr(), AMREX_REAL_ANYD(dx), updateRhoH,
-                                   r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                   BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                                   BL_TO_FORTRAN_ANYD(p0_mf[mfi]), updateRhoH);
             } else {
 #pragma gpu box(tileBox)
-                makeTfromRhoP(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                makeTfromRhoP(AMREX_INT_ANYD(tileBox.loVect()),
+                              AMREX_INT_ANYD(tileBox.hiVect()),
                               lev,
                               BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                               p0.dataPtr(), updateRhoH);
@@ -246,6 +266,17 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MachfromRhoHSphr()",MachfromRhoHSphr);
 
+    Vector<MultiFab> p0_cart(finest_level+1);
+
+    if (use_eos_e_instead_of_h) {
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            p0_cart[lev].setVal(0.);
+        }
+        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    }
+
 #ifdef AMREX_USE_CUDA
     // turn on GPU
     Cuda::setLaunchRegion(true);
@@ -258,7 +289,7 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
         const MultiFab& vel_mf = vel[lev];
         const MultiFab& w0cart_mf = w0cart[lev];
         MultiFab& mach_mf = mach[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& p0_mf = p0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -277,14 +308,11 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
 #pragma gpu box(tileBox)
             makeMachfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()),
                                   AMREX_INT_ANYD(tileBox.hiVect()),
-                                  lev,
                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                   BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-                                  p0.dataPtr(),BL_TO_FORTRAN_ANYD(w0cart_mf[mfi]),
-                                  AMREX_REAL_ANYD(dx),
-                                  BL_TO_FORTRAN_ANYD(mach_mf[mfi]),
-                                  r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                  BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                                  BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
+                                  BL_TO_FORTRAN_ANYD(w0cart_mf[mfi]),
+                                  BL_TO_FORTRAN_ANYD(mach_mf[mfi]));
         }
 
     }

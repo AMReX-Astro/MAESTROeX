@@ -135,14 +135,11 @@ contains
        normal, n_lo, n_hi, &
        gradw0_cart, gw_lo, gw_hi, &
        w0_force_cart, wf_lo, wf_hi, &
-       rho0, grav, &
+       rho0_cart, r0_lo, r0_hi, &
+       grav_cart, gr_lo, gr_hi, &
        dx, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi, &
        do_add_utilde_force) &
        bind(C, name="make_vel_force_sphr")
-
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: f_lo(3), f_hi(3)
@@ -154,6 +151,8 @@ contains
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
     integer         , intent (in   ) :: gw_lo(3), gw_hi(3)
     integer         , intent (in   ) :: wf_lo(3), wf_hi(3)
+    integer         , intent (in   ) :: r0_lo(3), r0_hi(3)
+    integer         , intent (in   ) :: gr_lo(3), gr_hi(3)
     double precision, intent (inout) :: vel_force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),AMREX_SPACEDIM)
     double precision, intent (in   ) ::       gpi(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),AMREX_SPACEDIM)
     double precision, intent (in   ) ::       rho(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
@@ -163,20 +162,12 @@ contains
     double precision, intent (in   ) ::    normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
     double precision, intent (in   ) :: gradw0_cart(gw_lo(1):gw_hi(1),gw_lo(2):gw_hi(2),gw_lo(3):gw_hi(3))
     double precision, intent (in   ) :: w0_force_cart(wf_lo(1):wf_hi(1),wf_lo(2):wf_hi(2),wf_lo(3):wf_hi(3),AMREX_SPACEDIM)
-    double precision, intent (in   ) ::     rho0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) ::     grav(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) ::       rho0_cart(r0_lo(1):r0_hi(1),r0_lo(2):r0_hi(2),r0_lo(3):r0_hi(3))
+    double precision, intent (in   ) :: grav_cart(gr_lo(1):gr_hi(1),gr_lo(2):gr_hi(2),gr_lo(3):gr_hi(3),AMREX_SPACEDIM)
     double precision, intent (in   ) :: dx(3)
-    double precision, intent (in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
     integer  , value, intent (in   ) :: do_add_utilde_force
 
     integer         :: i,j,k
-
-    double precision, allocatable:: rho0_cart(:,:,:,:)
-    double precision, allocatable :: grav_cart(:,:,:,:)
 
     double precision :: rhopert
     double precision :: xx, yy, zz
@@ -185,15 +176,7 @@ contains
 
     !$gpu
 
-    allocate(rho0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    allocate(grav_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),3))
-
     vel_force(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:AMREX_SPACEDIM) = ZERO
-
-    call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
-    call put_1d_array_on_cart_sphr(lo,hi,grav_cart,lo,hi,3,grav,dx,0,1,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
 
     do k = lo(3),hi(3)
        zz = prob_lo(3) + (dble(k) + HALF)*dx(3) - center(3)
@@ -202,7 +185,7 @@ contains
           do i = lo(1),hi(1)
              xx = prob_lo(1) + (dble(i) + HALF)*dx(1) - center(1)
 
-             rhopert = rho(i,j,k) - rho0_cart(i,j,k,1)
+             rhopert = rho(i,j,k) - rho0_cart(i,j,k)
 
              ! cutoff the buoyancy term if we are outside of the star
              if (rho(i,j,k) .lt. buoyancy_cutoff_factor*base_cutoff_density) then
@@ -244,9 +227,6 @@ contains
        end do
 
     endif
-
-    deallocate(rho0_cart)
-    deallocate(grav_cart)
 
   end subroutine make_vel_force_sphr
 

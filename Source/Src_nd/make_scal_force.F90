@@ -174,13 +174,10 @@ contains
        p0macx, x_lo, x_hi, &
        p0macy, y_lo, y_hi, &
        p0macz, z_lo, z_hi, &
-       dx, psi, &
-       is_prediction, add_thermal, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) &
+       psi_cart, ps_lo, ps_hi, &
+       dx, &
+       is_prediction, add_thermal) &
        bind(C,name="mkrhohforce_sphr")
-
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     ! compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
 
@@ -203,18 +200,12 @@ contains
     double precision, intent(in   ) ::  p0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
     double precision, intent(in   ) ::  p0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
+    integer         , intent(in   ) :: ps_lo(3), ps_hi(3)
+    double precision, intent(in   ) :: psi_cart(ps_lo(1):ps_hi(1),ps_lo(2):ps_hi(2),ps_lo(3):ps_hi(3))
     double precision, intent(in   ) :: dx(3)
-    double precision, intent(in   ) :: psi(0:max_radial_level,0:nr_fine-1)
     integer  , value, intent(in   ) :: is_prediction, add_thermal
-    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local variable
-    double precision, allocatable :: psi_cart(:,:,:,:)
-
     double precision :: divup, p0divu
     integer          :: i,j,k
 
@@ -259,19 +250,13 @@ contains
          (is_prediction .eq. 1 .AND. enthalpy_pred_type == predict_rhoh) .OR. &
          (is_prediction .eq. 0)) then
 
-       allocate(psi_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-
-       call put_1d_array_on_cart_sphr(lo,hi,psi_cart,lo,hi,1,psi,dx,0,0, &
-            r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
-
         do k = lo(3),hi(3)
            do j = lo(2),hi(2)
               do i = lo(1),hi(1)
-                rhoh_force(i,j,k) = rhoh_force(i,j,k) + psi_cart(i,j,k,1)
+                rhoh_force(i,j,k) = rhoh_force(i,j,k) + psi_cart(i,j,k)
              enddo
           enddo
        enddo
-       deallocate(psi_cart)
     endif
 
     if (add_thermal .eq. 1) then
@@ -388,8 +373,7 @@ contains
        wmac,  w_lo, w_hi, &
        s0_cart,s0_lo, s0_hi, &
        w0, dx, do_fullform, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) &
+       divu_cart, d_lo, d_hi) &
        bind(C,name="modify_scal_force_sphr")
 
     use fill_3d_data_module, only: put_1d_array_on_cart_sphr
@@ -401,6 +385,7 @@ contains
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
     integer         , intent(in   ) :: s0_lo(3), s0_hi(3)
+    integer         , intent(in   ) :: d_lo(3), d_hi(3)
     double precision, intent(inout) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3))
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent(in   ) :: umac (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
@@ -410,11 +395,7 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3)
     integer  , value, intent(in   ) :: do_fullform
-    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+    double precision, intent(in   ) :: divu_cart(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
 
     ! Local variables
     integer :: i,j,k,r
@@ -423,26 +404,7 @@ contains
     double precision :: s0_ylo,s0_yhi
     double precision :: s0_zlo,s0_zhi
 
-    double precision :: divu(0:max_radial_level,0:nr_fine-1)
-    double precision, allocatable :: divu_cart(:,:,:,:)
-
     !$gpu
-
-    allocate(divu_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-
-    if (use_exact_base_state) then
-       divu(0,:) = 0.0d0
-    else
-       do r=0,nr_fine-1
-          divu(0,r) = (r_edge_loc(0,r+1)**2 * w0(0,r+1) - &
-               r_edge_loc(0,r  )**2 * w0(0,r  ) ) / &
-               (dr(0)*r_cc_loc(0,r)**2)
-       end do
-    end if
-
-    ! compute w0 contribution to divu
-    call put_1d_array_on_cart_sphr(lo,hi,divu_cart,lo,hi,1,divu,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
 
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
@@ -456,7 +418,7 @@ contains
 
              if (do_fullform .eq. 1) then
 
-                force(i,j,k) = force(i,j,k) - scal(i,j,k)*(divumac+divu_cart(i,j,k,1))
+                force(i,j,k) = force(i,j,k) - scal(i,j,k)*(divumac+divu_cart(i,j,k))
              else
 
                 if (i.lt.domhi(1)) then
@@ -497,15 +459,13 @@ contains
                      (wmac(i,j,k+1)*s0_zhi - wmac(i,j,k)*s0_zlo)/dx(3)
 
                 force(i,j,k) = force(i,j,k) - divs0u &
-                     -(scal(i,j,k)-s0_cart(i,j,k))*(divumac+divu_cart(i,j,k,1))
+                     -(scal(i,j,k)-s0_cart(i,j,k))*(divumac+divu_cart(i,j,k))
 
              endif
 
           end do
        end do
     end do
-
-    deallocate(divu_cart)
 
   end subroutine modify_scal_force_sphr
 
