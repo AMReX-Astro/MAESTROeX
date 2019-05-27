@@ -81,11 +81,6 @@ Maestro::EstDt ()
 
     Real umax = 0.;
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
-
     for (int lev = 0; lev <= finest_level; ++lev) {
         Real dt_lev = 1.e99;
         Real umax_lev = 0.;
@@ -121,42 +116,36 @@ Maestro::EstDt ()
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
-#pragma gpu box(tileBox)
-                estdt(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                      lev,
-                      AMREX_MFITER_REDUCE_MIN(&dt_grid),
-                      AMREX_MFITER_REDUCE_MAX(&umax_grid),
-                      AMREX_REAL_ANYD(dx),
-                      BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
-                      BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
-                      BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
-                      BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
-                      BL_TO_FORTRAN_ANYD(dSdt_mf[mfi]),
+                estdt(&lev,&dt_grid,&umax_grid,
+                      ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                      ZFILL(dx),
+                      BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+                      BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+                      BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+                      BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+                      BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
                       w0.dataPtr(),
                       p0_old.dataPtr(),
                       gamma1bar_old.dataPtr());
             } else {
-
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu box(tileBox)
-                estdt_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                           AMREX_MFITER_REDUCE_MIN(&dt_grid),
-                           AMREX_MFITER_REDUCE_MAX(&umax_grid),
-                           AMREX_REAL_ANYD(dx),
-                           BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(dSdt_mf[mfi]),
-                           w0.dataPtr(),
-                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                           p0_old.dataPtr(),
-                           gamma1bar_old.dataPtr(),
-                           r_cc_loc.dataPtr(),
-                           r_edge_loc.dataPtr(),
-                           BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                    estdt_sphr(&dt_grid,&umax_grid,
+                               ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                               ZFILL(dx),
+                               BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+                               BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+                               BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+                               BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+                               BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
+                               w0.dataPtr(),
+                               BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+                               BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+                               BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                               p0_old.dataPtr(),
+                               gamma1bar_old.dataPtr(),
+                               r_cc_loc.dataPtr(),
+                               r_edge_loc.dataPtr(),
+                               BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #else
                 Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
@@ -265,11 +254,6 @@ Maestro::FirstDt ()
 
     Real umax = 0.;
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Cuda::setLaunchRegion(true);
-// #endif
-
     for (int lev = 0; lev <= finest_level; ++lev) {
         Real dt_lev = 1.e99;
         Real umax_lev = 0.;
@@ -300,35 +284,28 @@ Maestro::FirstDt ()
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0 ) {
-#pragma gpu box(tileBox)
-                firstdt(AMREX_INT_ANYD(tileBox.loVect()),
-                        AMREX_INT_ANYD(tileBox.hiVect()),
-                        lev,
-                        AMREX_MFITER_REDUCE_MIN(&dt_grid),
-                        AMREX_MFITER_REDUCE_MAX(&umax_grid),
-                        AMREX_REAL_ANYD(dx),
-                        BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+                firstdt(&lev,&dt_grid,&umax_grid,
+                        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                        ZFILL(dx),
+                        BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+                        BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+                        BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+                        BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
                         p0_old.dataPtr(),
                         gamma1bar_old.dataPtr());
             } else {
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu box(tileBox)
-                firstdt_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                             AMREX_INT_ANYD(tileBox.hiVect()),
-                             AMREX_MFITER_REDUCE_MIN(&dt_grid),
-                             AMREX_MFITER_REDUCE_MAX(&umax_grid),
-                             AMREX_REAL_ANYD(dx),
-                             BL_TO_FORTRAN_ANYD(sold_mf[mfi]),
-                             BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
-                             BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
-                             BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+                firstdt_sphr(&dt_grid,&umax_grid,
+                             ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                             ZFILL(dx),
+                             BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+                             BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+                             BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+                             BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
                              p0_old.dataPtr(),
                              gamma1bar_old.dataPtr(),
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                             BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                             BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #else
                 Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif
@@ -362,12 +339,6 @@ Maestro::FirstDt ()
         dt = std::min(dt,dt_lev);
 
     }     // end loop over levels
-
-
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Cuda::setLaunchRegion(false);
-// #endif
 
     if (maestro_verbose > 0) {
         Print() << "Minimum firstdt over all levels = " << dt << std::endl;
