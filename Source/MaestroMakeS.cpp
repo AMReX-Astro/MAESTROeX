@@ -27,7 +27,55 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     Cuda::setLaunchRegion(true);
 #endif
 
+    // put 1d base state quantities on cartestian grid for spherical case
+    Vector<MultiFab> gamma1bar_cart(finest_level+1);
+    Vector<MultiFab> p0_cart(finest_level+1);
+    Vector<MultiFab> gradp0_cart(finest_level+1);
+
+    // calculate gradp0
+    RealVector gradp0(finest_level+1);
+
+    if (spherical == 1) {
+        gradp0.resize((max_radial_level+1)*nr_fine);
+        if (use_delta_gamma1_term) {
+            for (int lev=0; lev<=finest_level; ++lev) {
+                Real dr = r_cc_loc[1] - r_cc_loc[0];
+                gradp0[lev*nr_fine] = (p0[lev*nr_fine + 1] - p0[lev*nr_fine]) / dr;
+
+                dr = r_cc_loc[nr_fine-1] - r_cc_loc[nr_fine-2];
+                gradp0[lev*nr_fine + nr_fine-1] = (p0[lev*nr_fine + nr_fine-1] - p0[lev*nr_fine + nr_fine-2]) / dr;
+
+                for (int r=1; r < nr_fine-1; r++) {
+                    dr = r_cc_loc[r+1] - r_cc_loc[r-1];
+                    gradp0[lev*nr_fine + r] = (p0[lev*nr_fine + r+1] - p0[lev*nr_fine + r-1]);
+                }
+            }
+        }
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            gradp0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+
+            gamma1bar_cart[lev].setVal(0.);
+            p0_cart[lev].setVal(0.);
+            gradp0_cart[lev].setVal(0.);
+        }
+
+        if (use_delta_gamma1_term) {
+            Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
+            Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+            Put1dArrayOnCart(gradp0,gradp0_cart,0,0,bcs_f,0);
+        }
+    }
+
+
     for (int lev=0; lev<=finest_level; ++lev) {
+
+        // Declare local storage now. This should be done outside the MFIter loop,
+        // and then we will resize the Fabs in each MFIter loop iteration. Then,
+        // we apply an Elixir to ensure that their memory is saved until it is no
+        // longer needed (only relevant for the asynchronous case, usually on GPUs).
 
         // get references to the MultiFabs at level lev
         MultiFab& S_cc_mf = S_cc[lev];
@@ -42,6 +90,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         const MultiFab& normal_mf = normal[lev];
         const MultiFab& cc_to_r = cell_cc_to_r[lev];
         const Real* dx = geom[lev].CellSize();
+
+        const MultiFab& p0_mf = p0_cart[lev];
+        const MultiFab& gradp0_mf = gradp0_cart[lev];
+        const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -58,6 +110,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             // We will also pass "validBox", which specifies the "valid" region.
 
             if (spherical == 1) {
+
 #pragma gpu box(tileBox)
                 make_S_cc_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                                lev,
@@ -70,10 +123,10 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                                BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
                                BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                                BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
-                               p0.dataPtr(),gamma1bar.dataPtr(), AMREX_REAL_ANYD(dx),
-                               BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
-                               r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                               BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                               BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(gradp0_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(normal_mf[mfi]));
 
             } else {
 #pragma gpu box(tileBox)
@@ -209,8 +262,10 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
+
 #pragma gpu box(tileBox)
-                make_rhcc_for_nodalproj_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                make_rhcc_for_nodalproj_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                             AMREX_INT_ANYD(tileBox.hiVect()),
                                              BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
                                              BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
                                              BL_TO_FORTRAN_ANYD(Sbar_mf[mfi]),
@@ -218,7 +273,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
                                              BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]));
             } else {
 #pragma gpu box(tileBox)
-                make_rhcc_for_nodalproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), 
+                make_rhcc_for_nodalproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                                         lev,
                                         BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
                                         BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
@@ -289,6 +344,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
         // get references to the MultiFabs at level lev
         const MultiFab& delta_p_mf = delta_p_term[lev];
         MultiFab& correction_cc_mf = correction_cc[lev];
+
         const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
         const MultiFab& p0_mf = p0_cart[lev];
         const MultiFab& beta0_mf = beta0_cart[lev];
@@ -359,6 +415,38 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()",MakeRHCCforMacProj);
 
+    // put 1d base state quantities on cartestian grid for spherical case
+    Vector<MultiFab> Sbar_cart(finest_level+1);
+    Vector<MultiFab> beta0_cart(finest_level+1);
+    Vector<MultiFab> gamma1bar_cart(finest_level+1);
+    Vector<MultiFab> p0_cart(finest_level+1);
+    Vector<MultiFab> rho0_cart(finest_level+1);
+
+    if (spherical == 1) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            Sbar_cart [lev].define(grids[lev], dmap[lev], 1, 0);
+            beta0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+
+            Sbar_cart [lev].setVal(0.);
+            beta0_cart[lev].setVal(0.);
+            gamma1bar_cart[lev].setVal(0.);
+            p0_cart[lev].setVal(0.);
+            rho0_cart[lev].setVal(0.);
+        }
+
+        Put1dArrayOnCart(Sbar,Sbar_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
+
+        if (dpdt_factor > 0.0) {
+            Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
+            Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+            Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_f,0);
+        }
+    }
+
 #ifdef AMREX_USE_CUDA
     // turn on GPU
     Cuda::setLaunchRegion(true);
@@ -373,7 +461,12 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
         const MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
         const MultiFab& delta_p_mf = delta_p_term[lev];
         MultiFab& delta_chi_mf = delta_chi[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
+
+        const MultiFab& Sbar_mf = Sbar_cart[lev];
+        const MultiFab& beta0_mf = beta0_cart[lev];
+        const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
+        const MultiFab& p0_mf = p0_cart[lev];
+        const MultiFab& rho0_mf = rho0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -394,15 +487,15 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                 make_rhcc_for_macproj_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                                            BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
                                            BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
-                                           Sbar.dataPtr(), beta0.dataPtr(),
-                                           rho0.dataPtr(), dx,
+                                           BL_TO_FORTRAN_ANYD(Sbar_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(beta0_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
                                            BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
-                                           gamma1bar.dataPtr(), p0.dataPtr(),
+                                           BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
                                            BL_TO_FORTRAN_ANYD(delta_p_mf[mfi]),
                                            BL_TO_FORTRAN_ANYD(delta_chi_mf[mfi]),
-                                           dt, is_predictor,
-                                           r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                           BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+                                           dt, is_predictor);
             } else {
 #pragma gpu box(tileBox)
                 make_rhcc_for_macproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),lev,

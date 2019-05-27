@@ -132,12 +132,10 @@ contains
        rHnuc, n_lo, n_hi, &
        rHext, e_lo, e_hi, &
        therm, t_lo, t_hi, &
-       p0, gamma1bar, dx, &
-       normal, no_lo, no_hi, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) bind (C,name="make_S_cc_sphr")
-
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+       p0_cart, p0_lo, p0_hi, &
+       gradp0_cart, gp0_lo, gp0_hi, &
+       gamma1bar_cart, g1_lo, g1_hi, &
+       normal, no_lo, no_hi) bind (C,name="make_S_cc_sphr")
 
     integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -151,6 +149,9 @@ contains
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     integer         , intent (in   ) :: no_lo(3), no_hi(3)
+    integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
+    integer         , intent (in   ) :: gp0_lo(3), gp0_hi(3)
+    integer         , intent (in   ) :: g1_lo(3), g1_hi(3)
     double precision, intent (inout) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     double precision, intent (inout) :: delta_gamma1(df_lo(1):df_hi(1),df_lo(2):df_hi(2),df_lo(3):df_hi(3))
@@ -160,14 +161,10 @@ contains
     double precision, intent (in   ) :: rHnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: rHext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
     double precision, intent (in   ) :: therm(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: dx(3)
+    double precision, intent (inout) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
+    double precision, intent (inout) :: gradp0_cart (gp0_lo(1):gp0_hi(1),gp0_lo(2):gp0_hi(2),gp0_lo(3):gp0_hi(3),1)
+    double precision, intent (inout) :: gamma1bar_cart (g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
     double precision, intent (in   ) :: normal(no_lo(1):no_hi(1),no_lo(2):no_hi(2),no_lo(3):no_hi(3),3)
-    double precision, intent (in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1),ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     integer i,j,k,r
     integer pt_index(3)
@@ -175,38 +172,8 @@ contains
 
     integer comp
     double precision sigma, xi_term, pres_term, Ut_dot_er
-    double precision gradp0(1,0:nr_fine-1)
-
-    double precision, allocatable ::       p0_cart(:,:,:,:)
-    double precision, allocatable ::   gradp0_cart(:,:,:,:)
-    double precision, allocatable ::gamma1bar_cart(:,:,:,:)
 
     !$gpu
-
-    if (use_delta_gamma1_term) then
-       ! compute gradp0 and put it on a cart
-       do r = 0, nr_fine-1
-          if (r == 0) then
-             gradp0(1,r) = (p0(lev,r+1) - p0(lev,r))/dr(lev)
-          else if (r == nr_fine-1) then
-             gradp0(1,r) = (p0(lev,r) - p0(lev,r-1))/dr(lev)
-          else
-             gradp0(1,r) = 0.5d0*(p0(lev,r+1) - p0(lev,r-1))/dr(lev)
-          endif
-       enddo
-
-       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
-
-       allocate(gradp0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,gradp0_cart,lo,hi,1,gradp0,dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
-
-       allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
-    endif
 
     ! loop over the data
     do k = lo(3),hi(3)
@@ -241,7 +208,7 @@ contains
                   + pres_term/(eos_state%rho*eos_state%dpdr)
 
              if (use_delta_gamma1_term) then
-                delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k,1)
+                delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k)
 
                 Ut_dot_er = &
                      u(i,j,k,1)*normal(i,j,k,1) + &
@@ -249,8 +216,8 @@ contains
                      u(i,j,k,3)*normal(i,j,k,3)
 
                 delta_gamma1_term(i,j,k) = delta_gamma1(i,j,k)*Ut_dot_er* &
-                     gradp0_cart(i,j,k,1)/ &
-                     (gamma1bar_cart(i,j,k,1)**2*p0_cart(i,j,k,1))
+                     gradp0_cart(i,j,k)/ &
+                     (gamma1bar_cart(i,j,k)**2*p0_cart(i,j,k))
 
              else
                 delta_gamma1_term(i,j,k) = 0.0d0
@@ -260,12 +227,6 @@ contains
           enddo
        enddo
     enddo
-
-    if (use_delta_gamma1_term) then
-       deallocate(p0_cart)
-       deallocate(gradp0_cart)
-       deallocate(gamma1bar_cart)
-    endif
 
   end subroutine make_S_cc_sphr
 
@@ -557,86 +518,55 @@ contains
   subroutine make_rhcc_for_macproj_sphr(lo, hi, &
        rhcc, c_lo, c_hi, &
        S_cc,  s_lo, s_hi, &
-       Sbar, beta0, &
-       rho0, dx, &
+       Sbar_cart, sb_lo, sb_hi, &
+       beta0_cart, b_lo, b_hi, &
+       rho0_cart, r_lo, r_hi, &
        delta_gamma1_term, dg_lo, dg_hi, &
-       gamma1bar, p0, &
+       gamma1bar_cart, g1_lo, g1_hi, &
+       p0_cart, p0_lo, p0_hi, &
        delta_p_term, dp_lo, dp_hi, &
        delta_chi, dc_lo, dc_hi, &
-       dt, is_predictor, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) &
+       dt, is_predictor) &
        bind (C,name="make_rhcc_for_macproj_sphr")
-
-
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: sb_lo(3), sb_hi(3)
+    integer         , intent (in   ) :: b_lo(3), b_hi(3)
     integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
+    integer         , intent (in   ) :: r_lo(3), r_hi(3)
+    integer         , intent (in   ) :: g1_lo(3), g1_hi(3)
+    integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
     double precision, intent (inout) :: rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision, intent (in   ) :: S_cc(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
-    double precision, intent (in   ) ::  Sbar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) ::  rho0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: dx(3)
+    double precision, intent (in   ) :: Sbar_cart(sb_lo(1):sb_hi(1),sb_lo(2):sb_hi(2),sb_lo(3):sb_hi(3))
+    double precision, intent (in   ) :: beta0_cart(b_lo(1):b_hi(1),b_lo(2):b_hi(2),b_lo(3):b_hi(3))
+    double precision, intent (in   ) :: rho0_cart(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
     double precision, intent (in   ) :: delta_gamma1_term (dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
-    double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in   ) :: gamma1bar_cart(g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
+    double precision, intent (in   ) :: p0_cart(p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
     integer         , intent (in   ) :: dp_lo(3), dp_hi(3)
     double precision, intent (in   ) :: delta_p_term(dp_lo(1):dp_hi(1),dp_lo(2):dp_hi(2),dp_lo(3):dp_hi(3))
     integer         , intent (in   ) :: dc_lo(3), dc_hi(3)
     double precision, intent (inout) :: delta_chi(dc_lo(1):dc_hi(1),dc_lo(2):dc_hi(2),dc_lo(3):dc_hi(3))
     double precision, value, intent (in   ) :: dt
     integer         , value, intent (in   ) :: is_predictor
-    double precision, intent (in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     !     Local variables
     integer :: i, j, k
-    double precision, allocatable ::       div_cart(:,:,:,:)
-    double precision, allocatable ::      Sbar_cart(:,:,:,:)
-    double precision, allocatable :: gamma1bar_cart(:,:,:,:)
-    double precision, allocatable ::        p0_cart(:,:,:,:)
-    double precision, allocatable ::      rho0_cart(:,:,:,:)
 
     !$gpu
-
-    allocate(div_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,div_cart,lo,hi,1,beta0,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
-
-    allocate(Sbar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-    call put_1d_array_on_cart_sphr(lo,hi,Sbar_cart,lo,hi,1,Sbar,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r, ccr_lo, ccr_hi)
 
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
-             rhcc(i,j,k) = div_cart(i,j,k,1) * (S_cc(i,j,k) - Sbar_cart(i,j,k,1) + delta_gamma1_term(i,j,k))
+             rhcc(i,j,k) = beta0_cart(i,j,k) * (S_cc(i,j,k) - Sbar_cart(i,j,k) + delta_gamma1_term(i,j,k))
           end do
        end do
     end do
 
-    deallocate(Sbar_cart)
-
     if (dpdt_factor .gt. 0.0d0) then
-
-       allocate(gamma1bar_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,gamma1bar_cart,lo,hi,1,gamma1bar,dx,0,0, &
-            r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
-
-       allocate(p0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0,dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
-
-       allocate(rho0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1))
-       call put_1d_array_on_cart_sphr(lo,hi,rho0_cart,lo,hi,1,rho0,dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
 
        if (is_predictor .eq. 1) &
             delta_chi(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.d0
@@ -644,22 +574,16 @@ contains
        do k = lo(3),hi(3)
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
-                if (rho0_cart(i,j,k,1) .gt. base_cutoff_density) then
+                if (rho0_cart(i,j,k) .gt. base_cutoff_density) then
                    delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / &
-                        (dt*gamma1bar_cart(i,j,k,1)*p0_cart(i,j,k,1))
-                   rhcc(i,j,k) = rhcc(i,j,k) + div_cart(i,j,k,1) * delta_chi(i,j,k)
+                        (dt*gamma1bar_cart(i,j,k)*p0_cart(i,j,k))
+                   rhcc(i,j,k) = rhcc(i,j,k) + beta0_cart(i,j,k) * delta_chi(i,j,k)
                 end if
              end do
           end do
        end do
 
-       deallocate(gamma1bar_cart)
-       deallocate(p0_cart)
-       deallocate(rho0_cart)
-
     end if
-
-    deallocate(div_cart)
 
   end subroutine make_rhcc_for_macproj_sphr
 

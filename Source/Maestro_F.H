@@ -804,8 +804,8 @@ extern "C"
                    const amrex::Real* p0, const amrex::Real* gamma1bar, const amrex::Real* dx);
 
      void make_S_cc_sphr(const int* lo, const int* hi, const int lev,
-                          amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
-               amrex::Real* delta_gamma1_term,const int* dg_lo, const int* dg_hi,
+                    amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
+                    amrex::Real* delta_gamma1_term,const int* dg_lo, const int* dg_hi,
                     amrex::Real* delta_gamma1,const int* df_lo, const int* df_hi,
                     const amrex::Real* scal,  const int* c_lo, const int* c_hi,
                     const amrex::Real* u,     const int* u_lo, const int* u_hi,
@@ -813,10 +813,10 @@ extern "C"
                     const amrex::Real* rHnuc, const int* n_lo, const int* n_hi,
                     const amrex::Real* rHext, const int* e_lo, const int* e_hi,
                     const amrex::Real* therm, const int* t_lo, const int* t_hi,
-                    const amrex::Real* p0, const amrex::Real* gamma1bar, const amrex::Real* dx,
-                    const amrex::Real* normal, const int* no_lo, const int* no_hi,
-    				    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-    				    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+                    const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi,
+                    const amrex::Real* gradp0_cart, const int* gp0_lo, const int* gp0_hi,
+                    const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
+                    const amrex::Real* normal, const int* no_lo, const int* no_hi);
 
     // rhcc = beta0 * (S - Sbar)
     void make_rhcc_for_nodalproj(const int* lo, const int* hi, const int lev,
@@ -865,19 +865,16 @@ extern "C"
 
     void make_rhcc_for_macproj_sphr(const int* lo, const int* hi,
 				    amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
-				    const amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
-				    const amrex::Real* Sbar,
-				    const amrex::Real* beta0,
-				    const amrex::Real* rho0,
-				    const amrex::Real* dx,
-            const amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
-				    const amrex::Real* gamma1bar,
-				    const amrex::Real* p0,
+				    const amrex::Real* S_cc, const int* s_lo, const int* s_hi,
+				    const amrex::Real* Sbar_cart, const int* sb_lo, const int* sb_hi,
+				    const amrex::Real* beta0_cart, const int* b_lo, const int* b_hi,
+				    const amrex::Real* rho0_cart, const int* r_lo, const int* r_hi,
+                    const amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
+				    const amrex::Real* gamma1bar_cart, const int* g1_lo, const int* g1_hi,
+				    const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi,
 				    const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi,
 				    amrex::Real* delta_chi, const int* dc_lo, const int* dc_hi,
-				    const amrex::Real dt, const int is_predictor,
-				    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-				    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+				    const amrex::Real dt, const int is_predictor);
 
     void create_correction_delta_gamma1_term(const int* lo, const int* hi, const int lev,
 				    amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
