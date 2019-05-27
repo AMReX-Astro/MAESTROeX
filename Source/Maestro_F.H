@@ -190,7 +190,7 @@ extern "C"
     // in compute_grad_phi.F90
     void compute_grad_phi(const int* lo, const int* hi,
                           const amrex::Real* phi,  const int* p_lo, const int* p_hi,
-                                amrex::Real* gphi, const int* g_lo, const int* g_hi, const int* nc_g,
+                                amrex::Real* gphi, const int* g_lo, const int* g_hi, 
                           const amrex::Real* dx);
 
     void compute_grad_phi_rad(const amrex::Real* phi,
@@ -1045,7 +1045,7 @@ extern "C"
 
     //////////////////////
     // in mac_solver.F90
-    void mac_solver_rhs(const int* lev, const int* lo, const int* hi,
+    void mac_solver_rhs(const int* lo, const int* hi, const int lev, 
 			amrex::Real* newrhs, const int* nrhs_lo, const int* nrhs_hi,
 			const amrex::Real* oldrhs, const int* orhs_lo, const int* orhs_hi,
                         const amrex::Real* uedge, const int* u_lo, const int* u_hi,

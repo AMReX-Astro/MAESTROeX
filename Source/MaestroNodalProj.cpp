@@ -580,10 +580,12 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "tileox", which specifies the tile's "valid" region.
-            compute_grad_phi(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                             BL_TO_FORTRAN_3D(phi_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(gphi_mf[mfi]),
-                             dx);
+#pragma gpu box(tilebox)
+            compute_grad_phi(AMREX_INT_ANYD(tilebox.loVect()), 
+                             AMREX_INT_ANYD(tilebox.hiVect()),
+                             BL_TO_FORTRAN_ANYD(phi_mf[mfi]),
+                             BL_TO_FORTRAN_ANYD(gphi_mf[mfi]),
+                             AMREX_REAL_ANYD(dx));
         }
     }
 

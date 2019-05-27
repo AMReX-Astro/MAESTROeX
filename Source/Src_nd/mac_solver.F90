@@ -9,7 +9,7 @@ module mac_solver_module
 
 contains
 
-  subroutine mac_solver_rhs(lev, lo, hi, &
+  subroutine mac_solver_rhs(lo, hi, lev, &
        newrhs, nrhs_lo, nrhs_hi, &
        oldrhs, orhs_lo, orhs_hi, &
        uedge, u_lo, u_hi, &
@@ -21,7 +21,8 @@ contains
 #endif
        dx) bind(C, name="mac_solver_rhs")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: nrhs_lo(3), nrhs_hi(3)
     double precision, intent(inout) :: newrhs(nrhs_lo(1):nrhs_hi(1),nrhs_lo(2):nrhs_hi(2),nrhs_lo(3):nrhs_hi(3))
     integer         , intent(in   ) :: orhs_lo(3), orhs_hi(3)
@@ -40,6 +41,8 @@ contains
 
     ! local
     integer i,j,k
+
+    !$gpu
 
     ! Compute newrhs = oldrhs - div(Uedge)
     do k = lo(3),hi(3)
