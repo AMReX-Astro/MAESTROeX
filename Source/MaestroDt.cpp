@@ -81,10 +81,10 @@ Maestro::EstDt ()
 
     Real umax = 0.;
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Cuda::setLaunchRegion(true);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Cuda::setLaunchRegion(true);
+// #endif
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         Real dt_lev = 1.e99;
@@ -184,10 +184,10 @@ Maestro::EstDt ()
 
     }     // end loop over levels
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    Cuda::setLaunchRegion(false);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     if (maestro_verbose > 0) {
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
