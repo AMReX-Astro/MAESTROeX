@@ -156,16 +156,14 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     Vector<MultiFab> divu_cart(finest_level+1);
 
     if (spherical == 1) {
-        divu.resize((max_radial_level+1)*nr_fine);
+        divu.resize(nr_fine);
         std::fill(divu.begin(), divu.end(), 0.);
 
         if (!use_exact_base_state) {
-            for (int lev=0; lev<=finest_level; ++lev) {
-                for (int r=1; r<nr_fine; ++r) {
-                    Real dr = r_edge_loc[r+1] - r_edge_loc[r];
-                    divu[lev*nr_fine + r] = (r_edge_loc[r+1]*r_edge_loc[r+1] * w0[r+1]
-                        - r_edge_loc[r] * r_edge_loc[r] * w0[r]) / (dr * r_cc_loc[r]*r_cc_loc[r]);
-                }
+            for (int r=0; r<nr_fine-1; ++r) {
+                Real dr = r_edge_loc[r+1] - r_edge_loc[r];
+                divu[r] = (r_edge_loc[r+1]*r_edge_loc[r+1] * w0[r+1]
+                           - r_edge_loc[r]*r_edge_loc[r] * w0[r]) / (dr * r_cc_loc[r]*r_cc_loc[r]);
             }
         }
 
