@@ -47,7 +47,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
             for (int r=1; r < nr_fine-1; r++) {
                 dr = r_cc_loc[r+1] - r_cc_loc[r-1];
-                gradp0[r] = (p0[r+1] - p0[r-1]);
+                gradp0[r] = (p0[r+1] - p0[r-1]) / dr;
             }
         }
 
