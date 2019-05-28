@@ -9,10 +9,10 @@ using namespace amrex;
 void Maestro::WriteSmallPlotFile (const int step,
                                   const Real t_in,
                                   const Real dt_in,
-                                  const Vector<Real>& rho0_in,
-                                  const Vector<Real>& rhoh0_in,
-                                  const Vector<Real>& p0_in,
-                                  const Vector<Real>& gamma1bar_in,
+                                  const RealVector& rho0_in,
+                                  const RealVector& rhoh0_in,
+                                  const RealVector& p0_in,
+                                  const RealVector& gamma1bar_in,
                                   const Vector<MultiFab>& u_in,
                                   Vector<MultiFab>& s_in,
                                   const Vector<MultiFab>& S_cc_in)
@@ -26,10 +26,10 @@ void
 Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
-                        const Vector<Real>& rho0_in,
-                        const Vector<Real>& rhoh0_in,
-                        const Vector<Real>& p0_in,
-                        const Vector<Real>& gamma1bar_in,
+                        const RealVector& rho0_in,
+                        const RealVector& rhoh0_in,
+                        const RealVector& p0_in,
+                        const RealVector& gamma1bar_in,
                         const Vector<MultiFab>& u_in,
                         Vector<MultiFab>& s_in,
                         const Vector<MultiFab>& S_cc_in,
@@ -136,12 +136,12 @@ Maestro::WritePlotFile (const int step,
 	WriteJobInfo(plotfilename);
 
 	VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
-	
+
 	// write out the cell-centered base state
 	if (ParallelDescriptor::IOProcessor()) {
 
 	  for (int lev=0; lev<=max_radial_level; ++lev) {
-	  
+
 	    std::ofstream BaseCCFile;
 	    BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
 	    std::string BaseCCFileName(plotfilename + "/BaseCC_");
@@ -159,7 +159,7 @@ Maestro::WritePlotFile (const int step,
 	    BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar \n";
 
 	    int nr = nr_fine / pow(2,(max_radial_level-lev));
-	    
+
 	    for (int i=0; i<nr; ++i) {
 	      BaseCCFile << r_cc_loc[lev+(max_radial_level+1)*i] << " "
 			 << rho0_in[lev+(max_radial_level+1)*i] << " "
@@ -190,9 +190,9 @@ Maestro::WritePlotFile (const int step,
 	    BaseFCFile.precision(17);
 
 	    BaseFCFile << "r_edge  w0 \n";
-	  
+
 	    int nr = nr_fine / pow(2,(max_radial_level-lev));
-	    
+
 	    for (int i=0; i<nr+1; ++i) {
 	      BaseFCFile << r_edge_loc[lev+(max_radial_level+1)*i] << " "
 			 << w0[lev+(max_radial_level+1)*i] << "\n";
@@ -234,8 +234,8 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& gamma1bar_cart,
                      const Vector<MultiFab>& u_in,
                      Vector<MultiFab>& s_in,
-                     const Vector<Real>& p0_in,
-                     const Vector<Real>& gamma1bar_in,
+                     const RealVector& p0_in,
+                     const RealVector& gamma1bar_in,
                      const Vector<MultiFab>& S_cc_in)
 {
 	// timer for profiling
@@ -251,7 +251,7 @@ Maestro::PlotFileMF (const int nPlot,
 	Vector<MultiFab> tempmf(finest_level+1);
 	Vector<MultiFab> tempmf_scalar1(finest_level+1);
 	Vector<MultiFab> tempmf_scalar2(finest_level+1);
-	Vector<Real> tempbar_plot ((max_radial_level+1)*nr_fine);
+	RealVector tempbar_plot ((max_radial_level+1)*nr_fine);
 	tempbar_plot.shrink_to_fit();
 	std::fill(tempbar_plot.begin(), tempbar_plot.end(), 0.);
 
@@ -495,27 +495,27 @@ Maestro::PlotFileMF (const int nPlot,
 	}
 	++dest_comp;
 
-        if (plot_base_state) {
-            // rho0, rhoh0, h0 and p0
-            for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy( rho0_cart[i],0,dest_comp,1);
-		plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+1,1);
-		plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+2,1);
-                
-		// we have to use protected_divide here to guard against division by zero
-		// in the case that there are zeros rho0
-		MultiFab& plot_mf_data_mf = *plot_mf_data[i];
+    if (plot_base_state) {
+        // rho0, rhoh0, h0 and p0
+        for (int i = 0; i <= finest_level; ++i) {
+        	plot_mf_data[i]->copy( rho0_cart[i],0,dest_comp,1);
+        	plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+1,1);
+        	plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+2,1);
+
+        	// we have to use protected_divide here to guard against division by zero
+        	// in the case that there are zeros rho0
+        	MultiFab& plot_mf_data_mf = *plot_mf_data[i];
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-		for ( MFIter mfi(plot_mf_data_mf, true); mfi.isValid(); ++mfi ) {
-                    plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
-		}
-                
-		plot_mf_data[i]->copy(p0_cart[i],0,dest_comp+3,1);
-            }
-            dest_comp += 4;
+        	for ( MFIter mfi(plot_mf_data_mf, true); mfi.isValid(); ++mfi ) {
+                plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
+        	}
+
+        	plot_mf_data[i]->copy(p0_cart[i],0,dest_comp+3,1);
         }
+        dest_comp += 4;
+    }
 
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 	Vector<MultiFab> w0r_cart(finest_level+1);
@@ -1500,9 +1500,9 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
 void
 Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
-                         const Vector<Real>& p0,
+                         const RealVector& p0,
                          const Vector<MultiFab>& p0_cart,
-                         const Vector<Real>& gamma1bar,
+                         const RealVector& gamma1bar,
                          const Vector<MultiFab>& gamma1bar_cart,
                          Vector<MultiFab>& deltagamma)
 {

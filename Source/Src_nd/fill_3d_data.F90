@@ -11,9 +11,10 @@ module fill_3d_data_module
 
   implicit none
 
-  private
-
-  public :: put_1d_array_on_cart_sphr, quad_interp, put_1d_array_on_cart
+  ! private :: addw0, addw0_sphr, make_w0mac_sphr, make_s0mac_sphr, &
+  !  make_s0mac_sphr_irreg, make_normal, put_data_on_faces
+  !
+  ! public
 
 contains
 
@@ -113,6 +114,8 @@ contains
     double precision :: x,y,z
     double precision :: radius,rfac,s0_cart_val
 
+    !$gpu
+
     if (use_exact_base_state) then
 
        if (is_input_edge_centered .eq. 1) then
@@ -147,7 +150,7 @@ contains
                       else
                          s0_cart(i,j,k,1) = s0_cart_val
                       end if
-                      
+
                    end do
                 end do
              end do
@@ -219,9 +222,10 @@ contains
                    end do
                 end do
              end do
-
+#ifndef AMREX_USE_CUDA
           else
              call amrex_error('Error: w0_interp_type not defined')
+#endif
           end if
 
        else
@@ -363,9 +367,10 @@ contains
                    end do
                 end do
              end do
-
+#ifndef AMREX_USE_CUDA
           else
              call amrex_error('Error: w0_interp_type not defined')
+#endif
           end if
 
        else
@@ -479,7 +484,9 @@ contains
                 end do
              end do
           else
+#ifndef AMREX_USE_CUDA
              call amrex_error('Error: s0_interp_type not defined')
+#endif
           end if
 
        end if  ! is_input_edge_centered
@@ -492,6 +499,8 @@ contains
 
     double precision, intent(in   ) :: x,x0,x1,x2,y0,y1,y2
     double precision, intent(  out) :: y
+
+    !$gpu
 
     y = y0 + (y1-y0)/(x1-x0)*(x-x0) &
          + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1)

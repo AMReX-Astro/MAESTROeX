@@ -90,7 +90,7 @@ Maestro::NodalProj (int proj_type,
         Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
     }
     else {
-        Vector<Real> beta0_nph( (max_radial_level+1)*nr_fine );
+        RealVector beta0_nph( (max_radial_level+1)*nr_fine );
         beta0_nph.shrink_to_fit();
         for(int i=0; i<beta0_nph.size(); ++i) {
             beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
@@ -169,7 +169,7 @@ Maestro::NodalProj (int proj_type,
 
             if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } 
+            }
             else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }
@@ -580,10 +580,12 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "tileox", which specifies the tile's "valid" region.
-            compute_grad_phi(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                             BL_TO_FORTRAN_3D(phi_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(gphi_mf[mfi]),
-                             dx);
+#pragma gpu box(tilebox)
+            compute_grad_phi(AMREX_INT_ANYD(tilebox.loVect()), 
+                             AMREX_INT_ANYD(tilebox.hiVect()),
+                             BL_TO_FORTRAN_ANYD(phi_mf[mfi]),
+                             BL_TO_FORTRAN_ANYD(gphi_mf[mfi]),
+                             AMREX_REAL_ANYD(dx));
         }
     }
 

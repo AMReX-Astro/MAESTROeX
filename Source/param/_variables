@@ -1,0 +1,13 @@
+# this is the list of variables indices that MAESTROeX will use for
+# accessing various state arrays.  We will keep them in the order that
+# they are specified here.
+
+#  descriptive-name     C++-name   Fortran-name  also-adds-to    count   if-def
+
+# the variable state
+@set: scalars nscal
+   density                Rho       rho_comp     None             1                None
+   enthalpy               Rhoh      rhoh_comp    None             1                None
+   species                FirstSpec spec_comp    None           (nspec, nspec)     None
+   temperature            Temp      temp_comp    None             1                None
+   pi                     Pi        pi_comp      None             1                None

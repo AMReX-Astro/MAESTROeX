@@ -1,6 +1,11 @@
 
 #include <Maestro.H>
 
+#ifdef AMREX_USE_CUDA
+#include <cuda_runtime_api.h>
+#include <AMReX_Arena.H>
+#endif
+
 using namespace amrex;
 
 void
@@ -12,7 +17,7 @@ Maestro::EstDt ()
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
-    Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
@@ -123,25 +128,24 @@ Maestro::EstDt ()
                       p0_old.dataPtr(),
                       gamma1bar_old.dataPtr());
             } else {
-
 #if (AMREX_SPACEDIM == 3)
-                estdt_sphr(&dt_grid,&umax_grid,
-                           ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                           ZFILL(dx),
-                           BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                           BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                           BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
-                           w0.dataPtr(),
-                           BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                           p0_old.dataPtr(),
-                           gamma1bar_old.dataPtr(),
-                           r_cc_loc.dataPtr(),
-                           r_edge_loc.dataPtr(),
-                           BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                    estdt_sphr(&dt_grid,&umax_grid,
+                               ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+                               ZFILL(dx),
+                               BL_TO_FORTRAN_FAB(sold_mf[mfi]),
+                               BL_TO_FORTRAN_FAB(uold_mf[mfi]),
+                               BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
+                               BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+                               BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
+                               w0.dataPtr(),
+                               BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+                               BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+                               BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                               p0_old.dataPtr(),
+                               gamma1bar_old.dataPtr(),
+                               r_cc_loc.dataPtr(),
+                               r_edge_loc.dataPtr(),
+                               BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #else
                 Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
@@ -168,6 +172,11 @@ Maestro::EstDt ()
         dt = std::min(dt,dt_lev);
 
     }     // end loop over levels
+
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Cuda::setLaunchRegion(false);
+// #endif
 
     if (maestro_verbose > 0) {
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
@@ -207,7 +216,7 @@ Maestro::FirstDt ()
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
-    Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 

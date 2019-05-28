@@ -7,7 +7,7 @@ using namespace amrex;
 void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                        const Vector<Real>& w0_force,
+                        const RealVector& w0_force,
                         const Vector<MultiFab>& w0_force_cart)
 {
 	// timer for profiling
@@ -346,13 +346,13 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                        Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const Vector<Real>& r0_old,
-                       const Vector<Real>& r0_edge_old,
+                       const RealVector& r0_old,
+                       const RealVector& r0_edge_old,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const Vector<Real>& r0_new,
-                       const Vector<Real>& r0_edge_new,
+                       const RealVector& r0_new,
+                       const RealVector& r0_edge_new,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const Vector<Real>& r0_predicted_edge,
+                       const RealVector& r0_predicted_edge,
                        int start_comp, int num_comp)
 {
     // timer for profiling
@@ -542,17 +542,17 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                        Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const Vector<Real>& r0_old,
-                       const Vector<Real>& r0_edge_old,
+                       const RealVector& r0_old,
+                       const RealVector& r0_edge_old,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const Vector<Real>& r0_new,
-                       const Vector<Real>& r0_edge_new,
+                       const RealVector& r0_new,
+                       const RealVector& r0_edge_new,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const Vector<Real>& rh0_old,
-                       const Vector<Real>& rh0_edge_old,
+                       const RealVector& rh0_old,
+                       const RealVector& rh0_edge_old,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
-                       const Vector<Real>& rh0_new,
-                       const Vector<Real>& rh0_edge_new,
+                       const RealVector& rh0_new,
+                       const RealVector& rh0_edge_new,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_old,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_new)
@@ -770,6 +770,11 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     const int startcomp = start_comp + 1;
     const int endcomp = startcomp + num_comp;
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -809,39 +814,36 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
 		if (spherical == 0) {
-#if (AMREX_SPACEDIM == 1)
-		    update_rhoh_1d(
-#elif (AMREX_SPACEDIM == 2)
-                    update_rhoh_2d(
-#elif (AMREX_SPACEDIM == 3)
-                    update_rhoh_3d(
-#endif
-				   &lev, tileBox.loVect(), tileBox.hiVect(),
-				   BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
-				   BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
-				   BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+#pragma gpu box(tileBox)
+		    update_rhoh(AMREX_INT_ANYD(tileBox.loVect()),
+                   AMREX_INT_ANYD(tileBox.hiVect()),
+                   lev,
+				   BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-				   BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-				   BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
 #endif
 #endif
-				   BL_TO_FORTRAN_FAB(force_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(force_mf[mfi]),
 				   p0,
-				   dx, &dt,
-				   &NumSpec);
+				   AMREX_REAL_ANYD(dx), dt,
+				   NumSpec);
 		} else {
 #if (AMREX_SPACEDIM == 3)
-		    update_rhoh_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
-					BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
-					BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
-					BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-					BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-					BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-					BL_TO_FORTRAN_FAB(force_mf[mfi]),
-					BL_TO_FORTRAN_3D(p0cart_mf[mfi]),
-					dx, &dt,
-					&NumSpec);
+#pragma gpu box(tileBox)
+		    update_rhoh_3d_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+					BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
+					AMREX_REAL_ANYD(dx), dt,
+					NumSpec);
 #else
 		    Abort("UpdateScal: Spherical is not valid for DIM < 3");
 #endif
@@ -855,32 +857,32 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
-#if (AMREX_SPACEDIM == 1)
-                update_rhoX_1d(
-#elif (AMREX_SPACEDIM == 2)
-                update_rhoX_2d(
-#elif (AMREX_SPACEDIM == 3)
-                update_rhoX_3d(
-#endif
-                    tileBox.loVect(), tileBox.hiVect(),
-                    BL_TO_FORTRAN_FAB(scalold_mf[mfi]),
-                    BL_TO_FORTRAN_FAB(scalnew_mf[mfi]),
-                    BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
+#pragma gpu box(tileBox)
+                update_rhoX(AMREX_INT_ANYD(tileBox.loVect()),
+                    AMREX_INT_ANYD(tileBox.hiVect()),
+                    BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                    BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                    BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
 #endif
 #endif
-                    BL_TO_FORTRAN_FAB(force_mf[mfi]),
-                    dx, &dt,
-                    &startcomp, &endcomp);
+                    BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+                    AMREX_REAL_ANYD(dx), dt,
+                    startcomp, endcomp);
             }
 	    else {
 		Abort("Invalid scalar in UpdateScal().");
 	    } // end if
 	} // end MFIter loop
     } // end loop over levels
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
     if (reflux_type == 2) {
@@ -916,6 +918,11 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -950,51 +957,58 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
             const Real* dx = geom[lev].CellSize();
 
 	    if (spherical == 0) {
-		update_velocity( &lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				 BL_TO_FORTRAN_3D(uold_mf[mfi]),
-				 BL_TO_FORTRAN_3D(unew_mf[mfi]),
-				 BL_TO_FORTRAN_3D(umac_mf[mfi]),
+#pragma gpu box(tileBox)
+		update_velocity(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
+				 BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(unew_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-				 BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-				 BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
 #endif
 #endif
-				 BL_TO_FORTRAN_3D(uedgex_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(uedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-				 BL_TO_FORTRAN_3D(uedgey_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(uedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-				 BL_TO_FORTRAN_3D(uedgez_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
 #endif
 #endif
-				 BL_TO_FORTRAN_3D(force_mf[mfi]),
-				 BL_TO_FORTRAN_3D(sponge_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+				 BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
 				 w0.dataPtr(),
-				 dx, &dt);
+				 AMREX_REAL_ANYD(dx), dt);
 	    } else {
 #if (AMREX_SPACEDIM == 3)
-		update_velocity_sphr( ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				      BL_TO_FORTRAN_3D(uold_mf[mfi]),
-				      BL_TO_FORTRAN_3D(unew_mf[mfi]),
-				      BL_TO_FORTRAN_3D(umac_mf[mfi]),
-				      BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-				      BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-				      BL_TO_FORTRAN_3D(uedgex_mf[mfi]),
-				      BL_TO_FORTRAN_3D(uedgey_mf[mfi]),
-				      BL_TO_FORTRAN_3D(uedgez_mf[mfi]),
-				      BL_TO_FORTRAN_3D(force_mf[mfi]),
-				      BL_TO_FORTRAN_3D(sponge_mf[mfi]),
+#pragma gpu box(tileBox)
+		update_velocity_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+				      BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(unew_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(uedgex_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(uedgey_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
 				      w0.dataPtr(),
-				      BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-				      BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-				      BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-				      dx, &dt);
+				      BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+				      BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+				      AMREX_REAL_ANYD(dx), dt);
 #else
 		Abort("UpdateVel: Spherical is not valid for DIM < 3");
 #endif
 	    }
         } // end MFIter loop
     } // end loop over levels
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     // average fine data onto coarser cells
     AverageDown(unew,0,AMREX_SPACEDIM);

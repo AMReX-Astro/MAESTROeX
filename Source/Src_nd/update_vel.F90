@@ -10,7 +10,7 @@ module update_vel_module
 
 contains
 
-  subroutine update_velocity(lev, lo, hi, &
+  subroutine update_velocity(lo, hi, lev, &
        uold, uo_lo, uo_hi, &
        unew, un_lo, un_hi, &
        umac,  u_lo, u_hi, &
@@ -32,7 +32,8 @@ contains
        w0, dx, dt) &
        bind(C,name="update_velocity")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: uo_lo(3), uo_hi(3)
     double precision, intent(in   ) :: uold(uo_lo(1):uo_hi(1),uo_lo(2):uo_hi(2),uo_lo(3):uo_hi(3),AMREX_SPACEDIM)
     integer         , intent(in   ) :: un_lo(3), un_hi(3)
@@ -62,11 +63,14 @@ contains
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
     double precision, intent(in   ) :: sponge (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent(in   ) :: w0     (0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: dx(AMREX_SPACEDIM), dt
+    double precision, intent(in   ) :: dx(AMREX_SPACEDIM)
+    double precision, value, intent(in   ) :: dt
 
     integer :: i,j,k, dim
     double precision :: ubar, vbar, wbar, w0bar
     double precision :: ugradu, ugradv, ugradw
+
+    !$gpu
 
     ! 1) Subtract (Utilde dot grad) Utilde term from old Utilde
     ! 2) Add forcing term to new Utilde
@@ -185,7 +189,8 @@ contains
     double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
     integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
     double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
-    double precision, intent(in   ) :: dx(3), dt
+    double precision, intent(in   ) :: dx(3)
+    double precision, value, intent(in   ) :: dt
 
     ! Local variables
     integer :: i, j, k
@@ -195,6 +200,8 @@ contains
     double precision :: gradvx,gradvy,gradvz
     double precision :: gradwx,gradwy,gradwz
     double precision :: w0_gradur,w0_gradvr,w0_gradwr
+
+    !$gpu
 
     ! 1) Subtract (Utilde dot grad) Utilde term from old Utilde
     ! 2) Add forcing term to new Utilde
