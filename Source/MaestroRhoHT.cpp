@@ -17,7 +17,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
     Vector<MultiFab> p0_cart(finest_level+1);
 
-    if (spherical == 1 && use_eos_e_instead_of_h) {
+    if (spherical == 1) {
 
         for (int lev=0; lev<=finest_level; ++lev) {
             p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
@@ -268,14 +268,11 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
 
     Vector<MultiFab> p0_cart(finest_level+1);
 
-    if (use_eos_e_instead_of_h) {
-
-        for (int lev=0; lev<=finest_level; ++lev) {
-            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-            p0_cart[lev].setVal(0.);
-        }
-        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+        p0_cart[lev].setVal(0.);
     }
+    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU

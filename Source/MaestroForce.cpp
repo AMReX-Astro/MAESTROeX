@@ -25,7 +25,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         gradw0_cart[lev].setVal(0.);
 
-        grav_cart[lev].define(grids[lev], dmap[lev], 1, AMREX_SPACEDIM);
+        grav_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         grav_cart[lev].setVal(0.);
 
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 1);

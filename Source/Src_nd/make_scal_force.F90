@@ -365,7 +365,7 @@ contains
 
   end subroutine modify_scal_force
 
-  subroutine modify_scal_force_sphr(domlo, domhi, lo, hi, &
+  subroutine modify_scal_force_sphr(lo, hi, domlo, domhi, &
        force, f_lo, f_hi, &
        scal,  s_lo, s_hi, &
        umac,  u_lo, u_hi, &
@@ -375,8 +375,6 @@ contains
        w0, dx, do_fullform, &
        divu_cart, d_lo, d_hi) &
        bind(C,name="modify_scal_force_sphr")
-
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: f_lo(3), f_hi(3)

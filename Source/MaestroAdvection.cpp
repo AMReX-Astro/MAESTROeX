@@ -815,8 +815,8 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                 // We will also pass "validBox", which specifies the "valid" region.
 		if (spherical == 0) {
 #pragma gpu box(tileBox)
-		    update_rhoh(AMREX_INT_ANYD(tileBox.loVect()), 
-                   AMREX_INT_ANYD(tileBox.hiVect()), 
+		    update_rhoh(AMREX_INT_ANYD(tileBox.loVect()),
+                   AMREX_INT_ANYD(tileBox.hiVect()),
                    lev,
 				   BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
 				   BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
@@ -858,7 +858,8 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
-                update_rhoX(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                update_rhoX(AMREX_INT_ANYD(tileBox.loVect()),
+                    AMREX_INT_ANYD(tileBox.hiVect()),
                     BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
                     BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
                     BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
