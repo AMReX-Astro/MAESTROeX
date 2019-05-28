@@ -43,7 +43,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
         }
 
-        Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_u,0);
         Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_f,0);
         Put1dArrayOnCart(grav_cell,grav_cart,0,1,bcs_f,0);
     }
@@ -173,7 +173,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             divu_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             divu_cart[lev].setVal(0.);
         }
-        Put1dArrayOnCart(divu,divu_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(divu,divu_cart,0,0,bcs_u,0);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {

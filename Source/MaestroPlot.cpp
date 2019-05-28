@@ -495,27 +495,27 @@ Maestro::PlotFileMF (const int nPlot,
 	}
 	++dest_comp;
 
-        if (plot_base_state) {
-            // rho0, rhoh0, h0 and p0
-            for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy( rho0_cart[i],0,dest_comp,1);
-		plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+1,1);
-		plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+2,1);
+    if (plot_base_state) {
+        // rho0, rhoh0, h0 and p0
+        for (int i = 0; i <= finest_level; ++i) {
+        	plot_mf_data[i]->copy( rho0_cart[i],0,dest_comp,1);
+        	plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+1,1);
+        	plot_mf_data[i]->copy(rhoh0_cart[i],0,dest_comp+2,1);
 
-		// we have to use protected_divide here to guard against division by zero
-		// in the case that there are zeros rho0
-		MultiFab& plot_mf_data_mf = *plot_mf_data[i];
+        	// we have to use protected_divide here to guard against division by zero
+        	// in the case that there are zeros rho0
+        	MultiFab& plot_mf_data_mf = *plot_mf_data[i];
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-		for ( MFIter mfi(plot_mf_data_mf, true); mfi.isValid(); ++mfi ) {
-                    plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
-		}
+        	for ( MFIter mfi(plot_mf_data_mf, true); mfi.isValid(); ++mfi ) {
+                plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
+        	}
 
-		plot_mf_data[i]->copy(p0_cart[i],0,dest_comp+3,1);
-            }
-            dest_comp += 4;
+        	plot_mf_data[i]->copy(p0_cart[i],0,dest_comp+3,1);
         }
+        dest_comp += 4;
+    }
 
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 	Vector<MultiFab> w0r_cart(finest_level+1);
