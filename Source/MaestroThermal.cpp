@@ -248,11 +248,11 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
-            const Box& gtbx = mfi.growntilebox(1);
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
-#pragma gpu box(gtbx)
-            make_thermal_coeffs(AMREX_INT_ANYD(gtbx.loVect()),AMREX_INT_ANYD(gtbx.hiVect()),
+#pragma gpu box(tileBox)
+            make_thermal_coeffs(AMREX_INT_ANYD(tileBox.loVect()),AMREX_INT_ANYD(tileBox.hiVect()),
                                 BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(Tcoeff_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(hcoeff_mf[mfi]),
