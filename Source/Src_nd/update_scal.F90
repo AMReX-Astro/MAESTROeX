@@ -15,18 +15,18 @@ module update_scal_module
 contains
 
   subroutine update_rhoX(lo, hi, &
-       sold,   so_lo, so_hi, &
-       snew,   sn_lo, sn_hi, &
-       sfluxx, x_lo, x_hi, &
+                         sold,   so_lo, so_hi, &
+                         snew,   sn_lo, sn_hi, &
+                         sfluxx, x_lo, x_hi, &
 #if (AMREX_SPACEDIM >= 2)
-       sfluxy, y_lo, y_hi, &
+                         sfluxy, y_lo, y_hi, &
 #endif
 #if (AMREX_SPACEDIM == 3)
-       sfluxz, z_lo, z_hi, &
+                         sfluxz, z_lo, z_hi, &
 #endif
-       force,  f_lo, f_hi, &
-       dx, dt, &
-       startcomp, endcomp) bind(C,name="update_rhoX")
+                         force,  f_lo, f_hi, &
+                         dx, dt, &
+                         startcomp, endcomp) bind(C,name="update_rhoX")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: so_lo(3), so_hi(3)

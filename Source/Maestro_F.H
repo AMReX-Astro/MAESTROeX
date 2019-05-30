@@ -1175,8 +1175,7 @@ extern "C"
 			const int startcomp, const int endcomp);
 
 
-    void update_rhoh(
-			const int* lo, const int* hi, const int lev,
+    void update_rhoh(const int* lo, const int* hi, const int lev,
 			const amrex::Real* sold, const int* so_lo, const int* so_hi,
 			      amrex::Real* snew, const int* sn_lo, const int* sn_hi,
 			const amrex::Real* sfluxx, const int* x_lo, const int* x_hi,
