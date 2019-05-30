@@ -686,7 +686,7 @@ extern "C"
 
     //////////////////////
     // in make_plot_variables.F90
-    void make_magvel(const int* lev, const int* lo, const int* hi,
+    void make_magvel(const int* lo, const int* hi, const int lev,
                      const amrex::Real* vel, const int* v_lo, const int* v_hi,
                      const amrex::Real* w0,
                      amrex::Real* magvel, const int* m_lo, const int* m_hi);
@@ -707,12 +707,12 @@ extern "C"
 
     void make_ad_excess(const int* lo, const int* hi,
                         const amrex::Real* state, const int* s_lo, const int* s_hi,
-                        const int* nc_s,
+                        const int nc_s,
                         amrex::Real* ad_excess, const int* a_lo, const int* a_hi);
 
     void make_ad_excess_sphr(const int* lo, const int* hi,
                         const amrex::Real* state, const int* s_lo, const int* s_hi,
-                        const int* nc_s,
+                        const int nc_s,
                         const amrex::Real* normal, const int* n_lo, const int* n_hi,
                         amrex::Real* ad_excess, const int* a_lo, const int* a_hi);
 
@@ -722,25 +722,25 @@ extern "C"
                         amrex::Real* vorticity, const int* d_lo, const int* d_hi,
                         const int* bc);
 
-    void make_deltagamma(const int* lev, const int* lo, const int* hi,
+    void make_deltagamma(const int* lo, const int* hi, const int lev,
                         const amrex::Real* state, const int* s_lo, const int* s_hi,
-                        const int* nc_s,
+                        const int nc_s,
                         const amrex::Real* p0, const amrex::Real* gamma1bar,
                         amrex::Real* deltagamma, const int* d_lo, const int* d_hi);
 
     void make_deltagamma_sphr(const int* lo, const int* hi,
                             const amrex::Real* state, const int* s_lo, const int* s_hi,
-                            const int* nc_s,
+                            const int nc_s,
                             const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
                             const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
                             amrex::Real* deltagamma, const int* d_lo, const int* d_hi);
 
-    void make_entropy(const int* lev, const int* lo, const int* hi,
+    void make_entropy(const int* lo, const int* hi, const int lev,
                      const amrex::Real* state, const int* s_lo, const int* s_hi,
-                     const int* nc_s,
+                     const int nc_s,
                      amrex::Real* entropy, const int* e_lo, const int* e_hi);
 
-    void make_divw0(const int* lev, const int* lo, const int* hi,
+    void make_divw0(const int* lo, const int* hi, const int lev,
                     const amrex::Real* w0, const amrex::Real* dx,
                     amrex::Real* divw0, const int* d_lo, const int* d_hi);
 
@@ -754,11 +754,11 @@ extern "C"
      void make_pidivu(const int* lo, const int* hi,
                      const amrex::Real* vel, const int* v_lo, const int* v_hi,
                      const amrex::Real* dx,
-                     const amrex::Real* pi_cc, const int* p_lo, const int* p_hi, const int* nc,
+                     const amrex::Real* pi_cc, const int* p_lo, const int* p_hi, const int nc,
                      amrex::Real* pidivuw0, const int* d_lo, const int* d_hi);
 
     void make_abar(const int* lo, const int* hi,
-                 const amrex::Real* state, const int* s_lo, const int* s_hi, const int* nc_s,
+                 const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
                  amrex::Real* abar, const int* a_lo, const int* a_hi);
 /////////////////////
 

@@ -1286,6 +1286,11 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 	}
 #endif
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
 	for (int lev=0; lev<=finest_level; ++lev) {
 
 		// get references to the MultiFabs at level lev
@@ -1306,10 +1311,13 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_magvel(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				            BL_TO_FORTRAN_3D(vel_mf[mfi]),
+#pragma gpu box(tileBox)
+				make_magvel(AMREX_INT_ANYD(tileBox.loVect()),
+                            AMREX_INT_ANYD(tileBox.hiVect()),
+                            lev,
+				            BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
 				            w0.dataPtr(),
-				            BL_TO_FORTRAN_3D(magvel_mf[mfi]));
+				            BL_TO_FORTRAN_ANYD(magvel_mf[mfi]));
 			}
 
 		} else {
@@ -1330,15 +1338,22 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_magvel_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				                 BL_TO_FORTRAN_3D(vel_mf[mfi]),
-				                 BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-				                 BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-				                 BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-				                 BL_TO_FORTRAN_3D(magvel_mf[mfi]));
+#pragma gpu box(tileBox)
+				make_magvel_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                 AMREX_INT_ANYD(tileBox.hiVect()),
+				                 BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
+				                 BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+				                 BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+				                 BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+				                 BL_TO_FORTRAN_ANYD(magvel_mf[mfi]));
 			}
 		}
 	}
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 	// average down and fill ghost cells
 	AverageDown(magvel,0,1);
@@ -1354,6 +1369,11 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeVelrc()",MakeVelrc);
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1376,15 +1396,20 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
-
-			make_velrc(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			           BL_TO_FORTRAN_3D(vel_mf[mfi]),
-			           BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
-			           BL_TO_FORTRAN_3D(normal_mf[mfi]),
-			           BL_TO_FORTRAN_3D(radvel_mf[mfi]),
-			           BL_TO_FORTRAN_3D(circvel_mf[mfi]));
+#pragma gpu box(tileBox)
+			make_velrc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+			           BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
+			           BL_TO_FORTRAN_ANYD(w0rcart_mf[mfi]),
+			           BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
+			           BL_TO_FORTRAN_ANYD(radvel_mf[mfi]),
+			           BL_TO_FORTRAN_ANYD(circvel_mf[mfi]));
 		}
 	}
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 	// average down and fill ghost cells
 	AverageDown(rad_vel,0,1);
@@ -1400,6 +1425,11 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeAdExcess()",MakeAdExcess);
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1421,9 +1451,11 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_ad_excess(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				               BL_TO_FORTRAN_FAB(state_mf[mfi]),
-				               BL_TO_FORTRAN_3D(ad_excess_mf[mfi]));
+#pragma gpu(tileBox)
+				make_ad_excess(AMREX_INT_ANYD(tileBox.loVect()),
+                               AMREX_INT_ANYD(tileBox.hiVect()),
+				               BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
+				               BL_TO_FORTRAN_ANYD(ad_excess_mf[mfi]));
 			}
 
 		} else {
@@ -1442,15 +1474,20 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-
-				make_ad_excess_sphr(ARLIM_3D(tileBox.loVect()),
-				                    ARLIM_3D(tileBox.hiVect()),
-				                    BL_TO_FORTRAN_FAB(state_mf[mfi]),
-				                    BL_TO_FORTRAN_3D(normal_mf[mfi]),
-				                    BL_TO_FORTRAN_3D(ad_excess_mf[mfi]));
+#pragma gpu(tileBox)
+				make_ad_excess_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+				                    AMREX_INT_ANYD(tileBox.hiVect()),
+				                    BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
+				                    BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
+				                    BL_TO_FORTRAN_ANYD(ad_excess_mf[mfi]));
 			}
 		}
 	}
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 	// average down and fill ghost cells
 	AverageDown(ad_excess,0,1);
@@ -1485,8 +1522,12 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
-			make_vorticity(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			               BL_TO_FORTRAN_3D(vel_mf[mfi]), dx,
+
+            // NOTE: do not offload to the gpu as make_vorticity_3d contains nested
+            // functions
+			make_vorticity(ARLIM_3D(tileBox.loVect()),
+                           ARLIM_3D(tileBox.hiVect()),
+			               BL_TO_FORTRAN_3D(vel_mf[mfi]), ZFILL(dx),
 			               BL_TO_FORTRAN_3D(vorticity_mf[mfi]), phys_bc.dataPtr());
 		}
 
@@ -1509,6 +1550,11 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeDeltaGamma()",MakeDeltaGamma);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
 	for (int lev=0; lev<=finest_level; ++lev) {
 
 		// get references to the MultiFabs at level lev
@@ -1530,10 +1576,13 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_deltagamma(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				                BL_TO_FORTRAN_FAB(state_mf[mfi]),
+#pragma gpu box(tileBox)
+				make_deltagamma(AMREX_INT_ANYD(tileBox.loVect()),
+                                AMREX_INT_ANYD(tileBox.hiVect()),
+                                lev,
+				                BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
 				                p0.dataPtr(), gamma1bar.dataPtr(),
-				                BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
+				                BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
 			}
 
 		} else {
@@ -1554,16 +1603,19 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_deltagamma_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				                     BL_TO_FORTRAN_FAB(state_mf[mfi]),
-				                     BL_TO_FORTRAN_3D(p0cart_mf[mfi]), BL_TO_FORTRAN_3D(gamma1barcart_mf[mfi]),
-				                     BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
+#pragma gpu box(tileBox)
+				make_deltagamma_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+				                     BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
+				                     BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), BL_TO_FORTRAN_ANYD(gamma1barcart_mf[mfi]),
+				                     BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
 			}
-
 		}
-
-
 	}
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 	// average down and fill ghost cells
 	AverageDown(deltagamma,0,1);
@@ -1576,6 +1628,11 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeEntropy()",MakeEntropy);
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1596,13 +1653,19 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
 			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
-			make_entropy(&lev,ARLIM_3D(tileBox.loVect()),
-			             ARLIM_3D(tileBox.hiVect()),
-			             BL_TO_FORTRAN_FAB(state_mf[mfi]),
-			             BL_TO_FORTRAN_3D(entropy_mf[mfi]));
+#pragma gpu box(tileBox)
+			make_entropy(AMREX_INT_ANYD(tileBox.loVect()),
+			             AMREX_INT_ANYD(tileBox.hiVect()),lev,
+			             BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
+			             BL_TO_FORTRAN_ANYD(entropy_mf[mfi]));
 		}
 
 	}
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 	// average down and fill ghost cells
 	AverageDown(entropy,0,1);
@@ -1615,6 +1678,11 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakeDivw0()",MakeDivw0);
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1637,9 +1705,11 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_divw0(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				           w0.dataPtr(), dx,
-				           BL_TO_FORTRAN_3D(divw0_mf[mfi]));
+#pragma gpu box(tileBox)
+				make_divw0(AMREX_INT_ANYD(tileBox.loVect()),
+                           AMREX_INT_ANYD(tileBox.hiVect()),lev,
+				           w0.dataPtr(), AMREX_REAL_ANYD(dx),
+				           BL_TO_FORTRAN_ANYD(divw0_mf[mfi]));
 			}
 
 		} else {
@@ -1662,17 +1732,22 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_divw0_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				                BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-				                BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-				                BL_TO_FORTRAN_3D(w0macz_mf[mfi]), dx,
-				                BL_TO_FORTRAN_3D(divw0_mf[mfi]));
+#pragma gpu box(tileBox)
+				make_divw0_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                AMREX_INT_ANYD(tileBox.hiVect()),
+				                BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+				                BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+				                BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                AMREX_REAL_ANYD(dx),
+				                BL_TO_FORTRAN_ANYD(divw0_mf[mfi]));
 			}
-
 		}
-
-
 	}
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 	// average down and fill ghost cells
 	AverageDown(divw0,0,1);
@@ -1682,18 +1757,21 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 void
 Maestro::MakePiDivu (const Vector<MultiFab>& vel,
                      const Vector<MultiFab>& state,
-                     // const Vector<MultiFab>& pi_cc,
                      Vector<MultiFab>& pidivu)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakePiDivu()",MakePiDivu);
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
 		// get references to the MultiFabs at level lev
 		const MultiFab& vel_mf = vel[lev];
 		const MultiFab& state_mf = state[lev];
-		// const MultiFab& pi_mf = pi_cc[lev];
 		MultiFab& pidivu_mf = pidivu[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -1710,14 +1788,20 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
-			make_pidivu(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			            BL_TO_FORTRAN_3D(vel_mf[mfi]), dx,
-			            // BL_TO_FORTRAN_3D(pi_mf[mfi]),
-			            BL_TO_FORTRAN_FAB(state_mf[mfi]),
-			            BL_TO_FORTRAN_3D(pidivu_mf[mfi]));
+#pragma gpu box(tileBox)
+			make_pidivu(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+			            BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
+                        AMREX_REAL_ANYD(dx),
+			            BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
+			            BL_TO_FORTRAN_ANYD(pidivu_mf[mfi]));
 		}
 
 	}
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 	// average down and fill ghost cells
 	AverageDown(pidivu,0,1);
@@ -1730,6 +1814,11 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::MakePiDivu()",MakeAbar);
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1751,12 +1840,19 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
 			// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
-			make_abar(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			          BL_TO_FORTRAN_FAB(state_mf[mfi]),
-			          BL_TO_FORTRAN_3D(abar_mf[mfi]));
+#pragma gpu box(tileBox)
+			make_abar(AMREX_INT_ANYD(tileBox.loVect()),
+                      AMREX_INT_ANYD(tileBox.hiVect()),
+			          BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
+			          BL_TO_FORTRAN_ANYD(abar_mf[mfi]));
 		}
 
 	}
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 	// average down and fill ghost cells
 	AverageDown(abar,0,1);
