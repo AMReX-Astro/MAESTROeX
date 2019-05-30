@@ -15,18 +15,18 @@ module update_scal_module
 contains
 
   subroutine update_rhoX(lo, hi, &
-                         sold,   so_lo, so_hi, &
-                         snew,   sn_lo, sn_hi, &
-                         sfluxx, x_lo, x_hi, &
+       sold,   so_lo, so_hi, &
+       snew,   sn_lo, sn_hi, &
+       sfluxx, x_lo, x_hi, &
 #if (AMREX_SPACEDIM >= 2)
-                         sfluxy, y_lo, y_hi, &
+       sfluxy, y_lo, y_hi, &
 #endif
 #if (AMREX_SPACEDIM == 3)
-                         sfluxz, z_lo, z_hi, &
+       sfluxz, z_lo, z_hi, &
 #endif
-                         force,  f_lo, f_hi, &
-                         dx, dt, &
-                         startcomp, endcomp) bind(C,name="update_rhoX")
+       force,  f_lo, f_hi, &
+       dx, dt, &
+       startcomp, endcomp) bind(C,name="update_rhoX")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: so_lo(3), so_hi(3)
@@ -130,7 +130,6 @@ contains
 
   end subroutine update_rhoX
 
-
   subroutine update_rhoh(lo, hi, lev, &
                          sold,   so_lo, so_hi, &
                          snew,   sn_lo, sn_hi, &
@@ -166,11 +165,11 @@ contains
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nscal)
     double precision, intent(in   ) :: p0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
-    double precision, value, intent(in   ) :: dt
+    double precision, value, intent(in) :: dt
     integer  , value, intent(in   ) :: nspec
 
     ! Local variables
-    integer          :: i, j, k
+    integer          :: i, j, k, r
     double precision :: divterm
 
     integer :: pt_index(3)
@@ -178,35 +177,40 @@ contains
 
     !$gpu
 
-    do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-          do i = lo(1), hi(1)
+    do k=lo(3),hi(3)
+       do j=lo(2),hi(2)
+          do i=lo(1),hi(1)
 
-             divterm = (sfluxx(i+1,j,k,rhoh_comp) - sfluxx(i,j,k,rhoh_comp))/dx(1)
+             divterm = ((sfluxx(i+1,j,k,rhoh_comp) - sfluxx(i,j,k,rhoh_comp))/dx(1) &
 #if (AMREX_SPACEDIM >= 2)
-             divterm = divterm &
-                  + (sfluxy(i,j+1,k,rhoh_comp) - sfluxy(i,j,k,rhoh_comp))/dx(2)
+                  + (sfluxy(i,j+1,k,rhoh_comp) - sfluxy(i,j,k,rhoh_comp))/dx(2) &
 #endif
 #if (AMREX_SPACEDIM == 3)
-             divterm = divterm &
-                  + (sfluxz(i,j,k+1,rhoh_comp) - sfluxz(i,j,k,rhoh_comp))/dx(3)
+                  + (sfluxz(i,j,k+1,rhoh_comp) - sfluxz(i,j,k,rhoh_comp))/dx(3) &
 #endif
-             snew(i,j,k,rhoh_comp) = sold(i,j,k,rhoh_comp) + dt * (-divterm + force(i,j,k,rhoh_comp))
+                       )
+             snew(i,j,k,rhoh_comp) = sold(i,j,k,rhoh_comp) + dt*(-divterm + force(i,j,k,rhoh_comp))
 
-          enddo
-       enddo
-    enddo
+          end do
+       end do
+    end do
 
-    if ( do_eos_h_above_cutoff ) then
+    if (do_eos_h_above_cutoff) then
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
+#if (AMREX_SPACEDIM == 1)
+                r = i
+#elif (AMREX_SPACEDIM == 2)
+                r = j
+#else
+                r = k
+#endif
 
                 if (snew(i,j,k,rho_comp) .le. base_cutoff_density) then
-
                    eos_state%rho = snew(i,j,k,rho_comp)
                    eos_state%T   = sold(i,j,k,temp_comp)
-                   eos_state%p   = p0_new(lev,k)
+                   eos_state%p   = p0_new(lev,r)
                    eos_state%xn  = snew(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
                    pt_index(:) = (/i, j, k/)
@@ -215,12 +219,11 @@ contains
                    call eos(eos_input_rp, eos_state, pt_index)
 
                    snew(i,j,k,rhoh_comp) = snew(i,j,k,rho_comp) * eos_state%h
-
                 end if
 
              enddo
           enddo
-       enddo
+       end do
     end if
 
   end subroutine update_rhoh
@@ -228,15 +231,15 @@ contains
 
 #if (AMREX_SPACEDIM == 3)
   subroutine update_rhoh_3d_sphr(lo, hi, &
-                                sold,   so_lo, so_hi, &
-                                snew,   sn_lo, sn_hi, &
-                                sfluxx, x_lo, x_hi, &
-                                sfluxy, y_lo, y_hi, &
-                                sfluxz, z_lo, z_hi, &
-                                force,  f_lo, f_hi, &
-                                p0_new_cart, p_lo, p_hi, &
-                                dx, dt, &
-                                nspec) bind(C,name="update_rhoh_3d_sphr")
+                                 sold,   so_lo, so_hi, &
+                                 snew,   sn_lo, sn_hi, &
+                                 sfluxx, x_lo, x_hi, &
+                                 sfluxy, y_lo, y_hi, &
+                                 sfluxz, z_lo, z_hi, &
+                                 force,  f_lo, f_hi, &
+                                 p0_new_cart, p_lo, p_hi, &
+                                 dx, dt, &
+                                 nspec) bind(C,name="update_rhoh_3d_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: so_lo(3), so_hi(3)
@@ -250,7 +253,7 @@ contains
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
     double precision, intent(in   ) :: sfluxz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nscal)
     integer         , intent(in   ) :: f_lo(3), f_hi(3)
-    double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nscal)
+    double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     integer         , intent(in   ) :: p_lo(3), p_hi(3)
     double precision, intent(in   ) :: p0_new_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
     double precision, intent(in   ) :: dx(3)

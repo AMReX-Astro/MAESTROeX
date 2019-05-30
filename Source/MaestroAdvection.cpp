@@ -786,12 +786,12 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& sfluxz_mf = sflux[lev][2];
 
-	MultiFab p0_cart_dummy;
-	p0_cart_dummy.define(grids[lev], dmap[lev], 1, 1);
-	if (start_comp == RhoH && spherical == 1) {
-	    MultiFab::Copy(p0_cart_dummy,p0_cart[lev],0,0,1,1);
-	}
-	const MultiFab& p0cart_mf = p0_cart_dummy;
+    	MultiFab p0_cart_dummy;
+    	p0_cart_dummy.define(grids[lev], dmap[lev], 1, 1);
+    	if (start_comp == RhoH && spherical == 1) {
+    	    MultiFab::Copy(p0_cart_dummy,p0_cart[lev],0,0,1,1);
+    	}
+    	const MultiFab& p0cart_mf = p0_cart_dummy;
 #endif
 #endif
         const MultiFab& force_mf = force[lev];
@@ -815,35 +815,34 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                 // We will also pass "validBox", which specifies the "valid" region.
 		if (spherical == 0) {
 #pragma gpu box(tileBox)
-		    update_rhoh(AMREX_INT_ANYD(tileBox.loVect()),
-                   AMREX_INT_ANYD(tileBox.hiVect()),
-                   lev,
-				   BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
+            update_rhoh(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                        lev,
+    				    BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
+    				    BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
+    				    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-				   BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
+    				    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-				   BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
+    				    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
 #endif
 #endif
-				   BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-				   p0,
-				   AMREX_REAL_ANYD(dx), dt,
-				   NumSpec);
+    				    BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+    				    p0,
+    				    AMREX_REAL_ANYD(dx), dt,
+    				    NumSpec);
 		} else {
 #if (AMREX_SPACEDIM == 3)
 #pragma gpu box(tileBox)
 		    update_rhoh_3d_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-					BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-					AMREX_REAL_ANYD(dx), dt,
-					NumSpec);
+            					BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
+            					BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
+            					BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
+            					BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
+            					BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
+            					BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+            					BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
+            					dx, dt,
+            					NumSpec);
 #else
 		    Abort("UpdateScal: Spherical is not valid for DIM < 3");
 #endif

@@ -1174,7 +1174,9 @@ extern "C"
 			const amrex::Real* dx, const amrex::Real dt,
 			const int startcomp, const int endcomp);
 
-    void update_rhoh(const int* lo, const int* hi, const int lev,
+
+    void update_rhoh(
+			const int* lo, const int* hi, const int lev,
 			const amrex::Real* sold, const int* so_lo, const int* so_hi,
 			      amrex::Real* snew, const int* sn_lo, const int* sn_hi,
 			const amrex::Real* sfluxx, const int* x_lo, const int* x_hi,
@@ -1190,7 +1192,7 @@ extern "C"
 			const int nspec);
 
 #if (AMREX_SPACEDIM == 3)
-void update_rhoh_3d_sphr(const int* lo, const int* hi,
+    void update_rhoh_3d_sphr(const int* lo, const int* hi,
 			 const amrex::Real* sold, const int* so_lo, const int* so_hi,
 			       amrex::Real* snew, const int* sn_lo, const int* sn_hi,
 			 const amrex::Real* sfluxx, const int* x_lo, const int* x_hi,
@@ -1198,8 +1200,8 @@ void update_rhoh_3d_sphr(const int* lo, const int* hi,
 			 const amrex::Real* sfluxz, const int* z_lo, const int* z_hi,
 			 const amrex::Real* force,  const int* f_lo, const int* f_hi,
 			 const amrex::Real* p0_new_cart, const int* p_lo, const int* p_hi,
-			 const amrex::Real* dx, const amrex::Real dt,
-			 const int nspec);
+			 const amrex::Real* dx, const amrex::Real* dt,
+			 const int* nspec);
 #endif
     //////////////////////
 
