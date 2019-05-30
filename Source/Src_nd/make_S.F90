@@ -322,7 +322,7 @@ contains
     double precision, value, intent(in   ) :: dt
 
     ! Local variables
-    integer :: i, j, k
+    integer :: i, j, k, r
     double precision :: correction_factor
 
     !$gpu
@@ -601,28 +601,25 @@ contains
     double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
 
     ! Local variables
-    integer :: i, j, k
+    integer :: i, j, k, r
 
     !$gpu
 
-    j = lo(2)
-    k = lo(3)
-#if (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
-#endif
-#if (AMREX_SPACEDIM >= 2)
        do j = lo(2),hi(2)
-#endif
           do i = lo(1),hi(1)
+#if (AMREX_SPACEDIM == 1)
+             r = i
+#elif (AMREX_SPACEDIM == 2)
+             r = j
+#else
+             r = k
+#endif
              delta_gamma1_term(i,j,k) = delta_gamma1_term(i,j,k) &
-                  + delta_gamma1(i,j,k)*psi(lev,k)/(gamma1bar(lev,k)**2*p0(lev,k))
+                  + delta_gamma1(i,j,k)*psi(lev,r)/(gamma1bar(lev,r)**2*p0(lev,r))
           end do
-#if (AMREX_SPACEDIM >=2)
        end do
-#if (AMREX_SPACEDIM == 3)
     end do
-#endif
-#endif
 
   end subroutine create_correction_delta_gamma1_term
 
@@ -649,25 +646,14 @@ contains
     integer :: i, j, k
 
     !$gpu
-
-    j = lo(2)
-    k = lo(3)
-#if (AMREX_SPACEDIM == 3)
     do k = lo(3),hi(3)
-#endif
-#if (AMREX_SPACEDIM >= 2)
        do j = lo(2),hi(2)
-#endif
           do i = lo(1),hi(1)
              delta_gamma1_term(i,j,k) = delta_gamma1_term(i,j,k) &
                   + delta_gamma1(i,j,k)*psi_cart(i,j,k)/(gamma1bar_cart(i,j,k)**2*p0_cart(i,j,k))
           end do
-#if (AMREX_SPACEDIM >=2)
        end do
-#if (AMREX_SPACEDIM == 3)
     end do
-#endif
-#endif
 
   end subroutine create_correction_delta_gamma1_term_sphr
 

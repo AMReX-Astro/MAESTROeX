@@ -62,7 +62,7 @@ contains
     integer, value  , intent (in   ) :: use_mask
 
     ! local
-    integer          :: i, j, k, n
+    integer          :: i, j, k, n, r
     double precision :: rho,T_in
 
     double precision :: x_in(nspec)
@@ -94,7 +94,14 @@ contains
                 enddo
 
                 if (drive_initial_convection) then
-                   T_in = tempbar_init_in(lev,k)
+#if (AMREX_SPACEDIM == 1)
+                   r = i
+#elif (AMREX_SPACEDIM == 2)
+                   r = j
+#elif (AMREX_SPACEDIM == 3)
+                   r = k
+#endif
+                   T_in = tempbar_init_in(lev,r)
                 else
                    T_in = s_in(i,j,k,temp_comp)
                 endif
