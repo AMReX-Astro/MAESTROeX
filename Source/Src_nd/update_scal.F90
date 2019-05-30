@@ -253,7 +253,7 @@ contains
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
     double precision, intent(in   ) :: sfluxz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nscal)
     integer         , intent(in   ) :: f_lo(3), f_hi(3)
-    double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nscal)
     integer         , intent(in   ) :: p_lo(3), p_hi(3)
     double precision, intent(in   ) :: p0_new_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
     double precision, intent(in   ) :: dx(3)
