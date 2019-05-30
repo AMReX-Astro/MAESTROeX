@@ -18,22 +18,26 @@ module fill_3d_data_module
 
 contains
 
-  subroutine put_1d_array_on_cart(lev, lo, hi, &
+  subroutine put_1d_array_on_cart(lo, hi, lev, &
        s0_cart, s0_cart_lo, s0_cart_hi, nc_s, &
        s0, is_input_edge_centered, is_output_a_vector) &
        bind(C, name="put_1d_array_on_cart")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
-    integer         , intent(in   ) :: s0_cart_lo(3), s0_cart_hi(3), nc_s
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev
+    integer         , intent(in   ) :: s0_cart_lo(3), s0_cart_hi(3)
+    integer  , value, intent(in   ) :: nc_s
     double precision, intent(inout) :: s0_cart(s0_cart_lo(1):s0_cart_hi(1), &
          s0_cart_lo(2):s0_cart_hi(2), &
          s0_cart_lo(3):s0_cart_hi(3), 1:nc_s)
     double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1+is_input_edge_centered)
-    integer         , intent(in   ) :: is_input_edge_centered, is_output_a_vector
+    integer  , value, intent(in   ) :: is_input_edge_centered, is_output_a_vector
 
     ! local
     integer i,j,k,r
     integer outcomp
+
+    !$gpu
 
     ! zero s0_cart, then fill in the non-zero values
     s0_cart(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
@@ -96,13 +100,14 @@ contains
        bind(C, name="put_1d_array_on_cart_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
-    integer         , intent(in   ) :: s0_cart_lo(3), s0_cart_hi(3), nc_s
+    integer         , intent(in   ) :: s0_cart_lo(3), s0_cart_hi(3)
+    integer  , value, intent(in   ) :: nc_s
     double precision, intent(inout) :: s0_cart(s0_cart_lo(1):s0_cart_hi(1), &
          s0_cart_lo(2):s0_cart_hi(2), &
          s0_cart_lo(3):s0_cart_hi(3), nc_s)
     double precision, intent(in   ) :: s0(0:max_radial_level,0:nr_fine-1+is_input_edge_centered)
     double precision, intent(in   ) :: dx(3)
-    integer         , intent(in   ) :: is_input_edge_centered, is_output_a_vector
+    integer  , value, intent(in   ) :: is_input_edge_centered, is_output_a_vector
     double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)

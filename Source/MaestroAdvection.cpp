@@ -841,7 +841,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
             					BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
             					BL_TO_FORTRAN_ANYD(force_mf[mfi]),
             					BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-            					dx, dt,
+            					AMREX_REAL_ANYD(dx), dt,
             					NumSpec);
 #else
 		    Abort("UpdateScal: Spherical is not valid for DIM < 3");

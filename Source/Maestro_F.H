@@ -282,18 +282,18 @@ extern "C"
 
     //////////////////////
     // in fill_3d_data.F90
-    void put_1d_array_on_cart(const int* lev, const int* lo, const int* hi,
+    void put_1d_array_on_cart(const int* lo, const int* hi, const int lev,
                               amrex::Real* s0_cart,
-                              const int* s0_cart_lo, const int* s0_cart_hi, const int* nc_s,
-                              const amrex::Real* s0, const int* is_input_edge_centered,
-                              const int* is_output_a_vector);
+                              const int* s0_cart_lo, const int* s0_cart_hi, const int nc_s,
+                              const amrex::Real* s0, const int is_input_edge_centered,
+                              const int is_output_a_vector);
 
     void put_1d_array_on_cart_sphr(const int* lo, const int* hi,
 				   amrex::Real* s0_cart,
-				   const int* s0_cart_lo, const int* s0_cart_hi, const int* nc_s,
+				   const int* s0_cart_lo, const int* s0_cart_hi, const int nc_s,
 				   const amrex::Real* s0, const amrex::Real* dx,
-				   const int* is_input_edge_centered,
-				   const int* is_output_a_vector,
+				   const int is_input_edge_centered,
+				   const int is_output_a_vector,
 				   const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 				   const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
@@ -1200,8 +1200,8 @@ extern "C"
 			 const amrex::Real* sfluxz, const int* z_lo, const int* z_hi,
 			 const amrex::Real* force,  const int* f_lo, const int* f_hi,
 			 const amrex::Real* p0_new_cart, const int* p_lo, const int* p_hi,
-			 const amrex::Real* dx, const amrex::Real* dt,
-			 const int* nspec);
+			 const amrex::Real* dx, const amrex::Real dt,
+			 const int nspec);
 #endif
     //////////////////////
 

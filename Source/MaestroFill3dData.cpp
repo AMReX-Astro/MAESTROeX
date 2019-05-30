@@ -70,15 +70,15 @@ Maestro::Put1dArrayOnCart (int level,
     	// lo/hi coordinates (including ghost cells), and/or the # of components
     	// We will also pass "validBox", which specifies the "valid" region.
     	if (spherical == 0) {
-    	    put_1d_array_on_cart(&level,ARLIM_3D(tileBox.loVect()),
-                     ARLIM_3D(tileBox.hiVect()),
-    				 BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-    				 s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
+    	    put_1d_array_on_cart(ARLIM_3D(tileBox.loVect()),
+                     ARLIM_3D(tileBox.hiVect()),level,
+    				 BL_TO_FORTRAN_3D(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
+    				 s0.dataPtr(), is_input_edge_centered, is_output_a_vector);
     	} else {
     	    put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-    				      BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
+    				      BL_TO_FORTRAN_3D(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
     				      s0.dataPtr(), dx,
-    				      &is_input_edge_centered, &is_output_a_vector,
+    				      is_input_edge_centered, is_output_a_vector,
     				      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
     				      BL_TO_FORTRAN_3D(cc_to_r[mfi]));
     	}
