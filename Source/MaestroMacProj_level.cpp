@@ -281,6 +281,11 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ComputeMACSolverRHS()",ComputeMACSolverRHS);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     // Note that umac = beta0*mac
     for (int lev = 0; lev <= finest_level; ++lev)
     {
@@ -306,20 +311,27 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
             const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
-            mac_solver_rhs(&lev,ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
-                           BL_TO_FORTRAN_3D(solverrhs_mf[mfi]),
-                           BL_TO_FORTRAN_3D(macrhs_mf[mfi]),
-                           BL_TO_FORTRAN_3D(uedge_mf[mfi]),
+#pragma gpu box(tileBox)
+            mac_solver_rhs(AMREX_INT_ANYD(tileBox.loVect()),
+                           AMREX_INT_ANYD(tileBox.hiVect()),lev,
+                           BL_TO_FORTRAN_ANYD(solverrhs_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(macrhs_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                           BL_TO_FORTRAN_3D(vedge_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                           BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
 #endif
 #endif
-                           dx);
+                           AMREX_REAL_ANYD(dx));
 
         }
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 }
 

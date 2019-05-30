@@ -581,7 +581,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "tileox", which specifies the tile's "valid" region.
 #pragma gpu box(tilebox)
-            compute_grad_phi(AMREX_INT_ANYD(tilebox.loVect()), 
+            compute_grad_phi(AMREX_INT_ANYD(tilebox.loVect()),
                              AMREX_INT_ANYD(tilebox.hiVect()),
                              BL_TO_FORTRAN_ANYD(phi_mf[mfi]),
                              BL_TO_FORTRAN_ANYD(gphi_mf[mfi]),
@@ -599,6 +599,11 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePiCC()",MakePiCC);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& pi_mf = pi[lev];
         MultiFab& snew_mf = snew[lev];
@@ -609,18 +614,24 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
         for ( MFIter mfi(snew_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the tile's valid region
-            const Box& tilebox = mfi.tilebox();
+            const Box& tileBox = mfi.tilebox();
             FArrayBox& snew_fab = snew_mf[mfi];
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "tilebox", which specifies the "tile's valid" region.
-            make_pi_cc(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                       BL_TO_FORTRAN_3D(pi_mf[mfi]),
-                       snew_fab.dataPtr(Pi), ARLIM_3D(snew_fab.loVect()), ARLIM_3D(snew_fab.hiVect()),
-                       BL_TO_FORTRAN_3D(beta0_cart_mf[mfi]));
+#pragma gpu box(tileBox)
+            make_pi_cc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                       BL_TO_FORTRAN_ANYD(pi_mf[mfi]),
+                       snew_fab.dataPtr(Pi), AMREX_INT_ANYD(snew_fab.loVect()), AMREX_INT_ANYD(snew_fab.hiVect()),
+                       BL_TO_FORTRAN_ANYD(beta0_cart_mf[mfi]));
         }
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 }

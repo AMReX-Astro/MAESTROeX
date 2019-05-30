@@ -885,12 +885,12 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 
     // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
     if (reflux_type == 2) {
-	for (int lev=finest_level-1; lev>=0; --lev) {
+        for (int lev=finest_level-1; lev>=0; --lev) {
             // update lev based on coarse-fine flux mismatch
             flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, start_comp, start_comp, num_comp, geom[lev]);
             if (start_comp == FirstSpec) {
                 // do the same for density if we updated the species
-		flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1, geom[lev]);
+                flux_reg_s[lev+1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1, geom[lev]);
             }
         }
     }

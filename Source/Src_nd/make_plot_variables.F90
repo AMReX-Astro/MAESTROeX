@@ -2,17 +2,12 @@
 
 module plot_variables_module
 
-  use amrex_mempool_module, only : bl_allocate, bl_deallocate
-  use amrex_fort_module, only: amrex_spacedim
   use eos_type_module
   use eos_module
   use network, only: nspec, aion
   use meth_params_module, only: spherical, rho_comp, rhoh_comp, temp_comp, spec_comp, &
        pi_comp, use_pprime_in_tfromp, base_cutoff_density
-  ! , pi_comp, &
-  !      use_eos_e_instead_of_h,
   use base_state_geometry_module, only:  max_radial_level, nr_fine
-  ! use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
   implicit none
 
@@ -22,7 +17,8 @@ contains
        ad_excess,a_lo,a_hi) bind(C, name="make_ad_excess")
 
     integer, intent(in) :: lo(3), hi(3)
-    integer, intent(in) :: s_lo(3), s_hi(3), nc_s
+    integer, intent(in) :: s_lo(3), s_hi(3)
+    integer, value, intent(in) :: nc_s
     integer, intent(in) :: a_lo(3), a_hi(3)
     double precision, intent(in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(inout) :: ad_excess(a_lo(1):a_hi(1),a_lo(2):a_hi(2),a_lo(3):a_hi(3))
@@ -34,6 +30,8 @@ contains
     double precision :: chi_rho, chi_t, dt, dp, nabla
 
     type (eos_t) :: eos_state
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -130,7 +128,8 @@ contains
        ad_excess,a_lo,a_hi) bind(C, name="make_ad_excess_sphr")
 
     integer, intent(in) :: lo(3), hi(3)
-    integer, intent(in) :: s_lo(3), s_hi(3), nc_s
+    integer, intent(in) :: s_lo(3), s_hi(3)
+    integer, value, intent(in) :: nc_s
     integer, intent(in) :: n_lo(3), n_hi(3)
     integer, intent(in) :: a_lo(3), a_hi(3)
     double precision, intent(in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
@@ -144,6 +143,8 @@ contains
     double precision :: chi_rho, chi_t, dp(4), dt(4), nabla
 
     type (eos_t) :: eos_state
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -250,7 +251,7 @@ contains
     double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
     double precision, intent(in) :: dx(3)
     double precision, intent(inout) :: vort(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-    integer, intent(in) :: bc(amrex_spacedim,2)
+    integer, intent(in) :: bc(AMREX_SPACEDIM,2)
 
     integer :: i, j, k
     logical :: fix_lo_x,fix_hi_x,fix_lo_y,fix_hi_y,fix_lo_z,fix_hi_z
@@ -342,7 +343,6 @@ contains
     integer :: i, j, k
     logical :: fix_lo_x,fix_hi_x,fix_lo_y,fix_hi_y,fix_lo_z,fix_hi_z
     double precision :: wy,vz,uz,wx,vx,uy
-
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -855,11 +855,10 @@ contains
   end subroutine make_vorticity_3d
 
 
+  subroutine make_magvel(lo,hi,lev,vel,v_lo,v_hi,w0,magvel,m_lo,m_hi) bind(C, name="make_magvel")
 
-
-  subroutine make_magvel(lev,lo,hi,vel,v_lo,v_hi,w0,magvel,m_lo,m_hi) bind(C, name="make_magvel")
-
-    integer, intent(in) :: lev, lo(3), hi(3)
+    integer, intent(in) :: lo(3), hi(3)
+    integer, value, intent(in) :: lev
     integer, intent(in) :: v_lo(3), v_hi(3)
     integer, intent(in) :: m_lo(3), m_hi(3)
     double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
@@ -867,6 +866,8 @@ contains
     double precision, intent(inout) :: magvel(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
 
     integer :: i, j, k
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -908,6 +909,8 @@ contains
 
     integer :: i, j, k
 
+    !$gpu
+
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -939,6 +942,8 @@ contains
 
     integer :: i,j,k,n
 
+    !$gpu
+
     circ_vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.0d0
 
     do k = lo(3), hi(3)
@@ -964,11 +969,13 @@ contains
 
   end subroutine make_velrc
 
-  subroutine make_deltagamma(lev,lo,hi,state,s_lo,s_hi,nc_s,p0,gamma1bar,&
+  subroutine make_deltagamma(lo,hi,lev,state,s_lo,s_hi,nc_s,p0,gamma1bar,&
        deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer  , value, intent (in   ) :: lev
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer  , value, intent (in   ) :: nc_s
     integer         , intent (in   ) :: d_lo(3), d_hi(3)
     double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
@@ -979,6 +986,8 @@ contains
     integer :: i, j, k, r
     integer :: pt_index(3)
     type (eos_t) :: eos_state
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -1018,7 +1027,8 @@ contains
        deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer  , value, intent (in   ) :: nc_s
     integer         , intent (in   ) :: p_lo(3), p_hi(3)
     integer         , intent (in   ) :: g_lo(3), g_hi(3)
     integer         , intent (in   ) :: d_lo(3), d_hi(3)
@@ -1031,6 +1041,8 @@ contains
     integer :: i, j, k
     integer :: pt_index(3)
     type (eos_t) :: eos_state
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -1057,11 +1069,12 @@ contains
 
   end subroutine make_deltagamma_sphr
 
-  subroutine make_entropy(lev,lo,hi,state,s_lo,s_hi,nc_s,&
+  subroutine make_entropy(lo,hi,lev,state,s_lo,s_hi,nc_s,&
        entropy,d_lo,d_hi) bind(C,name="make_entropy")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3), nc_s
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer  , value, intent (in   ) :: lev, nc_s
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: d_lo(3), d_hi(3)
     double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent (inout) :: entropy(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
@@ -1070,6 +1083,8 @@ contains
     integer :: i, j, k, r
     integer :: pt_index(3)
     type (eos_t) :: eos_state
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -1082,7 +1097,6 @@ contains
 #elif (AMREX_SPACEDIM == 3)
              r = k
 #endif
-
              eos_state%rho   = state(i,j,k,rho_comp)
              eos_state%T     = state(i,j,k,temp_comp)
              eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
@@ -1098,9 +1112,11 @@ contains
 
   end subroutine make_entropy
 
-  subroutine make_divw0(lev,lo,hi,w0,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
 
-    integer, intent (in) :: lev, lo(3), hi(3)
+  subroutine make_divw0(lo,hi,lev,w0,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
+
+    integer, intent (in) :: lo(3), hi(3)
+    integer, value, intent (in) :: lev
     integer, intent (in) :: d_lo(3), d_hi(3)
     double precision, intent (in) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent (in) :: dx(3)
@@ -1108,6 +1124,8 @@ contains
 
     ! Local variables
     integer :: i, j, k
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -1124,6 +1142,7 @@ contains
     enddo
 
   end subroutine make_divw0
+
 
   subroutine make_divw0_sphr(lo,hi,w0macx,x_lo,x_hi,w0macy,y_lo,y_hi,w0macz,z_lo,z_hi,&
        dx,divw0,d_lo,d_hi) bind(C,name="make_divw0_sphr")
@@ -1142,6 +1161,8 @@ contains
     ! Local variables
     integer :: i, j, k
 
+    !$gpu
+
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -1154,12 +1175,14 @@ contains
 
   end subroutine make_divw0_sphr
 
+
   subroutine make_pidivu(lo,hi,vel,v_lo,v_hi,dx,pi_cc,p_lo,p_hi,nc,&
        pidivu,d_lo,d_hi) bind(C,name="make_pidivu")
 
     integer, intent (in) :: lo(3), hi(3)
     integer, intent (in) :: v_lo(3), v_hi(3)
-    integer, intent (in) :: p_lo(3), p_hi(3),nc
+    integer, intent (in) :: p_lo(3), p_hi(3)
+    integer, value, intent (in) :: nc
     integer, intent (in) :: d_lo(3), d_hi(3)
     double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
     double precision, intent (in) :: dx(3)
@@ -1168,6 +1191,8 @@ contains
 
     ! Local variables
     integer :: i, j, k
+
+    !$gpu
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)
@@ -1196,7 +1221,8 @@ contains
     ! This routine derives the mass fractions of the species.
     !
     integer, intent (in) :: lo(3), hi(3)
-    integer, intent (in) :: s_lo(3), s_hi(3), nc_s
+    integer, intent (in) :: s_lo(3), s_hi(3)
+    integer, value, intent (in) :: nc_s
     integer, intent (in) :: a_lo(3), a_hi(3)
     double precision, intent(in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent (inout) :: abar(a_lo(1):a_hi(1),a_lo(2):a_hi(2),a_lo(3):a_hi(3))
@@ -1204,6 +1230,8 @@ contains
     ! Local variables
     integer :: i, j, k
     double precision :: xn(nspec)
+
+    !$gpu
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)
@@ -1214,8 +1242,6 @@ contains
        enddo
     enddo
 
-
-
-end subroutine make_abar
+  end subroutine make_abar
 
 end module plot_variables_module
