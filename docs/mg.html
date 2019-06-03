@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Multigrid &mdash; MAESTROeX 19.05
+  <title>Multigrid &mdash; MAESTROeX 19.06
  documentation</title>
   
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                19.05
+                19.06
 
               </div>
             
@@ -581,7 +581,7 @@ Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>.</p></
 <li><p><span class="math notranslate nohighlight">\(DG\phi\)</span> is cell-centered, also shown in Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>,
 computed from <span class="math notranslate nohighlight">\(G\phi\)</span> using the same differencing as <span class="math notranslate nohighlight">\(DU\)</span>.</p></li>
 </ul>
-<div class="figure align-center" id="id11">
+<div class="figure align-default" id="id11">
 <a class="reference internal image-reference" href="mgfigpath/MAC_mg2"><img alt="[fig:mg:MAC] Data centerings for the MAC projection" src="mgfigpath/MAC_mg2" style="width: 5.5in;" /></a>
 <p class="caption"><span class="caption-text">[fig:mg:MAC] Data centerings for the MAC projection</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
 </div>
@@ -610,7 +610,7 @@ the Laplacian operator. By default, MAESTRO uses a dense stencil
 (9-points in 2-d, 27-points in 3-d). Alternately, a <em>cross</em>
 stencil can be used (by setting hg_dense_stencil = F). This
 uses 5-points in 2-d, 7-points in 3-d.</p>
-<div class="figure align-center" id="id12">
+<div class="figure align-default" id="id12">
 <a class="reference internal image-reference" href="mgfigpath/HG_mg2"><img alt="[fig:mg:HG] Data centerings for the HG projection" src="mgfigpath/HG_mg2" style="width: 5.5in;" /></a>
 <p class="caption"><span class="caption-text">[fig:mg:HG] Data centerings for the HG projection</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
 </div>
@@ -645,7 +645,7 @@ runtime parameter.</p>
 <p>The tolerances, eps_init_proj_cart and eps_init_proj_sph
 (for Cartesian and spherical respectively) are set in mg_eps.f90
 and have the default values of:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 23%" />
 <col style="width: 38%" />
@@ -702,7 +702,7 @@ tolerances (set in divu_iter) are, for Cartesian:</p>
                   \right .\)</span></div>
 </div>
 <p>The various parameters are set in mg_eps.f90 and have the default values of:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 49%" />
 <col style="width: 51%" />
@@ -743,7 +743,7 @@ solver, :math:<a href="#id7"><span class="problematic" id="id8">`</span></a>epsi
 <div><p>mathtt{eps_mac_bottom}`. These parameters are set in</p>
 </div></blockquote>
 <p>mg_eps.f90 and have the default values:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 47%" />
 <col style="width: 53%" />
@@ -779,7 +779,7 @@ of <span class="math notranslate nohighlight">\(U^\mathrm{ADV}\)</span>.</p>
 tolerance is used for the bottom
 solver, <span class="math notranslate nohighlight">\(\epsilon_\mathrm{bottom} = \mathtt{eps\_hg\_bottom}\)</span>.</p>
 <p>The default parameter values are:</p>
-<table class="docutils align-center">
+<table class="docutils align-default">
 <colgroup>
 <col style="width: 46%" />
 <col style="width: 54%" />
