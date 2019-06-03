@@ -84,3 +84,16 @@ Make ppm_trace_foces true by default
 Fixed refluxing bug, and implemented reflux_type (0=none, 1=average-down, 2=reflux); default is 1 for now
 Force the user to supply anelastic_cutoff_density and base_cutoff_density
 Set burning_cutoff_density to base_cutoff_density if not specified
+
+06-03-2019
+Implement multiple tagging criteria for multiple levels of AMR
+Specify how often to print diagnostics using sum_interval and sum_per
+Plot files now include base states output
+Bugfix to new temporal algorithm in MaestroAdvanceAvg.cpp
+Many thermodynamics and source term subroutines offloaded to GPU: burner_loop, make_thermal_coeffs, mk_sponge, rhoh_vs_t, make_gamma, mkrhohforce, make_S, update_scal, update_vel, compute_dt, make_pi_cc
+Add cuda managed attributes to meth_params.F90 using parse_maestro_params.py
+Add RealVector typedef so that Real Vectors can be CUDA managed
+Move put_1d_array_on_sphr routine calls to C++ to avoid calls on the GPU
+If USE_CUDA=TRUE, then set USE_GPU_PRAGMA=TRUE and add CUDA to define
+Remove loop over level in 1d divu_cart and gradp0
+Offloaded plotting routines in make_plot_variables.F90 to GPU
