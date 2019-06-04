@@ -112,8 +112,8 @@ Maestro::Evolve ()
 
         if ( (plot_int > 0 && istep % plot_int == 0) ||
              (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
-             (istep == max_step) || (t_old >= stop_time) )
-        {
+             (plot_int > 0 || plot_deltat > 0) && ((istep == max_step) || (t_old >= stop_time)) )
+		{
             // write a plotfile
             Print() << "\nWriting plotfile " << istep << std::endl;
             WritePlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
@@ -122,47 +122,47 @@ Maestro::Evolve ()
 
         if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
              (small_plot_deltat > 0 && std::fmod(t_new, small_plot_deltat) < dt) ||
-             (istep == max_step)  || (t_old >= stop_time) )
-        {
+             (small_plot_int > 0 || small_plot_deltat > 0) && ((istep == max_step)  || (t_old >= stop_time)) )
+		{
             // write a small plotfile
             Print() << "\nWriting small plotfile " << istep << std::endl;
             WriteSmallPlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
                                gamma1bar_new,unew,snew,S_cc_new);
         }
 
-        if ( (chk_int > 0 && istep % chk_int == 0) ||
-             (istep == max_step) || (t_new >= stop_time) )
-        {
-            // write a checkpoint file
-            Print() << "\nWriting checkpoint " << istep << std::endl;
-            WriteCheckPoint(istep);
-        }
+		if ( (chk_int > 0 && istep % chk_int == 0) ||
+             (chk_int > 0) && ((istep == max_step) || (t_new >= stop_time) ))
+		{
+			// write a checkpoint file
+			Print() << "\nWriting checkpoint " << istep << std::endl;
+			WriteCheckPoint(istep);
+		}
 
-        if (diag_index == diag_buf_size || istep == max_step) {
-            // write out any buffered diagnostic information
-            WriteDiagFile(diag_index);
-        }
+		if (diag_index == diag_buf_size || istep == max_step) {
+			// write out any buffered diagnostic information
+			WriteDiagFile(diag_index);
+		}
 
-        // move new state into old state by swapping pointers
-        for (int lev=0; lev<=finest_level; ++lev) {
-            std::swap(    sold[lev],     snew[lev]);
-            std::swap(    uold[lev],     unew[lev]);
-            std::swap(S_cc_old[lev], S_cc_new[lev]);
-        }
+		// move new state into old state by swapping pointers
+		for (int lev=0; lev<=finest_level; ++lev) {
+			std::swap(    sold[lev],     snew[lev]);
+			std::swap(    uold[lev],     unew[lev]);
+			std::swap(S_cc_old[lev], S_cc_new[lev]);
+		}
 
-        std::swap( rho0_old, rho0_new);
-        std::swap(rhoh0_old,rhoh0_new);
-        std::swap(   p0_nm1,   p0_old);
-        std::swap(   p0_old,   p0_new);
+		std::swap( rho0_old, rho0_new);
+		std::swap(rhoh0_old,rhoh0_new);
+		std::swap(   p0_nm1,   p0_old);
+		std::swap(   p0_old,   p0_new);
 
-        std::swap(    beta0_old,    beta0_new);
-        std::swap(gamma1bar_old,gamma1bar_new);
-        std::swap(grav_cell_old,grav_cell_new);
+		std::swap(    beta0_old,    beta0_new);
+		std::swap(gamma1bar_old,gamma1bar_new);
+		std::swap(grav_cell_old,grav_cell_new);
 
 #ifdef DO_PROBLEM_POST_TIMESTEP
         if (ParallelDescriptor::IOProcessor()) {
             problem_post_timestep();
         }
 #endif
-    }
+	}
 }

@@ -5,24 +5,39 @@ using namespace amrex;
 
 void
 Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
-                        Vector<Real>& gamma1bar,
-                        const Vector<Real>& p0)
+                        RealVector& gamma1bar,
+                        const RealVector& p0)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGamma1bar()",MakeGamma1bar);
 
     Vector<MultiFab> gamma1(finest_level+1);
+    Vector<MultiFab> p0_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         gamma1[lev].define(grids[lev], dmap[lev], 1, 0);
     }
 
+    if (spherical == 1) {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            p0_cart[lev].setVal(0.);
+        }
+
+        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    }
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
         MultiFab& gamma1_mf = gamma1[lev];
-        const MultiFab&   scal_mf =   scal[lev];
-        const MultiFab&   cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& scal_mf = scal[lev];
+        const MultiFab& p0_mf = p0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -38,19 +53,22 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
-                make_gamma(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                           BL_TO_FORTRAN_3D(gamma1_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(scal_mf[mfi]),
+#pragma gpu box(tileBox)
+                make_gamma(AMREX_INT_ANYD(tileBox.loVect()),
+                           AMREX_INT_ANYD(tileBox.hiVect()),
+                           lev,
+                           BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                            p0.dataPtr());
             } else {
-                const Real* dx = geom[lev].CellSize();
 
-                make_gamma_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                                BL_TO_FORTRAN_3D(gamma1_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                                p0.dataPtr(), dx,
-                                r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+#pragma gpu box(tileBox)
+                make_gamma_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                AMREX_INT_ANYD(tileBox.hiVect()),
+                                BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
+
             }
         }
     }
@@ -60,4 +78,9 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 
     // call average to create gamma1bar
     Average(gamma1,gamma1bar,0);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 }

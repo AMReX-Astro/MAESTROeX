@@ -7,76 +7,74 @@ void
 Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                           const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-                          const Vector<Real>& w0_force,
+                          const RealVector& w0_force,
                           const Vector<MultiFab>& w0_force_cart,
-                          const Vector<Real>& rho0_nph,
-                          const Vector<Real>& grav_cell_nph,
+                          const RealVector& rho0_nph,
+                          const RealVector& grav_cell_nph,
                           const Vector<MultiFab>& sponge)
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::VelocityAdvance()",VelocityAdvance);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::VelocityAdvance()",VelocityAdvance);
 
-	Vector<MultiFab> vel_force(finest_level+1);
-	for (int lev=0; lev<=finest_level; ++lev) {
-		if (ppm_trace_forces == 0) {
-			vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-		} else {
-			// tracing needs more ghost cells
-			vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
-		}
-	}
+    Vector<MultiFab> vel_force(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        if (ppm_trace_forces == 0) {
+            vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        } else {
+            // tracing needs more ghost cells
+            vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+        }
+    }
 
-	Vector<std::array< MultiFab, AMREX_SPACEDIM > > uedge(finest_level+1);
-	for (int lev=0; lev<=finest_level; ++lev) {
-		AMREX_D_TERM(uedge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], AMREX_SPACEDIM, 0); ,
-		             uedge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], AMREX_SPACEDIM, 0); ,
-		             uedge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], AMREX_SPACEDIM, 0); );
-	}
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > uedge(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        AMREX_D_TERM(uedge[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], AMREX_SPACEDIM, 0); ,
+                     uedge[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], AMREX_SPACEDIM, 0); ,
+                     uedge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], AMREX_SPACEDIM, 0); );
+    }
 
-	//////////////////////////////////
-	// Create the velocity forcing term at time n using rho
-	//////////////////////////////////
-	int is_final_update = 0;
-	MakeVelForce(vel_force,is_final_update,umac,sold,rho0_old,grav_cell_old,
-	             w0_force,w0_force_cart,
+    //////////////////////////////////
+    // Create the velocity forcing term at time n using rho
+    //////////////////////////////////
+
+    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,
 #ifdef ROTATION
-	             w0mac,
+                 w0mac,
 #endif
-	             1);
+                 1);
 
-	//////////////////////////////////
-	// Add w0 to MAC velocities
-	//////////////////////////////////
+    //////////////////////////////////
+    // Add w0 to MAC velocities
+    //////////////////////////////////
 
-	Addw0(umac,w0mac,1.);
+    Addw0(umac,w0mac,1.);
 
-	//////////////////////////////////
-	// Create the edge states of velocity using the MAC velocity plus w0 on edges.
-	//////////////////////////////////
+    //////////////////////////////////
+    // Create the edge states of velocity using the MAC velocity plus w0 on edges.
+    //////////////////////////////////
 
-	MakeEdgeScal(uold,uedge,umac,vel_force,1,bcs_u,AMREX_SPACEDIM,0,0,AMREX_SPACEDIM,0);
+    MakeEdgeScal(uold,uedge,umac,vel_force,1,bcs_u,AMREX_SPACEDIM,0,0,AMREX_SPACEDIM,0);
 
-	//////////////////////////////////
-	// Subtract w0 from MAC velocities.
-	//////////////////////////////////
+    //////////////////////////////////
+    // Subtract w0 from MAC velocities.
+    //////////////////////////////////
 
-	Addw0(umac,w0mac,-1.);
+    Addw0(umac,w0mac,-1.);
 
-	//////////////////////////////////
-	// Now create the force at half-time using rhohalf
-	//////////////////////////////////
+    //////////////////////////////////
+    // Now create the force at half-time using rhohalf
+    //////////////////////////////////
 
-	MakeVelForce(vel_force,is_final_update,umac,rhohalf,rho0_nph,grav_cell_nph,
-	             w0_force,w0_force_cart,
+    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,
 #ifdef ROTATION
-	             w0mac,
+                 w0mac,
 #endif
-	             1);
+                 1);
 
-	//////////////////////////////////
-	// Update the velocity with convective differencing
-	//////////////////////////////////
+    //////////////////////////////////
+    // Update the velocity with convective differencing
+    //////////////////////////////////
 
-	UpdateVel(umac, uedge, vel_force, sponge, w0mac);
+    UpdateVel(umac, uedge, vel_force, sponge, w0mac);
 
 }

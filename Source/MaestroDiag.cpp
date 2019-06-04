@@ -11,8 +11,8 @@ using namespace amrex;
 void
 Maestro::DiagFile (const int step,
                    const Real t_in,
-                   const Vector<Real>& rho0_in,
-                   const Vector<Real>& p0_in,
+                   const RealVector& rho0_in,
+                   const RealVector& p0_in,
                    const Vector<MultiFab>& u_in,
                    const Vector<MultiFab>& s_in,
                    int& index)

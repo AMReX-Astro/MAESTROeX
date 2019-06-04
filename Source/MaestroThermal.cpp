@@ -18,7 +18,7 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
                              const Vector<MultiFab>& hcoeff,
                              const Vector<MultiFab>& Xkcoeff,
                              const Vector<MultiFab>& pcoeff,
-                             const Vector<Real>& p0,
+                             const RealVector& p0,
                              int temp_formulation) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeExplicitThermal()",MakeExplicitThermal);
@@ -151,7 +151,7 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
 
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
     {
-        if (Geometry::isPeriodic(idim)) {
+        if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         }
         else {
@@ -225,6 +225,11 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeThermalCoeffs()",MakeThermalCoeffs);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev = 0; lev <= finest_level; ++lev)
     {
         // get references to the MultiFabs at level lev
@@ -243,18 +248,24 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
-            const Box& tileBox = mfi.tilebox();
+            const Box& gtbx = mfi.growntilebox(1);
 
             // call fortran subroutine
-            make_thermal_coeffs(ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
-                                BL_TO_FORTRAN_FAB(scal_mf[mfi]),
-                                BL_TO_FORTRAN_3D(Tcoeff_mf[mfi]),
-                                BL_TO_FORTRAN_3D(hcoeff_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(Xkcoeff_mf[mfi]),
-                                BL_TO_FORTRAN_3D(pcoeff_mf[mfi]));
+#pragma gpu box(gtbx)
+            make_thermal_coeffs(AMREX_INT_ANYD(gtbx.loVect()),AMREX_INT_ANYD(gtbx.hiVect()),
+                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(Tcoeff_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(hcoeff_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(Xkcoeff_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(pcoeff_mf[mfi]));
 
         }
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 }
 
@@ -357,7 +368,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
     {
-        if (Geometry::isPeriodic(idim)) {
+        if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         }
         else {

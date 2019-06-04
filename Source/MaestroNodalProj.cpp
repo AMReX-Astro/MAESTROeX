@@ -90,7 +90,7 @@ Maestro::NodalProj (int proj_type,
         Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
     }
     else {
-        Vector<Real> beta0_nph( (max_radial_level+1)*nr_fine );
+        RealVector beta0_nph( (max_radial_level+1)*nr_fine );
         beta0_nph.shrink_to_fit();
         for(int i=0; i<beta0_nph.size(); ++i) {
             beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
@@ -156,7 +156,7 @@ Maestro::NodalProj (int proj_type,
     std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
     {
-        if (Geometry::isPeriodic(idim)) {
+        if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         }
         else {
@@ -169,7 +169,7 @@ Maestro::NodalProj (int proj_type,
 
             if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            } 
+            }
             else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }
@@ -580,10 +580,12 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "tileox", which specifies the tile's "valid" region.
-            compute_grad_phi(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                             BL_TO_FORTRAN_3D(phi_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(gphi_mf[mfi]),
-                             dx);
+#pragma gpu box(tilebox)
+            compute_grad_phi(AMREX_INT_ANYD(tilebox.loVect()),
+                             AMREX_INT_ANYD(tilebox.hiVect()),
+                             BL_TO_FORTRAN_ANYD(phi_mf[mfi]),
+                             BL_TO_FORTRAN_ANYD(gphi_mf[mfi]),
+                             AMREX_REAL_ANYD(dx));
         }
     }
 
@@ -597,6 +599,11 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePiCC()",MakePiCC);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& pi_mf = pi[lev];
         MultiFab& snew_mf = snew[lev];
@@ -607,18 +614,24 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
         for ( MFIter mfi(snew_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the tile's valid region
-            const Box& tilebox = mfi.tilebox();
+            const Box& tileBox = mfi.tilebox();
             FArrayBox& snew_fab = snew_mf[mfi];
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "tilebox", which specifies the "tile's valid" region.
-            make_pi_cc(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                       BL_TO_FORTRAN_3D(pi_mf[mfi]),
-                       snew_fab.dataPtr(Pi), ARLIM_3D(snew_fab.loVect()), ARLIM_3D(snew_fab.hiVect()),
-                       BL_TO_FORTRAN_3D(beta0_cart_mf[mfi]));
+#pragma gpu box(tileBox)
+            make_pi_cc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                       BL_TO_FORTRAN_ANYD(pi_mf[mfi]),
+                       snew_fab.dataPtr(Pi), AMREX_INT_ANYD(snew_fab.loVect()), AMREX_INT_ANYD(snew_fab.hiVect()),
+                       BL_TO_FORTRAN_ANYD(beta0_cart_mf[mfi]));
         }
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 }

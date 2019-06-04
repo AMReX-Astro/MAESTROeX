@@ -43,11 +43,13 @@ contains
 
     double precision :: time
 
+    !$gpu
+
     time = 0.d0
 
     ! Make sure the network and burner have been initialized.
 
-#ifndef ACC
+#if !defined(ACC) && !defined(AMREX_USE_CUDA)
     if (.NOT. network_initialized) then
        call amrex_error("ERROR in burner: must initialize network first.")
     endif
@@ -59,7 +61,7 @@ contains
 
     ! Initialize the final state by assuming it does not change.
 
-    state_out = state_in
+    call copy_burn_t(state_out, state_in)
 
     ! Do the burning.
 

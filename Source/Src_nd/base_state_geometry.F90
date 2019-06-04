@@ -27,24 +27,31 @@ module base_state_geometry_module
   ! finest_radial_level is the current finest level index, which may be less than
   ! max_radial_level depending on the refinement criteria
 
-  integer         , save, public :: max_radial_level
-  integer         , save, public :: finest_radial_level
-  integer         , save, public :: nr_fine   ! number of zones associated with *max_radial_level*
-  double precision, save, public :: dr_fine   ! base state grid spacing associated with *max_radial_level*
+  integer         , allocatable, save, public :: max_radial_level
+  integer         , allocatable, save, public :: finest_radial_level
+  integer         , allocatable, save, public :: nr_fine   ! number of zones associated with *max_radial_level*
+  double precision, allocatable, save, public :: dr_fine   ! base state grid spacing associated with *max_radial_level*
 
-  integer         , save, public  :: nr_irreg
-  double precision, save, public  :: center(3)
+  integer         , allocatable, save, public  :: nr_irreg
+  double precision, allocatable, save, public  :: center(:)
 
-  double precision, pointer, save, public  :: dr(:)
-  integer         , pointer, save, public  :: nr(:)
+  double precision, allocatable, save, public  :: dr(:)
+  integer         , allocatable, save, public  :: nr(:)
 
-  integer         , pointer, save, public  :: numdisjointchunks(:)
+  integer         , allocatable, save, public  :: numdisjointchunks(:)
   integer         , pointer, save, public  :: r_start_coord(:,:)
   integer         , pointer, save, public  :: r_end_coord(:,:)
 
-  integer         , pointer, save, public  :: anelastic_cutoff_density_coord(:)
-  integer         , pointer, save, public  :: base_cutoff_density_coord(:)
+  integer         , allocatable, save, public  :: anelastic_cutoff_density_coord(:)
+  integer         , allocatable, save, public  :: base_cutoff_density_coord(:)
   integer         , pointer, save, public  :: burning_cutoff_density_coord(:)
+
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine
+  attributes(managed) ::  nr_irreg, center, dr, nr
+  attributes(managed) :: base_cutoff_density_coord, anelastic_cutoff_density_coord
+  attributes(managed) :: numdisjointchunks
+#endif
 
 contains
 
@@ -69,6 +76,17 @@ contains
        print*,'Calling init_base_state_geometry()'
     end if
 
+    allocate(max_radial_level)
+    allocate(finest_radial_level)
+    allocate(nr_fine)
+    allocate(dr_fine)
+    allocate(nr_irreg)
+    allocate(center(3))
+    allocate(dr(0:max_radial_level))
+    allocate(nr(0:max_radial_level))
+    allocate(base_cutoff_density_coord(0:max_radial_level))
+    allocate(anelastic_cutoff_density_coord(0:max_radial_level))
+
     max_radial_level = max_radial_level_in
     nr_fine = nr_fine_in
     dr_fine = dr_fine_in
@@ -88,9 +106,8 @@ contains
        center = 0.5d0*(prob_lo + prob_hi)
     endif
 
-    ! allocate space for dr, nr
-    call bl_allocate(dr,0,max_radial_level)
-    call bl_allocate(nr,0,max_radial_level)
+    ! ! allocate space for dr, nr
+    ! call bl_allocate(nr,0,max_radial_level)
 
     ! compute nr(:) and dr(:)
     nr(max_radial_level) = nr_fine
@@ -140,8 +157,7 @@ contains
 
     end if
 
-    call bl_allocate(      anelastic_cutoff_density_coord,0,max_radial_level)
-    call bl_allocate(   base_cutoff_density_coord,0,max_radial_level)
+    ! call bl_allocate(   base_cutoff_density_coord,0,max_radial_level)
     call bl_allocate(burning_cutoff_density_coord,0,max_radial_level)
 
   end subroutine init_base_state_geometry
@@ -195,7 +211,7 @@ contains
     logical :: found
 
     call bl_proffortfuncstart("Maestro::compute_cutoff_coords")
-    
+
     ! compute the coordinates of the anelastic cutoff
     found = .false.
 
@@ -331,7 +347,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     call bl_proffortfuncstop("Maestro::compute_cutoff_coords")
-    
+
   end subroutine compute_cutoff_coords
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -347,23 +363,23 @@ contains
     integer :: n, r
     integer :: nchunks, maxchunks
     logical :: chunk_start
-    
+
     if (spherical .eq. 1) then
        finest_radial_level = 0
     else
        finest_radial_level = finest_radial_level_in
     end if
 
-    if (associated(numdisjointchunks)) then
-       call bl_deallocate(numdisjointchunks)
+    if (allocated(numdisjointchunks)) then
+       deallocate(numdisjointchunks)
     end if
-    call bl_allocate(numdisjointchunks,0,finest_radial_level)
+    allocate(numdisjointchunks(0:finest_radial_level))
 
     ! loop through tag_array first to determine the maximum number of chunks
     ! to use for allocating r_start_coord and r_end_coord
     maxchunks = 1
     do n=1,finest_radial_level
-       
+
        ! initialize variables
        chunk_start = .false.
        nchunks = 0
@@ -382,16 +398,16 @@ contains
        maxchunks = max(nchunks,maxchunks)
 
     end do
-    
+
     if (associated(r_start_coord)) then
        call bl_deallocate(r_start_coord)
     end if
-    call bl_allocate(r_start_coord,0,finest_radial_level,1,maxchunks) 
+    call bl_allocate(r_start_coord,0,finest_radial_level,1,maxchunks)
 
     if (associated(r_end_coord)) then
        call bl_deallocate(r_end_coord)
     end if
-    call bl_allocate(r_end_coord,0,finest_radial_level,1,maxchunks) 
+    call bl_allocate(r_end_coord,0,finest_radial_level,1,maxchunks)
 
     if (spherical .eq. 0) then
 
@@ -422,7 +438,7 @@ contains
              end if
           end do
        end do
-       
+
     else
 
        numdisjointchunks(0) = 1
@@ -433,7 +449,7 @@ contains
 
 !!$    print *,"hack,",numdisjointchunks
 !!$    print *,"hack,",r_start_coord(1,:),r_end_coord(1,:)
-    
+
   end subroutine init_multilevel
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -571,12 +587,19 @@ contains
 
   subroutine destroy_base_state_geometry() bind(C, name="destroy_base_state_geometry")
 
-    call bl_deallocate(dr)
-    call bl_deallocate(nr)
-    call bl_deallocate(anelastic_cutoff_density_coord)
-    call bl_deallocate(base_cutoff_density_coord)
+    deallocate(max_radial_level)
+    deallocate(finest_radial_level)
+    deallocate(nr_fine)
+    deallocate(dr_fine)
+    deallocate(nr_irreg)
+    deallocate(center)
+    deallocate(dr)
+
+    deallocate(nr)
+    deallocate(anelastic_cutoff_density_coord)
+    deallocate(base_cutoff_density_coord)
     call bl_deallocate(burning_cutoff_density_coord)
-    call bl_deallocate(numdisjointchunks)
+    deallocate(numdisjointchunks)
     call bl_deallocate(r_start_coord)
     call bl_deallocate(r_end_coord)
 

@@ -4,9 +4,9 @@
 using namespace amrex;
 
 void
-Maestro::PutInPertForm(Vector<MultiFab>& scal, 
-		       const Vector<Real>& s0, 
-		       int comp, int bccomp, 
+Maestro::PutInPertForm(Vector<MultiFab>& scal,
+		       const RealVector& s0,
+		       int comp, int bccomp,
                        const Vector<BCRec>& bcs,
                        bool flag)
 {
@@ -18,7 +18,7 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
     for (int lev = 0; lev <= finest_level; ++lev) {
 	s0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    
+
     // s0 is not edge centered
     // note that bcs parameter is not used
     Put1dArrayOnCart(s0,s0_cart,0,0);
@@ -39,10 +39,10 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
 }
 
 void
-Maestro::PutInPertForm(int level, 
-		       Vector<MultiFab>& scal, 
-		       const Vector<Real>& s0, 
-		       int comp, int bccomp, 
+Maestro::PutInPertForm(int level,
+		       Vector<MultiFab>& scal,
+		       const RealVector& s0,
+		       int comp, int bccomp,
                        const Vector<BCRec>& bcs,
                        bool flag)
 {
@@ -52,7 +52,7 @@ Maestro::PutInPertForm(int level,
     // place 1d array onto a cartesian grid
     Vector<MultiFab> s0_cart(finest_level+1);
     s0_cart[level].define(grids[level], dmap[level], 1, 0);
-    
+
     // s0 is not edge centered
     // note that bcs parameter is not used
     Put1dArrayOnCart(level,s0,s0_cart,0,0);
@@ -67,7 +67,7 @@ Maestro::PutInPertForm(int level,
 	average_down(scal[level],scal[level-1],geom[level],geom[level-1],
 		     comp,1,refRatio(level-1));
     }
-    
+
     FillPatch(level,t_old,scal[level],scal,scal,comp,comp,1,bccomp,bcs);
 
 }
@@ -104,7 +104,7 @@ Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
     }
 
 
-    
+
 }
 
 void

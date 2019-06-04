@@ -7,7 +7,7 @@
 using namespace amrex;
 
 void
-Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
+Maestro::Put1dArrayOnCart (const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
@@ -22,10 +22,20 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
         Abort("Put1dArrayOnCart with ghost cells requires bcs input");
     }
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
-	Put1dArrayOnCart(lev,s0,s0_cart,is_input_edge_centered,
-			 is_output_a_vector,bcs,sbccomp);
+        Put1dArrayOnCart(lev,s0,s0_cart,is_input_edge_centered,
+        		 is_output_a_vector,bcs,sbccomp);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
     int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;
 
@@ -41,7 +51,7 @@ Maestro::Put1dArrayOnCart (const Vector<Real>& s0,
 
 void
 Maestro::Put1dArrayOnCart (int level,
-                           const Vector<Real>& s0,
+                           const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
@@ -70,17 +80,20 @@ Maestro::Put1dArrayOnCart (int level,
     	// lo/hi coordinates (including ghost cells), and/or the # of components
     	// We will also pass "validBox", which specifies the "valid" region.
     	if (spherical == 0) {
-    	    put_1d_array_on_cart(&level,ARLIM_3D(tileBox.loVect()),
-                     ARLIM_3D(tileBox.hiVect()),
-    				 BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-    				 s0.dataPtr(), &is_input_edge_centered, &is_output_a_vector);
+#pragma gpu box(tileBox)
+    	    put_1d_array_on_cart(AMREX_INT_ANYD(tileBox.loVect()),
+                     AMREX_INT_ANYD(tileBox.hiVect()),level,
+    				 BL_TO_FORTRAN_ANYD(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
+    				 s0.dataPtr(), is_input_edge_centered, is_output_a_vector);
     	} else {
-    	    put_1d_array_on_cart_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-    				      BL_TO_FORTRAN_FAB(s0_cart_mf[mfi]),
-    				      s0.dataPtr(), dx,
-    				      &is_input_edge_centered, &is_output_a_vector,
+#pragma gpu box(tileBox)
+    	    put_1d_array_on_cart_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                          AMREX_INT_ANYD(tileBox.hiVect()),
+    				      BL_TO_FORTRAN_ANYD(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
+    				      s0.dataPtr(), AMREX_REAL_ANYD(dx),
+    				      is_input_edge_centered, is_output_a_vector,
     				      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-    				      BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+    				      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
     	}
     }
 
@@ -233,7 +246,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
 
 void
-Maestro::MakeS0mac (const Vector<Real>& s0,
+Maestro::MakeS0mac (const RealVector& s0,
                     Vector<std::array< MultiFab,AMREX_SPACEDIM > >& s0mac)
 {
     // timer for profiling

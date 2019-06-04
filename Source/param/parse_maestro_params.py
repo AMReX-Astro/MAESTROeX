@@ -204,6 +204,8 @@ class Param(object):
         # to 1, and the Fortran parmparse will resize
         if self.dtype == "string":
             ostr += "    allocate(character(len=1)::{})\n".format(name)
+        else:
+            ostr += "    allocate({})\n".format(name)
 
         if not self.debug_default is None:
             ostr += "#ifdef AMREX_DEBUG\n"
@@ -275,17 +277,32 @@ class Param(object):
             return None
 
         if self.f90_dtype == "int":
-            tstr = "integer                       , save :: {}\n".format(self.f90_name)
+            tstr = "integer          , allocatable, save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "Real":
-            tstr = "double precision              , save :: {}\n".format(self.f90_name)
+            tstr = "double precision , allocatable, save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "bool":
-            tstr = "logical                       , save :: {}\n".format(self.f90_name)
+            tstr = "logical          , allocatable, save :: {}\n".format(self.f90_name)
         elif self.f90_dtype == "string":
             tstr = "character (len=:), allocatable, save :: {}\n".format(self.f90_name)
+            print("warning: string parameter {} will not be available on the GPU".format(
+                self.f90_name))
         else:
             sys.exit("unsupported datatype for Fortran: {}".format(self.name))
 
         return tstr
+
+    def get_cuda_managed_string(self):
+        """this is the string that sets the variable as managed for CUDA"""
+        if self.f90_dtype == "string":
+            return "\n"
+        else:
+            cstr = ""
+            if self.ifdef is not None:
+                cstr += "#ifdef {}\n".format(self.ifdef)
+            cstr += "  attributes(managed) :: {}\n".format(self.f90_name)
+            if self.ifdef is not None:
+                cstr += "#endif\n"
+            return cstr
 
 
 def write_meth_module(plist, meth_template):
@@ -313,9 +330,22 @@ def write_meth_module(plist, meth_template):
     for p in param_decls:
         decls += "  {}".format(p)
 
+    cuda_managed_decls = [p.get_cuda_managed_string() for p in plist if p.in_fortran == 1]
+
+    cuda_managed_string = ""
+    for p in cuda_managed_decls:
+        cuda_managed_string += "{}".format(p)
+
     for line in mt:
         if line.find("@@f90_declarations@@") > 0:
             mo.write(decls)
+
+            # Do the CUDA managed declarations
+
+            mo.write("\n")
+            mo.write("#ifdef AMREX_USE_CUDA\n")
+            mo.write(cuda_managed_string)
+            mo.write("#endif\n")
 
             # Now do the OpenACC declarations
 
@@ -380,7 +410,7 @@ def write_meth_module(plist, meth_template):
 
         elif line.find("@@free_maestro_params@@") >= 0:
 
-            params_free = [q for q in params if q.in_fortran == 1 and q.f90_dtype == "string"]
+            params_free = [q for q in params if q.in_fortran == 1]
 
             for p in params_free:
                 mo.write("    if (allocated({})) then\n".format(p.f90_name))

@@ -13,7 +13,7 @@ void
 Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   Vector<MultiFab>& macphi,
                   const Vector<MultiFab>& macrhs,
-                  const Vector<Real>& beta0,
+                  const RealVector& beta0,
                   const int& is_predictor)
 {
     // timer for profiling
@@ -27,7 +27,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // we also need beta0 at edges
     // allocate AND compute it here
-    Vector<Real> beta0_edge( (max_radial_level+1)*(nr_fine+1) );
+    RealVector beta0_edge( (max_radial_level+1)*(nr_fine+1) );
     beta0_edge.shrink_to_fit();
 
     Vector< std::array< MultiFab,AMREX_SPACEDIM > > beta0_cart_edge(finest_level+1);
@@ -224,8 +224,8 @@ void Maestro::MacLevelSolve(const int& ilev,
 
 // multiply (or divide) face-data by beta0
 void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge,
-                                const Vector<Real>& beta0,
-                                const Vector<Real>& beta0_edge,
+                                const RealVector& beta0,
+                                const RealVector& beta0_edge,
                                 const int& mult_or_div)
 {
     // timer for profiling
@@ -281,6 +281,11 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ComputeMACSolverRHS()",ComputeMACSolverRHS);
 
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(true);
+#endif
+
     // Note that umac = beta0*mac
     for (int lev = 0; lev <= finest_level; ++lev)
     {
@@ -306,20 +311,27 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
             const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
-            mac_solver_rhs(&lev,ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
-                           BL_TO_FORTRAN_3D(solverrhs_mf[mfi]),
-                           BL_TO_FORTRAN_3D(macrhs_mf[mfi]),
-                           BL_TO_FORTRAN_3D(uedge_mf[mfi]),
+#pragma gpu box(tileBox)
+            mac_solver_rhs(AMREX_INT_ANYD(tileBox.loVect()),
+                           AMREX_INT_ANYD(tileBox.hiVect()),lev,
+                           BL_TO_FORTRAN_ANYD(solverrhs_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(macrhs_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
-                           BL_TO_FORTRAN_3D(vedge_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                           BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
 #endif
 #endif
-                           dx);
+                           AMREX_REAL_ANYD(dx));
 
         }
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn on GPU
+    Cuda::setLaunchRegion(false);
+#endif
 
 }
 
@@ -383,7 +395,7 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
 
     for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
     {
-        if (Geometry::isPeriodic(idim)) {
+        if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         }
         else {

@@ -316,63 +316,63 @@ Maestro::ExternInit ()
 void
 Maestro::BCSetup()
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::BCSetup()",BCSetup);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::BCSetup()",BCSetup);
 
-	Print() << "Calling BCSetup()" << std::endl;
+    Print() << "Calling BCSetup()" << std::endl;
 
-	bcs_s.resize(Nscal);      // scalars
-	bcs_u.resize(AMREX_SPACEDIM); // velocitiy
-	bcs_f.resize(Nscal);      // a vector of "first-order extrap"
+    bcs_s.resize(Nscal);          // scalars
+    bcs_u.resize(AMREX_SPACEDIM); // velocitiy
+    bcs_f.resize(Nscal);          // a vector of "first-order extrap"
 
-	// Check phys_bc against possible periodic geometry
-	// if periodic, must have internal BC marked.
-	//
-	if (Geometry::isAnyPeriodic())
-	{
-		//
-		// Do idiot check.  Periodic means interior in those directions.
-		//
-		for (int dir = 0; dir<AMREX_SPACEDIM; dir++)
-		{
-			if (Geometry::isPeriodic(dir))
-			{
-				if (phys_bc[dir] != Interior)
-				{
-					std::cerr << "Maestro::ReadParameters:periodic in direction "
-					          << dir << " but low BC is not Interior\n";
-					Error();
-				}
-				if (phys_bc[AMREX_SPACEDIM+dir] != Interior)
-				{
-					std::cerr << "Maestro::ReadParameters:periodic in direction "
-					          << dir << " but high BC is not Interior\n";
-					Error();
-				}
-			}
-		}
-	}
-	else
-	{
-		//
-		// Do idiot check.  If not periodic, should be no interior.
-		//
-		for (int dir=0; dir<AMREX_SPACEDIM; dir++)
-		{
-			if (phys_bc[dir] == Interior)
-			{
-				std::cerr << "Maestro::ReadParameters:interior bc in direction "
-				          << dir << " but not periodic\n";
-				Error();
-			}
-			if (phys_bc[AMREX_SPACEDIM+dir] == Interior)
-			{
-				std::cerr << "Maestro::ReadParameters:interior bc in direction "
-				          << dir << " but not periodic\n";
-				Error();
-			}
-		}
-	}
+    // Check phys_bc against possible periodic geometry
+    // if periodic, must have internal BC marked.
+    //
+    if (Geom(0).isAnyPeriodic())
+    {
+        //
+        // Do idiot check.  Periodic means interior in those directions.
+        //
+        for (int dir = 0; dir<AMREX_SPACEDIM; dir++)
+        {
+            if (Geom(0).isPeriodic(dir))
+            {
+                if (phys_bc[dir] != Interior)
+                {
+                    std::cerr << "Maestro::ReadParameters:periodic in direction "
+                              << dir << " but low BC is not Interior\n";
+                    Error();
+                }
+                if (phys_bc[AMREX_SPACEDIM+dir] != Interior)
+                {
+                    std::cerr << "Maestro::ReadParameters:periodic in direction "
+                              << dir << " but high BC is not Interior\n";
+                    Error();
+                }
+            }
+        }
+    }
+    else
+    {
+        //
+        // Do idiot check.  If not periodic, should be no interior.
+        //
+        for (int dir=0; dir<AMREX_SPACEDIM; dir++)
+        {
+            if (phys_bc[dir] == Interior)
+            {
+                std::cerr << "Maestro::ReadParameters:interior bc in direction "
+                          << dir << " but not periodic\n";
+                Error();
+            }
+            if (phys_bc[AMREX_SPACEDIM+dir] == Interior)
+            {
+                std::cerr << "Maestro::ReadParameters:interior bc in direction "
+                          << dir << " but not periodic\n";
+                Error();
+            }
+        }
+    }
 
 	// set up boundary conditions for Fillpatch operations
 	for (int dir = 0; dir < AMREX_SPACEDIM; ++dir)

@@ -14,7 +14,7 @@ module probin_module
 
   @@declarationsA@@
 
-#ifdef CUDA
+#ifdef AMREX_USE_CUDA
   @@cudaattributesA@@
 #endif
 
@@ -31,7 +31,7 @@ module extern_probin_module
 
   @@declarationsB@@
 
-#ifdef CUDA
+#ifdef AMREX_USE_CUDA
   @@cudaattributesB@@
 #endif
 
@@ -64,6 +64,8 @@ subroutine runtime_init()
 
   integer :: status
 
+  @@allocations@@
+
   @@defaults@@
 
   read (amrex_namelist, nml=probin, iostat=status)
@@ -71,7 +73,7 @@ subroutine runtime_init()
   if (status .ne. 0) then
      ! some problem in the namelist
      print *, 'ERROR: problem in the namelist'
-     stop
+     !stop
   endif
 
   @@acc@@
