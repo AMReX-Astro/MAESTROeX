@@ -382,20 +382,13 @@ private:
                        int is_final_update,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                        const amrex::Vector<amrex::MultiFab>& rho,
-<<<<<<< HEAD
-                       const amrex::Vector<amrex::Real>& rho0,
-                       const amrex::Vector<amrex::Real>& grav,
-                       const amrex::Vector<amrex::Real>& w0_force,
+                       const RealVector& rho0,
+                       const RealVector& grav,
+                       const RealVector& w0_force,
 		               const amrex::Vector<amrex::MultiFab>& w0_force_cart,
 #ifdef ROTATION
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
 #endif
-=======
-                       const RealVector& rho0,
-                       const RealVector& grav,
-                       const RealVector& w0_force,
-		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
->>>>>>> 8b214db3b9e13afa592888fbad69a46d5fed9d46
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,

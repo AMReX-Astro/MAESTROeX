@@ -75,6 +75,7 @@ module meth_params_module
   logical          , allocatable, save :: use_linear_grav_in_beta0
   double precision , allocatable, save :: rotational_frequency
   double precision , allocatable, save :: co_latitude
+  double precision , allocatable, save :: rotation_radius
   logical          , allocatable, save :: drive_initial_convection
   logical          , allocatable, save :: use_alt_energy_fix
   integer          , allocatable, save :: temp_diffusion_formulation
@@ -133,6 +134,7 @@ module meth_params_module
   attributes(managed) :: use_linear_grav_in_beta0
   attributes(managed) :: rotational_frequency
   attributes(managed) :: co_latitude
+  attributes(managed) :: rotation_radius
   attributes(managed) :: drive_initial_convection
   attributes(managed) :: use_alt_energy_fix
   attributes(managed) :: temp_diffusion_formulation
@@ -250,6 +252,8 @@ contains
     rotational_frequency = 0.0d0;
     allocate(co_latitude)
     co_latitude = 0.0d0;
+    allocate(rotation_radius)
+    rotation_radius = 1.0d6;
     allocate(drive_initial_convection)
     drive_initial_convection = .false.;
     allocate(use_alt_energy_fix)
@@ -325,6 +329,7 @@ contains
     call pp%query("use_linear_grav_in_beta0", use_linear_grav_in_beta0)
     call pp%query("rotational_frequency", rotational_frequency)
     call pp%query("co_latitude", co_latitude)
+    call pp%query("rotation_radius", rotation_radius)
     call pp%query("drive_initial_convection", drive_initial_convection)
     call pp%query("use_alt_energy_fix", use_alt_energy_fix)
     call pp%query("temp_diffusion_formulation", temp_diffusion_formulation)
@@ -489,6 +494,9 @@ contains
     end if
     if (allocated(co_latitude)) then
         deallocate(co_latitude)
+    end if
+    if (allocated(rotation_radius)) then
+        deallocate(rotation_radius)
     end if
     if (allocated(drive_initial_convection)) then
         deallocate(drive_initial_convection)

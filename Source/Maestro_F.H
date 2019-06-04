@@ -958,7 +958,7 @@ extern "C"
 #if (AMREX_SPACEDIM == 3)
                         const amrex::Real* wedge, const int* w_lo, const int* w_hi,
 #ifdef ROTATION
-                        const amrex::Real* uold, const int* uo_lo, const int* uo_hi, const int* nc_uo,
+                        const amrex::Real* uold, const int* uo_lo, const int* uo_hi,
 #endif
 #endif
                         const amrex::Real* w0,

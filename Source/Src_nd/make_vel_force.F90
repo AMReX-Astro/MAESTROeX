@@ -1,9 +1,9 @@
 module make_vel_force_module
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
-  use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, prob_lo, rotation_radius
+  use meth_params_module, only: base_cutoff_density,buoyancy_cutoff_factor, &
+    prob_lo, rotation_radius
   use base_state_geometry_module, only:  max_radial_level, nr_fine, dr, nr, center
-
 #ifdef ROTATION
   use rotation_module, only: sin_theta, cos_theta, omega
 #endif
@@ -232,7 +232,7 @@ contains
        bind(C, name="make_vel_force_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer         , intent (in   ) :: is_final_update
+    integer  , value, intent (in   ) :: is_final_update
     integer         , intent (in   ) :: f_lo(3), f_hi(3)
     integer         , intent (in   ) :: g_lo(3), g_hi(3)
     integer         , intent (in   ) :: r_lo(3), r_hi(3)
@@ -248,6 +248,10 @@ contains
     integer         , intent (in   ) :: w0y_lo(3), w0y_hi(3)
     integer         , intent (in   ) :: uo_lo(3), uo_hi(3)
 #endif
+    integer         , intent (in   ) :: r0_lo(3), r0_hi(3)
+    integer         , intent (in   ) :: gr_lo(3), gr_hi(3)
+    double precision, intent (inout) :: vel_force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),AMREX_SPACEDIM)
+    double precision, intent (in   ) ::       gpi(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),AMREX_SPACEDIM)
     double precision, intent (in   ) ::       rho(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
     double precision, intent (in   ) ::     uedge(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
     double precision, intent (in   ) ::     vedge(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
@@ -264,8 +268,7 @@ contains
     double precision, intent (in   ) ::       rho0_cart(r0_lo(1):r0_hi(1),r0_lo(2):r0_hi(2),r0_lo(3):r0_hi(3))
     double precision, intent (in   ) :: grav_cart(gr_lo(1):gr_hi(1),gr_lo(2):gr_hi(2),gr_lo(3):gr_hi(3),AMREX_SPACEDIM)
     double precision, intent (in   ) :: dx(3)
-    integer         , intent (in   ) :: do_add_utilde_force
-
+    integer  , value, intent (in   ) :: do_add_utilde_force
 
     integer         :: i,j,k
 
@@ -287,7 +290,7 @@ contains
           do i = lo(1),hi(1)
              xx = prob_lo(1) + (dble(i) + HALF)*dx(1) - center(1)
 
-             rhopert = rho(i,j,k) - rho0_cart(i,j,k,1)
+             rhopert = rho(i,j,k) - rho0_cart(i,j,k)
 
              ! cutoff the buoyancy term if we are outside of the star
              if (rho(i,j,k) .lt. buoyancy_cutoff_factor*base_cutoff_density) then
@@ -438,7 +441,7 @@ contains
 #endif
     double precision, intent (in   ) ::       rho0_cart(r0_lo(1):r0_hi(1),r0_lo(2):r0_hi(2),r0_lo(3):r0_hi(3))
     double precision, intent (in   ) :: grav_cart(gr_lo(1):gr_hi(1),gr_lo(2):gr_hi(2),gr_lo(3):gr_hi(3),AMREX_SPACEDIM)
-    double precision, intent (in   ) ::       beta0_cart(b0_lo(1):b0_hi(1),b0_lo(2):b0_hi(2),b0_lo(3):b0_hi(3))
+    double precision, intent (in   ) ::       beta0_cart(b0_lo(1):b0_hi(1),b0_lo(2):b0_hi(2),b0_lo(3):b0_hi(3),AMREX_SPACEDIM)
     double precision, intent (in   ) :: dx(3)
     integer  , value, intent (in   ) :: do_add_utilde_force
 

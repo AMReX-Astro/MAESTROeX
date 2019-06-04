@@ -394,7 +394,7 @@ rotational_frequency                Real               0.0    y
 co_latitude                         Real               0.0      y
 
 # radius used for computing centrifugal term in rotation problems
-rotation_radius                     Real               1.0e6
+rotation_radius                     Real               1.0e6    y
 
 # maximum mach number before the code aborts
 mach_max_abort                      Real               -1.0

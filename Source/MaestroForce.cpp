@@ -43,6 +43,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         rho0_cart[lev].setVal(0.);
+    }
 
 
 #ifdef ROTATION
@@ -103,8 +104,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             if (spherical == 0) {
 #pragma gpu box(tileBox)
                 make_vel_force(AMREX_INT_ANYD(tileBox.loVect()),
-                               AMREX_INT_ANYD(tileBox.hiVect()), lev,
-                               is_final_update,
+                               AMREX_INT_ANYD(tileBox.hiVect()),
+                               lev, is_final_update,
                                BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
                                BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
                                BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
