@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 #ifdef AMREX_USE_CUDA
     // turn off GPU in main program
     // only turn on GPU around appropriate subroutines
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// Refuse to continue if we did not provide an inputs file.

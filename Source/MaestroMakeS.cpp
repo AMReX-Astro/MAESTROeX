@@ -24,7 +24,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     // put 1d base state quantities on cartestian grid for spherical case
@@ -203,7 +203,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 }
@@ -236,7 +236,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -287,7 +287,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // averge down and fill ghost cells using first-order extrapolation
@@ -339,7 +339,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -387,7 +387,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average down and fill ghost cells using first-order extrapolation
@@ -451,7 +451,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -515,7 +515,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 }
