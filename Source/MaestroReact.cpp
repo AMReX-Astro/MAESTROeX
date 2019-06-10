@@ -48,7 +48,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
 #ifdef AMREX_USE_CUDA
         // turn on GPU
-        Cuda::setLaunchRegion(true);
+        Gpu::setLaunchRegion(true);
 #endif
 
         // do the burning, update rho_omegadot and rho_Hnuc
@@ -57,7 +57,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
 #ifdef AMREX_USE_CUDA
         // turn off GPU
-        Cuda::setLaunchRegion(false);
+        Gpu::setLaunchRegion(false);
 #endif
 
         // pass temperature through for seeding the temperature update eos call

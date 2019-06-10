@@ -772,7 +772,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -880,7 +880,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
@@ -919,7 +919,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -1006,7 +1006,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average fine data onto coarser cells
