@@ -29,7 +29,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 # GRIDDING AND REFINEMENT
 #amr.n_cell             = 160 160 160
 #amr.n_cell             = 96 96 96
-amr.n_cell = 64 64 64
+amr.n_cell = 48 48 48
 #amr.n_cell = 384 384 384
 amr.max_grid_size      = 32
 amr.max_level          = 2       # maximum level number allowed
@@ -72,15 +72,17 @@ maestro.use_exact_base_state = false
 
 # PLOTFILES
 maestro.plot_base_name  = rot1e3_    # root name of plot file
-maestro.plot_int   = 50      # number of timesteps between plot files
-maestro.plot_deltat = 100.0e0
+maestro.plot_int   = -1      # number of timesteps between plot files
+maestro.plot_deltat = 0.0e0
 maestro.small_plot_base_name = smallrot1e3_
 maestro.small_plot_vars = rho Pi p0 Hnuc circ_velocity radial_velocity abar magvel momentum
-maestro.small_plot_int = 10
+maestro.small_plot_int = -1
+maestro.small_plot_deltat = 0.0e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = 50
+maestro.chk_int         = -1
+maestro.chk_deltat      = 0.0e0
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
@@ -118,10 +120,10 @@ maestro.rotation_radius = 1.e10
 &probin
 
   ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e5
-  velpert_radius = 2.e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
+  velpert_amplitude = 5.e-3
+  velpert_radius = 5.e8
+  velpert_scale = 1.e8
+  velpert_steep = 5.e6
   tag_density_1 = 1.5e5
   tag_radius = 4.e8
 
