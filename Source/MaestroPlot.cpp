@@ -1289,7 +1289,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1353,7 +1353,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// average down and fill ghost cells
@@ -1373,7 +1373,7 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1409,7 +1409,7 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// average down and fill ghost cells
@@ -1429,7 +1429,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1486,7 +1486,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// average down and fill ghost cells
@@ -1552,7 +1552,7 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1614,7 +1614,7 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// average down and fill ghost cells
@@ -1631,7 +1631,7 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1664,7 +1664,7 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// average down and fill ghost cells
@@ -1681,7 +1681,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1746,7 +1746,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// average down and fill ghost cells
@@ -1764,7 +1764,7 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1800,7 +1800,7 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// average down and fill ghost cells
@@ -1817,7 +1817,7 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -1851,7 +1851,7 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
 	// average down and fill ghost cells

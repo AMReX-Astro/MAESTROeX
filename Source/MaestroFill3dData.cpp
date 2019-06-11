@@ -24,7 +24,7 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -34,7 +34,7 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;

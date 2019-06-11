@@ -182,7 +182,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     RealVector divu;
@@ -280,7 +280,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average fine data onto coarser cells
@@ -355,7 +355,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -442,7 +442,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average down and fill ghost cells

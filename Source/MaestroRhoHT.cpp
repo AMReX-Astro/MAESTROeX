@@ -12,7 +12,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -64,7 +64,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average down and fill ghost cells
@@ -93,7 +93,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -135,7 +135,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average down and fill ghost cells (Temperature)
@@ -159,7 +159,7 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -194,7 +194,7 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average down and fill ghost cells
@@ -213,7 +213,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -248,7 +248,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average down and fill ghost cells
@@ -276,7 +276,7 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -316,7 +316,7 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average down and fill ghost cells
@@ -335,7 +335,7 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Cuda::setLaunchRegion(true);
+    Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -398,7 +398,7 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Cuda::setLaunchRegion(false);
+    Gpu::setLaunchRegion(false);
 #endif
 
     // average down and fill ghost cells

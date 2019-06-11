@@ -180,7 +180,7 @@ Maestro::EstDt ()
 
 // #ifdef AMREX_USE_CUDA
 //     // turn off GPU
-//     Cuda::setLaunchRegion(false);
+//     Gpu::setLaunchRegion(false);
 // #endif
 
     if (maestro_verbose > 0) {
