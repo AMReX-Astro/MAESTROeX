@@ -18,7 +18,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 # Set the EOS, conductivity, and network directories
 # We first check if these exist in $(MAESTROEX_HOME)/Microphysics/(EOS/conductivity/networks)
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
-EOS_DIR          := helmholtz
+EOS_DIR          := gamma_law_general
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := general_null
 GENERAL_NET_INPUTS := simple.net
