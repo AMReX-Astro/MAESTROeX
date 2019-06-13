@@ -48,7 +48,7 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 
 # ALGORITHMIC OPTIONS
 maestro.spherical = 1
-maestro.evolve_base_state = true
+maestro.evolve_base_state = false
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
@@ -114,10 +114,10 @@ maestro.rotation_radius = 1.e10
 &probin
 
   ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e5
-  velpert_radius = 2.e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
+  velpert_amplitude = 1.e-3
+  velpert_radius = 4.e8
+  velpert_scale = 1.e9
+  velpert_steep = 1.e7
   tag_density_1 = 1.e7
   tag_radius = 4.e8
 

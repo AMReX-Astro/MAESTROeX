@@ -267,16 +267,16 @@ contains
 
        ! now do the big loop over all points in the domain
        do kloc = lo(3),hi(3)
-          z = prob_lo(3) + (dble(kloc)+HALF)*dx(3) - center(3)
+          z = prob_lo(3) + (dble(kloc)+HALF)*dx(3) 
           do jloc = lo(2),hi(2)
-             y = prob_lo(2) + (dble(jloc)+HALF)*dx(2) - center(2)
+             y = prob_lo(2) + (dble(jloc)+HALF)*dx(2)
              do iloc = lo(1),hi(1)
-                x = prob_lo(1) + (dble(iloc)+HALF)*dx(1) - center(1)
+                x = prob_lo(1) + (dble(iloc)+HALF)*dx(1) 
 
                 ! set perturbational velocity to zero
                 vpert = ZERO
 
-                rloc = sqrt(x**2 + y**2 + z**2)
+                rloc = sqrt((x-center(1))**2 + (y-center(2))**2 + (z-center(3))**2)
 
                 ! loop over the 27 combinations of fourier components
                 do i=1,3
@@ -327,7 +327,7 @@ contains
                    normal(2) = y * ONE / rloc
                    normal(3) = z * ONE / rloc
 
-                   vel(i,j,k,1:3) = normal(1:3) * interpolate(rloc, iconvel_model)
+                   vel(iloc,jloc,kloc,1:3) = normal(1:3) * interpolate(rloc, iconvel_model)
                 endif
 
                 ! add perturbational velocity to background velocity

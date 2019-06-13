@@ -12,7 +12,7 @@ source .slack_vars
 
 webhook_url="https://slack.com/api/files.upload"
 
-export PATH=$MEMBERWORK/ast106/MAESTROeX/Exec/SCIENCE/rotating_star/yt-conda/bin:$PATH
+export PATH=$MEMBERWORK/ast106/yt/bin:$PATH
 export PYTHONPATH=/sw/xk6/xalt/0.7.5/site:/sw/xk6/xalt/0.7.5/libexec
 
 # process script arguments

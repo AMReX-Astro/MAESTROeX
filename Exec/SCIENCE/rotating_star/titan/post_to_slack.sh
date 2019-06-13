@@ -12,14 +12,15 @@ source .slack_vars
 
 webhook_url="https://slack.com/api/files.upload"
 
-export PATH=$MEMBERWORK/ast106/MAESTROeX/Exec/SCIENCE/rotating_star/yt-conda/bin:$PATH
+export PATH=$MEMBERWORK/ast106/yt/bin:$PATH
+export PYTHONPATH=/sw/xk6/xalt/0.7.5/site:/sw/xk6/xalt/0.7.5/libexec
 
 # process script arguments
 t_new=$1
 istep=$2
 plotfile=$3
 
-plotvar="magvel"
+plotvar="Hnuc"
 
 # make plot and store plotname. For some reason yt is segfaulting on me at the end,
 # so I'm just going to redirect that error
