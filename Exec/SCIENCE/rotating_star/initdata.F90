@@ -323,9 +323,9 @@ contains
                 enddo
 
                 if (rloc > 0.0d0) then
-                   normal(1) = x * ONE / rloc
-                   normal(2) = y * ONE / rloc
-                   normal(3) = z * ONE / rloc
+                   normal(1) = (x - center(1)) / rloc
+                   normal(2) = (y - center(2)) / rloc
+                   normal(3) = (z - center(3)) / rloc
 
                    vel(iloc,jloc,kloc,1:3) = normal(1:3) * interpolate(rloc, iconvel_model)
                 endif
