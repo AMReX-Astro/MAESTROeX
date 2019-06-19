@@ -117,5 +117,6 @@ maestro.do_burning = false
   ! in the namelist.
 
   use_eos_coulomb = T
+  eos_assume_neutral = T
 
 /
