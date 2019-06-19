@@ -35,7 +35,7 @@ contains
 
                 r = sqrt(x**2 + y**2 + z**2)
 
-                rho_Hext(i,j,k) = heating_factor * 6.7d5 * exp(-(r/3.2d10)**2)
+                rho_Hext(i,j,k) = heating_factor * 6.7d5 * exp(-(r/4.525d10)**2)
             enddo
         enddo
     enddo
