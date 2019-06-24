@@ -67,7 +67,10 @@ def doit(labels):
     if args.outfile:
         plt_name = args.outfile
     else:
-        plt_name = '{}.{}-vs-{}.png'.format(args.infile, args.field, args.axis)
+        if (len(args.infiles) == 1):
+            plt_name = '{}.{}-vs-{}.png'.format(args.infiles[0], args.field, args.axis)
+        else:
+            plt_name = 'profile.{}-vs-{}.png'.format(args.field, args.axis)
     plot.save(plt_name)
 
 if __name__=='__main__':
