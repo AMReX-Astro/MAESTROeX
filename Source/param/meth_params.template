@@ -1,4 +1,4 @@
-! This module stores the runtime parameters and integer names for 
+! This module stores the runtime parameters and integer names for
 ! indexing arrays.
 !
 ! The Fortran-specific parameters are initialized in set_method_params(),
@@ -8,14 +8,25 @@
 module meth_params_module
 
   use amrex_fort_module, only : rt => amrex_real
+  use state_sizes_module, only: nscal
   implicit none
 
   ! variables in the module
 
-  integer, save :: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp
-  integer, save :: nscal
-  double precision, save :: prob_lo(3), prob_hi(3)
-  double precision, save :: rel_eps
+  integer, allocatable, save :: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp
+  double precision, allocatable, save :: prob_lo(:), prob_hi(:)
+  double precision, allocatable, save :: rel_eps
+
+#ifdef AMREX_USE_CUDA
+    attributes(managed) :: rho_comp
+    attributes(managed) :: rhoh_comp
+    attributes(managed) :: spec_comp
+    attributes(managed) :: temp_comp
+    attributes(managed) :: pi_comp
+    attributes(managed) :: prob_lo
+    attributes(managed) :: prob_hi
+    attributes(managed) :: rel_eps
+#endif
 
 
   ! Begin the declarations of the ParmParse parameters
@@ -36,6 +47,11 @@ contains
     implicit none
 
     type (amrex_parmparse) :: pp
+
+    allocate(rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp)
+    allocate(prob_lo(3))
+    allocate(prob_hi(3))
+    allocate(rel_eps)
 
     @@set_maestro_params@@
 
@@ -62,8 +78,12 @@ contains
   subroutine finalize_meth_params() bind(C, name="finalize_meth_params")
     implicit none
 
+    deallocate(rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp)
+    deallocate(prob_lo, prob_hi)
+    deallocate(rel_eps)
+
     @@free_maestro_params@@
-    
+
   end subroutine finalize_meth_params
 
 end module meth_params_module

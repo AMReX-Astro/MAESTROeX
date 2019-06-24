@@ -7,19 +7,14 @@ void
 Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 			  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-                          const Vector<Real>& w0_force,
+                          const RealVector& w0_force,
 			  const Vector<MultiFab>& w0_force_cart,
-                          const Vector<Real>& rho0_nph,
-                          const Vector<Real>& grav_cell_nph, 
+                          const RealVector& rho0_nph,
+                          const RealVector& grav_cell_nph,
 			  const Vector<MultiFab>& sponge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelocityAdvance()",VelocityAdvance);
-    
-    // allocate a dummy beta0 and set equal to zero
-    Vector<Real> beta0_dummy( (max_radial_level+1)*nr_fine );
-    beta0_dummy.shrink_to_fit();
-    std::fill(beta0_dummy.begin(),beta0_dummy.end(), 0.);
 
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -39,11 +34,11 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     }
 
     //////////////////////////////////
-    // Create the velocity forcing term at time n using rho 
+    // Create the velocity forcing term at time n using rho
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,beta0_dummy,0,1);
-    
+    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,1);
+
     //////////////////////////////////
     // Add w0 to MAC velocities
     //////////////////////////////////
@@ -55,7 +50,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     //////////////////////////////////
 
     MakeEdgeScal(uold,uedge,umac,vel_force,1,bcs_u,AMREX_SPACEDIM,0,0,AMREX_SPACEDIM,0);
-    
+
     //////////////////////////////////
     // Subtract w0 from MAC velocities.
     //////////////////////////////////
@@ -63,15 +58,15 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     Addw0(umac,w0mac,-1.);
 
     //////////////////////////////////
-    // Now create the force at half-time using rhohalf 
+    // Now create the force at half-time using rhohalf
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,beta0_dummy,0,1);
+    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,1);
 
     //////////////////////////////////
     // Update the velocity with convective differencing
     //////////////////////////////////
-    
+
     UpdateVel(umac, uedge, vel_force, sponge, w0mac);
 
 }

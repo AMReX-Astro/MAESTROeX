@@ -19,9 +19,11 @@ contains
   subroutine maestro_network_init() bind(C, name="maestro_network_init")
 
     use actual_rhs_module, only: actual_rhs_init
+    use burner_loop_module, only: burner_loop_init
 
     call network_init()
     call actual_rhs_init()
+    call burner_loop_init()
 
   end subroutine maestro_network_init
 
@@ -136,7 +138,7 @@ contains
     temp_comp = Temperature+1
     pi_comp   = Pressure+1
 
-    nscal = Nscalars
+    ! nscal = Nscalars
 
     prob_lo(1:3) = prob_lo_in(1:3)
     prob_hi(1:3) = prob_hi_in(1:3)

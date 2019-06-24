@@ -41,6 +41,9 @@ maestro.plot_int   = 10     # number of timesteps between plot files
 maestro.check_base_name = 3levs_chk
 maestro.chk_int         = 100
 
+# how often (number of coarse timesteps) to compute integral sums (for runtime diagnostics)
+maestro.sum_interval = 1
+
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in

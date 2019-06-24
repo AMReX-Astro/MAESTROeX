@@ -324,14 +324,14 @@ Maestro::BCSetup()
     // Check phys_bc against possible periodic geometry
     // if periodic, must have internal BC marked.
     //
-    if (Geometry::isAnyPeriodic())
+    if (Geom(0).isAnyPeriodic())
     {
         //
         // Do idiot check.  Periodic means interior in those directions.
         //
         for (int dir = 0; dir<AMREX_SPACEDIM; dir++)
         {
-            if (Geometry::isPeriodic(dir))
+            if (Geom(0).isPeriodic(dir))
             {
                 if (phys_bc[dir] != Interior)
                 {

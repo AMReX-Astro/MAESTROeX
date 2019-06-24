@@ -239,7 +239,7 @@ Maestro::InitData ()
 
 	// free memory in s0_init and p0_init by swapping it
 	// with an empty vector that will go out of scope
-	Vector<Real> s0_swap, p0_swap;
+	RealVector s0_swap, p0_swap;
 	std::swap(s0_swap,s0_init);
 	std::swap(p0_swap,p0_init);
 
@@ -400,8 +400,8 @@ void Maestro::InitProj ()
 	Vector<MultiFab>       delta_gamma1(finest_level+1);
 	Vector<MultiFab>  delta_gamma1_term(finest_level+1);
 
-	Vector<Real> Sbar( (max_radial_level+1)*nr_fine );
-	Vector<Real> delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
+	RealVector Sbar( (max_radial_level+1)*nr_fine );
+	RealVector delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
 	Sbar.shrink_to_fit();
 	delta_gamma1_termbar.shrink_to_fit();
 
@@ -479,11 +479,11 @@ void Maestro::DivuIter (int istep_divu_iter)
 	Vector<MultiFab> delta_gamma1      (finest_level+1);
 	Vector<MultiFab> delta_gamma1_term (finest_level+1);
 
-	Vector<Real> Sbar                  ( (max_radial_level+1)*nr_fine );
-	Vector<Real> w0_force              ( (max_radial_level+1)*nr_fine );
-	Vector<Real> p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
-	Vector<Real> delta_chi_w0          ( (max_radial_level+1)*nr_fine );
-	Vector<Real> delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
+	RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
+	RealVector w0_force              ( (max_radial_level+1)*nr_fine );
+	RealVector p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
+	RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
+	RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
 
 	Sbar.shrink_to_fit();
 	w0_force.shrink_to_fit();

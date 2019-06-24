@@ -112,7 +112,7 @@ Maestro::Evolve ()
 
         if ( (plot_int > 0 && istep % plot_int == 0) ||
              (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
-             (istep == max_step) || (t_old >= stop_time) )
+             (plot_int > 0 || plot_deltat > 0) && ((istep == max_step) || (t_old >= stop_time)) )
 		{
             // write a plotfile
 			Print() << "\nWriting plotfile " << istep << std::endl;
@@ -122,7 +122,7 @@ Maestro::Evolve ()
 
         if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
              (small_plot_deltat > 0 && std::fmod(t_new, small_plot_deltat) < dt) ||
-             (istep == max_step)  || (t_old >= stop_time) )
+             (small_plot_int > 0 || small_plot_deltat > 0) && ((istep == max_step)  || (t_old >= stop_time)) )
 		{
             // write a small plotfile
 			Print() << "\nWriting small plotfile " << istep << std::endl;
@@ -131,7 +131,7 @@ Maestro::Evolve ()
 		}
 
 		if ( (chk_int > 0 && istep % chk_int == 0) ||
-             (istep == max_step) || (t_new >= stop_time) )
+             (chk_int > 0) && ((istep == max_step) || (t_new >= stop_time) ))
 		{
 			// write a checkpoint file
 			Print() << "\nWriting checkpoint " << istep << std::endl;

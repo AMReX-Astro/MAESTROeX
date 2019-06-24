@@ -31,9 +31,13 @@ module network
   logical :: network_initialized = .false.
 
   ! this will be computed here, not in the actual network
-  real(kind=rt) :: aion_inv(nspec)
+  real(kind=rt), allocatable :: aion_inv(:)
 
   !$acc declare create(aion_inv)
+
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: aion_inv
+#endif
 
 contains
 
@@ -43,6 +47,8 @@ contains
     use amrex_constants_module, only : ONE
 
     implicit none
+
+    allocate(aion_inv(nspec))
 
     ! First, we call the specific network initialization.
     ! This should set the number of species and number of

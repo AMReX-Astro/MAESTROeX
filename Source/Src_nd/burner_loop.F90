@@ -2,53 +2,67 @@ module burner_loop_module
 
   use amrex_error_module
   use burner_module
-  use burn_type_module, only: burn_t
+  use burn_type_module, only: burn_t, copy_burn_t
   use network, only: nspec, network_species_index
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, &
-       pi_comp, burner_threshold_cutoff, burner_threshold_species, &
+       pi_comp, nscal, burner_threshold_cutoff, burner_threshold_species, &
        burning_cutoff_density, reaction_sum_tol, &
        drive_initial_convection
   use base_state_geometry_module, only: max_radial_level, nr_fine
 
   implicit none
 
+  public :: burner_loop_init
+
   private
 
-  integer, save :: ispec_threshold
-  logical, save :: firstCall = .true.
+  integer, allocatable, save :: ispec_threshold
 
+#ifdef AMREX_USE_CUDA
+  attributes(managed) :: ispec_threshold
+#endif
 
 contains
 
-  subroutine burner_loop(lev, lo, hi, &
-       s_in,     i_lo, i_hi, nc_i, &
-       s_out,    o_lo, o_hi, nc_o, &
+  subroutine burner_loop_init()
+
+      allocate(ispec_threshold)
+
+      ispec_threshold = network_species_index(burner_threshold_species)
+
+  end subroutine burner_loop_init
+
+  subroutine burner_loop(lo, hi, &
+       lev, &
+       s_in,     i_lo, i_hi, &
+       s_out,    o_lo, o_hi, &
        rho_Hext, e_lo, e_hi, &
-       rho_odot, r_lo, r_hi, nc_r, &
+       rho_odot, r_lo, r_hi, &
        rho_Hnuc, n_lo, n_hi, &
        tempbar_init_in, dt_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
 
-    integer         , intent (in   ) :: lev, lo(3), hi(3)
-    integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
-    integer         , intent (in   ) :: o_lo(3), o_hi(3), nc_o
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer, value  , intent (in   ) :: lev
+    integer         , intent (in   ) :: i_lo(3), i_hi(3)
+    integer         , intent (in   ) :: o_lo(3), o_hi(3)
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
-    integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
+    integer         , intent (in   ) :: r_lo(3), r_hi(3)
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3)
-    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
-    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
+    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nscal)
+    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nscal)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
-    double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
+    double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nspec)
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: tempbar_init_in(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: dt_in
+    double precision, value, intent (in) :: dt_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
-    integer         , intent (in   ) :: use_mask
+    integer, value  , intent (in   ) :: use_mask
 
     ! local
-    integer          :: i, j, k, n
+    integer          :: i, j, k, n, r
     double precision :: rho,T_in
 
     double precision :: x_in(nspec)
@@ -61,10 +75,7 @@ contains
 
     type (burn_t)    :: state_in, state_out
 
-    if (firstCall) then
-       ispec_threshold = network_species_index(burner_threshold_species)
-       firstCall = .false.
-    endif
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -83,7 +94,14 @@ contains
                 enddo
 
                 if (drive_initial_convection) then
-                   T_in = tempbar_init_in(lev,k)
+#if (AMREX_SPACEDIM == 1)
+                   r = i
+#elif (AMREX_SPACEDIM == 2)
+                   r = j
+#elif (AMREX_SPACEDIM == 3)
+                   r = k
+#endif
+                   T_in = tempbar_init_in(lev,r)
                 else
                    T_in = s_in(i,j,k,temp_comp)
                 endif
@@ -110,7 +128,7 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
-                   state_out = state_in
+                   call copy_burn_t(state_out, state_in)
                    call burner(state_in, state_out, dt_in)
                    do n = 1, nspec
                       x_out(n) = state_out % xn(n)
@@ -132,7 +150,9 @@ contains
                    sumX = sumX + x_out(n)
                 enddo
                 if (abs(sumX - 1.d0) > reaction_sum_tol) then
+#ifndef AMREX_USE_GPU
                    call amrex_error("ERROR: abundances do not sum to 1", abs(sumX-1.d0))
+#endif
                    do n = 1, nspec
                       state_out % xn(n) = state_out % xn(n)/sumX
                    enddo
@@ -165,32 +185,32 @@ contains
   end subroutine burner_loop
 
   subroutine burner_loop_sphr(lo, hi, &
-       s_in,     i_lo, i_hi, nc_i, &
-       s_out,    o_lo, o_hi, nc_o, &
+       s_in,     i_lo, i_hi, &
+       s_out,    o_lo, o_hi, &
        rho_Hext, e_lo, e_hi, &
-       rho_odot, r_lo, r_hi, nc_r, &
+       rho_odot, r_lo, r_hi, &
        rho_Hnuc, n_lo, n_hi, &
        tempbar_init_cart, t_lo, t_hi, dt_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
-    integer         , intent (in   ) :: i_lo(3), i_hi(3), nc_i
-    integer         , intent (in   ) :: o_lo(3), o_hi(3), nc_o
+    integer         , intent (in   ) :: i_lo(3), i_hi(3)
+    integer         , intent (in   ) :: o_lo(3), o_hi(3)
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
-    integer         , intent (in   ) :: r_lo(3), r_hi(3), nc_r
+    integer         , intent (in   ) :: r_lo(3), r_hi(3)
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3)
-    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nc_i)
-    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nc_o)
+    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nscal)
+    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nscal)
     double precision, intent (in   ) :: rho_Hext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
-    double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nc_r)
+    double precision, intent (inout) :: rho_odot(r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3),nspec)
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (in   ) :: tempbar_init_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
-    double precision, intent (in   ) :: dt_in
+    double precision, value, intent (in) :: dt_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
-    integer         , intent (in   ) :: use_mask
+    integer, value  , intent (in   ) :: use_mask
 
     ! local
     integer          :: i, j, k, n
@@ -206,10 +226,7 @@ contains
 
     type (burn_t)    :: state_in, state_out
 
-    if (firstCall) then
-       ispec_threshold = network_species_index(burner_threshold_species)
-       firstCall = .false.
-    endif
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -255,7 +272,7 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
-                   state_out = state_in
+                   call copy_burn_t(state_out, state_in)
                    call burner(state_in, state_out, dt_in)
                    do n = 1, nspec
                       x_out(n) = state_out % xn(n)
