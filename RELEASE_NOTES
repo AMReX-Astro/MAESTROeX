@@ -97,3 +97,9 @@ Move put_1d_array_on_sphr routine calls to C++ to avoid calls on the GPU
 If USE_CUDA=TRUE, then set USE_GPU_PRAGMA=TRUE and add CUDA to define
 Remove loop over level in 1d divu_cart and gradp0
 Offloaded plotting routines in make_plot_variables.F90 to GPU
+
+07-02-2019
+Add BSD-3 license
+Minor bugfixes at initialization
+Add diagnostic outputs of radially averaged profiles
+Add tests: test_stability, code_comp (code comparison project for Exeter)
