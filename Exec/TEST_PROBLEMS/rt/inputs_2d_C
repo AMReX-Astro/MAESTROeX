@@ -121,7 +121,7 @@ system.regtest_reduction = 1
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  eos_gamma = 5.0d0/3.0d0
+  eos_gamma = 1.666666667d0
   eos_assume_neutral = T
   const_conductivity = 1.0d0
 
