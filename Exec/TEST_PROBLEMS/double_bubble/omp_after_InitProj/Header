@@ -1,0 +1,93 @@
+HyperCLaw-V1.1
+45
+velx
+vely
+magvel
+momentum
+vort
+rho
+rhoh
+h
+rhoX(A)
+rhoX(B)
+rhoX(C)
+X(A)
+X(B)
+X(C)
+abar
+omegadot(A)
+omegadot(B)
+omegadot(C)
+Hnuc
+tfromp
+tfromh
+deltap
+deltaT
+Pi
+pioverp0
+p0pluspi
+gpix
+gpiy
+rhopert
+rhohpert
+tpert
+rho0
+rhoh0
+h0
+p0
+MachNumber
+deltagamma
+entropy
+entropypert
+S
+w0x
+w0y
+divw0
+thermal
+conductivity
+2
+0
+0
+0 0 
+2 2 
+
+((0,0) (255,255) (0,0)) 
+-9999998 
+0.0078125 0.0078125 
+0
+0
+0 16 0
+-9999998
+0 0.5
+0 0.5
+1.5 2
+0 0.5
+1 1.5
+0 0.5
+0.5 1
+0 0.5
+0 0.5
+1.5 2
+0 0.5
+1 1.5
+0 0.5
+0.5 1
+1.5 2
+1.5 2
+1.5 2
+1 1.5
+1.5 2
+0.5 1
+1 1.5
+1.5 2
+1 1.5
+1 1.5
+1 1.5
+0.5 1
+0.5 1
+1.5 2
+0.5 1
+1 1.5
+0.5 1
+0.5 1
+Level_0/Cell

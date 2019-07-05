@@ -1,0 +1,190 @@
+==============================================================================
+ MAESTROeX Job Information
+==============================================================================
+job name: 
+
+inputs file: inputs_2d_regression
+
+number of MPI processes: 1
+number of threads:       64
+tile size: 1024000 1024000 
+
+CPU time used since start of simulation (CPU-hours): 0.0460344
+
+==============================================================================
+ Plotfile Information
+==============================================================================
+output data / time: Tue Jun 25 21:24:11 2019
+output dir:         /global/u1/x/xinlong/github_folder/MAESTROeX/Exec/TEST_PROBLEMS/double_bubble
+
+
+==============================================================================
+ Build Information
+==============================================================================
+build date:    2019-06-25 21:20:10.581797
+build machine: Linux cori07 4.4.178-94.91-default #1 SMP Thu May 2 20:14:31 UTC 2019 (d683ca1) x86_64 x86_64 x86_64 GNU/Linux
+build dir:     /global/u1/x/xinlong/github_folder/MAESTROeX/Exec/TEST_PROBLEMS/double_bubble
+AMReX dir:     /global/homes/x/xinlong/github_folder/amrex/
+
+COMP:          gnu
+COMP version:  7.3.0
+
+C++ compiler:  g++
+C++ flags:      -Werror=return-type -g -O3  -fopenmp -DNDEBUG -DBL_USE_OMP -DAMREX_USE_OMP -DAMREX_GIT_VERSION="19.05.1-148-g26ee936b4dd8" -DBL_GCC_VERSION=7.3.0 -DBL_GCC_MAJOR_VERSION=7 -DBL_GCC_MINOR_VERSION=3 -DAMREX_LAUNCH= -DAMREX_DEVICE= -DAMREX_CUDA_FORT_GLOBAL= -DAMREX_CUDA_FORT_DEVICE= -DAMREX_CUDA_FORT_HOST= -DBL_SPACEDIM=2 -DAMREX_SPACEDIM=2 -DBL_FORT_USE_UNDERSCORE -DAMREX_FORT_USE_UNDERSCORE -DBL_Linux -DAMREX_Linux -DCRSEGRNDOMP -DEXTRA_THERMO -DINTEGRATOR=0 -I. -I. -I../../../Source -I../../../Source/Src_nd -I../../../Source/param_includes -I../../../constants -I../../../Util/model_parser -I../../../Util/simple_log -I../../../Microphysics/EOS -I/global/homes/x/xinlong/github_folder/Microphysics/EOS/multigamma -I../../../Microphysics/networks -I../../../Microphysics/networks/general_null -I/global/homes/x/xinlong/github_folder/Microphysics/EOS -I/global/homes/x/xinlong/github_folder/Microphysics/networks -I../../../Microphysics/conductivity -I../../../Microphysics/conductivity -I../../../Microphysics/conductivity/constant -I/global/homes/x/xinlong/github_folder/amrex//Src/Base -I/global/homes/x/xinlong/github_folder/amrex//Src/Boundary -I/global/homes/x/xinlong/github_folder/amrex//Src/AmrCore -I/global/homes/x/xinlong/github_folder/amrex//Src/LinearSolvers/C_CellMG -I/global/homes/x/xinlong/github_folder/amrex//Src/LinearSolvers/MLMG -I/global/homes/x/xinlong/github_folder/Microphysics/util -I/global/homes/x/xinlong/github_folder/Microphysics/util/LINPACK -I/global/homes/x/xinlong/github_folder/Microphysics/util/BLAS -I/global/homes/x/xinlong/github_folder/Microphysics/integration/VODE -I/global/homes/x/xinlong/github_folder/Microphysics/integration/VODE/vode_source/ -I/global/homes/x/xinlong/github_folder/Microphysics/integration/BS -I/global/homes/x/xinlong/github_folder/Microphysics/integration -I. -I../../../Source -I../../../Source/Src_nd -I../../../Source/param_includes -I../../../constants -I../../../Util/model_parser -I../../../Util/simple_log -I../../../Microphysics/EOS -I/global/homes/x/xinlong/github_folder/Microphysics/EOS/multigamma -I../../../Microphysics/networks -I../../../Microphysics/networks/general_null -I/global/homes/x/xinlong/github_folder/Microphysics/EOS -I/global/homes/x/xinlong/github_folder/Microphysics/networks -I../../../Microphysics/conductivity -I../../../Microphysics/conductivity -I../../../Microphysics/conductivity/constant -I/global/homes/x/xinlong/github_folder/amrex//Tools/C_scripts
+
+Fortran comp:  gfortran
+Fortran flags:  -g -O3 -ffree-line-length-none -fno-range-check -fno-second-underscore -fimplicit-none  -fopenmp
+
+Link flags:    -L. -L/opt/gcc/7.3.0/snos/lib/gcc/x86_64-suse-linux/7.3.0/../../../../lib64/
+Libraries:      -lgfortran -lquadmath
+
+EOS: /global/homes/x/xinlong/github_folder/Microphysics/EOS/multigamma
+NETWORK: ../../../Microphysics/networks/general_null
+CONDUCTIVITY: ../../../Microphysics/conductivity/constant
+MAESTROeX git describe: 19.05-16-g6d09d03-dirty
+AMReX git describe: 19.05.1-148-g26ee936b4
+Microphysics git describe: flame_wave-69-g76950944-dirty
+
+
+==============================================================================
+ Grid Information
+==============================================================================
+ level: 0
+   number of boxes = 64
+   maximum zones   = 512 512 
+
+ Boundary conditions
+   -x: interior
+   +x: interior
+   -y: outflow
+   +y: outflow
+
+
+==============================================================================
+ Species Information
+==============================================================================
+ index        
+                 name        
+      A        
+      Z
+------------------------------------------------------------------------------
+     0        
+                    A        
+      1        
+      1
+     1        
+                    B        
+      1        
+      1
+     2        
+                    C        
+      1        
+      1
+
+
+==============================================================================
+ Inputs File Parameters
+==============================================================================
+maestro.perturb_model = true
+maestro.ppm_type = 1
+geometry.prob_lo = 0.0 0.0
+geometry.prob_hi = 2.0 2.0
+maestro.lo_bc = 0 2
+maestro.hi_bc = 0 2
+geometry.is_periodic = 1 0 0
+maestro.v(nvals = 1)  :: [1]
+amrex.fpe_trap_invalid = 1
+amr.n_cell = 512 512
+amr.max_grid_size = 64
+amr.max_level = 0
+maestro.regrid_int = 2
+amr.ref_ratio(nvals = 4)  :: [2, 2, 2, 2]
+amr.blocking_factor = 8
+amr.refine_grid_layout = 0
+maestro.max_step = 5
+maestro.stop_time = 3.0e-4
+maestro.cfl = 0.8
+maestro.evolve_base_state = false
+maestro.do_initial_projection = true
+maestro.init_divu_iter = 3
+maestro.init_iter = 3
+maestro.do_sponge = 0
+maestro.sponge_center_density = 3.0e6
+maestro.sponge_start_factor = 10.0e0
+maestro.sponge_kappa = 10.0e0
+maestro.use_thermal_diffusion = false
+maestro.plot_base_name = double_bubble_2d_plt
+maestro.plot_int = 5
+maestro.check_base_name = double_bubble_2d_chk
+maestro.chk_int = -1
+maestro.eps_init_proj_cart = 1.0e-12
+maestro.eps_init_proj_sph = 1.0e-10
+maestro.eps_divu_cart = 1.0e-8
+maestro.eps_divu_sph = 1.0e-10
+maestro.divu_iter_factor = 100.0
+maestro.divu_level_factor = 10.0
+maestro.eps_mac = 1.0e-10
+maestro.eps_mac_max = 1.0e-8
+maestro.mac_level_factor = 10.0
+maestro.eps_mac_bottom = 1.0e-3
+maestro.eps_hg = 1.e-12
+maestro.eps_hg_max = 1.e-10
+maestro.hg_level_factor = 10.
+maestro.eps_hg_bottom = 1.e-4
+maestro.anelastic_cutoff_density = 1.e-10
+maestro.base_cutoff_density = 1.e-10
+maestro.grav_const = -1.0e9
+maestro.small_temp = 1.e-5
+maestro.do_burning = false
+                           pert_factor =     0.8100000000E-02
+                             pres_base =      1650000.000    
+                             dens_base =     0.1650000000E-02
+                         y_pert_center =     0.7000000000    
+                            pert_width =     0.2500000000E-01
+                         do_isentropic = T
+                                single = F
+                     eos_gamma_default =      1.399999976    
+ [*]                    species_a_name = A
+ [*]                   species_a_gamma =      1.666000000    
+ [*]                    species_b_name = B
+ [*]                   species_b_gamma =      1.400000000    
+ [*]                    species_c_name = C
+ [*]                   species_c_gamma =      1.666000000    
+                               small_x =     0.1000000000E-29
+                            use_tables = F
+                    use_c12ag_deboer17 = F
+                    const_conductivity =      1.000000000    
+                        scaling_method =          2
+                use_timestep_estimator = F
+                       ode_scale_floor =     0.1000000000E-05
+                            ode_method =          1
+                         safety_factor =      1000000000.    
+               do_constant_volume_burn = F
+                       call_eos_in_rhs = F
+                               dT_crit =     0.1000000000E+21
+                          burning_mode =          1
+                   burning_mode_factor =     0.1000000000    
+                 integrate_temperature = T
+                      integrate_energy = T
+                              jacobian =          1
+                     centered_diff_jac = F
+                        burner_verbose = F
+                             rtol_spec =     0.1000000000E-11
+                             rtol_temp =     0.1000000000E-05
+                             rtol_enuc =     0.1000000000E-05
+                             atol_spec =     0.1000000000E-11
+                             atol_temp =     0.1000000000E-05
+                             atol_enuc =     0.1000000000E-05
+                            retry_burn = F
+                     retry_burn_factor =      1.250000000    
+                 retry_burn_max_change =      100.0000000    
+                      abort_on_failure = T
+                renormalize_abundances = F
+                          SMALL_X_SAFE =     0.1000000000E-29
+                              MAX_TEMP =     0.1000000000E+12
+                           react_boost =     -1.000000000    
+               reactions_density_scale =      1.000000000    
+           reactions_temperature_scale =      1.000000000    
+                reactions_energy_scale =      1.000000000    
+                         ode_max_steps =     150000
+                  use_jacobian_caching = T
