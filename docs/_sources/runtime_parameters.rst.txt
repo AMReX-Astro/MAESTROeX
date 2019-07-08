@@ -136,6 +136,10 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``chk_int``                            | Number of timesteps between writing a checkpoint file   | 0             |
 +----------------------------------------+---------------------------------------------------------+---------------+
+| ``chk_deltat``                         | rather than output a checkpoint after a fixed number of | -1.0          |
+|                                        | timesteps, output after the solution has advanced past  |               |
+|                                        | chk\_deltat in time                                     |               |
++----------------------------------------+---------------------------------------------------------+---------------+
 | ``plot_h_with_use_tfromp``             | Turn on storing of enthalpy-based quantities in the     | true          |
 |                                        | plotfile when we are running with {\tt use\_tfromp} NOT |               |
 |                                        | IMPLEMENTED YET                                         |               |
