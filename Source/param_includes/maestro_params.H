@@ -33,6 +33,7 @@ static int         small_plot_int;
 static amrex::Real plot_deltat;
 static amrex::Real small_plot_deltat;
 static int         chk_int;
+static amrex::Real chk_deltat;
 static bool        plot_h_with_use_tfromp;
 static bool        plot_spec;
 static bool        plot_omegadot;

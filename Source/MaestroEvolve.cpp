@@ -131,7 +131,9 @@ Maestro::Evolve ()
 		}
 
 		if ( (chk_int > 0 && istep % chk_int == 0) ||
-             (chk_int > 0) && ((istep == max_step) || (t_new >= stop_time) ))
+         (chk_deltat > 0 && std::fmod(t_new, chk_deltat) < dt) ||
+         (chk_int > 0 || chk_deltat > 0) && ((istep == max_step) ||
+         (t_new >= stop_time) ))
 		{
 			// write a checkpoint file
 			Print() << "\nWriting checkpoint " << istep << std::endl;

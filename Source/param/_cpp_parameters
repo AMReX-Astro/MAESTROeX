@@ -144,6 +144,10 @@ small_plot_deltat                   Real           -1.0
 # Number of timesteps between writing a checkpoint file
 chk_int                             int            0
 
+# rather than output a checkpoint after a fixed number of timesteps, output
+# after the solution has advanced past chk\_deltat in time
+chk_deltat                          Real           -1.0
+
 # Turn on storing of enthalpy-based quantities in the plotfile
 # when we are running with {\tt use\_tfromp}
 # NOT IMPLEMENTED YET

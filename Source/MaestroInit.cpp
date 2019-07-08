@@ -185,7 +185,7 @@ Maestro::Init ()
 			WriteSmallPlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 		}
 
-		if (chk_int > 0) {
+		if (chk_int > 0 || chk_deltat > 0) {
 			Print() << "\nWriting checkpoint 0 after all initialization" << std::endl;
 			WriteCheckPoint(0);
         }

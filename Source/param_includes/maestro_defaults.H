@@ -33,6 +33,7 @@ int         Maestro::small_plot_int = 0;
 amrex::Real Maestro::plot_deltat = -1.0;
 amrex::Real Maestro::small_plot_deltat = -1.0;
 int         Maestro::chk_int = 0;
+amrex::Real Maestro::chk_deltat = -1.0;
 bool        Maestro::plot_h_with_use_tfromp = true;
 bool        Maestro::plot_spec = true;
 bool        Maestro::plot_omegadot = true;

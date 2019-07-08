@@ -33,6 +33,7 @@ pp.query("small_plot_int", small_plot_int);
 pp.query("plot_deltat", plot_deltat);
 pp.query("small_plot_deltat", small_plot_deltat);
 pp.query("chk_int", chk_int);
+pp.query("chk_deltat", chk_deltat);
 pp.query("plot_h_with_use_tfromp", plot_h_with_use_tfromp);
 pp.query("plot_spec", plot_spec);
 pp.query("plot_omegadot", plot_omegadot);
