@@ -177,6 +177,9 @@ plot_gpi                             bool            true
 # plot soundspeed
 plot_cs                              bool            false
 
+# plot gravitational acceleration
+plot_grav                            bool            false
+
 # prefix to use in plotfile file names
 plot_base_name                      string          "plt"
 

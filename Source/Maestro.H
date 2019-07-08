@@ -635,6 +635,9 @@ private:
     void MakeAdExcess (const amrex::Vector<amrex::MultiFab>& state,
                        amrex::Vector<amrex::MultiFab>& ad_excess);
 
+    void MakeGrav (const RealVector& rho0,
+                   amrex::Vector<amrex::MultiFab>& grav);
+
     void MakeVorticity (const amrex::Vector<amrex::MultiFab>& vel,
                         amrex::Vector<amrex::MultiFab>& vorticity);
 

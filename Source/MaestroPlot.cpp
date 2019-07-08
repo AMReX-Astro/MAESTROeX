@@ -628,6 +628,15 @@ Maestro::PlotFileMF (const int nPlot,
 		++dest_comp;
 	}
 
+  // gravitational_acceleration
+	if (plot_grav) {
+		MakeGrav(rho0_new, tempmf);
+		for (int i = 0; i <= finest_level; ++i) {
+			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+		}
+		++dest_comp;
+	}
+
         if (plot_base_state) {
             // w0
             Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0,1);
@@ -804,6 +813,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	// rho0, rhoh0, h0, p0, w0, divw0 (5+AMREX_SPACEDIM)
         if (plot_base_state) (*nPlot) += AMREX_SPACEDIM + 5;
 	if (plot_cs) (*nPlot)++;
+  if (plot_grav) (*nPlot)++;
 	if (plot_ad_excess) (*nPlot)++;
 	if (plot_pidivu) (*nPlot)++;
     if (plot_processors) (*nPlot)++;
@@ -938,6 +948,8 @@ Maestro::PlotFileVarNames (int * nPlot) const
 	names[cnt++] = "S";
 
 	if (plot_cs) names[cnt++] = "soundspeed";
+
+  if (plot_grav) names[cnt++] = "maggrav";
 
         if (plot_base_state) {
             // w0 and divw0
@@ -1492,6 +1504,29 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 	// average down and fill ghost cells
 	AverageDown(ad_excess,0,1);
 	FillPatch(t_old,ad_excess,ad_excess,ad_excess,0,0,1,0,bcs_f);
+}
+
+
+void
+Maestro::MakeGrav (const RealVector& rho0,
+                   Vector<MultiFab>& grav)
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::MakeGrav()",MakeGrav);
+
+  RealVector grav_cell( (max_radial_level+1)*nr_fine );
+  grav_cell.shrink_to_fit();
+
+  make_grav_cell(grav_cell.dataPtr(),
+                 rho0.dataPtr(),
+                 r_cc_loc.dataPtr(),
+                 r_edge_loc.dataPtr());
+
+  Put1dArrayOnCart(grav_cell,grav,0,0,bcs_f,0);
+
+	// average down and fill ghost cells
+	AverageDown(grav,0,1);
+	FillPatch(t_old,grav,grav,grav,0,0,1,0,bcs_f);
 }
 
 

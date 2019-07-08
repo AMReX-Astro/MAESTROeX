@@ -43,6 +43,7 @@ bool        Maestro::plot_trac = false;
 bool        Maestro::plot_base_state = true;
 bool        Maestro::plot_gpi = true;
 bool        Maestro::plot_cs = false;
+bool        Maestro::plot_grav = false;
 std::string Maestro::plot_base_name = "plt";
 std::string Maestro::small_plot_base_name = "smallplt";
 std::string Maestro::check_base_name = "chk";

@@ -43,6 +43,7 @@ static bool        plot_trac;
 static bool        plot_base_state;
 static bool        plot_gpi;
 static bool        plot_cs;
+static bool        plot_grav;
 static std::string plot_base_name;
 static std::string small_plot_base_name;
 static std::string check_base_name;

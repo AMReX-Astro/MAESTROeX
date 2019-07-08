@@ -43,6 +43,7 @@ pp.query("plot_trac", plot_trac);
 pp.query("plot_base_state", plot_base_state);
 pp.query("plot_gpi", plot_gpi);
 pp.query("plot_cs", plot_cs);
+pp.query("plot_grav", plot_grav);
 pp.query("plot_base_name", plot_base_name);
 pp.query("small_plot_base_name", small_plot_base_name);
 pp.query("check_base_name", check_base_name);

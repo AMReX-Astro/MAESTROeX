@@ -241,7 +241,7 @@ contains
 
 
   end subroutine make_ad_excess_sphr
-
+  
 
   subroutine make_vorticity(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc) bind(C, name="make_vorticity")
 
