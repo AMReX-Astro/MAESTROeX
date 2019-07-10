@@ -226,8 +226,9 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
     BL_PROFILE_VAR("Maestro::MakeThermalCoeffs()",MakeThermalCoeffs);
 
 #ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
     // turn on GPU
-    Gpu::setLaunchRegion(true);
+    if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev = 0; lev <= finest_level; ++lev)
@@ -264,7 +265,7 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
 
 #ifdef AMREX_USE_CUDA
     // turn off GPU
-    Gpu::setLaunchRegion(false);
+    if (not_launched) Gpu::setLaunchRegion(false);
 #endif
 
 }

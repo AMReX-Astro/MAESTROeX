@@ -11,7 +11,13 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
                        bool flag)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PutInPertForm()",PutInPertForm);
+    BL_PROFILE_VAR("Maestro::PutInPertForm()", PutInPertForm);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     // place 1d array onto a cartesian grid
     Vector<MultiFab> s0_cart(finest_level+1);
@@ -36,6 +42,11 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
     AverageDown(scal,comp,1);
     FillPatch(t_old,scal,scal,scal,comp,comp,1,bccomp,bcs);
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+
 }
 
 void
@@ -47,7 +58,13 @@ Maestro::PutInPertForm(int level,
                        bool flag)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PutInPertForm_lev()",PutInPertForm);
+    BL_PROFILE_VAR("Maestro::PutInPertForm_lev()", PutInPertForm);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     // place 1d array onto a cartesian grid
     Vector<MultiFab> s0_cart(finest_level+1);
@@ -70,6 +87,11 @@ Maestro::PutInPertForm(int level,
 
     FillPatch(level,t_old,scal[level],scal,scal,comp,comp,1,bccomp,bcs);
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+
 }
 
 void
@@ -78,6 +100,12 @@ Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ConvertRhoXToX()",ConvertRhoXToX);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     if (flag) {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -103,7 +131,10 @@ Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
         FillPatch(t_old,scal,scal,scal,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_s);
     }
 
-
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
 }
 
@@ -113,6 +144,12 @@ Maestro::ConvertRhoHToH(Vector<MultiFab>& scal,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ConvertRhoHToH()",ConvertRhoHToH);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     if (flag) {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -133,4 +170,9 @@ Maestro::ConvertRhoHToH(Vector<MultiFab>& scal,
     else {
         FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,RhoH,bcs_s);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }

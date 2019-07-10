@@ -18,6 +18,12 @@ Maestro::React (const Vector<MultiFab>& s_in,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::React()",React);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     // external heating
     if (do_heating) {
 
@@ -46,19 +52,9 @@ Maestro::React (const Vector<MultiFab>& s_in,
     // apply burning term
     if (do_burning) {
 
-#ifdef AMREX_USE_CUDA
-        // turn on GPU
-        Gpu::setLaunchRegion(true);
-#endif
-
         // do the burning, update rho_omegadot and rho_Hnuc
         // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
         Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in);
-
-#ifdef AMREX_USE_CUDA
-        // turn off GPU
-        Gpu::setLaunchRegion(false);
-#endif
 
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -73,7 +69,6 @@ Maestro::React (const Vector<MultiFab>& s_in,
         }
 
     }
-
 
     // if we aren't doing any heating/burning, then just copy the old to the new
     if (!do_heating && !do_burning) {
@@ -98,6 +93,12 @@ Maestro::React (const Vector<MultiFab>& s_in,
     else {
         TfromRhoH(s_out,p0);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+
 }
 
 void Maestro::Burner(const Vector<MultiFab>& s_in,

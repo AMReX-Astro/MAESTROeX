@@ -17,7 +17,13 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   const int& is_predictor)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MacProj()",MacProj);
+    BL_PROFILE_VAR("Maestro::MacProj()", MacProj);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     // this will hold solver RHS = macrhs - div(beta0*umac)
     Vector<MultiFab> solverrhs(finest_level+1);
@@ -161,6 +167,11 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         // fill level n ghost cells using interpolation from level n-1 data
         FillPatchUedge(umac);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
 }
 

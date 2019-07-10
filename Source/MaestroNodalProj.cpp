@@ -600,8 +600,9 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
     BL_PROFILE_VAR("Maestro::MakePiCC()",MakePiCC);
 
 #ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
     // turn on GPU
-    Gpu::setLaunchRegion(true);
+    if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -630,8 +631,8 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
     }
 
 #ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Gpu::setLaunchRegion(false);
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
 #endif
 
 }

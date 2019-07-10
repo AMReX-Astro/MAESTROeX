@@ -145,6 +145,11 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // solve -div B grad phi = RHS
 
+// #ifdef AMREX_USE_CUDA
+//     // turn on GPU
+//     Gpu::setLaunchRegion(true);
+// #endif
+
     // build an MLMG solver
     MLMG mac_mlmg(mlabec);
 
@@ -217,6 +222,11 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         FillPatchUedge(umac);
     }
 
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     Gpu::setLaunchRegion(false);
+// #endif
+
 }
 
 // multiply (or divide) face-data by beta0
@@ -277,8 +287,9 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     BL_PROFILE_VAR("Maestro::ComputeMACSolverRHS()",ComputeMACSolverRHS);
 
 #ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
     // turn on GPU
-    Gpu::setLaunchRegion(true);
+    if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
     // Note that umac = beta0*mac
@@ -325,8 +336,8 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     }
 
 #ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Gpu::setLaunchRegion(false);
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
 #endif
 }
 

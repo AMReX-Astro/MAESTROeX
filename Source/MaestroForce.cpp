@@ -148,8 +148,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     BL_PROFILE_VAR("Maestro::ModifyScalForce()",ModifyScalForce);
 
 #ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
     // turn on GPU
-    Gpu::setLaunchRegion(true);
+    if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
     RealVector divu;
@@ -245,17 +246,16 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         }
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Gpu::setLaunchRegion(false);
-#endif
-
     // average fine data onto coarser cells
     AverageDown(scal_force,comp,1);
 
     // fill ghost cells
     FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }
 
 void
@@ -269,6 +269,12 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHForce()",MakeRhoHForce);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     // if we are doing the prediction, then it only makes sense to be in
     // this routine if the quantity we are predicting is rhoh', h, or rhoh
@@ -318,12 +324,6 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                    rho0.dataPtr(),
                    r_cc_loc.dataPtr(),
                    r_edge_loc.dataPtr());
-
-
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -407,12 +407,12 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         }
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    Gpu::setLaunchRegion(false);
-#endif
-
     // average down and fill ghost cells
     AverageDown(scal_force,RhoH,1);
     FillPatch(t_old,scal_force,scal_force,scal_force,RhoH,RhoH,1,0,bcs_f);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }

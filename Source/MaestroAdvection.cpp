@@ -766,14 +766,15 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateScal()",UpdateScal);
 
-    // Make sure to pass in comp+1 for fortran indexing
-    const int startcomp = start_comp + 1;
-    const int endcomp = startcomp + num_comp;
-
 #ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
     // turn on GPU
     Gpu::setLaunchRegion(true);
 #endif
+
+    // Make sure to pass in comp+1 for fortran indexing
+    const int startcomp = start_comp + 1;
+    const int endcomp = startcomp + num_comp;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -878,11 +879,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 	} // end MFIter loop
     } // end loop over levels
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Gpu::setLaunchRegion(false);
-#endif
-
     // synchronize by refluxing and averaging down, starting from the finest_level-1/finest_level pair
     if (reflux_type == 2) {
         for (int lev=finest_level-1; lev>=0; --lev) {
@@ -905,6 +901,11 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 	AverageDown(statenew,Rho,1);
 	FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }
 
 void
@@ -918,8 +919,9 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
 
 #ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
     // turn on GPU
-    Gpu::setLaunchRegion(true);
+    if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -1004,15 +1006,15 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         } // end MFIter loop
     } // end loop over levels
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    Gpu::setLaunchRegion(false);
-#endif
-
     // average fine data onto coarser cells
     AverageDown(unew,0,AMREX_SPACEDIM);
 
     // fill ghost cells
     FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
 }
