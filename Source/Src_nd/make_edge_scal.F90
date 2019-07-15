@@ -50,31 +50,31 @@ contains
     integer         , intent(in   ) :: adv_bc(1,2,nbccomp)
 
     ! Local variables
-    double precision, pointer :: slopex(:,:)
+    double precision, allocatable :: slopex(:,:)
 
     double precision :: hx,dt2,dt4,savg,fl,fr
 
     integer :: i,is,ie
 
-    double precision, pointer :: Ip(:), Ipf(:)
-    double precision, pointer :: Im(:), Imf(:)
+    double precision, allocatable :: Ip(:), Ipf(:)
+    double precision, allocatable :: Im(:), Imf(:)
 
     ! these correspond to \mathrm{sedge}_L^x, etc.
-    double precision, pointer:: sedgelx(:),sedgerx(:)
+    double precision, allocatable:: sedgelx(:),sedgerx(:)
 
-    call bl_allocate(Ip,lo(1)-1,hi(1)+1)
-    call bl_allocate(Im,lo(1)-1,hi(1)+1)
+    allocate(Ip(lo(1)-1:hi(1)+1))
+    allocate(Im(lo(1)-1:hi(1)+1))
 
-    call bl_allocate(Ipf,lo(1)-1,hi(1)+1)
-    call bl_allocate(Imf,lo(1)-1,hi(1)+1)
+    allocate(Ipf(lo(1)-1:hi(1)+1))
+    allocate(Imf(lo(1)-1:hi(1)+1))
 
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1,1)
+    allocate(slopex(lo(1)-1:hi(1)+1,1))
 
     ! Final edge states.
     ! lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    call bl_allocate(sedgelx,lo(1),hi(1)+1)
-    call bl_allocate(sedgerx,lo(1),hi(1)+1)
+    allocate(sedgelx(lo(1):hi(1)+1))
+    allocate(sedgerx(lo(1):hi(1)+1))
 
     is = lo(1)
     ie = hi(1)
@@ -156,7 +156,9 @@ contains
           sedgex(is,comp) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_1d: invalid boundary type adv_bc(1,1)")
+#endif
        end if
     end if
 
@@ -177,17 +179,19 @@ contains
           sedgex(ie+1,comp) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_1d: invalid boundary type adv_bc(1,2)")
+#endif
        end if
     end if
 
-    call bl_deallocate(Ip)
-    call bl_deallocate(Im)
-    call bl_deallocate(Ipf)
-    call bl_deallocate(Imf)
-    call bl_deallocate(slopex)
-    call bl_deallocate(sedgelx)
-    call bl_deallocate(sedgerx)
+    deallocate(Ip)
+    deallocate(Im)
+    deallocate(Ipf)
+    deallocate(Imf)
+    deallocate(slopex)
+    deallocate(sedgelx)
+    deallocate(sedgerx)
 
   end subroutine make_edge_scal_1d
 #endif
@@ -223,54 +227,54 @@ contains
     integer         , intent(in   ) :: adv_bc(2,2,nbccomp)
 
     ! Local variables
-    double precision, pointer :: slopex(:,:,:)
-    double precision, pointer :: slopey(:,:,:)
+    double precision, allocatable :: slopex(:,:,:)
+    double precision, allocatable :: slopey(:,:,:)
 
     double precision :: hx,hy,dt2,dt4,savg,fl,fr
 
     integer :: i,j,is,js,ie,je
 
-    double precision, pointer :: Ip(:,:,:), Ipf(:,:,:)
-    double precision, pointer :: Im(:,:,:), Imf(:,:,:)
+    double precision, allocatable :: Ip(:,:,:), Ipf(:,:,:)
+    double precision, allocatable :: Im(:,:,:), Imf(:,:,:)
 
     ! these correspond to s_L^x, etc.
-    double precision, pointer:: slx(:,:),srx(:,:)
-    double precision, pointer:: sly(:,:),sry(:,:)
+    double precision, allocatable:: slx(:,:),srx(:,:)
+    double precision, allocatable:: sly(:,:),sry(:,:)
 
     ! these correspond to s_{\i-\half\e_x}^x, etc.
-    double precision, pointer:: simhx(:,:),simhy(:,:)
+    double precision, allocatable:: simhx(:,:),simhy(:,:)
 
     ! these correspond to \mathrm{sedge}_L^x, etc.
-    double precision, pointer:: sedgelx(:,:),sedgerx(:,:)
-    double precision, pointer:: sedgely(:,:),sedgery(:,:)
+    double precision, allocatable:: sedgelx(:,:),sedgerx(:,:)
+    double precision, allocatable:: sedgely(:,:),sedgery(:,:)
 
-    call bl_allocate(Ip,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
-    call bl_allocate(Im,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2))
+    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2))
 
-    call bl_allocate(Ipf,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
-    call bl_allocate(Imf,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    allocate(Ipf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2))
+    allocate(Imf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2))
 
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
-    call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
+    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2))
+    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2))
 
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse direction
-    call bl_allocate(slx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
-    call bl_allocate(srx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
-    call bl_allocate(simhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1)
+    allocate(slx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1))
+    allocate(srx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1))
+    allocate(simhx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1))
 
-    call bl_allocate(sly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
-    call bl_allocate(sry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
-    call bl_allocate(simhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1)
+    allocate(sly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1))
+    allocate(sry(lo(1)-1:hi(1)+1,lo(2):hi(2)+1))
+    allocate(simhy(lo(1)-1:hi(1)+1,lo(2):hi(2)+1))
 
     ! Final edge states.
     ! lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    call bl_allocate(sedgelx,lo(1),hi(1)+1,lo(2),hi(2))
-    call bl_allocate(sedgerx,lo(1),hi(1)+1,lo(2),hi(2))
-    call bl_allocate(sedgely,lo(1),hi(1),lo(2),hi(2)+1)
-    call bl_allocate(sedgery,lo(1),hi(1),lo(2),hi(2)+1)
+    allocate(sedgelx(lo(1):hi(1)+1,lo(2):hi(2)))
+    allocate(sedgerx(lo(1):hi(1)+1,lo(2):hi(2)))
+    allocate(sedgely(lo(1):hi(1),lo(2):hi(2)+1))
+    allocate(sedgery(lo(1):hi(1),lo(2):hi(2)+1))
 
     is = lo(1)
     ie = hi(1)
@@ -335,7 +339,9 @@ contains
           srx(ie+1,js-1:je+1) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
+#endif
        end if
     end if
 
@@ -357,7 +363,9 @@ contains
           srx(ie+1,js-1:je+1) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,2)")
+#endif
        end if
     end if
 
@@ -407,7 +415,9 @@ contains
           sry(is-1:ie+1,js) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
+#endif
        end if
     end if
 
@@ -429,7 +439,9 @@ contains
           sry(is-1:ie+1,je+1) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
+#endif
        end if
     end if
 
@@ -496,7 +508,9 @@ contains
           sedgex(is,js:je,comp) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
+#endif
        end if
     end if
 
@@ -517,7 +531,9 @@ contains
           sedgex(ie+1,js:je,comp) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,2)")
+#endif
        end if
     end if
 
@@ -571,7 +587,9 @@ contains
           sedgey(is:ie,js,comp) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
+#endif
        end if
     end if
 
@@ -592,26 +610,28 @@ contains
           sedgey(is:ie,je+1,comp) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,2)")
+#endif
        end if
     end if
 
-    call bl_deallocate(Ip)
-    call bl_deallocate(Im)
-    call bl_deallocate(Ipf)
-    call bl_deallocate(Imf)
-    call bl_deallocate(slopex)
-    call bl_deallocate(slopey)
-    call bl_deallocate(slx)
-    call bl_deallocate(srx)
-    call bl_deallocate(simhx)
-    call bl_deallocate(sly)
-    call bl_deallocate(sry)
-    call bl_deallocate(simhy)
-    call bl_deallocate(sedgelx)
-    call bl_deallocate(sedgerx)
-    call bl_deallocate(sedgely)
-    call bl_deallocate(sedgery)
+    deallocate(Ip)
+    deallocate(Im)
+    deallocate(Ipf)
+    deallocate(Imf)
+    deallocate(slopex)
+    deallocate(slopey)
+    deallocate(slx)
+    deallocate(srx)
+    deallocate(simhx)
+    deallocate(sly)
+    deallocate(sry)
+    deallocate(simhy)
+    deallocate(sedgelx)
+    deallocate(sedgerx)
+    deallocate(sedgely)
+    deallocate(sedgery)
 
   end subroutine make_edge_scal_2d
 #endif
@@ -654,56 +674,56 @@ contains
     integer         , intent(in   ) :: adv_bc(3,2,nbccomp)
 
     ! Local variables
-    double precision, pointer :: slopex(:,:,:,:)
-    double precision, pointer :: slopey(:,:,:,:)
-    double precision, pointer :: slopez(:,:,:,:)
+    double precision, allocatable :: slopex(:,:,:,:)
+    double precision, allocatable :: slopey(:,:,:,:)
+    double precision, allocatable :: slopez(:,:,:,:)
 
     double precision :: hx,hy,hz,dt2,dt3,dt4,dt6,fl,fr
     double precision :: savg
 
     integer :: i,j,k,is,js,ks,ie,je,ke
 
-    double precision, pointer :: Ip(:,:,:,:), Ipf(:,:,:,:)
-    double precision, pointer :: Im(:,:,:,:), Imf(:,:,:,:)
+    double precision, allocatable :: Ip(:,:,:,:), Ipf(:,:,:,:)
+    double precision, allocatable :: Im(:,:,:,:), Imf(:,:,:,:)
 
     ! these correspond to s_L^x, etc.
-    double precision, pointer:: slx(:,:,:),srx(:,:,:)
-    double precision, pointer:: sly(:,:,:),sry(:,:,:)
-    double precision, pointer:: slz(:,:,:),srz(:,:,:)
+    double precision, allocatable:: slx(:,:,:),srx(:,:,:)
+    double precision, allocatable:: sly(:,:,:),sry(:,:,:)
+    double precision, allocatable:: slz(:,:,:),srz(:,:,:)
 
     ! these correspond to s_{\i-\half\e_x}^x, etc.
-    double precision, pointer:: simhx(:,:,:),simhy(:,:,:),simhz(:,:,:)
+    double precision, allocatable:: simhx(:,:,:),simhy(:,:,:),simhz(:,:,:)
 
     ! these correspond to s_L^{x|y}, etc.
-    double precision, pointer:: slxy(:,:,:),srxy(:,:,:),slxz(:,:,:),srxz(:,:,:)
-    double precision, pointer:: slyx(:,:,:),sryx(:,:,:),slyz(:,:,:),sryz(:,:,:)
-    double precision, pointer:: slzx(:,:,:),srzx(:,:,:),slzy(:,:,:),srzy(:,:,:)
+    double precision, allocatable:: slxy(:,:,:),srxy(:,:,:),slxz(:,:,:),srxz(:,:,:)
+    double precision, allocatable:: slyx(:,:,:),sryx(:,:,:),slyz(:,:,:),sryz(:,:,:)
+    double precision, allocatable:: slzx(:,:,:),srzx(:,:,:),slzy(:,:,:),srzy(:,:,:)
 
     ! these correspond to s_{\i-\half\e_x}^{x|y}, etc.
-    double precision, pointer:: simhxy(:,:,:),simhxz(:,:,:)
-    double precision, pointer:: simhyx(:,:,:),simhyz(:,:,:)
-    double precision, pointer:: simhzx(:,:,:),simhzy(:,:,:)
+    double precision, allocatable:: simhxy(:,:,:),simhxz(:,:,:)
+    double precision, allocatable:: simhyx(:,:,:),simhyz(:,:,:)
+    double precision, allocatable:: simhzx(:,:,:),simhzy(:,:,:)
 
     ! these correspond to \mathrm{sedge}_L^x, etc.
-    double precision, pointer:: sedgelx(:,:,:),sedgerx(:,:,:)
-    double precision, pointer:: sedgely(:,:,:),sedgery(:,:,:)
-    double precision, pointer:: sedgelz(:,:,:),sedgerz(:,:,:)
+    double precision, allocatable:: sedgelx(:,:,:),sedgerx(:,:,:)
+    double precision, allocatable:: sedgely(:,:,:),sedgery(:,:,:)
+    double precision, allocatable:: sedgelz(:,:,:),sedgerz(:,:,:)
 
     ! used in corner coupling for conservative quantities
-    double precision, pointer:: divu(:,:,:)
+    double precision, allocatable:: divu(:,:,:)
 
-    call bl_allocate(slopex,lo-1,hi+1,1)
-    call bl_allocate(slopey,lo-1,hi+1,1)
-    call bl_allocate(slopez,lo-1,hi+1,1)
+    allocate(slopex(lo-1:hi+1,1,1,1))
+    allocate(slopey(lo-1:hi+1,1,1,1))
+    allocate(slopez(lo-1:hi+1,1,1,1))
 
-    call bl_allocate(Ip,lo-1,hi+1,3)
-    call bl_allocate(Im,lo-1,hi+1,3)
+    allocate(Ip(lo-1:hi+1,1,1,1))
+    allocate(Im(lo-1:hi+1,1,1,1))
 
-    call bl_allocate(Ipf,lo-1,hi+1,3)
-    call bl_allocate(Imf,lo-1,hi+1,3)
+    allocate(Ipf(lo-1:hi+1,1,1,1))
+    allocate(Imf(lo-1:hi+1,1,1,1))
 
     if (is_conservative .eq. 1) then
-       call bl_allocate(divu,lo-1,hi+1)
+       allocate(divu(lo-1:hi+1,1,1))
     end if
 
     is = lo(1)
@@ -759,9 +779,9 @@ contains
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    call bl_allocate(slx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
-    call bl_allocate(srx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
-    call bl_allocate(simhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    allocate(slx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
+    allocate(srx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
+    allocate(simhx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
 
     ! loop over appropriate x-faces
     if (ppm_type .eq. 0) then
@@ -806,7 +826,9 @@ contains
           srx(is,js-1:je+1,ks-1:ke+1) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+#endif
        end if
     end if
 
@@ -828,7 +850,9 @@ contains
           srx(ie+1,js-1:je+1,ks-1:ke+1) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+#endif
        end if
     end if
 
@@ -845,14 +869,14 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    call bl_deallocate(slopex)
+    deallocate(slopex)
 
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    call bl_allocate(sly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
-    call bl_allocate(sry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
-    call bl_allocate(simhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    allocate(sly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
+    allocate(sry(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
+    allocate(simhy(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
 
     ! loop over appropriate y-faces
     if (ppm_type .eq. 0) then
@@ -897,7 +921,9 @@ contains
           sry(is-1:ie+1,js,ks-1:ke+1) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+#endif
        end if
     end if
 
@@ -919,7 +945,9 @@ contains
           sry(is-1:ie+1,je+1,ks-1:ke+1) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+#endif
        end if
     end if
 
@@ -936,14 +964,14 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    call bl_deallocate(slopey)
+    deallocate(slopey)
 
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    call bl_allocate(slz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    call bl_allocate(srz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    call bl_allocate(simhz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    allocate(slz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
+    allocate(srz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
+    allocate(simhz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
 
     ! loop over appropriate z-faces
     if (ppm_type .eq. 0) then
@@ -988,7 +1016,9 @@ contains
           srz(is-1:ie+1,js-1:je+1,ks) = 0.d0
        else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+#endif
        end if
     end if
 
@@ -1010,7 +1040,9 @@ contains
           srz(is-1:ie+1,js-1:je+1,ke+1) = 0.d0
        else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+#endif
        end if
     end if
 
@@ -1026,16 +1058,16 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
-    call bl_deallocate(slopez)
+
+    deallocate(slopez)
 
     !******************************************************************
     ! Create s_{\i-\half\e_x}^{x|y}, etc.
     !******************************************************************
 
-    call bl_allocate(slxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
-    call bl_allocate(srxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
-    call bl_allocate(simhxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    allocate(slxy(lo(1):hi(1)+1,lo(2):hi(2),lo(3)-1:hi(3)+1))
+    allocate(srxy(lo(1):hi(1)+1,lo(2):hi(2),lo(3)-1:hi(3)+1))
+    allocate(simhxy(lo(1):hi(1)+1,lo(2):hi(2),lo(3)-1:hi(3)+1))
 
     ! loop over appropriate xy faces
     if (is_conservative .eq. 1) then
@@ -1094,7 +1126,9 @@ contains
           srxy(is,js:je,ks-1:ke+1) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+#endif
        end if
     end if
 
@@ -1116,7 +1150,9 @@ contains
           srxy(ie+1,js:je,ks-1:ke+1) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+#endif
        end if
     end if
 
@@ -1133,8 +1169,8 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    call bl_deallocate(slxy)
-    call bl_deallocate(srxy)
+    deallocate(slxy)
+    deallocate(srxy)
 
     ! loop over appropriate xz faces
 
@@ -1142,9 +1178,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    call bl_allocate(slxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
-    call bl_allocate(srxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
-    call bl_allocate(simhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    allocate(slxz(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)))
+    allocate(srxz(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)))
+    allocate(simhxz(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)))
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1202,7 +1238,9 @@ contains
           srxz(is,js-1:je+1,ks:ke) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+#endif
        end if
     end if
 
@@ -1224,7 +1262,9 @@ contains
           srxz(ie+1,js-1:je+1,ks:ke) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+#endif
        end if
     end if
 
@@ -1241,8 +1281,8 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    call bl_deallocate(slxz)
-    call bl_deallocate(srxz)
+    deallocate(slxz)
+    deallocate(srxz)
 
     ! loop over appropriate yx faces
 
@@ -1250,9 +1290,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    call bl_allocate(slyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
-    call bl_allocate(sryx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
-    call bl_allocate(simhyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    allocate(slyx(lo(1):hi(1),lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
+    allocate(sryx(lo(1):hi(1),lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
+    allocate(simhyx(lo(1):hi(1),lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1310,7 +1350,9 @@ contains
           sryx(is:ie,js,ks-1:ke+1) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+#endif
        end if
     end if
 
@@ -1332,7 +1374,9 @@ contains
           sryx(is:ie,je+1,ks-1:ke+1) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+#endif
        end if
     end if
 
@@ -1349,8 +1393,8 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    call bl_deallocate(slyx)
-    call bl_deallocate(sryx)
+    deallocate(slyx)
+    deallocate(sryx)
 
     ! loop over appropriate yz faces
 
@@ -1358,9 +1402,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    call bl_allocate(slyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
-    call bl_allocate(sryz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
-    call bl_allocate(simhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    allocate(slyz(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3)))
+    allocate(sryz(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3)))
+    allocate(simhyz(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3)))
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1418,7 +1462,9 @@ contains
           sryz(is-1:ie+1,js,ks:ke) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+#endif
        end if
     end if
 
@@ -1440,7 +1486,9 @@ contains
           sryz(is-1:ie+1,je+1,ks:ke) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+#endif
        end if
     end if
 
@@ -1457,9 +1505,9 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    call bl_deallocate(simhz)
-    call bl_deallocate(slyz)
-    call bl_deallocate(sryz)
+    deallocate(simhz)
+    deallocate(slyz)
+    deallocate(sryz)
 
     ! loop over appropriate zx faces
 
@@ -1467,9 +1515,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    call bl_allocate(slzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    call bl_allocate(srzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    call bl_allocate(simhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    allocate(slzx(lo(1):hi(1),lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
+    allocate(srzx(lo(1):hi(1),lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
+    allocate(simhzx(lo(1):hi(1),lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1527,7 +1575,9 @@ contains
           srzx(is:ie,js-1:je+1,ks) = 0.d0
        else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+#endif
        end if
     end if
 
@@ -1549,7 +1599,9 @@ contains
           srzx(is:ie,js-1:je+1,ke+1) = 0.d0
        else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+#endif
        end if
     end if
 
@@ -1566,9 +1618,9 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    call bl_deallocate(simhx)
-    call bl_deallocate(slzx)
-    call bl_deallocate(srzx)
+    deallocate(simhx)
+    deallocate(slzx)
+    deallocate(srzx)
 
     ! loop over appropriate zy faces
 
@@ -1576,9 +1628,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    call bl_allocate(slzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
-    call bl_allocate(srzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
-    call bl_allocate(simhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    allocate(slzy(lo(1)-1:hi(1)+1,lo(2):hi(2),lo(3):hi(3)+1))
+    allocate(srzy(lo(1)-1:hi(1)+1,lo(2):hi(2),lo(3):hi(3)+1))
+    allocate(simhzy(lo(1)-1:hi(1)+1,lo(2):hi(2),lo(3):hi(3)+1))
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1636,7 +1688,9 @@ contains
           srzy(is-1:ie+1,js:je,ks) = 0.d0
        else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+#endif
        end if
     end if
 
@@ -1658,7 +1712,9 @@ contains
           srzy(is-1:ie+1,js:je,ke+1) = 0.d0
        else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+#endif
        end if
     end if
 
@@ -1675,11 +1731,11 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    call bl_deallocate(simhy)
-    call bl_deallocate(slzy)
-    call bl_deallocate(srzy)
+    deallocate(simhy)
+    deallocate(slzy)
+    deallocate(srzy)
     if (is_conservative .eq. 1) then
-       call bl_deallocate(divu)
+       deallocate(divu)
     end if
 
     !******************************************************************
@@ -1689,8 +1745,8 @@ contains
     ! Final edge states.
     ! lo:hi+1 in the normal direction
     ! lo:hi in the transverse directions
-    call bl_allocate(sedgelx,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
-    call bl_allocate(sedgerx,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
+    allocate(sedgelx(lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3)))
+    allocate(sedgerx(lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3)))
 
     ! loop over appropriate x-faces
     if (is_conservative .eq. 1) then
@@ -1780,7 +1836,9 @@ contains
           sedgex(is,js:je,ks:ke,comp) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+#endif
        end if
     end if
 
@@ -1801,17 +1859,19 @@ contains
           sedgex(ie+1,js:je,ks:ke,comp) = 0.d0
        else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+#endif
        end if
     end if
 
-    call bl_deallocate(slx)
-    call bl_deallocate(srx)
-    call bl_deallocate(sedgelx)
-    call bl_deallocate(sedgerx)
+    deallocate(slx)
+    deallocate(srx)
+    deallocate(sedgelx)
+    deallocate(sedgerx)
 
-    call bl_allocate(sedgely,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
-    call bl_allocate(sedgery,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
+    allocate(sedgely(lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3)))
+    allocate(sedgery(lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3)))
 
     ! loop over appropriate y-faces
     if (is_conservative .eq. 1) then
@@ -1901,7 +1961,9 @@ contains
           sedgey(is:ie,js,ks:ke,comp) = 0.d0
        else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+#endif
        end if
     end if
 
@@ -1922,17 +1984,19 @@ contains
           sedgey(is:ie,je+1,ks:ke,comp) = 0.d0
        else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+#endif
        end if
     end if
 
-    call bl_deallocate(sly)
-    call bl_deallocate(sry)
-    call bl_deallocate(sedgely)
-    call bl_deallocate(sedgery)
+    deallocate(sly)
+    deallocate(sry)
+    deallocate(sedgely)
+    deallocate(sedgery)
 
-    call bl_allocate(sedgelz,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
-    call bl_allocate(sedgerz,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
+    allocate(sedgelz(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)+1))
+    allocate(sedgerz(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)+1))
 
     ! loop over appropriate z-faces
     if (is_conservative .eq. 1) then
@@ -2022,7 +2086,9 @@ contains
           sedgez(is:ie,js:je,ks,comp) = 0.d0
        else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+#endif
        end if
     end if
 
@@ -2043,27 +2109,29 @@ contains
           sedgez(is:ie,js:je,ke+1,comp) = 0.d0
        else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
        else
+#ifndef AMREX_USE_GPU
           call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+#endif
        end if
     end if
 
-    call bl_deallocate(Ip)
-    call bl_deallocate(Im)
-    call bl_deallocate(Ipf)
-    call bl_deallocate(Imf)
+    deallocate(Ip)
+    deallocate(Im)
+    deallocate(Ipf)
+    deallocate(Imf)
 
-    call bl_deallocate(slz)
-    call bl_deallocate(srz)
+    deallocate(slz)
+    deallocate(srz)
 
-    call bl_deallocate(simhxy)
-    call bl_deallocate(simhxz)
-    call bl_deallocate(simhyx)
-    call bl_deallocate(simhyz)
-    call bl_deallocate(simhzx)
-    call bl_deallocate(simhzy)
+    deallocate(simhxy)
+    deallocate(simhxz)
+    deallocate(simhyx)
+    deallocate(simhyz)
+    deallocate(simhzx)
+    deallocate(simhzy)
 
-    call bl_deallocate(sedgelz)
-    call bl_deallocate(sedgerz)
+    deallocate(sedgelz)
+    deallocate(sedgerz)
 
   end subroutine make_edge_scal_3d
 

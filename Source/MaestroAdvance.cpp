@@ -10,6 +10,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvanceTimeStep()",AdvanceTimeStep);
 
+// #ifdef AMREX_USE_CUDA
+//     auto not_launched = Gpu::notInLaunchRegion();
+//     // turn on GPU
+//     if (not_launched) Gpu::setLaunchRegion(true);
+// #endif
+
     // timers
     Real advect_time =0., advect_time_start;
     Real macproj_time=0., macproj_time_start;
@@ -538,6 +544,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
     ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
@@ -568,6 +580,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,ng_s);
         MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,ng_s);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
     // now update temperature
     if (use_tfromp) {
@@ -1162,5 +1179,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "Misc       :" << misc_time << " seconds\n";
         Print() << "Base State :" << base_time << " seconds\n";
     }
+//
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     if (not_launched) Gpu::setLaunchRegion(false);
+// #endif
 
 }

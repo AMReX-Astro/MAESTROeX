@@ -15,7 +15,7 @@
 module ppm_module
 
   use amrex_error_module
-  use amrex_mempool_module, only : bl_allocate, bl_deallocate
+  ! use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use meth_params_module, only: ppm_type, rel_eps
 
@@ -48,32 +48,33 @@ contains
     double precision :: dsl, dsr, dsc, D2, D2C, D2L, D2R, D2LIM, alphap, alpham
     double precision :: sgn, sigma, s6, amax, delam, delap, D2ABS
     double precision :: dafacem, dafacep, dabarm, dabarp, dafacemin, dabarmin, dachkm, dachkp
+    double precision :: dslv_l, dslv_r
 
     ! constant used in Colella 2008
     double precision, parameter :: C = 1.25d0
 
     ! s_{\ib,+}, s_{\ib,-}
-    double precision, pointer :: sp(:)
-    double precision, pointer :: sm(:)
+    double precision, allocatable :: sp(:)
+    double precision, allocatable :: sm(:)
 
     ! \delta s_{\ib}^{vL}
-    double precision, pointer :: dsvl(:)
+    double precision, allocatable :: dsvl(:)
 
     ! s_{i+\half}^{H.O.}
-    double precision, pointer :: sedge(:)
+    double precision, allocatable :: sedge(:)
 
     ! cell-centered indexing
-    call bl_allocate(sp,lo(1)-1,hi(1)+1)
-    call bl_allocate(sm,lo(1)-1,hi(1)+1)
+    allocate(sp(lo(1)-1:hi(1)+1))
+    allocate(sm(lo(1)-1:hi(1)+1))
 
     ! cell-centered indexing w/extra x-ghost cell
-    call bl_allocate(dsvl,lo(1)-2,hi(1)+2)
+    allocate(dsvl(lo(1)-2:hi(1)+2))
 
     ! edge-centered indexing for x-faces
     if (ppm_type .eq. 1) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+2)
+       allocate(sedge(lo(1)-1:hi(1)+2))
     else if (ppm_type .eq. 2) then
-       call bl_allocate(sedge,lo(1)-2,hi(1)+3)
+       allocate(sedge(lo(1)-2:hi(1)+3))
     end if
 
     ! compute s at x-edges
@@ -196,10 +197,11 @@ contains
        !----------------------------------------------------------------------
        ! ppm_type = 2
        !----------------------------------------------------------------------
-
+#ifndef AMREX_USE_GPU
        if (ng_s .lt. 4) then
           call amrex_error("Need 4 ghost cells for ppm_type=2")
        end if
+#endif
 
        ! interpolate s to x-edges
        do i=lo(1)-2,hi(1)+3
@@ -539,10 +541,10 @@ contains
        end do
     endif
 
-    call bl_deallocate(sp)
-    call bl_deallocate(sm)
-    call bl_deallocate(dsvl)
-    call bl_deallocate(sedge)
+    deallocate(sp)
+    deallocate(sm)
+    deallocate(dsvl)
+    deallocate(sedge)
 
   end subroutine ppm_1d
 
@@ -580,31 +582,31 @@ contains
     double precision, parameter :: C = 1.25d0
 
     ! s_{\ib,+}, s_{\ib,-}
-    double precision, pointer :: sp(:,:)
-    double precision, pointer :: sm(:,:)
+    double precision, allocatable :: sp(:,:)
+    double precision, allocatable :: sm(:,:)
 
     ! \delta s_{\ib}^{vL}
-    double precision, pointer :: dsvl(:,:)
+    double precision, allocatable :: dsvl(:,:)
 
     ! s_{i+\half}^{H.O.}
-    double precision, pointer :: sedge(:,:)
+    double precision, allocatable :: sedge(:,:)
 
     ! cell-centered indexing
-    call bl_allocate(sp,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1)
-    call bl_allocate(sm,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1)
+    allocate(sp(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1))
+    allocate(sm(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1))
 
     !-------------------------------------------------------------------------
     ! x-direction
     !-------------------------------------------------------------------------
 
     ! cell-centered indexing w/extra x-ghost cell
-    call bl_allocate(dsvl,lo(1)-2,hi(1)+2,lo(2)-1,hi(2)+1)
+    allocate(dsvl(lo(1)-2:hi(1)+2,lo(2)-1:hi(2)+1))
 
     ! edge-centered indexing for x-faces
     if (ppm_type .eq. 1) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+1)
+       allocate(sedge(lo(1)-1:hi(1)+2,lo(2)-1:hi(2)+1))
     else if (ppm_type .eq. 2) then
-       call bl_allocate(sedge,lo(1)-2,hi(1)+3,lo(2)-1,hi(2)+1)
+       allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-1:hi(2)+1))
     end if
 
     ! compute s at x-edges
@@ -751,10 +753,11 @@ contains
        !----------------------------------------------------------------------
        ! ppm_type = 2
        !----------------------------------------------------------------------
-
+#ifndef AMREX_USE_GPU
        if (ng_s .lt. 4) then
           call amrex_error("Need 4 ghost cells for ppm_type=2")
        end if
+#endif
 
        ! interpolate s to x-edges
        do j=lo(2)-1,hi(2)+1
@@ -1117,8 +1120,8 @@ contains
        end do
     endif
 
-    call bl_deallocate(sedge)
-    call bl_deallocate(dsvl)
+    deallocate(sedge)
+    deallocate(dsvl)
 
 
     !-------------------------------------------------------------------------
@@ -1126,13 +1129,13 @@ contains
     !-------------------------------------------------------------------------
 
     ! cell-centered indexing w/extra y-ghost cell
-    call bl_allocate(dsvl,lo(1)-1,hi(1)+1,lo(2)-2,hi(2)+2)
+    allocate(dsvl(lo(1)-1:hi(1)+1,lo(2)-2:hi(2)+2))
 
     ! edge-centered indexing for y-faces
     if (ppm_type .eq. 1) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+2)
+       allocate(sedge(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+2))
     else if (ppm_type .eq. 2) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+1,lo(2)-2,hi(2)+3)
+       allocate(sedge(lo(1)-1:hi(1)+1,lo(2)-2:hi(2)+3))
     end if
 
     ! compute s at y-edges
@@ -1640,10 +1643,10 @@ contains
        end do
     endif
 
-    call bl_deallocate(sp)
-    call bl_deallocate(sm)
-    call bl_deallocate(dsvl)
-    call bl_deallocate(sedge)
+    deallocate(sp)
+    deallocate(sm)
+    deallocate(dsvl)
+    deallocate(sedge)
 
   end subroutine ppm_2d
 
@@ -1680,31 +1683,31 @@ contains
     double precision, parameter :: C = 1.25d0
 
     ! s_{\ib,+}, s_{\ib,-}
-    double precision, pointer :: sp(:,:,:)
-    double precision, pointer :: sm(:,:,:)
+    double precision, allocatable :: sp(:,:,:)
+    double precision, allocatable :: sm(:,:,:)
 
     ! \delta s_{\ib}^{vL}
-    double precision, pointer :: dsvl(:,:,:)
+    double precision, allocatable :: dsvl(:,:,:)
 
     ! s_{i+\half}^{H.O.}
-    double precision, pointer :: sedge(:,:,:)
+    double precision, allocatable :: sedge(:,:,:)
 
     ! cell-centered indexing
-    call bl_allocate(sp,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
-    call bl_allocate(sm,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    allocate(sp(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
+    allocate(sm(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
 
     !-------------------------------------------------------------------------
     ! x-direction
     !-------------------------------------------------------------------------
 
     ! cell-centered indexing w/extra x-ghost cell
-    call bl_allocate(dsvl,lo(1)-2,hi(1)+2,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    allocate(dsvl(lo(1)-2:hi(1)+2,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
 
     ! edge-centered indexing for x-faces
     if (ppm_type .eq. 1) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+       allocate(sedge(lo(1)-1:hi(1)+2,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
     else if (ppm_type .eq. 2) then
-       call bl_allocate(sedge,lo(1)-2,hi(1)+3,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+       allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
     end if
 
     ! compute s at x-edges
@@ -1827,7 +1830,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -1880,7 +1883,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -1889,10 +1892,11 @@ contains
        !----------------------------------------------------------------------
        ! ppm_type = 2
        !----------------------------------------------------------------------
-
+#ifndef AMREX_USE_GPU
        if (ng_s .lt. 4) then
           call amrex_error("Need 4 ghost cells for ppm_type=2")
        end if
+#endif
 
        !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
        !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
@@ -2007,7 +2011,7 @@ contains
        end do
        !$OMP END DO
        !$OMP END PARALLEL
-       
+
        ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
        if (lo(1) .eq. domlo(1)) then
           if (adv_bc(1,1) .eq. EXT_DIR  .or. adv_bc(1,1) .eq. HOEXTRAP) then
@@ -2022,7 +2026,7 @@ contains
              !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
              !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
              !$OMP PRIVATE(delam,delap,D2ABS)
-             
+
              !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)-1,hi(2)+1
@@ -2285,7 +2289,7 @@ contains
           end do
        end do
        !$OMP END PARALLEL DO
-       
+
     else
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,sigma,s6)
@@ -2315,11 +2319,11 @@ contains
           end do
        end do
        !$OMP END PARALLEL DO
-       
+
     endif
 
-    call bl_deallocate(sedge)
-    call bl_deallocate(dsvl)
+    deallocate(sedge)
+    deallocate(dsvl)
 
 
     !-------------------------------------------------------------------------
@@ -2327,13 +2331,13 @@ contains
     !-------------------------------------------------------------------------
 
     ! cell-centered indexing w/extra y-ghost cell
-    call bl_allocate( dsvl,lo(1)-1,hi(1)+1,lo(2)-2,hi(2)+2,lo(3)-1,hi(3)+1)
+    allocate( dsvl(lo(1)-1:hi(1)+1,lo(2)-2:hi(2)+2,lo(3)-1:hi(3)+1))
 
     ! edge-centered indexing for y-faces
     if (ppm_type .eq. 1) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+1)
+       allocate(sedge(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+2,lo(3)-1:hi(3)+1))
     else if (ppm_type .eq. 2) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+1,lo(2)-2,hi(2)+3,lo(3)-1,hi(3)+1)
+       allocate(sedge(lo(1)-1:hi(1)+1,lo(2)-2:hi(2)+3,lo(3)-1:hi(3)+1))
     end if
     !
     ! Compute s at y-edges.
@@ -2458,7 +2462,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -2510,7 +2514,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -2953,11 +2957,11 @@ contains
           end do
        end do
        !$OMP END PARALLEL DO
-       
+
     endif
 
-    call bl_deallocate(sedge)
-    call bl_deallocate(dsvl)
+    deallocate(sedge)
+    deallocate(dsvl)
 
 
     !-------------------------------------------------------------------------
@@ -2965,13 +2969,13 @@ contains
     !-------------------------------------------------------------------------
 
     ! cell-centered indexing w/extra z-ghost cell
-    call bl_allocate(dsvl,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-2,hi(3)+2)
+    allocate(dsvl(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-2:hi(3)+2))
 
     ! edge-centered indexing for z-faces
     if (ppm_type .eq. 1) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+2)
+       allocate(sedge(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+2))
     else if (ppm_type .eq. 2) then
-       call bl_allocate(sedge,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-2,hi(3)+3)
+       allocate(sedge(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-2:hi(3)+3))
     end if
     !
     ! Compute s at z-edges.
@@ -3147,7 +3151,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -3563,7 +3567,7 @@ contains
        end do
        !$OMP END DO
        !$OMP END PARALLEL
-       
+
     else
 
        !$OMP PARALLEL PRIVATE(i,j,k,sigma,s6)
@@ -3601,13 +3605,13 @@ contains
        end do
        !$OMP END DO
        !$OMP END PARALLEL
-       
+
     endif
 
-    call bl_deallocate(sp)
-    call bl_deallocate(sm)
-    call bl_deallocate(dsvl)
-    call bl_deallocate(sedge)
+    deallocate(sp)
+    deallocate(sm)
+    deallocate(dsvl)
+    deallocate(sedge)
 
   end subroutine ppm_3d
 
