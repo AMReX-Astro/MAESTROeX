@@ -712,18 +712,18 @@ contains
     ! used in corner coupling for conservative quantities
     double precision, allocatable:: divu(:,:,:)
 
-    allocate(slopex(lo-1:hi+1,1,1,1))
-    allocate(slopey(lo-1:hi+1,1,1,1))
-    allocate(slopez(lo-1:hi+1,1,1,1))
+    allocate(slopex(lo-1:hi+1,1:2,1:2,1:2))
+    allocate(slopey(lo-1:hi+1,1:2,1:2,1:2))
+    allocate(slopez(lo-1:hi+1,1:2,1:2,1:2))
 
-    allocate(Ip(lo-1:hi+1,1,1,1))
-    allocate(Im(lo-1:hi+1,1,1,1))
+    allocate(Ip(lo-1:hi+1,1:2,1:2,1:2))
+    allocate(Im(lo-1:hi+1,1:2,1:2,1:2))
 
-    allocate(Ipf(lo-1:hi+1,1,1,1))
-    allocate(Imf(lo-1:hi+1,1,1,1))
+    allocate(Ipf(lo-1:hi+1,1:2,1:2,1:2))
+    allocate(Imf(lo-1:hi+1,1:2,1:2,1:2))
 
     if (is_conservative .eq. 1) then
-       allocate(divu(lo-1:hi+1,1,1))
+       allocate(divu(lo-1:hi+1,1:2,1:2))
     end if
 
     is = lo(1)

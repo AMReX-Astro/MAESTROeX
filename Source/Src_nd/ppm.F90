@@ -577,6 +577,7 @@ contains
     double precision :: dsl, dsr, dsc, D2, D2C, D2L, D2R, D2LIM, alphap, alpham
     double precision :: sgn, sigma, s6, amax, delam, delap, D2ABS
     double precision :: dafacem, dafacep, dabarm, dabarp, dafacemin, dabarmin, dachkm, dachkp
+    double precision :: dsvl_l, dsvl_r
 
     ! constant used in Colella 2008
     double precision, parameter :: C = 1.25d0
@@ -617,37 +618,78 @@ contains
        !----------------------------------------------------------------------
 
        ! compute van Leer slopes in x-direction
-       dsvl = ZERO
+       ! dsvl = ZERO
        do j=lo(2)-1,hi(2)+1
           do i=lo(1)-2,hi(1)+2
+             dsvl_l = ZERO
+             dsvl_r = ZERO
+             dsc = HALF * (s(i,j) - s(i-2,j))
+             dsl = TWO  * (s(i-1  ,j) - s(i-2,j))
+             dsr = TWO  * (s(i,j) - s(i-1  ,j))
+             ! if (dsl*dsr .gt. 0) dsvl(i,j) = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
+
+             if (dsl*dsr .gt. 0) dsvl_l = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
+
              dsc = HALF * (s(i+1,j) - s(i-1,j))
              dsl = TWO  * (s(i  ,j) - s(i-1,j))
              dsr = TWO  * (s(i+1,j) - s(i  ,j))
-             if (dsl*dsr .gt. 0) dsvl(i,j) = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
-          end do
-       end do
+             ! if (dsl*dsr .gt. 0) dsvl(i,j) = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
-       ! interpolate s to x-edges
-       do j=lo(2)-1,hi(2)+1
-          do i=lo(1)-1,hi(1)+2
-             sedge(i,j) = HALF*(s(i,j)+s(i-1,j)) - SIXTH*(dsvl(i,j)-dsvl(i-1,j))
+             if (dsl*dsr .gt. 0) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
+       !    end do
+       ! end do
+       !
+       ! ! interpolate s to x-edges
+       ! do j=lo(2)-1,hi(2)+1
+       !    do i=lo(1)-1,hi(1)+2
+             ! sedge(i,j) = HALF*(s(i,j)+s(i-1,j)) - SIXTH*(dsvl(i,j)-dsvl(i-1,j))
+             sm(i,j) = HALF*(s(i,j)+s(i-1,j)) - SIXTH*(dsvl_r-dsvl_l)
              ! make sure sedge lies in between adjacent cell-centered values
-             sedge(i,j) = max(sedge(i,j),min(s(i,j),s(i-1,j)))
-             sedge(i,j) = min(sedge(i,j),max(s(i,j),s(i-1,j)))
-          end do
-       end do
+             sm(i,j) = max(sm(i,j),min(s(i,j),s(i-1,j)))
+             sm(i,j) = min(sm(i,j),max(s(i,j),s(i-1,j)))
 
-       ! copy sedge into sp and sm
-       do j=lo(2)-1,hi(2)+1
-          do i=lo(1)-1,hi(1)+1
-             sp(i,j) = sedge(i+1,j)
-             sm(i,j) = sedge(i  ,j)
-          end do
-       end do
+             dsvl_l = ZERO
+             dsvl_r = ZERO
+             dsc = HALF * (s(i+1,j) - s(i-1,j))
+             dsl = TWO  * (s(i  ,j) - s(i-1,j))
+             dsr = TWO  * (s(i+1,j) - s(i  ,j))
+             ! if (dsl*dsr .gt. 0) dsvl(i,j) = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
-       ! modify using quadratic limiters
-       do j=lo(2)-1,hi(2)+1
-          do i=lo(1)-1,hi(1)+1
+             if (dsl*dsr .gt. 0) dsvl_l = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
+
+             dsc = HALF * (s(i+2,j) - s(i,j))
+             dsl = TWO  * (s(i+1  ,j) - s(i,j))
+             dsr = TWO  * (s(i+2,j) - s(i+1  ,j))
+             ! if (dsl*dsr .gt. 0) dsvl(i,j) = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
+
+             if (dsl*dsr .gt. 0) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
+       !    end do
+       ! end do
+       !
+       ! ! interpolate s to x-edges
+       ! do j=lo(2)-1,hi(2)+1
+       !    do i=lo(1)-1,hi(1)+2
+             ! sedge(i,j) = HALF*(s(i,j)+s(i-1,j)) - SIXTH*(dsvl(i,j)-dsvl(i-1,j))
+             sp(i,j) = HALF*(s(i+1,j)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
+             ! make sure sedge lies in between adjacent cell-centered values
+             sp(i,j) = max(sp(i+1,j),min(s(i+1,j),s(i,j)))
+             sp(i,j) = min(sp(i+1,j),max(s(i+1,j),s(i,j)))
+
+
+       !    end do
+       ! end do
+       !
+       ! ! copy sedge into sp and sm
+       ! do j=lo(2)-1,hi(2)+1
+       !    do i=lo(1)-1,hi(1)+1
+       !       sp(i,j) = sedge(i+1,j)
+       !       sm(i,j) = sedge(i  ,j)
+       !    end do
+       ! end do
+       !
+       ! ! modify using quadratic limiters
+       ! do j=lo(2)-1,hi(2)+1
+       !    do i=lo(1)-1,hi(1)+1
              if ((sp(i,j)-s(i,j))*(s(i,j)-sm(i,j)) .le. ZERO) then
                 sp(i,j) = s(i,j)
                 sm(i,j) = s(i,j)
