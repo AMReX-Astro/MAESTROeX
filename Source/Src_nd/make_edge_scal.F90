@@ -248,6 +248,8 @@ contains
     double precision, allocatable:: sedgelx(:,:),sedgerx(:,:)
     double precision, allocatable:: sedgely(:,:),sedgery(:,:)
 
+    double precision, allocatable :: sedge(:,:)
+
     allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2))
     allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2))
 
@@ -285,12 +287,21 @@ contains
        call slopex_2d(s(:,:,comp:comp),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
        call slopey_2d(s(:,:,comp:comp),slopey,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+
+      if (ppm_type .eq. 2) then
+         allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-2:hi(2)+3))
+      end if
+
        call ppm_2d(s(:,:,comp),ng_s,umac,vmac,ng_um,Ip,Im, &
-                    domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+                    sedge,domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
        if (ppm_trace_forces .eq. 1) then
           call ppm_2d(force(:,:,comp),ng_s,umac,vmac,ng_um,Ipf,Imf, &
-                       domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+                       sedge,domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
        end if
+
+       if (ppm_type .eq. 2) then
+         deallocate(sedge)
+       endif
     end if
     dt2 = HALF*dt
     dt4 = dt/4.0d0
@@ -712,18 +723,18 @@ contains
     ! used in corner coupling for conservative quantities
     double precision, allocatable:: divu(:,:,:)
 
-    allocate(slopex(lo-1:hi+1,1:2,1:2,1:2))
-    allocate(slopey(lo-1:hi+1,1:2,1:2,1:2))
-    allocate(slopez(lo-1:hi+1,1:2,1:2,1:2))
+    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
+    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
+    allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
 
-    allocate(Ip(lo-1:hi+1,1:2,1:2,1:2))
-    allocate(Im(lo-1:hi+1,1:2,1:2,1:2))
+    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
 
-    allocate(Ipf(lo-1:hi+1,1:2,1:2,1:2))
-    allocate(Imf(lo-1:hi+1,1:2,1:2,1:2))
+    allocate(Ipf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    allocate(Imf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
 
     if (is_conservative .eq. 1) then
-       allocate(divu(lo-1:hi+1,1:2,1:2))
+       allocate(divu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
     end if
 
     is = lo(1)

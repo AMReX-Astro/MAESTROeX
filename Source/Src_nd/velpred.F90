@@ -230,6 +230,8 @@ contains
 
     logical :: test
 
+    double precision, allocatable :: sedge(:,:)
+
     call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
     call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,2)
 
@@ -272,25 +274,34 @@ contains
        call slopex_2d(utilde,slopex,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
        call slopey_2d(utilde,slopey,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+          if (ppm_type .eq. 2) then
+             allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-2:hi(2)+3))
+          end if
+
        call ppm_2d(utilde(:,:,1),ng_ut, &
             ufull(:,:,1),ufull(:,:,2),ng_uf, &
-            Ipu,Imu,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+            Ipu,Imu,sedge,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
        call ppm_2d(utilde(:,:,2),ng_ut, &
             ufull(:,:,1),ufull(:,:,2),ng_uf, &
-            Ipv,Imv,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+            Ipv,Imv,sedge,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
 
        ! trace forces, if necessary.  Note by default the ppm routines
        ! will trace each component to each interface in all coordinate
        ! directions, but we really only need the force traced along
        ! its respective dimension.  This should be simplified later.
        if (ppm_trace_forces .eq. 1) then
+
           call ppm_2d(force(:,:,1),ng_f, &
                ufull(:,:,1),ufull(:,:,2),ng_uf, &
-               Ipfx,Imfx,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+               Ipfx,Imfx,sedge,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
           call ppm_2d(force(:,:,2),ng_f, &
                ufull(:,:,1),ufull(:,:,2),ng_uf, &
-               Ipfy,Imfy,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+               Ipfy,Imfy,sedge,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
        endif
+
+     if (ppm_type .eq. 2) then
+       deallocate(sedge)
+     endif
     end if
 
     !******************************************************************
@@ -1150,7 +1161,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
        select case(phys_bc(2,1))
@@ -1184,7 +1195,7 @@ contains
           call amrex_error("velpred_3d: invalid boundary type phys_bc(2,2)")
        end select
     end if
-    
+
     !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke
        do j=js,je+1
@@ -1197,7 +1208,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(ulyz)
     call bl_deallocate(uryz)
 
@@ -1223,7 +1234,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
        select case(phys_bc(3,1))
@@ -1270,7 +1281,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(ulzy)
     call bl_deallocate(urzy)
 
@@ -1295,7 +1306,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(uimhz)
 
     ! impose lo side bc's
@@ -1346,7 +1357,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(vlxz)
     call bl_deallocate(vrxz)
 
@@ -1372,7 +1383,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
        select case(phys_bc(3,1))
@@ -1419,7 +1430,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(vlzx)
     call bl_deallocate(vrzx)
 
@@ -1444,7 +1455,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(uimhy)
 
     ! impose lo side bc's
@@ -1495,7 +1506,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(wlxy)
     call bl_deallocate(wrxy)
 
@@ -1520,7 +1531,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(uimhx)
 
     ! impose lo side bc's
@@ -1571,7 +1582,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(wlyx)
     call bl_deallocate(wryx)
 
@@ -1610,7 +1621,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(ulx)
     call bl_deallocate(urx)
     call bl_deallocate(uimhyz)
@@ -1633,7 +1644,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     else
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
@@ -1650,7 +1661,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     end if
 
     ! impose lo side bc's
@@ -1717,7 +1728,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(uly)
     call bl_deallocate(ury)
     call bl_deallocate(vimhxz)
@@ -1740,7 +1751,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     else
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
@@ -1757,7 +1768,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     end if
 
     ! impose lo side bc's
@@ -1847,7 +1858,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     else
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)

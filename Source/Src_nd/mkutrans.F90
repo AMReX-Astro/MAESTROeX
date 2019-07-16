@@ -2,7 +2,7 @@
 #include "AMReX_BC_TYPES.H"
 
 module mkutrans_module
-  
+
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
@@ -177,6 +177,8 @@ contains
     double precision, pointer :: ulx(:,:),urx(:,:)
     double precision, pointer :: vly(:,:),vry(:,:)
 
+    double precision, allocatable :: sedge(:,:)
+
     double precision hx,hy,dt2,uavg
 
     integer :: i,j,is,js,ie,je
@@ -209,9 +211,18 @@ contains
        call slopex_2d(utilde(:,:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
        call slopey_2d(utilde(:,:,2:2),slopey,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+
+      if (ppm_type .eq. 2) then
+         allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-2:hi(2)+3))
+      end if
+
        call ppm_2d(utilde(:,:,1),ng_ut, &
             ufull(:,:,1),ufull(:,:,2),ng_uf, &
-            Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+            Ip,Im,sedge,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+
+        if (ppm_type .eq. 2) then
+          deallocate(sedge)
+        endif
     end if
 
     !******************************************************************
@@ -287,9 +298,16 @@ contains
     ! create vtrans
     !******************************************************************
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+      if (ppm_type .eq. 2) then
+         allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-2:hi(2)+3))
+      end if
        call ppm_2d(utilde(:,:,2),ng_ut, &
             ufull(:,:,1),ufull(:,:,2),ng_uf, &
-            Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+            Ip,Im,sedge,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+
+      if (ppm_type .eq. 2) then
+        deallocate(sedge)
+      endif
     end if
 
     if (ppm_type .eq. 0) then
