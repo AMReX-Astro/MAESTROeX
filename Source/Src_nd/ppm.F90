@@ -563,8 +563,8 @@ contains
     double precision, intent(in   ) ::  s(lo(1)-ng_s:,lo(2)-ng_s:)
     double precision, intent(in   ) ::  u(lo(1)-ng_u:,lo(2)-ng_u:)
     double precision, intent(in   ) ::  v(lo(1)-ng_u:,lo(2)-ng_u:)
-    double precision, intent(inout) :: Ip(lo(1)-1   :,lo(2)-1   :,:)
-    double precision, intent(inout) :: Im(lo(1)-1   :,lo(2)-1   :,:)
+    double precision, intent(inout) :: Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2)
+    double precision, intent(inout) :: Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2)
     double precision, intent(inout) :: sedge(lo(1)-2:hi(1)+3,lo(2)-2:hi(2)+3)
     integer         , intent(in   ) :: adv_bc(:,:)
     double precision, intent(in   ) :: dx(:),dt
@@ -578,7 +578,7 @@ contains
     double precision :: dsl, dsr, dsc, D2, D2C, D2L, D2R, D2LIM, alphap, alpham
     double precision :: sgn, sigma, s6, amax, delam, delap, D2ABS
     double precision :: dafacem, dafacep, dabarm, dabarp, dafacemin, dabarmin, dachkm, dachkp
-    double precision :: dsvl_l, dsvl_r, s_edge
+    double precision :: dsvl_l, dsvl_r, s_edge, smm, spp
 
     ! constant used in Colella 2008
     double precision, parameter :: C = 1.25d0
@@ -619,11 +619,11 @@ contains
             if (dsl*dsr .gt. 0) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
             ! interpolate s to x-edges
-            sm(i,j) = HALF*(s(i,j)+s(i-1,j)) - SIXTH*(dsvl_r-dsvl_l)
+            smm = HALF*(s(i,j)+s(i-1,j)) - SIXTH*(dsvl_r-dsvl_l)
 
             ! make sure sedge lies in between adjacent cell-centered values
-            sm(i,j) = max(sm(i,j),min(s(i,j),s(i-1,j)))
-            sm(i,j) = min(sm(i,j),max(s(i,j),s(i-1,j)))
+            smm = max(smm,min(s(i,j),s(i-1,j)))
+            smm = min(smm,max(s(i,j),s(i-1,j)))
 
             ! sp
             dsvl_l = ZERO
@@ -642,32 +642,29 @@ contains
             if (dsl*dsr .gt. 0) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
             ! interpolate s to x-edges
-            sp(i,j) = HALF*(s(i+1,j)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
+            spp = HALF*(s(i+1,j)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
 
             ! make sure sedge lies in between adjacent cell-centered values
-            sp(i,j) = max(sp(i,j),min(s(i+1,j),s(i,j)))
-            sp(i,j) = min(sp(i,j),max(s(i+1,j),s(i,j)))
+            spp = max(spp,min(s(i+1,j),s(i,j)))
+            spp = min(spp,max(s(i+1,j),s(i,j)))
 
             ! modify using quadratic limiters
-            if ((sp(i,j)-s(i,j))*(s(i,j)-sm(i,j)) .le. ZERO) then
-               sp(i,j) = s(i,j)
-               sm(i,j) = s(i,j)
-            else if (abs(sp(i,j)-s(i,j)) .ge. TWO*abs(sm(i,j)-s(i,j))) then
-               sp(i,j) = THREE*s(i,j) - TWO*sm(i,j)
-            else if (abs(sm(i,j)-s(i,j)) .ge. TWO*abs(sp(i,j)-s(i,j))) then
-               sm(i,j) = THREE*s(i,j) - TWO*sp(i,j)
+            if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
+               spp = s(i,j)
+               smm = s(i,j)
+            else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
+               spp = THREE*s(i,j) - TWO*smm
+            else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
+               smm = THREE*s(i,j) - TWO*spp
             end if
-         end do
-      ! end do
 
-      ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
-      if (lo(1) .eq. domlo(1)) then
-         if (adv_bc(1,1) .eq. EXT_DIR  .or. adv_bc(1,1) .eq. HOEXTRAP) then
+        ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
+        if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+           if (adv_bc(1,1) .eq. EXT_DIR  .or. adv_bc(1,1) .eq. HOEXTRAP) then
 
             ! make sure sedge lies in between adjacent cell-centered values
-            ! do j=lo(2)-1,hi(2)+1
               ! the value in the first cc ghost cell represents the edge value
-              sm(lo(1),j) = s(lo(1)-1,j)
+              smm = s(lo(1)-1,j)
 
               ! use a modified stencil to get sedge on the first interior edge
                s_edge = &
@@ -679,31 +676,64 @@ contains
                s_edge = max(s_edge,min(s(lo(1)+1,j),s(lo(1),j)))
                s_edge = min(s_edge,max(s(lo(1)+1,j),s(lo(1),j)))
 
-               sp(lo(1)  ,j) = s_edge
-               sm(lo(1)+1,j) = s_edge
+               spp = s_edge
+           end if
+        end if
 
-               sp(lo(1)+1,j) = sp(lo(1)+2,j)
-
-              ! modify using quadratic limiters
-               ii = lo(1)+1
-               if ((sp(ii,j)-s(ii,j))*(s(ii,j)-sm(ii,j)) .le. ZERO) then
-                  sp(ii,j) = s(ii,j)
-                  sm(ii,j) = s(ii,j)
-               else if (abs(sp(ii,j)-s(ii,j)) .ge. TWO*abs(sm(ii,j)-s(ii,j))) then
-                  sp(ii,j) = THREE*s(ii,j) - TWO*sm(ii,j)
-               else if (abs(sm(ii,j)-s(ii,j)) .ge. TWO*abs(sp(ii,j)-s(ii,j))) then
-                  sm(ii,j) = THREE*s(ii,j) - TWO*sp(ii,j)
-               end if
-         end if
-      end if
-
-      if (hi(1) .eq. domhi(1)) then
-         if (adv_bc(1,2) .eq. EXT_DIR  .or. adv_bc(1,2) .eq. HOEXTRAP) then
-            ! the value in the first cc ghost cell represents the edge value
-            sp(hi(1),j) = s(hi(1)+1,j)
+        if (i .eq. lo(1)+1 .and. lo(1) .eq. domlo(1)) then
+           if (adv_bc(1,1) .eq. EXT_DIR  .or. adv_bc(1,1) .eq. HOEXTRAP) then
 
             ! make sure sedge lies in between adjacent cell-centered values
-            ! do j=lo(2)-1,hi(2)+1
+
+              ! use a modified stencil to get sedge on the first interior edge
+               s_edge = &
+                   -FIFTH        *s(lo(1)-1,j) &
+                   + (THREE/FOUR)*s(lo(1)  ,j) &
+                   + HALF        *s(lo(1)+1,j) &
+                   - (ONE/20.0d0)*s(lo(1)+2,j)
+
+               s_edge = max(s_edge,min(s(lo(1)+1,j),s(lo(1),j)))
+               s_edge = min(s_edge,max(s(lo(1)+1,j),s(lo(1),j)))
+
+               smm = s_edge
+
+              ! modify using quadratic limiters
+               if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
+                  spp = s(i,j)
+                  smm = s(i,j)
+               else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
+                  spp = THREE*s(i,j) - TWO*smm
+               else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
+                  smm = THREE*s(i,j) - TWO*spp
+               end if
+           end if
+        end if
+
+        if (i .eq. hi(1) .and. hi(1) .eq. domhi(1)) then
+           if (adv_bc(1,2) .eq. EXT_DIR  .or. adv_bc(1,2) .eq. HOEXTRAP) then
+            ! the value in the first cc ghost cell represents the edge value
+            spp = s(hi(1)+1,j)
+
+            ! make sure sedge lies in between adjacent cell-centered values
+              ! use a modified stencil to get sedge on the first interior edge
+              s_edge = &
+                   -FIFTH        *s(hi(1)+1,j) &
+                   + (THREE/FOUR)*s(hi(1)  ,j) &
+                   + HALF        *s(hi(1)-1,j) &
+                   - (ONE/20.0d0)*s(hi(1)-2,j)
+
+               s_edge = max(s_edge,min(s(hi(1)-1,j),s(hi(1),j)))
+               s_edge = min(s_edge,max(s(hi(1)-1,j),s(hi(1),j)))
+
+               smm = s_edge
+
+           end if
+        end if
+
+        if (i .eq. hi(1)-1 .and. hi(1) .eq. domhi(1)) then
+           if (adv_bc(1,2) .eq. EXT_DIR  .or. adv_bc(1,2) .eq. HOEXTRAP) then
+
+            ! make sure sedge lies in between adjacent cell-centered values
               ! use a modified stencil to get sedge on the first interior edge
               s_edge = &
                    -FIFTH        *s(hi(1)+1,j) &
@@ -715,26 +745,64 @@ contains
                s_edge = min(s_edge,max(s(hi(1)-1,j),s(hi(1),j)))
 
               ! copy sedge into sp and sm
-               sp(hi(1)-1,j) = s_edge
-               sm(hi(1)  ,j) = s_edge
-
-              ! reset sm on second interior edge
-               sm(hi(1)-1,j) = sm(hi(1)-1,j)
+               spp = s_edge
 
               ! modify using quadratic limiters
-               ii = hi(1)-1
-               if ((sp(ii,j)-s(ii,j))*(s(ii,j)-sm(ii,j)) .le. ZERO) then
-                  sp(ii,j) = s(ii,j)
-                  sm(ii,j) = s(ii,j)
-               else if (abs(sp(ii,j)-s(ii,j)) .ge. TWO*abs(sm(ii,j)-s(ii,j))) then
-                  sp(ii,j) = THREE*s(ii,j) - TWO*sm(ii,j)
-               else if (abs(sm(ii,j)-s(ii,j)) .ge. TWO*abs(sp(ii,j)-s(ii,j))) then
-                  sm(ii,j) = THREE*s(ii,j) - TWO*sp(ii,j)
+               if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
+                  spp = s(i,j)
+                  smm = s(i,j)
+               else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
+                  spp = THREE*s(i,j) - TWO*smm
+               else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
+                  smm = THREE*s(i,j) - TWO*spp
                end if
-            ! end do
-         end if
-      end if
-   end do
+           end if
+        end if
+
+
+       !-------------------------------------------------------------------------
+       ! compute x-component of Ip and Im
+       !-------------------------------------------------------------------------
+
+       if (is_umac) then
+
+        ! u here is umac, so use edge-based indexing
+              sigma = abs(u(i+1,j))*dt/dx(1)
+              s6 = SIX*s(i,j) - THREE*(smm+spp)
+              if (u(i+1,j) .gt. rel_eps) then
+                 Ip(i,j,1) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+              else
+                 Ip(i,j,1) = s(i,j)
+              end if
+
+              sigma = abs(u(i,j))*dt/dx(1)
+              s6 = SIX*s(i,j) - THREE*(smm+spp)
+              if (u(i,j) .lt. -rel_eps) then
+                 Im(i,j,1) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+              else
+                 Im(i,j,1) = s(i,j)
+              end if
+
+     else
+              sigma = abs(u(i,j))*dt/dx(1)
+              s6 = SIX*s(i,j) - THREE*(smm+spp)
+              if (u(i,j) .gt. rel_eps) then
+                 Ip(i,j,1) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+              else
+                 Ip(i,j,1) = s(i,j)
+              end if
+
+              sigma = abs(u(i,j))*dt/dx(1)
+              s6 = SIX*s(i,j) - THREE*(smm+spp)
+              if (u(i,j) .lt. -rel_eps) then
+                 Im(i,j,1) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+              else
+                 Im(i,j,1) = s(i,j)
+              end if
+     endif
+       end do
+     end do
+
 
     else if (ppm_type .eq. 2) then
 
@@ -1053,74 +1121,67 @@ contains
           end if
        end if
 
+
+       !-------------------------------------------------------------------------
+       ! compute x-component of Ip and Im
+       !-------------------------------------------------------------------------
+
+       if (is_umac) then
+
+          ! u here is umac, so use edge-based indexing
+          do j=lo(2)-1,hi(2)+1
+             do i=lo(1)-1,hi(1)
+                sigma = abs(u(i+1,j))*dt/dx(1)
+                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                if (u(i+1,j) .gt. rel_eps) then
+                   Ip(i,j,1) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
+                else
+                   Ip(i,j,1) = s(i,j)
+                end if
+             end do
+
+             do i=lo(1),hi(1)+1
+                sigma = abs(u(i,j))*dt/dx(1)
+                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                if (u(i,j) .lt. -rel_eps) then
+                   Im(i,j,1) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
+                else
+                   Im(i,j,1) = s(i,j)
+                end if
+             end do
+          end do
+
+       else
+          do j=lo(2)-1,hi(2)+1
+             do i=lo(1)-1,hi(1)
+                sigma = abs(u(i,j))*dt/dx(1)
+                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                if (u(i,j) .gt. rel_eps) then
+                   Ip(i,j,1) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
+                else
+                   Ip(i,j,1) = s(i,j)
+                end if
+             end do
+
+             do i=lo(1),hi(1)+1
+                sigma = abs(u(i,j))*dt/dx(1)
+                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                if (u(i,j) .lt. -rel_eps) then
+                   Im(i,j,1) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
+                else
+                   Im(i,j,1) = s(i,j)
+                end if
+             end do
+          end do
+       endif
+
     end if
-
-    !-------------------------------------------------------------------------
-    ! compute x-component of Ip and Im
-    !-------------------------------------------------------------------------
-
-    if (is_umac) then
-
-       ! u here is umac, so use edge-based indexing
-       do j=lo(2)-1,hi(2)+1
-          do i=lo(1)-1,hi(1)
-             sigma = abs(u(i+1,j))*dt/dx(1)
-             s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
-             if (u(i+1,j) .gt. rel_eps) then
-                Ip(i,j,1) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
-             else
-                Ip(i,j,1) = s(i,j)
-             end if
-          end do
-
-          do i=lo(1),hi(1)+1
-             sigma = abs(u(i,j))*dt/dx(1)
-             s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
-             if (u(i,j) .lt. -rel_eps) then
-                Im(i,j,1) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
-             else
-                Im(i,j,1) = s(i,j)
-             end if
-          end do
-       end do
-
-    else
-       do j=lo(2)-1,hi(2)+1
-          do i=lo(1)-1,hi(1)
-             sigma = abs(u(i,j))*dt/dx(1)
-             s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
-             if (u(i,j) .gt. rel_eps) then
-                Ip(i,j,1) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
-             else
-                Ip(i,j,1) = s(i,j)
-             end if
-          end do
-
-          do i=lo(1),hi(1)+1
-             sigma = abs(u(i,j))*dt/dx(1)
-             s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
-             if (u(i,j) .lt. -rel_eps) then
-                Im(i,j,1) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
-             else
-                Im(i,j,1) = s(i,j)
-             end if
-          end do
-       end do
-    endif
-
-    ! deallocate(sedge)
 
 
     !-------------------------------------------------------------------------
     ! y-direction
     !-------------------------------------------------------------------------
 
-    ! edge-centered indexing for y-faces
-    ! if (ppm_type .eq. 1) then
-    !    allocate(sedge(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+2))
-    ! else if (ppm_type .eq. 2) then
-    !    allocate(sedge(lo(1)-1:hi(1)+1,lo(2)-2:hi(2)+3))
-    ! end if
 
     ! compute s at y-edges
     if (ppm_type .eq. 1) then
@@ -1149,10 +1210,10 @@ contains
              dsr = TWO  * (s(i,j+1) - s(i,j  ))
              if (dsl*dsr .gt. ZERO) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
-             sm(i,j) = HALF*(s(i,j)+s(i,j-1)) - SIXTH*(dsvl_r-dsvl_l)
+             smm = HALF*(s(i,j)+s(i,j-1)) - SIXTH*(dsvl_r-dsvl_l)
              ! make sure sedge lies in between adjacent cell-centered values
-             sm(i,j) = max(sm(i,j),min(s(i,j),s(i,j-1)))
-             sm(i,j) = min(sm(i,j),max(s(i,j),s(i,j-1)))
+             smm = max(smm,min(s(i,j),s(i,j-1)))
+             smm = min(smm,max(s(i,j),s(i,j-1)))
 
              ! sp
              dsvl_l = ZERO
@@ -1170,32 +1231,32 @@ contains
              dsr = TWO  * (s(i,j+2) - s(i,j+1))
              if (dsl*dsr .gt. ZERO) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
-             sp(i,j) = HALF*(s(i,j+1)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
+             spp = HALF*(s(i,j+1)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
              ! make sure sedge lies in between adjacent cell-centered values
-             sp(i,j) = max(sp(i,j),min(s(i,j+1),s(i,j)))
-             sp(i,j) = min(sp(i,j),max(s(i,j+1),s(i,j)))
+             spp = max(spp,min(s(i,j+1),s(i,j)))
+             spp = min(spp,max(s(i,j+1),s(i,j)))
 
              ! modify using quadratic limiters
-             if ((sp(i,j)-s(i,j))*(s(i,j)-sm(i,j)) .le. ZERO) then
-                sp(i,j) = s(i,j)
-                sm(i,j) = s(i,j)
-             else if (abs(sp(i,j)-s(i,j)) .ge. TWO*abs(sm(i,j)-s(i,j))) then
-                sp(i,j) = THREE*s(i,j) - TWO*sm(i,j)
-             else if (abs(sm(i,j)-s(i,j)) .ge. TWO*abs(sp(i,j)-s(i,j))) then
-                sm(i,j) = THREE*s(i,j) - TWO*sp(i,j)
+             if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
+                spp = s(i,j)
+                smm = s(i,j)
+             else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
+                spp = THREE*s(i,j) - TWO*smm
+             else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
+                smm = THREE*s(i,j) - TWO*spp
              end if
-          end do
-       end do
+       !    end do
+       ! end do
 
 
        ! different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's
-       if (lo(2) .eq. domlo(2)) then
+       if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
           if (adv_bc(2,1) .eq. EXT_DIR  .or. adv_bc(2,1) .eq. HOEXTRAP) then
 
              ! make sure sedge lies in between adjacent cell-centered values
-             do i=lo(1)-1,hi(1)+1
+             ! do i=lo(1)-1,hi(1)+1
                ! the value in the first cc ghost cell represents the edge value
-               sm(i,lo(2)) = s(i,lo(2)-1)
+               smm = s(i,lo(2)-1)
 
                ! use a modified stencil to get sedge on the first interior edge
                s_edge = &
@@ -1208,34 +1269,51 @@ contains
                 s_edge = min(s_edge,max(s(i,lo(2)+1),s(i,lo(2))))
              !
              ! ! copy sedge into sp and sm
-                sp(i,lo(2)  ) = s_edge
-                sm(i,lo(2)+1) = s_edge
+                spp = s_edge
+          end if
+       end if
+
+       ! different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's
+       if (j .eq. lo(2)+1 .and. lo(2) .eq. domlo(2)) then
+          if (adv_bc(2,1) .eq. EXT_DIR  .or. adv_bc(2,1) .eq. HOEXTRAP) then
+
+               ! use a modified stencil to get sedge on the first interior edge
+               s_edge = &
+                    -FIFTH        *s(i,lo(2)-1) &
+                    + (THREE/FOUR)*s(i,lo(2)  ) &
+                    + HALF        *s(i,lo(2)+1) &
+                    - (ONE/20.0d0)*s(i,lo(2)+2)
+
+                s_edge = max(s_edge,min(s(i,lo(2)+1),s(i,lo(2))))
+                s_edge = min(s_edge,max(s(i,lo(2)+1),s(i,lo(2))))
+             !
+             ! ! copy sedge into sp and sm
+                smm = s_edge
              !
              ! ! reset sp on second interior edge
                 ! sp(i,lo(2)+1) = sp(i,lo(2)+2)
              !
              ! ! modify using quadratic limiters
-                j = lo(2)+1
-                if ((sp(i,j)-s(i,j))*(s(i,j)-sm(i,j)) .le. ZERO) then
-                   sp(i,j) = s(i,j)
-                   sm(i,j) = s(i,j)
-                else if (abs(sp(i,j)-s(i,j)) .ge. TWO*abs(sm(i,j)-s(i,j))) then
-                   sp(i,j) = THREE*s(i,j) - TWO*sm(i,j)
-                else if (abs(sm(i,j)-s(i,j)) .ge. TWO*abs(sp(i,j)-s(i,j))) then
-                   sm(i,j) = THREE*s(i,j) - TWO*sp(i,j)
+                if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
+                   spp = s(i,j)
+                   smm = s(i,j)
+                else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
+                   spp = THREE*s(i,j) - TWO*smm
+                else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
+                   smm = THREE*s(i,j) - TWO*spp
                 end if
-             end do
+             ! end do
           end if
        end if
 
-       if (hi(2) .eq. domhi(2)) then
+       if (j .eq. hi(2) .and. hi(2) .eq. domhi(2)) then
           if (adv_bc(2,2) .eq. EXT_DIR  .or. adv_bc(2,2) .eq. HOEXTRAP) then
 
              ! make sure sedge lies in between adjacent cell-centered values
-             do i=lo(1)-1,hi(1)+1
+             ! do i=lo(1)-1,hi(1)+1
 
                 ! the value in the first cc ghost cell represents the edge value
-                sp(i,hi(2)) = s(i,hi(2)+1)
+                spp = s(i,hi(2)+1)
 
                 ! use a modified stencil to get sedge on the first interior edge
                 s_edge = &
@@ -1248,25 +1326,83 @@ contains
                 s_edge = min(s_edge,max(s(i,hi(2)-1),s(i,hi(2))))
              !
              ! ! copy sedge into sp and sm
-                sp(i,hi(2)-1) = s_edge
-                sm(i,hi(2)  ) = s_edge
-             !
-             ! ! reset sm on second interior edge
-                sm(i,hi(2)-1) = sm(i,hi(2)-1)
-             !
-             ! ! modify using quadratic limiters
-                j = hi(2)-1
-                if ((sp(i,j)-s(i,j))*(s(i,j)-sm(i,j)) .le. ZERO) then
-                   sp(i,j) = s(i,j)
-                   sm(i,j) = s(i,j)
-                else if (abs(sp(i,j)-s(i,j)) .ge. TWO*abs(sm(i,j)-s(i,j))) then
-                   sp(i,j) = THREE*s(i,j) - TWO*sm(i,j)
-                else if (abs(sm(i,j)-s(i,j)) .ge. TWO*abs(sp(i,j)-s(i,j))) then
-                   sm(i,j) = THREE*s(i,j) - TWO*sp(i,j)
-                end if
-             end do
+                smm = s_edge
+
           end if
        end if
+
+       if (j .eq. hi(2)-1 .and. hi(2) .eq. domhi(2)) then
+          if (adv_bc(2,2) .eq. EXT_DIR  .or. adv_bc(2,2) .eq. HOEXTRAP) then
+
+                ! use a modified stencil to get sedge on the first interior edge
+                s_edge = &
+                     -FIFTH        *s(i,hi(2)+1) &
+                     + (THREE/FOUR)*s(i,hi(2)  ) &
+                     + HALF        *s(i,hi(2)-1) &
+                     - (ONE/20.0d0)*s(i,hi(2)-2)
+
+                s_edge = max(s_edge,min(s(i,hi(2)-1),s(i,hi(2))))
+                s_edge = min(s_edge,max(s(i,hi(2)-1),s(i,hi(2))))
+             !
+             ! ! copy sedge into sp and sm
+                spp = s_edge
+             !
+             ! ! modify using quadratic limiters
+                if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
+                   spp = s(i,j)
+                   smm = s(i,j)
+                else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
+                   spp = THREE*s(i,j) - TWO*smm
+                else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
+                   smm = THREE*s(i,j) - TWO*spp
+                end if
+             ! end do
+          end if
+       end if
+
+       !-------------------------------------------------------------------------
+       ! compute y-component of Ip and Im
+       !-------------------------------------------------------------------------
+
+       if (is_umac) then
+
+          ! v here is vmac, so use edge-based indexing
+                sigma = abs(v(i,j+1))*dt/dx(2)
+                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                if (v(i,j+1) .gt. rel_eps) then
+                   Ip(i,j,2) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+                else
+                   Ip(i,j,2) = s(i,j)
+                end if
+
+                sigma = abs(v(i,j))*dt/dx(2)
+                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                if (v(i,j) .lt. -rel_eps) then
+                   Im(i,j,2) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+                else
+                   Im(i,j,2) = s(i,j)
+                end if
+
+       else
+                sigma = abs(v(i,j))*dt/dx(2)
+                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                if (v(i,j) .gt. rel_eps) then
+                   Ip(i,j,2) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+                else
+                   Ip(i,j,2) = s(i,j)
+                end if
+
+                sigma = abs(v(i,j))*dt/dx(2)
+                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                if (v(i,j) .lt. -rel_eps) then
+                   Im(i,j,2) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+                else
+                   Im(i,j,2) = s(i,j)
+                end if
+       endif
+
+     end do
+   end do
 
     else if (ppm_type .eq. 2) then
 
@@ -1575,64 +1711,66 @@ contains
           end if
 
        end if
+
+
+       !-------------------------------------------------------------------------
+       ! compute y-component of Ip and Im
+       !-------------------------------------------------------------------------
+
+       if (is_umac) then
+
+          ! v here is vmac, so use edge-based indexing
+          do j=lo(2)-1,hi(2)
+             do i=lo(1)-1,hi(1)+1
+                sigma = abs(v(i,j+1))*dt/dx(2)
+                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                if (v(i,j+1) .gt. rel_eps) then
+                   Ip(i,j,2) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
+                else
+                   Ip(i,j,2) = s(i,j)
+                end if
+             end do
+          end do
+
+          do j=lo(2),hi(2)+1
+             do i=lo(1)-1,hi(1)+1
+                sigma = abs(v(i,j))*dt/dx(2)
+                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                if (v(i,j) .lt. -rel_eps) then
+                   Im(i,j,2) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
+                else
+                   Im(i,j,2) = s(i,j)
+                end if
+             end do
+          end do
+
+       else
+          do j=lo(2)-1,hi(2)
+             do i=lo(1)-1,hi(1)+1
+                sigma = abs(v(i,j))*dt/dx(2)
+                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                if (v(i,j) .gt. rel_eps) then
+                   Ip(i,j,2) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
+                else
+                   Ip(i,j,2) = s(i,j)
+                end if
+             end do
+          end do
+
+          do j=lo(2),hi(2)+1
+             do i=lo(1)-1,hi(1)+1
+                sigma = abs(v(i,j))*dt/dx(2)
+                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                if (v(i,j) .lt. -rel_eps) then
+                   Im(i,j,2) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
+                else
+                   Im(i,j,2) = s(i,j)
+                end if
+             end do
+          end do
+       endif
+
     end if
-
-    !-------------------------------------------------------------------------
-    ! compute y-component of Ip and Im
-    !-------------------------------------------------------------------------
-
-    if (is_umac) then
-
-       ! v here is vmac, so use edge-based indexing
-       do j=lo(2)-1,hi(2)
-          do i=lo(1)-1,hi(1)+1
-             sigma = abs(v(i,j+1))*dt/dx(2)
-             s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
-             if (v(i,j+1) .gt. rel_eps) then
-                Ip(i,j,2) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
-             else
-                Ip(i,j,2) = s(i,j)
-             end if
-          end do
-       end do
-
-       do j=lo(2),hi(2)+1
-          do i=lo(1)-1,hi(1)+1
-             sigma = abs(v(i,j))*dt/dx(2)
-             s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
-             if (v(i,j) .lt. -rel_eps) then
-                Im(i,j,2) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
-             else
-                Im(i,j,2) = s(i,j)
-             end if
-          end do
-       end do
-
-    else
-       do j=lo(2)-1,hi(2)
-          do i=lo(1)-1,hi(1)+1
-             sigma = abs(v(i,j))*dt/dx(2)
-             s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
-             if (v(i,j) .gt. rel_eps) then
-                Ip(i,j,2) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
-             else
-                Ip(i,j,2) = s(i,j)
-             end if
-          end do
-       end do
-
-       do j=lo(2),hi(2)+1
-          do i=lo(1)-1,hi(1)+1
-             sigma = abs(v(i,j))*dt/dx(2)
-             s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
-             if (v(i,j) .lt. -rel_eps) then
-                Im(i,j,2) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
-             else
-                Im(i,j,2) = s(i,j)
-             end if
-          end do
-       end do
-    endif
 
     deallocate(sp)
     deallocate(sm)
