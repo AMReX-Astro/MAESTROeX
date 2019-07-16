@@ -571,7 +571,7 @@ contains
     logical         , intent(in   ) :: is_umac
 
     ! local
-    integer :: i,j
+    integer :: i,j,ii,jj
 
     logical :: extremum, bigp, bigm
 
@@ -587,9 +587,6 @@ contains
     double precision, allocatable :: sp(:,:)
     double precision, allocatable :: sm(:,:)
 
-    ! s_{i+\half}^{H.O.}
-    ! double precision, allocatable :: sedge(:,:)
-
     ! cell-centered indexing
     allocate(sp(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1))
     allocate(sm(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1))
@@ -597,13 +594,6 @@ contains
     !-------------------------------------------------------------------------
     ! x-direction
     !-------------------------------------------------------------------------
-
-    ! ! edge-centered indexing for x-faces
-    ! if (ppm_type .eq. 1) then
-    !    allocate(sedge(lo(1)-1:hi(1)+2,lo(2)-1:hi(2)+1))
-    ! else if (ppm_type .eq. 2) then
-    !    allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-1:hi(2)+1))
-    ! end if
 
     ! compute s at x-edges
     if (ppm_type .eq. 1) then
@@ -668,14 +658,14 @@ contains
                sm(i,j) = THREE*s(i,j) - TWO*sp(i,j)
             end if
          end do
-      end do
+      ! end do
 
       ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
       if (lo(1) .eq. domlo(1)) then
          if (adv_bc(1,1) .eq. EXT_DIR  .or. adv_bc(1,1) .eq. HOEXTRAP) then
 
             ! make sure sedge lies in between adjacent cell-centered values
-            do j=lo(2)-1,hi(2)+1
+            ! do j=lo(2)-1,hi(2)+1
               ! the value in the first cc ghost cell represents the edge value
               sm(lo(1),j) = s(lo(1)-1,j)
 
@@ -695,26 +685,25 @@ contains
                sp(lo(1)+1,j) = sp(lo(1)+2,j)
 
               ! modify using quadratic limiters
-               i = lo(1)+1
-               if ((sp(i,j)-s(i,j))*(s(i,j)-sm(i,j)) .le. ZERO) then
-                  sp(i,j) = s(i,j)
-                  sm(i,j) = s(i,j)
-               else if (abs(sp(i,j)-s(i,j)) .ge. TWO*abs(sm(i,j)-s(i,j))) then
-                  sp(i,j) = THREE*s(i,j) - TWO*sm(i,j)
-               else if (abs(sm(i,j)-s(i,j)) .ge. TWO*abs(sp(i,j)-s(i,j))) then
-                  sm(i,j) = THREE*s(i,j) - TWO*sp(i,j)
+               ii = lo(1)+1
+               if ((sp(ii,j)-s(ii,j))*(s(ii,j)-sm(ii,j)) .le. ZERO) then
+                  sp(ii,j) = s(ii,j)
+                  sm(ii,j) = s(ii,j)
+               else if (abs(sp(ii,j)-s(ii,j)) .ge. TWO*abs(sm(ii,j)-s(ii,j))) then
+                  sp(ii,j) = THREE*s(ii,j) - TWO*sm(ii,j)
+               else if (abs(sm(ii,j)-s(ii,j)) .ge. TWO*abs(sp(ii,j)-s(ii,j))) then
+                  sm(ii,j) = THREE*s(ii,j) - TWO*sp(ii,j)
                end if
-            end do
          end if
       end if
 
       if (hi(1) .eq. domhi(1)) then
          if (adv_bc(1,2) .eq. EXT_DIR  .or. adv_bc(1,2) .eq. HOEXTRAP) then
             ! the value in the first cc ghost cell represents the edge value
-            sp(hi(1),lo(2)-1:hi(2)+1) = s(hi(1)+1,lo(2)-1:hi(2)+1)
+            sp(hi(1),j) = s(hi(1)+1,j)
 
             ! make sure sedge lies in between adjacent cell-centered values
-            do j=lo(2)-1,hi(2)+1
+            ! do j=lo(2)-1,hi(2)+1
               ! use a modified stencil to get sedge on the first interior edge
               s_edge = &
                    -FIFTH        *s(hi(1)+1,j) &
@@ -733,18 +722,19 @@ contains
                sm(hi(1)-1,j) = sm(hi(1)-1,j)
 
               ! modify using quadratic limiters
-               i = hi(1)-1
-               if ((sp(i,j)-s(i,j))*(s(i,j)-sm(i,j)) .le. ZERO) then
-                  sp(i,j) = s(i,j)
-                  sm(i,j) = s(i,j)
-               else if (abs(sp(i,j)-s(i,j)) .ge. TWO*abs(sm(i,j)-s(i,j))) then
-                  sp(i,j) = THREE*s(i,j) - TWO*sm(i,j)
-               else if (abs(sm(i,j)-s(i,j)) .ge. TWO*abs(sp(i,j)-s(i,j))) then
-                  sm(i,j) = THREE*s(i,j) - TWO*sp(i,j)
+               ii = hi(1)-1
+               if ((sp(ii,j)-s(ii,j))*(s(ii,j)-sm(ii,j)) .le. ZERO) then
+                  sp(ii,j) = s(ii,j)
+                  sm(ii,j) = s(ii,j)
+               else if (abs(sp(ii,j)-s(ii,j)) .ge. TWO*abs(sm(ii,j)-s(ii,j))) then
+                  sp(ii,j) = THREE*s(ii,j) - TWO*sm(ii,j)
+               else if (abs(sm(ii,j)-s(ii,j)) .ge. TWO*abs(sp(ii,j)-s(ii,j))) then
+                  sm(ii,j) = THREE*s(ii,j) - TWO*sp(ii,j)
                end if
-            end do
+            ! end do
          end if
       end if
+   end do
 
     else if (ppm_type .eq. 2) then
 
