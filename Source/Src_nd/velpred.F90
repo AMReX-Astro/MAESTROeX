@@ -274,16 +274,13 @@ contains
        call slopex_2d(utilde,slopex,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
        call slopey_2d(utilde,slopey,domlo,domhi,lo,hi,ng_ut,2,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-          if (ppm_type .eq. 2) then
-             allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-2:hi(2)+3))
-          end if
 
        call ppm_2d(utilde(:,:,1),ng_ut, &
             ufull(:,:,1),ufull(:,:,2),ng_uf, &
-            Ipu,Imu,sedge,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+            Ipu,Imu,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
        call ppm_2d(utilde(:,:,2),ng_ut, &
             ufull(:,:,1),ufull(:,:,2),ng_uf, &
-            Ipv,Imv,sedge,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+            Ipv,Imv,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
 
        ! trace forces, if necessary.  Note by default the ppm routines
        ! will trace each component to each interface in all coordinate
@@ -293,15 +290,12 @@ contains
 
           call ppm_2d(force(:,:,1),ng_f, &
                ufull(:,:,1),ufull(:,:,2),ng_uf, &
-               Ipfx,Imfx,sedge,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+               Ipfx,Imfx,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
           call ppm_2d(force(:,:,2),ng_f, &
                ufull(:,:,1),ufull(:,:,2),ng_uf, &
-               Ipfy,Imfy,sedge,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+               Ipfy,Imfy,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
        endif
 
-     if (ppm_type .eq. 2) then
-       deallocate(sedge)
-     endif
     end if
 
     !******************************************************************

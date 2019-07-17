@@ -553,7 +553,7 @@ contains
   ! 2-d version
   !===========================================================================
 
-  subroutine ppm_2d(s,ng_s,u,v,ng_u,Ip,Im,sedge,domlo,domhi,lo,hi,adv_bc,dx,dt,is_umac)
+  subroutine ppm_2d(s,ng_s,u,v,ng_u,Ip,Im,domlo,domhi,lo,hi,adv_bc,dx,dt,is_umac)
 
     ! note that u,v here may be the normal cell-centered velocity,
     ! or the MAC velocity.  The is_umac argument tells us which it
@@ -565,7 +565,6 @@ contains
     double precision, intent(in   ) ::  v(lo(1)-ng_u:,lo(2)-ng_u:)
     double precision, intent(inout) :: Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2)
     double precision, intent(inout) :: Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,1:2)
-    double precision, intent(inout) :: sedge(lo(1)-2:hi(1)+3,lo(2)-2:hi(2)+3)
     integer         , intent(in   ) :: adv_bc(:,:)
     double precision, intent(in   ) :: dx(:),dt
     logical         , intent(in   ) :: is_umac
@@ -578,19 +577,11 @@ contains
     double precision :: dsl, dsr, dsc, D2, D2C, D2L, D2R, D2LIM, alphap, alpham
     double precision :: sgn, sigma, s6, amax, delam, delap, D2ABS
     double precision :: dafacem, dafacep, dabarm, dabarp, dafacemin, dabarmin, dachkm, dachkp
-    double precision :: dsvl_l, dsvl_r, s_edge, smm, spp
-    double precision :: sedgel, sedgel, sedger, sedgerr
+    double precision :: dsvl_l, dsvl_r, sedge, sm, sp
+    double precision :: sedgel, sedger, sedgerr
 
     ! constant used in Colella 2008
     double precision, parameter :: C = 1.25d0
-
-    ! s_{\ib,+}, s_{\ib,-}
-    double precision, allocatable :: sp(:,:)
-    double precision, allocatable :: sm(:,:)
-
-    ! cell-centered indexing
-    allocate(sp(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1))
-    allocate(sm(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1))
 
     !-------------------------------------------------------------------------
     ! x-direction
@@ -620,11 +611,11 @@ contains
             if (dsl*dsr .gt. 0) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
             ! interpolate s to x-edges
-            smm = HALF*(s(i,j)+s(i-1,j)) - SIXTH*(dsvl_r-dsvl_l)
+            sm = HALF*(s(i,j)+s(i-1,j)) - SIXTH*(dsvl_r-dsvl_l)
 
             ! make sure sedge lies in between adjacent cell-centered values
-            smm = max(smm,min(s(i,j),s(i-1,j)))
-            smm = min(smm,max(s(i,j),s(i-1,j)))
+            sm = max(sm,min(s(i,j),s(i-1,j)))
+            sm = min(sm,max(s(i,j),s(i-1,j)))
 
             ! sp
             dsvl_l = ZERO
@@ -643,20 +634,20 @@ contains
             if (dsl*dsr .gt. 0) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
             ! interpolate s to x-edges
-            spp = HALF*(s(i+1,j)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
+            sp = HALF*(s(i+1,j)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
 
             ! make sure sedge lies in between adjacent cell-centered values
-            spp = max(spp,min(s(i+1,j),s(i,j)))
-            spp = min(spp,max(s(i+1,j),s(i,j)))
+            sp = max(sp,min(s(i+1,j),s(i,j)))
+            sp = min(sp,max(s(i+1,j),s(i,j)))
 
             ! modify using quadratic limiters
-            if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
-               spp = s(i,j)
-               smm = s(i,j)
-            else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
-               spp = THREE*s(i,j) - TWO*smm
-            else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
-               smm = THREE*s(i,j) - TWO*spp
+            if ((sp-s(i,j))*(s(i,j)-sm) .le. ZERO) then
+               sp = s(i,j)
+               sm = s(i,j)
+            else if (abs(sp-s(i,j)) .ge. TWO*abs(sm-s(i,j))) then
+               sp = THREE*s(i,j) - TWO*sm
+            else if (abs(sm-s(i,j)) .ge. TWO*abs(sp-s(i,j))) then
+               sm = THREE*s(i,j) - TWO*sp
             end if
 
         ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
@@ -665,19 +656,19 @@ contains
 
             ! make sure sedge lies in between adjacent cell-centered values
               ! the value in the first cc ghost cell represents the edge value
-              smm = s(lo(1)-1,j)
+              sm = s(lo(1)-1,j)
 
               ! use a modified stencil to get sedge on the first interior edge
-               s_edge = &
+               sedge = &
                    -FIFTH        *s(lo(1)-1,j) &
                    + (THREE/FOUR)*s(lo(1)  ,j) &
                    + HALF        *s(lo(1)+1,j) &
                    - (ONE/20.0d0)*s(lo(1)+2,j)
 
-               s_edge = max(s_edge,min(s(lo(1)+1,j),s(lo(1),j)))
-               s_edge = min(s_edge,max(s(lo(1)+1,j),s(lo(1),j)))
+               sedge = max(sedge,min(s(lo(1)+1,j),s(lo(1),j)))
+               sedge = min(sedge,max(s(lo(1)+1,j),s(lo(1),j)))
 
-               spp = s_edge
+               sp = sedge
            end if
         end if
 
@@ -687,25 +678,25 @@ contains
             ! make sure sedge lies in between adjacent cell-centered values
 
               ! use a modified stencil to get sedge on the first interior edge
-               s_edge = &
+               sedge = &
                    -FIFTH        *s(lo(1)-1,j) &
                    + (THREE/FOUR)*s(lo(1)  ,j) &
                    + HALF        *s(lo(1)+1,j) &
                    - (ONE/20.0d0)*s(lo(1)+2,j)
 
-               s_edge = max(s_edge,min(s(lo(1)+1,j),s(lo(1),j)))
-               s_edge = min(s_edge,max(s(lo(1)+1,j),s(lo(1),j)))
+               sedge = max(sedge,min(s(lo(1)+1,j),s(lo(1),j)))
+               sedge = min(sedge,max(s(lo(1)+1,j),s(lo(1),j)))
 
-               smm = s_edge
+               sm = sedge
 
               ! modify using quadratic limiters
-               if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
-                  spp = s(i,j)
-                  smm = s(i,j)
-               else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
-                  spp = THREE*s(i,j) - TWO*smm
-               else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
-                  smm = THREE*s(i,j) - TWO*spp
+               if ((sp-s(i,j))*(s(i,j)-sm) .le. ZERO) then
+                  sp = s(i,j)
+                  sm = s(i,j)
+               else if (abs(sp-s(i,j)) .ge. TWO*abs(sm-s(i,j))) then
+                  sp = THREE*s(i,j) - TWO*sm
+               else if (abs(sm-s(i,j)) .ge. TWO*abs(sp-s(i,j))) then
+                  sm = THREE*s(i,j) - TWO*sp
                end if
            end if
         end if
@@ -713,20 +704,20 @@ contains
         if (i .eq. hi(1) .and. hi(1) .eq. domhi(1)) then
            if (adv_bc(1,2) .eq. EXT_DIR  .or. adv_bc(1,2) .eq. HOEXTRAP) then
             ! the value in the first cc ghost cell represents the edge value
-            spp = s(hi(1)+1,j)
+            sp = s(hi(1)+1,j)
 
             ! make sure sedge lies in between adjacent cell-centered values
               ! use a modified stencil to get sedge on the first interior edge
-              s_edge = &
+              sedge = &
                    -FIFTH        *s(hi(1)+1,j) &
                    + (THREE/FOUR)*s(hi(1)  ,j) &
                    + HALF        *s(hi(1)-1,j) &
                    - (ONE/20.0d0)*s(hi(1)-2,j)
 
-               s_edge = max(s_edge,min(s(hi(1)-1,j),s(hi(1),j)))
-               s_edge = min(s_edge,max(s(hi(1)-1,j),s(hi(1),j)))
+               sedge = max(sedge,min(s(hi(1)-1,j),s(hi(1),j)))
+               sedge = min(sedge,max(s(hi(1)-1,j),s(hi(1),j)))
 
-               smm = s_edge
+               sm = sedge
 
            end if
         end if
@@ -736,26 +727,26 @@ contains
 
             ! make sure sedge lies in between adjacent cell-centered values
               ! use a modified stencil to get sedge on the first interior edge
-              s_edge = &
+              sedge = &
                    -FIFTH        *s(hi(1)+1,j) &
                    + (THREE/FOUR)*s(hi(1)  ,j) &
                    + HALF        *s(hi(1)-1,j) &
                    - (ONE/20.0d0)*s(hi(1)-2,j)
 
-               s_edge = max(s_edge,min(s(hi(1)-1,j),s(hi(1),j)))
-               s_edge = min(s_edge,max(s(hi(1)-1,j),s(hi(1),j)))
+               sedge = max(sedge,min(s(hi(1)-1,j),s(hi(1),j)))
+               sedge = min(sedge,max(s(hi(1)-1,j),s(hi(1),j)))
 
               ! copy sedge into sp and sm
-               spp = s_edge
+               sp = sedge
 
               ! modify using quadratic limiters
-               if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
-                  spp = s(i,j)
-                  smm = s(i,j)
-               else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
-                  spp = THREE*s(i,j) - TWO*smm
-               else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
-                  smm = THREE*s(i,j) - TWO*spp
+               if ((sp-s(i,j))*(s(i,j)-sm) .le. ZERO) then
+                  sp = s(i,j)
+                  sm = s(i,j)
+               else if (abs(sp-s(i,j)) .ge. TWO*abs(sm-s(i,j))) then
+                  sp = THREE*s(i,j) - TWO*sm
+               else if (abs(sm-s(i,j)) .ge. TWO*abs(sp-s(i,j))) then
+                  sm = THREE*s(i,j) - TWO*sp
                end if
            end if
         end if
@@ -769,34 +760,34 @@ contains
 
         ! u here is umac, so use edge-based indexing
               sigma = abs(u(i+1,j))*dt/dx(1)
-              s6 = SIX*s(i,j) - THREE*(smm+spp)
+              s6 = SIX*s(i,j) - THREE*(sm+sp)
               if (u(i+1,j) .gt. rel_eps) then
-                 Ip(i,j,1) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+                 Ip(i,j,1) = sp - (sigma/TWO)*(sp-sm-(ONE-TWO3RD*sigma)*s6)
               else
                  Ip(i,j,1) = s(i,j)
               end if
 
               sigma = abs(u(i,j))*dt/dx(1)
-              s6 = SIX*s(i,j) - THREE*(smm+spp)
+              s6 = SIX*s(i,j) - THREE*(sm+sp)
               if (u(i,j) .lt. -rel_eps) then
-                 Im(i,j,1) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+                 Im(i,j,1) = sm + (sigma/TWO)*(sp-sm+(ONE-TWO3RD*sigma)*s6)
               else
                  Im(i,j,1) = s(i,j)
               end if
 
      else
               sigma = abs(u(i,j))*dt/dx(1)
-              s6 = SIX*s(i,j) - THREE*(smm+spp)
+              s6 = SIX*s(i,j) - THREE*(sm+sp)
               if (u(i,j) .gt. rel_eps) then
-                 Ip(i,j,1) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+                 Ip(i,j,1) = sp - (sigma/TWO)*(sp-sm-(ONE-TWO3RD*sigma)*s6)
               else
                  Ip(i,j,1) = s(i,j)
               end if
 
               sigma = abs(u(i,j))*dt/dx(1)
-              s6 = SIX*s(i,j) - THREE*(smm+spp)
+              s6 = SIX*s(i,j) - THREE*(sm+sp)
               if (u(i,j) .lt. -rel_eps) then
-                 Im(i,j,1) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+                 Im(i,j,1) = sm + (sigma/TWO)*(sp-sm+(ONE-TWO3RD*sigma)*s6)
               else
                  Im(i,j,1) = s(i,j)
               end if
@@ -832,15 +823,15 @@ contains
              end if
 
              ! 0
-             s_edge = (7.d0/12.d0)*(s(i-1,j)+s(i,j)) - (1.d0/12.d0)*(s(i-2,j)+s(i+1,j))
+             sedge = (7.d0/12.d0)*(s(i-1,j)+s(i,j)) - (1.d0/12.d0)*(s(i-2,j)+s(i+1,j))
              ! limit sedge
-             if ((s_edge-s(i-1,j))*(s(i,j)-s_edge) .lt. ZERO) then
-                D2  = THREE*(s(i-1,j)-TWO*s_edge+s(i,j))
+             if ((sedge-s(i-1,j))*(s(i,j)-sedge) .lt. ZERO) then
+                D2  = THREE*(s(i-1,j)-TWO*sedge+s(i,j))
                 D2L = s(i-2,j)-TWO*s(i-1,j)+s(i,j)
                 D2R = s(i-1,j)-TWO*s(i,j)+s(i+1,j)
                 sgn = sign(ONE,D2)
                 D2LIM = sgn*max(min(C*sgn*D2L,C*sgn*D2R,sgn*D2),ZERO)
-                s_edge = HALF*(s(i-1,j)+s(i,j)) - SIXTH*D2LIM
+                sedge = HALF*(s(i-1,j)+s(i,j)) - SIXTH*D2LIM
              end if
 
              ! +1
@@ -873,7 +864,7 @@ contains
          !  do i=lo(1)-1,hi(1)+1
 
              alphap = sedger-s(i,j)
-             alpham = s_edge-s(i,j)
+             alpham = sedge-s(i,j)
              bigp = abs(alphap).gt.TWO*abs(alpham)
              bigm = abs(alpham).gt.TWO*abs(alphap)
              extremum = .false.
@@ -885,7 +876,7 @@ contains
                 ! centered values for a change in sign in the differences adjacent to
                 ! the cell. We use the pair of differences whose minimum magnitude is the
                 ! largest, and thus least susceptible to sensitivity to roundoff.
-                dafacem = s_edge - sedgel
+                dafacem = sedge - sedgel
                 dafacep = sedgerr - sedger
                 dabarm = s(i,j) - s(i-1,j)
                 dabarp = s(i+1,j) - s(i,j)
@@ -938,8 +929,8 @@ contains
                 end if
              end if
 
-             smm = s(i,j) + alpham
-             spp = s(i,j) + alphap
+             sm = s(i,j) + alpham
+             sp = s(i,j) + alphap
 
 
          ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
@@ -950,8 +941,8 @@ contains
               if (i .eq. lo(1)) then
 
                 ! the value in the first cc ghost cell represents the edge value
-                smm    = s(lo(1)-1,j)
-                s_edge = s(lo(1)-1,j)
+                sm    = s(lo(1)-1,j)
+                sedge = s(lo(1)-1,j)
 
                 ! use a modified stencil to get sedge on the first interior edge
                 sedger = &
@@ -963,19 +954,19 @@ contains
                  sedger = max(sedger,min(s(lo(1)+1,j),s(lo(1),j)))
                  sedger = min(sedger,max(s(lo(1)+1,j),s(lo(1),j)))
 
-                 spp = sedger
+                 sp = sedger
 
               elseif (i .eq. lo(1)+1) then
 
                 ! use a modified stencil to get sedge on the first interior edge
-                s_edge = &
+                sedge = &
                      -FIFTH        *s(lo(1)-1,j) &
                      + (THREE/FOUR)*s(lo(1)  ,j) &
                      + HALF        *s(lo(1)+1,j) &
                      - (ONE/20.0d0)*s(lo(1)+2,j)
 
-                 s_edge = max(s_edge,min(s(lo(1)+1,j),s(lo(1),j)))
-                 s_edge = min(s_edge,max(s(lo(1)+1,j),s(lo(1),j)))
+                 sedge = max(sedge,min(s(lo(1)+1,j),s(lo(1),j)))
+                 sedge = min(sedge,max(s(lo(1)+1,j),s(lo(1),j)))
 
               elseif (i .eq. lo(1)+2) then
 
@@ -997,7 +988,7 @@ contains
               if (i .eq. lo(1)+1 .or. i .eq. lo(1)+2) then
 
                    alphap = sedger-s(i,j)
-                   alpham = s_edge-s(i,j)
+                   alpham = sedge-s(i,j)
                    bigp = abs(alphap).gt.TWO*abs(alpham)
                    bigm = abs(alpham).gt.TWO*abs(alphap)
                    extremum = .false.
@@ -1009,8 +1000,8 @@ contains
                       ! centered values for a change in sign in the differences adjacent to
                       ! the cell. We use the pair of differences whose minimum magnitude is the
                       ! largest, and thus least susceptible to sensitivity to roundoff.
-                      dafacem = s_edge - sedgel
-                      dafacep = sedgerr - s_edge
+                      dafacem = sedge - sedgel
+                      dafacep = sedgerr - sedge
                       dabarm = s(i,j) - s(i-1,j)
                       dabarp = s(i+1,j) - s(i,j)
                       dafacemin = min(abs(dafacem),abs(dafacep))
@@ -1062,8 +1053,8 @@ contains
                       end if
                    end if
 
-                   smm = s(i,j) + alpham
-                   spp = s(i,j) + alphap
+                   sm = s(i,j) + alpham
+                   sp = s(i,j) + alphap
 
                 end if
             end if
@@ -1075,20 +1066,20 @@ contains
               if (i .eq. hi(1)) then
 
                 ! the value in the first cc ghost cell represents the edge value
-                spp      = s(hi(1)+1,j)
-                s_edge = s(hi(1)+1,j)
+                sp      = s(hi(1)+1,j)
+                sedge = s(hi(1)+1,j)
 
                 ! use a modified stencil to get sedge on the first interior edge
-                s_edge = &
+                sedge = &
                      -FIFTH        *s(hi(1)+1,j) &
                      + (THREE/FOUR)*s(hi(1)  ,j) &
                      + HALF        *s(hi(1)-1,j) &
                      - (ONE/20.0d0)*s(hi(1)-2,j)
 
-                 s_edge = max(s_edge,min(s(hi(1)-1,j),s(hi(1),j)))
-                 s_edge = min(s_edge,max(s(hi(1)-1,j),s(hi(1),j)))
+                 sedge = max(sedge,min(s(hi(1)-1,j),s(hi(1),j)))
+                 sedge = min(sedge,max(s(hi(1)-1,j),s(hi(1),j)))
 
-                 smm = s_edge
+                 sm = sedge
 
               elseif (i .eq. hi(1)-1) then
 
@@ -1123,7 +1114,7 @@ contains
              if (i .eq. hi(1)-2 .or. i .eq. hi(1)-1) then
 
                    alphap = sedger-s(i,j)
-                   alpham = s_edge-s(i,j)
+                   alpham = sedge-s(i,j)
                    bigp = abs(alphap).gt.TWO*abs(alpham)
                    bigm = abs(alpham).gt.TWO*abs(alphap)
                    extremum = .false.
@@ -1135,7 +1126,7 @@ contains
                       ! centered values for a change in sign in the differences adjacent to
                       ! the cell. We use the pair of differences whose minimum magnitude is the
                       ! largest, and thus least susceptible to sensitivity to roundoff.
-                      dafacem = s_edge - sedgel
+                      dafacem = sedge - sedgel
                       dafacep = sedgerr - sedger
                       dabarm = s(i,j) - s(i-1,j)
                       dabarp = s(i+1,j) - s(i,j)
@@ -1188,8 +1179,8 @@ contains
                       end if
                    end if
 
-                   smm = s(i,j) + alpham
-                   spp = s(i,j) + alphap
+                   sm = s(i,j) + alpham
+                   sp = s(i,j) + alphap
 
                 end if
               end if
@@ -1201,34 +1192,34 @@ contains
 
                 ! u here is umac, so use edge-based indexing
                 sigma = abs(u(i+1,j))*dt/dx(1)
-                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (u(i+1,j) .gt. rel_eps) then
-                   Ip(i,j,1) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+                   Ip(i,j,1) = sp - (sigma/TWO)*(sp-sm-(ONE-TWO3RD*sigma)*s6)
                 else
                    Ip(i,j,1) = s(i,j)
                 end if
 
                 sigma = abs(u(i,j))*dt/dx(1)
-                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (u(i,j) .lt. -rel_eps) then
-                   Im(i,j,1) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+                   Im(i,j,1) = sm + (sigma/TWO)*(sp-sm+(ONE-TWO3RD*sigma)*s6)
                 else
                    Im(i,j,1) = s(i,j)
                 end if
 
              else
                 sigma = abs(u(i,j))*dt/dx(1)
-                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (u(i,j) .gt. rel_eps) then
-                   Ip(i,j,1) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+                   Ip(i,j,1) = sp - (sigma/TWO)*(sp-sm-(ONE-TWO3RD*sigma)*s6)
                 else
                    Ip(i,j,1) = s(i,j)
                 end if
 
                 sigma = abs(u(i,j))*dt/dx(1)
-                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (u(i,j) .lt. -rel_eps) then
-                   Im(i,j,1) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+                   Im(i,j,1) = sm + (sigma/TWO)*(sp-sm+(ONE-TWO3RD*sigma)*s6)
                 else
                    Im(i,j,1) = s(i,j)
                 end if
@@ -1272,10 +1263,10 @@ contains
              dsr = TWO  * (s(i,j+1) - s(i,j  ))
              if (dsl*dsr .gt. ZERO) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
-             smm = HALF*(s(i,j)+s(i,j-1)) - SIXTH*(dsvl_r-dsvl_l)
+             sm = HALF*(s(i,j)+s(i,j-1)) - SIXTH*(dsvl_r-dsvl_l)
              ! make sure sedge lies in between adjacent cell-centered values
-             smm = max(smm,min(s(i,j),s(i,j-1)))
-             smm = min(smm,max(s(i,j),s(i,j-1)))
+             sm = max(sm,min(s(i,j),s(i,j-1)))
+             sm = min(sm,max(s(i,j),s(i,j-1)))
 
              ! sp
              dsvl_l = ZERO
@@ -1293,19 +1284,19 @@ contains
              dsr = TWO  * (s(i,j+2) - s(i,j+1))
              if (dsl*dsr .gt. ZERO) dsvl_r = sign(ONE,dsc)*min(abs(dsc),abs(dsl),abs(dsr))
 
-             spp = HALF*(s(i,j+1)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
+             sp = HALF*(s(i,j+1)+s(i,j)) - SIXTH*(dsvl_r-dsvl_l)
              ! make sure sedge lies in between adjacent cell-centered values
-             spp = max(spp,min(s(i,j+1),s(i,j)))
-             spp = min(spp,max(s(i,j+1),s(i,j)))
+             sp = max(sp,min(s(i,j+1),s(i,j)))
+             sp = min(sp,max(s(i,j+1),s(i,j)))
 
              ! modify using quadratic limiters
-             if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
-                spp = s(i,j)
-                smm = s(i,j)
-             else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
-                spp = THREE*s(i,j) - TWO*smm
-             else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
-                smm = THREE*s(i,j) - TWO*spp
+             if ((sp-s(i,j))*(s(i,j)-sm) .le. ZERO) then
+                sp = s(i,j)
+                sm = s(i,j)
+             else if (abs(sp-s(i,j)) .ge. TWO*abs(sm-s(i,j))) then
+                sp = THREE*s(i,j) - TWO*sm
+             else if (abs(sm-s(i,j)) .ge. TWO*abs(sp-s(i,j))) then
+                sm = THREE*s(i,j) - TWO*sp
              end if
        !    end do
        ! end do
@@ -1318,20 +1309,20 @@ contains
              ! make sure sedge lies in between adjacent cell-centered values
              ! do i=lo(1)-1,hi(1)+1
                ! the value in the first cc ghost cell represents the edge value
-               smm = s(i,lo(2)-1)
+               sm = s(i,lo(2)-1)
 
                ! use a modified stencil to get sedge on the first interior edge
-               s_edge = &
+               sedge = &
                     -FIFTH        *s(i,lo(2)-1) &
                     + (THREE/FOUR)*s(i,lo(2)  ) &
                     + HALF        *s(i,lo(2)+1) &
                     - (ONE/20.0d0)*s(i,lo(2)+2)
 
-                s_edge = max(s_edge,min(s(i,lo(2)+1),s(i,lo(2))))
-                s_edge = min(s_edge,max(s(i,lo(2)+1),s(i,lo(2))))
+                sedge = max(sedge,min(s(i,lo(2)+1),s(i,lo(2))))
+                sedge = min(sedge,max(s(i,lo(2)+1),s(i,lo(2))))
              !
              ! ! copy sedge into sp and sm
-                spp = s_edge
+                sp = sedge
           end if
        end if
 
@@ -1340,29 +1331,26 @@ contains
           if (adv_bc(2,1) .eq. EXT_DIR  .or. adv_bc(2,1) .eq. HOEXTRAP) then
 
                ! use a modified stencil to get sedge on the first interior edge
-               s_edge = &
+               sedge = &
                     -FIFTH        *s(i,lo(2)-1) &
                     + (THREE/FOUR)*s(i,lo(2)  ) &
                     + HALF        *s(i,lo(2)+1) &
                     - (ONE/20.0d0)*s(i,lo(2)+2)
 
-                s_edge = max(s_edge,min(s(i,lo(2)+1),s(i,lo(2))))
-                s_edge = min(s_edge,max(s(i,lo(2)+1),s(i,lo(2))))
+                sedge = max(sedge,min(s(i,lo(2)+1),s(i,lo(2))))
+                sedge = min(sedge,max(s(i,lo(2)+1),s(i,lo(2))))
              !
              ! ! copy sedge into sp and sm
-                smm = s_edge
-             !
-             ! ! reset sp on second interior edge
-                ! sp(i,lo(2)+1) = sp(i,lo(2)+2)
-             !
+                sm = sedge
+
              ! ! modify using quadratic limiters
-                if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
-                   spp = s(i,j)
-                   smm = s(i,j)
-                else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
-                   spp = THREE*s(i,j) - TWO*smm
-                else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
-                   smm = THREE*s(i,j) - TWO*spp
+                if ((sp-s(i,j))*(s(i,j)-sm) .le. ZERO) then
+                   sp = s(i,j)
+                   sm = s(i,j)
+                else if (abs(sp-s(i,j)) .ge. TWO*abs(sm-s(i,j))) then
+                   sp = THREE*s(i,j) - TWO*sm
+                else if (abs(sm-s(i,j)) .ge. TWO*abs(sp-s(i,j))) then
+                   sm = THREE*s(i,j) - TWO*sp
                 end if
              ! end do
           end if
@@ -1371,24 +1359,21 @@ contains
        if (j .eq. hi(2) .and. hi(2) .eq. domhi(2)) then
           if (adv_bc(2,2) .eq. EXT_DIR  .or. adv_bc(2,2) .eq. HOEXTRAP) then
 
-             ! make sure sedge lies in between adjacent cell-centered values
-             ! do i=lo(1)-1,hi(1)+1
-
                 ! the value in the first cc ghost cell represents the edge value
-                spp = s(i,hi(2)+1)
+                sp = s(i,hi(2)+1)
 
                 ! use a modified stencil to get sedge on the first interior edge
-                s_edge = &
+                sedge = &
                      -FIFTH        *s(i,hi(2)+1) &
                      + (THREE/FOUR)*s(i,hi(2)  ) &
                      + HALF        *s(i,hi(2)-1) &
                      - (ONE/20.0d0)*s(i,hi(2)-2)
 
-                s_edge = max(s_edge,min(s(i,hi(2)-1),s(i,hi(2))))
-                s_edge = min(s_edge,max(s(i,hi(2)-1),s(i,hi(2))))
+                sedge = max(sedge,min(s(i,hi(2)-1),s(i,hi(2))))
+                sedge = min(sedge,max(s(i,hi(2)-1),s(i,hi(2))))
              !
              ! ! copy sedge into sp and sm
-                smm = s_edge
+                sm = sedge
 
           end if
        end if
@@ -1397,26 +1382,26 @@ contains
           if (adv_bc(2,2) .eq. EXT_DIR  .or. adv_bc(2,2) .eq. HOEXTRAP) then
 
                 ! use a modified stencil to get sedge on the first interior edge
-                s_edge = &
+                sedge = &
                      -FIFTH        *s(i,hi(2)+1) &
                      + (THREE/FOUR)*s(i,hi(2)  ) &
                      + HALF        *s(i,hi(2)-1) &
                      - (ONE/20.0d0)*s(i,hi(2)-2)
 
-                s_edge = max(s_edge,min(s(i,hi(2)-1),s(i,hi(2))))
-                s_edge = min(s_edge,max(s(i,hi(2)-1),s(i,hi(2))))
+                sedge = max(sedge,min(s(i,hi(2)-1),s(i,hi(2))))
+                sedge = min(sedge,max(s(i,hi(2)-1),s(i,hi(2))))
              !
              ! ! copy sedge into sp and sm
-                spp = s_edge
+                sp = sedge
              !
              ! ! modify using quadratic limiters
-                if ((spp-s(i,j))*(s(i,j)-smm) .le. ZERO) then
-                   spp = s(i,j)
-                   smm = s(i,j)
-                else if (abs(spp-s(i,j)) .ge. TWO*abs(smm-s(i,j))) then
-                   spp = THREE*s(i,j) - TWO*smm
-                else if (abs(smm-s(i,j)) .ge. TWO*abs(spp-s(i,j))) then
-                   smm = THREE*s(i,j) - TWO*spp
+                if ((sp-s(i,j))*(s(i,j)-sm) .le. ZERO) then
+                   sp = s(i,j)
+                   sm = s(i,j)
+                else if (abs(sp-s(i,j)) .ge. TWO*abs(sm-s(i,j))) then
+                   sp = THREE*s(i,j) - TWO*sm
+                else if (abs(sm-s(i,j)) .ge. TWO*abs(sp-s(i,j))) then
+                   sm = THREE*s(i,j) - TWO*sp
                 end if
              ! end do
           end if
@@ -1430,34 +1415,34 @@ contains
 
           ! v here is vmac, so use edge-based indexing
                 sigma = abs(v(i,j+1))*dt/dx(2)
-                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (v(i,j+1) .gt. rel_eps) then
-                   Ip(i,j,2) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+                   Ip(i,j,2) = sp - (sigma/TWO)*(sp-sm-(ONE-TWO3RD*sigma)*s6)
                 else
                    Ip(i,j,2) = s(i,j)
                 end if
 
                 sigma = abs(v(i,j))*dt/dx(2)
-                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (v(i,j) .lt. -rel_eps) then
-                   Im(i,j,2) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+                   Im(i,j,2) = sm + (sigma/TWO)*(sp-sm+(ONE-TWO3RD*sigma)*s6)
                 else
                    Im(i,j,2) = s(i,j)
                 end if
 
        else
                 sigma = abs(v(i,j))*dt/dx(2)
-                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (v(i,j) .gt. rel_eps) then
-                   Ip(i,j,2) = spp - (sigma/TWO)*(spp-smm-(ONE-TWO3RD*sigma)*s6)
+                   Ip(i,j,2) = sp - (sigma/TWO)*(sp-sm-(ONE-TWO3RD*sigma)*s6)
                 else
                    Ip(i,j,2) = s(i,j)
                 end if
 
                 sigma = abs(v(i,j))*dt/dx(2)
-                s6 = SIX*s(i,j) - THREE*(smm+spp)
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (v(i,j) .lt. -rel_eps) then
-                   Im(i,j,2) = smm + (sigma/TWO)*(spp-smm+(ONE-TWO3RD*sigma)*s6)
+                   Im(i,j,2) = sm + (sigma/TWO)*(sp-sm+(ONE-TWO3RD*sigma)*s6)
                 else
                    Im(i,j,2) = s(i,j)
                 end if
@@ -1470,32 +1455,65 @@ contains
 
        !----------------------------------------------------------------------
        ! ppm_type = 2
-       !----------------------------------------------------------------------
+       !---------------------------------------------------------
 
        ! interpolate s to y-edges
-       do j=lo(2)-2,hi(2)+3
-          do i=lo(1)-1,hi(1)+1
-             sedge(i,j) = (7.d0/12.d0)*(s(i,j-1)+s(i,j)) - (1.d0/12.d0)*(s(i,j-2)+s(i,j+1))
+         do j=lo(2)-1,hi(2)+1
+           do i=lo(1)-1,hi(1)+1
+             ! -1
+             sedgel = (7.d0/12.d0)*(s(i,j-2)+s(i,j-1)) - (1.d0/12.d0)*(s(i,j-3)+s(i,j))
              ! limit sedge
-             if ((sedge(i,j)-s(i,j-1))*(s(i,j)-sedge(i,j)) .lt. ZERO) then
-                D2  = THREE*(s(i,j-1)-TWO*sedge(i,j)+s(i,j))
+             if ((sedgel-s(i,j-2))*(s(i,j-1)-sedgel) .lt. ZERO) then
+                D2  = THREE*(s(i,j-2)-TWO*sedgel+s(i,j-1))
+                D2L = s(i,j-3)-TWO*s(i,j-2)+s(i,j-1)
+                D2R = s(i,j-2)-TWO*s(i,j-1)+s(i,j)
+                sgn = sign(ONE,D2)
+                D2LIM = sgn*max(min(C*sgn*D2L,C*sgn*D2R,sgn*D2),ZERO)
+                sedgel = HALF*(s(i,j-2)+s(i,j-1)) - SIXTH*D2LIM
+             end if
+
+             ! 0
+             sedge = (7.d0/12.d0)*(s(i,j-1)+s(i,j)) - (1.d0/12.d0)*(s(i,j-2)+s(i,j+1))
+             ! limit sedge
+             if ((sedge-s(i,j-1))*(s(i,j)-sedge) .lt. ZERO) then
+                D2  = THREE*(s(i,j-1)-TWO*sedge+s(i,j))
                 D2L = s(i,j-2)-TWO*s(i,j-1)+s(i,j)
                 D2R = s(i,j-1)-TWO*s(i,j)+s(i,j+1)
                 sgn = sign(ONE,D2)
                 D2LIM = sgn*max(min(C*sgn*D2L,C*sgn*D2R,sgn*D2),ZERO)
-                sedge(i,j) = HALF*(s(i,j-1)+s(i,j)) - SIXTH*D2LIM
+                sedge = HALF*(s(i,j-1)+s(i,j)) - SIXTH*D2LIM
              end if
-          end do
-       end do
+
+             ! +1
+             sedger = (7.d0/12.d0)*(s(i,j)+s(i,j+1)) - (1.d0/12.d0)*(s(i,j-1)+s(i,j+2))
+             ! limit sedge
+             if ((sedger-s(i,j))*(s(i,j+1)-sedger) .lt. ZERO) then
+                D2  = THREE*(s(i,j)-TWO*sedger+s(i,j+1))
+                D2L = s(i,j-1)-TWO*s(i,j)+s(i,j+1)
+                D2R = s(i,j)-TWO*s(i,j+1)+s(i,j+2)
+                sgn = sign(ONE,D2)
+                D2LIM = sgn*max(min(C*sgn*D2L,C*sgn*D2R,sgn*D2),ZERO)
+                sedger = HALF*(s(i,j)+s(i,j+1)) - SIXTH*D2LIM
+             end if
+
+             ! +2
+             sedgerr = (7.d0/12.d0)*(s(i,j+1)+s(i,j+2)) - (1.d0/12.d0)*(s(i,j)+s(i,j+3))
+             ! limit sedge
+             if ((sedgerr-s(i,j+1))*(s(i,j+2)-sedgerr) .lt. ZERO) then
+                D2  = THREE*(s(i,j+1)-TWO*sedgerr+s(i,j+2))
+                D2L = s(i,j)-TWO*s(i,j+1)+s(i,j+2)
+                D2R = s(i,j+1)-TWO*s(i,j+2)+s(i,j+3)
+                sgn = sign(ONE,D2)
+                D2LIM = sgn*max(min(C*sgn*D2L,C*sgn*D2R,sgn*D2),ZERO)
+                sedgerr = HALF*(s(i,j+1)+s(i,j+2)) - SIXTH*D2LIM
+             end if
 
        ! use Colella 2008 limiters
        ! This is a new version of the algorithm
        ! to eliminate sensitivity to roundoff.
-       do j=lo(2)-1,hi(2)+1
-          do i=lo(1)-1,hi(1)+1
 
-             alphap = sedge(i,j+1)-s(i,j)
-             alpham = sedge(i,j  )-s(i,j)
+             alphap = sedger-s(i,j)
+             alpham = sedge-s(i,j)
              bigp = abs(alphap).gt.TWO*abs(alpham)
              bigm = abs(alpham).gt.TWO*abs(alphap)
              extremum = .false.
@@ -1507,8 +1525,8 @@ contains
                 ! centered values for a change in sign in the differences adjacent to
                 ! the cell. We use the pair of differences whose minimum magnitude is the
                 ! largest, and thus least susceptible to sensitivity to roundoff.
-                dafacem = sedge(i,j) - sedge(i,j-1)
-                dafacep = sedge(i,j+2) - sedge(i,j+1)
+                dafacem = sedge - sedgel
+                dafacep = sedgerr - sedger
                 dabarm = s(i,j) - s(i,j-1)
                 dabarp = s(i,j+1) - s(i,j)
                 dafacemin = min(abs(dafacem),abs(dafacep))
@@ -1560,44 +1578,64 @@ contains
                 end if
              end if
 
-             sm(i,j) = s(i,j) + alpham
-             sp(i,j) = s(i,j) + alphap
+             sm = s(i,j) + alpham
+             sp = s(i,j) + alphap
 
-          end do
-       end do
+          ! end do
+       ! end do
 
        ! different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's
        if (lo(2) .eq. domlo(2)) then
           if (adv_bc(2,1) .eq. EXT_DIR  .or. adv_bc(2,1) .eq. HOEXTRAP) then
-             ! the value in the first cc ghost cell represents the edge value
-             sm(lo(1)-1:hi(1)+1,lo(2))    = s(lo(1)-1:hi(1)+1,lo(2)-1)
-             sedge(lo(1)-1:hi(1)+1,lo(2)) = s(lo(1)-1:hi(1)+1,lo(2)-1)
 
-             ! use a modified stencil to get sedge on the first interior edge
-             sedge(lo(1)-1:hi(1)+1,lo(2)+1) = &
-                  -FIFTH        *s(lo(1)-1:hi(1)+1,lo(2)-1) &
-                  + (THREE/FOUR)*s(lo(1)-1:hi(1)+1,lo(2)  ) &
-                  + HALF        *s(lo(1)-1:hi(1)+1,lo(2)+1) &
-                  - (ONE/20.0d0)*s(lo(1)-1:hi(1)+1,lo(2)+2)
+             if (j .eq. lo(2)) then
+               ! the value in the first cc ghost cell represents the edge value
+               sm    = s(i,lo(2)-1)
 
-             ! make sure sedge lies in between adjacent cell-centered values
-             do i=lo(1)-1,hi(1)+1
-                sedge(i,lo(2)+1) = max(sedge(i,lo(2)+1),min(s(i,lo(2)+1),s(i,lo(2))))
-                sedge(i,lo(2)+1) = min(sedge(i,lo(2)+1),max(s(i,lo(2)+1),s(i,lo(2))))
-             end do
+               ! use a modified stencil to get sedge on the first interior edge
+               sp = &
+                    -FIFTH        *s(i,lo(2)-1) &
+                    + (THREE/FOUR)*s(i,lo(2)  ) &
+                    + HALF        *s(i,lo(2)+1) &
+                    - (ONE/20.0d0)*s(i,lo(2)+2)
 
-             ! copy sedge into sp
-             do i=lo(1)-1,hi(1)+1
-                sp(i,lo(2)  ) = sedge(i,lo(2)+1)
-             end do
+                sp = max(sp,min(s(i,lo(2)+1),s(i,lo(2))))
+                sp = min(sp,max(s(i,lo(2)+1),s(i,lo(2))))
+
+             elseif (j .eq. lo(2)+1) then
+
+               sedgel = s(i,lo(2)-1)
+
+               sedge = &
+                    -FIFTH        *s(i,lo(2)-1) &
+                    + (THREE/FOUR)*s(i,lo(2)  ) &
+                    + HALF        *s(i,lo(2)+1) &
+                    - (ONE/20.0d0)*s(i,lo(2)+2)
+
+                sedge = max(sedge,min(s(i,lo(2)+1),s(i,lo(2))))
+                sedge = min(sedge,max(s(i,lo(2)+1),s(i,lo(2))))
+
+             elseif (j .eq. lo(2)+2) then
+
+               ! use a modified stencil to get sedge on the first interior edge
+               sedgel = &
+                    -FIFTH        *s(i,lo(2)-1) &
+                    + (THREE/FOUR)*s(i,lo(2)  ) &
+                    + HALF        *s(i,lo(2)+1) &
+                    - (ONE/20.0d0)*s(i,lo(2)+2)
+
+                sedgel = max(sedgel,min(s(i,lo(2)+1),s(i,lo(2))))
+                sedgel = min(sedgel,max(s(i,lo(2)+1),s(i,lo(2))))
+
+             endif
 
              ! apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells
-             do j=lo(2)+1,lo(2)+1
-                do i=lo(1)-1,hi(1)+1
 
-                   alphap = sedge(i,j+1)-s(i,j)
-                   alpham = sedge(i,j  )-s(i,j)
+             if (j .eq. lo(2)+1 .or. j .eq. lo(2)+2) then
+
+                   alphap = sedger-s(i,j)
+                   alpham = sedge-s(i,j)
                    bigp = abs(alphap).gt.TWO*abs(alpham)
                    bigm = abs(alpham).gt.TWO*abs(alphap)
                    extremum = .false.
@@ -1609,8 +1647,8 @@ contains
                       ! centered values for a change in sign in the differences adjacent to
                       ! the cell. We use the pair of differences whose minimum magnitude is the
                       ! largest, and thus least susceptible to sensitivity to roundoff.
-                      dafacem = sedge(i,j) - sedge(i,j-1)
-                      dafacep = sedge(i,j+2) - sedge(i,j+1)
+                      dafacem = sedge - sedgel
+                      dafacep = sedgerr - sedger
                       dabarm = s(i,j) - s(i,j-1)
                       dabarp = s(i,j+1) - s(i,j)
                       dafacemin = min(abs(dafacem),abs(dafacep))
@@ -1662,45 +1700,61 @@ contains
                       end if
                    end if
 
-                   sm(i,j) = s(i,j) + alpham
-                   sp(i,j) = s(i,j) + alphap
-
-                end do
-             end do
+                   sm = s(i,j) + alpham
+                   sp = s(i,j) + alphap
+             end if
           end if
        end if
 
        if (hi(2) .eq. domhi(2)) then
           if (adv_bc(2,2) .eq. EXT_DIR  .or. adv_bc(2,2) .eq. HOEXTRAP) then
-             ! the value in the first cc ghost cell represents the edge value
-             sp(lo(1)-1:hi(1)+1,hi(2))      = s(lo(1)-1:hi(1)+1,hi(2)+1)
-             sedge(lo(1)-1:hi(1)+1,hi(2)+1) = s(lo(1)-1:hi(1)+1,hi(2)+1)
 
-             ! use a modified stencil to get sedge on the first interior edge
-             sedge(lo(1)-1:hi(1)+1,hi(2)) = &
-                  -FIFTH        *s(lo(1)-1:hi(1)+1,hi(2)+1) &
-                  + (THREE/FOUR)*s(lo(1)-1:hi(1)+1,hi(2)  ) &
-                  + HALF        *s(lo(1)-1:hi(1)+1,hi(2)-1) &
-                  - (ONE/20.0d0)*s(lo(1)-1:hi(1)+1,hi(2)-2)
+            if (j .eq. hi(2)) then
 
-             ! make sure sedge lies in between adjacent cell-centered values
-             do i=lo(1)-1,hi(1)+1
-                sedge(i,hi(2)) = max(sedge(i,hi(2)),min(s(i,hi(2)-1),s(i,hi(2))))
-                sedge(i,hi(2)) = min(sedge(i,hi(2)),max(s(i,hi(2)-1),s(i,hi(2))))
-             end do
+              sp     = s(i,hi(2)+1)
 
-             ! copy sedge into sm
-             do i=lo(1)-1,hi(1)+1
-                sm(i,hi(2)  ) = sedge(i,hi(2))
-             end do
+              ! use a modified stencil to get sedge on the first interior edge
+              sm = &
+                   -FIFTH        *s(i,hi(2)+1) &
+                   + (THREE/FOUR)*s(i,hi(2)  ) &
+                   + HALF        *s(i,hi(2)-1) &
+                   - (ONE/20.0d0)*s(i,hi(2)-2)
+
+               sm = max(sm,min(s(i,hi(2)-1),s(i,hi(2))))
+               sm = min(sm,max(s(i,hi(2)-1),s(i,hi(2))))
+
+            elseif (j .eq. hi(2)-1) then
+
+              sedgerr = s(i,hi(2)+1)
+
+              sedger = &
+                   -FIFTH        *s(i,hi(2)+1) &
+                   + (THREE/FOUR)*s(i,hi(2)  ) &
+                   + HALF        *s(i,hi(2)-1) &
+                   - (ONE/20.0d0)*s(i,hi(2)-2)
+
+             sedger = max(sedger,min(s(i,hi(2)-1),s(i,hi(2))))
+             sedger = min(sedger,max(s(i,hi(2)-1),s(i,hi(2))))
+
+            elseif (j .eq. hi(2)-2) then
+
+              sedgerr = &
+                   -FIFTH        *s(i,hi(2)+1) &
+                   + (THREE/FOUR)*s(i,hi(2)  ) &
+                   + HALF        *s(i,hi(2)-1) &
+                   - (ONE/20.0d0)*s(i,hi(2)-2)
+
+             sedgerr = max(sedgerr,min(s(i,hi(2)-1),s(i,hi(2))))
+             sedgerr = min(sedgerr,max(s(i,hi(2)-1),s(i,hi(2))))
+
+            endif
 
              ! apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells
-             do j=hi(2)-2,hi(2)-1
-                do i=lo(1)-1,hi(1)+1
+             if (j .eq. hi(2)-2 .or. j .eq. hi(2)-1) then
 
-                   alphap = sedge(i,j+1)-s(i,j)
-                   alpham = sedge(i,j  )-s(i,j)
+                   alphap = sedger-s(i,j)
+                   alpham = sedge-s(i,j)
                    bigp = abs(alphap).gt.TWO*abs(alpham)
                    bigm = abs(alpham).gt.TWO*abs(alphap)
                    extremum = .false.
@@ -1712,8 +1766,8 @@ contains
                       ! centered values for a change in sign in the differences adjacent to
                       ! the cell. We use the pair of differences whose minimum magnitude is the
                       ! largest, and thus least susceptible to sensitivity to roundoff.
-                      dafacem = sedge(i,j) - sedge(i,j-1)
-                      dafacep = sedge(i,j+2) - sedge(i,j+1)
+                      dafacem = sedge - sedgel
+                      dafacep = sedgerr - sedger
                       dabarm = s(i,j) - s(i,j-1)
                       dabarp = s(i,j+1) - s(i,j)
                       dafacemin = min(abs(dafacem),abs(dafacep))
@@ -1765,13 +1819,10 @@ contains
                       end if
                    end if
 
-                   sm(i,j) = s(i,j) + alpham
-                   sp(i,j) = s(i,j) + alphap
-
-                end do
-             end do
+                   sm = s(i,j) + alpham
+                   sp = s(i,j) + alphap
+             end if
           end if
-
        end if
 
 
@@ -1782,61 +1833,44 @@ contains
        if (is_umac) then
 
           ! v here is vmac, so use edge-based indexing
-          do j=lo(2)-1,hi(2)
-             do i=lo(1)-1,hi(1)+1
+
                 sigma = abs(v(i,j+1))*dt/dx(2)
-                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (v(i,j+1) .gt. rel_eps) then
-                   Ip(i,j,2) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
+                   Ip(i,j,2) = sp - (sigma/TWO)*(sp-sm-(ONE-TWO3RD*sigma)*s6)
                 else
                    Ip(i,j,2) = s(i,j)
                 end if
-             end do
-          end do
 
-          do j=lo(2),hi(2)+1
-             do i=lo(1)-1,hi(1)+1
                 sigma = abs(v(i,j))*dt/dx(2)
-                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (v(i,j) .lt. -rel_eps) then
-                   Im(i,j,2) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
+                   Im(i,j,2) = sm + (sigma/TWO)*(sp-sm+(ONE-TWO3RD*sigma)*s6)
                 else
                    Im(i,j,2) = s(i,j)
                 end if
-             end do
-          end do
-
        else
-          do j=lo(2)-1,hi(2)
-             do i=lo(1)-1,hi(1)+1
                 sigma = abs(v(i,j))*dt/dx(2)
-                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (v(i,j) .gt. rel_eps) then
-                   Ip(i,j,2) = sp(i,j) - (sigma/TWO)*(sp(i,j)-sm(i,j)-(ONE-TWO3RD*sigma)*s6)
+                   Ip(i,j,2) = sp - (sigma/TWO)*(sp-sm-(ONE-TWO3RD*sigma)*s6)
                 else
                    Ip(i,j,2) = s(i,j)
                 end if
-             end do
-          end do
 
-          do j=lo(2),hi(2)+1
-             do i=lo(1)-1,hi(1)+1
                 sigma = abs(v(i,j))*dt/dx(2)
-                s6 = SIX*s(i,j) - THREE*(sm(i,j)+sp(i,j))
+                s6 = SIX*s(i,j) - THREE*(sm+sp)
                 if (v(i,j) .lt. -rel_eps) then
-                   Im(i,j,2) = sm(i,j) + (sigma/TWO)*(sp(i,j)-sm(i,j)+(ONE-TWO3RD*sigma)*s6)
+                   Im(i,j,2) = sm + (sigma/TWO)*(sp-sm+(ONE-TWO3RD*sigma)*s6)
                 else
                    Im(i,j,2) = s(i,j)
                 end if
-             end do
-          end do
-       endif
+         endif
+
+       end do
+     end do
 
     end if
-
-    deallocate(sp)
-    deallocate(sm)
-    ! deallocate(sedge)
 
   end subroutine ppm_2d
 

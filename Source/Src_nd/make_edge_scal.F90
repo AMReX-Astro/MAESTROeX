@@ -288,20 +288,13 @@ contains
        call slopey_2d(s(:,:,comp:comp),slopey,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
-      if (ppm_type .eq. 2) then
-         allocate(sedge(lo(1)-2:hi(1)+3,lo(2)-2:hi(2)+3))
-      end if
-
        call ppm_2d(s(:,:,comp),ng_s,umac,vmac,ng_um,Ip,Im, &
-                    sedge,domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+                    domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
        if (ppm_trace_forces .eq. 1) then
           call ppm_2d(force(:,:,comp),ng_s,umac,vmac,ng_um,Ipf,Imf, &
-                       sedge,domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
+                       domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
        end if
 
-       if (ppm_type .eq. 2) then
-         deallocate(sedge)
-       endif
     end if
     dt2 = HALF*dt
     dt4 = dt/4.0d0
