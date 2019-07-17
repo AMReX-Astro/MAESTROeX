@@ -1401,7 +1401,7 @@ contains
 
              ! apply Colella 2008 limiters to compute sm and sp in the second
              ! and third inner cells
-             do j=lo(2)+1,lo(2)+1
+             do j=lo(2)+1,lo(2)+2
                 do i=lo(1)-1,hi(1)+1
 
                    alphap = sedge(i,j+1)-s(i,j)
@@ -1827,7 +1827,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -1880,7 +1880,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -2007,7 +2007,7 @@ contains
        end do
        !$OMP END DO
        !$OMP END PARALLEL
-       
+
        ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
        if (lo(1) .eq. domlo(1)) then
           if (adv_bc(1,1) .eq. EXT_DIR  .or. adv_bc(1,1) .eq. HOEXTRAP) then
@@ -2022,7 +2022,7 @@ contains
              !$OMP PARALLEL PRIVATE(i,j,k,alphap,alpham,bigp,bigm,extremum,dafacem,dafacep) &
              !$OMP PRIVATE(dabarm,dabarp,dafacemin,dabarmin,dachkm,dachkp,D2,D2L,D2R,D2C,sgn,D2LIM,amax) &
              !$OMP PRIVATE(delam,delap,D2ABS)
-             
+
              !$OMP DO
              do k=lo(3)-1,hi(3)+1
                 do j=lo(2)-1,hi(2)+1
@@ -2285,7 +2285,7 @@ contains
           end do
        end do
        !$OMP END PARALLEL DO
-       
+
     else
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,sigma,s6)
@@ -2315,7 +2315,7 @@ contains
           end do
        end do
        !$OMP END PARALLEL DO
-       
+
     endif
 
     call bl_deallocate(sedge)
@@ -2458,7 +2458,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -2510,7 +2510,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -2953,7 +2953,7 @@ contains
           end do
        end do
        !$OMP END PARALLEL DO
-       
+
     endif
 
     call bl_deallocate(sedge)
@@ -3147,7 +3147,7 @@ contains
                 end do
              end do
              !$OMP END PARALLEL DO
-             
+
           end if
        end if
 
@@ -3563,7 +3563,7 @@ contains
        end do
        !$OMP END DO
        !$OMP END PARALLEL
-       
+
     else
 
        !$OMP PARALLEL PRIVATE(i,j,k,sigma,s6)
@@ -3601,7 +3601,7 @@ contains
        end do
        !$OMP END DO
        !$OMP END PARALLEL
-       
+
     endif
 
     call bl_deallocate(sp)
