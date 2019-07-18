@@ -570,7 +570,7 @@ contains
     logical         , intent(in   ) :: is_umac
 
     ! local
-    integer :: i,j,ii,jj
+    integer :: i,j
 
     logical :: extremum, bigp, bigm
 
@@ -582,6 +582,8 @@ contains
 
     ! constant used in Colella 2008
     double precision, parameter :: C = 1.25d0
+
+    !$gpu
 
     !-------------------------------------------------------------------------
     ! x-direction

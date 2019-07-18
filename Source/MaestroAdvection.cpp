@@ -96,6 +96,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
               MultiFab& utrans_mf  = utrans[lev][0];
 #if (AMREX_SPACEDIM >= 2)
               MultiFab& vtrans_mf  = utrans[lev][1];
+              MultiFab Ip, Im;
+              Ip.define(grids[lev], dmap[lev],2,1);
+              Im.define(grids[lev], dmap[lev],2,1);
 #if (AMREX_SPACEDIM == 3)
               MultiFab& wtrans_mf  = utrans[lev][2];
 	const MultiFab& w0macx_mf  = w0mac[lev][0];
@@ -107,6 +110,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 
 	// NOTE: don't tile, but threaded in fortran subroutine
+#if (AMREX_SPACEDIM == 1 || AMREX_SPACEDIM == 3)
         for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -118,8 +122,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             // We will also pass "validBox", which specifies the "valid" region.
 #if (AMREX_SPACEDIM == 1)
             mkutrans_1d(
-#elif (AMREX_SPACEDIM == 2)
-            mkutrans_2d(
 #elif (AMREX_SPACEDIM == 3)
             mkutrans_3d(
 #endif
@@ -128,18 +130,43 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
-                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
+                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
                         BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
                         BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
                         BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
                         BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 #endif
-#endif
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
 
         } // end MFIter loop
+
+#else
+    // NOTE: don't tile, but threaded in fortran subroutine
+        for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+#pragma gpu box(obx)
+            mkutrans_2d(
+                        AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                        lev, AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(utrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                        BL_TO_FORTRAN_ANYD(Im[mfi]),
+                        w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+
+        } // end MFIter loop
+#endif
     } // end loop over levels
 
     if (finest_level == 0) {
