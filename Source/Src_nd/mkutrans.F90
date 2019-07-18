@@ -160,6 +160,8 @@ contains
        Im, im_lo, im_hi, &
        w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
 
+    implicit none
+
     integer, value, intent(in   ) :: lev
     integer, intent(in) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
@@ -207,9 +209,9 @@ contains
        ! call slopey_2d(utilde(:,:,k,2:2),Im(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
-       call ppm_2d(utilde(:,:,k,1),ng_ut, &
-            ufull(:,:,k,1),ufull(:,:,k,2),ng_uf, &
-            Ip(:,:,k,:),Im(:,:,k,:),domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
+       call ppm_2d(lo,hi,utilde(:,:,:,1),ut_lo,ut_hi, &
+            ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi, &
+            Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc(:,:,1),dx,dt,.false.)
 
     end if
 
@@ -288,9 +290,10 @@ contains
     !******************************************************************
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
-       call ppm_2d(utilde(:,:,k,2),ng_ut, &
-            ufull(:,:,k,1),ufull(:,:,k,2),ng_uf, &
-            Ip(:,:,k,:),Im(:,:,k,:),domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+       call ppm_2d(lo,hi,utilde(:,:,:,2),ut_lo,ut_hi, &
+            ufull(:,:,:,1),uf_lo,uf_hi,&
+            ufull(:,:,:,2),uf_lo,uf_hi, &
+            Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc(:,:,2),dx,dt,.false.)
 
     end if
 

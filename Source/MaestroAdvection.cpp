@@ -331,8 +331,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #elif (AMREX_SPACEDIM == 3)
                 make_edge_scal_3d(
 #endif
-                    domainBox.loVect(), domainBox.hiVect(),
-                    tileBox.loVect(), tileBox.hiVect(),
+                    ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
+                    ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                     BL_TO_FORTRAN_FAB(scal_mf[mfi]), scal_mf.nGrow(),
                     BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
 #if (AMREX_SPACEDIM >= 2)
