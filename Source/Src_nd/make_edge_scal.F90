@@ -34,18 +34,21 @@ contains
        comp, bccomp, is_conservative) bind(C,name="make_edge_scal_1d")
 
     integer         , intent(in   ) :: domlo(1), domhi(1), lo(1), hi(1)
-    integer         , intent(in   ) :: s_lo(1), s_hi(1), nc_s
-    integer, value,   intent(in   ) :: ng_s
-    integer         , intent(in   ) :: x_lo(1), x_hi(1), nc_x
+    integer         , intent(in   ) :: s_lo(1), s_hi(1)
+    integer, value,   intent(in   ) :: nc_s, ng_s
+    integer         , intent(in   ) :: x_lo(1), x_hi(1)
+    integer, value,   intent(in   ) :: nc_x
     integer         , intent(in   ) :: u_lo(1), u_hi(1)
     integer, value,   intent(in   ) :: ng_um
-    integer         , intent(in   ) :: f_lo(1), f_hi(1), nc_f
+    integer         , intent(in   ) :: f_lo(1), f_hi(1)
+    integer, value,   intent(in   ) :: nc_f
     double precision, intent(in   ) :: s     (s_lo(1):s_hi(1),nc_s)
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),nc_x)
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1))
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),nc_f)
-    double precision, intent(in   ) :: dx(1), dt
-    integer         , intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
+    double precision, intent(in   ) :: dx(1)
+    double precision, value, intent(in   ) :: dt
+    integer, value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
     integer         , intent(in   ) :: adv_bc(1,2,nbccomp)
 
     ! Local variables
@@ -255,10 +258,10 @@ contains
 
     integer :: ip_lo(3), ip_hi(3), im_lo(3), im_hi(3)
 
-    ip_lo(:) = (/ lo(1)-1,lo(2)-1,s_lo(3) /)
-    ip_hi(:) = (/ hi(1)+1,hi(2)+1,s_hi(3) /)
-    im_lo(:) = (/ lo(1)-1,lo(2)-1,s_lo(3) /)
-    im_hi(:) = (/ hi(1)+1,hi(2)+1,s_hi(3) /)
+    ip_lo(:) = (/ lo(1)-1,lo(2)-1,lo(3) /)
+    ip_hi(:) = (/ hi(1)+1,hi(2)+1,hi(3) /)
+    im_lo(:) = (/ lo(1)-1,lo(2)-1,lo(3) /)
+    im_hi(:) = (/ hi(1)+1,hi(2)+1,hi(3) /)
 
     allocate(Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
     allocate(Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))

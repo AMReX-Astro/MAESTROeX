@@ -125,8 +125,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #elif (AMREX_SPACEDIM == 3)
             mkutrans_3d(
 #endif
-                        &lev, domainBox.loVect(), domainBox.hiVect(),
-                        tileBox.loVect(), tileBox.hiVect(),
+                        &lev, AMREX_ARLIM_ANYD(domainBox.loVect()), AMREX_ARLIM_ANYD(domainBox.hiVect()),
+                        AMREX_ARLIM_ANYD(tileBox.loVect()), AMREX_ARLIM_ANYD(tileBox.hiVect()),
                         BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
@@ -143,7 +143,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
 #else
     // NOTE: don't tile, but threaded in fortran subroutine
-        for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -153,16 +153,16 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(obx)
+// #pragma gpu box(obx)
             mkutrans_2d(
-                        AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                        lev, AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
-                        BL_TO_FORTRAN_ANYD(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
-                        BL_TO_FORTRAN_ANYD(utrans_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                        BL_TO_FORTRAN_ANYD(Im[mfi]),
+                        AMREX_ARLIM_ANYD(tileBox.loVect()), AMREX_ARLIM_ANYD(tileBox.hiVect()),
+                        lev, AMREX_ARLIM_ANYD(domainBox.loVect()), AMREX_ARLIM_ANYD(domainBox.hiVect()),
+                        BL_TO_FORTRAN_3D(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_3D(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
+                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
+                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
+                        BL_TO_FORTRAN_3D(Ip[mfi]),
+                        BL_TO_FORTRAN_3D(Im[mfi]),
                         w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
 
         } // end MFIter loop
@@ -243,8 +243,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #elif (AMREX_SPACEDIM == 3)
             velpred_3d(
 #endif
-                        &lev, domainBox.loVect(), domainBox.hiVect(),
-                        tileBox.loVect(), tileBox.hiVect(),
+                        &lev, AMREX_ARLIM_ANYD(domainBox.loVect()), AMREX_ARLIM_ANYD(domainBox.hiVect()),
+                        AMREX_ARLIM_ANYD(tileBox.loVect()), AMREX_ARLIM_ANYD(tileBox.hiVect()),
                         BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
@@ -331,14 +331,14 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #elif (AMREX_SPACEDIM == 3)
                 make_edge_scal_3d(
 #endif
-                    ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                    ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                    BL_TO_FORTRAN_FAB(scal_mf[mfi]), scal_mf.nGrow(),
-                    BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
+                    AMREX_ARLIM_3D(domainBox.loVect()), AMREX_ARLIM_3D(domainBox.hiVect()),
+                    AMREX_ARLIM_3D(tileBox.loVect()), AMREX_ARLIM_3D(tileBox.hiVect()),
+                    BL_TO_FORTRAN_3D(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
+                    BL_TO_FORTRAN_3D(sedgex_mf[mfi]), sedgex_mf.nComp(),
 #if (AMREX_SPACEDIM >= 2)
-                    BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
+                    BL_TO_FORTRAN_3D(sedgey_mf[mfi]), sedgey_mf.nComp(),
 #if (AMREX_SPACEDIM == 3)
-                    BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
+                    BL_TO_FORTRAN_3D(sedgez_mf[mfi]), sedgez_mf.nComp(),
 #endif
 #endif
                     BL_TO_FORTRAN_3D(umac_mf[mfi]),
@@ -349,9 +349,9 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #endif
 #endif
                     umac_mf.nGrow(),
-                    BL_TO_FORTRAN_FAB(force_mf[mfi]),
-                    dx, &dt, &is_vel, bcs[0].data(),
-                    &nbccomp, &scomp, &bccomp, &is_conservative);
+                    BL_TO_FORTRAN_3D(force_mf[mfi]), force_mf.nComp(),
+                    dx, dt, is_vel, bcs[0].data(),
+                    nbccomp, scomp, bccomp, is_conservative);
             } // end loop over components
         } // end MFIter loop
     } // end loop over levels

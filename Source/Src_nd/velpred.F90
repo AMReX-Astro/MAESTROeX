@@ -242,15 +242,15 @@ contains
     allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
     allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
 
-    allocate(Ipu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(Imu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(Ipv(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(Imv(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
+    allocate(Ipu(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
+    allocate(Imu(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
+    allocate(Ipv(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
+    allocate(Imv(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
 
-    allocate(Ipfx(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(Imfx(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(Ipfy(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(Imfy(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
+    allocate(Ipfx(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
+    allocate(Imfx(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
+    allocate(Ipfy(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
+    allocate(Imfy(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
 
     allocate(  ulx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
     allocate(  urx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))

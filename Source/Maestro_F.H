@@ -451,12 +451,12 @@ extern "C"
 #endif
                       const int* domlo, const int* domhi,
                       const int* lo, const int* hi,
-                      const amrex::Real* s,      const int* s_lo, const int* s_hi, const int* nc_s, int ng_s,
-                            amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x,
+                      const amrex::Real* s,      const int* s_lo, const int* s_hi, const int nc_s, int ng_s,
+                            amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int nc_x,
 #if (AMREX_SPACEDIM >= 2)
-                            amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y,
+                            amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int nc_y,
 #if (AMREX_SPACEDIM == 3)
-                            amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z,
+                            amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int nc_z,
 #endif
 #endif
                       const amrex::Real* umac,   const int* u_lo, const int* u_hi,
@@ -467,10 +467,10 @@ extern "C"
 #endif
 #endif
                       int ng_um,
-                      const amrex::Real* force,  const int* f_lo, const int* f_hi, const int* nc_f,
-                      const amrex::Real* dx, const amrex::Real* dt, const int* is_vel,
-                      const int* adv_bc, const int* nbccomp, const int* comp, const int* bccomp,
-                      const int* is_conservative);
+                      const amrex::Real* force,  const int* f_lo, const int* f_hi, const int nc_f,
+                      const amrex::Real* dx, const amrex::Real dt, const int is_vel,
+                      const int* adv_bc, const int nbccomp, const int comp, const int bccomp,
+                      const int is_conservative);
 
     //////////////////////
 
