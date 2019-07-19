@@ -33,6 +33,7 @@ CEXE_sources += MaestroThermal.cpp
 CEXE_sources += MaestroVelocityAdvance.cpp
 
 CEXE_headers += Maestro.H
+CEXE_headers += MaestroBCThreads.H
 CEXE_headers += MaestroPlot.H
 CEXE_headers += PhysBCFunctMaestro.H
 

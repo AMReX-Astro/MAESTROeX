@@ -674,16 +674,20 @@ contains
        comp, bccomp, is_conservative) bind(C,name="make_edge_scal_3d")
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
-    integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
-    integer, value,   intent(in   ) :: ng_s
-    integer         , intent(in   ) :: x_lo(3), x_hi(3), nc_x
-    integer         , intent(in   ) :: y_lo(3), y_hi(3), nc_y
-    integer         , intent(in   ) :: z_lo(3), z_hi(3), nc_z
+    integer         , intent(in   ) :: s_lo(3), s_hi(3)
+    integer, value,   intent(in   ) :: nc_s, ng_s
+    integer         , intent(in   ) :: x_lo(3), x_hi(3)
+    integer, value,   intent(in   ) :: nc_x
+    integer         , intent(in   ) :: y_lo(3), y_hi(3)
+    integer, value,   intent(in   ) :: nc_y
+    integer         , intent(in   ) :: z_lo(3), z_hi(3)
+    integer, value,   intent(in   ) :: nc_z
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
     integer, value,   intent(in   ) :: ng_um
-    integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
+    integer         , intent(in   ) :: f_lo(3), f_hi(3)
+    integer, value,   intent(in   ) :: nc_f
     double precision, intent(in   ) :: s     (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
     double precision, intent(inout) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nc_y)
@@ -692,8 +696,9 @@ contains
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
-    double precision, intent(in   ) :: dx(3), dt
-    integer         , intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
+    double precision, intent(in   ) :: dx(3)
+    double precision, value, intent(in   ) :: dt
+    integer, value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
     integer         , intent(in   ) :: adv_bc(3,2,nbccomp)
 
     ! Local variables

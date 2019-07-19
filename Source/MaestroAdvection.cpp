@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <MaestroBCThreads.H>
 
 using namespace amrex;
 
@@ -142,8 +143,16 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         } // end MFIter loop
 
 #else
+
+#ifdef AMREX_USE_CUDA
+        int* bc_f = prepare_bc(bcs_u[0].data(), 1);
+        set_bc_launch_config();
+#else
+        const int* bc_f = bcs_u[0].data();
+#endif
+
     // NOTE: don't tile, but threaded in fortran subroutine
-        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -153,19 +162,26 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-// #pragma gpu box(obx)
+#pragma gpu box(obx)
             mkutrans_2d(
-                        AMREX_ARLIM_ANYD(tileBox.loVect()), AMREX_ARLIM_ANYD(tileBox.hiVect()),
-                        lev, AMREX_ARLIM_ANYD(domainBox.loVect()), AMREX_ARLIM_ANYD(domainBox.hiVect()),
-                        BL_TO_FORTRAN_3D(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
-                        BL_TO_FORTRAN_3D(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
-                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(Ip[mfi]),
-                        BL_TO_FORTRAN_3D(Im[mfi]),
-                        w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+                        AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                        lev, AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(utrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                        BL_TO_FORTRAN_ANYD(Im[mfi]),
+                        w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f,
+                        phys_bc.dataPtr());
 
         } // end MFIter loop
+
+#ifdef AMREX_USE_CUDA
+        clean_bc_launch_config();
+        clean_bc(bc_f);
+#endif
+
 #endif
     } // end loop over levels
 
