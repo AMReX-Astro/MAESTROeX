@@ -151,7 +151,7 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 2)
-  subroutine mkutrans_2d(lo, hi, lev, domlo, domhi, &
+  subroutine mkutrans_2d(lo, hi, lev, idir, domlo, domhi, &
        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
        utrans, uu_lo, uu_hi, &
@@ -162,7 +162,7 @@ contains
 
     implicit none
 
-    integer, value, intent(in   ) :: lev
+    integer, value, intent(in   ) :: lev, idir
     integer, intent(in) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
     integer, value  , intent(in   ) :: nc_ut, ng_ut
@@ -201,19 +201,17 @@ contains
 
     k = lo(3)
 
-    if (ppm_type .eq. 0) then
-       ! call slopex_2d(utilde(:,:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-       ! call slopey_2d(utilde(:,:,2:2),slopey,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
+    ! if (ppm_type .eq. 0) then
+    !    ! call slopex_2d(utilde(:,:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+    !    ! call slopey_2d(utilde(:,:,2:2),slopey,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
+    !
+    !    ! call slopex_2d(utilde(:,:,k,1:1),Ip(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
+    !    ! call slopey_2d(utilde(:,:,k,2:2),Im(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
+    ! else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+    !
+    ! end if
 
-       ! call slopex_2d(utilde(:,:,k,1:1),Ip(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-       ! call slopey_2d(utilde(:,:,k,2:2),Im(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-
-       call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
-            ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi, &
-            Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc,dx,dt,.false.,1,1)
-
-    end if
+    if (idir == 1) then
 
     !******************************************************************
     ! create utrans
@@ -285,17 +283,11 @@ contains
        end do
     end do
 
+  else ! idir == 2
+
     !******************************************************************
     ! create vtrans
     !******************************************************************
-    if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-
-       call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
-            ufull(:,:,:,1),uf_lo,uf_hi,&
-            ufull(:,:,:,2),uf_lo,uf_hi, &
-            Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc,dx,dt,.false.,2,2)
-
-    end if
 
     do j=lo(2),hi(2)+1
        do i=lo(1),hi(1)
@@ -363,6 +355,8 @@ contains
           vtrans(i,j,k) = merge(ZERO,vtrans(i,j,k),test)
        enddo
     enddo
+
+  endif
 
   end subroutine mkutrans_2d
 #endif

@@ -1029,7 +1029,8 @@ extern "C"
 
 #else
   void mkutrans_2d(const int* lo, const int* hi,
-                    const int lev, const int* domlo, const int* domhi,
+                    const int lev, const int idir,
+                    const int* domlo, const int* domhi,
                     const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int nc_ut, const int ng_ut,
                     const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int nc_uf, int const ng_uf,
                     amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
@@ -1091,7 +1092,7 @@ extern "C"
         const int* domlo, const int* domhi,
         const int* adv_bc,
         const amrex::Real* dx, const amrex::Real dt,
-        const int u_mac, const int comp, const int bccomp);
+        const int is_umac, const int comp, const int bccomp);
 
     //////////////////////
 

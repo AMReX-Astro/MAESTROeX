@@ -288,12 +288,12 @@ contains
             ufull(:,:,:,1),uf_lo,uf_hi, &
             ufull(:,:,:,2),uf_lo,uf_hi, &
             Ipu,ip_lo,ip_hi,Imu,im_lo,im_hi, &
-            domlo,domhi,adv_bc,dx,dt,.false.,1,1)
+            domlo,domhi,adv_bc,dx,dt,0,1,1)
        call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi, &
             ufull(:,:,:,2),uf_lo,uf_hi, &
             Ipv,ip_lo,ip_hi,Imv,im_lo,im_hi, &
-            domlo,domhi,adv_bc,dx,dt,.false.,2,2)
+            domlo,domhi,adv_bc,dx,dt,0,2,2)
 
        ! trace forces, if necessary.  Note by default the ppm routines
        ! will trace each component to each interface in all coordinate
@@ -305,12 +305,13 @@ contains
           ufull(:,:,:,1),uf_lo,uf_hi, &
           ufull(:,:,:,2),uf_lo,uf_hi, &
                Ipfx,ip_lo,ip_hi,Imfx,im_lo,im_hi, &
-               domlo,domhi,adv_bc,dx,dt,.false.,1,1)
+               domlo,domhi,adv_bc,dx,dt,0,1,1)
+
           call ppm_2d(lo,hi,force,f_lo,f_hi,nc_f, &
                ufull(:,:,:,1),uf_lo,uf_hi, &
                ufull(:,:,:,2),uf_lo,uf_hi, &
                Ipfy,ip_lo,ip_hi,Imfy,im_lo,im_hi, &
-               domlo,domhi,adv_bc,dx,dt,.false.,2,2)
+               domlo,domhi,adv_bc,dx,dt,0,2,2)
        endif
 
     end if

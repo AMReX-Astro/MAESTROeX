@@ -143,6 +143,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         } // end MFIter loop
 
 #else
+// AMREX_SPACEDIM == 2
 
 #ifdef AMREX_USE_CUDA
         int* bc_f = prepare_bc(bcs_u[0].data(), 1);
@@ -150,6 +151,13 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #else
         const int* bc_f = bcs_u[0].data();
 #endif
+        MultiFab u_mf, v_mf;
+        u_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+        v_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+
+        MultiFab::Copy(u_mf, ufull[lev], 0, 0, 1, ufull[lev].nGrow());
+        MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
+
 
     // NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
@@ -158,31 +166,19 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
 
-// #pragma gpu box(obx)
-//             ppm_2d(AMREX_INT_ANYD(tileBox.loVect()),
-//                    AMREX_INT_ANYD(tileBox.hiVect()),
-//                    BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
-//                    utilde_mf.nComp(),
-//                    BL_TO_FORTRAN_ANYD(ufull_mf[mfi]),
-//                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
-//                    BL_TO_FORTRAN_ANYD(Im[mfi]),
-//                    AMREX_INT_ANYD(domainBox.loVect()),
-//                    AMREX_INT_ANYD(domainBox.hiVect()),
-//                    bc_f, AMREX_REAL_ANYD(dx), dt, false,
-//                    1,1,1);
-//
-// #pragma gpu box(obx)
-//            ppm_2d(AMREX_INT_ANYD(tileBox.loVect()),
-//                   AMREX_INT_ANYD(tileBox.hiVect()),
-//                   BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
-//                   utilde_mf.nComp(),
-//                   BL_TO_FORTRAN_ANYD(ufull_mf[mfi]),
-//                   BL_TO_FORTRAN_ANYD(Ip[mfi]),
-//                   BL_TO_FORTRAN_ANYD(Im[mfi]),
-//                   AMREX_INT_ANYD(domainBox.loVect()),
-//                   AMREX_INT_ANYD(domainBox.hiVect()),
-//                   bc_f, AMREX_REAL_ANYD(dx), dt, false,
-//                   2,2,2);
+#pragma gpu box(obx)
+            ppm_2d(AMREX_INT_ANYD(tileBox.loVect()),
+                   AMREX_INT_ANYD(tileBox.hiVect()),
+                   BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
+                   utilde_mf.nComp(),
+                   BL_TO_FORTRAN_ANYD(u_mf[mfi]),
+                   BL_TO_FORTRAN_ANYD(v_mf[mfi]),
+                   BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                   BL_TO_FORTRAN_ANYD(Im[mfi]),
+                   AMREX_INT_ANYD(domainBox.loVect()),
+                   AMREX_INT_ANYD(domainBox.hiVect()),
+                   bc_f, AMREX_REAL_ANYD(dx), dt, false,
+                   1,1);
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -191,7 +187,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #pragma gpu box(obx)
             mkutrans_2d(AMREX_INT_ANYD(tileBox.loVect()),
                         AMREX_INT_ANYD(tileBox.hiVect()),
-                        lev, AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                        lev, 1,
+                        AMREX_INT_ANYD(domainBox.loVect()),
+                        AMREX_INT_ANYD(domainBox.hiVect()),
                         BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_ANYD(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_ANYD(utrans_mf[mfi]),
@@ -200,6 +198,35 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_ANYD(Im[mfi]),
                         w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f,
                         phys_bc.dataPtr());
+
+#pragma gpu box(obx)
+            ppm_2d(AMREX_INT_ANYD(tileBox.loVect()),
+                   AMREX_INT_ANYD(tileBox.hiVect()),
+                   BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
+                   utilde_mf.nComp(),
+                   BL_TO_FORTRAN_ANYD(u_mf[mfi]),
+                   BL_TO_FORTRAN_ANYD(v_mf[mfi]),
+                   BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                   BL_TO_FORTRAN_ANYD(Im[mfi]),
+                   AMREX_INT_ANYD(domainBox.loVect()),
+                   AMREX_INT_ANYD(domainBox.hiVect()),
+                   bc_f, AMREX_REAL_ANYD(dx), dt, false,
+                   2,2);
+
+#pragma gpu box(obx)
+           mkutrans_2d(AMREX_INT_ANYD(tileBox.loVect()),
+                       AMREX_INT_ANYD(tileBox.hiVect()),
+                       lev, 2,
+                       AMREX_INT_ANYD(domainBox.loVect()),
+                       AMREX_INT_ANYD(domainBox.hiVect()),
+                       BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                       BL_TO_FORTRAN_ANYD(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
+                       BL_TO_FORTRAN_ANYD(utrans_mf[mfi]),
+                       BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
+                       BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                       BL_TO_FORTRAN_ANYD(Im[mfi]),
+                       w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f,
+                       phys_bc.dataPtr());
 
         } // end MFIter loop
 

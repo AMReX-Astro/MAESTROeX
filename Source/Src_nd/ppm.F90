@@ -549,7 +549,11 @@ contains
   ! 2-d version
   !===========================================================================
 
-  subroutine ppm_2d(lo,hi,s,s_lo,s_hi,nc_s,u,u_lo,u_hi,v,v_lo,v_hi,Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc,dx,dt,is_umac,comp,bccomp) bind(C,name="ppm_2d")
+  subroutine ppm_2d(lo,hi,s,s_lo,s_hi,nc_s,&
+    u,u_lo,u_hi,v,v_lo,v_hi,&
+    Ip,ip_lo,ip_hi,Im,im_lo,im_hi,&
+    domlo,domhi,adv_bc,&
+    dx,dt,is_umac,comp,bccomp) bind(C,name="ppm_2d")
 
     implicit none
 
@@ -566,10 +570,10 @@ contains
     double precision, intent(in   ) ::  v(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2)
     double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2)
-    integer         , intent(in   ) :: adv_bc(:,:,:)
+    integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    logical, value, intent(in   ) :: is_umac
+    integer, value, intent(in   ) :: is_umac
 
     ! local
     integer :: i,j,k,n
@@ -589,6 +593,8 @@ contains
 
     k = lo(3)
     n = comp
+
+    ! write(*,*) "ppm_2d, here is u", u(u_lo(1):u_lo(1)+10,u_lo(2),u_lo(3))
 
     !-------------------------------------------------------------------------
     ! x-direction
@@ -763,7 +769,7 @@ contains
        ! compute x-component of Ip and Im
        !-------------------------------------------------------------------------
 
-       if (is_umac) then
+       if (is_umac == 1) then
 
         ! u here is umac, so use edge-based indexing
               sigma = abs(u(i+1,j,k))*dt/dx(1)
@@ -1195,7 +1201,7 @@ contains
              !-------------------------------------------------------------------------
              ! compute x-component of Ip and Im
              !-------------------------------------------------------------------------
-             if (is_umac) then
+             if (is_umac == 1) then
 
                 ! u here is umac, so use edge-based indexing
                 sigma = abs(u(i+1,j,k))*dt/dx(1)
@@ -1418,7 +1424,7 @@ contains
        ! compute y-component of Ip and Im
        !-------------------------------------------------------------------------
 
-       if (is_umac) then
+       if (is_umac == 1) then
 
           ! v here is vmac, so use edge-based indexing
                 sigma = abs(v(i,j+1,k))*dt/dx(2)
@@ -1632,7 +1638,7 @@ contains
                     - (ONE/20.0d0)*s(i,lo(2)+2,k,n)
 
                 sedgel = max(sedgel,min(s(i,lo(2)+1,k,n),s(i,lo(2),k,n)))
-                sedgel = min(sedgel,max(s(i,lo(2)+1,k,n),s(i,lo(2),k,n))) 
+                sedgel = min(sedgel,max(s(i,lo(2)+1,k,n),s(i,lo(2),k,n)))
 
              endif
 
@@ -1837,7 +1843,7 @@ contains
        ! compute y-component of Ip and Im
        !-------------------------------------------------------------------------
 
-       if (is_umac) then
+       if (is_umac == 1) then
 
           ! v here is vmac, so use edge-based indexing
 
