@@ -284,16 +284,16 @@ contains
        call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,2,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
-       call ppm_2d(lo,hi,utilde(:,:,:,1),ut_lo,ut_hi, &
+       call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi, &
             ufull(:,:,:,2),uf_lo,uf_hi, &
             Ipu,ip_lo,ip_hi,Imu,im_lo,im_hi, &
-            domlo,domhi,adv_bc(:,:,1),dx,dt,.false.)
-       call ppm_2d(lo,hi,utilde(:,:,:,2),ut_lo,ut_hi, &
+            domlo,domhi,adv_bc,dx,dt,.false.,1,1)
+       call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi, &
             ufull(:,:,:,2),uf_lo,uf_hi, &
             Ipv,ip_lo,ip_hi,Imv,im_lo,im_hi, &
-            domlo,domhi,adv_bc(:,:,2),dx,dt,.false.)
+            domlo,domhi,adv_bc,dx,dt,.false.,2,2)
 
        ! trace forces, if necessary.  Note by default the ppm routines
        ! will trace each component to each interface in all coordinate
@@ -301,16 +301,16 @@ contains
        ! its respective dimension.  This should be simplified later.
        if (ppm_trace_forces .eq. 1) then
 
-          call ppm_2d(lo,hi,force(:,:,:,1),f_lo,f_hi, &
+          call ppm_2d(lo,hi,force,f_lo,f_hi,nc_f, &
           ufull(:,:,:,1),uf_lo,uf_hi, &
           ufull(:,:,:,2),uf_lo,uf_hi, &
                Ipfx,ip_lo,ip_hi,Imfx,im_lo,im_hi, &
-               domlo,domhi,adv_bc(:,:,1),dx,dt,.false.)
-          call ppm_2d(lo,hi,force(:,:,:,2),f_lo,f_hi, &
+               domlo,domhi,adv_bc,dx,dt,.false.,1,1)
+          call ppm_2d(lo,hi,force,f_lo,f_hi,nc_f, &
                ufull(:,:,:,1),uf_lo,uf_hi, &
                ufull(:,:,:,2),uf_lo,uf_hi, &
                Ipfy,ip_lo,ip_hi,Imfy,im_lo,im_hi, &
-               domlo,domhi,adv_bc(:,:,2),dx,dt,.false.)
+               domlo,domhi,adv_bc,dx,dt,.false.,2,2)
        endif
 
     end if

@@ -209,9 +209,9 @@ contains
        ! call slopey_2d(utilde(:,:,k,2:2),Im(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
-       call ppm_2d(lo,hi,utilde(:,:,:,1),ut_lo,ut_hi, &
+       call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi, &
-            Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc(:,:,1),dx,dt,.false.)
+            Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc,dx,dt,.false.,1,1)
 
     end if
 
@@ -290,10 +290,10 @@ contains
     !******************************************************************
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
-       call ppm_2d(lo,hi,utilde(:,:,:,2),ut_lo,ut_hi, &
+       call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi,&
             ufull(:,:,:,2),uf_lo,uf_hi, &
-            Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc(:,:,2),dx,dt,.false.)
+            Ip,ip_lo,ip_hi,Im,im_lo,im_hi,domlo,domhi,adv_bc,dx,dt,.false.,2,2)
 
     end if
 

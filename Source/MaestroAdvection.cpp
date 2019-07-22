@@ -158,13 +158,39 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
 
+// #pragma gpu box(obx)
+//             ppm_2d(AMREX_INT_ANYD(tileBox.loVect()),
+//                    AMREX_INT_ANYD(tileBox.hiVect()),
+//                    BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
+//                    utilde_mf.nComp(),
+//                    BL_TO_FORTRAN_ANYD(ufull_mf[mfi]),
+//                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
+//                    BL_TO_FORTRAN_ANYD(Im[mfi]),
+//                    AMREX_INT_ANYD(domainBox.loVect()),
+//                    AMREX_INT_ANYD(domainBox.hiVect()),
+//                    bc_f, AMREX_REAL_ANYD(dx), dt, false,
+//                    1,1,1);
+//
+// #pragma gpu box(obx)
+//            ppm_2d(AMREX_INT_ANYD(tileBox.loVect()),
+//                   AMREX_INT_ANYD(tileBox.hiVect()),
+//                   BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
+//                   utilde_mf.nComp(),
+//                   BL_TO_FORTRAN_ANYD(ufull_mf[mfi]),
+//                   BL_TO_FORTRAN_ANYD(Ip[mfi]),
+//                   BL_TO_FORTRAN_ANYD(Im[mfi]),
+//                   AMREX_INT_ANYD(domainBox.loVect()),
+//                   AMREX_INT_ANYD(domainBox.hiVect()),
+//                   bc_f, AMREX_REAL_ANYD(dx), dt, false,
+//                   2,2,2);
+
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(obx)
-            mkutrans_2d(
-                        AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+            mkutrans_2d(AMREX_INT_ANYD(tileBox.loVect()),
+                        AMREX_INT_ANYD(tileBox.hiVect()),
                         lev, AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                         BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_ANYD(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),

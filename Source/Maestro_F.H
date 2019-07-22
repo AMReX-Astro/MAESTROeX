@@ -1028,8 +1028,7 @@ extern "C"
                       const int* adv_bc, const int* phys_bc);
 
 #else
-  void mkutrans_2d(
-                    const int* lo, const int* hi,
+  void mkutrans_2d(const int* lo, const int* hi,
                     const int lev, const int* domlo, const int* domhi,
                     const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int nc_ut, const int ng_ut,
                     const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int nc_uf, int const ng_uf,
@@ -1077,6 +1076,23 @@ extern "C"
 #endif
 #endif
 			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
+    //////////////////////
+
+
+    //////////////////////
+    // in ppm.F90
+    void ppm_2d(const int* lo, const int* hi,
+        const amrex::Real* s,  const int* s_lo, const int* s_hi,
+        const int nc_s,
+        const amrex::Real* u,  const int* u_lo, const int* u_hi,
+        const amrex::Real* v,  const int* v_lo, const int* v_hi,
+        amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
+        amrex::Real* Im, const int* im_lo, const int* im_hi,
+        const int* domlo, const int* domhi,
+        const int* adv_bc,
+        const amrex::Real* dx, const amrex::Real dt,
+        const int u_mac, const int comp, const int bccomp);
+
     //////////////////////
 
     //////////////////////
