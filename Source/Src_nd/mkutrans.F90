@@ -218,7 +218,7 @@ contains
     !******************************************************************
 
     do j=lo(2),hi(2)
-       do i=lo(1),hi(1)+1
+       do i=lo(1),hi(1)
 
           if (ppm_type .eq. 0) then
              ! extrapolate to edges
@@ -238,8 +238,8 @@ contains
           if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
              select case(phys_bc(1,1))
              case (Inflow)
-                ul = utilde(lo(1)-1,j,k,1)
-                ur = utilde(lo(1)-1,j,k,1)
+                ul = utilde(i-1,j,k,1)
+                ur = utilde(i-1,j,k,1)
              case (SlipWall, NoSlipWall, Symmetry)
                 ul = ZERO
                 ur = ZERO
@@ -255,11 +255,11 @@ contains
           end if
 
           ! impose hi i side bc's
-          if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+          if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
              select case(phys_bc(1,2))
              case (Inflow)
-                ul = utilde(hi(1)+1,j,k,1)
-                ur = utilde(hi(1)+1,j,k,1)
+                ul = utilde(i,j,k,1)
+                ur = utilde(i,j,k,1)
              case (SlipWall, NoSlipWall, Symmetry)
                 ul = ZERO
                 ur = ZERO
@@ -289,7 +289,7 @@ contains
     ! create vtrans
     !******************************************************************
 
-    do j=lo(2),hi(2)+1
+    do j=lo(2),hi(2)
        do i=lo(1),hi(1)
 
           if (ppm_type .eq. 0) then
@@ -311,8 +311,8 @@ contains
           if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
              select case(phys_bc(2,1))
              case (Inflow)
-                vl = utilde(i,lo(2)-1,k,2)
-                vr = utilde(i,lo(2)-1,k,2)
+                vl = utilde(i,j-1,k,2)
+                vr = utilde(i,j-1,k,2)
              case (SlipWall, NoSlipWall, Symmetry)
                 vr = ZERO
                 vr = ZERO
@@ -328,11 +328,11 @@ contains
           end if
 
           ! impose hi side bc's
-          if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+          if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
              select case(phys_bc(2,2))
              case (Inflow)
-                vl = utilde(i,hi(2)+1,k,2)
-                vr = utilde(i,hi(2)+1,k,2)
+                vl = utilde(i,j,k,2)
+                vr = utilde(i,j,k,2)
              case (SlipWall, NoSlipWall, Symmetry)
                 vl = ZERO
                 vr = ZERO

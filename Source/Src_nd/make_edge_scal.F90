@@ -303,12 +303,12 @@ contains
        call slopey_2d(s(:,:,k,comp:comp),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
-       call ppm_2d(lo,hi,s,s_lo,s_hi,nc_s,&
+       call ppm_2d(ip_lo,ip_hi,s,s_lo,s_hi,nc_s,&
                     umac,u_lo,u_hi,vmac,v_lo,v_hi,&
                     Ip,ip_lo,ip_hi,Im,im_lo,im_hi, &
                     domlo,domhi,adv_bc,dx,dt,1,comp,bccomp)
        if (ppm_trace_forces .eq. 1) then
-          call ppm_2d(lo,hi,force,f_lo,f_hi,nc_f,&
+          call ppm_2d(ip_lo,ip_hi,force,f_lo,f_hi,nc_f,&
                       umac,u_lo,u_hi,vmac,v_lo,v_hi,&
                       Ipf,ip_lo,ip_hi,Imf,im_lo,im_hi, &
                       domlo,domhi,adv_bc,dx,dt,1,comp,bccomp)

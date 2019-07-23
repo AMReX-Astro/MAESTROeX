@@ -165,10 +165,12 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = amrex::growHi(tileBox,0, 1);
+            const Box& ybx = amrex::growHi(tileBox,1, 1);
 
 #pragma gpu box(obx)
-            ppm_2d(AMREX_INT_ANYD(tileBox.loVect()),
-                   AMREX_INT_ANYD(tileBox.hiVect()),
+            ppm_2d(AMREX_INT_ANYD(obx.loVect()),
+                   AMREX_INT_ANYD(obx.hiVect()),
                    BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
                    utilde_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(u_mf[mfi]),
@@ -184,9 +186,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(obx)
-            mkutrans_2d(AMREX_INT_ANYD(tileBox.loVect()),
-                        AMREX_INT_ANYD(tileBox.hiVect()),
+#pragma gpu box(xbx)
+            mkutrans_2d(AMREX_INT_ANYD(xbx.loVect()),
+                        AMREX_INT_ANYD(xbx.hiVect()),
                         lev, 1,
                         AMREX_INT_ANYD(domainBox.loVect()),
                         AMREX_INT_ANYD(domainBox.hiVect()),
@@ -200,8 +202,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         phys_bc.dataPtr());
 
 #pragma gpu box(obx)
-            ppm_2d(AMREX_INT_ANYD(tileBox.loVect()),
-                   AMREX_INT_ANYD(tileBox.hiVect()),
+            ppm_2d(AMREX_INT_ANYD(obx.loVect()),
+                   AMREX_INT_ANYD(obx.hiVect()),
                    BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
                    utilde_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(u_mf[mfi]),
@@ -213,9 +215,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                    bc_f, AMREX_REAL_ANYD(dx), dt, false,
                    2,2);
 
-#pragma gpu box(obx)
-           mkutrans_2d(AMREX_INT_ANYD(tileBox.loVect()),
-                       AMREX_INT_ANYD(tileBox.hiVect()),
+#pragma gpu box(ybx)
+           mkutrans_2d(AMREX_INT_ANYD(ybx.loVect()),
+                       AMREX_INT_ANYD(ybx.hiVect()),
                        lev, 2,
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),

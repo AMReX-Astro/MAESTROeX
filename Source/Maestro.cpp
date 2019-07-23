@@ -53,6 +53,10 @@ IntVect Maestro::nodal_flag_y(0,1,0);
 IntVect Maestro::nodal_flag_z(0,0,1);
 #endif
 
+#ifdef AMREX_USE_CUDA
+int Maestro::numBCThreadsMin[3] = {1, 1, 1};
+#endif
+
 // this will be reset upon restart
 Real Maestro::previousCPUTimeUsed = 0.0;
 

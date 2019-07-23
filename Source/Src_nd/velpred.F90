@@ -284,12 +284,12 @@ contains
        call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,2,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
-       call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
+       call ppm_2d(ip_lo,ip_hi,utilde,ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi, &
             ufull(:,:,:,2),uf_lo,uf_hi, &
             Ipu,ip_lo,ip_hi,Imu,im_lo,im_hi, &
             domlo,domhi,adv_bc,dx,dt,0,1,1)
-       call ppm_2d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
+       call ppm_2d(ip_lo,ip_hi,utilde,ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi, &
             ufull(:,:,:,2),uf_lo,uf_hi, &
             Ipv,ip_lo,ip_hi,Imv,im_lo,im_hi, &
@@ -301,13 +301,13 @@ contains
        ! its respective dimension.  This should be simplified later.
        if (ppm_trace_forces .eq. 1) then
 
-          call ppm_2d(lo,hi,force,f_lo,f_hi,nc_f, &
+          call ppm_2d(ip_lo,ip_hi,force,f_lo,f_hi,nc_f, &
           ufull(:,:,:,1),uf_lo,uf_hi, &
           ufull(:,:,:,2),uf_lo,uf_hi, &
                Ipfx,ip_lo,ip_hi,Imfx,im_lo,im_hi, &
                domlo,domhi,adv_bc,dx,dt,0,1,1)
 
-          call ppm_2d(lo,hi,force,f_lo,f_hi,nc_f, &
+          call ppm_2d(ip_lo,ip_hi,force,f_lo,f_hi,nc_f, &
                ufull(:,:,:,1),uf_lo,uf_hi, &
                ufull(:,:,:,2),uf_lo,uf_hi, &
                Ipfy,ip_lo,ip_hi,Imfy,im_lo,im_hi, &
