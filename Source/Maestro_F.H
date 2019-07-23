@@ -1094,6 +1094,19 @@ extern "C"
         const amrex::Real* dx, const amrex::Real dt,
         const int is_umac, const int comp, const int bccomp);
 
+    void ppm_3d(const int* lo, const int* hi,
+        const amrex::Real* s,  const int* s_lo, const int* s_hi,
+        const int nc_s,
+        const amrex::Real* u,  const int* u_lo, const int* u_hi,
+        const amrex::Real* v,  const int* v_lo, const int* v_hi,
+        const amrex::Real* w,  const int* w_lo, const int* w_hi,
+        amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
+        amrex::Real* Im, const int* im_lo, const int* im_hi,
+        const int* domlo, const int* domhi,
+        const int* adv_bc,
+        const amrex::Real* dx, const amrex::Real dt,
+        const int is_umac, const int comp, const int bccomp);
+
     //////////////////////
 
     //////////////////////

@@ -767,30 +767,30 @@ contains
        !$OMP END PARALLEL DO
        call slopez_3d(utilde,slopez,domlo,domhi,lo,hi,ng_ut,3,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_3d(utilde(:,:,:,1),ng_ut, &
-            ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-            Ipu,Imu,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-       call ppm_3d(utilde(:,:,:,2),ng_ut, &
-            ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-            Ipv,Imv,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
-       call ppm_3d(utilde(:,:,:,3),ng_ut, &
-            ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-            Ipw,Imw,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
+       call ppm_3d(lo,hi,utilde(:,:,:,1),ut_lo,ut_hi,nc_ut, &
+            ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
+            Ipu,lo-1,hi+1,Imu,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,1,1)
+       call ppm_3d(lo,hi,utilde(:,:,:,2),ut_lo,ut_hi,nc_ut, &
+            ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
+            Ipv,lo-1,hi+1,Imv,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,2,2)
+       call ppm_3d(lo,hi,utilde(:,:,:,3),ut_lo,ut_hi,nc_ut, &
+            ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
+            Ipw,lo-1,hi+1,Imw,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,3,3)
 
        ! trace forces, if necessary.  Note by default the ppm routines
        ! will trace each component to each interface in all coordinate
        ! directions, but we really only need the force traced along
        ! its respective dimension.  This should be simplified later.
        if (ppm_trace_forces .eq. 1) then
-          call ppm_3d(force(:,:,:,1),ng_f, &
-               ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-               Ipfx,Imfx,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-          call ppm_3d(force(:,:,:,2),ng_f, &
-               ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-               Ipfy,Imfy,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
-          call ppm_3d(force(:,:,:,3),ng_f, &
-               ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-               Ipfz,Imfz,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
+          call ppm_3d(lo,hi,force(:,:,:,1),f_lo,f_hi,nc_f, &
+               ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
+               Ipfx,lo-1,hi+1,Imfx,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,1,1)
+          call ppm_3d(lo,hi,force(:,:,:,2),f_lo,f_hi,nc_f, &
+               ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
+               Ipfy,lo-1,hi+1,Imfy,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,2,2)
+          call ppm_3d(lo,hi,force(:,:,:,3),f_lo,f_hi,nc_f, &
+               ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
+               Ipfz,lo-1,hi+1,Imfz,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,3,3)
        endif
     end if
 
