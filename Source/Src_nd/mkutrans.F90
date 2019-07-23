@@ -6,6 +6,7 @@ module mkutrans_module
 #ifndef AMREX_USE_CUDA
   use amrex_error_module
 #endif
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use slope_module
   use ppm_module
@@ -414,12 +415,12 @@ contains
     double precision, pointer:: vly(:,:,:),vry(:,:,:)
     double precision, pointer:: wlz(:,:,:),wrz(:,:,:)
 
-    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
-    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
-    allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
+    call bl_allocate(slopex,lo-1,hi+1,1)
+    call bl_allocate(slopey,lo-1,hi+1,1)
+    call bl_allocate(slopez,lo-1,hi+1,1)
 
-    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
-    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    call bl_allocate(Ip,lo-1,hi+1,3)
+    call bl_allocate(Im,lo-1,hi+1,3)
 
     is = lo(1)
     js = lo(2)
@@ -450,8 +451,8 @@ contains
     ! create utrans
     !******************************************************************
 
-    allocate(ulx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(urx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
+    call bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)
@@ -535,9 +536,9 @@ contains
        end do
     end do
 
-    deallocate(slopex)
-    deallocate(ulx)
-    deallocate(urx)
+    call bl_deallocate(slopex)
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
 
     !******************************************************************
     ! create vtrans
@@ -549,8 +550,8 @@ contains
             Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
     end if
 
-    allocate(vly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(vry(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
+    call bl_allocate(vly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(vry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)+1
@@ -633,9 +634,9 @@ contains
        enddo
     enddo
 
-    deallocate(slopey)
-    deallocate(vly)
-    deallocate(vry)
+    call bl_deallocate(slopey)
+    call bl_deallocate(vly)
+    call bl_deallocate(vry)
 
     !******************************************************************
     ! create wtrans
@@ -647,8 +648,8 @@ contains
             Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
     end if
 
-    allocate(wlz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
-    allocate(wrz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
+    call bl_allocate(wlz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(wrz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     if (ppm_type .eq. 0) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -676,9 +677,9 @@ contains
        end do
     end if
 
-    deallocate(slopez)
-    deallocate(Ip)
-    deallocate(Im)
+    call bl_deallocate(slopez)
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
@@ -753,8 +754,8 @@ contains
        !$OMP END PARALLEL DO
     end if
 
-    deallocate(wlz)
-    deallocate(wrz)
+    call bl_deallocate(wlz)
+    call bl_deallocate(wrz)
 
   end subroutine mkutrans_3d
 #endif

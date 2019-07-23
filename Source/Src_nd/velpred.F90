@@ -725,23 +725,23 @@ contains
 
     logical :: test
 
-    allocate(slopex,lo-1,hi+1,3)
-    allocate(slopey,lo-1,hi+1,3)
-    allocate(slopez,lo-1,hi+1,3)
+    call bl_allocate(slopex,lo-1,hi+1,3)
+    call bl_allocate(slopey,lo-1,hi+1,3)
+    call bl_allocate(slopez,lo-1,hi+1,3)
 
-    allocate(Ipu,lo-1,hi+1,3)
-    allocate(Imu,lo-1,hi+1,3)
-    allocate(Ipv,lo-1,hi+1,3)
-    allocate(Imv,lo-1,hi+1,3)
-    allocate(Ipw,lo-1,hi+1,3)
-    allocate(Imw,lo-1,hi+1,3)
+    call bl_allocate(Ipu,lo-1,hi+1,3)
+    call bl_allocate(Imu,lo-1,hi+1,3)
+    call bl_allocate(Ipv,lo-1,hi+1,3)
+    call bl_allocate(Imv,lo-1,hi+1,3)
+    call bl_allocate(Ipw,lo-1,hi+1,3)
+    call bl_allocate(Imw,lo-1,hi+1,3)
 
-    allocate(Ipfx,lo-1,hi+1,3)
-    allocate(Imfx,lo-1,hi+1,3)
-    allocate(Ipfy,lo-1,hi+1,3)
-    allocate(Imfy,lo-1,hi+1,3)
-    allocate(Ipfz,lo-1,hi+1,3)
-    allocate(Imfz,lo-1,hi+1,3)
+    call bl_allocate(Ipfx,lo-1,hi+1,3)
+    call bl_allocate(Imfx,lo-1,hi+1,3)
+    call bl_allocate(Ipfy,lo-1,hi+1,3)
+    call bl_allocate(Imfy,lo-1,hi+1,3)
+    call bl_allocate(Ipfz,lo-1,hi+1,3)
+    call bl_allocate(Imfz,lo-1,hi+1,3)
 
     is = lo(1)
     ie = hi(1)
@@ -801,8 +801,8 @@ contains
     ! normal predictor states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
-    allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
+    call bl_allocate(ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
+    call bl_allocate(urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
        !$OMP PARALLEL DO PRIVATE(i,j,k,maxu,minu)
@@ -843,7 +843,7 @@ contains
        end do
     end if
 
-    deallocate(slopex)
+    call bl_deallocate(slopex)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -891,7 +891,7 @@ contains
        end select
     end if
 
-    allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
+    call bl_allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks-1,ke+1
@@ -916,8 +916,8 @@ contains
 
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    allocate(uly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
-    allocate(ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
+    call bl_allocate(uly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
+    call bl_allocate(ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
        !$OMP PARALLEL DO PRIVATE(i,j,k,minu,maxu)
@@ -958,7 +958,7 @@ contains
        enddo
     end if
 
-    deallocate(slopey)
+    call bl_deallocate(slopey)
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -1006,7 +1006,7 @@ contains
        end select
     end if
 
-    allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
+    call bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1,1,3)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks-1,ke+1
@@ -1030,8 +1030,8 @@ contains
     ! normal predictor states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    allocate(ulz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
-    allocate(urz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
+    call bl_allocate(ulz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
+    call bl_allocate(urz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
 
     if (ppm_type .eq. 0) then
        !$OMP PARALLEL DO PRIVATE(i,j,k,minu,maxu)
@@ -1072,13 +1072,13 @@ contains
        end do
     end if
 
-    deallocate(slopez)
-    deallocate(Ipu)
-    deallocate(Imu)
-    deallocate(Ipv)
-    deallocate(Imv)
-    deallocate(Ipw)
-    deallocate(Imw)
+    call bl_deallocate(slopez)
+    call bl_deallocate(Ipu)
+    call bl_deallocate(Imu)
+    call bl_deallocate(Ipv)
+    call bl_deallocate(Imv)
+    call bl_deallocate(Ipw)
+    call bl_deallocate(Imw)
 
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
@@ -1126,7 +1126,7 @@ contains
        end select
     end if
 
-    allocate(uimhz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
+    call bl_allocate(uimhz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1,1,3)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke+1
@@ -1155,9 +1155,9 @@ contains
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    allocate(ulyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
-    allocate(uryz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
-    allocate(uimhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(ulyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(uryz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(uimhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
 
     ! uimhyz loop
     !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1221,16 +1221,16 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(ulyz)
-    deallocate(uryz)
+    call bl_deallocate(ulyz)
+    call bl_deallocate(uryz)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    allocate(ulzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
-    allocate(urzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
-    allocate(uimhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(ulzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(urzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(uimhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
 
     ! uimhzy loop
     !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1294,15 +1294,15 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(ulzy)
-    deallocate(urzy)
+    call bl_deallocate(ulzy)
+    call bl_deallocate(urzy)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    allocate(vlxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
-    allocate(vrxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vlxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vrxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
     ! vimhxz loop
     !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1319,7 +1319,7 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(uimhz)
+    call bl_deallocate(uimhz)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -1355,7 +1355,7 @@ contains
        end select
     end if
 
-    allocate(vimhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vimhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke
@@ -1370,16 +1370,16 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(vlxz)
-    deallocate(vrxz)
+    call bl_deallocate(vlxz)
+    call bl_deallocate(vrxz)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    allocate(vlzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    allocate(vrzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
-    allocate(vimhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(vlzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(vrzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(vimhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     ! vimhzx loop
     !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1443,15 +1443,15 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(vlzx)
-    deallocate(vrzx)
+    call bl_deallocate(vlzx)
+    call bl_deallocate(vrzx)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    allocate(wlxy,lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3),lo(3)-1,hi(3)+1)
-    allocate(wrxy,lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3),lo(3)-1,hi(3)+1)
+    call bl_allocate(wlxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    call bl_allocate(wrxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
 
     ! wimhxy loop
     !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1468,7 +1468,7 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(uimhy)
+    call bl_deallocate(uimhy)
 
     ! impose lo side bc's
     if (lo(1) .eq. domlo(1)) then
@@ -1504,7 +1504,7 @@ contains
        end select
     end if
 
-    allocate(wimhxy,lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3),lo(3)-1,hi(3)+1)
+    call bl_allocate(wimhxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks-1,ke+1
@@ -1519,15 +1519,15 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(wlxy)
-    deallocate(wrxy)
+    call bl_deallocate(wlxy)
+    call bl_deallocate(wrxy)
 
     ! transverse states
     ! lo-1:hi+1 in base direction
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
-    allocate(wlyx,lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3),lo(3)-1,hi(3)+1)
-    allocate(wryx,lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3),lo(3)-1,hi(3)+1)
+    call bl_allocate(wlyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(wryx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     ! wimhyx loop
     !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1544,7 +1544,7 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(uimhx)
+    call bl_deallocate(uimhx)
 
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
@@ -1580,7 +1580,7 @@ contains
        end select
     end if
 
-    allocate(wimhyx,lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3),lo(3)-1,hi(3)+1)
+    call bl_allocate(wimhyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks-1,ke+1
@@ -1595,8 +1595,8 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(wlyx)
-    deallocate(wryx)
+    call bl_deallocate(wlyx)
+    call bl_deallocate(wryx)
 
     !******************************************************************
     ! Create umac, etc.
@@ -1605,8 +1605,8 @@ contains
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    allocate(umacl,lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3),lo(3),hi(3))
-    allocate(umacr,lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3),lo(3),hi(3))
+    call bl_allocate(umacl,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
+    call bl_allocate(umacr,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
     do k=ks,ke
@@ -1634,10 +1634,10 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(ulx)
-    deallocate(urx)
-    deallocate(uimhyz)
-    deallocate(uimhzy)
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+    call bl_deallocate(uimhyz)
+    call bl_deallocate(uimhzy)
 
     if (spherical .eq. 1) then
 
@@ -1706,14 +1706,14 @@ contains
        end select
     end if
 
-    deallocate(umacl)
-    deallocate(umacr)
+    call bl_deallocate(umacl)
+    call bl_deallocate(umacr)
 
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    allocate(vmacl,lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3),lo(3),hi(3))
-    allocate(vmacr,lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3),lo(3),hi(3))
+    call bl_allocate(vmacl,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vmacr,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
     do k=ks,ke
@@ -1741,10 +1741,10 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(uly)
-    deallocate(ury)
-    deallocate(vimhxz)
-    deallocate(vimhzx)
+    call bl_deallocate(uly)
+    call bl_deallocate(ury)
+    call bl_deallocate(vimhxz)
+    call bl_deallocate(vimhzx)
 
     if (spherical .eq. 1) then
 
@@ -1813,14 +1813,14 @@ contains
        end select
     end if
 
-    deallocate(vmacl)
-    deallocate(vmacr)
+    call bl_deallocate(vmacl)
+    call bl_deallocate(vmacr)
 
     ! mac states
     ! Allocated from lo:hi+1 in the normal direction
     ! lo:hi in the transverse direction
-    allocate(wmacl,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
-    allocate(wmacr,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(wmacl,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(wmacr,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
 
     !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
     do k=ks,ke+1
@@ -1848,10 +1848,10 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(ulz)
-    deallocate(urz)
-    deallocate(wimhxy)
-    deallocate(wimhyx)
+    call bl_deallocate(ulz)
+    call bl_deallocate(urz)
+    call bl_deallocate(wimhxy)
+    call bl_deallocate(wimhyx)
 
     if (spherical .eq. 1) then
 
@@ -1922,15 +1922,15 @@ contains
        end select
     end if
 
-    deallocate(wmacl)
-    deallocate(wmacr)
+    call bl_deallocate(wmacl)
+    call bl_deallocate(wmacr)
 
-    deallocate(Ipfx)
-    deallocate(Imfx)
-    deallocate(Ipfy)
-    deallocate(Imfy)
-    deallocate(Ipfz)
-    deallocate(Imfz)
+    call bl_deallocate(Ipfx)
+    call bl_deallocate(Imfx)
+    call bl_deallocate(Ipfy)
+    call bl_deallocate(Imfy)
+    call bl_deallocate(Ipfz)
+    call bl_deallocate(Imfz)
 
   end subroutine velpred_3d
 #endif

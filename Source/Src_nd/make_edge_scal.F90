@@ -13,6 +13,7 @@
 module make_edge_scal_module
 
   use amrex_error_module
+  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use slope_module
   use ppm_module
@@ -740,18 +741,18 @@ contains
     ! used in corner coupling for conservative quantities
     double precision, pointer:: divu(:,:,:)
 
-    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
-    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
-    allocate(slopez(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,1))
+    call bl_allocate(slopex,lo-1,hi+1,1)
+    call bl_allocate(slopey,lo-1,hi+1,1)
+    call bl_allocate(slopez,lo-1,hi+1,1)
 
-    allocate(Ip(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
-    allocate(Im(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    call bl_allocate(Ip,lo-1,hi+1,3)
+    call bl_allocate(Im,lo-1,hi+1,3)
 
-    allocate(Ipf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
-    allocate(Imf(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,3))
+    call bl_allocate(Ipf,lo-1,hi+1,3)
+    call bl_allocate(Imf,lo-1,hi+1,3)
 
     if (is_conservative .eq. 1) then
-       allocate(divu(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
+       call bl_allocate(divu,lo-1,hi+1)
     end if
 
     is = lo(1)
@@ -805,11 +806,11 @@ contains
     !******************************************************************
 
     ! Normal predictor states.
-    ! Allocated from lo:hi+1 in the normal direction
+    ! call bl_allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    allocate(slx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(srx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(simhx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1))
+    call bl_allocate(slx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(srx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(simhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3)-1,hi(3)+1)
 
     ! loop over appropriate x-faces
     if (ppm_type .eq. 0) then
@@ -897,14 +898,14 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(slopex)
+    call bl_deallocate(slopex)
 
     ! Normal predictor states.
-    ! Allocated from lo:hi+1 in the normal direction
+    ! call bl_allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    allocate(sly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(sry(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(simhy(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
+    call bl_allocate(sly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(sry,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(simhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     ! loop over appropriate y-faces
     if (ppm_type .eq. 0) then
@@ -932,7 +933,7 @@ contains
     end if
 
     ! impose lo side bc's
-    if (lo(2) .eq. domlo(2),k) then
+    if (lo(2) .eq. domlo(2)) then
        if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
           sly(lo(1)-1:hi(1)+1,lo(2),lo(3)-1:hi(3)+1) = s(lo(1)-1:hi(1)+1,lo(2)-1,lo(3)-1:hi(3)+1,comp)
           sry(lo(1)-1:hi(1)+1,lo(2),lo(3)-1:hi(3)+1) = s(lo(1)-1:hi(1)+1,lo(2)-1,lo(3)-1:hi(3)+1,comp)
@@ -992,14 +993,14 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(slopey)
+    call bl_deallocate(slopey)
 
     ! Normal predictor states.
-    ! Allocated from lo:hi+1 in the normal direction
+    ! call bl_allocated from lo:hi+1 in the normal direction
     ! lo-1:hi+1 in the transverse directions
-    allocate(slz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
-    allocate(srz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
-    allocate(simhz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
+    call bl_allocate(slz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(srz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(simhz,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     ! loop over appropriate z-faces
     if (ppm_type .eq. 0) then
@@ -1087,15 +1088,15 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(slopez)
+    call bl_deallocate(slopez)
 
     !******************************************************************
     ! Create s_{\i-\half\e_x}^{x|y}, etc.
     !******************************************************************
 
-    allocate(slxy(lo(1):hi(1)+1,lo(2):hi(2),lo(3)-1:hi(3)+1))
-    allocate(srxy(lo(1):hi(1)+1,lo(2):hi(2),lo(3)-1:hi(3)+1))
-    allocate(simhxy(lo(1):hi(1)+1,lo(2):hi(2),lo(3)-1:hi(3)+1))
+    call bl_allocate(slxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    call bl_allocate(srxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
+    call bl_allocate(simhxy,lo(1),hi(1)+1,lo(2),hi(2),lo(3)-1,hi(3)+1)
 
     ! loop over appropriate xy faces
     if (is_conservative .eq. 1) then
@@ -1197,8 +1198,8 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(slxy)
-    deallocate(srxy)
+    call bl_deallocate(slxy)
+    call bl_deallocate(srxy)
 
     ! loop over appropriate xz faces
 
@@ -1206,9 +1207,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    allocate(slxz(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)))
-    allocate(srxz(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)))
-    allocate(simhxz(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3)))
+    call bl_allocate(slxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(srxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
+    call bl_allocate(simhxz,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3))
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1309,8 +1310,8 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(slxz)
-    deallocate(srxz)
+    call bl_deallocate(slxz)
+    call bl_deallocate(srxz)
 
     ! loop over appropriate yx faces
 
@@ -1318,9 +1319,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    allocate(slyx(lo(1):hi(1),lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(sryx(lo(1):hi(1),lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
-    allocate(simhyx(lo(1):hi(1),lo(2):hi(2)+1,lo(3)-1:hi(3)+1))
+    call bl_allocate(slyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(sryx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
+    call bl_allocate(simhyx,lo(1),hi(1),lo(2),hi(2)+1,lo(3)-1,hi(3)+1)
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1361,7 +1362,7 @@ contains
     end if
 
     ! impose lo side bc's
-    if (lo(2) .eq. domlo(2),k) then
+    if (lo(2) .eq. domlo(2)) then
        if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
           slyx(lo(1):hi(1),lo(2),lo(3)-1:hi(3)+1) = s(lo(1):hi(1),lo(2)-1,lo(3)-1:hi(3)+1,comp)
           sryx(lo(1):hi(1),lo(2),lo(3)-1:hi(3)+1) = s(lo(1):hi(1),lo(2)-1,lo(3)-1:hi(3)+1,comp)
@@ -1421,8 +1422,8 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(slyx)
-    deallocate(sryx)
+    call bl_deallocate(slyx)
+    call bl_deallocate(sryx)
 
     ! loop over appropriate yz faces
 
@@ -1430,9 +1431,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    allocate(slyz(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3)))
-    allocate(sryz(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3)))
-    allocate(simhyz(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3)))
+    call bl_allocate(slyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(sryz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(simhyz,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3))
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1473,7 +1474,7 @@ contains
     end if
 
     ! impose lo side bc's
-    if (lo(2) .eq. domlo(2),k) then
+    if (lo(2) .eq. domlo(2)) then
        if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
           slyz(lo(1)-1:hi(1)+1,lo(2),lo(3):hi(3)) = s(lo(1)-1:hi(1)+1,lo(2)-1,lo(3):hi(3),comp)
           sryz(lo(1)-1:hi(1)+1,lo(2),lo(3):hi(3)) = s(lo(1)-1:hi(1)+1,lo(2)-1,lo(3):hi(3),comp)
@@ -1533,9 +1534,9 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(simhz)
-    deallocate(slyz)
-    deallocate(sryz)
+    call bl_deallocate(simhz)
+    call bl_deallocate(slyz)
+    call bl_deallocate(sryz)
 
     ! loop over appropriate zx faces
 
@@ -1543,9 +1544,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    allocate(slzx(lo(1):hi(1),lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
-    allocate(srzx(lo(1):hi(1),lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
-    allocate(simhzx(lo(1):hi(1),lo(2)-1:hi(2)+1,lo(3):hi(3)+1))
+    call bl_allocate(slzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(srzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
+    call bl_allocate(simhzx,lo(1),hi(1),lo(2)-1,hi(2)+1,lo(3),hi(3)+1)
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1646,9 +1647,9 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(simhx)
-    deallocate(slzx)
-    deallocate(srzx)
+    call bl_deallocate(simhx)
+    call bl_deallocate(slzx)
+    call bl_deallocate(srzx)
 
     ! loop over appropriate zy faces
 
@@ -1656,9 +1657,9 @@ contains
     ! lo:hi+1 in normal direction
     ! lo:hi in transverse direction
     ! lo-1:hi+1 in unused direction
-    allocate(slzy(lo(1)-1:hi(1)+1,lo(2):hi(2),lo(3):hi(3)+1))
-    allocate(srzy(lo(1)-1:hi(1)+1,lo(2):hi(2),lo(3):hi(3)+1))
-    allocate(simhzy(lo(1)-1:hi(1)+1,lo(2):hi(2),lo(3):hi(3)+1))
+    call bl_allocate(slzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(srzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(simhzy,lo(1)-1,hi(1)+1,lo(2),hi(2),lo(3),hi(3)+1)
 
     if (is_conservative .eq. 1) then
        !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -1759,11 +1760,11 @@ contains
     enddo
     !$OMP END PARALLEL DO
 
-    deallocate(simhy)
-    deallocate(slzy)
-    deallocate(srzy)
+    call bl_deallocate(simhy)
+    call bl_deallocate(slzy)
+    call bl_deallocate(srzy)
     if (is_conservative .eq. 1) then
-       deallocate(divu)
+       call bl_deallocate(divu)
     end if
 
     !******************************************************************
@@ -1773,8 +1774,8 @@ contains
     ! Final edge states.
     ! lo:hi+1 in the normal direction
     ! lo:hi in the transverse directions
-    allocate(sedgelx(lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3)))
-    allocate(sedgerx(lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3)))
+    call bl_allocate(sedgelx,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
+    call bl_allocate(sedgerx,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
 
     ! loop over appropriate x-faces
     if (is_conservative .eq. 1) then
@@ -1893,13 +1894,13 @@ contains
        end if
     end if
 
-    deallocate(slx)
-    deallocate(srx)
-    deallocate(sedgelx)
-    deallocate(sedgerx)
+    call bl_deallocate(slx)
+    call bl_deallocate(srx)
+    call bl_deallocate(sedgelx)
+    call bl_deallocate(sedgerx)
 
-    allocate(sedgely(lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3)))
-    allocate(sedgery(lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3)))
+    call bl_allocate(sedgely,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(sedgery,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
 
     ! loop over appropriate y-faces
     if (is_conservative .eq. 1) then
@@ -1973,7 +1974,7 @@ contains
     !$OMP END PARALLEL DO
 
     ! impose lo side bc's
-    if (lo(2) .eq. domlo(2),k) then
+    if (lo(2) .eq. domlo(2)) then
        if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
           sedgey(lo(1):hi(1),lo(2),lo(3):hi(3),comp) = s(lo(1):hi(1),lo(2)-1,lo(3):hi(3),comp)
        else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
@@ -2018,13 +2019,13 @@ contains
        end if
     end if
 
-    deallocate(sly)
-    deallocate(sry)
-    deallocate(sedgely)
-    deallocate(sedgery)
+    call bl_deallocate(sly)
+    call bl_deallocate(sry)
+    call bl_deallocate(sedgely)
+    call bl_deallocate(sedgery)
 
-    allocate(sedgelz(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)+1))
-    allocate(sedgerz(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)+1))
+    call bl_allocate(sedgelz,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
+    call bl_allocate(sedgerz,lo(1),hi(1),lo(2),hi(2),lo(3),hi(3)+1)
 
     ! loop over appropriate z-faces
     if (is_conservative .eq. 1) then
@@ -2143,23 +2144,23 @@ contains
        end if
     end if
 
-    deallocate(Ip)
-    deallocate(Im)
-    deallocate(Ipf)
-    deallocate(Imf)
+    call bl_deallocate(Ip)
+    call bl_deallocate(Im)
+    call bl_deallocate(Ipf)
+    call bl_deallocate(Imf)
 
-    deallocate(slz)
-    deallocate(srz)
+    call bl_deallocate(slz)
+    call bl_deallocate(srz)
 
-    deallocate(simhxy)
-    deallocate(simhxz)
-    deallocate(simhyx)
-    deallocate(simhyz)
-    deallocate(simhzx)
-    deallocate(simhzy)
+    call bl_deallocate(simhxy)
+    call bl_deallocate(simhxz)
+    call bl_deallocate(simhyx)
+    call bl_deallocate(simhyz)
+    call bl_deallocate(simhzx)
+    call bl_deallocate(simhzy)
 
-    deallocate(sedgelz)
-    deallocate(sedgerz)
+    call bl_deallocate(sedgelz)
+    call bl_deallocate(sedgerz)
 
   end subroutine make_edge_scal_3d
 
