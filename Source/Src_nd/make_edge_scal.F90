@@ -784,12 +784,12 @@ contains
        end do
        call slopez_3d(s(:,:,:,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_3d(lo,hi,s(:,:,:,comp),s_lo,s_hi,nc_s, &
+       call ppm_3d(lo-1,hi+1,s(:,:,:,comp),s_lo,s_hi,nc_s, &
                     umac,u_lo,u_hi,vmac,v_lo,v_hi,wmac,w_lo,w_hi, &
                     Ip,lo-1,hi+1,Im,lo-1,hi+1, &
                     domlo,domhi,adv_bc,dx,dt,1,comp,bccomp)
        if (ppm_trace_forces .eq. 1) then
-          call ppm_3d(lo,hi,force(:,:,:,comp),f_lo,f_hi,nc_f, &
+          call ppm_3d(lo-1,hi+1,force(:,:,:,comp),f_lo,f_hi,nc_f, &
                         umac,u_lo,u_hi,vmac,v_lo,v_hi,wmac,w_lo,w_hi, &
                         Ipf,lo-1,hi+1,Imf,lo-1,hi+1, &
                        domlo,domhi,adv_bc,dx,dt,1,comp,bccomp)

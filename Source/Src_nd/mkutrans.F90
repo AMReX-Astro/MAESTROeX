@@ -363,7 +363,7 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 3)
-  subroutine mkutrans_3d(lev, domlo, domhi, lo, hi, &
+  subroutine mkutrans_3d(lo, hi, lev, idir, domlo, domhi, &
        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
        utrans, uu_lo, uu_hi, &
@@ -375,14 +375,16 @@ contains
        w0, &
        dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
 
-    integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
-    integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut
-    integer, value  , intent(in   ) :: ng_ut
-    integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
-    integer, value  , intent(in   ) :: ng_uf
+    integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
+    integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
+    integer, value  , intent(in   ) :: lev, idir, nc_ut, ng_ut
+    integer         , intent(in   ) :: uf_lo(3), uf_hi(3)
+    integer, value  , intent(in   ) :: nc_uf, ng_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: uw_lo(3), uw_hi(3)
+    ! integer         , intent(in   ) :: ip_lo(3), ip_hi(3)
+    ! integer         , intent(in   ) :: im_lo(3), im_hi(3)
     integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
     integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
     integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
@@ -391,11 +393,14 @@ contains
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
     double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2),uv_lo(3):uv_hi(3))
     double precision, intent(inout) :: wtrans(uw_lo(1):uw_hi(1),uw_lo(2):uw_hi(2),uw_lo(3):uw_hi(3))
+    ! double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),AMREX_SPACEDIM)
+    ! double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
     double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
     double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: dx(3), dt
+    double precision, intent(in   ) :: dx(3)
+    double precision, value, intent(in   ) :: dt
     integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
 
     ! double precision, pointer :: slopex(:,:,:,:)
@@ -444,7 +449,7 @@ contains
     !******************************************************************
 
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_3d(lo,hi,utilde(:,:,:,1),ut_lo,ut_hi,nc_ut, &
+       call ppm_3d(lo-1,hi+1,utilde(:,:,:,1),ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi, &
             ufull(:,:,:,3),uf_lo,uf_hi, &
             Ip,lo-1,hi+1,Im,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,1,1)
@@ -539,7 +544,7 @@ contains
     !******************************************************************
 
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_3d(lo,hi,utilde(:,:,:,2),ut_lo,ut_hi,nc_ut, &
+       call ppm_3d(lo-1,hi+1,utilde(:,:,:,2),ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi, &
             ufull(:,:,:,3),uf_lo,uf_hi, &
             Ip,lo-1,hi+1,Im,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,2,2)
@@ -633,7 +638,7 @@ contains
     !******************************************************************
 
     if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_3d(lo,hi,utilde(:,:,:,3),ut_lo,ut_hi,nc_ut, &
+       call ppm_3d(lo-1,hi+1,utilde(:,:,:,3),ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi, &
             ufull(:,:,:,3),uf_lo,uf_hi, &
             Ip,lo-1,hi+1,Im,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,3,3)

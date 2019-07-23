@@ -1876,7 +1876,6 @@ contains
 
   end subroutine ppm_2d
 
-
   !===========================================================================
   ! 3-d version
   !===========================================================================
@@ -1886,7 +1885,7 @@ contains
       u,u_lo,u_hi,v,v_lo,v_hi,w,w_lo,w_hi, &
       Ip,ip_lo,ip_hi,Im,im_lo,im_hi, &
       domlo,domhi, &
-      adv_bc,dx,dt,is_umac,comp,bccomp)
+      adv_bc,dx,dt,is_umac,comp,bccomp) bind(C,name="ppm_3d")
 
       integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3),s_lo(3),s_hi(3)
       integer         , intent(in   ) :: u_lo(3),u_hi(3),v_lo(3),v_hi(3),w_lo(3),w_hi(3)
@@ -1931,9 +1930,9 @@ contains
 
        !$OMP PARALLEL PRIVATE(i,j,k,dsc,dsl,dsr)
        !$OMP DO
-       do k=lo(3)-1,hi(3)+1
-          do j=lo(2)-1,hi(2)+1
-             do i=lo(1)-1,hi(1)+1
+       do k=lo(3),hi(3)
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
                 !
                 ! Compute van Leer slopes in x-direction.
                 !
@@ -2004,25 +2003,25 @@ contains
 
                 ! Different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's.
                 !
-                if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+                if (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
                    if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! The value in the first cc ghost cell represents the edge value.
                       !
-                      sm = s(lo(1)-1,j,k)
+                      sm = s(i-1,j,k)
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(lo(1)-1,j,k) &
-                           + (THREE/FOUR)*s(lo(1)  ,j,k) &
-                           + HALF        *s(lo(1)+1,j,k) &
-                           - (ONE/20.0d0)*s(lo(1)+2,j,k)
+                      sedge = -FIFTH     *s(i-1,j,k) &
+                           + (THREE/FOUR)*s(i,j,k) &
+                           + HALF        *s(i+1,j,k) &
+                           - (ONE/20.0d0)*s(i+2,j,k)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(lo(1)+1,j,k),s(lo(1),j,k)))
-                      sedge = min(sedge,max(s(lo(1)+1,j,k),s(lo(1),j,k)))
+                      sedge = max(sedge,min(s(i+1,j,k),s(i,j,k)))
+                      sedge = min(sedge,max(s(i+1,j,k),s(i,j,k)))
                       !
                       ! Copy sedge into sp and sm.
                       !
@@ -2031,21 +2030,21 @@ contains
                    end if
                 end if
 
-                if (i .eq. lo(1)+1 .and. lo(1) .eq. domlo(1)) then
+                if (i .eq. lo(1)+2 .and. lo(1)+1 .eq. domlo(1)) then
                    if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(lo(1)-1,j,k) &
-                           + (THREE/FOUR)*s(lo(1)  ,j,k) &
-                           + HALF        *s(lo(1)+1,j,k) &
-                           - (ONE/20.0d0)*s(lo(1)+2,j,k)
+                      sedge = -FIFTH     *s(i-2,j,k) &
+                           + (THREE/FOUR)*s(i-1,j,k) &
+                           + HALF        *s(i,j,k) &
+                           - (ONE/20.0d0)*s(i+1,j,k)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(lo(1)+1,j,k),s(lo(1),j,k)))
-                      sedge = min(sedge,max(s(lo(1)+1,j,k),s(lo(1),j,k)))
+                      sedge = max(sedge,min(s(i,j,k),s(i-1,j,k)))
+                      sedge = min(sedge,max(s(i,j,k),s(i-1,j,k)))
 
                       sm = sedge
 
@@ -2064,46 +2063,46 @@ contains
                    end if
                 end if
 
-                if (i .eq. hi(1) .and. hi(1) .eq. domhi(1)) then
+                if (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                       ! The value in the first cc ghost cell represents the edge value.
                       !
-                      sp = s(hi(1)+1,j,k)
+                      sp = s(i+1,j,k)
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(hi(1)+1,j,k) &
-                           + (THREE/FOUR)*s(hi(1)  ,j,k) &
-                           + HALF        *s(hi(1)-1,j,k) &
-                           - (ONE/20.0d0)*s(hi(1)-2,j,k)
+                      sedge = -FIFTH     *s(i+1,j,k) &
+                           + (THREE/FOUR)*s(i,j,k) &
+                           + HALF        *s(i-1,j,k) &
+                           - (ONE/20.0d0)*s(i-2,j,k)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(hi(1)-1,j,k),s(hi(1),j,k)))
-                      sedge = min(sedge,max(s(hi(1)-1,j,k),s(hi(1),j,k)))
+                      sedge = max(sedge,min(s(i-1,j,k),s(i,j,k)))
+                      sedge = min(sedge,max(s(i-1,j,k),s(i,j,k)))
 
                       sm = sedge
 
                    end if
                 end if
 
-                if (i .eq. hi(1)-1 .and. hi(1) .eq. domhi(1)) then
+                if (i .eq. hi(1)-2 .and. hi(1)-1 .eq. domhi(1)) then
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(hi(1)+1,j,k) &
-                           + (THREE/FOUR)*s(hi(1)  ,j,k) &
-                           + HALF        *s(hi(1)-1,j,k) &
-                           - (ONE/20.0d0)*s(hi(1)-2,j,k)
+                      sedge = -FIFTH     *s(i+2,j,k) &
+                           + (THREE/FOUR)*s(i+1,j,k) &
+                           + HALF        *s(i,j,k) &
+                           - (ONE/20.0d0)*s(i-1,j,k)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(hi(1)-1,j,k),s(hi(1),j,k)))
-                      sedge = min(sedge,max(s(hi(1)-1,j,k),s(hi(1),j,k)))
+                      sedge = max(sedge,min(s(i,j,k),s(i+1,j,k)))
+                      sedge = min(sedge,max(s(i,j,k),s(i+1,j,k)))
                       !
                       ! Copy sedge into sp and sm.
                       !
@@ -2184,9 +2183,9 @@ contains
        !    call amrex_error("Need 4 ghost cells for ppm_type=2")
        ! end if
 
-       do k=lo(3)-1,hi(3)+1
-          do j=lo(2)-1,hi(2)+1
-             do i=lo(1)-1,hi(1)+1
+       do k=lo(3),hi(3)
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
                 ! -1
                 ! Interpolate s to x-edges.
                 sedgel = (7.d0/12.d0)*(s(i-2,j,k)+s(i-1,j,k)) &
@@ -2319,50 +2318,50 @@ contains
                 sp = s(i,j,k) + alphap
 
                 ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
-                if (lo(1) .eq. domlo(1)) then
+                if (lo(1)+1 .eq. domlo(1)) then
                    if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
-                      if (i .eq. lo(1)) then
+                      if (i .eq. lo(1)+1) then
                          !
                          ! The value in the first cc ghost cell represents the edge value.
                          !
-                         sm    = s(lo(1)-1,j,k)
+                         sm    = s(i-1,j,k)
 
                          ! use a modified stencil to get sedge on the first interior edge
-                         sp = -FIFTH        *s(lo(1)-1,j,k) &
-                              + (THREE/FOUR)*s(lo(1)  ,j,k) &
-                              + HALF        *s(lo(1)+1,j,k) &
-                              - (ONE/20.0d0)*s(lo(1)+2,j,k)
+                         sp = -FIFTH        *s(i-1,j,k) &
+                              + (THREE/FOUR)*s(i  ,j,k) &
+                              + HALF        *s(i+1,j,k) &
+                              - (ONE/20.0d0)*s(i+2,j,k)
 
                          ! make sure sedge lies in between adjacent cell-centered values
-                         sp = max(sp,min(s(lo(1)+1,j,k),s(lo(1),j,k)))
-                         sp = min(sp,max(s(lo(1)+1,j,k),s(lo(1),j,k)))
+                         sp = max(sp,min(s(i+1,j,k),s(i,j,k)))
+                         sp = min(sp,max(s(i+1,j,k),s(i,j,k)))
 
-                      elseif (i .eq. lo(1)+1) then
+                     elseif (i .eq. lo(1)+2) then
 
-                         sedgel = s(lo(1)-1,j,k)
+                         sedgel = s(i-2,j,k)
 
                          ! use a modified stencil to get sedge on the first interior edge
-                         sedge = -FIFTH        *s(lo(1)-1,j,k) &
-                              + (THREE/FOUR)*s(lo(1)  ,j,k) &
-                              + HALF        *s(lo(1)+1,j,k) &
-                              - (ONE/20.0d0)*s(lo(1)+2,j,k)
+                         sedge = -FIFTH     *s(i-2,j,k) &
+                              + (THREE/FOUR)*s(i-1,j,k) &
+                              + HALF        *s(i,j,k) &
+                              - (ONE/20.0d0)*s(i+12,j,k)
 
                          ! make sure sedge lies in between adjacent cell-centered values
-                         sedge = max(sedge,min(s(lo(1)+1,j,k),s(lo(1),j,k)))
-                         sedge = min(sedge,max(s(lo(1)+1,j,k),s(lo(1),j,k)))
+                         sedge = max(sedge,min(s(i,j,k),s(i-1,j,k)))
+                         sedge = min(sedge,max(s(i,j,k),s(i-1,j,k)))
 
-                      elseif (i .eq. lo(1)+2) then
+                     elseif (i .eq. lo(1)+3) then
 
                          ! use a modified stencil to get sedge on the first interior edge
-                         sedgel = -FIFTH        *s(lo(1)-1,j,k) &
-                              + (THREE/FOUR)*s(lo(1)  ,j,k) &
-                              + HALF        *s(lo(1)+1,j,k) &
-                              - (ONE/20.0d0)*s(lo(1)+2,j,k)
+                         sedgel = -FIFTH    *s(i-3,j,k) &
+                              + (THREE/FOUR)*s(i-2,j,k) &
+                              + HALF        *s(i-1,j,k) &
+                              - (ONE/20.0d0)*s(i,j,k)
 
                          ! make sure sedge lies in between adjacent cell-centered values
-                         sedgel = max(sedgel,min(s(lo(1)+1,j,k),s(lo(1),j,k)))
-                         sedgel = min(sedgel,max(s(lo(1)+1,j,k),s(lo(1),j,k)))
+                         sedgel = max(sedgel,min(s(i-1,j,k),s(i-2,j,k)))
+                         sedgel = min(sedgel,max(s(i-1,j,k),s(i-2,j,k)))
 
                       endif
 
@@ -2370,7 +2369,7 @@ contains
                       ! Apply Colella 2008 limiters to compute sm and sp in the second
                       ! and third inner cells.
 
-                      if (i .eq. lo(1)+1 .or. i .eq. lo(1)+2) then
+                      if (i .eq. lo(1)+2 .or. i .eq. lo(1)+3) then
 
                          alphap = sedger-s(i,j,k)
                          alpham = sedge-s(i,j,k)
@@ -2445,59 +2444,59 @@ contains
                    end if
                 end if
 
-                if (hi(1) .eq. domhi(1)) then
+                if (hi(1)-1 .eq. domhi(1)) then
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
-                      if (i .eq. hi(1)) then
+                      if (i .eq. hi(1)-1) then
 
                          !
                          ! The value in the first cc ghost cell represents the edge value.
                          !
-                         sp = s(hi(1)+1,j,k)
+                         sp = s(i+1,j,k)
 
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sm = -FIFTH        *s(hi(1)+1,j,k) &
-                              + (THREE/FOUR)*s(hi(1)  ,j,k) &
-                              + HALF        *s(hi(1)-1,j,k) &
-                              - (ONE/20.0d0)*s(hi(1)-2,j,k)
+                         sm = -FIFTH        *s(i+1,j,k) &
+                              + (THREE/FOUR)*s(i,j,k) &
+                              + HALF        *s(i-1,j,k) &
+                              - (ONE/20.0d0)*s(i-2,j,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sm = max(sm,min(s(hi(1)-1,j,k),s(hi(1),j,k)))
-                         sm = min(sm,max(s(hi(1)-1,j,k),s(hi(1),j,k)))
+                         sm = max(sm,min(s(i-1,j,k),s(i,j,k)))
+                         sm = min(sm,max(s(i-1,j,k),s(i,j,k)))
 
 
-                      elseif (i .eq. hi(1)-1) then
+                     elseif (i .eq. hi(1)-2) then
 
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedger = -FIFTH        *s(hi(1)+1,j,k) &
-                              + (THREE/FOUR)*s(hi(1)  ,j,k) &
-                              + HALF        *s(hi(1)-1,j,k) &
-                              - (ONE/20.0d0)*s(hi(1)-2,j,k)
+                         sedger = -FIFTH    *s(i+2,j,k) &
+                              + (THREE/FOUR)*s(i+1,j,k) &
+                              + HALF        *s(i,j,k) &
+                              - (ONE/20.0d0)*s(i-1,j,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedger = max(sedger,min(s(hi(1)-1,j,k),s(hi(1),j,k)))
-                         sedger = min(sedger,max(s(hi(1)-1,j,k),s(hi(1),j,k)))
+                         sedger = max(sedger,min(s(i,j,k),s(i+1,j,k)))
+                         sedger = min(sedger,max(s(i,j,k),s(i+1,j,k)))
 
-                      elseif (i .eq. hi(1)-2) then
+                     elseif (i .eq. hi(1)-3) then
 
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedgerr = -FIFTH        *s(hi(1)+1,j,k) &
-                              + (THREE/FOUR)*s(hi(1)  ,j,k) &
-                              + HALF        *s(hi(1)-1,j,k) &
-                              - (ONE/20.0d0)*s(hi(1)-2,j,k)
+                         sedgerr = -FIFTH   *s(i+3,j,k) &
+                              + (THREE/FOUR)*s(i+2,j,k) &
+                              + HALF        *s(i+1,j,k) &
+                              - (ONE/20.0d0)*s(i,j,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedgerr = max(sedgerr,min(s(hi(1)-1,j,k),s(hi(1),j,k)))
-                         sedgerr = min(sedgerr,max(s(hi(1)-1,j,k),s(hi(1),j,k)))
+                         sedgerr = max(sedgerr,min(s(i+1,j,k),s(i+2,j,k)))
+                         sedgerr = min(sedgerr,max(s(i+1,j,k),s(i+2,j,k)))
 
                       endif
 
@@ -2505,7 +2504,7 @@ contains
                       ! Apply Colella 2008 limiters to compute sm and sp in the second
                       ! and third inner cells.
 
-                      if (i .eq. hi(1)-1 .or. i .eq. (hi(1)-2)) then
+                      if (i .eq. hi(1)-2 .or. i .eq. hi(1)-3) then
 
                          alphap = sedger-s(i,j,k)
                          alpham = sedge-s(i,j,k)
@@ -2651,11 +2650,9 @@ contains
        ! ppm_type = 1
        !----------------------------------------------------------------------
 
-       !$OMP PARALLEL PRIVATE(i,j,k,dsc,dsl,dsr)
-       !$OMP DO
-       do k=lo(3)-1,hi(3)+1
-          do j=lo(2)-1,hi(2)+1
-             do i=lo(1)-1,hi(1)+1
+       do k=lo(3),hi(3)
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
                 !
                 ! Compute van Leer slopes in y-direction.
                 !
@@ -2725,24 +2722,24 @@ contains
                 !
                 ! Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
                 !
-                if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+                if (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
                    if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
                       !
                       ! The value in the first cc ghost cell represents the edge value.
                       !
-                      sm = s(i,lo(2)-1,k)
+                      sm = s(i,j-1,k)
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(i,lo(2)-1,k) &
-                           + (THREE/FOUR)*s(i,lo(2)  ,k) &
-                           + HALF        *s(i,lo(2)+1,k) &
-                           - (ONE/20.0d0)*s(i,lo(2)+2,k)
+                      sedge = -FIFTH     *s(i,j-1,k) &
+                           + (THREE/FOUR)*s(i,j  ,k) &
+                           + HALF        *s(i,j+1,k) &
+                           - (ONE/20.0d0)*s(i,j+2,k)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,lo(2)+1,k),s(i,lo(2),k)))
-                      sedge = min(sedge,max(s(i,lo(2)+1,k),s(i,lo(2),k)))
+                      sedge = max(sedge,min(s(i,j+1,k),s(i,j,k)))
+                      sedge = min(sedge,max(s(i,j+1,k),s(i,j,k)))
                       !
                       ! Copy sedge into sp and sm.
                       !
@@ -2751,21 +2748,21 @@ contains
                    end if
                 end if
 
-                if (j .eq. lo(2)+1 .and. lo(2) .eq. domlo(2)) then
+                if (j .eq. lo(2)+2 .and. lo(2)+1 .eq. domlo(2)) then
                    if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(i,lo(2)-1,k) &
-                           + (THREE/FOUR)*s(i,lo(2)  ,k) &
-                           + HALF        *s(i,lo(2)+1,k) &
-                           - (ONE/20.0d0)*s(i,lo(2)+2,k)
+                      sedge = -FIFTH     *s(i,j-2,k) &
+                           + (THREE/FOUR)*s(i,j-1,k) &
+                           + HALF        *s(i,j,k) &
+                           - (ONE/20.0d0)*s(i,j+1,k)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,lo(2)+1,k),s(i,lo(2),k)))
-                      sedge = min(sedge,max(s(i,lo(2)+1,k),s(i,lo(2),k)))
+                      sedge = max(sedge,min(s(i,j,k),s(i,j-1,k)))
+                      sedge = min(sedge,max(s(i,j,k),s(i,j-1,k)))
                       !
                       sm = sedge
                       !
@@ -2783,44 +2780,44 @@ contains
                    end if
                 end if
 
-                if (j .eq. hi(2) .and. hi(2) .eq. domhi(2)) then
+                if (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                       !
                       ! The value in the first cc ghost cell represents the edge value.
                       !
-                      sp = s(i,hi(2)+1,k)
+                      sp = s(i,j+1,k)
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(i,hi(2)+1,k) &
-                           + (THREE/FOUR)*s(i,hi(2)  ,k) &
-                           + HALF        *s(i,hi(2)-1,k) &
-                           - (ONE/20.0d0)*s(i,hi(2)-2,k)
+                      sedge = -FIFTH     *s(i,j+1,k) &
+                           + (THREE/FOUR)*s(i,j,k) &
+                           + HALF        *s(i,j-1,k) &
+                           - (ONE/20.0d0)*s(i,j-2,k)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,hi(2)-1,k),s(i,hi(2),k)))
-                      sedge = min(sedge,max(s(i,hi(2)-1,k),s(i,hi(2),k)))
+                      sedge = max(sedge,min(s(i,j-1,k),s(i,j,k)))
+                      sedge = min(sedge,max(s(i,j-1,k),s(i,j,k)))
                       !
                       sm = sedge
 
                    end if
                 end if
 
-                if (j .eq. hi(2)-1 .and. hi(2) .eq. domhi(2)) then
+                if (j .eq. hi(2)-2 .and. hi(2)-1 .eq. domhi(2)) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(i,hi(2)+1,k) &
-                           + (THREE/FOUR)*s(i,hi(2)  ,k) &
-                           + HALF        *s(i,hi(2)-1,k) &
-                           - (ONE/20.0d0)*s(i,hi(2)-2,k)
+                      sedge = -FIFTH     *s(i,j+2,k) &
+                           + (THREE/FOUR)*s(i,j+1,k) &
+                           + HALF        *s(i,j,k) &
+                           - (ONE/20.0d0)*s(i,j-1,k)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,hi(2)-1,k),s(i,hi(2),k)))
-                      sedge = min(sedge,max(s(i,hi(2)-1,k),s(i,hi(2),k)))
+                      sedge = max(sedge,min(s(i,j,k),s(i,j+1,k)))
+                      sedge = min(sedge,max(s(i,j,k),s(i,j+1,k)))
                       !
                       ! Copy sedge into sp and sm.
                       !
@@ -2901,9 +2898,9 @@ contains
        ! ppm_type = 2
        !----------------------------------------------------------------------
 
-       do k=lo(3)-1,hi(3)+1
-          do j=lo(2)-1,hi(2)+1
-             do i=lo(1)-1,hi(1)+1
+       do k=lo(3),hi(3)
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
                 ! -1
                 ! Interpolate s to y-edges.
                 sedgel = (7.d0/12.d0)*(s(i,j-2,k)+s(i,j-1,k)) &
@@ -3043,57 +3040,57 @@ contains
                 !
                 ! Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
                 !
-                if (lo(2) .eq. domlo(2)) then
+                if (lo(2)+1 .eq. domlo(2)) then
                    if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
-                      if (j .eq. lo(2)) then
+                      if (j .eq. lo(2)+1) then
 
                          !
                          ! The value in the first cc ghost cell represents the edge value.
                          !
-                         sm = s(i,lo(2)-1,k)
-                         sedge = s(i,lo(2)-1,k)
+                         sm = s(i,j-1,k)
+                         sedge = s(i,j-1,k)
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sp = -FIFTH        *s(i,lo(2)-1,k) &
-                              + (THREE/FOUR)*s(i,lo(2)  ,k) &
-                              + HALF        *s(i,lo(2)+1,k) &
-                              - (ONE/20.0d0)*s(i,lo(2)+2,k)
+                         sp = -FIFTH        *s(i,j-1,k) &
+                              + (THREE/FOUR)*s(i,j  ,k) &
+                              + HALF        *s(i,j+1,k) &
+                              - (ONE/20.0d0)*s(i,j+2,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sp = max(sp,min(s(i,lo(2)+1,k),s(i,lo(2),k)))
-                         sp = min(sp,max(s(i,lo(2)+1,k),s(i,lo(2),k)))
+                         sp = max(sp,min(s(i,j+1,k),s(i,j,k)))
+                         sp = min(sp,max(s(i,j+1,k),s(i,j,k)))
 
-                      elseif (j .eq. lo(2)+1) then
+                     elseif (j .eq. lo(2)+2) then
 
-                         sedgel = s(i,lo(2)-1,k)
+                         sedgel = s(i,j-2,k)
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedge = -FIFTH        *s(i,lo(2)-1,k) &
-                              + (THREE/FOUR)*s(i,lo(2)  ,k) &
-                              + HALF        *s(i,lo(2)+1,k) &
-                              - (ONE/20.0d0)*s(i,lo(2)+2,k)
+                         sedge = -FIFTH     *s(i,j-2,k) &
+                              + (THREE/FOUR)*s(i,j-1,k) &
+                              + HALF        *s(i,j,k) &
+                              - (ONE/20.0d0)*s(i,j+1,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedge = max(sedge,min(s(i,lo(2)+1,k),s(i,lo(2),k)))
-                         sedge = min(sedge,max(s(i,lo(2)+1,k),s(i,lo(2),k)))
+                         sedge = max(sedge,min(s(i,j,k),s(i,j-1,k)))
+                         sedge = min(sedge,max(s(i,j,k),s(i,j-1,k)))
 
-                      elseif (j .eq. lo(2)+2) then
+                     elseif (j .eq. lo(2)+3) then
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedgel = -FIFTH        *s(i,lo(2)-1,k) &
-                              + (THREE/FOUR)*s(i,lo(2)  ,k) &
-                              + HALF        *s(i,lo(2)+1,k) &
-                              - (ONE/20.0d0)*s(i,lo(2)+2,k)
+                         sedgel = -FIFTH    *s(i,j-3,k) &
+                              + (THREE/FOUR)*s(i,j-2,k) &
+                              + HALF        *s(i,j-1,k) &
+                              - (ONE/20.0d0)*s(i,j,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedgel = max(sedgel,min(s(i,lo(2)+1,k),s(i,lo(2),k)))
-                         sedgel = min(sedgel,max(s(i,lo(2)+1,k),s(i,lo(2),k)))
+                         sedgel = max(sedgel,min(s(i,j-1,k),s(i,j-2,k)))
+                         sedgel = min(sedgel,max(s(i,j-1,k),s(i,j-2,k)))
 
                       endif
 
@@ -3101,7 +3098,7 @@ contains
                       ! Apply Colella 2008 limiters to compute sm and sp in the second
                       ! and third inner cells.
 
-                      if (j .eq. lo(2)+1 .or. j .eq. lo(2)+2) then
+                      if (j .eq. lo(2)+2 .or. j .eq. lo(2)+3) then
 
                          alphap = sedger-s(i,j,k)
                          alpham = sedge-s(i,j,k)
@@ -3179,57 +3176,57 @@ contains
                    end if
                 end if
 
-                if (hi(2) .eq. domhi(2)) then
+                if (hi(2)-1 .eq. domhi(2)) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
-                      if (j .eq. hi(2)) then
+                      if (j .eq. hi(2)-1) then
 
                          !
                          ! The value in the first cc ghost cell represents the edge value.
                          !
-                         sp = s(i,hi(2)+1,k)
+                         sp = s(i,j+1,k)
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sm  = -FIFTH        *s(i,hi(2)+1,k) &
-                              + (THREE/FOUR)*s(i,hi(2)  ,k) &
-                              + HALF        *s(i,hi(2)-1,k) &
-                              - (ONE/20.0d0)*s(i,hi(2)-2,k)
+                         sm  = -FIFTH       *s(i,j+1,k) &
+                              + (THREE/FOUR)*s(i,j,k) &
+                              + HALF        *s(i,j-1,k) &
+                              - (ONE/20.0d0)*s(i,j-2,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sm  = max(sm,min(s(i,hi(2)-1,k),s(i,hi(2),k)))
-                         sm = min(sm,max(s(i,hi(2)-1,k),s(i,hi(2),k)))
+                         sm  = max(sm,min(s(i,j-1,k),s(i,j,k)))
+                         sm = min(sm,max(s(i,j-1,k),s(i,j,k)))
 
-                      elseif (j .eq. hi(2)-1) then
+                     elseif (j .eq. hi(2)-2) then
 
-                         sedgerr = s(i,hi(2)+1,k)
+                         sedgerr = s(i,j+2,k)
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedger = -FIFTH        *s(i,hi(2)+1,k) &
-                              + (THREE/FOUR)*s(i,hi(2)  ,k) &
-                              + HALF        *s(i,hi(2)-1,k) &
-                              - (ONE/20.0d0)*s(i,hi(2)-2,k)
+                         sedger = -FIFTH    *s(i,j+2,k) &
+                              + (THREE/FOUR)*s(i,j+1,k) &
+                              + HALF        *s(i,j,k) &
+                              - (ONE/20.0d0)*s(i,j-1,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedger = max(sedger,min(s(i,hi(2)-1,k),s(i,hi(2),k)))
-                         sedger = min(sedger,max(s(i,hi(2)-1,k),s(i,hi(2),k)))
+                         sedger = max(sedger,min(s(i,j,k),s(i,j+1,k)))
+                         sedger = min(sedger,max(s(i,j,k),s(i,j+1,k)))
 
-                      elseif (j .eq. hi(2)-2) then
+                     elseif (j .eq. hi(2)-3) then
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedgerr = -FIFTH        *s(i,hi(2)+1,k) &
-                              + (THREE/FOUR)*s(i,hi(2)  ,k) &
-                              + HALF        *s(i,hi(2)-1,k) &
-                              - (ONE/20.0d0)*s(i,hi(2)-2,k)
+                         sedgerr = -FIFTH   *s(i,j+3,k) &
+                              + (THREE/FOUR)*s(i,j+2,k) &
+                              + HALF        *s(i,j+1,k) &
+                              - (ONE/20.0d0)*s(i,j,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedgerr = max(sedgerr,min(s(i,hi(2)-1,k),s(i,hi(2),k)))
-                         sedgerr = min(sedgerr,max(s(i,hi(2)-1,k),s(i,hi(2),k)))
+                         sedgerr = max(sedgerr,min(s(i,j+1,k),s(i,j+2,k)))
+                         sedgerr = min(sedgerr,max(s(i,j+1,k),s(i,j+2,k)))
 
                       endif
 
@@ -3237,7 +3234,7 @@ contains
                       ! Apply Colella 2008 limiters to compute sm and sp in the second
                       ! and third inner cells.
 
-                      if (j .eq. hi(2)-1 .or. j .eq. hi(2)-2) then
+                      if (j .eq. hi(2)-2 .or. j .eq. hi(2)-3) then
 
                          alphap = sedger-s(i,j,k)
                          alpham = sedge-s(i,j,k)
@@ -3382,11 +3379,9 @@ contains
        ! ppm_type = 1
        !----------------------------------------------------------------------
 
-       !$OMP PARALLEL PRIVATE(i,j,k,dsc,dsl,dsr)
-       !$OMP DO
-       do k=lo(3)-1,hi(3)+1
-          do j=lo(2)-1,hi(2)+1
-             do i=lo(1)-1,hi(1)+1
+       do k=lo(3),hi(3)
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
                 !
                 ! Compute van Leer slopes in z-direction.
                 !
@@ -3457,25 +3452,25 @@ contains
                 !
                 ! Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
                 !
-                if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+                if (k .eq. lo(3)+1 .and. lo(3)+1 .eq. domlo(3)) then
                    if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
 
                       ! The value in the first cc ghost cell represents the edge value.
                       !
-                      sm = s(i,j,lo(3)-1)
+                      sm = s(i,j,k-1)
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(i,j,lo(3)-1) &
-                           + (THREE/FOUR)*s(i,j,lo(3)  ) &
-                           + HALF        *s(i,j,lo(3)+1) &
-                           - (ONE/20.0d0)*s(i,j,lo(3)+2)
+                      sedge = -FIFTH     *s(i,j,k-1) &
+                           + (THREE/FOUR)*s(i,j,k) &
+                           + HALF        *s(i,j,k+1) &
+                           - (ONE/20.0d0)*s(i,j,k+2)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,lo(3)+1),s(i,j,lo(3))))
-                      sedge = min(sedge,max(s(i,j,lo(3)+1),s(i,j,lo(3))))
+                      sedge = max(sedge,min(s(i,j,k+1),s(i,j,k)))
+                      sedge = min(sedge,max(s(i,j,k+1),s(i,j,k)))
                       !
                       ! Copy sedge into sp and sm.
                       !
@@ -3484,21 +3479,21 @@ contains
                    end if
                 end if
 
-                if (k .eq. lo(3)+1 .and. lo(3) .eq. domlo(3)) then
+                if (k .eq. lo(3)+2 .and. lo(3)+1 .eq. domlo(3)) then
                    if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(i,j,lo(3)-1) &
-                           + (THREE/FOUR)*s(i,j,lo(3)  ) &
-                           + HALF        *s(i,j,lo(3)+1) &
-                           - (ONE/20.0d0)*s(i,j,lo(3)+2)
+                      sedge = -FIFTH     *s(i,j,k-2) &
+                           + (THREE/FOUR)*s(i,j,k-1) &
+                           + HALF        *s(i,j,k) &
+                           - (ONE/20.0d0)*s(i,j,k+1)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,lo(3)+1),s(i,j,lo(3))))
-                      sedge = min(sedge,max(s(i,j,lo(3)+1),s(i,j,lo(3))))
+                      sedge = max(sedge,min(s(i,j,k),s(i,j,k-1)))
+                      sedge = min(sedge,max(s(i,j,k),s(i,j,k-1)))
                       !
                       sm = sedge
                       !
@@ -3516,46 +3511,46 @@ contains
                    end if
                 end if
 
-                if (k .eq. hi(3) .and. hi(3) .eq. domhi(3)) then
+                if (k .eq. hi(3)-1 .and. hi(3)-1 .eq. domhi(3)) then
                    if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! The value in the first cc ghost cell represents the edge value.
                       !
-                      sp = s(i,j,hi(3)+1)
+                      sp = s(i,j,k+1)
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(i,j,hi(3)+1) &
-                           + (THREE/FOUR)*s(i,j,hi(3)  ) &
-                           + HALF        *s(i,j,hi(3)-1) &
-                           - (ONE/20.0d0)*s(i,j,hi(3)-2)
+                      sedge = -FIFTH     *s(i,j,k+1) &
+                           + (THREE/FOUR)*s(i,j,k) &
+                           + HALF        *s(i,j,k-1) &
+                           - (ONE/20.0d0)*s(i,j,k-2)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,hi(3)-1),s(i,j,hi(3))))
-                      sedge = min(sedge,max(s(i,j,hi(3)-1),s(i,j,hi(3))))
+                      sedge = max(sedge,min(s(i,j,k-1),s(i,j,k)))
+                      sedge = min(sedge,max(s(i,j,k-1),s(i,j,k)))
                       !
                       sm = sedge
                    end if
                 end if
 
-                if (k .eq. hi(3)-1 .and. hi(3) .eq. domhi(3)) then
+                if (k .eq. hi(3)-2 .and. hi(3)-1 .eq. domhi(3)) then
                    if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH        *s(i,j,hi(3)+1) &
-                           + (THREE/FOUR)*s(i,j,hi(3)  ) &
-                           + HALF        *s(i,j,hi(3)-1) &
-                           - (ONE/20.0d0)*s(i,j,hi(3)-2)
+                      sedge = -FIFTH     *s(i,j,k+2) &
+                           + (THREE/FOUR)*s(i,j,k+1) &
+                           + HALF        *s(i,j,k) &
+                           - (ONE/20.0d0)*s(i,j,k-1)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,hi(3)-1),s(i,j,hi(3))))
-                      sedge = min(sedge,max(s(i,j,hi(3)-1),s(i,j,hi(3))))
+                      sedge = max(sedge,min(s(i,j,k),s(i,j,k+1)))
+                      sedge = min(sedge,max(s(i,j,k),s(i,j,k+1)))
                       !
                       ! Copy sedge into sp and sm.
                       !
@@ -3630,9 +3625,9 @@ contains
        !----------------------------------------------------------------------
        ! ppm_type = 2
        !----------------------------------------------------------------------
-       do k=lo(3)-1,hi(3)+1
-          do j=lo(2)-1,hi(2)+1
-             do i=lo(1)-1,hi(1)+1
+       do k=lo(3),hi(3)
+          do j=lo(2),hi(2)
+             do i=lo(1),hi(1)
                 ! -1
                 ! Interpolate s to z-edges.
                 sedgel = (7.d0/12.d0)*(s(i,j,k-2)+s(i,j,k-1)) &
@@ -3768,65 +3763,65 @@ contains
                 !
                 ! Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
                 !
-                if (lo(3) .eq. domlo(3)) then
+                if (lo(3)+1 .eq. domlo(3)) then
                    if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
 
-                      if (k .eq. lo(3)) then
+                      if (k .eq. lo(3)+1) then
 
                          !
                          ! The value in the first cc ghost cell represents the edge value.
                          !
-                         sm = s(i,j,lo(3)-1)
+                         sm = s(i,j,k-1)
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sp = -FIFTH        *s(i,j,lo(3)-1) &
-                              + (THREE/FOUR)*s(i,j,lo(3)  ) &
-                              + HALF        *s(i,j,lo(3)+1) &
-                              - (ONE/20.0d0)*s(i,j,lo(3)+2)
+                         sp = -FIFTH        *s(i,j,k-1) &
+                              + (THREE/FOUR)*s(i,j,k) &
+                              + HALF        *s(i,j,k+1) &
+                              - (ONE/20.0d0)*s(i,j,k+2)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sp = max(sp,min(s(i,j,lo(3)+1),s(i,j,lo(3))))
-                         sp = min(sp,max(s(i,j,lo(3)+1),s(i,j,lo(3))))
+                         sp = max(sp,min(s(i,j,k+1),s(i,j,k)))
+                         sp = min(sp,max(s(i,j,k+1),s(i,j,k)))
 
-                      elseif (k .eq. lo(3)+1) then
+                     elseif (k .eq. lo(3)+2) then
 
-                         sedgel = s(i,j,lo(3)-1)
+                         sedgel = s(i,j,k-2)
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedge = -FIFTH        *s(i,j,lo(3)-1) &
-                              + (THREE/FOUR)*s(i,j,lo(3)  ) &
-                              + HALF        *s(i,j,lo(3)+1) &
-                              - (ONE/20.0d0)*s(i,j,lo(3)+2)
+                         sedge = -FIFTH     *s(i,j,k-2) &
+                              + (THREE/FOUR)*s(i,j,k-1) &
+                              + HALF        *s(i,j,k) &
+                              - (ONE/20.0d0)*s(i,j,k+1)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedge = max(sedge,min(s(i,j,lo(3)+1),s(i,j,lo(3))))
-                         sedge = min(sedge,max(s(i,j,lo(3)+1),s(i,j,lo(3))))
+                         sedge = max(sedge,min(s(i,j,k),s(i,j,k-1)))
+                         sedge = min(sedge,max(s(i,j,k),s(i,j,k-1)))
 
-                      elseif (k .eq. lo(3)+2) then
+                     elseif (k .eq. lo(3)+3) then
 
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedgel = -FIFTH        *s(i,j,lo(3)-1) &
-                              + (THREE/FOUR)*s(i,j,lo(3)  ) &
-                              + HALF        *s(i,j,lo(3)+1) &
-                              - (ONE/20.0d0)*s(i,j,lo(3)+2)
+                         sedgel = -FIFTH    *s(i,j,k-3) &
+                              + (THREE/FOUR)*s(i,j,k-2) &
+                              + HALF        *s(i,j,k-1) &
+                              - (ONE/20.0d0)*s(i,j,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedgel = max(sedgel,min(s(i,j,lo(3)+1),s(i,j,lo(3))))
-                         sedgel = min(sedgel,max(s(i,j,lo(3)+1),s(i,j,lo(3))))
+                         sedgel = max(sedgel,min(s(i,j,k-1),s(i,j,k-2)))
+                         sedgel = min(sedgel,max(s(i,j,k-1),s(i,j,k-2)))
 
                       endif
 
                       ! Apply Colella 2008 limiters to compute sm and sp in the second
                       ! and third inner cells.
 
-                      if (k .eq. lo(3)+1 .or. k .eq. lo(3)+2) then
+                      if (k .eq. lo(3)+2 .or. k .eq. lo(3)+3) then
 
                          alphap = sedger-s(i,j,k)
                          alpham = sedge-s(i,j,k)
@@ -3904,58 +3899,58 @@ contains
                    end if
                 end if
 
-                if (hi(3) .eq. domhi(3)) then
+                if (hi(3)-1 .eq. domhi(3)) then
                    if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
 
-                      if (k .eq. hi(3)) then
+                      if (k .eq. hi(3)-1) then
 
                          !
                          ! The value in the first cc ghost cell represents the edge value.
                          !
-                         sp = s(i,j,hi(3)+1)
+                         sp = s(i,j,k+1)
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sm = -FIFTH        *s(i,j,hi(3)+1) &
-                              + (THREE/FOUR)*s(i,j,hi(3)  ) &
-                              + HALF        *s(i,j,hi(3)-1) &
-                              - (ONE/20.0d0)*s(i,j,hi(3)-2)
+                         sm = -FIFTH        *s(i,j,k+1) &
+                              + (THREE/FOUR)*s(i,j,k) &
+                              + HALF        *s(i,j,k-1) &
+                              - (ONE/20.0d0)*s(i,j,k-2)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sm= max(sm,min(s(i,j,hi(3)-1),s(i,j,hi(3))))
-                         sm = min(sm,max(s(i,j,hi(3)-1),s(i,j,hi(3))))
+                         sm= max(sm,min(s(i,j,k-1),s(i,j,k)))
+                         sm = min(sm,max(s(i,j,k-1),s(i,j,k)))
 
-                      elseif (k .eq. hi(3)-1) then
+                     elseif (k .eq. hi(3)-2) then
 
-                         sedgerr = s(i,j,hi(3)+1)
+                         sedgerr = s(i,j,k+2)
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedger = -FIFTH        *s(i,j,hi(3)+1) &
-                              + (THREE/FOUR)*s(i,j,hi(3)  ) &
-                              + HALF        *s(i,j,hi(3)-1) &
-                              - (ONE/20.0d0)*s(i,j,hi(3)-2)
+                         sedger = -FIFTH    *s(i,j,k+2) &
+                              + (THREE/FOUR)*s(i,j,k+1) &
+                              + HALF        *s(i,j,k) &
+                              - (ONE/20.0d0)*s(i,j,k-1)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedger = max(sedger,min(s(i,j,hi(3)-1),s(i,j,hi(3))))
-                         sedger = min(sedger,max(s(i,j,hi(3)-1),s(i,j,hi(3))))
+                         sedger = max(sedger,min(s(i,j,k),s(i,j,k+1)))
+                         sedger = min(sedger,max(s(i,j,k),s(i,j,k+1)))
 
-                      elseif (k .eq. hi(3)-2) then
+                     elseif (k .eq. hi(3)-3) then
 
                          !
                          ! Use a modified stencil to get sedge on the first interior edge.
                          !
-                         sedgerr = -FIFTH        *s(i,j,hi(3)+1) &
-                              + (THREE/FOUR)*s(i,j,hi(3)  ) &
-                              + HALF        *s(i,j,hi(3)-1) &
-                              - (ONE/20.0d0)*s(i,j,hi(3)-2)
+                         sedgerr = -FIFTH   *s(i,j,k+3) &
+                              + (THREE/FOUR)*s(i,j,k+2) &
+                              + HALF        *s(i,j,k+1) &
+                              - (ONE/20.0d0)*s(i,j,k)
                          !
                          ! Make sure sedge lies in between adjacent cell-centered values.
                          !
-                         sedgerr = max(sedgerr,min(s(i,j,hi(3)-1),s(i,j,hi(3))))
-                         sedgerr = min(sedgerr,max(s(i,j,hi(3)-1),s(i,j,hi(3))))
+                         sedgerr = max(sedgerr,min(s(i,j,k+1),s(i,j,k+2)))
+                         sedgerr = min(sedgerr,max(s(i,j,k+1),s(i,j,k+2)))
 
                       endif
 
@@ -3963,7 +3958,7 @@ contains
                       ! Apply Colella 2008 limiters to compute sm and sp in the second
                       ! and third inner cells.
                       !
-                      if (k .eq. hi(3)-1 .or. k .eq. hi(3)-2) then
+                      if (k .eq. hi(3)-2 .or. k .eq. hi(3)-3) then
 
                          alphap = sedger-s(i,j,k)
                          alpham = sedge-s(i,j,k)
@@ -4093,6 +4088,7 @@ contains
     end if
 
   end subroutine ppm_3d
+
 
 
 
