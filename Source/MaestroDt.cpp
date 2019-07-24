@@ -309,17 +309,20 @@ Maestro::FirstDt ()
 		
             } else {
 #if (AMREX_SPACEDIM == 3)
-                firstdt_sphr(&dt_grid,&umax_grid,
-                             ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                             ZFILL(dx),
-                             BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                             BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+		
+#pragma gpu box(tileBox)
+                firstdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
+			     AMREX_MFITER_REDUCE_MAX(&umax_grid),
+                             AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                             AMREX_REAL_ANYD(dx),
+                             BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
+                             BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
+                             BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
+                             BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
                              p0_old.dataPtr(),
                              gamma1bar_old.dataPtr(),
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                             BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                             BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 #else
                 Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif

@@ -566,6 +566,7 @@ contains
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
 
+    use amrex_fort_module, only: amrex_min, amrex_max
 
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -598,6 +599,8 @@ contains
     integer pt_index(3)
     type (eos_t) :: eos_state
 
+    !$gpu
+    
     call bl_allocate(gp0_cart,lo,hi,3)
 
     eps = 1.0d-8
@@ -613,9 +616,6 @@ contains
     ux      = 0.d0
     uy      = 0.d0
     uz      = 0.d0
-
-    dt = 1.d99
-    umax = 0.d0
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -645,7 +645,7 @@ contains
        enddo
     enddo
 
-    umax = max(umax,ux,uy,uz)
+    call amrex_max(umax, max(ux,uy,uz))
 
     ux = ux / dx(1)
     uy = uy / dx(2)
@@ -657,9 +657,9 @@ contains
 
     ! advective constraint
     if (ux .ne. 0.d0 .or. uy .ne. 0.d0 .or. uz .ne. 0.d0) then
-       dt = cfl / max(ux,uy,uz)
+       call amrex_min(dt, cfl/max(ux,uy,uz))
     else if (spdx .ne. 0.d0 .and. spdy .ne. 0.d0 .and. spdz .ne. 0.d0) then
-       dt = cfl / max(spdx,spdy,spdz)
+       call amrex_min(dt, cfl/max(spdx,spdy,spdz))
     end if
 
     ! sound speed constraint
@@ -669,13 +669,13 @@ contains
        else
           dt_sound = cfl / max(spdx,spdy,spdz)
        end if
-       dt = min(dt,dt_sound)
+       call amrex_min(dt,dt_sound)
     end if
 
     ! force constraints
-    if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
-    if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
-    if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+    if (pforcex > eps) call amrex_min(dt,sqrt(2.0D0*dx(1)/pforcex))
+    if (pforcey > eps) call amrex_min(dt,sqrt(2.0D0*dx(2)/pforcey))
+    if (pforcez > eps) call amrex_min(dt,sqrt(2.0D0*dx(3)/pforcez))
 
     ! divU constraint
     if (use_divu_firstdt) then
@@ -720,7 +720,7 @@ contains
           enddo
        enddo
 
-       dt = min(dt,dt_divu)
+       call amrex_min(dt,dt_divu)
 
     end if
 
