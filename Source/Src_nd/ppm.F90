@@ -1918,6 +1918,8 @@ contains
     ! constant used in Colella 2008
     double precision, parameter :: C = 1.25d0
 
+    !$gpu
+
     n = comp
 
     !-------------------------------------------------------------------------

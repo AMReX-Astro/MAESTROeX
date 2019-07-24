@@ -274,8 +274,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(xbx)
-            mkutrans_3d(AMREX_INT_ANYD(tileBox.loVect()),
-                        AMREX_INT_ANYD(tileBox.hiVect()),
+            mkutrans_3d(AMREX_INT_ANYD(xbx.loVect()),
+                        AMREX_INT_ANYD(xbx.hiVect()),
                         lev, 1,
                         AMREX_INT_ANYD(domainBox.loVect()),
                         AMREX_INT_ANYD(domainBox.hiVect()),
@@ -308,8 +308,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                    2,2);
 
 #pragma gpu box(ybx)
-           mkutrans_3d(AMREX_INT_ANYD(tileBox.loVect()),
-                       AMREX_INT_ANYD(tileBox.hiVect()),
+           mkutrans_3d(AMREX_INT_ANYD(ybx.loVect()),
+                       AMREX_INT_ANYD(ybx.hiVect()),
                        lev, 2,
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),
@@ -342,8 +342,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                   3,3);
 
 #pragma gpu box(zbx)
-          mkutrans_3d(AMREX_INT_ANYD(tileBox.loVect()),
-                      AMREX_INT_ANYD(tileBox.hiVect()),
+          mkutrans_3d(AMREX_INT_ANYD(zbx.loVect()),
+                      AMREX_INT_ANYD(zbx.hiVect()),
                       lev, 3,
                       AMREX_INT_ANYD(domainBox.loVect()),
                       AMREX_INT_ANYD(domainBox.hiVect()),

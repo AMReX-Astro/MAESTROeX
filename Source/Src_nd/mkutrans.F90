@@ -417,6 +417,8 @@ contains
 
     double precision :: ulx, urx, vly, vry, wlz, wrz
 
+    !$gpu
+
     ! call bl_allocate(slopex,lo-1,hi+1,1)
     ! call bl_allocate(slopey,lo-1,hi+1,1)
     ! call bl_allocate(slopez,lo-1,hi+1,1)
@@ -442,7 +444,7 @@ contains
 
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
-             do i=lo(1),hi(1)+1
+             do i=lo(1),hi(1)
 
                 if (ppm_type .eq. 0) then
                    !$OMP PARALLEL DO PRIVATE(i,j,k)
@@ -462,8 +464,8 @@ contains
                 if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                    select case(phys_bc(1,1))
                    case (Inflow)
-                      ulx = utilde(lo(1)-1,j,k,1)
-                      urx = utilde(lo(1)-1,j,k,1)
+                      ulx = utilde(i-1,j,k,1)
+                      urx = utilde(i-1,j,k,1)
                    case (SlipWall, NoSlipWall, Symmetry)
                       ulx = ZERO
                       urx = ZERO
@@ -479,11 +481,11 @@ contains
                 end if
 
                 ! impose hi side bc's
-                if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+                if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                    select case(phys_bc(1,2))
                    case (Inflow)
-                      ulx = utilde(hi(1)+1,j,k,1)
-                      urx = utilde(hi(1)+1,j,k,1)
+                      ulx = utilde(i+1,j,k,1)
+                      urx = utilde(i+1,j,k,1)
                    case (SlipWall, NoSlipWall, Symmetry)
                       ulx = ZERO
                       urx = ZERO
@@ -530,7 +532,7 @@ contains
        !******************************************************************
 
        do k=lo(3),hi(3)
-          do j=lo(2),hi(2)+1
+          do j=lo(2),hi(2)
              do i=lo(1),hi(1)
 
                 if (ppm_type .eq. 0) then
@@ -553,8 +555,8 @@ contains
                 if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                    select case(phys_bc(2,1))
                    case (Inflow)
-                      vly = utilde(i,lo(2)-1,k,2)
-                      vry = utilde(i,lo(2)-1,k,2)
+                      vly = utilde(i,j-1,k,2)
+                      vry = utilde(i,j-1,k,2)
                    case (SlipWall, NoSlipWall, Symmetry)
                       vly = ZERO
                       vry = ZERO
@@ -570,11 +572,11 @@ contains
                 end if
 
                 ! impose hi side bc's
-                if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+                if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                    select case(phys_bc(2,2))
                    case (Inflow)
-                      vly = utilde(i,hi(2)+1,k,2)
-                      vry = utilde(i,hi(2)+1,k,2)
+                      vly = utilde(i,j+1,k,2)
+                      vry = utilde(i,j+1,k,2)
                    case (SlipWall, NoSlipWall, Symmetry)
                       vly = ZERO
                       vry = ZERO
@@ -616,7 +618,7 @@ contains
        ! create wtrans
        !******************************************************************
 
-       do k=lo(3),hi(3)+1
+       do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
 
@@ -636,8 +638,8 @@ contains
                 if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                    select case(phys_bc(3,1))
                    case (Inflow)
-                      wlz = utilde(i,j,lo(3)-1,3)
-                      wrz = utilde(i,j,lo(3)-1,3)
+                      wlz = utilde(i,j,k-1,3)
+                      wrz = utilde(i,j,k-1,3)
                    case (SlipWall, NoSlipWall, Symmetry)
                       wlz = ZERO
                       wrz = ZERO
@@ -653,11 +655,11 @@ contains
                 end if
 
                 ! impose hi side bc's
-                if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+                if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                    select case(phys_bc(3,2))
                    case (Inflow)
-                      wlz = utilde(i,j,hi(3)+1,3)
-                      wrz = utilde(i,j,hi(3)+1,3)
+                      wlz = utilde(i,j,k+1,3)
+                      wrz = utilde(i,j,k+1,3)
                    case (SlipWall, NoSlipWall, Symmetry)
                       wlz = ZERO
                       wrz = ZERO
