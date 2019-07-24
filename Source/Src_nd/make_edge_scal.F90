@@ -300,8 +300,8 @@ contains
     k = lo(3)
 
     if (ppm_type .eq. 0) then
-       call slopex_2d(s(:,:,k,comp:comp),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
-       call slopey_2d(s(:,:,k,comp:comp),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp))
+       call slopex_2d(s(:,:,k,comp:comp),slopex(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_s,1,adv_bc(:,:,bccomp:bccomp))
+       call slopey_2d(s(:,:,k,comp:comp),slopey(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_s,1,adv_bc(:,:,bccomp:bccomp))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
        call ppm_2d(ip_lo,ip_hi,s,s_lo,s_hi,nc_s,&
@@ -779,8 +779,8 @@ contains
     if (ppm_type .eq. 0) then
 
        do k = lo(3)-1,hi(3)+1
-          call slopex_2d(s(:,:,k,comp:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
-          call slopey_2d(s(:,:,k,comp:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
+          call slopex_2d(s(:,:,k,comp:),slopex(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_s,1,adv_bc(:,:,bccomp:))
+          call slopey_2d(s(:,:,k,comp:),slopey(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_s,1,adv_bc(:,:,bccomp:))
        end do
        call slopez_3d(s(:,:,:,comp:),slopez,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then

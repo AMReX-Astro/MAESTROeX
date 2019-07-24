@@ -200,8 +200,8 @@ contains
 
     ! for ppm 0, slopex = Ip, slopey = Im
 
-    s_lo(:) = lo
-    s_hi(:) = hi
+    s_lo(:) = lo-1
+    s_hi(:) = hi+1
 
     call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,1)
     call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,1)
@@ -214,10 +214,10 @@ contains
     k = lo(3)
 
     if (ppm_type .eq. 0) then
-       s_hi(1) = hi(1)-1
+       s_hi(1) = s_hi(1)-1
        call slopex_2d(utilde(:,:,k,1:1),slopex,domlo,domhi,s_lo,s_hi,ng_ut,1,adv_bc(:,:,1:1))
-       s_hi(:) = hi
-       s_hi(2) = hi(2)-1
+       s_hi(:) = hi+1
+       s_hi(2) = s_hi(2)-1
        call slopey_2d(utilde(:,:,k,2:2),slopey,domlo,domhi,s_lo,s_hi,ng_ut,1,adv_bc(:,:,2:2))
 
        ! call slopex_2d(utilde(:,:,k,1:1),Ip(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))

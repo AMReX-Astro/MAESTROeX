@@ -153,23 +153,22 @@ contains
     use meth_params_module, only : slope_order
 
     integer         , intent(in   ) :: domlo(:),domhi(:),lo(:),hi(:),ng,nvar
-    double precision, intent(in   ) ::   s(lo(1)-ng:, lo(2)-ng:,:)
-    double precision, intent(  out) :: slx(lo(1)- 1:, lo(2)- 1:,:)
+    double precision, intent(in   ) ::   s(lo(1)-ng+1:, lo(2)-ng+1:,:)
+    double precision, intent(  out) :: slx(lo(1):, lo(2):,:)
     integer         , intent(in)    :: adv_bc(:,:,:)
 
     ! Local variables
     integer :: i,j,comp
 
     double precision :: del,slim,sflag,dpls,dmin,ds
-    double precision :: dxscr(lo(1)-2:hi(1)+2,4)
     double precision :: dcen, dlim, dflag, dxl, dxr
 
     if (slope_order .eq. 0) then
 
        ! HERE DOING 1ST ORDER
        do comp=1,nvar
-          do j = lo(2)-1,hi(2)+1
-             do i = lo(1)-1,hi(1)+1
+          do j = lo(2),hi(2)
+             do i = lo(1),hi(1)
                 slx(i,j,comp) = ZERO
              enddo
           enddo
@@ -179,8 +178,8 @@ contains
 
        ! HERE DOING 2ND ORDER
        do comp=1,nvar
-          do j = lo(2)-1,hi(2)+1
-             do i = lo(1)-1,hi(1)+1
+          do j = lo(2),hi(2)
+             do i = lo(1),hi(1)
                 del = half*(s(i+1,j,comp) - s(i-1,j,comp))
                 dpls = two*(s(i+1,j,comp) - s(i  ,j,comp))
                 dmin = two*(s(i  ,j,comp) - s(i-1,j,comp))
@@ -192,9 +191,9 @@ contains
 
 
              if (adv_bc(1,1,comp) .eq. EXT_DIR  .or. adv_bc(1,1,comp) .eq. HOEXTRAP) then
-                if (i .eq. lo(1)-1 .and. lo(1) .eq. domlo(1)) then
+                if (i .eq. lo(1) .and. lo(1)+1 .eq. domlo(1)) then
                    slx(i,j,comp) = ZERO
-                elseif (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+               elseif (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
                    del = (s(i+1,j,comp)+three*s(i,j,comp)- &
                         four*s(i-1,j,comp) ) * third
                    dpls = two*(s(i+1,j,comp) - s(i,j,comp))
@@ -208,9 +207,9 @@ contains
 
 
              if (adv_bc(1,2,comp) .eq. EXT_DIR  .or. adv_bc(1,2,comp) .eq. HOEXTRAP) then
-                if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+                if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                    slx(i,j,comp) = ZERO
-                elseif (i .eq. hi(1) .and. hi(1) .eq. domhi(1)) then
+               elseif (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
                    del = -(s(i-1,j,comp)+three*s(i,j,comp)- &
                         four*s(i+1,j,comp) ) * third
                    dpls = two*(s(i,j,comp) - s(i-1,j,comp))
@@ -229,9 +228,8 @@ contains
 
        ! HERE DOING 4TH ORDER
        do comp=1,nvar
-          do j = lo(2)-1,hi(2)+1
-
-             do i = lo(1)-1,hi(1)+1
+          do j = lo(2),hi(2)
+             do i = lo(1),hi(1)
                 ! left
                 dcen = half*(s(i,j,comp)-s(i-2,j,comp))
                 dmin = two*(s(i-1,j,comp)-s(i-2,j,comp))
@@ -263,9 +261,9 @@ contains
 
 
                 if (adv_bc(1,1,comp) .eq. EXT_DIR  .or. adv_bc(1,1,comp) .eq. HOEXTRAP) then
-                   if (i .eq. lo(1)-1 .and. lo(1) .eq. domlo(1)) then
+                   if (i .eq. lo(1) .and. lo(1)+1 .eq. domlo(1)) then
                       slx(i,j,comp) = ZERO
-                   elseif (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+                  elseif (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
                       del = -sixteen/fifteen*s(i-1,j,comp) + half*s(i,j,comp) + &
                            two3rd*s(i+1,j,comp) - tenth*s(i+2,j,comp)
                       dmin = two*(s(i,j,comp)-s(i-1,j,comp))
@@ -274,7 +272,7 @@ contains
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
                       slx(i,j,comp)= sflag*min(slim,abs(del))
-                   elseif (i .eq. lo(1)+1 .and. lo(1) .eq. domlo(1)) then
+                  elseif (i .eq. lo(1)+2 .and. lo(1)+1 .eq. domlo(1)) then
                       ! Recalculate the slope at lo(1)+1 using the revised dxl
                       del = -sixteen/fifteen*s(i-2,j,comp) + half*s(i-1,j,comp) + &
                            two3rd*s(i,j,comp) - tenth*s(i+1,j,comp)
@@ -292,9 +290,9 @@ contains
 
 
                 if (adv_bc(1,2,comp) .eq. EXT_DIR  .or. adv_bc(1,2,comp) .eq. HOEXTRAP) then
-                   if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+                   if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                       slx(i,j,comp) = ZERO
-                   elseif (i .eq. hi(1) .and. hi(1) .eq. domhi(1)) then
+                  elseif (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
                       del = -( -sixteen/fifteen*s(i+1,j,comp) + half*s(i,j,comp) +  &
                            two3rd*s(i-1,j,comp) - tenth*s(i-2,j,comp) )
                       dmin = two*(s(i,j,comp)-s(i-1,j,comp))
@@ -303,7 +301,7 @@ contains
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
                       slx(i,j,comp)= sflag*min(slim,abs(del))
-                   elseif (i .eq. hi(1)-1 .and. hi(1) .eq. domhi(1)) then
+                  elseif (i .eq. hi(1)-2 .and. hi(1)-1 .eq. domhi(1)) then
                       ! Recalculate the slope at hi(1)-1 using the revised dxr
                       del = -( -sixteen/fifteen*s(i+2,j,comp) + half*s(i+1,j,comp) +  &
                            two3rd*s(i,j,comp) - tenth*s(i-1,j,comp) )
@@ -334,11 +332,10 @@ contains
 
     integer         , intent(in)  :: domlo(:),domhi(:),lo(:),hi(:),ng,nvar
     integer         , intent(in)  :: adv_bc(:,:,:)
-    double precision, intent( in) ::   s(lo(1)-ng:,lo(2)-ng:,:)
-    double precision, intent(out) :: sly(lo(1)- 1:,lo(2)- 1:,:)
+    double precision, intent( in) ::   s(lo(1)-ng+1:,lo(2)-ng+1:,:)
+    double precision, intent(out) :: sly(lo(1):,lo(2):,:)
 
     ! local
-    double precision :: dyscr(lo(2)-2:hi(2)+2,4)
     double precision :: dpls,dmin,ds,del,slim,sflag
     double precision :: dcen,dlim,dflag,dyl,dyr
 
@@ -348,8 +345,8 @@ contains
 
        ! HERE DOING 1ST ORDER
        do comp=1,nvar
-          do j = lo(2)-1,hi(2)+1
-             do i = lo(1)-1,hi(1)+1
+          do j = lo(2),hi(2)
+             do i = lo(1),hi(1)
                 sly(i,j,comp) = ZERO
              enddo
           enddo
@@ -359,8 +356,8 @@ contains
 
        ! HERE DOING 2ND ORDER
        do comp=1,nvar
-          do j = lo(2)-1,hi(2)+1
-             do i = lo(1)-1,hi(1)+1
+          do j = lo(2),hi(2)
+             do i = lo(1),hi(1)
 
                 del  = half*(s(i,j+1,comp) - s(i,j-1,comp))
                 dpls = two *(s(i,j+1,comp) - s(i,j  ,comp))
@@ -372,9 +369,9 @@ contains
 
 
                 if (adv_bc(2,1,comp) .eq. EXT_DIR .or. adv_bc(2,1,comp) .eq. HOEXTRAP) then
-                   if (j .eq. lo(2)-1 .and. lo(2) .eq. domlo(2)) then
+                   if (j .eq. lo(2) .and. lo(2)+1 .eq. domlo(2)) then
                       sly(i,j,comp) = ZERO
-                   elseif (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+                  elseif (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
                       del = (s(i,j+1,comp)+three*s(i,j,comp)- &
                            four*s(i,j-1,comp)) * third
                       dpls = two*(s(i,j+1,comp) - s(i,j,comp))
@@ -388,9 +385,9 @@ contains
 
 
                 if (adv_bc(2,2,comp) .eq. EXT_DIR .or. adv_bc(2,2,comp) .eq. HOEXTRAP) then
-                   if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+                   if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                       sly(i,j,comp) = ZERO
-                   elseif (j .eq. hi(2) .and. hi(2) .eq. domhi(2)) then
+                  elseif (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
                       del = -(s(i,j-1,comp)+three*s(i,j,comp)- &
                            four*s(i,j+1,comp)) * third
                       dpls = two*(s(i,j+1,comp) - s(i,j,comp))
@@ -410,8 +407,8 @@ contains
 
        ! HERE DOING 4TH ORDER
        do comp=1,nvar
-          do i = lo(1)-1,hi(1)+1
-             do j = lo(2)-1,hi(2)+1
+          do i = lo(1),hi(1)
+             do j = lo(2),hi(2)
                  ! left
                 dcen = half*(s(i,j,comp)-s(i,j-2,comp))
                 dmin = two*(s(i,j-1,comp)-s(i,j-2,comp))
@@ -438,25 +435,14 @@ contains
                 dlim  = merge(dlim,ZERO,dpls*dmin.gt.ZERO)
                 dflag = sign(one,dcen)
 
-             !    dyscr(j,cen) = dcen
-             !    dyscr(j,lim) = dlim
-             !    dyscr(j,flag) = dflag
-             ! enddo
-             !
-             ! do j = lo(2)-1,hi(2)+1
-
-                 ! dcen = dyscr(j,cen)
-                 ! dlim = dyscr(j,lim)
-                 ! dflag = dyscr(j,flag)
-
                 ds = two * two3rd * dcen - sixth * (dyr + dyl)
                 sly(i,j,comp) = dflag*min(abs(ds),dlim)
 
 
                 if (adv_bc(2,1,comp) .eq. EXT_DIR .or. adv_bc(2,1,comp) .eq. HOEXTRAP) then
-                   if (j .eq. lo(2)-1 .and. lo(2) .eq. domlo(2)) then
+                   if (j .eq. lo(2) .and. lo(2)+1 .eq. domlo(2)) then
                       sly(i,j,comp) = ZERO
-                   elseif (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+                  elseif (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
                       del = -sixteen/fifteen*s(i,j-1,comp) +  half*s(i,j,comp) +  &
                            two3rd*s(i,j+1,comp) - tenth*s(i,j+2,comp)
                       dmin = two*(s(i,j,comp)-s(i,j-1,comp))
@@ -465,7 +451,7 @@ contains
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
                       sly(i,j,comp)= sflag*min(slim,abs(del))
-                   elseif (j .eq. lo(2)+1 .and. lo(2) .eq. domlo(2)) then
+                  elseif (j .eq. lo(2)+2 .and. lo(2)+1 .eq. domlo(2)) then
 
                       ! Recalculate the slope at lo(2)+1 using the revised dyl
                       del = -sixteen/fifteen*s(i,j-2,comp) +  half*s(i,j-1,comp) +  &
@@ -483,9 +469,9 @@ contains
 
 
                 if (adv_bc(2,2,comp) .eq. EXT_DIR .or. adv_bc(2,2,comp) .eq. HOEXTRAP) then
-                   if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+                   if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                       sly(i,j,comp) = ZERO
-                   elseif (j .eq. hi(2) .and. hi(2) .eq. domhi(2)) then
+                  elseif (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
                       del = -( -sixteen/fifteen*s(i,j+1,comp) +  half*s(i,j,comp) + &
                            two3rd*s(i,j-1,comp) - tenth*s(i,j-2,comp) )
                       dmin = two*(s(i,j,comp)-s(i,j-1,comp))
@@ -494,7 +480,7 @@ contains
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
                       sly(i,j,comp)= sflag*min(slim,abs(del))
-                   elseif (j .eq. hi(2)-1 .and. hi(2) .eq. domhi(2)) then
+                  elseif (j .eq. hi(2)-2 .and. hi(2)-1 .eq. domhi(2)) then
                       ! Recalculate the slope at lo(2)+1 using the revised dyr
                       del = -( -sixteen/fifteen*s(i,j+2,comp) +  half*s(i,j+1,comp) + &
                            two3rd*s(i,j,comp) - tenth*s(i,j-1,comp) )

@@ -1170,6 +1170,23 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in slope.F90
+
+    void slopex_2d(const int* lo, const int* hi,
+                   const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
+                   const amrex::Real* slopex, const int* sl_lo, const int* sl_hi,
+                   const int* domlo, const int* domhi,
+                   const int comp, const int* adv_bc, const int nbccomp, const int bccomp);
+
+   void slopey_2d(const int* lo, const int* hi,
+                  const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
+                  const amrex::Real* slopey, const int* sl_lo, const int* sl_hi,
+                  const int* domlo, const int* domhi,
+                  const int comp, const int* adv_bc, const int nbccomp, const int bccomp);
+
+    //////////////////////
+
+    //////////////////////
     // in sponge.F90
     void init_sponge(const amrex::Real* rho0);
 

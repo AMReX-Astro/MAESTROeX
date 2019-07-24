@@ -280,8 +280,8 @@ contains
     hy = dx(2)
 
     if (ppm_type .eq. 0) then
-       call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,2,adv_bc)
-       call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,2,adv_bc)
+       call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_ut,2,adv_bc)
+       call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_ut,2,adv_bc)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
        call ppm_2d(ip_lo,ip_hi,utilde,ut_lo,ut_hi,nc_ut, &
@@ -761,8 +761,8 @@ contains
     if (ppm_type .eq. 0) then
        !$OMP PARALLEL DO PRIVATE(k)
        do k = lo(3)-1,hi(3)+1
-          call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
-          call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
+          call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_ut,3,adv_bc)
+          call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_ut,3,adv_bc)
        end do
        !$OMP END PARALLEL DO
        call slopez_3d(utilde,slopez,domlo,domhi,lo,hi,ng_ut,3,adv_bc)
