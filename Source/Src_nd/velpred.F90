@@ -280,8 +280,10 @@ contains
     hy = dx(2)
 
     if (ppm_type .eq. 0) then
-       call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_ut,2,adv_bc)
-       call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_ut,2,adv_bc)
+       call slopex_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                    slopex,ip_lo,ip_hi,2,domlo,domhi,2,adv_bc,AMREX_SPACEDIM,1)
+       call slopey_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                    slopey,ip_lo,ip_hi,2,domlo,domhi,2,adv_bc,AMREX_SPACEDIM,1)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
        call ppm_2d(ip_lo,ip_hi,utilde,ut_lo,ut_hi,nc_ut, &

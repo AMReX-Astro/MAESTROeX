@@ -147,21 +147,28 @@ contains
   end subroutine slopex_1d
 
 
-  subroutine slopex_2d(s,slx,domlo,domhi,lo,hi,ng,nvar,adv_bc)
+  subroutine slopex_2d(lo,hi,s,s_lo,s_hi,nc_s,slx,sl_lo,sl_hi,nc_sl, &
+       domlo,domhi,nvar,adv_bc,nbccomp,bccomp) bind(C,name="slopex_2d")
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
-    integer         , intent(in   ) :: domlo(:),domhi(:),lo(:),hi(:),ng,nvar
-    double precision, intent(in   ) ::   s(lo(1)-ng+1:, lo(2)-ng+1:,:)
-    double precision, intent(  out) :: slx(lo(1):, lo(2):,:)
-    integer         , intent(in)    :: adv_bc(:,:,:)
+    integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3)
+    integer         , intent(in   ) :: s_lo(3),s_hi(3),sl_lo(3),sl_hi(3)
+    integer  , value, intent(in   ) :: nc_s,nc_sl,nvar,nbccomp,bccomp
+    double precision, intent(in   ) ::   s(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent(  out) :: slx(sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
+    integer         , intent(in)    :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
 
     ! Local variables
-    integer :: i,j,comp
+    integer :: i,j,k,comp,bc_comp
 
     double precision :: del,slim,sflag,dpls,dmin,ds
     double precision :: dcen, dlim, dflag, dxl, dxr
+
+    !$gpu
+
+    k = s_lo(3)
 
     if (slope_order .eq. 0) then
 
@@ -169,7 +176,7 @@ contains
        do comp=1,nvar
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
-                slx(i,j,comp) = ZERO
+                slx(i,j,k,comp) = ZERO
              enddo
           enddo
        enddo
@@ -178,46 +185,47 @@ contains
 
        ! HERE DOING 2ND ORDER
        do comp=1,nvar
+          bc_comp = bccomp + comp-1
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
-                del = half*(s(i+1,j,comp) - s(i-1,j,comp))
-                dpls = two*(s(i+1,j,comp) - s(i  ,j,comp))
-                dmin = two*(s(i  ,j,comp) - s(i-1,j,comp))
+                del = half*(s(i+1,j,k,comp) - s(i-1,j,k,comp))
+                dpls = two*(s(i+1,j,k,comp) - s(i  ,j,k,comp))
+                dmin = two*(s(i  ,j,k,comp) - s(i-1,j,k,comp))
                 slim = min(abs(dpls), abs(dmin))
                 slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                 sflag = sign(one,del)
-                slx(i,j,comp)= sflag*min(slim,abs(del))
+                slx(i,j,k,comp)= sflag*min(slim,abs(del))
              enddo
 
 
-             if (adv_bc(1,1,comp) .eq. EXT_DIR  .or. adv_bc(1,1,comp) .eq. HOEXTRAP) then
+             if (adv_bc(1,1,bc_comp) .eq. EXT_DIR  .or. adv_bc(1,1,bc_comp) .eq. HOEXTRAP) then
                 if (i .eq. lo(1) .and. lo(1)+1 .eq. domlo(1)) then
-                   slx(i,j,comp) = ZERO
-               elseif (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
-                   del = (s(i+1,j,comp)+three*s(i,j,comp)- &
-                        four*s(i-1,j,comp) ) * third
-                   dpls = two*(s(i+1,j,comp) - s(i,j,comp))
-                   dmin = two*(s(i,j,comp) - s(i-1,j,comp))
+                   slx(i,j,k,comp) = ZERO
+                elseif (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
+                   del = (s(i+1,j,k,comp)+three*s(i,j,k,comp)- &
+                        four*s(i-1,j,k,comp) ) * third
+                   dpls = two*(s(i+1,j,k,comp) - s(i,j,k,comp))
+                   dmin = two*(s(i,j,k,comp) - s(i-1,j,k,comp))
                    slim = min(abs(dpls), abs(dmin))
                    slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                    sflag = sign(one,del)
-                   slx(i,j,comp)= sflag*min(slim,abs(del))
+                   slx(i,j,k,comp)= sflag*min(slim,abs(del))
                 endif
              endif
 
 
-             if (adv_bc(1,2,comp) .eq. EXT_DIR  .or. adv_bc(1,2,comp) .eq. HOEXTRAP) then
+             if (adv_bc(1,2,bc_comp) .eq. EXT_DIR  .or. adv_bc(1,2,bc_comp) .eq. HOEXTRAP) then
                 if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
-                   slx(i,j,comp) = ZERO
-               elseif (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
-                   del = -(s(i-1,j,comp)+three*s(i,j,comp)- &
-                        four*s(i+1,j,comp) ) * third
-                   dpls = two*(s(i,j,comp) - s(i-1,j,comp))
-                   dmin = two*(s(i+1,j,comp) - s(i,j,comp))
+                   slx(i,j,k,comp) = ZERO
+                elseif (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
+                   del = -(s(i-1,j,k,comp)+three*s(i,j,k,comp)- &
+                        four*s(i+1,j,k,comp) ) * third
+                   dpls = two*(s(i,j,k,comp) - s(i-1,j,k,comp))
+                   dmin = two*(s(i+1,j,k,comp) - s(i,j,k,comp))
                    slim = min(abs(dpls), abs(dmin))
                    slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                    sflag = sign(one,del)
-                   slx(i,j,comp)= sflag*min(slim,abs(del))
+                   slx(i,j,k,comp)= sflag*min(slim,abs(del))
                 endif
              endif
 
@@ -228,92 +236,93 @@ contains
 
        ! HERE DOING 4TH ORDER
        do comp=1,nvar
+          bc_comp = bccomp + comp-1
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
                 ! left
-                dcen = half*(s(i,j,comp)-s(i-2,j,comp))
-                dmin = two*(s(i-1,j,comp)-s(i-2,j,comp))
-                dpls = two*(s(i,j,comp)-s(i-1,j,comp))
+                dcen = half*(s(i,j,k,comp)-s(i-2,j,k,comp))
+                dmin = two*(s(i-1,j,k,comp)-s(i-2,j,k,comp))
+                dpls = two*(s(i,j,k,comp)-s(i-1,j,k,comp))
                 dlim = min(abs(dmin),abs(dpls))
                 dlim = merge(dlim,ZERO,dpls*dmin.gt.ZERO)
                 dflag = sign(one,dcen)
                 dxl = dflag*min(dlim, abs(dcen))
 
                 ! right
-                dcen = half*(s(i+2,j,comp)-s(i,j,comp))
-                dmin = two*(s(i+1,j,comp)-s(i,j,comp))
-                dpls = two*(s(i+2,j,comp)-s(i+1,j,comp))
+                dcen = half*(s(i+2,j,k,comp)-s(i,j,k,comp))
+                dmin = two*(s(i+1,j,k,comp)-s(i,j,k,comp))
+                dpls = two*(s(i+2,j,k,comp)-s(i+1,j,k,comp))
                 dlim = min(abs(dmin),abs(dpls))
                 dlim = merge(dlim,ZERO,dpls*dmin.gt.ZERO)
                 dflag = sign(one,dcen)
                 dxr = dflag*min(dlim, abs(dcen))
 
                 ! center
-                dcen = half*(s(i+1,j,comp)-s(i-1,j,comp))
-                dmin = two*(s(i  ,j,comp)-s(i-1,j,comp))
-                dpls = two*(s(i+1,j,comp)-s(i  ,j,comp))
+                dcen = half*(s(i+1,j,k,comp)-s(i-1,j,k,comp))
+                dmin = two*(s(i  ,j,k,comp)-s(i-1,j,k,comp))
+                dpls = two*(s(i+1,j,k,comp)-s(i  ,j,k,comp))
                 dlim = min(abs(dmin),abs(dpls))
                 dlim = merge(dlim,ZERO,dpls*dmin.gt.ZERO)
                 dflag = sign(one,dcen)
 
                 ds = two * two3rd * dcen - sixth * (dxr + dxl)
-                slx(i,j,comp) = dflag*min(abs(ds),dlim)
+                slx(i,j,k,comp) = dflag*min(abs(ds),dlim)
 
 
-                if (adv_bc(1,1,comp) .eq. EXT_DIR  .or. adv_bc(1,1,comp) .eq. HOEXTRAP) then
+                if (adv_bc(1,1,bc_comp) .eq. EXT_DIR  .or. adv_bc(1,1,bc_comp) .eq. HOEXTRAP) then
                    if (i .eq. lo(1) .and. lo(1)+1 .eq. domlo(1)) then
-                      slx(i,j,comp) = ZERO
-                  elseif (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
-                      del = -sixteen/fifteen*s(i-1,j,comp) + half*s(i,j,comp) + &
-                           two3rd*s(i+1,j,comp) - tenth*s(i+2,j,comp)
-                      dmin = two*(s(i,j,comp)-s(i-1,j,comp))
-                      dpls = two*(s(i+1,j,comp)-s(i,j,comp))
+                      slx(i,j,k,comp) = ZERO
+                   elseif (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
+                      del = -sixteen/fifteen*s(i-1,j,k,comp) + half*s(i,j,k,comp) + &
+                           two3rd*s(i+1,j,k,comp) - tenth*s(i+2,j,k,comp)
+                      dmin = two*(s(i,j,k,comp)-s(i-1,j,k,comp))
+                      dpls = two*(s(i+1,j,k,comp)-s(i,j,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
-                      slx(i,j,comp)= sflag*min(slim,abs(del))
-                  elseif (i .eq. lo(1)+2 .and. lo(1)+1 .eq. domlo(1)) then
+                      slx(i,j,k,comp)= sflag*min(slim,abs(del))
+                   elseif (i .eq. lo(1)+2 .and. lo(1)+1 .eq. domlo(1)) then
                       ! Recalculate the slope at lo(1)+1 using the revised dxl
-                      del = -sixteen/fifteen*s(i-2,j,comp) + half*s(i-1,j,comp) + &
-                           two3rd*s(i,j,comp) - tenth*s(i+1,j,comp)
-                      dmin = two*(s(i-1,j,comp)-s(i-2,j,comp))
-                      dpls = two*(s(i,j,comp)-s(i-1,j,comp))
+                      del = -sixteen/fifteen*s(i-2,j,k,comp) + half*s(i-1,j,k,comp) + &
+                           two3rd*s(i,j,k,comp) - tenth*s(i+1,j,k,comp)
+                      dmin = two*(s(i-1,j,k,comp)-s(i-2,j,k,comp))
+                      dpls = two*(s(i,j,k,comp)-s(i-1,j,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
                       dxl = sflag*min(slim,abs(del))
 
                       ds = two * two3rd * dcen - sixth * (dxr + dxl)
-                      slx(i,j,comp) = dflag*min(abs(ds),dlim)
+                      slx(i,j,k,comp) = dflag*min(abs(ds),dlim)
                    endif
                 endif
 
 
-                if (adv_bc(1,2,comp) .eq. EXT_DIR  .or. adv_bc(1,2,comp) .eq. HOEXTRAP) then
+                if (adv_bc(1,2,bc_comp) .eq. EXT_DIR  .or. adv_bc(1,2,bc_comp) .eq. HOEXTRAP) then
                    if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
-                      slx(i,j,comp) = ZERO
-                  elseif (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
-                      del = -( -sixteen/fifteen*s(i+1,j,comp) + half*s(i,j,comp) +  &
-                           two3rd*s(i-1,j,comp) - tenth*s(i-2,j,comp) )
-                      dmin = two*(s(i,j,comp)-s(i-1,j,comp))
-                      dpls = two*(s(i+1,j,comp)-s(i,j,comp))
+                      slx(i,j,k,comp) = ZERO
+                   elseif (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
+                      del = -( -sixteen/fifteen*s(i+1,j,k,comp) + half*s(i,j,k,comp) +  &
+                           two3rd*s(i-1,j,k,comp) - tenth*s(i-2,j,k,comp) )
+                      dmin = two*(s(i,j,k,comp)-s(i-1,j,k,comp))
+                      dpls = two*(s(i+1,j,k,comp)-s(i,j,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
-                      slx(i,j,comp)= sflag*min(slim,abs(del))
-                  elseif (i .eq. hi(1)-2 .and. hi(1)-1 .eq. domhi(1)) then
+                      slx(i,j,k,comp)= sflag*min(slim,abs(del))
+                   elseif (i .eq. hi(1)-2 .and. hi(1)-1 .eq. domhi(1)) then
                       ! Recalculate the slope at hi(1)-1 using the revised dxr
-                      del = -( -sixteen/fifteen*s(i+2,j,comp) + half*s(i+1,j,comp) +  &
-                           two3rd*s(i,j,comp) - tenth*s(i-1,j,comp) )
-                      dmin = two*(s(i+1,j,comp)-s(i,j,comp))
-                      dpls = two*(s(i+2,j,comp)-s(i+1,j,comp))
+                      del = -( -sixteen/fifteen*s(i+2,j,k,comp) + half*s(i+1,j,k,comp) +  &
+                           two3rd*s(i,j,k,comp) - tenth*s(i-1,j,k,comp) )
+                      dmin = two*(s(i+1,j,k,comp)-s(i,j,k,comp))
+                      dpls = two*(s(i+2,j,k,comp)-s(i+1,j,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
                       dxr = sflag*min(slim,abs(del))
 
                       ds = two * two3rd * dcen - sixth * (dxl + dxr)
-                      slx(i,j,comp) = dflag*min(abs(ds),dlim)
+                      slx(i,j,k,comp) = dflag*min(abs(ds),dlim)
                    endif
                 endif
              enddo
@@ -325,21 +334,28 @@ contains
 
   end subroutine slopex_2d
 
-  subroutine slopey_2d(s,sly,domlo,domhi,lo,hi,ng,nvar,adv_bc)
+  subroutine slopey_2d(lo,hi,s,s_lo,s_hi,nc_s,sly,sl_lo,sl_hi,nc_sl, &
+      domlo,domhi,nvar,adv_bc,nbccomp,bccomp)  bind(C,name="slopey_2d")
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
-    integer         , intent(in)  :: domlo(:),domhi(:),lo(:),hi(:),ng,nvar
-    integer         , intent(in)  :: adv_bc(:,:,:)
-    double precision, intent( in) ::   s(lo(1)-ng+1:,lo(2)-ng+1:,:)
-    double precision, intent(out) :: sly(lo(1):,lo(2):,:)
+    integer         , intent(in)  :: domlo(3),domhi(3),lo(3),hi(3)
+    integer         , intent(in   ) :: s_lo(3),s_hi(3),sl_lo(3),sl_hi(3)
+    integer  , value, intent(in   ) :: nc_s,nc_sl,nvar,nbccomp,bccomp
+    double precision, intent(in   ) ::   s(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent(  out) :: sly(sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
+    integer         , intent(in)  :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
 
     ! local
     double precision :: dpls,dmin,ds,del,slim,sflag
     double precision :: dcen,dlim,dflag,dyl,dyr
 
-    integer :: i,j,comp
+    integer :: i,j,k,comp,bc_comp
+
+    !$gpu
+
+    k = s_lo(3)
 
     if (slope_order .eq. 0) then
 
@@ -347,7 +363,7 @@ contains
        do comp=1,nvar
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
-                sly(i,j,comp) = ZERO
+                sly(i,j,k,comp) = ZERO
              enddo
           enddo
        enddo
@@ -356,46 +372,47 @@ contains
 
        ! HERE DOING 2ND ORDER
        do comp=1,nvar
+          bc_comp = bccomp + comp-1
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
 
-                del  = half*(s(i,j+1,comp) - s(i,j-1,comp))
-                dpls = two *(s(i,j+1,comp) - s(i,j  ,comp))
-                dmin = two *(s(i,j  ,comp) - s(i,j-1,comp))
+                del  = half*(s(i,j+1,k,comp) - s(i,j-1,k,comp))
+                dpls = two *(s(i,j+1,k,comp) - s(i,j  ,k,comp))
+                dmin = two *(s(i,j  ,k,comp) - s(i,j-1,k,comp))
                 slim = min(abs(dpls),abs(dmin))
                 slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                 sflag = sign(one,del)
-                sly(i,j,comp)= sflag*min(slim,abs(del))
+                sly(i,j,k,comp)= sflag*min(slim,abs(del))
 
 
-                if (adv_bc(2,1,comp) .eq. EXT_DIR .or. adv_bc(2,1,comp) .eq. HOEXTRAP) then
+                if (adv_bc(2,1,bc_comp) .eq. EXT_DIR .or. adv_bc(2,1,bc_comp) .eq. HOEXTRAP) then
                    if (j .eq. lo(2) .and. lo(2)+1 .eq. domlo(2)) then
-                      sly(i,j,comp) = ZERO
-                  elseif (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
-                      del = (s(i,j+1,comp)+three*s(i,j,comp)- &
-                           four*s(i,j-1,comp)) * third
-                      dpls = two*(s(i,j+1,comp) - s(i,j,comp))
-                      dmin = two*(s(i,j,comp) - s(i,j-1,comp))
+                      sly(i,j,k,comp) = ZERO
+                   elseif (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
+                      del = (s(i,j+1,k,comp)+three*s(i,j,k,comp)- &
+                           four*s(i,j-1,k,comp)) * third
+                      dpls = two*(s(i,j+1,k,comp) - s(i,j,k,comp))
+                      dmin = two*(s(i,j,k,comp) - s(i,j-1,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
-                      sly(i,j,comp)= sflag*min(slim,abs(del))
+                      sly(i,j,k,comp)= sflag*min(slim,abs(del))
                    endif
                 endif
 
 
-                if (adv_bc(2,2,comp) .eq. EXT_DIR .or. adv_bc(2,2,comp) .eq. HOEXTRAP) then
+                if (adv_bc(2,2,bc_comp) .eq. EXT_DIR .or. adv_bc(2,2,bc_comp) .eq. HOEXTRAP) then
                    if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
-                      sly(i,j,comp) = ZERO
-                  elseif (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
-                      del = -(s(i,j-1,comp)+three*s(i,j,comp)- &
-                           four*s(i,j+1,comp)) * third
-                      dpls = two*(s(i,j+1,comp) - s(i,j,comp))
-                      dmin = two*(s(i,j,comp) - s(i,j-1,comp))
+                      sly(i,j,k,comp) = ZERO
+                   elseif (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
+                      del = -(s(i,j-1,k,comp)+three*s(i,j,k,comp)- &
+                           four*s(i,j+1,k,comp)) * third
+                      dpls = two*(s(i,j+1,k,comp) - s(i,j,k,comp))
+                      dmin = two*(s(i,j,k,comp) - s(i,j-1,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
-                      sly(i,j,comp)= sflag*min(slim,abs(del))
+                      sly(i,j,k,comp)= sflag*min(slim,abs(del))
 
                    endif
                 endif
@@ -407,91 +424,92 @@ contains
 
        ! HERE DOING 4TH ORDER
        do comp=1,nvar
+          bc_comp = bccomp + comp-1
           do i = lo(1),hi(1)
              do j = lo(2),hi(2)
-                 ! left
-                dcen = half*(s(i,j,comp)-s(i,j-2,comp))
-                dmin = two*(s(i,j-1,comp)-s(i,j-2,comp))
-                dpls = two*(s(i,j,comp)-s(i,j-1,comp))
+                ! left
+                dcen = half*(s(i,j,k,comp)-s(i,j-2,k,comp))
+                dmin = two*(s(i,j-1,k,comp)-s(i,j-2,k,comp))
+                dpls = two*(s(i,j,k,comp)-s(i,j-1,k,comp))
                 dlim  = min(abs(dmin),abs(dpls))
                 dlim  = merge(dlim,ZERO,dpls*dmin.gt.ZERO)
                 dflag = sign(one,dcen)
                 dyl = dflag*min(dlim,abs(dcen))
 
                 ! right
-                dcen = half*(s(i,j+2,comp)-s(i,j,comp))
-                dmin = two*(s(i,j+1,comp)-s(i,j,comp))
-                dpls = two*(s(i,j+2,comp)-s(i,j+1,comp))
+                dcen = half*(s(i,j+2,k,comp)-s(i,j,k,comp))
+                dmin = two*(s(i,j+1,k,comp)-s(i,j,k,comp))
+                dpls = two*(s(i,j+2,k,comp)-s(i,j+1,k,comp))
                 dlim  = min(abs(dmin),abs(dpls))
                 dlim  = merge(dlim,ZERO,dpls*dmin.gt.ZERO)
                 dflag = sign(one,dcen)
                 dyr = dflag*min(dlim,abs(dcen))
 
                 ! center
-                dcen = half*(s(i,j+1,comp)-s(i,j-1,comp))
-                dmin = two*(s(i,j  ,comp)-s(i,j-1,comp))
-                dpls = two*(s(i,j+1,comp)-s(i,j  ,comp))
+                dcen = half*(s(i,j+1,k,comp)-s(i,j-1,k,comp))
+                dmin = two*(s(i,j  ,k,comp)-s(i,j-1,k,comp))
+                dpls = two*(s(i,j+1,k,comp)-s(i,j  ,k,comp))
                 dlim  = min(abs(dmin),abs(dpls))
                 dlim  = merge(dlim,ZERO,dpls*dmin.gt.ZERO)
                 dflag = sign(one,dcen)
 
                 ds = two * two3rd * dcen - sixth * (dyr + dyl)
-                sly(i,j,comp) = dflag*min(abs(ds),dlim)
+                sly(i,j,k,comp) = dflag*min(abs(ds),dlim)
 
 
-                if (adv_bc(2,1,comp) .eq. EXT_DIR .or. adv_bc(2,1,comp) .eq. HOEXTRAP) then
+                if (adv_bc(2,1,bc_comp) .eq. EXT_DIR .or. adv_bc(2,1,bc_comp) .eq. HOEXTRAP) then
                    if (j .eq. lo(2) .and. lo(2)+1 .eq. domlo(2)) then
-                      sly(i,j,comp) = ZERO
-                  elseif (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
-                      del = -sixteen/fifteen*s(i,j-1,comp) +  half*s(i,j,comp) +  &
-                           two3rd*s(i,j+1,comp) - tenth*s(i,j+2,comp)
-                      dmin = two*(s(i,j,comp)-s(i,j-1,comp))
-                      dpls = two*(s(i,j+1,comp)-s(i,j,comp))
+                      sly(i,j,k,comp) = ZERO
+                   elseif (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
+                      del = -sixteen/fifteen*s(i,j-1,k,comp) +  half*s(i,j,k,comp) +  &
+                           two3rd*s(i,j+1,k,comp) - tenth*s(i,j+2,k,comp)
+                      dmin = two*(s(i,j,k,comp)-s(i,j-1,k,comp))
+                      dpls = two*(s(i,j+1,k,comp)-s(i,j,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
-                      sly(i,j,comp)= sflag*min(slim,abs(del))
-                  elseif (j .eq. lo(2)+2 .and. lo(2)+1 .eq. domlo(2)) then
+                      sly(i,j,k,comp)= sflag*min(slim,abs(del))
+                   elseif (j .eq. lo(2)+2 .and. lo(2)+1 .eq. domlo(2)) then
 
                       ! Recalculate the slope at lo(2)+1 using the revised dyl
-                      del = -sixteen/fifteen*s(i,j-2,comp) +  half*s(i,j-1,comp) +  &
-                           two3rd*s(i,j,comp) - tenth*s(i,j+1,comp)
-                      dmin = two*(s(i,j-1,comp)-s(i,j-2,comp))
-                      dpls = two*(s(i,j,comp)-s(i,j-1,comp))
+                      del = -sixteen/fifteen*s(i,j-2,k,comp) +  half*s(i,j-1,k,comp) +  &
+                           two3rd*s(i,j,k,comp) - tenth*s(i,j+1,k,comp)
+                      dmin = two*(s(i,j-1,k,comp)-s(i,j-2,k,comp))
+                      dpls = two*(s(i,j,k,comp)-s(i,j-1,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
                       dyl = sflag*min(slim,abs(del))
                       ds = two * two3rd * dcen - sixth * (dyr + dyl)
-                      sly(i,j,comp) = dflag*min(abs(ds),dlim)
+                      sly(i,j,k,comp) = dflag*min(abs(ds),dlim)
                    endif
                 endif
 
 
-                if (adv_bc(2,2,comp) .eq. EXT_DIR .or. adv_bc(2,2,comp) .eq. HOEXTRAP) then
+                if (adv_bc(2,2,bc_comp) .eq. EXT_DIR .or. adv_bc(2,2,bc_comp) .eq. HOEXTRAP) then
                    if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
-                      sly(i,j,comp) = ZERO
-                  elseif (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
-                      del = -( -sixteen/fifteen*s(i,j+1,comp) +  half*s(i,j,comp) + &
-                           two3rd*s(i,j-1,comp) - tenth*s(i,j-2,comp) )
-                      dmin = two*(s(i,j,comp)-s(i,j-1,comp))
-                      dpls = two*(s(i,j+1,comp)-s(i,j,comp))
+                      sly(i,j,k,comp) = ZERO
+                   elseif (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
+                      del = -( -sixteen/fifteen*s(i,j+1,k,comp) +  half*s(i,j,k,comp) + &
+                           two3rd*s(i,j-1,k,comp) - tenth*s(i,j-2,k,comp) )
+                      dmin = two*(s(i,j,k,comp)-s(i,j-1,k,comp))
+                      dpls = two*(s(i,j+1,k,comp)-s(i,j,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
-                      sly(i,j,comp)= sflag*min(slim,abs(del))
-                  elseif (j .eq. hi(2)-2 .and. hi(2)-1 .eq. domhi(2)) then
+                      sly(i,j,k,comp)= sflag*min(slim,abs(del))
+                   elseif (j .eq. hi(2)-2 .and. hi(2)-1 .eq. domhi(2)) then
                       ! Recalculate the slope at lo(2)+1 using the revised dyr
-                      del = -( -sixteen/fifteen*s(i,j+2,comp) +  half*s(i,j+1,comp) + &
-                           two3rd*s(i,j,comp) - tenth*s(i,j-1,comp) )
-                      dmin = two*(s(i,j+1,comp)-s(i,j,comp))
-                      dpls = two*(s(i,j+2,comp)-s(i,j+1,comp))
+                      del = -( -sixteen/fifteen*s(i,j+2,k,comp) +  half*s(i,j+1,k,comp) + &
+                           two3rd*s(i,j,k,comp) - tenth*s(i,j-1,k,comp) )
+                      dmin = two*(s(i,j+1,k,comp)-s(i,j,k,comp))
+                      dpls = two*(s(i,j+2,k,comp)-s(i,j+1,k,comp))
                       slim = min(abs(dpls), abs(dmin))
                       slim = merge(slim, ZERO, dpls*dmin.gt.ZERO)
                       sflag = sign(one,del)
                       dyr = sflag*min(slim,abs(del))
                       ds = two * two3rd * dcen - sixth * (dyl + dyr)
-                      sly(i,j,comp) = dflag*min(abs(ds),dlim)
+                      sly(i,j,k,comp) = dflag*min(abs(ds),dlim)
                    endif
                 endif
 

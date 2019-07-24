@@ -270,8 +270,8 @@ contains
     allocate(Ipf(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
     allocate(Imf(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
 
-    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
+    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1))
+    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1))
 
     ! Normal predictor states.
     ! Allocated from lo:hi+1 in the normal direction
@@ -300,8 +300,10 @@ contains
     k = lo(3)
 
     if (ppm_type .eq. 0) then
-       call slopex_2d(s(:,:,k,comp:comp),slopex(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_s,1,adv_bc(:,:,bccomp:bccomp))
-       call slopey_2d(s(:,:,k,comp:comp),slopey(:,:,k,:),domlo,domhi,lo-1,hi+1,ng_s,1,adv_bc(:,:,bccomp:bccomp))
+       call slopex_2d(lo-1,hi+1,s(:,:,:,comp:comp),s_lo,s_hi,1, &
+                slopex(:,:,:,1:1),ip_lo,ip_hi,1,domlo,domhi,1,adv_bc,nbccomp,bccomp)
+       call slopey_2d(lo-1,hi+1,s(:,:,:,comp:comp),s_lo,s_hi,1, &
+                slopey(:,:,:,1:1),ip_lo,ip_hi,1,domlo,domhi,1,adv_bc,nbccomp,bccomp)
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
        call ppm_2d(ip_lo,ip_hi,s,s_lo,s_hi,nc_s,&

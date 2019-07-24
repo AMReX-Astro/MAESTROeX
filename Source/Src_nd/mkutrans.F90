@@ -191,20 +191,9 @@ contains
 
     logical :: test
 
-    double precision, pointer :: slopex(:,:,:)
-    double precision, pointer :: slopey(:,:,:)
-
-    integer :: s_lo(3), s_hi(3)
-
     !$gpu
 
     ! for ppm 0, slopex = Ip, slopey = Im
-
-    s_lo(:) = lo-1
-    s_hi(:) = hi+1
-
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,1)
-    call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,1,1)
 
     dt2 = HALF*dt
 
@@ -213,19 +202,8 @@ contains
 
     k = lo(3)
 
-    if (ppm_type .eq. 0) then
-       s_hi(1) = s_hi(1)-1
-       call slopex_2d(utilde(:,:,k,1:1),slopex,domlo,domhi,s_lo,s_hi,ng_ut,1,adv_bc(:,:,1:1))
-       s_hi(:) = hi+1
-       s_hi(2) = s_hi(2)-1
-       call slopey_2d(utilde(:,:,k,2:2),slopey,domlo,domhi,s_lo,s_hi,ng_ut,1,adv_bc(:,:,2:2))
-
-       ! call slopex_2d(utilde(:,:,k,1:1),Ip(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-       ! call slopey_2d(utilde(:,:,k,2:2),Im(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
-
-    end if
-
     if (idir == 1) then
+
 
 
        !******************************************************************
@@ -236,18 +214,15 @@ contains
           do i=lo(1),hi(1)
 
              if (ppm_type .eq. 0) then
-                ! extrapolate to edges
-                ulx = utilde(i-1,j,k,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,k,1)))*slopex(i-1,j,1)
-                urx = utilde(i  ,j,k,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,k,1)))*slopex(i  ,j,1)
 
-                ! ulx = utilde(i-1,j,k,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,k,1)))*Ip(i-1,j,k,1)
-                ! urx = utilde(i  ,j,k,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,k,1)))*Ip(i  ,j,k,1)
+                ulx = utilde(i-1,j,k,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,k,1)))*Ip(i-1,j,k,1)
+                urx = utilde(i  ,j,k,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,k,1)))*Ip(i  ,j,k,1)
+
              else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                 ! extrapolate to edges
                 ulx = Ip(i-1,j,k,1)
                 urx = Im(i  ,j,k,1)
              end if
-             ! end do
 
              ! impose lo i side bc's
              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
@@ -309,12 +284,8 @@ contains
 
              if (ppm_type .eq. 0) then
                 ! ! extrapolate to edges
-                vly = utilde(i,j-1,k,2) + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,k,2)))*slopey(i,j-1,1)
-                vry = utilde(i,j  ,k,2) - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,k,2)))*slopey(i,j  ,1)
-
-                ! extrapolate to edges
-                ! vly = utilde(i,j-1,k,2) + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,k,2)))*Im(i,j-1,k,1)
-                ! vry = utilde(i,j  ,k,2) - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,k,2)))*Im(i,j  ,k,1)
+                vly = utilde(i,j-1,k,2) + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,k,2)))*Im(i,j-1,k,1)
+                vry = utilde(i,j  ,k,2) - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,k,2)))*Im(i,j  ,k,1)
 
              else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                 ! extrapolate to edges
@@ -370,11 +341,7 @@ contains
              vtrans(i,j,k) = merge(ZERO,vtrans(i,j,k),test)
           enddo
        enddo
-
     endif
-
-    call bl_deallocate(slopex)
-    call bl_deallocate(slopey)
 
   end subroutine mkutrans_2d
 #endif
