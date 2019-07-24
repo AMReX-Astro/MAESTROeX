@@ -258,6 +258,15 @@ Maestro::FirstDt ()
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
                  w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
 
+#if (AMREX_SPACEDIM == 3)
+    // build and initialize grad_p0 for spherical case
+    Vector<MultiFab> grad_p0(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        grad_p0[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	grad_p0[lev].setVal(0.);
+    }
+#endif
+    
     Real umax = 0.;
 
     Real dt_lev = 1.e99;
@@ -270,6 +279,7 @@ Maestro::FirstDt ()
         const MultiFab& sold_mf = sold[lev];
         const MultiFab& vel_force_mf = vel_force[lev];
         const MultiFab& S_cc_old_mf = S_cc_old[lev];
+	MultiFab& grad_p0_mf = grad_p0[lev];
         const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -321,6 +331,7 @@ Maestro::FirstDt ()
                              BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
                              p0_old.dataPtr(),
                              gamma1bar_old.dataPtr(),
+			     BL_TO_FORTRAN_ANYD(grad_p0_mf[mfi]), 
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                              BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 #else

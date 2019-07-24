@@ -563,6 +563,7 @@ contains
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
        p0, gamma1bar, &
+       gp0_cart, g_lo, g_hi, &
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
 
@@ -575,10 +576,12 @@ contains
     integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+    double precision, intent(inout) :: gp0_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),3)
     double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
@@ -592,7 +595,7 @@ contains
     double precision :: gp_dot_u,gamma1bar_p_avg,eps,dt_divu,dt_sound,denom,rho_min
     integer          :: i,j,k,r
 
-    double precision, pointer :: gp0_cart(:,:,:,:)
+    !double precision, pointer :: gp0_cart(:,:,:,:)
 
     double precision :: gp0(0:max_radial_level,0:nr_fine)
 
@@ -601,7 +604,7 @@ contains
 
     !$gpu
     
-    call bl_allocate(gp0_cart,lo,hi,3)
+    !call bl_allocate(gp0_cart,lo,hi,3)
 
     eps = 1.0d-8
 
@@ -698,7 +701,7 @@ contains
        gp0(0,nr_fine) = gp0(0,nr_fine-1)
        gp0(0,      0) = gp0(0,        1)
 
-       call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,lo,hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc, &
+       call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,g_lo,g_hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
        !REDUCTION(MIN : dt_divu)
@@ -724,7 +727,7 @@ contains
 
     end if
 
-    call bl_deallocate(gp0_cart)
+    !call bl_deallocate(gp0_cart)
 
   end subroutine firstdt_sphr
 
