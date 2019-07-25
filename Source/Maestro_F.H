@@ -1187,6 +1187,13 @@ extern "C"
                   const int* domlo, const int* domhi,
                   const int nvar, const int* adv_bc, const int nbccomp, const int bccomp);
 
+    void slopez_3d(const int* lo, const int* hi,
+                  const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
+                  const amrex::Real* slopez, const int* sl_lo, const int* sl_hi,
+                  const int nc_sl,
+                  const int* domlo, const int* domhi,
+                  const int nvar, const int* adv_bc, const int nbccomp, const int bccomp);
+
     //////////////////////
 
     //////////////////////

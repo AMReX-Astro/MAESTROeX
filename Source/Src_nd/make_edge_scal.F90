@@ -781,15 +781,15 @@ contains
     if (ppm_type .eq. 0) then
 
           call slopex_2d(lo-1,hi+1,s(:,:,:,comp:comp),s_lo,s_hi,1, &
-                        slopex(:,:,:,1:1),lo-1,hi+1,1,domlo,domhi,1, &
+                        slopex,lo-1,hi+1,1,domlo,domhi,1, &
                         adv_bc,nbccomp,bccomp)
           call slopey_2d(lo-1,hi+1,s(:,:,:,comp:comp),s_lo,s_hi,1, &
-                        slopey(:,:,:,1:1),lo-1,hi+1,1,domlo,domhi,1, &
+                        slopey,lo-1,hi+1,1,domlo,domhi,1, &
                         adv_bc,nbccomp,bccomp)
 
-       call slopez_3d(s(:,:,:,comp:comp),1, &
-                       slopez,1, &
-                       domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:bccomp),1)
+       call slopez_3d(lo,hi,s(:,:,:,comp:comp),s_lo,s_hi,1, &
+                       slopez,lo-1,hi+1,1, &
+                       domlo,domhi,1,adv_bc,nbccomp,bccomp)
 
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_3d(lo-1,hi+1,s,s_lo,s_hi,nc_s, &

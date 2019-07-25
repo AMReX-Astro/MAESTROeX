@@ -531,16 +531,19 @@ contains
   end subroutine slopey_2d
 
 
-  subroutine slopez_3d(s,nc_s,slz,nc_sl,domlo,domhi,lo,hi,ng,nvar,adv_bc,nbccomp)
+  subroutine slopez_3d(lo,hi,s,s_lo,s_hi,nc_s,slz,sl_lo,sl_hi,nc_sl, &
+                       domlo,domhi,nvar,adv_bc,nbccomp,bccomp) &
+                       bind(C, name="slopez_3d")
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
     integer         , intent(in)  :: domlo(3),domhi(3),lo(3),hi(3)
-    integer         , intent(in)  :: ng,nvar,nbccomp,nc_s,nc_sl
+    integer         , intent(in)  :: s_lo(3),s_hi(3),sl_lo(3),sl_hi(3)
+    integer  , value, intent(in)  :: nvar,nbccomp,bccomp,nc_s,nc_sl
+    double precision, intent(in   ) ::   s(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
+    double precision, intent(  out) :: slz(sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
     integer         , intent(in)  :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
-    double precision, intent( in) ::   s(lo(1)-ng:hi(1)+ng,lo(2)-ng:hi(2)+ng,lo(3)-ng:hi(3)+ng,nc_s)
-    double precision, intent(out) :: slz(lo(1)- 1:hi(1)+1,lo(2)- 1:hi(2)+1,lo(3)- 1:hi(3)+1,nc_sl)
 
     double precision :: dpls,dmin,ds,del,slim,sflag
     double precision :: dcen,dlim,dflag,dzl,dzr
@@ -663,7 +666,7 @@ contains
                          slz(i,j,k,comp)= sflag*min(slim,abs(del))
 
                       elseif (k .eq. lo(3)+1 .and. lo(3) .eq. domlo(3)) then
-                         ! Recalculate the slope at lo(2)+1 using the revised dzscr(lo(2),fromm)
+                         ! Recalculate the slope at lo(2)+1 using the revised dzl
                          del = -sixteen/fifteen*s(i,j,k-2,comp) +  half*s(i,j,k-1,comp) +  &
                               two3rd*s(i,j,k,comp) - tenth*s(i,j,k+1,comp)
                          dmin = two*(s(i,j,k-1,comp)-s(i,j,k-2,comp))
@@ -693,7 +696,7 @@ contains
                          slz(i,j,k,comp)= sflag*min(slim,abs(del))
 
                       elseif (k .eq. hi(3)-1 .and. hi(3) .eq. domhi(3)) then
-                         ! Recalculate the slope at lo(3)+1 using the revised dzscr(lo(3),fromm)
+                         ! Recalculate the slope at lo(3)+1 using the revised dzr
                          del = -( -sixteen/fifteen*s(i,j,k+2,comp) +  half*s(i,j,k+1,comp) + &
                               two3rd*s(i,j,k,comp) - tenth*s(i,j,k-1,comp) )
                          dmin = two*(s(i,j,k+1,comp)-s(i,j,k,comp))
