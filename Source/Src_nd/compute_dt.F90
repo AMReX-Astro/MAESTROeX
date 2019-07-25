@@ -391,7 +391,9 @@ contains
        divu,  d_lo, d_hi, &
        p0, gamma1bar) bind (C,name="firstdt")
 
-    integer         , intent(in   ) :: lev
+    use amrex_fort_module, only: amrex_min, amrex_max
+    
+    integer, value  , intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
@@ -414,6 +416,8 @@ contains
     integer :: pt_index(3)
     type(eos_t) :: eos_state
 
+    !$gpu
+    
     eps = 1.d-8
 
     rho_min = 1.d-20
@@ -427,9 +431,6 @@ contains
     ux      = 0.d0
     uy      = 0.d0
     uz      = 0.d0
-
-    dt = 1.d99
-    umax = 0.d0
 
     ! loop over the data
     do k = lo(3),hi(3)
@@ -464,7 +465,7 @@ contains
        enddo
     enddo
 
-    umax = max(umax,ux,uy,uz)
+    call amrex_max(umax, max(ux,uy,uz))
 
     ux = ux / dx(1)
     spdx = spdx / dx(1)
@@ -480,9 +481,9 @@ contains
     ! use advective constraint unless velocities are zero everywhere
     ! in which case we use the sound speed
     if (ux .ne. 0.d0 .or. uy .ne. 0.d0 .or. uz .ne. 0.d0) then
-       dt = cfl / max(ux,uy,uz)
+       call amrex_min(dt, cfl / max(ux,uy,uz))
     else if (spdx .ne. 0.d0 .or. spdy .ne. 0.d0 .or. spdz .ne. 0.d0) then
-       dt = cfl / max(spdx,spdy,spdz)
+       call amrex_min(dt, cfl / max(spdx,spdy,spdz))
     end if
 
     ! sound speed constraint
@@ -492,14 +493,14 @@ contains
        else
           dt_sound = cfl / max(spdx,spdy,spdz)
        end if
-       dt = min(dt,dt_sound)
+       call amrex_min(dt,dt_sound)
     end if
 
     ! force constraints
-    if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
-    if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
+    if (pforcex > eps) call amrex_min(dt,sqrt(2.0D0*dx(1)/pforcex))
+    if (pforcey > eps) call amrex_min(dt,sqrt(2.0D0*dx(2)/pforcey))
 #if (AMREX_SPACEDIM == 3)
-    if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+    if (pforcez > eps) call amrex_min(dt,sqrt(2.0D0*dx(3)/pforcez))
 #endif
 
     ! divU constraint
@@ -550,7 +551,7 @@ contains
 
 #endif
 
-       dt = min(dt,dt_divu)
+       call amrex_min(dt,dt_divu)
 
     end if
 
@@ -562,9 +563,11 @@ contains
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
        p0, gamma1bar, &
+       gp0_cart, g_lo, g_hi, &
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
 
+    use amrex_fort_module, only: amrex_min, amrex_max
 
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -573,10 +576,12 @@ contains
     integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
+    double precision, intent(inout) :: gp0_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),3)
     double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
@@ -590,14 +595,16 @@ contains
     double precision :: gp_dot_u,gamma1bar_p_avg,eps,dt_divu,dt_sound,denom,rho_min
     integer          :: i,j,k,r
 
-    double precision, pointer :: gp0_cart(:,:,:,:)
+    !double precision, pointer :: gp0_cart(:,:,:,:)
 
     double precision :: gp0(0:max_radial_level,0:nr_fine)
 
     integer pt_index(3)
     type (eos_t) :: eos_state
 
-    call bl_allocate(gp0_cart,lo,hi,3)
+    !$gpu
+    
+    !call bl_allocate(gp0_cart,lo,hi,3)
 
     eps = 1.0d-8
 
@@ -612,9 +619,6 @@ contains
     ux      = 0.d0
     uy      = 0.d0
     uz      = 0.d0
-
-    dt = 1.d99
-    umax = 0.d0
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -644,7 +648,7 @@ contains
        enddo
     enddo
 
-    umax = max(umax,ux,uy,uz)
+    call amrex_max(umax, max(ux,uy,uz))
 
     ux = ux / dx(1)
     uy = uy / dx(2)
@@ -656,9 +660,9 @@ contains
 
     ! advective constraint
     if (ux .ne. 0.d0 .or. uy .ne. 0.d0 .or. uz .ne. 0.d0) then
-       dt = cfl / max(ux,uy,uz)
+       call amrex_min(dt, cfl/max(ux,uy,uz))
     else if (spdx .ne. 0.d0 .and. spdy .ne. 0.d0 .and. spdz .ne. 0.d0) then
-       dt = cfl / max(spdx,spdy,spdz)
+       call amrex_min(dt, cfl/max(spdx,spdy,spdz))
     end if
 
     ! sound speed constraint
@@ -668,13 +672,13 @@ contains
        else
           dt_sound = cfl / max(spdx,spdy,spdz)
        end if
-       dt = min(dt,dt_sound)
+       call amrex_min(dt,dt_sound)
     end if
 
     ! force constraints
-    if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
-    if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
-    if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+    if (pforcex > eps) call amrex_min(dt,sqrt(2.0D0*dx(1)/pforcex))
+    if (pforcey > eps) call amrex_min(dt,sqrt(2.0D0*dx(2)/pforcey))
+    if (pforcez > eps) call amrex_min(dt,sqrt(2.0D0*dx(3)/pforcez))
 
     ! divU constraint
     if (use_divu_firstdt) then
@@ -697,7 +701,7 @@ contains
        gp0(0,nr_fine) = gp0(0,nr_fine-1)
        gp0(0,      0) = gp0(0,        1)
 
-       call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,lo,hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc, &
+       call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,g_lo,g_hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc, &
             cc_to_r,ccr_lo,ccr_hi)
 
        !REDUCTION(MIN : dt_divu)
@@ -719,11 +723,11 @@ contains
           enddo
        enddo
 
-       dt = min(dt,dt_divu)
+       call amrex_min(dt,dt_divu)
 
     end if
 
-    call bl_deallocate(gp0_cart)
+    !call bl_deallocate(gp0_cart)
 
   end subroutine firstdt_sphr
 

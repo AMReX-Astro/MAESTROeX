@@ -213,6 +213,12 @@ Maestro::FirstDt ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FirstDt()",FirstDt);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+    
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
@@ -252,27 +258,40 @@ Maestro::FirstDt ()
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
                  w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
 
+#if (AMREX_SPACEDIM == 3)
+    // build and initialize grad_p0 for spherical case
+    Vector<MultiFab> grad_p0(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        grad_p0[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	grad_p0[lev].setVal(0.);
+    }
+#endif
+    
     Real umax = 0.;
 
+    Real dt_lev = 1.e99;
+    Real umax_lev = 0.;
+
     for (int lev = 0; lev <= finest_level; ++lev) {
-        Real dt_lev = 1.e99;
-        Real umax_lev = 0.;
 
         // get references to the MultiFabs at level lev
-        MultiFab& uold_mf = uold[lev];
-        MultiFab& sold_mf = sold[lev];
-        MultiFab& vel_force_mf = vel_force[lev];
-        MultiFab& S_cc_old_mf = S_cc_old[lev];
+        const MultiFab& uold_mf = uold[lev];
+        const MultiFab& sold_mf = sold[lev];
+        const MultiFab& vel_force_mf = vel_force[lev];
+        const MultiFab& S_cc_old_mf = S_cc_old[lev];
+	MultiFab& grad_p0_mf = grad_p0[lev];
         const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
-        for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
+	{
 
-            Real dt_grid = 1.e99;
-            Real umax_grid = 0.;
+        Real dt_grid = 1.e99;
+        Real umax_grid = 0.;
+	    
+        for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -284,37 +303,48 @@ Maestro::FirstDt ()
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0 ) {
-                firstdt(&lev,&dt_grid,&umax_grid,
-                        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                        ZFILL(dx),
-                        BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                        BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                        p0_old.dataPtr(),
-                        gamma1bar_old.dataPtr());
+
+#pragma gpu box(tileBox)
+		firstdt(lev,
+			AMREX_MFITER_REDUCE_MIN(&dt_grid),
+			AMREX_MFITER_REDUCE_MAX(&umax_grid),
+			AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+			AMREX_REAL_ANYD(dx),
+			BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
+			BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
+			BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
+			BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+			p0_old.dataPtr(),
+			gamma1bar_old.dataPtr());
+		
             } else {
 #if (AMREX_SPACEDIM == 3)
-                firstdt_sphr(&dt_grid,&umax_grid,
-                             ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                             ZFILL(dx),
-                             BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                             BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
+		
+#pragma gpu box(tileBox)
+                firstdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
+			     AMREX_MFITER_REDUCE_MAX(&umax_grid),
+                             AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                             AMREX_REAL_ANYD(dx),
+                             BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
+                             BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
+                             BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
+                             BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
                              p0_old.dataPtr(),
                              gamma1bar_old.dataPtr(),
+			     BL_TO_FORTRAN_ANYD(grad_p0_mf[mfi]), 
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                             BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                             BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 #else
                 Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif
             }
-
-            dt_lev = std::min(dt_lev,dt_grid);
-            umax_lev = std::max(umax_lev,umax_grid);
         }
 
+	dt_lev = std::min(dt_lev,dt_grid);
+	umax_lev = std::max(umax_lev,umax_grid);
+
+	} //end openmp
+	
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);
 
@@ -366,4 +396,10 @@ Maestro::FirstDt ()
     // set rel_eps in fortran module
     umax *= 1.e-8;
     set_rel_eps(&umax);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+    
 }
