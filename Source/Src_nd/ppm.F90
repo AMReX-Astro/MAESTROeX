@@ -15,7 +15,6 @@
 module ppm_module
 
   use amrex_error_module
-  use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
   use meth_params_module, only: ppm_type, rel_eps
 

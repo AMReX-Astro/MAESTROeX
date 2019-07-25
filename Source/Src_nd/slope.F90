@@ -174,13 +174,17 @@ contains
 
        ! HERE DOING 1ST ORDER
        do comp=1,nvar
-          do k = lo(3), hi(3)
+#if (AMREX_SPACEDIM == 3)
+           do k = lo(3), hi(3)
+#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    slx(i,j,k,comp) = ZERO
                 enddo
              enddo
-          enddo
+#if (AMREX_SPACEDIM == 3)
+         enddo
+#endif
        enddo
 
     else if (slope_order .eq. 2) then
@@ -188,7 +192,9 @@ contains
        ! HERE DOING 2ND ORDER
        do comp=1,nvar
           bc_comp = bccomp + comp-1
+#if (AMREX_SPACEDIM == 3)
           do k = lo(3), hi(3)
+#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    del = half*(s(i+1,j,k,comp) - s(i-1,j,k,comp))
@@ -233,7 +239,9 @@ contains
                 endif
 
              enddo
-          enddo
+#if (AMREX_SPACEDIM == 3)
+         enddo
+#endif
        enddo
 
     else
@@ -241,7 +249,9 @@ contains
        ! HERE DOING 4TH ORDER
        do comp=1,nvar
           bc_comp = bccomp + comp-1
+#if (AMREX_SPACEDIM == 3)
           do k = lo(3), hi(3)
+#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    ! left
@@ -332,7 +342,9 @@ contains
                    endif
                 enddo
              enddo
-          enddo
+#if (AMREX_SPACEDIM == 3)
+         enddo
+#endif
        enddo
 
     endif
@@ -364,13 +376,17 @@ contains
 
        ! HERE DOING 1ST ORDER
        do comp=1,nvar
-          do k = lo(3),hi(3)
+#if (AMREX_SPACEDIM == 3)
+           do k = lo(3), hi(3)
+#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    sly(i,j,k,comp) = ZERO
                 enddo
              enddo
-          enddo
+#if (AMREX_SPACEDIM == 3)
+         enddo
+#endif
        enddo
 
     else if (slope_order .eq. 2) then
@@ -378,7 +394,9 @@ contains
        ! HERE DOING 2ND ORDER
        do comp=1,nvar
           bc_comp = bccomp + comp-1
-          do k = lo(3),hi(3)
+#if (AMREX_SPACEDIM == 3)
+          do k = lo(3), hi(3)
+#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
 
@@ -424,7 +442,9 @@ contains
                    endif
                 enddo
              enddo
-          enddo
+#if (AMREX_SPACEDIM == 3)
+         enddo
+#endif
        enddo
 
     else
@@ -432,7 +452,9 @@ contains
        ! HERE DOING 4TH ORDER
        do comp=1,nvar
           bc_comp = bccomp + comp-1
-          do k = lo(3),hi(3)
+#if (AMREX_SPACEDIM == 3)
+          do k = lo(3), hi(3)
+#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    ! left
@@ -523,7 +545,9 @@ contains
 
                 enddo
              enddo
-          enddo
+#if (AMREX_SPACEDIM == 3)
+         enddo
+#endif
        enddo
 
     endif

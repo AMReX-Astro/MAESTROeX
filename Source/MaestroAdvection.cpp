@@ -548,8 +548,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #elif (AMREX_SPACEDIM == 3)
             velpred_3d(
 #endif
-                        &lev, domainBox.loVect(), domainBox.hiVect(),
-                        tileBox.loVect(), tileBox.hiVect(),
+                        &lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
+                        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                         BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
