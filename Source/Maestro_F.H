@@ -183,7 +183,7 @@ extern "C"
 		      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
 		      const amrex::Real* divu,  const int* d_lo, const int* d_hi,
 		      const amrex::Real* p0, const amrex::Real* gamma1bar,
-		      amrex::Real* gp0_cart, const int* g_lo, const int* g_hi, 
+		      amrex::Real* gp0_cart, const int* g_lo, const int* g_hi,
 		      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
               const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
     //////////////////////
@@ -467,7 +467,7 @@ extern "C"
                       const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
 #endif
 #endif
-                      int ng_um,
+                      const int ng_um,
                       const amrex::Real* force,  const int* f_lo, const int* f_hi, const int nc_f,
                       const amrex::Real* dx, const amrex::Real dt, const int is_vel,
                       const int* adv_bc, const int nbccomp, const int comp, const int bccomp,
