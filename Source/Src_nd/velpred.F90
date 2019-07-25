@@ -766,7 +766,7 @@ contains
                         slopex,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
         call slopey_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
                         slopey,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
-       call slopez_3d(lo,hi,utilde,ut_lo,ut_hi,nc_ut, &
+       call slopez_3d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
                       slopez,lo-1,hi+1,AMREX_SPACEDIM, &
                       domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
 

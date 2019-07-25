@@ -787,7 +787,7 @@ contains
                         slopey,lo-1,hi+1,1,domlo,domhi,1, &
                         adv_bc,nbccomp,bccomp)
 
-       call slopez_3d(lo,hi,s(:,:,:,comp:comp),s_lo,s_hi,1, &
+       call slopez_3d(lo-1,hi+1,s(:,:,:,comp:comp),s_lo,s_hi,1, &
                        slopez,lo-1,hi+1,1, &
                        domlo,domhi,1,adv_bc,nbccomp,bccomp)
 

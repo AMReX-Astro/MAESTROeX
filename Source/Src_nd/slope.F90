@@ -550,14 +550,16 @@ contains
 
     integer :: i,j,k,comp
 
+    !$gpu
+
     if (slope_order .eq. 0) then
 
        ! HERE DOING 1ST ORDER
        do comp=1,nvar
-          do k = lo(3)-1,hi(3)+1
-             do j = lo(2)-1,hi(2)+1
-                do i = lo(1)-1,hi(1)+1
-                   slz(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3)-1:hi(3)+1,comp) = ZERO
+          do k = lo(3),hi(3)
+             do j = lo(2),hi(2)
+                do i = lo(1),hi(1)
+                   slz(i,j,k,comp) = ZERO
                 enddo
              enddo
           enddo
@@ -567,9 +569,9 @@ contains
 
        ! HERE DOING 2ND ORDER
        do comp=1,nvar
-          do k = lo(3)-1,hi(3)+1
-             do j = lo(2)-1,hi(2)+1
-                do i = lo(1)-1,hi(1)+1
+          do k = lo(3),hi(3)
+             do j = lo(2),hi(2)
+                do i = lo(1),hi(1)
 
                    del  = half*(s(i,j,k+1,comp) - s(i,j,k-1,comp))
                    dpls = two *(s(i,j,k+1,comp) - s(i,j,k  ,comp))
@@ -581,9 +583,9 @@ contains
 
 
                    if (adv_bc(3,1,comp) .eq. EXT_DIR .or. adv_bc(3,1,comp) .eq. HOEXTRAP) then
-                      if (k .eq. lo(3)-1 .and. lo(3) .eq. domlo(3)) then
+                      if (k .eq. lo(3) .and. lo(3)+1 .eq. domlo(3)) then
                          slz(i,j,k,comp) = ZERO
-                      elseif (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+                     elseif (k .eq. lo(3)+1 .and. lo(3)+1 .eq. domlo(3)) then
                          del = (s(i,j,k+1,comp)+three*s(i,j,k,comp)- &
                               four*s(i,j,k-1,comp)) * third
                          dpls = two*(s(i,j,k+1,comp) - s(i,j,k,comp))
@@ -597,9 +599,9 @@ contains
 
 
                    if (adv_bc(3,2,comp) .eq. EXT_DIR .or. adv_bc(3,2,comp) .eq. HOEXTRAP) then
-                      if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+                      if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                          slz(i,j,k,comp) = ZERO
-                      elseif (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+                     elseif (k .eq. hi(3)-1 .and. hi(3)-1 .eq. domhi(3)) then
                          del = -(s(i,j,k-1,comp)+three*s(i,j,k,comp)- &
                               four*s(i,j,k+1,comp)) * third
                          dpls = two*(s(i,j,k+1,comp) - s(i,j,k,comp))
@@ -619,9 +621,9 @@ contains
 
        ! HERE DOING 4TH ORDER
        do comp=1,nvar
-          do j = lo(2)-1,hi(2)+1
-             do i = lo(1)-1,hi(1)+1
-                do k = lo(3)-1,hi(3)+1
+          do j = lo(2),hi(2)
+             do i = lo(1),hi(1)
+                do k = lo(3),hi(3)
                     ! left
                    dcen = half*(s(i,j,k,comp)-s(i,j,k-2,comp))
                    dmin = two*(s(i,j,k-1,comp)-s(i,j,k-2,comp))
@@ -653,9 +655,9 @@ contains
                    slz(i,j,k,comp) = dflag*min(abs(ds),dlim)
 
                    if (adv_bc(3,1,comp) .eq. EXT_DIR .or. adv_bc(3,1,comp) .eq. HOEXTRAP) then
-                      if (k .eq. lo(3)-1 .and. lo(3) .eq. domlo(3)) then
+                      if (k .eq. lo(3) .and. lo(3)+1 .eq. domlo(3)) then
                          slz(i,j,k,comp) = ZERO
-                      elseif (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+                     elseif (k .eq. lo(3)+1 .and. lo(3)+1 .eq. domlo(3)) then
                          del = -sixteen/fifteen*s(i,j,k-1,comp) +  half*s(i,j,k,comp) +  &
                               two3rd*s(i,j,k+1,comp) - tenth*s(i,j,k+2,comp)
                          dmin = two*(s(i,j,k,comp)-s(i,j,k-1,comp))
@@ -665,7 +667,7 @@ contains
                          sflag = sign(one,del)
                          slz(i,j,k,comp)= sflag*min(slim,abs(del))
 
-                      elseif (k .eq. lo(3)+1 .and. lo(3) .eq. domlo(3)) then
+                     elseif (k .eq. lo(3)+2 .and. lo(3)+1 .eq. domlo(3)) then
                          ! Recalculate the slope at lo(2)+1 using the revised dzl
                          del = -sixteen/fifteen*s(i,j,k-2,comp) +  half*s(i,j,k-1,comp) +  &
                               two3rd*s(i,j,k,comp) - tenth*s(i,j,k+1,comp)
@@ -677,16 +679,16 @@ contains
                          dzl = slz(i,j,k-1,comp)
                          ds = two * two3rd * dcen - &
                               sixth * (dzr + dzl)
-                         slz(i,j,lo(3)+1,comp) = dflag*min(abs(ds),dlim)
+                         slz(i,j,k,comp) = dflag*min(abs(ds),dlim)
                       endif
                    endif
 
 
                    if (adv_bc(3,2,comp) .eq. EXT_DIR .or. adv_bc(3,2,comp) .eq. HOEXTRAP) then
-                      if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+                      if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                          slz(i,j,k,comp) = ZERO
-                      elseif (k .eq. hi(3) .and. hi(3) .eq. domhi(3)) then
-                         del = -( -sixteen/fifteen*s(i,j,hi(3)+1,comp) +  half*s(i,j,hi(3)  ,comp) + &
+                     elseif (k .eq. hi(3)-1 .and. hi(3)-1 .eq. domhi(3)) then
+                         del = -( -sixteen/fifteen*s(i,j,k+1,comp) +  half*s(i,j,k,comp) + &
                               two3rd*s(i,j,k-1,comp) - tenth*s(i,j,k-2,comp) )
                          dmin = two*(s(i,j,k,comp)-s(i,j,k-1,comp))
                          dpls = two*(s(i,j,k+1,comp)-s(i,j,k,comp))
@@ -695,7 +697,7 @@ contains
                          sflag = sign(one,del)
                          slz(i,j,k,comp)= sflag*min(slim,abs(del))
 
-                      elseif (k .eq. hi(3)-1 .and. hi(3) .eq. domhi(3)) then
+                     elseif (k .eq. hi(3)-2 .and. hi(3)-1 .eq. domhi(3)) then
                          ! Recalculate the slope at lo(3)+1 using the revised dzr
                          del = -( -sixteen/fifteen*s(i,j,k+2,comp) +  half*s(i,j,k+1,comp) + &
                               two3rd*s(i,j,k,comp) - tenth*s(i,j,k-1,comp) )

@@ -399,6 +399,8 @@ contains
     double precision :: ulx,urx,vly,vry
     double precision :: wlz,wrz
 
+    !$gpu
+
     dt2 = HALF*dt
 
     hx = dx(1)
@@ -413,7 +415,7 @@ contains
 
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
-             do i=lo(1),hi(1)+1
+             do i=lo(1),hi(1)
 
                 if (ppm_type .eq. 0) then
                    ! extrapolate to edges
@@ -448,7 +450,7 @@ contains
                 end if
 
                 ! impose hi side bc's
-                if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+                if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                    select case(phys_bc(1,2))
                    case (Inflow)
                       ulx = utilde(i+1,j,k,1)
@@ -498,7 +500,7 @@ contains
        !******************************************************************
 
        do k=lo(3),hi(3)
-          do j=lo(2),hi(2)+1
+          do j=lo(2),hi(2)
              do i=lo(1),hi(1)
 
                 if (ppm_type .eq. 0) then
@@ -537,7 +539,7 @@ contains
                 end if
 
                 ! impose hi side bc's
-                if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+                if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                    select case(phys_bc(2,2))
                    case (Inflow)
                       vly = utilde(i,j+1,k,2)
@@ -583,7 +585,7 @@ contains
        ! create wtrans
        !******************************************************************
 
-       do k=lo(3),hi(3)+1
+       do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
 
@@ -620,7 +622,7 @@ contains
                 end if
 
                 ! impose hi side bc's
-                if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+                if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                    select case(phys_bc(3,2))
                    case (Inflow)
                       wlz = utilde(i,j,k+1,3)
