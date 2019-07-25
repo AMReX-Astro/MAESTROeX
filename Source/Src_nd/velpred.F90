@@ -762,19 +762,13 @@ contains
 
     if (ppm_type .eq. 0) then
 
-        !$OMP PARALLEL DO PRIVATE(k)
-       do k = lo(3)-1,hi(3)+1
-          call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
-          call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
-       end do
-       !$OMP END PARALLEL DO
-       call slopez_3d(utilde,slopez,domlo,domhi,lo,hi,ng_ut,3,adv_bc)
-
-       !  call slopex_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-       !                  slopex,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
-       !  call slopey_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-       !                  slopey,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
-       ! call slopez_3d(utilde,AMREX_SPACEDIM,slopez,AMREX_SPACEDIM,domlo,domhi,lo,hi,ng_ut,3,adv_bc,AMREX_SPACEDIM)
+        call slopex_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                        slopex,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
+        call slopey_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                        slopey,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
+       call slopez_3d(utilde,AMREX_SPACEDIM, &
+                      slopez,AMREX_SPACEDIM, &
+                      domlo,domhi,lo,hi,ng_ut,3,adv_bc,AMREX_SPACEDIM)
 
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_3d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &

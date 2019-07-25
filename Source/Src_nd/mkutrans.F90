@@ -413,21 +413,14 @@ subroutine mkutrans_3d(lo, hi, lev, idir, domlo, domhi, &
     hy = dx(2)
     hz = dx(3)
 
-    if (ppm_type .eq. 0) then
-       do k = lo(3)-1,hi(3)+1
-          call slopex_2d(utilde(:,:,k,1:1),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-          call slopey_2d(utilde(:,:,k,2:2),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
-       end do
-       call slopez_3d(utilde(:,:,:,3:3),slopez,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,3:3))
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       ! call ppm_3d(utilde(:,:,:,1),ng_ut, &
-       !      ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-       !      Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-    end if
-
     !******************************************************************
     ! create utrans
     !******************************************************************
+
+    if (ppm_type .eq. 0) then
+      call slopex_2d(lo-1,hi+1,utilde(:,:,:,1:1),ut_lo,ut_hi,1, &
+                     slopex(:,:,:,1:1),lo-1,hi+1,1,domlo,domhi,1,adv_bc(:,:,1:1),1,1)
+    end if
 
     do k=lo(3),hi(3)
       do j=lo(2),hi(2)
@@ -513,10 +506,10 @@ subroutine mkutrans_3d(lo, hi, lev, idir, domlo, domhi, &
     ! create vtrans
     !******************************************************************
 
-    if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       ! call ppm_3d(utilde(:,:,:,2),ng_ut, &
-       !      ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-       !      Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,2),dx,dt,.false.)
+    if (ppm_type .eq. 0) then
+       call slopey_2d(lo-1,hi+1,utilde(:,:,:,2:2),ut_lo,ut_hi,1, &
+                      slopey,lo-1,hi+1,1, &
+                      domlo,domhi,1,adv_bc,AMREX_SPACEDIM,2)
     end if
 
     do k=lo(3),hi(3)
@@ -603,10 +596,8 @@ subroutine mkutrans_3d(lo, hi, lev, idir, domlo, domhi, &
     ! create wtrans
     !******************************************************************
 
-    if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       ! call ppm_3d(utilde(:,:,:,3),ng_ut, &
-       !      ufull(:,:,:,1),ufull(:,:,:,2),ufull(:,:,:,3),ng_uf, &
-       !      Ip,Im,domlo,domhi,lo,hi,adv_bc(:,:,3),dx,dt,.false.)
+    if (ppm_type .eq. 0) then
+       call slopez_3d(utilde(:,:,:,3:3),1,slopez,1,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,3:3),1)
     end if
 
     do k=lo(3),hi(3)+1
