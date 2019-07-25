@@ -8,7 +8,6 @@ module compute_dt_module
        cfl, use_soundspeed_firstdt, use_divu_firstdt, &
        use_exact_base_state
   use base_state_geometry_module, only:  max_radial_level, nr_fine, nr, dr
-  use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
   implicit none
 
@@ -203,6 +202,8 @@ contains
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="estdt_sphr")
 
+    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+    
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
@@ -568,6 +569,7 @@ contains
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
 
     use amrex_fort_module, only: amrex_min, amrex_max
+    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
