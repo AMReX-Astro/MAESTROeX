@@ -1319,17 +1319,16 @@ extern "C"
 
     //////////////////////
     // in velpred.F90
+#if (AMREX_SPACEDIM == 1 || AMREX_SPACEDIM == 3)
 #if (AMREX_SPACEDIM == 1)
     void velpred_1d(
-#elif (AMREX_SPACEDIM == 2)
-    void velpred_2d(
 #elif (AMREX_SPACEDIM == 3)
     void velpred_3d(
 #endif
-                      const int* lev, const int* domlo, const int* domhi,
                       const int* lo, const int* hi,
-                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, int ng_ut,
-                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf, int ng_uf,
+                      const int lev, const int* domlo, const int* domhi,
+                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int nc_ut, int ng_ut,
+                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int nc_uf, int ng_uf,
                       const amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
 #if (AMREX_SPACEDIM >= 2)
                       const amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
@@ -1347,9 +1346,31 @@ extern "C"
 		      const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
 #endif
 #endif
-                      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f, int ng_f,
-                      const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt,
+                      const amrex::Real* force, const int* f_lo, const int* f_hi, const int nc_f, int ng_f,
+                      const amrex::Real* w0, const amrex::Real* dx, const amrex::Real dt,
                       const int* adv_bc, const int* phys_bc);
+
+#elif (AMREX_SPACEDIM == 2)
+  void velpred_2d(const int* lo, const int* hi,
+                    const int lev, const int* domlo, const int* domhi,
+                    const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int nc_ut, int ng_ut,
+                    const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int nc_uf, int ng_uf,
+                    const amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
+                    const amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
+                    amrex::Real* umac, const int* mu_lo, const int* mu_hi,
+                    amrex::Real* vmac, const int* mv_lo, const int* mv_hi,
+                    const amrex::Real* Imu, const int* imu_lo, const int* imu_hi,
+                    const amrex::Real* Ipu, const int* ipu_lo, const int* ipu_hi,
+                    const amrex::Real* Imv, const int* imv_lo, const int* imv_hi,
+                    const amrex::Real* Ipv, const int* ipv_lo, const int* ipv_hi,
+                    const amrex::Real* Imfx, const int* imfx_lo, const int* imfx_hi,
+                    const amrex::Real* Ipfx, const int* ipfx_lo, const int* ipfx_hi,
+                    const amrex::Real* Imfy, const int* imfy_lo, const int* imfy_hi,
+                    const amrex::Real* Ipfy, const int* ipfy_lo, const int* ipfy_hi,
+                    const amrex::Real* force, const int* f_lo, const int* f_hi, const int nc_f, int ng_f,
+                    const amrex::Real* w0, const amrex::Real* dx, const amrex::Real dt,
+                    const int* adv_bc, const int* phys_bc);
+#endif
 
     //////////////////////
 
