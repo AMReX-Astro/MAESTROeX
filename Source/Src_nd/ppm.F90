@@ -1079,7 +1079,6 @@ contains
                       ! the value in the first cc ghost cell represents the edge value
                       sp      = s(i+1,j,k,n)
                       sedge = s(i+1,j,k,n)
-
                       ! use a modified stencil to get sedge on the first interior edge
                       sedge = &
                            -FIFTH        *s(i+1,j,k,n) &
@@ -1090,9 +1089,11 @@ contains
                       sedge = max(sedge,min(s(i-1,j,k,n),s(i,j,k,n)))
                       sedge = min(sedge,max(s(i-1,j,k,n),s(i,j,k,n)))
 
+
                       sm = sedge
 
                    elseif (i .eq. hi(1)-2) then
+
 
                       sedgerr = s(i+2,j,k,n)
 
