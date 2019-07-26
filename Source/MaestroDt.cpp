@@ -259,11 +259,14 @@ Maestro::FirstDt ()
         Real umax_lev = 0.;
 
         // get references to the MultiFabs at level lev
-        MultiFab& uold_mf = uold[lev];
-        MultiFab& sold_mf = sold[lev];
-        MultiFab& vel_force_mf = vel_force[lev];
-        MultiFab& S_cc_old_mf = S_cc_old[lev];
+        const MultiFab& uold_mf = uold[lev];
+        const MultiFab& sold_mf = sold[lev];
+        const MultiFab& vel_force_mf = vel_force[lev];
+        const MultiFab& S_cc_old_mf = S_cc_old[lev];
         const MultiFab& cc_to_r = cell_cc_to_r[lev];
+#if (AMREX_SPACEDIM == 3)
+	MultiFab& grad_p0_mf = grad_p0[lev];
+#endif
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
