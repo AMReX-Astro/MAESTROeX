@@ -623,6 +623,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             const Box& obx = amrex::grow(tileBox, 1);
             const Box& xbx = amrex::growHi(tileBox,0, 1);
             const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& mxbx = amrex::growLo(obx,0, -1);
+            const Box& mybx = amrex::growLo(obx,1, -1);
 
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
@@ -630,12 +632,12 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #pragma gpu box(obx)
                 slopex_2d(AMREX_INT_ANYD(obx.loVect()),
                        AMREX_INT_ANYD(obx.hiVect()),
-                       BL_TO_FORTRAN_ANYD(u_mf[mfi]),
-                       u_mf.nComp(),
+                       BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
+                       utilde_mf.nComp(),
                        BL_TO_FORTRAN_ANYD(Ipu[mfi]),Ipu.nComp(),
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),
-                       1,bc_f,AMREX_SPACEDIM,1);
+                       2,bc_f,AMREX_SPACEDIM,1);
 
             } else {
 
@@ -676,12 +678,12 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #pragma gpu box(obx)
                slopey_2d(AMREX_INT_ANYD(obx.loVect()),
                       AMREX_INT_ANYD(obx.hiVect()),
-                      BL_TO_FORTRAN_ANYD(v_mf[mfi]),
-                      v_mf.nComp(),
+                      BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
+                      utilde_mf.nComp(),
                       BL_TO_FORTRAN_ANYD(Imv[mfi]),Imv.nComp(),
                       AMREX_INT_ANYD(domainBox.loVect()),
                       AMREX_INT_ANYD(domainBox.hiVect()),
-                      1,bc_f,AMREX_SPACEDIM,2);
+                      2,bc_f,AMREX_SPACEDIM,1);
 
             } else {
 
@@ -721,43 +723,77 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 
-            velpred_interface_2d(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                        ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                        BL_TO_FORTRAN_3D(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
-                        BL_TO_FORTRAN_3D(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
-                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(Imu[mfi]),
-                        BL_TO_FORTRAN_3D(Ipu[mfi]),
-                        BL_TO_FORTRAN_3D(Imv[mfi]),
-                        BL_TO_FORTRAN_3D(Ipv[mfi]),
-                        BL_TO_FORTRAN_3D(ulx[mfi]),
-                        BL_TO_FORTRAN_3D(urx[mfi]),
-                        BL_TO_FORTRAN_3D(uimhx[mfi]),
-                        BL_TO_FORTRAN_3D(uly[mfi]),
-                        BL_TO_FORTRAN_3D(ury[mfi]),
-                        BL_TO_FORTRAN_3D(uimhy[mfi]),
-                        dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+            // x-direction
+#pragma gpu box(mxbx)
+            velpred_interface_2d(AMREX_INT_ANYD(mxbx.loVect()), AMREX_INT_ANYD(mxbx.hiVect()),1,
+                        AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(utrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(Imu[mfi]),
+                        BL_TO_FORTRAN_ANYD(Ipu[mfi]),
+                        BL_TO_FORTRAN_ANYD(Imv[mfi]),
+                        BL_TO_FORTRAN_ANYD(Ipv[mfi]),
+                        BL_TO_FORTRAN_ANYD(ulx[mfi]),
+                        BL_TO_FORTRAN_ANYD(urx[mfi]),
+                        BL_TO_FORTRAN_ANYD(uimhx[mfi]),
+                        AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
 
-            velpred_2d(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),lev,
-                        ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                        BL_TO_FORTRAN_3D(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
-                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-                        BL_TO_FORTRAN_3D(Imfx[mfi]),
-                        BL_TO_FORTRAN_3D(Ipfx[mfi]),
-                        BL_TO_FORTRAN_3D(Imfy[mfi]),
-                        BL_TO_FORTRAN_3D(Ipfy[mfi]),
-                        BL_TO_FORTRAN_3D(ulx[mfi]),
-                        BL_TO_FORTRAN_3D(urx[mfi]),
-                        BL_TO_FORTRAN_3D(uimhx[mfi]),
-                        BL_TO_FORTRAN_3D(uly[mfi]),
-                        BL_TO_FORTRAN_3D(ury[mfi]),
-                        BL_TO_FORTRAN_3D(uimhy[mfi]),
-                        BL_TO_FORTRAN_3D(force_mf[mfi]), force_mf.nComp(), force_mf.nGrow(),
-                        w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+            // y-direction
+#pragma gpu box(mybx)
+            velpred_interface_2d(AMREX_INT_ANYD(mybx.loVect()), AMREX_INT_ANYD(mybx.hiVect()),2,
+                        AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(Imu[mfi]),
+                        BL_TO_FORTRAN_ANYD(Ipu[mfi]),
+                        BL_TO_FORTRAN_ANYD(Imv[mfi]),
+                        BL_TO_FORTRAN_ANYD(Ipv[mfi]),
+                        BL_TO_FORTRAN_ANYD(uly[mfi]),
+                        BL_TO_FORTRAN_ANYD(ury[mfi]),
+                        BL_TO_FORTRAN_ANYD(uimhy[mfi]),
+                        AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
+
+            // x-direction
+#pragma gpu box(xbx)
+            velpred_2d(AMREX_INT_ANYD(xbx.loVect()), AMREX_INT_ANYD(xbx.hiVect()),lev,1,
+                        AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(utrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(Imfx[mfi]),
+                        BL_TO_FORTRAN_ANYD(Ipfx[mfi]),
+                        BL_TO_FORTRAN_ANYD(ulx[mfi]),
+                        BL_TO_FORTRAN_ANYD(urx[mfi]),
+                        BL_TO_FORTRAN_ANYD(uimhx[mfi]),
+                        BL_TO_FORTRAN_ANYD(uly[mfi]),
+                        BL_TO_FORTRAN_ANYD(ury[mfi]),
+                        BL_TO_FORTRAN_ANYD(uimhy[mfi]),
+                        BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(), force_mf.nGrow(),
+                        w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
+
+            // y-direction
+#pragma gpu box(ybx)
+            velpred_2d(AMREX_INT_ANYD(ybx.loVect()), AMREX_INT_ANYD(ybx.hiVect()),lev,2,
+                        AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_ANYD(utrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(Imfy[mfi]),
+                        BL_TO_FORTRAN_ANYD(Ipfy[mfi]),
+                        BL_TO_FORTRAN_ANYD(ulx[mfi]),
+                        BL_TO_FORTRAN_ANYD(urx[mfi]),
+                        BL_TO_FORTRAN_ANYD(uimhx[mfi]),
+                        BL_TO_FORTRAN_ANYD(uly[mfi]),
+                        BL_TO_FORTRAN_ANYD(ury[mfi]),
+                        BL_TO_FORTRAN_ANYD(uimhy[mfi]),
+                        BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(), force_mf.nGrow(),
+                        w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
         } // end MFIter loop
 
 #ifdef AMREX_USE_CUDA
