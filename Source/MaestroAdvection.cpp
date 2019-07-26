@@ -530,6 +530,14 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
               Imfx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
               Ipfy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
               Imfy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+              MultiFab ulx, urx, uimhx, uly, ury, uimhy;
+              ulx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+              urx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+              uimhx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+              uly.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+              ury.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+              uimhy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wtrans_mf  = utrans[lev][2];
               MultiFab& wmac_mf    = umac[lev][2];
@@ -713,22 +721,41 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 
-            velpred_2d(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),lev,
+            velpred_interface_2d(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                         ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
                         BL_TO_FORTRAN_3D(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_3D(ufull_mf[mfi]), ufull_mf.nComp(), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
                         BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
                         BL_TO_FORTRAN_3D(Imu[mfi]),
                         BL_TO_FORTRAN_3D(Ipu[mfi]),
                         BL_TO_FORTRAN_3D(Imv[mfi]),
                         BL_TO_FORTRAN_3D(Ipv[mfi]),
+                        BL_TO_FORTRAN_3D(ulx[mfi]),
+                        BL_TO_FORTRAN_3D(urx[mfi]),
+                        BL_TO_FORTRAN_3D(uimhx[mfi]),
+                        BL_TO_FORTRAN_3D(uly[mfi]),
+                        BL_TO_FORTRAN_3D(ury[mfi]),
+                        BL_TO_FORTRAN_3D(uimhy[mfi]),
+                        dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+
+            velpred_2d(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),lev,
+                        ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
+                        BL_TO_FORTRAN_3D(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
+                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
+                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
+                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
                         BL_TO_FORTRAN_3D(Imfx[mfi]),
                         BL_TO_FORTRAN_3D(Ipfx[mfi]),
                         BL_TO_FORTRAN_3D(Imfy[mfi]),
                         BL_TO_FORTRAN_3D(Ipfy[mfi]),
+                        BL_TO_FORTRAN_3D(ulx[mfi]),
+                        BL_TO_FORTRAN_3D(urx[mfi]),
+                        BL_TO_FORTRAN_3D(uimhx[mfi]),
+                        BL_TO_FORTRAN_3D(uly[mfi]),
+                        BL_TO_FORTRAN_3D(ury[mfi]),
+                        BL_TO_FORTRAN_3D(uimhy[mfi]),
                         BL_TO_FORTRAN_3D(force_mf[mfi]), force_mf.nComp(), force_mf.nGrow(),
                         w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
         } // end MFIter loop
