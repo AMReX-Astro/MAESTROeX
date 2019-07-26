@@ -14,6 +14,12 @@ Maestro::EstDt ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EstDt()",EstDt);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+    
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
@@ -81,9 +87,10 @@ Maestro::EstDt ()
 
     Real umax = 0.;
 
+    Real dt_lev = 1.e99;
+    Real umax_lev = 0.;
+	
     for (int lev = 0; lev <= finest_level; ++lev) {
-        Real dt_lev = 1.e99;
-        Real umax_lev = 0.;
 
         // get references to the MultiFabs at level lev
         MultiFab& uold_mf = uold[lev];
@@ -102,10 +109,12 @@ Maestro::EstDt ()
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
-        for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
+	{
+	    
+        Real dt_grid = 1.e99;
+	Real umax_grid = 0.;
 
-            Real dt_grid = 1.e99;
-            Real umax_grid = 0.;
+        for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -116,14 +125,16 @@ Maestro::EstDt ()
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
-                estdt(&lev,&dt_grid,&umax_grid,
-                      ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                      ZFILL(dx),
-                      BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                      BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                      BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                      BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                      BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
+#pragma gpu box(tileBox)
+                estdt(lev, AMREX_MFITER_REDUCE_MIN(&dt_grid),
+		      AMREX_MFITER_REDUCE_MAX(&umax_grid),
+                      AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                      AMREX_REAL_ANYD(dx),
+                      BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
+		      BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
+		      BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
+                      BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+                      BL_TO_FORTRAN_ANYD(dSdt_mf[mfi]),
                       w0.dataPtr(),
                       p0_old.dataPtr(),
                       gamma1bar_old.dataPtr());
@@ -150,11 +161,13 @@ Maestro::EstDt ()
                 Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
             }
-
-            dt_lev = std::min(dt_lev,dt_grid);
-            umax_lev = std::max(umax_lev,umax_grid);
         }
-
+	
+	dt_lev = std::min(dt_lev,dt_grid);
+	umax_lev = std::max(umax_lev,umax_grid);
+	    
+	} //end openmp
+	
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);
 
@@ -173,10 +186,10 @@ Maestro::EstDt ()
 
     }     // end loop over levels
 
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     Gpu::setLaunchRegion(false);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
     if (maestro_verbose > 0) {
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
@@ -372,6 +385,11 @@ Maestro::FirstDt ()
 
     }     // end loop over levels
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+
     if (maestro_verbose > 0) {
         Print() << "Minimum firstdt over all levels = " << dt << std::endl;
     }
@@ -397,11 +415,5 @@ Maestro::FirstDt ()
 
     // set rel_eps in fortran module
     umax *= 1.e-8;
-    set_rel_eps(&umax);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-    
+    set_rel_eps(&umax);    
 }

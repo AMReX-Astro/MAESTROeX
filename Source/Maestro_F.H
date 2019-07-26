@@ -141,7 +141,7 @@ extern "C"
 
     //////////////////////
     // in compute_dt.F90
-    void estdt(const int* lev, amrex::Real* dt, amrex::Real* umax,
+    void estdt(const int lev, amrex::Real* dt, amrex::Real* umax,
                const int* lo, const int* hi,
                const amrex::Real* dx,
                const amrex::Real* scal,  const int* s_lo, const int* s_hi, const int* nc_s,

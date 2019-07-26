@@ -23,7 +23,9 @@ contains
        dSdt,  t_lo, t_hi, &
        w0, p0, gamma1bar) bind (C,name="estdt")
 
-    integer         , intent(in   ) :: lev
+    use amrex_fort_module, only: amrex_min, amrex_max
+    
+    integer  , value, intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
@@ -43,12 +45,15 @@ contains
 
     ! local variables
     double precision :: spdx, spdy, spdz, spdr, rho_min
-    double precision :: fx, fy, fz
+    double precision :: fx, fy, fz, dt_temp
     double precision :: eps,denom,gradp0
     double precision :: a, b, c
     integer          :: i,j,k,r
 
+    !$gpu
+    
     rho_min = 1.d-20
+    dt_temp = 1.e99
 
     eps = 1.d-8
 
@@ -56,7 +61,7 @@ contains
     spdy    = 0.d0
     spdz    = 0.d0
     spdr    = 0.d0
-    umax    = 0.d0
+    
     !
     ! Limit dt based on velocity terms.
     !
@@ -84,14 +89,14 @@ contains
     enddo
 #endif
 
-    umax = max(umax,spdx,spdy,spdz,spdr)
+    call amrex_max(umax, max(spdx,spdy,spdz,spdr))
 
-    if (spdx > eps) dt = min(dt, dx(1)/spdx)
-    if (spdy > eps) dt = min(dt, dx(2)/spdy)
-    if (spdz > eps) dt = min(dt, dx(3)/spdz)
-    if (spdr > eps) dt = min(dt, dx(AMREX_SPACEDIM)/spdr)
+    if (spdx > eps) dt_temp = min(dt_temp, dx(1)/spdx)
+    if (spdy > eps) dt_temp = min(dt_temp, dx(2)/spdy)
+    if (spdz > eps) dt_temp = min(dt_temp, dx(3)/spdz)
+    if (spdr > eps) dt_temp = min(dt_temp, dx(AMREX_SPACEDIM)/spdr)
 
-    dt = dt * cfl
+    dt_temp = dt_temp * cfl
     !
     ! Limit dt based on forcing terms
     !
@@ -112,14 +117,14 @@ contains
     enddo
 
     if (fx > eps) &
-         dt = min(dt,sqrt(2.0d0*dx(1)/fx))
+         dt_temp = min(dt_temp,sqrt(2.0d0*dx(1)/fx))
 
     if (fy > eps) &
-         dt = min(dt,sqrt(2.0d0*dx(2)/fy))
+         dt_temp = min(dt_temp,sqrt(2.0d0*dx(2)/fy))
 
 #if (AMREX_SPACEDIM == 3)
     if (fz > eps) &
-         dt = min(dt,sqrt(2.0d0*dx(3)/fz))
+         dt_temp = min(dt_temp,sqrt(2.0d0*dx(3)/fz))
 #endif
 
     !
@@ -156,7 +161,7 @@ contains
              denom = divU(i,j,k) - u(i,j,k,AMREX_SPACEDIM)*gradp0/(gamma1bar(lev,r)*p0(lev,r))
 
              if (denom > 0.d0) then
-                dt = min(dt, 0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                dt_temp = min(dt_temp, 0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
              endif
 
           enddo
@@ -179,12 +184,15 @@ contains
                 a = 0.5d0*scal(i,j,k,rho_comp)*dSdt(i,j,k)
                 b = scal(i,j,k,rho_comp)*divU(i,j,k)
                 c = rho_min - scal(i,j,k,rho_comp)
-                dt = min(dt,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
+                dt_temp = min(dt_temp,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
              endif
 
           enddo
        enddo
     enddo
+
+    ! set dt to local min
+    call amrex_min(dt, dt_temp)
 
   end subroutine estdt
 
