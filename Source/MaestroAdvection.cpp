@@ -550,7 +550,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 
-#if (AMREX_SPACEDIM == 1 || AMREX_SPACEDIM == 3)
+#if (AMREX_SPACEDIM == 1)
 
 	// NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
@@ -563,28 +563,12 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 
-#if (AMREX_SPACEDIM == 1)
-            velpred_1d(
-#elif (AMREX_SPACEDIM == 3)
-            velpred_3d(
-#endif
-                        &lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
+            velpred_1d(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
                         ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                         BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
                         BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
                         BL_TO_FORTRAN_3D(utrans_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
-#endif
                         BL_TO_FORTRAN_3D(umac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-                        BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-			BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-#endif
                         BL_TO_FORTRAN_FAB(force_mf[mfi]), force_mf.nGrow(),
                         w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
         } // end MFIter loop
@@ -801,7 +785,40 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         clean_bc(bc_f);
 #endif
 
-#endif
+#elif (AMREX_SPACEDIM == 3)
+
+	// NOTE: don't tile, but threaded in fortran subroutine
+        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+            velpred_3d(ARLIM_3D(tileBox.loVect()),
+                        ARLIM_3D(tileBox.hiVect()),
+                        lev, ARLIM_3D(domainBox.loVect()),
+                        ARLIM_3D(domainBox.hiVect()),
+                        BL_TO_FORTRAN_3D(utilde_mf[mfi]),
+                        utilde_mf.nComp(), utilde_mf.nGrow(),
+                        BL_TO_FORTRAN_3D(ufull_mf[mfi]),
+                        ufull_mf.nComp(), ufull_mf.nGrow(),
+                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
+                        BL_TO_FORTRAN_3D(vtrans_mf[mfi]),
+                        BL_TO_FORTRAN_3D(wtrans_mf[mfi]),
+                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
+                        BL_TO_FORTRAN_3D(vmac_mf[mfi]),
+                        BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+            			BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
+            			BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
+            			BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+                        BL_TO_FORTRAN_3D(force_mf[mfi]), force_mf.nComp(), force_mf.nGrow(),
+                        w0.dataPtr(), dx, dt, bcs_u[0].data(), phys_bc.dataPtr());
+        } // end MFIter loop
+
+#endif // AMREX_SPACEDIM
     } // end loop over levels
 
     // edge_restriction

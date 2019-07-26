@@ -611,7 +611,7 @@ end subroutine velpred_2d
 
 
 #if (AMREX_SPACEDIM == 3)
-  subroutine velpred_3d(lev, domlo, domhi, lo, hi, &
+  subroutine velpred_3d(lo, hi, lev, domlo, domhi, &
        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
        utrans, uu_lo, uu_hi, &
@@ -626,11 +626,11 @@ end subroutine velpred_2d
        force,   f_lo,  f_hi, nc_f, ng_f, &
        w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_3d")
 
-    integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
-    integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut
-    integer, value,   intent(in   ) :: ng_ut
-    integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
-    integer, value,   intent(in   ) :: ng_uf
+    integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
+    integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
+    integer, value,   intent(in   ) :: lev, ng_ut, nc_ut
+    integer         , intent(in   ) :: uf_lo(3), uf_hi(3)
+    integer, value,   intent(in   ) :: ng_uf, nc_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: uw_lo(3), uw_hi(3)
@@ -640,8 +640,8 @@ end subroutine velpred_2d
     integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
     integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
     integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
-    integer         , intent(in   ) ::  f_lo(3),  f_hi(3), nc_f
-    integer, value,   intent(in   ) :: ng_f
+    integer         , intent(in   ) ::  f_lo(3),  f_hi(3)
+    integer, value,   intent(in   ) :: ng_f, nc_f
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
@@ -655,7 +655,8 @@ end subroutine velpred_2d
     double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
     double precision, intent(in   ) :: force ( f_lo(1): f_hi(1), f_lo(2): f_hi(2), f_lo(3): f_hi(3),nc_f)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: dx(3), dt
+    double precision, intent(in   ) :: dx(3)
+    double precision, value, intent(in   ) :: dt
     integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
 
     ! local variables
@@ -1923,5 +1924,6 @@ end subroutine velpred_2d
 
   end subroutine velpred_3d
 #endif
+
 
 end module velpred_module
