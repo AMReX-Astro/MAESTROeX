@@ -2177,7 +2177,6 @@ contains
           end do
        end do
 
-
     else if (ppm_type .eq. 2) then
 
        !----------------------------------------------------------------------
@@ -2894,8 +2893,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
 
     else if (ppm_type .eq. 2) then
 
