@@ -331,8 +331,8 @@ contains
        else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
           slx(is,js-1:je+1) = srx(is,js-1:je+1)
        else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-          slx(ie+1,js-1:je+1) = 0.d0
-          srx(ie+1,js-1:je+1) = 0.d0
+          slx(is,js-1:je+1) = 0.d0
+          srx(is,js-1:je+1) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
           call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
@@ -1026,7 +1026,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(slopez)
 
     !******************************************************************
