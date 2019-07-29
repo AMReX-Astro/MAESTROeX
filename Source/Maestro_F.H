@@ -1383,7 +1383,7 @@ extern "C"
                     amrex::Real* ur, const int* ur_lo, const int* ur_hi,
                     amrex::Real* uimh, const int* ui_lo, const int* ui_hi,
                     const amrex::Real* dx, const amrex::Real dt,
-                    const int* adv_bc, const int* phys_bc);
+                    const int* phys_bc);
 
     void velpred_transverse_3d(const int* lo, const int* hi,
                     const int base_dir, const int norm_dir,
@@ -1403,7 +1403,7 @@ extern "C"
                     const amrex::Real* uimhz, const int* uiz_lo, const int* uiz_hi,
                     const amrex::Real* uimh_trans, const int* uit_lo, const int* uit_hi,
 		            const amrex::Real* dx, const amrex::Real dt,
-                    const int* adv_bc, const int* phys_bc);
+                    const int* phys_bc);
 
     void velpred_3d(const int* lo, const int* hi,
                     const int lev, const int idir,
@@ -1430,7 +1430,7 @@ extern "C"
               const amrex::Real* wimhyx, const int* wyx_lo, const int* wyx_hi,
                     const amrex::Real* force, const int* f_lo, const int* f_hi, const int nc_f, int ng_f,
                     const amrex::Real* w0, const amrex::Real* dx, const amrex::Real dt,
-                    const int* adv_bc, const int* phys_bc);
+                    const int* phys_bc);
 #endif
 
     //////////////////////

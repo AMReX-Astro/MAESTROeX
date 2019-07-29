@@ -609,7 +609,6 @@ end subroutine velpred_2d
 #endif
 
 
-
 #if (AMREX_SPACEDIM == 3)
 subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
      utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
@@ -624,7 +623,7 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
      ul, ul_lo, ul_hi, &
      ur, ur_lo, ur_hi, &
      uimh, ui_lo, ui_hi, &
-     dx,dt,adv_bc,phys_bc) bind(C,name="velpred_interface_3d")
+     dx,dt,phys_bc) bind(C,name="velpred_interface_3d")
 
   integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
   integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
@@ -655,25 +654,15 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
   double precision, intent(inout) :: uimh (ui_lo(1):ui_hi(1),ui_lo(2):ui_hi(2),ui_lo(3):ui_hi(3),AMREX_SPACEDIM)
   double precision, intent(in   ) :: dx(3)
   double precision, value, intent(in   ) :: dt
-  integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
+  integer         , intent(in   ) :: phys_bc(3,2) ! dim, lohi, (comp)
 
   ! local variables
 
-  ! these correspond to umac_L, etc.
-  double precision :: umacl,umacr
-  double precision :: vmacl,vmacr
-  double precision :: wmacl,wmacr
-
   double precision :: hx, hy, hz, dt2, dt4, dt6, uavg, maxu, minu
-  double precision :: fl, fr
 
   integer :: i,j,k
 
-  logical :: test
-  !
-  ! call bl_allocate(slopex,lo-1,hi+1,3)
-  ! call bl_allocate(slopey,lo-1,hi+1,3)
-  ! call bl_allocate(slopez,lo-1,hi+1,3)
+  !$gpu
 
   dt2 = HALF*dt
   dt4 = dt/4.0d0
@@ -682,44 +671,6 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
   hx = dx(1)
   hy = dx(2)
   hz = dx(3)
-
-  ! if (ppm_type .eq. 0) then
-  !
-  !    call slopex_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-  !         slopex,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
-  !    call slopey_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-  !         slopey,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
-  !    call slopez_3d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-  !         slopez,lo-1,hi+1,AMREX_SPACEDIM, &
-  !         domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
-  !
-  ! else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-  !    ! call ppm_3d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-  !    !      ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
-  !    !      Ipu,lo-1,hi+1,Imu,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,1,1)
-  !    ! call ppm_3d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-  !    !      ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
-  !    !      Ipv,lo-1,hi+1,Imv,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,2,2)
-  !    ! call ppm_3d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-  !    !      ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
-  !    !      Ipw,lo-1,hi+1,Imw,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,3,3)
-  !    !
-  !    ! ! trace forces, if necessary.  Note by default the ppm routines
-  !    ! ! will trace each component to each interface in all coordinate
-  !    ! ! directions, but we really only need the force traced along
-  !    ! ! its respective dimension.  This should be simplified later.
-  !    ! if (ppm_trace_forces .eq. 1) then
-  !    !    call ppm_3d(lo-1,hi+1,force,f_lo,f_hi,nc_f, &
-  !    !         ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
-  !    !         Ipfx,lo-1,hi+1,Imfx,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,1,1)
-  !    !    call ppm_3d(lo-1,hi+1,force,f_lo,f_hi,nc_f, &
-  !    !         ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
-  !    !         Ipfy,lo-1,hi+1,Imfy,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,2,2)
-  !    !    call ppm_3d(lo-1,hi+1,force,f_lo,f_hi,nc_f, &
-  !    !         ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
-  !    !         Ipfz,lo-1,hi+1,Imfz,lo-1,hi+1,domlo,domhi,adv_bc,dx,dt,0,3,3)
-  !    ! endif
-  ! end if
 
   !******************************************************************
   ! Create u_{\i-\half\e_x}^x, etc.
@@ -731,23 +682,23 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
      ! Allocated from lo:hi+1 in the normal direction
      ! lo-1:hi+1 in the transverse directions
 
-     do k=lo(3)-1,hi(3)+1
-        do j=lo(2)-1,hi(2)+1
-           do i=lo(1),hi(1)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
 
               if (ppm_type .eq. 0) then
-                 ! maxu = (HALF - dt2*max(ZERO,ufull(i-1,j,k,1))/hx)
-                 ! minu = (HALF + dt2*min(ZERO,ufull(i  ,j,k,1))/hx)
-                 !
-                 ! ! extrapolate all components of velocity to left face
-                 ! ul(i,j,k,1) = utilde(i-1,j,k,1) + maxu * slopex(i-1,j,k,1)
-                 ! ul(i,j,k,2) = utilde(i-1,j,k,2) + maxu * slopex(i-1,j,k,2)
-                 ! ul(i,j,k,3) = utilde(i-1,j,k,3) + maxu * slopex(i-1,j,k,3)
-                 !
-                 ! ! extrapolate all components of velocity to right face
-                 ! ur(i,j,k,1) = utilde(i,j,k,1) - minu * slopex(i,j,k,1)
-                 ! ur(i,j,k,2) = utilde(i,j,k,2) - minu * slopex(i,j,k,2)
-                 ! ur(i,j,k,3) = utilde(i,j,k,3) - minu * slopex(i,j,k,3)
+                 maxu = (HALF - dt2*max(ZERO,ufull(i-1,j,k,1))/hx)
+                 minu = (HALF + dt2*min(ZERO,ufull(i  ,j,k,1))/hx)
+
+                 ! extrapolate all components of velocity to left face
+                 ul(i,j,k,1) = utilde(i-1,j,k,1) + maxu * Ipu(i-1,j,k,1)
+                 ul(i,j,k,2) = utilde(i-1,j,k,2) + maxu * Ipu(i-1,j,k,2)
+                 ul(i,j,k,3) = utilde(i-1,j,k,3) + maxu * Ipu(i-1,j,k,3)
+
+                 ! extrapolate all components of velocity to right face
+                 ur(i,j,k,1) = utilde(i,j,k,1) - minu * Ipu(i,j,k,1)
+                 ur(i,j,k,2) = utilde(i,j,k,2) - minu * Ipu(i,j,k,2)
+                 ur(i,j,k,3) = utilde(i,j,k,3) - minu * Ipu(i,j,k,3)
               else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                  ! extrapolate all components of velocity to left face
                  ul(i,j,k,1) = Ipu(i-1,j,k,1)
@@ -764,45 +715,49 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                  select case(phys_bc(1,1))
                  case (Inflow)
-                    ul(lo(1),j,k,1:3) = utilde(lo(1)-1,j,k,1:3)
-                    ur(lo(1),j,k,1:3) = utilde(lo(1)-1,j,k,1:3)
+                    ul(i,j,k,1:3) = utilde(i-1,j,k,1:3)
+                    ur(i,j,k,1:3) = utilde(i-1,j,k,1:3)
                  case (SlipWall, Symmetry)
-                    ul(lo(1),j,k,1) = ZERO
-                    ur(lo(1),j,k,1) = ZERO
-                    ul(lo(1),j,k,2) = ur(lo(1),j,k,2)
-                    ul(lo(1),j,k,3) = ur(lo(1),j,k,3)
+                    ul(i,j,k,1) = ZERO
+                    ur(i,j,k,1) = ZERO
+                    ul(i,j,k,2) = ur(i,j,k,2)
+                    ul(i,j,k,3) = ur(i,j,k,3)
                  case (NoSlipWall)
-                    ul(lo(1),j,k,1:3) = ZERO
-                    ur(lo(1),j,k,1:3) = ZERO
+                    ul(i,j,k,1:3) = ZERO
+                    ur(i,j,k,1:3) = ZERO
                  case (Outflow)
-                    ur(lo(1),j,k,1) = min(ur(lo(1),j,k,1),ZERO)
-                    ul(lo(1),j,k,1:3) = ul(lo(1),j,k,1:3)
+                    ur(i,j,k,1) = min(ur(i,j,k,1),ZERO)
+                    ul(i,j,k,1:3) = ul(i,j,k,1:3)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  select case(phys_bc(1,2))
                  case (Inflow)
-                    ul(hi(1)+1,j,k,1:3) = utilde(hi(1)+1,j,k,1:)
-                    ur(hi(1)+1,j,k,1:3) = utilde(hi(1)+1,j,k,1:3)
+                    ul(i,j,k,1:3) = utilde(i,j,k,1:)
+                    ur(i,j,k,1:3) = utilde(i,j,k,1:3)
                  case (SlipWall, Symmetry)
-                    ul(hi(1)+1,j,k,1) = ZERO
-                    ur(hi(1)+1,j,k,1) = ZERO
-                    ur(hi(1)+1,j,k,2) = ul(hi(1)+1,j,k,2)
-                    ur(hi(1)+1,j,k,3) = ul(hi(1)+1,j,k,3)
+                    ul(i,j,k,1) = ZERO
+                    ur(i,j,k,1) = ZERO
+                    ur(i,j,k,2) = ul(i,j,k,2)
+                    ur(i,j,k,3) = ul(i,j,k,3)
                  case (NoSlipWall)
-                    ul(hi(1)+1,j,k,1:3) = ZERO
-                    ur(hi(1)+1,j,k,1:3) = ZERO
+                    ul(i,j,k,1:3) = ZERO
+                    ur(i,j,k,1:3) = ZERO
                  case (Outflow)
-                    ul(hi(1)+1,j,k,1) = max(ul(hi(1)+1,j,k,1),ZERO)
-                    ur(hi(1)+1,j,k,1:3) = ul(hi(1)+1,j,k,1:3)
+                    ul(i,j,k,1) = max(ul(i,j,k,1),ZERO)
+                    ur(i,j,k,1:3) = ul(i,j,k,1:3)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,2)")
+#endif
                  end select
               end if
 
@@ -827,23 +782,23 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
      ! Allocated from lo:hi+1 in the normal direction
      ! lo-1:hi+1 in the transverse directions
 
-     do k=lo(3)-1,hi(3)+1
-        do j=lo(2),hi(2)+1
-           do i=lo(1)-1,hi(1)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
 
               if (ppm_type .eq. 0) then
-                 ! maxu = (HALF - dt2*max(ZERO,ufull(i,j-1,k,2))/hy)
-                 ! minu = (HALF + dt2*min(ZERO,ufull(i,j  ,k,2))/hy)
-                 !
-                 ! ! extrapolate all components of velocity to left face
-                 ! ul(i,j,k,1) = utilde(i,j-1,k,1) + maxu * slopey(i,j-1,k,1)
-                 ! ul(i,j,k,2) = utilde(i,j-1,k,2) + maxu * slopey(i,j-1,k,2)
-                 ! ul(i,j,k,3) = utilde(i,j-1,k,3) + maxu * slopey(i,j-1,k,3)
-                 !
-                 ! ! extrapolate all components of velocity to right face
-                 ! ur(i,j,k,1) = utilde(i,j,k,1) - minu * slopey(i,j,k,1)
-                 ! ur(i,j,k,2) = utilde(i,j,k,2) - minu * slopey(i,j,k,2)
-                 ! ur(i,j,k,3) = utilde(i,j,k,3) - minu * slopey(i,j,k,3)
+                 maxu = (HALF - dt2*max(ZERO,ufull(i,j-1,k,2))/hy)
+                 minu = (HALF + dt2*min(ZERO,ufull(i,j  ,k,2))/hy)
+
+                 ! extrapolate all components of velocity to left face
+                 ul(i,j,k,1) = utilde(i,j-1,k,1) + maxu * Imv(i,j-1,k,1)
+                 ul(i,j,k,2) = utilde(i,j-1,k,2) + maxu * Imv(i,j-1,k,2)
+                 ul(i,j,k,3) = utilde(i,j-1,k,3) + maxu * Imv(i,j-1,k,3)
+
+                 ! extrapolate all components of velocity to right face
+                 ur(i,j,k,1) = utilde(i,j,k,1) - minu * Imv(i,j,k,1)
+                 ur(i,j,k,2) = utilde(i,j,k,2) - minu * Imv(i,j,k,2)
+                 ur(i,j,k,3) = utilde(i,j,k,3) - minu * Imv(i,j,k,3)
 
               else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                  ! extrapolate all components of velocity to left face
@@ -861,45 +816,49 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                  select case(phys_bc(2,1))
                  case (Inflow)
-                    ul(i,lo(2),k,1:3) = utilde(i,lo(2)-1,k,1:3)
-                    ur(i,lo(2),k,1:3) = utilde(i,lo(2)-1,k,1:3)
+                    ul(i,j,k,1:3) = utilde(i,j-1,k,1:3)
+                    ur(i,j,k,1:3) = utilde(i,j-1,k,1:3)
                  case (SlipWall, Symmetry)
-                    ul(i,lo(2),k,1) = ur(i,lo(2),k,1)
-                    ul(i,lo(2),k,2) = ZERO
-                    ur(i,lo(2),k,2) = ZERO
-                    ul(i,lo(2),k,3) = ur(i,lo(2),k,3)
+                    ul(i,j,k,1) = ur(i,j,k,1)
+                    ul(i,j,k,2) = ZERO
+                    ur(i,j,k,2) = ZERO
+                    ul(i,j,k,3) = ur(i,j,k,3)
                  case (NoSlipWall)
-                    ul(i,lo(2),k,1:3) = ZERO
-                    ur(i,lo(2),k,1:3) = ZERO
+                    ul(i,j,k,1:3) = ZERO
+                    ur(i,j,k,1:3) = ZERO
                  case (Outflow)
-                    ur(i,lo(2),k,2) = min(ur(i,lo(2),k,2),ZERO)
-                    ul(i,lo(2),k,1:3) = ur(i,lo(2),k,1:3)
+                    ur(i,j,k,2) = min(ur(i,j,k,2),ZERO)
+                    ul(i,j,k,1:3) = ur(i,j,k,1:3)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  select case(phys_bc(2,2))
                  case (Inflow)
-                    ul(i,hi(2)+1,k,1:3) = utilde(i,hi(2)+1,k,1:3)
-                    ur(i,hi(2)+1,k,1:3) = utilde(i,hi(2)+1,k,1:3)
+                    ul(i,j,k,1:3) = utilde(i,j,k,1:3)
+                    ur(i,j,k,1:3) = utilde(i,j,k,1:3)
                  case (SlipWall, Symmetry)
-                    ur(i,hi(2)+1,k,1) = ul(i,hi(2)+1,k,1)
-                    ul(i,hi(2)+1,k,2) = ZERO
-                    ur(i,hi(2)+1,k,2) = ZERO
-                    ur(i,hi(2)+1,k,3) = ul(i,hi(2)+1,k,3)
+                    ur(i,j,k,1) = ul(i,j,k,1)
+                    ul(i,j,k,2) = ZERO
+                    ur(i,j,k,2) = ZERO
+                    ur(i,j,k,3) = ul(i,j,k,3)
                  case (NoSlipWall)
-                    ul(i,hi(2)+1,k,1:3) = ZERO
-                    ur(i,hi(2)+1,k,1:3) = ZERO
+                    ul(i,j,k,1:3) = ZERO
+                    ur(i,j,k,1:3) = ZERO
                  case (Outflow)
-                    ul(i,hi(2)+1,k,2) = max(ul(i,hi(2)+1,k,2),ZERO)
-                    ur(i,hi(2)+1,k,1:3) = ul(i,hi(2)+1,k,1:3)
+                    ul(i,j,k,2) = max(ul(i,j,k,2),ZERO)
+                    ur(i,j,k,1:3) = ul(i,j,k,1:3)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,2)")
+#endif
                  end select
               end if
 
@@ -923,23 +882,23 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
      ! Allocated from lo:hi+1 in the normal direction
      ! lo-1:hi+1 in the transverse directions
 
-     do k=lo(3),hi(3)+1
-        do j=lo(2)-1,hi(2)+1
-           do i=lo(1)-1,hi(1)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
 
               if (ppm_type .eq. 0) then
-                 ! maxu = (HALF - dt2*max(ZERO,ufull(i,j,k-1,3))/hz)
-                 ! minu = (HALF + dt2*min(ZERO,ufull(i,j,k  ,3))/hz)
-                 !
-                 ! ! extrapolate all components of velocity to left face
-                 ! ul(i,j,k,1) = utilde(i,j,k-1,1) + maxu * slopez(i,j,k-1,1)
-                 ! ul(i,j,k,2) = utilde(i,j,k-1,2) + maxu * slopez(i,j,k-1,2)
-                 ! ul(i,j,k,3) = utilde(i,j,k-1,3) + maxu * slopez(i,j,k-1,3)
-                 !
-                 ! ! extrapolate all components of velocity to right face
-                 ! ur(i,j,k,1) = utilde(i,j,k,1) - minu * slopez(i,j,k,1)
-                 ! ur(i,j,k,2) = utilde(i,j,k,2) - minu * slopez(i,j,k,2)
-                 ! ur(i,j,k,3) = utilde(i,j,k,3) - minu * slopez(i,j,k,3)
+                 maxu = (HALF - dt2*max(ZERO,ufull(i,j,k-1,3))/hz)
+                 minu = (HALF + dt2*min(ZERO,ufull(i,j,k  ,3))/hz)
+
+                 ! extrapolate all components of velocity to left face
+                 ul(i,j,k,1) = utilde(i,j,k-1,1) + maxu * Imw(i,j,k-1,1)
+                 ul(i,j,k,2) = utilde(i,j,k-1,2) + maxu * Imw(i,j,k-1,2)
+                 ul(i,j,k,3) = utilde(i,j,k-1,3) + maxu * Imw(i,j,k-1,3)
+
+                 ! extrapolate all components of velocity to right face
+                 ur(i,j,k,1) = utilde(i,j,k,1) - minu * Imw(i,j,k,1)
+                 ur(i,j,k,2) = utilde(i,j,k,2) - minu * Imw(i,j,k,2)
+                 ur(i,j,k,3) = utilde(i,j,k,3) - minu * Imw(i,j,k,3)
 
               else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
@@ -958,45 +917,49 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                  select case(phys_bc(3,1))
                  case (Inflow)
-                    ul(i,j,lo(3),1:3) = utilde(i,j,lo(3)-1,1:3)
-                    ur(i,j,lo(3),1:3) = utilde(i,j,lo(3)-1,1:3)
+                    ul(i,j,k,1:3) = utilde(i,j,k-1,1:3)
+                    ur(i,j,k,1:3) = utilde(i,j,k-1,1:3)
                  case (SlipWall, Symmetry)
-                    ul(i,j,lo(3),1) = ur(i,j,lo(3),1)
-                    ul(i,j,lo(3),2) = ur(i,j,lo(3),2)
-                    ul(i,j,lo(3),3) = ZERO
-                    ur(i,j,lo(3),3) = ZERO
+                    ul(i,j,k,1) = ur(i,j,k,1)
+                    ul(i,j,k,2) = ur(i,j,k,2)
+                    ul(i,j,k,3) = ZERO
+                    ur(i,j,k,3) = ZERO
                  case (NoSlipWall)
-                    ul(i,j,lo(3),1:3) = ZERO
-                    ur(i,j,lo(3),1:3) = ZERO
+                    ul(i,j,k,1:3) = ZERO
+                    ur(i,j,k,1:3) = ZERO
                  case (Outflow)
-                    ur(i,j,lo(3),3) = min(ur(i,j,lo(3),3),ZERO)
-                    ul(i,j,lo(3),1:3) = ur(i,j,lo(3),1:3)
+                    ur(i,j,k,3) = min(ur(i,j,k,3),ZERO)
+                    ul(i,j,k,1:3) = ur(i,j,k,1:3)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                  select case(phys_bc(3,2))
                  case (Inflow)
-                    ul(i,j,hi(3)+1,1:3) = utilde(i,j,hi(3)+1,1:3)
-                    ur(i,j,hi(3)+1,1:3) = utilde(i,j,hi(3)+1,1:3)
+                    ul(i,j,k,1:3) = utilde(i,j,k,1:3)
+                    ur(i,j,k,1:3) = utilde(i,j,k,1:3)
                  case (SlipWall, Symmetry)
-                    ur(i,j,hi(3)+1,1) = ul(i,j,hi(3)+1,1)
-                    ur(i,j,hi(3)+1,2) = ul(i,j,hi(3)+1,2)
-                    ul(i,j,hi(3)+1,3) = ZERO
-                    ur(i,j,hi(3)+1,3) = ZERO
+                    ur(i,j,k,1) = ul(i,j,k,1)
+                    ur(i,j,k,2) = ul(i,j,k,2)
+                    ul(i,j,k,3) = ZERO
+                    ur(i,j,k,3) = ZERO
                  case (NoSlipWall)
-                    ul(i,j,hi(3)+1,1:3) = ZERO
-                    ur(i,j,hi(3)+1,1:3) = ZERO
+                    ul(i,j,k,1:3) = ZERO
+                    ur(i,j,k,1:3) = ZERO
                  case (Outflow)
-                    ul(i,j,hi(3)+1,3) = max(ul(i,j,hi(3)+1,3),ZERO)
-                    ur(i,j,hi(3)+1,1:3) = ul(i,j,hi(3)+1,1:3)
+                    ul(i,j,k,3) = max(ul(i,j,k,3),ZERO)
+                    ur(i,j,k,1:3) = ul(i,j,k,1:3)
                  case (Interior)
                  case default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,2)")
+#endif
                  end select
               end if
 
@@ -1037,7 +1000,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
      urz, urz_lo, urz_hi, &
      uimhz, uiz_lo, uiz_hi, &
      uimh_trans, uit_lo, uit_hi, &
-     dx,dt,adv_bc,phys_bc) bind(C,name="velpred_transverse_3d")
+     dx,dt,phys_bc) bind(C,name="velpred_transverse_3d")
 
   integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
   integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
@@ -1071,7 +1034,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
   double precision, intent(inout) :: uimh_trans (uit_lo(1):uit_hi(1),uit_lo(2):uit_hi(2),uit_lo(3):uit_hi(3))
   double precision, intent(in   ) :: dx(3)
   double precision, value, intent(in   ) :: dt
-  integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
+  integer         , intent(in   ) :: phys_bc(3,2) ! dim, lohi, (comp)
 
   ! local variables
 
@@ -1083,12 +1046,11 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
   double precision :: wlxy, wrxy
   double precision :: wlyx, wryx
 
-  double precision :: hx, hy, hz, dt2, dt4, dt6, uavg, maxu, minu
-  double precision :: fl, fr
+  double precision :: hx, hy, hz, dt2, dt4, dt6, uavg
 
   integer :: i,j,k
 
-  logical :: test
+  !$gpu
 
   dt2 = HALF*dt
   dt4 = dt/4.0d0
@@ -1109,9 +1071,12 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
      ! lo:hi+1 in normal direction
      ! lo:hi in transverse direction
      ! uimhyz loop
+     ! do k=lo(3),hi(3)
+     !    do j=lo(2),hi(2)+1
+     !       do i=lo(1)-1,hi(1)+1
      do k=lo(3),hi(3)
-        do j=lo(2),hi(2)+1
-           do i=lo(1)-1,hi(1)+1
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
               ! extrapolate to faces
               ulyz = uly(i,j,k,1) - (dt6/hz)*(wtrans(i,j-1,k+1)+wtrans(i,j-1,k)) &
                    * (uimhz(i,j-1,k+1,1)-uimhz(i,j-1,k,1))
@@ -1122,8 +1087,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                  select case(phys_bc(2,1))
                  case (Inflow)
-                    ulyz = utilde(i,lo(2)-1,k,1)
-                    uryz = utilde(i,lo(2)-1,k,1)
+                    ulyz = utilde(i,j-1,k,1)
+                    uryz = utilde(i,j-1,k,1)
                  case (SlipWall, Symmetry, Outflow)
                     ulyz = uryz
                  case (NoSlipWall)
@@ -1131,16 +1096,18 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     uryz = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  select case(phys_bc(2,2))
                  case (Inflow)
-                    ulyz = utilde(i,hi(2)+1,k,1)
-                    uryz = utilde(i,hi(2)+1,k,1)
+                    ulyz = utilde(i,j,k,1)
+                    uryz = utilde(i,j,k,1)
                  case (SlipWall, Symmetry, Outflow)
                     uryz = ulyz
                  case (NoSlipWall)
@@ -1148,7 +1115,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     uryz = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,2)")
+#endif
                  end select
               end if
 
@@ -1169,9 +1138,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
      ! lo:hi in transverse direction
 
      ! uimhzy loop
-     do k=lo(3),hi(3)+1
+     do k=lo(3),hi(3)
         do j=lo(2),hi(2)
-           do i=lo(1)-1,hi(1)+1
+           do i=lo(1),hi(1)
               ! extrapolate to faces
               ulzy = ulz(i,j,k,1) - (dt6/hy)*(vtrans(i,j+1,k-1)+vtrans(i,j,k-1)) &
                    * (uimhy(i,j+1,k-1,1)-uimhy(i,j,k-1,1))
@@ -1182,8 +1151,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                  select case(phys_bc(3,1))
                  case (Inflow)
-                    ulzy = utilde(i,j,lo(3)-1,1)
-                    urzy = utilde(i,j,lo(3)-1,1)
+                    ulzy = utilde(i,j,k-1,1)
+                    urzy = utilde(i,j,k-1,1)
                  case (SlipWall, Symmetry, Outflow)
                     ulzy = urzy
                  case (NoSlipWall)
@@ -1191,16 +1160,18 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     urzy = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                  select case(phys_bc(3,2))
                  case (Inflow)
-                    ulzy = utilde(i,j,hi(3)+1,1)
-                    urzy = utilde(i,j,hi(3)+1,1)
+                    ulzy = utilde(i,j,k,1)
+                    urzy = utilde(i,j,k,1)
                  case (SlipWall, Symmetry, Outflow)
                     urzy = ulzy
                  case (NoSlipWall)
@@ -1208,7 +1179,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     urzy = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,2)")
+#endif
                  end select
               end if
 
@@ -1229,8 +1202,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
 
      ! vimhxz loop
      do k=lo(3),hi(3)
-        do j=lo(2)-1,hi(2)+1
-           do i=lo(1),hi(1)+1
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
               ! extrapolate to faces
               vlxz = ulx(i,j,k,2) - (dt6/hz)*(wtrans(i-1,j,k+1)+wtrans(i-1,j,k)) &
                    * (uimhz(i-1,j,k+1,2)-uimhz(i-1,j,k,2))
@@ -1242,8 +1215,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                  select case(phys_bc(1,1))
                  case (Inflow)
-                    vlxz = utilde(lo(1)-1,j,k,2)
-                    vrxz = utilde(lo(1)-1,j,k,2)
+                    vlxz = utilde(i-1,j,k,2)
+                    vrxz = utilde(i-1,j,k,2)
                  case (SlipWall, Symmetry, Outflow)
                     vlxz = vrxz
                  case (NoSlipWall)
@@ -1251,16 +1224,18 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     vrxz = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  select case(phys_bc(1,2))
                  case (Inflow)
-                    vlxz = utilde(hi(1)+1,j,k,2)
-                    vrxz = utilde(hi(1)+1,j,k,2)
+                    vlxz = utilde(i,j,k,2)
+                    vrxz = utilde(i,j,k,2)
                  case (SlipWall, Symmetry, Outflow)
                     vrxz = vlxz
                  case (NoSlipWall)
@@ -1268,7 +1243,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     vrxz = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,2)")
+#endif
                  end select
               end if
 
@@ -1288,8 +1265,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
      ! lo:hi in transverse direction
 
      ! vimhzx loop
-     do k=lo(3),hi(3)+1
-        do j=lo(2)-1,hi(2)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
            do i=lo(1),hi(1)
               ! extrapolate to faces
               vlzx = ulz(i,j,k,2) - (dt6/hx)*(utrans(i+1,j,k-1)+utrans(i,j,k-1)) &
@@ -1301,8 +1278,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                  select case(phys_bc(3,1))
                  case (Inflow)
-                    vlzx = utilde(i,j,lo(3)-1,2)
-                    vrzx = utilde(i,j,lo(3)-1,2)
+                    vlzx = utilde(i,j,k-1,2)
+                    vrzx = utilde(i,j,k-1,2)
                  case (SlipWall, Symmetry, Outflow)
                     vlzx = vrzx
                  case (NoSlipWall)
@@ -1310,16 +1287,18 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     vrzx = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                  select case(phys_bc(3,2))
                  case (Inflow)
-                    vlzx = utilde(i,j,hi(3)+1,2)
-                    vrzx = utilde(i,j,hi(3)+1,2)
+                    vlzx = utilde(i,j,k,2)
+                    vrzx = utilde(i,j,k,2)
                  case (SlipWall, Symmetry, Outflow)
                     vrzx = vlzx
                  case (NoSlipWall)
@@ -1327,7 +1306,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     vrzx = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,2)")
+#endif
                  end select
               end if
 
@@ -1347,9 +1328,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
      ! lo:hi in transverse direction
 
      ! wimhxy loop
-     do k=lo(3)-1,hi(3)+1
+     do k=lo(3),hi(3)
         do j=lo(2),hi(2)
-           do i=lo(1),hi(1)+1
+           do i=lo(1),hi(1)
               ! extrapolate to faces
               wlxy = ulx(i,j,k,3) - (dt6/hy)*(vtrans(i-1,j+1,k)+vtrans(i-1,j,k)) &
                    * (uimhy(i-1,j+1,k,3)-uimhy(i-1,j,k,3))
@@ -1360,8 +1341,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                  select case(phys_bc(1,1))
                  case (Inflow)
-                    wlxy = utilde(lo(1)-1,j,k,3)
-                    wrxy = utilde(lo(1)-1,j,k,3)
+                    wlxy = utilde(i-1,j,k,3)
+                    wrxy = utilde(i-1,j,k,3)
                  case (SlipWall, Symmetry, Outflow)
                     wlxy = wrxy
                  case (NoSlipWall)
@@ -1369,16 +1350,18 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     wrxy = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  select case(phys_bc(1,2))
                  case (Inflow)
-                    wlxy = utilde(hi(1)+1,j,k,3)
-                    wrxy = utilde(hi(1)+1,j,k,3)
+                    wlxy = utilde(i,j,k,3)
+                    wrxy = utilde(i,j,k,3)
                  case (SlipWall, Symmetry, Outflow)
                     wrxy = wlxy
                  case (NoSlipWall)
@@ -1386,7 +1369,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     wrxy = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,2)")
+#endif
                  end select
               end if
 
@@ -1406,8 +1391,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
      ! lo:hi in transverse direction
 
      ! wimhyx loop
-     do k=lo(3)-1,hi(3)+1
-        do j=lo(2),hi(2)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
            do i=lo(1),hi(1)
               ! extrapolate to faces
               wlyx = uly(i,j,k,3) - (dt6/hx)*(utrans(i+1,j-1,k)+utrans(i,j-1,k)) &
@@ -1419,8 +1404,8 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                  select case(phys_bc(2,1))
                  case (Inflow)
-                    wlyx = utilde(i,lo(2)-1,k,3)
-                    wryx = utilde(i,lo(2)-1,k,3)
+                    wlyx = utilde(i,j-1,k,3)
+                    wryx = utilde(i,j-1,k,3)
                  case (SlipWall, Symmetry, Outflow)
                     wlyx = wryx
                  case (NoSlipWall)
@@ -1428,16 +1413,18 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     wryx = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  select case(phys_bc(2,2))
                  case (Inflow)
-                    wlyx = utilde(i,hi(2)+1,k,3)
-                    wryx = utilde(i,hi(2)+1,k,3)
+                    wlyx = utilde(i,j,k,3)
+                    wryx = utilde(i,j,k,3)
                  case (SlipWall, Symmetry, Outflow)
                     wryx = wlyx
                  case (NoSlipWall)
@@ -1445,7 +1432,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     wryx = ZERO
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,2)")
+#endif
                  end select
               end if
 
@@ -1483,7 +1472,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
      wimhxy, wxy_lo, wxy_hi, &
      wimhyx, wyx_lo, wyx_hi, &
      force,   f_lo,  f_hi, nc_f, ng_f, &
-     w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_3d")
+     w0,dx,dt,phys_bc) bind(C,name="velpred_3d")
 
   integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
   integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
@@ -1533,7 +1522,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
   double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
   double precision, intent(in   ) :: dx(3)
   double precision, value, intent(in   ) :: dt
-  integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
+  integer         , intent(in   ) :: phys_bc(3,2) ! dim, lohi, (comp)
 
   ! local variables
 
@@ -1542,12 +1531,14 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
   double precision :: vmacl,vmacr
   double precision :: wmacl,wmacr
 
-  double precision :: hx, hy, hz, dt2, dt4, dt6, uavg, maxu, minu
+  double precision :: hx, hy, hz, dt2, dt4, dt6, uavg
   double precision :: fl, fr
 
   integer :: i,j,k
 
   logical :: test
+
+  !$gpu
 
   dt2 = HALF*dt
   dt4 = dt/4.0d0
@@ -1569,7 +1560,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
 
      do k=lo(3),hi(3)
         do j=lo(2),hi(2)
-           do i=lo(1),hi(1)+1
+           do i=lo(1),hi(1)
               ! use the traced force if ppm_trace_forces = 1
               fl = merge(force(i-1,j,k,1), Ipf(i-1,j,k,1), ppm_trace_forces == 0)
               fr = merge(force(i  ,j,k,1), Imf(i  ,j,k,1), ppm_trace_forces == 0)
@@ -1610,29 +1601,33 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                  select case(phys_bc(1,1))
                  case (Inflow)
-                    umac(lo(1),j,k) = utilde(lo(1)-1,j,k,1)
+                    umac(i,j,k) = utilde(i-1,j,k,1)
                  case (SlipWall, NoSlipWall, Symmetry)
-                    umac(lo(1),j,k) = ZERO
+                    umac(i,j,k) = ZERO
                  case (Outflow)
-                    umac(lo(1),j,k) = min(umacr,ZERO)
+                    umac(i,j,k) = min(umacr,ZERO)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  select case(phys_bc(1,2))
                  case (Inflow)
-                    umac(hi(1)+1,j,k) = utilde(hi(1)+1,j,k,1)
+                    umac(i,j,k) = utilde(i,j,k,1)
                  case (SlipWall, Symmetry, NoSlipWall)
-                    umac(hi(1)+1,j,k) = ZERO
+                    umac(i,j,k) = ZERO
                  case (Outflow)
-                    umac(hi(1)+1,j,k) = max(umacl,ZERO)
+                    umac(i,j,k) = max(umacl,ZERO)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,2)")
+#endif
                  end select
               end if
            enddo
@@ -1645,9 +1640,8 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
      ! Allocated from lo:hi+1 in the normal direction
      ! lo:hi in the transverse direction
 
-     !$OMP PARALLEL DO PRIVATE(i,j,k,fl,fr)
      do k=lo(3),hi(3)
-        do j=lo(2),hi(2)+1
+        do j=lo(2),hi(2)
            do i=lo(1),hi(1)
               ! use the traced force if ppm_trace_forces = 1
               fl = merge(force(i,j-1,k,2), Ipf(i,j-1,k,2), ppm_trace_forces == 0)
@@ -1688,29 +1682,33 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                  select case(phys_bc(2,1))
                  case (Inflow)
-                    vmac(i,lo(2),k) = utilde(i,lo(2)-1,k,2)
+                    vmac(i,j,k) = utilde(i,j-1,k,2)
                  case (SlipWall, Symmetry, NoSlipWall)
-                    vmac(i,lo(2),k) = ZERO
+                    vmac(i,j,k) = ZERO
                  case (Outflow)
-                    vmac(i,lo(2),k) = min(vmacr,ZERO)
+                    vmac(i,j,k) = min(vmacr,ZERO)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,1)")
+#endif
                  end select
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  select case(phys_bc(2,2))
                  case (Inflow)
-                    vmac(i,hi(2)+1,k) = utilde(i,hi(2)+1,k,2)
+                    vmac(i,j,k) = utilde(i,j,k,2)
                  case (SlipWall, Symmetry, NoSlipWall)
-                    vmac(i,hi(2)+1,k) = ZERO
+                    vmac(i,j,k) = ZERO
                  case (Outflow)
-                    vmac(i,hi(2)+1,k) = max(vmacl,ZERO)
+                    vmac(i,j,k) = max(vmacl,ZERO)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,2)")
+#endif
                  end select
               end if
            enddo
@@ -1723,7 +1721,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
      ! Allocated from lo:hi+1 in the normal direction
      ! lo:hi in the transverse direction
 
-     do k=lo(3),hi(3)+1
+     do k=lo(3),hi(3)
         do j=lo(2),hi(2)
            do i=lo(1),hi(1)
               ! use the traced force if ppm_trace_forces = 1
@@ -1767,32 +1765,35 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                  select case(phys_bc(3,1))
                  case (Inflow)
-                    wmac(i,j,lo(3)) = utilde(i,j,lo(3)-1,3)
+                    wmac(i,j,k) = utilde(i,j,k-1,3)
                  case (SlipWall, Symmetry, NoSlipWall)
-                    wmac(i,j,lo(3)) = ZERO
+                    wmac(i,j,k) = ZERO
                  case (Outflow)
-                    wmac(i,j,lo(3)) = min(wmacr,ZERO)
+                    wmac(i,j,k) = min(wmacr,ZERO)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,1)")
+#endif
                  end select
               end if
 
               ! impose lo side bc's
-              if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                  select case(phys_bc(3,2))
                  case (Inflow)
-                    wmac(i,j,hi(3)+1) = utilde(i,j,hi(3)+1,3)
+                    wmac(i,j,k) = utilde(i,j,k,3)
                  case (SlipWall, Symmetry, NoSlipWall)
-                    wmac(i,j,hi(3)+1) = ZERO
+                    wmac(i,j,k) = ZERO
                  case (Outflow)
-                    wmac(i,j,hi(3)+1) = max(wmacl,ZERO)
+                    wmac(i,j,k) = max(wmacl,ZERO)
                  case (Interior)
                  case  default
+#ifndef AMREX_USE_CUDA
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,2)")
+#endif
                  end select
               end if
-
 
            enddo
         enddo
@@ -1802,6 +1803,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
 
 end subroutine velpred_3d
 #endif
+
 
 
 
