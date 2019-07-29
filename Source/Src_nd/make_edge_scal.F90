@@ -200,7 +200,6 @@ contains
 #endif
 
 
-
 #if (AMREX_SPACEDIM == 2)
 subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
      s,      s_lo, s_hi, nc_s, ng_s, &
