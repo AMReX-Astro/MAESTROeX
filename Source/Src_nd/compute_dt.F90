@@ -206,11 +206,9 @@ contains
        w0macx, x_lo, x_hi, &
        w0macy, y_lo, y_hi, &
        w0macz, z_lo, z_hi, &
-       p0, gamma1bar, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) bind (C,name="estdt_sphr")
+       gp0_cart, g_lo, g_hi) bind (C,name="estdt_sphr")
 
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
+    use amrex_fort_module, only: amrex_min, amrex_max
     
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -220,6 +218,7 @@ contains
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
     integer         , intent(in   ) :: t_lo(3), t_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     integer         , intent(in   ) :: y_lo(3), y_hi(3)
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
@@ -228,30 +227,21 @@ contains
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu  (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
     double precision, intent(in   ) :: dSdt  (t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
+    double precision, intent(in   ) :: gp0_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),3)
     double precision, intent(in   ) :: w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
     double precision, intent(in   ) :: w0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
     double precision, intent(in   ) :: w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
     double precision, intent(in   ) :: w0       (0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
-
-    double precision, pointer :: gp0_cart(:,:,:,:)
-
-    double precision :: gp0(0:max_radial_level,0:nr_fine)
 
     double precision :: spdx, spdy, spdz, spdr, rho_min
-    double precision :: gp_dot_u, gamma1bar_p_avg
+    double precision :: gp_dot_u, dt_temp
     double precision :: fx, fy, fz, eps, denom, a, b, c
     integer          :: i,j,k,r
 
-    call bl_allocate(gp0_cart,lo,hi,3)
-
+    !$gpu
+    
     rho_min = 1.d-20
+    dt_temp = 1.e99
 
     eps = 1.0d-8
 
@@ -291,15 +281,15 @@ contains
        spdr = max(spdr ,abs(w0(0,k)))
     enddo
 
-    umax = max(umax,spdx,spdy,spdz,spdr)
+    call amrex_max(umax,max(spdx,spdy,spdz,spdr))
 
-    if (spdx > eps) dt = min(dt, dx(1)/spdx)
-    if (spdy > eps) dt = min(dt, dx(2)/spdy)
-    if (spdz > eps) dt = min(dt, dx(3)/spdz)
-    if (spdr > eps) dt = min(dt, dr(0)/spdr)
+    if (spdx > eps) dt_temp = min(dt_temp, dx(1)/spdx)
+    if (spdy > eps) dt_temp = min(dt_temp, dx(2)/spdy)
+    if (spdz > eps) dt_temp = min(dt_temp, dx(3)/spdz)
+    if (spdr > eps) dt_temp = min(dt_temp, dr(0)/spdr)
 
-    dt = dt * cfl
-
+    dt_temp = dt_temp*cfl
+    
     ! Limit dt based on forcing terms
     fx = 0.d0
     fy = 0.d0
@@ -330,32 +320,15 @@ contains
     enddo
 
     if (fx > eps) &
-         dt = min(dt,sqrt(2.0D0*dx(1)/fx))
+         dt_temp = min(dt_temp,sqrt(2.0D0*dx(1)/fx))
 
     if (fy > eps) &
-         dt = min(dt,sqrt(2.0D0*dx(2)/fy))
+         dt_temp = min(dt_temp,sqrt(2.0D0*dx(2)/fy))
 
     if (fz > eps) &
-         dt = min(dt,sqrt(2.0D0*dx(3)/fz))
+         dt_temp = min(dt_temp,sqrt(2.0D0*dx(3)/fz))
 
     ! divU constraint
-    if (use_exact_base_state) then
-       do r=1,nr_fine-1
-          gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
-          gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/(r_cc_loc(0,r) - r_cc_loc(0,r-1)) ) / gamma1bar_p_avg
-       end do
-    else
-       do r=1,nr_fine-1
-          gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
-          gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
-       end do
-    end if
-    gp0(0,nr_fine) = gp0(0,nr_fine-1)
-    gp0(0,      0) = gp0(0,        1)
-
-    call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,lo,hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
-
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -367,7 +340,7 @@ contains
              denom = divU(i,j,k) - gp_dot_u
 
              if (denom > 0.d0) then
-                dt = min(dt,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                dt_temp = min(dt_temp,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
              endif
              !
              ! An additional dS/dt timestep constraint originally
@@ -382,15 +355,16 @@ contains
                 a = 0.5d0*scal(i,j,k,rho_comp)*dSdt(i,j,k)
                 b = scal(i,j,k,rho_comp)*divU(i,j,k)
                 c = rho_min - scal(i,j,k,rho_comp)
-                dt = min(dt,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
+                dt_temp = min(dt_temp,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
              endif
 
           enddo
        enddo
     enddo
-
-    call bl_deallocate(gp0_cart)
-
+    
+    ! set dt to local min
+    call amrex_min(dt, dt_temp)
+    
   end subroutine estdt_sphr
 
   subroutine firstdt(lev, dt, umax, lo, hi, dx, &
@@ -571,10 +545,7 @@ contains
        u,     u_lo, u_hi, nc_u, &
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
-       p0, gamma1bar, &
-       gp0_cart, g_lo, g_hi, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
+       gp0_cart, g_lo, g_hi) bind (C,name="firstdt_sphr")
 
     use amrex_fort_module, only: amrex_min, amrex_max
 
@@ -590,18 +561,11 @@ contains
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-    double precision, intent(inout) :: gp0_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),3)
-    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+    double precision, intent(in   ) :: gp0_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3),3)
 
     ! local variables
     double precision :: spdx,spdy,spdz,pforcex,pforcey,pforcez,ux,uy,uz
-    double precision :: gp_dot_u,gamma1bar_p_avg,eps,dt_divu,dt_sound,denom,rho_min
+    double precision :: gp_dot_u,eps,dt_divu,dt_sound,denom,rho_min
     integer          :: i,j,k,r
 
     integer pt_index(3)
@@ -713,9 +677,9 @@ contains
 
   end subroutine firstdt_sphr
 
-  subroutine firstdt_divu(gp0, &
+  subroutine estdt_divu(gp0, &
        p0, gamma1bar, &
-       r_cc_loc, r_edge_loc) bind (C,name="firstdt_divu")
+       r_cc_loc, r_edge_loc) bind (C,name="estdt_divu")
 
     double precision, intent(inout) :: gp0      (0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
@@ -746,6 +710,6 @@ contains
     gp0(0,nr_fine) = gp0(0,nr_fine-1)
     gp0(0,      0) = gp0(0,        1)
 
-  end subroutine firstdt_divu
+  end subroutine estdt_divu
 
 end module compute_dt_module

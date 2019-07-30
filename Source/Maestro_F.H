@@ -162,9 +162,7 @@ extern "C"
 		    const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
 		    const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
 		    const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
-		    const amrex::Real* p0, const amrex::Real* gamma1bar,
-		    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-		    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+		    const amrex::Real* gp0_cart, const int* g_lo, const int* g_hi);
 
     void firstdt(const int lev, amrex::Real* dt, amrex::Real* umax,
                  const int* lo, const int* hi,
@@ -182,12 +180,9 @@ extern "C"
 		      const amrex::Real* u,     const int* u_lo, const int* u_hi, const int* nc_u,
 		      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
 		      const amrex::Real* divu,  const int* d_lo, const int* d_hi,
-		      const amrex::Real* p0, const amrex::Real* gamma1bar,
-		      amrex::Real* gp0_cart, const int* g_lo, const int* g_hi, 
-		      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-		      const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+		      const amrex::Real* gp0_cart, const int* g_lo, const int* g_hi);
     
-    void firstdt_divu(amrex::Real* gp0,
+    void estdt_divu(amrex::Real* gp0,
 		      const amrex::Real* p0, const amrex::Real* gamma1bar,
 		      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
     //////////////////////
