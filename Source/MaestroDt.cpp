@@ -296,6 +296,19 @@ Maestro::FirstDt ()
 #if (AMREX_SPACEDIM == 3)
 	MultiFab& grad_p0_mf = grad_p0[lev];
 #endif
+	
+#ifdef AMREX_USE_CUDA
+       for (MFIter mfi(uold_mf); mfi.isValid(); ++mfi)
+       {
+           // Prefetch data to the host (and then back to the device at the end)
+           // to avoid expensive page faults while the initialization is done.
+           uold_mf.prefetchToHost(mfi);
+	   sold_mf.prefetchToHost(mfi);
+	   vel_force_mf.prefetchToHost(mfi);
+	   S_cc_old_mf.prefetchToHost(mfi);
+       }
+#endif
+	
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -360,6 +373,16 @@ Maestro::FirstDt ()
 
 	} //end openmp
 	
+#ifdef AMREX_USE_CUDA
+       for (MFIter mfi(uold_mf); mfi.isValid(); ++mfi)
+       {
+           uold_mf.prefetchToDevice(mfi);
+	   sold_mf.prefetchToDevice(mfi);
+	   vel_force_mf.prefetchToDevice(mfi);
+	   S_cc_old_mf.prefetchToDevice(mfi);
+       }
+#endif
+       
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);
 
