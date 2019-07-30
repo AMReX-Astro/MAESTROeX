@@ -273,11 +273,22 @@ Maestro::FirstDt ()
 
 #if (AMREX_SPACEDIM == 3)
     // build and initialize grad_p0 for spherical case
-    Vector<MultiFab> grad_p0(finest_level+1);
+    Vector<MultiFab> gp0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        grad_p0[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-	grad_p0[lev].setVal(0.);
+        gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	gp0_cart[lev].setVal(0.);
     }
+    RealVector gp0( (max_radial_level+1)*(nr_fine+1) );
+    gp0.shrink_to_fit();
+    std::fill(gp0.begin(),gp0.end(), 0.);
+
+    // divU constraint
+    if (use_divu_firstdt) {
+	firstdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(), 
+		     r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    }
+
+    Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
 #endif
     
     Real umax = 0.;
@@ -294,22 +305,9 @@ Maestro::FirstDt ()
         const MultiFab& S_cc_old_mf = S_cc_old[lev];
         const MultiFab& cc_to_r = cell_cc_to_r[lev];
 #if (AMREX_SPACEDIM == 3)
-	MultiFab& grad_p0_mf = grad_p0[lev];
+	MultiFab& gp0_cart_mf = gp0_cart[lev];
 #endif
 	
-#ifdef AMREX_USE_CUDA
-       for (MFIter mfi(uold_mf); mfi.isValid(); ++mfi)
-       {
-           // Prefetch data to the host (and then back to the device at the end)
-           // to avoid expensive page faults while the initialization is done.
-           uold_mf.prefetchToHost(mfi);
-	   sold_mf.prefetchToHost(mfi);
-	   vel_force_mf.prefetchToHost(mfi);
-	   S_cc_old_mf.prefetchToHost(mfi);
-       }
-#endif
-	
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
@@ -359,7 +357,7 @@ Maestro::FirstDt ()
                              BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
                              p0_old.dataPtr(),
                              gamma1bar_old.dataPtr(),
-			     BL_TO_FORTRAN_ANYD(grad_p0_mf[mfi]), 
+			     BL_TO_FORTRAN_ANYD(gp0_cart_mf[mfi]), 
                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                              BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
 #else
@@ -373,16 +371,6 @@ Maestro::FirstDt ()
 
 	} //end openmp
 	
-#ifdef AMREX_USE_CUDA
-       for (MFIter mfi(uold_mf); mfi.isValid(); ++mfi)
-       {
-           uold_mf.prefetchToDevice(mfi);
-	   sold_mf.prefetchToDevice(mfi);
-	   vel_force_mf.prefetchToDevice(mfi);
-	   S_cc_old_mf.prefetchToDevice(mfi);
-       }
-#endif
-       
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);
 

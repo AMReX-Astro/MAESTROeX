@@ -577,7 +577,6 @@ contains
        cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
 
     use amrex_fort_module, only: amrex_min, amrex_max
-    use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -605,16 +604,10 @@ contains
     double precision :: gp_dot_u,gamma1bar_p_avg,eps,dt_divu,dt_sound,denom,rho_min
     integer          :: i,j,k,r
 
-    !double precision, pointer :: gp0_cart(:,:,:,:)
-
-    double precision :: gp0(0:max_radial_level,0:nr_fine)
-
     integer pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
-    
-    !call bl_allocate(gp0_cart,lo,hi,3)
 
     eps = 1.0d-8
 
@@ -695,25 +688,6 @@ contains
 
        dt_divu = 1.d99
 
-       ! spherical divU constraint
-       if (use_exact_base_state) then
-          do r=1,nr_fine-1
-             gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
-             gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/(r_cc_loc(0,r) - r_cc_loc(0,r-1)) ) / gamma1bar_p_avg
-          end do
-       else
-          do r=1,nr_fine-1
-             gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
-             gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
-          end do
-       end if
-
-       gp0(0,nr_fine) = gp0(0,nr_fine-1)
-       gp0(0,      0) = gp0(0,        1)
-
-       call put_1d_array_on_cart_sphr(lo,hi,gp0_cart,g_lo,g_hi,3,gp0,dx,1,1,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
-
        !REDUCTION(MIN : dt_divu)
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
@@ -737,8 +711,41 @@ contains
 
     end if
 
-    !call bl_deallocate(gp0_cart)
-
   end subroutine firstdt_sphr
+
+  subroutine firstdt_divu(gp0, &
+       p0, gamma1bar, &
+       r_cc_loc, r_edge_loc) bind (C,name="firstdt_divu")
+
+    double precision, intent(inout) :: gp0      (0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+
+    ! local variables
+    double precision :: gamma1bar_p_avg
+    integer          :: r
+
+
+    !$gpu
+    
+    ! spherical divU constraint
+    if (use_exact_base_state) then
+       do r=1,nr_fine-1
+          gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
+          gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/(r_cc_loc(0,r) - r_cc_loc(0,r-1)) ) / gamma1bar_p_avg
+       end do
+    else
+       do r=1,nr_fine-1
+          gamma1bar_p_avg = 0.5d0 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1))
+          gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
+       end do
+    end if
+    
+    gp0(0,nr_fine) = gp0(0,nr_fine-1)
+    gp0(0,      0) = gp0(0,        1)
+
+  end subroutine firstdt_divu
 
 end module compute_dt_module
