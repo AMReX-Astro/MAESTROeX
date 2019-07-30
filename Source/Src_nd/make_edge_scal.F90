@@ -657,6 +657,8 @@ subroutine make_divu(lo, hi, &
 
   integer :: i,j,k
 
+  !$gpu
+
   if (is_conservative .eq. 1) then
      do k=lo(3),hi(3)
         do j=lo(2),hi(2)
@@ -720,6 +722,8 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
 
   integer :: i,j,k
 
+  !$gpu
+
   dt2 = HALF*dt
   dt3 = dt/3.0d0
   dt4 = dt/4.0d0
@@ -738,9 +742,9 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
      ! call bl_allocated from lo:hi+1 in the normal direction
      ! lo-1:hi+1 in the transverse directions
 
-     do k=lo(3)-1,hi(3)+1
-        do j=lo(2)-1,hi(2)+1
-           do i=lo(1),hi(1)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
 
               ! loop over appropriate x-faces
               if (ppm_type .eq. 0) then
@@ -757,19 +761,19 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               ! impose lo side bc's
               if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                  if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                    sl(lo(1),j,k) = s(lo(1)-1,j,k,comp)
-                    sr(lo(1),j,k) = s(lo(1)-1,j,k,comp)
+                    sl(i,j,k) = s(i-1,j,k,comp)
+                    sr(i,j,k) = s(i-1,j,k,comp)
                  else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
-                       sr(lo(1),j,k) = min(sr(lo(1),j,k),0.d0)
+                       sr(i,j,k) = min(sr(i,j,k),0.d0)
                     end if
-                    sl(lo(1),j,k) = sr(lo(1),j,k)
+                    sl(i,j,k) = sr(i,j,k)
                  else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
-                    sl(lo(1),j,k) = sr(lo(1),j,k)
+                    sl(i,j,k) = sr(i,j,k)
                  else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-                    sl(lo(1),j,k) = 0.d0
-                    sr(lo(1),j,k) = 0.d0
+                    sl(i,j,k) = 0.d0
+                    sr(i,j,k) = 0.d0
                  else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -779,21 +783,21 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (i .eq.hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+              if (i .eq.hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                    sl(hi(1)+1,j,k) = s(hi(1)+1,j,k,comp)
-                    sr(hi(1)+1,j,k) = s(hi(1)+1,j,k,comp)
+                    sl(i,j,k) = s(i,j,k,comp)
+                    sr(i,j,k) = s(i,j,k,comp)
                  else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
-                       sl(hi(1)+1,j,k) = max(sl(hi(1)+1,j,k),0.d0)
+                       sl(i,j,k) = max(sl(i,j,k),0.d0)
                     end if
-                    sr(hi(1)+1,j,k) = sl(hi(1)+1,j,k)
+                    sr(i,j,k) = sl(i,j,k)
                  else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-                    sr(hi(1)+1,j,k) = sl(hi(1)+1,j,k)
+                    sr(i,j,k) = sl(i+1,j,k)
                  else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
-                    sl(hi(1)+1,j,k) = 0.d0
-                    sr(hi(1)+1,j,k) = 0.d0
+                    sl(i,j,k) = 0.d0
+                    sr(i,j,k) = 0.d0
                  else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -816,9 +820,9 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
      ! call bl_allocated from lo:hi+1 in the normal direction
      ! lo-1:hi+1 in the transverse directions
 
-     do k=lo(3)-1,hi(3)+1
-        do j=lo(2),hi(2)+1
-           do i=lo(1)-1,hi(1)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
 
               ! loop over appropriate y-faces
               if (ppm_type .eq. 0) then
@@ -835,19 +839,19 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               ! impose lo side bc's
               if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                    sl(i,lo(2),k) = s(i,lo(2)-1,k,comp)
-                    sr(i,lo(2),k) = s(i,lo(2)-1,k,comp)
+                    sl(i,j,k) = s(i,j-1,k,comp)
+                    sr(i,j,k) = s(i,j-1,k,comp)
                  else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
-                       sr(i,lo(2),k) = min(sr(i,lo(2),k),0.d0)
+                       sr(i,j,k) = min(sr(i,j,k),0.d0)
                     end if
-                    sl(i,lo(2),k) = sr(i,lo(2),k)
+                    sl(i,j,k) = sr(i,j,k)
                  else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
-                    sl(i,lo(2),k) = sr(i,lo(2),k)
+                    sl(i,j,k) = sr(i,j,k)
                  else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
-                    sl(i,lo(2),k) = 0.d0
-                    sr(i,lo(2),k) = 0.d0
+                    sl(i,j,k) = 0.d0
+                    sr(i,j,k) = 0.d0
                  else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -857,21 +861,21 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                    sl(i,hi(2)+1,k) = s(i,hi(2)+1,k,comp)
-                    sr(i,hi(2)+1,k) = s(i,hi(2)+1,k,comp)
+                    sl(i,j,k) = s(i,j,k,comp)
+                    sr(i,j,k) = s(i,j,k,comp)
                  else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
-                       sl(i,hi(2)+1,k) = max(sl(i,hi(2)+1,k),0.d0)
+                       sl(i,j,k) = max(sl(i,j,k),0.d0)
                     end if
-                    sr(i,hi(2)+1,k) = sl(i,hi(2)+1,k)
+                    sr(i,j,k) = sl(i,j,k)
                  else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
-                    sr(i,hi(2)+1,k) = sl(i,hi(2)+1,k)
+                    sr(i,j,k) = sl(i,j,k)
                  else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
-                    sl(i,hi(2)+1,k) = 0.d0
-                    sr(i,hi(2)+1,k) = 0.d0
+                    sl(i,j,k) = 0.d0
+                    sr(i,j,k) = 0.d0
                  else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -893,9 +897,9 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
      ! call bl_allocated from lo:hi+1 in the normal direction
      ! lo-1:hi+1 in the transverse directions
 
-     do k=lo(3),hi(3)+1
-        do j=lo(2)-1,hi(2)+1
-           do i=lo(1)-1,hi(1)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
 
               ! loop over appropriate z-faces
               if (ppm_type .eq. 0) then
@@ -911,19 +915,19 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               ! impose lo side bc's
               if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                    sl(i,j,lo(3)) = s(i,j,lo(3),comp)
-                    sr(i,j,lo(3)) = s(i,j,lo(3),comp)
+                    sl(i,j,k) = s(i,j,k,comp)
+                    sr(i,j,k) = s(i,j,k,comp)
                  else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
-                       sr(i,j,lo(3)) = min(sr(i,j,lo(3)),0.d0)
+                       sr(i,j,k) = min(sr(i,j,k),0.d0)
                     end if
-                    sl(i,j,lo(3)) = sr(i,j,lo(3))
+                    sl(i,j,k) = sr(i,j,k)
                  else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
-                    sl(i,j,lo(3)) = sr(i,j,lo(3))
+                    sl(i,j,k) = sr(i,j,k)
                  else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
-                    sl(i,j,lo(3)) = 0.d0
-                    sr(i,j,lo(3)) = 0.d0
+                    sl(i,j,k) = 0.d0
+                    sr(i,j,k) = 0.d0
                  else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -933,21 +937,21 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
-                    sl(i,j,hi(3)+1) = s(i,j,hi(3)+1,comp)
-                    sr(i,j,hi(3)+1) = s(i,j,hi(3)+1,comp)
+                    sl(i,j,k) = s(i,j,k,comp)
+                    sr(i,j,k) = s(i,j,k,comp)
                  else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
-                       sl(i,j,hi(3)+1) = max(sl(i,j,hi(3)+1),0.d0)
+                       sl(i,j,k) = max(sl(i,j,k),0.d0)
                     end if
-                    sr(i,j,hi(3)+1) = sl(i,j,hi(3)+1)
+                    sr(i,j,k) = sl(i,j,k)
                  else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
-                    sr(i,j,hi(3)+1) = sl(i,j,hi(3)+1)
+                    sr(i,j,k) = sl(i,j,k)
                  else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
-                    sl(i,j,hi(3)+1) = 0.d0
-                    sr(i,j,hi(3)+1) = 0.d0
+                    sl(i,j,k) = 0.d0
+                    sr(i,j,k) = 0.d0
                  else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -1037,6 +1041,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
   double precision :: slyx,sryx,slyz,sryz
   double precision :: slzx,srzx,slzy,srzy
 
+  !$gpu
+
   dt2 = HALF*dt
   dt3 = dt/3.0d0
   dt4 = dt/4.0d0
@@ -1057,9 +1063,9 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
 
   if (norm_dir == 1 .and. trans_dir == 2) then
      ! simhxy
-     do k=lo(3)-1,hi(3)+1
+     do k=lo(3),hi(3)
         do j=lo(2),hi(2)
-           do i=lo(1),hi(1)+1
+           do i=lo(1),hi(1)
 
               ! loop over appropriate xy faces
               if (is_conservative .eq. 1) then
@@ -1090,8 +1096,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               ! impose lo side bc's
               if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                  if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                    slxy = s(lo(1)-1,j,k,comp)
-                    srxy = s(lo(1)-1,j,k,comp)
+                    slxy = s(i-1,j,k,comp)
+                    srxy = s(i-1,j,k,comp)
                  else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
@@ -1112,10 +1118,10 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                    slxy = s(hi(1)+1,j,k,comp)
-                    srxy = s(hi(1)+1,j,k,comp)
+                    slxy = s(i,j,k,comp)
+                    srxy = s(i,j,k,comp)
                  else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
@@ -1147,8 +1153,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
      ! loop over appropriate xz faces
      ! simhxz
      do k=lo(3),hi(3)
-        do j=lo(2)-1,hi(2)+1
-           do i=lo(1),hi(1)+1
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
 
               if (is_conservative .eq. 1) then
                  ! make slxz, srxz by updating 1D extrapolation
@@ -1175,8 +1181,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               ! impose lo side bc's
               if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                  if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                    slxz = s(lo(1)-1,j,k,comp)
-                    srxz = s(lo(1)-1,j,k,comp)
+                    slxz = s(i-1,j,k,comp)
+                    srxz = s(i-1,j,k,comp)
                  else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
@@ -1197,10 +1203,10 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                    slxz = s(hi(1)+1,j,k,comp)
-                    srxz = s(hi(1)+1,j,k,comp)
+                    slxz = s(i,j,k,comp)
+                    srxz = s(i,j,k,comp)
                  else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
@@ -1232,8 +1238,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
      ! simhyx
      ! loop over appropriate yx faces
 
-     do k=lo(3)-1,hi(3)+1
-        do j=lo(2),hi(2)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
            do i=lo(1),hi(1)
 
               if (is_conservative .eq. 1) then
@@ -1261,8 +1267,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               ! impose lo side bc's
               if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                    slyx = s(i,lo(2)-1,k,comp)
-                    sryx = s(i,lo(2)-1,k,comp)
+                    slyx = s(i,j-1,k,comp)
+                    sryx = s(i,j-1,k,comp)
                  else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
@@ -1283,10 +1289,10 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                    slyx = s(i,hi(2)+1,k,comp)
-                    sryx = s(i,hi(2)+1,k,comp)
+                    slyx = s(i,j,k,comp)
+                    sryx = s(i,j,k,comp)
                  else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
@@ -1319,8 +1325,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
      ! loop over appropriate yz faces
 
      do k=lo(3),hi(3)
-        do j=lo(2),hi(2)+1
-           do i=lo(1)-1,hi(1)+1
+        do j=lo(2),hi(2)
+           do i=lo(1),hi(1)
 
               if (is_conservative .eq. 1) then
                  ! make slyz, sryz by updating 1D extrapolation
@@ -1347,8 +1353,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               ! impose lo side bc's
               if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                    slyz = s(i,lo(2)-1,k,comp)
-                    sryz = s(i,lo(2)-1,k,comp)
+                    slyz = s(i,j-1,k,comp)
+                    sryz = s(i,j-1,k,comp)
                  else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
@@ -1369,10 +1375,10 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                    slyz = s(i,hi(2)+1,k,comp)
-                    sryz = s(i,hi(2)+1,k,comp)
+                    slyz = s(i,j+1,k,comp)
+                    sryz = s(i,j+1,k,comp)
                  else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
@@ -1404,8 +1410,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
      ! simhzx
      ! loop over appropriate zx faces
 
-     do k=lo(3),hi(3)+1
-        do j=lo(2)-1,hi(2)+1
+     do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
            do i=lo(1),hi(1)
 
               if (is_conservative .eq. 1) then
@@ -1433,8 +1439,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               ! impose lo side bc's
               if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                    slzx = s(i,j,lo(3)-1,comp)
-                    srzx = s(i,j,lo(3)-1,comp)
+                    slzx = s(i,j,k-1,comp)
+                    srzx = s(i,j,k-1,comp)
                  else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
@@ -1455,10 +1461,10 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
-                    slzx = s(i,j,hi(3)+1,comp)
-                    srzx = s(i,j,hi(3)+1,comp)
+                    slzx = s(i,j,k,comp)
+                    srzx = s(i,j,k,comp)
                  else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
@@ -1490,9 +1496,9 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
      ! simhzy
      ! loop over appropriate zy faces
 
-     do k=lo(3),hi(3)+1
+     do k=lo(3),hi(3)
         do j=lo(2),hi(2)
-           do i=lo(1)-1,hi(1)+1
+           do i=lo(1),hi(1)
 
               if (is_conservative .eq. 1) then
                  ! make slzy, srzy by updating 1D extrapolation
@@ -1519,8 +1525,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               ! impose lo side bc's
               if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                    slzy = s(i,j,lo(3)-1,comp)
-                    srzy = s(i,j,lo(3)-1,comp)
+                    slzy = s(i,j,k-1,comp)
+                    srzy = s(i,j,k-1,comp)
                  else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
@@ -1541,10 +1547,10 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3)+1 .and. hi(3) .eq. domhi(3)) then
+              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
-                    slzy = s(i,j,hi(3)+1,comp)
-                    srzy = s(i,j,hi(3)+1,comp)
+                    slzy = s(i,j,k,comp)
+                    srzy = s(i,j,k,comp)
                  else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
@@ -1651,6 +1657,8 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
   double precision :: sedgely,sedgery
   double precision :: sedgelz,sedgerz
 
+  !$gpu
+
   dt2 = HALF*dt
   dt3 = dt/3.0d0
   dt4 = dt/4.0d0
@@ -1670,7 +1678,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
      ! lo:hi in the transverse directions
      do k=lo(3),hi(3)
         do j=lo(2),hi(2)
-           do i=lo(1),hi(1)+1
+           do i=lo(1),hi(1)
 
               ! loop over appropriate x-faces
               if (is_conservative .eq. 1) then
@@ -1722,18 +1730,18 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               ! impose lo side bc's
               if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                  if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                    sedge(lo(1),j,k,comp) = s(lo(1)-1,j,k,comp)
+                    sedge(i,j,k,comp) = s(i-1,j,k,comp)
                  else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
-                       sedge(lo(1),j,k,comp) = min(sedgerx,0.d0)
+                       sedge(i,j,k,comp) = min(sedgerx,0.d0)
                     else
-                       sedge(lo(1),j,k,comp) = sedgerx
+                       sedge(i,j,k,comp) = sedgerx
                     end if
                  else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
-                    sedge(lo(1),j,k,comp) = sedgerx
+                    sedge(i,j,k,comp) = sedgerx
                  else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-                    sedge(lo(1),j,k,comp) = 0.d0
+                    sedge(i,j,k,comp) = 0.d0
                  else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -1743,20 +1751,20 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1)+1 .and. hi(1) .eq. domhi(1)) then
+              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                    sedge(hi(1)+1,j,k,comp) = s(hi(1)+1,j,k,comp)
+                    sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
-                       sedge(hi(1)+1,j,k,comp) = max(sedgelx,0.d0)
+                       sedge(i,j,k,comp) = max(sedgelx,0.d0)
                     else
                        sedge(hi(1)+1,j,k,comp) = sedgelx
                     end if
                  else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-                    sedge(hi(1)+1,j,k,comp) = sedgelx
+                    sedge(i,j,k,comp) = sedgelx
                  else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
-                    sedge(hi(1)+1,j,k,comp) = 0.d0
+                    sedge(i,j,k,comp) = 0.d0
                  else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -1771,7 +1779,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
   else if (idir == 2) then
 
      do k=lo(3),hi(3)
-        do j=lo(2),hi(2)+1
+        do j=lo(2),hi(2)
            do i=lo(1),hi(1)
 
               ! loop over appropriate y-faces
@@ -1824,18 +1832,18 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               ! impose lo side bc's
               if (j .eq.lo(2) .and. lo(2) .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                    sedge(i,lo(2),k,comp) = s(i,lo(2)-1,k,comp)
+                    sedge(i,j,k,comp) = s(i,j-1,k,comp)
                  else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
-                       sedge(i,lo(2),k,comp) = min(sedgery,0.d0)
+                       sedge(i,j,k,comp) = min(sedgery,0.d0)
                     else
-                       sedge(i,lo(2),k,comp) = sedgery
+                       sedge(i,j,k,comp) = sedgery
                     end if
                  else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
-                    sedge(i,lo(2),k,comp) = sedgery
+                    sedge(i,j,k,comp) = sedgery
                  else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
-                    sedge(i,lo(2),k,comp) = 0.d0
+                    sedge(i,j,k,comp) = 0.d0
                  else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -1845,20 +1853,20 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2)+1 .and. hi(2) .eq. domhi(2)) then
+              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                    sedge(i,hi(2)+1,k,comp) = s(i,hi(2)+1,k,comp)
+                    sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
-                       sedge(i,hi(2)+1,k,comp) = max(sedgely,0.d0)
+                       sedge(i,j,k,comp) = max(sedgely,0.d0)
                     else
-                       sedge(i,hi(2)+1,k,comp) = sedgely
+                       sedge(i,j,k,comp) = sedgely
                     end if
                  else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
-                    sedge(i,hi(2)+1,k,comp) = sedgely
+                    sedge(i,j,k,comp) = sedgely
                  else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
-                    sedge(i,hi(2)+1,k,comp) = 0.d0
+                    sedge(i,j,k,comp) = 0.d0
                  else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -1872,7 +1880,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
 
   else ! idir == 3
 
-     do k=lo(3),hi(3)+1
+     do k=lo(3),hi(3)
         do j=lo(2),hi(2)
            do i=lo(1),hi(1)
 
@@ -1926,18 +1934,18 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               ! impose lo side bc's
               if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                    sedge(i,j,lo(3),comp) = s(i,j,lo(3)-1,comp)
+                    sedge(i,j,k,comp) = s(i,j,k-1,comp)
                  else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
-                       sedge(i,j,lo(3),comp) = min(sedgerz,0.d0)
+                       sedge(i,j,k,comp) = min(sedgerz,0.d0)
                     else
-                       sedge(i,j,lo(3),comp) = sedgerz
+                       sedge(i,j,k,comp) = sedgerz
                     end if
                  else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
-                    sedge(i,j,lo(3),comp) = sedgerz
+                    sedge(i,j,k,comp) = sedgerz
                  else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
-                    sedge(i,j,lo(3),comp) = 0.d0
+                    sedge(i,j,k,comp) = 0.d0
                  else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU
@@ -1947,20 +1955,20 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (hi(3) .eq. domhi(3)) then
+              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
-                    sedge(i,j,hi(3)+1,comp) = s(i,j,hi(3)+1,comp)
+                    sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
-                       sedge(i,j,hi(3)+1,comp) = max(sedgelz,0.d0)
+                       sedge(i,j,k,comp) = max(sedgelz,0.d0)
                     else
-                       sedge(i,j,hi(3)+1,comp) = sedgelz
+                       sedge(i,j,k,comp) = sedgelz
                     end if
                  else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
-                    sedge(i,j,hi(3)+1,comp) = sedgelz
+                    sedge(i,j,k,comp) = sedgelz
                  else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
-                    sedge(i,j,hi(3)+1,comp) = 0.d0
+                    sedge(i,j,k,comp) = 0.d0
                  else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
                  else
 #ifndef AMREX_USE_GPU

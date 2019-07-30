@@ -1586,8 +1586,10 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
             const Box& obx = amrex::grow(tileBox, 1);
             const Box& xbx = amrex::growHi(tileBox,0, 1);
             const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& zbx = amrex::growHi(tileBox,2, 1);
             const Box& mxbx = amrex::growLo(obx,0, -1);
             const Box& mybx = amrex::growLo(obx,1, -1);
+            const Box& mzbx = amrex::growLo(obx,2, -1);
 
             // Be careful to pass in comp+1 for fortran indexing
             for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
@@ -1682,7 +1684,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                // x-direction
 #pragma gpu box(mxbx)
                make_edge_scal_predictor_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), 1,
+                   AMREX_INT_ANYD(mxbx.loVect()), AMREX_INT_ANYD(mxbx.hiVect()), 1,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1700,7 +1702,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                // y-direction
 #pragma gpu box(mybx)
                make_edge_scal_predictor_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), 2,
+                   AMREX_INT_ANYD(mybx.loVect()), AMREX_INT_ANYD(mybx.hiVect()), 2,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1718,7 +1720,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                // z-direction
 #pragma gpu box(mzbx)
                make_edge_scal_predictor_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), 3,
+                   AMREX_INT_ANYD(mzbx.loVect()), AMREX_INT_ANYD(mzbx.hiVect()), 3,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1734,9 +1736,11 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                    nbccomp, scomp, bccomp);
 
                // simhxy
-#pragma gpu box(obx)
+               Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+               imhbox = amrex::growHi(imhbox, 0, 1);
+#pragma gpu box(imhbox)
                make_edge_scal_transverse_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),1,2,
+                   AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),1,2,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1757,9 +1761,11 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                    nbccomp, scomp, bccomp, is_conservative);
 
                // simhxz
-#pragma gpu box(obx)
+               imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+               imhbox = amrex::growHi(imhbox, 0, 1);
+#pragma gpu box(imhbox)
                make_edge_scal_transverse_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),1,3,
+                   AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),1,3,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1780,9 +1786,11 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                    nbccomp, scomp, bccomp, is_conservative);
 
                // simhyx
-#pragma gpu box(obx)
+               imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+               imhbox = amrex::growHi(imhbox, 1, 1);
+#pragma gpu box(imhbox)
                make_edge_scal_transverse_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),2,1,
+                   AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),2,1,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1803,9 +1811,11 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                    nbccomp, scomp, bccomp, is_conservative);
 
                // simhyz
-#pragma gpu box(obx)
+               imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+               imhbox = amrex::growHi(imhbox, 1, 1);
+#pragma gpu box(imhbox)
                make_edge_scal_transverse_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),2,3,
+                   AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),2,3,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1826,9 +1836,11 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                    nbccomp, scomp, bccomp, is_conservative);
 
                // simhzx
-#pragma gpu box(obx)
+               imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+               imhbox = amrex::growHi(imhbox, 2, 1);
+#pragma gpu box(imhbox)
                make_edge_scal_transverse_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),3,1,
+                   AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),3,1,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1849,9 +1861,11 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                    nbccomp, scomp, bccomp, is_conservative);
 
                // simhzy
-#pragma gpu box(obx)
+               imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+               imhbox = amrex::growHi(imhbox, 2, 1);
+#pragma gpu box(imhbox)
                make_edge_scal_transverse_3d(
-                   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),3,2,
+                   AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),3,2,
                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
@@ -1873,8 +1887,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 
                 // x-direction
 #pragma gpu box(xbx)
-                make_edge_scal_3d(AMREX_INT_ANYD(tileBox.loVect()),
-                    AMREX_INT_ANYD(tileBox.hiVect()),1,
+                make_edge_scal_3d(AMREX_INT_ANYD(xbx.loVect()),
+                    AMREX_INT_ANYD(xbx.hiVect()),1,
                     AMREX_INT_ANYD(domainBox.loVect()),
                     AMREX_INT_ANYD(domainBox.hiVect()),
                     BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
@@ -1898,8 +1912,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 
                 // y-direction
 #pragma gpu box(ybx)
-                make_edge_scal_3d(AMREX_INT_ANYD(tileBox.loVect()),
-                    AMREX_INT_ANYD(tileBox.hiVect()),2,
+                make_edge_scal_3d(AMREX_INT_ANYD(ybx.loVect()),
+                    AMREX_INT_ANYD(ybx.hiVect()),2,
                     AMREX_INT_ANYD(domainBox.loVect()),
                     AMREX_INT_ANYD(domainBox.hiVect()),
                     BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
@@ -1923,8 +1937,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 
                 // z-direction
 #pragma gpu box(zbx)
-                make_edge_scal_3d(AMREX_INT_ANYD(tileBox.loVect()),
-                    AMREX_INT_ANYD(tileBox.hiVect()),3,
+                make_edge_scal_3d(AMREX_INT_ANYD(zbx.loVect()),
+                    AMREX_INT_ANYD(zbx.hiVect()),3,
                     AMREX_INT_ANYD(domainBox.loVect()),
                     AMREX_INT_ANYD(domainBox.hiVect()),
                     BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
