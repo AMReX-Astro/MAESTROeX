@@ -245,6 +245,12 @@ Maestro::FirstDt ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FirstDt()",FirstDt);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
