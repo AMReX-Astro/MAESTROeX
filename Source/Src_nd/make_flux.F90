@@ -710,9 +710,8 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 2)
-  subroutine make_rhoh_flux_2d(lev, lo, hi, &
-       sfluxx, fx_lo, fx_hi, nc_fx, &
-       sfluxy, fy_lo, fy_hi, nc_fy, &
+  subroutine make_rhoh_flux_2d(lo, hi, lev, idir, &
+       sflux, f_lo, f_hi, nc_f, &
        sedgex, x_lo, x_hi, nc_x, &
        sedgey, y_lo, y_hi, nc_y, &
        umac,   u_lo, u_hi, &
@@ -723,19 +722,21 @@ contains
        rhoh0_new, rhoh0_edge_new, &
        w0) bind(C,name="make_rhoh_flux_2d")
 
-    integer         , intent(in   ) :: lev, lo(2), hi(2)
-    integer         , intent(in   ) :: fx_lo(2), fx_hi(2), nc_fx
-    double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),nc_fx)
-    integer         , intent(in   ) :: fy_lo(2), fy_hi(2), nc_fy
-    double precision, intent(inout) :: sfluxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),nc_fy)
-    integer         , intent(in   ) :: x_lo(2), x_hi(2), nc_x
-    double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),nc_x)
-    integer         , intent(in   ) :: y_lo(2), y_hi(2), nc_y
-    double precision, intent(inout) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),nc_y)
-    integer         , intent(in   ) :: u_lo(2), u_hi(2)
-    double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2))
-    integer         , intent(in   ) :: v_lo(2), v_hi(2)
-    double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2))
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev, idir
+    integer         , intent(in   ) :: f_lo(3), f_hi(3)
+    integer  , value, intent(in   ) :: nc_f
+    double precision, intent(inout) :: sflux(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    integer         , intent(in   ) :: x_lo(3), x_hi(3)
+    integer  , value, intent(in   ) :: nc_x
+    double precision, intent(in   ) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
+    integer         , intent(in   ) :: y_lo(3), y_hi(3)
+    integer  , value, intent(in   ) :: nc_y
+    double precision, intent(in   ) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nc_y)
+    integer         , intent(in   ) :: u_lo(3), u_hi(3)
+    double precision, intent(in   ) :: umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
+    integer         , intent(in   ) :: v_lo(3), v_hi(3)
+    double precision, intent(in   ) :: vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
@@ -747,9 +748,11 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
 
     ! Local variables
-    integer          :: i,j
+    integer          :: i,j,k
     double precision :: rho0_edge, rhoh0_edge
     logical          :: have_h, have_hprime, have_rhoh
+
+    !$gpu
 
     have_h = enthalpy_pred_type.eq.predict_h .or. &
          enthalpy_pred_type.eq.predict_T_then_h .or. &
@@ -759,150 +762,164 @@ contains
 
     have_rhoh = enthalpy_pred_type.eq.predict_rhoh
 
-    ! create x-fluxes
-    if (have_h) then
-       ! enthalpy edge state is h
+    if (idir == 1) then
 
-       if (species_pred_type == predict_rhoprime_and_X) then
-          ! density edge state is rho'
-          do j=lo(2),hi(2)
-             rho0_edge = HALF*(rho0_old(lev,j)+rho0_new(lev,j))
-             do i=lo(1),hi(1)+1
-                sfluxx(i,j,rhoh_comp) = &
-                     umac(i,j)*(rho0_edge+sedgex(i,j,rho_comp))*sedgex(i,j,rhoh_comp)
+       ! create x-fluxes
+       if (have_h) then
+          ! enthalpy edge state is h
+
+          if (species_pred_type == predict_rhoprime_and_X) then
+             ! density edge state is rho'
+             do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                   rho0_edge = HALF*(rho0_old(lev,j)+rho0_new(lev,j))
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = &
+                           umac(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
+
+          else if (species_pred_type == predict_rho_and_X .or. &
+               species_pred_type == predict_rhoX) then
+             ! density edge state is rho
+             do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = &
+                           umac(i,j,k)*sedgex(i,j,k,rho_comp)*sedgex(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
+
+          endif
+
+       else if (have_hprime) then
+
+          ! enthalpy edge state is h'
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_2d : predict_hprime not coded yet")
+#endif
+
+       else if (have_rhoh) then
+
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedgex(i,j,k,rhoh_comp)
+                end do
              end do
           end do
 
-       else if (species_pred_type == predict_rho_and_X .or. &
-            species_pred_type == predict_rhoX) then
-          ! density edge state is rho
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)+1
-                sfluxx(i,j,rhoh_comp) = &
-                     umac(i,j)*sedgex(i,j,rho_comp)*sedgex(i,j,rhoh_comp)
+       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+          ! enthalpy edge state is (rho h)'
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                rhoh0_edge = HALF*(rhoh0_old(lev,j)+rhoh0_new(lev,j))
+                do i=lo(1),hi(1)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*(rhoh0_edge+sedgex(i,j,k,rhoh_comp))
+                end do
              end do
           end do
 
-       endif
+       else
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
+#endif
+       end if
 
-    else if (have_hprime) then
+    else ! idir == 2
 
-       ! enthalpy edge state is h'
-       call amrex_error("make_rhoh_flux_2d : predict_hprime not coded yet")
+       ! create y-fluxes
+       if (have_h) then
+          ! enthalpy edge state is h
 
-    else if (have_rhoh) then
+          if (species_pred_type == predict_rhoprime_and_X) then
+             ! density edge state is rho'
+             do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                   rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = &
+                           (vmac(i,j,k)+w0(lev,j))*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
 
-       do j=lo(2),hi(2)
-          do i=lo(1),hi(1)+1
-             sfluxx(i,j,rhoh_comp) = umac(i,j)*sedgex(i,j,rhoh_comp)
-          end do
-       end do
+          else if (species_pred_type == predict_rho_and_X .or. &
+               species_pred_type == predict_rhoX) then
+             ! density edge state is rho
+             do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = &
+                           (vmac(i,j,k)+w0(lev,j))*sedgey(i,j,k,rho_comp)*sedgey(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
 
-    else if (enthalpy_pred_type.eq.predict_rhohprime) then
-       ! enthalpy edge state is (rho h)'
-       do j=lo(2),hi(2)
-          rhoh0_edge = HALF*(rhoh0_old(lev,j)+rhoh0_new(lev,j))
-          do i=lo(1),hi(1)+1
-             sfluxx(i,j,rhoh_comp) = umac(i,j)*(rhoh0_edge+sedgex(i,j,rhoh_comp))
-          end do
-       end do
+          endif
 
-    else
-       call amrex_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
-    end if
+       else if (have_hprime) then
 
-    ! create y-fluxes
-    if (have_h) then
-       ! enthalpy edge state is h
+          ! enthalpy edge state is h'
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_2d : predict_hprime not coded yet")
+#endif
 
-       if (species_pred_type == predict_rhoprime_and_X) then
-          ! density edge state is rho'
-          do j=lo(2),hi(2)+1
-             rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
-             do i=lo(1),hi(1)
-                sfluxy(i,j,rhoh_comp) = &
-                     (vmac(i,j)+w0(lev,j))*(rho0_edge+sedgey(i,j,rho_comp))*sedgey(i,j,rhoh_comp)
+       else if (have_rhoh) then
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
+                   sflux(i,j,k,rhoh_comp) = (vmac(i,j,k)+w0(lev,j))*sedgey(i,j,k,rhoh_comp)
+                end do
              end do
           end do
 
-       else if (species_pred_type == predict_rho_and_X .or. &
-            species_pred_type == predict_rhoX) then
-          ! density edge state is rho
-          do j=lo(2),hi(2)+1
-             do i=lo(1),hi(1)
-                sfluxy(i,j,rhoh_comp) = &
-                     (vmac(i,j)+w0(lev,j))*sedgey(i,j,rho_comp)*sedgey(i,j,rhoh_comp)
+       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+          ! enthalpy edge state is (rho h)'
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                rhoh0_edge = HALF*(rhoh0_edge_old(lev,j)+rhoh0_edge_new(lev,j))
+                do i=lo(1),hi(1)
+                   sflux(i,j,k,rhoh_comp) = (vmac(i,j,k)+w0(lev,j))*(sedgey(i,j,k,rhoh_comp)+rhoh0_edge)
+                end do
              end do
           end do
 
-       endif
+       else
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
+#endif
+       end if
 
-    else if (have_hprime) then
-
-       ! enthalpy edge state is h'
-       call amrex_error("make_rhoh_flux_2d : predict_hprime not coded yet")
-
-    else if (have_rhoh) then
-
-       do j=lo(2),hi(2)+1
-          do i=lo(1),hi(1)
-             sfluxy(i,j,rhoh_comp) = (vmac(i,j)+w0(lev,j))*sedgey(i,j,rhoh_comp)
-          end do
-       end do
-
-    else if (enthalpy_pred_type.eq.predict_rhohprime) then
-       ! enthalpy edge state is (rho h)'
-       do j=lo(2),hi(2)+1
-          rhoh0_edge = HALF*(rhoh0_edge_old(lev,j)+rhoh0_edge_new(lev,j))
-          do i=lo(1),hi(1)
-             sfluxy(i,j,rhoh_comp) = (vmac(i,j)+w0(lev,j))*(sedgey(i,j,rhoh_comp)+rhoh0_edge)
-          end do
-       end do
-
-    else
-       call amrex_error("make_rhoh_flux_2d : enthalpy_pred_type not recognized.")
-    end if
+    endif
 
   end subroutine make_rhoh_flux_2d
 #endif
 
 
 #if (AMREX_SPACEDIM == 3)
-  subroutine make_rhoh_flux_3d(lev, lo, hi, &
-       sfluxx, fx_lo, fx_hi, nc_fx, &
-       sfluxy, fy_lo, fy_hi, nc_fy, &
-       sfluxz, fz_lo, fz_hi, nc_fz, &
-       sedgex, x_lo, x_hi, nc_x, &
-       sedgey, y_lo, y_hi, nc_y, &
-       sedgez, z_lo, z_hi, nc_z, &
+  subroutine make_rhoh_flux_3d(lo, hi, lev, idir, &
+       sflux, f_lo, f_hi, nc_f, &
+       sedge, x_lo, x_hi, nc_x, &
        umac,   u_lo, u_hi, &
-       vmac,   v_lo, v_hi, &
-       wmac,   w_lo, w_hi, &
        rho0_old, rho0_edge_old, &
        rho0_new, rho0_edge_new, &
        rhoh0_old, rhoh0_edge_old, &
        rhoh0_new, rhoh0_edge_new, &
        w0) bind(C,name="make_rhoh_flux_3d")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
-    integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
-    double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3),nc_fx)
-    integer         , intent(in   ) :: fy_lo(3), fy_hi(3), nc_fy
-    double precision, intent(inout) :: sfluxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),fy_lo(3):fy_hi(3),nc_fy)
-    integer         , intent(in   ) :: fz_lo(3), fz_hi(3), nc_fz
-    double precision, intent(inout) :: sfluxz(fz_lo(1):fz_hi(1),fz_lo(2):fz_hi(2),fz_lo(3):fz_hi(3),nc_fz)
-    integer         , intent(in   ) :: x_lo(3), x_hi(3), nc_x
-    double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
-    integer         , intent(in   ) :: y_lo(3), y_hi(3), nc_y
-    double precision, intent(inout) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nc_y)
-    integer         , intent(in   ) :: z_lo(3), z_hi(3), nc_z
-    double precision, intent(inout) :: sedgez(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nc_z)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev, idir
+    integer         , intent(in   ) :: f_lo(3), f_hi(3)
+    integer  , value, intent(in   ) :: nc_f
+    double precision, intent(inout) :: sflux(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+    integer         , intent(in   ) :: x_lo(3), x_hi(3)
+    integer  , value, intent(in   ) :: nc_x
+    double precision, intent(inout) :: sedge(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-    integer         , intent(in   ) :: v_lo(3), v_hi(3)
-    double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-    integer         , intent(in   ) :: w_lo(3), w_hi(3)
-    double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
@@ -918,6 +935,8 @@ contains
     double precision :: rho0_edge, rhoh0_edge
     logical         :: have_h, have_hprime, have_rhoh
 
+    !$gpu
+
     have_h = enthalpy_pred_type.eq.predict_h .or. &
          enthalpy_pred_type.eq.predict_T_then_h .or. &
          enthalpy_pred_type.eq.predict_Tprime_then_h
@@ -926,157 +945,214 @@ contains
 
     have_rhoh = enthalpy_pred_type.eq.predict_rhoh
 
-    ! create x-fluxes and y-fluxes
-    if (have_h) then
-       ! enthalpy edge state is h
+    if (idir == 1) then
 
-       if (species_pred_type == predict_rhoprime_and_X) then
-          ! density edge state is rho'
+       ! create x-fluxes
+       if (have_h) then
+          ! enthalpy edge state is h
+
+          if (species_pred_type == predict_rhoprime_and_X) then
+             ! density edge state is rho'
+
+             do k=lo(3),hi(3)
+                rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
+                do j=lo(2),hi(2)
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = &
+                           umac(i,j,k)*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
+
+          else if (species_pred_type == predict_rho_and_X .or. &
+               species_pred_type == predict_rhoX) then
+             ! density edge state is rho
+
+             do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = &
+                           umac(i,j,k)*sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
+
+          endif
+
+       else if (have_hprime) then
+
+          ! enthalpy edge state is h'
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_3d : predict_hprime not coded yet")
+#endif
+
+       else if (have_rhoh) then
 
           do k=lo(3),hi(3)
-             rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
              do j=lo(2),hi(2)
-                do i=lo(1),hi(1)+1
-                   sfluxx(i,j,k,rhoh_comp) = &
-                        umac(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp)
-                end do
-             end do
-
-             do j=lo(2),hi(2)+1
                 do i=lo(1),hi(1)
-                   sfluxy(i,j,k,rhoh_comp) = &
-                        vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedge(i,j,k,rhoh_comp)
                 end do
              end do
           end do
 
-       else if (species_pred_type == predict_rho_and_X .or. &
-            species_pred_type == predict_rhoX) then
-          ! density edge state is rho
+       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+          ! enthalpy edge state is (rho h)'
+
+          do k=lo(3),hi(3)
+             rhoh0_edge = HALF*(rhoh0_old(lev,k)+rhoh0_new(lev,k))
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*(rhoh0_edge+sedge(i,j,k,rhoh_comp))
+                end do
+             end do
+          end do
+
+       else
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
+#endif
+       end if
+
+    elseif (idir == 2) then
+
+       ! create y-fluxes
+       if (have_h) then
+          ! enthalpy edge state is h
+
+          if (species_pred_type == predict_rhoprime_and_X) then
+             ! density edge state is rho'
+
+             do k=lo(3),hi(3)
+                rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
+                do j=lo(2),hi(2)
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = &
+                           umac(i,j,k)*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
+
+          else if (species_pred_type == predict_rho_and_X .or. &
+               species_pred_type == predict_rhoX) then
+             ! density edge state is rho
+
+             do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = &
+                           umac(i,j,k)*sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
+
+          endif
+
+       else if (have_hprime) then
+
+          ! enthalpy edge state is h'
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_3d : predict_hprime not coded yet")
+#endif
+
+       else if (have_rhoh) then
 
           do k=lo(3),hi(3)
              do j=lo(2),hi(2)
-                do i=lo(1),hi(1)+1
-                   sfluxx(i,j,k,rhoh_comp) = &
-                        umac(i,j,k)*sedgex(i,j,k,rho_comp)*sedgex(i,j,k,rhoh_comp)
-                end do
-             end do
-
-             do j=lo(2),hi(2)+1
                 do i=lo(1),hi(1)
-                   sfluxy(i,j,k,rhoh_comp) = &
-                        vmac(i,j,k)*sedgey(i,j,k,rho_comp)*sedgey(i,j,k,rhoh_comp)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedge(i,j,k,rhoh_comp)
                 end do
              end do
           end do
 
-       endif
+       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+          ! enthalpy edge state is (rho h)'
 
-    else if (have_hprime) then
-
-       ! enthalpy edge state is h'
-       call amrex_error("make_rhoh_flux_3d : predict_hprime not coded yet")
-
-    else if (have_rhoh) then
-
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)+1
-                sfluxx(i,j,k,rhoh_comp) = umac(i,j,k)*sedgex(i,j,k,rhoh_comp)
-             end do
-          end do
-
-          do j=lo(2),hi(2)+1
-             do i=lo(1),hi(1)
-                sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k)*sedgey(i,j,k,rhoh_comp)
-             end do
-          end do
-       end do
-
-    else if (enthalpy_pred_type.eq.predict_rhohprime) then
-       ! enthalpy edge state is (rho h)'
-
-       do k=lo(3),hi(3)
-          rhoh0_edge = HALF*(rhoh0_old(lev,k)+rhoh0_new(lev,k))
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)+1
-                sfluxx(i,j,k,rhoh_comp) = umac(i,j,k)*(rhoh0_edge+sedgex(i,j,k,rhoh_comp))
-             end do
-          end do
-
-          do j=lo(2),hi(2)+1
-             do i=lo(1),hi(1)
-                sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k)*(rhoh0_edge+sedgey(i,j,k,rhoh_comp))
-             end do
-          end do
-       end do
-
-    else
-       call amrex_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
-    end if
-
-    ! create z-fluxes
-    if (have_h) then
-       ! enthalpy edge state is h
-
-       if (species_pred_type == predict_rhoprime_and_X) then
-          ! density edge state is rho'
-
-          do k=lo(3),hi(3)+1
-             rho0_edge = HALF*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k))
+          do k=lo(3),hi(3)
+             rhoh0_edge = HALF*(rhoh0_old(lev,k)+rhoh0_new(lev,k))
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-                   sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k)+w0(lev,k))* &
-                        (rho0_edge+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,rhoh_comp)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*(rhoh0_edge+sedge(i,j,k,rhoh_comp))
                 end do
              end do
           end do
 
-       else if (species_pred_type == predict_rho_and_X .or. &
-            species_pred_type == predict_rhoX) then
-          ! density edge state is rho
+       else
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
+#endif
+       end if
 
-          do k=lo(3),hi(3)+1
+
+    else ! idir == 3
+
+       ! create z-fluxes
+       if (have_h) then
+          ! enthalpy edge state is h
+
+          if (species_pred_type == predict_rhoprime_and_X) then
+             ! density edge state is rho'
+
+             do k=lo(3),hi(3)
+                rho0_edge = HALF*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k))
+                do j=lo(2),hi(2)
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,k))* &
+                           (rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
+
+          else if (species_pred_type == predict_rho_and_X .or. &
+               species_pred_type == predict_rhoX) then
+             ! density edge state is rho
+
+             do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                   do i=lo(1),hi(1)
+                      sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,k))* &
+                           sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
+                   end do
+                end do
+             end do
+
+          endif
+
+       else if (have_hprime) then
+
+          ! enthalpy edge state is h'
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_3d : predict_hprime not coded yet")
+#endif
+
+       else if (have_rhoh) then
+
+          do k=lo(3),hi(3)
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-                   sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k)+w0(lev,k))* &
-                        sedgez(i,j,k,rho_comp)*sedgez(i,j,k,rhoh_comp)
+                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,k))*sedge(i,j,k,rhoh_comp)
                 end do
              end do
           end do
 
-       endif
+       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+          ! enthalpy edge state is (rho h)'
 
-    else if (have_hprime) then
-
-       ! enthalpy edge state is h'
-       call amrex_error("make_rhoh_flux_3d : predict_hprime not coded yet")
-
-    else if (have_rhoh) then
-
-       do k=lo(3),hi(3)+1
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
-                sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k)+w0(lev,k))*sedgez(i,j,k,rhoh_comp)
+          do k=lo(3),hi(3)
+             rhoh0_edge = HALF*(rhoh0_edge_old(lev,k)+rhoh0_edge_new(lev,k))
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
+                   sflux(i,j,k,rhoh_comp) = &
+                        (umac(i,j,k)+w0(lev,k))*(sedge(i,j,k,rhoh_comp)+rhoh0_edge)
+                end do
              end do
           end do
-       end do
 
-    else if (enthalpy_pred_type.eq.predict_rhohprime) then
-       ! enthalpy edge state is (rho h)'
-
-       do k=lo(3),hi(3)+1
-          rhoh0_edge = HALF*(rhoh0_edge_old(lev,k)+rhoh0_edge_new(lev,k))
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
-                sfluxz(i,j,k,rhoh_comp) = &
-                     (wmac(i,j,k)+w0(lev,k))*(sedgez(i,j,k,rhoh_comp)+rhoh0_edge)
-             end do
-          end do
-       end do
-
-    else
-       call amrex_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
+       else
+#ifndef AMREX_USE_CUDA
+          call amrex_error("make_rhoh_flux_3d : enthalpy_pred_type not recognized.")
+#endif
+       end if
     end if
 
 
