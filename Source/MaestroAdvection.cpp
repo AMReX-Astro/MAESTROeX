@@ -540,47 +540,67 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
             } else {
 
                 if (use_exact_base_state) {
-
-                    make_rhoh_flux_3d_sphr_irreg(tileBox.loVect(), tileBox.hiVect(),
-                                                 BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-                                                 BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-                                                 BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-                                                 BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-                                                 BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-                                                 BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                                                 BL_TO_FORTRAN_3D(rhoh0mac_edgex[mfi]),
-                                                 BL_TO_FORTRAN_3D(rhoh0mac_edgey[mfi]),
-                                                 BL_TO_FORTRAN_3D(rhoh0mac_edgez[mfi]));
+                    // x-direction
+#pragma gpu box(xbx)
+                    make_rhoh_flux_3d_sphr_irreg(AMREX_INT_ANYD(xbx.loVect()),
+                                                 AMREX_INT_ANYD(xbx.hiVect()),
+                                                 BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                                                 BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                                                 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                                 BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                                                 BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]));
+                     // y-direction
+#pragma gpu box(ybx)
+                     make_rhoh_flux_3d_sphr_irreg(AMREX_INT_ANYD(ybx.loVect()),
+                                                  AMREX_INT_ANYD(ybx.hiVect()),
+                                                  BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                                                  BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                                                  BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                                  BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                                                  BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]));
+                  // z-direction
+#pragma gpu box(zbx)
+                  make_rhoh_flux_3d_sphr_irreg(AMREX_INT_ANYD(zbx.loVect()),
+                                               AMREX_INT_ANYD(zbx.hiVect()),
+                                               BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+                                               BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+                                               BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                               BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                               BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]));
                 }
                 else
                 {
-                    make_rhoh_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
-                                           BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-                                           BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-                                           BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-                                           BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-                                           BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-                                           BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                                           BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]),
-                                           BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
-                                           BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
-                                           BL_TO_FORTRAN_3D(h0mac_edgex[mfi]),
-                                           BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
-                                           BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
+                    // x-direction
+#pragma gpu box(xbx)
+                    make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
+                                           AMREX_INT_ANYD(xbx.hiVect()),
+                                           BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                                           BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                                           BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]),
+                                           BL_TO_FORTRAN_ANYD(h0mac_edgex[mfi]));
+                   // y-direction
+#pragma gpu box(ybx)
+                   make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(ybx.loVect()),
+                                          AMREX_INT_ANYD(ybx.hiVect()),
+                                          BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                                          BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                                          BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]),
+                                          BL_TO_FORTRAN_ANYD(h0mac_edgey[mfi]));
+                  // z-direction
+#pragma gpu box(zbx)
+                  make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(zbx.loVect()),
+                                         AMREX_INT_ANYD(zbx.hiVect()),
+                                         BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+                                         BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+                                         BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                         BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                         BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
+                                         BL_TO_FORTRAN_ANYD(h0mac_edgez[mfi]));
                 }
-
             }
 #endif
         } // end MFIter loop
