@@ -555,6 +555,7 @@ contains
     integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
