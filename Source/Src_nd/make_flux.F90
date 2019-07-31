@@ -136,13 +136,10 @@ contains
 
 #if (AMREX_SPACEDIM == 2)
   subroutine make_rhoX_flux_2d(lo, hi, lev, idir, &
-       sfluxx, fx_lo, fx_hi, nc_fx, &
-       sfluxy, fy_lo, fy_hi, nc_fy, &
+       sflux, fx_lo, fx_hi, nc_fx, &
        etarhoflux, eta_lo, eta_hi, &
-       sedgex, x_lo, x_hi, nc_x, &
-       sedgey, y_lo, y_hi, nc_y, &
+       sedge, x_lo, x_hi, nc_x, &
        umac,   u_lo, u_hi, &
-       vmac,   v_lo, v_hi, &
        rho0_old, rho0_edge_old, &
        rho0_new, rho0_edge_new, &
        rho0_predicted_edge, &
@@ -153,22 +150,14 @@ contains
     integer  , value, intent(in   ) :: lev, idir
     integer         , intent(in   ) :: fx_lo(3), fx_hi(3)
     integer  , value, intent(in   ) :: nc_fx
-    double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3),nc_fx)
-    integer         , intent(in   ) :: fy_lo(3), fy_hi(3)
-    integer  , value, intent(in   ) :: nc_fy
-    double precision, intent(inout) :: sfluxy(fy_lo(1):fy_hi(1),fy_lo(2):fy_hi(2),fy_lo(3):fy_hi(3),nc_fy)
+    double precision, intent(inout) :: sflux(fx_lo(1):fx_hi(1),fx_lo(2):fx_hi(2),fx_lo(3):fx_hi(3),nc_fx)
     integer         , intent(in   ) :: eta_lo(3), eta_hi(3)
     double precision, intent(inout) :: etarhoflux(eta_lo(1):eta_hi(1),eta_lo(2):eta_hi(2),eta_lo(3):eta_hi(3))
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     integer  , value, intent(in   ) :: nc_x
-    double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
-    integer         , intent(in   ) :: y_lo(3), y_hi(3)
-    integer  , value, intent(in   ) :: nc_y
-    double precision, intent(inout) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nc_y)
+    double precision, intent(inout) :: sedge(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-    integer         , intent(in   ) :: v_lo(3), v_hi(3)
-    double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
@@ -185,8 +174,7 @@ contains
     !$gpu
 
     ! reset density fluxes
-    sfluxx(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1) = ZERO
-    sfluxy(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1) = ZERO
+    sflux(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1) = ZERO
 
     if (idir == 1) then
 
@@ -200,22 +188,22 @@ contains
                    if (species_pred_type == predict_rhoprime_and_X) then
                       ! edge states are rho' and X.  To make the (rho X) flux,
                       ! we need the edge state of rho0
-                      sfluxx(i,j,k,comp) = umac(i,j,k)* &
-                           (rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp)
+                      sflux(i,j,k,comp) = umac(i,j,k)* &
+                           (rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,comp)
 
                    else if (species_pred_type == predict_rhoX) then
                       ! edge states are (rho X)
-                      sfluxx(i,j,k,comp) = umac(i,j,k)*sedgex(i,j,k,comp)
+                      sflux(i,j,k,comp) = umac(i,j,k)*sedge(i,j,k,comp)
 
                    else if (species_pred_type == predict_rho_and_X) then
                       ! edge states are rho and X
-                      sfluxx(i,j,k,comp) = umac(i,j,k)* &
-                           sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp)
+                      sflux(i,j,k,comp) = umac(i,j,k)* &
+                           sedge(i,j,k,rho_comp)*sedge(i,j,k,comp)
 
                    end if
 
                    ! compute the density fluxes by summing the species fluxes
-                   sfluxx(i,j,k,1) = sfluxx(i,j,k,1) + sfluxx(i,j,k,comp)
+                   sflux(i,j,k,1) = sflux(i,j,k,1) + sflux(i,j,k,comp)
 
                 end do
              end do
@@ -234,24 +222,24 @@ contains
                    if (species_pred_type == predict_rhoprime_and_X) then
                       ! edge states are rho' and X.  To make the (rho X) flux,
                       ! we need the edge state of rho0
-                      sfluxy(i,j,k,comp) = &
-                           (vmac(i,j,k)+w0(lev,j))*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp)
+                      sflux(i,j,k,comp) = &
+                           (umac(i,j,k)+w0(lev,j))*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,comp)
 
                    else if (species_pred_type == predict_rhoX) then
                       ! edge states are (rho X)
-                      sfluxy(i,j,k,comp) = &
-                           (vmac(i,j,k)+w0(lev,j))*sedgey(i,j,k,comp)
+                      sflux(i,j,k,comp) = &
+                           (umac(i,j,k)+w0(lev,j))*sedge(i,j,k,comp)
 
                    else if (species_pred_type == predict_rho_and_X) then
                       ! edge state are rho and X
-                      sfluxy(i,j,k,comp) = &
-                           (vmac(i,j,k)+w0(lev,j))*sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp)
+                      sflux(i,j,k,comp) = &
+                           (umac(i,j,k)+w0(lev,j))*sedge(i,j,k,rho_comp)*sedge(i,j,k,comp)
 
                    endif
 
                    if (evolve_base_state .and. .not.use_exact_base_state) then
                       if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
-                         etarhoflux(i,j,k) = etarhoflux(i,j,k) + sfluxy(i,j,k,comp)
+                         etarhoflux(i,j,k) = etarhoflux(i,j,k) + sflux(i,j,k,comp)
                       end if
 
                       if ( comp.eq.spec_comp+nspec-1) then
@@ -260,7 +248,7 @@ contains
                    endif  ! evolve_base_state
 
                    ! compute the density fluxes by summing the species fluxes
-                   sfluxy(i,j,k,1) = sfluxy(i,j,k,1) + sfluxx(i,j,k,comp)
+                   sflux(i,j,k,1) = sflux(i,j,k,1) + sflux(i,j,k,comp)
 
                 end do
              end do
@@ -314,7 +302,7 @@ contains
     ! reset density fluxes
     sflux(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1) = ZERO
 
-    if (idir == 1) then
+    if (idir == 1 .or. idir == 2) then
 
        ! create x-fluxes
        do comp = startcomp, endcomp
@@ -347,41 +335,6 @@ contains
                 end do
              end do
           enddo
-       enddo
-
-    elseif (idir == 2) then
-
-       ! create y-fluxes
-       do comp = startcomp, endcomp
-          do k=lo(3),hi(3)
-             rho0_edge = HALF*(rho0_old(lev,k)+rho0_new(lev,k))
-             do j=lo(2),hi(2)
-                do i=lo(1),hi(1)
-
-                   if (species_pred_type == predict_rhoprime_and_X) then
-                      ! edge states are rho' and X.  To make the (rho X)
-                      ! flux, we need the edge state of rho0
-                      sflux(i,j,k,comp) = &
-                           umac(i,j,k)*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,comp)
-
-                   else if (species_pred_type == predict_rhoX) then
-                      ! edge states are (rho X)
-                      sflux(i,j,k,comp) = &
-                           umac(i,j,k)*sedge(i,j,k,comp)
-
-                   else if (species_pred_type == predict_rho_and_X) then
-                      ! edge states are rho and X
-                      sflux(i,j,k,comp) = &
-                           umac(i,j,k)*sedge(i,j,k,rho_comp)*sedge(i,j,k,comp)
-
-                   endif
-
-                   ! compute the density fluxes by summing the species fluxes
-                   sflux(i,j,k,1) = sflux(i,j,k,1) + sflux(i,j,k,comp)
-
-                end do
-             end do
-          end do
        enddo
 
     else ! idir == 3
@@ -591,10 +544,8 @@ contains
 #if (AMREX_SPACEDIM == 2)
   subroutine make_rhoh_flux_2d(lo, hi, lev, idir, &
        sflux, f_lo, f_hi, nc_f, &
-       sedgex, x_lo, x_hi, nc_x, &
-       sedgey, y_lo, y_hi, nc_y, &
+       sedge, x_lo, x_hi, nc_x, &
        umac,   u_lo, u_hi, &
-       vmac,   v_lo, v_hi, &
        rho0_old, rho0_edge_old, &
        rho0_new, rho0_edge_new, &
        rhoh0_old, rhoh0_edge_old, &
@@ -608,14 +559,9 @@ contains
     double precision, intent(inout) :: sflux(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     integer  , value, intent(in   ) :: nc_x
-    double precision, intent(in   ) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
-    integer         , intent(in   ) :: y_lo(3), y_hi(3)
-    integer  , value, intent(in   ) :: nc_y
-    double precision, intent(in   ) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nc_y)
+    double precision, intent(in   ) :: sedge(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(in   ) :: umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-    integer         , intent(in   ) :: v_lo(3), v_hi(3)
-    double precision, intent(in   ) :: vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
@@ -654,7 +600,7 @@ contains
                    rho0_edge = HALF*(rho0_old(lev,j)+rho0_new(lev,j))
                    do i=lo(1),hi(1)
                       sflux(i,j,k,rhoh_comp) = &
-                           umac(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp)
+                           umac(i,j,k)*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
                    end do
                 end do
              end do
@@ -666,7 +612,7 @@ contains
                 do j=lo(2),hi(2)
                    do i=lo(1),hi(1)
                       sflux(i,j,k,rhoh_comp) = &
-                           umac(i,j,k)*sedgex(i,j,k,rho_comp)*sedgex(i,j,k,rhoh_comp)
+                           umac(i,j,k)*sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
                    end do
                 end do
              end do
@@ -685,7 +631,7 @@ contains
           do k=lo(3),hi(3)
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedgex(i,j,k,rhoh_comp)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedge(i,j,k,rhoh_comp)
                 end do
              end do
           end do
@@ -696,7 +642,7 @@ contains
              do j=lo(2),hi(2)
                 rhoh0_edge = HALF*(rhoh0_old(lev,j)+rhoh0_new(lev,j))
                 do i=lo(1),hi(1)
-                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*(rhoh0_edge+sedgex(i,j,k,rhoh_comp))
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*(rhoh0_edge+sedge(i,j,k,rhoh_comp))
                 end do
              end do
           end do
@@ -720,7 +666,7 @@ contains
                    rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
                    do i=lo(1),hi(1)
                       sflux(i,j,k,rhoh_comp) = &
-                           (vmac(i,j,k)+w0(lev,j))*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp)
+                           (umac(i,j,k)+w0(lev,j))*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
                    end do
                 end do
              end do
@@ -732,7 +678,7 @@ contains
                 do j=lo(2),hi(2)
                    do i=lo(1),hi(1)
                       sflux(i,j,k,rhoh_comp) = &
-                           (vmac(i,j,k)+w0(lev,j))*sedgey(i,j,k,rho_comp)*sedgey(i,j,k,rhoh_comp)
+                           (umac(i,j,k)+w0(lev,j))*sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
                    end do
                 end do
              end do
@@ -750,7 +696,7 @@ contains
           do k=lo(3),hi(3)
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-                   sflux(i,j,k,rhoh_comp) = (vmac(i,j,k)+w0(lev,j))*sedgey(i,j,k,rhoh_comp)
+                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,j))*sedge(i,j,k,rhoh_comp)
                 end do
              end do
           end do
@@ -761,7 +707,7 @@ contains
              do j=lo(2),hi(2)
                 rhoh0_edge = HALF*(rhoh0_edge_old(lev,j)+rhoh0_edge_new(lev,j))
                 do i=lo(1),hi(1)
-                   sflux(i,j,k,rhoh_comp) = (vmac(i,j,k)+w0(lev,j))*(sedgey(i,j,k,rhoh_comp)+rhoh0_edge)
+                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,j))*(sedge(i,j,k,rhoh_comp)+rhoh0_edge)
                 end do
              end do
           end do
