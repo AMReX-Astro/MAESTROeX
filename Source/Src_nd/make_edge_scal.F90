@@ -1986,6 +1986,4 @@ end subroutine make_edge_scal_3d
 
 #endif
 
-
-
 end module make_edge_scal_module

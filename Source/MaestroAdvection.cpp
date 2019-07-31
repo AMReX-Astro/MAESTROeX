@@ -93,7 +93,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                        const RealVector& r0_predicted_edge,
                        int start_comp, int num_comp)
 {
-    // timer for profiling 
+    // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoXFlux()", MakeRhoXFlux);
 
 #ifdef AMREX_USE_CUDA
@@ -219,11 +219,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                                 BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
                                 BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
                                 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
                                 r0_old.dataPtr(), r0_edge_old.dataPtr(),
                                 r0_new.dataPtr(), r0_edge_new.dataPtr(),
                                 r0_predicted_edge.dataPtr(),
@@ -236,12 +232,8 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                                 lev, 2,
                                 BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
                                 BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
                                 BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
                                 r0_old.dataPtr(), r0_edge_old.dataPtr(),
                                 r0_new.dataPtr(), r0_edge_new.dataPtr(),
                                 r0_predicted_edge.dataPtr(),
@@ -254,11 +246,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                                 lev, 3,
                                 BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
                                 BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
                                 BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
                                 r0_old.dataPtr(), r0_edge_old.dataPtr(),
                                 r0_new.dataPtr(), r0_edge_new.dataPtr(),
@@ -266,23 +254,36 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                                 w0.dataPtr(),
                                 startcomp, endcomp);
     	    } else {
-    		    make_rhoX_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
-                                    BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-                                    BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-                                    BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-                                    BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-                                    BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-                                    BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]),
-                                    BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
-                                    BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
-                                    &startcomp, &endcomp);
+                // x-direction
+#pragma gpu box(xbx)
+    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
+                                    AMREX_INT_ANYD(xbx.hiVect()),
+                                    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]),
+                                    startcomp, endcomp);
+                // y-direction
+#pragma gpu box(ybx)
+    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(ybx.loVect()),
+                                    AMREX_INT_ANYD(ybx.hiVect()),
+                                    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]),
+                                    startcomp, endcomp);
+                // z-direction
+#pragma gpu box(zbx)
+    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(zbx.loVect()),
+                                    AMREX_INT_ANYD(zbx.hiVect()),
+                                    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
+                                    startcomp, endcomp);
 	    } // end spherical
 #endif
 	} // end MFIter loop
