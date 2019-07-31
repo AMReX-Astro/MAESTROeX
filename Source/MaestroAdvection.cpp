@@ -93,7 +93,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                        const RealVector& r0_predicted_edge,
                        int start_comp, int num_comp)
 {
-    // timer for profiling
+    // timer for profiling 
     BL_PROFILE_VAR("Maestro::MakeRhoXFlux()", MakeRhoXFlux);
 
 #ifdef AMREX_USE_CUDA
