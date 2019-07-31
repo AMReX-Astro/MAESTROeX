@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -30,7 +31,7 @@ Maestro::PrintMF (Vector<MultiFab>& MF)
                 const Box& validBox = ba[i];
 
                 // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
                 print_mf(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
@@ -70,7 +71,7 @@ Maestro::PrintEdge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
                 const Box& validBox = ba[i];
 
                 // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data, 
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
                 print_edge(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
@@ -102,22 +103,22 @@ void Maestro::WriteMF (Vector<MultiFab>& mf,
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i] = new MultiFab((mf[i]).boxArray(),(mf[i]).DistributionMap(),nComp,0);
     }
-    
+
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy((mf[i]),0,0,nComp);
     }
-                    
+
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf.push_back(plot_mf_data[i]);
-    }    
-    
+    }
+
     Vector<int> step_array;
     step_array.resize(maxLevel()+1, 0);
 
     WriteMultiLevelPlotfile(name, finest_level+1, plot_mf, varnames,
                             Geom(), 0., step_array, refRatio());
-    
+
 
 }

@@ -15,7 +15,6 @@
 #include <AMReX_PlotFileUtil.H>
 
 #include <PhysBCFunctMaestro.H>
-#include <Maestro_F.H>
 
 #ifdef AMREX_USE_CUDA
 #include <AMReX_CudaAllocators.H>
@@ -24,8 +23,10 @@
 // Define vector types for CUDA
 #ifdef AMREX_USE_CUDA
 typedef amrex::Vector< amrex::Real, amrex::CudaManagedAllocator<amrex::Real> > RealVector;
+typedef amrex::Vector< int, amrex::CudaManagedAllocator<int> > IntVector;
 #else
 typedef amrex::Vector< amrex::Real > RealVector;
+typedef amrex::Vector< int > IntVector;
 #endif
 
 class Maestro
@@ -916,7 +917,7 @@ private:
 
     // stores domain boundary conditions
     // these muse be vectors (rather than arrays) so we can ParmParse them
-    amrex::Vector<int> phys_bc;
+    IntVector phys_bc;
 
     // boundary condition objects needed for FillPatch routines
     // this is essentially an array (over components)
@@ -969,12 +970,12 @@ private:
     int nr_irreg;
 
     // these provide information about the multilevel base state configuration
-    amrex::Vector<int> numdisjointchunks;
-    amrex::Vector<int> r_start_coord;
-    amrex::Vector<int> r_end_coord;
+    IntVector numdisjointchunks;
+    IntVector r_start_coord;
+    IntVector r_end_coord;
 
     // array of tagged boxes (planar)
-    amrex::Vector<int> tag_array;
+    IntVector tag_array;
 
     // diag file array buffers
     amrex::Vector<amrex::Real> diagfile1_data;

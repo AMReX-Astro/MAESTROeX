@@ -39,3 +39,4 @@ CEXE_headers += MaestroPlot.H
 CEXE_headers += PhysBCFunctMaestro.H
 
 FEXE_headers += Maestro_F.H
+FEXE_headers += MaestroHydro_F.H

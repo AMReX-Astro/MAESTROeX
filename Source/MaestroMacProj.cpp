@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 #include <AMReX_VisMF.H>
 
 using namespace amrex;
@@ -18,7 +19,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MacProj()", MacProj);
-// 
+//
 // #ifdef AMREX_USE_CUDA
 //     auto not_launched = Gpu::notInLaunchRegion();
 //     // turn on GPU

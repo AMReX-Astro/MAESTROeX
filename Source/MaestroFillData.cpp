@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 #include <PhysBCFunctMaestro.H>
 
 using namespace amrex;

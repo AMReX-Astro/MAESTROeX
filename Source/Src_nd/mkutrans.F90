@@ -153,8 +153,8 @@ contains
 
 #if (AMREX_SPACEDIM == 2)
   subroutine mkutrans_2d(lo, hi, lev, idir, domlo, domhi, &
-       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
+       utilde, ut_lo, ut_hi, nc_ut, &
+       ufull,  uf_lo, uf_hi, nc_uf, &
        utrans, uu_lo, uu_hi, &
        vtrans, uv_lo, uv_hi, &
        Ip, ip_lo, ip_hi, &
@@ -166,9 +166,9 @@ contains
     integer, value, intent(in   ) :: lev, idir
     integer, intent(in) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
-    integer, value  , intent(in   ) :: nc_ut, ng_ut
+    integer, value  , intent(in   ) :: nc_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3)
-    integer, value  , intent(in   ) :: nc_uf, ng_uf
+    integer, value  , intent(in   ) :: nc_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: ip_lo(3), ip_hi(3)
@@ -349,8 +349,8 @@ contains
 #if (AMREX_SPACEDIM == 3)
 
   subroutine mkutrans_3d(lo, hi, lev, idir, domlo, domhi, &
-       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
+       utilde, ut_lo, ut_hi, nc_ut, &
+       ufull,  uf_lo, uf_hi, nc_uf, &
        utrans, uu_lo, uu_hi, &
        vtrans, uv_lo, uv_hi, &
        wtrans, uw_lo, uw_hi, &
@@ -364,9 +364,9 @@ contains
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
-    integer, value  , intent(in   ) :: lev, idir, ng_ut, nc_ut
+    integer, value  , intent(in   ) :: lev, idir, nc_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3)
-    integer, value  , intent(in   ) :: ng_uf, nc_uf
+    integer, value  , intent(in   ) :: nc_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: uw_lo(3), uw_hi(3)
