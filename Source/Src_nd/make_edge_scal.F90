@@ -1377,8 +1377,8 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               ! impose hi side bc's
               if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                    slyz = s(i,j+1,k,comp)
-                    sryz = s(i,j+1,k,comp)
+                    slyz = s(i,j,k,comp)
+                    sryz = s(i,j,k,comp)
                  else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 2) then
@@ -1759,7 +1759,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
                     if (is_vel .eq. 1 .and. comp .eq. 1) then
                        sedge(i,j,k,comp) = max(sedgelx,0.d0)
                     else
-                       sedge(hi(1)+1,j,k,comp) = sedgelx
+                       sedge(i,j,k,comp) = sedgelx
                     end if
                  else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
                     sedge(i,j,k,comp) = sedgelx
