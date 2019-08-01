@@ -322,7 +322,7 @@ Maestro::FirstDt ()
         const MultiFab& vel_force_mf = vel_force[lev];
         const MultiFab& S_cc_old_mf = S_cc_old[lev];
 #if (AMREX_SPACEDIM == 3)
-	const MultiFab& gp0_cart_mf = gp0_cart[lev];
+        const MultiFab& gp0_cart_mf = gp0_cart[lev];
 #endif
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
