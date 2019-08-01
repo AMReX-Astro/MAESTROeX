@@ -185,7 +185,7 @@ contains
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
 
     double precision hx,hy,dt2,uavg
-    double precision :: ul, urx, vly, vry
+    double precision :: ulx, urx, vly, vry
 
     integer :: i,j,k
 
@@ -447,13 +447,11 @@ contains
              do i=lo(1),hi(1)
 
                 if (ppm_type .eq. 0) then
-                   !$OMP PARALLEL DO PRIVATE(i,j,k)
                    ! extrapolate to edges
                    ulx = utilde(i-1,j,k,1) &
                         + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,k,1)))*Ip(i-1,j,k,1)
                    urx = utilde(i  ,j,k,1) &
                         - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,k,1)))*Ip(i  ,j,k,1)
-                   !$OMP END PARALLEL DO
                 else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                    ! extrapolate to edges
                    ulx = Ip(i-1,j,k,1)
@@ -536,7 +534,6 @@ contains
              do i=lo(1),hi(1)
 
                 if (ppm_type .eq. 0) then
-                   !$OMP PARALLEL DO PRIVATE(i,j,k)
                    ! extrapolate to edges
                    vly = utilde(i,j-1,k,2) &
                         + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,k,2)))*Im(i,j-1,k,1)
