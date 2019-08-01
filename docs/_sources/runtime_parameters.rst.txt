@@ -318,7 +318,7 @@ namespace: ``maestro``
 |                                        | {\tt species\_pred\_type} = 3 means predict $\rho$ and  |               |
 |                                        | $X$ separately.                                         |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``use_delta_gamma1_term``              | turns on second order correction to delta gamma1 term   | false         |
+| ``use_delta_gamma1_term``              | turns on second order correction to delta gamma1 term   | true          |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``use_etarho``                         | turn on the etarho term as described in flow chart      | true          |
 +----------------------------------------+---------------------------------------------------------+---------------+
