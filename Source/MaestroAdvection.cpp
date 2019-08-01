@@ -131,16 +131,14 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
         } // end MFIter loop
 
-#elif (AMREX_SPACEDIM == 2)
-// AMREX_SPACEDIM == 2
+#elif (AMREX_SPACEDIM == 2 || AMREX_SPACEDIM == 3)
 
 #ifdef AMREX_USE_CUDA
         int* bc_f = prepare_bc(bcs_u[0].data(), 1);
-        set_bc_launch_config();
 #else
         const int* bc_f = bcs_u[0].data();
 #endif
-        MultiFab u_mf, v_mf;
+        MultiFab u_mf, v_mf, w_mf;
 
         if (ppm_type == 0) {
            u_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
@@ -149,6 +147,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
            MultiFab::Copy(u_mf, utilde[lev], 0, 0, 1, utilde[lev].nGrow());
            MultiFab::Copy(v_mf, utilde[lev], 1, 0, 1, utilde[lev].nGrow());
 
+#if (AMREX_SPACEDIM == 3)
+           w_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+           MultiFab::Copy(w_mf, utilde[lev], 2, 0, 1, utilde[lev].nGrow());
+#endif
+
         } else if (ppm_type == 1 || ppm_type == 2) {
 
            u_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
@@ -156,10 +159,16 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
            MultiFab::Copy(u_mf, ufull[lev], 0, 0, 1, ufull[lev].nGrow());
            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
+
+#if (AMREX_SPACEDIM == 3)
+           w_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+           MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
+#endif
         }
 
-
-    // NOTE: don't tile, but threaded in fortran subroutine
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -167,6 +176,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             const Box& obx = amrex::grow(tileBox, 1);
             const Box& xbx = amrex::growHi(tileBox,0, 1);
             const Box& ybx = amrex::growHi(tileBox,1, 1);
+#if (AMREX_SPACEDIM == 3)
+            const Box& zbx = amrex::growHi(tileBox, 2, 1);
+#endif
+
+#if (AMREX_SPACEDIM == 2)
 
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
@@ -262,59 +276,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        BL_TO_FORTRAN_ANYD(Im[mfi]),
                        w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f,
                        phys_bc.dataPtr());
-
-        } // end MFIter loop
-
-#ifdef AMREX_USE_CUDA
-        clean_bc_launch_config();
-        clean_bc(bc_f);
-#endif
-
-# else
-// AMREX_SPACEDIM == 3
-
-#ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs_u[0].data(), 1);
-        set_bc_launch_config();
-#else
-        const int* bc_f = bcs_u[0].data();
-#endif
-
-        MultiFab u_mf, v_mf, w_mf;
-
-       if (ppm_type == 0) {
-           u_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
-           v_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
-           w_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
-
-           MultiFab::Copy(u_mf, utilde[lev], 0, 0, 1, utilde[lev].nGrow());
-           MultiFab::Copy(v_mf, utilde[lev], 1, 0, 1, utilde[lev].nGrow());
-           MultiFab::Copy(w_mf, utilde[lev], 2, 0, 1, utilde[lev].nGrow());
-
-       } else if (ppm_type == 1 || ppm_type == 2) {
-
-           u_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
-           v_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
-           w_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
-
-           MultiFab::Copy(u_mf, ufull[lev], 0, 0, 1, ufull[lev].nGrow());
-           MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
-           MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
-       }
-
-        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
-            const Box& xbx = amrex::growHi(tileBox, 0, 1);
-            const Box& ybx = amrex::growHi(tileBox, 1, 1);
-            const Box& zbx = amrex::growHi(tileBox, 2, 1);
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+#elif (AMREX_SPACEDIM == 3)
 
             // x-direction
             if (ppm_type == 0) {
@@ -463,13 +425,12 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
                         w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
 
+#endif
         } // end MFIter loop
 
 #ifdef AMREX_USE_CUDA
-        clean_bc_launch_config();
         clean_bc(bc_f);
 #endif
-
 
 #endif // end if AMREX_SPACEDIM
     } // end loop over levels
@@ -598,7 +559,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
 #ifdef AMREX_USE_CUDA
         int* bc_f = prepare_bc(bcs_u[0].data(), 1);
-        set_bc_launch_config();
 #else
         const int* bc_f = bcs_u[0].data();
 #endif
@@ -620,6 +580,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
         }
 
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -801,7 +764,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         } // end MFIter loop
 
 #ifdef AMREX_USE_CUDA
-        clean_bc_launch_config();
         clean_bc(bc_f);
 #endif
 
@@ -809,7 +771,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
 #ifdef AMREX_USE_CUDA
         int* bc_f = prepare_bc(bcs_u[0].data(), 1);
-        set_bc_launch_config();
 #else
         const int* bc_f = bcs_u[0].data();
 #endif
@@ -834,7 +795,10 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
            MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
         }
-
+        
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -1277,7 +1241,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         } // end MFIter loop
 
 #ifdef AMREX_USE_CUDA
-        clean_bc_launch_config();
         clean_bc(bc_f);
 #endif
 
