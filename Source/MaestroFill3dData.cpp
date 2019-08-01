@@ -127,10 +127,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
         // need one cell-centered MF for the MFIter
         MultiFab& sold_mf = sold[lev];
 
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -142,8 +139,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
-#pragma gpu box(gbx)
-                addw0(AMREX_INT_ANYD(gbx.loVect()), AMREX_INT_ANYD(gbx.hiVect()),lev,
+                addw0(ARLIM_3D(gbx.loVect()), ARLIM_3D(gbx.hiVect()),lev,
 #if (AMREX_SPACEDIM == 1)
                       BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
 #elif (AMREX_SPACEDIM == 2)
@@ -161,24 +157,21 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                 const Box& zbx = amrex::growHi(tileBox, 2, 1);
 
                 // x-direction
-#pragma gpu box(xbx)
-                addw0_sphr(AMREX_INT_ANYD(xbx.loVect()),
-                           AMREX_INT_ANYD(xbx.hiVect()),
+                addw0_sphr(ARLIM_3D(xbx.loVect()),
+                           ARLIM_3D(xbx.hiVect()),
                            BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
                            BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
                            mult);
 
                // y-direction
-#pragma gpu box(ybx)
-               addw0_sphr(AMREX_INT_ANYD(ybx.loVect()),
-                          AMREX_INT_ANYD(ybx.hiVect()),
+               addw0_sphr(ARLIM_3D(ybx.loVect()),
+                          ARLIM_3D(ybx.hiVect()),
                           BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
                           BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
                           mult);
               // z-direction
-#pragma gpu box(zbx)
-              addw0_sphr(AMREX_INT_ANYD(zbx.loVect()),
-                         AMREX_INT_ANYD(zbx.hiVect()),
+              addw0_sphr(ARLIM_3D(zbx.loVect()),
+                         ARLIM_3D(zbx.hiVect()),
                          BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
                          BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
                          mult);
@@ -370,7 +363,13 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& face,
                         int harmonic_avg) {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PutDataOnFaces()",PutDataOnFaces);
+    BL_PROFILE_VAR("Maestro::PutDataOnFaces()", PutDataOnFaces);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -393,26 +392,44 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Box& xbx = amrex::growHi(tileBox, 0, 1);
+            const Box& ybx = amrex::growHi(tileBox, 1, 1);
+            const Box& zbx = amrex::growHi(tileBox, 2, 1);
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            put_data_on_faces(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                              BL_TO_FORTRAN_3D(scc_mf[mfi]),
-                              BL_TO_FORTRAN_3D(facex_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
-                              BL_TO_FORTRAN_3D(facey_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                              BL_TO_FORTRAN_3D(facez_mf[mfi]),
-#endif
-#endif
-                              &harmonic_avg);
+#pragma gpu(xbx)
+            put_data_on_xfaces(AMREX_INT_ANYD(xbx.loVect()),
+                              AMREX_INT_ANYD(xbx.hiVect()),
+                              BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(facex_mf[mfi]),
+                              harmonic_avg);
+
+#pragma gpu(ybx)
+            put_data_on_yfaces(AMREX_INT_ANYD(ybx.loVect()),
+                            AMREX_INT_ANYD(ybx.hiVect()),
+                            BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(facey_mf[mfi]),
+                            harmonic_avg);
+
+#pragma gpu(zbx)
+            put_data_on_zfaces(AMREX_INT_ANYD(zbx.loVect()),
+                              AMREX_INT_ANYD(zbx.hiVect()),
+                              BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(facez_mf[mfi]),
+                              harmonic_avg);
         }
     }
 
     // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
     AverageDownFaces(face);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }
 
 
