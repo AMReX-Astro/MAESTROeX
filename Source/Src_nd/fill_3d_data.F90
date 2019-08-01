@@ -11,11 +11,6 @@ module fill_3d_data_module
 
   implicit none
 
-  ! private :: addw0, addw0_sphr, make_w0mac_sphr, make_s0mac_sphr, &
-  !  make_s0mac_sphr_irreg, make_normal, put_data_on_faces
-  !
-  ! public
-
 contains
 
   subroutine put_1d_array_on_cart(lo, hi, lev, &
@@ -515,59 +510,37 @@ contains
 
   end subroutine quad_interp
 
-  subroutine addw0(lev, lo, hi, &
+  subroutine addw0(lo, hi, lev, &
        uedge, u_lo, u_hi, &
-#if (AMREX_SPACEDIM >= 2)
-       vedge, v_lo, v_hi, &
-#if (AMREX_SPACEDIM == 3)
-       wedge, w_lo, w_hi, &
-#endif
-#endif
        w0,mult) bind(C, name="addw0")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(inout) :: uedge(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-#if (AMREX_SPACEDIM >= 2)
-    integer         , intent(in   ) :: v_lo(3), v_hi(3)
-    double precision, intent(inout) :: vedge(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-#if (AMREX_SPACEDIM == 3)
-    integer         , intent(in   ) :: w_lo(3), w_hi(3)
-    double precision, intent(inout) :: wedge(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-#endif
-#endif
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: mult
+    double precision, value, intent(in   ) :: mult
 
     ! local
-    integer i,j,k
+    integer :: i,j,k,r
+
+    !$gpu
+
+    do k = lo(3),hi(3)
+       do j = lo(2),hi(2)
+          do i = lo(1),hi(1)
 
 #if (AMREX_SPACEDIM == 1)
-    j = lo(2)
-    k = lo(3)
-    do i = lo(1),hi(1)+1
-       uedge(i,j,k) = uedge(i,j,k) + mult * w0(lev,i)
-    end do
-
+              r = i
 #elif (AMREX_SPACEDIM == 2)
-    k = lo(3)
-    do j = lo(2),hi(2)+1
-       do i = lo(1)-1,hi(1)+1
-          vedge(i,j,k) = vedge(i,j,k) + mult * w0(lev,j)
-       end do
-    end do
+              r = j
 #elif (AMREX_SPACEDIM == 3)
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
-    do k = lo(3),hi(3)+1
-       do j = lo(2)-1,hi(2)+1
-          do i = lo(1)-1,hi(1)+1
-             wedge(i,j,k) = wedge(i,j,k) + mult * w0(lev,k)
+              r = k
+#endif
+             uedge(i,j,k) = uedge(i,j,k) + mult * w0(lev,r)
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
-
-#endif
 
   end subroutine addw0
 

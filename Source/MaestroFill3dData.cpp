@@ -127,33 +127,36 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
         // need one cell-centered MF for the MFIter
         MultiFab& sold_mf = sold[lev];
 
-        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        // NOTE: don't use tiling - put OpenMP into F90
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& gbx = amrex::growLo(obx, AMREX_SPACEDIM-1, -1);
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
-
-                addw0(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                      BL_TO_FORTRAN_3D(uedge_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
-                      BL_TO_FORTRAN_3D(vedge_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                      BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+#pragma gpu box(gbx)
+                addw0(AMREX_INT_ANYD(gbx.loVect()), AMREX_INT_ANYD(gbx.hiVect()),lev,
+#if (AMREX_SPACEDIM == 1)
+                      BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
+#elif (AMREX_SPACEDIM == 2)
+                      BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+#elif (AMREX_SPACEDIM == 3)
+                      BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
 #endif
-#endif
-                      w0.dataPtr(),&mult);
+                      w0.dataPtr(),mult);
 
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-                addw0_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
+                addw0_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
                            BL_TO_FORTRAN_3D(uedge_mf[mfi]),
                            BL_TO_FORTRAN_3D(vedge_mf[mfi]),
                            BL_TO_FORTRAN_3D(wedge_mf[mfi]),

@@ -181,7 +181,7 @@ extern "C"
 		      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
 		      const amrex::Real* divu,  const int* d_lo, const int* d_hi,
 		      const amrex::Real* gp0_cart, const int* g_lo, const int* g_hi);
-    
+
     void estdt_divu(amrex::Real* gp0,
 		      const amrex::Real* p0, const amrex::Real* gamma1bar,
 		      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
@@ -297,15 +297,9 @@ extern "C"
 				   const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 				   const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void addw0(const int* lev, const int* lo, const int* hi,
+    void addw0(const int* lo, const int* hi, const int lev,
                amrex::Real* uedge, const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
-               amrex::Real* vedge, const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-               amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
-#endif
-               const amrex::Real* w0, const amrex::Real* mult);
+               const amrex::Real* w0, const amrex::Real mult);
 
     void addw0_sphr(const int* lo, const int* hi,
 		    amrex::Real* umac, const int* u_lo, const int* u_hi,
