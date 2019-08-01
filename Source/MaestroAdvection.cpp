@@ -158,8 +158,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
         }
 
-
-    // NOTE: don't tile, but threaded in fortran subroutine
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region

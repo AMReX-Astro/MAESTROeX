@@ -1087,6 +1087,7 @@ extern "C"
 
     //////////////////////
     // in ppm.F90
+#if (AMREX_SPACEDIM == 2)
     void ppm_2d(const int* lo, const int* hi,
         const amrex::Real* s,  const int* s_lo, const int* s_hi,
         const int nc_s,
@@ -1098,7 +1099,7 @@ extern "C"
         const int* adv_bc,
         const amrex::Real* dx, const amrex::Real dt,
         const int is_umac, const int comp, const int bccomp);
-
+#elif (AMREX_SPACEDIM == 3)
     void ppm_3d(const int* lo, const int* hi,
         const amrex::Real* s,  const int* s_lo, const int* s_hi,
         const int nc_s,
@@ -1111,7 +1112,7 @@ extern "C"
         const int* adv_bc,
         const amrex::Real* dx, const amrex::Real dt,
         const int is_umac, const int comp, const int bccomp);
-
+#endif
     //////////////////////
 
     //////////////////////

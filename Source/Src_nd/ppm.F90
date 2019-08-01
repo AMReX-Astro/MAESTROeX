@@ -543,7 +543,7 @@ contains
 
   end subroutine ppm_1d
 
-
+#if (AMREX_SPACEDIM==2)
   !===========================================================================
   ! 2-d version
   !===========================================================================
@@ -1875,7 +1875,7 @@ contains
 
   end subroutine ppm_2d
 
-
+#elif (AMREX_SPACEDIM == 3)
   !===========================================================================
   ! 3-d version
   !===========================================================================
@@ -1932,8 +1932,6 @@ contains
        ! ppm_type = 1
        !----------------------------------------------------------------------
 
-       !$OMP PARALLEL PRIVATE(i,j,k,dsc,dsl,dsr)
-       !$OMP DO
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
@@ -2893,8 +2891,6 @@ contains
              end do
           end do
        end do
-       !$OMP END DO
-       !$OMP END PARALLEL
 
     else if (ppm_type .eq. 2) then
 
@@ -4093,7 +4089,7 @@ contains
 
   end subroutine ppm_3d
 
-
+#endif
 
 
 end module ppm_module
