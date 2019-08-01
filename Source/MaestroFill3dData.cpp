@@ -156,14 +156,32 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-                addw0_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                           BL_TO_FORTRAN_3D(uedge_mf[mfi]),
-                           BL_TO_FORTRAN_3D(vedge_mf[mfi]),
-                           BL_TO_FORTRAN_3D(wedge_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                           &mult);
+                const Box& xbx = amrex::growHi(tileBox, 0, 1);
+                const Box& ybx = amrex::growHi(tileBox, 1, 1);
+                const Box& zbx = amrex::growHi(tileBox, 2, 1);
+
+                // x-direction
+#pragma gpu box(xbx)
+                addw0_sphr(AMREX_INT_ANYD(xbx.loVect()),
+                           AMREX_INT_ANYD(xbx.hiVect()),
+                           BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                           mult);
+
+               // y-direction
+#pragma gpu box(ybx)
+               addw0_sphr(AMREX_INT_ANYD(ybx.loVect()),
+                          AMREX_INT_ANYD(ybx.hiVect()),
+                          BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                          mult);
+              // z-direction
+#pragma gpu box(zbx)
+              addw0_sphr(AMREX_INT_ANYD(zbx.loVect()),
+                         AMREX_INT_ANYD(zbx.hiVect()),
+                         BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+                         BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                         mult);
 #else
                 Abort("Addw0: Spherical is not valid for DIM < 3");
 #endif

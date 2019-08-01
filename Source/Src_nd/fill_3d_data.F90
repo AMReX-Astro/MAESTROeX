@@ -546,60 +546,28 @@ contains
 
   subroutine addw0_sphr(lo, hi, &
        umac, u_lo, u_hi, &
-       vmac, v_lo, v_hi, &
-       wmac, w_lo, w_hi, &
-       w0macx, x_lo, x_hi, &
-       w0macy, y_lo, y_hi, &
-       w0macz, z_lo, z_hi, &
+       w0mac, x_lo, x_hi, &
        mult) bind(C, name="addw0_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(inout) ::   umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-    integer         , intent(in   ) :: v_lo(3), v_hi(3)
-    double precision, intent(inout) ::   vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-    integer         , intent(in   ) :: w_lo(3), w_hi(3)
-    double precision, intent(inout) ::   wmac(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
-    double precision, intent(in   ) :: w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
-    integer         , intent(in   ) :: y_lo(3), y_hi(3)
-    double precision, intent(in   ) :: w0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
-    integer         , intent(in   ) :: z_lo(3), z_hi(3)
-    double precision, intent(in   ) :: w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
+    double precision, intent(in   ) :: w0mac(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
     double precision, intent(in   ) :: mult
 
     ! local variable
     integer :: i,j,k
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
+    !$gpu
+
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
-          do i = lo(1),hi(1)+1
-             umac(i,j,k) = umac(i,j,k) + mult * w0macx(i,j,k)
-          end do
-       end do
-    end do
-    !$OMP END PARALLEL DO
-
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
-    do k = lo(3),hi(3)
-       do j = lo(2),hi(2)+1
           do i = lo(1),hi(1)
-             vmac(i,j,k) = vmac(i,j,k) + mult * w0macy(i,j,k)
+             umac(i,j,k) = umac(i,j,k) + mult * w0mac(i,j,k)
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
-
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
-    do k = lo(3),hi(3)+1
-       do j = lo(2),hi(2)
-          do i = lo(1),hi(1)
-             wmac(i,j,k) = wmac(i,j,k) + mult * w0macz(i,j,k)
-          end do
-       end do
-    end do
-    !$OMP END PARALLEL DO
 
   end subroutine addw0_sphr
 

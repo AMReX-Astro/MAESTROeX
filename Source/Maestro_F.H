@@ -303,12 +303,8 @@ extern "C"
 
     void addw0_sphr(const int* lo, const int* hi,
 		    amrex::Real* umac, const int* u_lo, const int* u_hi,
-		    amrex::Real* vmac, const int* v_lo, const int* v_hi,
-		    amrex::Real* wmac, const int* w_lo, const int* w_hi,
 		    const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
-		    const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
-		    const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
-		    const amrex::Real* mult);
+		    const amrex::Real mult);
 
     void make_w0mac_sphr(const int* lo, const int* hi,
 			 const amrex::Real* w0,
