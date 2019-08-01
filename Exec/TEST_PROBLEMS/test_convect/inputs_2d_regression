@@ -54,6 +54,7 @@ maestro.hi_bc = 0 2
 geometry.is_periodic =  1 0
 
 maestro.do_heating = true
+maestro.use_delta_gamma1_term = false
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
