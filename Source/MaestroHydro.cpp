@@ -91,8 +91,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
         }
 
-
-        // NOTE: don't tile, but threaded in fortran subroutine
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -233,7 +234,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
         }
 
-        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -560,6 +564,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
         }
 
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -773,6 +780,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
         }
 
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -1306,6 +1316,22 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         simhzx.define(grids[lev],dmap[lev],1,1);
         simhzy.define(grids[lev],dmap[lev],1,1);
 
+        slx.setVal(0.);
+        srx.setVal(0.);
+        simhx.setVal(0.);
+        sly.setVal(0.);
+        sry.setVal(0.);
+        simhy.setVal(0.);
+        slz.setVal(0.);
+        srz.setVal(0.);
+        simhz.setVal(0.);
+
+        simhxy.setVal(0.);
+        simhxz.setVal(0.);
+        simhyx.setVal(0.);
+        simhyz.setVal(0.);
+        simhzx.setVal(0.);
+        simhzy.setVal(0.);
 #endif
 #endif
         const MultiFab& force_mf = force[lev];
@@ -1343,7 +1369,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #elif (AMREX_SPACEDIM == 2)
 
 #ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs_u[0].data(), 1);
+        int* bc_f = prepare_bc(bcs[0].data(), 1);
 #else
         const int* bc_f = bcs[0].data();
 #endif
@@ -1353,7 +1379,9 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 
             MultiFab::Copy(vec_scal_mf[comp], scal_mf, start_scomp+comp, 0, 1, scal_mf.nGrow());
         }
-
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -1514,36 +1542,49 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #elif (AMREX_SPACEDIM == 3)
 
 #ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs_u[0].data(), 1);
+        int* bc_f = prepare_bc(bcs[0].data(), 1);
 #else
         const int* bc_f = bcs[0].data();
 #endif
         Vector<MultiFab> vec_scal_mf(num_comp);
         for (int comp=0; comp < num_comp; ++comp) {
             vec_scal_mf[comp].define(grids[lev],dmap[lev],1,scal_mf.nGrow());
+            vec_scal_mf[comp].setVal(0.);
 
             MultiFab::Copy(vec_scal_mf[comp], scal_mf, start_scomp+comp, 0, 1, scal_mf.nGrow());
         }
 
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+        // Be careful to pass in comp+1 for fortran indexing
+        for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
 
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
-            const Box& zbx = amrex::growHi(tileBox,2, 1);
-            const Box& mxbx = amrex::growLo(obx,0, -1);
-            const Box& mybx = amrex::growLo(obx,1, -1);
-            const Box& mzbx = amrex::growLo(obx,2, -1);
+            int vcomp = scomp - start_scomp - 1;
 
-            // Be careful to pass in comp+1 for fortran indexing
-            for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
+            int bccomp = start_bccomp + scomp - start_scomp;
 
-                int vcomp = scomp - start_scomp - 1;
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+            for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
-                int bccomp = start_bccomp + scomp - start_scomp;
+                // Get the index space of the valid region
+                const Box& tileBox = mfi.tilebox();
+                const Box& obx = amrex::grow(tileBox, 1);
+                const Box& xbx = amrex::growHi(tileBox, 0, 1);
+                const Box& ybx = amrex::growHi(tileBox, 1, 1);
+                const Box& zbx = amrex::growHi(tileBox, 2, 1);
+                const Box& mxbx = amrex::growLo(obx, 0, -1);
+                const Box& mybx = amrex::growLo(obx, 1, -1);
+                const Box& mzbx = amrex::growLo(obx, 2, -1);
 
+#pragma gpu box(obx)
+                make_divu(AMREX_INT_ANYD(obx.loVect()),
+                          AMREX_INT_ANYD(obx.hiVect()),
+                          BL_TO_FORTRAN_ANYD(divu[mfi]),
+                          BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                          AMREX_REAL_ANYD(dx), is_conservative);
+                          
                 // x-direction
                 if (ppm_type == 0) {
                     // we're going to reuse Ip here as slopex and Im as slopey
@@ -1614,72 +1655,81 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                                AMREX_INT_ANYD(domainBox.hiVect()),
                                bc_f, AMREX_REAL_ANYD(dx), dt, true,
                                scomp, bccomp);
-
                     }
                 }
+            }
 
-#pragma gpu box(obx)
-                make_divu(AMREX_INT_ANYD(obx.loVect()),
-                          AMREX_INT_ANYD(obx.hiVect()),
-                          BL_TO_FORTRAN_ANYD(divu[mfi]),
-                          BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                          AMREX_REAL_ANYD(dx), is_conservative);
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+            for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+
+                // Get the index space of the valid region
+                const Box& tileBox = mfi.tilebox();
+                const Box& obx = amrex::grow(tileBox, 1);
+                const Box& xbx = amrex::growHi(tileBox, 0, 1);
+                const Box& ybx = amrex::growHi(tileBox, 1, 1);
+                const Box& zbx = amrex::growHi(tileBox, 2, 1);
+                const Box& mxbx = amrex::growLo(obx, 0, -1);
+                const Box& mybx = amrex::growLo(obx, 1, -1);
+                const Box& mzbx = amrex::growLo(obx, 2, -1);
 
                 // x-direction
 #pragma gpu box(mxbx)
-                make_edge_scal_predictor_3d(
-                    AMREX_INT_ANYD(mxbx.loVect()), AMREX_INT_ANYD(mxbx.hiVect()), 1,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                    BL_TO_FORTRAN_ANYD(Im[mfi]),
-                    BL_TO_FORTRAN_ANYD(slopez[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp);
+                make_edge_scal_predictor_3d(AMREX_INT_ANYD(mxbx.loVect()),
+                                            AMREX_INT_ANYD(mxbx.hiVect()), 1,
+                                            AMREX_INT_ANYD(domainBox.loVect()),
+                                            AMREX_INT_ANYD(domainBox.hiVect()),
+                                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+                                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                                            BL_TO_FORTRAN_ANYD(Im[mfi]),
+                                            BL_TO_FORTRAN_ANYD(slopez[mfi]),
+                                            BL_TO_FORTRAN_ANYD(slx[mfi]),
+                                            BL_TO_FORTRAN_ANYD(srx[mfi]),
+                                            BL_TO_FORTRAN_ANYD(simhx[mfi]),
+                                            AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                                            nbccomp, scomp, bccomp);
 
                 // y-direction
 #pragma gpu box(mybx)
-                make_edge_scal_predictor_3d(
-                    AMREX_INT_ANYD(mybx.loVect()), AMREX_INT_ANYD(mybx.hiVect()), 2,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                    BL_TO_FORTRAN_ANYD(Im[mfi]),
-                    BL_TO_FORTRAN_ANYD(slopez[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp);
+                make_edge_scal_predictor_3d(AMREX_INT_ANYD(mybx.loVect()),
+                                            AMREX_INT_ANYD(mybx.hiVect()), 2,
+                                            AMREX_INT_ANYD(domainBox.loVect()),
+                                            AMREX_INT_ANYD(domainBox.hiVect()),
+                                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+                                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                                            BL_TO_FORTRAN_ANYD(Im[mfi]),
+                                            BL_TO_FORTRAN_ANYD(slopez[mfi]),
+                                            BL_TO_FORTRAN_ANYD(sly[mfi]),
+                                            BL_TO_FORTRAN_ANYD(sry[mfi]),
+                                            BL_TO_FORTRAN_ANYD(simhy[mfi]),
+                                            AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                                            nbccomp, scomp, bccomp);
 
                 // z-direction
 #pragma gpu box(mzbx)
-                make_edge_scal_predictor_3d(
-                    AMREX_INT_ANYD(mzbx.loVect()), AMREX_INT_ANYD(mzbx.hiVect()), 3,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                    BL_TO_FORTRAN_ANYD(Im[mfi]),
-                    BL_TO_FORTRAN_ANYD(slopez[mfi]),
-                    BL_TO_FORTRAN_ANYD(slz[mfi]),
-                    BL_TO_FORTRAN_ANYD(srz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhz[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp);
+                make_edge_scal_predictor_3d(AMREX_INT_ANYD(mzbx.loVect()),
+                                            AMREX_INT_ANYD(mzbx.hiVect()), 3,
+                                            AMREX_INT_ANYD(domainBox.loVect()),
+                                            AMREX_INT_ANYD(domainBox.hiVect()),
+                                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+                                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                                            BL_TO_FORTRAN_ANYD(Im[mfi]),
+                                            BL_TO_FORTRAN_ANYD(slopez[mfi]),
+                                            BL_TO_FORTRAN_ANYD(slz[mfi]),
+                                            BL_TO_FORTRAN_ANYD(srz[mfi]),
+                                            BL_TO_FORTRAN_ANYD(simhz[mfi]),
+                                            AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                                            nbccomp, scomp, bccomp);
 
                 // simhxy
                 Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
@@ -1906,8 +1956,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                                   AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
                                   nbccomp, scomp, bccomp, is_conservative);
 
-            } // end loop over components
-        } // end MFIter loop
+            } // end MFIter loop
+        } // end loop over components
 
 #ifdef AMREX_USE_CUDA
         clean_bc(bc_f);

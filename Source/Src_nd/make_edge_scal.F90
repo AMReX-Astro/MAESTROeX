@@ -751,7 +751,6 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
                  ! mahi(3) slx, srx with 1D extrapolation
                  sl(i,j,k) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,1)
                  sr(i,j,k) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,1)
-                 !$OMP END PARALLEL DO
               else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                  ! make slx, srx with 1D extrapolation
                  sl(i,j,k) = Ip(i-1,j,k,1)
@@ -783,7 +782,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (i .eq.hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j,k,comp)
                     sr(i,j,k) = s(i,j,k,comp)
@@ -1026,7 +1025,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
   double precision, intent(inout) :: simh_trans(sit_lo(1):sit_hi(1),sit_lo(2):sit_hi(2),sit_lo(3):sit_hi(3))
   double precision, intent(in   ) :: dx(3)
   double precision, value, intent(in   ) :: dt
-  integer, value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
+  integer,   value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
   integer         , intent(in   ) :: adv_bc(3,2,nbccomp)
 
   ! Local variables
@@ -1642,7 +1641,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
   double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
   double precision, intent(in   ) :: dx(3)
   double precision, value, intent(in   ) :: dt
-  integer, value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
+  integer,   value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
   integer         , intent(in   ) :: adv_bc(3,2,nbccomp)
 
   ! Local variables
@@ -1830,7 +1829,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(vmac(i,j,k)).gt.rel_eps)
 
               ! impose lo side bc's
-              if (j .eq.lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j-1,k,comp)
                  else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
@@ -1985,7 +1984,5 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
 end subroutine make_edge_scal_3d
 
 #endif
-
-
 
 end module make_edge_scal_module
