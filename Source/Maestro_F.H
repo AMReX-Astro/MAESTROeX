@@ -181,7 +181,7 @@ extern "C"
 		      const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f,
 		      const amrex::Real* divu,  const int* d_lo, const int* d_hi,
 		      const amrex::Real* gp0_cart, const int* g_lo, const int* g_hi);
-    
+
     void estdt_divu(amrex::Real* gp0,
 		      const amrex::Real* p0, const amrex::Real* gamma1bar,
 		      const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
@@ -1082,6 +1082,7 @@ extern "C"
 
     //////////////////////
     // in ppm.F90
+#if (AMREX_SPACEDIM ==  2)
     void ppm_2d(const int* lo, const int* hi,
         const amrex::Real* s,  const int* s_lo, const int* s_hi,
         const int nc_s,
@@ -1093,7 +1094,7 @@ extern "C"
         const int* adv_bc,
         const amrex::Real* dx, const amrex::Real dt,
         const int is_umac, const int comp, const int bccomp);
-
+#endif
     //////////////////////
 
     //////////////////////

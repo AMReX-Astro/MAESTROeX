@@ -544,7 +544,7 @@ contains
 
   end subroutine ppm_1d
 
-
+#if (AMREX_SPACEDIM ==  2)
   !===========================================================================
   ! 2-d version
   !===========================================================================
@@ -1877,7 +1877,7 @@ contains
 
   end subroutine ppm_2d
 
-
+#elif (AMREX_SPACEDIM ==  3)
 
   !===========================================================================
   ! 3-d version
@@ -4088,5 +4088,6 @@ subroutine ppm_3d(s,ng_s,u,v,w,ng_u,Ip,Im,domlo,domhi,lo,hi,adv_bc,dx,dt,is_umac
 
 end subroutine ppm_3d
 
+#endif
 
 end module ppm_module
