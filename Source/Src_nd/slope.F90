@@ -146,16 +146,16 @@ contains
 
   end subroutine slopex_1d
 
-
+#if (AMREX_SPACEDIM >= 2)
   subroutine slopex_2d(lo,hi,s,s_lo,s_hi,nc_s,slx,sl_lo,sl_hi,nc_sl, &
-       domlo,domhi,nvar,adv_bc,nbccomp,bccomp) bind(C,name="slopex_2d")
+       domlo,domhi,nvar,startcomp,adv_bc,nbccomp,start_bccomp) bind(C,name="slopex_2d")
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
     integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3)
     integer         , intent(in   ) :: s_lo(3),s_hi(3),sl_lo(3),sl_hi(3)
-    integer  , value, intent(in   ) :: nc_s,nc_sl,nvar,nbccomp,bccomp
+    integer  , value, intent(in   ) :: nc_s,nc_sl,nvar,startcomp,nbccomp,start_bccomp
     double precision, intent(in   ) ::   s(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(  out) :: slx(sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
     integer         , intent(in)    :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
@@ -167,34 +167,25 @@ contains
     double precision :: dcen, dlim, dflag, dxl, dxr
 
     !$gpu
-
-    k = lo(3)
-
     if (slope_order .eq. 0) then
 
        ! HERE DOING 1ST ORDER
-       do comp=1,nvar
-#if (AMREX_SPACEDIM == 3)
-           do k = lo(3), hi(3)
-#endif
+       do comp=startcomp,startcomp+nvar-1
+          do k = lo(3), hi(3)
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    slx(i,j,k,comp) = ZERO
                 enddo
              enddo
-#if (AMREX_SPACEDIM == 3)
-         enddo
-#endif
+          enddo
        enddo
 
     else if (slope_order .eq. 2) then
 
        ! HERE DOING 2ND ORDER
-       do comp=1,nvar
-          bc_comp = bccomp + comp-1
-#if (AMREX_SPACEDIM == 3)
+       do comp=startcomp,startcomp+nvar-1
+          bc_comp = start_bccomp + comp-startcomp
           do k = lo(3), hi(3)
-#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    del = half*(s(i+1,j,k,comp) - s(i-1,j,k,comp))
@@ -239,19 +230,15 @@ contains
                 endif
 
              enddo
-#if (AMREX_SPACEDIM == 3)
-         enddo
-#endif
+          enddo
        enddo
 
     else
 
        ! HERE DOING 4TH ORDER
-       do comp=1,nvar
-          bc_comp = bccomp + comp-1
-#if (AMREX_SPACEDIM == 3)
+       do comp=startcomp,startcomp+nvar-1
+          bc_comp = start_bccomp + comp-startcomp
           do k = lo(3), hi(3)
-#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    ! left
@@ -342,9 +329,7 @@ contains
                    endif
                 enddo
              enddo
-#if (AMREX_SPACEDIM == 3)
-         enddo
-#endif
+          enddo
        enddo
 
     endif
@@ -352,14 +337,14 @@ contains
   end subroutine slopex_2d
 
   subroutine slopey_2d(lo,hi,s,s_lo,s_hi,nc_s,sly,sl_lo,sl_hi,nc_sl, &
-       domlo,domhi,nvar,adv_bc,nbccomp,bccomp)  bind(C,name="slopey_2d")
+       domlo,domhi,nvar,startcomp,adv_bc,nbccomp,start_bccomp)  bind(C,name="slopey_2d")
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
     integer         , intent(in)  :: domlo(3),domhi(3),lo(3),hi(3)
     integer         , intent(in   ) :: s_lo(3),s_hi(3),sl_lo(3),sl_hi(3)
-    integer  , value, intent(in   ) :: nc_s,nc_sl,nvar,nbccomp,bccomp
+    integer  , value, intent(in   ) :: nc_s,nc_sl,nvar,startcomp,nbccomp,start_bccomp
     double precision, intent(in   ) ::   s(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(  out) :: sly(sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
     integer         , intent(in)  :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
@@ -371,34 +356,25 @@ contains
     integer :: i,j,k,comp,bc_comp
 
     !$gpu
-
-    k = lo(3)
-
     if (slope_order .eq. 0) then
 
        ! HERE DOING 1ST ORDER
-       do comp=1,nvar
-#if (AMREX_SPACEDIM == 3)
-           do k = lo(3), hi(3)
-#endif
+       do comp=startcomp,startcomp+nvar-1
+          do k = lo(3), hi(3)
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    sly(i,j,k,comp) = ZERO
                 enddo
              enddo
-#if (AMREX_SPACEDIM == 3)
-         enddo
-#endif
+          enddo
        enddo
 
     else if (slope_order .eq. 2) then
 
        ! HERE DOING 2ND ORDER
-       do comp=1,nvar
-          bc_comp = bccomp + comp-1
-#if (AMREX_SPACEDIM == 3)
+       do comp=startcomp,startcomp+nvar-1
+          bc_comp = start_bccomp + comp-startcomp
           do k = lo(3), hi(3)
-#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
 
@@ -444,19 +420,15 @@ contains
                    endif
                 enddo
              enddo
-#if (AMREX_SPACEDIM == 3)
-         enddo
-#endif
+          enddo
        enddo
 
     else
 
        ! HERE DOING 4TH ORDER
-       do comp=1,nvar
-          bc_comp = bccomp + comp-1
-#if (AMREX_SPACEDIM == 3)
+       do comp=startcomp,startcomp+nvar-1
+          bc_comp = start_bccomp + comp-startcomp
           do k = lo(3), hi(3)
-#endif
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
                    ! left
@@ -547,26 +519,24 @@ contains
 
                 enddo
              enddo
-#if (AMREX_SPACEDIM == 3)
-         enddo
-#endif
+          enddo
        enddo
 
     endif
 
   end subroutine slopey_2d
 
-
+#if (AMREX_SPACEDIM == 3)
   subroutine slopez_3d(lo,hi,s,s_lo,s_hi,nc_s,slz,sl_lo,sl_hi,nc_sl, &
-                       domlo,domhi,nvar,adv_bc,nbccomp,bccomp) &
-                       bind(C, name="slopez_3d")
+       domlo,domhi,nvar,startcomp,adv_bc,nbccomp,start_bccomp) &
+       bind(C, name="slopez_3d")
 
     use amrex_constants_module
     use meth_params_module, only : slope_order
 
     integer         , intent(in)  :: domlo(3),domhi(3),lo(3),hi(3)
     integer         , intent(in)  :: s_lo(3),s_hi(3),sl_lo(3),sl_hi(3)
-    integer  , value, intent(in)  :: nvar,nbccomp,bccomp,nc_s,nc_sl
+    integer  , value, intent(in)  :: nvar,startcomp,nbccomp,start_bccomp,nc_s,nc_sl
     double precision, intent(in   ) ::   s(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(  out) :: slz(sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
     integer         , intent(in)  :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
@@ -574,14 +544,14 @@ contains
     double precision :: dpls,dmin,ds,del,slim,sflag
     double precision :: dcen,dlim,dflag,dzl,dzr
 
-    integer :: i,j,k,comp
+    integer :: i,j,k,comp,bc_comp
 
     !$gpu
 
     if (slope_order .eq. 0) then
 
        ! HERE DOING 1ST ORDER
-       do comp=1,nvar
+       do comp=startcomp,startcomp+nvar-1
           do k = lo(3),hi(3)
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
@@ -594,7 +564,8 @@ contains
     else if (slope_order .eq. 2) then
 
        ! HERE DOING 2ND ORDER
-       do comp=1,nvar
+       do comp=startcomp,startcomp+nvar-1
+          bc_comp = start_bccomp + comp-startcomp
           do k = lo(3),hi(3)
              do j = lo(2),hi(2)
                 do i = lo(1),hi(1)
@@ -608,10 +579,10 @@ contains
                    slz(i,j,k,comp)= sflag*min(slim,abs(del))
 
 
-                   if (adv_bc(3,1,comp) .eq. EXT_DIR .or. adv_bc(3,1,comp) .eq. HOEXTRAP) then
+                   if (adv_bc(3,1,bc_comp) .eq. EXT_DIR .or. adv_bc(3,1,bc_comp) .eq. HOEXTRAP) then
                       if (k .eq. lo(3) .and. lo(3)+1 .eq. domlo(3)) then
                          slz(i,j,k,comp) = ZERO
-                     elseif (k .eq. lo(3)+1 .and. lo(3)+1 .eq. domlo(3)) then
+                      elseif (k .eq. lo(3)+1 .and. lo(3)+1 .eq. domlo(3)) then
                          del = (s(i,j,k+1,comp)+three*s(i,j,k,comp)- &
                               four*s(i,j,k-1,comp)) * third
                          dpls = two*(s(i,j,k+1,comp) - s(i,j,k,comp))
@@ -624,10 +595,10 @@ contains
                    endif
 
 
-                   if (adv_bc(3,2,comp) .eq. EXT_DIR .or. adv_bc(3,2,comp) .eq. HOEXTRAP) then
+                   if (adv_bc(3,2,bc_comp) .eq. EXT_DIR .or. adv_bc(3,2,bc_comp) .eq. HOEXTRAP) then
                       if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                          slz(i,j,k,comp) = ZERO
-                     elseif (k .eq. hi(3)-1 .and. hi(3)-1 .eq. domhi(3)) then
+                      elseif (k .eq. hi(3)-1 .and. hi(3)-1 .eq. domhi(3)) then
                          del = -(s(i,j,k-1,comp)+three*s(i,j,k,comp)- &
                               four*s(i,j,k+1,comp)) * third
                          dpls = two*(s(i,j,k+1,comp) - s(i,j,k,comp))
@@ -646,11 +617,12 @@ contains
     else
 
        ! HERE DOING 4TH ORDER
-       do comp=1,nvar
+       do comp=startcomp,startcomp+nvar-1
+          bc_comp = start_bccomp + comp-startcomp
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
                 do k = lo(3),hi(3)
-                    ! left
+                   ! left
                    dcen = half*(s(i,j,k,comp)-s(i,j,k-2,comp))
                    dmin = two*(s(i,j,k-1,comp)-s(i,j,k-2,comp))
                    dpls = two*(s(i,j,k,comp)-s(i,j,k-1,comp))
@@ -680,10 +652,10 @@ contains
                         sixth * (dzr + dzl)
                    slz(i,j,k,comp) = dflag*min(abs(ds),dlim)
 
-                   if (adv_bc(3,1,comp) .eq. EXT_DIR .or. adv_bc(3,1,comp) .eq. HOEXTRAP) then
+                   if (adv_bc(3,1,bc_comp) .eq. EXT_DIR .or. adv_bc(3,1,bc_comp) .eq. HOEXTRAP) then
                       if (k .eq. lo(3) .and. lo(3)+1 .eq. domlo(3)) then
                          slz(i,j,k,comp) = ZERO
-                     elseif (k .eq. lo(3)+1 .and. lo(3)+1 .eq. domlo(3)) then
+                      elseif (k .eq. lo(3)+1 .and. lo(3)+1 .eq. domlo(3)) then
                          del = -sixteen/fifteen*s(i,j,k-1,comp) +  half*s(i,j,k,comp) +  &
                               two3rd*s(i,j,k+1,comp) - tenth*s(i,j,k+2,comp)
                          dmin = two*(s(i,j,k,comp)-s(i,j,k-1,comp))
@@ -693,7 +665,7 @@ contains
                          sflag = sign(one,del)
                          slz(i,j,k,comp)= sflag*min(slim,abs(del))
 
-                     elseif (k .eq. lo(3)+2 .and. lo(3)+1 .eq. domlo(3)) then
+                      elseif (k .eq. lo(3)+2 .and. lo(3)+1 .eq. domlo(3)) then
                          ! Recalculate the slope at lo(2)+1 using the revised dzl
                          del = -sixteen/fifteen*s(i,j,k-2,comp) +  half*s(i,j,k-1,comp) +  &
                               two3rd*s(i,j,k,comp) - tenth*s(i,j,k+1,comp)
@@ -710,10 +682,10 @@ contains
                    endif
 
 
-                   if (adv_bc(3,2,comp) .eq. EXT_DIR .or. adv_bc(3,2,comp) .eq. HOEXTRAP) then
+                   if (adv_bc(3,2,bc_comp) .eq. EXT_DIR .or. adv_bc(3,2,bc_comp) .eq. HOEXTRAP) then
                       if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
                          slz(i,j,k,comp) = ZERO
-                     elseif (k .eq. hi(3)-1 .and. hi(3)-1 .eq. domhi(3)) then
+                      elseif (k .eq. hi(3)-1 .and. hi(3)-1 .eq. domhi(3)) then
                          del = -( -sixteen/fifteen*s(i,j,k+1,comp) +  half*s(i,j,k,comp) + &
                               two3rd*s(i,j,k-1,comp) - tenth*s(i,j,k-2,comp) )
                          dmin = two*(s(i,j,k,comp)-s(i,j,k-1,comp))
@@ -723,7 +695,7 @@ contains
                          sflag = sign(one,del)
                          slz(i,j,k,comp)= sflag*min(slim,abs(del))
 
-                     elseif (k .eq. hi(3)-2 .and. hi(3)-1 .eq. domhi(3)) then
+                      elseif (k .eq. hi(3)-2 .and. hi(3)-1 .eq. domhi(3)) then
                          ! Recalculate the slope at lo(3)+1 using the revised dzr
                          del = -( -sixteen/fifteen*s(i,j,k+2,comp) +  half*s(i,j,k+1,comp) + &
                               two3rd*s(i,j,k,comp) - tenth*s(i,j,k-1,comp) )
@@ -748,6 +720,7 @@ contains
 
   end subroutine slopez_3d
 
-
+#endif
+#endif
 
 end module slope_module

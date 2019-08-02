@@ -202,11 +202,11 @@ contains
 
 #if (AMREX_SPACEDIM == 2)
 subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
-     s,      s_lo, s_hi, nc_s, ng_s, &
+     s,      s_lo, s_hi, nc_s, &
      umac,   u_lo, u_hi, &
      vmac,   v_lo, v_hi,&
-     Ip, ip_lo, ip_hi, &
-     Im, im_lo, im_hi, &
+     Ip, ip_lo, ip_hi, ip_dim, &
+     Im, im_lo, im_hi, im_dim, &
      sl, sl_lo, sl_hi, &
      sr, sr_lo, sr_hi, &
      simh, si_lo, si_hi, &
@@ -215,7 +215,7 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
 
   integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
   integer         , intent(in   ) :: s_lo(3), s_hi(3)
-  integer, value,   intent(in   ) :: idir, nc_s, ng_s
+  integer, value,   intent(in   ) :: idir, nc_s, ip_dim, im_dim
   integer         , intent(in   ) :: u_lo(3), u_hi(3)
   integer         , intent(in   ) :: v_lo(3), v_hi(3)
   integer         , intent(in   ) :: ip_lo(3), ip_hi(3)
@@ -226,8 +226,8 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
   double precision, intent(in   ) :: s     (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),1:nc_s)
   double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
   double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-  double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),AMREX_SPACEDIM)
-  double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),AMREX_SPACEDIM)
+  double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),ip_dim,AMREX_SPACEDIM)
+  double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),im_dim,AMREX_SPACEDIM)
   double precision, intent(inout) :: sl     (sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3))
   double precision, intent(inout) :: sr     (sr_lo(1):sr_hi(1),sr_lo(2):sr_hi(2),sr_lo(3):sr_hi(3))
   double precision, intent(inout) :: simh     (si_lo(1):si_hi(1),si_lo(2):si_hi(2),si_lo(3):si_hi(3))
@@ -240,11 +240,17 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
 
   double precision :: hx,hy,dt2,dt4,savg
 
-  integer :: i,j,k
+  integer :: i,j,k,m
 
   !$gpu
 
   k = s_lo(3)
+
+  if (ip_dim > 1) then
+      m = comp
+  else
+      m = 1
+  endif
 
   dt2 = HALF*dt
   dt4 = dt/4.0d0
@@ -263,12 +269,12 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
         do i=lo(1),hi(1)
            if (ppm_type .eq. 0) then
               ! make slx, srx with 1D extrapolation
-              sl(i,j,k) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,1)
-              sr(i,j,k) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,1)
+              sl(i,j,k) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,comp,1)
+              sr(i,j,k) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,comp,1)
            else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
               ! make slx, srx with 1D extrapolation
-              sl(i,j,k) = Ip(i-1,j,k,1)
-              sr(i,j,k) = Im(i  ,j,k,1)
+              sl(i,j,k) = Ip(i-1,j,k,m,1)
+              sr(i,j,k) = Im(i  ,j,k,m,1)
            end if
 
            ! impose lo side bc's
@@ -334,12 +340,12 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
 
            if (ppm_type .eq. 0) then
               ! make sly, sry with 1D extrapolation
-              sl(i,j,k) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,1)
-              sr(i,j,k) = s(i,j,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*Im(i,j,k,1)
+              sl(i,j,k) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,comp,1)
+              sr(i,j,k) = s(i,j,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*Im(i,j,k,comp,1)
            else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
               ! make sly, sry with 1D extrapolation
-              sl(i,j,k) = Ip(i,j-1,k,2)
-              sr(i,j,k) = Im(i,j,k,2)
+              sl(i,j,k) = Ip(i,j-1,k,m,2)
+              sr(i,j,k) = Im(i,j,k,m,2)
            end if
 
            ! impose lo side bc's
@@ -679,9 +685,9 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
      umac,   u_lo, u_hi, &
      vmac,   v_lo, v_hi, &
      wmac,   w_lo, w_hi, &
-     Ip, ip_lo, ip_hi, &
-     Im, im_lo, im_hi, &
-     slopez, slo_lo, slo_hi, &
+     Ip, ip_lo, ip_hi, ip_dim, &
+     Im, im_lo, im_hi, im_dim, &
+     slopez, slo_lo, slo_hi, nc_sl, &
      sl, sl_lo, sl_hi, &
      sr, sr_lo, sr_hi, &
      simh, si_lo, si_hi, &
@@ -690,7 +696,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
 
   integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
   integer         , intent(in   ) :: s_lo(3), s_hi(3)
-  integer, value,   intent(in   ) :: idir, nc_s
+  integer, value,   intent(in   ) :: idir, nc_s, nc_sl, ip_dim, im_dim
   integer         , intent(in   ) :: u_lo(3), u_hi(3)
   integer         , intent(in   ) :: v_lo(3), v_hi(3)
   integer         , intent(in   ) :: w_lo(3), w_hi(3)
@@ -704,9 +710,9 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
   double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
   double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
   double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-  double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),AMREX_SPACEDIM)
-  double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),AMREX_SPACEDIM)
-  double precision, intent(in   ) :: slopez     (slo_lo(1):slo_hi(1),slo_lo(2):slo_hi(2),slo_lo(3):slo_hi(3))
+  double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),ip_dim,AMREX_SPACEDIM)
+  double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),im_dim,AMREX_SPACEDIM)
+  double precision, intent(in   ) :: slopez     (slo_lo(1):slo_hi(1),slo_lo(2):slo_hi(2),slo_lo(3):slo_hi(3),nc_sl)
   double precision, intent(inout) :: sl     (sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3))
   double precision, intent(inout) :: sr     (sr_lo(1):sr_hi(1),sr_lo(2):sr_hi(2),sr_lo(3):sr_hi(3))
   double precision, intent(inout) :: simh     (si_lo(1):si_hi(1),si_lo(2):si_hi(2),si_lo(3):si_hi(3))
@@ -720,9 +726,17 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
   double precision :: hx,hy,hz,dt2,dt3,dt4,dt6,fl,fr
   double precision :: savg
 
-  integer :: i,j,k
+  integer :: i,j,k,m
 
   !$gpu
+
+  k = s_lo(3)
+
+  if (ip_dim > 1) then
+      m = comp
+  else
+      m = 1
+  endif
 
   dt2 = HALF*dt
   dt3 = dt/3.0d0
@@ -749,12 +763,12 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               ! loop over appropriate x-faces
               if (ppm_type .eq. 0) then
                  ! mahi(3) slx, srx with 1D extrapolation
-                 sl(i,j,k) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,1)
-                 sr(i,j,k) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,1)
+                 sl(i,j,k) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,comp,1)
+                 sr(i,j,k) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,comp,1)
               else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                  ! make slx, srx with 1D extrapolation
-                 sl(i,j,k) = Ip(i-1,j,k,1)
-                 sr(i,j,k) = Im(i  ,j,k,1)
+                 sl(i,j,k) = Ip(i-1,j,k,m,1)
+                 sr(i,j,k) = Im(i  ,j,k,m,1)
               end if
 
               ! impose lo side bc's
@@ -827,12 +841,12 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               if (ppm_type .eq. 0) then
 
                  ! make sly, sry with 1D extrapolation
-                 sl(i,j,k) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,1)
-                 sr(i,j,k) = s(i,j  ,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*Im(i,j  ,k,1)
+                 sl(i,j,k) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,comp,1)
+                 sr(i,j,k) = s(i,j  ,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*Im(i,j  ,k,comp,1)
               else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                  ! make sly, sry with 1D extrapolation
-                 sl(i,j,k) = Ip(i,j-1,k,2)
-                 sr(i,j,k) = Im(i,j  ,k,2)
+                 sl(i,j,k) = Ip(i,j-1,k,m,2)
+                 sr(i,j,k) = Im(i,j  ,k,m,2)
               end if
 
               ! impose lo side bc's
@@ -903,12 +917,12 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               ! loop over appropriate z-faces
               if (ppm_type .eq. 0) then
                  ! make slz, srz with 1D extrapolation
-                 sl(i,j,k) = s(i,j,k-1,comp) + (HALF - dt2*wmac(i,j,k)/hz)*slopez(i,j,k-1)
-                 sr(i,j,k) = s(i,j,k  ,comp) - (HALF + dt2*wmac(i,j,k)/hz)*slopez(i,j,k)
+                 sl(i,j,k) = s(i,j,k-1,comp) + (HALF - dt2*wmac(i,j,k)/hz)*slopez(i,j,k-1,comp)
+                 sr(i,j,k) = s(i,j,k  ,comp) - (HALF + dt2*wmac(i,j,k)/hz)*slopez(i,j,k,comp)
               else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                  ! make slz, srz with 1D extrapolation
-                 sl(i,j,k) = Ip(i,j,k-1,3)
-                 sr(i,j,k) = Im(i,j,k  ,3)
+                 sl(i,j,k) = Ip(i,j,k-1,m,3)
+                 sr(i,j,k) = Im(i,j,k  ,m,3)
               end if
 
               ! impose lo side bc's
