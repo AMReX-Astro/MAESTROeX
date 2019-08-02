@@ -552,7 +552,7 @@ contains
     double precision, intent(inout) ::   umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     double precision, intent(in   ) :: w0mac(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
-    double precision, intent(in   ) :: mult
+    double precision, value, intent(in   ) :: mult
 
     ! local variable
     integer :: i,j,k

@@ -73,12 +73,30 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
                          RealVector& etarho_cell)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeEtarhoSphr()",MakeEtarhoSphr);
+    BL_PROFILE_VAR("Maestro::MakeEtarhoSphr()", MakeEtarhoSphr);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     Vector<MultiFab> eta_cart(finest_level+1);
+    Vector<MultiFab> rho0_nph_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         eta_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+		rho0_nph_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
+
+    // time-centered base state density
+    RealVector rho0_nph((max_radial_level+1)*nr_fine);
+    rho0_nph.shrink_to_fit();
+
+    for (int i = 0; i < rho0_nph.size(); ++i) {
+        rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
+    }
+
+    Put1dArrayOnCart(rho0_nph,rho0_nph_cart,0,0);
 
 #if (AMREX_SPACEDIM == 3)
 
@@ -87,6 +105,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
         // get references to the MultiFabs at level lev
         const MultiFab& scalold_mf = scal_old[lev];
         const MultiFab& scalnew_mf = scal_new[lev];
+        const MultiFab& rho0_nph_mf = rho0_nph_cart[lev];
         const MultiFab& umac_mf   = umac[lev][0];
         const MultiFab& vmac_mf   = umac[lev][1];
         const MultiFab& wmac_mf   = umac[lev][2];
@@ -95,31 +114,33 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
         const MultiFab& w0macz_mf = w0mac[lev][2];
         const MultiFab& normal_mf = normal[lev];
         MultiFab& etacart_mf = eta_cart[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(scalold_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(scalold_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validbox = mfi.validbox();
+            const Box& tilebox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
-
-            construct_eta_cart( validbox.loVect(), validbox.hiVect(),
+#pragma gpu box(tilebox)
+            construct_eta_cart( AMREX_INT_ANYD(tilebox.loVect()),
+                                AMREX_INT_ANYD(tilebox.hiVect()),
                                 scalold_mf[mfi].dataPtr(Rho),
-                                scalold_mf[mfi].loVect(), scalold_mf[mfi].hiVect(),
+                                AMREX_INT_ANYD(scalold_mf[mfi].loVect()), AMREX_INT_ANYD(scalold_mf[mfi].hiVect()),
                                 scalnew_mf[mfi].dataPtr(Rho),
-                                scalnew_mf[mfi].loVect(), scalnew_mf[mfi].hiVect(),
-                                BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-                                BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-                                BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                                BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                                BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                                BL_TO_FORTRAN_3D(normal_mf[mfi]),
-                                BL_TO_FORTRAN_3D(etacart_mf[mfi]),
-                                rho0_old.dataPtr(), rho0_new.dataPtr(),
-                                dx, r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                                AMREX_INT_ANYD(scalnew_mf[mfi].loVect()), AMREX_INT_ANYD(scalnew_mf[mfi].hiVect()),
+                                BL_TO_FORTRAN_ANYD(rho0_nph_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(etacart_mf[mfi]),
+                                AMREX_REAL_ANYD(dx));
         }         // end MFIter loop
     }     // end loop over levels
 
@@ -141,18 +162,23 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     etarho_edge[0] = 0.0;
     if (spherical == 1) {
 
-	double dr1, dr2;
-	for (int r=1; r<nr_fine; ++r) {
-	    dr1 = r_cc_loc[r] - r_edge_loc[r];
-	    dr2 = r_edge_loc[r] - r_cc_loc[r-1];
-	    etarho_edge[r] = (dr2*etarho_cell[r] + dr1*etarho_cell[r-1])/(dr1+dr2);
-	}
+    	double dr1, dr2;
+    	for (int r=1; r<nr_fine; ++r) {
+    	    dr1 = r_cc_loc[r] - r_edge_loc[r];
+    	    dr2 = r_edge_loc[r] - r_cc_loc[r-1];
+    	    etarho_edge[r] = (dr2*etarho_cell[r] + dr1*etarho_cell[r-1])/(dr1+dr2);
+    	}
 
     } else {
-	for (int r=1; r<nr_fine; ++r) {
-	    etarho_edge[r] = 0.5*(etarho_cell[r] + etarho_cell[r-1]);
-	}
+    	for (int r=1; r<nr_fine; ++r) {
+    	    etarho_edge[r] = 0.5*(etarho_cell[r] + etarho_cell[r-1]);
+    	}
     }
     // probably should do some better extrapolation here eventually
     etarho_edge[nr_fine] = etarho_cell[nr_fine-1];
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }

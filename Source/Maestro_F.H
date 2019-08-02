@@ -303,7 +303,7 @@ extern "C"
 
     void addw0_sphr(const int* lo, const int* hi,
 		    amrex::Real* umac, const int* u_lo, const int* u_hi,
-		    const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
+		    const amrex::Real* w0mac, const int* x_lo, const int* x_hi,
 		    const amrex::Real mult);
 
     void make_w0mac_sphr(const int* lo, const int* hi,
@@ -485,6 +485,7 @@ extern "C"
     void construct_eta_cart(const int* lo, const int* hi,
 			    const amrex::Real* rho_old, const int* ro_lo, const int* ro_hi,
 			    const amrex::Real* rho_new, const int* rn_lo, const int* rn_hi,
+			    const amrex::Real* rho0_nph_cart, const int* rc_lo, const int* rc_hi,
 			    const amrex::Real* umac,    const int* u_lo,  const int* u_hi,
 			    const amrex::Real* vmac,    const int* v_lo,  const int* v_hi,
 			    const amrex::Real* wmac,    const int* w_lo,  const int* w_hi,
@@ -493,10 +494,7 @@ extern "C"
 			    const amrex::Real* w0macz,  const int* z_lo,  const int* z_hi,
 			    const amrex::Real* normal,  const int* n_lo,  const int* n_hi,
 			    amrex::Real* eta_cart, const int* e_lo,  const int* e_hi,
-			    const amrex::Real* rho0_old, const amrex::Real* rho0_new,
-			    const amrex::Real* dx,
-			    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-			    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+			    const amrex::Real* dx);
     //////////////////////
 
     //////////////////////

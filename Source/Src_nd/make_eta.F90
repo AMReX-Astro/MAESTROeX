@@ -174,6 +174,7 @@ contains
   subroutine construct_eta_cart(lo, hi, &
        rho_old, ro_lo, ro_hi, &
        rho_new, rn_lo, rn_hi, &
+       rho0_nph_cart, rc_lo, rc_hi, &
        umac,     u_lo,  u_hi, &
        vmac,     v_lo,  v_hi, &
        wmac,     w_lo,  w_hi, &
@@ -182,14 +183,12 @@ contains
        w0macz,   z_lo,  z_hi, &
        normal,   n_lo,  n_hi, &
        eta_cart, e_lo,  e_hi, &
-       rho0_old, rho0_new, dx, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) &
-       bind(C, name="construct_eta_cart")
+       dx) bind(C, name="construct_eta_cart")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: ro_lo(3), ro_hi(3)
     integer         , intent(in   ) :: rn_lo(3), rn_hi(3)
+    integer         , intent(in   ) :: rc_lo(3), rc_hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
@@ -200,6 +199,7 @@ contains
     integer         , intent(in   ) :: e_lo(3), e_hi(3)
     double precision, intent(in   ) ::  rho_old(ro_lo(1):ro_hi(1),ro_lo(2):ro_hi(2),ro_lo(3):ro_hi(3))
     double precision, intent(in   ) ::  rho_new(rn_lo(1):rn_hi(1),rn_lo(2):rn_hi(2),rn_lo(3):rn_hi(3))
+    double precision, intent(in   ) ::  rho0_nph_cart(rc_lo(1):rc_hi(1),rc_lo(2):rc_hi(2),rc_lo(3):rc_hi(3))
     double precision, intent(in   ) ::     umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
     double precision, intent(in   ) ::     vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(in   ) ::     wmac(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
@@ -208,38 +208,15 @@ contains
     double precision, intent(in   ) ::   w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
     double precision, intent(in   ) ::   normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
     double precision, intent(inout) :: eta_cart(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
-    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
-    double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! Local
-    double precision ::      rho0_nph(0:max_radial_level,0:nr_fine-1)
-
-    double precision, pointer :: rho0_new_cart(:,:,:,:)
-    double precision, pointer :: rho0_nph_cart(:,:,:,:)
 
     double precision :: U_dot_er
     integer :: i,j,k,r
 
-    call bl_allocate(rho0_new_cart,lo,hi,1)
-    call bl_allocate(rho0_nph_cart,lo,hi,1)
+    !$gpu
 
-    ! put the time-centered base state density on a Cartesian patch.
-    do r = 0, nr_fine-1
-       rho0_nph(0,r) = HALF*(rho0_old(0,r) + rho0_new(0,r))
-    enddo
-
-    call put_1d_array_on_cart_sphr(lo,hi,rho0_new_cart,lo,hi,1,rho0_new,dx,0,0, &
-         r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
-    call put_1d_array_on_cart_sphr(lo,hi,rho0_nph_cart,lo,hi,1,rho0_nph,dx,0,0, &
-         r_cc_loc,r_edge_loc, cc_to_r,ccr_lo,ccr_hi)
-
-    !$OMP PARALLEL DO PRIVATE(i,j,k,U_dot_er)
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
@@ -253,15 +230,11 @@ contains
 
              ! construct time-centered [ rho' (U dot e_r) ]
              eta_cart(i,j,k) = (HALF*(rho_old(i,j,k) + rho_new(i,j,k)) - &
-                  rho0_nph_cart(i,j,k,1)) * U_dot_er
+                  rho0_nph_cart(i,j,k)) * U_dot_er
 
           enddo
        enddo
     enddo
-    !$OMP END PARALLEL DO
-
-    call bl_deallocate(rho0_new_cart)
-    call bl_deallocate(rho0_nph_cart)
 
   end subroutine construct_eta_cart
 
