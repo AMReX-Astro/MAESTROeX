@@ -240,7 +240,7 @@ contains
 
     double precision :: hx,hy,dt2,dt4,savg
 
-    integer :: i,j,k,comp,bccomp
+    integer :: i,j,k,m,comp,bccomp
 
     !$gpu
 
@@ -252,8 +252,9 @@ contains
     hx = dx(1)
     hy = dx(2)
 
-    do comp = start_comp,start_comp+ncomp-1
-       bccomp = start_bccomp + comp - start_comp
+    do m = 1, ncomp
+       bccomp = start_bccomp + m-1
+       comp = start_comp + m-1
 
        !******************************************************************
        ! Create s_{\i-\half\e_x}^x, etc.
@@ -266,30 +267,30 @@ contains
              do i=lo(1),hi(1)
                 if (ppm_type .eq. 0) then
                    ! make slx, srx with 1D extrapolation
-                   sl(i,j,k,comp) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,comp,1)
-                   sr(i,j,k,comp) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,comp,1)
+                   sl(i,j,k,m) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,m,1)
+                   sr(i,j,k,m) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,m,1)
                 else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                    ! make slx, srx with 1D extrapolation
-                   sl(i,j,k,comp) = Ip(i-1,j,k,comp,1)
-                   sr(i,j,k,comp) = Im(i  ,j,k,comp,1)
+                   sl(i,j,k,m) = Ip(i-1,j,k,m,1)
+                   sr(i,j,k,m) = Im(i  ,j,k,m,1)
                 end if
 
                 ! impose lo side bc's
                 if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
                    if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k,comp) = s(i-1,j,k,comp)
-                      sr(i,j,k,comp) = s(i-1,j,k,comp)
+                      sl(i,j,k,m) = s(i-1,j,k,comp)
+                      sr(i,j,k,m) = s(i-1,j,k,comp)
                    else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
                         adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
                       if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         sr(i,j,k,comp) = min(sr(i,j,k,comp),0.d0)
+                         sr(i,j,k,m) = min(sr(i,j,k,m),0.d0)
                       end if
-                      sl(i,j,k,comp) = sr(i,j,k,comp)
+                      sl(i,j,k,m) = sr(i,j,k,m)
                    else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
-                      sl(i,j,k,comp) = sr(i,j,k,comp)
+                      sl(i,j,k,m) = sr(i,j,k,m)
                    else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k,comp) = 0.d0
-                      sr(i,j,k,comp) = 0.d0
+                      sl(i,j,k,m) = 0.d0
+                      sr(i,j,k,m) = 0.d0
                    else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
                    else
 #ifndef AMREX_USE_GPU
@@ -301,19 +302,19 @@ contains
                 ! impose hi side bc's
                 if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k,comp) = s(i,j,k,comp)
-                      sr(i,j,k,comp) = s(i,j,k,comp)
+                      sl(i,j,k,m) = s(i,j,k,comp)
+                      sr(i,j,k,m) = s(i,j,k,comp)
                    else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
                         adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
                       if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         sl(i,j,k,comp) = max(sl(i,j,k,comp),0.d0)
+                         sl(i,j,k,m) = max(sl(i,j,k,m),0.d0)
                       end if
-                      sr(i,j,k,comp) = sl(i,j,k,comp)
+                      sr(i,j,k,m) = sl(i,j,k,m)
                    else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-                      sr(i,j,k,comp) = sl(i,j,k,comp)
+                      sr(i,j,k,m) = sl(i,j,k,m)
                    else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k,comp) = 0.d0
-                      sr(i,j,k,comp) = 0.d0
+                      sl(i,j,k,m) = 0.d0
+                      sr(i,j,k,m) = 0.d0
                    else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
                    else
 #ifndef AMREX_USE_GPU
@@ -323,9 +324,9 @@ contains
                 end if
 
                 ! make simhx by solving Riemann problem
-                simh(i,j,k,comp) = merge(sl(i,j,k,comp),sr(i,j,k,comp),umac(i,j,k) .gt. 0.d0)
-                savg = HALF*(sl(i,j,k,comp)+sr(i,j,k,comp))
-                simh(i,j,k,comp) = merge(simh(i,j,k,comp),savg,abs(umac(i,j,k)) .gt. rel_eps)
+                simh(i,j,k,m) = merge(sl(i,j,k,m),sr(i,j,k,m),umac(i,j,k) .gt. 0.d0)
+                savg = HALF*(sl(i,j,k,m)+sr(i,j,k,m))
+                simh(i,j,k,m) = merge(simh(i,j,k,m),savg,abs(umac(i,j,k)) .gt. rel_eps)
              enddo
           enddo
 
@@ -337,30 +338,30 @@ contains
 
                 if (ppm_type .eq. 0) then
                    ! make sly, sry with 1D extrapolation
-                   sl(i,j,k,comp) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,comp,1)
-                   sr(i,j,k,comp) = s(i,j,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*Im(i,j,k,comp,1)
+                   sl(i,j,k,m) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,m,1)
+                   sr(i,j,k,m) = s(i,j,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*Im(i,j,k,m,1)
                 else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                    ! make sly, sry with 1D extrapolation
-                   sl(i,j,k,comp) = Ip(i,j-1,k,comp,2)
-                   sr(i,j,k,comp) = Im(i,j,k,comp,2)
+                   sl(i,j,k,m) = Ip(i,j-1,k,m,2)
+                   sr(i,j,k,m) = Im(i,j,k,m,2)
                 end if
 
                 ! impose lo side bc's
                 if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
                    if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k,comp) = s(i,j-1,k,comp)
-                      sr(i,j,k,comp) = s(i,j-1,k,comp)
+                      sl(i,j,k,m) = s(i,j-1,k,comp)
+                      sr(i,j,k,m) = s(i,j-1,k,comp)
                    else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
                         adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
                       if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         sr(i,j,k,comp) = min(sr(i,j,k,comp),0.d0)
+                         sr(i,j,k,m) = min(sr(i,j,k,m),0.d0)
                       end if
-                      sl(i,j,k,comp) = sr(i,j,k,comp)
+                      sl(i,j,k,m) = sr(i,j,k,m)
                    else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
-                      sl(i,j,k,comp) = sr(i,j,k,comp)
+                      sl(i,j,k,m) = sr(i,j,k,m)
                    else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k,comp) = 0.d0
-                      sr(i,j,k,comp) = 0.d0
+                      sl(i,j,k,m) = 0.d0
+                      sr(i,j,k,m) = 0.d0
                    else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
                    else
 #ifndef AMREX_USE_GPU
@@ -372,19 +373,19 @@ contains
                 ! impose hi side bc's
                 if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k,comp) = s(i,j,k,comp)
-                      sr(i,j,k,comp) = s(i,j,k,comp)
+                      sl(i,j,k,m) = s(i,j,k,comp)
+                      sr(i,j,k,m) = s(i,j,k,comp)
                    else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
                         adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                       if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         sl(i,j,k,comp) = max(sl(i,j,k,comp),0.d0)
+                         sl(i,j,k,m) = max(sl(i,j,k,m),0.d0)
                       end if
-                      sr(i,j,k,comp) = sl(i,j,k,comp)
+                      sr(i,j,k,m) = sl(i,j,k,m)
                    else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
-                      sr(i,j,k,comp) = sl(i,j,k,comp)
+                      sr(i,j,k,m) = sl(i,j,k,m)
                    else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k,comp) = 0.d0
-                      sr(i,j,k,comp) = 0.d0
+                      sl(i,j,k,m) = 0.d0
+                      sr(i,j,k,m) = 0.d0
                    else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
                    else
 #ifndef AMREX_USE_GPU
@@ -394,9 +395,9 @@ contains
                 end if
 
                 ! make simhy by solving Riemann problem
-                simh(i,j,k,comp) = merge(sl(i,j,k,comp),sr(i,j,k,comp),vmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(sl(i,j,k,comp)+sr(i,j,k,comp))
-                simh(i,j,k,comp) = merge(simh(i,j,k,comp),savg,abs(vmac(i,j,k)) .gt. rel_eps)
+                simh(i,j,k,m) = merge(sl(i,j,k,m),sr(i,j,k,m),vmac(i,j,k) .gt. 0.d0)
+                savg = HALF*(sl(i,j,k,m)+sr(i,j,k,m))
+                simh(i,j,k,m) = merge(simh(i,j,k,m),savg,abs(vmac(i,j,k)) .gt. rel_eps)
              enddo
           enddo
 
@@ -411,8 +412,8 @@ contains
        sedge, x_lo, x_hi, nc_x, &
        umac,   u_lo, u_hi, &
        vmac,   v_lo, v_hi,&
-       Ipf, ipf_lo, ipf_hi, &
-       Imf, imf_lo, imf_hi, &
+       Ipf, ipf_lo, ipf_hi, ip_dim, &
+       Imf, imf_lo, imf_hi, im_dim, &
        sl, sl_lo, sl_hi, nc_sl, &
        sr, sr_lo, sr_hi, nc_sr, &
        simh, si_lo, si_hi, nc_si, &
@@ -422,7 +423,7 @@ contains
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
-    integer, value,   intent(in   ) :: idir, nc_s, nc_sl, nc_sr, nc_si
+    integer, value,   intent(in   ) :: idir, nc_s, nc_sl, nc_sr, nc_si, ip_dim, im_dim
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     integer, value,   intent(in   ) :: nc_x
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
@@ -438,8 +439,8 @@ contains
     double precision, intent(inout) :: sedge(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),1:nc_x)
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-    double precision, intent(in) :: Ipf(ipf_lo(1):ipf_hi(1),ipf_lo(2):ipf_hi(2),ipf_lo(3):ipf_hi(3),AMREX_SPACEDIM)
-    double precision, intent(in) :: Imf(imf_lo(1):imf_hi(1),imf_lo(2):imf_hi(2),imf_lo(3):imf_hi(3),AMREX_SPACEDIM)
+    double precision, intent(in) :: Ipf(ipf_lo(1):ipf_hi(1),ipf_lo(2):ipf_hi(2),ipf_lo(3):ipf_hi(3),ip_dim,AMREX_SPACEDIM)
+    double precision, intent(in) :: Imf(imf_lo(1):imf_hi(1),imf_lo(2):imf_hi(2),imf_lo(3):imf_hi(3),im_dim,AMREX_SPACEDIM)
     double precision, intent(in   ) :: sl     (sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
     double precision, intent(in   ) :: sr     (sr_lo(1):sr_hi(1),sr_lo(2):sr_hi(2),sr_lo(3):sr_hi(3),nc_sr)
     double precision, intent(in   ) :: simh     (si_lo(1):si_hi(1),si_lo(2):si_hi(2),si_lo(3):si_hi(3),nc_si)
@@ -453,7 +454,7 @@ contains
 
     double precision :: hx,hy,dt2,dt4,savg,fl,fr
 
-    integer :: i,j,k,comp,bccomp
+    integer :: i,j,k,m,comp,bccomp
 
     ! these correspond to \mathrm{sedge}_L^x, etc.
     double precision :: sedgel,sedger
@@ -468,8 +469,9 @@ contains
     hx = dx(1)
     hy = dx(2)
 
-    do comp = start_comp,start_comp+ncomp-1
-       bccomp = start_bccomp + comp - start_comp
+    do m = 1, ncomp
+       bccomp = start_bccomp + m-1
+       comp = start_comp + m-1
 
        !******************************************************************
        ! Create sedgel, etc.
@@ -482,24 +484,24 @@ contains
              do i=lo(1),hi(1)
 
                 ! make sedgel, sedger
-                fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,1), ppm_trace_forces == 0)
-                fr = merge(force(i  ,j,k,comp), Imf(i  ,j,k,1), ppm_trace_forces == 0)
+                fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,m,1), ppm_trace_forces == 0)
+                fr = merge(force(i  ,j,k,comp), Imf(i  ,j,k,m,1), ppm_trace_forces == 0)
 
                 if(is_conservative .eq. 1) then
-                   sedgel = sl(i,j,k,comp) &
-                        - (dt2/hy)*(simh(i-1,j+1,k,comp)*vmac(i-1,j+1,k) - simh(i-1,j,k,comp)*vmac(i-1,j,k)) &
+                   sedgel = sl(i,j,k,m) &
+                        - (dt2/hy)*(simh(i-1,j+1,k,m)*vmac(i-1,j+1,k) - simh(i-1,j,k,m)*vmac(i-1,j,k)) &
                         - (dt2/hx)*s(i-1,j,k,comp)*(umac(i  ,j,k)-umac(i-1,j,k)) &
                         + dt2*fl
-                   sedger = sr(i,j,k,comp) &
-                        - (dt2/hy)*(simh(i  ,j+1,k,comp)*vmac(i  ,j+1,k) - simh(i  ,j,k,comp)*vmac(i  ,j,k)) &
+                   sedger = sr(i,j,k,m) &
+                        - (dt2/hy)*(simh(i  ,j+1,k,m)*vmac(i  ,j+1,k) - simh(i  ,j,k,m)*vmac(i  ,j,k)) &
                         - (dt2/hx)*s(i  ,j,k,comp)*(umac(i+1,j,k)-umac(i  ,j,k)) &
                         + dt2*fr
                 else
-                   sedgel = sl(i,j,k,comp) &
-                        - (dt4/hy)*(vmac(i-1,j+1,k)+vmac(i-1,j,k))*(simh(i-1,j+1,k,comp)-simh(i-1,j,k,comp)) &
+                   sedgel = sl(i,j,k,m) &
+                        - (dt4/hy)*(vmac(i-1,j+1,k)+vmac(i-1,j,k))*(simh(i-1,j+1,k,m)-simh(i-1,j,k,m)) &
                         + dt2*fl
-                   sedger = sr(i,j,k,comp) &
-                        - (dt4/hy)*(vmac(i  ,j+1,k)+vmac(i  ,j,k))*(simh(i  ,j+1,k,comp)-simh(i  ,j,k,comp)) &
+                   sedger = sr(i,j,k,m) &
+                        - (dt4/hy)*(vmac(i  ,j+1,k)+vmac(i  ,j,k))*(simh(i  ,j+1,k,m)-simh(i  ,j,k,m)) &
                         + dt2*fr
                 end if
 
@@ -563,24 +565,24 @@ contains
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
                 ! make sedgel, sedger
-                fl = merge(force(i,j-1,k,comp), Ipf(i,j-1,k,2), ppm_trace_forces == 0)
-                fr = merge(force(i,j,k,comp), Imf(i,j,k,2), ppm_trace_forces == 0)
+                fl = merge(force(i,j-1,k,comp), Ipf(i,j-1,k,m,2), ppm_trace_forces == 0)
+                fr = merge(force(i,j,k,comp), Imf(i,j,k,m,2), ppm_trace_forces == 0)
 
                 if(is_conservative .eq. 1) then
-                   sedgel = sl(i,j,k,comp) &
-                        - (dt2/hx)*(simh(i+1,j-1,k,comp)*umac(i+1,j-1,k) - simh(i,j-1,k,comp)*umac(i,j-1,k)) &
+                   sedgel = sl(i,j,k,m) &
+                        - (dt2/hx)*(simh(i+1,j-1,k,m)*umac(i+1,j-1,k) - simh(i,j-1,k,m)*umac(i,j-1,k)) &
                         - (dt2/hy)*s(i,j-1,k,comp)*(vmac(i,j,k)-vmac(i,j-1,k)) &
                         + dt2*fl
-                   sedger = sr(i,j,k,comp) &
-                        - (dt2/hx)*(simh(i+1,j,k,comp)*umac(i+1,j,k) - simh(i,j,k,comp)*umac(i,j,k)) &
+                   sedger = sr(i,j,k,m) &
+                        - (dt2/hx)*(simh(i+1,j,k,m)*umac(i+1,j,k) - simh(i,j,k,m)*umac(i,j,k)) &
                         - (dt2/hy)*s(i,j,k,comp)*(vmac(i,j+1,k)-vmac(i,j,k)) &
                         + dt2*fr
                 else
-                   sedgel = sl(i,j,k,comp) &
-                        - (dt4/hx)*(umac(i+1,j-1,k)+umac(i,j-1,k))*(simh(i+1,j-1,k,comp)-simh(i,j-1,k,comp)) &
+                   sedgel = sl(i,j,k,m) &
+                        - (dt4/hx)*(umac(i+1,j-1,k)+umac(i,j-1,k))*(simh(i+1,j-1,k,m)-simh(i,j-1,k,m)) &
                         + dt2*fl
-                   sedger = sr(i,j,k,comp) &
-                        - (dt4/hx)*(umac(i+1,j,k)+umac(i,j,k))*(simh(i+1,j,k,comp)-simh(i,j,k,comp)) &
+                   sedger = sr(i,j,k,m) &
+                        - (dt4/hx)*(umac(i+1,j,k)+umac(i,j,k))*(simh(i+1,j,k,m)-simh(i,j,k,m)) &
                         + dt2*fr
                 end if
 
@@ -691,16 +693,16 @@ contains
        wmac,   w_lo, w_hi, &
        Ip, ip_lo, ip_hi, ip_dim, &
        Im, im_lo, im_hi, im_dim, &
-       slopez, slo_lo, slo_hi, nc_sl, &
-       sl, sl_lo, sl_hi, &
-       sr, sr_lo, sr_hi, &
-       simh, si_lo, si_hi, &
+       slopez, slo_lo, slo_hi, nc_slo, &
+       sl, sl_lo, sl_hi, nc_sl, &
+       sr, sr_lo, sr_hi, nc_sr, &
+       simh, si_lo, si_hi, nc_si, &
        dx, dt, is_vel, adv_bc, nbccomp, &
-       comp, bccomp) bind(C,name="make_edge_scal_predictor_3d")
+       ncomp, start_comp, start_bccomp) bind(C,name="make_edge_scal_predictor_3d")
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
-    integer, value,   intent(in   ) :: idir, nc_s, nc_sl, ip_dim, im_dim
+    integer, value,   intent(in   ) :: idir, nc_s, nc_slo, nc_sl, nc_sr, nc_si, ip_dim, im_dim
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
@@ -716,31 +718,25 @@ contains
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),ip_dim,AMREX_SPACEDIM)
     double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),im_dim,AMREX_SPACEDIM)
-    double precision, intent(in   ) :: slopez     (slo_lo(1):slo_hi(1),slo_lo(2):slo_hi(2),slo_lo(3):slo_hi(3),nc_sl)
-    double precision, intent(inout) :: sl     (sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3))
-    double precision, intent(inout) :: sr     (sr_lo(1):sr_hi(1),sr_lo(2):sr_hi(2),sr_lo(3):sr_hi(3))
-    double precision, intent(inout) :: simh     (si_lo(1):si_hi(1),si_lo(2):si_hi(2),si_lo(3):si_hi(3))
+    double precision, intent(in   ) :: slopez     (slo_lo(1):slo_hi(1),slo_lo(2):slo_hi(2),slo_lo(3):slo_hi(3),nc_slo)
+    double precision, intent(inout) :: sl     (sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
+    double precision, intent(inout) :: sr     (sr_lo(1):sr_hi(1),sr_lo(2):sr_hi(2),sr_lo(3):sr_hi(3),nc_sr)
+    double precision, intent(inout) :: simh     (si_lo(1):si_hi(1),si_lo(2):si_hi(2),si_lo(3):si_hi(3),nc_si)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    integer, value, intent(in   ) :: is_vel, nbccomp, comp, bccomp
-    integer         , intent(in   ) :: adv_bc(3,2,nbccomp)
+    integer, value, intent(in   ) :: is_vel, nbccomp, ncomp, start_comp, start_bccomp
+    integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
 
     ! Local variables
 
     double precision :: hx,hy,hz,dt2,dt3,dt4,dt6,fl,fr
     double precision :: savg
 
-    integer :: i,j,k,m
+    integer :: i,j,k,m,comp,bccomp
 
     !$gpu
 
-    k = s_lo(3)
-
-    if (ip_dim > 1) then
-       m = comp
-    else
-       m = 1
-    endif
+    k = lo(3)
 
     dt2 = HALF*dt
     dt3 = dt/3.0d0
@@ -751,241 +747,247 @@ contains
     hy = dx(2)
     hz = dx(3)
 
-    !******************************************************************
-    ! Create s_{\i-\half\e_x}^x, etc.
-    !******************************************************************
+    do m = 1, ncomp
+       bccomp = start_bccomp + m-1
+       comp = start_comp + m-1
 
-    if (idir == 1) then
-       ! Normal predictor states.
-       ! call bl_allocated from lo:hi+1 in the normal direction
-       ! lo-1:hi+1 in the transverse directions
+       !******************************************************************
+       ! Create s_{\i-\half\e_x}^x, etc.
+       !******************************************************************
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+       if (idir == 1) then
+          ! Normal predictor states.
+          ! call bl_allocated from lo:hi+1 in the normal direction
+          ! lo-1:hi+1 in the transverse directions
 
-                ! loop over appropriate x-faces
-                if (ppm_type .eq. 0) then
-                   ! mahi(3) slx, srx with 1D extrapolation
-                   sl(i,j,k) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,comp,1)
-                   sr(i,j,k) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,comp,1)
-                else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-                   ! make slx, srx with 1D extrapolation
-                   sl(i,j,k) = Ip(i-1,j,k,m,1)
-                   sr(i,j,k) = Im(i  ,j,k,m,1)
-                end if
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                ! impose lo side bc's
-                if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
-                   if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k) = s(i-1,j,k,comp)
-                      sr(i,j,k) = s(i-1,j,k,comp)
-                   else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         sr(i,j,k) = min(sr(i,j,k),0.d0)
-                      end if
-                      sl(i,j,k) = sr(i,j,k)
-                   else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
-                      sl(i,j,k) = sr(i,j,k)
-                   else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k) = 0.d0
-                      sr(i,j,k) = 0.d0
-                   else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
-#endif
+                   ! loop over appropriate x-faces
+                   if (ppm_type .eq. 0) then
+                      ! mahi(3) slx, srx with 1D extrapolation
+                      sl(i,j,k,m) = s(i-1,j,k,comp) + (HALF - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,m,1)
+                      sr(i,j,k,m) = s(i  ,j,k,comp) - (HALF + dt2*umac(i,j,k)/hx)*Ip(i  ,j,k,m,1)
+                   else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+                      ! make slx, srx with 1D extrapolation
+                      sl(i,j,k,m) = Ip(i-1,j,k,m,1)
+                      sr(i,j,k,m) = Im(i  ,j,k,m,1)
                    end if
-                end if
 
-                ! impose hi side bc's
-                if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
-                   if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k) = s(i,j,k,comp)
-                      sr(i,j,k) = s(i,j,k,comp)
-                   else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         sl(i,j,k) = max(sl(i,j,k),0.d0)
-                      end if
-                      sr(i,j,k) = sl(i,j,k)
-                   else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-                      sr(i,j,k) = sl(i+1,j,k)
-                   else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k) = 0.d0
-                      sr(i,j,k) = 0.d0
-                   else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
-                   else
+                   ! impose lo side bc's
+                   if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+                      if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
+                         sl(i,j,k,m) = s(i-1,j,k,comp)
+                         sr(i,j,k,m) = s(i-1,j,k,comp)
+                      else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 1) then
+                            sr(i,j,k,m) = min(sr(i,j,k,m),0.d0)
+                         end if
+                         sl(i,j,k,m) = sr(i,j,k,m)
+                      else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
+                         sl(i,j,k,m) = sr(i,j,k,m)
+                      else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
+                         sl(i,j,k,m) = 0.d0
+                         sr(i,j,k,m) = 0.d0
+                      else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
+                      else
 #ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
 #endif
+                      end if
                    end if
-                end if
 
-                ! make simhx by solving Riemann problem
-                simh(i,j,k) = merge(sl(i,j,k),sr(i,j,k),umac(i,j,k) .gt. 0.d0)
-                savg = HALF*(sl(i,j,k)+sr(i,j,k))
-                simh(i,j,k) = merge(simh(i,j,k),savg,abs(umac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+                      if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
+                         sl(i,j,k,m) = s(i,j,k,comp)
+                         sr(i,j,k,m) = s(i,j,k,comp)
+                      else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 1) then
+                            sl(i,j,k,m) = max(sl(i,j,k,m),0.d0)
+                         end if
+                         sr(i,j,k,m) = sl(i,j,k,m)
+                      else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
+                         sr(i,j,k,m) = sl(i,j,k,m)
+                      else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
+                         sl(i,j,k,m) = 0.d0
+                         sr(i,j,k,m) = 0.d0
+                      else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhx by solving Riemann problem
+                   simh(i,j,k,m) = merge(sl(i,j,k,m),sr(i,j,k,m),umac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(sl(i,j,k,m)+sr(i,j,k,m))
+                   simh(i,j,k,m) = merge(simh(i,j,k,m),savg,abs(umac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    else if (idir == 2) then
+       else if (idir == 2) then
 
-       ! Normal predictor states.
-       ! call bl_allocated from lo:hi+1 in the normal direction
-       ! lo-1:hi+1 in the transverse directions
+          ! Normal predictor states.
+          ! call bl_allocated from lo:hi+1 in the normal direction
+          ! lo-1:hi+1 in the transverse directions
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                ! loop over appropriate y-faces
-                if (ppm_type .eq. 0) then
+                   ! loop over appropriate y-faces
+                   if (ppm_type .eq. 0) then
 
-                   ! make sly, sry with 1D extrapolation
-                   sl(i,j,k) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,comp,1)
-                   sr(i,j,k) = s(i,j  ,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*Im(i,j  ,k,comp,1)
-                else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-                   ! make sly, sry with 1D extrapolation
-                   sl(i,j,k) = Ip(i,j-1,k,m,2)
-                   sr(i,j,k) = Im(i,j  ,k,m,2)
-                end if
-
-                ! impose lo side bc's
-                if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
-                   if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k) = s(i,j-1,k,comp)
-                      sr(i,j,k) = s(i,j-1,k,comp)
-                   else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         sr(i,j,k) = min(sr(i,j,k),0.d0)
-                      end if
-                      sl(i,j,k) = sr(i,j,k)
-                   else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
-                      sl(i,j,k) = sr(i,j,k)
-                   else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k) = 0.d0
-                      sr(i,j,k) = 0.d0
-                   else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
-#endif
+                      ! make sly, sry with 1D extrapolation
+                      sl(i,j,k,m) = s(i,j-1,k,comp) + (HALF - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,m,1)
+                      sr(i,j,k,m) = s(i,j  ,k,comp) - (HALF + dt2*vmac(i,j,k)/hy)*Im(i,j  ,k,m,1)
+                   else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+                      ! make sly, sry with 1D extrapolation
+                      sl(i,j,k,m) = Ip(i,j-1,k,m,2)
+                      sr(i,j,k,m) = Im(i,j  ,k,m,2)
                    end if
-                end if
 
-                ! impose hi side bc's
-                if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
-                   if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k) = s(i,j,k,comp)
-                      sr(i,j,k) = s(i,j,k,comp)
-                   else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         sl(i,j,k) = max(sl(i,j,k),0.d0)
-                      end if
-                      sr(i,j,k) = sl(i,j,k)
-                   else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
-                      sr(i,j,k) = sl(i,j,k)
-                   else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k) = 0.d0
-                      sr(i,j,k) = 0.d0
-                   else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
-                   else
+                   ! impose lo side bc's
+                   if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+                      if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
+                         sl(i,j,k,m) = s(i,j-1,k,comp)
+                         sr(i,j,k,m) = s(i,j-1,k,comp)
+                      else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 2) then
+                            sr(i,j,k,m) = min(sr(i,j,k,m),0.d0)
+                         end if
+                         sl(i,j,k,m) = sr(i,j,k,m)
+                      else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
+                         sl(i,j,k,m) = sr(i,j,k,m)
+                      else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
+                         sl(i,j,k,m) = 0.d0
+                         sr(i,j,k,m) = 0.d0
+                      else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
+                      else
 #ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
 #endif
+                      end if
                    end if
-                end if
 
-                ! make simhy by solving Riemann problem
-                simh(i,j,k) = merge(sl(i,j,k),sr(i,j,k),vmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(sl(i,j,k)+sr(i,j,k))
-                simh(i,j,k) = merge(simh(i,j,k),savg,abs(vmac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+                      if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
+                         sl(i,j,k,m) = s(i,j,k,comp)
+                         sr(i,j,k,m) = s(i,j,k,comp)
+                      else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 2) then
+                            sl(i,j,k,m) = max(sl(i,j,k,m),0.d0)
+                         end if
+                         sr(i,j,k,m) = sl(i,j,k,m)
+                      else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
+                         sr(i,j,k,m) = sl(i,j,k,m)
+                      else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
+                         sl(i,j,k,m) = 0.d0
+                         sr(i,j,k,m) = 0.d0
+                      else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhy by solving Riemann problem
+                   simh(i,j,k,m) = merge(sl(i,j,k,m),sr(i,j,k,m),vmac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(sl(i,j,k,m)+sr(i,j,k,m))
+                   simh(i,j,k,m) = merge(simh(i,j,k,m),savg,abs(vmac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    else ! idir == 3
-       ! Normal predictor states.
-       ! call bl_allocated from lo:hi+1 in the normal direction
-       ! lo-1:hi+1 in the transverse directions
+       else ! idir == 3
+          ! Normal predictor states.
+          ! call bl_allocated from lo:hi+1 in the normal direction
+          ! lo-1:hi+1 in the transverse directions
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                ! loop over appropriate z-faces
-                if (ppm_type .eq. 0) then
-                   ! make slz, srz with 1D extrapolation
-                   sl(i,j,k) = s(i,j,k-1,comp) + (HALF - dt2*wmac(i,j,k)/hz)*slopez(i,j,k-1,comp)
-                   sr(i,j,k) = s(i,j,k  ,comp) - (HALF + dt2*wmac(i,j,k)/hz)*slopez(i,j,k,comp)
-                else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-                   ! make slz, srz with 1D extrapolation
-                   sl(i,j,k) = Ip(i,j,k-1,m,3)
-                   sr(i,j,k) = Im(i,j,k  ,m,3)
-                end if
-
-                ! impose lo side bc's
-                if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
-                   if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k) = s(i,j,k,comp)
-                      sr(i,j,k) = s(i,j,k,comp)
-                   else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 3) then
-                         sr(i,j,k) = min(sr(i,j,k),0.d0)
-                      end if
-                      sl(i,j,k) = sr(i,j,k)
-                   else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
-                      sl(i,j,k) = sr(i,j,k)
-                   else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k) = 0.d0
-                      sr(i,j,k) = 0.d0
-                   else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
-#endif
+                   ! loop over appropriate z-faces
+                   if (ppm_type .eq. 0) then
+                      ! make slz, srz with 1D extrapolation
+                      sl(i,j,k,m) = s(i,j,k-1,comp) + (HALF - dt2*wmac(i,j,k)/hz)*slopez(i,j,k-1,m)
+                      sr(i,j,k,m) = s(i,j,k  ,comp) - (HALF + dt2*wmac(i,j,k)/hz)*slopez(i,j,k,m)
+                   else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+                      ! make slz, srz with 1D extrapolation
+                      sl(i,j,k,m) = Ip(i,j,k-1,m,3)
+                      sr(i,j,k,m) = Im(i,j,k  ,m,3)
                    end if
-                end if
 
-                ! impose hi side bc's
-                if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
-                   if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
-                      sl(i,j,k) = s(i,j,k,comp)
-                      sr(i,j,k) = s(i,j,k,comp)
-                   else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 3) then
-                         sl(i,j,k) = max(sl(i,j,k),0.d0)
-                      end if
-                      sr(i,j,k) = sl(i,j,k)
-                   else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
-                      sr(i,j,k) = sl(i,j,k)
-                   else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
-                      sl(i,j,k) = 0.d0
-                      sr(i,j,k) = 0.d0
-                   else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
-                   else
+                   ! impose lo side bc's
+                   if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+                      if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
+                         sl(i,j,k,m) = s(i,j,k,comp)
+                         sr(i,j,k,m) = s(i,j,k,comp)
+                      else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 3) then
+                            sr(i,j,k,m) = min(sr(i,j,k,m),0.d0)
+                         end if
+                         sl(i,j,k,m) = sr(i,j,k,m)
+                      else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
+                         sl(i,j,k,m) = sr(i,j,k,m)
+                      else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
+                         sl(i,j,k,m) = 0.d0
+                         sr(i,j,k,m) = 0.d0
+                      else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
+                      else
 #ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
 #endif
+                      end if
                    end if
-                end if
 
-                ! make simhz by solving Riemann problem
-                simh(i,j,k) = merge(sl(i,j,k),sr(i,j,k),wmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(sl(i,j,k)+sr(i,j,k))
-                simh(i,j,k) = merge(simh(i,j,k),savg,abs(wmac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+                      if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
+                         sl(i,j,k,m) = s(i,j,k,comp)
+                         sr(i,j,k,m) = s(i,j,k,comp)
+                      else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 3) then
+                            sl(i,j,k,m) = max(sl(i,j,k,m),0.d0)
+                         end if
+                         sr(i,j,k,m) = sl(i,j,k,m)
+                      else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
+                         sr(i,j,k,m) = sl(i,j,k,m)
+                      else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
+                         sl(i,j,k,m) = 0.d0
+                         sr(i,j,k,m) = 0.d0
+                      else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhz by solving Riemann problem
+                   simh(i,j,k,m) = merge(sl(i,j,k,m),sr(i,j,k,m),wmac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(sl(i,j,k,m)+sr(i,j,k,m))
+                   simh(i,j,k,m) = merge(simh(i,j,k,m),savg,abs(wmac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    endif
+       endif
+
+    enddo
 
   end subroutine make_edge_scal_predictor_3d
 
@@ -996,18 +998,19 @@ contains
        vmac,   v_lo, v_hi, &
        wmac,   w_lo, w_hi, &
        divu, d_lo, d_hi, &
-       slx, slx_lo, slx_hi, &
-       srx, srx_lo, srx_hi, &
-       simhx, six_lo, six_hi, &
-       sly, sly_lo, sly_hi, &
-       sry, sry_lo, sry_hi, &
-       simhy, siy_lo, siy_hi, &
-       slz, slz_lo, slz_hi, &
-       srz, srz_lo, srz_hi, &
-       simhz, siz_lo, siz_hi, &
-       simh_trans, sit_lo, sit_hi, &
+       slx, slx_lo, slx_hi, nc_slx, &
+       srx, srx_lo, srx_hi, nc_srx, &
+       simhx, six_lo, six_hi, nc_simhx, &
+       sly, sly_lo, sly_hi, nc_sly, &
+       sry, sry_lo, sry_hi, nc_sry, &
+       simhy, siy_lo, siy_hi, nc_simhy, &
+       slz, slz_lo, slz_hi, nc_slz, &
+       srz, srz_lo, srz_hi, nc_srz, &
+       simhz, siz_lo, siz_hi, nc_simhz, &
+       simh_trans, sit_lo, sit_hi, nc_sit, &
        dx, dt, is_vel, adv_bc, nbccomp, &
-       comp, bccomp, is_conservative) bind(C,name="make_edge_scal_transverse_3d")
+       ncomp, start_comp, start_bccomp, is_conservative) &
+       bind(C,name="make_edge_scal_transverse_3d")
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
@@ -1016,6 +1019,8 @@ contains
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
+    integer, value,   intent(in   ) :: nc_slx, nc_srx, nc_simhx, nc_sly, nc_sry, nc_simhy
+    integer, value,   intent(in   ) :: nc_slz, nc_srz, nc_simhz, nc_sit
     integer         , intent(in   ) :: slx_lo(3), slx_hi(3)
     integer         , intent(in   ) :: srx_lo(3), srx_hi(3)
     integer         , intent(in   ) :: six_lo(3), six_hi(3)
@@ -1031,19 +1036,20 @@ contains
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(in   ) :: divu  (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-    double precision, intent(in   ) :: slx   (slx_lo(1):slx_hi(1),slx_lo(2):slx_hi(2),slx_lo(3):slx_hi(3))
-    double precision, intent(in   ) :: srx   (srx_lo(1):srx_hi(1),srx_lo(2):srx_hi(2),srx_lo(3):srx_hi(3))
-    double precision, intent(in   ) :: simhx (six_lo(1):six_hi(1),six_lo(2):six_hi(2),six_lo(3):six_hi(3))
-    double precision, intent(in   ) :: sly   (sly_lo(1):sly_hi(1),sly_lo(2):sly_hi(2),sly_lo(3):sly_hi(3))
-    double precision, intent(in   ) :: sry   (sry_lo(1):sry_hi(1),sry_lo(2):sry_hi(2),sry_lo(3):sry_hi(3))
-    double precision, intent(in   ) :: simhy (siy_lo(1):siy_hi(1),siy_lo(2):siy_hi(2),siy_lo(3):siy_hi(3))
-    double precision, intent(in   ) :: slz   (slz_lo(1):slz_hi(1),slz_lo(2):slz_hi(2),slz_lo(3):slz_hi(3))
-    double precision, intent(in   ) :: srz   (srz_lo(1):srz_hi(1),srz_lo(2):srz_hi(2),srz_lo(3):srz_hi(3))
-    double precision, intent(in   ) :: simhz (siz_lo(1):siz_hi(1),siz_lo(2):siz_hi(2),siz_lo(3):siz_hi(3))
-    double precision, intent(inout) :: simh_trans(sit_lo(1):sit_hi(1),sit_lo(2):sit_hi(2),sit_lo(3):sit_hi(3))
+    double precision, intent(in   ) :: slx   (slx_lo(1):slx_hi(1),slx_lo(2):slx_hi(2),slx_lo(3):slx_hi(3),nc_slx)
+    double precision, intent(in   ) :: srx   (srx_lo(1):srx_hi(1),srx_lo(2):srx_hi(2),srx_lo(3):srx_hi(3),nc_srx)
+    double precision, intent(in   ) :: simhx (six_lo(1):six_hi(1),six_lo(2):six_hi(2),six_lo(3):six_hi(3),nc_simhx)
+    double precision, intent(in   ) :: sly   (sly_lo(1):sly_hi(1),sly_lo(2):sly_hi(2),sly_lo(3):sly_hi(3),nc_sly)
+    double precision, intent(in   ) :: sry   (sry_lo(1):sry_hi(1),sry_lo(2):sry_hi(2),sry_lo(3):sry_hi(3),nc_sry)
+    double precision, intent(in   ) :: simhy (siy_lo(1):siy_hi(1),siy_lo(2):siy_hi(2),siy_lo(3):siy_hi(3),nc_simhy)
+    double precision, intent(in   ) :: slz   (slz_lo(1):slz_hi(1),slz_lo(2):slz_hi(2),slz_lo(3):slz_hi(3),nc_slz)
+    double precision, intent(in   ) :: srz   (srz_lo(1):srz_hi(1),srz_lo(2):srz_hi(2),srz_lo(3):srz_hi(3),nc_srz)
+    double precision, intent(in   ) :: simhz (siz_lo(1):siz_hi(1),siz_lo(2):siz_hi(2),siz_lo(3):siz_hi(3),nc_simhz)
+    double precision, intent(inout) :: simh_trans(sit_lo(1):sit_hi(1),sit_lo(2):sit_hi(2),sit_lo(3):sit_hi(3),nc_sit)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    integer,   value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
+    integer,   value, intent(in   ) :: is_vel, nbccomp, ncomp, start_comp, start_bccomp
+    integer,   value, intent(in   ) :: is_conservative
     integer         , intent(in   ) :: adv_bc(3,2,nbccomp)
 
     ! Local variables
@@ -1051,7 +1057,7 @@ contains
     double precision :: hx,hy,hz,dt2,dt3,dt4,dt6,fl,fr
     double precision :: savg
 
-    integer :: i,j,k
+    integer :: i,j,k,m,comp,bccomp
 
     ! these correspond to s_L^{x|y}, etc.
     double precision :: slxy,srxy,slxz,srxz
@@ -1069,533 +1075,539 @@ contains
     hy = dx(2)
     hz = dx(3)
 
-    ! These are transverse terms.
-    ! lo:hi+1 in normal direction
-    ! lo:hi in transverse direction
-    ! lo-1:hi+1 in unused direction
+    do m = 1, ncomp
+       bccomp = start_bccomp + m-1
+       comp = start_comp + m-1
 
-    !******************************************************************
-    ! Create s_{\i-\half\e_x}^{x|y}, etc.
-    !******************************************************************
+       ! These are transverse terms.
+       ! lo:hi+1 in normal direction
+       ! lo:hi in transverse direction
+       ! lo-1:hi+1 in unused direction
 
-    if (norm_dir == 1 .and. trans_dir == 2) then
-       ! simhxy
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+       !******************************************************************
+       ! Create s_{\i-\half\e_x}^{x|y}, etc.
+       !******************************************************************
 
-                ! loop over appropriate xy faces
-                if (is_conservative .eq. 1) then
-                   ! make slxy, srxy by updating 1D extrapolation
-                   slxy = slx(i,j,k) &
-                        - (dt3/hy)*(simhy(i-1,j+1,k)*vmac(i-1,j+1,k) &
-                        - simhy(i-1,j,k)*vmac(i-1,j,k)) &
-                        - dt3*s(i-1,j,k,comp)*divu(i-1,j,k) &
-                        + (dt3/hy)*s(i-1,j,k,comp)*(vmac(i-1,j+1,k)-vmac(i-1,j,k))
-                   srxy = srx(i,j,k) &
-                        - (dt3/hy)*(simhy(i  ,j+1,k)*vmac(i  ,j+1,k) &
-                        - simhy(i  ,j,k)*vmac(i  ,j,k)) &
-                        - dt3*s(i,j,k,comp)*divu(i,j,k) &
-                        + (dt3/hy)*s(i,j,k,comp)*(vmac(i,j+1,k)-vmac(i,j,k))
+       if (norm_dir == 1 .and. trans_dir == 2) then
+          ! simhxy
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                else
+                   ! loop over appropriate xy faces
+                   if (is_conservative .eq. 1) then
+                      ! make slxy, srxy by updating 1D extrapolation
+                      slxy = slx(i,j,k,m) &
+                           - (dt3/hy)*(simhy(i-1,j+1,k,m)*vmac(i-1,j+1,k) &
+                           - simhy(i-1,j,k,m)*vmac(i-1,j,k)) &
+                           - dt3*s(i-1,j,k,comp)*divu(i-1,j,k) &
+                           + (dt3/hy)*s(i-1,j,k,comp)*(vmac(i-1,j+1,k)-vmac(i-1,j,k))
+                      srxy = srx(i,j,k,m) &
+                           - (dt3/hy)*(simhy(i  ,j+1,k,m)*vmac(i  ,j+1,k) &
+                           - simhy(i  ,j,k,m)*vmac(i  ,j,k)) &
+                           - dt3*s(i,j,k,comp)*divu(i,j,k) &
+                           + (dt3/hy)*s(i,j,k,comp)*(vmac(i,j+1,k)-vmac(i,j,k))
 
-                   ! make slxy, srxy by updating 1D extrapolation
-                   slxy = slx(i,j,k) &
-                        - (dt6/hy)*(vmac(i-1,j+1,k)+vmac(i-1,j,k)) &
-                        *(simhy(i-1,j+1,k)-simhy(i-1,j,k))
-                   srxy = srx(i,j,k) &
-                        - (dt6/hy)*(vmac(i  ,j+1,k)+vmac(i  ,j,k)) &
-                        *(simhy(i  ,j+1,k)-simhy(i  ,j,k))
-
-                end if
-
-                ! impose lo side bc's
-                if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
-                   if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                      slxy = s(i-1,j,k,comp)
-                      srxy = s(i-1,j,k,comp)
-                   else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         srxy = min(srxy,0.d0)
-                      end if
-                      slxy = srxy
-                   else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
-                      slxy = srxy
-                   else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-                      slxy = 0.d0
-                      srxy = 0.d0
-                   else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
                    else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
-#endif
-                   end if
-                end if
 
-                ! impose hi side bc's
-                if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
-                   if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                      slxy = s(i,j,k,comp)
-                      srxy = s(i,j,k,comp)
-                   else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         slxy = max(slxy,0.d0)
+                      ! make slxy, srxy by updating 1D extrapolation
+                      slxy = slx(i,j,k,m) &
+                           - (dt6/hy)*(vmac(i-1,j+1,k)+vmac(i-1,j,k)) &
+                           *(simhy(i-1,j+1,k,m)-simhy(i-1,j,k,m))
+                      srxy = srx(i,j,k,m) &
+                           - (dt6/hy)*(vmac(i  ,j+1,k)+vmac(i  ,j,k)) &
+                           *(simhy(i  ,j+1,k,m)-simhy(i  ,j,k,m))
+
+                   end if
+
+                   ! impose lo side bc's
+                   if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+                      if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
+                         slxy = s(i-1,j,k,comp)
+                         srxy = s(i-1,j,k,comp)
+                      else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 1) then
+                            srxy = min(srxy,0.d0)
+                         end if
+                         slxy = srxy
+                      else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
+                         slxy = srxy
+                      else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
+                         slxy = 0.d0
+                         srxy = 0.d0
+                      else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+#endif
                       end if
-                      srxy = slxy
-                   else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-                      srxy = slxy
-                   else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
-                      slxy = 0.d0
-                      srxy = 0.d0
-                   else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
-#endif
                    end if
-                end if
 
-                ! make simhxy by solving Riemann problem
-                simh_trans(i,j,k) = merge(slxy,srxy,umac(i,j,k) .gt. 0.d0)
-                savg = HALF*(slxy+srxy)
-                simh_trans(i,j,k) = merge(simh_trans(i,j,k),savg,abs(umac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+                      if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
+                         slxy = s(i,j,k,comp)
+                         srxy = s(i,j,k,comp)
+                      else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 1) then
+                            slxy = max(slxy,0.d0)
+                         end if
+                         srxy = slxy
+                      else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
+                         srxy = slxy
+                      else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
+                         slxy = 0.d0
+                         srxy = 0.d0
+                      else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhxy by solving Riemann problem
+                   simh_trans(i,j,k,m) = merge(slxy,srxy,umac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(slxy+srxy)
+                   simh_trans(i,j,k,m) = merge(simh_trans(i,j,k,m),savg,abs(umac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    else if (norm_dir == 1 .and. trans_dir == 3) then
-       ! loop over appropriate xz faces
-       ! simhxz
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+       else if (norm_dir == 1 .and. trans_dir == 3) then
+          ! loop over appropriate xz faces
+          ! simhxz
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                if (is_conservative .eq. 1) then
-                   ! make slxz, srxz by updating 1D extrapolation
-                   slxz = slx(i,j,k) &
-                        - (dt3/hz)*(simhz(i-1,j,k+1)*wmac(i-1,j,k+1) &
-                        - simhz(i-1,j,k)*wmac(i-1,j,k)) &
-                        - dt3*s(i-1,j,k,comp)*divu(i-1,j,k) &
-                        + (dt3/hz)*s(i-1,j,k,comp)*(wmac(i-1,j,k+1)-wmac(i-1,j,k))
-                   srxz = srx(i,j,k) &
-                        - (dt3/hz)*(simhz(i  ,j,k+1)*wmac(i  ,j,k+1) &
-                        - simhz(i  ,j,k)*wmac(i  ,j,k)) &
-                        - dt3*s(i,j,k,comp)*divu(i,j,k) &
-                        + (dt3/hz)*s(i,j,k,comp)*(wmac(i,j,k+1)-wmac(i,j,k))
-                else
-                   ! make slxz, srxz by updating 1D extrapolation
-                   slxz = slx(i,j,k) &
-                        - (dt6/hz)*(wmac(i-1,j,k+1)+wmac(i-1,j,k)) &
-                        *(simhz(i-1,j,k+1)-simhz(i-1,j,k))
-                   srxz = srx(i,j,k) &
-                        - (dt6/hz)*(wmac(i  ,j,k+1)+wmac(i  ,j,k)) &
-                        *(simhz(i  ,j,k+1)-simhz(i  ,j,k))
-                end if
-
-                ! impose lo side bc's
-                if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
-                   if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                      slxz = s(i-1,j,k,comp)
-                      srxz = s(i-1,j,k,comp)
-                   else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         srxz = min(srxz,0.d0)
-                      end if
-                      slxz = srxz
-                   else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
-                      slxz = srxz
-                   else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-                      slxz = 0.d0
-                      srxz = 0.d0
-                   else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
+                   if (is_conservative .eq. 1) then
+                      ! make slxz, srxz by updating 1D extrapolation
+                      slxz = slx(i,j,k,m) &
+                           - (dt3/hz)*(simhz(i-1,j,k+1,m)*wmac(i-1,j,k+1) &
+                           - simhz(i-1,j,k,m)*wmac(i-1,j,k)) &
+                           - dt3*s(i-1,j,k,comp)*divu(i-1,j,k) &
+                           + (dt3/hz)*s(i-1,j,k,comp)*(wmac(i-1,j,k+1)-wmac(i-1,j,k))
+                      srxz = srx(i,j,k,m) &
+                           - (dt3/hz)*(simhz(i  ,j,k+1,m)*wmac(i  ,j,k+1) &
+                           - simhz(i  ,j,k,m)*wmac(i  ,j,k)) &
+                           - dt3*s(i,j,k,comp)*divu(i,j,k) &
+                           + (dt3/hz)*s(i,j,k,comp)*(wmac(i,j,k+1)-wmac(i,j,k))
                    else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
-#endif
+                      ! make slxz, srxz by updating 1D extrapolation
+                      slxz = slx(i,j,k,m) &
+                           - (dt6/hz)*(wmac(i-1,j,k+1)+wmac(i-1,j,k)) &
+                           *(simhz(i-1,j,k+1,m)-simhz(i-1,j,k,m))
+                      srxz = srx(i,j,k,m) &
+                           - (dt6/hz)*(wmac(i  ,j,k+1)+wmac(i  ,j,k)) &
+                           *(simhz(i  ,j,k+1,m)-simhz(i  ,j,k,m))
                    end if
-                end if
 
-                ! impose hi side bc's
-                if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
-                   if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                      slxz = s(i,j,k,comp)
-                      srxz = s(i,j,k,comp)
-                   else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         slxz = max(slxz,0.d0)
+                   ! impose lo side bc's
+                   if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+                      if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
+                         slxz = s(i-1,j,k,comp)
+                         srxz = s(i-1,j,k,comp)
+                      else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 1) then
+                            srxz = min(srxz,0.d0)
+                         end if
+                         slxz = srxz
+                      else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
+                         slxz = srxz
+                      else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
+                         slxz = 0.d0
+                         srxz = 0.d0
+                      else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+#endif
                       end if
-                      srxz = slxz
-                   else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-                      srxz = slxz
-                   else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
-                      slxz = 0.d0
-                      srxz = 0.d0
-                   else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
-#endif
                    end if
-                end if
 
-                ! make simhxz by solving Riemann problem
-                simh_trans(i,j,k) = merge(slxz,srxz,umac(i,j,k) .gt. 0.d0)
-                savg = HALF*(slxz+srxz)
-                simh_trans(i,j,k) = merge(simh_trans(i,j,k),savg,abs(umac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+                      if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
+                         slxz = s(i,j,k,comp)
+                         srxz = s(i,j,k,comp)
+                      else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 1) then
+                            slxz = max(slxz,0.d0)
+                         end if
+                         srxz = slxz
+                      else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
+                         srxz = slxz
+                      else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
+                         slxz = 0.d0
+                         srxz = 0.d0
+                      else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhxz by solving Riemann problem
+                   simh_trans(i,j,k,m) = merge(slxz,srxz,umac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(slxz+srxz)
+                   simh_trans(i,j,k,m) = merge(simh_trans(i,j,k,m),savg,abs(umac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    else if (norm_dir == 2 .and. trans_dir == 1) then
-       ! simhyx
-       ! loop over appropriate yx faces
+       else if (norm_dir == 2 .and. trans_dir == 1) then
+          ! simhyx
+          ! loop over appropriate yx faces
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                if (is_conservative .eq. 1) then
-                   ! make slyx, sryx by updating 1D extrapolation
-                   slyx = sly(i,j,k) &
-                        - (dt3/hx)*(simhx(i+1,j-1,k)*umac(i+1,j-1,k) &
-                        - simhx(i,j-1,k)*umac(i,j-1,k)) &
-                        - dt3*s(i,j-1,k,comp)*divu(i,j-1,k) &
-                        + (dt3/hx)*s(i,j-1,k,comp)*(umac(i+1,j-1,k)-umac(i,j-1,k))
-                   sryx = sry(i,j,k) &
-                        - (dt3/hx)*(simhx(i+1,j  ,k)*umac(i+1,j  ,k) &
-                        - simhx(i,j  ,k)*umac(i,j  ,k)) &
-                        - dt3*s(i,j,k,comp)*divu(i,j,k) &
-                        + (dt3/hx)*s(i,j,k,comp)*(umac(i+1,j,k)-umac(i,j,k))
-                else
-                   ! make slyx, sryx by updating 1D extrapolation
-                   slyx = sly(i,j,k) &
-                        - (dt6/hx)*(umac(i+1,j-1,k)+umac(i,j-1,k)) &
-                        *(simhx(i+1,j-1,k)-simhx(i,j-1,k))
-                   sryx = sry(i,j,k) &
-                        - (dt6/hx)*(umac(i+1,j  ,k)+umac(i,j  ,k)) &
-                        *(simhx(i+1,j  ,k)-simhx(i,j  ,k))
-                end if
-
-                ! impose lo side bc's
-                if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
-                   if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                      slyx = s(i,j-1,k,comp)
-                      sryx = s(i,j-1,k,comp)
-                   else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         sryx = min(sryx,0.d0)
-                      end if
-                      slyx = sryx
-                   else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
-                      slyx = sryx
-                   else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
-                      slyx = 0.d0
-                      sryx = 0.d0
-                   else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
+                   if (is_conservative .eq. 1) then
+                      ! make slyx, sryx by updating 1D extrapolation
+                      slyx = sly(i,j,k,m) &
+                           - (dt3/hx)*(simhx(i+1,j-1,k,m)*umac(i+1,j-1,k) &
+                           - simhx(i,j-1,k,m)*umac(i,j-1,k)) &
+                           - dt3*s(i,j-1,k,comp)*divu(i,j-1,k) &
+                           + (dt3/hx)*s(i,j-1,k,comp)*(umac(i+1,j-1,k)-umac(i,j-1,k))
+                      sryx = sry(i,j,k,m) &
+                           - (dt3/hx)*(simhx(i+1,j  ,k,m)*umac(i+1,j  ,k) &
+                           - simhx(i,j  ,k,m)*umac(i,j  ,k)) &
+                           - dt3*s(i,j,k,comp)*divu(i,j,k) &
+                           + (dt3/hx)*s(i,j,k,comp)*(umac(i+1,j,k)-umac(i,j,k))
                    else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
-#endif
+                      ! make slyx, sryx by updating 1D extrapolation
+                      slyx = sly(i,j,k,m) &
+                           - (dt6/hx)*(umac(i+1,j-1,k)+umac(i,j-1,k)) &
+                           *(simhx(i+1,j-1,k,m)-simhx(i,j-1,k,m))
+                      sryx = sry(i,j,k,m) &
+                           - (dt6/hx)*(umac(i+1,j  ,k)+umac(i,j  ,k)) &
+                           *(simhx(i+1,j  ,k,m)-simhx(i,j  ,k,m))
                    end if
-                end if
 
-                ! impose hi side bc's
-                if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
-                   if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                      slyx = s(i,j,k,comp)
-                      sryx = s(i,j,k,comp)
-                   else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         slyx = max(slyx,0.d0)
+                   ! impose lo side bc's
+                   if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+                      if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
+                         slyx = s(i,j-1,k,comp)
+                         sryx = s(i,j-1,k,comp)
+                      else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 2) then
+                            sryx = min(sryx,0.d0)
+                         end if
+                         slyx = sryx
+                      else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
+                         slyx = sryx
+                      else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
+                         slyx = 0.d0
+                         sryx = 0.d0
+                      else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+#endif
                       end if
-                      sryx = slyx
-                   else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
-                      sryx = slyx
-                   else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
-                      slyx = 0.d0
-                      sryx = 0.d0
-                   else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
-#endif
                    end if
-                end if
 
-                ! make simhyx by solving Riemann problem
-                simh_trans(i,j,k) = merge(slyx,sryx,vmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(slyx+sryx)
-                simh_trans(i,j,k) = merge(simh_trans(i,j,k),savg,abs(vmac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+                      if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
+                         slyx = s(i,j,k,comp)
+                         sryx = s(i,j,k,comp)
+                      else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 2) then
+                            slyx = max(slyx,0.d0)
+                         end if
+                         sryx = slyx
+                      else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
+                         sryx = slyx
+                      else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
+                         slyx = 0.d0
+                         sryx = 0.d0
+                      else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhyx by solving Riemann problem
+                   simh_trans(i,j,k,m) = merge(slyx,sryx,vmac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(slyx+sryx)
+                   simh_trans(i,j,k,m) = merge(simh_trans(i,j,k,m),savg,abs(vmac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    else if (norm_dir == 2 .and. trans_dir == 3) then
-       ! simhyz
-       ! loop over appropriate yz faces
+       else if (norm_dir == 2 .and. trans_dir == 3) then
+          ! simhyz
+          ! loop over appropriate yz faces
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                if (is_conservative .eq. 1) then
-                   ! make slyz, sryz by updating 1D extrapolation
-                   slyz = sly(i,j,k) &
-                        - (dt3/hz)*(simhz(i,j-1,k+1)*wmac(i,j-1,k+1) &
-                        - simhz(i,j-1,k)*wmac(i,j-1,k)) &
-                        - dt3*s(i,j-1,k,comp)*divu(i,j-1,k) &
-                        + (dt3/hz)*s(i,j-1,k,comp)*(wmac(i,j-1,k+1)-wmac(i,j-1,k))
-                   sryz = sry(i,j,k) &
-                        - (dt3/hz)*(simhz(i,j  ,k+1)*wmac(i,j  ,k+1) &
-                        - simhz(i,j  ,k)*wmac(i,j  ,k)) &
-                        - dt3*s(i,j,k,comp)*divu(i,j,k) &
-                        + (dt3/hz)*s(i,j,k,comp)*(wmac(i,j,k+1)-wmac(i,j,k))
-                else
-                   ! make slyz, sryz by updating 1D extrapolation
-                   slyz = sly(i,j,k) &
-                        - (dt6/hz)*(wmac(i,j-1,k+1)+wmac(i,j-1,k)) &
-                        *(simhz(i,j-1,k+1)-simhz(i,j-1,k))
-                   sryz = sry(i,j,k) &
-                        - (dt6/hz)*(wmac(i,j  ,k+1)+wmac(i,j  ,k)) &
-                        *(simhz(i,j  ,k+1)-simhz(i,j  ,k))
-                end if
-
-                ! impose lo side bc's
-                if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
-                   if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                      slyz = s(i,j-1,k,comp)
-                      sryz = s(i,j-1,k,comp)
-                   else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         sryz = min(sryz,0.d0)
-                      end if
-                      slyz = sryz
-                   else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
-                      slyz = sryz
-                   else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
-                      slyz = 0.d0
-                      sryz = 0.d0
-                   else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
+                   if (is_conservative .eq. 1) then
+                      ! make slyz, sryz by updating 1D extrapolation
+                      slyz = sly(i,j,k,m) &
+                           - (dt3/hz)*(simhz(i,j-1,k+1,m)*wmac(i,j-1,k+1) &
+                           - simhz(i,j-1,k,m)*wmac(i,j-1,k)) &
+                           - dt3*s(i,j-1,k,comp)*divu(i,j-1,k) &
+                           + (dt3/hz)*s(i,j-1,k,comp)*(wmac(i,j-1,k+1)-wmac(i,j-1,k))
+                      sryz = sry(i,j,k,m) &
+                           - (dt3/hz)*(simhz(i,j  ,k+1,m)*wmac(i,j  ,k+1) &
+                           - simhz(i,j  ,k,m)*wmac(i,j  ,k)) &
+                           - dt3*s(i,j,k,comp)*divu(i,j,k) &
+                           + (dt3/hz)*s(i,j,k,comp)*(wmac(i,j,k+1)-wmac(i,j,k))
                    else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
-#endif
+                      ! make slyz, sryz by updating 1D extrapolation
+                      slyz = sly(i,j,k,m) &
+                           - (dt6/hz)*(wmac(i,j-1,k+1)+wmac(i,j-1,k)) &
+                           *(simhz(i,j-1,k+1,m)-simhz(i,j-1,k,m))
+                      sryz = sry(i,j,k,m) &
+                           - (dt6/hz)*(wmac(i,j  ,k+1)+wmac(i,j  ,k)) &
+                           *(simhz(i,j  ,k+1,m)-simhz(i,j  ,k,m))
                    end if
-                end if
 
-                ! impose hi side bc's
-                if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
-                   if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                      slyz = s(i,j,k,comp)
-                      sryz = s(i,j,k,comp)
-                   else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         slyz = max(slyz,0.d0)
+                   ! impose lo side bc's
+                   if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+                      if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
+                         slyz = s(i,j-1,k,comp)
+                         sryz = s(i,j-1,k,comp)
+                      else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 2) then
+                            sryz = min(sryz,0.d0)
+                         end if
+                         slyz = sryz
+                      else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
+                         slyz = sryz
+                      else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
+                         slyz = 0.d0
+                         sryz = 0.d0
+                      else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+#endif
                       end if
-                      sryz = slyz
-                   else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
-                      sryz = slyz
-                   else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
-                      slyz = 0.d0
-                      sryz = 0.d0
-                   else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
-#endif
                    end if
-                end if
 
-                ! make simhyz by solving Riemann problem
-                simh_trans(i,j,k) = merge(slyz,sryz,vmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(slyz+sryz)
-                simh_trans(i,j,k) = merge(simh_trans(i,j,k),savg,abs(vmac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+                      if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
+                         slyz = s(i,j,k,comp)
+                         sryz = s(i,j,k,comp)
+                      else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 2) then
+                            slyz = max(slyz,0.d0)
+                         end if
+                         sryz = slyz
+                      else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
+                         sryz = slyz
+                      else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
+                         slyz = 0.d0
+                         sryz = 0.d0
+                      else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhyz by solving Riemann problem
+                   simh_trans(i,j,k,m) = merge(slyz,sryz,vmac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(slyz+sryz)
+                   simh_trans(i,j,k,m) = merge(simh_trans(i,j,k,m),savg,abs(vmac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    else if (norm_dir == 3 .and. trans_dir == 1) then
-       ! simhzx
-       ! loop over appropriate zx faces
+       else if (norm_dir == 3 .and. trans_dir == 1) then
+          ! simhzx
+          ! loop over appropriate zx faces
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                if (is_conservative .eq. 1) then
-                   ! make slzx, srzx by updating 1D extrapolation
-                   slzx = slz(i,j,k) &
-                        - (dt3/hx)*(simhx(i+1,j,k-1)*umac(i+1,j,k-1) &
-                        - simhx(i,j,k-1)*umac(i,j,k-1)) &
-                        - dt3*s(i,j,k-1,comp)*divu(i,j,k-1) &
-                        + (dt3/hx)*s(i,j,k-1,comp)*(umac(i+1,j,k-1)-umac(i,j,k-1))
-                   srzx = srz(i,j,k) &
-                        - (dt3/hx)*(simhx(i+1,j,k  )*umac(i+1,j,k  ) &
-                        - simhx(i,j,k  )*umac(i,j,k  )) &
-                        - dt3*s(i,j,k,comp)*divu(i,j,k) &
-                        + (dt3/hx)*s(i,j,k,comp)*(umac(i+1,j,k)-umac(i,j,k))
-                else
-                   ! make slzx, srzx by updating 1D extrapolation
-                   slzx = slz(i,j,k) &
-                        - (dt6/hx)*(umac(i+1,j,k-1)+umac(i,j,k-1)) &
-                        *(simhx(i+1,j,k-1)-simhx(i,j,k-1))
-                   srzx = srz(i,j,k) &
-                        - (dt6/hx)*(umac(i+1,j,k  )+umac(i,j,k  )) &
-                        *(simhx(i+1,j,k  )-simhx(i,j,k  ))
-                end if
-
-                ! impose lo side bc's
-                if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
-                   if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                      slzx = s(i,j,k-1,comp)
-                      srzx = s(i,j,k-1,comp)
-                   else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 3) then
-                         srzx = min(srzx,0.d0)
-                      end if
-                      slzx = srzx
-                   else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
-                      slzx = srzx
-                   else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
-                      slzx = 0.d0
-                      srzx = 0.d0
-                   else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
+                   if (is_conservative .eq. 1) then
+                      ! make slzx, srzx by updating 1D extrapolation
+                      slzx = slz(i,j,k,m) &
+                           - (dt3/hx)*(simhx(i+1,j,k-1,m)*umac(i+1,j,k-1) &
+                           - simhx(i,j,k-1,m)*umac(i,j,k-1)) &
+                           - dt3*s(i,j,k-1,comp)*divu(i,j,k-1) &
+                           + (dt3/hx)*s(i,j,k-1,comp)*(umac(i+1,j,k-1)-umac(i,j,k-1))
+                      srzx = srz(i,j,k,m) &
+                           - (dt3/hx)*(simhx(i+1,j,k  ,m)*umac(i+1,j,k  ) &
+                           - simhx(i,j,k  ,m)*umac(i,j,k  )) &
+                           - dt3*s(i,j,k,comp)*divu(i,j,k) &
+                           + (dt3/hx)*s(i,j,k,comp)*(umac(i+1,j,k)-umac(i,j,k))
                    else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
-#endif
+                      ! make slzx, srzx by updating 1D extrapolation
+                      slzx = slz(i,j,k,m) &
+                           - (dt6/hx)*(umac(i+1,j,k-1)+umac(i,j,k-1)) &
+                           *(simhx(i+1,j,k-1,m)-simhx(i,j,k-1,m))
+                      srzx = srz(i,j,k,m) &
+                           - (dt6/hx)*(umac(i+1,j,k  )+umac(i,j,k  )) &
+                           *(simhx(i+1,j,k  ,m)-simhx(i,j,k  ,m))
                    end if
-                end if
 
-                ! impose hi side bc's
-                if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
-                   if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
-                      slzx = s(i,j,k,comp)
-                      srzx = s(i,j,k,comp)
-                   else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 3) then
-                         slzx = max(slzx,0.d0)
+                   ! impose lo side bc's
+                   if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+                      if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
+                         slzx = s(i,j,k-1,comp)
+                         srzx = s(i,j,k-1,comp)
+                      else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 3) then
+                            srzx = min(srzx,0.d0)
+                         end if
+                         slzx = srzx
+                      else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
+                         slzx = srzx
+                      else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
+                         slzx = 0.d0
+                         srzx = 0.d0
+                      else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+#endif
                       end if
-                      srzx = slzx
-                   else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
-                      srzx = slzx
-                   else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
-                      slzx = 0.d0
-                      srzx = 0.d0
-                   else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
-#endif
                    end if
-                end if
 
-                ! make simhzx by solving Riemann problem
-                simh_trans(i,j,k) = merge(slzx,srzx,wmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(slzx+srzx)
-                simh_trans(i,j,k) = merge(simh_trans(i,j,k),savg,abs(wmac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+                      if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
+                         slzx = s(i,j,k,comp)
+                         srzx = s(i,j,k,comp)
+                      else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 3) then
+                            slzx = max(slzx,0.d0)
+                         end if
+                         srzx = slzx
+                      else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
+                         srzx = slzx
+                      else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
+                         slzx = 0.d0
+                         srzx = 0.d0
+                      else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhzx by solving Riemann problem
+                   simh_trans(i,j,k,m) = merge(slzx,srzx,wmac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(slzx+srzx)
+                   simh_trans(i,j,k,m) = merge(simh_trans(i,j,k,m),savg,abs(wmac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    else if (norm_dir == 3 .and. trans_dir == 2) then
-       ! simhzy
-       ! loop over appropriate zy faces
+       else if (norm_dir == 3 .and. trans_dir == 2) then
+          ! simhzy
+          ! loop over appropriate zy faces
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                if (is_conservative .eq. 1) then
-                   ! make slzy, srzy by updating 1D extrapolation
-                   slzy = slz(i,j,k) &
-                        - (dt3/hy)*(simhy(i,j+1,k-1)*vmac(i,j+1,k-1) &
-                        - simhy(i,j,k-1)*vmac(i,j,k-1)) &
-                        - dt3*s(i,j,k-1,comp)*divu(i,j,k-1) &
-                        + (dt3/hy)*s(i,j,k-1,comp)*(vmac(i,j+1,k-1)-vmac(i,j,k-1))
-                   srzy = srz(i,j,k) &
-                        - (dt3/hy)*(simhy(i,j+1,k  )*vmac(i,j+1,k  ) &
-                        - simhy(i,j,k  )*vmac(i,j,k  )) &
-                        - dt3*s(i,j,k,comp)*divu(i,j,k) &
-                        + (dt3/hy)*s(i,j,k,comp)*(vmac(i,j+1,k)-vmac(i,j,k))
-                else
-                   ! make slzy, srzy by updating 1D extrapolation
-                   slzy = slz(i,j,k) &
-                        - (dt6/hy)*(vmac(i,j+1,k-1)+vmac(i,j,k-1)) &
-                        *(simhy(i,j+1,k-1)-simhy(i,j,k-1))
-                   srzy = srz(i,j,k) &
-                        - (dt6/hy)*(vmac(i,j+1,k  )+vmac(i,j,k  )) &
-                        *(simhy(i,j+1,k  )-simhy(i,j,k  ))
-                end if
-
-                ! impose lo side bc's
-                if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
-                   if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                      slzy = s(i,j,k-1,comp)
-                      srzy = s(i,j,k-1,comp)
-                   else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 3) then
-                         srzy = min(srzy,0.d0)
-                      end if
-                      slzy = srzy
-                   else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
-                      slzy = srzy
-                   else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
-                      slzy = 0.d0
-                      srzy = 0.d0
-                   else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
+                   if (is_conservative .eq. 1) then
+                      ! make slzy, srzy by updating 1D extrapolation
+                      slzy = slz(i,j,k,m) &
+                           - (dt3/hy)*(simhy(i,j+1,k-1,m)*vmac(i,j+1,k-1) &
+                           - simhy(i,j,k-1,m)*vmac(i,j,k-1)) &
+                           - dt3*s(i,j,k-1,comp)*divu(i,j,k-1) &
+                           + (dt3/hy)*s(i,j,k-1,comp)*(vmac(i,j+1,k-1)-vmac(i,j,k-1))
+                      srzy = srz(i,j,k,m) &
+                           - (dt3/hy)*(simhy(i,j+1,k  ,m)*vmac(i,j+1,k  ) &
+                           - simhy(i,j,k  ,m)*vmac(i,j,k  )) &
+                           - dt3*s(i,j,k,comp)*divu(i,j,k) &
+                           + (dt3/hy)*s(i,j,k,comp)*(vmac(i,j+1,k)-vmac(i,j,k))
                    else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
-#endif
+                      ! make slzy, srzy by updating 1D extrapolation
+                      slzy = slz(i,j,k,m) &
+                           - (dt6/hy)*(vmac(i,j+1,k-1)+vmac(i,j,k-1)) &
+                           *(simhy(i,j+1,k-1,m)-simhy(i,j,k-1,m))
+                      srzy = srz(i,j,k,m) &
+                           - (dt6/hy)*(vmac(i,j+1,k  )+vmac(i,j,k  )) &
+                           *(simhy(i,j+1,k  ,m)-simhy(i,j,k  ,m))
                    end if
-                end if
 
-                ! impose hi side bc's
-                if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
-                   if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
-                      slzy = s(i,j,k,comp)
-                      srzy = s(i,j,k,comp)
-                   else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 3) then
-                         slzy = max(slzy,0.d0)
+                   ! impose lo side bc's
+                   if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+                      if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
+                         slzy = s(i,j,k-1,comp)
+                         srzy = s(i,j,k-1,comp)
+                      else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 3) then
+                            srzy = min(srzy,0.d0)
+                         end if
+                         slzy = srzy
+                      else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
+                         slzy = srzy
+                      else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
+                         slzy = 0.d0
+                         srzy = 0.d0
+                      else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+#endif
                       end if
-                      srzy = slzy
-                   else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
-                      srzy = slzy
-                   else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
-                      slzy = 0.d0
-                      srzy = 0.d0
-                   else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
-#endif
                    end if
-                end if
 
-                ! make simhzy by solving Riemann problem
-                simh_trans(i,j,k) = merge(slzy,srzy,wmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(slzy+srzy)
-                simh_trans(i,j,k) = merge(simh_trans(i,j,k),savg,abs(wmac(i,j,k)) .gt. rel_eps)
+                   ! impose hi side bc's
+                   if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+                      if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
+                         slzy = s(i,j,k,comp)
+                         srzy = s(i,j,k,comp)
+                      else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 3) then
+                            slzy = max(slzy,0.d0)
+                         end if
+                         srzy = slzy
+                      else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
+                         srzy = slzy
+                      else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
+                         slzy = 0.d0
+                         srzy = 0.d0
+                      else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+#endif
+                      end if
+                   end if
+
+                   ! make simhzy by solving Riemann problem
+                   simh_trans(i,j,k,m) = merge(slzy,srzy,wmac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(slzy+srzy)
+                   simh_trans(i,j,k,m) = merge(simh_trans(i,j,k,m),savg,abs(wmac(i,j,k)) .gt. rel_eps)
+                enddo
              enddo
           enddo
-       enddo
 
-    endif
+       endif
+
+    enddo
 
   end subroutine make_edge_scal_transverse_3d
 
@@ -1607,25 +1619,25 @@ contains
        umac,   u_lo, u_hi, &
        vmac,   v_lo, v_hi, &
        wmac,   w_lo, w_hi, &
-       Ipf, ipf_lo, ipf_hi, &
-       Imf, imf_lo, imf_hi, &
-       sl, sl_lo, sl_hi, &
-       sr, sr_lo, sr_hi, &
-       simhxy, xy_lo, xy_hi, &
-       simhxz, xz_lo, xz_hi, &
-       simhyx, yx_lo, yx_hi, &
-       simhyz, yz_lo, yz_hi, &
-       simhzx, zx_lo, zx_hi, &
-       simhzy, zy_lo, zy_hi, &
+       Ipf, ipf_lo, ipf_hi, ip_dim, &
+       Imf, imf_lo, imf_hi, im_dim, &
+       sl, sl_lo, sl_hi, nc_sl, &
+       sr, sr_lo, sr_hi, nc_sr, &
+       simhxy, xy_lo, xy_hi, nc_xy, &
+       simhxz, xz_lo, xz_hi, nc_xz, &
+       simhyx, yx_lo, yx_hi, nc_yx, &
+       simhyz, yz_lo, yz_hi, nc_yz, &
+       simhzx, zx_lo, zx_hi, nc_zx, &
+       simhzy, zy_lo, zy_hi, nc_zy, &
        force,  f_lo, f_hi, nc_f, &
        dx, dt, is_vel, adv_bc, nbccomp, &
-       comp, bccomp, is_conservative) bind(C,name="make_edge_scal_3d")
+       ncomp, start_comp, start_bccomp, is_conservative) bind(C,name="make_edge_scal_3d")
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
-    integer, value,   intent(in   ) :: idir, nc_s
+    integer, value,   intent(in   ) :: idir, nc_s, ip_dim, im_dim
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
-    integer, value,   intent(in   ) :: nc_x
+    integer, value,   intent(in   ) :: nc_x, nc_sl, nc_sr
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
@@ -1633,6 +1645,7 @@ contains
     integer         , intent(in   ) :: imf_lo(3), imf_hi(3)
     integer         , intent(in   ) :: sl_lo(3), sl_hi(3)
     integer         , intent(in   ) :: sr_lo(3), sr_hi(3)
+    integer, value,   intent(in   ) :: nc_xy, nc_xz, nc_yx, nc_yz, nc_zx, nc_zy
     integer         , intent(in   ) :: xy_lo(3), xy_hi(3)
     integer         , intent(in   ) :: xz_lo(3), xz_hi(3)
     integer         , intent(in   ) :: yx_lo(3), yx_hi(3)
@@ -1646,28 +1659,29 @@ contains
     double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-    double precision, intent(in) :: Ipf(ipf_lo(1):ipf_hi(1),ipf_lo(2):ipf_hi(2),ipf_lo(3):ipf_hi(3),AMREX_SPACEDIM)
-    double precision, intent(in) :: Imf(imf_lo(1):imf_hi(1),imf_lo(2):imf_hi(2),imf_lo(3):imf_hi(3),AMREX_SPACEDIM)
-    double precision, intent(in   ) :: sl    (sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3))
-    double precision, intent(in   ) :: sr    (sr_lo(1):sr_hi(1),sr_lo(2):sr_hi(2),sr_lo(3):sr_hi(3))
-    double precision, intent(in   ) :: simhxy(xy_lo(1):xy_hi(1),xy_lo(2):xy_hi(2),xy_lo(3):xy_hi(3))
-    double precision, intent(in   ) :: simhxz(xz_lo(1):xz_hi(1),xz_lo(2):xz_hi(2),xz_lo(3):xz_hi(3))
-    double precision, intent(in   ) :: simhyx(yx_lo(1):yx_hi(1),yx_lo(2):yx_hi(2),yx_lo(3):yx_hi(3))
-    double precision, intent(in   ) :: simhyz(yz_lo(1):yz_hi(1),yz_lo(2):yz_hi(2),yz_lo(3):yz_hi(3))
-    double precision, intent(in   ) :: simhzx(zx_lo(1):zx_hi(1),zx_lo(2):zx_hi(2),zx_lo(3):zx_hi(3))
-    double precision, intent(in   ) :: simhzy(zy_lo(1):zy_hi(1),zy_lo(2):zy_hi(2),zy_lo(3):zy_hi(3))
+    double precision, intent(in) :: Ipf(ipf_lo(1):ipf_hi(1),ipf_lo(2):ipf_hi(2),ipf_lo(3):ipf_hi(3),ip_dim,AMREX_SPACEDIM)
+    double precision, intent(in) :: Imf(imf_lo(1):imf_hi(1),imf_lo(2):imf_hi(2),imf_lo(3):imf_hi(3),im_dim,AMREX_SPACEDIM)
+    double precision, intent(in   ) :: sl    (sl_lo(1):sl_hi(1),sl_lo(2):sl_hi(2),sl_lo(3):sl_hi(3),nc_sl)
+    double precision, intent(in   ) :: sr    (sr_lo(1):sr_hi(1),sr_lo(2):sr_hi(2),sr_lo(3):sr_hi(3),nc_sr)
+    double precision, intent(in   ) :: simhxy(xy_lo(1):xy_hi(1),xy_lo(2):xy_hi(2),xy_lo(3):xy_hi(3),nc_xy)
+    double precision, intent(in   ) :: simhxz(xz_lo(1):xz_hi(1),xz_lo(2):xz_hi(2),xz_lo(3):xz_hi(3),nc_xz)
+    double precision, intent(in   ) :: simhyx(yx_lo(1):yx_hi(1),yx_lo(2):yx_hi(2),yx_lo(3):yx_hi(3),nc_yx)
+    double precision, intent(in   ) :: simhyz(yz_lo(1):yz_hi(1),yz_lo(2):yz_hi(2),yz_lo(3):yz_hi(3),nc_yz)
+    double precision, intent(in   ) :: simhzx(zx_lo(1):zx_hi(1),zx_lo(2):zx_hi(2),zx_lo(3):zx_hi(3),nc_zx)
+    double precision, intent(in   ) :: simhzy(zy_lo(1):zy_hi(1),zy_lo(2):zy_hi(2),zy_lo(3):zy_hi(3),nc_zy)
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    integer,   value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
-    integer         , intent(in   ) :: adv_bc(3,2,nbccomp)
+    integer,   value, intent(in   ) :: is_vel, nbccomp, ncomp, start_comp, start_bccomp
+    integer,   value, intent(in   ) :: is_conservative
+    integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
 
     ! Local variables
 
     double precision :: hx,hy,hz,dt2,dt3,dt4,dt6,fl,fr
     double precision :: savg
 
-    integer :: i,j,k
+    integer :: i,j,k,m,comp,bccomp
 
     ! these correspond to \mathrm{sedge}_L^x, etc.
     double precision :: sedgelx,sedgerx
@@ -1685,319 +1699,325 @@ contains
     hy = dx(2)
     hz = dx(3)
 
-    !******************************************************************
-    ! Create sedgelx, etc.
-    !******************************************************************
+    do m = 1, ncomp
+       bccomp = start_bccomp + m-1
+       comp = start_comp + m-1
 
-    if (idir == 1) then
-       ! Final edge states.
-       ! lo:hi+1 in the normal direction
-       ! lo:hi in the transverse directions
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+       !******************************************************************
+       ! Create sedgelx, etc.
+       !******************************************************************
 
-                ! loop over appropriate x-faces
-                if (is_conservative .eq. 1) then
-                   ! make sedgelx, sedgerx
-                   fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,1), ppm_trace_forces == 0)
-                   fr = merge(force(i  ,j,k,comp), Imf(i  ,j,k,1), ppm_trace_forces == 0)
+       if (idir == 1) then
+          ! Final edge states.
+          ! lo:hi+1 in the normal direction
+          ! lo:hi in the transverse directions
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                   sedgelx = sl(i,j,k) &
-                        - (dt2/hy)*(simhyz(i-1,j+1,k  )*vmac(i-1,j+1,k  ) &
-                        - simhyz(i-1,j,k)*vmac(i-1,j,k)) &
-                        - (dt2/hz)*(simhzy(i-1,j  ,k+1)*wmac(i-1,j  ,k+1) &
-                        - simhzy(i-1,j,k)*wmac(i-1,j,k)) &
-                        - (dt2/hx)*s(i-1,j,k,comp)*(umac(i  ,j,k)-umac(i-1,j,k)) &
-                        + dt2*fl
+                   ! loop over appropriate x-faces
+                   if (is_conservative .eq. 1) then
+                      ! make sedgelx, sedgerx
+                      fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,m,1), ppm_trace_forces == 0)
+                      fr = merge(force(i  ,j,k,comp), Imf(i  ,j,k,m,1), ppm_trace_forces == 0)
 
-                   sedgerx = sr(i,j,k) &
-                        - (dt2/hy)*(simhyz(i  ,j+1,k  )*vmac(i  ,j+1,  k) &
-                        - simhyz(i  ,j,k)*vmac(i  ,j,k)) &
-                        - (dt2/hz)*(simhzy(i  ,j  ,k+1)*wmac(i  ,j  ,k+1) &
-                        - simhzy(i  ,j,k)*wmac(i  ,j,k)) &
-                        - (dt2/hx)*s(i  ,j,k,comp)*(umac(i+1,j,k)-umac(i  ,j,k)) &
-                        + dt2*fr
-                else
-                   ! make sedgelx, sedgerx
-                   fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,1), ppm_trace_forces == 0)
-                   fr = merge(force(i  ,j,k,comp), Ipf(i  ,j,k,1), ppm_trace_forces == 0)
+                      sedgelx = sl(i,j,k,m) &
+                           - (dt2/hy)*(simhyz(i-1,j+1,k  ,m)*vmac(i-1,j+1,k  ) &
+                           - simhyz(i-1,j,k,m)*vmac(i-1,j,k)) &
+                           - (dt2/hz)*(simhzy(i-1,j  ,k+1,m)*wmac(i-1,j  ,k+1) &
+                           - simhzy(i-1,j,k,m)*wmac(i-1,j,k)) &
+                           - (dt2/hx)*s(i-1,j,k,comp)*(umac(i  ,j,k)-umac(i-1,j,k)) &
+                           + dt2*fl
 
-                   sedgelx = sl(i,j,k) &
-                        - (dt4/hy)*(vmac(i-1,j+1,k  )+vmac(i-1,j,k))* &
-                        (simhyz(i-1,j+1,k  )-simhyz(i-1,j,k)) &
-                        - (dt4/hz)*(wmac(i-1,j  ,k+1)+wmac(i-1,j,k))* &
-                        (simhzy(i-1,j  ,k+1)-simhzy(i-1,j,k)) &
-                        + dt2*fl
+                      sedgerx = sr(i,j,k,m) &
+                           - (dt2/hy)*(simhyz(i  ,j+1,k  ,m)*vmac(i  ,j+1,  k) &
+                           - simhyz(i  ,j,k,m)*vmac(i  ,j,k)) &
+                           - (dt2/hz)*(simhzy(i  ,j  ,k+1,m)*wmac(i  ,j  ,k+1) &
+                           - simhzy(i  ,j,k,m)*wmac(i  ,j,k)) &
+                           - (dt2/hx)*s(i  ,j,k,comp)*(umac(i+1,j,k)-umac(i  ,j,k)) &
+                           + dt2*fr
+                   else
+                      ! make sedgelx, sedgerx
+                      fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,m,1), ppm_trace_forces == 0)
+                      fr = merge(force(i  ,j,k,comp), Ipf(i  ,j,k,m,1), ppm_trace_forces == 0)
 
-                   sedgerx = sr(i,j,k) &
-                        - (dt4/hy)*(vmac(i  ,j+1,k  )+vmac(i  ,j,k))* &
-                        (simhyz(i  ,j+1,k  )-simhyz(i  ,j,k)) &
-                        - (dt4/hz)*(wmac(i  ,j  ,k+1)+wmac(i  ,j,k))* &
-                        (simhzy(i  ,j  ,k+1)-simhzy(i  ,j,k)) &
-                        + dt2*fr
-                end if
+                      sedgelx = sl(i,j,k,m) &
+                           - (dt4/hy)*(vmac(i-1,j+1,k  )+vmac(i-1,j,k))* &
+                           (simhyz(i-1,j+1,k  ,m)-simhyz(i-1,j,k,m)) &
+                           - (dt4/hz)*(wmac(i-1,j  ,k+1)+wmac(i-1,j,k))* &
+                           (simhzy(i-1,j  ,k+1,m)-simhzy(i-1,j,k,m)) &
+                           + dt2*fl
 
-                ! make sedgex by solving Riemann problem
-                ! boundary conditions enforced outside of i,j,k loop
-                sedge(i,j,k,comp) = merge(sedgelx,sedgerx,umac(i,j,k) .gt. 0.d0)
-                savg = HALF*(sedgelx+sedgerx)
-                sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(umac(i,j,k)).gt.rel_eps)
+                      sedgerx = sr(i,j,k,m) &
+                           - (dt4/hy)*(vmac(i  ,j+1,k  )+vmac(i  ,j,k))* &
+                           (simhyz(i  ,j+1,k  ,m)-simhyz(i  ,j,k,m)) &
+                           - (dt4/hz)*(wmac(i  ,j  ,k+1)+wmac(i  ,j,k))* &
+                           (simhzy(i  ,j  ,k+1,m)-simhzy(i  ,j,k,m)) &
+                           + dt2*fr
+                   end if
 
-                ! impose lo side bc's
-                if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
-                   if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-                      sedge(i,j,k,comp) = s(i-1,j,k,comp)
-                   else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         sedge(i,j,k,comp) = min(sedgerx,0.d0)
-                      else
+                   ! make sedgex by solving Riemann problem
+                   ! boundary conditions enforced outside of i,j,k loop
+                   sedge(i,j,k,comp) = merge(sedgelx,sedgerx,umac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(sedgelx+sedgerx)
+                   sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(umac(i,j,k)).gt.rel_eps)
+
+                   ! impose lo side bc's
+                   if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+                      if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
+                         sedge(i,j,k,comp) = s(i-1,j,k,comp)
+                      else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 1) then
+                            sedge(i,j,k,comp) = min(sedgerx,0.d0)
+                         else
+                            sedge(i,j,k,comp) = sedgerx
+                         end if
+                      else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
                          sedge(i,j,k,comp) = sedgerx
-                      end if
-                   else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
-                      sedge(i,j,k,comp) = sedgerx
-                   else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-                      sedge(i,j,k,comp) = 0.d0
-                   else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
-#endif
-                   end if
-                end if
-
-                ! impose hi side bc's
-                if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
-                   if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-                      sedge(i,j,k,comp) = s(i,j,k,comp)
-                   else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 1) then
-                         sedge(i,j,k,comp) = max(sedgelx,0.d0)
+                      else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
+                         sedge(i,j,k,comp) = 0.d0
+                      else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
                       else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
+#endif
+                      end if
+                   end if
+
+                   ! impose hi side bc's
+                   if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+                      if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
+                         sedge(i,j,k,comp) = s(i,j,k,comp)
+                      else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 1) then
+                            sedge(i,j,k,comp) = max(sedgelx,0.d0)
+                         else
+                            sedge(i,j,k,comp) = sedgelx
+                         end if
+                      else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
                          sedge(i,j,k,comp) = sedgelx
-                      end if
-                   else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-                      sedge(i,j,k,comp) = sedgelx
-                   else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
-                      sedge(i,j,k,comp) = 0.d0
-                   else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
-                   else
+                      else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
+                         sedge(i,j,k,comp) = 0.d0
+                      else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
+                      else
 #ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,2)")
 #endif
+                      end if
                    end if
-                end if
+                enddo
              enddo
           enddo
-       enddo
 
-    else if (idir == 2) then
+       else if (idir == 2) then
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                ! loop over appropriate y-faces
-                if (is_conservative .eq. 1) then
-                   ! make sedgely, sedgery
-                   fl = merge(force(i,j-1,k,comp), Ipf(i,j-1,k,2), ppm_trace_forces == 0)
-                   fr = merge(force(i,j  ,k,comp), Imf(i,j  ,k,2), ppm_trace_forces == 0)
+                   ! loop over appropriate y-faces
+                   if (is_conservative .eq. 1) then
+                      ! make sedgely, sedgery
+                      fl = merge(force(i,j-1,k,comp), Ipf(i,j-1,k,m,2), ppm_trace_forces == 0)
+                      fr = merge(force(i,j  ,k,comp), Imf(i,j  ,k,m,2), ppm_trace_forces == 0)
 
-                   sedgely = sl(i,j,k) &
-                        - (dt2/hx)*(simhxz(i+1,j-1,k  )*umac(i+1,j-1,k  ) &
-                        - simhxz(i,j-1,k)*umac(i,j-1,k)) &
-                        - (dt2/hz)*(simhzx(i  ,j-1,k+1)*wmac(i  ,j-1,k+1) &
-                        - simhzx(i,j-1,k)*wmac(i,j-1,k)) &
-                        - (dt2/hy)*s(i,j-1,k,comp)*(vmac(i,j  ,k)-vmac(i,j-1,k)) &
-                        + dt2*fl
+                      sedgely = sl(i,j,k,m) &
+                           - (dt2/hx)*(simhxz(i+1,j-1,k  ,m)*umac(i+1,j-1,k  ) &
+                           - simhxz(i,j-1,k,m)*umac(i,j-1,k)) &
+                           - (dt2/hz)*(simhzx(i  ,j-1,k+1,m)*wmac(i  ,j-1,k+1) &
+                           - simhzx(i,j-1,k,m)*wmac(i,j-1,k)) &
+                           - (dt2/hy)*s(i,j-1,k,comp)*(vmac(i,j  ,k)-vmac(i,j-1,k)) &
+                           + dt2*fl
 
-                   sedgery = sr(i,j,k) &
-                        - (dt2/hx)*(simhxz(i+1,j  ,k  )*umac(i+1,j  ,k  ) &
-                        - simhxz(i,j  ,k)*umac(i,j  ,k)) &
-                        - (dt2/hz)*(simhzx(i  ,j  ,k+1)*wmac(i  ,j  ,k+1) &
-                        - simhzx(i,j  ,k)*wmac(i,j  ,k)) &
-                        - (dt2/hy)*s(i,j  ,k,comp)*(vmac(i,j+1,k)-vmac(i,j  ,k)) &
-                        + dt2*fr
-                else
-                   ! make sedgely, sedgery
-                   fl = merge(force(i,j-1,k,comp), Ipf(i,j-1,k,2), ppm_trace_forces == 0)
-                   fr = merge(force(i,j  ,k,comp), Imf(i,j  ,k,2), ppm_trace_forces == 0)
+                      sedgery = sr(i,j,k,m) &
+                           - (dt2/hx)*(simhxz(i+1,j  ,k  ,m)*umac(i+1,j  ,k  ) &
+                           - simhxz(i,j  ,k,m)*umac(i,j  ,k)) &
+                           - (dt2/hz)*(simhzx(i  ,j  ,k+1,m)*wmac(i  ,j  ,k+1) &
+                           - simhzx(i,j  ,k,m)*wmac(i,j  ,k)) &
+                           - (dt2/hy)*s(i,j  ,k,comp)*(vmac(i,j+1,k)-vmac(i,j  ,k)) &
+                           + dt2*fr
+                   else
+                      ! make sedgely, sedgery
+                      fl = merge(force(i,j-1,k,comp), Ipf(i,j-1,k,m,2), ppm_trace_forces == 0)
+                      fr = merge(force(i,j  ,k,comp), Imf(i,j  ,k,m,2), ppm_trace_forces == 0)
 
-                   sedgely = sl(i,j,k) &
-                        - (dt4/hx)*(umac(i+1,j-1,k  )+umac(i,j-1,k))* &
-                        (simhxz(i+1,j-1,k  )-simhxz(i,j-1,k)) &
-                        - (dt4/hz)*(wmac(i  ,j-1,k+1)+wmac(i,j-1,k))* &
-                        (simhzx(i  ,j-1,k+1)-simhzx(i,j-1,k)) &
-                        + dt2*fl
+                      sedgely = sl(i,j,k,m) &
+                           - (dt4/hx)*(umac(i+1,j-1,k  )+umac(i,j-1,k))* &
+                           (simhxz(i+1,j-1,k  ,m)-simhxz(i,j-1,k,m)) &
+                           - (dt4/hz)*(wmac(i  ,j-1,k+1)+wmac(i,j-1,k))* &
+                           (simhzx(i  ,j-1,k+1,m)-simhzx(i,j-1,k,m)) &
+                           + dt2*fl
 
-                   sedgery = sr(i,j,k) &
-                        - (dt4/hx)*(umac(i+1,j  ,k  )+umac(i,j  ,k))* &
-                        (simhxz(i+1,j  ,k  )-simhxz(i,j  ,k)) &
-                        - (dt4/hz)*(wmac(i  ,j  ,k+1)+wmac(i,j  ,k))* &
-                        (simhzx(i  ,j  ,k+1)-simhzx(i,j  ,k)) &
-                        + dt2*fr
-                end if
+                      sedgery = sr(i,j,k,m) &
+                           - (dt4/hx)*(umac(i+1,j  ,k  )+umac(i,j  ,k))* &
+                           (simhxz(i+1,j  ,k  ,m)-simhxz(i,j  ,k,m)) &
+                           - (dt4/hz)*(wmac(i  ,j  ,k+1)+wmac(i,j  ,k))* &
+                           (simhzx(i  ,j  ,k+1,m)-simhzx(i,j  ,k,m)) &
+                           + dt2*fr
+                   end if
 
-                ! make sedgey by solving Riemann problem
-                ! boundary conditions enforced outside of i,j,k loop
-                sedge(i,j,k,comp) = merge(sedgely,sedgery,vmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(sedgely+sedgery)
-                sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(vmac(i,j,k)).gt.rel_eps)
+                   ! make sedgey by solving Riemann problem
+                   ! boundary conditions enforced outside of i,j,k loop
+                   sedge(i,j,k,comp) = merge(sedgely,sedgery,vmac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(sedgely+sedgery)
+                   sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(vmac(i,j,k)).gt.rel_eps)
 
-                ! impose lo side bc's
-                if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
-                   if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-                      sedge(i,j,k,comp) = s(i,j-1,k,comp)
-                   else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         sedge(i,j,k,comp) = min(sedgery,0.d0)
-                      else
+                   ! impose lo side bc's
+                   if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+                      if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
+                         sedge(i,j,k,comp) = s(i,j-1,k,comp)
+                      else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 2) then
+                            sedge(i,j,k,comp) = min(sedgery,0.d0)
+                         else
+                            sedge(i,j,k,comp) = sedgery
+                         end if
+                      else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
                          sedge(i,j,k,comp) = sedgery
-                      end if
-                   else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
-                      sedge(i,j,k,comp) = sedgery
-                   else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
-                      sedge(i,j,k,comp) = 0.d0
-                   else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
-#endif
-                   end if
-                end if
-
-                ! impose hi side bc's
-                if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
-                   if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-                      sedge(i,j,k,comp) = s(i,j,k,comp)
-                   else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 2) then
-                         sedge(i,j,k,comp) = max(sedgely,0.d0)
+                      else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
+                         sedge(i,j,k,comp) = 0.d0
+                      else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
                       else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+#endif
+                      end if
+                   end if
+
+                   ! impose hi side bc's
+                   if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+                      if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
+                         sedge(i,j,k,comp) = s(i,j,k,comp)
+                      else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 2) then
+                            sedge(i,j,k,comp) = max(sedgely,0.d0)
+                         else
+                            sedge(i,j,k,comp) = sedgely
+                         end if
+                      else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
                          sedge(i,j,k,comp) = sedgely
-                      end if
-                   else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
-                      sedge(i,j,k,comp) = sedgely
-                   else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
-                      sedge(i,j,k,comp) = 0.d0
-                   else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
-                   else
+                      else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
+                         sedge(i,j,k,comp) = 0.d0
+                      else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
+                      else
 #ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
 #endif
+                      end if
                    end if
-                end if
+                enddo
              enddo
           enddo
-       enddo
 
-    else ! idir == 3
+       else ! idir == 3
 
-       do k=lo(3),hi(3)
-          do j=lo(2),hi(2)
-             do i=lo(1),hi(1)
+          do k=lo(3),hi(3)
+             do j=lo(2),hi(2)
+                do i=lo(1),hi(1)
 
-                ! loop over appropriate z-faces
-                if (is_conservative .eq. 1) then
-                   ! make sedgelz, sedgerz
-                   fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,3), ppm_trace_forces == 0)
-                   fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,3), ppm_trace_forces == 0)
+                   ! loop over appropriate z-faces
+                   if (is_conservative .eq. 1) then
+                      ! make sedgelz, sedgerz
+                      fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,m,3), ppm_trace_forces == 0)
+                      fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,m,3), ppm_trace_forces == 0)
 
-                   sedgelz = sl(i,j,k) &
-                        - (dt2/hx)*(simhxy(i+1,j  ,k-1)*umac(i+1,j  ,k-1) &
-                        - simhxy(i,j,k-1)*umac(i,j,k-1)) &
-                        - (dt2/hy)*(simhyx(i  ,j+1,k-1)*vmac(i  ,j+1,k-1) &
-                        - simhyx(i,j,k-1)*vmac(i,j,k-1)) &
-                        - (dt2/hz)*s(i,j,k-1,comp)*(wmac(i,j,k  )-wmac(i,j,k-1)) &
-                        + dt2*fl
+                      sedgelz = sl(i,j,k,m) &
+                           - (dt2/hx)*(simhxy(i+1,j  ,k-1,m)*umac(i+1,j  ,k-1) &
+                           - simhxy(i,j,k-1,m)*umac(i,j,k-1)) &
+                           - (dt2/hy)*(simhyx(i  ,j+1,k-1,m)*vmac(i  ,j+1,k-1) &
+                           - simhyx(i,j,k-1,m)*vmac(i,j,k-1)) &
+                           - (dt2/hz)*s(i,j,k-1,comp)*(wmac(i,j,k  )-wmac(i,j,k-1)) &
+                           + dt2*fl
 
-                   sedgerz = sr(i,j,k) &
-                        - (dt2/hx)*(simhxy(i+1,j  ,k  )*umac(i+1,j  ,k  ) &
-                        - simhxy(i,j,k  )*umac(i,j,k  )) &
-                        - (dt2/hy)*(simhyx(i  ,j+1,k  )*vmac(i  ,j+1,k  ) &
-                        - simhyx(i,j,k  )*vmac(i,j,k  )) &
-                        - (dt2/hz)*s(i,j,k  ,comp)*(wmac(i,j,k+1)-wmac(i,j,k  )) &
-                        + dt2*fr
-                else
-                   ! make sedgelz, sedgerz
-                   fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,3), ppm_trace_forces == 0)
-                   fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,3), ppm_trace_forces == 0)
+                      sedgerz = sr(i,j,k,m) &
+                           - (dt2/hx)*(simhxy(i+1,j  ,k  ,m)*umac(i+1,j  ,k  ) &
+                           - simhxy(i,j,k  ,m)*umac(i,j,k  )) &
+                           - (dt2/hy)*(simhyx(i  ,j+1,k  ,m)*vmac(i  ,j+1,k  ) &
+                           - simhyx(i,j,k  ,m)*vmac(i,j,k  )) &
+                           - (dt2/hz)*s(i,j,k  ,comp)*(wmac(i,j,k+1)-wmac(i,j,k  )) &
+                           + dt2*fr
+                   else
+                      ! make sedgelz, sedgerz
+                      fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,m,3), ppm_trace_forces == 0)
+                      fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,m,3), ppm_trace_forces == 0)
 
-                   sedgelz = sl(i,j,k) &
-                        - (dt4/hx)*(umac(i+1,j  ,k-1)+umac(i,j,k-1)) &
-                        *(simhxy(i+1,j  ,k-1)-simhxy(i,j,k-1)) &
-                        - (dt4/hy)*(vmac(i  ,j+1,k-1)+vmac(i,j,k-1)) &
-                        *(simhyx(i  ,j+1,k-1)-simhyx(i,j,k-1)) &
-                        + dt2*fl
+                      sedgelz = sl(i,j,k,m) &
+                           - (dt4/hx)*(umac(i+1,j  ,k-1)+umac(i,j,k-1)) &
+                           *(simhxy(i+1,j  ,k-1,m)-simhxy(i,j,k-1,m)) &
+                           - (dt4/hy)*(vmac(i  ,j+1,k-1)+vmac(i,j,k-1)) &
+                           *(simhyx(i  ,j+1,k-1,m)-simhyx(i,j,k-1,m)) &
+                           + dt2*fl
 
-                   sedgerz = sr(i,j,k) &
-                        - (dt4/hx)*(umac(i+1,j  ,k  )+umac(i,j,k  )) &
-                        *(simhxy(i+1,j  ,k  )-simhxy(i,j,k  )) &
-                        - (dt4/hy)*(vmac(i  ,j+1,k  )+vmac(i,j,k  )) &
-                        *(simhyx(i  ,j+1,k  )-simhyx(i,j,k  )) &
-                        + dt2*fr
-                end if
+                      sedgerz = sr(i,j,k,m) &
+                           - (dt4/hx)*(umac(i+1,j  ,k  )+umac(i,j,k  )) &
+                           *(simhxy(i+1,j  ,k  ,m)-simhxy(i,j,k  ,m)) &
+                           - (dt4/hy)*(vmac(i  ,j+1,k  )+vmac(i,j,k  )) &
+                           *(simhyx(i  ,j+1,k  ,m)-simhyx(i,j,k  ,m)) &
+                           + dt2*fr
+                   end if
 
-                ! make sedgez by solving Riemann problem
-                ! boundary conditions enforced outside of i,j,k loop
-                sedge(i,j,k,comp) = merge(sedgelz,sedgerz,wmac(i,j,k) .gt. 0.d0)
-                savg = HALF*(sedgelz+sedgerz)
-                sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(wmac(i,j,k)).gt.rel_eps)\
+                   ! make sedgez by solving Riemann problem
+                   ! boundary conditions enforced outside of i,j,k loop
+                   sedge(i,j,k,comp) = merge(sedgelz,sedgerz,wmac(i,j,k) .gt. 0.d0)
+                   savg = HALF*(sedgelz+sedgerz)
+                   sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(wmac(i,j,k)).gt.rel_eps)\
 
-                ! impose lo side bc's
-                if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
-                   if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                      sedge(i,j,k,comp) = s(i,j,k-1,comp)
-                   else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 3) then
-                         sedge(i,j,k,comp) = min(sedgerz,0.d0)
-                      else
+                   ! impose lo side bc's
+                   if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+                      if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
+                         sedge(i,j,k,comp) = s(i,j,k-1,comp)
+                      else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 3) then
+                            sedge(i,j,k,comp) = min(sedgerz,0.d0)
+                         else
+                            sedge(i,j,k,comp) = sedgerz
+                         end if
+                      else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
                          sedge(i,j,k,comp) = sedgerz
-                      end if
-                   else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
-                      sedge(i,j,k,comp) = sedgerz
-                   else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
-                      sedge(i,j,k,comp) = 0.d0
-                   else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
-                   else
-#ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
-#endif
-                   end if
-                end if
-
-                ! impose hi side bc's
-                if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
-                   if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
-                      sedge(i,j,k,comp) = s(i,j,k,comp)
-                   else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
-                        adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
-                      if (is_vel .eq. 1 .and. comp .eq. 3) then
-                         sedge(i,j,k,comp) = max(sedgelz,0.d0)
+                      else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
+                         sedge(i,j,k,comp) = 0.d0
+                      else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
                       else
-                         sedge(i,j,k,comp) = sedgelz
-                      end if
-                   else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
-                      sedge(i,j,k,comp) = sedgelz
-                   else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
-                      sedge(i,j,k,comp) = 0.d0
-                   else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
-                   else
 #ifndef AMREX_USE_GPU
-                      call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
 #endif
+                      end if
                    end if
-                end if
+
+                   ! impose hi side bc's
+                   if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+                      if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
+                         sedge(i,j,k,comp) = s(i,j,k,comp)
+                      else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
+                           adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
+                         if (is_vel .eq. 1 .and. comp .eq. 3) then
+                            sedge(i,j,k,comp) = max(sedgelz,0.d0)
+                         else
+                            sedge(i,j,k,comp) = sedgelz
+                         end if
+                      else if (adv_bc(3,2,bccomp) .eq. REFLECT_EVEN) then
+                         sedge(i,j,k,comp) = sedgelz
+                      else if (adv_bc(3,2,bccomp) .eq. REFLECT_ODD) then
+                         sedge(i,j,k,comp) = 0.d0
+                      else if (adv_bc(3,2,bccomp) .eq. INT_DIR) then
+                      else
+#ifndef AMREX_USE_GPU
+                         call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
+#endif
+                      end if
+                   end if
+                enddo
              enddo
           enddo
-       enddo
 
-    end if
+       end if
+
+    end do
 
   end subroutine make_edge_scal_3d
 

@@ -591,14 +591,9 @@ contains
 
     !$gpu
 
-    do n = start_comp,start_comp+ncomp-1
-       bccomp = start_bccomp + n - start_comp
-
-       if (ip_dim > 1) then
-          m = n
-       else
-          m = 1
-       endif
+    do m = 1, ncomp
+       n = start_comp + m-1
+       bccomp = start_bccomp + m-1
 
        !-------------------------------------------------------------------------
        ! x-direction
@@ -1934,14 +1929,9 @@ contains
 
     !$gpu
 
-    do n = start_comp,start_comp+ncomp-1
-       bccomp = start_bccomp + n - start_comp
-
-       if (ip_dim > 1) then
-          m = n
-       else
-          m = 1
-       endif
+    do m = 1, ncomp
+       n = start_comp + m-1
+       bccomp = start_bccomp + m-1
 
        !-------------------------------------------------------------------------
        ! x-direction
