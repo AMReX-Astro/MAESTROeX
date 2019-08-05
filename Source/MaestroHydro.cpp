@@ -1279,14 +1279,14 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         Imf.define(grids[lev],dmap[lev],Nscal*AMREX_SPACEDIM,1);
 
         MultiFab slx, srx, simhx;
-        slx.define(grids[lev],dmap[lev],1,1);
-        srx.define(grids[lev],dmap[lev],1,1);
-        simhx.define(grids[lev],dmap[lev],1,1);
+        slx.define(grids[lev],dmap[lev],Nscal,1);
+        srx.define(grids[lev],dmap[lev],Nscal,1);
+        simhx.define(grids[lev],dmap[lev],Nscal,1);
 
         MultiFab sly, sry, simhy;
-        sly.define(grids[lev],dmap[lev],1,1);
-        sry.define(grids[lev],dmap[lev],1,1);
-        simhy.define(grids[lev],dmap[lev],1,1);
+        sly.define(grids[lev],dmap[lev],Nscal,1);
+        sry.define(grids[lev],dmap[lev],Nscal,1);
+        simhy.define(grids[lev],dmap[lev],Nscal,1);
 
         slx.setVal(0.);
         srx.setVal(0.);
@@ -1403,7 +1403,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                           BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
                           AMREX_INT_ANYD(domainBox.loVect()),
                           AMREX_INT_ANYD(domainBox.hiVect()),
-                          num_comp,start_scomp+1,bc_f,nbccomp,start_bccomp);
+                          num_comp,start_scomp+1,bc_f,nbccomp,start_bccomp+1);
 
                 // y-direction
 #pragma gpu box(obx)
@@ -1414,118 +1414,115 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                           BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
                           AMREX_INT_ANYD(domainBox.loVect()),
                           AMREX_INT_ANYD(domainBox.hiVect()),
-                          num_comp,start_scomp+1,bc_f,nbccomp,start_bccomp);
+                          num_comp,start_scomp+1,bc_f,nbccomp,start_bccomp+1);
 
 
             } else {
 #pragma gpu box(obx)
+                ppm_2d(AMREX_INT_ANYD(obx.loVect()),
+                       AMREX_INT_ANYD(obx.hiVect()),
+                       BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                       scal_mf.nComp(),
+                       BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                       BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                       BL_TO_FORTRAN_ANYD(Ip[mfi]),Nscal,
+                       BL_TO_FORTRAN_ANYD(Im[mfi]),Nscal,
+                       AMREX_INT_ANYD(domainBox.loVect()),
+                       AMREX_INT_ANYD(domainBox.hiVect()),
+                       bc_f, AMREX_REAL_ANYD(dx), dt, true,
+                       start_scomp+1,num_comp,start_bccomp+1,nbccomp);
+
+                if (ppm_trace_forces == 1) {
+#pragma gpu box(obx)
                     ppm_2d(AMREX_INT_ANYD(obx.loVect()),
                            AMREX_INT_ANYD(obx.hiVect()),
-                           BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                           scal_mf.nComp(),
+                           BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+                           force_mf.nComp(),
                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(Ip[mfi]),Nscal,
-                           BL_TO_FORTRAN_ANYD(Im[mfi]),Nscal,
+                           BL_TO_FORTRAN_ANYD(Ipf[mfi]),Nscal,
+                           BL_TO_FORTRAN_ANYD(Imf[mfi]),Nscal,
                            AMREX_INT_ANYD(domainBox.loVect()),
                            AMREX_INT_ANYD(domainBox.hiVect()),
                            bc_f, AMREX_REAL_ANYD(dx), dt, true,
-                           start_scomp+1,num_comp,start_bccomp,nbccomp);
-
-                    if (ppm_trace_forces == 1) {
-#pragma gpu box(obx)
-                        ppm_2d(AMREX_INT_ANYD(obx.loVect()),
-                               AMREX_INT_ANYD(obx.hiVect()),
-                               BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-                               force_mf.nComp(),
-                               BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(Ipf[mfi]),Nscal,
-                               BL_TO_FORTRAN_ANYD(Imf[mfi]),Nscal,
-                               AMREX_INT_ANYD(domainBox.loVect()),
-                               AMREX_INT_ANYD(domainBox.hiVect()),
-                               bc_f, AMREX_REAL_ANYD(dx), dt, true,
-                               start_scomp+1,num_comp,start_bccomp,nbccomp);
+                           start_scomp+1,num_comp,start_bccomp+1,nbccomp);
                 }
             }
 
-            for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
 
-                int bccomp = start_bccomp + scomp - start_scomp;
-
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-
-                // x-direction
+            // x-direction
 #pragma gpu box(mxbx)
-                make_edge_scal_predictor_2d(
-                    AMREX_INT_ANYD(mxbx.loVect()), AMREX_INT_ANYD(mxbx.hiVect()), 1,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ip[mfi]), Ip.nComp(),
-                    BL_TO_FORTRAN_ANYD(Im[mfi]), Im.nComp(),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp);
+            make_edge_scal_predictor_2d(
+                AMREX_INT_ANYD(mxbx.loVect()), AMREX_INT_ANYD(mxbx.hiVect()), 1,
+                AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                BL_TO_FORTRAN_ANYD(Ip[mfi]), Ip.nComp(),
+                BL_TO_FORTRAN_ANYD(Im[mfi]), Im.nComp(),
+                BL_TO_FORTRAN_ANYD(slx[mfi]), slx.nComp(),
+                BL_TO_FORTRAN_ANYD(srx[mfi]), srx.nComp(),
+                BL_TO_FORTRAN_ANYD(simhx[mfi]), simhx.nComp(),
+                AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                nbccomp, num_comp, start_scomp+1, start_bccomp+1);
 
-                // y-direction
+            // y-direction
 #pragma gpu box(mybx)
-                make_edge_scal_predictor_2d(
-                    AMREX_INT_ANYD(mybx.loVect()), AMREX_INT_ANYD(mybx.hiVect()), 2,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ip[mfi]), Ip.nComp(),
-                    BL_TO_FORTRAN_ANYD(Im[mfi]), Im.nComp(),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp);
+            make_edge_scal_predictor_2d(
+                AMREX_INT_ANYD(mybx.loVect()), AMREX_INT_ANYD(mybx.hiVect()), 2,
+                AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                BL_TO_FORTRAN_ANYD(Ip[mfi]), Ip.nComp(),
+                BL_TO_FORTRAN_ANYD(Im[mfi]), Im.nComp(),
+                BL_TO_FORTRAN_ANYD(sly[mfi]), sly.nComp(),
+                BL_TO_FORTRAN_ANYD(sry[mfi]), sry.nComp(),
+                BL_TO_FORTRAN_ANYD(simhy[mfi]), simhy.nComp(),
+                AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                nbccomp, num_comp, start_scomp+1, start_bccomp+1);
 
-                // x-direction
+            // NOTE: make sure that simh here is the tangential direction
+            // to sl/sr
+            // x-direction
 #pragma gpu box(xbx)
-                make_edge_scal_2d(
-                    AMREX_INT_ANYD(xbx.loVect()), AMREX_INT_ANYD(xbx.hiVect()),1,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
-                    BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Imf[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp, is_conservative);
+            make_edge_scal_2d(
+                AMREX_INT_ANYD(xbx.loVect()), AMREX_INT_ANYD(xbx.hiVect()),1,
+                AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+                BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+                BL_TO_FORTRAN_ANYD(Imf[mfi]),
+                BL_TO_FORTRAN_ANYD(slx[mfi]), slx.nComp(),
+                BL_TO_FORTRAN_ANYD(srx[mfi]), srx.nComp(),
+                BL_TO_FORTRAN_ANYD(simhy[mfi]), simhy.nComp(),
+                BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
+                AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                nbccomp, num_comp, start_scomp+1, start_bccomp+1, is_conservative);
 
-                // y-direction
+            // y-direction
 #pragma gpu box(ybx)
-                make_edge_scal_2d(
-                    AMREX_INT_ANYD(ybx.loVect()), AMREX_INT_ANYD(ybx.hiVect()),2,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
-                    BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Imf[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp, is_conservative);
-            } // end loop over components
+            make_edge_scal_2d(
+                AMREX_INT_ANYD(ybx.loVect()), AMREX_INT_ANYD(ybx.hiVect()),2,
+                AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+                BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+                BL_TO_FORTRAN_ANYD(Imf[mfi]),
+                BL_TO_FORTRAN_ANYD(sly[mfi]), sly.nComp(),
+                BL_TO_FORTRAN_ANYD(sry[mfi]), sry.nComp(),
+                BL_TO_FORTRAN_ANYD(simhx[mfi]), simhx.nComp(),
+                BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
+                AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                nbccomp, num_comp, start_scomp+1, start_bccomp+1, is_conservative);
         } // end MFIter loop
 
 #ifdef AMREX_USE_CUDA
@@ -1606,35 +1603,35 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 
                 // Be careful to pass in comp+1 for fortran indexing
 #pragma gpu box(obx)
+                ppm_3d(AMREX_INT_ANYD(obx.loVect()),
+                       AMREX_INT_ANYD(obx.hiVect()),
+                       BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                       scal_mf.nComp(),
+                       BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                       BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                       BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                       BL_TO_FORTRAN_ANYD(Ip[mfi]),Nscal,
+                       BL_TO_FORTRAN_ANYD(Im[mfi]),Nscal,
+                       AMREX_INT_ANYD(domainBox.loVect()),
+                       AMREX_INT_ANYD(domainBox.hiVect()),
+                       bc_f, AMREX_REAL_ANYD(dx), dt, true,
+                       start_scomp+1,num_comp,start_bccomp,nbccomp);
+
+                if (ppm_trace_forces == 1) {
+#pragma gpu box(obx)
                     ppm_3d(AMREX_INT_ANYD(obx.loVect()),
                            AMREX_INT_ANYD(obx.hiVect()),
-                           BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                           scal_mf.nComp(),
+                           BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+                           force_mf.nComp(),
                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
                            BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(Ip[mfi]),Nscal,
-                           BL_TO_FORTRAN_ANYD(Im[mfi]),Nscal,
+                           BL_TO_FORTRAN_ANYD(Ipf[mfi]),Nscal,
+                           BL_TO_FORTRAN_ANYD(Imf[mfi]),Nscal,
                            AMREX_INT_ANYD(domainBox.loVect()),
                            AMREX_INT_ANYD(domainBox.hiVect()),
                            bc_f, AMREX_REAL_ANYD(dx), dt, true,
                            start_scomp+1,num_comp,start_bccomp,nbccomp);
-
-                    if (ppm_trace_forces == 1) {
-#pragma gpu box(obx)
-                        ppm_3d(AMREX_INT_ANYD(obx.loVect()),
-                               AMREX_INT_ANYD(obx.hiVect()),
-                               BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-                               force_mf.nComp(),
-                               BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(Ipf[mfi]),Nscal,
-                               BL_TO_FORTRAN_ANYD(Imf[mfi]),Nscal,
-                               AMREX_INT_ANYD(domainBox.loVect()),
-                               AMREX_INT_ANYD(domainBox.hiVect()),
-                               bc_f, AMREX_REAL_ANYD(dx), dt, true,
-                               start_scomp+1,num_comp,start_bccomp,nbccomp);
                 }
             }
         }

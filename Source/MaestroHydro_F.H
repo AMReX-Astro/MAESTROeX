@@ -34,26 +34,26 @@ extern "C"
                     const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
                     const amrex::Real* Ip, const int* ip_lo, const int* ip_hi, const int ip_dim,
                     const amrex::Real* Im, const int* im_lo, const int* im_hi, const int im_dim,
-                    amrex::Real* sl, const int* sl_lo, const int* sl_hi,
-                    amrex::Real* sr, const int* sr_lo, const int* sr_hi,
-                    amrex::Real* simh, const int* si_lo, const int* si_hi,
+                    amrex::Real* sl, const int* sl_lo, const int* sl_hi, const int nc_sl,
+                    amrex::Real* sr, const int* sr_lo, const int* sr_hi, const int nc_sr,
+                    amrex::Real* simh, const int* si_lo, const int* si_hi, const int nc_si,
                     const amrex::Real* dx, const amrex::Real dt, const int is_vel,
-                    const int* adv_bc, const int nbccomp, const int comp, const int bccomps);
+                    const int* adv_bc, const int nbccomp, const int ncomp, const int start_comp, const int start_bccomp);
 
     void make_edge_scal_2d(const int* lo, const int* hi, const int idir,
                       const int* domlo, const int* domhi,
-                    const amrex::Real* s,      const int* s_lo, const int* s_hi, const int nc_s, int ng_s,
+                    const amrex::Real* s,      const int* s_lo, const int* s_hi, const int nc_s,
                           amrex::Real* sedge, const int* x_lo, const int* x_hi, const int nc_x,
                     const amrex::Real* umac,   const int* u_lo, const int* u_hi,
                     const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
                     const amrex::Real* Ipf, const int* ipf_lo, const int* ipf_hi,
                     const amrex::Real* Imf, const int* imf_lo, const int* imf_hi,
-                    const amrex::Real* sl, const int* sl_lo, const int* sl_hi,
-                    const amrex::Real* sr, const int* sr_lo, const int* sr_hi,
-                    const amrex::Real* simh, const int* si_lo, const int* si_hi,
+                    const amrex::Real* sl, const int* sl_lo, const int* sl_hi, const int nc_sl,
+                    const amrex::Real* sr, const int* sr_lo, const int* sr_hi, const int nc_sr,
+                    const amrex::Real* simh, const int* si_lo, const int* si_hi, const int nc_si,
                     const amrex::Real* force,  const int* f_lo, const int* f_hi, const int nc_f,
                     const amrex::Real* dx, const amrex::Real dt, const int is_vel,
-                    const int* adv_bc, const int nbccomp, const int comp, const int bccomp,
+                    const int* adv_bc, const int nbccomp, const int ncomp, const int start_comp, const int start_bccomp,
                     const int is_conservative);
 
 #elif (AMREX_SPACEDIM == 3)
