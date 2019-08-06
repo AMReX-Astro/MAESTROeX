@@ -52,6 +52,8 @@ maestro.grav_const = -1.5e10
 maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
+maestro.use_delta_gamma1_term = false
+
 maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 10.e0
