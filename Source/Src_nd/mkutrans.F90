@@ -2,7 +2,7 @@
 #include "AMReX_BC_TYPES.H"
 
 module mkutrans_module
-  
+
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
@@ -16,134 +16,6 @@ module mkutrans_module
   private
 
 contains
-
-#if (AMREX_SPACEDIM == 1)
-  subroutine mkutrans_1d(lev, domlo, domhi, lo, hi, &
-       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
-       utrans, uu_lo, uu_hi, &
-       w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_1d")
-
-    integer         , intent(in   ) :: lev, domlo(1), domhi(1), lo(1), hi(1)
-    integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut
-    integer, value  , intent(in   ) :: ng_ut
-    integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
-    integer, value  , intent(in   ) :: ng_uf
-    integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
-    double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
-    double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),nc_uf)
-    double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1))
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: dx(1), dt
-    integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
-
-    double precision, pointer :: slopex(:,:)
-
-    double precision, pointer :: Ip(:)
-    double precision, pointer :: Im(:)
-
-    double precision, pointer :: ulx(:),urx(:)
-
-    double precision hx,dt2,uavg
-
-    integer :: i,is,ie
-
-    logical :: test
-
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1,1)
-
-    call bl_allocate(ulx,lo(1),hi(1)+1)
-    call bl_allocate(urx,lo(1),hi(1)+1)
-
-    call bl_allocate(Ip,lo(1)-1,hi(1)+1)
-    call bl_allocate(Im,lo(1)-1,hi(1)+1)
-
-    is = lo(1)
-    ie = hi(1)
-
-    dt2 = HALF*dt
-
-    hx = dx(1)
-
-    if (ppm_type .eq. 0) then
-       call slopex_1d(utilde(:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_1d(utilde(:,1),ng_ut,ufull(:,1),ng_uf,Ip,Im, &
-            domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-    end if
-
-
-    !******************************************************************
-    ! create utrans
-    !******************************************************************
-
-    if (ppm_type .eq. 0) then
-       do i=is,ie+1
-          ! extrapolate to edges
-          ulx(i) = utilde(i-1,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,1)))*slopex(i-1,1)
-          urx(i) = utilde(i  ,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,1)))*slopex(i  ,1)
-       end do
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       do i=is,ie+1
-          ! extrapolate to edges
-          ulx(i) = Ip(i-1)
-          urx(i) = Im(i  )
-       end do
-    end if
-
-    ! impose lo i side bc's
-    if (lo(1) .eq. domlo(1)) then
-       select case(phys_bc(1,1))
-       case (Inflow)
-          ulx(is) = utilde(is-1,1)
-          urx(is) = utilde(is-1,1)
-       case (SlipWall, NoSlipWall, Symmetry)
-          ulx(is) = ZERO
-          urx(is) = ZERO
-       case (Outflow)
-          ulx(is) = min(urx(is),ZERO)
-          urx(is) = ulx(is)
-       case (Interior)
-       case  default
-          call amrex_error("mkutrans_1d: invalid boundary type phys_bc(1,1)")
-       end select
-    end if
-
-    ! impose hi i side bc's
-    if (hi(1) .eq. domhi(1)) then
-       select case(phys_bc(1,2))
-       case (Inflow)
-          ulx(ie+1) = utilde(ie+1,1)
-          urx(ie+1) = utilde(ie+1,1)
-       case (SlipWall, NoSlipWall, Symmetry)
-          ulx(ie+1) = ZERO
-          urx(ie+1) = ZERO
-       case (Outflow)
-          ulx(ie+1) = max(ulx(ie+1),ZERO)
-          urx(ie+1) = ulx(ie+1)
-       case (Interior)
-       case  default
-          call amrex_error("mkutrans_1d: invalid boundary type phys_bc(1,2)")
-       end select
-    end if
-
-    do i=is,ie+1
-       ! solve Riemann problem using full velocity
-       uavg = HALF*(ulx(i)+urx(i))
-       test = ((ulx(i)+w0(lev,i) .le. ZERO .and. urx(i)+w0(lev,i) .ge. ZERO) .or. &
-            (abs(ulx(i)+urx(i)+TWO*w0(lev,i)) .lt. rel_eps))
-       utrans(i) = merge(ulx(i),urx(i),uavg+w0(lev,i) .gt. ZERO)
-       utrans(i) = merge(ZERO,utrans(i),test)
-    end do
-
-    call bl_deallocate(slopex)
-    call bl_deallocate(Ip)
-    call bl_deallocate(Im)
-    call bl_deallocate(ulx)
-    call bl_deallocate(urx)
-
-  end subroutine mkutrans_1d
-#endif
 
 #if (AMREX_SPACEDIM == 2)
   subroutine mkutrans_2d(lev, domlo, domhi, lo, hi, &

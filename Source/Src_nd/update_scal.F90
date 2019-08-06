@@ -18,9 +18,7 @@ contains
                          sold,   so_lo, so_hi, &
                          snew,   sn_lo, sn_hi, &
                          sfluxx, x_lo, x_hi, &
-#if (AMREX_SPACEDIM >= 2)
                          sfluxy, y_lo, y_hi, &
-#endif
 #if (AMREX_SPACEDIM == 3)
                          sfluxz, z_lo, z_hi, &
 #endif
@@ -35,10 +33,8 @@ contains
     double precision, intent(inout) :: snew  (sn_lo(1):sn_hi(1),sn_lo(2):sn_hi(2),sn_lo(3):sn_hi(3),nscal)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     double precision, intent(in   ) :: sfluxx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nscal)
-#if (AMREX_SPACEDIM >= 2)
     integer         , intent(in   ) :: y_lo(3), y_hi(3)
     double precision, intent(in   ) :: sfluxy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nscal)
-#endif
 #if (AMREX_SPACEDIM == 3)
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
     double precision, intent(in   ) :: sfluxz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nscal)
@@ -63,10 +59,8 @@ contains
              do i = lo(1), hi(1)
 
                 divterm = (sfluxx(i+1,j,k,comp) - sfluxx(i,j,k,comp))/dx(1)
-#if (AMREX_SPACEDIM >= 2)
                 divterm = divterm &
                      + (sfluxy(i,j+1,k,comp) - sfluxy(i,j,k,comp))/dx(2)
-#endif
 #if (AMREX_SPACEDIM == 3)
                 divterm = divterm &
                      + (sfluxz(i,j,k+1,comp) - sfluxz(i,j,k,comp))/dx(3)
@@ -134,9 +128,7 @@ contains
                          sold,   so_lo, so_hi, &
                          snew,   sn_lo, sn_hi, &
                          sfluxx, x_lo, x_hi, &
-#if (AMREX_SPACEDIM >= 2)
                          sfluxy, y_lo, y_hi, &
-#endif
 #if (AMREX_SPACEDIM == 3)
                          sfluxz, z_lo, z_hi, &
 #endif
@@ -153,10 +145,8 @@ contains
     double precision, intent(inout) :: snew  (sn_lo(1):sn_hi(1),sn_lo(2):sn_hi(2),sn_lo(3):sn_hi(3),nscal)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     double precision, intent(in   ) :: sfluxx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nscal)
-#if (AMREX_SPACEDIM >= 2)
     integer         , intent(in   ) :: y_lo(3), y_hi(3)
     double precision, intent(in   ) :: sfluxy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nscal)
-#endif
 #if (AMREX_SPACEDIM == 3)
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
     double precision, intent(in   ) :: sfluxz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nscal)
@@ -182,9 +172,7 @@ contains
           do i=lo(1),hi(1)
 
              divterm = ((sfluxx(i+1,j,k,rhoh_comp) - sfluxx(i,j,k,rhoh_comp))/dx(1) &
-#if (AMREX_SPACEDIM >= 2)
                   + (sfluxy(i,j+1,k,rhoh_comp) - sfluxy(i,j,k,rhoh_comp))/dx(2) &
-#endif
 #if (AMREX_SPACEDIM == 3)
                   + (sfluxz(i,j,k+1,rhoh_comp) - sfluxz(i,j,k,rhoh_comp))/dx(3) &
 #endif
@@ -199,9 +187,7 @@ contains
        do k = lo(3), hi(3)
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
-#if (AMREX_SPACEDIM == 1)
-                r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                 r = j
 #else
                 r = k

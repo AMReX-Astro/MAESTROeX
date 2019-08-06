@@ -20,159 +20,6 @@ module velpred_module
 
 contains
 
-#if (AMREX_SPACEDIM == 1)
-  subroutine velpred_1d(lev, domlo, domhi, lo, hi, &
-       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
-       umac,   uu_lo, uu_hi, &
-       force,   f_lo,  f_hi, nc_f, ng_f, &
-       w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_1d")
-
-    integer         , intent(in   ) :: lev, domlo(1), domhi(1), lo(1), hi(1)
-    integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut
-    integer, value,   intent(in   ) :: ng_ut
-    integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
-    integer, value,   intent(in   ) :: ng_uf
-    integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
-    integer         , intent(in   ) ::  f_lo(1),  f_hi(1), nc_f
-    integer, value,   intent(in   ) :: ng_f
-    double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
-    double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),nc_uf)
-    double precision, intent(inout) :: umac(uu_lo(1):uu_hi(1))
-    double precision, intent(in   ) :: force ( f_lo(1): f_hi(1),nc_f)
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: dx(1), dt
-    integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
-
-    ! Local variables
-    double precision, pointer :: slopex(:,:)
-
-    double precision, pointer :: Ipu(:), Ipf(:)
-    double precision, pointer :: Imu(:), Imf(:)
-
-    ! these correspond to umac_L, etc.
-    double precision, pointer :: umacl(:),umacr(:)
-
-    double precision :: hx, dt2, dt4, uavg
-
-    integer :: i,is,ie
-
-    logical :: test
-
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,1,1)
-
-    call bl_allocate(Ipu,lo(1)-1,hi(1)+1)
-    call bl_allocate(Imu,lo(1)-1,hi(1)+1)
-
-    call bl_allocate(Ipf,lo(1)-1,hi(1)+1)
-    call bl_allocate(Imf,lo(1)-1,hi(1)+1)
-
-    call bl_allocate(umacl,lo(1),hi(1)+1)
-    call bl_allocate(umacr,lo(1),hi(1)+1)
-
-    is = lo(1)
-    ie = hi(1)
-
-    dt2 = HALF*dt
-    dt4 = dt/4.0d0
-
-    hx = dx(1)
-
-    if (ppm_type .eq. 0) then
-       call slopex_1d(utilde,slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc)
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_1d(utilde(:,1),ng_ut,ufull(:,1),ng_uf,Ipu,Imu, &
-            domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-       if (ppm_trace_forces .eq. 1) then
-          call ppm_1d(force(:,1),ng_f,ufull(:,1),ng_uf,Ipf,Imf, &
-               domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-       endif
-    end if
-
-    !******************************************************************
-    ! Create umac
-    !******************************************************************
-
-    if (ppm_type .eq. 0) then
-       do i=is,ie+1
-          ! extrapolate velocity to left face
-          umacl(i) = utilde(i-1,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,1)))*slopex(i-1,1) &
-               + dt2*force(i-1,1)
-          ! extrapolate velocity to right face
-          umacr(i) = utilde(i  ,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,1)))*slopex(i  ,1) &
-               + dt2*force(i,1)
-       end do
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       if (ppm_trace_forces .eq. 0) then
-          do i=is,ie+1
-             ! extrapolate velocity to left face
-             umacl(i) = Ipu(i-1) + dt2*force(i-1,1)
-             ! extrapolate velocity to right face
-             umacr(i) = Imu(i  ) + dt2*force(i  ,1)
-          end do
-       else
-          do i=is,ie+1
-             ! extrapolate velocity to left face
-             umacl(i) = Ipu(i-1) + dt2*Ipf(i-1)
-             ! extrapolate velocity to right face
-             umacr(i) = Imu(i  ) + dt2*Imf(i  )
-          end do
-       endif
-    end if
-
-    do i=is,ie+1
-       ! solve Riemann problem using full velocity
-       uavg = HALF*(umacl(i)+umacr(i))
-       test = ((umacl(i)+w0(lev,i) .le. ZERO .and. umacr(i)+w0(lev,i) .ge. ZERO) .or. &
-            (abs(umacl(i)+umacr(i)+TWO*w0(lev,i)) .lt. rel_eps))
-       umac(i) = merge(umacl(i),umacr(i),uavg+w0(lev,i) .gt. ZERO)
-       umac(i) = merge(ZERO,umac(i),test)
-    enddo
-
-    ! impose lo side bc's
-    if (lo(1) .eq. domlo(1)) then
-       select case(phys_bc(1,1))
-       case (Inflow)
-          umac(is) = utilde(is-1,1)
-       case (SlipWall, NoSlipWall, Symmetry)
-          umac(is) = ZERO
-       case (Outflow)
-          umac(is) = min(umacr(is),ZERO)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_1d: invalid boundary type phys_bc(1,1)")
-       end select
-    end if
-
-    ! impose hi side bc's
-    if (hi(1) .eq. domhi(1)) then
-       select case(phys_bc(1,2))
-       case (Inflow)
-          umac(ie+1) = utilde(ie+1,1)
-       case (SlipWall, NoSlipWall, Symmetry)
-          umac(ie+1) = ZERO
-       case (Outflow)
-          umac(ie+1) = max(umacl(ie+1),ZERO)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_1d: invalid boundary type phys_bc(1,2)")
-       end select
-    end if
-
-    call bl_deallocate(slopex)
-
-    call bl_deallocate(Ipu)
-    call bl_deallocate(Imu)
-
-    call bl_deallocate(Ipf)
-    call bl_deallocate(Imf)
-
-    call bl_deallocate(umacl)
-    call bl_deallocate(umacr)
-
-  end subroutine velpred_1d
-#endif
-
 #if (AMREX_SPACEDIM == 2)
   subroutine velpred_2d(lev, domlo, domhi, lo, hi, &
        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
@@ -1150,7 +997,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     ! impose lo side bc's
     if (lo(2) .eq. domlo(2)) then
        select case(phys_bc(2,1))
@@ -1184,7 +1031,7 @@ contains
           call amrex_error("velpred_3d: invalid boundary type phys_bc(2,2)")
        end select
     end if
-    
+
     !$OMP PARALLEL DO PRIVATE(i,j,k,uavg)
     do k=ks,ke
        do j=js,je+1
@@ -1197,7 +1044,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(ulyz)
     call bl_deallocate(uryz)
 
@@ -1223,7 +1070,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
        select case(phys_bc(3,1))
@@ -1270,7 +1117,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(ulzy)
     call bl_deallocate(urzy)
 
@@ -1295,7 +1142,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(uimhz)
 
     ! impose lo side bc's
@@ -1346,7 +1193,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(vlxz)
     call bl_deallocate(vrxz)
 
@@ -1372,7 +1219,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     ! impose lo side bc's
     if (lo(3) .eq. domlo(3)) then
        select case(phys_bc(3,1))
@@ -1419,7 +1266,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(vlzx)
     call bl_deallocate(vrzx)
 
@@ -1444,7 +1291,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(uimhy)
 
     ! impose lo side bc's
@@ -1495,7 +1342,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(wlxy)
     call bl_deallocate(wrxy)
 
@@ -1520,7 +1367,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(uimhx)
 
     ! impose lo side bc's
@@ -1571,7 +1418,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(wlyx)
     call bl_deallocate(wryx)
 
@@ -1610,7 +1457,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(ulx)
     call bl_deallocate(urx)
     call bl_deallocate(uimhyz)
@@ -1633,7 +1480,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     else
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
@@ -1650,7 +1497,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     end if
 
     ! impose lo side bc's
@@ -1717,7 +1564,7 @@ contains
        enddo
     enddo
     !$OMP END PARALLEL DO
-    
+
     call bl_deallocate(uly)
     call bl_deallocate(ury)
     call bl_deallocate(vimhxz)
@@ -1740,7 +1587,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     else
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)
@@ -1757,7 +1604,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     end if
 
     ! impose lo side bc's
@@ -1847,7 +1694,7 @@ contains
           enddo
        enddo
        !$OMP END PARALLEL DO
-       
+
     else
 
        !$OMP PARALLEL DO PRIVATE(i,j,k,uavg,test)

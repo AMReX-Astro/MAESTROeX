@@ -23,9 +23,7 @@ contains
     ! local
     integer          :: j,k
 
-    if (amrex_spacedim .eq. 1) then
-       phisum(lev,0:nr_fine-1) = sum(phi(lo(1):hi(1),0,0));
-    else if (amrex_spacedim .eq. 2) then
+    if (amrex_spacedim .eq. 2) then
        do j=lo(2),hi(2)
           phisum(lev,j) = phisum(lev,j) + sum(phi(lo(1):hi(1),j,0))
        end do

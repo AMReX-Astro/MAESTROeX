@@ -12,9 +12,7 @@ contains
 
   subroutine mkrhohforce(lo, hi, lev, &
        rhoh_force, f_lo, f_hi, &
-#if (AMREX_SPACEDIM == 1)
-       umac, u_lo, u_hi, &
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
        vmac, v_lo, v_hi, &
 #elif (AMREX_SPACEDIM == 3)
        wmac, w_lo, w_hi, &
@@ -30,10 +28,7 @@ contains
     integer  , value, intent(in   ) :: lev
     integer         , intent(in   ) :: f_lo(3), f_hi(3)
     double precision, intent(inout) :: rhoh_force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3))
-#if (AMREX_SPACEDIM == 1)
-    integer         , intent(in   ) :: u_lo(3), u_hi(3)
-    double precision, intent(in   ) :: umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     double precision, intent(in   ) :: vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
 #elif (AMREX_SPACEDIM == 3)
@@ -65,25 +60,7 @@ contains
     !
     ! Add wtilde d(p0)/dr
     !
-#if (AMREX_SPACEDIM == 1)
-    j = 0
-    k = 0
-    do i = lo(1),hi(1)
-
-       if (i .lt. base_cutoff_density_coord(lev)) then
-          gradp0 = rho0(lev,i) * grav(lev,i)
-       else if (i.eq.nr(lev)-1) then
-          ! NOTE: this should be zero since p0 is constant up here
-          gradp0 = ( p0(lev,i) - p0(lev,i-1) ) / dr(lev)
-       else
-          ! NOTE: this should be zero since p0 is constant up here
-          gradp0 = ( p0(lev,i+1) - p0(lev,i) ) / dr(lev)
-       end if
-
-       veladv = 0.5d0*(umac(i,j,k)+umac(i+1,j,k))
-       rhoh_force(i,j,k) = veladv * gradp0
-    enddo
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     k = 0
     do j = lo(2),hi(2)
 
@@ -143,9 +120,6 @@ contains
              r = j
 #endif
              do i = lo(1),hi(1)
-#if (AMREX_SPACEDIM == 1)
-                r = i
-#endif
                 rhoh_force(i,j,k) = rhoh_force(i,j,k) + psi(lev,r)
              end do
           end do
@@ -275,11 +249,9 @@ contains
        force, f_lo, f_hi, &
        scal,  s_lo, s_hi, &
        umac,  u_lo, u_hi, &
-#if (AMREX_SPACEDIM >= 2)
        vmac,  v_lo, v_hi, &
 #if (AMREX_SPACEDIM == 3)
        wmac,  w_lo, w_hi, &
-#endif
 #endif
        s0, s0_edge, w0, dx, do_fullform) &
        bind(C,name="modify_scal_force")
@@ -289,20 +261,16 @@ contains
     integer         , intent(in   ) :: f_lo(3), f_hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
-#if (AMREX_SPACEDIM >= 2)
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
 #if (AMREX_SPACEDIM == 3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
 #endif
-#endif
     double precision, intent(inout) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3))
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent(in   ) :: umac (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-#if (AMREX_SPACEDIM >= 2)
     double precision, intent(in   ) :: vmac (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
 #if (AMREX_SPACEDIM == 3)
     double precision, intent(in   ) :: wmac (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-#endif
 #endif
     double precision, intent(in   ) :: s0     (0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: s0_edge(0:max_radial_level,0:nr_fine)
@@ -321,10 +289,7 @@ contains
           do i = lo(1),hi(1)
 
              ! umac does not contain w0
-#if (AMREX_SPACEDIM == 1)
-             r = i
-             divu = (umac(i+1,j,k) - umac(i,j,k)) / dx(1)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
              divu = (umac(i+1,j,k) - umac(i,j,k)) / dx(1) &
                   +(vmac(i,j+1,k) - vmac(i,j,k)) / dx(2)
@@ -342,10 +307,7 @@ contains
                 force(i,j,k) = force(i,j,k) - scal(i,j,k)*divu
              else
 
-#if (AMREX_SPACEDIM == 1)
-                divs0u = (umac(i+1,j,k) * s0_edge(lev,i+1) - &
-                     umac(i  ,j,k) * s0_edge(lev,i  ) )/ dx(1)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                 divs0u = s0(lev,j)*(  umac(i+1,j,k) - umac(i,j,k))/dx(1) &
                      +(vmac(i,j+1,k) * s0_edge(lev,j+1) - &
                      vmac(i,j  ,k) * s0_edge(lev,j  ) )/ dx(2)
