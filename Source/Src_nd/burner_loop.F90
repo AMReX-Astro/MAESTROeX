@@ -94,9 +94,7 @@ contains
                 enddo
 
                 if (drive_initial_convection) then
-#if (AMREX_SPACEDIM == 1)
-                   r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                    r = j
 #elif (AMREX_SPACEDIM == 3)
                    r = k

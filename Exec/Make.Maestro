@@ -31,6 +31,10 @@ DEFINES += -DEXTRA_THERMO
 
 USE_MG = FALSE
 
+ifeq ($(DIM), 1)
+    $(error MAESTROeX requires DIM >= 2)
+endif
+
 #------------------------------------------------------------------------------
 # Maestro directories
 #------------------------------------------------------------------------------
@@ -192,7 +196,7 @@ ifdef USE_CUDA
   ifeq ($(USE_CUDA), TRUE)
     USE_GPU_PRAGMA = TRUE
     MANAGED_PROBIN_FLAG := --managed
-    DEFINES += -DCUDA 
+    DEFINES += -DCUDA
   endif
 endif
 

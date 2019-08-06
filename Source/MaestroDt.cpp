@@ -19,7 +19,7 @@ Maestro::EstDt ()
     // turn on GPU
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
-    
+
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
@@ -39,10 +39,8 @@ Maestro::EstDt ()
     for (int lev=0; lev<=finest_level; ++lev) {
         umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
         umac_dummy[lev][0].setVal(0.);
-#if (AMREX_SPACEDIM >= 2)
         umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         umac_dummy[lev][1].setVal(0.);
-#endif
 #if (AMREX_SPACEDIM == 3)
         umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
         umac_dummy[lev][2].setVal(0.);
@@ -56,9 +54,7 @@ Maestro::EstDt ()
         // initialize
         for (int lev=0; lev<=finest_level; ++lev) {
             w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-#if (AMREX_SPACEDIM >= 2)
             w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#endif
 #if (AMREX_SPACEDIM == 3)
             w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
@@ -97,17 +93,17 @@ Maestro::EstDt ()
     std::fill(gp0.begin(),gp0.end(), 0.);
 
     // divU constraint
-    estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(), 
+    estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
 	       r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
 
     Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
 #endif
-    
+
     Real umax = 0.;
 
     Real dt_lev = 1.e99;
     Real umax_lev = 0.;
-	
+
     for (int lev = 0; lev <= finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -128,7 +124,7 @@ Maestro::EstDt ()
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
 	{
-	    
+
         Real dt_grid = 1.e99;
 	Real umax_grid = 0.;
 
@@ -174,18 +170,18 @@ Maestro::EstDt ()
 			   BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
 			   BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
 			   BL_TO_FORTRAN_ANYD(gp0_cart_mf[mfi]));
-		
+
 #else
                 Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
             }
         }
-	
+
 	dt_lev = std::min(dt_lev,dt_grid);
 	umax_lev = std::max(umax_lev,umax_grid);
-	    
+
 	} //end openmp
-	
+
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);
 
@@ -249,7 +245,7 @@ Maestro::FirstDt ()
     // turn on GPU
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
-    
+
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
@@ -269,10 +265,8 @@ Maestro::FirstDt ()
     for (int lev=0; lev<=finest_level; ++lev) {
         umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
         umac_dummy[lev][0].setVal(0.);
-#if (AMREX_SPACEDIM >= 2)
         umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         umac_dummy[lev][1].setVal(0.);
-#endif
 #if (AMREX_SPACEDIM == 3)
         umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
         umac_dummy[lev][2].setVal(0.);
@@ -302,13 +296,13 @@ Maestro::FirstDt ()
 
     // divU constraint
     if (use_divu_firstdt) {
-	estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(), 
+	estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
 		   r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
 
     Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
 #endif
-    
+
     Real umax = 0.;
 
     Real dt_lev = 1.e99;
@@ -324,7 +318,7 @@ Maestro::FirstDt ()
 #if (AMREX_SPACEDIM == 3)
 	const MultiFab& gp0_cart_mf = gp0_cart[lev];
 #endif
-	
+
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
@@ -333,7 +327,7 @@ Maestro::FirstDt ()
 
         Real dt_grid = 1.e99;
         Real umax_grid = 0.;
-	    
+
         for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
@@ -359,10 +353,10 @@ Maestro::FirstDt ()
 			BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
 			p0_old.dataPtr(),
 			gamma1bar_old.dataPtr());
-		
+
             } else {
 #if (AMREX_SPACEDIM == 3)
-		
+
 #pragma gpu box(tileBox)
                 firstdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
 			     AMREX_MFITER_REDUCE_MAX(&umax_grid),
@@ -383,7 +377,7 @@ Maestro::FirstDt ()
 	umax_lev = std::max(umax_lev,umax_grid);
 
 	} //end openmp
-	
+
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);
 
@@ -439,5 +433,5 @@ Maestro::FirstDt ()
 
     // set rel_eps in fortran module
     umax *= 1.e-8;
-    set_rel_eps(&umax);    
+    set_rel_eps(&umax);
 }

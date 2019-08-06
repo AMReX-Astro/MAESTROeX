@@ -24,7 +24,7 @@ contains
        w0, p0, gamma1bar) bind (C,name="estdt")
 
     use amrex_fort_module, only: amrex_min, amrex_max
-    
+
     integer  , value, intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -51,7 +51,7 @@ contains
     integer          :: i,j,k,r
 
     !$gpu
-    
+
     rho_min = 1.d-20
     dt_temp = 1.e99
 
@@ -61,7 +61,7 @@ contains
     spdy    = 0.d0
     spdz    = 0.d0
     spdr    = 0.d0
-    
+
     !
     ! Limit dt based on velocity terms.
     !
@@ -209,7 +209,7 @@ contains
        gp0_cart, g_lo, g_hi) bind (C,name="estdt_sphr")
 
     use amrex_fort_module, only: amrex_min, amrex_max
-    
+
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
@@ -239,7 +239,7 @@ contains
     integer          :: i,j,k,r
 
     !$gpu
-    
+
     rho_min = 1.d-20
     dt_temp = 1.e99
 
@@ -289,7 +289,7 @@ contains
     if (spdr > eps) dt_temp = min(dt_temp, dr(0)/spdr)
 
     dt_temp = dt_temp*cfl
-    
+
     ! Limit dt based on forcing terms
     fx = 0.d0
     fy = 0.d0
@@ -361,10 +361,10 @@ contains
           enddo
        enddo
     enddo
-    
+
     ! set dt to local min
     call amrex_min(dt, dt_temp)
-    
+
   end subroutine estdt_sphr
 
   subroutine firstdt(lev, dt, umax, lo, hi, dx, &
@@ -375,7 +375,7 @@ contains
        p0, gamma1bar) bind (C,name="firstdt")
 
     use amrex_fort_module, only: amrex_min, amrex_max
-    
+
     integer, value  , intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -400,7 +400,7 @@ contains
     type(eos_t) :: eos_state
 
     !$gpu
-    
+
     eps = 1.d-8
 
     rho_min = 1.d-20
@@ -433,7 +433,6 @@ contains
              spdx    = max(spdx,eos_state%cs)
              ux      = max(ux,abs(u(i,j,k,1)))
              pforcex = max(pforcex,abs(force(i,j,k,1)))
-#if (AMREX_SPACEDIM >= 2)
              spdy    = max(spdy,eos_state%cs)
              uy      = max(uy,abs(u(i,j,k,2)))
              pforcey = max(pforcey,abs(force(i,j,k,2)))
@@ -441,7 +440,6 @@ contains
              spdz    = max(spdz,eos_state%cs)
              uz      = max(uz,abs(u(i,j,k,3)))
              pforcez = max(pforcez,abs(force(i,j,k,3)))
-#endif
 #endif
 
           enddo
@@ -452,13 +450,11 @@ contains
 
     ux = ux / dx(1)
     spdx = spdx / dx(1)
-#if (AMREX_SPACEDIM >= 2)
     uy = uy / dx(2)
     spdy = spdy / dx(2)
 #if (AMREX_SPACEDIM == 3)
     uz = uz / dx(3)
     spdz = spdz / dx(3)
-#endif
 #endif
 
     ! use advective constraint unless velocities are zero everywhere
@@ -693,7 +689,7 @@ contains
 
 
     !$gpu
-    
+
     ! spherical divU constraint
     if (use_exact_base_state) then
        do r=1,nr_fine-1
@@ -706,7 +702,7 @@ contains
           gp0(0,r) = ( (p0(0,r) - p0(0,r-1))/dr(0) ) / gamma1bar_p_avg
        end do
     end if
-    
+
     gp0(0,nr_fine) = gp0(0,nr_fine-1)
     gp0(0,      0) = gp0(0,        1)
 
