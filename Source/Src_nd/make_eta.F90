@@ -91,14 +91,7 @@ contains
     logical :: top_edge
 
     ! Sum etarho
-#if (AMREX_SPACEDIM == 1)
-    k = lo(3)
-    j = lo(2)
-    do i=lo(1),hi(1)
-       etarhosum(i,lev) = etarhoflux(i,j,k)
-    end do
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     k = lo(3)
     do j=lo(2),hi(2)
        do i=lo(1),hi(1)
@@ -121,20 +114,7 @@ contains
     ! we only add the contribution at the top edge if we are at the top of the domain
     ! this prevents double counting
     top_edge = .false.
-#if (AMREX_SPACEDIM == 1)
-    do k = 1,numdisjointchunks(lev)
-       if (hi(1) .eq. r_end_coord(lev,k)) then
-          top_edge = .true.
-       end if
-    end do
-    if (top_edge) then
-       k = hi(3)
-       j = hi(2)
-       i = hi(1)+1
-       etarhosum(i,lev) = etarhoflux(i,j,k)
-    end if
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     do i=1,numdisjointchunks(lev)
        if (hi(2) .eq. r_end_coord(lev,i)) then
           top_edge = .true.

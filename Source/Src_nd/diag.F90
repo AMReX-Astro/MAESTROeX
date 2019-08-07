@@ -1,4 +1,4 @@
-! diag module for MAESTROeX. 
+! diag module for MAESTROeX.
 ! currently, there are 3 output files:
 !
 !   diag_enuc.out:
@@ -8,7 +8,7 @@
 !          radius of peak enuc
 !          total nuclear energy release (erg / s)
 !
-!   diag_temp.out:          
+!   diag_temp.out:
 !          peak temperature
 !          x/y/z location of peak temperature
 !          velocity components at location of peak temperature (including vr)
@@ -82,9 +82,7 @@ contains
 
     ! weight is the factor by which the volume of a cell at the current level
     ! relates to the volume of a cell at the coarsest level of refinement.
-#if (AMREX_SPACEDIM == 1)
-    weight = 1.d0 / 2.d0**(lev)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     weight = 1.d0 / 4.d0**(lev)
 #elif (AMREX_SPACEDIM == 3)
     weight = 1.d0 / 8.d0**(lev)
@@ -108,9 +106,7 @@ contains
              if (cell_valid) then
 
                 ! vel is the magnitude of the velocity, including w0
-#if (AMREX_SPACEDIM == 1)
-                vel = sqrt( (u(i,j,k,1) + 0.5d0*(w0(lev,i) + w0(lev,i+1)) )**2 )
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                 vel = sqrt(  u(i,j,k,1)**2 + &
                      ( u(i,j,k,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
@@ -277,7 +273,7 @@ contains
                    vel_enucmax(2)   = u(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k))
                    vel_enucmax(3)   = u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1))
                 end if
-                
+
                 ! call the EOS to get the sound speed and internal energy
                 eos_state%T     = scal(i,j,k,temp_comp)
                 eos_state%rho   = scal(i,j,k,rho_comp)
@@ -330,7 +326,7 @@ contains
        ! mass at the current center, we need to add the contribution
        ! of the upper half of the zone below us and the lower half of
        ! the current zone.
-       
+
        ! don't add any contributions from outside the star -- i.e.
        ! rho < base_cutoff_density
        if ( rho0(0,r-1) > base_cutoff_density ) then
@@ -348,14 +344,14 @@ contains
                (r_cc_loc(0,r) - r_edge_loc(0,r  )) * &
                (r_cc_loc(0,r)**2 + &
                 r_cc_loc(0,r)*r_edge_loc(0,r  ) + &
-                r_edge_loc(0,r  )**2)          
+                r_edge_loc(0,r  )**2)
        else
           term2 = ZERO
        endif
 
        m(r) = m(r-1) + term1 + term2
-          
-       ! dU = - G M dM / r;  
+
+       ! dU = - G M dM / r;
        ! dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
        grav_ener = grav_ener - &
             FOUR*M_PI*Gconst*m(r)*r_cc_loc(0,r)*rho0(0,r)*(r_edge_loc(0,r+1)-r_edge_loc(0,r))

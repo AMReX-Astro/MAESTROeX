@@ -62,21 +62,7 @@ contains
              if (state(i,j,k,rho_comp) <= base_cutoff_density) then
                 nabla = 0.0d0
              else
-#if (AMREX_SPACEDIM == 1)
-                ! forward difference
-                if (i == lo(1)) then
-                   dt = state(i+1,j,k,temp_comp) - state(i,j,k,temp_comp)
-                   dp = pres(i+1,j,k) - pres(i,j,k)
-                   ! backward difference
-                else if (i == hi(1)) then
-                   dt = state(i,j,k,temp_comp) - state(i-1,j,k,temp_comp)
-                   dp = pres(i,j,k) - pres(i-1,j,k)
-                   ! centered difference
-                else
-                   dt = state(i+1,j,k,temp_comp) - state(i-1,j,k,temp_comp)
-                   dp = pres(i+1,j,k) - pres(i-1,j,k)
-                endif
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                 ! forward difference
                 if (j == lo(2)) then
                    dt = state(i,j+1,k,temp_comp) - state(i,j,k,temp_comp)
@@ -241,7 +227,7 @@ contains
 
 
   end subroutine make_ad_excess_sphr
-  
+
 
   subroutine make_vorticity(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc) bind(C, name="make_vorticity")
 
@@ -257,9 +243,7 @@ contains
     logical :: fix_lo_x,fix_hi_x,fix_lo_y,fix_hi_y,fix_lo_z,fix_hi_z
     double precision :: wy,vz,uz,wx,vx,uy
 
-#if (AMREX_SPACEDIM == 1)
-    vort(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.0d0
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     call make_vorticity_2d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
 #else
     call make_vorticity_3d(lo,hi,vel,v_lo,v_hi,dx,vort,d_lo,d_hi,bc)
@@ -872,9 +856,7 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-#if (AMREX_SPACEDIM == 1)
-             magvel(i,j,k) = sqrt( (vel(i,j,k,1) + 0.5d0*(w0(lev,i) + w0(lev,i+1)) )**2 )
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              magvel(i,j,k) = sqrt(  vel(i,j,k,1)**2 + &
                   ( vel(i,j,k,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
@@ -993,9 +975,7 @@ contains
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-             r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
 #elif (AMREX_SPACEDIM == 3)
              r = k
@@ -1090,9 +1070,7 @@ contains
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-             r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
 #elif (AMREX_SPACEDIM == 3)
              r = k
@@ -1130,9 +1108,7 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-#if (AMREX_SPACEDIM == 1)
-             divw0(i,j,k) = (w0(lev,i+1) - w0(lev,i)) / dx(1)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              divw0(i,j,k) = (w0(lev,j+1) - w0(lev,j)) / dx(2)
 #else
              divw0(i,j,k) = (w0(lev,k+1) - w0(lev,k)) / dx(3)
@@ -1198,13 +1174,11 @@ contains
        do j=lo(2),hi(2)
           do i=lo(1),hi(1)
              pidivu(i,j,k) = pi_cc(i,j,k,pi_comp)*0.5d0*(vel(i+1,j,k,1) - vel(i-1,j,k,1))/dx(1)
-#if (AMREX_SPACEDIM >= 2)
              pidivu(i,j,k) = pidivu(i,j,k) + &
                   pi_cc(i,j,k,pi_comp)*0.5d0*(vel(i,j+1,k,2) - vel(i,j-1,k,2))/dx(2)
 #if (AMREX_SPACEDIM == 3)
              pidivu(i,j,k) = pidivu(i,j,k) + &
                   pi_cc(i,j,k,pi_comp)*0.5d0*(vel(i,j,k+1,3) - vel(i,j-1,k,3))/dx(3)
-#endif
 #endif
           enddo
        enddo
