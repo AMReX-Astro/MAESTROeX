@@ -124,6 +124,11 @@ with open('mathsymbols.tex', 'r') as f:
                 mathjax_config['TeX']['Macros'][macro[0]] = ["{"+macro[3]+"}", int(macro[2])]
 
 
+math_eqref_format = "Eq.{number}"
+math_number_all = True
+num_fig = True
+math_num_fig = True
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

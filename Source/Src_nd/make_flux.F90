@@ -54,85 +54,6 @@ module make_flux_module
 
 contains
 
-#if (AMREX_SPACEDIM == 1)
-  subroutine make_rhoX_flux_1d(lev, lo, hi, &
-       sfluxx, fx_lo, fx_hi, nc_fx, &
-       etarhoflux, eta_lo, eta_hi, &
-       sedgex, x_lo, x_hi, nc_x, &
-       umac,   u_lo, u_hi, &
-       rho0_old, rho0_edge_old, &
-       rho0_new, rho0_edge_new, &
-       rho0_predicted_edge, &
-       w0, &
-       startcomp, endcomp) bind(C,name="make_rhoX_flux_1d")
-
-    integer         , intent(in   ) :: lev, lo(1), hi(1)
-    integer         , intent(in   ) :: fx_lo(1), fx_hi(1), nc_fx
-    double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),nc_fx)
-    integer         , intent(in   ) :: eta_lo(1), eta_hi(1)
-    double precision, intent(inout) :: etarhoflux(eta_lo(1):eta_hi(1))
-    integer         , intent(in   ) :: x_lo(1), x_hi(1), nc_x
-    double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),nc_x)
-    integer         , intent(in   ) :: u_lo(1), u_hi(1)
-    double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1))
-    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: startcomp, endcomp
-
-    ! Local variables
-    integer          :: comp
-    integer          :: i
-    double precision :: rho0_edge
-
-    do comp = startcomp, endcomp
-
-       ! create x-fluxes
-       do i = lo(1),hi(1)+1
-
-          if (species_pred_type == predict_rhoprime_and_X) then
-             ! edge states are rho' and X.  To make the (rho X) flux,
-             ! we need the edge state of rho0
-             rho0_edge = HALF*(rho0_edge_old(lev,i)+rho0_edge_new(lev,i))
-             sfluxx(i,comp) = &
-                  (umac(i)+w0(lev,i))*(rho0_edge+sedgex(i,rho_comp))*sedgex(i,comp)
-
-          else if (species_pred_type == predict_rhoX) then
-             ! edge states are (rho X)
-             sfluxx(i,comp) = &
-                  (umac(i)+w0(lev,i))*sedgex(i,comp)
-
-          else if (species_pred_type == predict_rho_and_X) then
-             ! edge states are rho and X
-             sfluxx(i,comp) = &
-                  (umac(i)+w0(lev,i))*sedgex(i,rho_comp)*sedgex(i,comp)
-          end if
-
-          if (evolve_base_state .and. .not.use_exact_base_state) then
-             if (comp .ge. spec_comp .and. comp .le. spec_comp+nspec-1) then
-                etarhoflux(i) = etarhoflux(i) + sfluxx(i,comp)
-             end if
-
-             if ( comp.eq.spec_comp+nspec-1) then
-                etarhoflux(i) = etarhoflux(i) - w0(lev,i)*rho0_predicted_edge(lev,i)
-             end if
-          endif
-       end do
-    end do ! end comp loop
-
-    ! compute the density fluxes by summing the species fluxes
-    
-    ! loop for x-fluxes
-    do i = lo(1), hi(1)+1
-       sfluxx(i,1) = sum(sfluxx(i,startcomp:endcomp))
-    end do
-
-  end subroutine make_rhoX_flux_1d
-#endif
-
 #if (AMREX_SPACEDIM == 2)
   subroutine make_rhoX_flux_2d(lev, lo, hi, &
        sfluxx, fx_lo, fx_hi, nc_fx, &
@@ -239,7 +160,7 @@ contains
     end do
 
     ! compute the density fluxes by summing the species fluxes
-    
+
     ! loop for x-fluxes
     do j = lo(2), hi(2)
        do i = lo(1), hi(1)+1
@@ -404,7 +325,7 @@ contains
     end do
 
     ! compute the density fluxes by summing the species fluxes
-    
+
     ! loop for x-fluxes
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -431,7 +352,7 @@ contains
           end do
        end do
     end do
-    
+
   end subroutine make_rhoX_flux_3d
 
   !----------------------------------------------------------------------------
@@ -579,7 +500,7 @@ contains
     end do ! end loop over components
 
     ! compute the density fluxes by summing the species fluxes
-    
+
     ! loop for x-fluxes
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -606,97 +527,8 @@ contains
           end do
        end do
     end do
-    
+
   end subroutine make_rhoX_flux_3d_sphr
-#endif
-
-
-#if (AMREX_SPACEDIM == 1)
-  subroutine make_rhoh_flux_1d(lev, lo, hi, &
-       sfluxx, fx_lo, fx_hi, nc_fx, &
-       sedgex, x_lo, x_hi, nc_x, &
-       umac,   u_lo, u_hi, &
-       rho0_old, rho0_edge_old, &
-       rho0_new, rho0_edge_new, &
-       rhoh0_old, rhoh0_edge_old, &
-       rhoh0_new, rhoh0_edge_new, &
-       w0) bind(C,name="make_rhoh_flux_1d")
-
-    integer         , intent(in   ) :: lev, lo(1), hi(1)
-    integer         , intent(in   ) :: fx_lo(1), fx_hi(1), nc_fx
-    double precision, intent(inout) :: sfluxx(fx_lo(1):fx_hi(1),nc_fx)
-    integer         , intent(in   ) :: x_lo(1), x_hi(1), nc_x
-    double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),nc_x)
-    integer         , intent(in   ) :: u_lo(1), u_hi(1)
-    double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1))
-    double precision, intent(in   ) :: rho0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rho0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rho0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rho0_edge_new(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rhoh0_old(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rhoh0_edge_old(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: rhoh0_new(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: rhoh0_edge_new(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-
-    ! Local variables
-    integer          :: i
-    double precision :: rho0_edge, rhoh0_edge
-    logical          :: have_h, have_hprime, have_rhoh
-
-    have_h = enthalpy_pred_type.eq.predict_h .or. &
-         enthalpy_pred_type.eq.predict_T_then_h .or. &
-         enthalpy_pred_type.eq.predict_Tprime_then_h
-
-    have_hprime = enthalpy_pred_type.eq.predict_hprime
-
-    have_rhoh = enthalpy_pred_type.eq.predict_rhoh
-
-    ! create x-fluxes
-    if (have_h) then
-       ! enthalpy edge state is h
-       if (species_pred_type == predict_rhoprime_and_X) then
-          ! density edge state is rho'
-          do i=lo(1),hi(1)+1
-             rho0_edge = HALF*(rho0_edge_old(lev,i)+rho0_edge_new(lev,i))
-             sfluxx(i,rhoh_comp) = &
-                  (umac(i)+w0(lev,i))*(rho0_edge+sedgex(i,rho_comp))*sedgex(i,rhoh_comp)
-          end do
-
-       else if (species_pred_type == predict_rho_and_X .or. &
-            species_pred_type == predict_rhoX) then
-
-          ! density edge state is rho
-          do i=lo(1),hi(1)+1
-             sfluxx(i,rhoh_comp) = &
-                  (umac(i)+w0(lev,i))*sedgex(i,rho_comp)*sedgex(i,rhoh_comp)
-          end do
-
-       endif
-
-    else if (have_hprime) then
-
-       ! enthalpy edge state is h'
-       call amrex_error("make_rhoh_flux_1d : predict_hprime not coded yet")
-
-    else if (have_rhoh) then
-
-       do i=lo(1),hi(1)+1
-          sfluxx(i,rhoh_comp) = (umac(i)+w0(lev,i))*sedgex(i,rhoh_comp)
-       end do
-
-    else if (enthalpy_pred_type.eq.predict_rhohprime) then
-       ! enthalpy edge state is (rho h)'
-       do i=lo(1),hi(1)+1
-          rhoh0_edge = HALF*(rhoh0_edge_old(lev,i)+rhoh0_edge_new(lev,i))
-          sfluxx(i,rhoh_comp) = (umac(i)+w0(lev,i))*(sedgex(i,rhoh_comp)+rhoh0_edge)
-       end do
-
-    else
-       call amrex_error("make_rhoh_flux_1d : enthalpy_pred_type not recognized.")
-    end if
-
-  end subroutine make_rhoh_flux_1d
 #endif
 
 #if (AMREX_SPACEDIM == 2)

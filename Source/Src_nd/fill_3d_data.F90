@@ -54,9 +54,7 @@ contains
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-                r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                 r = j
 #elif (AMREX_SPACEDIM == 3)
                 r = k
@@ -73,9 +71,7 @@ contains
           do j = lo(2),hi(2)
              do i = lo(1),hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-                r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                 r = j
 #elif (AMREX_SPACEDIM == 3)
                 r = k
@@ -517,24 +513,20 @@ contains
 
   subroutine addw0(lev, lo, hi, &
        uedge, u_lo, u_hi, &
-#if (AMREX_SPACEDIM >= 2)
        vedge, v_lo, v_hi, &
 #if (AMREX_SPACEDIM == 3)
        wedge, w_lo, w_hi, &
-#endif
 #endif
        w0,mult) bind(C, name="addw0")
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(inout) :: uedge(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-#if (AMREX_SPACEDIM >= 2)
     integer         , intent(in   ) :: v_lo(3), v_hi(3)
     double precision, intent(inout) :: vedge(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
 #if (AMREX_SPACEDIM == 3)
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
     double precision, intent(inout) :: wedge(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-#endif
 #endif
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: mult
@@ -542,14 +534,7 @@ contains
     ! local
     integer i,j,k
 
-#if (AMREX_SPACEDIM == 1)
-    j = lo(2)
-    k = lo(3)
-    do i = lo(1),hi(1)+1
-       uedge(i,j,k) = uedge(i,j,k) + mult * w0(lev,i)
-    end do
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     k = lo(3)
     do j = lo(2),hi(2)+1
        do i = lo(1)-1,hi(1)+1
@@ -1452,11 +1437,9 @@ contains
   subroutine put_data_on_faces(lo, hi, &
        scc, cc_lo, cc_hi, &
        facex, x_lo, x_hi, &
-#if (AMREX_SPACEDIM >= 2)
        facey, y_lo, y_hi, &
 #if (AMREX_SPACEDIM == 3)
        facez, z_lo, z_hi, &
-#endif
 #endif
        harmonic_avg) bind(C, name="put_data_on_faces")
 
@@ -1465,13 +1448,11 @@ contains
     double precision, intent(in   ) :: scc(cc_lo(1):cc_hi(1),cc_lo(2):cc_hi(2),cc_lo(3):cc_hi(3))
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     double precision, intent(inout) :: facex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
-#if (AMREX_SPACEDIM >= 2)
     integer         , intent(in   ) :: y_lo(3), y_hi(3)
     double precision, intent(inout) :: facey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
 #if (AMREX_SPACEDIM == 3)
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
     double precision, intent(inout) :: facez(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
-#endif
 #endif
     integer         , intent(in   ) :: harmonic_avg
 
@@ -1486,9 +1467,7 @@ contains
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
-#if (AMREX_SPACEDIM >= 2)
           do j = lo(2),hi(2)
-#endif
              do i = lo(1),hi(1)+1
                 denom = (scc(i,j,k) + scc(i-1,j,k))
                 if (denom .ne. 0.d0) then
@@ -1497,9 +1476,7 @@ contains
                    facex(i,j,k) = HALF*denom
                 end if
              end do
-#if (AMREX_SPACEDIM >= 2)
           end do
-#endif
 #if (AMREX_SPACEDIM == 3)
        end do
 #endif
@@ -1507,7 +1484,6 @@ contains
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
-#if (AMREX_SPACEDIM >= 2)
           do j = lo(2),hi(2)+1
              do i = lo(1),hi(1)
                 denom = (scc(i,j,k) + scc(i,j-1,k))
@@ -1518,7 +1494,6 @@ contains
                 end if
              end do
           end do
-#endif
 #if (AMREX_SPACEDIM == 3)
        end do
 #endif
@@ -1543,20 +1518,15 @@ contains
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
-#if (AMREX_SPACEDIM >= 2)
           do j = lo(2),hi(2)
-#endif
              do i = lo(1),hi(1)+1
                 facex(i,j,k) = HALF*(scc(i,j,k)+scc(i-1,j,k))
              end do
-#if (AMREX_SPACEDIM >= 2)
           end do
-#endif
 #if (AMREX_SPACEDIM == 3)
        end do
 #endif
 
-#if (AMREX_SPACEDIM >= 2)
 #if (AMREX_SPACEDIM == 3)
        do k = lo(3),hi(3)
 #endif
@@ -1567,7 +1537,6 @@ contains
           end do
 #if (AMREX_SPACEDIM == 3)
        end do
-#endif
 #endif
 
 #if (AMREX_SPACEDIM == 3)

@@ -51,9 +51,7 @@ contains
        do j=lo(2),hi(2)
           do i=lo(1),hi(1)
 
-             if (amrex_spacedim .eq. 1) then
-                r = i
-             else if (amrex_spacedim .eq. 2) then
+             if (amrex_spacedim .eq. 2) then
                 r = j
              else if (amrex_spacedim .eq. 3) then
                 r = k

@@ -68,15 +68,13 @@ contains
           r = k
 #elif (AMREX_SPACEDIM == 2)
           r = j
-#else
-          r = i
 #endif
           tag_array(lev,r) = set
        endif
     enddo
     enddo
     enddo
-       
+
   end subroutine state_error
 
   subroutine tag_boxes(tag,tag_lo,tag_hi, &
@@ -104,9 +102,9 @@ contains
     call abort()
 
     ! Tag on regions of high temperature
-#if (AMREX_SPACEDIM == 3) 
+#if (AMREX_SPACEDIM == 3)
     do k = lo(3), hi(3)
-       
+
        if (tag_array(lev,k) > 0) then
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
@@ -120,7 +118,7 @@ contains
 #elif (AMREX_SPACEDIM == 2)
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
-          
+
           if (tag_array(lev,j) > 0) then
              do i = lo(1), hi(1)
                 tag(i,j,k) = set
@@ -129,22 +127,8 @@ contains
 
        enddo
     enddo
-
-#else
-    do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-          do i = lo(1), hi(1)
-             
-             if (tag_array(lev,i) > 0) then
-                tag(i,j,k) = set
-             endif
-             
-          enddo
-       enddo
-    enddo
-    
 #endif
-       
+
   end subroutine tag_boxes
 
   subroutine retag_array(set,clear,&
@@ -176,14 +160,12 @@ contains
           r = k/2
 #elif (AMREX_SPACEDIM == 2)
           r = j/2
-#else
-          r = i/2
 #endif
           tag_array(lev-1,r) = set
     enddo
     enddo
     enddo
-       
+
   end subroutine retag_array
-  
+
 end module tagging_module

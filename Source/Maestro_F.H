@@ -299,11 +299,9 @@ extern "C"
 
     void addw0(const int* lev, const int* lo, const int* hi,
                amrex::Real* uedge, const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
                amrex::Real* vedge, const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
                amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
 #endif
                const amrex::Real* w0, const amrex::Real* mult);
 
@@ -349,11 +347,9 @@ extern "C"
     void put_data_on_faces(const int* lo, const int* hi,
 			   const amrex::Real* scc, const int* cc_lo, const int* cc_hi,
 			   amrex::Real* facex, const int* x_lo, const int* x_hi,
-#if (AMREX_SPACEDIM >= 2)
 			   amrex::Real* facey, const int* y_lo, const int* y_hi,
 #if (AMREX_SPACEDIM == 3)
 			   amrex::Real* facez, const int* z_lo, const int* z_hi,
-#endif
 #endif
 			   const int* harmonic_avg);
     //////////////////////
@@ -442,9 +438,7 @@ extern "C"
 
     //////////////////////
     // in make_edge_scal.F90
-#if (AMREX_SPACEDIM == 1)
-    void make_edge_scal_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     void make_edge_scal_2d(
 #elif (AMREX_SPACEDIM == 3)
     void make_edge_scal_3d(
@@ -453,18 +447,14 @@ extern "C"
                       const int* lo, const int* hi,
                       const amrex::Real* s,      const int* s_lo, const int* s_hi, const int nc_s, int ng_s,
                             amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int nc_x,
-#if (AMREX_SPACEDIM >= 2)
                             amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int nc_y,
 #if (AMREX_SPACEDIM == 3)
                             amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int nc_z,
 #endif
-#endif
                       const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
                       const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
                       const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
-#endif
 #endif
                       int ng_um,
                       const amrex::Real* force,  const int* f_lo, const int* f_hi, const int nc_f,
@@ -513,35 +503,27 @@ extern "C"
 
     //////////////////////
     // in make_flux.F90
-#if (AMREX_SPACEDIM == 1)
-    void make_rhoX_flux_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     void make_rhoX_flux_2d(
 #elif (AMREX_SPACEDIM == 3)
     void make_rhoX_flux_3d(
 #endif
 			   const int* lev, const int* lo, const int* hi,
 			   amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, const int* nc_fx,
-#if (AMREX_SPACEDIM >= 2)
 			   amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi, const int* nc_fy,
 #if (AMREX_SPACEDIM == 3)
 			   amrex::Real* sfluxz, const int* fz_lo, const int* fz_hi, const int* nc_fz,
 #endif
-#endif
 			   amrex::Real* etarhoflux, const int* eta_lo, const int* eta_hi,
 			   amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x,
-#if (AMREX_SPACEDIM >= 2)
 			   amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y,
 #if (AMREX_SPACEDIM == 3)
 			   amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z,
 #endif
-#endif
 			   const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
 			   const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
 			   const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
-#endif
 #endif
 			   const amrex::Real* rho0_old, const amrex::Real* rho0_edge_old,
 			   const amrex::Real* rho0_new, const amrex::Real* rho0_edge_new,
@@ -568,34 +550,26 @@ extern "C"
 				const int* startcomp, const int* endcomp);
 #endif
 
-#if (AMREX_SPACEDIM == 1)
-    void make_rhoh_flux_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     void make_rhoh_flux_2d(
 #elif (AMREX_SPACEDIM == 3)
     void make_rhoh_flux_3d(
 #endif
 			   const int* lev, const int* lo, const int* hi,
 			   amrex::Real* sfluxx, const int* fx_lo, const int* fx_hi, const int* nc_fx,
-#if (AMREX_SPACEDIM >= 2)
 			   amrex::Real* sfluxy, const int* fy_lo, const int* fy_hi, const int* nc_fy,
 #if (AMREX_SPACEDIM == 3)
 			   amrex::Real* sfluxz, const int* fz_lo, const int* fz_hi, const int* nc_fz,
 #endif
-#endif
 			   amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x,
-#if (AMREX_SPACEDIM >= 2)
 			   amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y,
 #if (AMREX_SPACEDIM == 3)
 			   amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z,
 #endif
-#endif
 			   const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
 			   const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
 			   const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
-#endif
 #endif
 			   const amrex::Real* rho0_old, const amrex::Real* rho0_edge_old,
 			   const amrex::Real* rho0_new, const amrex::Real* rho0_edge_new,
@@ -897,11 +871,9 @@ extern "C"
                            amrex::Real* force, const int* f_lo, const int* f_hi,
                            const amrex::Real* scal,  const int* s_lo, const int* s_hi,
                            const amrex::Real* umac,  const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
                            const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
                            const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
-#endif
 #endif
                            const amrex::Real* s0, const amrex::Real* s0_edge, const amrex::Real* w0,
                            const amrex::Real* dx, const int do_fullform);
@@ -920,9 +892,7 @@ extern "C"
 
     void mkrhohforce(const int* lo, const int* hi, const int lev,
                      amrex::Real* rhoh_force, const int* f_lo, const int* f_hi,
-#if (AMREX_SPACEDIM == 1)
-                     const amrex::Real* umac,  const int* u_lo, const int* u_hi,
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                      const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
 #elif (AMREX_SPACEDIM == 3)
                      const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
@@ -1006,16 +976,7 @@ extern "C"
 
     //////////////////////
     // in mkutrans.F90
-#if (AMREX_SPACEDIM == 1)
-    void mkutrans_1d(const int* lev, const int* domlo, const int* domhi,
-                      const int* lo, const int* hi,
-                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, int ng_ut,
-                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf, int ng_uf,
-                      amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
-                      const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt,
-                      const int* adv_bc, const int* phys_bc);
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
   void mkutrans_2d(const int* lo, const int* hi,
                     const int lev, const int idir,
                     const int* domlo, const int* domhi,
@@ -1054,32 +1015,26 @@ extern "C"
 			amrex::Real* newrhs, const int* nrhs_lo, const int* nrhs_hi,
 			const amrex::Real* oldrhs, const int* orhs_lo, const int* orhs_hi,
                         const amrex::Real* uedge, const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
                         const amrex::Real* vedge, const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
 			const amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
 #endif
 			const amrex::Real* dx);
 
     void mult_beta0(const int* lev, const int* lo, const int* hi,
                amrex::Real* uedge, const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
                amrex::Real* vedge, const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
                amrex::Real* wedge, const int* w_lo, const int* w_hi,
 #endif
 	       const amrex::Real* beta0_edge,
-#endif
                const amrex::Real* beta0, const int* mult_or_div);
 
     void mac_bcoef_face(const int* lev, const int* lo, const int* hi,
 			amrex::Real* xface, const int* x_lo, const int* x_hi,
-#if (AMREX_SPACEDIM >= 2)
 			amrex::Real* yface, const int* y_lo, const int* y_hi,
 #if (AMREX_SPACEDIM == 3)
 			amrex::Real* zface, const int* z_lo, const int* z_hi,
-#endif
 #endif
 			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
     //////////////////////
@@ -1211,11 +1166,9 @@ extern "C"
 			const amrex::Real* sold, const int* so_lo, const int* so_hi,
 			      amrex::Real* snew, const int* sn_lo, const int* sn_hi,
 			const amrex::Real* sfluxx, const int* x_lo, const int* x_hi,
-#if (AMREX_SPACEDIM >= 2)
 			const amrex::Real* sfluxy, const int* y_lo, const int* y_hi,
 #if (AMREX_SPACEDIM == 3)
 			const amrex::Real* sfluxz, const int* z_lo, const int* z_hi,
-#endif
 #endif
 			const amrex::Real* force,  const int* f_lo, const int* f_hi,
 			const amrex::Real* dx, const amrex::Real dt,
@@ -1226,11 +1179,9 @@ extern "C"
 			const amrex::Real* sold, const int* so_lo, const int* so_hi,
 			      amrex::Real* snew, const int* sn_lo, const int* sn_hi,
 			const amrex::Real* sfluxx, const int* x_lo, const int* x_hi,
-#if (AMREX_SPACEDIM >= 2)
 			const amrex::Real* sfluxy, const int* y_lo, const int* y_hi,
 #if (AMREX_SPACEDIM == 3)
 			const amrex::Real* sfluxz, const int* z_lo, const int* z_hi,
-#endif
 #endif
 			const amrex::Real* force,  const int* f_lo, const int* f_hi,
 			const amrex::Real* p0_new,
@@ -1257,18 +1208,14 @@ extern "C"
 			 const amrex::Real* uold, const int* uo_lo, const int* uo_hi,
 			       amrex::Real* unew, const int* un_lo, const int* un_hi,
 			 const amrex::Real* umac, const int* u_lo, const int* u_hi,
-#if (AMREX_SPACEDIM >= 2)
 			 const amrex::Real* vmac, const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
 			 const amrex::Real* wmac, const int* w_lo, const int* w_hi,
 #endif
-#endif
 			 const amrex::Real* uedgex, const int* x_lo, const int* x_hi,
-#if (AMREX_SPACEDIM >= 2)
 			 const amrex::Real* uedgey, const int* y_lo, const int* y_hi,
 #if (AMREX_SPACEDIM == 3)
 			 const amrex::Real* uedgez, const int* z_lo, const int* z_hi,
-#endif
 #endif
 			 const amrex::Real* force, const int* f_lo, const int* f_hi,
 			 const amrex::Real* sponge, const int* s_lo, const int* s_hi,
@@ -1294,9 +1241,7 @@ extern "C"
 
     //////////////////////
     // in velpred.F90
-#if (AMREX_SPACEDIM == 1)
-    void velpred_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     void velpred_2d(
 #elif (AMREX_SPACEDIM == 3)
     void velpred_3d(
@@ -1306,21 +1251,17 @@ extern "C"
                       const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, int ng_ut,
                       const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf, int ng_uf,
                       const amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
-#if (AMREX_SPACEDIM >= 2)
                       const amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
 #if (AMREX_SPACEDIM == 3)
                       const amrex::Real* wtrans, const int* uw_lo, const int* uw_hi,
 #endif
-#endif
                       amrex::Real* umac, const int* mu_lo, const int* mu_hi,
-#if (AMREX_SPACEDIM >= 2)
                       amrex::Real* vmac, const int* mv_lo, const int* mv_hi,
 #if (AMREX_SPACEDIM == 3)
                       amrex::Real* wmac, const int* mw_lo, const int* mw_hi,
 		      const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi,
 		      const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi,
 		      const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
-#endif
 #endif
                       const amrex::Real* force, const int* f_lo, const int* f_hi, const int* nc_f, int ng_f,
                       const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt,

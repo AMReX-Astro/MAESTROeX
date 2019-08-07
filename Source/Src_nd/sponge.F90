@@ -206,10 +206,7 @@ contains
 
     if (spherical .eq. 0) then
 
-#if (AMREX_SPACEDIM == 1)
-       do i=lo(1),hi(1)
-          r = prob_lo(1) + (dble(i)+HALF)*dx(1)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
        do j=lo(2),hi(2)
           r = prob_lo(2) + (dble(j)+HALF)*dx(2)
 #else
@@ -222,9 +219,7 @@ contains
              else
                 smdamp = ONE
              endif
-#if (AMREX_SPACEDIM == 1)
-             sponge(i,lo(2):hi(2),lo(3):hi(3)) = ONE / (ONE + dt * smdamp* sponge_kappa)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              sponge(lo(1):hi(1),j,lo(3):hi(3)) = ONE / (ONE + dt * smdamp* sponge_kappa)
 #else
              sponge(lo(1):hi(1),lo(2):hi(2),k) = ONE / (ONE + dt * smdamp* sponge_kappa)
