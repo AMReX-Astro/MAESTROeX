@@ -95,8 +95,8 @@ paper 3.
    ``UNIT_TESTS/``. This problem sub-directory will contain any
    problem-specific files as well as the ``GNUmakefile`` that
    specifies how to build the executable. Note: we rely on features of
-   GNU make. Full details of the ``GNUmakefile`` can be found in § \
-   `[sec:adding_problems] <#sec:adding_problems>`__. Here we will
+   GNU make. Full details of the ``GNUmakefile`` can be found in §
+   :ref:`sec:adding_problems`. Here we will
    configure for a serial build.
 
    Change directory to
@@ -180,7 +180,7 @@ paper 3.
    of some of the more common runtime parameters is given in § \ `5
    <#sec:gettingstarted:runtime>`__, and a full list of all
    MAESTROeX runtime parameters and their default values is given in
-   Chapter \ `[ch:runtimeparameters] <#ch:runtimeparameters>`__.
+   Chapter :ref:`sec:runtime_parameters`.
 
    MAESTROeX is run simply as::
 
@@ -197,8 +197,7 @@ paper 3.
 
    As the code runs, a lot of information will pass through the
    screen.  For each timestep, each of the steps 1 through 12 shown in
-   the MAESTROeX flowchart (Chapter `[ch:flowchart]
-   <#ch:flowchart>`__) will be shown along with diagnostic information
+   the MAESTROeX flowchart (Chapter :ref:`ch:flowchart`) will be shown along with diagnostic information
    about the solution. Upon completion some memory usage information
    is printed.
 
@@ -277,11 +276,11 @@ plotfile, ``plt00200``, in the :math:`y`-direction::
 
     fextract.Linux.gfortran.exe -d 2 -v "density" -p plt00200
 
-These routines are described in § \ `[sec:analysis] <#sec:analysis>`__.
+These routines are described in § :ref:`sec:analysis`.
 
 There is also a python visualization method in
 ``AmrPostprocessing/python``. This is described
-in § \ `[sec:vis:python] <#sec:vis:python>`__.
+in § :ref:`sec:vis:python`.
 
 VisIt
 -----
@@ -300,7 +299,7 @@ yt
 --
 
 yt (version 3.0 and later) can natively read the MAESTROeX plotfiles. See
-the yt documentation or § \ `[sec:vis:yt] <#sec:vis:yt>`__.
+the yt documentation or § :ref:`sec:vis_yt`.
 
 Diagnostic Files
 ----------------
@@ -343,7 +342,7 @@ installation. For popular national computing facilities, this is
 already setup, and the build system looks at the machine hostname to
 set the proper libraries. For other machines, you may need to edit
 the GMake.MPI file in the AMReX build files. See
-§ \ `[ch:make] <#ch:make>`__ for more details.
+§ :ref:`ch:make` for more details.
 
 OpenMP can be used to parallelize on shared-memory machines
 (i.e. within a node). OpenMP support is accomplished through the

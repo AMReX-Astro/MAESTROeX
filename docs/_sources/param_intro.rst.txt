@@ -1,3 +1,5 @@
+.. _sec:runtime_parameters:
+
 ******************
 Runtime Parameters
 ******************
