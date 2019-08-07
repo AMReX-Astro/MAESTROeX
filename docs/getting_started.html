@@ -392,9 +392,10 @@ is printed.</p>
 </li>
 <li><p><em>Examine the output</em>.</p>
 <p>As the code runs, it will output both plotfiles and checkpoints as
-well as one or more text diagnostic files (<code class="docutils literal notranslate"><span class="pre">maestro_diag.out</span></code>
-by default) with integral or extrema information (like maximum Mach
-number) from each timestep.</p>
+well as one or more text diagnostic files (this is currently only
+implemented for spherical problems)
+with integral or extrema information (like maximum Mach number)
+from each timestep.</p>
 <p>By default, the plotfiles will be named plt<em>nnnnnnn</em>, where
 the number <em>nnnnnnn</em> is the timestep number when the file was
 outputted. Similarly, the checkpoints are named
@@ -480,10 +481,12 @@ the yt documentation or § <a class="reference internal" href="visualization.htm
 </div>
 <div class="section" id="diagnostic-files">
 <h3>Diagnostic Files<a class="headerlink" href="#diagnostic-files" title="Permalink to this headline">¶</a></h3>
-<p>By default, MAESTROeX outputs global diagnostics each timestep into a
-file called <code class="docutils literal notranslate"><span class="pre">maestro_diag.out</span></code>. This includes the maximum Mach
-number, peak temperature, and peak nuclear energy generation rate.
-Individual problems can provide their own diag.f90 file to
+<p>By default, MAESTROeX outputs global diagnostics each timestep into 3
+files called <code class="docutils literal notranslate"><span class="pre">diag_vel.out</span></code>, <code class="docutils literal notranslate"><span class="pre">diag_temp.out</span></code>, and <code class="docutils literal notranslate"><span class="pre">diag_enuc.out</span></code>
+for spherical problems (ex. <code class="docutils literal notranslate"><span class="pre">wdconvect</span></code>).
+These include various properties such as the maximum Mach number,
+peak temperature, and peak nuclear energy generation rate, respectively.
+Individual problems can provide their own <code class="docutils literal notranslate"><span class="pre">diag.F90</span></code> file to
 produce custom diagnostic output. This information can be plotted
 directly with GNUplot, for example.</p>
 </div>
@@ -504,7 +507,7 @@ through github onto the development branch.</p>
 </div>
 <div class="section" id="parallel-jobs">
 <h2>Parallel Jobs<a class="headerlink" href="#parallel-jobs" title="Permalink to this headline">¶</a></h2>
-<p>To run in parallel with MPI, you would set MPI := t in your
+<p>To run in parallel with MPI, you would set <code class="docutils literal notranslate"><span class="pre">USE_MPI</span> <span class="pre">:=</span> <span class="pre">TRUE</span></code> in your
 GNUmakefile. For a machine with working MPI compiler wrappers
 (mpif90 and mpicc), the build system should find these and
 compile with MPI support automatically. This is the easiest way to do

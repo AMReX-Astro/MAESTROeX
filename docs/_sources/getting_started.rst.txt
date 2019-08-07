@@ -204,9 +204,10 @@ paper 3.
 #. *Examine the output*.
 
    As the code runs, it will output both plotfiles and checkpoints as
-   well as one or more text diagnostic files (``maestro_diag.out``
-   by default) with integral or extrema information (like maximum Mach
-   number) from each timestep.
+   well as one or more text diagnostic files (this is currently only
+   implemented for spherical problems)
+   with integral or extrema information (like maximum Mach number)
+   from each timestep.
 
    By default, the plotfiles will be named plt\ *nnnnnnn*, where
    the number *nnnnnnn* is the timestep number when the file was
@@ -304,10 +305,12 @@ the yt documentation or § :ref:`sec:vis_yt`.
 Diagnostic Files
 ----------------
 
-By default, MAESTROeX outputs global diagnostics each timestep into a
-file called ``maestro_diag.out``. This includes the maximum Mach
-number, peak temperature, and peak nuclear energy generation rate.
-Individual problems can provide their own diag.f90 file to
+By default, MAESTROeX outputs global diagnostics each timestep into 3
+files called ``diag_vel.out``, ``diag_temp.out``, and ``diag_enuc.out``
+for spherical problems (ex. ``wdconvect``).
+These include various properties such as the maximum Mach number,
+peak temperature, and peak nuclear energy generation rate, respectively.
+Individual problems can provide their own ``diag.F90`` file to
 produce custom diagnostic output. This information can be plotted
 directly with GNUplot, for example.
 
@@ -331,7 +334,7 @@ through github onto the development branch.
 Parallel Jobs
 =============
 
-To run in parallel with MPI, you would set MPI := t in your
+To run in parallel with MPI, you would set ``USE_MPI := TRUE`` in your
 GNUmakefile. For a machine with working MPI compiler wrappers
 (mpif90 and mpicc), the build system should find these and
 compile with MPI support automatically. This is the easiest way to do
