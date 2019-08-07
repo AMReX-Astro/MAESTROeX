@@ -7,19 +7,18 @@ MAESTROeX Flowchart
 The equation set and solution procedure used by MAESTROeX has evolved
 over time. In this chapter, we outline the algorithm currently
 implemented in the code. The latest published reference for MAESTROeX
-is the multilevel paper :raw-latex:`\cite{multilevel}`. In this description, we
-make frequent reference to paper I :raw-latex:`\cite{lowMach}`,
-paper II :raw-latex:`\cite{lowMach2}`, paper III :raw-latex:`\cite{lowMach3}`, and
-paper IV :raw-latex:`\cite{lowMach4}`.
+is the multilevel paper :cite:`multilevel`. In this description, we
+make frequent reference to paper I :cite:`lowMach`,
+paper II :cite:`lowMach2`, paper III :cite:`lowMach3`, and
+paper IV :cite:`lowMach4`.
 
 Summary of the MAESTROeX Equation Set
 =====================================
 
 Here we summarize the equations solved by MAESTROeX. We refer the reader
 to papers I through IV and the multilevel paper for the derivation
-and motivation of the equation set. (Note: this ‘traditional’ algorithm
-uses Strang-splitting for the reactions. An alternate implementation, using
-spectral deferred corrections is outlined in Chapter \ `[ch:sdc] <#ch:sdc>`__.)
+and motivation of the equation set.  Note: this ‘traditional’ algorithm
+uses Strang-splitting for the reactions.
 
 Base State
 ----------
@@ -30,10 +29,11 @@ and a base state pressure, :math:`p_0`, in hydrostatic equilibrum:
 
 .. math:: \nabla p_0 = -\rho_0 |g| \er
 
-The gravitational acceleration, :math:`g` is either constant or a point-mass
-with a :math:`1/r^2` dependence (see §\ `[sec:planarinvsqgravity] <#sec:planarinvsqgravity>`__) for plane-parallel geometries, or a monopole
-constructed by integrating the base state density for spherical
-geometries.
+The gravitational acceleration, :math:`g` is either constant or a
+point-mass with a :math:`1/r^2` dependence (see §
+:ref:`sec:planarinvsqgravity`) for plane-parallel geometries, or a
+monopole constructed by integrating the base state density for
+spherical geometries.
 
 For the time-dependence, we will define a base state velocity, :math:`w_0`,
 which will adjust the base state from one hydrostatic equilibrum to
@@ -138,9 +138,9 @@ term is only present if we are using thermal diffusion (``use_thermal_diffusion 
 In this constraint, :math:`\gammabar` is the lateral average of
 :math:`\Gamma_1 \equiv d\log p / d\log \rho |_s`. Using the lateral average
 here makes it possible to cast the constraint as a
-divergence. :raw-latex:`\cite{KP:2012}` discuss the general case where we want to
+divergence. :cite:`KP:2012` discuss the general case where we want to
 keep the local variations of :math:`\Gamma_1` (and we explored this in paper
-III). We also look at this in § \ `[sec:flow:gamma1vary] <#sec:flow:gamma1vary>`__.
+III). We also look at this in § :ref:`sec_flow_gamma1vary`
 
 Momentum
 --------
@@ -165,7 +165,7 @@ or
 This is the form of the momentum equation that we solved in papers
 I–IV and in the multilevel paper.
 
-Several authors :raw-latex:`\cite{KP:2012,VLBWZ:2013}` explored the idea of energy
+Several authors :cite:`KP:2012,VLBWZ:2013` explored the idea of energy
 conservation in a low Mach number system and found that an additional
 term (which can look like a buoyancy) is needed in the low Mach number
 formulation, yielding:
@@ -1110,8 +1110,11 @@ equation set in the following way:
       + \frac{f}{\overline{\Gamma_1^{n+1}} p_0^{n+1}}
       \left[\frac{p(\rho,h,X_k)^{n+1} - \overline{p(\rho,h,X_k)^{n+1}}}{\Delta t^n}\right]\right\}.
 
-[sec:flow:gamma1vary] :math:`\Gamma_1` Variation Changes
---------------------------------------------------------
+
+.. _sec_flow_gamma1vary:
+
+:math:`\Gamma_1` Variation Changes
+----------------------------------
 
 The constraint we derive from requiring the pressure to be close to
 the background hydrostatic pressure takes the form:
