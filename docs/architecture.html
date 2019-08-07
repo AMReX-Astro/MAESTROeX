@@ -38,9 +38,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Runtime Parameters" href="param_intro.html" />
-    <link rel="prev" title="Common Runtime Parameters" href="common_parameters.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -96,71 +94,11 @@
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html">MAESTROeX Flowchart</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">MAESTROeX Architecture</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#maestro-basics">MAESTRO Basics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#the-maestro-ecosystem">The MAESTRO ‘Ecosystem’</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adding-a-new-problem">Adding A New Problem</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#the-gnumakefile">The GNUmakefile</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#handling-problem-specific-source-files">Handling Problem-Specific Source Files</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#defining-runtime-parameters">Defining Runtime Parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#preparing-the-initial-model">Preparing the Initial Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#customizing-the-initialization">Customizing the Initialization</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#amrex-data-structures">AMReX Data Structures</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#box">box</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#common-operations-on-a-box">Common Operations on a box</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#boxarray-and-ml-boxarray">boxarray and ml_boxarray</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#layout-and-ml-layout">layout and ml_layout</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fab">fab</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#multifab">multifab</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#working-with-multifabs">Working with multifabs</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#bc-tower">bc_tower</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#maestro-data-organization">MAESTRO Data Organization</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#s-multifabs-fluid-state">‘s’ multifabs (fluid state)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#u-multifabs-fluid-velocity">‘u’ multifabs (fluid velocity)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#umac-the-mac-velocity">umac (the MAC velocity)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#base-state-arrays">Base State Arrays</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#maestro-helper-modules">MAESTRO Helper Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#average-module">average_module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#eos-module">eos_module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fill-3d-module">fill_3d_module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fundamental-constants-module">fundamental_constants_module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#geometry">geometry</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#network">network</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#probin-module">probin_module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#variables">variables</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#amrex-helper-modules">AMReX Helper Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#amrex-constants">amrex_constants</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#parallel">parallel</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#sec-example-example-accessing-state-and-mac-data">[sec:example] Example: Accessing State and MAC Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#filling-ghostcells">Filling Ghostcells</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#boundary-conditions">Boundary Conditions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#multigrid">Multigrid</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#multilevel-and-refinement-criteria">Multilevel and Refinement Criteria</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#particles">Particles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#regression-testing">Regression Testing</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
@@ -1553,15 +1491,6 @@ from <a href="#id21"><span class="problematic" id="id22">:raw-latex:`\cite{mult
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="param_intro.html" class="btn btn-neutral float-right" title="Runtime Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="common_parameters.html" class="btn btn-neutral float-left" title="Common Runtime Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
