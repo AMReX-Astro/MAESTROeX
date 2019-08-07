@@ -81,7 +81,7 @@ contains
     allocate(nr_fine)
     allocate(dr_fine)
     allocate(nr_irreg)
-    
+
     max_radial_level = max_radial_level_in
     finest_radial_level = max_radial_level ! FIXME - we want to set this after regridding
     nr_fine = nr_fine_in
@@ -125,10 +125,10 @@ contains
        ! compute r_cc_loc, r_edge_loc
        do n = 0,max_radial_level
           do i = 0,nr(n)-1
-             r_cc_loc(n,i) = prob_lo(amrex_spacedim-1) + (dble(i)+HALF)*dr(n)
+             r_cc_loc(n,i) = prob_lo(amrex_spacedim) + (dble(i)+HALF)*dr(n)
           end do
           do i = 0,nr(n)
-             r_edge_loc(n,i) = prob_lo(amrex_spacedim-1) + (dble(i))*dr(n)
+             r_edge_loc(n,i) = prob_lo(amrex_spacedim) + (dble(i))*dr(n)
           end do
        enddo
 
