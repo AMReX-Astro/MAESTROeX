@@ -42,7 +42,6 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    .. MESA/instructions
    eta
    pert
-   sdc
    Godunov
    mg
    rotation
