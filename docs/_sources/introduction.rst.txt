@@ -294,7 +294,7 @@ Notation
 ========
 
 Throughout the papers describing MAESTROeX, we’ve largely kept our
-notation consistent. Table \ `[table:sym] <#table:sym>`__ defines the
+notation consistent. The table below defines the
 frequently-used quantities and provides their units. Additionally,
 for any quantity :math:`\phi`, we denote the average of :math:`\phi` over a layer
 at constaint radius (or height for plane-parallel simulations) as

@@ -107,7 +107,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#definitions">Definitions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sec-flow-singlestep-single-step">[sec:flow:singlestep] Single Step</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#volume-discrepancy-changes">Volume Discrepancy Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#sec-flow-gamma1vary-gamma-1-variation-changes">[sec:flow:gamma1vary] <span class="math notranslate nohighlight">\(\Gamma_1\)</span> Variation Changes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gamma-1-variation-changes"><span class="math notranslate nohighlight">\(\Gamma_1\)</span> Variation Changes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#keeping-to-first-order-in-delta-gamma-1">Keeping to First Order in <span class="math notranslate nohighlight">\(\delta\Gamma_1\)</span></a></li>
 </ul>
 </li>
@@ -236,17 +236,16 @@
 <p>The equation set and solution procedure used by MAESTROeX has evolved
 over time. In this chapter, we outline the algorithm currently
 implemented in the code. The latest published reference for MAESTROeX
-is the multilevel paper <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{multilevel}`</span></a>. In this description, we
-make frequent reference to paper I <a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{lowMach}`</span></a>,
-paper II <a href="#id5"><span class="problematic" id="id6">:raw-latex:`\cite{lowMach2}`</span></a>, paper III <a href="#id7"><span class="problematic" id="id8">:raw-latex:`\cite{lowMach3}`</span></a>, and
-paper IV <a href="#id9"><span class="problematic" id="id10">:raw-latex:`\cite{lowMach4}`</span></a>.</p>
+is the multilevel paper <a class="reference internal" href="zreferences.html#multilevel" id="id1">[NonakaAlmgrenBell+10]</a>. In this description, we
+make frequent reference to paper I <a class="reference internal" href="zreferences.html#lowmach" id="id2">[AlmgrenBellRendlemanZingale06a]</a>,
+paper II <a class="reference internal" href="zreferences.html#lowmach2" id="id3">[AlmgrenBellRendlemanZingale06b]</a>, paper III <a class="reference internal" href="zreferences.html#lowmach3" id="id4">[AlmgrenBellNonakaZingale08]</a>, and
+paper IV <a class="reference internal" href="zreferences.html#lowmach4" id="id5">[ZingaleAlmgrenBell+09]</a>.</p>
 <div class="section" id="summary-of-the-maestroex-equation-set">
 <h2>Summary of the MAESTROeX Equation Set<a class="headerlink" href="#summary-of-the-maestroex-equation-set" title="Permalink to this headline">¶</a></h2>
 <p>Here we summarize the equations solved by MAESTROeX. We refer the reader
 to papers I through IV and the multilevel paper for the derivation
-and motivation of the equation set. (Note: this ‘traditional’ algorithm
-uses Strang-splitting for the reactions. An alternate implementation, using
-spectral deferred corrections is outlined in Chapter <a class="reference external" href="#ch:sdc">[ch:sdc]</a>.)</p>
+and motivation of the equation set.  Note: this ‘traditional’ algorithm
+uses Strang-splitting for the reactions.</p>
 <div class="section" id="base-state">
 <h3>Base State<a class="headerlink" href="#base-state" title="Permalink to this headline">¶</a></h3>
 <p>The stratified atmosphere is characterized by a one-dimensional
@@ -254,10 +253,11 @@ time-dependent base state, defined by a base state density, <span class="math no
 and a base state pressure, <span class="math notranslate nohighlight">\(p_0\)</span>, in hydrostatic equilibrum:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-0">
 <span class="eqno">(1)<a class="headerlink" href="#equation-flowchart-0" title="Permalink to this equation">¶</a></span>\[\nabla p_0 = -\rho_0 |g| \er\]</div>
-<p>The gravitational acceleration, <span class="math notranslate nohighlight">\(g\)</span> is either constant or a point-mass
-with a <span class="math notranslate nohighlight">\(1/r^2\)</span> dependence (see §<a class="reference external" href="#sec:planarinvsqgravity">[sec:planarinvsqgravity]</a>) for plane-parallel geometries, or a monopole
-constructed by integrating the base state density for spherical
-geometries.</p>
+<p>The gravitational acceleration, <span class="math notranslate nohighlight">\(g\)</span> is either constant or a
+point-mass with a <span class="math notranslate nohighlight">\(1/r^2\)</span> dependence (see §
+<span class="xref std std-ref">sec:planarinvsqgravity</span>) for plane-parallel geometries, or a
+monopole constructed by integrating the base state density for
+spherical geometries.</p>
 <p>For the time-dependence, we will define a base state velocity, <span class="math notranslate nohighlight">\(w_0\)</span>,
 which will adjust the base state from one hydrostatic equilibrum to
 another in response to heating.</p>
@@ -333,9 +333,9 @@ term is only present if we are using thermal diffusion (<code class="docutils li
 <p>In this constraint, <span class="math notranslate nohighlight">\(\gammabar\)</span> is the lateral average of
 <span class="math notranslate nohighlight">\(\Gamma_1 \equiv d\log p / d\log \rho |_s\)</span>. Using the lateral average
 here makes it possible to cast the constraint as a
-divergence. <a href="#id11"><span class="problematic" id="id12">:raw-latex:`\cite{KP:2012}`</span></a> discuss the general case where we want to
+divergence. <a class="reference internal" href="zreferences.html#kp-2012" id="id6">[KP12]</a> discuss the general case where we want to
 keep the local variations of <span class="math notranslate nohighlight">\(\Gamma_1\)</span> (and we explored this in paper
-III). We also look at this in § <a class="reference external" href="#sec:flow:gamma1vary">[sec:flow:gamma1vary]</a>.</p>
+III). We also look at this in § <a class="reference internal" href="#sec-flow-gamma1vary"><span class="std std-ref">\Gamma_1 Variation Changes</span></a></p>
 </div>
 <div class="section" id="momentum">
 <h3>Momentum<a class="headerlink" href="#momentum" title="Permalink to this headline">¶</a></h3>
@@ -353,7 +353,7 @@ and perturbational density as <span class="math notranslate nohighlight">\(\rho'
    -\frac{\rho^\prime}{\rho} |g| \er\]</div>
 <p>This is the form of the momentum equation that we solved in papers
 I–IV and in the multilevel paper.</p>
-<p>Several authors <a href="#id13"><span class="problematic" id="id14">:raw-latex:`\cite{KP:2012,VLBWZ:2013}`</span></a> explored the idea of energy
+<p>Several authors <a class="reference internal" href="zreferences.html#kp-2012" id="id7">[KP12]</a><a class="reference internal" href="zreferences.html#vlbwz-2013" id="id8">[VLB+13]</a> explored the idea of energy
 conservation in a low Mach number system and found that an additional
 term (which can look like a buoyancy) is needed in the low Mach number
 formulation, yielding:</p>
@@ -603,7 +603,7 @@ we set</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-42">
 <span class="eqno">(43)<a class="headerlink" href="#equation-flowchart-42" title="Permalink to this equation">¶</a></span>\[S^{n+\myhalf,\star\star} = \frac{S^0 + S^1}{2},\]</div>
 <p>where <span class="math notranslate nohighlight">\(S^1\)</span> is found during initialization. For other time steps
-<span class="math notranslate nohighlight">\((n \ne 0)\)</span>, following <a href="#id15"><span class="problematic" id="id16">:raw-latex:`\cite{SNe}`</span></a>, we extrapolate
+<span class="math notranslate nohighlight">\((n \ne 0)\)</span>, following <a href="#id9"><span class="problematic" id="id10">:raw-latex:`\cite{SNe}`</span></a>, we extrapolate
 to the half-time using <span class="math notranslate nohighlight">\(S\)</span> at the previous and current
 time levels</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-43">
@@ -1078,8 +1078,8 @@ discrepancy term:</p>
 </li>
 </ul>
 </div>
-<div class="section" id="sec-flow-gamma1vary-gamma-1-variation-changes">
-<h3>[sec:flow:gamma1vary] <span class="math notranslate nohighlight">\(\Gamma_1\)</span> Variation Changes<a class="headerlink" href="#sec-flow-gamma1vary-gamma-1-variation-changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="gamma-1-variation-changes">
+<span id="sec-flow-gamma1vary"></span><h3><span class="math notranslate nohighlight">\(\Gamma_1\)</span> Variation Changes<a class="headerlink" href="#gamma-1-variation-changes" title="Permalink to this headline">¶</a></h3>
 <p>The constraint we derive from requiring the pressure to be close to
 the background hydrostatic pressure takes the form:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-100">
@@ -1209,7 +1209,7 @@ First we construct:</p>
 </div>
 <div class="section" id="thermal-diffusion-changes">
 <span id="sec-flow-diffusion"></span><h3>Thermal Diffusion Changes<a class="headerlink" href="#thermal-diffusion-changes" title="Permalink to this headline">¶</a></h3>
-<p>Thermal diffusion was introduced in the XRB paper <a href="#id17"><span class="problematic" id="id18">:raw-latex:`\cite{xrb}`</span></a>. This
+<p>Thermal diffusion was introduced in the XRB paper <a href="#id11"><span class="problematic" id="id12">:raw-latex:`\cite{xrb}`</span></a>. This
 introduces a new term to <span class="math notranslate nohighlight">\(S\)</span> as well as the enthalpy equation.
 Treating the enthalpy equation now requires a parabolic solve. We describe
 that process here.</p>
@@ -1348,7 +1348,7 @@ we define <span class="math notranslate nohighlight">\({\bf V} = (\Ubt^{1,\star}
 <div class="math notranslate nohighlight" id="equation-flowchart-125">
 <span class="eqno">(126)<a class="headerlink" href="#equation-flowchart-125" title="Permalink to this equation">¶</a></span>\[L_\beta^\rho \phi = D \left ( \beta_0^{\myhalf} {\bf V} \right) - \beta_0^{\myhalf} \left[ \left(S^{1}-\overline{S^{1}}\right) - \left(S^{0}-\overline{S^{0}}\right) \right]  .\]</div>
 <p>(The motivation for this form of the projection in the initial pressure iterations
-is discussed in <a href="#id19"><span class="problematic" id="id20">:raw-latex:`\cite{almgren:bell:crutchfield}`</span></a>.)
+is discussed in <a href="#id13"><span class="problematic" id="id14">:raw-latex:`\cite{almgren:bell:crutchfield}`</span></a>.)
 We discard the new velocity resulting from this, but keep the new
 value for <span class="math notranslate nohighlight">\(\pi^{\myhalf} = \pi^{-\myhalf} + (1 / \dt) \; \phi.\)</span>
 These steps also yield new scalar data at time <span class="math notranslate nohighlight">\(\dt,\)</span> which
@@ -1397,7 +1397,7 @@ compute <span class="math notranslate nohighlight">\(h\)</span> with the EOS usi
 <p>See the multilevel paper for the latest.</p>
 </div>
 <div class="section" id="changes-between-the-multilevel-paper-and-paper-5-raw-latex-cite-wdconvect">
-<h3>Changes Between the Multilevel Paper and Paper 5 <a href="#id21"><span class="problematic" id="id22">:raw-latex:`\cite{wdconvect}`</span></a><a class="headerlink" href="#changes-between-the-multilevel-paper-and-paper-5-raw-latex-cite-wdconvect" title="Permalink to this headline">¶</a></h3>
+<h3>Changes Between the Multilevel Paper and Paper 5 <a href="#id15"><span class="problematic" id="id16">:raw-latex:`\cite{wdconvect}`</span></a><a class="headerlink" href="#changes-between-the-multilevel-paper-and-paper-5-raw-latex-cite-wdconvect" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Added rotation.</p></li>
 </ol>
