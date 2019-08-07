@@ -1,8 +1,9 @@
+.. _sec:analysis:
+
 ********
 Analysis
 ********
 
-.. _sec:analysis:
 
 The Postprocessing Routines
 ===========================

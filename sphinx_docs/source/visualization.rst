@@ -359,7 +359,9 @@ log is taken of the data before plotting. The script is then run as:
 
     runtimevis.py plt00000
 
-[sec:vis:yt] Visualizing with yt
+.. _sec:vis_yt:
+
+Visualizing with yt
 ================================
 
 yt is a Python package for analyzing and visualizing simulation data,

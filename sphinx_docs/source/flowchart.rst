@@ -1,3 +1,5 @@
+.. _ch:flowchart:
+
 *******************
 MAESTROeX Flowchart
 *******************
