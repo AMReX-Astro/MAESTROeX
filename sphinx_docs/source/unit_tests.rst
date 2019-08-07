@@ -33,25 +33,21 @@ do not solve the L2 minimization problem exactly so we iterate up to
 the constraint. The iteration will give different results depending
 on orientation since we work through the corners in arbitrary order.
 
-.. raw:: latex
+.. figure:: dens_2d_orig_density.png
+   :align: center
 
-   \centering
+   Initial Gaussian density profile
 
-|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|
-|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|
-|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|
+.. figure:: dens_2d_ppm1_xp_final_density.png
+   :align: center
+
+   density profile after advecting to the right for one period 
+
+.. figure:: dens_2d_ppm1_xp_final_abserror.png
+   :align: center
+
+   absolute error between the final and initial density fields,
+   showing the error in the advection scheme
 
 test_average
 ============
