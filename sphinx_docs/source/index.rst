@@ -54,8 +54,9 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    enthalpy
 
 .. toctree::
+   :caption: References
 
-   references
+   zreferences
 
 Indices and tables
 ==================

@@ -219,7 +219,7 @@ paper 3.
    file in each plotfile and checkpoint directory.
 
    .. note:: unless otherwise specified all quantities in
-      MAESTROeX are assumed to be in CGS units.
+      MAESTROeX are assumed to be in CGS units.
 
    Visualization of results is described in the next section.
 
