@@ -565,15 +565,15 @@ data. Both of these are used in MAESTRO.</p>
 the cell-interfaces at the half-time. The edge-centered velocities
 are shown in Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>. If we consider purely
 incompressible flow, the projection appears as:</p>
-<div class="math notranslate nohighlight">
-\[D G \phi = D U\]</div>
+<div class="math notranslate nohighlight" id="equation-mg-0">
+<span class="eqno">(1)<a class="headerlink" href="#equation-mg-0" title="Permalink to this equation">¶</a></span>\[D G \phi = D U\]</div>
 <p>where <span class="math notranslate nohighlight">\(D\)</span> is the divergence operator and <span class="math notranslate nohighlight">\(G\)</span> is the gradient operator.
 In this discretization, <span class="math notranslate nohighlight">\(\phi\)</span> is cell-centered (see
 Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>). The remaining quantities are discretized as:</p>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(DU\)</span> is cell-centered,</p>
-<div class="math notranslate nohighlight">
-\[(DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
+<div class="math notranslate nohighlight" id="equation-mg-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-mg-1" title="Permalink to this equation">¶</a></span>\[(DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
                \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}\]</div>
 </li>
 <li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is edge-centered, on the MAC grid, as shown in
@@ -590,16 +590,16 @@ the timestep. Here, <span class="math notranslate nohighlight">\(\phi\)</span> i
 shows the locations of the various quantities involved in the HG
 projection. Again considering simple incompressible flow, we now
 solve:</p>
-<div class="math notranslate nohighlight">
-\[L \phi = D U\]</div>
+<div class="math notranslate nohighlight" id="equation-mg-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-mg-2" title="Permalink to this equation">¶</a></span>\[L \phi = D U\]</div>
 <p>where <span class="math notranslate nohighlight">\(L\)</span> is a discretization of the Laplacian operator. In this
 sense, the HG projection is an <em>approximate projection</em>, that is,
 <span class="math notranslate nohighlight">\(L \neq DG\)</span> (in discretized form). The various operations have the
 following centerings:</p>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(DU\)</span> is node-centered. This is computed as:</p>
-<div class="math notranslate nohighlight">
-\[(DU)_{i-1/2,j-1/2} = \frac{\frac{1}{2} (u_{i,j} + u_{i,j-1}) -
+<div class="math notranslate nohighlight" id="equation-mg-3">
+<span class="eqno">(4)<a class="headerlink" href="#equation-mg-3" title="Permalink to this equation">¶</a></span>\[(DU)_{i-1/2,j-1/2} = \frac{\frac{1}{2} (u_{i,j} + u_{i,j-1}) -
                              \frac{1}{2} (u_{i-1,j} + u_{i-1,j-1})}{\Delta x} +
                        \frac{\frac{1}{2} (v_{i,j} + v_{i-1,j}) -
                              \frac{1}{2} (v_{i,j-1} + v_{i-1,j-1})}{\Delta y}\]</div>
@@ -864,6 +864,10 @@ higher values to get more information about the solve.</p>
     /* TOC colors */
     .wy-nav-side span[id*='MathJax-Span']{
        color: inherit;
+    }
+
+    span.eqno {
+       float: right;
     }
   </style>
 

@@ -227,14 +227,16 @@ For example, the equations of constant-density incompressible flow
 are:
 
 .. math::
+   \Ub_t = -\Ub \cdot \nabla \Ub + \nabla p
+   :label: incompressible_u
 
-   \begin{aligned}
-   \Ub_t &=& -\Ub \cdot \nabla \Ub + \nabla p \label{eq:incompressible_u} \\
-   \nabla \cdot \Ub &=& 0\end{aligned}
+.. math::
+   \nabla \cdot \Ub = 0
+
 
 Here, :math:`\Ub` represents the velocity vector [1]_ and :math:`p` is
 the dynamical pressure. The time-evolution equation for the velocity
-(Eq. `[eq:incompressible_u] <#eq:incompressible_u>`__) can be solved
+(:eq:`incompressible_u`) can be solved
 using techniques similar to those developed for compressible
 hydrodynamics, updating the old velocity, :math:`\Ub^n`, to the new
 time-level, :math:`\Ub^\star`.  Here the ‘:math:`^\star`’ indicates
@@ -245,11 +247,13 @@ the fact that any vector field can be expressed as the sum of a
 divergence-free quantity and the gradient of a scalar. For the
 velocity, we can write:
 
-.. math:: \Ub^\star = \Ub^d + \nabla \phi \label{eq:decomposition}
+.. math::
+   \Ub^\star = \Ub^d + \nabla \phi 
+   :label: decomposition
 
 where :math:`\Ub^d` is the divergence free portion of the velocity vector,
 :math:`\Ub^\star`, and :math:`\phi` is a scalar. Taking the divergence of
-Eq. (\ `[eq:decomposition] <#eq:decomposition>`__), we have
+:eq:`decomposition`, we have
 
 .. math:: \nabla^2 \phi = \nabla \cdot \Ub^\star
 

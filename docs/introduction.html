@@ -305,12 +305,12 @@ equations of motion.</p>
 hydrodynamics. This approximation is formally the <span class="math notranslate nohighlight">\(M \rightarrow 0\)</span>
 limit of the Navier-Stokes equations. In incompressible hydrodynamics,
 the velocity satisfies a constraint equation:</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot \Ub = 0\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-0">
+<span class="eqno">(1)<a class="headerlink" href="#equation-introduction-0" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub = 0\]</div>
 <p>which acts to instantaneously equilibrate the flow, thereby filtering
 out soundwaves. The constraint equation implies that</p>
-<div class="math notranslate nohighlight">
-\[D\rho/Dt = 0\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-introduction-1" title="Permalink to this equation">¶</a></span>\[D\rho/Dt = 0\]</div>
 <p>(through the continuity equation) which says that the density is
 constant along particle paths. This means that there are no
 compressibility effects modeled in this approximation.</p>
@@ -322,8 +322,8 @@ perturbations are carried with respect to a static hydrostatic
 background (described by density <span class="math notranslate nohighlight">\(\rho_0\)</span>). The density perturbation
 is ignored in the continuity equation, resulting in a constraint
 equation:</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot (\rho_0 \Ub) = 0\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-introduction-2" title="Permalink to this equation">¶</a></span>\[\nabla \cdot (\rho_0 \Ub) = 0\]</div>
 <p>This properly captures the compressibility effects due to the
 stratification of the background. Because there is no evolution
 equation for the perturbational density, approximations are made to
@@ -340,12 +340,12 @@ waves. Large amplitude density and temperature fluctuations are
 allowed. The only requirement is that the total pressure stay close to
 the background pressure, which is assumed constant. This requirement
 can be expressed as:</p>
-<div class="math notranslate nohighlight">
-\[p = p_0\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-3">
+<span class="eqno">(4)<a class="headerlink" href="#equation-introduction-3" title="Permalink to this equation">¶</a></span>\[p = p_0\]</div>
 <p>and differentiating this along particle paths leads to a constraint on
 the velocity field:</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot \Ub = S\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-4">
+<span class="eqno">(5)<a class="headerlink" href="#equation-introduction-4" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub = S\]</div>
 <p>This looks like the constraint for incompressible hydrodynamics, but
 now we have a source term, <span class="math notranslate nohighlight">\(S\)</span>, representing the local compressibility
 effects due to the energy generation and thermal diffusion. Since the
@@ -361,8 +361,8 @@ changes due to the background stratification. This was originally
 derived for an ideal gas equation of state for atmospherical flows.
 Allowing the background pressure, <span class="math notranslate nohighlight">\(p_0\)</span> to vary (e.g. in hydrostatic
 equilibrium), differentiating pressure along particle paths gives:</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot (p_0^{1/\gamma} \Ub) = H\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-5">
+<span class="eqno">(6)<a class="headerlink" href="#equation-introduction-5" title="Permalink to this equation">¶</a></span>\[\nabla \cdot (p_0^{1/\gamma} \Ub) = H\]</div>
 <p>where <span class="math notranslate nohighlight">\(\gamma\)</span> is the ratio of specific heats and <span class="math notranslate nohighlight">\(H\)</span> is the source.</p>
 <p>MAESTROeX is based on this method, generalizing this constraint to an
 arbitrary equation of state and allowing for the time-variation of the
@@ -386,14 +386,14 @@ Dec. 2013, this new formulation is the default in MAESTROeX.</p>
 <p>Most astrophysical hydrodynamics codes
 (e.g. CASTRO <a class="reference internal" href="references.html#castro" id="id10">[AlmgrenBecknerBell+10]</a> or FLASH <a class="reference internal" href="references.html#flash" id="id11">[FryxellOlsonRicker+00]</a>) solve the
 compressible Euler equations, which can be written in the form:</p>
-<div class="math notranslate nohighlight">
-\[\Ub_t + \nabla \cdot F(\Ub) = 0\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-6">
+<span class="eqno">(7)<a class="headerlink" href="#equation-introduction-6" title="Permalink to this equation">¶</a></span>\[\Ub_t + \nabla \cdot F(\Ub) = 0\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Ub\)</span> is the vector of conserved quantities, <span class="math notranslate nohighlight">\(\Ub = (\rho, \rho u,
 \rho E)\)</span>, with <span class="math notranslate nohighlight">\(\rho\)</span> the density, <span class="math notranslate nohighlight">\(u\)</span> the velocity, and <span class="math notranslate nohighlight">\(E\)</span> the total
 energy per unit mass. This system of equations can be expressed
 as a system of advection equations:</p>
-<div class="math notranslate nohighlight">
-\[{\bf q}_t + A({\bf q}) {\bf q}_x = 0\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-7">
+<span class="eqno">(8)<a class="headerlink" href="#equation-introduction-7" title="Permalink to this equation">¶</a></span>\[{\bf q}_t + A({\bf q}) {\bf q}_x = 0\]</div>
 <p>where <span class="math notranslate nohighlight">\({\bf q}\)</span> are called the primitive variables, and <span class="math notranslate nohighlight">\(A\)</span> is the
 Jacobian, <span class="math notranslate nohighlight">\(A \equiv \partial F / \partial U\)</span>. The eigenvalues of the
 matrix <span class="math notranslate nohighlight">\(A\)</span> are the characteristic speeds—the speeds at which
@@ -413,13 +413,13 @@ advection-like equations (representing, e.g. conservation of mass and
 momentum) coupled with a divergence constraint on the velocity field.
 For example, the equations of constant-density incompressible flow
 are:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
-\Ub_t &amp;=&amp; -\Ub \cdot \nabla \Ub + \nabla p \label{eq:incompressible_u} \\
-\nabla \cdot \Ub &amp;=&amp; 0\end{aligned}\end{split}\]</div>
+<div class="math notranslate nohighlight" id="equation-incompressible-u">
+<span class="eqno">(9)<a class="headerlink" href="#equation-incompressible-u" title="Permalink to this equation">¶</a></span>\[\Ub_t = -\Ub \cdot \nabla \Ub + \nabla p\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-8">
+<span class="eqno">(10)<a class="headerlink" href="#equation-introduction-8" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub = 0\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(\Ub\)</span> represents the velocity vector <a class="footnote-reference brackets" href="#id18" id="id13">1</a> and <span class="math notranslate nohighlight">\(p\)</span> is
 the dynamical pressure. The time-evolution equation for the velocity
-(Eq. <a class="reference external" href="#eq:incompressible_u">[eq:incompressible_u]</a>) can be solved
+(<a class="reference internal" href="#equation-incompressible-u">Eq.9</a>) can be solved
 using techniques similar to those developed for compressible
 hydrodynamics, updating the old velocity, <span class="math notranslate nohighlight">\(\Ub^n\)</span>, to the new
 time-level, <span class="math notranslate nohighlight">\(\Ub^\star\)</span>.  Here the ‘<span class="math notranslate nohighlight">\(^\star\)</span>’ indicates
@@ -429,19 +429,19 @@ force it to obey the constraint equation. The basic idea follows from
 the fact that any vector field can be expressed as the sum of a
 divergence-free quantity and the gradient of a scalar. For the
 velocity, we can write:</p>
-<div class="math notranslate nohighlight">
-\[\Ub^\star = \Ub^d + \nabla \phi \label{eq:decomposition}\]</div>
+<div class="math notranslate nohighlight" id="equation-decomposition">
+<span class="eqno">(11)<a class="headerlink" href="#equation-decomposition" title="Permalink to this equation">¶</a></span>\[\Ub^\star = \Ub^d + \nabla \phi\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Ub^d\)</span> is the divergence free portion of the velocity vector,
 <span class="math notranslate nohighlight">\(\Ub^\star\)</span>, and <span class="math notranslate nohighlight">\(\phi\)</span> is a scalar. Taking the divergence of
-Eq. (<a class="reference external" href="#eq:decomposition">[eq:decomposition]</a>), we have</p>
-<div class="math notranslate nohighlight">
-\[\nabla^2 \phi = \nabla \cdot \Ub^\star\]</div>
+<a class="reference internal" href="#equation-decomposition">Eq.11</a>, we have</p>
+<div class="math notranslate nohighlight" id="equation-introduction-9">
+<span class="eqno">(12)<a class="headerlink" href="#equation-introduction-9" title="Permalink to this equation">¶</a></span>\[\nabla^2 \phi = \nabla \cdot \Ub^\star\]</div>
 <p>(where we used <span class="math notranslate nohighlight">\(\nabla \cdot \Ub^d = 0\)</span>).
 With appropriate boundary conditions, this Poisson equation can be
 solved for <span class="math notranslate nohighlight">\(\phi\)</span>, and the final, divergence-free velocity can
 be computed as</p>
-<div class="math notranslate nohighlight">
-\[\Ub^{n+1} = \Ub^\star - \nabla \phi\]</div>
+<div class="math notranslate nohighlight" id="equation-introduction-10">
+<span class="eqno">(13)<a class="headerlink" href="#equation-introduction-10" title="Permalink to this equation">¶</a></span>\[\Ub^{n+1} = \Ub^\star - \nabla \phi\]</div>
 <p>Because soundwaves are filtered, the timestep constraint now depends only
 on <span class="math notranslate nohighlight">\(|\Ub|\)</span>.</p>
 <p>Extensions to variable-density incompressible
@@ -723,6 +723,10 @@ incompressible / low speed papers, <span class="math notranslate nohighlight">\(
     /* TOC colors */
     .wy-nav-side span[id*='MathJax-Span']{
        color: inherit;
+    }
+
+    span.eqno {
+       float: right;
     }
   </style>
 

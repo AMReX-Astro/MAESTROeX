@@ -278,14 +278,14 @@ slightly depending on which form we are dealing with.</p>
 <h3>Advective form<a class="headerlink" href="#advective-form" title="Permalink to this headline">¶</a></h3>
 <p>Most of the time, we are dealing with equations in advective form.
 Here, a scalar, <span class="math notranslate nohighlight">\(\phi\)</span>, obeys:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial \phi}{\partial t} = -\Ub \cdot \nabla \phi + f\]</div>
+<div class="math notranslate nohighlight" id="equation-pert-0">
+<span class="eqno">(1)<a class="headerlink" href="#equation-pert-0" title="Permalink to this equation">¶</a></span>\[\frac{\partial \phi}{\partial t} = -\Ub \cdot \nabla \phi + f\]</div>
 <p>where <span class="math notranslate nohighlight">\(f\)</span> is the force. This is the form that the perturbation
 equations take, as well as the equation for <span class="math notranslate nohighlight">\(X_k\)</span> itself.</p>
 <p>A piecewise linear prediction of <span class="math notranslate nohighlight">\(\phi\)</span> to the interface
 would appear as:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-pert-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-pert-1" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \phi_{i+1/2,j}^{n+1/2} &amp;=&amp; \phi_{i,j}^n
     + \left . \frac{\Delta x}{2} \frac{\partial \phi}{\partial x} \right |_{i,j}
     + \left . \frac{\Delta t}{2} \frac{\partial \phi}{\partial t} \right |_{i,j} \\
@@ -305,11 +305,11 @@ of equations, we add additional advection-like terms to <span class="math notran
 <div class="section" id="conservative-form">
 <h3>Conservative form<a class="headerlink" href="#conservative-form" title="Permalink to this headline">¶</a></h3>
 <p>A conservative equation takes the form:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial \phi}{\partial t} = -\nabla \cdot ( \phi \Ub) + f\]</div>
+<div class="math notranslate nohighlight" id="equation-pert-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-pert-2" title="Permalink to this equation">¶</a></span>\[\frac{\partial \phi}{\partial t} = -\nabla \cdot ( \phi \Ub) + f\]</div>
 <p>Now a piecewise linear prediction of <span class="math notranslate nohighlight">\(\phi\)</span> to the interface is</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-pert-3">
+<span class="eqno">(4)<a class="headerlink" href="#equation-pert-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \phi_{i+1/2,j}^{n+1/2} &amp;=&amp; \phi_{i,j}^n
     + \left . \frac{\Delta x}{2} \frac{\partial \phi}{\partial x} \right |_{i,j}
     + \left . \frac{\Delta t}{2} \frac{\partial \phi}{\partial t} \right |_{i,j} \\
@@ -333,19 +333,19 @@ with <code class="docutils literal notranslate"><span class="pre">is_conservativ
 <div class="section" id="basic-equations">
 <h3>Basic equations<a class="headerlink" href="#basic-equations" title="Permalink to this headline">¶</a></h3>
 <p>The full density evolution equation is</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-pert-4">
+<span class="eqno">(5)<a class="headerlink" href="#equation-pert-4" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial\rho}{\partial t} &amp;=&amp; -\nabla\cdot(\rho\Ub) \nonumber \\
 &amp;=&amp; -\Ub\cdot\nabla\rho - \rho\nabla\cdot\Ub \, . \label{rho equation}\end{aligned}\end{split}\]</div>
 <p>The species are evolved according to</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-pert-5">
+<span class="eqno">(6)<a class="headerlink" href="#equation-pert-5" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho X_k)}{\partial t} &amp;=&amp; -\nabla\cdot(\rho\Ub X_k) + \rho \omegadot_k \nonumber \\
 &amp;=&amp; -\Ub\cdot\nabla(\rho X_k) - \rho X_k \nabla\cdot\Ub + \rho \omegadot_k \, . \label{species equation}\end{aligned}\end{split}\]</div>
 <p>In practice, only the species evolution equation is evolved, and the
 total density is set as</p>
-<div class="math notranslate nohighlight">
-\[\rho = \sum_k (\rho X_k)\]</div>
+<div class="math notranslate nohighlight" id="equation-pert-6">
+<span class="eqno">(7)<a class="headerlink" href="#equation-pert-6" title="Permalink to this equation">¶</a></span>\[\rho = \sum_k (\rho X_k)\]</div>
 <p>To advance <span class="math notranslate nohighlight">\((\rho X_k)\)</span> to the next timestep, we need to predict a
 time-centered, interface state. Algebraically, there are multiple
 paths to get this interface state—we can predict <span class="math notranslate nohighlight">\((\rho X)\)</span> to the
@@ -401,22 +401,22 @@ module.</p>
 + \rho'_\mathrm{edge})(X_k)_\mathrm{edge}\)</span>.</p>
 <p>We predict both <span class="math notranslate nohighlight">\(\rho'\)</span> and <span class="math notranslate nohighlight">\(\rho_0\)</span> to edges separately and later use them to
 reconstruct <span class="math notranslate nohighlight">\(\rho\)</span> at edges. The base state density evolution equation is</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial\rho_0}{\partial t} = -\nabla\cdot(\rho_0 w_0 \eb_r) =
+<div class="math notranslate nohighlight" id="equation-pert-7">
+<span class="eqno">(8)<a class="headerlink" href="#equation-pert-7" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho_0}{\partial t} = -\nabla\cdot(\rho_0 w_0 \eb_r) =
 -w_0\frac{\partial\rho_0}{\partial r}
 \underbrace{-\rho_0\frac{\partial w_0}{\partial r}}_{``\rho_0 ~ \text{force&quot;}}.
 \label{rho0 equation}\]</div>
 <p>Subtract (<a class="reference external" href="#rho0equation">[rho0 equation]</a>) from (<a class="reference external" href="#rhoequation">[rho equation]</a>) and rearrange
 terms, noting that <span class="math notranslate nohighlight">\(\Ub = \Ubt + w_o\eb_r\)</span>, to obtain the
 perturbational density equation,</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' \underbrace{- \rho'\nabla\cdot\Ub
+<div class="math notranslate nohighlight" id="equation-pert-8">
+<span class="eqno">(9)<a class="headerlink" href="#equation-pert-8" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' \underbrace{- \rho'\nabla\cdot\Ub
 - \nabla\cdot(\rho_0\Ubt)}_{\rho' ~ \text{force}} \, .
 \label{rhoprime equation}\]</div>
 <p>We also need <span class="math notranslate nohighlight">\(X_k\)</span> at the edges. Here, we subtract <span class="math notranslate nohighlight">\(X_k \times\)</span>
 Eq. <a class="reference external" href="#rhoequation">[rho equation]</a> from Eq. <a class="reference external" href="#speciesequation">[species equation]</a> to obtain</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial X_k}{\partial t} = -\Ub \cdot \nabla X_k + \omegadot_k\]</div>
+<div class="math notranslate nohighlight" id="equation-pert-9">
+<span class="eqno">(10)<a class="headerlink" href="#equation-pert-9" title="Permalink to this equation">¶</a></span>\[\frac{\partial X_k}{\partial t} = -\Ub \cdot \nabla X_k + \omegadot_k\]</div>
 <p>When using Strang-splitting, we ignore the <span class="math notranslate nohighlight">\(\omegadot_k\)</span> source terms, and
 then the species equation is a pure advection equation with no force.</p>
 <div class="section" id="predicting-rho-at-edges">
@@ -480,8 +480,8 @@ done in advective form.</p>
 <p>Here we wish to construct <span class="math notranslate nohighlight">\((\rho X_k)_\mathrm{edge}\)</span> by predicting
 <span class="math notranslate nohighlight">\((\rho X_k)\)</span> to the edges as a single quantity. We recall
 Eq. <a class="reference external" href="#speciesequation">[species equation]</a>:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial(\rho X_k)}{\partial t} =
+<div class="math notranslate nohighlight" id="equation-pert-10">
+<span class="eqno">(11)<a class="headerlink" href="#equation-pert-10" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho X_k)}{\partial t} =
   -\nabla \cdot (\rho \Ub X_k) + \rho \omegadot_k \, . \nonumber\]</div>
 <p>The edge state is created by calling <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in
 <code class="docutils literal notranslate"><span class="pre">density_advance</span></code> with <code class="docutils literal notranslate"><span class="pre">is_conservative</span> <span class="pre">=</span> <span class="pre">.true.</span></code>.
@@ -498,8 +498,8 @@ by predicting <span class="math notranslate nohighlight">\(\rho\)</span> and <sp
 <p>Predicting <span class="math notranslate nohighlight">\(X_k\)</span> to the edges proceeds exactly as described in
 § <a class="reference external" href="#sec:pert:predict_X">2.2.4</a>.</p>
 <p>Predicting the full <span class="math notranslate nohighlight">\(\rho\)</span> begins with Eq. <a class="reference external" href="#rhoequation">[rho equation]</a>:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial\rho}{\partial t}
+<div class="math notranslate nohighlight" id="equation-pert-11">
+<span class="eqno">(12)<a class="headerlink" href="#equation-pert-11" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho}{\partial t}
 = -\Ub\cdot\nabla\rho \, \underbrace{- \rho\nabla\cdot\Ub}_{``\rho~\text{force''}} \, . \label{rho equation labeled}\]</div>
 <p>Using this, <span class="math notranslate nohighlight">\(\rho\)</span> is predicted to the edges using
 <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in <code class="docutils literal notranslate"><span class="pre">density_advance</span></code>, with the underbraced
@@ -515,8 +515,8 @@ associated discretization is</div>
 <div class="line">:</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\frac{\partial\rho X_k}{\partial t} =
+<div><div class="math notranslate nohighlight" id="equation-pert-12">
+<span class="eqno">(13)<a class="headerlink" href="#equation-pert-12" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\left({\rho_0}^{n+\myhalf,{\rm avg}}
 + \rho'_\mathrm{edge} \right)(X_k)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
 </div></blockquote>
@@ -524,16 +524,16 @@ associated discretization is</div>
 <div class="line">:</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\frac{\partial\rho X_k}{\partial t} =
+<div><div class="math notranslate nohighlight" id="equation-pert-13">
+<span class="eqno">(14)<a class="headerlink" href="#equation-pert-13" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\left(\rho X_k \right)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
 </div></blockquote>
 <div class="line-block">
 <div class="line">:</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\frac{\partial\rho X_k}{\partial t} =
+<div><div class="math notranslate nohighlight" id="equation-pert-14">
+<span class="eqno">(15)<a class="headerlink" href="#equation-pert-14" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\rho_\mathrm{edge} (X_k)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
 </div></blockquote>
 </div>
@@ -544,8 +544,8 @@ associated discretization is</div>
 <span id="id2"></span><h3>Basic equations<a class="headerlink" href="#basic-equations-1" title="Permalink to this headline">¶</a></h3>
 <p>MAESTRO solves an enthalpy equation.
 The full enthalpy equation is</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-pert-15">
+<span class="eqno">(16)<a class="headerlink" href="#equation-pert-15" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)}{\partial t} &amp;=&amp; -\nabla\cdot(\rho h \Ub) + \frac{Dp_0}{Dt}
 + \nabla\cdot \kth \nabla T + \rho H_{\rm nuc} + \rho H_{\rm ext} \nonumber \\
 &amp;=&amp; \underbrace{-\Ub\cdot\nabla(\rho h) - \rho h\nabla\cdot\Ub}_{-\nabla\cdot(\rho h\Ub)}
@@ -557,12 +557,12 @@ an edge state enthalpy starting from <span class="math notranslate nohighlight">
 enthalpy equation that does not include the <span class="math notranslate nohighlight">\(\rho H_{\rm nuc}\)</span> and
 <span class="math notranslate nohighlight">\(\rho H_{\rm ext}\)</span> terms, where were already accounted for in
 react_state, so our equation becomes</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial(\rho h)}{\partial t} = -\Ub\cdot\nabla(\rho h) - \rho h\nabla\cdot\Ub
+<div class="math notranslate nohighlight" id="equation-pert-16">
+<span class="eqno">(17)<a class="headerlink" href="#equation-pert-16" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho h)}{\partial t} = -\Ub\cdot\nabla(\rho h) - \rho h\nabla\cdot\Ub
 + \underbrace{\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla\cdot\kth\nabla T}_{``(\rho h) ~ \text{force}&quot;} \label{rhoh equation}\]</div>
 <p>We define the base state enthalpy evolution equation as</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-pert-17">
+<span class="eqno">(18)<a class="headerlink" href="#equation-pert-17" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)_0}{\partial t} &amp;=&amp; -\nabla\cdot[(\rho h)_0 w_0\eb_r]
 + \frac{D_0p_0}{Dt} \nonumber \\
 &amp;=&amp; -w_0\frac{\partial(\rho h)_0}{\partial r}
@@ -572,8 +572,8 @@ react_state, so our equation becomes</p>
 <h4>Perturbational enthalpy formulation<a class="headerlink" href="#perturbational-enthalpy-formulation" title="Permalink to this headline">¶</a></h4>
 <p>Subtracting (<a class="reference external" href="#rhoh0equation">[rhoh0 equation]</a>) from (<a class="reference external" href="#rhohequation">[rhoh equation]</a>) and
 rearranging terms gives the perturbational enthalpy equation</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-pert-18">
+<span class="eqno">(19)<a class="headerlink" href="#equation-pert-18" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)'}{\partial t} &amp;=&amp; -\nabla\cdot[(\rho h)'\Ub]
 - \nabla\cdot[(\rho h)_0\Ubt] + (\Ubt \cdot \er)\frac{\partial p_0}{\partial r}
 + \nabla\cdot\kth\nabla T\nonumber \\
@@ -585,8 +585,8 @@ rearranging terms gives the perturbational enthalpy equation</p>
 <h4>Temperature formulation<a class="headerlink" href="#temperature-formulation" title="Permalink to this headline">¶</a></h4>
 <p>Alternately, we can consider an temperature evolution equation, derived
 from enthalpy, as:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
+<div class="math notranslate nohighlight" id="equation-pert-19">
+<span class="eqno">(20)<a class="headerlink" href="#equation-pert-19" title="Permalink to this equation">¶</a></span>\[\frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
 + \frac{1}{\rho c_p}\left\{(1-\rho h_p)\left[\psi
 + (\Ubt \cdot \er )\frac{\partial p_0}{\partial r}\right]
 + \nabla \cdot \kth \nabla T
@@ -594,8 +594,8 @@ from enthalpy, as:</p>
 + \rho H_{\rm nuc} + \rho H_{\rm ext}\right\}.\]</div>
 <p>Again, we neglect the reaction terms, since that will be handled during
 the reaction step, so we can write this as:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
+<div class="math notranslate nohighlight" id="equation-pert-20">
+<span class="eqno">(21)<a class="headerlink" href="#equation-pert-20" title="Permalink to this equation">¶</a></span>\[\frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
 \underbrace{
 + \frac{1}{\rho c_p}\left\{(1-\rho h_p)\left[\psi
 + (\Ubt \cdot \er )\frac{\partial p_0}{\partial r}\right]
@@ -608,8 +608,8 @@ the reaction step, so we can write this as:</p>
 alone. This can be derived by expanding the derivative of <span class="math notranslate nohighlight">\((\rho h)\)</span>
 in Eq. <a class="reference external" href="#rhohequation">[rhoh equation]</a> and subtracting off <span class="math notranslate nohighlight">\(h \times\)</span> the
 continuity equation (Eq. <a class="reference external" href="#rhoequation">[rho equation]</a>):</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial h}{\partial t} = -\Ub \cdot \nabla h
+<div class="math notranslate nohighlight" id="equation-pert-21">
+<span class="eqno">(22)<a class="headerlink" href="#equation-pert-21" title="Permalink to this equation">¶</a></span>\[\frac{\partial h}{\partial t} = -\Ub \cdot \nabla h
 \underbrace{+ \frac{1}{\rho}
 \left \{ \psi + (\Ubt \cdot \er )\frac{\partial p_0}{\partial r}
 + \nabla \cdot \kth \nabla T \right \} }_{``h~\text{force''}} \, .
@@ -1222,8 +1222,8 @@ The first two terms in <span class="math notranslate nohighlight">\((\rho h)'\)<
 <code class="docutils literal notranslate"><span class="pre">mkrhohforce</span></code>. For spherical problems, we have found that a different
 representation of the pressure term in the <span class="math notranslate nohighlight">\((\rho h)'\)</span> force gives better
 results, namely:</p>
-<div class="math notranslate nohighlight">
-\[(\Ubt \cdot \er)\frac{\partial p_0}{\partial r} \equiv \Ubt\cdot\nabla p_0 =
+<div class="math notranslate nohighlight" id="equation-pert-22">
+<span class="eqno">(23)<a class="headerlink" href="#equation-pert-22" title="Permalink to this equation">¶</a></span>\[(\Ubt \cdot \er)\frac{\partial p_0}{\partial r} \equiv \Ubt\cdot\nabla p_0 =
 \nabla\cdot(\Ubt p_0) - p_0\nabla\cdot\Ubt.\]</div>
 </div>
 <div class="section" id="predicting-rho-h-0-at-edges">
@@ -1393,8 +1393,8 @@ as the <code class="docutils literal notranslate"><span class="pre">predict_h</s
 Section <a class="reference external" href="#AdvancingrhoX_k">2.5</a>. The forcing term does not include reaction
 source terms accounted for in <strong>React State</strong>, and is the same
 for all enthalpy_pred_types.</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial(\rho h)}{\partial t} =
+<div class="math notranslate nohighlight" id="equation-pert-23">
+<span class="eqno">(24)<a class="headerlink" href="#equation-pert-23" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho h)}{\partial t} =
 -\nabla\cdot\left\{\left \langle (\rho h) \right \rangle_\mathrm{edge}
  \left(\Ubt + w_0\eb_r\right)\right\} + (\Ubt \cdot \er)\frac{\partial p_0}{\partial r} + \psi   .\]</div>
 <p>where <span class="math notranslate nohighlight">\(\left \langle (\rho h) \right \rangle_\mathrm{edge}\)</span> is the
@@ -1552,6 +1552,10 @@ consistent results.</p>
     /* TOC colors */
     .wy-nav-side span[id*='MathJax-Span']{
        color: inherit;
+    }
+
+    span.eqno {
+       float: right;
     }
   </style>
 

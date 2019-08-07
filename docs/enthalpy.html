@@ -219,8 +219,8 @@
 <p>The compressible and low Mach number formulations of the governing
 equations both share the unapproximated continuity and momentum equations
 shown here (where <span class="math notranslate nohighlight">\(p = p_0 + \pi\)</span>).</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-enthalpy-0">
+<span class="eqno">(1)<a class="headerlink" href="#equation-enthalpy-0" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho X_k)}{\partial t} &amp;=&amp; -\nabla\cdot(\rho X_k\Ub) +
 \rho\omegadot_k,\label{enth:eq:species}\\
 \frac{\partial\Ub}{\partial t} &amp;=&amp; -\Ub\cdot\nabla\Ub  -
@@ -235,8 +235,8 @@ would over-constrain the system, but its solution can help us in
 providing a diagnostic capability for the solution. We can write the
 energy equation in terms of internal energy, <span class="math notranslate nohighlight">\(e\)</span>, or enthalpy, <span class="math notranslate nohighlight">\(h\)</span>;
 these two equations are analytically equivalent.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-enthalpy-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-enthalpy-1" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)}{\partial t} + \nabla\cdot(\rho h\Ub)
  &amp;=&amp; \frac{Dp}{Dt} + \rho\Hnuc \nonumber \\
 %
@@ -250,11 +250,11 @@ need to evaluate <span class="math notranslate nohighlight">\(p \nabla \cdot \Ub
 <h2>Derivation of Velocity Constraint<a class="headerlink" href="#derivation-of-velocity-constraint" title="Permalink to this headline">¶</a></h2>
 <p>Differentiating the equation of state, written in the form, <span class="math notranslate nohighlight">\(p =
 p(\rho,T,X_k),\)</span> along particle paths, we can write</p>
-<div class="math notranslate nohighlight">
-\[\frac{D p}{Dt}  = p_\rho \frac{D \rho}{Dt} + p_T \frac{D T}{Dt} + \sum_k p_{X_k} \frac{D X_k}{Dt}\]</div>
+<div class="math notranslate nohighlight" id="equation-enthalpy-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-enthalpy-2" title="Permalink to this equation">¶</a></span>\[\frac{D p}{Dt}  = p_\rho \frac{D \rho}{Dt} + p_T \frac{D T}{Dt} + \sum_k p_{X_k} \frac{D X_k}{Dt}\]</div>
 <p>Then, by rearranging the terms, we get</p>
-<div class="math notranslate nohighlight">
-\[\frac{D \rho}{Dt}  = -\rho \nabla \cdot \Ub =
+<div class="math notranslate nohighlight" id="equation-enthalpy-3">
+<span class="eqno">(4)<a class="headerlink" href="#equation-enthalpy-3" title="Permalink to this equation">¶</a></span>\[\frac{D \rho}{Dt}  = -\rho \nabla \cdot \Ub =
     \frac{1}{p_\rho}
     \left( \frac{D p}{Dt} - p_T \frac{D T}{Dt}
                           - \sum_k p_{X_k} {\omegadot}_k \right)  ,\]</div>
@@ -265,20 +265,20 @@ and <span class="math notranslate nohighlight">\(p_T = \left.\partial p/\partial
 <h3>Using the Enthalpy Equation<a class="headerlink" href="#using-the-enthalpy-equation" title="Permalink to this headline">¶</a></h3>
 <p>Now writing <span class="math notranslate nohighlight">\(h = h(p,T,X_k)\)</span> and expanding <span class="math notranslate nohighlight">\(Dh/Dt\)</span> and using the
 enthalpy evolution equation:</p>
-<div class="math notranslate nohighlight">
-\[\rho \frac{D h}{Dt}  = \rho \left( h_p \frac{D p}{Dt} + c_p \frac{D T}{Dt} + \sum_k h_{X_k} \frac{D X_k}{Dt} \right)
+<div class="math notranslate nohighlight" id="equation-enthalpy-4">
+<span class="eqno">(5)<a class="headerlink" href="#equation-enthalpy-4" title="Permalink to this equation">¶</a></span>\[\rho \frac{D h}{Dt}  = \rho \left( h_p \frac{D p}{Dt} + c_p \frac{D T}{Dt} + \sum_k h_{X_k} \frac{D X_k}{Dt} \right)
                      = \frac{D p}{D t} + \rho \Hnuc\]</div>
 <p>we can express <span class="math notranslate nohighlight">\(DT/Dt\)</span> in terms of</p>
-<div class="math notranslate nohighlight">
-\[\frac{DT}{Dt} = \frac{1}{\rho c_p} \left( (1 - \rho h_p) \frac{D p}{D t}
+<div class="math notranslate nohighlight" id="equation-enthalpy-5">
+<span class="eqno">(6)<a class="headerlink" href="#equation-enthalpy-5" title="Permalink to this equation">¶</a></span>\[\frac{DT}{Dt} = \frac{1}{\rho c_p} \left( (1 - \rho h_p) \frac{D p}{D t}
 - \sum_k \rho \xi_k \omegadot_k + \rho \Hnuc \right)  , \label{eq:dTdt}\]</div>
 <p>where <span class="math notranslate nohighlight">\(c_p = \left.\partial h/\partial T\right|_{p,X_k}\)</span> is the
 specific heat at constant pressure,
 <span class="math notranslate nohighlight">\(\xi_k = \left.\partial h/\partial X_k \right|_{p,T}\)</span>,
 and <span class="math notranslate nohighlight">\(h_p = \left.\partial h/\partial p\right|_{T,X_k}.\)</span></p>
 <p>We could then write,</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-enthalpy-6">
+<span class="eqno">(7)<a class="headerlink" href="#equation-enthalpy-6" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \nabla \cdot \Ub &amp;=&amp; \frac{1}{\rho p_\rho} \left(
 - \frac{D p}{D t} + \frac{p_T}{\rho c_p}
   \left( (1 - \rho h_p) \frac{D p}{D t} - \rho \sum_k \xi_k \omegadot_k + \rho \Hnuc \right)
@@ -292,27 +292,27 @@ and <span class="math notranslate nohighlight">\(h_p = \left.\partial h/\partial
 of <span class="math notranslate nohighlight">\(h\)</span> on <span class="math notranslate nohighlight">\(p\)</span>, as shown by the presence of the <span class="math notranslate nohighlight">\(h_p\)</span> term.</p>
 <p>Then, replacing <span class="math notranslate nohighlight">\(p\)</span> by <span class="math notranslate nohighlight">\(p_0(r)\)</span>, <span class="math notranslate nohighlight">\(Dp/Dt\)</span> becomes <span class="math notranslate nohighlight">\(\Ub \cdot
 \nabla p_0\)</span>, and the divergence constraint can be written</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot \Ub + \alpha \Ub \cdot \nabla p_0 =
+<div class="math notranslate nohighlight" id="equation-enthalpy-7">
+<span class="eqno">(8)<a class="headerlink" href="#equation-enthalpy-7" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub + \alpha \Ub \cdot \nabla p_0 =
 \frac{1}{\rho p_\rho} \left(
    \frac{p_T}{\rho c_p} \left(
   - \sum_k\rho  \xi_k \omegadot_k + \rho \Hnuc \right)
  + \sum_k p_{X_k} \omegadot_k \right)  \equiv \tilde{S}  \label{eq:full_divu_constraint} ,\]</div>
 <p>where we define</p>
-<div class="math notranslate nohighlight">
-\[\alpha(\rho,T) \equiv - \left( \frac{(1 - \rho h_p )p_T - \rho c_p}{\rho^2
+<div class="math notranslate nohighlight" id="equation-enthalpy-8">
+<span class="eqno">(9)<a class="headerlink" href="#equation-enthalpy-8" title="Permalink to this equation">¶</a></span>\[\alpha(\rho,T) \equiv - \left( \frac{(1 - \rho h_p )p_T - \rho c_p}{\rho^2
   c_p p_\rho} \right)  . \label{eq:alphadef}\]</div>
 </div>
 <div class="section" id="using-the-energy-equation">
 <h3>Using the Energy Equation<a class="headerlink" href="#using-the-energy-equation" title="Permalink to this headline">¶</a></h3>
 <p>Now writing <span class="math notranslate nohighlight">\(e = e(p,T,X_k)\)</span> and expanding <span class="math notranslate nohighlight">\(De/Dt\)</span> and using the
 energy evolution equation:</p>
-<div class="math notranslate nohighlight">
-\[\rho \frac{D e}{Dt}  = \rho \left( e_p \frac{D p}{Dt} + e_T \frac{D T}{Dt} + \sum_k e_{X_k} \frac{D X_k}{Dt} \right)
+<div class="math notranslate nohighlight" id="equation-enthalpy-9">
+<span class="eqno">(10)<a class="headerlink" href="#equation-enthalpy-9" title="Permalink to this equation">¶</a></span>\[\rho \frac{D e}{Dt}  = \rho \left( e_p \frac{D p}{Dt} + e_T \frac{D T}{Dt} + \sum_k e_{X_k} \frac{D X_k}{Dt} \right)
                      = -p \nabla \cdot \Ub + \rho \Hnuc\]</div>
 <p>we can express <span class="math notranslate nohighlight">\(DT/Dt\)</span> in terms of</p>
-<div class="math notranslate nohighlight">
-\[\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-enthalpy-10">
+<span class="eqno">(11)<a class="headerlink" href="#equation-enthalpy-10" title="Permalink to this equation">¶</a></span>\[\begin{aligned}
 \frac{DT}{Dt} &amp;=&amp; \frac{1}{\rho e_T} \left(
                   -p \nabla \cdot \Ub + \rho \Hnuc
                  - \rho e_p \frac{D p}{Dt}
@@ -320,8 +320,8 @@ energy evolution equation:</p>
 <p>where <span class="math notranslate nohighlight">\(e_T = \left.\partial e/\partial T\right|_{p,X_k}\)</span>
 and <span class="math notranslate nohighlight">\(e_p = \left.\partial e/\partial p\right|_{T,X_k}.\)</span>
 Then</p>
-<div class="math notranslate nohighlight">
-\[-\rho \nabla \cdot \Ub =
+<div class="math notranslate nohighlight" id="equation-enthalpy-11">
+<span class="eqno">(12)<a class="headerlink" href="#equation-enthalpy-11" title="Permalink to this equation">¶</a></span>\[-\rho \nabla \cdot \Ub =
     \frac{1}{p_\rho} \left( \frac{D p}{Dt}
     - \frac{p_T}{\rho e_T} \left(
                  -p \nabla \cdot \Ub + \rho \Hnuc
@@ -329,8 +329,8 @@ Then</p>
                  - \rho \sum_k e_{X_k} \omegadot_k   \right)
     - \sum_k p_{X_k} {\omegadot}_k \right)  ,\]</div>
 <p>which leads to</p>
-<div class="math notranslate nohighlight">
-\[\left(-\rho -  \frac{p p_T}{\rho e_T p_\rho} \right) \nabla \cdot \Ub =
+<div class="math notranslate nohighlight" id="equation-enthalpy-12">
+<span class="eqno">(13)<a class="headerlink" href="#equation-enthalpy-12" title="Permalink to this equation">¶</a></span>\[\left(-\rho -  \frac{p p_T}{\rho e_T p_\rho} \right) \nabla \cdot \Ub =
     \frac{1}{p_\rho} \left( (1 + \frac{e_p p_T}{e_T}) \frac{D p}{Dt}
                            - \frac{p_T}{\rho e_T} \left(
                                         \rho \Hnuc
@@ -344,25 +344,25 @@ l.h.s. as well as on the r.h.s.</p>
 <h2>Comparison of Constraints<a class="headerlink" href="#comparison-of-constraints" title="Permalink to this headline">¶</a></h2>
 <p>If we set <span class="math notranslate nohighlight">\(\omegadot_k = \Hnuc = 0\)</span> for simplicity, then the
 constraint as derived using <span class="math notranslate nohighlight">\(h\)</span> can be written</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot \Ub
+<div class="math notranslate nohighlight" id="equation-enthalpy-13">
+<span class="eqno">(14)<a class="headerlink" href="#equation-enthalpy-13" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub
 + \left( \frac{(1 - \rho h_p )p_T - \rho c_p}{\rho^2
   c_p p_\rho} \right) \frac{D p_0}{D t} = 0\]</div>
 <p>and the constraint derived using <span class="math notranslate nohighlight">\(e\)</span> can be written</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot \Ub
+<div class="math notranslate nohighlight" id="equation-enthalpy-14">
+<span class="eqno">(15)<a class="headerlink" href="#equation-enthalpy-14" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub
 + \left( \frac{\rho e_T + \rho e_p p_T}{\rho^2 e_T p_\rho + p p_T} \right) \frac{D p_0}{D t} = 0\]</div>
 <p>We note that if we evaluate both constraints for <span class="math notranslate nohighlight">\(p = \rho R T,\)</span> with
 <span class="math notranslate nohighlight">\(h = c_p T,\)</span> <span class="math notranslate nohighlight">\(e = c_v T,\)</span> <span class="math notranslate nohighlight">\(c_p = c_v + R\)</span> and <span class="math notranslate nohighlight">\(\gamma = c_p / c_v,\)</span>
 then both constraints reduce to</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot \Ub + \frac{1}{\gamma p} \frac{D p_0}{D t} = 0\]</div>
+<div class="math notranslate nohighlight" id="equation-enthalpy-15">
+<span class="eqno">(16)<a class="headerlink" href="#equation-enthalpy-15" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub + \frac{1}{\gamma p} \frac{D p_0}{D t} = 0\]</div>
 </div>
 <div class="section" id="enthalpy-vs-energy-equation">
 <h2>Enthalpy vs Energy Equation<a class="headerlink" href="#enthalpy-vs-energy-equation" title="Permalink to this headline">¶</a></h2>
 <p>The full enthalpy equation, with no approximations, appears as:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial(\rho h)}{\partial t} = -\nabla\cdot(\rho h\Ub) +
+<div class="math notranslate nohighlight" id="equation-enthalpy-16">
+<span class="eqno">(17)<a class="headerlink" href="#equation-enthalpy-16" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho h)}{\partial t} = -\nabla\cdot(\rho h\Ub) +
   \frac{Dp}{Dt} + \rho\Hnuc \label{eq:enthalpy}\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(h = e + p/\rho\)</span> is the specific enthalpy, with <span class="math notranslate nohighlight">\(e\)</span> the specific
 internal energy. In the low Mach number formulation, we replace <span class="math notranslate nohighlight">\(p\)</span>
@@ -377,8 +377,8 @@ causes us to drive off of the constraint.</p>
 <p>The mismatch between the pressure implicit in the definition of <span class="math notranslate nohighlight">\(h\)</span>
 and <span class="math notranslate nohighlight">\(p_0\)</span> can be seen by substituting <span class="math notranslate nohighlight">\(h = e + p/\rho\)</span> into the
 enthalpy equation, where we replace <span class="math notranslate nohighlight">\(p\)</span> with <span class="math notranslate nohighlight">\(p_0\)</span> in the <span class="math notranslate nohighlight">\(Dp/Dt\)</span> term:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-enthalpy-17">
+<span class="eqno">(18)<a class="headerlink" href="#equation-enthalpy-17" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)}{\partial t} &amp;=&amp; -\nabla\cdot(\rho h\Ub) +
   \frac{Dp_0}{Dt} + \rho\Hnuc \nonumber \\
 %
@@ -392,24 +392,24 @@ enthalpy equation, where we replace <span class="math notranslate nohighlight">\
 substitute <span class="math notranslate nohighlight">\(p_0\)</span> for <span class="math notranslate nohighlight">\(p\)</span> in this equation as well. Thus, we can pose
 the situation as the following. If we solve the evolution equation
 for <span class="math notranslate nohighlight">\(h\)</span> then we effectively are solving</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial(\rho e)}{\partial t} +
+<div class="math notranslate nohighlight" id="equation-enthalpy-18">
+<span class="eqno">(19)<a class="headerlink" href="#equation-enthalpy-18" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho e)}{\partial t} +
   \nabla\cdot(\rho e\Ub) = -p \; \nabla\cdot\Ub + \rho\Hnuc +
   \left \{ \frac{Dp_0}{Dt} - \frac{Dp}{Dt} \right \} \nonumber\]</div>
 <p>but if we solve the evolution equation for <span class="math notranslate nohighlight">\(e\)</span> we are effectively solving</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial(\rho e)}{\partial t} +
+<div class="math notranslate nohighlight" id="equation-enthalpy-19">
+<span class="eqno">(20)<a class="headerlink" href="#equation-enthalpy-19" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho e)}{\partial t} +
   \nabla\cdot(\rho e\Ub) = p_0 \nabla\cdot\Ub + \rho\Hnuc \nonumber\]</div>
 <p>The second equation subtracted from the first gives:</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:difference between h and e equations}
+<div class="math notranslate nohighlight" id="equation-enthalpy-20">
+<span class="eqno">(21)<a class="headerlink" href="#equation-enthalpy-20" title="Permalink to this equation">¶</a></span>\[\label{eq:difference between h and e equations}
   \frac{D (p_0 - p)}{Dt} - (p_0 - p)  \nabla \cdot \Ub = 0,\]</div>
 <p>but this equation is only true, in general, if <span class="math notranslate nohighlight">\(p=p_0\)</span>.</p>
 <p>Suppose we solve the current enthalpy equation, but when we call the
 EOS, we subtract <span class="math notranslate nohighlight">\(p_0\)</span> from <span class="math notranslate nohighlight">\(\rho h\)</span> and then call the EOS with <span class="math notranslate nohighlight">\(e\)</span>
 instead of <span class="math notranslate nohighlight">\(h\)</span>. This is equivalent to:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-enthalpy-21">
+<span class="eqno">(22)<a class="headerlink" href="#equation-enthalpy-21" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)}{\partial t} &amp;=&amp; -\nabla\cdot(\rho h\Ub) +
   \frac{Dp_0}{Dt} + \rho\Hnuc \nonumber \\
 %
@@ -425,23 +425,23 @@ use_eos_e_instead_of_h = T.</p>
 <h3>Constant <span class="math notranslate nohighlight">\(\gamma\)</span> Gas<a class="headerlink" href="#constant-gamma-gas" title="Permalink to this headline">¶</a></h3>
 <p>Going back to the constant <span class="math notranslate nohighlight">\(\gamma\)</span>, ideal gas EOS, we can rewrite the
 enthalpy equation as a pressure evolution equation</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-enthalpy-22">
+<span class="eqno">(23)<a class="headerlink" href="#equation-enthalpy-22" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
   \frac{\partial\rho h}{\partial t} + \nabla\cdot\left(\rho h\Ub\right) &amp;=&amp; \frac{Dp_0}{Dt} + \rho H {} \nonumber\\
   \frac{\gamma}{\gamma-1}\frac{\partial p}{\partial t} + \frac{\gamma}{\gamma-1}\nabla\cdot\left(p\Ub\right) &amp;=&amp; \frac{Dp_0}{Dt} + \rho H {} \nonumber\\
   \frac{Dp}{Dt} &amp;=&amp; -p\nabla\cdot\Ub + \frac{\gamma}{\gamma-1}\left(\frac{Dp_0}{Dt}+\rho H\right) \label{eq:H:pressure evolution}.\end{aligned}\end{split}\]</div>
 <p>Similarly, we can derive a pressure evolution equation from the energy equation</p>
-<div class="math notranslate nohighlight">
-\[\frac{Dp}{Dt} = -p\nabla\cdot\Ub - \left(\gamma-1\right)p_0\nabla\cdot\Ub + \rho H \label{eq:e:pressure evolution}\]</div>
+<div class="math notranslate nohighlight" id="equation-enthalpy-23">
+<span class="eqno">(24)<a class="headerlink" href="#equation-enthalpy-23" title="Permalink to this equation">¶</a></span>\[\frac{Dp}{Dt} = -p\nabla\cdot\Ub - \left(\gamma-1\right)p_0\nabla\cdot\Ub + \rho H \label{eq:e:pressure evolution}\]</div>
 <p>Now, if we further make the assumption that <span class="math notranslate nohighlight">\(p_0\)</span> is constant,
 <span class="math notranslate nohighlight">\(Dp_0/Dt = 0\)</span>, then the divergence constraint for such a gas reduces
 to</p>
-<div class="math notranslate nohighlight">
-\[\nabla\cdot\Ub = \frac{\gamma-1}{\gamma p_0}\rho H \label{eq:div constraint for constant gamma}.\]</div>
+<div class="math notranslate nohighlight" id="equation-enthalpy-24">
+<span class="eqno">(25)<a class="headerlink" href="#equation-enthalpy-24" title="Permalink to this equation">¶</a></span>\[\nabla\cdot\Ub = \frac{\gamma-1}{\gamma p_0}\rho H \label{eq:div constraint for constant gamma}.\]</div>
 <p>Plugging this back into either of <a class="reference external" href="#eq:H:pressureevolution">[eq:H:pressure evolution]</a> or
 <a class="reference external" href="#eq:e:pressureevolution">[eq:e:pressure evolution]</a> gives</p>
-<div class="math notranslate nohighlight">
-\[\frac{Dp}{Dt} = \frac{\gamma-1}{\gamma}\left(1-\frac{p}{p_0}\right)\rho H. \label{eq:pressure evolution constant gamma}\]</div>
+<div class="math notranslate nohighlight" id="equation-enthalpy-25">
+<span class="eqno">(26)<a class="headerlink" href="#equation-enthalpy-25" title="Permalink to this equation">¶</a></span>\[\frac{Dp}{Dt} = \frac{\gamma-1}{\gamma}\left(1-\frac{p}{p_0}\right)\rho H. \label{eq:pressure evolution constant gamma}\]</div>
 <dl class="simple">
 <dt>If <span class="math notranslate nohighlight">\(p_0\)</span> is assumed constant and using <a href="#id1"><span class="problematic" id="id2">`</span></a>[eq:div constraint for</dt><dd><p>constant gamma] &lt;#eq:div constraint for
 constant gamma&gt;`__, the difference between the enthalpy equation and</p>
@@ -449,8 +449,8 @@ constant gamma&gt;`__, the difference between the enthalpy equation and</p>
 </dl>
 <p>the energy equation, <a class="reference external" href="#eq:differencebetweenhandeequations">[eq:difference between h and e equations]</a>,
 can be rewritten as</p>
-<div class="math notranslate nohighlight">
-\[-\frac{Dp}{Dt} - \frac{\gamma}{\gamma-1}\left(1-\frac{p}{p_0}\right)\rho H = 0,\]</div>
+<div class="math notranslate nohighlight" id="equation-enthalpy-26">
+<span class="eqno">(27)<a class="headerlink" href="#equation-enthalpy-26" title="Permalink to this equation">¶</a></span>\[-\frac{Dp}{Dt} - \frac{\gamma}{\gamma-1}\left(1-\frac{p}{p_0}\right)\rho H = 0,\]</div>
 <dl class="simple">
 <dt>where the equality holds from <a href="#id3"><span class="problematic" id="id4">`</span></a>[eq:pressure evolution constant</dt><dd><p>gamma] &lt;#eq:pressure evolution constant
 gamma&gt;`__. In other words, for the constant <span class="math notranslate nohighlight">\(\gamma\)</span> gas we have</p>
@@ -483,8 +483,8 @@ modifies the divergence constraint, which effectively modifies both
 only modifies <span class="math notranslate nohighlight">\(\rho.\)</span> Is this relevant and/or useful?? Recall that
 the current “volume discrepancy factor” takes the form of adding to
 the r.h.s. of the constraint:</p>
-<div class="math notranslate nohighlight">
-\[\nabla \cdot(\beta_0\Ub) = \beta_0\left(S-\frac{1}{\overline{\Gamma_1} p_0}
+<div class="math notranslate nohighlight" id="equation-enthalpy-27">
+<span class="eqno">(28)<a class="headerlink" href="#equation-enthalpy-27" title="Permalink to this equation">¶</a></span>\[\nabla \cdot(\beta_0\Ub) = \beta_0\left(S-\frac{1}{\overline{\Gamma_1} p_0}
        \frac{\partial p_0}{\partial t} - \frac{f}{\overline{\Gamma_1} p_0}
        \frac{p_0-p_\text{EOS}}{\dt}\right)\]</div>
 </li>
@@ -552,6 +552,10 @@ projection, don’t we need these to be in terms of <span class="math notranslat
     /* TOC colors */
     .wy-nav-side span[id*='MathJax-Span']{
        color: inherit;
+    }
+
+    span.eqno {
+       float: right;
     }
   </style>
 

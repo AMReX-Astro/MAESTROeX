@@ -222,8 +222,8 @@ been shown to be more accurate and efficient than Strang splitting in a
 terrestrial, non-stratified, low Mach number reacting flow solver <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{Non11}`</span></a>,
 so we would like to develop an SDC version of MAESTRO.</p>
 <p>MAESTRO integrates the following system of equations:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-0">
+<span class="eqno">(1)<a class="headerlink" href="#equation-sdc-0" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial\Ub}{\partial t} &amp;=&amp;
     -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi
     - \frac{\rho-\rho_0}{\rho} g\eb_r,\label{eq:momentum}\\
@@ -268,8 +268,8 @@ sequence:</p>
 the reaction portion of the species evolution equations along with a
 temperature evolution equation. This is done using a standard stiff ODE solver
 package (like VODE) on the system:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-sdc-1" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{dX_k}{dt} &amp;=&amp; \omegadot_k(\rho,X_k,T), \\
 \frac{dT}{dt}   &amp;=&amp;
     \frac{1}{c_p} \left ( -\sum_k \xi_k  \omegadot_k  + \Hnuc \right ).\end{aligned}\end{split}\]</div>
@@ -280,14 +280,14 @@ start of the integration and held constant thereafter.
 The density remains constant during this step, i.e.,
 <span class="math notranslate nohighlight">\(\rho^\mathrm{new} = \rho^\mathrm{old}\)</span>, and we
 update the enthalpy at the end of the integration as:</p>
-<div class="math notranslate nohighlight">
-\[h^\mathrm{new} = h^\mathrm{old} + \frac{\Delta t}{2} \Hnuc.\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-sdc-2" title="Permalink to this equation">¶</a></span>\[h^\mathrm{new} = h^\mathrm{old} + \frac{\Delta t}{2} \Hnuc.\]</div>
 </li>
 <li><p>Advect for <span class="math notranslate nohighlight">\(\Delta t\)</span>:</p>
 <p>Beginning with the results from the previous reaction half time step, we integrate
 that state using the equations</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-3">
+<span class="eqno">(4)<a class="headerlink" href="#equation-sdc-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho X_k)}{\partial t} &amp;=&amp;
     -\nabla\cdot(\rho X_k\Ub), \\
 \frac{\partial(\rho h)}{\partial t} &amp;=&amp;
@@ -313,8 +313,8 @@ iteration is responsible for updating all the thermodynamic quantities
 including both the advection (incorporated via a piecewise constant advective
 flux divergence source term) and the reactions. This provides a much stronger coupling between
 the physical processes. In particular, our system now looks like:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-4">
+<span class="eqno">(5)<a class="headerlink" href="#equation-sdc-4" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{d(\rho X_k)}{dt} &amp;=&amp; \rho \omegadot_k(\rho,X_k,T) - \underbrace{\nabla\cdot(\rho X_k\Ub)}_{A_{\rho X_k}}\label{eq:sdc:rhoX} \\
 \frac{d(\rho h)}{dt}   &amp;=&amp; \rho \Hnuc - \underbrace{\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt}}_{A_{\rho h}} \label{eq:sdc:rhoh}\end{aligned}\end{split}\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(A_{\rho X_k}\)</span> and <span class="math notranslate nohighlight">\(A_{\rho h}\)</span> are piecewise-constant (in time)
@@ -327,8 +327,8 @@ shown in figure <a class="reference external" href="#fig:sdc:flowchart">[fig:sd
 <h3>Advective Update<a class="headerlink" href="#advective-update" title="Permalink to this headline">¶</a></h3>
 <p>In the advective update, our goal is to compute <span class="math notranslate nohighlight">\(A_{\rho X_k}\)</span> and
 <span class="math notranslate nohighlight">\(A_{\rho h}\)</span>. These terms approximate the following:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-5">
+<span class="eqno">(6)<a class="headerlink" href="#equation-sdc-5" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 A_{\rho X_k} &amp;=&amp;  \left [- \nabla \cdot (\rho X_k \Ub) \right ]^{n+1/2} \\
 A_{\rho h}   &amp;=&amp;  \left [- \nabla \cdot (\rho h \Ub) + \frac{Dp_0}{Dt} \right ]^{n+1/2}\end{aligned}\end{split}\]</div>
 <p>The construction of the interface states used in the advective terms
@@ -341,15 +341,15 @@ advection process.</p>
 <h3>Final Update<a class="headerlink" href="#final-update" title="Permalink to this headline">¶</a></h3>
 <p>The RHS routine that the ODE solver operates on will first construct
 the density as:</p>
-<div class="math notranslate nohighlight">
-\[\rho = \sum_k (\rho X_k)\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-6">
+<span class="eqno">(7)<a class="headerlink" href="#equation-sdc-6" title="Permalink to this equation">¶</a></span>\[\rho = \sum_k (\rho X_k)\]</div>
 <p>It will then derive the temperature from the equation of state. If we
 are running with use_tfromp = T, then we do</p>
-<div class="math notranslate nohighlight">
-\[T = T(\rho, p_0, X_k)\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-7">
+<span class="eqno">(8)<a class="headerlink" href="#equation-sdc-7" title="Permalink to this equation">¶</a></span>\[T = T(\rho, p_0, X_k)\]</div>
 <p>otherwise, we do</p>
-<div class="math notranslate nohighlight">
-\[T = T(\rho, h, X_k)\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-8">
+<span class="eqno">(9)<a class="headerlink" href="#equation-sdc-8" title="Permalink to this equation">¶</a></span>\[T = T(\rho, h, X_k)\]</div>
 <p>Note that in contrast to the Strang splitting version, here we call the EOS
 every time we enter the RHS routine, but here we call the EOS to compute temperature
 rather than thermodynamic coefficients.</p>
@@ -372,28 +372,28 @@ the density evolution equation does not have a reaction source term.</p>
 <ul>
 <li><p>species_pred_type = 1 (predict_rhoprime_and_X)
 or 3 (predict_rho_and_X)</p>
-<div class="math notranslate nohighlight">
-\[I_{X_k} = \frac{1}{\rho^{n+\myhalf}} \left [
+<div class="math notranslate nohighlight" id="equation-sdc-9">
+<span class="eqno">(10)<a class="headerlink" href="#equation-sdc-9" title="Permalink to this equation">¶</a></span>\[I_{X_k} = \frac{1}{\rho^{n+\myhalf}} \left [
       \frac{(\rho X_k)^\mathrm{new} -
             (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}  \right ].\]</div>
 <p>(Andy’s Idea) Define <span class="math notranslate nohighlight">\(I_{X_k}\)</span> using</p>
-<div class="math notranslate nohighlight">
-\[I_{X_k} = \frac{X_k^\mathrm{new} - X_k^\mathrm{old}}{\Delta t} - A_{X_k},\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-10">
+<span class="eqno">(11)<a class="headerlink" href="#equation-sdc-10" title="Permalink to this equation">¶</a></span>\[I_{X_k} = \frac{X_k^\mathrm{new} - X_k^\mathrm{old}}{\Delta t} - A_{X_k},\]</div>
 <p>where we first define a state that has only been updated with advection:</p>
-<div class="math notranslate nohighlight">
-\[\frac{(\rho X_k)^{(1)} - (\rho X_k)^\mathrm{old}}{\Delta t} = A_{\rho X_k},\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-11">
+<span class="eqno">(12)<a class="headerlink" href="#equation-sdc-11" title="Permalink to this equation">¶</a></span>\[\frac{(\rho X_k)^{(1)} - (\rho X_k)^\mathrm{old}}{\Delta t} = A_{\rho X_k},\]</div>
 <p>and then define the species mass fractions,</p>
-<div class="math notranslate nohighlight">
-\[X_k^{(1)} = (\rho X_k)^{(1)} / \sum_k (\rho X_k)^{(1)}, \quad
+<div class="math notranslate nohighlight" id="equation-sdc-12">
+<span class="eqno">(13)<a class="headerlink" href="#equation-sdc-12" title="Permalink to this equation">¶</a></span>\[X_k^{(1)} = (\rho X_k)^{(1)} / \sum_k (\rho X_k)^{(1)}, \quad
 X_k^\mathrm{old} = (\rho X_k)^\mathrm{old} / \sum_k (\rho X_k)^\mathrm{old}, \quad
 X_k^\mathrm{new} = (\rho X_k)^\mathrm{new} / \sum_k (\rho X_k)^\mathrm{new},\]</div>
 <p>and finally define <span class="math notranslate nohighlight">\(A_{X_k}\)</span> using</p>
-<div class="math notranslate nohighlight">
-\[\frac{X^{(1)} - X^\mathrm{old}}{\Delta t}= A_{X_k}.\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-13">
+<span class="eqno">(14)<a class="headerlink" href="#equation-sdc-13" title="Permalink to this equation">¶</a></span>\[\frac{X^{(1)} - X^\mathrm{old}}{\Delta t}= A_{X_k}.\]</div>
 </li>
 <li><p>species_pred_type = 2 (predict_rhoX)</p>
-<div class="math notranslate nohighlight">
-\[I_{\rho X_k} = \frac{(\rho X_k)^\mathrm{new} - (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}.
+<div class="math notranslate nohighlight" id="equation-sdc-14">
+<span class="eqno">(15)<a class="headerlink" href="#equation-sdc-14" title="Permalink to this equation">¶</a></span>\[I_{\rho X_k} = \frac{(\rho X_k)^\mathrm{new} - (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}.
 \label{eq:sdc:Irhoo}\]</div>
 </li>
 </ul>
@@ -403,8 +403,8 @@ X_k^\mathrm{new} = (\rho X_k)^\mathrm{new} / \sum_k (\rho X_k)^\mathrm{new},\]</
 <p>The appropriate constructions are:</p>
 <ul>
 <li><p>enthalpy_pred_type = 0 (predict_rhoh)</p>
-<div class="math notranslate nohighlight">
-\[I_{\rho h} = \frac{(\rho h)^{\rm new} - (\rho h)^{\rm old}}{\Delta t} - A_{\rho h}.\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-15">
+<span class="eqno">(16)<a class="headerlink" href="#equation-sdc-15" title="Permalink to this equation">¶</a></span>\[I_{\rho h} = \frac{(\rho h)^{\rm new} - (\rho h)^{\rm old}}{\Delta t} - A_{\rho h}.\]</div>
 </li>
 <li><p>enthalpy_pred_type = 1 (predict_rhohprime, not implemented yet)</p>
 <p>(Andy’s Idea) Here we need an <span class="math notranslate nohighlight">\(I_{\rho h}\)</span> term for the <span class="math notranslate nohighlight">\((\rho h)'\)</span> evolution
@@ -421,36 +421,36 @@ what about an average thermal diffusion?</p>
 <li><p>enthalpy_pred_type = 2 (predict_h )</p>
 <p>This is the most straightforward prediction type. The SDC solver
 integrates the equation for <span class="math notranslate nohighlight">\((\rho h)\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial(\rho h)}{\partial t} = -\nabla\cdot(\rho h \Ub) + \frac{Dp_0}{Dt}  + \rho H_{\rm nuc}\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-16">
+<span class="eqno">(17)<a class="headerlink" href="#equation-sdc-16" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho h)}{\partial t} = -\nabla\cdot(\rho h \Ub) + \frac{Dp_0}{Dt}  + \rho H_{\rm nuc}\]</div>
 <p>(shown here without diffusion or external heat sources). Expanding
 the time derivative and divergence, and using the continuity equation
 we see:</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial h}{\partial t} = -\Ub \cdot \nabla h + \frac{1}{\rho} \frac{Dp_0}{Dt}  + \frac{1}{\rho} (\rho H_{\rm nuc}) \label{eq:sdc:h}\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-17">
+<span class="eqno">(18)<a class="headerlink" href="#equation-sdc-17" title="Permalink to this equation">¶</a></span>\[\frac{\partial h}{\partial t} = -\Ub \cdot \nabla h + \frac{1}{\rho} \frac{Dp_0}{Dt}  + \frac{1}{\rho} (\rho H_{\rm nuc}) \label{eq:sdc:h}\]</div>
 <p>Comparing these equations, we see that</p>
-<div class="math notranslate nohighlight">
-\[I_{h}  = \frac{1}{\rho^{n+\myhalf}} \left [
+<div class="math notranslate nohighlight" id="equation-sdc-18">
+<span class="eqno">(19)<a class="headerlink" href="#equation-sdc-18" title="Permalink to this equation">¶</a></span>\[I_{h}  = \frac{1}{\rho^{n+\myhalf}} \left [
     \frac{(\rho h)^\mathrm{new} - (\rho h)^\mathrm{old}}{\Delta t} - A_{\rho h} \right ]\]</div>
 <p>(Andy’s Idea) Form <span class="math notranslate nohighlight">\(I_h\)</span> in the same way we would form <span class="math notranslate nohighlight">\(I_{X_k}\)</span> from above:</p>
-<div class="math notranslate nohighlight">
-\[I_h = \frac{h^\mathrm{new} - h^\mathrm{old}}{\Delta t} - A_h,\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-19">
+<span class="eqno">(20)<a class="headerlink" href="#equation-sdc-19" title="Permalink to this equation">¶</a></span>\[I_h = \frac{h^\mathrm{new} - h^\mathrm{old}}{\Delta t} - A_h,\]</div>
 <p>where we first define</p>
-<div class="math notranslate nohighlight">
-\[\frac{(\rho h)^{(1)} - (\rho h)^\mathrm{old}}{\Delta t} = A_{\rho h},\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-20">
+<span class="eqno">(21)<a class="headerlink" href="#equation-sdc-20" title="Permalink to this equation">¶</a></span>\[\frac{(\rho h)^{(1)} - (\rho h)^\mathrm{old}}{\Delta t} = A_{\rho h},\]</div>
 <p>and then define <span class="math notranslate nohighlight">\(h\)</span>,</p>
-<div class="math notranslate nohighlight">
-\[h^{(1)} = (\rho h)^{(1)} / \sum_k(\rho X_k)^{(1)}, \quad h^\mathrm{old} = (\rho h)^\mathrm{old} / \sum_k(\rho X_k)^\mathrm{old}, \quad h^\mathrm{new} = (\rho h)^\mathrm{new} / \sum_k(\rho X_k)^\mathrm{new},\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-21">
+<span class="eqno">(22)<a class="headerlink" href="#equation-sdc-21" title="Permalink to this equation">¶</a></span>\[h^{(1)} = (\rho h)^{(1)} / \sum_k(\rho X_k)^{(1)}, \quad h^\mathrm{old} = (\rho h)^\mathrm{old} / \sum_k(\rho X_k)^\mathrm{old}, \quad h^\mathrm{new} = (\rho h)^\mathrm{new} / \sum_k(\rho X_k)^\mathrm{new},\]</div>
 <p>and finally define <span class="math notranslate nohighlight">\(A_h\)</span> using</p>
-<div class="math notranslate nohighlight">
-\[I_h = \frac{h^{(1)} - h^\mathrm{old}}{\Delta t} = A_h.\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-22">
+<span class="eqno">(23)<a class="headerlink" href="#equation-sdc-22" title="Permalink to this equation">¶</a></span>\[I_h = \frac{h^{(1)} - h^\mathrm{old}}{\Delta t} = A_h.\]</div>
 </li>
 <li><p>enthalpy_pred_type = 3 (predict_T_then_rhoprime) or
 enthalpy_pred_type = 4 (predict_T_then_h )</p>
 <p>Both of these enthalpy_pred_types predict temperature. Expressing
 <span class="math notranslate nohighlight">\(h = h(p_0,T,X_k)\)</span> and differentiating along particle paths:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-23">
+<span class="eqno">(24)<a class="headerlink" href="#equation-sdc-23" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{Dh}{Dt} &amp;=&amp; \left . \frac{\partial h}{\partial T} \right |_{p,X_k} \frac{DT}{Dt} +
                   \left . \frac{\partial h}{\partial p} \right |_{T,X_k} \frac{Dp_0}{Dt} +
            \sum_k \left . \frac{\partial h}{\partial X_k} \right |_{p,T} \frac{DX_k}{Dt} \\
@@ -459,13 +459,13 @@ enthalpy_pred_type = 4 (predict_T_then_h )</p>
 (Table <a class="reference external" href="#table:sym">[table:sym]</a>), and we substitute <span class="math notranslate nohighlight">\(DX_k/Dt = \omegadot_k\)</span> (from the species
 continuity equation, Eq. <a class="reference external" href="#speciesequation">[species equation]</a>). Using Eq. <a class="reference external" href="#eq:sdc:h">[eq:sdc:h]</a>, we have
 the familiar temperature evolution equation:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\rho c_p \frac{DT}{Dt} = \underbrace{(1 - \rho h_p) \frac{Dp_0}{Dt}}_{\begin{smallmatrix}\text{already~accounted~for} \\ \text{in~T~prediction}\end{smallmatrix}} - \sum_k \xi_k \rho \omegadot_k + \rho \Hnuc\end{split}\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-24">
+<span class="eqno">(25)<a class="headerlink" href="#equation-sdc-24" title="Permalink to this equation">¶</a></span>\[\begin{split}\rho c_p \frac{DT}{Dt} = \underbrace{(1 - \rho h_p) \frac{Dp_0}{Dt}}_{\begin{smallmatrix}\text{already~accounted~for} \\ \text{in~T~prediction}\end{smallmatrix}} - \sum_k \xi_k \rho \omegadot_k + \rho \Hnuc\end{split}\]</div>
 <p>where the underbraced term is already present in mktempforce. Recognizing that
 Eq. <a class="reference external" href="#eq:sdc:Irhoh">[eq:sdc:Irhoh]</a> is the SDC approximation to <span class="math notranslate nohighlight">\((\rho \Hnuc)\)</span> and Eq. <a class="reference external" href="#eq:sdc:Irhoo">[eq:sdc:Irhoo]</a> is the
 SDC approximation to <span class="math notranslate nohighlight">\((\rho \omegadot_k)\)</span>, we can define</p>
-<div class="math notranslate nohighlight">
-\[I_T = \frac{1}{\rho^{n+\myhalf} c_p^{n+\myhalf}} \left \{
+<div class="math notranslate nohighlight" id="equation-sdc-25">
+<span class="eqno">(26)<a class="headerlink" href="#equation-sdc-25" title="Permalink to this equation">¶</a></span>\[I_T = \frac{1}{\rho^{n+\myhalf} c_p^{n+\myhalf}} \left \{
   \left [ \frac{(\rho h)^\mathrm{new} - (\rho h)^\mathrm{old}}{\Delta t} - A_{\rho h} \right ]
   - \sum_k \xi_k^{n+\myhalf} \left [      \frac{(\rho X_k)^\mathrm{new} -
             (\rho X_k)^\mathrm{old}}{\Delta t} - A_{\rho X_k}  \right ] \right \}\]</div>
@@ -473,11 +473,11 @@ SDC approximation to <span class="math notranslate nohighlight">\((\rho \omegado
 terms only, and compute the resulting temperature, <span class="math notranslate nohighlight">\(T^{(1)}\)</span>. Compare that temperature
 with the final temperature computed by the SDC VODE call. The difference
 between these values is <span class="math notranslate nohighlight">\(I_T\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[I_T = \frac{T^\mathrm{new} - T^\mathrm{old}}{\Delta t} - A_T,\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-26">
+<span class="eqno">(27)<a class="headerlink" href="#equation-sdc-26" title="Permalink to this equation">¶</a></span>\[I_T = \frac{T^\mathrm{new} - T^\mathrm{old}}{\Delta t} - A_T,\]</div>
 <p>with <span class="math notranslate nohighlight">\(A_T\)</span> given by</p>
-<div class="math notranslate nohighlight">
-\[\frac{T^{(1)} - T^\mathrm{old}}{\Delta t} = A_T,\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-27">
+<span class="eqno">(28)<a class="headerlink" href="#equation-sdc-27" title="Permalink to this equation">¶</a></span>\[\frac{T^{(1)} - T^\mathrm{old}}{\Delta t} = A_T,\]</div>
 <p>and <span class="math notranslate nohighlight">\(T^{(1)}\)</span> computed using the equation of state from <span class="math notranslate nohighlight">\(\rho^{(1)}, X_k^{(1)}\)</span>,
 and <span class="math notranslate nohighlight">\(h^{(1)}\)</span> (or <span class="math notranslate nohighlight">\(p_0\)</span>, if use_tfromp = T).</p>
 </li>
@@ -509,8 +509,8 @@ need to evolve <span class="math notranslate nohighlight">\(p_0\)</span> in the 
 <div class="section" id="algorithm-flowchart-adr-with-fixed-base-state">
 <h2>Algorithm Flowchart - ADR with Fixed Base State<a class="headerlink" href="#algorithm-flowchart-adr-with-fixed-base-state" title="Permalink to this headline">¶</a></h2>
 <p>We now include thermal diffusion and assume the base state is constant in time but not space:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-28">
+<span class="eqno">(29)<a class="headerlink" href="#equation-sdc-28" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial\Ub}{\partial t} =&amp;
     -\Ub\cdot\nabla\Ub  - \frac{1}{\rho}\nabla\pi
     - \frac{\rho-\rho_0}{\rho} g\eb_r,\\
@@ -527,11 +527,11 @@ need to evolve <span class="math notranslate nohighlight">\(p_0\)</span> in the 
 <div class="line">Use <span class="math notranslate nohighlight">\(\Ub^n\)</span> and a second-order Godunov method to compute time-centered edge velocities, <span class="math notranslate nohighlight">\(\uadvsdcstar\)</span>, with time-lagged dynamic pressure and explicit buoyancy as forcing terms. The <span class="math notranslate nohighlight">\(\star\)</span> superscript indicates that this field does not satisfy the divergence constraint. Compute <span class="math notranslate nohighlight">\(S^{n+\myhalf,{\rm pred}}\)</span> by extrapolating in time,</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[S^{n+\myhalf,{\rm pred}} = S^n + \frac{\Delta t^n}{2}\frac{S^n - S^{n-1}}{\Delta t^{n-1}},\]</div>
+<div><div class="math notranslate nohighlight" id="equation-sdc-29">
+<span class="eqno">(30)<a class="headerlink" href="#equation-sdc-29" title="Permalink to this equation">¶</a></span>\[S^{n+\myhalf,{\rm pred}} = S^n + \frac{\Delta t^n}{2}\frac{S^n - S^{n-1}}{\Delta t^{n-1}},\]</div>
 <p>and project <span class="math notranslate nohighlight">\(\uadvsdcstar\)</span> to obtain <span class="math notranslate nohighlight">\(\uadvsdcpred\)</span>, which satisfies</p>
-<div class="math notranslate nohighlight">
-\[\nabla\cdot\left(\beta_0^n\uadvsdcpred\right) = S^{n+\myhalf,\rm{pred}}.\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-30">
+<span class="eqno">(31)<a class="headerlink" href="#equation-sdc-30" title="Permalink to this equation">¶</a></span>\[\nabla\cdot\left(\beta_0^n\uadvsdcpred\right) = S^{n+\myhalf,\rm{pred}}.\]</div>
 </div></blockquote>
 <div class="line-block">
 <div class="line"><strong>Step 2:</strong> (<em>Predictor</em>)</div>
@@ -540,31 +540,31 @@ need to evolve <span class="math notranslate nohighlight">\(p_0\)</span> in the 
 <div class="line">Use <span class="math notranslate nohighlight">\(\uadvsdcpred\)</span> and a second-order Godunov integrator to compute time-centered edge states, <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^{n+\myhalf,(0)}\)</span>, with time-lagged reactions (<span class="math notranslate nohighlight">\(I^{\rm lagged} = I^{(j_{\rm max})}\)</span> from the previous time step), explicit diffusion, and time-centered thermodynamic pressure as source terms. Define the advective flux divergences as</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div><div class="math notranslate nohighlight" id="equation-sdc-31">
+<span class="eqno">(32)<a class="headerlink" href="#equation-sdc-31" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 A_{\rho X_k}^{(0)} &amp;=&amp; -\nabla\cdot\left[\left(\rho X_k\right)^{n+\myhalf,{(0)}}\uadvsdcpred\right],\\
 A_{\rho h}^{(0)} &amp;=&amp; -\nabla\cdot\left[\left(\rho h\right)^{n+\myhalf,(0)}\uadvsdcpred\right] + \uadvsdcpred\cdot\nabla p_0.\end{aligned}\end{split}\]</div>
 <p>Next, use these fluxes to compute the time-advanced density,</p>
-<div class="math notranslate nohighlight">
-\[\frac{\rho^{n+1} - \rho^n}{\Delta t} = \sum_k A_{\rho X_k}^{(0)}.\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-32">
+<span class="eqno">(33)<a class="headerlink" href="#equation-sdc-32" title="Permalink to this equation">¶</a></span>\[\frac{\rho^{n+1} - \rho^n}{\Delta t} = \sum_k A_{\rho X_k}^{(0)}.\]</div>
 <p>Then, compute preliminary, time-advanced species using</p>
-<div class="math notranslate nohighlight">
-\[\frac{\rho^{n+1}\widehat{X}_k^{n+1,(0)} - (\rho X_k)^n}{\Delta t} = A_{\rho X_k}^{(0)} + I_{\rho X_k}^{\rm lagged}.\label{eq:sdc species 2}\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-33">
+<span class="eqno">(34)<a class="headerlink" href="#equation-sdc-33" title="Permalink to this equation">¶</a></span>\[\frac{\rho^{n+1}\widehat{X}_k^{n+1,(0)} - (\rho X_k)^n}{\Delta t} = A_{\rho X_k}^{(0)} + I_{\rho X_k}^{\rm lagged}.\label{eq:sdc species 2}\]</div>
 </div></blockquote>
 <div class="line-block">
 <div class="line"><strong>Step 2B:</strong> (<em>Compute diffusive flux divergence</em>)</div>
 <div class="line">Solve a Crank-Nicolson-type diffusion equation for <span class="math notranslate nohighlight">\(\widehat{h}^{n+1,(0)}\)</span>, using transport coefficients evaluated at <span class="math notranslate nohighlight">\(t^n\)</span> everywhere,</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div><div class="math notranslate nohighlight" id="equation-sdc-34">
+<span class="eqno">(35)<a class="headerlink" href="#equation-sdc-34" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\rho^{n+1}\widehat{h}^{n+1,(0)} - (\rho h)^n}{\Delta t} =&amp; A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged}\nonumber\\
 &amp; + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n + \nabla\cdot\frac{\kth^n}{c_p^n}\nabla \widehat{h}^{n+1,(0)}\right)\nonumber\\
 &amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
 &amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right),\label{eq:sdc enthalpy 2}\end{aligned}\end{split}\]</div>
 <p>which is equivalent to</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-35">
+<span class="eqno">(36)<a class="headerlink" href="#equation-sdc-35" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \left(\rho^{n+1} - \frac{\Delta t}{2}\nabla\cdot\frac{k_{\rm th}^n}{c_p^n}\nabla\right)\widehat{h}^{n+1,(0)} =&amp; (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(0)} + I_{\rho h}^{\rm lagged} + \left(\half\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n\right)\nonumber\\
 &amp;\hspace{0.85in} - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla\widehat{X}_k^{n+1,(0)}\right)\nonumber\\
 &amp;\hspace{0.85in} - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0\right)\Bigg].\end{aligned}\end{split}\]</div>
@@ -574,13 +574,13 @@ A_{\rho h}^{(0)} &amp;=&amp; -\nabla\cdot\left[\left(\rho h\right)^{n+\myhalf,(0
 <div class="line">Define <span class="math notranslate nohighlight">\(Q_{\rho X_k}^{(0)}\)</span> as the right hand side of (<a class="reference external" href="#eq:sdcspecies2">[eq:sdc species 2]</a>) without the <span class="math notranslate nohighlight">\(I_{\rho X_k}^{\rm lagged}\)</span> term, and define <span class="math notranslate nohighlight">\(Q_{\rho h}^{(0)}\)</span> as the right hand side of (<a class="reference external" href="#eq:sdcenthalpy2">[eq:sdc enthalpy 2]</a>) without the <span class="math notranslate nohighlight">\(I_{\rho h}^{\rm lagged}\)</span> term. Use VODE to integerate (<a class="reference external" href="#eq:sdcspecies">[eq:sdc species]</a>) and (<a class="reference external" href="#eq:sdcenthalpy">[eq:sdc enthalpy]</a>) over <span class="math notranslate nohighlight">\(\Delta t\)</span> to advance <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^n\)</span> to <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^{n+1,(0)}\)</span> using the piecewise-constant advection and diffusion source terms:</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div><div class="math notranslate nohighlight" id="equation-sdc-36">
+<span class="eqno">(37)<a class="headerlink" href="#equation-sdc-36" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho X_k)}{\partial t} &amp;=&amp; Q_{\rho X_k}^{(0)} + \rho\dot\omega_k\\
 \frac{\partial(\rho h)}{\partial t} &amp;=&amp; Q_{\rho h}^{(0)} + \rho\Hnuc.\end{aligned}\end{split}\]</div>
 <p>At this point we can define <span class="math notranslate nohighlight">\(I_{\rho X_k}^{(0)}\)</span> and <span class="math notranslate nohighlight">\(I_{\rho h}^{(0)}\)</span>, or whatever term we need depending on our species and enthalpy edge state prediction types, for use in the corrector step. In our first implementation, we are predicting <span class="math notranslate nohighlight">\(\rho X_k\)</span> and <span class="math notranslate nohighlight">\(\rho h\)</span>, in which case we define:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-37">
+<span class="eqno">(38)<a class="headerlink" href="#equation-sdc-37" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 I_{\rho X_k}^{(0)} &amp;=&amp; \frac{(\rho X_k)^{n+1,(0)} - (\rho X_k)^n}{\Delta t} - Q_{\rho X_k}^{(0)}\\
 I_{\rho h}^{(0)} &amp;=&amp; \frac{(\rho h)^{n+1,(0)} - (\rho h)^n}{\Delta t} - Q_{\rho h}^{(0)}.\end{aligned}\end{split}\]</div>
 </div></blockquote>
@@ -589,11 +589,11 @@ I_{\rho h}^{(0)} &amp;=&amp; \frac{(\rho h)^{n+1,(0)} - (\rho h)^n}{\Delta t} - 
 <div class="line">First, compute <span class="math notranslate nohighlight">\(S^{n+\myhalf}\)</span> and <span class="math notranslate nohighlight">\(\beta_0^{n+\myhalf}\)</span> using</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[S^{n+\myhalf} = \frac{S^n + S^{n+1,(0)}}{2}, \qquad \beta_0^{n+\myhalf} = \frac{\beta_0^n + \beta_0^{n+1,(0)}}{2}.\]</div>
+<div><div class="math notranslate nohighlight" id="equation-sdc-38">
+<span class="eqno">(39)<a class="headerlink" href="#equation-sdc-38" title="Permalink to this equation">¶</a></span>\[S^{n+\myhalf} = \frac{S^n + S^{n+1,(0)}}{2}, \qquad \beta_0^{n+\myhalf} = \frac{\beta_0^n + \beta_0^{n+1,(0)}}{2}.\]</div>
 <p>Then, project <span class="math notranslate nohighlight">\(\uadvsdcstar\)</span> to obtain <span class="math notranslate nohighlight">\(\uadvsdc\)</span>, which satisfies</p>
-<div class="math notranslate nohighlight">
-\[\nabla\cdot\left(\beta_0^{n+\myhalf}\uadvsdc\right) = S^{n+\myhalf}.\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-39">
+<span class="eqno">(40)<a class="headerlink" href="#equation-sdc-39" title="Permalink to this equation">¶</a></span>\[\nabla\cdot\left(\beta_0^{n+\myhalf}\uadvsdc\right) = S^{n+\myhalf}.\]</div>
 </div></blockquote>
 <div class="line-block">
 <div class="line"><strong>Step 4:</strong> (<em>Corrector Loop</em>)</div>
@@ -602,28 +602,28 @@ I_{\rho h}^{(0)} &amp;=&amp; \frac{(\rho h)^{n+1,(0)} - (\rho h)^n}{\Delta t} - 
 <div class="line">Use <span class="math notranslate nohighlight">\(\uadvsdc\)</span> and a second-order Godunov integrator to compute time-centered edge states, <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^{n+\myhalf}\)</span>, with iteratively-lagged reactions (<span class="math notranslate nohighlight">\(I^{(j-1)}\)</span>), explicit diffusion, and time-centered thermodynamic pressure as source terms. Define the advective flux divergences as</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div><div class="math notranslate nohighlight" id="equation-sdc-40">
+<span class="eqno">(41)<a class="headerlink" href="#equation-sdc-40" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 A_{\rho X_k}^{(j)} &amp;=&amp; -\nabla\cdot\left[\left(\rho X_k\right)^{n+\myhalf,(j)}\uadvsdc\right],\\
 A_{\rho h}^{(j)} &amp;=&amp; -\nabla\cdot\left[\left(\rho h\right)^{n+\myhalf,(j)}\uadvsdc\right] + \uadvsdc\cdot\nabla p_0.\end{aligned}\end{split}\]</div>
 <p>Then, compute preliminary, time-advanced species using</p>
-<div class="math notranslate nohighlight">
-\[\frac{\rho^{n+1}\widehat{X}_k^{n+1,(j)} - (\rho X_k)^n}{\Delta t} = A_{\rho X_k}^{(j)} + I_{\rho X_k}^{(j-1)}.\label{eq:sdc species 3}\]</div>
+<div class="math notranslate nohighlight" id="equation-sdc-41">
+<span class="eqno">(42)<a class="headerlink" href="#equation-sdc-41" title="Permalink to this equation">¶</a></span>\[\frac{\rho^{n+1}\widehat{X}_k^{n+1,(j)} - (\rho X_k)^n}{\Delta t} = A_{\rho X_k}^{(j)} + I_{\rho X_k}^{(j-1)}.\label{eq:sdc species 3}\]</div>
 </div></blockquote>
 <div class="line-block">
 <div class="line"><strong>Step 4B:</strong> (<em>Compute diffusive flux divergence</em>)</div>
 <div class="line">Solve a backward-Euler-type correction equation for <span class="math notranslate nohighlight">\(\widehat{h}^{n+1,(j)}\)</span>,</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div><div class="math notranslate nohighlight" id="equation-sdc-42">
+<span class="eqno">(43)<a class="headerlink" href="#equation-sdc-42" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\rho^{n+1}\widehat{h}^{n+1,(j)} - (\rho h)^n}{\Delta t} =&amp; A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)}\nonumber\\
 &amp; + \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{h}^{n+1,(j)} + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
 &amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
 &amp; - \half\left(\nabla\cdot\frac{h_p^n k_{\rm th}^n}{c_p^n}\nabla p_0 + \nabla\cdot\frac{h_p^{n+1,(j-1)}k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla p_0\right),\label{eq:sdc enthalpy 3}\end{aligned}\end{split}\]</div>
 <p>which is equivalent to</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-43">
+<span class="eqno">(44)<a class="headerlink" href="#equation-sdc-43" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \left(\rho^{n+1} - \Delta t\nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\right)\widehat{h}^{n+1,(j)} =&amp; (\rho h)^n + \Delta t\Bigg[A_{\rho h}^{(j)} + I_{\rho h}^{(j-1)} \nonumber\\
 &amp; + \half\left(\nabla\cdot\frac{\kth^n}{c_p^n}\nabla h^n - \nabla\cdot\frac{\kth^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla h^{n+1,(j-1)}\right)\nonumber\\
 &amp; - \half\left(\sum_k\nabla\cdot\frac{\xi_k^n k_{\rm th}^n}{c_p^n}\nabla X_k^n + \sum_k\nabla\cdot\frac{\xi_k^{n+1,(j-1)} k_{\rm th}^{n+1,(j-1)}}{c_p^{n+1,(j-1)}}\nabla\widehat{X}_k^{n+1,(j)}\right)\nonumber\\
@@ -634,14 +634,14 @@ A_{\rho h}^{(j)} &amp;=&amp; -\nabla\cdot\left[\left(\rho h\right)^{n+\myhalf,(j
 <div class="line">Define <span class="math notranslate nohighlight">\(Q_{\rho X_k}^{(j)}\)</span> as the right hand side of (<a class="reference external" href="#eq:sdcspecies3">[eq:sdc species 3]</a>) without the <span class="math notranslate nohighlight">\(I_{\rho X_k}^{(j-1)}\)</span> term, and define <span class="math notranslate nohighlight">\(Q_{\rho h}^{(j)}\)</span> as the right hand side of (<a class="reference external" href="#eq:sdcenthalpy3">[eq:sdc enthalpy 3]</a>) without the <span class="math notranslate nohighlight">\(I_{\rho h}^{(j-1)}\)</span> term. Use VODE to integerate (<a class="reference external" href="#eq:sdcspecies">[eq:sdc species]</a>) and (<a class="reference external" href="#eq:sdcenthalpy">[eq:sdc enthalpy]</a>) over <span class="math notranslate nohighlight">\(\Delta t\)</span> to advance <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^n\)</span> to <span class="math notranslate nohighlight">\((\rho X_k, \rho h)^{n+1,(j)}\)</span> using the piecewise-constant advection and diffusion source terms:</div>
 </div>
 <blockquote>
-<div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div><div class="math notranslate nohighlight" id="equation-sdc-44">
+<span class="eqno">(45)<a class="headerlink" href="#equation-sdc-44" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho X_k)}{\partial t} &amp;=&amp; Q_{\rho X_k}^{(j)} + \rho\dot\omega_k\\
 \frac{\partial(\rho h)}{\partial t} &amp;=&amp; Q_{\rho h}^{(j)} + \rho\Hnuc.\end{aligned}\end{split}\]</div>
 <p>At this point we can define <span class="math notranslate nohighlight">\(I_{\rho X_k}^{(j)}\)</span>, <span class="math notranslate nohighlight">\(I_{\rho h}^{(j)}\)</span>, and any other <span class="math notranslate nohighlight">\(I\)</span> terms we need depending on
 our species and enthalpy edge state prediction types, for use in the predictor in the next time step. In our first implementation, we are predicting <span class="math notranslate nohighlight">\(\rho X_k\)</span> and <span class="math notranslate nohighlight">\(\rho h\)</span>, in which case we define:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-sdc-45">
+<span class="eqno">(46)<a class="headerlink" href="#equation-sdc-45" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 I_{\rho X_k}^{(j)} &amp;=&amp; \frac{(\rho X_k)^{n+1,(j)} - (\rho X_k)^n}{\Delta t} - Q_{\rho X_k}^{(j)}\\
 I_{\rho h}^{(j)} &amp;=&amp; \frac{(\rho h)^{n+1,(j)} - (\rho h)^n}{\Delta t} - Q_{\rho h}^{(j)}.\end{aligned}\end{split}\]</div>
 </div></blockquote>
@@ -705,6 +705,10 @@ I_{\rho h}^{(j)} &amp;=&amp; \frac{(\rho h)^{n+1,(j)} - (\rho h)^n}{\Delta t} - 
     /* TOC colors */
     .wy-nav-side span[id*='MathJax-Span']{
        color: inherit;
+    }
+
+    span.eqno {
+       float: right;
     }
   </style>
 

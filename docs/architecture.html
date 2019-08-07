@@ -615,8 +615,8 @@ equilibrium. The second type generate the initial model internally,
 by integrating the condition of hydrostatic equilibrium together with
 a simplifying assumption on the energy (e.g. isothermal or
 isentropic). In both cases hydrostatic equilibrium is enforced as:</p>
-<div class="math notranslate nohighlight">
-\[\frac{p_{i+1} - p_i}{\Delta r} = \frac{1}{2} (\rho_i + \rho_{i+1})
+<div class="math notranslate nohighlight" id="equation-architecture-0">
+<span class="eqno">(1)<a class="headerlink" href="#equation-architecture-0" title="Permalink to this equation">¶</a></span>\[\frac{p_{i+1} - p_i}{\Delta r} = \frac{1}{2} (\rho_i + \rho_{i+1})
 g_{i+1/2}\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(g_{i+1/2}\)</span> is the edge-centered gravitational acceleration.</p>
 <p>The toy_atm example provides a simple approximation for a thin
@@ -929,14 +929,14 @@ this EOS to enable/disable Coulomb corrections.</p>
 </li>
 <li><p>gamma_law_general assumes an ideal gas with a mixed
 composition and a constant ratio of specific heats, <span class="math notranslate nohighlight">\(\gamma\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[p = \rho e (\gamma - 1) = \frac{\rho k_B T}{\mu m_p}\]</div>
+<div class="math notranslate nohighlight" id="equation-architecture-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-architecture-1" title="Permalink to this equation">¶</a></span>\[p = \rho e (\gamma - 1) = \frac{\rho k_B T}{\mu m_p}\]</div>
 <p>where <span class="math notranslate nohighlight">\(k_B\)</span> is Boltzmann’s constant and <span class="math notranslate nohighlight">\(m_p\)</span> is the mass of the
 proton.
 The mean molecular weight, <span class="math notranslate nohighlight">\(\mu\)</span>, is computed assuming
 electrically neutral atoms:</p>
-<div class="math notranslate nohighlight">
-\[\mu = \left ( \sum_k \frac{X_k}{A_k} \right )^{-1}\]</div>
+<div class="math notranslate nohighlight" id="equation-architecture-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-architecture-2" title="Permalink to this equation">¶</a></span>\[\mu = \left ( \sum_k \frac{X_k}{A_k} \right )^{-1}\]</div>
 <p>An option in the source code itself exists for treating the
 species as fully-ionized, but there is no runtime-parameter to
 make this switch.</p>
@@ -949,8 +949,8 @@ specific internal energy take the form of :math:<a href="#id10"><span class="pro
 <blockquote>
 <div><p>1)`. The main thermodynamic quantities take the form:</p>
 </div></blockquote>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-architecture-3">
+<span class="eqno">(4)<a class="headerlink" href="#equation-architecture-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 p &amp;= \frac{\rho k T}{m_u} \sum_k \frac{X_k}{A_k} \\
 e &amp;= \frac{k T}{m_u} \sum_k \frac{1}{\gamma_k - 1} \frac{X_k}{A_k} \\
 h &amp;= \frac{k T}{m_u} \sum_k \frac{\gamma_k}{\gamma_k - 1} \frac{X_k}{A_k}\end{aligned}\end{split}\]</div>
@@ -958,8 +958,8 @@ h &amp;= \frac{k T}{m_u} \sum_k \frac{\gamma_k}{\gamma_k - 1} \frac{X_k}{A_k}\en
 X_k/A_k\)</span>, but now we have two other sums that involve different
 <span class="math notranslate nohighlight">\(\gamma_k\)</span> weightings.</p>
 <p>The specific heats are constructed as usual,</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-architecture-4">
+<span class="eqno">(5)<a class="headerlink" href="#equation-architecture-4" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 c_v &amp;= \left . \frac{\partial e}{\partial T} \right |_\rho =
     \frac{k}{m_u} \sum_k \frac{1}{\gamma_k - 1} \frac{X_k}{A_k} \\
 c_p &amp;= \left . \frac{\partial h}{\partial T} \right |_p =
@@ -967,8 +967,8 @@ c_p &amp;= \left . \frac{\partial h}{\partial T} \right |_p =
 <p>and it can be seen that the specific gas constant, <span class="math notranslate nohighlight">\(R \equiv c_p - c_v\)</span> is
 independent of the <span class="math notranslate nohighlight">\(\gamma_i\)</span>, and is simply <span class="math notranslate nohighlight">\(R = k/m_u\bar{A}\)</span> giving the
 usual relation that <span class="math notranslate nohighlight">\(p = R\rho T\)</span>. Furthermore, we can show</p>
-<div class="math notranslate nohighlight">
-\[\Gamma_1 \equiv \left . \frac{\partial \log p}{\partial \log \rho} \right |_s =
+<div class="math notranslate nohighlight" id="equation-architecture-5">
+<span class="eqno">(6)<a class="headerlink" href="#equation-architecture-5" title="Permalink to this equation">¶</a></span>\[\Gamma_1 \equiv \left . \frac{\partial \log p}{\partial \log \rho} \right |_s =
    \left ( \sum_k \frac{\gamma_k}{\gamma_k - 1} \frac{X_k}{A_k} \right ) \bigg /
    \left ( \sum_k \frac{1}{\gamma_k - 1} \frac{X_k}{A_k} \right ) =
 \frac{c_p}{c_v} \equiv \gamma_\mathrm{effective}\]</div>
@@ -1600,6 +1600,10 @@ from <a href="#id21"><span class="problematic" id="id22">:raw-latex:`\cite{mult
     /* TOC colors */
     .wy-nav-side span[id*='MathJax-Span']{
        color: inherit;
+    }
+
+    span.eqno {
+       float: right;
     }
   </style>
 

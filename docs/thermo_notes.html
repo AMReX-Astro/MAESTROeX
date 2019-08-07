@@ -214,23 +214,23 @@ is a slight approximation that ignores the mass difference between protons
 and neutrons as well as some minor binding energy terms.</p>
 <p>The number density [cm:math:<cite>^-{3}</cite>] of isotope <span class="math notranslate nohighlight">\(i\)</span> is can be formed from the mass
 density and the molar mass of that isotope as follows:</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:number density}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-0">
+<span class="eqno">(1)<a class="headerlink" href="#equation-thermo-notes-0" title="Permalink to this equation">¶</a></span>\[\label{eq:number density}
   n_i = \frac{\rho_i N_\text{A}}{A_i},\]</div>
 <p>where <span class="math notranslate nohighlight">\(N_\text{A}\)</span> is Avogadro’s number [# / mole]. The molar abundance,
 <span class="math notranslate nohighlight">\(Y_i\)</span>, is a measure of the number of moles of species <span class="math notranslate nohighlight">\(i\)</span> per gram in the
 system:</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:molar abundance}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-thermo-notes-1" title="Permalink to this equation">¶</a></span>\[\label{eq:molar abundance}
   Y_i = \frac{n_i}{\rho N_\text{A}} = \frac{\rho_i}{\rho}\frac{1}{A_i}
   \equiv \frac{X_i}{A_i}\]</div>
 <p>where we have defined the mass fraction, <span class="math notranslate nohighlight">\(X_i = \frac{\rho_i}{\rho}\)</span>. Note</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:mass fraction sums to 1}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-thermo-notes-2" title="Permalink to this equation">¶</a></span>\[\label{eq:mass fraction sums to 1}
   \sum_i X_i = 1.\]</div>
 <p>We write the average molar mass and average proton number as:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-3">
+<span class="eqno">(4)<a class="headerlink" href="#equation-thermo-notes-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \label{eq:abar}
   \bar{A} &amp;= \frac{\sum_i A_i n_i}{\sum_i n_i} = \left(\sum_i X_i\right)
   \left(\sum_i \frac{X_i}{A_i}\right)^{-1}\\
@@ -241,14 +241,14 @@ system:</p>
 (<span class="math notranslate nohighlight">\(p\)</span> or <span class="math notranslate nohighlight">\(e\)</span>, e.g.) with respect to composition. Our EOS does not return such
 derivatives but instead returns derivatives of these variables with respect
 to <span class="math notranslate nohighlight">\(\bar{A}\)</span> and <span class="math notranslate nohighlight">\(\bar{Z}\)</span>. Using the chain rule, we have</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:p_xk}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-4">
+<span class="eqno">(5)<a class="headerlink" href="#equation-thermo-notes-4" title="Permalink to this equation">¶</a></span>\[\label{eq:p_xk}
   \frac{\ptl p}{\ptl X_k} = p_{X_k} =
   \frac{\ptl p}{\ptl \bar{A}}\frac{\ptl \bar{A}}{\ptl X_k} +
   \frac{\ptl p}{\ptl \bar{Z}}\frac{\ptl \bar{Z}}{\ptl X_k}.\]</div>
 <p>From <a class="reference external" href="#eq:abar">[eq:abar]</a> and <a class="reference external" href="#eq:zbar">[eq:zbar]</a> we have</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-5">
+<span class="eqno">(6)<a class="headerlink" href="#equation-thermo-notes-5" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \label{eq:abar_X_k}
   \frac{\ptl \bar{A}}{\ptl X_k} &amp;= \left(\sum_i \frac{X_i}{A_i}\right)^{-1}
   - \frac{\bar{A}^2}{A_k} = -\frac{\bar{A}}{A_k}\left(\bar{A} - A_k\right)\\
@@ -259,27 +259,27 @@ to <span class="math notranslate nohighlight">\(\bar{A}\)</span> and <span class
   -\frac{\bar{A}}{A_k}\left(\bar{Z} - Z_k\right),\end{aligned}\end{split}\]</div>
 <p>where after differentiation we have used <a class="reference external" href="#eq:massfractionsumsto1">[eq:mass fraction sums to 1]</a>
 to write</p>
-<div class="math notranslate nohighlight">
-\[\left(\sum_i \frac{X_i}{A_i}\right)^{-1} = \bar{A}.\]</div>
+<div class="math notranslate nohighlight" id="equation-thermo-notes-6">
+<span class="eqno">(7)<a class="headerlink" href="#equation-thermo-notes-6" title="Permalink to this equation">¶</a></span>\[\left(\sum_i \frac{X_i}{A_i}\right)^{-1} = \bar{A}.\]</div>
 <p>We therefore have</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:p_Xk_full}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-7">
+<span class="eqno">(8)<a class="headerlink" href="#equation-thermo-notes-7" title="Permalink to this equation">¶</a></span>\[\label{eq:p_Xk_full}
   p_{X_k} = -\frac{\bar{A}}{A_k}\left(\bar{A} - A_k\right)
   \frac{\ptl p}{\ptl\bar{A}} - \frac{\bar{A}}{A_k}\left(\bar{Z} - Z_k\right)
   \frac{\ptl p}{\ptl\bar{Z}}.\]</div>
 <p>Before it was brought to our attention by Frank Timmes, we were missing the
 second term in <a class="reference external" href="#eq:abar_X_k">[eq:abar_X_k]</a>. The only place where such terms
 appear in our algorithm is in a sum over all species, such as:</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:sum over species}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-8">
+<span class="eqno">(9)<a class="headerlink" href="#equation-thermo-notes-8" title="Permalink to this equation">¶</a></span>\[\label{eq:sum over species}
   \sum_i p_{X_i}\dot{\omega}_i =
   -\bar{A}^2\frac{\ptl p}{\ptl\bar{A}}\sum_i \frac{\dot{\omega}_i}{A_i}
   +\bar{A}\frac{\ptl p}{\ptl\bar{A}}\sum_i \dot{\omega}_i
   -\bar{A}\bar{Z}\frac{\ptl p}{\ptl\bar{Z}}\sum_i \frac{\dot{\omega}_i}{A_i}
   +\bar{A}\frac{\ptl p}{\ptl \bar{Z}}\sum_i\frac{Z_i}{A_i}\dot{\omega}_i.\]</div>
 <p>The second term in <a class="reference external" href="#eq:sumoverspecies">[eq:sum over species]</a> is identically zero because</p>
-<div class="math notranslate nohighlight">
-\[\sum_k \dot{\omega}_k \equiv 0.\]</div>
+<div class="math notranslate nohighlight" id="equation-thermo-notes-9">
+<span class="eqno">(10)<a class="headerlink" href="#equation-thermo-notes-9" title="Permalink to this equation">¶</a></span>\[\sum_k \dot{\omega}_k \equiv 0.\]</div>
 <p>This second term arises from what was added to <a class="reference external" href="#eq:abar_X_k">[eq:abar_X_k]</a> by
 Frank’s correction. Therefore, although important for individual derivatives
 with respect to composition, this correction term has no effect on our
@@ -296,39 +296,39 @@ The parcel is stable to convection if the displaced parcel’s density is
 greater than
 the surrounding fluid and gravity pushes the parcel back towards where it came
 from. Then the criterion for stability should be</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-10">
+<span class="eqno">(11)<a class="headerlink" href="#equation-thermo-notes-10" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
  \rho_{parcel}(r+\Delta r) - \rho_{background}(r + \Delta r) &amp;&gt;&amp; 0 \\
  \bigg[\rho_{parcel}(r) + \bigg(\frac{d\rho}{dr}\bigg)_{parcel}\Delta r\bigg] -
  \bigg[\rho_{background}(r) + \bigg(\frac{d\rho}{dr}\bigg)_{background}\Delta r\bigg] &amp;&gt;&amp; 0 \end{aligned}\end{split}\]</div>
 <p>Since the parcel originates at r, <span class="math notranslate nohighlight">\(\rho_{parcel}(r) = \rho_{background}(r)\)</span> and
 so the stability criterion is</p>
-<div class="math notranslate nohighlight">
-\[\bigg(\frac{d\rho}{dr}\bigg)_{parcel} &gt; \bigg(\frac{d\rho}{dr}\bigg)_{background}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-11">
+<span class="eqno">(12)<a class="headerlink" href="#equation-thermo-notes-11" title="Permalink to this equation">¶</a></span>\[\bigg(\frac{d\rho}{dr}\bigg)_{parcel} &gt; \bigg(\frac{d\rho}{dr}\bigg)_{background}
 \label{eqn:basicStability}\]</div>
 <p>Since the total pressure, <span class="math notranslate nohighlight">\(P\)</span>, always increases inward in a star in hydrostatic
 equilibrium, we can use <span class="math notranslate nohighlight">\(P\)</span> instead of <span class="math notranslate nohighlight">\(r\)</span> as the independent radial variable.
 Then condition for stability can be written as</p>
-<div class="math notranslate nohighlight">
-\[\bigg( \frac{d \ln \rho}{d \ln P}\bigg )_{parcel} &lt; \bigg(\frac{d \ln \rho}{d \ln P}\bigg)_{background}\]</div>
+<div class="math notranslate nohighlight" id="equation-thermo-notes-12">
+<span class="eqno">(13)<a class="headerlink" href="#equation-thermo-notes-12" title="Permalink to this equation">¶</a></span>\[\bigg( \frac{d \ln \rho}{d \ln P}\bigg )_{parcel} &lt; \bigg(\frac{d \ln \rho}{d \ln P}\bigg)_{background}\]</div>
 <p>Using the equation of state <span class="math notranslate nohighlight">\(P = P( \rho, T, \bar{\mu})\)</span>, where
 <span class="math notranslate nohighlight">\(\bar{\mu}\)</span> is the average mass per molecule, we can write</p>
-<div class="math notranslate nohighlight">
-\[d \ln P = \frac{\partial \ln P}{\partial \ln \rho} \bigg |_{T, \bar{\mu}}d \ln \rho + \frac{\partial \ln P}{\partial \ln T} \bigg |_{\rho, \bar{\mu}} d \ln T + \frac{\partial \ln P}{\partial \ln \bar{\mu}}\bigg |_{\rho, T} d \ln \bar{\mu}\
+<div class="math notranslate nohighlight" id="equation-thermo-notes-13">
+<span class="eqno">(14)<a class="headerlink" href="#equation-thermo-notes-13" title="Permalink to this equation">¶</a></span>\[d \ln P = \frac{\partial \ln P}{\partial \ln \rho} \bigg |_{T, \bar{\mu}}d \ln \rho + \frac{\partial \ln P}{\partial \ln T} \bigg |_{\rho, \bar{\mu}} d \ln T + \frac{\partial \ln P}{\partial \ln \bar{\mu}}\bigg |_{\rho, T} d \ln \bar{\mu}\
 \label{eqn:lnEOS}\]</div>
 <p>For convenience we introduce</p>
-<div class="math notranslate nohighlight">
-\[\chi_{\rho} = \frac{\partial \ln P}{\partial \ln \rho}\bigg |_{T,\bar{\mu}} \qquad
+<div class="math notranslate nohighlight" id="equation-thermo-notes-14">
+<span class="eqno">(15)<a class="headerlink" href="#equation-thermo-notes-14" title="Permalink to this equation">¶</a></span>\[\chi_{\rho} = \frac{\partial \ln P}{\partial \ln \rho}\bigg |_{T,\bar{\mu}} \qquad
   \chi_T = \frac{\partial \ln P}{\partial \ln T} \bigg |_{\rho,\bar{\mu}} \qquad
   \chi_{\bar{\mu}} = \frac{\partial \ln P}{\partial \ln \bar{\mu}} \bigg |_{\rho, T}\]</div>
 <p>Then we can rearrange <a class="reference external" href="#eqn:lnEOS">[eqn:lnEOS]</a> to get</p>
-<div class="math notranslate nohighlight">
-\[\frac{d \ln \rho}{\partial \ln P} = \frac{1}{\chi_\rho} -
+<div class="math notranslate nohighlight" id="equation-thermo-notes-15">
+<span class="eqno">(16)<a class="headerlink" href="#equation-thermo-notes-15" title="Permalink to this equation">¶</a></span>\[\frac{d \ln \rho}{\partial \ln P} = \frac{1}{\chi_\rho} -
   \frac{\chi_T}{\chi_\rho} \frac{d \ln T}{d \ln P}- \frac{\chi_{\bar{\mu}}}{\chi_\rho}
   \frac{d \ln \bar{\mu}}{d \ln P}\]</div>
 <p>Then the general stability criterion is</p>
-<div class="math notranslate nohighlight">
-\[\bigg ( \frac{1}{\chi_\rho} -
+<div class="math notranslate nohighlight" id="equation-thermo-notes-16">
+<span class="eqno">(17)<a class="headerlink" href="#equation-thermo-notes-16" title="Permalink to this equation">¶</a></span>\[\bigg ( \frac{1}{\chi_\rho} -
   \frac{\chi_T}{\chi_\rho} \frac{d \ln T}{d \ln P}- \frac{\chi_{\bar{\mu}}}{\chi_\rho}
   \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{parcel} &lt;
   \bigg ( \frac{1}{\chi_\rho} -
@@ -354,8 +354,8 @@ fluid is fully ionized.</p></li>
 we can assume, in view of the arbitrarily small initial perturbation of
 the parcel, that <span class="math notranslate nohighlight">\(\chi_\rho\)</span> and <span class="math notranslate nohighlight">\(\chi_T\)</span> to have the same values in the
 parcel as in the background. Then the stability criterion becomes</p>
-<div class="math notranslate nohighlight">
-\[\bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} &gt;
+<div class="math notranslate nohighlight" id="equation-thermo-notes-17">
+<span class="eqno">(18)<a class="headerlink" href="#equation-thermo-notes-17" title="Permalink to this equation">¶</a></span>\[\bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} &gt;
   \bigg (  \frac{d \ln T}{d \ln P} + \frac{\chi_{\bar{\mu}}}{\chi_T}
   \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{background}
 \label{eqn:Ledoux}\]</div>
@@ -370,8 +370,8 @@ composition in the parcel here.)
 The effect of variable composition are then absorbed into <span class="math notranslate nohighlight">\(\chi_\rho\)</span> and
 <span class="math notranslate nohighlight">\(\chi_T\)</span>. Again, we can take <span class="math notranslate nohighlight">\(\chi_\rho\)</span> and <span class="math notranslate nohighlight">\(\chi_T\)</span> to have the same values
 in the parcel as in the background. The criterion then is</p>
-<div class="math notranslate nohighlight">
-\[\bigg ( \frac{d \ln T}{d \ln P} \bigg )_{parcel} &gt;
+<div class="math notranslate nohighlight" id="equation-thermo-notes-18">
+<span class="eqno">(19)<a class="headerlink" href="#equation-thermo-notes-18" title="Permalink to this equation">¶</a></span>\[\bigg ( \frac{d \ln T}{d \ln P} \bigg )_{parcel} &gt;
   \bigg ( \frac{d \ln T}{d \ln P} \bigg )_{background}
 \label{eqn:Schwarz}\]</div>
 <p>We obtain the Schwarzchild criterion for
@@ -379,23 +379,23 @@ stability if we also assume the parcel moves adiabatically.</p>
 <p>The Scharwzchild criterion can be recast in terms of entropy if
 the EOS is taken as <span class="math notranslate nohighlight">\(P(\rho, S)\)</span> instead of <span class="math notranslate nohighlight">\(P(\rho, T)\)</span>. Then, in place
 of equation (<a class="reference external" href="#eqn:lnEOS">[eqn:lnEOS]</a>) we have</p>
-<div class="math notranslate nohighlight">
-\[d \rho = \frac{\partial \rho}{\partial P} \bigg |_{S} d P + \frac{\partial \rho}{\partial S} \bigg |_{P} dS\]</div>
+<div class="math notranslate nohighlight" id="equation-thermo-notes-19">
+<span class="eqno">(20)<a class="headerlink" href="#equation-thermo-notes-19" title="Permalink to this equation">¶</a></span>\[d \rho = \frac{\partial \rho}{\partial P} \bigg |_{S} d P + \frac{\partial \rho}{\partial S} \bigg |_{P} dS\]</div>
 <p>We can subsitute this into equation (<a class="reference external" href="#eqn:basicStability">[eqn:basicStability]</a>) for stability,
 and assuming the parcel moves adiabatically, we get</p>
-<div class="math notranslate nohighlight">
-\[\bigg ( \frac{\partial \rho}{\partial S} \bigg |_{P} \frac{dS}{dr}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-20">
+<span class="eqno">(21)<a class="headerlink" href="#equation-thermo-notes-20" title="Permalink to this equation">¶</a></span>\[\bigg ( \frac{\partial \rho}{\partial S} \bigg |_{P} \frac{dS}{dr}
   \bigg )_{background}&lt; 0\]</div>
 <p>One of Maxwell’s relations is</p>
-<div class="math notranslate nohighlight">
-\[\frac{\partial \rho^{-1}}{\partial S} \bigg |_{P} = \frac{\partial T}{\partial P} \bigg |_{S}\]</div>
+<div class="math notranslate nohighlight" id="equation-thermo-notes-21">
+<span class="eqno">(22)<a class="headerlink" href="#equation-thermo-notes-21" title="Permalink to this equation">¶</a></span>\[\frac{\partial \rho^{-1}}{\partial S} \bigg |_{P} = \frac{\partial T}{\partial P} \bigg |_{S}\]</div>
 <p>All thermodynamically stable substances have temperatures that increase upon
 adiabatic compression, i.e. <span class="math notranslate nohighlight">\(\frac{\partial T}{\partial P} \big |_{S} &gt; 0\)</span>.
 So Maxwell’s relation implies that
 <span class="math notranslate nohighlight">\(\frac{\partial \rho}{\partial S} \big |_{P} &lt; 0\)</span>.
 The stability criterion then becomes</p>
-<div class="math notranslate nohighlight">
-\[\bigg ( \frac{d S}{d r} \bigg )_{background} &gt; 0
+<div class="math notranslate nohighlight" id="equation-thermo-notes-22">
+<span class="eqno">(23)<a class="headerlink" href="#equation-thermo-notes-22" title="Permalink to this equation">¶</a></span>\[\bigg ( \frac{d S}{d r} \bigg )_{background} &gt; 0
 \label{eqn:stabilityEntr}\]</div>
 </li>
 </ol>
@@ -403,8 +403,8 @@ The stability criterion then becomes</p>
 initial model is complicated by the phenomenon of semiconvection, which
 occurs when the Ledoux criterion is statisfied but the Schwarzchild is not,
 i.e.</p>
-<div class="math notranslate nohighlight">
-\[\bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} &lt;
+<div class="math notranslate nohighlight" id="equation-thermo-notes-23">
+<span class="eqno">(24)<a class="headerlink" href="#equation-thermo-notes-23" title="Permalink to this equation">¶</a></span>\[\bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} &lt;
   \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{background} &lt;
   \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} -
   \bigg ( \frac{\chi_{\bar{\mu}}}{\chi_T}
@@ -426,8 +426,8 @@ to nuclear reactions,
 not the initial configuration we supply. Thus I think we want to guard against
 semiconvection as well as “traditional” convection by using the stability
 criterion</p>
-<div class="math notranslate nohighlight">
-\[\bigg ( \frac{d \ln T}{d \ln P} \bigg )_{parcel} =
+<div class="math notranslate nohighlight" id="equation-thermo-notes-24">
+<span class="eqno">(25)<a class="headerlink" href="#equation-thermo-notes-24" title="Permalink to this equation">¶</a></span>\[\bigg ( \frac{d \ln T}{d \ln P} \bigg )_{parcel} =
 \frac{d \ln T}{d \ln P} \bigg |_{S,\bar{\mu}} &gt;
   \bigg ( \frac{d \ln T}{d \ln P} \bigg )_{background}\]</div>
 <p>Although this looks like the Schwarschild criterion (and, because I’m not
@@ -449,24 +449,24 @@ if a system is stable (<span class="math notranslate nohighlight">\(\Delta\nabla
 &gt; 0\)</span>) to convection under the Schwarzschild criterion (i.e. neglecting
 compositional gradients). Cox and Giuli (see chapter 9) define three
 different “adiabatic exponents” that we will use:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-25">
+<span class="eqno">(26)<a class="headerlink" href="#equation-thermo-notes-25" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
   \Gamma_1 &amp;\equiv&amp;   \left(\frac{d\ln p}{d\ln\rho}\right)_\text{ad} \\
   \frac{\Gamma_2}{\Gamma_2-1} &amp;\equiv&amp;
   \left(\frac{d\ln p}{d\ln T}\right)_\text{ad} \\
   \Gamma_3 - 1 &amp;\equiv&amp; \left(\frac{d\ln T}{d\ln\rho}\right)_\text{ad},\end{aligned}\end{split}\]</div>
 <p>where the subscript “ad” means along an adiabat. We can combine the
 exponents to get the following relation</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:Gamma relations}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-26">
+<span class="eqno">(27)<a class="headerlink" href="#equation-thermo-notes-26" title="Permalink to this equation">¶</a></span>\[\label{eq:Gamma relations}
   \Gamma_1 = \left(\frac{\Gamma_2}{\Gamma_2-1}\right)\left(\Gamma_3-1\right).\]</div>
 <p>The adiabatic excess is defined as</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:adiabatic excess}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-27">
+<span class="eqno">(28)<a class="headerlink" href="#equation-thermo-notes-27" title="Permalink to this equation">¶</a></span>\[\label{eq:adiabatic excess}
   \Delta\nabla = \nabla_\text{actual} - \nabla_\text{ad}\]</div>
 <p>where</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:thermal gradient}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-28">
+<span class="eqno">(29)<a class="headerlink" href="#equation-thermo-notes-28" title="Permalink to this equation">¶</a></span>\[\label{eq:thermal gradient}
   \nabla \equiv \frac{d\ln T}{d\ln P}\]</div>
 <p>is the thermal gradient. It is important to note that these thermal
 gradients are only along the radial direction. The “actual”
@@ -478,30 +478,30 @@ find another relation to use with <a class="reference external" href="#eq:Gammar
 for the adiabatic excess.</p>
 <p>The Schwarzschild criterion does not care about changes in composition
 and we therefore write <span class="math notranslate nohighlight">\(p = p(\rho,T)\)</span> and</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:dp}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-29">
+<span class="eqno">(30)<a class="headerlink" href="#equation-thermo-notes-29" title="Permalink to this equation">¶</a></span>\[\label{eq:dp}
   d\ln p = \chi_\rho d\ln\rho + \chi_T d\ln T\]</div>
 <p>where</p>
-<div class="math notranslate nohighlight">
-\[\chi_\rho = \left(\frac{d\ln p}{d\ln\rho}\right)_T,\qquad
+<div class="math notranslate nohighlight" id="equation-thermo-notes-30">
+<span class="eqno">(31)<a class="headerlink" href="#equation-thermo-notes-30" title="Permalink to this equation">¶</a></span>\[\chi_\rho = \left(\frac{d\ln p}{d\ln\rho}\right)_T,\qquad
 \chi_T = \left(\frac{d\ln p}{d\ln T}\right)_\rho.\]</div>
 <p>Dividing <a class="reference external" href="#eq:dp">[eq:dp]</a> by <span class="math notranslate nohighlight">\(d\ln\rho\)</span> and taking this along an adiabat
 we have</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:dp2}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-31">
+<span class="eqno">(32)<a class="headerlink" href="#equation-thermo-notes-31" title="Permalink to this equation">¶</a></span>\[\label{eq:dp2}
   \left(\frac{d\ln p}{d\ln\rho}\right)_\text{ad} = \chi_\rho + \chi_T
   \left(\frac{d\ln T}{d\ln\rho}\right)_\text{ad}.\]</div>
 <p>Using the <span class="math notranslate nohighlight">\(\Gamma\)</span>’s, we have</p>
-<div class="math notranslate nohighlight">
-\[\label{eq:Gamma1 relation with Gamma2}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-32">
+<span class="eqno">(33)<a class="headerlink" href="#equation-thermo-notes-32" title="Permalink to this equation">¶</a></span>\[\label{eq:Gamma1 relation with Gamma2}
   \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right).\]</div>
 <dl class="simple">
 <dt>Combining <a class="reference external" href="#eq:Gammarelations">[eq:Gamma relations]</a> and <a href="#id3"><span class="problematic" id="id4">`</span></a>[eq:Gamma1 relation</dt><dd><p>with Gamma2] &lt;#eq:Gamma1 relation
 with Gamma2&gt;`__ to eliminate <span class="math notranslate nohighlight">\(\Gamma_3\)</span>, we have:</p>
 </dd>
 </dl>
-<div class="math notranslate nohighlight">
-\[\label{eq:nabla_ad}
+<div class="math notranslate nohighlight" id="equation-thermo-notes-33">
+<span class="eqno">(34)<a class="headerlink" href="#equation-thermo-notes-33" title="Permalink to this equation">¶</a></span>\[\label{eq:nabla_ad}
   \nabla_\text{ad} = \frac{\Gamma_1 - \chi_\rho}{\chi_T\Gamma_1}\]</div>
 <p>which uses only terms which are easily returned from an EOS call.</p>
 </div>
@@ -560,6 +560,10 @@ with Gamma2&gt;`__ to eliminate <span class="math notranslate nohighlight">\(\Ga
     /* TOC colors */
     .wy-nav-side span[id*='MathJax-Span']{
        color: inherit;
+    }
+
+    span.eqno {
+       float: right;
     }
   </style>
 
