@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Volume Discrepancy Factor &mdash; MAESTROeX 19.08
+  <title>References &mdash; MAESTROeX 19.08
  documentation</title>
   
 
@@ -39,8 +39,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Equation of State Notes" href="eos_notes.html" />
-    <link rel="prev" title="Low Density Cutoffs" href="lo_density.html" /> 
+    <link rel="prev" title="Notes on Enthalpy" href="enthalpy.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -111,9 +110,9 @@
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
@@ -133,8 +132,8 @@
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
 </ul>
 <p class="caption"><span class="caption-text">References</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">References</a></li>
 </ul>
 
             
@@ -180,13 +179,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Volume Discrepancy Factor</li>
+      <li>References</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/volume_discrepancy.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/zreferences.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -199,54 +198,86 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="volume-discrepancy-factor">
-<h1>Volume Discrepancy Factor<a class="headerlink" href="#volume-discrepancy-factor" title="Permalink to this headline">¶</a></h1>
-<p>The volume discrepancy term is used in the constraint equation to
-force the system back to the equation of state. We write our velocity
-constraint equation as</p>
-<div class="math notranslate nohighlight" id="equation-volume-discrepancy-0">
-<span class="eqno">(1)<a class="headerlink" href="#equation-volume-discrepancy-0" title="Permalink to this equation">¶</a></span>\[\nablab \cdotb (\beta_0 \Ub)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .
-\label{eq:fullconstraint}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(f\)</span> is the volume discrepancy factor and ranges from 0 to 1, and
-<span class="math notranslate nohighlight">\(p_\mathrm{EOS}\)</span> is the thermodynamic pressure as returned by the EOS,
-using the full state as input.
-In practice we evaluate this as</p>
-<div class="math notranslate nohighlight" id="equation-volume-discrepancy-1">
-<span class="eqno">(2)<a class="headerlink" href="#equation-volume-discrepancy-1" title="Permalink to this equation">¶</a></span>\[p_\mathrm{EOS} = p(\rho,h,X_k)\]</div>
-<p>The idea behind this forcing term is that if <span class="math notranslate nohighlight">\(p_\mathrm{EOS} &gt; p_0\)</span> then
-<span class="math notranslate nohighlight">\(\nablab \cdotb (\beta_0 \Ub) &gt; 0\)</span>, and the cell will evacuate. This
-has the effect of returning us to <span class="math notranslate nohighlight">\(p_\mathrm{EOS} = p_0\)</span>.</p>
-<p>In MAESTRO, we decomponse the velocity into a base state component
-and a local component. The base state constraint equation is simply
-the horizontal average of the full constraint. Starting with
-<span class="math notranslate nohighlight">\(\Ub = \Ubt + w_0 \er\)</span> in equation <a class="reference external" href="#eq:fullconstraint">[eq:fullconstraint]</a>, we have</p>
-<div class="math notranslate nohighlight" id="equation-volume-discrepancy-2">
-<span class="eqno">(3)<a class="headerlink" href="#equation-volume-discrepancy-2" title="Permalink to this equation">¶</a></span>\[\nablab \cdotb (\beta_0 w_0 \er) + \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .
-\label{eq:fullconstraint2}\]</div>
-<p>Averaging this over a layer, we note that <span class="math notranslate nohighlight">\(\overline{\nablab \cdotb (\beta_0 \Ubt)} = 0\)</span>,
-yielding</p>
-<div class="math notranslate nohighlight" id="equation-volume-discrepancy-3">
-<span class="eqno">(4)<a class="headerlink" href="#equation-volume-discrepancy-3" title="Permalink to this equation">¶</a></span>\[\nablab \cdotb (\beta_0 w_0 \er)  = \beta_0 \left(\overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \right )
-\label{eq:w0constraint_vd}\]</div>
-<p>and</p>
-<div class="math notranslate nohighlight" id="equation-volume-discrepancy-4">
-<span class="eqno">(5)<a class="headerlink" href="#equation-volume-discrepancy-4" title="Permalink to this equation">¶</a></span>\[\nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \overline{S} + \frac{f}{\gammabar p_0} \frac{p_\mathrm{EOS} - \overline{p_\mathrm{EOS}}}{\Delta t} \right )  .
-\label{eq:Utconstraint_vd}\]</div>
-<p>In solving the <span class="math notranslate nohighlight">\(w_0\)</span> evolution equation
-(Eq. [<a class="reference external" href="#eq:w0constraint_vd">[eq:w0constraint_vd]</a>]), we expand the divergence, giving</p>
-<div class="math notranslate nohighlight" id="equation-volume-discrepancy-5">
-<span class="eqno">(6)<a class="headerlink" href="#equation-volume-discrepancy-5" title="Permalink to this equation">¶</a></span>\[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} -
-w_0 \er  \cdotb \frac{1}{\beta_0} \nablab \beta_0  - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t}  .\]</div>
-<p>Recalling that</p>
-<div class="math notranslate nohighlight" id="equation-volume-discrepancy-6">
-<span class="eqno">(7)<a class="headerlink" href="#equation-volume-discrepancy-6" title="Permalink to this equation">¶</a></span>\[\frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r} =
- \frac{1}{\beta_0} \frac{\partial \beta_0}{\partial r}\]</div>
-<p>(see Paper I), and that <span class="math notranslate nohighlight">\(\psi \equiv D_0 p_0 / Dt \equiv \partial p_0 / \partial t +
-w_0 \partial p_0 / \partial r\)</span>, we have</p>
-<div class="math notranslate nohighlight" id="equation-volume-discrepancy-7">
-<span class="eqno">(8)<a class="headerlink" href="#equation-volume-discrepancy-7" title="Permalink to this equation">¶</a></span>\[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \psi -
- \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t}  .\]</div>
-<p>This is the form that is solved in <code class="docutils literal notranslate"><span class="pre">make_w0</span></code>.</p>
+  <div class="section" id="references">
+<h1>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h1>
+<p id="bibtex-bibliography-zreferences-0"><dl class="citation">
+<dt class="label" id="almgren-2000"><span class="brackets">Alm00</span></dt>
+<dd><p>A. Almgren. A new look at the pseudo-incompressible solution to Lamb’s problem of hydrostatic adjustment. <em>Journal of Atmospheric Science</em>, 57:995–998, April 2000.</p>
+</dd>
+<dt class="label" id="almgren-bell-crutchfield"><span class="brackets">ABC00</span></dt>
+<dd><p>A. S. Almgren, J. B. Bell, and W. Y. Crutchfield. Approximate projection methods: part I. Inviscid analysis. <em>SIAM J. Sci. Comput.</em>, 22(4):1139–59, 2000.</p>
+</dd>
+<dt class="label" id="almgrenbellszymczak-1996"><span class="brackets">ABS96</span></dt>
+<dd><p>A. S. Almgren, J. B. Bell, and W. G. Szymczak. A numerical method for the incompressible Navier-Stokes equations based on an approximate projection. <em>SIAM J. Sci. Comput.</em>, 17(2):358–369, March 1996.</p>
+</dd>
+<dt class="label" id="bellcolellahowell-1991"><span class="brackets">BCH91</span></dt>
+<dd><p>J. B. Bell, P. Colella, and L. H. Howell. An efficient second-order projection method for viscous incompressible flow. In <em>Proceedings of the Tenth AIAA Computational Fluid Dynamics Conference</em>, 360–367. AIAA, June 1991.</p>
+</dd>
+<dt class="label" id="snld"><span class="brackets">BDR+04</span></dt>
+<dd><p>J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, and M. Zingale. Direct numerical simulations of Type Ia supernovae flames I: the Landau-Darrieus instability. <em>\apj </em>, 606:1029, 2004.</p>
+</dd>
+<dt class="label" id="bellmarcus-1992b"><span class="brackets">BM92</span></dt>
+<dd><p>J. B. Bell and D. L. Marcus. A second-order projection method for variable-density flows. <em>Journal of Computational Physics</em>, 101(2):334–348, August 1992.</p>
+</dd>
+<dt class="label" id="daybell00"><span class="brackets">DB00</span></dt>
+<dd><p>M. S. Day and J. B. Bell. Numerical simulation of laminar reacting flows with complex chemistry. <em>Combust. Theory Modelling</em>, 4(4):535–556, 2000.</p>
+</dd>
+<dt class="label" id="durran"><span class="brackets">Dur89</span></dt>
+<dd><p>D. R. Durran. Improving the anelastic approximation. <em>Journal of Atmospheric Science</em>, 46(11):1453–1461, 1989.</p>
+</dd>
+<dt class="label" id="kp-2012"><span class="brackets">KP12</span></dt>
+<dd><p>Rupert Klein and Olivier Pauluis. Thermodynamic consistency of a pseudoincompressible approximation  for general equations of state. <em>JAS</em>, March 2012.</p>
+</dd>
+<dt class="label" id="vlbwz-2013"><span class="brackets">VLB+13</span></dt>
+<dd><p>Geoffrey M. Vasil, Daniel Lecoanet, Benjamin P. Brown, Toby S. Wood, and Ellen G. Zweibel. Energy conservation and gravity waves in sound-proof treatments of stellar interiors. ii. lagrangian constrained analysis. <em>Astrophysical Journal</em>, 773:169–, 2013.</p>
+</dd>
+<dt class="label" id="castro"><span class="brackets">AlmgrenBecknerBell+10</span></dt>
+<dd><p>A. S. Almgren, V. E. Beckner, J. B. Bell, M. S. Day, L. H. Howell, C. C. Joggerst, M. J. Lijewski, A. Nonaka, M. Singer, and M. Zingale. CASTRO: A New Compressible Astrophysical Solver. I. Hydrodynamics and Self-gravity. <em>\apj </em>, 715:1221–1238, June 2010. <a class="reference external" href="https://arxiv.org/abs/1005.0114">arXiv:1005.0114</a>, <a class="reference external" href="https://doi.org/10.1088/0004-637X/715/2/1221">doi:10.1088/0004-637X/715/2/1221</a>.</p>
+</dd>
+<dt class="label" id="lowmach3"><span class="brackets">AlmgrenBellNonakaZingale08</span></dt>
+<dd><p>A. S. Almgren, J. B. Bell, A. Nonaka, and M. Zingale. Low Mach Number Modeling of Type Ia Supernovae. III. Reactions. <em>\apj </em>, 684:449–470, September 2008. <a class="reference external" href="https://doi.org/10.1086/590321">doi:10.1086/590321</a>.</p>
+</dd>
+<dt class="label" id="lowmach2"><span class="brackets">AlmgrenBellRendlemanZingale06</span></dt>
+<dd><p>A. S. Almgren, J. B. Bell, C. A. Rendleman, and M. Zingale. Low Mach Number Modeling of Type Ia Supernovae. II. Energy Evolution. <em>\apj </em>, 649:927–938, October 2006. <a class="reference external" href="https://arxiv.org/abs/arXiv:astro-ph/0606496">arXiv:arXiv:astro-ph/0606496</a>, <a class="reference external" href="https://doi.org/10.1086/507089">doi:10.1086/507089</a>.</p>
+</dd>
+<dt class="label" id="snturb"><span class="brackets">AspdenBellDay+08</span></dt>
+<dd><p>A. J. Aspden, J. B. Bell, M. S. Day, S. E. Woosley, and M. Zingale. Turbulence-Flame Interactions in Type Ia Supernovae. <em>ApJ</em>, 689:1173–1185, December 2008. <a class="reference external" href="https://arxiv.org/abs/0811.2816">arXiv:0811.2816</a>, <a class="reference external" href="https://doi.org/10.1086/592726">doi:10.1086/592726</a>.</p>
+</dd>
+<dt class="label" id="bellcolellaglaz"><span class="brackets">BellColellaGlaz89</span></dt>
+<dd><p>J. B. Bell, P. Colella, and H. M. Glaz. A Second Order Projection Method for the Incompressible Navier-Stokes Equations. <em>Journal of Computational Physics</em>, 85:257, December 1989. <a class="reference external" href="https://doi.org/10.1016/0021-9991(89)90151-4">doi:10.1016/0021-9991(89)90151-4</a>.</p>
+</dd>
+<dt class="label" id="flash"><span class="brackets">FryxellOlsonRicker+00</span></dt>
+<dd><p>B. Fryxell, K. Olson, P. Ricker, F. X. Timmes, M. Zingale, D. Q. Lamb, P. MacNeice, R. Rosner, J. W. Truran, and H. Tufo. FLASH: An Adaptive Mesh Hydrodynamics Code for Modeling Astrophysical Thermonuclear Flashes. <em>\apjs </em>, 131:273–334, November 2000. <a class="reference external" href="https://doi.org/10.1086/317361">doi:10.1086/317361</a>.</p>
+</dd>
+<dt class="label" id="leveque"><span class="brackets">LeVeque02</span></dt>
+<dd><p>R. J. LeVeque. <em>Finite Volume Methods for Hyperbolic Problems</em>. Cambridge Texts in Applied Mathematics. Cambridge University Press, 2002.</p>
+</dd>
+<dt class="label" id="xrb"><span class="brackets">MaloneNonakaAlmgren+11</span></dt>
+<dd><p>C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, and M. Zingale. Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional Convection Prior to the Outburst of a Pure $^4$He Accretor. <em>\apj </em>, 728:118–+, February 2011. <a class="reference external" href="https://arxiv.org/abs/1012.0609">arXiv:1012.0609</a>, <a class="reference external" href="https://doi.org/10.1088/0004-637X/728/2/118">doi:10.1088/0004-637X/728/2/118</a>.</p>
+</dd>
+<dt class="label" id="multilevel"><span class="brackets">NonakaAlmgrenBell+10</span></dt>
+<dd><p>A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. <em>\apjs </em>, 188:358–383, June 2010. <a class="reference external" href="https://arxiv.org/abs/1005.0112">arXiv:1005.0112</a>, <a class="reference external" href="https://doi.org/10.1088/0067-0049/188/2/358">doi:10.1088/0067-0049/188/2/358</a>.</p>
+</dd>
+<dt class="label" id="wdturb"><span class="brackets">NonakaAspdenZingale+12</span></dt>
+<dd><p>A. Nonaka, A. J. Aspden, M. Zingale, A. S. Almgren, J. B. Bell, and S. E. Woosley. High-resolution Simulations of Convection Preceding Ignition in Type Ia Supernovae Using Adaptive Mesh Refinement. <em>\apj </em>, 745:73, January 2012. <a class="reference external" href="https://arxiv.org/abs/1111.3086">arXiv:1111.3086</a>, <a class="reference external" href="https://doi.org/10.1088/0004-637X/745/1/73">doi:10.1088/0004-637X/745/1/73</a>.</p>
+</dd>
+<dt class="label" id="bds3d"><span class="brackets">NonakaMayAlmgrenBell11</span></dt>
+<dd><p>A. Nonaka, S. May, A. S. Almgren, and J. B. Bell. A Three-Dimensional, Unsplit Godunov Method for Scalar Conservation Laws. <em>SIAM J. Sci. Comput.</em>, 33(4):2039–2062, 2011.</p>
+</dd>
+<dt class="label" id="yt"><span class="brackets">TurkSmithOishi+11</span></dt>
+<dd><p>M. J. Turk, B. D. Smith, J. S. Oishi, S. Skory, S. W. Skillman, T. Abel, and M. L. Norman. yt: A Multi-code Analysis Toolkit for Astrophysical Simulation Data. <em>\apjs </em>, 192:9, January 2011. <a class="reference external" href="https://arxiv.org/abs/1011.3514">arXiv:1011.3514</a>, <a class="reference external" href="https://doi.org/10.1088/0067-0049/192/1/9">doi:10.1088/0067-0049/192/1/9</a>.</p>
+</dd>
+<dt class="label" id="snrt3d"><span class="brackets">ZingaleWoosleyRendleman+05</span></dt>
+<dd><p>M Zingale, S. E. Woosley, C. A. Rendleman, M. S. Day, and J. B. Bell. Three-dimensional Numerical Simulations of Rayleigh-Taylor Unstable Flames in Type Ia Supernovae. <em>\apj </em>, 632:1021, 2005.</p>
+</dd>
+<dt class="label" id="lowmach4"><span class="brackets">ZingaleAlmgrenBell+09</span></dt>
+<dd><p>M. Zingale, A. S. Almgren, J. B. Bell, A. Nonaka, and S. E. Woosley. Low Mach Number Modeling of Type IA Supernovae. IV. White Dwarf Convection. <em>\apj </em>, 704:196–210, October 2009. <a class="reference external" href="https://arxiv.org/abs/0908.2668">arXiv:0908.2668</a>, <a class="reference external" href="https://doi.org/10.1088/0004-637X/704/1/196">doi:10.1088/0004-637X/704/1/196</a>.</p>
+</dd>
+<dt class="label" id="wdconvect"><span class="brackets">ZingaleNonakaAlmgren+11</span></dt>
+<dd><p>M. Zingale, A. Nonaka, A. S. Almgren, J. B. Bell, C. M. Malone, and S. E. Woosley. The Convective Phase Preceding Type Ia Supernovae. <em>\apj </em>, 740:8, October 2011. <a class="reference external" href="https://doi.org/10.1088/0004-637X/740/1/8">doi:10.1088/0004-637X/740/1/8</a>.</p>
+</dd>
+</dl>
+</p>
 </div>
 
 
@@ -257,10 +288,8 @@ w_0 \partial p_0 / \partial r\)</span>, we have</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="eos_notes.html" class="btn btn-neutral float-right" title="Equation of State Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="lo_density.html" class="btn btn-neutral float-left" title="Low Density Cutoffs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="enthalpy.html" class="btn btn-neutral float-left" title="Notes on Enthalpy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

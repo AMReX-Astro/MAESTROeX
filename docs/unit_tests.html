@@ -142,8 +142,9 @@
 <li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
 </ul>
+<p class="caption"><span class="caption-text">References</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
             
@@ -232,23 +233,23 @@ ensure that the error does not show any directional bias.</p>
 independent of the advection direction—small differences can
 arise. What’s happening here is that within each cell BDS is trying
 to define a tri-linear profile for rho subject to the constrants in
-the BDS paper <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{bds3d}`</span></a> (constraints 1 and 2 on p. 2044 after eq. 3.4). We
+the BDS paper (<a class="reference internal" href="zreferences.html#bds3d" id="id1">[NonakaMayAlmgrenBell11]</a>) (constraints 1 and 2 on p. 2044 after eq. 3.4). We
 do not solve the L2 minimization problem exactly so we iterate up to
 3 times using a simple heuristic algorithm designed to work toward
 the constraint. The iteration will give different results depending
 on orientation since we work through the corners in arbitrary order.</p>
-<div class="figure align-center" id="id11">
-<img alt="_images/dens_2d_orig_density.png" src="_images/dens_2d_orig_density.png" />
-<p class="caption"><span class="caption-text">Initial Gaussian density profile</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+<div class="figure align-center" id="id6">
+<a class="reference internal image-reference" href="_images/dens_2d_orig_density.png"><img alt="_images/dens_2d_orig_density.png" src="_images/dens_2d_orig_density.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">Initial Gaussian density profile</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
 </div>
-<div class="figure align-center" id="id12">
-<img alt="_images/dens_2d_ppm1_xp_final_density.png" src="_images/dens_2d_ppm1_xp_final_density.png" />
-<p class="caption"><span class="caption-text">density profile after advecting to the right for one period</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+<div class="figure align-center" id="id7">
+<a class="reference internal image-reference" href="_images/dens_2d_ppm1_xp_final_density.png"><img alt="_images/dens_2d_ppm1_xp_final_density.png" src="_images/dens_2d_ppm1_xp_final_density.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">density profile after advecting to the right for one period</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
 </div>
-<div class="figure align-center" id="id13">
-<img alt="_images/dens_2d_ppm1_xp_final_abserror.png" src="_images/dens_2d_ppm1_xp_final_abserror.png" />
+<div class="figure align-center" id="id8">
+<a class="reference internal image-reference" href="_images/dens_2d_ppm1_xp_final_abserror.png"><img alt="_images/dens_2d_ppm1_xp_final_abserror.png" src="_images/dens_2d_ppm1_xp_final_abserror.png" style="width: 80%;" /></a>
 <p class="caption"><span class="caption-text">absolute error between the final and initial density fields,
-showing the error in the advection scheme</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
+showing the error in the advection scheme</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
 </div>
 </div>
 <div class="section" id="test-average">
@@ -260,7 +261,7 @@ the fill_3d_module module, and then calls average to
 put it back onto a 1D radial array. This way we test the accuracy
 of our procedure to map between the 1D radial and 3D Cartesian
 states. The output from this test was described in detail
-in <a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{multilevel}`</span></a>.</p>
+in <a class="reference internal" href="zreferences.html#multilevel" id="id2">[NonakaAlmgrenBell+10]</a>.</p>
 </div>
 <div class="section" id="test-basestate">
 <h2>test_basestate<a class="headerlink" href="#test-basestate" title="Permalink to this headline">¶</a></h2>
@@ -271,8 +272,8 @@ the base state velocity, <span class="math notranslate nohighlight">\(w_0\)</spa
 the heating and this is used to advect the base state density
 and compute the new pressure, <span class="math notranslate nohighlight">\(p_0\)</span>. An early version of
 this routine was used for the plane-parallel expansion test
-in <a href="#id5"><span class="problematic" id="id6">:raw-latex:`\cite{lowMach2}`</span></a>. This version of the test was also shown
-for a spherical, self-gravitating star in <a href="#id7"><span class="problematic" id="id8">:raw-latex:`\cite{multilevel}`</span></a>.</p>
+in <a class="reference internal" href="zreferences.html#lowmach2" id="id3">[AlmgrenBellRendlemanZingale06]</a>. This version of the test was also shown
+for a spherical, self-gravitating star in <a class="reference internal" href="zreferences.html#multilevel" id="id4">[NonakaAlmgrenBell+10]</a>.</p>
 </div>
 <div class="section" id="test-diffusion">
 <h2>test_diffusion<a class="headerlink" href="#test-diffusion" title="Permalink to this headline">¶</a></h2>
@@ -283,7 +284,7 @@ based on the explicit thermal diffusion timescale and loops
 over calls to the thermal diffusion solver. A Gaussian remains
 Gaussian when diffusing, so an explicit error can be computed
 by comparing to the analytic solution. This test is
-described in <a href="#id9"><span class="problematic" id="id10">:raw-latex:`\cite{xrb}`</span></a>.</p>
+described in <a class="reference internal" href="zreferences.html#xrb" id="id5">[MaloneNonakaAlmgren+11]</a>.</p>
 </div>
 <div class="section" id="test-eos">
 <h2>test_eos<a class="headerlink" href="#test-eos" title="Permalink to this headline">¶</a></h2>
@@ -307,13 +308,18 @@ the final particle position should overlap with the initial
 position.</p>
 <p>Particle data is stored separately from the fluid data. Instead
 of being part of the plotfiles, the particle data is outputted
-each timestep into files named timestamp_, where
+each timestep into files named <code class="docutils literal notranslate"><span class="pre">timestamp_NN</span></code>, where
 the number indicates which processor did the writing. These
 particle files can be processed and the particle data plotted
-using the python routines in data_processing/python/.</p>
+using the python routines in <code class="docutils literal notranslate"><span class="pre">data_processing/python/</span></code>.</p>
 <p>The output from this test can be visualized with the script
 plot.py in the test directory. The output shows the particle
-paths (see figure <a class="reference external" href="#fig:unit:particles">[fig:unit:particles]</a>).</p>
+paths (see below):</p>
+<div class="figure align-center" id="id9">
+<a class="reference internal image-reference" href="_images/particle_paths.png"><img alt="_images/particle_paths.png" src="_images/particle_paths.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">Particle paths for the test_particles problem. The initial
+position of the particles is marked with an <span class="math notranslate nohighlight">\(\times\)</span>.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="test-projection">
 <h2>test_projection<a class="headerlink" href="#test-projection" title="Permalink to this headline">¶</a></h2>
@@ -324,35 +330,38 @@ paths (see figure <a class="reference external" href="#fig:unit:particles">[fig
 scalar differs depending on the boundary conditions (wall and
 periodic are supported currently). Finally, the hgproject routine
 is called to recover the initial divergence-free field.
-Figure <a class="reference external" href="#fig:unit:projtest">[fig:unit:projtest]</a> shows the initial field, polluted
+The figures below show the initial field, polluted
 field, and result of the projection for the hgproject case.</p>
-<p><a href="#id14"><span class="problematic" id="id15">|[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.|</span></a>
-<a href="#id16"><span class="problematic" id="id17">|[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.|</span></a>
-<a href="#id18"><span class="problematic" id="id19">|[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.|</span></a></p>
+<div class="figure align-center" id="id10">
+<a class="reference internal image-reference" href="_images/wall_u_init_x-velocity.png"><img alt="_images/wall_u_init_x-velocity.png" src="_images/wall_u_init_x-velocity.png" style="width: 60%;" /></a>
+<p class="caption"><span class="caption-text">Initial divergence free velocity field (x-component)</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id11">
+<a class="reference internal image-reference" href="_images/wall_u_plus_grad_phi_x-velocity.png"><img alt="_images/wall_u_plus_grad_phi_x-velocity.png" src="_images/wall_u_plus_grad_phi_x-velocity.png" style="width: 60%;" /></a>
+<p class="caption"><span class="caption-text">Velocity field plus gradient of a scalar (x-component)</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id12">
+<a class="reference internal image-reference" href="_images/wall_u_new_x-velocity.png"><img alt="_images/wall_u_new_x-velocity.png" src="_images/wall_u_new_x-velocity.png" style="width: 60%;" /></a>
+<p class="caption"><span class="caption-text">Resulting velocity after projecting out the non-divergence free
+portion (x-component).</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+</div>
+<p>This is with slipwall boundary conditions on all sides, a 2-level grid
+with the left half refined and right half coarse, and the hgprojection
+tested.</p>
+<div class="figure align-center" id="id13">
+<a class="reference internal image-reference" href="_images/test_project_3d.png"><img alt="_images/test_project_3d.png" src="_images/test_project_3d.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">Projection test in 3-d showing the x-velocity (left), y-velocity
+(middle), and z-velocity (right) initially (top row), after the
+gradient of a scalar is added (center row), and the resulting
+velocity after the projection. This is with slipwall boundary conditions
+on all sides, a 2-level grid with an octant refined, and the hgprojection.</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="test-react">
 <h2>test_react<a class="headerlink" href="#test-react" title="Permalink to this headline">¶</a></h2>
 <p>This simply tests the reaction network by calling
-the MAESTRO react_state routine directly. The network is
-selected in the GNUmakefile by setting the NETWORK_DIR
+the MAESTRO react_state routine directly. The network is
+selected in the GNUmakefile by setting the <code class="docutils literal notranslate"><span class="pre">NETWORK_DIR</span></code>
 variable. A 3d cube is setup with density varying on one axis,
 temperature varying on another, and the composition varying on the
 third. The density and temperature ranges are set in the inputs
@@ -360,83 +369,11 @@ file. The composition is read in via an input file.</p>
 <p>A good use of this test is to test whether a burner is threadsafe.
 This is accomplished by compiling with OpenMP (setting OMP=t)
 and the running with 1 thread and multiple threads (this can be done
-by setting the environment variable OMP_NUM_THREADS to the
+by setting the environment variable <code class="docutils literal notranslate"><span class="pre">OMP_NUM_THREADS</span></code> to the
 desired number of threads). Since each zone is independent of the
 others, the results should be identical regardless of the number
 of threads. This can be confirmed using the fcompare tool
-in BoxLib/Tools/Postprocessing/F_Src/.</p>
-<p>Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).| image:: unitfigpath/dens_2d_orig_density</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">height</dt>
-<dd class="field-odd"><p>1.9in</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).| image:: unitfigpath/dens_2d_ppm1_xp_final_density</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">height</dt>
-<dd class="field-odd"><p>1.9in</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).| image:: unitfigpath/dens_2d_ppm1_xp_final_abserror</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">height</dt>
-<dd class="field-odd"><p>1.9in</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.| image:: unitfigpath/wall_u_init_x-velocity</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">height</dt>
-<dd class="field-odd"><p>1.9in</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.| image:: unitfigpath/wall_u_plus_grad_phi_x-velocity</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">height</dt>
-<dd class="field-odd"><p>1.9in</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.| image:: unitfigpath/wall_u_new_x-velocity</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">height</dt>
-<dd class="field-odd"><p>1.9in</p>
-</dd>
-</dl>
-</div></blockquote>
+in <code class="docutils literal notranslate"><span class="pre">BoxLib/Tools/Postprocessing/F_Src/</span></code>.</p>
 </div>
 </div>
 

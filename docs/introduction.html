@@ -145,8 +145,9 @@
 <li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
 </ul>
+<p class="caption"><span class="caption-text">References</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
             
@@ -223,10 +224,10 @@ AMReX.  Henceforth, we will refer only to MAESTROeX, although some of
 the ideas originated in MAESTRO before the change to MAESTROeX.</p>
 <p>The idea for MAESTROeX grew out of our success in applying low Mach
 number combustion methods developed for terrestrial flames
-<a class="reference internal" href="references.html#daybell00" id="id1">[DB00]</a> to small-scale astrophysical flames (including
-Landau-Darrieus instability <a class="reference internal" href="references.html#snld" id="id2">[BDR+04]</a>, Rayleigh-Taylor unstable
-flames <a class="reference internal" href="references.html#snrt3d" id="id3">[ZingaleWoosleyRendleman+05]</a>, and flame-turbulence interactions
-<a class="reference internal" href="references.html#snturb" id="id4">[AspdenBellDay+08]</a>). Our original small-scale astrophysical combustion
+<a class="reference internal" href="zreferences.html#daybell00" id="id1">[DB00]</a> to small-scale astrophysical flames (including
+Landau-Darrieus instability <a class="reference internal" href="zreferences.html#snld" id="id2">[BDR+04]</a>, Rayleigh-Taylor unstable
+flames <a class="reference internal" href="zreferences.html#snrt3d" id="id3">[ZingaleWoosleyRendleman+05]</a>, and flame-turbulence interactions
+<a class="reference internal" href="zreferences.html#snturb" id="id4">[AspdenBellDay+08]</a>). Our original small-scale astrophysical combustion
 algorithm is detailed in</p>
 <ul class="simple">
 <li><p><em>Adaptive Low Mach Number Simulations of Nuclear Flames,</em>
@@ -238,12 +239,12 @@ a white dwarf preceding the ignition of a Type Ia supernovae.  As
 such, we needed to incorporate the compressibility effects due to
 large-scale stratification in the star. The method closest in spirit
 to MAESTROeX is the pseudo-incompressible method of Durran
-<a class="reference internal" href="references.html#durran" id="id5">[Dur89]</a>, developed for terrestrial atmospheric flows (assuming
+<a class="reference internal" href="zreferences.html#durran" id="id5">[Dur89]</a>, developed for terrestrial atmospheric flows (assuming
 an ideal gas). Part of the complexity of the equations in MAESTROeX
 stems from the need to descibe a general equation of state.
 Additionally, since reactions can significantly alter the hydrostatic
 structure of a star, we incorporated extensions that capture the
-expansion of the background state <a class="reference internal" href="references.html#almgren-2000" id="id6">[Alm00]</a>. The low Mach
+expansion of the background state <a class="reference internal" href="zreferences.html#almgren-2000" id="id6">[Alm00]</a>. The low Mach
 number equations for stellar flows were developed in a series of
 papers leading up to the first application to this problem:</p>
 <ul class="simple">
@@ -370,13 +371,13 @@ base state.</p>
 </div>
 <div class="section" id="alternate-energy-formulation">
 <h3>Alternate Energy Formulation<a class="headerlink" href="#alternate-energy-formulation" title="Permalink to this headline">¶</a></h3>
-<p>Several authors <a class="reference internal" href="references.html#kp-2012" id="id7">[KP12]</a><a class="reference internal" href="references.html#vlbwz-2013" id="id8">[VLB+13]</a> showed that with a slightly
+<p>Several authors <a class="reference internal" href="zreferences.html#kp-2012" id="id7">[KP12]</a><a class="reference internal" href="zreferences.html#vlbwz-2013" id="id8">[VLB+13]</a> showed that with a slightly
 different momentum equation, the low Mach number system can conserve
 an energy (that is, a quantity that looks like the compressible
 energy, but formed using the low Mach number quantities). This change
 manifests itself as either a change to the buoyancy term or by
 changing <span class="math notranslate nohighlight">\(\nabla \pi\)</span> to <span class="math notranslate nohighlight">\(\beta_0 \nabla (\pi/\beta_0)\)</span>. Furthermore,
-<a class="reference internal" href="references.html#vlbwz-2013" id="id9">[VLB+13]</a> showed that the new formulation better captures the
+<a class="reference internal" href="zreferences.html#vlbwz-2013" id="id9">[VLB+13]</a> showed that the new formulation better captures the
 vertical propagation of gravity waves. As of
 Dec. 2013, this new formulation is the default in MAESTROeX.</p>
 </div>
@@ -384,7 +385,7 @@ Dec. 2013, this new formulation is the default in MAESTROeX.</p>
 <div class="section" id="projection-methods-101">
 <h2>Projection Methods 101<a class="headerlink" href="#projection-methods-101" title="Permalink to this headline">¶</a></h2>
 <p>Most astrophysical hydrodynamics codes
-(e.g. CASTRO <a class="reference internal" href="references.html#castro" id="id10">[AlmgrenBecknerBell+10]</a> or FLASH <a class="reference internal" href="references.html#flash" id="id11">[FryxellOlsonRicker+00]</a>) solve the
+(e.g. CASTRO <a class="reference internal" href="zreferences.html#castro" id="id10">[AlmgrenBecknerBell+10]</a> or FLASH <a class="reference internal" href="zreferences.html#flash" id="id11">[FryxellOlsonRicker+00]</a>) solve the
 compressible Euler equations, which can be written in the form:</p>
 <div class="math notranslate nohighlight" id="equation-introduction-6">
 <span class="eqno">(7)<a class="headerlink" href="#equation-introduction-6" title="Permalink to this equation">¶</a></span>\[\Ub_t + \nabla \cdot F(\Ub) = 0\]</div>
@@ -402,7 +403,7 @@ information propagates. For the Euler equations, these are <span class="math not
 compressible equations make use of this wave-nature to compute fluxes
 at the interfaces of grid cells to update the state in time. An
 excellent introduction to these methods is provided by LeVeque’s book
-<a class="reference internal" href="references.html#leveque" id="id12">[LeVeque02]</a>. The timestep for these methods is limited by the time
+<a class="reference internal" href="zreferences.html#leveque" id="id12">[LeVeque02]</a>. The timestep for these methods is limited by the time
 it takes for the maximum characteristic speed to traverse one grid cell.
 For very subsonic flows, this means that the timestep is dominated by
 the propagation of soundwaves, which may not be important to the
@@ -445,16 +446,16 @@ be computed as</p>
 <p>Because soundwaves are filtered, the timestep constraint now depends only
 on <span class="math notranslate nohighlight">\(|\Ub|\)</span>.</p>
 <p>Extensions to variable-density incompressible
-flows <a class="reference internal" href="references.html#bellmarcus-1992b" id="id14">[BM92]</a> involve a slightly different
+flows <a class="reference internal" href="zreferences.html#bellmarcus-1992b" id="id14">[BM92]</a> involve a slightly different
 decomposition of the velocity field and, as a result, a slightly
 different Poisson equation. There is also a variety of different ways
-to express what is being projected <a class="reference internal" href="references.html#almgren-bell-crutchfield" id="id15">[ABC00]</a>,
+to express what is being projected <a class="reference internal" href="zreferences.html#almgren-bell-crutchfield" id="id15">[ABC00]</a>,
 and different discretizations of the divergence and gradient operators
 lead to slightly different mathematical properties of the methods
 (leading to “approximate
-projections” <a class="reference internal" href="references.html#almgrenbellszymczak-1996" id="id16">[ABS96]</a>). Finally, for
+projections” <a class="reference internal" href="zreferences.html#almgrenbellszymczak-1996" id="id16">[ABS96]</a>). Finally, for
 second-order methods, two projections are typically done per timestep.
-The first (the ‘MAC’ projection <a class="reference internal" href="references.html#bellcolellahowell-1991" id="id17">[BCH91]</a>)
+The first (the ‘MAC’ projection <a class="reference internal" href="zreferences.html#bellcolellahowell-1991" id="id17">[BCH91]</a>)
 operates on the half-time, edge-centered advective velocities, making
 sure that they satisfy the divergence constraint. These advective
 velocities are used to construct the fluxes through the interfaces to
