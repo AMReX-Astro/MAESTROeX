@@ -237,21 +237,19 @@ do not solve the L2 minimization problem exactly so we iterate up to
 3 times using a simple heuristic algorithm designed to work toward
 the constraint. The iteration will give different results depending
 on orientation since we work through the corners in arbitrary order.</p>
-<p><a href="#id11"><span class="problematic" id="id12">|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|</span></a>
-<a href="#id13"><span class="problematic" id="id14">|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|</span></a>
-<a href="#id15"><span class="problematic" id="id16">|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|</span></a></p>
+<div class="figure align-center" id="id11">
+<img alt="_images/dens_2d_orig_density.png" src="_images/dens_2d_orig_density.png" />
+<p class="caption"><span class="caption-text">Initial Gaussian density profile</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id12">
+<img alt="_images/dens_2d_ppm1_xp_final_density.png" src="_images/dens_2d_ppm1_xp_final_density.png" />
+<p class="caption"><span class="caption-text">density profile after advecting to the right for one period</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id13">
+<img alt="_images/dens_2d_ppm1_xp_final_abserror.png" src="_images/dens_2d_ppm1_xp_final_abserror.png" />
+<p class="caption"><span class="caption-text">absolute error between the final and initial density fields,
+showing the error in the advection scheme</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="test-average">
 <h2>test_average<a class="headerlink" href="#test-average" title="Permalink to this headline">¶</a></h2>
@@ -328,21 +326,21 @@ periodic are supported currently). Finally, the hgproject routine
 is called to recover the initial divergence-free field.
 Figure <a class="reference external" href="#fig:unit:projtest">[fig:unit:projtest]</a> shows the initial field, polluted
 field, and result of the projection for the hgproject case.</p>
-<p><a href="#id17"><span class="problematic" id="id18">|[fig:unit:projtest]
+<p><a href="#id14"><span class="problematic" id="id15">|[fig:unit:projtest]
 Initial divergence free velocity field (x-component; left); Velocity
 field plus gradient of a scalar (x-component; center); and resulting
 velocity after projecting out the non-divergence free portion
 (x-component; right). This is with slipwall boundary conditions on
 all sides, a 2-level grid with the left half refined and right half
 coarse, and the hgprojection tested.|</span></a>
-<a href="#id19"><span class="problematic" id="id20">|[fig:unit:projtest]
+<a href="#id16"><span class="problematic" id="id17">|[fig:unit:projtest]
 Initial divergence free velocity field (x-component; left); Velocity
 field plus gradient of a scalar (x-component; center); and resulting
 velocity after projecting out the non-divergence free portion
 (x-component; right). This is with slipwall boundary conditions on
 all sides, a 2-level grid with the left half refined and right half
 coarse, and the hgprojection tested.|</span></a>
-<a href="#id21"><span class="problematic" id="id22">|[fig:unit:projtest]
+<a href="#id18"><span class="problematic" id="id19">|[fig:unit:projtest]
 Initial divergence free velocity field (x-component; left); Velocity
 field plus gradient of a scalar (x-component; center); and resulting
 velocity after projecting out the non-divergence free portion
