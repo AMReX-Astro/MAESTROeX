@@ -231,9 +231,11 @@ Algorithm
    MAESTROeX things can go wrong in multiple places without it being obvious
    where the root problem is.
 
-#. *In the final projection in the algorithm, we project* :math:`U^{n+1}` *, using a time-centered* :math:`\beta_0` *, a time-centered* :math:`\rho_0` *, but
-   an* “:math:`n+1`” *-centered* :math:`S` *. Why then is the resulting* :math:`\phi` *(which then
-   defines* :math:`\pi` *) is at* “:math:`n+1/2`” *?*
+#. *In the final projection in the algorithm, we project* :math:`U^{n+1}` *,
+   using a time-centered* :math:`\beta_0` *, a time-centered* :math:`\rho_0` *, but
+   an* “:math:`n+1`” *-centered* :math:`S` *. Why then is the
+   resulting* :math:`\phi` *(which then defines* :math:`\pi` *) is
+   at* “:math:`n+1/2`” *?*
 
    The short answer to this question is that you should think of this
    as really projecting :math:`(U^{n+1} - U^n)` and the right hand side as having
@@ -244,7 +246,8 @@ Algorithm
 
    So everything is in fact time-centered.
 
-#. *Why is* :math:`\gammabar` *computed as the average of the full state* :math:`\Gamma_1` *instead of computed from the base state density and
+#. *Why is* :math:`\gammabar` *computed as the average of the full
+   state* :math:`\Gamma_1` *instead of computed from the base state density and
    pressure via the equation of state?*
 
    The primary reason is that there is no base state composition. The
@@ -258,8 +261,8 @@ Algorithm
    No. This is a design decision. There is no support for axisymmetric
    coordinates in MAESTROeX. Spherical problems must be run in 3-d.
 
-#. *Why did we switch all the equations over to the
-   *:math:`\tilde{\Ub}`* form instead of just working with *:math:`\Ub`*?*
+#. *Why did we switch all the equations over to the* :math:`\tilde{\Ub}` *form
+   instead of just working with* :math:`\Ub` *?*
 
    This is basically a numerical discretization issue. Whenever the base
    state aligns with the grid, you should be able to show that you get
