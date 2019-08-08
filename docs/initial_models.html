@@ -215,17 +215,27 @@
 <p>Here we briefly describe the various routines for generating initial models
 for the main MAESTRO problems and how the initial model is used to initialize
 both the base state and the full Cartesian state.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When run, MAESTROeX outputs info that’s useful to check, including <code class="docutils literal notranslate"><span class="pre">dr</span></code> of
+base state and <code class="docutils literal notranslate"><span class="pre">dr</span></code> of the input file, which should be the same at the
+finest level; and Maximum HSE Error, which should be some small number.</p>
+</div>
 <div class="section" id="creating-the-model-data-from-raw-data">
 <span id="sec-creating-the-model-data-from-raw-data"></span><h2>Creating the Model Data from Raw Data<a class="headerlink" href="#creating-the-model-data-from-raw-data" title="Permalink to this headline">¶</a></h2>
-<p>[sec:initial_models_main]</p>
-<p>We have found that for the best performance, the MAESTRO initialization procedure should be given model data with the same
-resolution as the base state resolution, <span class="math notranslate nohighlight">\(\Delta r\)</span>. For planar
-problems, <span class="math notranslate nohighlight">\(\Delta r = \Delta x\)</span>. For multilevel planar problems, we
-use <span class="math notranslate nohighlight">\(\Delta r\)</span> equal to <span class="math notranslate nohighlight">\(\Delta x\)</span> at the finest resolution. For
-spherical problems we set <span class="math notranslate nohighlight">\(\Delta r = \Delta x/\mathtt{drdxfac}\)</span>. We
-generate our initial model either analytically or from raw data,
-<span class="math notranslate nohighlight">\(\rho^{\raw}, T^{\raw}, p^{\raw}\)</span>, and <span class="math notranslate nohighlight">\(X^{\raw}\)</span>. Here is the raw
-data file for each test problem:</p>
+<p>We have found that for the best performance, the MAESTROeX
+initialization procedure should be given model data with the same
+resolution as the base state resolution, <span class="math notranslate nohighlight">\(\Delta r\)</span>.</p>
+<ul class="simple">
+<li><p>For planar problems, <span class="math notranslate nohighlight">\(\Delta r = \Delta x\)</span>.</p></li>
+<li><p>For multilevel planar problems, we use <span class="math notranslate nohighlight">\(\Delta r\)</span> equal to <span class="math notranslate nohighlight">\(\Delta x\)</span>
+at the finest resolution.</p></li>
+<li><p>For spherical problems we set <span class="math notranslate nohighlight">\(\Delta r = \Delta x/\mathtt{drdxfac}\)</span>.</p></li>
+</ul>
+<p>We generate our initial model either analytically or from raw data,
+<span class="math notranslate nohighlight">\(\rho^{\raw}, T^{\raw}, p^{\raw}\)</span>, and <span class="math notranslate nohighlight">\(X^{\raw}\)</span>.</p>
+<p>Here is the raw data file for each test
+problem:</p>
 <div class="math notranslate nohighlight" id="equation-initial-models-0">
 <span class="eqno">(1)<a class="headerlink" href="#equation-initial-models-0" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 {\tt reacting\_bubble} &amp; \rightarrow &amp; \mathrm{none-it~ is~ generated~ analytically} \nonumber \nonumber \\
@@ -236,20 +246,44 @@ data file for each test problem:</p>
 to interpolate the raw data, yielding the model data, <span class="math notranslate nohighlight">\(\rho^{\model},
 T^{\model}, p^{\model}\)</span>, and <span class="math notranslate nohighlight">\(X^{\model}\)</span>. The fortran subroutine
 then uses an iterative procedure to modify the model data so that it
-is thermodynamically consistent with the MAESTRO equation of
+is thermodynamically consistent with the MAESTROeX equation of
 state (EOS), and also satisfies our chosen hydrostatic equilibrium
 (HSE) discretization,</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-1">
-<span class="eqno">(2)<a class="headerlink" href="#equation-initial-models-1" title="Permalink to this equation">¶</a></span>\[\frac{p_r - p_{r-1}}{\Delta r} = \frac{\rho_r + \rho_{r-1}}{2}g_{r-\myhalf},\label{HSE Discretization}\]</div>
-<p>to a user defined tolerance. Here are the fortran subroutines for each test problem:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-2">
-<span class="eqno">(3)<a class="headerlink" href="#equation-initial-models-2" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
-{\tt reacting\_bubble} &amp; \rightarrow &amp; {\tt Util/initial\_models/test2/init\_1d.f90} \nonumber \\
-{\tt test\_convect} &amp; \rightarrow &amp; {\tt Util/initial\_models/test2/init\_1d.f90} \nonumber \\
-{\tt wdconvect} &amp; \rightarrow &amp; none\footnotemark \nonumber \\
-{\tt spherical\_heat} &amp; \rightarrow &amp; {\tt Util/initial\_models/spherical/init\_1d.f90} \nonumber \\\end{aligned}\end{split}\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-hse-discretization">
+<span class="eqno">(2)<a class="headerlink" href="#equation-eq-hse-discretization" title="Permalink to this equation">¶</a></span>\[\frac{p_r - p_{r-1}}{\Delta r} = \frac{\rho_r + \rho_{r-1}}{2}g_{r-\myhalf},\]</div>
+<p>to a user defined tolerance. The shared <code class="docutils literal notranslate"><span class="pre">initial_models</span></code> git repo
+(<a class="reference external" href="https://github.com/AMReX-Astro/initial_models">https://github.com/AMReX-Astro/initial_models</a>) has the routines used
+for creating initial models.  Here are the names of the <code class="docutils literal notranslate"><span class="pre">initial_models</span></code>
+directories used for different problems:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>problem name</p></th>
+<th class="head"><p>initial_models routine</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">reacting_bubble</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">test_convect</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test2</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">wdconvect</span></code></p></td>
+<td><p>none</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">spherical_heat</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">spherical</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <p>The model data is not generated at run-time—it must be generated in
-advance of running any MAESTRO examples. The inputs file should point
+advance of running any MAESTROeX examples. The inputs file should point
 to the file containing the model data.</p>
 </div>
 <div class="section" id="creating-the-initial-data-from-the-model-data">
@@ -266,16 +300,21 @@ the value since we called
 <span class="math notranslate nohighlight">\(p^{\model} = p^{\model}(\rho^{\model},T^{\model},X^{\model})\)</span> at the end of the
 initial model generation routines in
 § <a class="reference external" href="#Sec:CreatingtheModelDatafromRawData">1</a>.</p>
-<p>For multilevel planar problems, we generate
-initial data at the non-finest levels by using linear interpolation
-from the two nearest model points (see Figure <a href="#id1"><span class="problematic" id="id2">`</span></a>[Fig:Multilevel</p>
-<blockquote>
-<div><p>Initialization] &lt;#Fig:Multilevel
-Initialization&gt;`__). Note that the initial data is not in HSE nor is</p>
-</div></blockquote>
-<p>it thermodynamically consistent on non-finest cells. We will enforce
-these on the base state and full state later.</p>
-<p>[Fig:Multilevel Initialization]</p>
+<p>For multilevel planar problems, we generate initial data at the
+non-finest levels by using linear interpolation from the two nearest
+model points (see the figure below). Note that the initial data is not
+in HSE nor is it thermodynamically consistent on non-finest cells. We
+will enforce these on the base state and full state later.</p>
+<div class="figure align-default" id="id1">
+<a class="reference internal image-reference" href="_images/multilevel_init.png"><img alt="_images/multilevel_init.png" src="_images/multilevel_init.png" style="width: 10%;" /></a>
+<p class="caption"><span class="caption-text">Multilevel Initialization. The data from the initial model
+is represented by the dots on the right. The initial data at the
+finest level is represented by the circles. The initial data at
+non-finest levels is represented by the squares. We copy data from
+the dots directly into the circles. We use linear interpolation
+using the two nearest points to copy data from the dots to the
+squares.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
 <p>We deal with the edge of the star by tracking the first coarse cell
 in which the density falls below base_cutoff_density. We note
 the radius of this cell center, and the values of <span class="math notranslate nohighlight">\(\rho\)</span>, <span class="math notranslate nohighlight">\(\rho h\)</span>, <span class="math notranslate nohighlight">\(X_k\)</span>,
@@ -290,7 +329,7 @@ section describes how the base state (<span class="math notranslate nohighlight"
 state (<span class="math notranslate nohighlight">\(\rho, h, X\)</span>, and <span class="math notranslate nohighlight">\(T\)</span>) are computed. The base state is, general, not
 simply a direct copy of the initial model data, since we require that
 <span class="math notranslate nohighlight">\(\rho_0 = \overline\rho\)</span>. Additionally, we require thebase state to
-be HSE according to equation (<a class="reference external" href="#HSEDiscretization">[HSE Discretization]</a>), and that the full
+be HSE according to <a class="reference internal" href="#equation-eq-hse-discretization">Eq.2</a>, and that the full
 state is thermodynamically consistent with <span class="math notranslate nohighlight">\(p_0\)</span>. Overall we do:</p>
 <ol class="arabic simple">
 <li><p>Fill <span class="math notranslate nohighlight">\(\rho^{\init}, h^{\init}, X^{\init}\)</span>, and <span class="math notranslate nohighlight">\(T^{\init}\)</span> onto a
@@ -309,89 +348,89 @@ a diagnostic and as a seed for EOS calls.</p></li>
 state is thermodynamically consistent with <span class="math notranslate nohighlight">\(p_0\)</span>.</p>
 <div class="section" id="coarse-fine-enforce-hse-discretization">
 <span id="sec-coarse-fine-hse-discretization"></span><h3>Coarse-Fine enforce_HSE Discretization<a class="headerlink" href="#coarse-fine-enforce-hse-discretization" title="Permalink to this headline">¶</a></h3>
-<p>When integrating the HSE discretization upward, we must use a different
-differencing procedure at coarse-fine interfaces. Figure <a class="reference external" href="#fig:ctof">[fig:ctof]</a> shows
-the transition from coarse (level <span class="math notranslate nohighlight">\(l-1\)</span>) to fine (level <span class="math notranslate nohighlight">\(l\)</span>), with the zone
-center indices noted.</p>
-<div class="figure align-default" id="id3">
-<a class="reference internal image-reference" href="figpath/ctof"><img alt="[fig:ctof] A coarse-fine interface in the 1-d base state" src="figpath/ctof" style="width: 2.5in;" /></a>
-<p class="caption"><span class="caption-text">[fig:ctof] A coarse-fine interface in the 1-d base state</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<p>When integrating the HSE discretization upward, we must use a
+different differencing procedure at coarse-fine interfaces.  The
+figure below shows the transition from coarse (level
+<span class="math notranslate nohighlight">\(l-1\)</span>) to fine (level <span class="math notranslate nohighlight">\(l\)</span>), with the zone center indices
+noted.</p>
+<div class="figure align-default" id="id2">
+<a class="reference internal image-reference" href="_images/ctof.png"><img alt="_images/ctof.png" src="_images/ctof.png" style="width: 40%;" /></a>
+<p class="caption"><span class="caption-text">A coarse-fine interface in the 1-d base state</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
 <p>To find the zone-centered pressure in the first fine zone, <span class="math notranslate nohighlight">\(p_r^l\)</span>, from
 the zone-centered pressure in the coarse zone just below the coarse-fine interface,
-<span class="math notranslate nohighlight">\(p_{\sfrac{r}{2}-1}^{l-1}\)</span>, we integrate in 2 steps. We allow for a spatially
+<span class="math notranslate nohighlight">\(p_{r/2-1}^{l-1}\)</span>, we integrate in 2 steps. We allow for a spatially
 changing gravitational acceleration, for complete generality.</p>
 <p>First we integrate up to the
 coarse-fine interface from the coarse-cell center as:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-3">
-<span class="eqno">(4)<a class="headerlink" href="#equation-initial-models-3" title="Permalink to this equation">¶</a></span>\[\frac{p_{r-\myhalf}^l - p_{\sfrac{r}{2}-1}^{l-1}}{\Delta r^{l-1}/2} =
-  \frac{\rho_{r-\myhalf}^l + \rho_{\sfrac{r}{2}-1}^{l-1}}{2}  \,
-  \frac{g_{r-\myhalf}^l + g_{\sfrac{r}{2}-1}^{l-1}}{2}\]</div>
+<div class="math notranslate nohighlight" id="equation-initial-models-1">
+<span class="eqno">(3)<a class="headerlink" href="#equation-initial-models-1" title="Permalink to this equation">¶</a></span>\[\frac{p_{r-\myhalf}^l - p_{r/2-1}^{l-1}}{\Delta r^{l-1}/2} =
+  \frac{\rho_{r-\myhalf}^l + \rho_{r/2-1}^{l-1}}{2}  \,
+  \frac{g_{r-\myhalf}^l + g_{r/2-1}^{l-1}}{2}\]</div>
 <p>We can rewrite this as an expression for the pressure at the coarse-fine interface:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-4">
-<span class="eqno">(5)<a class="headerlink" href="#equation-initial-models-4" title="Permalink to this equation">¶</a></span>\[p_{r-\myhalf}^l = p_{\sfrac{r}{2}-1}^{l-1} + \frac{\Delta r^{l-1}}{8}
-  \left(\rho_{r-\myhalf}^l + \rho_{\sfrac{r}{2}-1}^{l-1}\right)
-  \left(g_{r-\myhalf}^l + g_{\sfrac{r}{2}-1}^{l-1}\right).
-  \label{eq:ctoi}\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-ctoi">
+<span class="eqno">(4)<a class="headerlink" href="#equation-eq-ctoi" title="Permalink to this equation">¶</a></span>\[p_{r-\myhalf}^l = p_{r/2-1}^{l-1} + \frac{\Delta r^{l-1}}{8}
+  \left(\rho_{r-\myhalf}^l + \rho_{r/2-1}^{l-1}\right)
+  \left(g_{r-\myhalf}^l + g_{r/2-1}^{l-1}\right).\]</div>
 <p>Next we integrate up from the coarse-fine interface to the fine-cell center:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-5">
-<span class="eqno">(6)<a class="headerlink" href="#equation-initial-models-5" title="Permalink to this equation">¶</a></span>\[\frac{p_r^l - p_{r-\myhalf}^l}{\Delta r^l/2} =
+<div class="math notranslate nohighlight" id="equation-initial-models-2">
+<span class="eqno">(5)<a class="headerlink" href="#equation-initial-models-2" title="Permalink to this equation">¶</a></span>\[\frac{p_r^l - p_{r-\myhalf}^l}{\Delta r^l/2} =
   \frac{\rho_r^l + \rho_{r-\myhalf}^l}{2} \,
   \frac{g_r^l + g_{r-\myhalf}^l}{2}\]</div>
 <p>We can rewrite this as an expression for the pressure at the fine-cell center:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-6">
-<span class="eqno">(7)<a class="headerlink" href="#equation-initial-models-6" title="Permalink to this equation">¶</a></span>\[p_r^l = p_{r-\myhalf}^l + \frac{\Delta r^l}{8}
+<div class="math notranslate nohighlight" id="equation-eq-itof">
+<span class="eqno">(6)<a class="headerlink" href="#equation-eq-itof" title="Permalink to this equation">¶</a></span>\[p_r^l = p_{r-\myhalf}^l + \frac{\Delta r^l}{8}
   \left(\rho_r^l + \rho_{r-\myhalf}^l\right)
-  \left(g_r^l + g_{r-\myhalf}^l\right).
-  \label{eq:itof}\]</div>
-<p>Combining equations <a class="reference external" href="#eq:ctoi">[eq:ctoi]</a> and <a class="reference external" href="#eq:itof">[eq:itof]</a> gives</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-7">
-<span class="eqno">(8)<a class="headerlink" href="#equation-initial-models-7" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
-p_r^l = p_{\sfrac{r}{2}-1}^{l-1} &amp;+&amp;
-     \frac{\Delta r^{l-1}}{8} \left(\rho_{r-\myhalf}^l + \rho_{\sfrac{r}{2}-1}^{l-1}\right)
-                                \left(   g_{r-\myhalf}^l +    g_{\sfrac{r}{2}-1}^{l-1}\right) \nonumber \\
- &amp;+&amp; \frac{\Delta r^l}{8} \left(\rho_r^l + \rho_{r-\myhalf}^l\right)
-                            \left(   g_r^l +    g_{r-\myhalf}^l\right).\end{aligned}\end{split}\]</div>
+  \left(g_r^l + g_{r-\myhalf}^l\right).\]</div>
+<p>Combining <a class="reference internal" href="#equation-eq-ctoi">Eq.4</a> and <a class="reference internal" href="#equation-eq-itof">Eq.6</a> gives</p>
+<div class="math notranslate nohighlight" id="equation-initial-models-3">
+<span class="eqno">(7)<a class="headerlink" href="#equation-initial-models-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
+p_r^l = p_{r/2-1}^{l-1} &amp;+
+     \frac{\Delta r^{l-1}}{8} \left(\rho_{r-\myhalf}^l + \rho_{r/2-1}^{l-1}\right)
+                                \left(   g_{r-\myhalf}^l +    g_{r/2-1}^{l-1}\right) \nonumber \\
+ &amp;+ \frac{\Delta r^l}{8} \left(\rho_r^l + \rho_{r-\myhalf}^l\right)
+                            \left(   g_r^l +    g_{r-\myhalf}^l\right).\end{align}\end{split}\]</div>
 <p>We can simplify using</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-8">
-<span class="eqno">(9)<a class="headerlink" href="#equation-initial-models-8" title="Permalink to this equation">¶</a></span>\[\Delta r^{l-1} = 2\Delta r^l,\]</div>
+<div class="math notranslate nohighlight" id="equation-initial-models-4">
+<span class="eqno">(8)<a class="headerlink" href="#equation-initial-models-4" title="Permalink to this equation">¶</a></span>\[\Delta r^{l-1} = 2\Delta r^l,\]</div>
 <p>and by interpolating the cell-centered densities to the coarse-fine interface as:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-9">
-<span class="eqno">(10)<a class="headerlink" href="#equation-initial-models-9" title="Permalink to this equation">¶</a></span>\[\rho_{r-\myhalf}^l = \frac{2}{3}\rho_r^l + \frac{1}{3}\rho_{\sfrac{r}{2}-1}^{l-1}.\]</div>
+<div class="math notranslate nohighlight" id="equation-initial-models-5">
+<span class="eqno">(9)<a class="headerlink" href="#equation-initial-models-5" title="Permalink to this equation">¶</a></span>\[\rho_{r-\myhalf}^l = \frac{2}{3}\rho_r^l + \frac{1}{3}\rho_{r/2-1}^{l-1}.\]</div>
 <p>Because we carry both the cell- and edge-centered gravitational accelerations, we
 do not need to interpolate <span class="math notranslate nohighlight">\(g\)</span> to the interface.
 Simplifying, we have</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-10">
-<span class="eqno">(11)<a class="headerlink" href="#equation-initial-models-10" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
-p_r^l = p_{\sfrac{r}{2}-1}^{l-1} &amp;+&amp;
+<div class="math notranslate nohighlight" id="equation-initial-models-6">
+<span class="eqno">(10)<a class="headerlink" href="#equation-initial-models-6" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
+p_r^l = p_{r/2-1}^{l-1} &amp;+
    \frac{\Delta r^l}{4}\left(\frac{2}{3}\rho_r^l +
-                             \frac{4}{3}\rho_{\sfrac{r}{2}-1}^{l-1} \right)
-                       \left(   g_{r-\myhalf}^l +    g_{\sfrac{r}{2}-1}^{l-1}\right) \nonumber \\
-  &amp;+&amp; \frac{\Delta r^l}{8}\left(\frac{5}{3}\rho_r^l +
-                                  \frac{1}{3}\rho_{\sfrac{r}{2}-1}^{l-1}\right)
-                       \left(   g_r^l +    g_{r-\myhalf}^l\right)  .\end{aligned}\end{split}\]</div>
+                             \frac{4}{3}\rho_{r/2-1}^{l-1} \right)
+                       \left(   g_{r-\myhalf}^l +    g_{r/2-1}^{l-1}\right) \nonumber \\
+  &amp;+ \frac{\Delta r^l}{8}\left(\frac{5}{3}\rho_r^l +
+                                  \frac{1}{3}\rho_{r/2-1}^{l-1}\right)
+                       \left(   g_r^l +    g_{r-\myhalf}^l\right)  .\end{align}\end{split}\]</div>
 <p>Finally, we note for constant <span class="math notranslate nohighlight">\(g\)</span>, this simplifies to:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-11">
-<span class="eqno">(12)<a class="headerlink" href="#equation-initial-models-11" title="Permalink to this equation">¶</a></span>\[p_r^l = p_{\sfrac{r}{2}-1}^{l-1} +
-  \frac{3\Delta r^l g}{4}\left(\rho_{\sfrac{r}{2}-1}^{l-1} + \rho_r^l\right).\label{Coarse-Fine Stencil}\]</div>
-<p>When integrating across a fine-coarse interface (see Figure <a class="reference external" href="#fig:ftoc">[fig:ftoc]</a>), the proceduce is similar.</p>
-<div class="figure align-default" id="id4">
-<a class="reference internal image-reference" href="figpath/ftoc"><img alt="[fig:ftoc] A fine-coarse interface in the 1-d base state" src="figpath/ftoc" style="width: 2.5in;" /></a>
-<p class="caption"><span class="caption-text">[fig:ftoc] A fine-coarse interface in the 1-d base state</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<div class="math notranslate nohighlight" id="equation-initial-models-7">
+<span class="eqno">(11)<a class="headerlink" href="#equation-initial-models-7" title="Permalink to this equation">¶</a></span>\[p_r^l = p_{r/2-1}^{l-1} +
+  \frac{3\Delta r^l g}{4}\left(\rho_{r/2-1}^{l-1} + \rho_r^l\right).\label{Coarse-Fine Stencil}\]</div>
+<p>When integrating across a fine-coarse interface (see the figure
+below), the proceduce is similar.</p>
+<div class="figure align-default" id="id3">
+<a class="reference internal image-reference" href="_images/ftoc.png"><img alt="_images/ftoc.png" src="_images/ftoc.png" style="width: 40%;" /></a>
+<p class="caption"><span class="caption-text">A fine-coarse interface in the 1-d base state</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
 <p>The expression for general gravity becomes:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-12">
-<span class="eqno">(13)<a class="headerlink" href="#equation-initial-models-12" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
-p_{(r+1)/2}^{l-1} = p_{r}^l &amp;+&amp;
+<div class="math notranslate nohighlight" id="equation-initial-models-8">
+<span class="eqno">(12)<a class="headerlink" href="#equation-initial-models-8" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
+p_{(r+1)/2}^{l-1} = p_{r}^l &amp;+
    \frac{\Delta r^l}{4}\left(\frac{2}{3}\rho_r^l +
                              \frac{4}{3}\rho_{(r+1)/2}^{l-1} \right)
                        \left(   g_{(r+1)/2 -\myhalf}^{l-1} +    g_{(r+1)/2}^{l-1}\right) \nonumber \\
-  &amp;+&amp; \frac{\Delta r^l}{8}\left(\frac{5}{3}\rho_r^l +
+  &amp;+ \frac{\Delta r^l}{8}\left(\frac{5}{3}\rho_r^l +
                                   \frac{1}{3}\rho_{(r+1)/2}^{l-1}\right)
-                       \left(   g_r^l +    g_{(r+1)/2 -\myhalf}^{l-1} \right)  .\end{aligned}\end{split}\]</div>
+                       \left(   g_r^l +    g_{(r+1)/2 -\myhalf}^{l-1} \right)  .\end{align}\end{split}\]</div>
 <p>and for spatially-constant gravity, it simplifies to:</p>
-<div class="math notranslate nohighlight" id="equation-initial-models-13">
-<span class="eqno">(14)<a class="headerlink" href="#equation-initial-models-13" title="Permalink to this equation">¶</a></span>\[p_{(r+1)/2}^{l-1} = p_{r}^l + \frac{3\Delta r^l g}{4}\left(\rho_{r}^l+\rho_{(r+1)/2}^{l-1}\right).\label{Fine-Coarse Stencil}\]</div>
+<div class="math notranslate nohighlight" id="equation-initial-models-9">
+<span class="eqno">(13)<a class="headerlink" href="#equation-initial-models-9" title="Permalink to this equation">¶</a></span>\[p_{(r+1)/2}^{l-1} = p_{r}^l + \frac{3\Delta r^l g}{4}\left(\rho_{r}^l+\rho_{(r+1)/2}^{l-1}\right).\label{Fine-Coarse Stencil}\]</div>
 </div>
 </div>
 </div>
