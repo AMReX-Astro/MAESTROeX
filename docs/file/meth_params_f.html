@@ -1,0 +1,700 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>meth_params.F90 &mdash; MAESTROeX 19.08
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="state_sizes.f90" href="state_sizes_f.html" />
+    <link rel="prev" title="File maestro_queries.H" href="maestro__queries_8H.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                19.08
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../common_parameters.html">Common Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../param_includes_files.html">Param_includes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="maestro__defaults_8H.html">File maestro_defaults.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro__params_8H.html">File maestro_params.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro__queries_8H.html">File maestro_queries.H</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">meth_params.F90</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#f/meth_params_module">meth_params_module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="state_sizes_f.html">state_sizes.f90</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../filelist.html">File list</a> &raquo;</li>
+        
+          <li><a href="../param_includes_files.html">Param_includes</a> &raquo;</li>
+        
+      <li>meth_params.F90</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/file/meth_params_f.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="meth-params-f90">
+<h1>meth_params.F90<a class="headerlink" href="#meth-params-f90" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="f/meth_params_module">
+<span id="meth-params-module"></span><h2>meth_params_module<a class="headerlink" href="#f/meth_params_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Quick access</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#f/meth_params_module/anelastic_cutoff_density" title="f/meth_params_module/anelastic_cutoff_density"><code class="xref f f-var docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code></a>, <a class="reference internal" href="#f/meth_params_module/average_base_state" title="f/meth_params_module/average_base_state"><code class="xref f f-var docutils literal notranslate"><span class="pre">average_base_state</span></code></a>, <a class="reference internal" href="#f/meth_params_module/base_cutoff_density" title="f/meth_params_module/base_cutoff_density"><code class="xref f f-var docutils literal notranslate"><span class="pre">base_cutoff_density</span></code></a>, <a class="reference internal" href="#f/meth_params_module/beta0_type" title="f/meth_params_module/beta0_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">beta0_type</span></code></a>, <a class="reference internal" href="#f/meth_params_module/buoyancy_cutoff_factor" title="f/meth_params_module/buoyancy_cutoff_factor"><code class="xref f f-var docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code></a>, <a class="reference internal" href="#f/meth_params_module/burner_threshold_cutoff" title="f/meth_params_module/burner_threshold_cutoff"><code class="xref f f-var docutils literal notranslate"><span class="pre">burner_threshold_cutoff</span></code></a>, <a class="reference internal" href="#f/meth_params_module/burner_threshold_species" title="f/meth_params_module/burner_threshold_species"><code class="xref f f-var docutils literal notranslate"><span class="pre">burner_threshold_species</span></code></a>, <a class="reference internal" href="#f/meth_params_module/burning_cutoff_density" title="f/meth_params_module/burning_cutoff_density"><code class="xref f f-var docutils literal notranslate"><span class="pre">burning_cutoff_density</span></code></a>, <a class="reference internal" href="#f/meth_params_module/cfl" title="f/meth_params_module/cfl"><code class="xref f f-var docutils literal notranslate"><span class="pre">cfl</span></code></a>, <a class="reference internal" href="#f/meth_params_module/co_latitude" title="f/meth_params_module/co_latitude"><code class="xref f f-var docutils literal notranslate"><span class="pre">co_latitude</span></code></a>, <a class="reference internal" href="#f/meth_params_module/do_2d_planar_octant" title="f/meth_params_module/do_2d_planar_octant"><code class="xref f f-var docutils literal notranslate"><span class="pre">do_2d_planar_octant</span></code></a>, <a class="reference internal" href="#f/meth_params_module/do_eos_h_above_cutoff" title="f/meth_params_module/do_eos_h_above_cutoff"><code class="xref f f-var docutils literal notranslate"><span class="pre">do_eos_h_above_cutoff</span></code></a>, <a class="reference internal" href="#f/meth_params_module/do_planar_invsq_grav" title="f/meth_params_module/do_planar_invsq_grav"><code class="xref f f-var docutils literal notranslate"><span class="pre">do_planar_invsq_grav</span></code></a>, <a class="reference internal" href="#f/meth_params_module/do_smallscale" title="f/meth_params_module/do_smallscale"><code class="xref f f-var docutils literal notranslate"><span class="pre">do_smallscale</span></code></a>, <a class="reference internal" href="#f/meth_params_module/do_sponge" title="f/meth_params_module/do_sponge"><code class="xref f f-var docutils literal notranslate"><span class="pre">do_sponge</span></code></a>, <a class="reference internal" href="#f/meth_params_module/dpdt_factor" title="f/meth_params_module/dpdt_factor"><code class="xref f f-var docutils literal notranslate"><span class="pre">dpdt_factor</span></code></a>, <a class="reference internal" href="#f/meth_params_module/drdxfac" title="f/meth_params_module/drdxfac"><code class="xref f f-var docutils literal notranslate"><span class="pre">drdxfac</span></code></a>, <a class="reference internal" href="#f/meth_params_module/drive_initial_convection" title="f/meth_params_module/drive_initial_convection"><code class="xref f f-var docutils literal notranslate"><span class="pre">drive_initial_convection</span></code></a>, <a class="reference internal" href="#f/meth_params_module/enthalpy_pred_type" title="f/meth_params_module/enthalpy_pred_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">enthalpy_pred_type</span></code></a>, <a class="reference internal" href="#f/meth_params_module/evolve_base_state" title="f/meth_params_module/evolve_base_state"><code class="xref f f-var docutils literal notranslate"><span class="pre">evolve_base_state</span></code></a>, <a class="reference internal" href="#f/meth_params_module/grav_const" title="f/meth_params_module/grav_const"><code class="xref f f-var docutils literal notranslate"><span class="pre">grav_const</span></code></a>, <a class="reference internal" href="#f/meth_params_module/limit_conductivity" title="f/meth_params_module/limit_conductivity"><code class="xref f f-var docutils literal notranslate"><span class="pre">limit_conductivity</span></code></a>, <a class="reference internal" href="#f/meth_params_module/maestro_verbose" title="f/meth_params_module/maestro_verbose"><code class="xref f f-var docutils literal notranslate"><span class="pre">maestro_verbose</span></code></a>, <a class="reference internal" href="#f/meth_params_module/model_file" title="f/meth_params_module/model_file"><code class="xref f f-var docutils literal notranslate"><span class="pre">model_file</span></code></a>, <a class="reference internal" href="#f/meth_params_module/octant" title="f/meth_params_module/octant"><code class="xref f f-var docutils literal notranslate"><span class="pre">octant</span></code></a>, <a class="reference internal" href="#f/meth_params_module/perturb_model" title="f/meth_params_module/perturb_model"><code class="xref f f-var docutils literal notranslate"><span class="pre">perturb_model</span></code></a>, <a class="reference internal" href="#f/meth_params_module/pi_comp" title="f/meth_params_module/pi_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">pi_comp</span></code></a>, <a class="reference internal" href="#f/meth_params_module/planar_invsq_mass" title="f/meth_params_module/planar_invsq_mass"><code class="xref f f-var docutils literal notranslate"><span class="pre">planar_invsq_mass</span></code></a>, <a class="reference internal" href="#f/meth_params_module/ppm_trace_forces" title="f/meth_params_module/ppm_trace_forces"><code class="xref f f-var docutils literal notranslate"><span class="pre">ppm_trace_forces</span></code></a>, <a class="reference internal" href="#f/meth_params_module/ppm_type" title="f/meth_params_module/ppm_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">ppm_type</span></code></a>, <a class="reference internal" href="#f/meth_params_module/print_init_hse_diag" title="f/meth_params_module/print_init_hse_diag"><code class="xref f f-var docutils literal notranslate"><span class="pre">print_init_hse_diag</span></code></a>, <a class="reference internal" href="#f/meth_params_module/prob_hi" title="f/meth_params_module/prob_hi"><code class="xref f f-var docutils literal notranslate"><span class="pre">prob_hi</span></code></a>, <a class="reference internal" href="#f/meth_params_module/prob_lo" title="f/meth_params_module/prob_lo"><code class="xref f f-var docutils literal notranslate"><span class="pre">prob_lo</span></code></a>, <a class="reference internal" href="#f/meth_params_module/reaction_sum_tol" title="f/meth_params_module/reaction_sum_tol"><code class="xref f f-var docutils literal notranslate"><span class="pre">reaction_sum_tol</span></code></a>, <a class="reference internal" href="#f/meth_params_module/rel_eps" title="f/meth_params_module/rel_eps"><code class="xref f f-var docutils literal notranslate"><span class="pre">rel_eps</span></code></a>, <a class="reference internal" href="#f/meth_params_module/rho_comp" title="f/meth_params_module/rho_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">rho_comp</span></code></a>, <a class="reference internal" href="#f/meth_params_module/rhoh_comp" title="f/meth_params_module/rhoh_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">rhoh_comp</span></code></a>, <a class="reference internal" href="#f/meth_params_module/rotational_frequency" title="f/meth_params_module/rotational_frequency"><code class="xref f f-var docutils literal notranslate"><span class="pre">rotational_frequency</span></code></a>, <a class="reference internal" href="#f/meth_params_module/s0_interp_type" title="f/meth_params_module/s0_interp_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">s0_interp_type</span></code></a>, <a class="reference internal" href="#f/meth_params_module/s0mac_interp_type" title="f/meth_params_module/s0mac_interp_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">s0mac_interp_type</span></code></a>, <a class="reference internal" href="#f/meth_params_module/slope_order" title="f/meth_params_module/slope_order"><code class="xref f f-var docutils literal notranslate"><span class="pre">slope_order</span></code></a>, <a class="reference internal" href="#f/meth_params_module/small_dens" title="f/meth_params_module/small_dens"><code class="xref f f-var docutils literal notranslate"><span class="pre">small_dens</span></code></a>, <a class="reference internal" href="#f/meth_params_module/small_temp" title="f/meth_params_module/small_temp"><code class="xref f f-var docutils literal notranslate"><span class="pre">small_temp</span></code></a>, <a class="reference internal" href="#f/meth_params_module/spec_comp" title="f/meth_params_module/spec_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">spec_comp</span></code></a>, <a class="reference internal" href="#f/meth_params_module/species_pred_type" title="f/meth_params_module/species_pred_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">species_pred_type</span></code></a>, <a class="reference internal" href="#f/meth_params_module/spherical" title="f/meth_params_module/spherical"><code class="xref f f-var docutils literal notranslate"><span class="pre">spherical</span></code></a>, <a class="reference internal" href="#f/meth_params_module/sponge_center_density" title="f/meth_params_module/sponge_center_density"><code class="xref f f-var docutils literal notranslate"><span class="pre">sponge_center_density</span></code></a>, <a class="reference internal" href="#f/meth_params_module/sponge_kappa" title="f/meth_params_module/sponge_kappa"><code class="xref f f-var docutils literal notranslate"><span class="pre">sponge_kappa</span></code></a>, <a class="reference internal" href="#f/meth_params_module/sponge_start_factor" title="f/meth_params_module/sponge_start_factor"><code class="xref f f-var docutils literal notranslate"><span class="pre">sponge_start_factor</span></code></a>, <a class="reference internal" href="#f/meth_params_module/temp_comp" title="f/meth_params_module/temp_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">temp_comp</span></code></a>, <a class="reference internal" href="#f/meth_params_module/temp_diffusion_formulation" title="f/meth_params_module/temp_diffusion_formulation"><code class="xref f f-var docutils literal notranslate"><span class="pre">temp_diffusion_formulation</span></code></a>, <a class="reference internal" href="#f/meth_params_module/thermal_diffusion_type" title="f/meth_params_module/thermal_diffusion_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">thermal_diffusion_type</span></code></a>, <a class="reference internal" href="#f/meth_params_module/track_grid_losses" title="f/meth_params_module/track_grid_losses"><code class="xref f f-var docutils literal notranslate"><span class="pre">track_grid_losses</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_alt_energy_fix" title="f/meth_params_module/use_alt_energy_fix"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_delta_gamma1_term" title="f/meth_params_module/use_delta_gamma1_term"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_delta_gamma1_term</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_divu_firstdt" title="f/meth_params_module/use_divu_firstdt"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_divu_firstdt</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_eos_e_instead_of_h" title="f/meth_params_module/use_eos_e_instead_of_h"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_eos_e_instead_of_h</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_exact_base_state" title="f/meth_params_module/use_exact_base_state"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_exact_base_state</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_linear_grav_in_beta0" title="f/meth_params_module/use_linear_grav_in_beta0"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_linear_grav_in_beta0</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_pprime_in_tfromp" title="f/meth_params_module/use_pprime_in_tfromp"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_pprime_in_tfromp</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_soundspeed_firstdt" title="f/meth_params_module/use_soundspeed_firstdt"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_soundspeed_firstdt</span></code></a>, <a class="reference internal" href="#f/meth_params_module/use_tpert_in_tagging" title="f/meth_params_module/use_tpert_in_tagging"><code class="xref f f-var docutils literal notranslate"><span class="pre">use_tpert_in_tagging</span></code></a>, <a class="reference internal" href="#f/meth_params_module/w0_interp_type" title="f/meth_params_module/w0_interp_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">w0_interp_type</span></code></a>, <a class="reference internal" href="#f/meth_params_module/w0mac_interp_type" title="f/meth_params_module/w0mac_interp_type"><code class="xref f f-var docutils literal notranslate"><span class="pre">w0mac_interp_type</span></code></a></p>
+</dd>
+<dt class="field-even">Routines</dt>
+<dd class="field-even"><p><a class="reference internal" href="#f/meth_params_module/finalize_meth_params" title="f/meth_params_module/finalize_meth_params"><code class="xref f f-func docutils literal notranslate"><span class="pre">finalize_meth_params()</span></code></a>, <a class="reference internal" href="#f/meth_params_module/read_method_params" title="f/meth_params_module/read_method_params"><code class="xref f f-func docutils literal notranslate"><span class="pre">read_method_params()</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Needed modules</p>
+<ul class="simple">
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_fort_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">rt()</span></code> =&gt; <code class="xref f f-func docutils literal notranslate"><span class="pre">rt()</span></code>)</p></li>
+<li><p><a class="reference internal" href="state_sizes_f.html#f/state_sizes_module" title="f/state_sizes_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">state_sizes_module</span></code></a> (<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal"><code class="xref f f-func docutils literal notranslate"><span class="pre">nscal()</span></code></a>)</p></li>
+</ul>
+<p class="rubric">Variables</p>
+<ul>
+<li><dl class="variable">
+<dt id="f/meth_params_module/anelastic_cutoff_density">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">anelastic_cutoff_density</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/anelastic_cutoff_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/average_base_state">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">average_base_state</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/average_base_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/base_cutoff_density">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">base_cutoff_density</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/base_cutoff_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/beta0_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">beta0_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/beta0_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/buoyancy_cutoff_factor">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">buoyancy_cutoff_factor</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/buoyancy_cutoff_factor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/burner_threshold_cutoff">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">burner_threshold_cutoff</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/burner_threshold_cutoff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/burner_threshold_species">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">burner_threshold_species</code><em> [</em><em>character</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/burner_threshold_species" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/burning_cutoff_density">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">burning_cutoff_density</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/burning_cutoff_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/cfl">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">cfl</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/cfl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/co_latitude">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">co_latitude</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/co_latitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/do_2d_planar_octant">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">do_2d_planar_octant</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/do_2d_planar_octant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/do_eos_h_above_cutoff">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">do_eos_h_above_cutoff</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/do_eos_h_above_cutoff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/do_planar_invsq_grav">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">do_planar_invsq_grav</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/do_planar_invsq_grav" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/do_smallscale">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">do_smallscale</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/do_smallscale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/do_sponge">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">do_sponge</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/do_sponge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/dpdt_factor">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">dpdt_factor</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/dpdt_factor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/drdxfac">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">drdxfac</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/drdxfac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/drive_initial_convection">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">drive_initial_convection</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/drive_initial_convection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/enthalpy_pred_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">enthalpy_pred_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/enthalpy_pred_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/evolve_base_state">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">evolve_base_state</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/evolve_base_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/grav_const">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">grav_const</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/grav_const" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/limit_conductivity">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">limit_conductivity</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/limit_conductivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/maestro_verbose">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">maestro_verbose</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/maestro_verbose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/model_file">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">model_file</code><em> [</em><em>character</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/model_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/octant">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">octant</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/octant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/perturb_model">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">perturb_model</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/perturb_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/pi_comp">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">pi_comp</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/pi_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/planar_invsq_mass">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">planar_invsq_mass</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/planar_invsq_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/ppm_trace_forces">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">ppm_trace_forces</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/ppm_trace_forces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/ppm_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">ppm_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/ppm_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/print_init_hse_diag">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">print_init_hse_diag</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/print_init_hse_diag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/prob_hi">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">prob_hi</code> (*)<em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/prob_hi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/prob_lo">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">prob_lo</code> (*)<em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/prob_lo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/reaction_sum_tol">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">reaction_sum_tol</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/reaction_sum_tol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/rel_eps">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">rel_eps</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/rel_eps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/rho_comp">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">rho_comp</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/rho_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/rhoh_comp">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">rhoh_comp</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/rhoh_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/rotational_frequency">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">rotational_frequency</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/rotational_frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/s0_interp_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">s0_interp_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/s0_interp_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/s0mac_interp_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">s0mac_interp_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/s0mac_interp_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/slope_order">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">slope_order</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/slope_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/small_dens">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">small_dens</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/small_dens" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/small_temp">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">small_temp</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/small_temp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/spec_comp">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">spec_comp</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/spec_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/species_pred_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">species_pred_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/species_pred_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/spherical">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">spherical</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/spherical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/sponge_center_density">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">sponge_center_density</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/sponge_center_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/sponge_kappa">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">sponge_kappa</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/sponge_kappa" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/sponge_start_factor">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">sponge_start_factor</code><em> [</em><em>double precision</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/sponge_start_factor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/temp_comp">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">temp_comp</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/temp_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/temp_diffusion_formulation">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">temp_diffusion_formulation</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/temp_diffusion_formulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/thermal_diffusion_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">thermal_diffusion_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/thermal_diffusion_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/track_grid_losses">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">track_grid_losses</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/track_grid_losses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_alt_energy_fix">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_alt_energy_fix</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_alt_energy_fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_delta_gamma1_term">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_delta_gamma1_term</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_delta_gamma1_term" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_divu_firstdt">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_divu_firstdt</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_divu_firstdt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_eos_e_instead_of_h">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_eos_e_instead_of_h</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_eos_e_instead_of_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_exact_base_state">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_exact_base_state</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_exact_base_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_linear_grav_in_beta0">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_linear_grav_in_beta0</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_linear_grav_in_beta0" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_pprime_in_tfromp">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_pprime_in_tfromp</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_pprime_in_tfromp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_soundspeed_firstdt">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_soundspeed_firstdt</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_soundspeed_firstdt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/use_tpert_in_tagging">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">use_tpert_in_tagging</code><em> [</em><em>logical</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/use_tpert_in_tagging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/w0_interp_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">w0_interp_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/w0_interp_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/meth_params_module/w0mac_interp_type">
+<code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">w0mac_interp_type</code><em> [</em><em>integer</em><em>,</em><em>save/allocatable</em><em>]</em><a class="headerlink" href="#f/meth_params_module/w0mac_interp_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+</ul>
+<p class="rubric">Subroutines and functions</p>
+<dl class="subroutine">
+<dt id="f/meth_params_module/read_method_params">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">read_method_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#f/meth_params_module/read_method_params" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Use </dt>
+<dd class="field-odd"><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_parmparse_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">amrex_parmparse_build()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">amrex_parmparse_destroy()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">amrex_parmparse()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_paralleldescriptor_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">parallel_ioprocessor()</span></code> =&gt; <code class="xref f f-func docutils literal notranslate"><span class="pre">parallel_ioprocessor()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_error_module</span></code>, <code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_fort_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">rt()</span></code> =&gt; <code class="xref f f-func docutils literal notranslate"><span class="pre">rt()</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/meth_params_module/finalize_meth_params">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">meth_params_module/</code><code class="sig-name descname">finalize_meth_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#f/meth_params_module/finalize_meth_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="state_sizes_f.html" class="btn btn-neutral float-right" title="state_sizes.f90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="maestro__queries_8H.html" class="btn btn-neutral float-left" title="File maestro_queries.H" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2019, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>

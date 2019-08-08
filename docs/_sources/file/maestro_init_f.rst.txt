@@ -1,0 +1,8 @@
+maestro_init.f90
+================
+
+maestro\_init\_module
+---------------------
+
+.. f:automodule:: maestro_init_module
+

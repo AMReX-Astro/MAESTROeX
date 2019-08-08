@@ -1,0 +1,8 @@
+make_S.F90
+==========
+
+make\_s\_module
+---------------
+
+.. f:automodule:: make_s_module
+

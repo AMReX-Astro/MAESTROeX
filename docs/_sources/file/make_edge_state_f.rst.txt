@@ -1,0 +1,8 @@
+make_edge_state.f90
+===================
+
+make\_edge\_state\_module
+-------------------------
+
+.. f:automodule:: make_edge_state_module
+

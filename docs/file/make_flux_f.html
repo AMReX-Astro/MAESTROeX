@@ -1,0 +1,813 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>make_flux.F90 &mdash; MAESTROeX 19.08
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="make_gamma.F90" href="make_gamma_f.html" />
+    <link rel="prev" title="make_explicit_thermal.F90" href="make_explicit_thermal_f.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                19.08
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flowchart.html">MAESTROeX Flowchart</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../common_parameters.html">Common Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../enthalpy.html">Notes on Enthalpy</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="advect_base_f.html">advect_base.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="average_f.html">average.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base_state_f.html">base_state.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bc_fill_nd_f.html">bc_fill_nd.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cell_to_edge_f.html">cell_to_edge.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compute_dt_f.html">compute_dt.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compute_grad_phi_f.html">compute_grad_phi.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="debug_f.html">debug.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="diag_f.html">diag.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enforce_HSE_f.html">enforce_HSE.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fill_umac_ghost_f.html">fill_umac_ghost.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mac_solver_f.html">mac_solver.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_S_f.html">make_S.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_beta0_f.html">make_beta0.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_edge_scal_f.html">make_edge_scal.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_edge_state_f.html">make_edge_state.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_eta_f.html">make_eta.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">make_flux.F90</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#f/make_flux_module">make_flux_module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_pi_cc_f.html">make_pi_cc.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_scal_force_f.html">make_scal_force.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_vel_force_f.html">make_vel_force.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_w0_f.html">make_w0.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mkutrans_f.html">mkutrans.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ppm_f.html">ppm.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="regrid_f.html">regrid.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rhoh_vs_t_f.html">rhoh_vs_t.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rotation_f.html">rotation.f90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="slope_f.html">slope.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sponge_f.html">sponge.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tagging_f.html">tagging.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="update_scal_f.html">update_scal.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="update_vel_f.html">update_vel.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="velpred_f.html">velpred.F90</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../param_includes_files.html">Param_includes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../filelist.html">File list</a> &raquo;</li>
+        
+          <li><a href="../Src_nd_files.html">Src_nd</a> &raquo;</li>
+        
+      <li>make_flux.F90</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/file/make_flux_f.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="make-flux-f90">
+<h1>make_flux.F90<a class="headerlink" href="#make-flux-f90" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="f/make_flux_module">
+<span id="make-flux-module"></span><h2>make_flux_module<a class="headerlink" href="#f/make_flux_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Quick access</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#f/make_flux_module/predict_h" title="f/make_flux_module/predict_h"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_h</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_hprime" title="f/make_flux_module/predict_hprime"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_hprime</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_rho_and_x" title="f/make_flux_module/predict_rho_and_x"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rho_and_x</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_rhoh" title="f/make_flux_module/predict_rhoh"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rhoh</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_rhohprime" title="f/make_flux_module/predict_rhohprime"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rhohprime</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_rhoprime_and_x" title="f/make_flux_module/predict_rhoprime_and_x"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rhoprime_and_x</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_rhox" title="f/make_flux_module/predict_rhox"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rhox</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_t_then_h" title="f/make_flux_module/predict_t_then_h"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_t_then_h</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_t_then_rhohprime" title="f/make_flux_module/predict_t_then_rhohprime"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_t_then_rhohprime</span></code></a>, <a class="reference internal" href="#f/make_flux_module/predict_tprime_then_h" title="f/make_flux_module/predict_tprime_then_h"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_tprime_then_h</span></code></a></p>
+</dd>
+<dt class="field-even">Routines</dt>
+<dd class="field-even"><p><a class="reference internal" href="#f/make_flux_module/make_rhoh_flux_2d" title="f/make_flux_module/make_rhoh_flux_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhoh_flux_2d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhoh_flux_3d" title="f/make_flux_module/make_rhoh_flux_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhoh_flux_3d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_2d" title="f/make_flux_module/make_rhox_flux_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_2d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_3d" title="f/make_flux_module/make_rhox_flux_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_3d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_3d_sphr" title="f/make_flux_module/make_rhox_flux_3d_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_3d_sphr()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/mk_rhoh_flux_3d_sphr" title="f/make_flux_module/mk_rhoh_flux_3d_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">mk_rhoh_flux_3d_sphr()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/mk_rhoh_flux_3d_sphr_irreg" title="f/make_flux_module/mk_rhoh_flux_3d_sphr_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">mk_rhoh_flux_3d_sphr_irreg()</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Needed modules</p>
+<ul class="simple">
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_error_module</span></code></p></li>
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
+<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>)</p></li>
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">network</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">nspec()</span></code>)</p></li>
+<li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/rho_comp" title="f/meth_params_module/rho_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">rho_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/rhoh_comp" title="f/meth_params_module/rhoh_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">rhoh_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/enthalpy_pred_type" title="f/meth_params_module/enthalpy_pred_type"><code class="xref f f-func docutils literal notranslate"><span class="pre">enthalpy_pred_type()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/species_pred_type" title="f/meth_params_module/species_pred_type"><code class="xref f f-func docutils literal notranslate"><span class="pre">species_pred_type()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/evolve_base_state" title="f/meth_params_module/evolve_base_state"><code class="xref f f-func docutils literal notranslate"><span class="pre">evolve_base_state()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/use_exact_base_state" title="f/meth_params_module/use_exact_base_state"><code class="xref f f-func docutils literal notranslate"><span class="pre">use_exact_base_state()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/spec_comp" title="f/meth_params_module/spec_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">spec_comp()</span></code></a>)</p></li>
+</ul>
+<p class="rubric">Variables</p>
+<ul>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_h">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_h</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=2</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_hprime">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_hprime</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=5</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_hprime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_rho_and_x">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_rho_and_x</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=3</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_rho_and_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_rhoh">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_rhoh</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=0</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_rhoh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_rhohprime">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_rhohprime</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=1</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_rhohprime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_rhoprime_and_x">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_rhoprime_and_x</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=1</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_rhoprime_and_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_rhox">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_rhox</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=2</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_rhox" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_t_then_h">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_t_then_h</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=4</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_t_then_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_t_then_rhohprime">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_t_then_rhohprime</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=3</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_t_then_rhohprime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/make_flux_module/predict_tprime_then_h">
+<code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">predict_tprime_then_h</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=6</em><em>]</em><a class="headerlink" href="#f/make_flux_module/predict_tprime_then_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+</ul>
+<p class="rubric">Subroutines and functions</p>
+<dl class="subroutine">
+<dt id="f/make_flux_module/make_rhox_flux_2d">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_2d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">etarhoflux</em>, <em class="sig-param">eta_lo</em>, <em class="sig-param">eta_hi</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rho0_predicted_edge</em>, <em class="sig-param">w0</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_2d" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>fx_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fx_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fy_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fy_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>eta_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>eta_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>x_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>y_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>y_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>u_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>v_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/make_flux_module/make_rhox_flux_3d">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_3d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">etarhoflux</em>, <em class="sig-param">eta_lo</em>, <em class="sig-param">eta_hi</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rho0_predicted_edge</em>, <em class="sig-param">w0</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_3d" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>eta_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>eta_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/make_flux_module/make_rhox_flux_3d_sphr">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_3d_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">wy_lo</em>, <em class="sig-param">wy_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">wz_lo</em>, <em class="sig-param">wz_hi</em>, <em class="sig-param">rho0_edgex</em>, <em class="sig-param">rx_lo</em>, <em class="sig-param">rx_hi</em>, <em class="sig-param">rho0_edgey</em>, <em class="sig-param">ry_lo</em>, <em class="sig-param">ry_hi</em>, <em class="sig-param">rho0_edgez</em>, <em class="sig-param">rz_lo</em>, <em class="sig-param">rz_hi</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_3d_sphr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>rx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>ry_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ry_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>rz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/make_flux_module/make_rhoh_flux_2d">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhoh_flux_2d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rhoh0_old</em>, <em class="sig-param">rhoh0_edge_old</em>, <em class="sig-param">rhoh0_new</em>, <em class="sig-param">rhoh0_edge_new</em>, <em class="sig-param">w0</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhoh_flux_2d" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>fx_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fx_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fy_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fy_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>x_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>y_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>y_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>u_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>v_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/make_flux_module/make_rhoh_flux_3d">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhoh_flux_3d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rhoh0_old</em>, <em class="sig-param">rhoh0_edge_old</em>, <em class="sig-param">rhoh0_new</em>, <em class="sig-param">rhoh0_edge_new</em>, <em class="sig-param">w0</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhoh_flux_3d" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>precision</strong></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/make_flux_module/mk_rhoh_flux_3d_sphr">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">mk_rhoh_flux_3d_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">wy_lo</em>, <em class="sig-param">wy_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">wz_lo</em>, <em class="sig-param">wz_hi</em>, <em class="sig-param">rho0_edgex</em>, <em class="sig-param">rx_lo</em>, <em class="sig-param">rx_hi</em>, <em class="sig-param">rho0_edgey</em>, <em class="sig-param">ry_lo</em>, <em class="sig-param">ry_hi</em>, <em class="sig-param">rho0_edgez</em>, <em class="sig-param">rz_lo</em>, <em class="sig-param">rz_hi</em>, <em class="sig-param">h0_edgex</em>, <em class="sig-param">hx_lo</em>, <em class="sig-param">hx_hi</em>, <em class="sig-param">h0_edgey</em>, <em class="sig-param">hy_lo</em>, <em class="sig-param">hy_hi</em>, <em class="sig-param">h0_edgez</em>, <em class="sig-param">hz_lo</em>, <em class="sig-param">hz_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/mk_rhoh_flux_3d_sphr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>rx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>ry_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ry_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>rz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>hx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>hy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>hz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/make_flux_module/mk_rhoh_flux_3d_sphr_irreg">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">mk_rhoh_flux_3d_sphr_irreg</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">wy_lo</em>, <em class="sig-param">wy_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">wz_lo</em>, <em class="sig-param">wz_hi</em>, <em class="sig-param">rhoh0_edgex</em>, <em class="sig-param">hx_lo</em>, <em class="sig-param">hx_hi</em>, <em class="sig-param">rhoh0_edgey</em>, <em class="sig-param">hy_lo</em>, <em class="sig-param">hy_hi</em>, <em class="sig-param">rhoh0_edgez</em>, <em class="sig-param">hz_lo</em>, <em class="sig-param">hz_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/mk_rhoh_flux_3d_sphr_irreg" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>wz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>hx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>hy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>precision</strong></p></li>
+<li><p><strong>hz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="make_gamma_f.html" class="btn btn-neutral float-right" title="make_gamma.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="make_explicit_thermal_f.html" class="btn btn-neutral float-left" title="make_explicit_thermal.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2019, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>

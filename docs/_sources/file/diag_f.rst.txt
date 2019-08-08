@@ -1,0 +1,8 @@
+diag.F90
+========
+
+diag\_module
+------------
+
+.. f:automodule:: diag_module
+

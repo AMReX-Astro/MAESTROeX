@@ -1,0 +1,8 @@
+slope.F90
+=========
+
+slope\_module
+-------------
+
+.. f:automodule:: slope_module
+

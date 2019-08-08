@@ -1,0 +1,8 @@
+mac_solver.F90
+==============
+
+mac\_solver\_module
+-------------------
+
+.. f:automodule:: mac_solver_module
+

@@ -1,0 +1,8 @@
+inlet_bc.f90
+============
+
+inlet\_bc\_module
+-----------------
+
+.. f:automodule:: inlet_bc_module
+

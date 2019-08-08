@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Param_includes &mdash; MAESTROeX 19.04.1
+  <title>Param_includes &mdash; MAESTROeX 19.08
  documentation</title>
   
 
@@ -38,7 +38,9 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="File maestro_defaults.H" href="file/maestro__defaults_8H.html" />
+    <link rel="prev" title="velpred.F90" href="file/velpred_f.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -62,7 +64,7 @@
             
             
               <div class="version">
-                19.04.1
+                19.08
 
               </div>
             
@@ -99,7 +101,6 @@
 <li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">MAESTROeX Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
@@ -120,7 +121,6 @@
 <li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sdc.html">Spectral Deferred Corrections</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
@@ -130,8 +130,28 @@
 <li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
 </ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="filelist.html">File list</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="file/Maestro_8H.html">File Maestro.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file/MaestroPlot_8H.html">File MaestroPlot.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file/PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Src_nd_files.html">Src_nd</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Param_includes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="file/maestro__defaults_8H.html">File maestro_defaults.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="file/maestro__params_8H.html">File maestro_params.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="file/maestro__queries_8H.html">File maestro_queries.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="file/meth_params_f.html">meth_params.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="file/state_sizes_f.html">state_sizes.f90</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
             
@@ -177,6 +197,8 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
+          <li><a href="filelist.html">File list</a> &raquo;</li>
+        
       <li>Param_includes</li>
     
     
@@ -199,6 +221,19 @@
   <div class="section" id="param-includes">
 <h1>Param_includes<a class="headerlink" href="#param-includes" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file/maestro__defaults_8H.html">File maestro_defaults.H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="file/maestro__params_8H.html">File maestro_params.H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="file/maestro__queries_8H.html">File maestro_queries.H</a></li>
+<li class="toctree-l1"><a class="reference internal" href="file/meth_params_f.html">meth_params.F90</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="file/meth_params_f.html#f/meth_params_module">meth_params_module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="file/state_sizes_f.html">state_sizes.f90</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="file/state_sizes_f.html#f/state_sizes_module">state_sizes_module</a></li>
+</ul>
+</li>
+</ul>
 </div>
 </div>
 
@@ -208,12 +243,21 @@
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="file/maestro__defaults_8H.html" class="btn btn-neutral float-right" title="File maestro_defaults.H" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="file/velpred_f.html" class="btn btn-neutral float-left" title="velpred.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, MAESTROeX development tem
+        &copy; Copyright 2018-2019, MAESTROeX development tem
 
     </p>
   </div>
@@ -239,7 +283,8 @@
   
   
     
-   
+    
+
 
 </body>
 </html>
