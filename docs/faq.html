@@ -333,24 +333,25 @@ parameters.</p>
 <ol class="arabic">
 <li><p><em>How can we dump out a variable to a plotfile from any point in the
 code?</em></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">use</span> <span class="n">fabio_module</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;AMReX_VisMF.H&gt;</span>
 
-<span class="n">call</span> <span class="n">fabio_ml_multifab_write_d</span><span class="p">(</span><span class="n">uold</span><span class="p">,</span><span class="n">mla</span><span class="o">%</span><span class="n">mba</span><span class="o">%</span><span class="n">rr</span><span class="p">(:,</span><span class="mi">1</span><span class="p">),</span><span class="s2">&quot;a_uold&quot;</span><span class="p">)</span>
-<span class="n">call</span> <span class="n">fabio_ml_multifab_write_d</span><span class="p">(</span><span class="n">umac</span><span class="p">(:,</span><span class="mi">1</span><span class="p">),</span><span class="n">mla</span><span class="o">%</span><span class="n">mba</span><span class="o">%</span><span class="n">rr</span><span class="p">(:,</span><span class="mi">1</span><span class="p">),</span><span class="s2">&quot;a_umacx&quot;</span><span class="p">)</span>
+<span class="n">VisMF</span><span class="p">::</span><span class="n">Write</span><span class="p">(</span><span class="n">uold</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s2">&quot;a_uold&quot;</span><span class="p">);</span>
+<span class="n">VisMF</span><span class="p">::</span><span class="n">Write</span><span class="p">(</span><span class="n">umac</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="s2">&quot;a_umacx&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>This plotfile is visualized using Amrvis using the flag <code class="docutils literal notranslate"><span class="pre">-mf</span></code>.</p>
 </li>
-<li><p><em>How can I print out a multifab’s contents from within the code?</em></p>
-<p>There is a print method in multifab_module. This can
+<li><p><em>How can I print out a MultiFab’s contents from within the code?</em></p>
+<p>There is a print subroutine in <code class="docutils literal notranslate"><span class="pre">MaestroDebug.cpp</span></code> file. This can
 be simply called as</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">call</span> <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PrintMF</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>where a is a multifab (single-level).</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">a</span></code> is a MultiFab (multi-level).</p>
 </li>
 <li><p><em>How can I debug a parallel (MPI) job with gdb?</em></p>
 <p>If you only need to use a few processors, the following command will work:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpiexec</span> <span class="o">-</span><span class="n">n</span> <span class="mi">4</span> <span class="n">xterm</span> <span class="o">-</span><span class="n">e</span> <span class="n">gdb</span> <span class="o">./</span><span class="n">main</span><span class="o">.</span><span class="n">Linux</span><span class="o">.</span><span class="n">gfortran</span><span class="o">.</span><span class="n">mpi</span><span class="o">.</span><span class="n">exe</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpiexec</span> <span class="o">-</span><span class="n">n</span> <span class="mi">4</span> <span class="n">xterm</span> <span class="o">-</span><span class="n">e</span> <span class="n">gdb</span> <span class="o">./</span><span class="n">Maestro2d</span><span class="o">.</span><span class="n">gnu</span><span class="o">.</span><span class="n">ex</span>
 </pre></div>
 </div>
 <p>where the executable needs to be created with the <code class="docutils literal notranslate"><span class="pre">-g</span></code> flag to
@@ -363,8 +364,7 @@ in each. You need to then issue:</p>
 </li>
 <li><p><em>How can I get more information about floating point exceptions?</em></p>
 <p>AMReX can intercept floating point exceptions and provide a helpful
-backtrace that shows you where they were generated. See §
-<a class="reference external" href="#ch:makefiles:special">[ch:makefiles:special]</a>.</p>
+backtrace file that shows you where they were generated.</p>
 </li>
 </ol>
 </div>

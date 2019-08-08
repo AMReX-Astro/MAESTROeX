@@ -18,6 +18,7 @@ Compiling
    subroutine ends. Fortran 90 does not do this. Most
    MAESTROeX routines rely on this Fortran 95 feature.
 
+   
 #. *The code doesn’t compile, but complains right away that there
    is “No rule to make target ‘AMReX_constants_mod.o’, needed by ‘tmp_build_dir/d/2d.gnu.MPI/f90.depends’”*
 
@@ -25,6 +26,7 @@ Compiling
    to the ``amrex/`` directory. You cannot use ‘:math:`\sim`’ as a shortcut
    for your home directory.
 
+   
 #. *make issues an error like:*
 
    .. raw:: latex
@@ -79,6 +81,7 @@ Running
    can be overridden on a problem-by-problem basis by setting the relevant
    parameters in the problem's inputs file (see the `solver tolerances` section in the § :ref:`runtime parameters tables<sec:runtime-parameters-tables>`).
 
+   
 #. *Why do the initial projection and “divu” iters sometimes
    have a harder time converging than the multigrid solves in the main algorithm?*
 
@@ -90,6 +93,7 @@ Running
    initial projection and “divu” solve present a harded linear system
    to solve.
 
+   
 #. *How can I obtain profiling infomation for my run?*
 
    The code is already instrumented with timers. Simply compile with
@@ -117,6 +121,7 @@ Running
    line-by-line information can be obtained by passing the ``-l``
    argument to ``gprof``.
 
+   
 #. *How can I force MAESTROeX to abort?*
 
    In the output directory, do ``touch .abort_maestro``. This
@@ -125,6 +130,7 @@ Running
    ``.abort_maestro`` file before restarting the code in the
    same directory.
 
+   
 #. *When I run I get the error*
 
     ::
@@ -145,22 +151,24 @@ Debugging
 
    ::
 
-           use fabio_module
+           #include <AMReX_VisMF.H>
 
-           call fabio_ml_multifab_write_d(uold,mla%mba%rr(:,1),"a_uold")
-           call fabio_ml_multifab_write_d(umac(:,1),mla%mba%rr(:,1),"a_umacx")
+           VisMF::Write(uold[0],"a_uold");
+           VisMF::Write(umac[0][0],"a_umacx");
 
-#. *How can I print out a multifab’s contents from within the code?*
+   This plotfile is visualized using Amrvis using the flag ``-mf``.
+	   
+#. *How can I print out a MultiFab’s contents from within the code?*
 
-   There is a print method in multifab_module. This can
+   There is a print subroutine in ``MaestroDebug.cpp`` file. This can
    be simply called as
 
    ::
 
-         call print(a)
+         PrintMF(a);
 
 
-   where a is a multifab (single-level).
+   where ``a`` is a MultiFab (multi-level).
 
 #. *How can I debug a parallel (MPI) job with gdb?*
 
@@ -168,7 +176,7 @@ Debugging
 
    ::
 
-       mpiexec -n 4 xterm -e gdb ./main.Linux.gfortran.mpi.exe
+       mpiexec -n 4 xterm -e gdb ./Maestro2d.gnu.ex
 
    where the executable needs to be created with the ``-g`` flag to
    the compiler. This will pop up multiple xterms with gdb running
@@ -183,8 +191,7 @@ Debugging
 #. *How can I get more information about floating point exceptions?*
 
    AMReX can intercept floating point exceptions and provide a helpful
-   backtrace that shows you where they were generated. See §
-   `[ch:makefiles:special] <#ch:makefiles:special>`__.
+   backtrace file that shows you where they were generated. 
 
 I/O
 ===
