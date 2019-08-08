@@ -409,9 +409,11 @@ watching where it starts from and watching it move one cell per dt. In
 MAESTROeX things can go wrong in multiple places without it being obvious
 where the root problem is.</p>
 </li>
-<li><p><em>In the final projection in the algorithm, we project</em> <span class="math notranslate nohighlight">\(U^{n+1}\)</span> <em>, using a time-centered</em> <span class="math notranslate nohighlight">\(\beta_0\)</span> <em>, a time-centered</em> <span class="math notranslate nohighlight">\(\rho_0\)</span> <em>, but
-an</em> “<span class="math notranslate nohighlight">\(n+1\)</span>” <em>-centered</em> <span class="math notranslate nohighlight">\(S\)</span> <em>. Why then is the resulting</em> <span class="math notranslate nohighlight">\(\phi\)</span> <em>(which then
-defines</em> <span class="math notranslate nohighlight">\(\pi\)</span> <em>) is at</em> “<span class="math notranslate nohighlight">\(n+1/2\)</span>” <em>?</em></p>
+<li><p><em>In the final projection in the algorithm, we project</em> <span class="math notranslate nohighlight">\(U^{n+1}\)</span> <em>,
+using a time-centered</em> <span class="math notranslate nohighlight">\(\beta_0\)</span> <em>, a time-centered</em> <span class="math notranslate nohighlight">\(\rho_0\)</span> <em>, but
+an</em> “<span class="math notranslate nohighlight">\(n+1\)</span>” <em>-centered</em> <span class="math notranslate nohighlight">\(S\)</span> <em>. Why then is the
+resulting</em> <span class="math notranslate nohighlight">\(\phi\)</span> <em>(which then defines</em> <span class="math notranslate nohighlight">\(\pi\)</span> <em>) is
+at</em> “<span class="math notranslate nohighlight">\(n+1/2\)</span>” <em>?</em></p>
 <p>The short answer to this question is that you should think of this
 as really projecting <span class="math notranslate nohighlight">\((U^{n+1} - U^n)\)</span> and the right hand side as having
 <span class="math notranslate nohighlight">\((S^{n+1} - S^n)\)</span>. This is because the pressure enters the dynamic equations as
@@ -420,7 +422,8 @@ as really projecting <span class="math notranslate nohighlight">\((U^{n+1} - U^n
 <span class="math notranslate nohighlight">\(\pi\)</span> as well as the <span class="math notranslate nohighlight">\(U\)</span>.)</p>
 <p>So everything is in fact time-centered.</p>
 </li>
-<li><p><em>Why is</em> <span class="math notranslate nohighlight">\(\gammabar\)</span> <em>computed as the average of the full state</em> <span class="math notranslate nohighlight">\(\Gamma_1\)</span> <em>instead of computed from the base state density and
+<li><p><em>Why is</em> <span class="math notranslate nohighlight">\(\gammabar\)</span> <em>computed as the average of the full
+state</em> <span class="math notranslate nohighlight">\(\Gamma_1\)</span> <em>instead of computed from the base state density and
 pressure via the equation of state?</em></p>
 <p>The primary reason is that there is no base state composition. The
 base state density is simply the average of the full state density,
@@ -432,8 +435,8 @@ these base state quantities.</p>
 <p>No. This is a design decision. There is no support for axisymmetric
 coordinates in MAESTROeX. Spherical problems must be run in 3-d.</p>
 </li>
-<li><p><em>Why did we switch all the equations over to the
-*:math:`tilde{Ub}`</em> form instead of just working with <em>:math:`Ub`</em>?*</p>
+<li><p><em>Why did we switch all the equations over to the</em> <span class="math notranslate nohighlight">\(\tilde{\Ub}\)</span> <em>form
+instead of just working with</em> <span class="math notranslate nohighlight">\(\Ub\)</span> <em>?</em></p>
 <p>This is basically a numerical discretization issue. Whenever the base
 state aligns with the grid, you should be able to show that you get
 exactly the same answer each way.</p>
