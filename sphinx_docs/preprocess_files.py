@@ -32,6 +32,9 @@ def delete_lines(filename, filepath):
     """
     For some reason sphinx-fortran does not like it when there are ' in the
     middle of strings, so we shall remove all of these.
+
+    It also gets confused by 'double precision', so I'm going to replace all of
+    these with 'real'
     """
 
     txt = ""
@@ -39,6 +42,7 @@ def delete_lines(filename, filepath):
         txt = infile.read()
 
     txt = re.sub(r"(call log\(\".*\")", "", txt, flags=re.M)
+    txt = re.sub(r"double precision", "real", txt, flags=re.M)
 
     with open(os.path.join(filepath, filename), 'w') as outfile:
         outfile.write(txt)

@@ -19,7 +19,6 @@ contains
 
   subroutine make_grav_cell(grav_cell,rho0,r_cc_loc,r_edge_loc) &
        bind(C, name="make_grav_cell")
-
     ! compute the base state gravitational acceleration at the cell
     ! centers.  The base state uses 0-based indexing, so grav_cell
     ! does too.
@@ -237,7 +236,6 @@ contains
 
   subroutine make_grav_edge(grav_edge,rho0,r_edge_loc) &
        bind(C, name="make_grav_edge")
-
     ! compute the base state gravity at the cell edges
     ! grav_edge(0) is the gravitational acceleration at the left edge of zone 0).
     ! The base state uses 0-based indexing, so grav_edge does too.

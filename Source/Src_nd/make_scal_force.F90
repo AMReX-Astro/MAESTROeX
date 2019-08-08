@@ -21,7 +21,6 @@ contains
        p0, rho0, grav, psi, &
        is_prediction, add_thermal) &
        bind(C,name="mkrhohforce")
-
     ! compute the source terms for the non-reactive part of the enthalpy equation {w dp0/dr}
 
     integer         , intent(in   ) :: lo(3),hi(3)
