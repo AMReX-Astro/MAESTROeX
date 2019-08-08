@@ -96,6 +96,7 @@
 <p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
@@ -201,102 +202,94 @@
             
   <div class="section" id="maestroex-architecture">
 <h1>MAESTROeX Architecture<a class="headerlink" href="#maestroex-architecture" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="maestro-basics">
-<h2>MAESTRO Basics<a class="headerlink" href="#maestro-basics" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO models problems that are in tight hydrostatic equilibrium.
+<div class="section" id="maestroex-basics">
+<h2>MAESTROeX Basics<a class="headerlink" href="#maestroex-basics" title="Permalink to this headline">¶</a></h2>
+<p>MAESTROeX models problems that are in tight hydrostatic equilibrium.
 The fluid state is decomposed into a 1D radial base state that
 describes the hydrostatic structure of the star or atmosphere, and a
-2- or 3D Cartesian full state, that captures the departures from
+2- or 3-D Cartesian full state, that captures the departures from
 hydrostatic equilibrium. Two basic geometries are allowed. A
 <em>plane-parallel</em> geometry assumes that the domain is thin compared to
 the radius of curvature of the star, and therefore the 1D base state
 is perfectly aligned with the Cartesian state. A <em>spherical</em>
-geometry is for modeling an entire star <a class="footnote-reference brackets" href="#id15" id="id1">1</a>. Here, the 1D base state is not
-aligned with the Cartesian state. Figure <a class="reference external" href="#fig:base_state">[fig:base_state]</a> shows
+geometry is for modeling an entire star <a class="footnote-reference brackets" href="#id16" id="id1">1</a>. Here, the 1D base state is not
+aligned with the Cartesian state. The figure below shows
 these geometries.</p>
-<p><a href="#id25"><span class="problematic" id="id26">|[fig:base_state] MAESTRO geometries, showing both the
-1D base state and the full Cartesian state. (Left) For multi-level
+<div class="figure align-center" id="id24">
+<a class="reference internal image-reference" href="base_grid.eps"><img alt="base_grid" src="base_grid.eps" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">MAESTROeX geometries, showing both the 1D base state and
+the full Cartesian state. (Left) For multi-level
 problems in planar geometry, we force a direct alignment between the
 radial array cell centers and the Cartesian grid cell centers by
 allowing the radial base state spacing to change with space and
 time. (Right) For multi-level problems in spherical geometry, since
 there is no direct alignment between the radial array cell centers
 and the Cartesian grid cell centers, we choose to fix the radial
-base state spacing across levels. Figure taken
-from :raw-latex:`\cite{multilevel}`.|</span></a>
-<a href="#id27"><span class="problematic" id="id28">|[fig:base_state] MAESTRO geometries, showing both the
-1D base state and the full Cartesian state. (Left) For multi-level
-problems in planar geometry, we force a direct alignment between the
-radial array cell centers and the Cartesian grid cell centers by
-allowing the radial base state spacing to change with space and
-time. (Right) For multi-level problems in spherical geometry, since
-there is no direct alignment between the radial array cell centers
-and the Cartesian grid cell centers, we choose to fix the radial
-base state spacing across levels. Figure taken
-from :raw-latex:`\cite{multilevel}`.|</span></a></p>
-<p>MAESTRO can use adaptive mesh refinement to focus resolution on
+base state spacing across levels. Figure taken from <a class="reference internal" href="zreferences.html#multilevel" id="id2">[NonakaAlmgrenBell+10]</a>.</span><a class="headerlink" href="#id24" title="Permalink to this image">¶</a></p>
+</div>
+<p>MAESTROeX can use adaptive mesh refinement to focus resolution on
 complex regions of flow. For Cartesian/plane-parallel geometries, all
 cells at the same height must be at the same level of refinement.
 This restriction is to allow for the base state to directly align with
 the Cartesian state everywhere. For spherical geometries, there is no
-such restriction (again, see Figure <a class="reference external" href="#fig:base_state">[fig:base_state]</a>).
-The MAESTRO grids are managed by the AMReX library, which is
+such restriction (again, see above figure).
+The MAESTROeX grids are managed by the AMReX library, which is
 distributed separately.</p>
 </div>
-<div class="section" id="the-maestro-ecosystem">
-<h2>The MAESTRO ‘Ecosystem’<a class="headerlink" href="#the-maestro-ecosystem" title="Permalink to this headline">¶</a></h2>
-<p>Building MAESTRO requires both the MAESTRO-specific source
-files (distributed in the MAESTRO/ directory), and the
+<div class="section" id="the-maestroex-ecosystem">
+<h2>The MAESTROeX ‘Ecosystem’<a class="headerlink" href="#the-maestroex-ecosystem" title="Permalink to this headline">¶</a></h2>
+<p>Building MAESTROeX requires both the MAESTROeX-specific source
+files (distributed in the MAESTROeX/ directory), and the
 AMReX library (distributed separately, consisting of the amrex/ directory).
-AMReX provides both a C++ and a Fortran framework. MAESTRO only uses the Fortran portions of AMReX. Figure <a class="reference external" href="#fig:arch:eco">[fig:arch:eco]</a>
+AMReX provides both a C++ and a Fortran framework. Figure <a class="reference external" href="#fig:arch:eco">[fig:arch:eco]</a>
 shows the relationship between the different packages, highlighting
-what goes into defining a specific MAESTRO problem.</p>
-<p>Problems piece together various MAESTRO directories, choosing a
+what goes into defining a specific MAESTROeX problem.</p>
+<p>Problems piece together various MAESTROeX directories, choosing a
 reaction network, equation of state, and conductivity routine to build
-an executable. Briefly, the MAESTRO sub-directories are:</p>
+an executable. Briefly, the MAESTROeX sub-directories are:</p>
 <ul>
-<li><p>MAESTRO/</p>
-<p>The main MAESTRO algorithm directory.</p>
-<p>Important directories under MAESTRO/ include:</p>
+<li><p>MAESTROeX/</p>
+<p>The main MAESTROeX algorithm directory.</p>
+<p>Important directories under MAESTROeX/ include:</p>
 <ul>
 <li><p>Docs/</p>
 <p>Documentation describing the basic algorithm (including this
 document).</p>
 </li>
 <li><p>Exec/</p>
-<p>The various problem-setups. Each problem in MAESTRO gets it own
+<p>The various problem-setups. Each problem in MAESTROeX gets it own
 sub-directory under SCIENCE/, TEST_PROBLEMS/, or
 UNIT_TESTS/. The GNUmakefile in the problem directory
 includes the instructions on how to build the executable,
 including what modules in Microphysics/ are used. Any file that
 you place in a sub-directory here takes precedence over a file of
-the same name in MAESTRO/. This allows problems to have
-custom versions of the main MAESTRO routines (e.g. initial
+the same name in MAESTROeX/. This allows problems to have
+custom versions of the main MAESTROeX routines (e.g. initial
 conditions via initdata.f90. See § <a class="reference external" href="#sec:makefile">3.1</a> and
 Chapter <a class="reference external" href="#ch:make">[ch:make]</a> for details on the build system).</p>
 <ul>
 <li><p>SCIENCE/</p>
-<p>MAESTRO problem directories for science studies. These are
+<p>MAESTROeX problem directories for science studies. These are
 the setups that have been used for science papers in the past,
 or are the basis for current science studies.</p>
 </li>
 <li><p>TEST_PROBLEMS/</p>
-<p>MAESTRO problem directories for simple test problems that have
-been used while developing MAESTRO. Many of these problems
+<p>MAESTROeX problem directories for simple test problems that have
+been used while developing MAESTROeX. Many of these problems
 have appeared in the various papers describing the
-MAESTRO algorithm.</p>
+MAESTROeX algorithm.</p>
 </li>
 <li><p>UNIT_TESTS/</p>
-<p>Special MAESTRO problem directories that test only a single
-component of the MAESTRO algorithm. These often have their
+<p>Special MAESTROeX problem directories that test only a single
+component of the MAESTROeX algorithm. These often have their
 own main drivers (varden.f90) that setup and initialize
 some data structures and then call only a few of the
-MAESTRO routines. See Chapter <a class="reference external" href="#chapter:unit_tests">[chapter:unit_tests]</a> for details.</p>
+MAESTROeX routines. See Chapter <a class="reference external" href="#chapter:unit_tests">[chapter:unit_tests]</a> for details.</p>
 </li>
 </ul>
 </li>
-<li><p>Microphysics/ <a class="footnote-reference brackets" href="#id16" id="id2">2</a></p>
-<p>The basic microphysics routines used by MAESTRO. These are organized
+<li><p>Microphysics/ <a class="footnote-reference brackets" href="#id17" id="id3">2</a></p>
+<p>The basic microphysics routines used by MAESTROeX. These are organized
 into the following sub-directories.</p>
 <ul>
 <li><p>conductivity/</p>
@@ -313,8 +306,8 @@ non-reacting species.</p>
 </ul>
 </li>
 <li><p>Source/</p>
-<p>The main MAESTRO source. Here you will find the driver routine,
-the advection routines, etc. All MAESTRO problems will compile
+<p>The main MAESTROeX source. Here you will find the driver routine,
+the advection routines, etc. All MAESTROeX problems will compile
 this source.</p>
 </li>
 <li><p>Util/</p>
@@ -336,7 +329,7 @@ model data.</p>
 <p>A random number generator.</p>
 </li>
 <li><p>VODE/</p>
-<p>The VODE <a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{vode}`</span></a> package for integrating ODEs. At the
+<p>The VODE <a href="#id4"><span class="problematic" id="id5">:raw-latex:`\cite{vode}`</span></a> package for integrating ODEs. At the
 moment, this is used for integrating various reaction networks.</p>
 </li>
 </ul>
@@ -346,21 +339,21 @@ moment, this is used for integrating various reaction networks.</p>
 </ul>
 <p>The AMReX directory structure is shown in
 Figure <a class="reference external" href="#fig:arch:amrex">[fig:arch:amrex]</a>. The subset of the directories that are
-used by MAESTRO are:</p>
+used by MAESTROeX are:</p>
 <ul>
 <li><p>Src/</p>
-<p>The main AMReX source directory. In MAESTRO, we only use the
+<p>The main AMReX source directory. In MAESTROeX, we only use the
 Fortran source files. The core directories are:</p>
 <ul>
 <li><p>F_BaseLib/</p>
 <p>The Fortran AMReX files. This is a library for describing
 meshes consisting of a union of boxes. The AMReX modules
-define the basic datatypes used in MAESTRO. AMReX also
+define the basic datatypes used in MAESTROeX. AMReX also
 provides the routines that handle the parallelization and I/O.</p>
 </li>
 <li><p>LinearSolvers/</p>
 <p>The AMReX linear solvers—these are used to solve elliptic
-problems in the MAESTRO algorithm.</p>
+problems in the MAESTROeX algorithm.</p>
 <ul>
 <li><p>F_MG</p>
 <p>The Fortran multigrid solver, with support for both
@@ -380,7 +373,7 @@ comps/ sub-directory.</p>
 </li>
 <li><p>F_scripts/</p>
 <p>Some simple scripts that are useful for building, running,
-maintaining MAESTRO.</p>
+maintaining MAESTROeX.</p>
 </li>
 </ul>
 </li>
@@ -394,7 +387,7 @@ python-based routines are also here. These are described both in
 </div>
 <div class="section" id="adding-a-new-problem">
 <span id="sec-adding-problems"></span><h2>Adding A New Problem<a class="headerlink" href="#adding-a-new-problem" title="Permalink to this headline">¶</a></h2>
-<p>Different MAESTRO problems are defined in sub-directories under
+<p>Different MAESTROeX problems are defined in sub-directories under
 Exec/ in SCIENCE, TEST_PROBLEMS, or UNIT_TESTS.
 To add a problem, start by creating a new sub-directory—this is
 where you will compile your problem and store all the problem-specific
@@ -424,28 +417,28 @@ optimization and adds various runtime checks through compiler flags.
 MPI and OMP are set to true if we want to use either MPI
 or OpenMP for parallelization. If MPI := t, you will need to
 have the MPI libraries installed, and their location may need to be
-specified in MAESTRO/mk/GMakeMPI.mak.</p>
+specified in MAESTROeX/mk/GMakeMPI.mak.</p>
 <p>The next line sets the compiler to be used for compilation:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="p">:</span><span class="o">=</span> <span class="n">gfortran</span>
 </pre></div>
 </div>
-<p>The MAESTRO build system knows what options to use for various
+<p>The MAESTROeX build system knows what options to use for various
 compiler families. The COMP flag specifies which compiler to
 use. Allowed values include Intel, gfortran, PGI,
 PathScale, and Cray. The specific details of these
-choices are defined in the MAESTRO/mk/comps/ directory.</p>
+choices are defined in the MAESTROeX/mk/comps/ directory.</p>
 <p>MKVERBOSE set to true will echo the build commands to the
 terminal as the are executed.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MKVERBOSE</span> <span class="p">:</span><span class="o">=</span> <span class="n">t</span>
 </pre></div>
 </div>
-<p>The next line defines where the top of the MAESTRO source tree is located.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MAESTRO_TOP_DIR</span> <span class="p">:</span><span class="o">=</span> <span class="o">../../..</span>
+<p>The next line defines where the top of the MAESTROeX source tree is located.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MAESTROeX_TOP_DIR</span> <span class="p">:</span><span class="o">=</span> <span class="o">../../..</span>
 </pre></div>
 </div>
-<p>A MAESTRO application is built from several packages (the
+<p>A MAESTROeX application is built from several packages (the
 multigrid solver, an EOS, a reaction network, etc.). The core
-MAESTRO packages are always included, so a problem only needs
+MAESTROeX packages are always included, so a problem only needs
 to define the EOS, reaction network, and conductivities to
 use, as well as any extra, problem-specific files.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EOS_DIR</span> <span class="p">:</span><span class="o">=</span> <span class="n">helmholtz</span>
@@ -481,17 +474,17 @@ inserted into the Fortran source at compile time via the include
 statement. Presently, the only instance of this is with the Helmholtz
 general equation of state found in Microphysics/EOS/helmholtz/. This is
 automatically handled by the GMaestro.mak instructions.</p>
-<p>Runtime parameters listed in the MAESTRO/_parameters file are
+<p>Runtime parameters listed in the MAESTROeX/_parameters file are
 parsed at compile time and the file probin.f90 is written and
 compiled. This is a Fortran module that holds the values of the
 runtime parameters and makes them available to any routine. By
 default, the build system looks for a file called _parameters
 in the problem directory and adds those parameters along with the
-master list of MAESTRO parameters (MAESTRO/_parameters) to
+master list of MAESTROeX parameters (MAESTROeX/_parameters) to
 the probin_module.</p>
 <p>The final line in the GNUmakefile includes the rules to actually
 build the executable.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>include $(MAESTRO_TOP_DIR)/GMaestro.mak
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>include $(MAESTROeX_TOP_DIR)/GMaestro.mak
 </pre></div>
 </div>
 <div class="section" id="handling-problem-specific-source-files">
@@ -508,9 +501,9 @@ list in the GNUmakefile.</p>
 </div>
 <div class="section" id="defining-runtime-parameters">
 <span id="sec-def-runtime-param"></span><h3>Defining Runtime Parameters<a class="headerlink" href="#defining-runtime-parameters" title="Permalink to this headline">¶</a></h3>
-<p>The runtime parameters for the core MAESTRO algorithm are listed in
-MAESTRO/_parameters. That file is parsed at compile-time by
-the MAESTRO/write_probin.py script (along with any
+<p>The runtime parameters for the core MAESTROeX algorithm are listed in
+MAESTROeX/_parameters. That file is parsed at compile-time by
+the MAESTROeX/write_probin.py script (along with any
 problem-specific parameters). The script outputs the probin.f90
 source file. Each line in the _parameters file has the form:
 10em <em>data-type</em> 10em <em>value</em>
@@ -524,7 +517,7 @@ in the _parameters file into categories. The category headings
 are defined by comments in the _parameters file and any comments
 following that heading are placed into that category. The documentation
 (Chapter <a class="reference external" href="#ch:parameters">[ch:parameters]</a>) is produced by the script
-MAESTRO/docs/runtime_parameters/rp.py.</p>
+MAESTROeX/docs/runtime_parameters/rp.py.</p>
 <p>At runtime, the default values for the parameters can be overridden
 either through the inputs file (by adding a line of the form:
 parameter = value) or through a command-line argument (taking the
@@ -537,9 +530,9 @@ be automatically found at compile time.</p>
 </div>
 <div class="section" id="preparing-the-initial-model">
 <span id="sec-initial-models"></span><h3>Preparing the Initial Model<a class="headerlink" href="#preparing-the-initial-model" title="Permalink to this headline">¶</a></h3>
-<p>MAESTRO models subsonic, non-hydrostatic flows as deviations from
+<p>MAESTROeX models subsonic, non-hydrostatic flows as deviations from
 a background state in hydrostatic equilibrium.
-The solution in MAESTRO is broken up into a 1D base state and the 2-
+The solution in MAESTROeX is broken up into a 1D base state and the 2-
 or 3D full state. The job of the 1D base state in the algorithm is
 to represent the hydrostatic structure. The full, Cartesian state
 carries the departures from hydrostatic equilibrium. The underlying
@@ -548,11 +541,11 @@ state is in hydrostatic equilibrium. At the start of a simulation,
 the initial model is read in and taken as the base state. Therefore,
 any initial model needs to already be in hydrostatic equilibrium.</p>
 <p>The routines in Util/initial_models/ prepare an initial model
-for MAESTRO. In general, there are two different proceduces that are
+for MAESTROeX. In general, there are two different proceduces that are
 needed. The first type modify an existing 1D initial model produced
 somewhere else (e.g. a 1D stellar evolution code), and map it onto a
 uniform grid, at the desired resolution, using the equation of state
-in MAESTRO, and using MAESTRO’s discretization of hydrostatic
+in MAESTROeX, and using MAESTROeX’s discretization of hydrostatic
 equilibrium. The second type generate the initial model internally,
 by integrating the condition of hydrostatic equilibrium together with
 a simplifying assumption on the energy (e.g. isothermal or
@@ -565,12 +558,12 @@ g_{i+1/2}\]</div>
 (plane-parallel) convectively-unstable accreted layer on the surface
 of a star. This can be used as the starting point for a more complex
 model.</p>
-<p>MAESTRO initial models are read in by the Util/model_parser
+<p>MAESTROeX initial models are read in by the Util/model_parser
 routines. This expects the initial model to contain a header giving
 the number of variables and their names, followed by rows of data
 giving the coordinate and data values at that coordinate. The initial
 model should contain the same species data (in the form of mass fractions) as
-defined in the network module used by the MAESTRO problem.</p>
+defined in the network module used by the MAESTROeX problem.</p>
 <p>Full details on which initial model routine matches each problem and
 how the initial models are used to initialize the full state data can
 be found in § <a class="reference external" href="#sec:initial_models_main">[sec:initial_models_main]</a>.</p>
@@ -586,7 +579,7 @@ starting point for full stars.</p>
 </div>
 <div class="section" id="amrex-data-structures">
 <h2>AMReX Data Structures<a class="headerlink" href="#amrex-data-structures" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO’s gridding is handled by the AMReX library, which
+<p>MAESTROeX’s gridding is handled by the AMReX library, which
 contains the most fundamental objects used to construct parallel
 block-structured AMR applications—different
 regions of the domain can have different spatial resolutions.
@@ -608,7 +601,7 @@ processor (load balancing).</p>
 <p>On a grid, the data can be stored at cell-centers, on a face/edge, or
 on the corners. In AMReX, data that is on an edge is termed ‘nodal’
 in that direction (see Figure <a class="reference external" href="#fig:dataloc">[fig:dataloc]</a>). Data that is on the
-corners is nodal in all spatial directions. In MAESTRO, the state
+corners is nodal in all spatial directions. In MAESTROeX, the state
 data (density, enthalpy, velocity, <span class="math notranslate nohighlight">\(\ldots\)</span>) is generally
 cell-centered. Fluxes are nodal in the direction they represent.
 A few quantities are nodal in all directions (e.g. <span class="math notranslate nohighlight">\(\phi\)</span> used in
@@ -700,13 +693,13 @@ different fluid variables, and (nx,ny,nz) are the number of
 cells in each respective spatial dimension. For 2D problems,
 nz=1.</p>
 <p>A fab would represent the data for a single box in the domain.
-In MAESTRO, we don’t usually deal with fabs alone, but rather
+In MAESTROeX, we don’t usually deal with fabs alone, but rather
 we deal with multifabs, described next.</p>
 </div>
 <div class="section" id="multifab">
 <h3>multifab<a class="headerlink" href="#multifab" title="Permalink to this headline">¶</a></h3>
 <p>A multifab is a collection of fabs at the same level of
-refinement. This is the primary data structure that MAESTRO routine operate on. A multilevel simulation stores the
+refinement. This is the primary data structure that MAESTROeX routine operate on. A multilevel simulation stores the
 data in an array of multifabs, where the array index refers
 to the refinement level.</p>
 <p>All fabs in a given multifab have the same number of ghost cells,
@@ -716,7 +709,7 @@ but different multifabs can have different numbers of ghost cells
 <h4>Working with multifabs<a class="headerlink" href="#working-with-multifabs" title="Permalink to this headline">¶</a></h4>
 <p>To build a multifab, we need to provide a layout, the number of
 components to store in the multifab  and the number of ghostcells. In
-MAESTRO  the hierarchy of grids will be described by a single
+MAESTROeX  the hierarchy of grids will be described by a single
 ml_layout. A multifab can be declared and built at any time in a
 simulation using the ml_layout, thereby allocating space at every
 grid location in the simulation. The sequence to build a multifab appears as</p>
@@ -750,17 +743,17 @@ calling multifab_destroy on the multifab.</p>
 <h3>bc_tower<a class="headerlink" href="#bc-tower" title="Permalink to this headline">¶</a></h3>
 <p>A bc_tower holds the information about what boundary conditions are
 in effect for each variable in a
-MAESTRO simulation. These are interpretted by the ghost cell filling
+MAESTROeX simulation. These are interpretted by the ghost cell filling
 routines. See § <a class="reference external" href="#sec:arch:bcs">10</a> for more detail.</p>
 </div>
 </div>
-<div class="section" id="maestro-data-organization">
-<h2>MAESTRO Data Organization<a class="headerlink" href="#maestro-data-organization" title="Permalink to this headline">¶</a></h2>
-<p>The state of the star in MAESTRO is described by both a
+<div class="section" id="maestroex-data-organization">
+<h2>MAESTROeX Data Organization<a class="headerlink" href="#maestroex-data-organization" title="Permalink to this headline">¶</a></h2>
+<p>The state of the star in MAESTROeX is described by both a
 multidimensional state and the 1D base state. The full
 multidimensional state is stored in multifabs while the base state
 is simply stored in Fortran arrays. Here we describe the
-major MAESTRO data-structures.</p>
+major MAESTROeX data-structures.</p>
 <div class="section" id="s-multifabs-fluid-state">
 <h3>‘s’ multifabs (fluid state)<a class="headerlink" href="#s-multifabs-fluid-state" title="Permalink to this headline">¶</a></h3>
 <p>The fluid state (density, enthalpy, species, temperature, and tracer)
@@ -790,7 +783,7 @@ through the faces of the zone—the <span class="math notranslate nohighlight">\
 <span class="math notranslate nohighlight">\(y\)</span>-velocity on the <span class="math notranslate nohighlight">\(y\)</span>-edges, etc. (see figure <a class="reference external" href="#fig:mac">[fig:mac]</a>). This
 type of velocity discretization is termed the MAC velocity (after the
 “marker-and-cell” method for free boundaries in incompressible
-flows <a href="#id5"><span class="problematic" id="id6">:raw-latex:`\cite{harlowwelch:1965}`</span></a>).</p>
+flows <a href="#id6"><span class="problematic" id="id7">:raw-latex:`\cite{harlowwelch:1965}`</span></a>).</p>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -840,9 +833,9 @@ state then has its ghost cells filled by the usually multifab ghost
 cell routines.</p>
 </div>
 </div>
-<div class="section" id="maestro-helper-modules">
-<h2>MAESTRO Helper Modules<a class="headerlink" href="#maestro-helper-modules" title="Permalink to this headline">¶</a></h2>
-<p>A number of MAESTRO modules appear frequently throughout the source.
+<div class="section" id="maestroex-helper-modules">
+<h2>MAESTROeX Helper Modules<a class="headerlink" href="#maestroex-helper-modules" title="Permalink to this headline">¶</a></h2>
+<p>A number of MAESTROeX modules appear frequently throughout the source.
 Below, we describe some of the more common functionality of the most
 popular modules.</p>
 <div class="section" id="average-module">
@@ -858,14 +851,14 @@ state to connect the state variables thermodynamically. It
 gets the information about the fluid species from the network
 module (for example, the atomic number, <span class="math notranslate nohighlight">\(Z\)</span>, and atomic weight, <span class="math notranslate nohighlight">\(A\)</span>,
 of the nuclei).</p>
-<p>Presently there is a single EOS that comes with MAESTRO, tt gamma_law_general,
-but many more are available through the external Microphysics repo <a class="footnote-reference brackets" href="#id17" id="id7">3</a>. The Microphysics EOSs share the same interface and can be compiled into MAESTRO directly.
+<p>Presently there is a single EOS that comes with MAESTROeX, tt gamma_law_general,
+but many more are available through the external Microphysics repo <a class="footnote-reference brackets" href="#id18" id="id8">3</a>. The Microphysics EOSs share the same interface and can be compiled into MAESTROeX directly.
 Here are the more popular EOSs:</p>
 <ul>
 <li><p>helmholtz represents a general stellar equation
 of state, consisting of nuclei (as an ideal gas), radiation,
 and electrons (with arbitrary degeneracy and degree of relativity).
-This equation of state is that described in <a href="#id8"><span class="problematic" id="id9">:raw-latex:`\cite{timmes_eos}`</span></a>.</p>
+This equation of state is that described in <a href="#id9"><span class="problematic" id="id10">:raw-latex:`\cite{timmes_eos}`</span></a>.</p>
 <p>A runtime parameter, use_eos_coulomb, is defined in
 this EOS to enable/disable Coulomb corrections.</p>
 </li>
@@ -887,7 +880,7 @@ make this switch.</p>
 species can have a different value of <span class="math notranslate nohighlight">\(\gamma\)</span>. This mainly affects
 how the internal energy is constructed as each species, represented
 with a mass fraction <span class="math notranslate nohighlight">\(X_k\)</span> will have its contribution to the total
-specific internal energy take the form of :math:<a href="#id10"><span class="problematic" id="id11">`</span></a>e = p/rho/(gamma_k -</p>
+specific internal energy take the form of :math:<a href="#id11"><span class="problematic" id="id12">`</span></a>e = p/rho/(gamma_k -</p>
 <blockquote>
 <div><p>1)`. The main thermodynamic quantities take the form:</p>
 </div></blockquote>
@@ -932,14 +925,14 @@ custom <span class="math notranslate nohighlight">\(\gamma_i\)</span> for up to 
 which has fields for all the thermodynamic inputs and outputs. The
 type definition is brought in through eos_type_module.</p>
 <blockquote>
-<div><p><a class="footnote-reference brackets" href="#id18" id="id12">4</a></p>
+<div><p><a class="footnote-reference brackets" href="#id19" id="id13">4</a></p>
 </div></blockquote>
 <p>The first argument to the eos call is an integer key that
 specifies which thermodynamic variables (in addition to the mass
 fractions) are used as input. EOS input options are listed
 in table <a class="reference external" href="#arch:table:eosinput">[arch:table:eosinput]</a>.</p>
-<table class="docutils align-default" id="id23">
-<caption><span class="caption-text">[arch:table:eosinput] EOS input flags</span><a class="headerlink" href="#id23" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-default" id="id25">
+<caption><span class="caption-text">[arch:table:eosinput] EOS input flags</span><a class="headerlink" href="#id25" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 36%" />
 <col style="width: 64%" />
@@ -991,7 +984,7 @@ in CGS units.</p>
 <h3>network<a class="headerlink" href="#network" title="Permalink to this headline">¶</a></h3>
 <p>The network module defines the number species advected by the
 code (nspec), their ordering, and gives their basic properties
-(like atomic number, <span class="math notranslate nohighlight">\(Z\)</span>, and atomic mass, <span class="math notranslate nohighlight">\(A\)</span>). All MAESTRO problems
+(like atomic number, <span class="math notranslate nohighlight">\(Z\)</span>, and atomic mass, <span class="math notranslate nohighlight">\(A\)</span>). All MAESTROeX problems
 require a network module, even if there are no reactions
 modeled. Many different reaction modules (containing different sets
 of isotopes) exist in Microphysics/networks. The particular network
@@ -1019,8 +1012,8 @@ described in § <a class="reference external" href="#sec:def_runtime_param">3.2
 <p>The variables module provides integer keys to index the state
 multifabs and other arrays dealing with the scalar quantities. The
 most commonly used keys are are list in table <a class="reference external" href="#arch:table:variables">[arch:table:variables]</a>.</p>
-<table class="docutils align-default" id="id24">
-<caption><span class="caption-text">[arch:table:variables] Common variables module keys</span><a class="headerlink" href="#id24" title="Permalink to this table">¶</a></caption>
+<table class="docutils align-default" id="id26">
+<caption><span class="caption-text">[arch:table:variables] Common variables module keys</span><a class="headerlink" href="#id26" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 15%" />
 <col style="width: 85%" />
@@ -1077,12 +1070,12 @@ builds.</p>
 </div>
 <div class="section" id="sec-example-example-accessing-state-and-mac-data">
 <h2>[sec:example] Example: Accessing State and MAC Data<a class="headerlink" href="#sec-example-example-accessing-state-and-mac-data" title="Permalink to this headline">¶</a></h2>
-<p>In MAESTRO, the state data is stored in a cell-centered multifab array
+<p>In MAESTROeX, the state data is stored in a cell-centered multifab array
 (the array index refers to the AMR level) and the MAC velocities are
 stored in a 2D nodal multifab array (with indices referring to the AMR
 level and the velocity component). Here we demonstrate a typical way
 to extract the state and MAC velocity data.</p>
-<p>All MAESTRO routines are contained in a module, to allow for compile-time
+<p>All MAESTROeX routines are contained in a module, to allow for compile-time
 argument checking.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="n">example_module</span>
 
@@ -1105,7 +1098,7 @@ multifab_module defines
 the multifab data type. The ml_layout_module defines the
 datatype for a ml_layout—many routines will take an ml_layoutto
 allow us to fill ghostcells. The variables module is a
-MAESTRO module that provides integer keys for indexing the state
+MAESTROeX module that provides integer keys for indexing the state
 arrays. In this case the integer rho_comp refers to the
 location in the state array corresponding to density.</p>
 <p>Next we declare the subroutine arguments:</p>
@@ -1307,7 +1300,7 @@ This call is usually preceded by a call to
 ml_cc_restriction_c which sets the level n-1 data to be
 the average of the level n data covering it.</p></li>
 </ul>
-<p>You generally won’t see calls in the MAESTRO source code to these subroutines,
+<p>You generally won’t see calls in the MAESTROeX source code to these subroutines,
 as there is now a special AMReX subroutine, ml_restrict_and_fill,
 that takes an array of multifabs at different level, and in order calls:
 (1) ml_cc_restriction_c, (2) multifab_fill_boundary,
@@ -1321,7 +1314,7 @@ for all variables.</p>
 </div>
 <div class="section" id="boundary-conditions">
 <span id="sec-arch-bcs"></span><h2>Boundary Conditions<a class="headerlink" href="#boundary-conditions" title="Permalink to this headline">¶</a></h2>
-<p>When MAESTRO is run, the boundary condition parameters are read in
+<p>When MAESTROeX is run, the boundary condition parameters are read in
 from the input file and used to build the bc_tower. The
 bc_tower consists of a bc_level object for each level of resolution
 in the simulation. The bc_level contains 3 different descriptions of
@@ -1359,13 +1352,13 @@ velocity components, and the subsequent slots are for the other
 standard variables described in the variables_module. For
 instance, to reference the boundary condition for density, one would
 index with dm+rho_comp. For temporary variables that are
-created on the fly in the various routines in MAESTRO there may not
+created on the fly in the various routines in MAESTROeX there may not
 be a variable name in variables_module that describes the
 temporary variable. In this case, the special variables
 foextrap_comp and hoextrap_comp (first-order and high-order
 extrapolation) are used.</p>
 <p>ell_bc_level_array is the analog to
-adv_bc_level_array for the elliptic solves in MAESTRO. This
+adv_bc_level_array for the elliptic solves in MAESTROeX. This
 will come into play in the multigrid portions of the code. The
 actions that are used for ell_bc_level_array are either
 Dirichlet or Neumann boundary condtions. For the velocity
@@ -1380,7 +1373,7 @@ want the boundaries to introduce any tangental acceleration (or
 shear), this is equivalent to setting <span class="math notranslate nohighlight">\(\phi = 0\)</span> (then <span class="math notranslate nohighlight">\(\partial
 \phi/\partial t = 0\)</span>, with <span class="math notranslate nohighlight">\(t\)</span> meaning ‘tangental’). This allows the
 velocity to adjust as needed to the domain (see, for example,
-<a href="#id13"><span class="problematic" id="id14">:raw-latex:`\cite{almgrenBellSzymczak:1996}`</span></a>).</p>
+<a href="#id14"><span class="problematic" id="id15">:raw-latex:`\cite{almgrenBellSzymczak:1996}`</span></a>).</p>
 <p>The actual filling of the ghostcells according to the descriptions
 contained in the bc_tower is carried out by the multifab_physbc routine. When you have an EXT_DIR
 condition in multifab_physbc (an specified in the inputs file
@@ -1390,7 +1383,7 @@ equal to the value that actually lies on the wall.</p>
 </div>
 <div class="section" id="multigrid">
 <h2>Multigrid<a class="headerlink" href="#multigrid" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO uses the multigrid solver to enforce the divergence
+<p>MAESTROeX uses the multigrid solver to enforce the divergence
 constraint both on the half-time edge-centered advective velocities
 (the “MAC projection”) and on the final cell-centered velocities
 (the “HG projection”). For the MAC projection, since the velocity
@@ -1407,7 +1400,7 @@ More detail on the multigrid solvers is given in Chapter <a class="reference ex
 </div>
 <div class="section" id="particles">
 <span id="arch-sec-particles"></span><h2>Particles<a class="headerlink" href="#particles" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO has support for Lagrangian particles that are passively
+<p>MAESTROeX has support for Lagrangian particles that are passively
 advected with the velocity field. These are useful for diagnostics
 and post-processing. To use particles, particles must be seeded into
 the domain by writing a problem-specific init_particles.f90
@@ -1429,27 +1422,27 @@ positions. See § <a class="reference external" href="#analysis:sec:particles">
 <div class="section" id="regression-testing">
 <h2>Regression Testing<a class="headerlink" href="#regression-testing" title="Permalink to this headline">¶</a></h2>
 <p>There is an extensive regression test suite for AMReX that works with
-MAESTRO. Full details, and a sample MAESTRO configuration file are
+MAESTROeX. Full details, and a sample MAESTROeX configuration file are
 provided in the AMReX User’s Guide and source.</p>
 <dl class="footnote brackets">
-<dt class="label" id="id15"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id16"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Spherical geometry
 only exists for 3-d. This is a design decision—convection is 3-d.
 You can however run as an octant</p>
 </dd>
-<dt class="label" id="id16"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dt class="label" id="id17"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
 <dd><p>Note: many more compatible routines are available in the separate Microphysics git repo</p>
 </dd>
-<dt class="label" id="id17"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
+<dt class="label" id="id18"><span class="brackets"><a class="fn-backref" href="#id8">3</a></span></dt>
 <dd><p>Microphysics is
-available at <a class="reference external" href="https://github.com/starkiller-astro/Microphysics">https://github.com/starkiller-astro/Microphysics</a>. MAESTRO will
+available at <a class="reference external" href="https://github.com/starkiller-astro/Microphysics">https://github.com/starkiller-astro/Microphysics</a>. MAESTROeX will
 find it via the MICROPHYSICS_HOME environment variable</p>
 </dd>
-<dt class="label" id="id18"><span class="brackets"><a class="fn-backref" href="#id12">4</a></span></dt>
+<dt class="label" id="id19"><span class="brackets"><a class="fn-backref" href="#id13">4</a></span></dt>
 <dd><p>Note: an older interface to the EOS exists, but is
 deprecated. In this mode, the eos_old_interface module declares
 the variables that need appear in the old-style eos call
-argument list. MAESTRO routines use these module variables in the
+argument list. MAESTROeX routines use these module variables in the
 EOS call to avoid having to declare each quantity in each routine
 that calls the EOS. Most code has been updated to use the new interface.</p>
 </dd>
@@ -1462,7 +1455,7 @@ time. (Right) For multi-level problems in spherical geometry, since
 there is no direct alignment between the radial array cell centers
 and the Cartesian grid cell centers, we choose to fix the radial
 base state spacing across levels. Figure taken
-from <a href="#id19"><span class="problematic" id="id20">:raw-latex:`\cite{multilevel}`</span></a>.| image:: archfigpath/base_grid</p>
+from <a href="#id20"><span class="problematic" id="id21">:raw-latex:`\cite{multilevel}`</span></a>.| image:: archfigpath/base_grid</p>
 <blockquote>
 <div><dl class="field-list simple">
 <dt class="field-odd">height</dt>
@@ -1478,7 +1471,7 @@ time. (Right) For multi-level problems in spherical geometry, since
 there is no direct alignment between the radial array cell centers
 and the Cartesian grid cell centers, we choose to fix the radial
 base state spacing across levels. Figure taken
-from <a href="#id21"><span class="problematic" id="id22">:raw-latex:`\cite{multilevel}`</span></a>.| image:: archfigpath/base_spherical</p>
+from <a href="#id22"><span class="problematic" id="id23">:raw-latex:`\cite{multilevel}`</span></a>.| image:: archfigpath/base_spherical</p>
 <blockquote>
 <div><dl class="field-list simple">
 <dt class="field-odd">height</dt>
