@@ -142,7 +142,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#nodal-mg">Nodal MG</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#maestros-multigrid-use">MAESTRO’s Multigrid Use</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#maestroexs-multigrid-use">MAESTROeX’s Multigrid Use</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#convergence-criteria">Convergence Criteria</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#multigrid-solver-tolerances">Multigrid Solver Tolerances</a></li>
 </ul>
@@ -240,7 +240,7 @@ at C-F interfaces to ensure the correct solution to the Poisson equation
 across these interfaces. There is no correction step needed in this
 case (this differs from <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{ricker:2008}`</span></a>).</p>
 <p>The MG solver always works with jumps of <span class="math notranslate nohighlight">\(2\times\)</span> between levels. In
-some codes (but not MAESTRO) we can have jumps of <span class="math notranslate nohighlight">\(4\times\)</span> between
+some codes (but not MAESTROeX) we can have jumps of <span class="math notranslate nohighlight">\(4\times\)</span> between
 levels. AMReX uses a mini_cycle in these cases, effectively
 inserting a multigrid level between the two AMR levels and doing a mini
 V-cycle.</p>
@@ -277,19 +277,19 @@ section.</p></li>
 <li><p>bottom_max_iter: the maximum number of iterations for the
 bottom solver</p></li>
 <li><p>bottom_solver_eps: the tolerance used by the bottom
-solver. In MAESTRO, this is set via mg_eps_module.</p></li>
+solver. In MAESTROeX, this is set via mg_eps_module.</p></li>
 <li><p>max_iter: the maximum number of multigrid cycles.</p></li>
 <li><p>max_bottom_nlevel: additional coarsening if you use
 bottom_solver type 4 (see below)</p></li>
 <li><p>min_width: minimum size of grid at coarsest multigrid level</p></li>
 <li><p>rel_solver_eps: the relative tolerance of the solver (in
-MAESTRO, this is set via mg_eps_module.</p></li>
+MAESTROeX, this is set via mg_eps_module.</p></li>
 <li><p>abs_solver_eps: the absolute tolerance of the solver (in
-MAESTRO, this is set via mg_eps_module.</p></li>
-<li><p>verbose: the verbosity of the multigrid solver. In MAESTRO,
+MAESTROeX, this is set via mg_eps_module.</p></li>
+<li><p>verbose: the verbosity of the multigrid solver. In MAESTROeX,
 this is set via the mg_verbose runtime parameter. Higher
 numbers give more verbosity.</p></li>
-<li><p>cg_verbose: the verbosity of the bottom solver. In MAESTRO,
+<li><p>cg_verbose: the verbosity of the bottom solver. In MAESTROeX,
 this is set via the cg_verbose runtime parameter. Higher
 numbers give more verbosity.</p></li>
 </ul>
@@ -410,7 +410,7 @@ grids and then put the data on fewer boxes and processors and further
 coarsen the problem, again until we get as close to <span class="math notranslate nohighlight">\(2^3\)</span> as possible.
 At that point, one of the other bottom solvers will be called upon
 to solve the problem.</p>
-<p>There are several bottom solvers available in AMReX. For MAESTRO.
+<p>There are several bottom solvers available in AMReX. For MAESTROeX.
 These are set through the mg_bottom_solver (MAC/cell-centered)
 and hg_bottom_solver (nodal) runtime parameters.
 The allowed values are:</p>
@@ -479,7 +479,7 @@ structure is not appropriate for the fancy bottom solver.</p></li>
 </div>
 <div class="section" id="flowchart">
 <h2>Flowchart<a class="headerlink" href="#flowchart" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO multigrid solves always involve the full AMR hierarchy.</p>
+<p>MAESTROeX multigrid solves always involve the full AMR hierarchy.</p>
 <div class="section" id="cell-centered-mg">
 <h3>Cell-Centered MG<a class="headerlink" href="#cell-centered-mg" title="Permalink to this headline">¶</a></h3>
 <p>The flowchart below shows the structure of a cell-centered multigrid
@@ -557,13 +557,13 @@ convergence at each level.</p></li>
 </ul>
 </div>
 </div>
-<div class="section" id="maestros-multigrid-use">
-<h2>MAESTRO’s Multigrid Use<a class="headerlink" href="#maestros-multigrid-use" title="Permalink to this headline">¶</a></h2>
-<p>MAESTRO uses multigrid to enforce the velocity constraint through
+<div class="section" id="maestroexs-multigrid-use">
+<h2>MAESTROeX’s Multigrid Use<a class="headerlink" href="#maestroexs-multigrid-use" title="Permalink to this headline">¶</a></h2>
+<p>MAESTROeX uses multigrid to enforce the velocity constraint through
 projections at the half-time (the MAC projection) and end of the time
 step (the HG projection). Two multigrid solvers are provided by
 AMReX—one for cell-centered data and one for node-centered (nodal)
-data. Both of these are used in MAESTRO.</p>
+data. Both of these are used in MAESTROeX.</p>
 <p>The MAC projection operates on the advective velocities predicted at
 the cell-interfaces at the half-time. The edge-centered velocities
 are shown in Figure <a class="reference external" href="#fig:mg:MAC">[fig:mg:MAC]</a>. If we consider purely
@@ -609,7 +609,7 @@ following centerings:</p>
 </li>
 <li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is cell-centered, as shown in Figure <a class="reference external" href="#fig:mg:HG">[fig:mg:HG]</a>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(L\phi\)</span> is node-centered. This is a direct discretization of
-the Laplacian operator. By default, MAESTRO uses a dense stencil
+the Laplacian operator. By default, MAESTROeX uses a dense stencil
 (9-points in 2-d, 27-points in 3-d). Alternately, a <em>cross</em>
 stencil can be used (by setting hg_dense_stencil = F). This
 uses 5-points in 2-d, 7-points in 3-d.</p>
@@ -622,7 +622,7 @@ uses 5-points in 2-d, 7-points in 3-d.</p>
 </div>
 <div class="section" id="convergence-criteria">
 <h2>Convergence Criteria<a class="headerlink" href="#convergence-criteria" title="Permalink to this headline">¶</a></h2>
-<p>All MAESTRO multigrid solves consist of pure V-cycles.</p>
+<p>All MAESTROeX multigrid solves consist of pure V-cycles.</p>
 <div class="section" id="multigrid-solver-tolerances">
 <span id="sec-mgtol"></span><h3>Multigrid Solver Tolerances<a class="headerlink" href="#multigrid-solver-tolerances" title="Permalink to this headline">¶</a></h3>
 <p>Beginning at the start of execution, there are several places where

@@ -2,12 +2,12 @@
 Unit Tests
 **********
 
-In addition to the MAESTRO science problems, which use the full
-capabilities of MAESTRO, there are a number of unit tests that
-exercise only specific components of the MAESTRO solvers. These
+In addition to the MAESTROeX science problems, which use the full
+capabilities of MAESTROeX, there are a number of unit tests that
+exercise only specific components of the MAESTROeX solvers. These
 tests have their own drivers (a custom varden.f90) that
 initialize only the data needed for the specific test and call
-specific MAESTRO routines directly.
+specific MAESTROeX routines directly.
 
 test_advect
 ===========
@@ -81,7 +81,7 @@ test_diffusion
 ==============
 
 This test initializes a Gaussian temperature profile and calls
-the thermal diffusion routines in MAESTRO to evolve the state
+the thermal diffusion routines in MAESTROeX to evolve the state
 considering only diffusion. The driver estimates a timestep
 based on the explicit thermal diffusion timescale and loops
 over calls to the thermal diffusion solver. A Gaussian remains
@@ -180,7 +180,7 @@ test_react
 ==========
 
 This simply tests the reaction network by calling
-the MAESTRO react_state routine directly. The network is
+the MAESTROeX react_state routine directly. The network is
 selected in the GNUmakefile by setting the ``NETWORK_DIR``
 variable. A 3d cube is setup with density varying on one axis,
 temperature varying on another, and the composition varying on the

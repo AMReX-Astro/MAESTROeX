@@ -8,7 +8,7 @@ Interface State Details
 Predicting interface states
 ===========================
 
-The MAESTRO hyperbolic equations come in two forms: advective and
+The MAESTROeX hyperbolic equations come in two forms: advective and
 conservative. The procedure for predicting interface states differs
 slightly depending on which form we are dealing with.
 
@@ -111,7 +111,7 @@ paths to get this interface state—we can predict :math:`(\rho X)` to the
 edges as a single quantity, or predict :math:`\rho` and :math:`X` separately
 (either in full or perturbation form). In the notes below, we use the
 subscript ‘edge’ to indicate what quantity was *predicted* to the
-edges. In MAESTRO, the different methods of computing :math:`(\rho X)` on
+edges. In MAESTROeX, the different methods of computing :math:`(\rho X)` on
 edges are controlled by the ``species_pred_type parameter``. The
 quantities predicted to edges and the
 resulting edge state are shown in the table \ `[table:pred:species] <#table:pred:species>`__
@@ -209,7 +209,7 @@ There are two ways to predict :math:`\rho_0` at edges.
    this :math:`\rho` at edges is used to compute fluxes for :math:`\rho X_k`.
 
 We note that in essence these choices reflect a hyperbolic (1)
-vs. elliptic (2) approach. In MAESTRO, if we setup a problem with
+vs. elliptic (2) approach. In MAESTROeX, if we setup a problem with
 :math:`\rho = \rho_0` initially, and enforce a constraint :math:`\nabla \cdot
 (\rho_0 \Ub) = 0` (i.e. the anelastic constraint), then analytically,
 we should never generate a :math:`\rho'`. To realize this behavior
@@ -320,7 +320,7 @@ Energy Evolution
 Basic equations
 ---------------
 
-MAESTRO solves an enthalpy equation.
+MAESTROeX solves an enthalpy equation.
 The full enthalpy equation is
 
 .. math::
@@ -444,7 +444,7 @@ The general procedure for making the :math:`(\rho h)` edge state is as follows:
    precise construction depends on what species and enthalpy quantities
    are input to mkflux.
 
-Finally, when MAESTRO is run with ``use_tfromp = T``, the
+Finally, when MAESTROeX is run with ``use_tfromp = T``, the
 temperature is derived from the density, basestate pressure (:math:`p_0`),
 and :math:`X_k`. When run with reactions or external heating,
 react_state updates the temperature after the reaction/heating
@@ -455,7 +455,7 @@ heat release due to the adjustment of the density (which in turn sees
 it through the velocity field and :math:`S`). As a result, the
 ``enthalpy_pred_types`` that predict temperature to the interface
 ( ``predict_T_then_rhoprime`` and ``predict_T_then_h`` ) will
-not work. MAESTRO will abort if the code is run with this
+not work. MAESTROeX will abort if the code is run with this
 combination of parameters.
 
 Table \ `[table:pred:hoverview] <#table:pred:hoverview>`__
@@ -1101,10 +1101,10 @@ Comparing ``cflfac = 0.7`` and ``cflfac = 0.1`` with
 
 .. figure:: \pertfigpath/compare_tF_d0_h1_s123
    :alt: Compare the castro.ppm_type CASTRO runs with the
-   species_pred_type MAESTRO runs.
+   species_pred_type MAESTROeX runs.
 
    Compare the castro.ppm_type CASTRO runs with the
-   species_pred_type MAESTRO runs.
+   species_pred_type MAESTROeX runs.
 
 [fig:compare_tF_d0_h1_s123]
 
@@ -1122,10 +1122,10 @@ Comparing ``cflfac = 0.7`` and ``cflfac = 0.1`` with
 
 .. figure:: \pertfigpath/compare_castro
    :alt: Compare the castro.ppm_type CASTRO runs with the
-   species_pred_type MAESTRO runs.
+   species_pred_type MAESTROeX runs.
 
    Compare the castro.ppm_type CASTRO runs with the
-   species_pred_type MAESTRO runs.
+   species_pred_type MAESTROeX runs.
 
 [fig:compare_castro]
 

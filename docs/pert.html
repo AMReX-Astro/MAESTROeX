@@ -274,7 +274,7 @@
 <span id="ch-pert"></span><h1>Interface State Details<a class="headerlink" href="#interface-state-details" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="predicting-interface-states">
 <h2>Predicting interface states<a class="headerlink" href="#predicting-interface-states" title="Permalink to this headline">¶</a></h2>
-<p>The MAESTRO hyperbolic equations come in two forms: advective and
+<p>The MAESTROeX hyperbolic equations come in two forms: advective and
 conservative. The procedure for predicting interface states differs
 slightly depending on which form we are dealing with.</p>
 <div class="section" id="advective-form">
@@ -355,7 +355,7 @@ paths to get this interface state—we can predict <span class="math notranslate
 edges as a single quantity, or predict <span class="math notranslate nohighlight">\(\rho\)</span> and <span class="math notranslate nohighlight">\(X\)</span> separately
 (either in full or perturbation form). In the notes below, we use the
 subscript ‘edge’ to indicate what quantity was <em>predicted</em> to the
-edges. In MAESTRO, the different methods of computing <span class="math notranslate nohighlight">\((\rho X)\)</span> on
+edges. In MAESTROeX, the different methods of computing <span class="math notranslate nohighlight">\((\rho X)\)</span> on
 edges are controlled by the <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">parameter</span></code>. The
 quantities predicted to edges and the
 resulting edge state are shown in the table <a class="reference external" href="#table:pred:species">[table:pred:species]</a></p>
@@ -452,7 +452,7 @@ is not available yet. <span class="math notranslate nohighlight">\(\rho_0^{n+\my
 this <span class="math notranslate nohighlight">\(\rho\)</span> at edges is used to compute fluxes for <span class="math notranslate nohighlight">\(\rho X_k\)</span>.</p></li>
 </ol>
 <p>We note that in essence these choices reflect a hyperbolic (1)
-vs. elliptic (2) approach. In MAESTRO, if we setup a problem with
+vs. elliptic (2) approach. In MAESTROeX, if we setup a problem with
 <span class="math notranslate nohighlight">\(\rho = \rho_0\)</span> initially, and enforce a constraint <span class="math notranslate nohighlight">\(\nabla \cdot
 (\rho_0 \Ub) = 0\)</span> (i.e. the anelastic constraint), then analytically,
 we should never generate a <span class="math notranslate nohighlight">\(\rho'\)</span>. To realize this behavior
@@ -545,7 +545,7 @@ associated discretization is</div>
 <span id="sec-pred-enthalpy"></span><h2>Energy Evolution<a class="headerlink" href="#energy-evolution" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="basic-equations-1">
 <span id="id2"></span><h3>Basic equations<a class="headerlink" href="#basic-equations-1" title="Permalink to this headline">¶</a></h3>
-<p>MAESTRO solves an enthalpy equation.
+<p>MAESTROeX solves an enthalpy equation.
 The full enthalpy equation is</p>
 <div class="math notranslate nohighlight" id="equation-pert-15">
 <span class="eqno">(16)<a class="headerlink" href="#equation-pert-15" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
@@ -646,7 +646,7 @@ the EOS.</p></li>
 precise construction depends on what species and enthalpy quantities
 are input to mkflux.</p></li>
 </ol>
-<p>Finally, when MAESTRO is run with <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code>, the
+<p>Finally, when MAESTROeX is run with <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code>, the
 temperature is derived from the density, basestate pressure (<span class="math notranslate nohighlight">\(p_0\)</span>),
 and <span class="math notranslate nohighlight">\(X_k\)</span>. When run with reactions or external heating,
 react_state updates the temperature after the reaction/heating
@@ -657,7 +657,7 @@ heat release due to the adjustment of the density (which in turn sees
 it through the velocity field and <span class="math notranslate nohighlight">\(S\)</span>). As a result, the
 <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_types</span></code> that predict temperature to the interface
 ( <code class="docutils literal notranslate"><span class="pre">predict_T_then_rhoprime</span></code> and <code class="docutils literal notranslate"><span class="pre">predict_T_then_h</span></code> ) will
-not work. MAESTRO will abort if the code is run with this
+not work. MAESTROeX will abort if the code is run with this
 combination of parameters.</p>
 <p>Table <a class="reference external" href="#table:pred:hoverview">[table:pred:hoverview]</a>
 gives a summary

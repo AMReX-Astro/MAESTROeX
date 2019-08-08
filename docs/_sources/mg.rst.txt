@@ -14,7 +14,7 @@ across these interfaces. There is no correction step needed in this
 case (this differs from :raw-latex:`\cite{ricker:2008}`).
 
 The MG solver always works with jumps of :math:`2\times` between levels. In
-some codes (but not MAESTRO) we can have jumps of :math:`4\times` between
+some codes (but not MAESTROeX) we can have jumps of :math:`4\times` between
 levels. AMReX uses a mini_cycle in these cases, effectively
 inserting a multigrid level between the two AMR levels and doing a mini
 V-cycle.
@@ -66,7 +66,7 @@ The following parameters are specified when building the mg_tower:
    bottom solver
 
 -  bottom_solver_eps: the tolerance used by the bottom
-   solver. In MAESTRO, this is set via mg_eps_module.
+   solver. In MAESTROeX, this is set via mg_eps_module.
 
 -  max_iter: the maximum number of multigrid cycles.
 
@@ -76,16 +76,16 @@ The following parameters are specified when building the mg_tower:
 -  min_width: minimum size of grid at coarsest multigrid level
 
 -  rel_solver_eps: the relative tolerance of the solver (in
-   MAESTRO, this is set via mg_eps_module.
+   MAESTROeX, this is set via mg_eps_module.
 
 -  abs_solver_eps: the absolute tolerance of the solver (in
-   MAESTRO, this is set via mg_eps_module.
+   MAESTROeX, this is set via mg_eps_module.
 
--  verbose: the verbosity of the multigrid solver. In MAESTRO,
+-  verbose: the verbosity of the multigrid solver. In MAESTROeX,
    this is set via the mg_verbose runtime parameter. Higher
    numbers give more verbosity.
 
--  cg_verbose: the verbosity of the bottom solver. In MAESTRO,
+-  cg_verbose: the verbosity of the bottom solver. In MAESTROeX,
    this is set via the cg_verbose runtime parameter. Higher
    numbers give more verbosity.
 
@@ -224,7 +224,7 @@ coarsen the problem, again until we get as close to :math:`2^3` as possible.
 At that point, one of the other bottom solvers will be called upon
 to solve the problem.
 
-There are several bottom solvers available in AMReX. For MAESTRO.
+There are several bottom solvers available in AMReX. For MAESTROeX.
 These are set through the mg_bottom_solver (MAC/cell-centered)
 and hg_bottom_solver (nodal) runtime parameters.
 The allowed values are:
@@ -306,7 +306,7 @@ Some grid examples help make this clear:
 Flowchart
 =========
 
-MAESTRO multigrid solves always involve the full AMR hierarchy.
+MAESTROeX multigrid solves always involve the full AMR hierarchy.
 
 Cell-Centered MG
 ----------------
@@ -388,14 +388,14 @@ solve using pure V-cycles.
 -  compute_defect: This is called multiple times, checking for
    convergence at each level.
 
-MAESTRO’s Multigrid Use
-=======================
+MAESTROeX’s Multigrid Use
+=========================
 
-MAESTRO uses multigrid to enforce the velocity constraint through
+MAESTROeX uses multigrid to enforce the velocity constraint through
 projections at the half-time (the MAC projection) and end of the time
 step (the HG projection). Two multigrid solvers are provided by
 AMReX—one for cell-centered data and one for node-centered (nodal)
-data. Both of these are used in MAESTRO.
+data. Both of these are used in MAESTROeX.
 
 The MAC projection operates on the advective velocities predicted at
 the cell-interfaces at the half-time. The edge-centered velocities
@@ -412,7 +412,7 @@ Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__). The remaining quantities are discreti
 
    .. math::
 
-      (DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} + 
+      (DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
                      \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}
 
 -  :math:`G\phi` is edge-centered, on the MAC grid, as shown in
@@ -456,7 +456,7 @@ following centerings:
 -  :math:`G\phi` is cell-centered, as shown in Figure \ `[fig:mg:HG] <#fig:mg:HG>`__.
 
 -  :math:`L\phi` is node-centered. This is a direct discretization of
-   the Laplacian operator. By default, MAESTRO uses a dense stencil
+   the Laplacian operator. By default, MAESTROeX uses a dense stencil
    (9-points in 2-d, 27-points in 3-d). Alternately, a *cross*
    stencil can be used (by setting hg_dense_stencil = F). This
    uses 5-points in 2-d, 7-points in 3-d.
@@ -474,7 +474,7 @@ following centerings:
 Convergence Criteria
 ====================
 
-All MAESTRO multigrid solves consist of pure V-cycles.
+All MAESTROeX multigrid solves consist of pure V-cycles.
 
 .. _sec:mgtol:
 
@@ -533,15 +533,15 @@ and the “divu” iterations.
       \small
 
    | lll
-     :math:`\epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll} 
+     :math:`\epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll}
                         \min\, \{& \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
-                                 & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^2 \, \} & 
+                                 & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^2 \, \} &
                                 \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \\[2mm]
                         \min\, \{& \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
-                                 & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^2 \, \} & 
+                                 & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^2 \, \} &
                                 \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} - 1  \\[2mm]
                         \min\, \{& \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
-                                 & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^2 \, \} & 
+                                 & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^2 \, \} &
                                 \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter}   \\
                                       \end{array}
                        \right .`
@@ -550,13 +550,13 @@ and the “divu” iterations.
 
    .. raw:: latex
 
-      \small 
+      \small
 
    | ll
-     :math:`\epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll} 
+     :math:`\epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll}
                           \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}^2 &
                                 \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \, \\[2mm]
-                         \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}  & 
+                         \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}  &
                                 \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} - 1 \, \\[2mm]
                          \mathtt{eps\_divu\_sph}  &
                                 \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} \, )\\

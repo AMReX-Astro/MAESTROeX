@@ -212,12 +212,12 @@
             
   <div class="section" id="unit-tests">
 <h1>Unit Tests<a class="headerlink" href="#unit-tests" title="Permalink to this headline">¶</a></h1>
-<p>In addition to the MAESTRO science problems, which use the full
-capabilities of MAESTRO, there are a number of unit tests that
-exercise only specific components of the MAESTRO solvers. These
+<p>In addition to the MAESTROeX science problems, which use the full
+capabilities of MAESTROeX, there are a number of unit tests that
+exercise only specific components of the MAESTROeX solvers. These
 tests have their own drivers (a custom varden.f90) that
 initialize only the data needed for the specific test and call
-specific MAESTRO routines directly.</p>
+specific MAESTROeX routines directly.</p>
 <div class="section" id="test-advect">
 <h2>test_advect<a class="headerlink" href="#test-advect" title="Permalink to this headline">¶</a></h2>
 <p>This test initializes a Gaussian density field (no other scalar
@@ -279,7 +279,7 @@ for a spherical, self-gravitating star in <a class="reference internal" href="zr
 <div class="section" id="test-diffusion">
 <h2>test_diffusion<a class="headerlink" href="#test-diffusion" title="Permalink to this headline">¶</a></h2>
 <p>This test initializes a Gaussian temperature profile and calls
-the thermal diffusion routines in MAESTRO to evolve the state
+the thermal diffusion routines in MAESTROeX to evolve the state
 considering only diffusion. The driver estimates a timestep
 based on the explicit thermal diffusion timescale and loops
 over calls to the thermal diffusion solver. A Gaussian remains
@@ -337,7 +337,7 @@ on all sides, a 2-level grid with an octant refined, and the hgprojection.</span
 <div class="section" id="test-react">
 <h2>test_react<a class="headerlink" href="#test-react" title="Permalink to this headline">¶</a></h2>
 <p>This simply tests the reaction network by calling
-the MAESTRO react_state routine directly. The network is
+the MAESTROeX react_state routine directly. The network is
 selected in the GNUmakefile by setting the <code class="docutils literal notranslate"><span class="pre">NETWORK_DIR</span></code>
 variable. A 3d cube is setup with density varying on one axis,
 temperature varying on another, and the composition varying on the

@@ -121,24 +121,24 @@
 <li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Godunov Interface States</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#maestro-notation">MAESTRO Notation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#maestroex-notation">MAESTROeX Notation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#computing-ub-from-ubt">Computing <span class="math notranslate nohighlight">\(\Ub\)</span> From <span class="math notranslate nohighlight">\(\Ubt\)</span></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#computing-partial-w-0-partial-r">Computing <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#computing-ubt-trans-in-maestro">Computing <span class="math notranslate nohighlight">\(\Ubt^{\trans}\)</span> in MAESTRO</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#computing-ubt-trans-in-maestroex">Computing <span class="math notranslate nohighlight">\(\Ubt^{\trans}\)</span> in MAESTROeX</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#d-cartesian-case">2D Cartesian Case</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#d-cartesian-case-1">3D Cartesian Case</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#d-spherical-case">3D Spherical Case</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#computing-ubt-mac-in-maestro">Computing <span class="math notranslate nohighlight">\(\Ubt^{\mac,*}\)</span> in MAESTRO</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#computing-ubt-mac-in-maestroex">Computing <span class="math notranslate nohighlight">\(\Ubt^{\mac,*}\)</span> in MAESTROeX</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#d-cartesian-case-2">2D Cartesian Case</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#d-cartesian-case-3">3D Cartesian Case</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#d-spherical-case-1">3D Spherical Case</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestro">Computing <span class="math notranslate nohighlight">\(\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}\)</span>, and <span class="math notranslate nohighlight">\(\Ubt^{\edge}\)</span> in MAESTRO</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestroex">Computing <span class="math notranslate nohighlight">\(\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}\)</span>, and <span class="math notranslate nohighlight">\(\Ubt^{\edge}\)</span> in MAESTROeX</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#d-cartesian-case-4">2D Cartesian Case</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#d-cartesian-case-5">3D Cartesian Case</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#d-spherical-case-2">3D Spherical Case</a></li>
@@ -245,9 +245,9 @@
             
   <div class="section" id="godunov-interface-states">
 <h1>Godunov Interface States<a class="headerlink" href="#godunov-interface-states" title="Permalink to this headline">¶</a></h1>
-<p>These are working notes for the Godunov step in MAESTRO and VARDEN.</p>
-<div class="section" id="maestro-notation">
-<h2>MAESTRO Notation<a class="headerlink" href="#maestro-notation" title="Permalink to this headline">¶</a></h2>
+<p>These are working notes for the Godunov step in MAESTROeX and VARDEN.</p>
+<div class="section" id="maestroex-notation">
+<h2>MAESTROeX Notation<a class="headerlink" href="#maestroex-notation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>For 2D, <span class="math notranslate nohighlight">\(\Ub = (u,w)\)</span> and <span class="math notranslate nohighlight">\(\Ubt = (\ut,\wt)\)</span>.
 Note that <span class="math notranslate nohighlight">\(u = \ut\)</span>. We will use the shorthand <span class="math notranslate nohighlight">\(\ib = (x,r)\)</span>.</p></li>
@@ -291,8 +291,8 @@ are given by the two-point centered difference:</p>
 using put_1d_array_on_cart_3d_sphr.</p>
 </div>
 </div>
-<div class="section" id="computing-ubt-trans-in-maestro">
-<h2>Computing <span class="math notranslate nohighlight">\(\Ubt^{\trans}\)</span> in MAESTRO<a class="headerlink" href="#computing-ubt-trans-in-maestro" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="computing-ubt-trans-in-maestroex">
+<h2>Computing <span class="math notranslate nohighlight">\(\Ubt^{\trans}\)</span> in MAESTROeX<a class="headerlink" href="#computing-ubt-trans-in-maestroex" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line">In advance_premac, we call mkutrans, to compute
 <span class="math notranslate nohighlight">\(\Ubt^{\trans}\)</span>. We will only compute the normal
@@ -377,8 +377,8 @@ the upwind velocity, is done with the full velocity, not the
 perturbational velocity.</p>
 </div>
 </div>
-<div class="section" id="computing-ubt-mac-in-maestro">
-<h2>Computing <span class="math notranslate nohighlight">\(\Ubt^{\mac,*}\)</span> in MAESTRO<a class="headerlink" href="#computing-ubt-mac-in-maestro" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="computing-ubt-mac-in-maestroex">
+<h2>Computing <span class="math notranslate nohighlight">\(\Ubt^{\mac,*}\)</span> in MAESTROeX<a class="headerlink" href="#computing-ubt-mac-in-maestroex" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line">In advance_premac, we call velpred to compute
 <span class="math notranslate nohighlight">\(\Ubt^{\mac,*}\)</span>. We will only compute the normal component of
@@ -571,8 +571,8 @@ As in the plane-parallel case, make sure to upwind using the
 full velocity.</p>
 </div>
 </div>
-<div class="section" id="computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestro">
-<span id="scalar-edge-state-prediction-in-maestro"></span><h2>Computing <span class="math notranslate nohighlight">\(\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}\)</span>, and <span class="math notranslate nohighlight">\(\Ubt^{\edge}\)</span> in MAESTRO<a class="headerlink" href="#computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestro" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestroex">
+<span id="scalar-edge-state-prediction-in-maestroex"></span><h2>Computing <span class="math notranslate nohighlight">\(\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}\)</span>, and <span class="math notranslate nohighlight">\(\Ubt^{\edge}\)</span> in MAESTROeX<a class="headerlink" href="#computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestroex" title="Permalink to this headline">¶</a></h2>
 <p>We call make_edge_scal to compute <span class="math notranslate nohighlight">\(\rho^{'\edge}, X_k^{\edge},
 (\rho h)^{'\edge}\)</span>, and <span class="math notranslate nohighlight">\(\Ubt^{\edge}\)</span> at each edge.
 The procedure is the same for each quantitiy, so we shall simply denote
@@ -973,9 +973,9 @@ obtain <span class="math notranslate nohighlight">\(v_{\ib-\half\eb_y}^{\mac,*}\
 <div class="section" id="computing-ub-edge-and-rho-edge-in-varden">
 <h2>Computing <span class="math notranslate nohighlight">\(\Ub^{\edge}\)</span> and <span class="math notranslate nohighlight">\(\rho^{\edge}\)</span> in VARDEN<a class="headerlink" href="#computing-ub-edge-and-rho-edge-in-varden" title="Permalink to this headline">¶</a></h2>
 <p>To compute <span class="math notranslate nohighlight">\(\Ub^{\edge}\)</span>, VARDEN uses the exact same algorithm
-as the <span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in MAESTRO. The algorithm for
+as the <span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in MAESTROeX. The algorithm for
 <span class="math notranslate nohighlight">\(\rho^{\edge}\)</span> in VARDEN is slightly different than the
-<span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in MAESTRO since it uses a “conservative”
+<span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in MAESTROeX since it uses a “conservative”
 formulation. Here, <span class="math notranslate nohighlight">\(s\)</span> is used in place of either <span class="math notranslate nohighlight">\(\rho, u, v\)</span>, or
 <span class="math notranslate nohighlight">\(w\)</span> (in 3D).</p>
 <div class="section" id="d-cartesian-case-8">
@@ -1180,7 +1180,7 @@ to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x
 The PPM method is an improvement over the piecewise-linear method.
 Using our notation, we modify equations (<a class="reference external" href="#3Dpredictstoleft">[3D predict s to left]</a>) and
 (<a class="reference external" href="#3Dpredictstoright">[3D predict s to right]</a>) in Section
-<a class="reference external" href="#ScalarEdgeStatePredictioninMAESTRO">4</a> to obtain better estimates
+<a class="reference external" href="#ScalarEdgeStatePredictioninMAESTROeX">4</a> to obtain better estimates
 for the time-centered 1D edge states, <span class="math notranslate nohighlight">\(s_{L/R,\ib-\myhalf\eb_x}\)</span>, etc.. Once these states
 are obtained, we continue with the full-dimensional extrapolations as
 described before.</div>

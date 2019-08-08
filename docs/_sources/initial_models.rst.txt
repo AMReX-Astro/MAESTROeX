@@ -3,7 +3,7 @@ Initial Models
 **************
 
 Here we briefly describe the various routines for generating initial models
-for the main MAESTRO problems and how the initial model is used to initialize
+for the main MAESTROeX problems and how the initial model is used to initialize
 both the base state and the full Cartesian state.
 
 .. note::
