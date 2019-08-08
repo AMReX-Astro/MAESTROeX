@@ -88,6 +88,127 @@ the parameter with the highest priority takes precedence. This allows
 specific implementations to override the general parameter defaults.
 
 
+Common Runtime Parameters
+=========================
+
+Controlling Timestepping and Output
+-----------------------------------
+
+Parameters that set the maximum time for the simulation to run
+include:
+
+-  ``stop_time`` is the maximum simulation time, in seconds,
+   to evolve the system for.
+
+-  ``max_step`` is the maximum number of steps to take.
+
+Parameters affecting the size of the timestep include:
+
+-  ``cfl`` is a multiplicative factor (:math:`\le 1`)
+   applied to the advective CFL timestep
+
+-  ``init_shrink`` is the factor (:math:`\le 1`) by which to reduce
+   the initial timestep from the estimated first timestep.
+
+Parameters affecting output and restart include:
+
+-  ``restart_file`` tells MAESTROeX to restart from a checkpoint. The
+   value of this parameter should be the name of the checkpoint file to
+   restart from. For example, to restart from the checkpoint file ``chk00010``,
+   you would set ``maestro.restart_file = chk00010``.
+
+-  ``plot_int`` is the number of steps to take between
+   outputting a plotfile
+
+-  ``plot_deltat`` is the simulation time to evolve between
+   outputting a plotfile. Note: to output only based on simulation
+   time, set ``maestro.plot_int = -1``.
+
+-  ``chk_int`` is the number of steps to take between
+   outputting a checkpoint.
+
+-  ``plot_base_name`` is the basename to use for the
+   plotfile filename. The step number will be appended to
+   this name.
+
+Note that in addition to the normal plotfiles, there are *small* plotfiles
+that store a small subset of the fields, intended to be output more frequently.
+These are described in § \ `[vis:sec:miniplotfile] <#vis:sec:miniplotfile>`__.
+
+Defining the Grid and Boundary Conditions
+-----------------------------------------
+
+Parameters that determine the spatial extent of the grid,
+the types of boundaries, and the number of computational cells include:
+
+-  ``amr.max_level`` is the maximum number of grid levels in the AMR
+   hierarchy to use. ``amr.max_level = 0`` indicates running with only a
+   single level spanning the whole domain.
+
+-  ``amr.n_cell`` is the size of the
+   base level in terms of number of cells. It takes a list of integer numbers,
+   defining the size in the :math:`x`, :math:`y`, and :math:`z`
+   coordinate directions, e.g. ``amr.n_cell = 64 64 64`` would define a domain
+   of size :math:`64^3`
+
+-  ``amr.max_grid_size`` is the maximum extent of a grid, in any
+   coordinate direction, as measured in terms of number of cells.
+
+   For multilevel problems, this parameter can take a list of values,
+   each value determining the maximum extent at each level.
+
+-  ``geometry.prob_lo`` is
+   the physical coordinate of the lower extent of the domain boundary.
+   It takes a list of values defining the coordinates
+   in the :math:`x`, :math:`y`, and :math:`z` coordinate directions.
+
+-  ``geometry.prob_hi`` is
+   the physical coordinate of the upper extent of the domain boundary.
+   It takes a list of values defining the coordinates
+   in the :math:`x`, :math:`y`, and :math:`z` coordinate directions.
+
+-  Boundary conditions are specified via integer flags.
+
+   -  ``maestro.lo_bc`` and  ``maestro.hi_bc`` are the
+      boundary condition types at the lower (‘lo’) and upper
+      (‘hi’) domain boundaries in the :math:`x`, :math:`y`, and :math:`z`
+      coordinate directions. The different types are set via integer
+      flags listed in table :ref:`table-bc-flags`.
+
+      .. _table-bc-flags:
+
+      .. table:: Boundary condition flags
+
+         +----------------------+--------------+
+         | BC type              | integer flag |
+         +======================+==============+
+         | Interior             | :math:`0`    |
+         +----------------------+--------------+
+         | Inflow               | :math:`1`    |
+         +----------------------+--------------+
+         | Outflow              | :math:`2`    |
+         +----------------------+--------------+
+         | Symmetry             | :math:`3`    |
+         +----------------------+--------------+
+         | Slip wall            | :math:`4`    |
+         +----------------------+--------------+
+         | No-slip wall         | :math:`5`    |
+         +----------------------+--------------+
+
+   -  Periodic boundary conditions are set using the parameter
+      ``geometry.is_periodic``. This takes a list of values, with ``1`` indicating
+      periodic boundary conditions (and ``0`` non-periodic). So to set periodic
+      boundary conditions in the :math:`x`-direction only, you would set
+      ``geometry.is_periodic = 1 0 0``.
+
+Note that grid cells must be square, i.e. :math:`\Delta x = \Delta y = \Delta z`
+where :math:`\Delta x` on the base grid is computed as :math:`({\tt prob\_hi\_x}
+- {\tt prob\_lo\_x})/{\tt n\_cellx}`. For multilevel problems, the effective
+number of zones on the finest grid in the :math:`x` direction will be
+:math:`{\tt n\_cellx} \cdot 2^{({\tt max\_levels} -1)}`.
+
+
+
 Parameters by Namespace
 =======================
 

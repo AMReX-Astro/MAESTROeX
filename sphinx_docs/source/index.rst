@@ -22,7 +22,6 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    getting_started
    problems
    unit_tests
-   common_parameters
    param_intro
    initial_models
    visualization
