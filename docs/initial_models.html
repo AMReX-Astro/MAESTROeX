@@ -305,7 +305,7 @@ non-finest levels by using linear interpolation from the two nearest
 model points (see the figure below). Note that the initial data is not
 in HSE nor is it thermodynamically consistent on non-finest cells. We
 will enforce these on the base state and full state later.</p>
-<div class="figure align-default" id="id1">
+<div class="figure align-center" id="id1">
 <a class="reference internal image-reference" href="_images/multilevel_init.png"><img alt="_images/multilevel_init.png" src="_images/multilevel_init.png" style="width: 10%;" /></a>
 <p class="caption"><span class="caption-text">Multilevel Initialization. The data from the initial model
 is represented by the dots on the right. The initial data at the
@@ -353,7 +353,7 @@ different differencing procedure at coarse-fine interfaces.  The
 figure below shows the transition from coarse (level
 <span class="math notranslate nohighlight">\(l-1\)</span>) to fine (level <span class="math notranslate nohighlight">\(l\)</span>), with the zone center indices
 noted.</p>
-<div class="figure align-default" id="id2">
+<div class="figure align-center" id="id2">
 <a class="reference internal image-reference" href="_images/ctof.png"><img alt="_images/ctof.png" src="_images/ctof.png" style="width: 40%;" /></a>
 <p class="caption"><span class="caption-text">A coarse-fine interface in the 1-d base state</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
@@ -414,7 +414,7 @@ p_r^l = p_{r/2-1}^{l-1} &amp;+
   \frac{3\Delta r^l g}{4}\left(\rho_{r/2-1}^{l-1} + \rho_r^l\right).\label{Coarse-Fine Stencil}\]</div>
 <p>When integrating across a fine-coarse interface (see the figure
 below), the proceduce is similar.</p>
-<div class="figure align-default" id="id3">
+<div class="figure align-center" id="id3">
 <a class="reference internal image-reference" href="_images/ftoc.png"><img alt="_images/ftoc.png" src="_images/ftoc.png" style="width: 40%;" /></a>
 <p class="caption"><span class="caption-text">A fine-coarse interface in the 1-d base state</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
