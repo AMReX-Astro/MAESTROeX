@@ -1,3 +1,5 @@
+.. _sec:initial_models_main:
+
 **************
 Initial Models
 **************
