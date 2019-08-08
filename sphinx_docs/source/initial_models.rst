@@ -96,6 +96,7 @@ in HSE nor is it thermodynamically consistent on non-finest cells. We
 will enforce these on the base state and full state later.
 
 .. figure:: multilevel_init.png
+   :align: center
    :width: 10%
 
    Multilevel Initialization. The data from the initial model
@@ -160,6 +161,7 @@ figure below shows the transition from coarse (level
 noted.
 
 .. figure:: ctof.png
+   :align: center
    :width: 40%
 
    A coarse-fine interface in the 1-d base state
@@ -247,6 +249,7 @@ When integrating across a fine-coarse interface (see the figure
 below), the proceduce is similar.
 
 .. figure:: ftoc.png
+   :align: center
    :width: 40%
 
    A fine-coarse interface in the 1-d base state
