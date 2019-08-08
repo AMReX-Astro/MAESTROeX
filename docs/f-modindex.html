@@ -230,7 +230,7 @@
        <td></td>
        <td>
        <a href="file/advect_base_f.html#f/advect_base_module"><code class="xref">advect_base_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>Create the psi term, where psi = D_0 p_0/Dt</em></td></tr>
      <tr>
        <td></td>
        <td>
@@ -243,17 +243,17 @@
        <td></td>
        <td>
        <a href="file/base_state_geometry_f.html#f/base_state_geometry_module"><code class="xref">base_state_geometry_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>a module for storing the geometric information so we don&#39;t have to pass it</em></td></tr>
      <tr>
        <td></td>
        <td>
        <a href="file/base_state_f.html#f/base_state_module"><code class="xref">base_state_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>init_base_state is used to initialize the base state arrays from the model file.  The actual reading of the model file is handled by the model_parser_module in Util/</em></td></tr>
      <tr>
        <td></td>
        <td>
        <a href="file/bc_fill_nd_f.html#f/bc_fill_module"><code class="xref">bc_fill_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>since this is a .F90 file (instead of .f90) we run this through a C++ preprocessor for e.g., #if (AMREX_SPACEDIM == 1) statements.</em></td></tr>
      <tr>
        <td></td>
        <td>
@@ -289,7 +289,7 @@
        <td></td>
        <td>
        <a href="file/diag_f.html#f/diag_module"><code class="xref">diag_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>diag module for MAESTROeX. currently, there are 3 output files:</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-e"><td></td><td>
        <strong>e</strong></td><td></td></tr>
@@ -323,7 +323,7 @@
        <td></td>
        <td>
        <a href="file/inlet_bc_f.html#f/inlet_bc_module"><code class="xref">inlet_bc_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>inlet_bc_module is a simple container module that holds the parameters that are used by physbc to implement the inlet boundary conditions. As these are problem-specific, any problem needing inlet boundary</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-m"><td></td><td>
        <strong>m</strong></td><td></td></tr>
@@ -346,17 +346,17 @@
        <td></td>
        <td>
        <a href="file/make_edge_scal_f.html#f/make_edge_scal_module"><code class="xref">make_edge_scal_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>make_edge_scal constructs the edge state of a scalar, using a second-order Taylor expansion in space (through dx/2) and time (though dt/2) (if ppm_type = 0) or using PPM (for ppm_type = 1,2)....</em></td></tr>
      <tr>
        <td></td>
        <td>
        <a href="file/make_edge_state_f.html#f/make_edge_state_module"><code class="xref">make_edge_state_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>make_edge_state is for reconstruction of the base state variables to predict the time-centered edge states.</em></td></tr>
      <tr>
        <td></td>
        <td>
        <a href="file/make_eta_f.html#f/make_eta_module"><code class="xref">make_eta_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>Compute eta_rho = Avg { rho&#39; U dot e_r }  (see paper III, Eq. 30)</em></td></tr>
      <tr>
        <td></td>
        <td>
@@ -366,12 +366,12 @@
        <td></td>
        <td>
        <a href="file/make_flux_f.html#f/make_flux_module"><code class="xref">make_flux_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>The make_flux routines take the predicted edges states of the scalars and the MAC velocities and compute the fluxes through the interfaces....</em></td></tr>
      <tr>
        <td></td>
        <td>
        <a href="file/make_gamma_f.html#f/make_gamma_module"><code class="xref">make_gamma_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>compute gamma1 for the full state.</em></td></tr>
      <tr>
        <td></td>
        <td>
@@ -391,7 +391,7 @@
        <td></td>
        <td>
        <a href="file/make_psi_f.html#f/make_psi_module"><code class="xref">make_psi_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>Create the psi term, where psi = D_0 p_0/Dt</em></td></tr>
      <tr>
        <td></td>
        <td>
@@ -411,7 +411,7 @@
        <td></td>
        <td>
        <a href="file/make_w0_f.html#f/make_w0_module"><code class="xref">make_w0_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>compute w0 -- the base state velocity.  This is based on the average heating in a layer (Sbar) and the mixing (the eta quantities).  The computation of w0 for plane-parallel atmospheres was first described</em></td></tr>
      <tr>
        <td></td>
        <td>
@@ -434,7 +434,7 @@
        <td></td>
        <td>
        <a href="file/ppm_f.html#f/ppm_module"><code class="xref">ppm_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>compute the PPM integrals, Ip and Im.  These are the integrals under the parabolic profile of the reconstructed quantity over the domain that can reach the interface over the timestep dt....</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-r"><td></td><td>
        <strong>r</strong></td><td></td></tr>
@@ -442,7 +442,7 @@
        <td></td>
        <td>
        <a href="file/regrid_f.html#f/regrid_base_module"><code class="xref">regrid_base_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>Regrid base state variables (ex. psi, etarho, rho0, etc.)</em></td></tr>
      <tr>
        <td></td>
        <td>
@@ -452,7 +452,7 @@
        <td></td>
        <td>
        <a href="file/rotation_f.html#f/rotation_module"><code class="xref">rotation_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>co_latitude, rotation_radius, theta_in_rad, sin_theta and cos_theta are only important when wanting to rotate a plane-parallel patch which lives at an angle co_latitude from the rotation axis and at a</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-s"><td></td><td>
        <strong>s</strong></td><td></td></tr>
@@ -499,7 +499,7 @@
        <td></td>
        <td>
        <a href="file/velpred_f.html#f/velpred_module"><code class="xref">velpred_module</code></a></td><td>
-       <em></em></td></tr>
+       <em>velpred is called by advance_premac -- it is used to predict the normal velocities to the interfaces.  We don&#39;t care about the transverse velocities here.  The prediction is done piecewise linear (for now)</em></td></tr>
    </table>
 
 

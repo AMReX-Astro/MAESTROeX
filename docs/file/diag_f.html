@@ -266,17 +266,39 @@
 <h1>diag.F90<a class="headerlink" href="#diag-f90" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="f/diag_module">
 <span id="diag-module"></span><h2>diag_module<a class="headerlink" href="#f/diag_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Description</p>
+<p>diag module for MAESTROeX.
+currently, there are 3 output files:</p>
+<p>diag_enuc.out:
+peak nuc energy generation rate (erg / g / s)
+x/y/z location of peak enuc
+velocity components at location of peak enuc (including vr)
+radius of peak enuc
+total nuclear energy release (erg / s)</p>
+<p>diag_temp.out:
+peak temperature
+x/y/z location of peak temperature
+velocity components at location of peak temperature (including vr)
+radius of peak temperature
+central temperature</p>
+<p>diag_vel.out:
+peak total velocity
+peak Mach number
+total kinetic energy
+gravitational potential energy
+total internal energy
+velocity components at the center of the star</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#f/diag_module/diag" title="f/diag_module/diag"><code class="xref f f-func docutils literal notranslate"><span class="pre">diag()</span></code></a>, <a class="reference internal" href="#f/diag_module/diag_grav_energy" title="f/diag_module/diag_grav_energy"><code class="xref f f-func docutils literal notranslate"><span class="pre">diag_grav_energy()</span></code></a>, <a class="reference internal" href="#f/diag_module/diag_sphr" title="f/diag_module/diag_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">diag_sphr()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/rho_comp" title="f/meth_params_module/rho_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">rho_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/spec_comp" title="f/meth_params_module/spec_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">spec_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/temp_comp" title="f/meth_params_module/temp_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">temp_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/prob_lo" title="f/meth_params_module/prob_lo"><code class="xref f f-func docutils literal notranslate"><span class="pre">prob_lo()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/sponge_start_factor" title="f/meth_params_module/sponge_start_factor"><code class="xref f f-func docutils literal notranslate"><span class="pre">sponge_start_factor()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/sponge_center_density" title="f/meth_params_module/sponge_center_density"><code class="xref f f-func docutils literal notranslate"><span class="pre">sponge_center_density()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/base_cutoff_density" title="f/meth_params_module/base_cutoff_density"><code class="xref f f-func docutils literal notranslate"><span class="pre">base_cutoff_density()</span></code></a>)</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">network</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">nspec()</span></code>)</p></li>
-<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/center" title="f/base_state_geometry_module/center"><code class="xref f f-func docutils literal notranslate"><span class="pre">center()</span></code></a>)</p></li>
+<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/center" title="f/base_state_geometry_module/center"><code class="xref f f-func docutils literal notranslate"><span class="pre">center()</span></code></a>): a module for storing the geometric information so we don’t have to pass it</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_module</span></code></p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_type_module</span></code></p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
@@ -286,33 +308,34 @@
 <dl class="subroutine">
 <dt id="f/diag_module/diag">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">diag_module/</code><code class="sig-name descname">diag</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">nc_s</em>, <em class="sig-param">rho_hnuc</em>, <em class="sig-param">hn_lo</em>, <em class="sig-param">hn_hi</em>, <em class="sig-param">rho_hext</em>, <em class="sig-param">he_lo</em>, <em class="sig-param">he_hi</em>, <em class="sig-param">rho0</em>, <em class="sig-param">p0</em>, <em class="sig-param">u</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">w0</em>, <em class="sig-param">dx</em>, <em class="sig-param">mach_max</em>, <em class="sig-param">temp_max</em>, <em class="sig-param">enuc_max</em>, <em class="sig-param">hext_max</em>, <em class="sig-param">mask</em>, <em class="sig-param">m_lo</em>, <em class="sig-param">m_hi</em>, <em class="sig-param">use_mask</em><span class="sig-paren">)</span><a class="headerlink" href="#f/diag_module/diag" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">diag</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>scal</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>rho_hnuc</strong> (hn_hi(1)-(hn_lo(1))+1,hn_hi(2)-(hn_lo(2))+1,hn_hi(3)-(hn_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hn_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hn_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>rho_hext</strong> (he_hi(1)-(he_lo(1))+1,he_hi(2)-(he_lo(2))+1,he_hi(3)-(he_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>he_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>he_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>rho0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1,3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>mach_max</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>temp_max</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>enuc_max</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>hext_max</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>mask</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>m_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -325,55 +348,56 @@
 <dl class="subroutine">
 <dt id="f/diag_module/diag_sphr">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">diag_module/</code><code class="sig-name descname">diag_sphr</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">nc_s</em>, <em class="sig-param">rho_hnuc</em>, <em class="sig-param">hn_lo</em>, <em class="sig-param">hn_hi</em>, <em class="sig-param">rho_hext</em>, <em class="sig-param">he_lo</em>, <em class="sig-param">he_hi</em>, <em class="sig-param">u</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">w0r</em>, <em class="sig-param">wr_lo</em>, <em class="sig-param">wr_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">normal</em>, <em class="sig-param">n_lo</em>, <em class="sig-param">n_hi</em>, <em class="sig-param">t_max</em>, <em class="sig-param">coord_tmax</em>, <em class="sig-param">vel_tmax</em>, <em class="sig-param">enuc_max</em>, <em class="sig-param">coord_enucmax</em>, <em class="sig-param">vel_enucmax</em>, <em class="sig-param">kin_ener</em>, <em class="sig-param">int_ener</em>, <em class="sig-param">nuc_ener</em>, <em class="sig-param">u_max</em>, <em class="sig-param">mach_max</em>, <em class="sig-param">ncenter</em>, <em class="sig-param">t_center</em>, <em class="sig-param">vel_center</em>, <em class="sig-param">mask</em>, <em class="sig-param">m_lo</em>, <em class="sig-param">m_hi</em>, <em class="sig-param">use_mask</em><span class="sig-paren">)</span><a class="headerlink" href="#f/diag_module/diag_sphr" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">diag_sphr</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>scal</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>rho_hnuc</strong> (hn_hi(1)-(hn_lo(1))+1,hn_hi(2)-(hn_lo(2))+1,hn_hi(3)-(hn_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hn_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hn_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>rho_hext</strong> (he_hi(1)-(he_lo(1))+1,he_hi(2)-(he_lo(2))+1,he_hi(3)-(he_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>he_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>he_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>u</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1,3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0macx</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0macy</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,y_hi(3)-(y_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0macz</strong> (z_hi(1)-(z_lo(1))+1,z_hi(2)-(z_lo(2))+1,z_hi(3)-(z_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0r</strong> (wr_hi(1)-(wr_lo(1))+1,wr_hi(2)-(wr_lo(2))+1,wr_hi(3)-(wr_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>wr_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>wr_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>normal</strong> (n_hi(1)-(n_lo(1))+1,n_hi(2)-(n_lo(2))+1,n_hi(3)-(n_lo(3))+1,3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>n_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>n_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>t_max</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>coord_tmax</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>vel_tmax</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>enuc_max</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>coord_enucmax</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>vel_enucmax</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>kin_ener</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>int_ener</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>nuc_ener</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>u_max</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>mach_max</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>ncenter</strong><em> [</em><em>integer</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>t_center</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>vel_center</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>mask</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>m_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -386,13 +410,14 @@
 <dl class="subroutine">
 <dt id="f/diag_module/diag_grav_energy">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">diag_module/</code><code class="sig-name descname">diag_grav_energy</code><span class="sig-paren">(</span><em class="sig-param">grav_ener</em>, <em class="sig-param">rho0</em>, <em class="sig-param">r_cc_loc</em>, <em class="sig-param">r_edge_loc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/diag_module/diag_grav_energy" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">diag_grav_energy</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>grav_ener</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>rho0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 </dl>

@@ -266,20 +266,26 @@
 <h1>make_w0.f90<a class="headerlink" href="#make-w0-f90" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="f/make_w0_module">
 <span id="make-w0-module"></span><h2>make_w0_module<a class="headerlink" href="#f/make_w0_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Description</p>
+<p>compute w0 – the base state velocity.  This is based on the average
+heating in a layer (Sbar) and the mixing (the eta quantities).  The
+computation of w0 for plane-parallel atmospheres was first described
+in paper II, with modifications due to mixing in paper III.  For
+spherical geometry, it was first described in paper III.</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#f/make_w0_module/make_w0" title="f/make_w0_module/make_w0"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0()</span></code></a>, <a class="reference internal" href="#f/make_w0_module/make_w0_planar" title="f/make_w0_module/make_w0_planar"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0_planar()</span></code></a>, <a class="reference internal" href="#f/make_w0_module/make_w0_planar_var_g" title="f/make_w0_module/make_w0_planar_var_g"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0_planar_var_g()</span></code></a>, <a class="reference internal" href="#f/make_w0_module/make_w0_spherical" title="f/make_w0_module/make_w0_spherical"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0_spherical()</span></code></a>, <a class="reference internal" href="#f/make_w0_module/make_w0_spherical_simple" title="f/make_w0_module/make_w0_spherical_simple"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0_spherical_simple()</span></code></a>, <a class="reference internal" href="#f/make_w0_module/make_w0_sphr_irreg" title="f/make_w0_module/make_w0_sphr_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0_sphr_irreg()</span></code></a>, <a class="reference internal" href="#f/make_w0_module/prolong_base_to_uniform" title="f/make_w0_module/prolong_base_to_uniform"><code class="xref f f-func docutils literal notranslate"><span class="pre">prolong_base_to_uniform()</span></code></a>, <a class="reference internal" href="#f/make_w0_module/tridiag" title="f/make_w0_module/tridiag"><code class="xref f f-func docutils literal notranslate"><span class="pre">tridiag()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
 <li><p><a class="reference internal" href="make_grav_f.html#f/make_grav_module" title="f/make_grav_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">make_grav_module</span></code></a></p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_error_module</span></code></p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_paralleldescriptor_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">parallel_ioprocessor()</span></code> =&gt; <code class="xref f f-func docutils literal notranslate"><span class="pre">parallel_ioprocessor()</span></code>)</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">fundamental_constants_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">gconst()</span></code>)</p></li>
-<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/finest_radial_level" title="f/base_state_geometry_module/finest_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">finest_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/dr" title="f/base_state_geometry_module/dr"><code class="xref f f-func docutils literal notranslate"><span class="pre">dr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_start_coord" title="f/base_state_geometry_module/r_start_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_start_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_end_coord" title="f/base_state_geometry_module/r_end_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_end_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr" title="f/base_state_geometry_module/nr"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/base_cutoff_density_coord" title="f/base_state_geometry_module/base_cutoff_density_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">base_cutoff_density_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/numdisjointchunks" title="f/base_state_geometry_module/numdisjointchunks"><code class="xref f f-func docutils literal notranslate"><span class="pre">numdisjointchunks()</span></code></a>)</p></li>
+<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/finest_radial_level" title="f/base_state_geometry_module/finest_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">finest_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/dr" title="f/base_state_geometry_module/dr"><code class="xref f f-func docutils literal notranslate"><span class="pre">dr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_start_coord" title="f/base_state_geometry_module/r_start_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_start_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_end_coord" title="f/base_state_geometry_module/r_end_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_end_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr" title="f/base_state_geometry_module/nr"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/base_cutoff_density_coord" title="f/base_state_geometry_module/base_cutoff_density_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">base_cutoff_density_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/numdisjointchunks" title="f/base_state_geometry_module/numdisjointchunks"><code class="xref f f-func docutils literal notranslate"><span class="pre">numdisjointchunks()</span></code></a>): a module for storing the geometric information so we don’t have to pass it</p></li>
 <li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/spherical" title="f/meth_params_module/spherical"><code class="xref f f-func docutils literal notranslate"><span class="pre">spherical()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/maestro_verbose" title="f/meth_params_module/maestro_verbose"><code class="xref f f-func docutils literal notranslate"><span class="pre">maestro_verbose()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/do_planar_invsq_grav" title="f/meth_params_module/do_planar_invsq_grav"><code class="xref f f-func docutils literal notranslate"><span class="pre">do_planar_invsq_grav()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/do_2d_planar_octant" title="f/meth_params_module/do_2d_planar_octant"><code class="xref f f-func docutils literal notranslate"><span class="pre">do_2d_planar_octant()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/dpdt_factor" title="f/meth_params_module/dpdt_factor"><code class="xref f f-func docutils literal notranslate"><span class="pre">dpdt_factor()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/base_cutoff_density" title="f/meth_params_module/base_cutoff_density"><code class="xref f f-func docutils literal notranslate"><span class="pre">base_cutoff_density()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/grav_const" title="f/meth_params_module/grav_const"><code class="xref f f-func docutils literal notranslate"><span class="pre">grav_const()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/use_exact_base_state" title="f/meth_params_module/use_exact_base_state"><code class="xref f f-func docutils literal notranslate"><span class="pre">use_exact_base_state()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/average_base_state" title="f/meth_params_module/average_base_state"><code class="xref f f-func docutils literal notranslate"><span class="pre">average_base_state()</span></code></a>)</p></li>
 </ul>
 <p class="rubric">Variables</p>
@@ -287,27 +293,28 @@
 <dl class="subroutine">
 <dt id="f/make_w0_module/make_w0">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">make_w0_module/</code><code class="sig-name descname">make_w0</code><span class="sig-paren">(</span><em class="sig-param">w0</em>, <em class="sig-param">w0_old</em>, <em class="sig-param">w0_force</em>, <em class="sig-param">sbar_in</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">p0_old</em>, <em class="sig-param">p0_new</em>, <em class="sig-param">gamma1bar_old</em>, <em class="sig-param">gamma1bar_new</em>, <em class="sig-param">p0_minus_peosbar</em>, <em class="sig-param">etarho_ec</em>, <em class="sig-param">etarho_cc</em>, <em class="sig-param">delta_chi_w0</em>, <em class="sig-param">r_cc_loc</em>, <em class="sig-param">r_edge_loc</em>, <em class="sig-param">dt</em>, <em class="sig-param">dtold</em>, <em class="sig-param">is_predictor</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_w0_module/make_w0" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_w0</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>w0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0_force</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>sbar_in</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_minus_peosbar</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_ec</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_cc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>delta_chi_w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dtold</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>is_predictor</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
@@ -323,19 +330,19 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>w0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>sbar_in</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_minus_peosbar</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_cc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0_force</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dtold</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>delta_chi_w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>is_predictor</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
@@ -354,22 +361,22 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>w0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>sbar_in</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_minus_peosbar</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_cc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0_force</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dtold</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Called from</dt>
@@ -387,23 +394,23 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>w0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>sbar_in</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_minus_peosbar</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_ec</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_cc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0_force</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dtold</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Called from</dt>
@@ -421,18 +428,18 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>sbar_in</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_cc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Call to</dt>
@@ -447,8 +454,8 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>base_ml</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>base_fine</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Called from</dt>
@@ -463,11 +470,11 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>a</strong> (n)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>b</strong> (n)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>c</strong> (n)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r</strong> (n)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u</strong> (n)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Options</dt>
@@ -485,23 +492,23 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>w0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>sbar_in</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gamma1bar_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_minus_peosbar</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_ec</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>etarho_cc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0_force</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dtold</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Called from</dt>

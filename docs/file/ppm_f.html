@@ -266,13 +266,23 @@
 <h1>ppm.F90<a class="headerlink" href="#ppm-f90" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="f/ppm_module">
 <span id="ppm-module"></span><h2>ppm_module<a class="headerlink" href="#f/ppm_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Description</p>
+<p>compute the PPM integrals, Ip and Im.  These are the integrals under
+the parabolic profile of the reconstructed quantity over the domain
+that can reach the interface over the timestep dt.</p>
+<p>Ip captures the amount of the state that can reach the right
+interface of the cell and Im captures what can reach the left
+interface of the cell over the step.</p>
+<p>There are cases here: one (originally called the ‘fpu version’) uses
+the MAC velocity for the tracing while the non-fpu versions use the
+cell-centered velocity.</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#f/ppm_module/ppm_2d" title="f/ppm_module/ppm_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">ppm_2d()</span></code></a>, <a class="reference internal" href="#f/ppm_module/ppm_3d" title="f/ppm_module/ppm_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">ppm_3d()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_error_module</span></code></p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_mempool_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">bl_allocate()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">bl_deallocate()</span></code>)</p></li>
@@ -284,23 +294,26 @@
 <dl class="subroutine">
 <dt id="f/ppm_module/ppm_2d">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">ppm_module/</code><code class="sig-name descname">ppm_2d</code><span class="sig-paren">(</span><em class="sig-param">s</em>, <em class="sig-param">ng_s</em>, <em class="sig-param">u</em>, <em class="sig-param">v</em>, <em class="sig-param">ng_u</em>, <em class="sig-param">ip</em>, <em class="sig-param">im</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">is_umac</em><span class="sig-paren">)</span><a class="headerlink" href="#f/ppm_module/ppm_2d" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>note that u,v here may be the normal cell-centered velocity,
+or the MAC velocity.  The is_umac argument tells us which it
+is.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>s</strong> (-(lo(1)-ng_s)+1,-(lo(2)-ng_s)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ng_s</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>u</strong> (-(lo(1)-ng_u)+1,-(lo(2)-ng_u)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v</strong> (-(lo(1)-ng_u)+1,-(lo(2)-ng_u)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ng_u</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>ip</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>im</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>domlo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>domhi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>adv_bc</strong> (,)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>dx</strong> (*)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>is_umac</strong><em> [</em><em>logical</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
@@ -316,21 +329,21 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>s</strong> (-(lo(1)-ng_s )+1,-(lo(2)-ng_s )+1,-(lo(3)-ng_s )+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ng_s</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>u</strong> (-(lo(1)-ng_u )+1,-(lo(2)-ng_u )+1,-(lo(3)-ng_u )+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v</strong> (-(lo(1)-ng_u )+1,-(lo(2)-ng_u )+1,-(lo(3)-ng_u )+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w</strong> (-(lo(1)-ng_u )+1,-(lo(2)-ng_u )+1,-(lo(3)-ng_u )+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ng_u</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>ip</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,-(lo(3)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>im</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,-(lo(3)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>domlo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>domhi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>adv_bc</strong> (,)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>dx</strong> (*)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>is_umac</strong><em> [</em><em>logical</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>

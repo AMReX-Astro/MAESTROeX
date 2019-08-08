@@ -266,6 +266,19 @@
 <h1>rotation.f90<a class="headerlink" href="#rotation-f90" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="f/rotation_module">
 <span id="rotation-module"></span><h2>rotation_module<a class="headerlink" href="#f/rotation_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Description</p>
+<p>co_latitude, rotation_radius, theta_in_rad, sin_theta and cos_theta
+are only important when wanting to rotate a plane-parallel patch
+which lives at an angle co_latitude from the rotation axis and at a
+distance rotation_radius from center().  mk_vel_force should
+calculate the rotational forcing terms for the points within the
+patch.</p>
+<p>for spherical problems, the only important variable from
+init_rotation() is omega, the angular frequency - mk_vel_force will
+calculate the appropriate terms for a given coordinate</p>
+<p>NOTE: it is currently unclear how to handle BC’s with a
+plane-parallel patch and it is not advisable to utilize
+rotation for such problems.</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables</dt>
@@ -275,7 +288,7 @@
 <dd class="field-even"><p><a class="reference internal" href="#f/rotation_module/init_rotation" title="f/rotation_module/init_rotation"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_rotation()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/rotational_frequency" title="f/meth_params_module/rotational_frequency"><code class="xref f f-func docutils literal notranslate"><span class="pre">rotational_frequency()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/co_latitude" title="f/meth_params_module/co_latitude"><code class="xref f f-func docutils literal notranslate"><span class="pre">co_latitude()</span></code></a>)</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>

@@ -217,27 +217,46 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro7MaestroEv">
 <span id="_CPPv3N7Maestro7MaestroEv"></span><span id="_CPPv2N7Maestro7MaestroEv"></span><span id="Maestro::Maestro"></span><span class="target" id="classMaestro_1a10d059c89d8bcc51df55620552a7dd43"></span><code class="sig-name descname">Maestro</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro7MaestroEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>constructor </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7MaestroD0Ev">
 <span id="_CPPv3N7MaestroD0Ev"></span><span id="_CPPv2N7MaestroD0Ev"></span><span id="Maestro::~Maestro"></span><span class="target" id="classMaestro_1aa4d712c5503942254b3a2ffcce866b2c"></span><em class="property">virtual</em> <code class="sig-name descname">~Maestro</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7MaestroD0Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>destructor </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro5SetupEv">
 <span id="_CPPv3N7Maestro5SetupEv"></span><span id="_CPPv2N7Maestro5SetupEv"></span><span id="Maestro::Setup"></span><span class="target" id="classMaestro_1a18a558d416c39313d564c396ead4fce9"></span>void <code class="sig-name descname">Setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro5SetupEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p><ul class="simple">
+<li><p>read in C++/F90 parameters</p></li>
+<li><p>define global C++/F90 variables and initialize network</p></li>
+<li><p>set up boundary conditions</p></li>
+<li><p>initialize base state geometry parameters</p></li>
+<li><p>set <code class="docutils literal notranslate"><span class="pre">istep</span></code>, <code class="docutils literal notranslate"><span class="pre">t_new</span></code>, <code class="docutils literal notranslate"><span class="pre">t_old</span></code></p></li>
+<li><p>allocate MultiFabs and base state arrays </p></li>
+</ul>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro4InitEv">
 <span id="_CPPv3N7Maestro4InitEv"></span><span id="_CPPv2N7Maestro4InitEv"></span><span id="Maestro::Init"></span><span class="target" id="classMaestro_1ac9405928d3319e15fd739032fb95454d"></span>void <code class="sig-name descname">Init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro4InitEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p><ul class="simple">
+<li><p>initialize multifab and base state data</p></li>
+<li><p>perform initial projection</p></li>
+<li><p>perform divu iters</p></li>
+<li><p>perform initial (pressure) iterations </p></li>
+</ul>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro6EvolveEv">
 <span id="_CPPv3N7Maestro6EvolveEv"></span><span id="_CPPv2N7Maestro6EvolveEv"></span><span id="Maestro::Evolve"></span><span class="target" id="classMaestro_1afd0fb8da81fe1412c028853fd2baf134"></span>void <code class="sig-name descname">Evolve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro6EvolveEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>advance solution to final time </p>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
@@ -245,7 +264,8 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro10getCPUTimeEv">
 <span id="_CPPv3N7Maestro10getCPUTimeEv"></span><span id="_CPPv2N7Maestro10getCPUTimeEv"></span><span id="Maestro::getCPUTime"></span><span class="target" id="classMaestro_1ab19d317c24c5f37a7a7b5cf9da6257e7"></span><em class="property">static</em> amrex::Real <code class="sig-name descname">getCPUTime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro10getCPUTimeEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Get the amount of CPU time used. This will persist after restarts. </p>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
@@ -266,7 +286,8 @@
 <dl class="enum">
 <dt id="_CPPv4N7Maestro13plotfile_flagE">
 <span id="_CPPv3N7Maestro13plotfile_flagE"></span><span id="_CPPv2N7Maestro13plotfile_flagE"></span><span class="target" id="classMaestro_1a3136b60da3b0025837413d27b86766df"></span><em class="property">enum </em><code class="sig-name descname">plotfile_flag</code><a class="headerlink" href="#_CPPv4N7Maestro13plotfile_flagE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p><em>Values:</em></p>
+<dd><p>flag for writing plotfiles </p>
+<p><em>Values:</em></p>
 <dl class="enumerator">
 <dt id="_CPPv4N7Maestro12plotInitDataE">
 <span id="_CPPv3N7Maestro12plotInitDataE"></span><span id="_CPPv2N7Maestro12plotInitDataE"></span><span class="target" id="classMaestro_1a3136b60da3b0025837413d27b86766dfac591c8009ca5822a9ab9f1af32fcd716"></span><code class="sig-name descname">plotInitData</code> = -9999999<a class="headerlink" href="#_CPPv4N7Maestro12plotInitDataE" title="Permalink to this definition">¶</a><br /></dt>
@@ -290,27 +311,32 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro15AdvanceTimeStepEb">
 <span id="_CPPv3N7Maestro15AdvanceTimeStepEb"></span><span id="_CPPv2N7Maestro15AdvanceTimeStepEb"></span><span id="Maestro::AdvanceTimeStep__b"></span><span class="target" id="classMaestro_1a28cd0470817dcd413c0baa62a3afc9cd"></span>void <code class="sig-name descname">AdvanceTimeStep</code><span class="sig-paren">(</span>bool <em>is_initIter</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro15AdvanceTimeStepEb" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Advance solution at all levels for a single time step. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro20AdvanceTimeStepIrregEb">
 <span id="_CPPv3N7Maestro20AdvanceTimeStepIrregEb"></span><span id="_CPPv2N7Maestro20AdvanceTimeStepIrregEb"></span><span id="Maestro::AdvanceTimeStepIrreg__b"></span><span class="target" id="classMaestro_1a1af64b127c7d89e4fb7901aede4f9374"></span>void <code class="sig-name descname">AdvanceTimeStepIrreg</code><span class="sig-paren">(</span>bool <em>is_initIter</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro20AdvanceTimeStepIrregEb" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Advance solution for a single time step with irregular base state spacing. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro22AdvanceTimeStepAverageEb">
 <span id="_CPPv3N7Maestro22AdvanceTimeStepAverageEb"></span><span id="_CPPv2N7Maestro22AdvanceTimeStepAverageEb"></span><span id="Maestro::AdvanceTimeStepAverage__b"></span><span class="target" id="classMaestro_1a1e0f1346cd45de344eddadd8519d7340"></span>void <code class="sig-name descname">AdvanceTimeStepAverage</code><span class="sig-paren">(</span>bool <em>is_initIter</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro22AdvanceTimeStepAverageEb" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Advance solution for a single time step with regular base state spacing and new time-stepping scheme </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13AdvancePremacERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro13AdvancePremacERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro13AdvancePremacERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::AdvancePremac__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1aefff044c2471863abaea9204b81d23f9"></span>void <code class="sig-name descname">AdvancePremac</code><span class="sig-paren">(</span>amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>w0_force</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>w0_force_cart</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro13AdvancePremacERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute unprojected mac velocities. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10MakeUtransERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro10MakeUtransERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro10MakeUtransERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::MakeUtrans__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR"></span><span class="target" id="classMaestro_1ae3d0e7102380f802fadeacbb82ad8989"></span>void <code class="sig-name descname">MakeUtrans</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>utilde</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>ufull</em>, amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>utrans</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro10MakeUtransERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Create <code class="docutils literal notranslate"><span class="pre">utrans</span></code>, the transverse velocity. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7VelPredERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
@@ -320,32 +346,38 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MakeEdgeScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex5BCRecEEEiiiii">
 <span id="_CPPv3N7Maestro12MakeEdgeScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex5BCRecEEEiiiii"></span><span id="_CPPv2N7Maestro12MakeEdgeScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex5BCRecEEEiiiii"></span><span id="Maestro::MakeEdgeScal__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:amrex::MultiFab:CR.i.amrex::Vector:amrex::BCRec:CR.i.i.i.i.i"></span><span class="target" id="classMaestro_1acbf6fcf4fafeb6754113ebf5c2d8cc79"></span>void <code class="sig-name descname">MakeEdgeScal</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>state</em>, amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sedge</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>force</em>, int <em>is_vel</em>, <em class="property">const</em> amrex::Vector&lt;amrex::BCRec&gt; &amp;<em>bcs</em>, int <em>nbccomp</em>, int <em>start_scomp</em>, int <em>start_bccomp</em>, int <em>num_comp</em>, int <em>is_conservative</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro12MakeEdgeScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex5BCRecEEEiiiii" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate scalars on cell edges given cell-centered state. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MakeRhoXFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorii">
 <span id="_CPPv3N7Maestro12MakeRhoXFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorii"></span><span id="_CPPv2N7Maestro12MakeRhoXFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorii"></span><span id="Maestro::MakeRhoXFlux__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:amrex::MultiFab:R.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.i.i"></span><span class="target" id="classMaestro_1a46310e87078d4861c0efe374fec9eae8"></span>void <code class="sig-name descname">MakeRhoXFlux</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>state</em>, amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sflux</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>etarhoflux</em>, amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sedge</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_old</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_edge_old</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>r0mac_old</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_new</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_edge_new</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>r0mac_new</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_predicted_edge</em>, int <em>start_comp</em>, int <em>num_comp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro12MakeRhoXFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorii" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate <code class="docutils literal notranslate"><span class="pre">rhoX</span></code> flux. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MakeRhoHFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro12MakeRhoHFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro12MakeRhoHFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::MakeRhoHFlux__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR"></span><span class="target" id="classMaestro_1abef4cf23bb862f1c99c05cded98dbac6"></span>void <code class="sig-name descname">MakeRhoHFlux</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>state</em>, amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sflux</em>, amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sedge</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_old</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_edge_old</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>r0mac_old</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_new</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_edge_new</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>r0mac_new</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rh0_old</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rh0_edge_old</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>rh0mac_old</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rh0_new</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rh0_edge_new</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>rh0mac_new</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>h0mac_old</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>h0mac_new</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro12MakeRhoHFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate <code class="docutils literal notranslate"><span class="pre">rhoh</span></code> flux. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10UpdateScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiiPKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro10UpdateScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiiPKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10UpdateScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiiPKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::UpdateScal__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:amrex::MultiFab:CR.i.i.amrex::RealCP.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1afe4cf61cab85cbf4856ce6a172e57556"></span>void <code class="sig-name descname">UpdateScal</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>stateold</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>statenew</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sflux</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>force</em>, int <em>start_scomp</em>, int <em>num_comp</em>, <em class="property">const</em> amrex::Real *<em>p0</em> = NULL, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>p0_cart</em> = {}<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro10UpdateScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiiPKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Given scalar fluxes, update scalars. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9UpdateVelERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro9UpdateVelERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro9UpdateVelERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::UpdateVel__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR"></span><span class="target" id="classMaestro_1a7e71742a522a126dce2df138b646a758"></span>void <code class="sig-name descname">UpdateVel</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>uedge</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>force</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>sponge</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro9UpdateVelERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Update velocity. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7AverageERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectori">
 <span id="_CPPv3N7Maestro7AverageERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectori"></span><span id="_CPPv2N7Maestro7AverageERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectori"></span><span id="Maestro::Average__amrex::Vector:amrex::MultiFab:CR.RealVectorR.i"></span><span class="target" id="classMaestro_1adde9df19174030bd78b7b249c565429d"></span>void <code class="sig-name descname">Average</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf</em>, <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>phibar</em>, int <em>comp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro7AverageERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectori" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute the radial average of a quantitiy. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro15WriteCheckPointEi">
@@ -375,27 +407,32 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ConvertRhoXToXERN5amrex6VectorIN5amrex8MultiFabEEEb">
 <span id="_CPPv3N7Maestro14ConvertRhoXToXERN5amrex6VectorIN5amrex8MultiFabEEEb"></span><span id="_CPPv2N7Maestro14ConvertRhoXToXERN5amrex6VectorIN5amrex8MultiFabEEEb"></span><span id="Maestro::ConvertRhoXToX__amrex::Vector:amrex::MultiFab:R.b"></span><span class="target" id="classMaestro_1ae3f55d6000415505d413a1f1b8129871"></span>void <code class="sig-name descname">ConvertRhoXToX</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>scal</em>, bool <em>flag</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro14ConvertRhoXToXERN5amrex6VectorIN5amrex8MultiFabEEEb" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Return species mass fraction <code class="docutils literal notranslate"><span class="pre">X</span></code> given the conserved variable <code class="docutils literal notranslate"><span class="pre">rhoX</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ConvertRhoHToHERN5amrex6VectorIN5amrex8MultiFabEEEb">
 <span id="_CPPv3N7Maestro14ConvertRhoHToHERN5amrex6VectorIN5amrex8MultiFabEEEb"></span><span id="_CPPv2N7Maestro14ConvertRhoHToHERN5amrex6VectorIN5amrex8MultiFabEEEb"></span><span id="Maestro::ConvertRhoHToH__amrex::Vector:amrex::MultiFab:R.b"></span><span class="target" id="classMaestro_1a68cf06da2bd4e219c100c2f08a61893a"></span>void <code class="sig-name descname">ConvertRhoHToH</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>scal</em>, bool <em>flag</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro14ConvertRhoHToHERN5amrex6VectorIN5amrex8MultiFabEEEb" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Return enthalpy <code class="docutils literal notranslate"><span class="pre">h</span></code> given the conserved variable <code class="docutils literal notranslate"><span class="pre">rhoh</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7PrintMFERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro7PrintMFERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro7PrintMFERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::PrintMF__amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1af4086c99708101d81deed3e93ee40791"></span>void <code class="sig-name descname">PrintMF</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>CC</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro7PrintMFERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Print out the contents of a Vector of MultiFabs. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9PrintEdgeERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi">
 <span id="_CPPv3N7Maestro9PrintEdgeERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi"></span><span id="_CPPv2N7Maestro9PrintEdgeERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi"></span><span id="Maestro::PrintEdge__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.i"></span><span class="target" id="classMaestro_1a46ee4326980d89f19a572b07e5e44047"></span>void <code class="sig-name descname">PrintEdge</code><span class="sig-paren">(</span>amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>EDGE</em>, int <em>dir</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro9PrintEdgeERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Print out the contents of a Vector of edge-based MultiFabs. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7WriteMFERN5amrex6VectorIN5amrex8MultiFabEEENSt6stringE">
 <span id="_CPPv3N7Maestro7WriteMFERN5amrex6VectorIN5amrex8MultiFabEEENSt6stringE"></span><span id="_CPPv2N7Maestro7WriteMFERN5amrex6VectorIN5amrex8MultiFabEEENSt6stringE"></span><span id="Maestro::WriteMF__amrex::Vector:amrex::MultiFab:R.ss"></span><span class="target" id="classMaestro_1ad884abe0a92a82c516aa9cb0ea9b9efc"></span>void <code class="sig-name descname">WriteMF</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf</em>, std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro7WriteMFERN5amrex6VectorIN5amrex8MultiFabEEENSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Utility to write out a multilevel multifab to a plotfile. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14DensityAdvanceEiRN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVector">
@@ -405,22 +442,26 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro13WriteDiagFileERi">
 <span id="_CPPv3N7Maestro13WriteDiagFileERi"></span><span id="_CPPv2N7Maestro13WriteDiagFileERi"></span><span id="Maestro::WriteDiagFile__iR"></span><span class="target" id="classMaestro_1a23abfd7f70bd9a98aa589da681583d4a"></span>void <code class="sig-name descname">WriteDiagFile</code><span class="sig-paren">(</span>int &amp;<em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro13WriteDiagFileERi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Put together an array of multifabs for writing. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8DiagFileEKiKN5amrex4RealERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERi">
 <span id="_CPPv3N7Maestro8DiagFileEKiKN5amrex4RealERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERi"></span><span id="_CPPv2N7Maestro8DiagFileEKiKN5amrex4RealERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERi"></span><span id="Maestro::DiagFile__iC.amrex::RealC.RealVectorCR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.iR"></span><span class="target" id="classMaestro_1a7d24d569e3d249ab40156606161faec1"></span>void <code class="sig-name descname">DiagFile</code><span class="sig-paren">(</span><em class="property">const</em> int <em>step</em>, <em class="property">const</em> amrex::Real <em>dt_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rho0_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0_in</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>u_in</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>s_in</em>, int &amp;<em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8DiagFileEKiKN5amrex4RealERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Write plotfile to disk. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro5EstDtEv">
 <span id="_CPPv3N7Maestro5EstDtEv"></span><span id="_CPPv2N7Maestro5EstDtEv"></span><span id="Maestro::EstDt"></span><span class="target" id="classMaestro_1af755fc55cbe605cc2dcf1483eefd1f26"></span>void <code class="sig-name descname">EstDt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro5EstDtEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute the time step. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7FirstDtEv">
 <span id="_CPPv3N7Maestro7FirstDtEv"></span><span id="_CPPv2N7Maestro7FirstDtEv"></span><span id="Maestro::FirstDt"></span><span class="target" id="classMaestro_1a85a547b36c7dc2cada1f2c0f8d2605b7"></span>void <code class="sig-name descname">FirstDt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro7FirstDtEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute initial time step. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro15EnthalpyAdvanceEiRN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
@@ -430,47 +471,71 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro9FillPatchEN5amrex4RealERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi">
 <span id="_CPPv3N7Maestro9FillPatchEN5amrex4RealERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="_CPPv2N7Maestro9FillPatchEN5amrex4RealERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="Maestro::FillPatch__amrex::Real.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.i.i.i.i.amrex::Vector:amrex::BCRec:CR.i"></span><span class="target" id="classMaestro_1a3c8a423d3fe2c6e021830ee67d62edc1"></span>void <code class="sig-name descname">FillPatch</code><span class="sig-paren">(</span>amrex::Real <em>time</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf_old</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf_new</em>, int <em>srccomp</em>, int <em>destcomp</em>, int <em>ncomp</em>, int <em>startbccomp</em>, <em class="property">const</em> amrex::Vector&lt;amrex::BCRec&gt; &amp;<em>bcs_in</em>, int <em>variable_type</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro9FillPatchEN5amrex4RealERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Call <code class="docutils literal notranslate"><span class="pre">FillPatch</span></code> for all levels. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9FillPatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi">
 <span id="_CPPv3N7Maestro9FillPatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="_CPPv2N7Maestro9FillPatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="Maestro::FillPatch__i.amrex::Real.amrex::MultiFabR.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.i.i.i.i.amrex::Vector:amrex::BCRec:CR.i"></span><span class="target" id="classMaestro_1af4603eed54d6e563a1e38310acf1008f"></span>void <code class="sig-name descname">FillPatch</code><span class="sig-paren">(</span>int <em>lev</em>, amrex::Real <em>time</em>, amrex::MultiFab &amp;<em>mf</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf_old</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf_new</em>, int <em>srccomp</em>, int <em>destcomp</em>, int <em>ncomp</em>, int <em>startbccomp</em>, <em class="property">const</em> amrex::Vector&lt;amrex::BCRec&gt; &amp;<em>bcs_in</em>, int <em>variable_type</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro9FillPatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute a new multifab by coping in phi from valid region and filling ghost cells<ul class="simple">
+<li><p>works for single level and 2-level cases (fill fine grid ghost by interpolating from coarse)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scomp</span></code> is the source component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dcomp</span></code> is the destination component AND the bc component </p></li>
+</ul>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro15FillCoarsePatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiRKN5amrex6VectorIN5amrex5BCRecEEEi">
 <span id="_CPPv3N7Maestro15FillCoarsePatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="_CPPv2N7Maestro15FillCoarsePatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="Maestro::FillCoarsePatch__i.amrex::Real.amrex::MultiFabR.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.i.i.i.amrex::Vector:amrex::BCRec:CR.i"></span><span class="target" id="classMaestro_1ad22d5b7fd0a9c444093f317c2c075ae2"></span>void <code class="sig-name descname">FillCoarsePatch</code><span class="sig-paren">(</span>int <em>lev</em>, amrex::Real <em>time</em>, amrex::MultiFab &amp;<em>mf</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf_old</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf_new</em>, int <em>srccomp</em>, int <em>destcomp</em>, int <em>ncomp</em>, <em class="property">const</em> amrex::Vector&lt;amrex::BCRec&gt; &amp;<em>bcs</em>, int <em>variable_type</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro15FillCoarsePatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiRKN5amrex6VectorIN5amrex5BCRecEEEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Fill an entire multifab by interpolating from the coarser level<ul class="simple">
+<li><p>this comes into play when a new level of refinement appears</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scomp</span></code> is the source component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dcomp</span></code> is the destination component AND the bc component </p></li>
+</ul>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7GetDataEiN5amrex4RealERN5amrex6VectorIPN5amrex8MultiFabEEERN5amrex6VectorIN5amrex4RealEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro7GetDataEiN5amrex4RealERN5amrex6VectorIPN5amrex8MultiFabEEERN5amrex6VectorIN5amrex4RealEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro7GetDataEiN5amrex4RealERN5amrex6VectorIPN5amrex8MultiFabEEERN5amrex6VectorIN5amrex4RealEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::GetData__i.amrex::Real.amrex::Vector:amrex::MultiFabP:R.amrex::Vector:amrex::Real:R.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1af952122e4a5797c522d67e741af130f7"></span>void <code class="sig-name descname">GetData</code><span class="sig-paren">(</span>int <em>lev</em>, amrex::Real <em>time</em>, amrex::Vector&lt;amrex::MultiFab *&gt; &amp;<em>mf</em>, amrex::Vector&lt;amrex::Real&gt; &amp;<em>mftime</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf_old</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf_new</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro7GetDataEiN5amrex4RealERN5amrex6VectorIPN5amrex8MultiFabEEERN5amrex6VectorIN5amrex4RealEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Utility to copy in data from <code class="docutils literal notranslate"><span class="pre">mf_old</span></code> and/or <code class="docutils literal notranslate"><span class="pre">mf_new</span></code> into <code class="docutils literal notranslate"><span class="pre">mf</span></code><ul class="simple">
+<li><p>if time=t_old we copy mf_old into mf</p></li>
+<li><p>if time=t_new we copy mf_new into mf</p></li>
+<li><p>otherwise copy copy in both <code class="docutils literal notranslate"><span class="pre">mf_old</span></code> and <code class="docutils literal notranslate"><span class="pre">mf_new</span></code> into <code class="docutils literal notranslate"><span class="pre">mf</span></code> and the <code class="docutils literal notranslate"><span class="pre">fillpatch</span></code> routines know to interpolate in time. However in MAESTRO since we don’t subcycle I’m not sure if we need this capability? </p></li>
+</ul>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro11AverageDownERN5amrex6VectorIN5amrex8MultiFabEEEii">
 <span id="_CPPv3N7Maestro11AverageDownERN5amrex6VectorIN5amrex8MultiFabEEEii"></span><span id="_CPPv2N7Maestro11AverageDownERN5amrex6VectorIN5amrex8MultiFabEEEii"></span><span id="Maestro::AverageDown__amrex::Vector:amrex::MultiFab:R.i.i"></span><span class="target" id="classMaestro_1a6048476c7666df3e817f519ba16c68ac"></span>void <code class="sig-name descname">AverageDown</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>mf</em>, int <em>comp</em>, int <em>ncomp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro11AverageDownERN5amrex6VectorIN5amrex8MultiFabEEEii" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Set covered coarse cells to be the average of overlying fine cells. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro16AverageDownFacesERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro16AverageDownFacesERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro16AverageDownFacesERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::AverageDownFaces__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R"></span><span class="target" id="classMaestro_1a02d6860099634db1a5fe43535cab01df"></span>void <code class="sig-name descname">AverageDownFaces</code><span class="sig-paren">(</span>amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>edge</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro16AverageDownFacesERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Set covered faces to be the average of overlying fine faces. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13FillUmacGhostERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi">
 <span id="_CPPv3N7Maestro13FillUmacGhostERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi"></span><span id="_CPPv2N7Maestro13FillUmacGhostERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi"></span><span id="Maestro::FillUmacGhost__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.i"></span><span class="target" id="classMaestro_1adab370bb4e25c6610c6f292809fb45d3"></span>void <code class="sig-name descname">FillUmacGhost</code><span class="sig-paren">(</span>amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, int <em>level</em> = -1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro13FillUmacGhostERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Fill in ONE ghost cell for all components of a face-centered (MAC) velocity field behind physical boundaries. Does not modify the velocities on the boundary </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14FillPatchUedgeERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro14FillPatchUedgeERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro14FillPatchUedgeERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::FillPatchUedge__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R"></span><span class="target" id="classMaestro_1a49f2202a9627fed1db27c667c41a9078"></span>void <code class="sig-name descname">FillPatchUedge</code><span class="sig-paren">(</span>amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>uedge</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro14FillPatchUedgeERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Fill in all ghost cells for an edge-based MAC velocity field. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro16Put1dArrayOnCartERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEii">
 <span id="_CPPv3N7Maestro16Put1dArrayOnCartERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEii"></span><span id="_CPPv2N7Maestro16Put1dArrayOnCartERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEii"></span><span id="Maestro::Put1dArrayOnCart__RealVectorCR.amrex::Vector:amrex::MultiFab:R.i.i.amrex::Vector:amrex::BCRec:CR.i.i"></span><span class="target" id="classMaestro_1a49c1bd2e8ac7a9d0a236ea960de0d28a"></span>void <code class="sig-name descname">Put1dArrayOnCart</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>s0</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>s0_cart</em>, int <em>is_input_edge_centered</em>, int <em>is_output_a_vector</em>, <em class="property">const</em> amrex::Vector&lt;amrex::BCRec&gt; &amp;<em>bcs</em> = amrex::Vector&lt;amrex::BCRec&gt;(), int <em>sbccomp</em> = 0, int <em>variable_type</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro16Put1dArrayOnCartERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEii" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Maps 1d arrays onto multi-D cartesian MultiFabs. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro16Put1dArrayOnCartEiRK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEi">
@@ -530,57 +595,74 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro8InitDataEv">
 <span id="_CPPv3N7Maestro8InitDataEv"></span><span id="_CPPv2N7Maestro8InitDataEv"></span><span id="Maestro::InitData"></span><span class="target" id="classMaestro_1a1cac3313bb52f05a87adf58091b7cb6c"></span>void <code class="sig-name descname">InitData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8InitDataEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>fill in multifab and base state data </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro23MakeNewLevelFromScratchEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE">
 <span id="_CPPv3N7Maestro23MakeNewLevelFromScratchEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE"></span><span id="_CPPv2N7Maestro23MakeNewLevelFromScratchEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE"></span><span id="Maestro::MakeNewLevelFromScratch__i.amrex::Real.amrex::BoxArrayCR.amrex::DistributionMappingCR"></span><span class="target" id="classMaestro_1ae18d49a35794a83a6fa650d067a18a38"></span><em class="property">virtual</em> void <code class="sig-name descname">MakeNewLevelFromScratch</code><span class="sig-paren">(</span>int <em>lev</em>, amrex::Real <em>time</em>, <em class="property">const</em> amrex::BoxArray &amp;<em>ba</em>, <em class="property">const</em> amrex::DistributionMapping &amp;<em>dm</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro23MakeNewLevelFromScratchEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>During initialization of a simulation, <code class="docutils literal notranslate"><a class="reference internal" href="../file/Maestro_8H.html#classMaestro_1a1cac3313bb52f05a87adf58091b7cb6c"><span class="std std-ref"><span class="pre">Maestro::InitData()</span></span></a></code> calls <code class="docutils literal notranslate"><span class="pre">AmrCore::InitFromScratch()</span></code>, which calls a <code class="docutils literal notranslate"><span class="pre">MakeNewGrids()</span></code> function that repeatedly calls this function to create finer levels. This function creates a new fine level that did not exist before by interpolating from the coarser level overrides the pure virtual function in <code class="docutils literal notranslate"><span class="pre">AmrCore</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8InitProjEv">
 <span id="_CPPv3N7Maestro8InitProjEv"></span><span id="_CPPv2N7Maestro8InitProjEv"></span><span id="Maestro::InitProj"></span><span class="target" id="classMaestro_1a863e99df051622da60778665e39e44a0"></span>void <code class="sig-name descname">InitProj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8InitProjEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Initial projection. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8DivuIterEi">
 <span id="_CPPv3N7Maestro8DivuIterEi"></span><span id="_CPPv2N7Maestro8DivuIterEi"></span><span id="Maestro::DivuIter__i"></span><span class="target" id="classMaestro_1a7b24443370226c944f734e027d7fe1e3"></span>void <code class="sig-name descname">DivuIter</code><span class="sig-paren">(</span>int <em>istep_divu_iter</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8DivuIterEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Divu iteration. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8InitIterEv">
 <span id="_CPPv3N7Maestro8InitIterEv"></span><span id="_CPPv2N7Maestro8InitIterEv"></span><span id="Maestro::InitIter"></span><span class="target" id="classMaestro_1a04eb89bd60c3bb43d94d2af46c32dc4d"></span>void <code class="sig-name descname">InitIter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8InitIterEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Initial iteration to initialize <code class="docutils literal notranslate"><span class="pre">gradpi</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7MacProjERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKi">
 <span id="_CPPv3N7Maestro7MacProjERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKi"></span><span id="_CPPv2N7Maestro7MacProjERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKi"></span><span id="Maestro::MacProj__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:CR.RealVectorCR.iCR"></span><span class="target" id="classMaestro_1a6e60c3333605faacd1aaf9994bd03948"></span>void <code class="sig-name descname">MacProj</code><span class="sig-paren">(</span>amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>macphi</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>macrhs</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>beta0</em>, <em class="property">const</em> int &amp;<em>is_predictor</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro7MacProjERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code> enters with face-centered, time-centered <code class="docutils literal notranslate"><span class="pre">Utilde^*</span></code> and should leave with <code class="docutils literal notranslate"><span class="pre">Utilde</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">macphi</span></code> is the solution to the elliptic solve and enters as either zero, or the solution to the predictor MAC projection</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">macrhs</span></code> enters as <code class="docutils literal notranslate"><span class="pre">beta0*(S-Sbar)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">beta0</span></code> is a 1d cell-centered array </p></li>
+</ul>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro16MultFacesByBeta0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKi">
 <span id="_CPPv3N7Maestro16MultFacesByBeta0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKi"></span><span id="_CPPv2N7Maestro16MultFacesByBeta0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKi"></span><span id="Maestro::MultFacesByBeta0__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.RealVectorCR.RealVectorCR.iCR"></span><span class="target" id="classMaestro_1a485d87a6ebc973ce77de070fc2d38de4"></span>void <code class="sig-name descname">MultFacesByBeta0</code><span class="sig-paren">(</span>amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>edge</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>beta0</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>beta0_edge</em>, <em class="property">const</em> int &amp;<em>mult_or_div</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro16MultFacesByBeta0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Multiply (or divide) face-centered data by <code class="docutils literal notranslate"><span class="pre">beta0</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro19ComputeMACSolverRHSERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro19ComputeMACSolverRHSERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro19ComputeMACSolverRHSERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::ComputeMACSolverRHS__amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR"></span><span class="target" id="classMaestro_1a01fe9a7a82d4878accad0034c2bb7abd"></span>void <code class="sig-name descname">ComputeMACSolverRHS</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>solverrhs</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>macrhs</em>, <em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro19ComputeMACSolverRHSERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute the RHS for the solve, <code class="docutils literal notranslate"><span class="pre">RHS</span> <span class="pre">=</span> <span class="pre">macrhs</span> <span class="pre">-</span> <span class="pre">div(beta0*umac)</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro17AvgFaceBcoeffsInvERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro17AvgFaceBcoeffsInvERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro17AvgFaceBcoeffsInvERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::AvgFaceBcoeffsInv__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::R.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1a2b46136d1f1083391b919ba0331a33a7"></span>void <code class="sig-name descname">AvgFaceBcoeffsInv</code><span class="sig-paren">(</span>amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>facebcoef</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rhocc</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro17AvgFaceBcoeffsInvERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Average <code class="docutils literal notranslate"><span class="pre">bcoefs</span></code> at faces using inverse of <code class="docutils literal notranslate"><span class="pre">rho</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro15SetMacSolverBCsERN5amrex15MLABecLaplacianE">
 <span id="_CPPv3N7Maestro15SetMacSolverBCsERN5amrex15MLABecLaplacianE"></span><span id="_CPPv2N7Maestro15SetMacSolverBCsERN5amrex15MLABecLaplacianE"></span><span id="Maestro::SetMacSolverBCs__amrex::MLABecLaplacianR"></span><span class="target" id="classMaestro_1a8144cbbe6b7b7118b2cefbe4bb0ffd78"></span>void <code class="sig-name descname">SetMacSolverBCs</code><span class="sig-paren">(</span>amrex::MLABecLaplacian &amp;<em>mlabec</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro15SetMacSolverBCsERN5amrex15MLABecLaplacianE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Set boundaries for <code class="docutils literal notranslate"><span class="pre">LABecLaplacian</span></code> to solve <code class="docutils literal notranslate"><span class="pre">-div(B</span> <span class="pre">grad)</span> <span class="pre">phi</span> <span class="pre">=</span> <span class="pre">RHS</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10MakeEtarhoER10RealVectorR10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro10MakeEtarhoER10RealVectorR10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10MakeEtarhoER10RealVectorR10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeEtarho__RealVectorR.RealVectorR.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1aaa030fa594d0fe2a20a7f3b5ae70c03d"></span>void <code class="sig-name descname">MakeEtarho</code><span class="sig-paren">(</span><a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>etarho_edge</em>, <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>etarho_cell</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>etarho_flux</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro10MakeEtarhoER10RealVectorR10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute <code class="docutils literal notranslate"><span class="pre">eta_rho</span></code> at edge- and cell-centers. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14MakeEtarhoSphrERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEER10RealVectorR10RealVector">
@@ -590,17 +672,20 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro9Make_S_ccERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorR10RealVectorRK10RealVector">
 <span id="_CPPv3N7Maestro9Make_S_ccERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorR10RealVectorRK10RealVector"></span><span id="_CPPv2N7Maestro9Make_S_ccERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorR10RealVectorRK10RealVector"></span><span id="Maestro::Make_S_cc__amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.RealVectorCR.RealVectorCR.RealVectorR.RealVectorCR"></span><span class="target" id="classMaestro_1a471bc2580d7346393a19dce81165e6e8"></span>void <code class="sig-name descname">Make_S_cc</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>S_cc</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>delta_gamma1_term</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>delta_gamma1</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>scal</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>u</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rho_omegadot</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rho_Hnuc</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rho_Hext</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>thermal</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>gamma1bar</em>, <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>delta_gamma1_termbar</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>psi_in</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro9Make_S_ccERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorR10RealVectorRK10RealVector" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute S at cell-centers. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro20MakeRHCCforNodalProjERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro20MakeRHCCforNodalProjERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro20MakeRHCCforNodalProjERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeRHCCforNodalProj__amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:CR.RealVectorCR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1a7a5a19352cb789953f64ff16853ac1c6"></span>void <code class="sig-name descname">MakeRHCCforNodalProj</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rhcc</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>S_cc</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>Sbar</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>beta0</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>delta_gamma1_term</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro20MakeRHCCforNodalProjERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute <code class="docutils literal notranslate"><span class="pre">rhcc</span> <span class="pre">=</span> <span class="pre">beta0*(S_cc-Sbar)</span> <span class="pre">+</span> <span class="pre">beta0*delta_chi</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro18MakeRHCCforMacProjERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEi">
 <span id="_CPPv3N7Maestro18MakeRHCCforMacProjERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEi"></span><span id="_CPPv2N7Maestro18MakeRHCCforMacProjERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEi"></span><span id="Maestro::MakeRHCCforMacProj__amrex::Vector:amrex::MultiFab:R.RealVectorCR.amrex::Vector:amrex::MultiFab:CR.RealVectorCR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR.RealVectorCR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R.i"></span><span class="target" id="classMaestro_1a670f0031e1535dbfd8706bb5e02be247"></span>void <code class="sig-name descname">MakeRHCCforMacProj</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rhcc</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rho0</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>S_cc</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>Sbar</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>beta0</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>delta_gamma1_term</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>gamma1bar</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>delta_p_term</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>delta_chi</em>, int <em>is_predictor</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro18MakeRHCCforMacProjERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute <code class="docutils literal notranslate"><span class="pre">rhcc</span> <span class="pre">=</span> <span class="pre">beta0*(S_cc-Sbar)</span> <span class="pre">+</span> <span class="pre">beta0*delta_chi</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro23CorrectRHCCforNodalProjERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">
@@ -610,12 +695,15 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro9NodalProjEiRN5amrex6VectorIN5amrex8MultiFabEEEi">
 <span id="_CPPv3N7Maestro9NodalProjEiRN5amrex6VectorIN5amrex8MultiFabEEEi"></span><span id="_CPPv2N7Maestro9NodalProjEiRN5amrex6VectorIN5amrex8MultiFabEEEi"></span><span id="Maestro::NodalProj__i.amrex::Vector:amrex::MultiFab:R.i"></span><span class="target" id="classMaestro_1ac792a0729e162dcc1adfbb44995e4d0e"></span>void <code class="sig-name descname">NodalProj</code><span class="sig-paren">(</span>int <em>proj_type</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rhcc</em>, int <em>istep_divu_iter</em> = 0<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro9NodalProjEiRN5amrex6VectorIN5amrex8MultiFabEEEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Perform a nodal projection. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro17CreateUvecForProjEiRN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro17CreateUvecForProjEiRN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro17CreateUvecForProjEiRN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::CreateUvecForProj__i.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1a8534bad6cbaf59e56c6c986d3545c9c2"></span>void <code class="sig-name descname">CreateUvecForProj</code><span class="sig-paren">(</span>int <em>proj_type</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>Vproj</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>sig</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro17CreateUvecForProjEiRN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Fill in <code class="docutils literal notranslate"><span class="pre">Vproj</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">initial_projection_comp:</span> <span class="pre">Utilde^0</span> <span class="pre">--</span> <span class="pre">uold</span></code> <code class="docutils literal notranslate"><span class="pre">divu_iters_comp:</span> <span class="pre">Utilde^0</span> <span class="pre">--</span> <span class="pre">uold</span></code> <code class="docutils literal notranslate"><span class="pre">pressure_iters_comp:</span> <span class="pre">(Utilde^n+1,*</span> <span class="pre">-</span> <span class="pre">Utilde^n)/dt</span> <span class="pre">--</span> <span class="pre">(unew-uold)/dt</span></code> <code class="docutils literal notranslate"><span class="pre">regular_timestep_comp:</span> <span class="pre">(Utilde^n+1,*</span> <span class="pre">+</span> <span class="pre">dt*gpi/rhohalf)</span> <span class="pre">--</span> <span class="pre">unew</span> <span class="pre">+</span> <span class="pre">dt*gpi/rhohalf</span></code> <code class="docutils literal notranslate"><span class="pre">sig</span></code> contains <code class="docutils literal notranslate"><span class="pre">rhohalf</span></code> if <code class="docutils literal notranslate"><span class="pre">proj_type</span> <span class="pre">==</span> <span class="pre">regular_timestep_comp</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro19SetBoundaryVelocityERN5amrex6VectorIN5amrex8MultiFabEEE">
@@ -625,22 +713,26 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ComputeGradPhiERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro14ComputeGradPhiERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro14ComputeGradPhiERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::ComputeGradPhi__amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1a1d0ee67c15c7be8ec6eef3bdeb1c1ce1"></span>void <code class="sig-name descname">ComputeGradPhi</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>phi</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>gphi</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro14ComputeGradPhiERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Given a nodal phi, compute <code class="docutils literal notranslate"><span class="pre">grad(phi)</span></code> at cell centers. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8MakePiCCERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro8MakePiCCERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro8MakePiCCERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakePiCC__amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1af1b179c598d2d1fe60a8755ec3f1d30d"></span>void <code class="sig-name descname">MakePiCC</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>beta0_cart</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8MakePiCCERKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Average nodal pi to cell-centers and put in the Pi component of <code class="docutils literal notranslate"><span class="pre">snew</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12PlotFileNameEKiPNSt6stringE">
 <span id="_CPPv3N7Maestro12PlotFileNameEKiPNSt6stringE"></span><span id="_CPPv2N7Maestro12PlotFileNameEKiPNSt6stringE"></span><span id="Maestro::PlotFileName__iC.ssP"></span><span class="target" id="classMaestro_1a0beb13547e1a5dc1cfb708fb1db11c56"></span>void <code class="sig-name descname">PlotFileName</code><span class="sig-paren">(</span><em class="property">const</em> int <em>lev</em>, std::string *<em>plotfilename</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro12PlotFileNameEKiPNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Get plotfile name. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10PlotFileMFEKiKN5amrex4RealEKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro10PlotFileMFEKiKN5amrex4RealEKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10PlotFileMFEKiKN5amrex4RealEKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::PlotFileMF__iC.amrex::RealC.amrex::RealC.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R.RealVectorCR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1ad4ad5cd26f2fa919f65d47770c7823a9"></span>amrex::Vector&lt;<em class="property">const</em> amrex::MultiFab *&gt; <code class="sig-name descname">PlotFileMF</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nPlot</em>, <em class="property">const</em> amrex::Real <em>t_in</em>, <em class="property">const</em> amrex::Real <em>dt_in</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rho0_cart</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rhoh0_cart</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>p0_cart</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>gamma1bar_cart</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>u_in</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>s_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>gamma1bar_in</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>S_cc_in</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro10PlotFileMFEKiKN5amrex4RealEKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Put together an array of multifabs for writing. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro15SmallPlotFileMFEKiKiN5amrex6VectorIPKN5amrex8MultiFabEEEKN5amrex6VectorINSt6stringEEEKN5amrex6VectorINSt6stringEEE">
@@ -650,22 +742,26 @@
 <dl class="function">
 <dt id="_CPPv4NK7Maestro16PlotFileVarNamesEPi">
 <span id="_CPPv3NK7Maestro16PlotFileVarNamesEPi"></span><span id="_CPPv2NK7Maestro16PlotFileVarNamesEPi"></span><span id="Maestro::PlotFileVarNames__iPC"></span><span class="target" id="classMaestro_1a32af6dc726435edcd712372b0491095e"></span>amrex::Vector&lt;std::string&gt; <code class="sig-name descname">PlotFileVarNames</code><span class="sig-paren">(</span>int *<em>nPlot</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK7Maestro16PlotFileVarNamesEPi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Set plotfile variables names. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4NK7Maestro21SmallPlotFileVarNamesEPiN5amrex6VectorINSt6stringEEE">
 <span id="_CPPv3NK7Maestro21SmallPlotFileVarNamesEPiN5amrex6VectorINSt6stringEEE"></span><span id="_CPPv2NK7Maestro21SmallPlotFileVarNamesEPiN5amrex6VectorINSt6stringEEE"></span><span id="Maestro::SmallPlotFileVarNames__iP.amrex::Vector:ss:C"></span><span class="target" id="classMaestro_1a9d4800930c2dabaa84fbc9ec56487f8f"></span>amrex::Vector&lt;std::string&gt; <code class="sig-name descname">SmallPlotFileVarNames</code><span class="sig-paren">(</span>int *<em>nPlot</em>, amrex::Vector&lt;std::string&gt; <em>varnames</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK7Maestro21SmallPlotFileVarNamesEPiN5amrex6VectorINSt6stringEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Set small plotfile variables names. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro18WriteSmallPlotFileEKiKN5amrex4RealEKN5amrex4RealERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro18WriteSmallPlotFileEKiKN5amrex4RealEKN5amrex4RealERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro18WriteSmallPlotFileEKiKN5amrex4RealEKN5amrex4RealERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::WriteSmallPlotFile__iC.amrex::RealC.amrex::RealC.RealVectorCR.RealVectorCR.RealVectorCR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1a91e02862507a8c73e6a876afa92152e3"></span>void <code class="sig-name descname">WriteSmallPlotFile</code><span class="sig-paren">(</span><em class="property">const</em> int <em>step</em>, <em class="property">const</em> amrex::Real <em>t_in</em>, <em class="property">const</em> amrex::Real <em>dt_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rho0_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rhoh0_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>gamma1bar_in</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>u_in</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>s_in</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>S_cc_in</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro18WriteSmallPlotFileEKiKN5amrex4RealEKN5amrex4RealERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Write a small plotfile to disk. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13WritePlotFileEKiKN5amrex4RealEKN5amrex4RealERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEEKb">
 <span id="_CPPv3N7Maestro13WritePlotFileEKiKN5amrex4RealEKN5amrex4RealERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEEKb"></span><span id="_CPPv2N7Maestro13WritePlotFileEKiKN5amrex4RealEKN5amrex4RealERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEEKb"></span><span id="Maestro::WritePlotFile__iC.amrex::RealC.amrex::RealC.RealVectorCR.RealVectorCR.RealVectorCR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:CR.bC"></span><span class="target" id="classMaestro_1a76e73190c250c5f6f45948d33dd15139"></span>void <code class="sig-name descname">WritePlotFile</code><span class="sig-paren">(</span><em class="property">const</em> int <em>step</em>, <em class="property">const</em> amrex::Real <em>t_in</em>, <em class="property">const</em> amrex::Real <em>dt_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rho0_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rhoh0_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0_in</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>gamma1bar_in</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>u_in</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>s_in</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>S_cc_in</em>, <em class="property">const</em> bool <em>is_small</em> = false<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro13WritePlotFileEKiKN5amrex4RealEKN5amrex4RealERK10RealVectorRK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEEKb" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Write plotfile to disk. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4NK7Maestro12WriteJobInfoERKNSt6stringE">
@@ -675,57 +771,68 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeMagvel__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1a8f27e65dc1134a7c2ee7b85453210ccc"></span>void <code class="sig-name descname">MakeMagvel</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>vel</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>magvel</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the magnitude of the velocity. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9MakeVelrcERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro9MakeVelrcERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro9MakeVelrcERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeVelrc__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1a5dc82fc7a91f29614020c915bff9a649"></span>void <code class="sig-name descname">MakeVelrc</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>vel</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>w0rcart</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rad_vel</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>circ_vel</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro9MakeVelrcERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the radial and circular components of the velocity. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MakeAdExcessERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro12MakeAdExcessERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro12MakeAdExcessERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeAdExcess__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1a24395fbb6b89bc5f07da2ac8260e5423"></span>void <code class="sig-name descname">MakeAdExcess</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>state</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>ad_excess</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro12MakeAdExcessERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the adiabatic excess. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8MakeGravERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro8MakeGravERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro8MakeGravERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeGrav__RealVectorCR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1af756a3a19a763b9d2b3489fc5f27e05b"></span>void <code class="sig-name descname">MakeGrav</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rho0</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>grav</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8MakeGravERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the gravitational acceleration. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13MakeVorticityERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro13MakeVorticityERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro13MakeVorticityERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeVorticity__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1a76adba247435ee5fe8edb9d60a39e7fd"></span>void <code class="sig-name descname">MakeVorticity</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>vel</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>vorticity</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro13MakeVorticityERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the vorticity. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14MakeDeltaGammaERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro14MakeDeltaGammaERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro14MakeDeltaGammaERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeDeltaGamma__amrex::Vector:amrex::MultiFab:CR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR.RealVectorCR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1ac9e7ab6715e6a99d2e73cd04c8abd1bb"></span>void <code class="sig-name descname">MakeDeltaGamma</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>state</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>p0_cart</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>gamma1bar</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>gamma1bar_cart</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>deltagamma</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro14MakeDeltaGammaERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate <code class="docutils literal notranslate"><span class="pre">deltagamma</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro11MakeEntropyERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro11MakeEntropyERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro11MakeEntropyERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeEntropy__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1a620b0e6c6dc74319f0208bf0b8999be1"></span>void <code class="sig-name descname">MakeEntropy</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>state</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>entropy</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro11MakeEntropyERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the entropy. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9MakeDivw0ERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro9MakeDivw0ERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro9MakeDivw0ERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeDivw0__amrex::Vector:std::array:amrex::MultiFab.AMREX_SPACEDIM::CR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1abc0c9fa53781ceb72b98789580a7dd22"></span>void <code class="sig-name descname">MakeDivw0</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;std::array&lt;amrex::MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>divw0</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro9MakeDivw0ERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the divergenve of the base state velocity. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10MakePiDivuERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro10MakePiDivuERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10MakePiDivuERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakePiDivu__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1a212d51b8d30664d09eb1f3b33a82d9de"></span>void <code class="sig-name descname">MakePiDivu</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>vel</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>pi_cc</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>pidivu</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro10MakePiDivuERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate <code class="docutils literal notranslate"><span class="pre">pi</span></code> times the divergence of the velocity. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8MakeAbarERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro8MakeAbarERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro8MakeAbarERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeAbar__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R"></span><span class="target" id="classMaestro_1ae6d5bca6a67114cf2063712442658558"></span>void <code class="sig-name descname">MakeAbar</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>state</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>abar</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8MakeAbarERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Mass fractions of the species. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro5ReactERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorKN5amrex4RealE">
 <span id="_CPPv3N7Maestro5ReactERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorKN5amrex4RealE"></span><span id="_CPPv2N7Maestro5ReactERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorKN5amrex4RealE"></span><span id="Maestro::React__amrex::Vector:amrex::MultiFab:CR.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:R.RealVectorCR.amrex::RealC"></span><span class="target" id="classMaestro_1aac8a593ce4fff4f8c7f47569d962c1ef"></span>void <code class="sig-name descname">React</code><span class="sig-paren">(</span><em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>s_in</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>s_out</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rho_Hext</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rho_omegadot</em>, amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rho_Hnuc</em>, <em class="property">const</em> <a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em>, <em class="property">const</em> amrex::Real <em>dt_react</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro5ReactERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorKN5amrex4RealE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute heating term, <code class="docutils literal notranslate"><span class="pre">rho_Hext</span></code>, then react the state over <code class="docutils literal notranslate"><span class="pre">dt_react</span></code> and update <code class="docutils literal notranslate"><span class="pre">rho_omegadot</span></code>, <code class="docutils literal notranslate"><span class="pre">rho_Hnuc</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro6BurnerERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorKN5amrex4RealE">
@@ -735,37 +842,48 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro11MakeHeatingERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro11MakeHeatingERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro11MakeHeatingERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeHeating__amrex::Vector:amrex::MultiFab:R.amrex::Vector:amrex::MultiFab:CR"></span><span class="target" id="classMaestro_1a7e4b0224fdde8c26b7cee9346f52c22c"></span>void <code class="sig-name descname">MakeHeating</code><span class="sig-paren">(</span>amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>rho_Hext</em>, <em class="property">const</em> amrex::Vector&lt;amrex::MultiFab&gt; &amp;<em>scal</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro11MakeHeatingERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute heating term, <code class="docutils literal notranslate"><span class="pre">rho_Hext</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro6RegridEv">
 <span id="_CPPv3N7Maestro6RegridEv"></span><span id="_CPPv2N7Maestro6RegridEv"></span><span id="Maestro::Regrid"></span><span class="target" id="classMaestro_1abe2bab86f88615a2736157247dc32f26"></span>void <code class="sig-name descname">Regrid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro6RegridEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Check to see if we need to regrid, then regrid. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8TagArrayEv">
 <span id="_CPPv3N7Maestro8TagArrayEv"></span><span id="_CPPv2N7Maestro8TagArrayEv"></span><span id="Maestro::TagArray"></span><span class="target" id="classMaestro_1a1c541b9c45abc34091024b10d592144a"></span>void <code class="sig-name descname">TagArray</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8TagArrayEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Set tagging array to include buffer zones for multilevel. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8ErrorEstEiRN5amrex11TagBoxArrayEN5amrex4RealEi">
 <span id="_CPPv3N7Maestro8ErrorEstEiRN5amrex11TagBoxArrayEN5amrex4RealEi"></span><span id="_CPPv2N7Maestro8ErrorEstEiRN5amrex11TagBoxArrayEN5amrex4RealEi"></span><span id="Maestro::ErrorEst__i.amrex::TagBoxArrayR.amrex::Real.i"></span><span class="target" id="classMaestro_1a753ad7c4b59f6b088ab5a2a21d51b96b"></span><em class="property">virtual</em> void <code class="sig-name descname">ErrorEst</code><span class="sig-paren">(</span>int <em>lev</em>, amrex::TagBoxArray &amp;<em>tags</em>, amrex::Real <em>time</em>, int <em>ng</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro8ErrorEstEiRN5amrex11TagBoxArrayEN5amrex4RealEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Tag all cells for refinement</p>
+<p>Overrides the pure virtual function in <code class="docutils literal notranslate"><span class="pre">AmrCore</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro11RemakeLevelEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE">
 <span id="_CPPv3N7Maestro11RemakeLevelEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE"></span><span id="_CPPv2N7Maestro11RemakeLevelEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE"></span><span id="Maestro::RemakeLevel__i.amrex::Real.amrex::BoxArrayCR.amrex::DistributionMappingCR"></span><span class="target" id="classMaestro_1afe6338e8df9c078ef92e7c456c9eaa5b"></span><em class="property">virtual</em> void <code class="sig-name descname">RemakeLevel</code><span class="sig-paren">(</span>int <em>lev</em>, amrex::Real <em>time</em>, <em class="property">const</em> amrex::BoxArray &amp;<em>ba</em>, <em class="property">const</em> amrex::DistributionMapping &amp;<em>dm</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro11RemakeLevelEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Within a call to <code class="docutils literal notranslate"><span class="pre">AmrCore::regrid</span></code>, this function fills in data at a level that existed before, using pre-existing fine and interpolated coarse data</p>
+<p>overrides the pure virtual function in <code class="docutils literal notranslate"><span class="pre">AmrCore</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro22MakeNewLevelFromCoarseEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE">
 <span id="_CPPv3N7Maestro22MakeNewLevelFromCoarseEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE"></span><span id="_CPPv2N7Maestro22MakeNewLevelFromCoarseEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE"></span><span id="Maestro::MakeNewLevelFromCoarse__i.amrex::Real.amrex::BoxArrayCR.amrex::DistributionMappingCR"></span><span class="target" id="classMaestro_1a62922e635eb2e61715fb0a2b452b897e"></span><em class="property">virtual</em> void <code class="sig-name descname">MakeNewLevelFromCoarse</code><span class="sig-paren">(</span>int <em>lev</em>, amrex::Real <em>time</em>, <em class="property">const</em> amrex::BoxArray &amp;<em>ba</em>, <em class="property">const</em> amrex::DistributionMapping &amp;<em>dm</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro22MakeNewLevelFromCoarseEiN5amrex4RealERKN5amrex8BoxArrayERKN5amrex19DistributionMappingE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Within a call to <code class="docutils literal notranslate"><span class="pre">AmrCore::regrid</span></code>, this function fills in data at a level that did NOT exist before, using interpolated coarse data</p>
+<p>overrides the pure virtual function in <code class="docutils literal notranslate"><span class="pre">AmrCore</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10ClearLevelEi">
 <span id="_CPPv3N7Maestro10ClearLevelEi"></span><span id="_CPPv2N7Maestro10ClearLevelEi"></span><span id="Maestro::ClearLevel__i"></span><span class="target" id="classMaestro_1ad7bbe898df114861c9cad01e5d795efd"></span><em class="property">virtual</em> void <code class="sig-name descname">ClearLevel</code><span class="sig-paren">(</span>int <em>lev</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro10ClearLevelEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Within a call to <code class="docutils literal notranslate"><span class="pre">AmrCore::regrid</span></code>, this function deletes all data at a level of refinement that is no longer needed</p>
+<p>overrides the pure virtual function in <code class="docutils literal notranslate"><span class="pre">AmrCore</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9TfromRhoHERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVector">
@@ -805,17 +923,20 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ReadParametersEv">
 <span id="_CPPv3N7Maestro14ReadParametersEv"></span><span id="_CPPv2N7Maestro14ReadParametersEv"></span><span id="Maestro::ReadParameters"></span><span class="target" id="classMaestro_1a1d30aef2296ef500e6b720b17fe5fd0d"></span>void <code class="sig-name descname">ReadParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro14ReadParametersEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Read in C++ parameters from inputs file. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13VariableSetupEv">
 <span id="_CPPv3N7Maestro13VariableSetupEv"></span><span id="_CPPv2N7Maestro13VariableSetupEv"></span><span id="Maestro::VariableSetup"></span><span class="target" id="classMaestro_1ac0d2ead39ce5ba5597cd3fec5ee3f9f4"></span>void <code class="sig-name descname">VariableSetup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro13VariableSetupEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Define variable mappings (<code class="docutils literal notranslate"><span class="pre">Rho</span></code>, <code class="docutils literal notranslate"><span class="pre">RhoH</span></code>, …, <code class="docutils literal notranslate"><span class="pre">Nscal</span></code>, etc.) </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7BCSetupEv">
 <span id="_CPPv3N7Maestro7BCSetupEv"></span><span id="_CPPv2N7Maestro7BCSetupEv"></span><span id="Maestro::BCSetup"></span><span class="target" id="classMaestro_1a69a9b30273795d1f29cc31d41b25fe9e"></span>void <code class="sig-name descname">BCSetup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7Maestro7BCSetupEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Set up <code class="docutils literal notranslate"><span class="pre">BCRec</span></code> definitions for BC types. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10MakeSpongeERN5amrex6VectorIN5amrex8MultiFabEEE">
@@ -853,7 +974,8 @@
 <dl class="member">
 <dt id="_CPPv4N7Maestro5istepE">
 <span id="_CPPv3N7Maestro5istepE"></span><span id="_CPPv2N7Maestro5istepE"></span><span id="Maestro::istep__i"></span><span class="target" id="classMaestro_1a95291a8e1c2bccd2b099ce87d21c026c"></span>int <code class="sig-name descname">istep</code><a class="headerlink" href="#_CPPv4N7Maestro5istepE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>which step? </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv4N7Maestro10start_stepE">
@@ -883,7 +1005,8 @@
 <dl class="member">
 <dt id="_CPPv4N7Maestro6ng_advE">
 <span id="_CPPv3N7Maestro6ng_advE"></span><span id="_CPPv2N7Maestro6ng_advE"></span><span id="Maestro::ng_adv__i"></span><span class="target" id="classMaestro_1af5b83b3d16a814cf278e8b17b76b6e80"></span>int <code class="sig-name descname">ng_adv</code><a class="headerlink" href="#_CPPv4N7Maestro6ng_advE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>number of ghost cells needed for hyperbolic step </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv4N7Maestro4soldE">
@@ -933,12 +1056,14 @@
 <dl class="member">
 <dt id="_CPPv4N7Maestro18rhcc_for_nodalprojE">
 <span id="_CPPv3N7Maestro18rhcc_for_nodalprojE"></span><span id="_CPPv2N7Maestro18rhcc_for_nodalprojE"></span><span id="Maestro::rhcc_for_nodalproj__amrex::Vector:amrex::MultiFab:"></span><span class="target" id="classMaestro_1a7de5bb856914b8d9a8eb32c505c47a57"></span>amrex::Vector&lt;amrex::MultiFab&gt; <code class="sig-name descname">rhcc_for_nodalproj</code><a class="headerlink" href="#_CPPv4N7Maestro18rhcc_for_nodalprojE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>this only needs to persist leading into the initial pressure iters since we project <code class="docutils literal notranslate"><span class="pre">(beta0^nph</span> <span class="pre">S^1</span> <span class="pre">-</span> <span class="pre">beta0</span> <span class="pre">S^0)</span> <span class="pre">/</span> <span class="pre">dt</span></code> during a regular time step we overwrite this </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv4N7Maestro6normalE">
 <span id="_CPPv3N7Maestro6normalE"></span><span id="_CPPv2N7Maestro6normalE"></span><span id="Maestro::normal__amrex::Vector:amrex::MultiFab:"></span><span class="target" id="classMaestro_1a394208d849e79634363981ab871c5618"></span>amrex::Vector&lt;amrex::MultiFab&gt; <code class="sig-name descname">normal</code><a class="headerlink" href="#_CPPv4N7Maestro6normalE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>spherical only - we make this persistent in that we only have to rebuild and fill this after regridding </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv4N7Maestro12cell_cc_to_rE">
@@ -948,12 +1073,14 @@
 <dl class="member">
 <dt id="_CPPv4N7Maestro7phys_bcE">
 <span id="_CPPv3N7Maestro7phys_bcE"></span><span id="_CPPv2N7Maestro7phys_bcE"></span><span id="Maestro::phys_bc__amrex::Vector:i:"></span><span class="target" id="classMaestro_1a913098369e47e986afce2c5eaefb8021"></span>amrex::Vector&lt;int&gt; <code class="sig-name descname">phys_bc</code><a class="headerlink" href="#_CPPv4N7Maestro7phys_bcE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Stores domain boundary conditions. These muse be vectors (rather than arrays) so we can ParmParse them </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv4N7Maestro5bcs_sE">
 <span id="_CPPv3N7Maestro5bcs_sE"></span><span id="_CPPv2N7Maestro5bcs_sE"></span><span id="Maestro::bcs_s__amrex::Vector:amrex::BCRec:"></span><span class="target" id="classMaestro_1a0523f76482b26296209c9630afe15ed4"></span>amrex::Vector&lt;amrex::BCRec&gt; <code class="sig-name descname">bcs_s</code><a class="headerlink" href="#_CPPv4N7Maestro5bcs_sE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Boundary condition objects needed for FillPatch routines. This is essentially an array (over components) of <code class="docutils literal notranslate"><span class="pre">2*DIM</span></code> integer arrays storing the physical boundary condition types at the <code class="docutils literal notranslate"><span class="pre">lo/hi</span></code> walls in each direction </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv4N7Maestro5bcs_uE">
@@ -1073,7 +1200,8 @@
 <dl class="member">
 <dt id="_CPPv4N7Maestro6p0_nm1E">
 <span id="_CPPv3N7Maestro6p0_nm1E"></span><span id="_CPPv2N7Maestro6p0_nm1E"></span><span id="Maestro::p0_nm1__RealVector"></span><span class="target" id="classMaestro_1a088a526f249fb71ac8af86bbf775578b"></span><a class="reference internal" href="../file/Maestro_8H.html#_CPPv410RealVector" title="RealVector">RealVector</a> <code class="sig-name descname">p0_nm1</code><a class="headerlink" href="#_CPPv4N7Maestro6p0_nm1E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal notranslate"><span class="pre">p0^{n-1}</span></code> needed to compute <code class="docutils literal notranslate"><span class="pre">d(p0)/dt</span></code> for nonuniform grid spacing </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv4N7Maestro9beta0_nm1E">
@@ -1138,7 +1266,8 @@
 <dl class="member">
 <dt id="_CPPv4N7Maestro9tag_arrayE">
 <span id="_CPPv3N7Maestro9tag_arrayE"></span><span id="_CPPv2N7Maestro9tag_arrayE"></span><span id="Maestro::tag_array__amrex::Vector:i:"></span><span class="target" id="classMaestro_1ab86c11ddebb3899619d93b0c9d6650fa"></span>amrex::Vector&lt;int&gt; <code class="sig-name descname">tag_array</code><a class="headerlink" href="#_CPPv4N7Maestro9tag_arrayE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>array of tagged boxes (planar) </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv4N7Maestro14diagfile1_dataE">
@@ -1158,7 +1287,9 @@
 <dl class="member">
 <dt id="_CPPv4N7Maestro10flux_reg_sE">
 <span id="_CPPv3N7Maestro10flux_reg_sE"></span><span id="_CPPv2N7Maestro10flux_reg_sE"></span><span id="Maestro::flux_reg_s__amrex::Vector:std::unique_ptr:amrex::FluxRegister::"></span><span class="target" id="classMaestro_1ae50f95036958045067a047ef41031e4b"></span>amrex::Vector&lt;std::unique_ptr&lt;amrex::FluxRegister&gt;&gt; <code class="sig-name descname">flux_reg_s</code><a class="headerlink" href="#_CPPv4N7Maestro10flux_reg_sE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Stores fluxes at coarse-fine interface for synchronization. This will be sized <code class="docutils literal notranslate"><span class="pre">max_level+1</span></code></p>
+<p>NOTE: the flux register associated with <code class="docutils literal notranslate"><span class="pre">flux_reg[lev]</span></code> is associated with the <code class="docutils literal notranslate"><span class="pre">lev/lev-1</span></code> interface (and has grid spacing associated with <code class="docutils literal notranslate"><span class="pre">lev-1</span></code>) therefore <code class="docutils literal notranslate"><span class="pre">flux_reg[0]</span></code> and <code class="docutils literal notranslate"><span class="pre">flux_reg[max_level]</span></code> are never actually used in the reflux operation </p>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">

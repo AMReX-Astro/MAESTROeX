@@ -266,6 +266,11 @@
 <h1>base_state_geometry.F90<a class="headerlink" href="#base-state-geometry-f90" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="f/base_state_geometry_module">
 <span id="base-state-geometry-module"></span><h2>base_state_geometry_module<a class="headerlink" href="#f/base_state_geometry_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Description</p>
+<p>a module for storing the geometric information so we don’t have to pass it</p>
+<p>This module provides the coordinate value for the left edge of a base-state
+zone (r_edge_loc) and the zone center (r_cc_loc).  As always, it is assumed that
+the base state arrays begin with index 0, not 1.</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables</dt>
@@ -275,7 +280,7 @@
 <dd class="field-even"><p><a class="reference internal" href="#f/base_state_geometry_module/compute_cutoff_coords" title="f/base_state_geometry_module/compute_cutoff_coords"><code class="xref f f-func docutils literal notranslate"><span class="pre">compute_cutoff_coords()</span></code></a>, <a class="reference internal" href="#f/base_state_geometry_module/destroy_base_state_geometry" title="f/base_state_geometry_module/destroy_base_state_geometry"><code class="xref f f-func docutils literal notranslate"><span class="pre">destroy_base_state_geometry()</span></code></a>, <a class="reference internal" href="#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a>, <a class="reference internal" href="#f/base_state_geometry_module/init_base_state_geometry" title="f/base_state_geometry_module/init_base_state_geometry"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_base_state_geometry()</span></code></a>, <a class="reference internal" href="#f/base_state_geometry_module/init_base_state_map_sphr" title="f/base_state_geometry_module/init_base_state_map_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_base_state_map_sphr()</span></code></a>, <a class="reference internal" href="#f/base_state_geometry_module/init_multilevel" title="f/base_state_geometry_module/init_multilevel"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_multilevel()</span></code></a>, <a class="reference internal" href="#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_error_module</span></code></p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_mempool_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">bl_allocate()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">bl_deallocate()</span></code>)</p></li>
@@ -377,17 +382,18 @@
 <dl class="subroutine">
 <dt id="f/base_state_geometry_module/init_base_state_geometry">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">init_base_state_geometry</code><span class="sig-paren">(</span><em class="sig-param">max_radial_level_in</em>, <em class="sig-param">nr_fine_in</em>, <em class="sig-param">dr_fine_in</em>, <em class="sig-param">r_cc_loc</em>, <em class="sig-param">r_edge_loc</em>, <em class="sig-param">dx_fine</em>, <em class="sig-param">nr_irreg_in</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_geometry_module/init_base_state_geometry" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">init_base_state_geometry</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Options</dt>
 <dd class="field-odd"><p><strong>max_radial_level_in</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(r_cc_loc,0)-1)</em><em>]</em></p>
 </dd>
 <dt class="field-even">Parameters</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>nr_fine_in</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>dr_fine_in</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_cc_loc</strong> (max_radial_level_in + 1,nr_fine_in)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (max_radial_level_in + 1,nr_fine_in + 1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>dx_fine</strong> (amrex_spacedim-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nr_irreg_in</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
@@ -397,14 +403,15 @@
 <dl class="subroutine">
 <dt id="f/base_state_geometry_module/init_base_state_map_sphr">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">init_base_state_map_sphr</code><span class="sig-paren">(</span><em class="sig-param">cc_to_r</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">dx_fine</em>, <em class="sig-param">dx_lev</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_geometry_module/init_base_state_map_sphr" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">init_base_state_map_sphr</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>cc_to_r</strong> (hi(1)-(lo(1))+1,hi(2)-(lo(2))+1,hi(3)-(lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>dx_fine</strong> (amrex_spacedim-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dx_lev</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 </dl>
@@ -413,9 +420,10 @@
 <dl class="subroutine">
 <dt id="f/base_state_geometry_module/compute_cutoff_coords">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">compute_cutoff_coords</code><span class="sig-paren">(</span><em class="sig-param">rho0</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_geometry_module/compute_cutoff_coords" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">compute_cutoff_coords</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p>
+<dd class="field-odd"><p><strong>rho0</strong> (<a class="reference internal" href="#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -423,7 +431,10 @@
 <dl class="subroutine">
 <dt id="f/base_state_geometry_module/init_multilevel">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">init_multilevel</code><span class="sig-paren">(</span><em class="sig-param">tag_array</em>, <em class="sig-param">finest_radial_level_in</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_geometry_module/init_multilevel" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>compute numdisjointchunks, r_start_coord, r_end_coord
+FIXME - right now there is one chunk at each level that spans the domain
+Binds to C function <code class="docutils literal notranslate"><span class="pre">init_multilevel</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tag_array</strong> (<a class="reference internal" href="#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -439,7 +450,7 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>s0</strong> (<a class="reference internal" href="#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>is_cell_centered</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
@@ -455,7 +466,7 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>s0</strong> (<a class="reference internal" href="#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>is_cell_centered</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
@@ -468,7 +479,8 @@
 <dl class="subroutine">
 <dt id="f/base_state_geometry_module/destroy_base_state_geometry">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">destroy_base_state_geometry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_geometry_module/destroy_base_state_geometry" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">destroy_base_state_geometry</span></code></p>
+</dd></dl>
 
 </div>
 </div>

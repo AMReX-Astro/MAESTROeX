@@ -266,19 +266,27 @@
 <h1>make_edge_scal.F90<a class="headerlink" href="#make-edge-scal-f90" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="f/make_edge_scal_module">
 <span id="make-edge-scal-module"></span><h2>make_edge_scal_module<a class="headerlink" href="#f/make_edge_scal_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Description</p>
+<p>make_edge_scal constructs the edge state of a scalar, using a
+second-order Taylor expansion in space (through dx/2) and time
+(though dt/2) (if ppm_type = 0) or using PPM (for ppm_type = 1,2).</p>
+<p>We use only MAC-projected edge velocities in this prediction.</p>
+<p>We are computing all edge states for each variable.  This is what is
+done for the final updates of the state variables and velocity.  For
+velocity, we should set is_vel = .true.</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#f/make_edge_scal_module/make_edge_scal_2d" title="f/make_edge_scal_module/make_edge_scal_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_edge_scal_2d()</span></code></a>, <a class="reference internal" href="#f/make_edge_scal_module/make_edge_scal_3d" title="f/make_edge_scal_module/make_edge_scal_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_edge_scal_3d()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_error_module</span></code></p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_mempool_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">bl_allocate()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">bl_deallocate()</span></code>)</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
 <li><p><a class="reference internal" href="slope_f.html#f/slope_module" title="f/slope_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">slope_module</span></code></a></p></li>
-<li><p><a class="reference internal" href="ppm_f.html#f/ppm_module" title="f/ppm_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">ppm_module</span></code></a></p></li>
+<li><p><a class="reference internal" href="ppm_f.html#f/ppm_module" title="f/ppm_module: compute the PPM integrals, Ip and Im.  These are the integrals under the parabolic profile of the reconstructed quantity over the domain that can reach the interface over the timestep dt...."><code class="xref f f-mod docutils literal notranslate"><span class="pre">ppm_module</span></code></a>: compute the PPM integrals, Ip and Im.  These are the integrals under the parabolic profile of the reconstructed quantity over the domain that can reach the interface over the timestep dt….</p></li>
 <li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/rel_eps" title="f/meth_params_module/rel_eps"><code class="xref f f-func docutils literal notranslate"><span class="pre">rel_eps()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/ppm_type" title="f/meth_params_module/ppm_type"><code class="xref f f-func docutils literal notranslate"><span class="pre">ppm_type()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/ppm_trace_forces" title="f/meth_params_module/ppm_trace_forces"><code class="xref f f-func docutils literal notranslate"><span class="pre">ppm_trace_forces()</span></code></a>)</p></li>
 </ul>
 <p class="rubric">Subroutines and functions</p>
@@ -292,32 +300,32 @@
 <li><p><strong>domhi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>s</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
 <li><p><strong>ng_s</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>x_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>y_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>y_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ng_um</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>force</strong> (f_hi(1)-(f_lo(1))+1,f_hi(2)-(f_lo(2))+1,nc_f)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>f_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>f_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>dx</strong> (2)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>is_vel</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>adv_bc</strong> (2,2,nbccomp)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nbccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
@@ -342,39 +350,39 @@
 <li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>s</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
 <li><p><strong>ng_s</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,y_hi(3)-(y_lo(3))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>sedgez</strong> (z_hi(1)-(z_lo(1))+1,z_hi(2)-(z_lo(2))+1,z_hi(3)-(z_lo(3))+1,nc_z)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>wmac</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ng_um</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>force</strong> (f_hi(1)-(f_lo(1))+1,f_hi(2)-(f_lo(2))+1,f_hi(3)-(f_lo(3))+1,nc_f)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>f_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>f_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>is_vel</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>adv_bc</strong> (3,2,nbccomp)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nbccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>

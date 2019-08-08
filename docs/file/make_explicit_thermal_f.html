@@ -272,7 +272,7 @@
 <dd class="field-odd"><p><a class="reference internal" href="#f/make_explicit_thermal_module/make_thermal_coeffs" title="f/make_explicit_thermal_module/make_thermal_coeffs"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_thermal_coeffs()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_type_module</span></code></p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_module</span></code></p></li>
@@ -285,24 +285,27 @@
 <dl class="subroutine">
 <dt id="f/make_explicit_thermal_module/make_thermal_coeffs">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">make_explicit_thermal_module/</code><code class="sig-name descname">make_thermal_coeffs</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">tcoeff</em>, <em class="sig-param">t_lo</em>, <em class="sig-param">t_hi</em>, <em class="sig-param">hcoeff</em>, <em class="sig-param">h_lo</em>, <em class="sig-param">h_hi</em>, <em class="sig-param">xkcoeff</em>, <em class="sig-param">xk_lo</em>, <em class="sig-param">xk_hi</em>, <em class="sig-param">pcoeff</em>, <em class="sig-param">p_lo</em>, <em class="sig-param">p_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_explicit_thermal_module/make_thermal_coeffs" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
+for the thermal diffusion term in the enthalpy equation.</p>
+<p>note: we explicitly fill the ghostcells by looping over them directly</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>scal</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>tcoeff</strong> (t_hi(1)-(t_lo(1))+1,t_hi(2)-(t_lo(2))+1,t_hi(3)-(t_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>t_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>t_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>hcoeff</strong> (h_hi(1)-(h_lo(1))+1,h_hi(2)-(h_lo(2))+1,h_hi(3)-(h_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>h_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>h_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>xkcoeff</strong> (xk_hi(1)-(xk_lo(1))+1,xk_hi(2)-(xk_lo(2))+1,xk_hi(3)-(xk_lo(3))+1,nspec)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>xk_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>xk_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong></p></li>
+<li><p><strong>pcoeff</strong> (p_hi(1)-(p_lo(1))+1,p_hi(2)-(p_lo(2))+1,p_hi(3)-(p_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>p_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>p_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>

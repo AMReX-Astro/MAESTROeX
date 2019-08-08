@@ -266,25 +266,31 @@
 <h1>regrid.f90<a class="headerlink" href="#regrid-f90" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="f/regrid_base_module">
 <span id="regrid-base-module"></span><h2>regrid_base_module<a class="headerlink" href="#f/regrid_base_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Description</p>
+<p>Regrid base state variables (ex. psi, etarho, rho0, etc.)</p>
+<p>We copy the coarsest level only, interpolate to all
+the other levels and then copy the valid data from
+the old arrays onto the new.</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#f/regrid_base_module/regrid_base_state_cc" title="f/regrid_base_module/regrid_base_state_cc"><code class="xref f f-func docutils literal notranslate"><span class="pre">regrid_base_state_cc()</span></code></a>, <a class="reference internal" href="#f/regrid_base_module/regrid_base_state_edge" title="f/regrid_base_module/regrid_base_state_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">regrid_base_state_edge()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_mempool_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">bl_allocate()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">bl_deallocate()</span></code>)</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
-<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/dr" title="f/base_state_geometry_module/dr"><code class="xref f f-func docutils literal notranslate"><span class="pre">dr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr" title="f/base_state_geometry_module/nr"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/numdisjointchunks" title="f/base_state_geometry_module/numdisjointchunks"><code class="xref f f-func docutils literal notranslate"><span class="pre">numdisjointchunks()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_start_coord" title="f/base_state_geometry_module/r_start_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_start_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_end_coord" title="f/base_state_geometry_module/r_end_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_end_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/finest_radial_level" title="f/base_state_geometry_module/finest_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">finest_radial_level()</span></code></a>)</p></li>
+<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/dr" title="f/base_state_geometry_module/dr"><code class="xref f f-func docutils literal notranslate"><span class="pre">dr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr" title="f/base_state_geometry_module/nr"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/numdisjointchunks" title="f/base_state_geometry_module/numdisjointchunks"><code class="xref f f-func docutils literal notranslate"><span class="pre">numdisjointchunks()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_start_coord" title="f/base_state_geometry_module/r_start_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_start_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_end_coord" title="f/base_state_geometry_module/r_end_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_end_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/finest_radial_level" title="f/base_state_geometry_module/finest_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">finest_radial_level()</span></code></a>): a module for storing the geometric information so we don’t have to pass it</p></li>
 </ul>
 <p class="rubric">Subroutines and functions</p>
 <dl class="subroutine">
 <dt id="f/regrid_base_module/regrid_base_state_cc">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">regrid_base_module/</code><code class="sig-name descname">regrid_base_state_cc</code><span class="sig-paren">(</span><em class="sig-param">state_cc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/regrid_base_module/regrid_base_state_cc" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">regrid_base_state_cc</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p>
+<dd class="field-odd"><p><strong>state_cc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -292,9 +298,10 @@
 <dl class="subroutine">
 <dt id="f/regrid_base_module/regrid_base_state_edge">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">regrid_base_module/</code><code class="sig-name descname">regrid_base_state_edge</code><span class="sig-paren">(</span><em class="sig-param">state_ec</em><span class="sig-paren">)</span><a class="headerlink" href="#f/regrid_base_module/regrid_base_state_edge" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">regrid_base_state_edge</span></code></p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p>
+<dd class="field-odd"><p><strong>state_ec</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>

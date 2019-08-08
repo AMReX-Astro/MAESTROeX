@@ -266,6 +266,12 @@
 <h1>inlet_bc.f90<a class="headerlink" href="#inlet-bc-f90" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="f/inlet_bc_module">
 <span id="inlet-bc-module"></span><h2>inlet_bc_module<a class="headerlink" href="#f/inlet_bc_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Description</p>
+<p>inlet_bc_module is a simple container module that holds the parameters
+that are used by physbc to implement the inlet boundary conditions.
+As these are problem-specific, any problem needing inlet boundary
+conditions should create its own version of this module, using this
+outline.</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables</dt>
@@ -288,7 +294,10 @@
 <dl class="subroutine">
 <dt id="f/inlet_bc_module/set_inlet_bcs">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">inlet_bc_module/</code><code class="sig-name descname">set_inlet_bcs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#f/inlet_bc_module/set_inlet_bcs" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>here we would initialize the parameters that are module variables.
+this routine is called when the base state is defined initially,
+and upon restart, just after the base state is read in.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Called from</dt>
 <dd class="field-odd"><p><a class="reference internal" href="base_state_f.html#f/base_state_module/init_base_state" title="f/base_state_module/init_base_state"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_base_state()</span></code></a>, <a class="reference internal" href="base_state_f.html#f/base_state_module/init_base_state_irreg" title="f/base_state_module/init_base_state_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_base_state_irreg()</span></code></a></p>
 </dd>

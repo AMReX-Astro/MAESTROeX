@@ -272,10 +272,10 @@
 <dd class="field-odd"><p><a class="reference internal" href="#f/debug_module/print_base_cc" title="f/debug_module/print_base_cc"><code class="xref f f-func docutils literal notranslate"><span class="pre">print_base_cc()</span></code></a>, <a class="reference internal" href="#f/debug_module/print_base_edge" title="f/debug_module/print_base_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">print_base_edge()</span></code></a>, <a class="reference internal" href="#f/debug_module/print_edge" title="f/debug_module/print_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">print_edge()</span></code></a>, <a class="reference internal" href="#f/debug_module/print_mf" title="f/debug_module/print_mf"><code class="xref f f-func docutils literal notranslate"><span class="pre">print_mf()</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Needed modules</p>
+<p class="rubric">Required modules</p>
 <ul class="simple">
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_paralleldescriptor_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">parallel_ioprocessor()</span></code> =&gt; <code class="xref f f-func docutils literal notranslate"><span class="pre">parallel_ioprocessor()</span></code>)</p></li>
-<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_start_coord" title="f/base_state_geometry_module/r_start_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_start_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_end_coord" title="f/base_state_geometry_module/r_end_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_end_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/numdisjointchunks" title="f/base_state_geometry_module/numdisjointchunks"><code class="xref f f-func docutils literal notranslate"><span class="pre">numdisjointchunks()</span></code></a>)</p></li>
+<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_start_coord" title="f/base_state_geometry_module/r_start_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_start_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_end_coord" title="f/base_state_geometry_module/r_end_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_end_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/numdisjointchunks" title="f/base_state_geometry_module/numdisjointchunks"><code class="xref f f-func docutils literal notranslate"><span class="pre">numdisjointchunks()</span></code></a>): a module for storing the geometric information so we don’t have to pass it</p></li>
 </ul>
 <p class="rubric">Subroutines and functions</p>
 <dl class="subroutine">
@@ -283,7 +283,7 @@
 <em class="property">subroutine  </em><code class="sig-prename descclassname">debug_module/</code><code class="sig-name descname">print_base_cc</code><span class="sig-paren">(</span><em class="sig-param">base</em><span class="sig-paren">)</span><a class="headerlink" href="#f/debug_module/print_base_cc" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p>
+<dd class="field-odd"><p><strong>base</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -293,7 +293,7 @@
 <em class="property">subroutine  </em><code class="sig-prename descclassname">debug_module/</code><code class="sig-name descname">print_base_edge</code><span class="sig-paren">(</span><em class="sig-param">base</em><span class="sig-paren">)</span><a class="headerlink" href="#f/debug_module/print_base_edge" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p>
+<dd class="field-odd"><p><strong>base</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -307,7 +307,7 @@
 <li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>mf</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1,nc_m)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>m_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_m</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
@@ -325,7 +325,7 @@
 <li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>precision</strong><em> [</em><em>double</em><em>]</em></p></li>
+<li><p><strong>mf</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1,nc_m)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>m_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_m</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
