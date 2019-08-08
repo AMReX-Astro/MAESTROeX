@@ -277,7 +277,7 @@ over a layer of constant radius, resulting in
 
 .. math::
    \frac{\partial(\rho h)_0}{\partial t} &=& -\nabla\cdot\left[(\rho h)_0w_0\eb_r\right] +
-     \psi + \overline{\rho \Hnuc} + \overline{\rho \Hext}. 
+     \psi + \overline{\rho \Hnuc} + \overline{\rho \Hext}.
    :label: eq:flow:enthalpy_base
 
 Subtracting it from the full enthalpy equation gives:
@@ -697,7 +697,7 @@ Compute :math:`\psi^{\nph,\star}`.
   first compute:
 
   .. math::
- 
+
      \begin{align}
      \overline{\Gamma_1^{(1)}} &= {\rm{\bf Avg}} \left[ \Gamma_1\left(\rho^{(1)}, p_0^{n}, X_k^{(1)}\right) \right]  , \\
      \overline{\Gamma_1^{(2),\star}} &= {\rm{\bf Avg}} \left[ \Gamma_1\left(\rho^{(2),\star}, p_0^{n+1,\star}, X_k^{(2),\star}\right) \right].\end{align}
@@ -1458,12 +1458,10 @@ which is numerically implemented as a diffusion equation for :math:`h^{(2)}`.
    8I** defines :math:`T^{(2)}` while **Step 4I** defines :math:`T^{(2),\star}`
    .
 
-.. _Sec:Initialization:
+.. _sec:Initialization:
 
 Initialization
 ==============
-
-[sec:flow:initialization]
 
 We start each calculation with user-specified initial values for
 :math:`\rho`, :math:`X_k` and :math:`T,` as well as an initial background state. In
