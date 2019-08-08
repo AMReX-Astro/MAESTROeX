@@ -29,6 +29,7 @@ ifneq ($(NO_DOXYGEN),TRUE)
 	python3 make_api.py
 endif
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	python3 postprocess_files.py
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
@@ -40,3 +41,4 @@ ifneq ($(NO_DOXYGEN),TRUE)
 endif
 	python3 make_api.py
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	python3 postprocess_files.py

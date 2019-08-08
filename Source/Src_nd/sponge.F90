@@ -37,7 +37,6 @@ module sponge_module
 contains
 
   subroutine init_sponge(rho0) bind(C, name="init_sponge")
-
     ! The sponge has a HALF * ( 1 - cos( (r - r_sp)/L)) profile, where
     ! the width, L, is r_tp - r_sp.
     !
@@ -121,7 +120,6 @@ contains
 
   subroutine init_sponge_irreg(rho0,r_cc_loc,r_edge_loc) &
     bind(C, name="init_sponge_irreg")
-
     ! The sponge has a HALF * ( 1 - cos( (r - r_sp)/L)) profile, where
     ! the width, L, is r_tp - r_sp.
     !
