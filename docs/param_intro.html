@@ -102,7 +102,11 @@
 <li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Runtime Parameters</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#introduction-to-runtime-parameters">Introduction to Runtime Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#introduction-to-runtime-parameters">Introduction to Runtime Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#c-parameter-format">C++ parameter format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#microphysics-extern-parameter-format">Microphysics/extern parameter format</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#parameters-by-namespace">Parameters by Namespace</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="runtime_parameters.html">namespace: <code class="docutils literal notranslate"><span class="pre">maestro</span></code></a></li>
 </ul>
@@ -213,33 +217,88 @@
 <span id="sec-runtime-parameters"></span><h1>Runtime Parameters<a class="headerlink" href="#runtime-parameters" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction-to-runtime-parameters">
 <h2>Introduction to Runtime Parameters<a class="headerlink" href="#introduction-to-runtime-parameters" title="Permalink to this headline">¶</a></h2>
-<p>The runtime parameters are defined in the MAESTRO/_parameters
-files, and any other problem-specific parameter files. These
-parameters are then made available to the code through the
-probin_module.</p>
-<p>Any runtime parameters defined by the microphysics (either in the
-MAESTRO/Microphysics/ source or the external Microphysics/
-source are also parsed at build time and read in via the same
-namelist in probin.f90. These microphysics runtime parameters
-can be accessed via extern_probin_module.</p>
-<p>Parameter definitions take the form of:</p>
+<p>MAESTROeX has 2 sets of runtime parameters—those controlled by
+C++ and those controlled by Fortran. The C++ parameters are set
+in the inputs file and managed by the AMReX <code class="docutils literal notranslate"><span class="pre">ParmParse</span></code>
+class. For MAESTROeX-specific parameters, we list the runtime
+parameters in a file <code class="docutils literal notranslate"><span class="pre">Source/param/_cpp_parameters</span></code> and generate the
+C++ code and headers using the <code class="docutils literal notranslate"><span class="pre">Source/param/mk_params.sh</span></code> script—note
+this script needs to be run every time the <code class="docutils literal notranslate"><span class="pre">_cpp_parameters</span></code>
+file is updated.</p>
+<p>The behavior of the network, EOS, and other microphysics routines are
+controlled by a different set of runtime parameters. These parameters are defined
+in plain-text files <code class="docutils literal notranslate"><span class="pre">_parameters</span></code> located in the different
+directories that hold the microphysics code. At compile time, a
+script in the AMReX bulid system, <code class="docutils literal notranslate"><span class="pre">findparams.py</span></code>, locates all
+of the <code class="docutils literal notranslate"><span class="pre">_parameters</span></code> files that are needed for the given choice
+of network, integrator, and EOS, and assembles all of the runtime
+parameters into a module named <code class="docutils literal notranslate"><span class="pre">extern_probin_module</span></code> (using the
+<code class="docutils literal notranslate"><span class="pre">write_probin.py</span></code> script). The parameters are set in the <code class="docutils literal notranslate"><span class="pre">&amp;probin</span></code> namelist
+in the problem inputs file.</p>
+<div class="section" id="c-parameter-format">
+<h3>C++ parameter format<a class="headerlink" href="#c-parameter-format" title="Permalink to this headline">¶</a></h3>
+<p>The C parameters take the form of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># comment describing the parameter
+name   type   default   need in Fortran?   ifdef    fortran name    fortran type
+</pre></div>
+</div>
+<p>Here,</p>
+<blockquote>
+<div><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> is the name of the parameter that will be looked for
+in the inputs file.</p>
+<p>The name can actually take the form of <code class="docutils literal notranslate"><span class="pre">(a,</span> <span class="pre">b)</span></code>, where <code class="docutils literal notranslate"><span class="pre">a</span></code> is
+the name to be used in the inputs file where the parameter is set
+and <code class="docutils literal notranslate"><span class="pre">b</span></code> is the name used within the MAESTROeX C++ class.  It is not
+recommended to name new parameters with this functionality—this
+was implemented for backwards compatibility.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code> is one of int, Real, or string</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">default</span></code> is the default value of the parameter.</p></li>
+</ul>
+</div></blockquote>
+<p>The next columns are optional, but you need to fill in all of the
+information up to and including any of the optional columns you need
+(e.g., if you are going to provide the fortran name, you also need to
+provide <code class="docutils literal notranslate"><span class="pre">need</span> <span class="pre">in</span> <span class="pre">Fortran?</span></code> and <code class="docutils literal notranslate"><span class="pre">ifdef</span></code>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">need</span> <span class="pre">in</span> <span class="pre">Fortran?</span></code> is <code class="docutils literal notranslate"><span class="pre">y</span></code> if the runtime parameter should be
+made available in Fortran (through <code class="docutils literal notranslate"><span class="pre">meth_params_module</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ifdef</span></code> provides the name of a preprocessor name that should
+wrap this parameter definition—it will only be compiled in if that
+name is defined to the preprocessor.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fortran</span> <span class="pre">name</span></code> is the name that the parameter should use in
+Fortran—by default it will be the same as <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fortran</span> <span class="pre">type</span></code> is the data type of the parameter in Fortran—by
+default it will be the Fortran-equivalent to <code class="docutils literal notranslate"><span class="pre">type</span></code>.</p></li>
+</ul>
+</div></blockquote>
+<p>Finally, any comment (starting with <code class="docutils literal notranslate"><span class="pre">#</span></code>) immediately before the
+parameter definition will be used to generate the documentation
+describing the parameters.</p>
+</div>
+<div class="section" id="microphysics-extern-parameter-format">
+<h3>Microphysics/extern parameter format<a class="headerlink" href="#microphysics-extern-parameter-format" title="Permalink to this headline">¶</a></h3>
+<p>The microphysics/extern parameter definitions take the form of:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># comment describing the parameter</span>
 <span class="n">name</span>              <span class="n">data</span><span class="o">-</span><span class="nb">type</span>       <span class="n">default</span><span class="o">-</span><span class="n">value</span>      <span class="n">priority</span>
 </pre></div>
 </div>
-<p>Here, the priority is simply an integer. When two directories
+<p>Here, the <code class="docutils literal notranslate"><span class="pre">priority</span></code> is simply an integer. When two directories
 define the same parameter, but with different defaults, the version of
 the parameter with the highest priority takes precedence. This allows
 specific implementations to override the general parameter defaults.</p>
-<p>The following tables list all of the general
-MAESTRO runtime parameters.
-These tables are generated automatically using the
-rp.py script in MAESTRO/docs/runtime_parameters/ by parsing
-the MAESTRO/_parameters file. The problem-specific parameters
-are not shown here.</p>
+</div>
 </div>
 <div class="section" id="parameters-by-namespace">
 <h2>Parameters by Namespace<a class="headerlink" href="#parameters-by-namespace" title="Permalink to this headline">¶</a></h2>
+<p>The following tables list all of the general
+MAESTROeX runtime parameters.
+These tables are generated automatically using the
+<code class="docutils literal notranslate"><span class="pre">rp.py</span></code> script in <code class="docutils literal notranslate"><span class="pre">MAESTROeX/sphinx_docs</span></code> by parsing
+the <code class="docutils literal notranslate"><span class="pre">MAESTROeX/Source/param/_cpp_parameters</span></code> file. The problem-specific parameters
+are not shown here.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="runtime_parameters.html">namespace: <code class="docutils literal notranslate"><span class="pre">maestro</span></code></a></li>
