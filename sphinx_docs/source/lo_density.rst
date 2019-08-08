@@ -2,7 +2,7 @@
 Low Density Cutoffs
 *******************
 
-These are working notes for the low density parameters in MAESTRO.
+These are working notes for the low density parameters in MAESTROeX.
 In low density regions, we modify the behavior of the algorithm. Here
 is a summary of some parameters, and a brief description of what they
 do.
