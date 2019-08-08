@@ -322,9 +322,9 @@ at constaint radius (or height for plane-parallel simulations) as
    |                       | energy generation  rate                                               |                                      |
    +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
    | :math:`\Hnuc`         | nuclear energy                                                        | erg g :math:`^{-1}`                  |
-   |                       | generation rate                                                       | s:math:`^{-1}`                       |
+   |                       | generation rate                                                       | s :math:`^{-1}`                      |
    +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`h_p`           | :math:`h_p \equiv \partial h/\partial p |_{T,X_k}`                    | cm  :math:`^{3}` g:math:`^{-1}`      |
+   | :math:`h_p`           | :math:`h_p \equiv \partial h/\partial p |_{T,X_k}`                    | cm :math:`^{3}` g :math:`^{-1}`      |
    +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
    | :math:`\kth`          | thermal conductivity                                                  | erg cm :math:`^{-1}`                 |
    |                       |                                                                       | s :math:`^{-1}` K :math:`^{-1}`      |
