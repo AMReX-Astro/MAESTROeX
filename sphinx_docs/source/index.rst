@@ -52,6 +52,13 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    enthalpy
 
 .. toctree::
+   :maxdepth: 1
+   :caption: API
+
+   filelist
+   classlist
+
+.. toctree::
    :caption: References
 
    zreferences
