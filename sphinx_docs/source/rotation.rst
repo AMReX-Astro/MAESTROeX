@@ -5,14 +5,14 @@ Rotation in MAESTROeX
 Rotation
 ========
 
-To handle rotation in MAESTRO we move to the co-rotating reference frame. Time
+To handle rotation in MAESTROeX we move to the co-rotating reference frame. Time
 derivatives of a vector in the inertial frame are related to those in the
 co-rotating frame by
 
 .. math::
 
    \label{eq:derivative relations}
-     \left(\frac{D}{Dt}\right)_\text{i} = 
+     \left(\frac{D}{Dt}\right)_\text{i} =
      \left[\left(\frac{D}{Dt}\right)_\text{rot} + \Omegab\times\ \right],
 
 where i(rot) refers to the inertial(co-rotating) frame and :math:`\Omegab` is
@@ -22,7 +22,7 @@ assuming :math:`\Omegab` is constant, we have
 .. math::
 
    \label{eq:rotational velocity relation}
-     \frac{Dv_\text{i}}{Dt} = \frac{Dv_\text{rot}}{Dt} + 
+     \frac{Dv_\text{i}}{Dt} = \frac{Dv_\text{rot}}{Dt} +
      2\Omegab \times \mathbf{v_\text{rot}} +
      \Omegab\times\left(\Omegab\times r_\text{rot}\right).
 
@@ -32,11 +32,11 @@ equation we have a momentum equation in the co-rotating frame:
 .. math::
 
    \label{eq:momentum equation with rotation}
-     \frac{\partial(\rho\mathbf{U})}{\partial t} + 
-     \nabla\cdot\left(\mathbf{U}(\rho\mathbf{U}) + p \right) = 
+     \frac{\partial(\rho\mathbf{U})}{\partial t} +
+     \nabla\cdot\left(\mathbf{U}(\rho\mathbf{U}) + p \right) =
      \underbrace{-2\rho\Omegab\times\mathbf{U}}_{\text{Coriolis}} -
      \underbrace{\rho\Omegab\times\left(\Omegab\times
-       \rb\right)}_{\text{Centrifugal}} - 
+       \rb\right)}_{\text{Centrifugal}} -
      \rho \mathbf{g}.
 
 The Coriolis and Centrifugal terms are force terms that will be added to
@@ -73,7 +73,7 @@ passed into mk_vel_force; in particular
 
 .. math::
 
-   \cos\theta \equiv \frac{\rb\cdot\text{\bf k}}{r} = 
+   \cos\theta \equiv \frac{\rb\cdot\text{\bf k}}{r} =
    \text{\bf normal}\cdot\text{\bf k} = \text{\tt normal}(3).
 
 The magnitude of :math:`\rb` is calculated based on the current zone’s location with

@@ -163,7 +163,7 @@ reduce file sizes.
 Small vs. regular plotfiles
 --------------------------
 
-MAESTRO can manage two independent sets of plotfiles. This allows you to
+MAESTROeX can manage two independent sets of plotfiles. This allows you to
 output the default plotfiles, which contain a lot of variables, sparsely,
 and output small-plotfiles much more frequently. A small-plotfile is controlled
 by the analogous runtime parameters as the main plotfiles:
@@ -370,5 +370,5 @@ with many other simulation codes). For more
 information, see the yt homepage at http://yt-project.org/ and
 :cite:`yt`.
 
-Some sample scripts that use yt with MAESTRO data are contained in
+Some sample scripts that use yt with MAESTROeX data are contained in
 ``MAESTROeX/Util/yt/``.

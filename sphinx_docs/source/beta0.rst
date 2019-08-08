@@ -3,7 +3,7 @@ Notes on :math:`\beta_0`
 ************************
 
 The goal of :math:`\beta_0` is to capture the expansion of a displaced fluid
-element due to the stratification of the atmosphere. MAESTRO computes
+element due to the stratification of the atmosphere. MAESTROeX computes
 :math:`\beta_0` as:
 
 .. math::

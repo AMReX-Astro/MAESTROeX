@@ -2,10 +2,10 @@
 Godunov Interface States
 ************************
 
-These are working notes for the Godunov step in MAESTRO and VARDEN.
+These are working notes for the Godunov step in MAESTROeX and VARDEN.
 
-MAESTRO Notation
-================
+MAESTROeX Notation
+==================
 
 -  For 2D, :math:`\Ub = (u,w)` and :math:`\Ubt = (\ut,\wt)`.
    Note that :math:`u = \ut`. We will use the shorthand :math:`\ib = (x,r)`.
@@ -60,8 +60,8 @@ using put_1d_array_on_cart_3d_sphr.
 
    \newpage
 
-Computing :math:`\Ubt^{\trans}` in MAESTRO
-==========================================
+Computing :math:`\Ubt^{\trans}` in MAESTROeX
+============================================
 
 | In advance_premac, we call mkutrans, to compute
   :math:`\Ubt^{\trans}`. We will only compute the normal
@@ -183,8 +183,8 @@ perturbational velocity.
 
    \newpage
 
-Computing :math:`\Ubt^{\mac,*}` in MAESTRO
-==========================================
+Computing :math:`\Ubt^{\mac,*}` in MAESTROeX
+============================================
 
 | In advance_premac, we call velpred to compute
   :math:`\Ubt^{\mac,*}`. We will only compute the normal component of
@@ -254,7 +254,7 @@ Solve a Riemann problem:
    \begin{cases}
    0, & \left(u_{L,\ib-\half\eb_x}^{\mac,*} \le 0 ~~ {\rm AND} ~~ u_{R,\ib-\half\eb_x}^{\mac,*} \ge 0\right) ~~ {\rm OR} ~~ \left|u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*}\right| < \epsilon, \\
    \ut_{L,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} > 0, \\
-   \ut_{R,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} < 0. 
+   \ut_{R,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} < 0.
    \end{cases}
 
 Predict :math:`\wt` to x-faces using a 1D extrapolation:
@@ -295,7 +295,7 @@ Solve a Riemann problem:
    \begin{cases}
    0, & \left(w_L^{\mac,*} \le 0 ~~ {\rm AND} ~~ w_R^{\mac,*} \ge 0\right) ~~ {\rm OR} ~~ \left|w_L^{\mac,*} + w_R^{\mac,*}\right| < \epsilon, \\
    \wt_{L,\ib-\half\eb_r}^{\mac,*}, & w_L^{\mac,*} + w_R^{\mac,*} > 0, \\
-   \wt_{R,\ib-\half\eb_r}^{\mac,*}, & w_L^{\mac,*} + w_R^{\mac,*} < 0. 
+   \wt_{R,\ib-\half\eb_r}^{\mac,*}, & w_L^{\mac,*} + w_R^{\mac,*} < 0.
    \end{cases}
 
 .. raw:: latex
@@ -408,7 +408,7 @@ the effects of corner coupling.
      \begin{cases}
      0, & \left(u_{L,\ib-\half\eb_x}^{\mac,*} \le 0 ~~ {\rm AND} ~~ u_{R,\ib-\half\eb_x}^{\mac,*} \ge 0\right) ~~ {\rm OR} ~~ \left|u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*}\right| < \epsilon, \\
      \ut_{L,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} > 0, \\
-     \ut_{R,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} < 0. 
+     \ut_{R,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} < 0.
      \end{cases}
 
   Predict :math:`\vt` to y-faces using a full-dimensional extrapolation.
@@ -419,7 +419,7 @@ the effects of corner coupling.
   .. math::
 
      \begin{aligned}
-     \wt_{L,\ib-\half\eb_r}^{\mac,*} &=& \wt_{L,\ib-\half\eb_r}^{\mac,*} - 
+     \wt_{L,\ib-\half\eb_r}^{\mac,*} &=& \wt_{L,\ib-\half\eb_r}^{\mac,*} -
      \frac{\dt}{4h}\left(\wt^{\trans}_{\ib+\half\eb_r} + \wt^{\trans}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\
      \wt_{R,\ib-\half\eb_r}^{\mac,*} &=& \wt_{R,\ib-\half\eb_r}^{\mac,*} -
      \frac{\dt}{4h}\left(\wt^{\trans}_{\ib-\half\eb_r} + \wt^{\trans}_{\ib-\frac{3}{2}\eb_r}\right)\left(w_{0,\ib-\half\eb_r}-w_{0,\ib-\frac{3}{2}\eb_r}\right)\end{aligned}
@@ -443,12 +443,12 @@ full velocity.
 
    \newpage
 
-.. _Scalar Edge State Prediction in MAESTRO:
+.. _Scalar Edge State Prediction in MAESTROeX:
 
-Computing :math:`\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}`, and :math:`\Ubt^{\edge}` in MAESTRO
-===================================================================================================
+Computing :math:`\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}`, and :math:`\Ubt^{\edge}` in MAESTROeX
+=====================================================================================================
 
-We call make_edge_scal to compute :math:`\rho^{'\edge}, X_k^{\edge}, 
+We call make_edge_scal to compute :math:`\rho^{'\edge}, X_k^{\edge},
 (\rho h)^{'\edge}`, and :math:`\Ubt^{\edge}` at each edge.
 The procedure is the same for each quantitiy, so we shall simply denote
 the scalar as :math:`s`. We always need to compute :math:`\rho'` and :math:`X_k` to faces,
@@ -549,7 +549,7 @@ of motion are:
   .. math::
 
      \begin{aligned}
-     s_{L,\ib-\half\eb_x}^{\edge} &=& s_{L,\ib-\half\eb_x}^{\edge} - 
+     s_{L,\ib-\half\eb_x}^{\edge} &=& s_{L,\ib-\half\eb_x}^{\edge} -
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib-\eb_x+\half\eb_r} + \wt^{\mac}_{\ib-\eb_x-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\
      s_{R,\ib-\half\eb_x}^{\edge} &=& s_{R,\ib-\half\eb_x}^{\edge} -
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}
@@ -622,7 +622,7 @@ of motion are:
   .. math::
 
      \begin{aligned}
-     s_{L,\ib-\half\eb_r}^{\edge} &=& s_{L,\ib-\half\eb_r}^{\edge} - 
+     s_{L,\ib-\half\eb_r}^{\edge} &=& s_{L,\ib-\half\eb_r}^{\edge} -
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib-\half\eb_r} + \wt^{\mac}_{\ib-\frac{3}{2}\eb_r}\right)\left(w_{0,\ib-\half\eb_r}-w_{0,\ib-\frac{3}{2}\eb_r}\right) \\
      s_{R,\ib-\half\eb_r}^{\edge} &=& s_{R,\ib-\half\eb_r}^{\edge} -
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}
@@ -764,7 +764,7 @@ the effects of corner coupling.
   .. math::
 
      \begin{aligned}
-     s_{L,\ib-\half\eb_x}^{\edge} &=& s_{L,\ib-\half\eb_x}^{\edge} - 
+     s_{L,\ib-\half\eb_x}^{\edge} &=& s_{L,\ib-\half\eb_x}^{\edge} -
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib-\eb_x+\half\eb_r} + \wt^{\mac}_{\ib-\eb_x-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\
      s_{R,\ib-\half\eb_x}^{\edge} &=& s_{R,\ib-\half\eb_x}^{\edge} -
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}
@@ -933,9 +933,9 @@ Computing :math:`\Ub^{\edge}` and :math:`\rho^{\edge}` in VARDEN
 ================================================================
 
 To compute :math:`\Ub^{\edge}`, VARDEN uses the exact same algorithm
-as the :math:`s^{\edge}` case in MAESTRO. The algorithm for
+as the :math:`s^{\edge}` case in MAESTROeX. The algorithm for
 :math:`\rho^{\edge}` in VARDEN is slightly different than the
-:math:`s^{\edge}` case in MAESTRO since it uses a “conservative”
+:math:`s^{\edge}` case in MAESTROeX since it uses a “conservative”
 formulation. Here, :math:`s` is used in place of either :math:`\rho, u, v`, or
 :math:`w` (in 3D).
 
@@ -1211,7 +1211,7 @@ Piecewise Parabolic Method (PPM)
   The PPM method is an improvement over the piecewise-linear method.
   Using our notation, we modify equations (`[3D predict s to left] <#3D predict s to left>`__) and
   (`[3D predict s to right] <#3D predict s to right>`__) in Section
-  `4 <#Scalar Edge State Prediction in MAESTRO>`__ to obtain better estimates
+  `4 <#Scalar Edge State Prediction in MAESTROeX>`__ to obtain better estimates
   for the time-centered 1D edge states, :math:`s_{L/R,\ib-\myhalf\eb_x}`, etc.. Once these states
   are obtained, we continue with the full-dimensional extrapolations as
   described before.
@@ -1263,7 +1263,7 @@ Here are the steps for the :math:`x`-direction. For simplicity, we replace the v
 -  | **Step 4:** Obtain 1D edge states.
    | Perform a 1D extrapolation, without source terms, to get
      left and right edge states. Add the source terms later if desired/necessary.
-   | 
+   |
 
      .. math::
 
@@ -1273,7 +1273,7 @@ Here are the steps for the :math:`x`-direction. For simplicity, we replace the v
         \mathcal{I}_{i-1,+}(\sigma), & u_{i-1} ~ \text{or} ~ u_{i-\myhalf}^{\mac} > 0 \\
         s_{i-1}, & \text{else}.
         \end{cases}\\
-        s_{R,i-\myhalf} &=& 
+        s_{R,i-\myhalf} &=&
         \begin{cases}
         \mathcal{I}_{i,-}(\sigma), & u_{i} ~ \text{or} ~ u_{i-\myhalf}^{\mac} < 0 \\
         s_{i}, & \text{else}.
@@ -1291,7 +1291,7 @@ Use a 4th-order interpolation in space with van Leer limiting to obtain edge val
 
 .. math::
 
-   \delta s_i = 
+   \delta s_i =
    \frac{1}{2}\left(s_{i+1}-s_{i-1}\right),
 
 .. math::
