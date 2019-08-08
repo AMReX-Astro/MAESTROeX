@@ -107,7 +107,8 @@ By default, the some of the runtime parameters are listed in
 ``_parameters`` file in each problem directory.
 
 ::
-   PROBIN_PARAMETER_DIRS := .
+   
+    PROBIN_PARAMETER_DIRS := .
    
 They are parsed at compile time and the file ``extern.F90``
 is written and compiled. This is a Fortran module that holds the values of
