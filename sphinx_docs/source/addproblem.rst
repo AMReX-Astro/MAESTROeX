@@ -103,7 +103,7 @@ directory will always be put first in the VPATH, so any source
 files placed there override those with the same name found elsewhere
 in the source tree.
 
-By default, the some of the runtime parameters are listed in
+By default, some of the runtime parameters are listed in
 ``_parameters`` file in each problem directory.
 
 ::
