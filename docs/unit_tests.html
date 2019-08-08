@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Common Runtime Parameters" href="common_parameters.html" />
+    <link rel="next" title="Runtime Parameters" href="param_intro.html" />
     <link rel="prev" title="Problem Setups" href="problems.html" /> 
 </head>
 
@@ -105,12 +105,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#test-basestate">test_basestate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#test-diffusion">test_diffusion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#test-eos">test_eos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#test-particles">test_particles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#test-projection">test_projection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#test-react">test_react</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
@@ -300,30 +298,6 @@ either <span class="math notranslate nohighlight">\(T\)</span> or <span class="m
 stored holding the results and errors. This allows us to determine
 whether the EOS inversion routines are working right.</p>
 </div>
-<div class="section" id="test-particles">
-<h2>test_particles<a class="headerlink" href="#test-particles" title="Permalink to this headline">¶</a></h2>
-<p>This test exercises the particle advection routine. A simple
-circular velocity field, with the magnitude increasing with radius
-from the center is initialized. A number of particles are then
-initialized at various radii from the center and they are advected
-for one period. The particle paths should be perfect circles, and
-the final particle position should overlap with the initial
-position.</p>
-<p>Particle data is stored separately from the fluid data. Instead
-of being part of the plotfiles, the particle data is outputted
-each timestep into files named <code class="docutils literal notranslate"><span class="pre">timestamp_NN</span></code>, where
-the number indicates which processor did the writing. These
-particle files can be processed and the particle data plotted
-using the python routines in <code class="docutils literal notranslate"><span class="pre">data_processing/python/</span></code>.</p>
-<p>The output from this test can be visualized with the script
-plot.py in the test directory. The output shows the particle
-paths (see below):</p>
-<div class="figure align-center" id="id9">
-<a class="reference internal image-reference" href="_images/particle_paths.png"><img alt="_images/particle_paths.png" src="_images/particle_paths.png" style="width: 80%;" /></a>
-<p class="caption"><span class="caption-text">Particle paths for the test_particles problem. The initial
-position of the particles is marked with an <span class="math notranslate nohighlight">\(\times\)</span>.</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
-</div>
-</div>
 <div class="section" id="test-projection">
 <h2>test_projection<a class="headerlink" href="#test-projection" title="Permalink to this headline">¶</a></h2>
 <p>This tests the projection routines in 2- and 3-d—either the hgprojection
@@ -335,29 +309,29 @@ periodic are supported currently). Finally, the hgproject routine
 is called to recover the initial divergence-free field.
 The figures below show the initial field, polluted
 field, and result of the projection for the hgproject case.</p>
-<div class="figure align-center" id="id10">
+<div class="figure align-center" id="id9">
 <a class="reference internal image-reference" href="_images/wall_u_init_x-velocity.png"><img alt="_images/wall_u_init_x-velocity.png" src="_images/wall_u_init_x-velocity.png" style="width: 60%;" /></a>
-<p class="caption"><span class="caption-text">Initial divergence free velocity field (x-component)</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Initial divergence free velocity field (x-component)</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id10">
+<a class="reference internal image-reference" href="_images/wall_u_plus_grad_phi_x-velocity.png"><img alt="_images/wall_u_plus_grad_phi_x-velocity.png" src="_images/wall_u_plus_grad_phi_x-velocity.png" style="width: 60%;" /></a>
+<p class="caption"><span class="caption-text">Velocity field plus gradient of a scalar (x-component)</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
 </div>
 <div class="figure align-center" id="id11">
-<a class="reference internal image-reference" href="_images/wall_u_plus_grad_phi_x-velocity.png"><img alt="_images/wall_u_plus_grad_phi_x-velocity.png" src="_images/wall_u_plus_grad_phi_x-velocity.png" style="width: 60%;" /></a>
-<p class="caption"><span class="caption-text">Velocity field plus gradient of a scalar (x-component)</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
-</div>
-<div class="figure align-center" id="id12">
 <a class="reference internal image-reference" href="_images/wall_u_new_x-velocity.png"><img alt="_images/wall_u_new_x-velocity.png" src="_images/wall_u_new_x-velocity.png" style="width: 60%;" /></a>
 <p class="caption"><span class="caption-text">Resulting velocity after projecting out the non-divergence free
-portion (x-component).</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+portion (x-component).</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
 </div>
 <p>This is with slipwall boundary conditions on all sides, a 2-level grid
 with the left half refined and right half coarse, and the hgprojection
 tested.</p>
-<div class="figure align-center" id="id13">
+<div class="figure align-center" id="id12">
 <a class="reference internal image-reference" href="_images/test_project_3d.png"><img alt="_images/test_project_3d.png" src="_images/test_project_3d.png" style="width: 80%;" /></a>
 <p class="caption"><span class="caption-text">Projection test in 3-d showing the x-velocity (left), y-velocity
 (middle), and z-velocity (right) initially (top row), after the
 gradient of a scalar is added (center row), and the resulting
 velocity after the projection. This is with slipwall boundary conditions
-on all sides, a 2-level grid with an octant refined, and the hgprojection.</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
+on all sides, a 2-level grid with an octant refined, and the hgprojection.</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
 </div>
 </div>
 <div class="section" id="test-react">
@@ -388,7 +362,7 @@ in <code class="docutils literal notranslate"><span class="pre">BoxLib/Tools/Pos
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="common_parameters.html" class="btn btn-neutral float-right" title="Common Runtime Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="param_intro.html" class="btn btn-neutral float-right" title="Runtime Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="problems.html" class="btn btn-neutral float-left" title="Problem Setups" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

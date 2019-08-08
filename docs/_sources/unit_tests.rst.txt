@@ -43,7 +43,7 @@ on orientation since we work through the corners in arbitrary order.
    :align: center
    :width: 80%
 
-   density profile after advecting to the right for one period 
+   density profile after advecting to the right for one period
 
 .. figure:: dens_2d_ppm1_xp_final_abserror.png
    :align: center
@@ -101,34 +101,34 @@ either :math:`T` or :math:`\rho` (depending on the type), and stores the new :ma
 stored holding the results and errors. This allows us to determine
 whether the EOS inversion routines are working right.
 
-test_particles
-==============
-
-This test exercises the particle advection routine. A simple
-circular velocity field, with the magnitude increasing with radius
-from the center is initialized. A number of particles are then
-initialized at various radii from the center and they are advected
-for one period. The particle paths should be perfect circles, and
-the final particle position should overlap with the initial
-position.
-
-Particle data is stored separately from the fluid data. Instead
-of being part of the plotfiles, the particle data is outputted
-each timestep into files named ``timestamp_NN``, where
-the number indicates which processor did the writing. These
-particle files can be processed and the particle data plotted
-using the python routines in ``data_processing/python/``.
-
-The output from this test can be visualized with the script
-plot.py in the test directory. The output shows the particle
-paths (see below):
-
-.. figure:: particle_paths.png
-   :align: center
-   :width: 80%
-
-   Particle paths for the test_particles problem. The initial
-   position of the particles is marked with an :math:`\times`.
+.. test_particles
+.. ==============
+..
+.. This test exercises the particle advection routine. A simple
+.. circular velocity field, with the magnitude increasing with radius
+.. from the center is initialized. A number of particles are then
+.. initialized at various radii from the center and they are advected
+.. for one period. The particle paths should be perfect circles, and
+.. the final particle position should overlap with the initial
+.. position.
+..
+.. Particle data is stored separately from the fluid data. Instead
+.. of being part of the plotfiles, the particle data is outputted
+.. each timestep into files named ``timestamp_NN``, where
+.. the number indicates which processor did the writing. These
+.. particle files can be processed and the particle data plotted
+.. using the python routines in ``data_processing/python/``.
+..
+.. The output from this test can be visualized with the script
+.. plot.py in the test directory. The output shows the particle
+.. paths (see below):
+..
+.. .. figure:: particle_paths.png
+..    :align: center
+..    :width: 80%
+..
+..    Particle paths for the test_particles problem. The initial
+..    position of the particles is marked with an :math:`\times`.
 
 test_projection
 ===============
@@ -195,4 +195,3 @@ desired number of threads). Since each zone is independent of the
 others, the results should be identical regardless of the number
 of threads. This can be confirmed using the fcompare tool
 in ``BoxLib/Tools/Postprocessing/F_Src/``.
-

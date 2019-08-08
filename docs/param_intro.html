@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="namespace: maestro" href="runtime_parameters.html" />
-    <link rel="prev" title="Common Runtime Parameters" href="common_parameters.html" /> 
+    <link rel="prev" title="Unit Tests" href="unit_tests.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -100,11 +100,15 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Runtime Parameters</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction-to-runtime-parameters">Introduction to Runtime Parameters</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#c-parameter-format">C++ parameter format</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#microphysics-extern-parameter-format">Microphysics/extern parameter format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#common-runtime-parameters">Common Runtime Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#controlling-timestepping-and-output">Controlling Timestepping and Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#defining-the-grid-and-boundary-conditions">Defining the Grid and Boundary Conditions</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#parameters-by-namespace">Parameters by Namespace</a><ul>
@@ -291,6 +295,126 @@ the parameter with the highest priority takes precedence. This allows
 specific implementations to override the general parameter defaults.</p>
 </div>
 </div>
+<div class="section" id="common-runtime-parameters">
+<h2>Common Runtime Parameters<a class="headerlink" href="#common-runtime-parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="controlling-timestepping-and-output">
+<h3>Controlling Timestepping and Output<a class="headerlink" href="#controlling-timestepping-and-output" title="Permalink to this headline">¶</a></h3>
+<p>Parameters that set the maximum time for the simulation to run
+include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">stop_time</span></code> is the maximum simulation time, in seconds,
+to evolve the system for.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_step</span></code> is the maximum number of steps to take.</p></li>
+</ul>
+<p>Parameters affecting the size of the timestep include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cfl</span></code> is a multiplicative factor (<span class="math notranslate nohighlight">\(\le 1\)</span>)
+applied to the advective CFL timestep</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">init_shrink</span></code> is the factor (<span class="math notranslate nohighlight">\(\le 1\)</span>) by which to reduce
+the initial timestep from the estimated first timestep.</p></li>
+</ul>
+<p>Parameters affecting output and restart include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">restart_file</span></code> tells MAESTROeX to restart from a checkpoint. The
+value of this parameter should be the name of the checkpoint file to
+restart from. For example, to restart from the checkpoint file <code class="docutils literal notranslate"><span class="pre">chk00010</span></code>,
+you would set <code class="docutils literal notranslate"><span class="pre">maestro.restart_file</span> <span class="pre">=</span> <span class="pre">chk00010</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plot_int</span></code> is the number of steps to take between
+outputting a plotfile</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plot_deltat</span></code> is the simulation time to evolve between
+outputting a plotfile. Note: to output only based on simulation
+time, set <code class="docutils literal notranslate"><span class="pre">maestro.plot_int</span> <span class="pre">=</span> <span class="pre">-1</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chk_int</span></code> is the number of steps to take between
+outputting a checkpoint.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plot_base_name</span></code> is the basename to use for the
+plotfile filename. The step number will be appended to
+this name.</p></li>
+</ul>
+<p>Note that in addition to the normal plotfiles, there are <em>small</em> plotfiles
+that store a small subset of the fields, intended to be output more frequently.
+These are described in § <a class="reference external" href="#vis:sec:miniplotfile">[vis:sec:miniplotfile]</a>.</p>
+</div>
+<div class="section" id="defining-the-grid-and-boundary-conditions">
+<h3>Defining the Grid and Boundary Conditions<a class="headerlink" href="#defining-the-grid-and-boundary-conditions" title="Permalink to this headline">¶</a></h3>
+<p>Parameters that determine the spatial extent of the grid,
+the types of boundaries, and the number of computational cells include:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">amr.max_level</span></code> is the maximum number of grid levels in the AMR
+hierarchy to use. <code class="docutils literal notranslate"><span class="pre">amr.max_level</span> <span class="pre">=</span> <span class="pre">0</span></code> indicates running with only a
+single level spanning the whole domain.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">amr.n_cell</span></code> is the size of the
+base level in terms of number of cells. It takes a list of integer numbers,
+defining the size in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>
+coordinate directions, e.g. <code class="docutils literal notranslate"><span class="pre">amr.n_cell</span> <span class="pre">=</span> <span class="pre">64</span> <span class="pre">64</span> <span class="pre">64</span></code> would define a domain
+of size <span class="math notranslate nohighlight">\(64^3\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">amr.max_grid_size</span></code> is the maximum extent of a grid, in any
+coordinate direction, as measured in terms of number of cells.</p>
+<p>For multilevel problems, this parameter can take a list of values,
+each value determining the maximum extent at each level.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geometry.prob_lo</span></code> is
+the physical coordinate of the lower extent of the domain boundary.
+It takes a list of values defining the coordinates
+in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span> coordinate directions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geometry.prob_hi</span></code> is
+the physical coordinate of the upper extent of the domain boundary.
+It takes a list of values defining the coordinates
+in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span> coordinate directions.</p></li>
+<li><p>Boundary conditions are specified via integer flags.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">maestro.lo_bc</span></code> and  <code class="docutils literal notranslate"><span class="pre">maestro.hi_bc</span></code> are the
+boundary condition types at the lower (‘lo’) and upper
+(‘hi’) domain boundaries in the <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, and <span class="math notranslate nohighlight">\(z\)</span>
+coordinate directions. The different types are set via integer
+flags listed in table <a class="reference internal" href="#table-bc-flags"><span class="std std-ref">Boundary condition flags</span></a>.</p>
+<span id="table-bc-flags"></span><table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Boundary condition flags</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>BC type</p></th>
+<th class="head"><p>integer flag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Interior</p></td>
+<td><p><span class="math notranslate nohighlight">\(0\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Inflow</p></td>
+<td><p><span class="math notranslate nohighlight">\(1\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Outflow</p></td>
+<td><p><span class="math notranslate nohighlight">\(2\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Symmetry</p></td>
+<td><p><span class="math notranslate nohighlight">\(3\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Slip wall</p></td>
+<td><p><span class="math notranslate nohighlight">\(4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>No-slip wall</p></td>
+<td><p><span class="math notranslate nohighlight">\(5\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Periodic boundary conditions are set using the parameter
+<code class="docutils literal notranslate"><span class="pre">geometry.is_periodic</span></code>. This takes a list of values, with <code class="docutils literal notranslate"><span class="pre">1</span></code> indicating
+periodic boundary conditions (and <code class="docutils literal notranslate"><span class="pre">0</span></code> non-periodic). So to set periodic
+boundary conditions in the <span class="math notranslate nohighlight">\(x\)</span>-direction only, you would set
+<code class="docutils literal notranslate"><span class="pre">geometry.is_periodic</span> <span class="pre">=</span> <span class="pre">1</span> <span class="pre">0</span> <span class="pre">0</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+<p>Note that grid cells must be square, i.e. <span class="math notranslate nohighlight">\(\Delta x = \Delta y = \Delta z\)</span>
+where <span class="math notranslate nohighlight">\(\Delta x\)</span> on the base grid is computed as <span class="math notranslate nohighlight">\(({\tt prob\_hi\_x}
+- {\tt prob\_lo\_x})/{\tt n\_cellx}\)</span>. For multilevel problems, the effective
+number of zones on the finest grid in the <span class="math notranslate nohighlight">\(x\)</span> direction will be
+<span class="math notranslate nohighlight">\({\tt n\_cellx} \cdot 2^{({\tt max\_levels} -1)}\)</span>.</p>
+</div>
+</div>
 <div class="section" id="parameters-by-namespace">
 <h2>Parameters by Namespace<a class="headerlink" href="#parameters-by-namespace" title="Permalink to this headline">¶</a></h2>
 <p>The following tables list all of the general
@@ -318,7 +442,7 @@ are not shown here.</p>
         <a href="runtime_parameters.html" class="btn btn-neutral float-right" title="namespace: maestro" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="common_parameters.html" class="btn btn-neutral float-left" title="Common Runtime Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="unit_tests.html" class="btn btn-neutral float-left" title="Unit Tests" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

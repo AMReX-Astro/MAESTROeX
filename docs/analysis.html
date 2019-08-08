@@ -100,7 +100,6 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
 <li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="common_parameters.html">Common Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
@@ -225,8 +224,10 @@ plotfile. Typing the executable names without any arguments will
 provide usage examples.</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">fboxinfo.cpp</span></code></p>
-<p>Print out some basic information about the number of boxes on each
-refinement level and (optionally) the bounds of each of the boxes.</p>
+<div class="line-block">
+<div class="line">Print out some basic information about the number of boxes on each
+refinement level and (optionally) the bounds of each of the boxes.</div>
+</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">fcompare.cpp</span></code></p>
 <div class="line-block">
@@ -239,27 +240,37 @@ for the zone where var has the largest error.</div>
 </div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">fextract.cpp</span></code></p>
-<p>Extract a 1-d line through a dataset (1-, 2-, or 3-d). This works
+<div class="line-block">
+<div class="line">Extract a 1-d line through a dataset (1-, 2-, or 3-d). This works
 with both uniformly-gridded or AMR datasets. For multi-dimensional
 datasets, the coordinate direction to extract along can be specified.
 The line is always taken through the center of the domain. Either
 a single variable or all variables, along with the coordinate
-information, are output to a file.</p>
+information, are output to a file.</div>
+</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">fextrema.cpp</span></code></p>
-<p>Report the min and max of each variable (or only a single variable)
-in one or more plotfiles.</p>
+<div class="line-block">
+<div class="line">Report the min and max of each variable (or only a single variable)
+in one or more plotfiles.</div>
+</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">fsnapshot.cpp</span></code></p>
-<p>Create an image (PPM file) of a single variable in a plotfile. For
+<div class="line-block">
+<div class="line">Create an image (PPM file) of a single variable in a plotfile. For
 3-d, the slice plane through the center of the domain is specified.
-Separate routines exist for 2-d and 3-d datasets.</p>
+Separate routines exist for 2-d and 3-d datasets.</div>
+</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ftime.f90</span></code></p>
-<p>For each plotfile, simply print the simulation time.</p>
+<div class="line-block">
+<div class="line">For each plotfile, simply print the simulation time.</div>
+</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">fvarnames.f90</span></code></p>
-<p>Simply print out the list of variables stored in a plotfile.</p>
+<div class="line-block">
+<div class="line">Simply print out the list of variables stored in a plotfile.</div>
+</div>
 </li>
 </ul>
 </div>
