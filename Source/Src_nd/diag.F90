@@ -84,9 +84,8 @@ contains
 
     ! weight is the factor by which the volume of a cell at the current level
     ! relates to the volume of a cell at the coarsest level of refinement.
-#if (AMREX_SPACEDIM == 1)
-    weight = 1.d0 / 2.d0**(lev)
-#elif (AMREX_SPACEDIM == 2)
+
+#if (AMREX_SPACEDIM == 2)
     weight = 1.d0 / 4.d0**(lev)
 #elif (AMREX_SPACEDIM == 3)
     weight = 1.d0 / 8.d0**(lev)
@@ -108,9 +107,7 @@ contains
           if (cell_valid) then
 
             ! vel is the magnitude of the velocity, including w0
-#if (AMREX_SPACEDIM == 1)
-            vel = sqrt( (u(i,j,k,1) + 0.5d0*(w0(lev,i) + w0(lev,i+1)) )**2 )
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
             vel = sqrt(  u(i,j,k,1)**2 + &
                         ( u(i,j,k,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
@@ -128,9 +125,7 @@ contains
                vel_Tmax(1)   = u(i,j,k,1)
                vel_Tmax(2)   = u(i,j,k,2)
                vel_Tmax(3)   = u(i,j,k,3)
-#if (AMREX_SPACEDIM == 1)
-               vel_Tmax(1)   = vel_Tmax(1) + 0.5d0*(w0(lev,i) + w0(lev,i+1))
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                vel_Tmax(2)   = vel_Tmax(2) + 0.5d0*(w0(lev,j) + w0(lev,j+1))
 #elif (AMREX_SPACEDIM == 3)
                vel_Tmax(3)   = vel_Tmax(3) + 0.5d0*(w0(lev,k) + w0(lev,k+1))
@@ -146,9 +141,7 @@ contains
               vel_enucmax(1)   = u(i,j,k,1)
               vel_enucmax(2)   = u(i,j,k,2)
               vel_enucmax(3)   = u(i,j,k,3)
-#if (AMREX_SPACEDIM == 1)
-              vel_enucmax(1)   = vel_enucmax(1) + 0.5d0*(w0(lev,i) + w0(lev,i+1))
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
               vel_enucmax(2)   = vel_enucmax(2) + 0.5d0*(w0(lev,j) + w0(lev,j+1))
 #elif (AMREX_SPACEDIM == 3)
               vel_enucmax(3)   = vel_enucmax(3) + 0.5d0*(w0(lev,k) + w0(lev,k+1))

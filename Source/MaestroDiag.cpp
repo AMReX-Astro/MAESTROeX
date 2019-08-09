@@ -466,13 +466,13 @@ Maestro::DiagFile (const int step,
             diagfile1 << std::setw(setwVal) << std::left << t_in;
             diagfile1 << std::setw(setwVal) << std::left << T_max;
 
-            const Real coordT2 = (AMREX_SPACEDIM <2) ? 0.0 : coord_Tmax[1];
+            const Real coordT2 = coord_Tmax[1];
             const Real coordT3 = (AMREX_SPACEDIM <3) ? 0.0 : coord_Tmax[2];
             diagfile1 << std::setw(setwVal) << std::left << coord_Tmax[0];
             diagfile1 << std::setw(setwVal) << std::left << coordT2;
             diagfile1 << std::setw(setwVal) << std::left << coordT3;
 
-            const Real velT2 = (AMREX_SPACEDIM <2) ? 0.0 : vel_Tmax[1];
+            const Real velT2 = vel_Tmax[1];
             const Real velT3 = (AMREX_SPACEDIM <3) ? 0.0 : vel_Tmax[2];
             diagfile1 << std::setw(setwVal) << std::left << vel_Tmax[0];
             diagfile1 << std::setw(setwVal) << std::left << velT2;
