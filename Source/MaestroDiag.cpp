@@ -466,17 +466,17 @@ Maestro::DiagFile (const int step,
             diagfile1 << std::setw(setwVal) << std::left << t_in;
             diagfile1 << std::setw(setwVal) << std::left << T_max;
 
-            const Real coordT2 = coord_Tmax[1];
-            const Real coordT3 = (AMREX_SPACEDIM <3) ? 0.0 : coord_Tmax[2];
+            const Real coord_temp_max_y = coord_Tmax[1];
+            const Real coord_temp_max_z = (AMREX_SPACEDIM <3) ? 0.0 : coord_Tmax[2];
             diagfile1 << std::setw(setwVal) << std::left << coord_Tmax[0];
-            diagfile1 << std::setw(setwVal) << std::left << coordT2;
-            diagfile1 << std::setw(setwVal) << std::left << coordT3;
+            diagfile1 << std::setw(setwVal) << std::left << coord_temp_max_y;
+            diagfile1 << std::setw(setwVal) << std::left << coord_temp_max_z;
 
-            const Real velT2 = vel_Tmax[1];
-            const Real velT3 = (AMREX_SPACEDIM <3) ? 0.0 : vel_Tmax[2];
+            const Real vel_temp_max_y = vel_Tmax[1];
+            const Real vel_temp_max_z = (AMREX_SPACEDIM <3) ? 0.0 : vel_Tmax[2];
             diagfile1 << std::setw(setwVal) << std::left << vel_Tmax[0];
-            diagfile1 << std::setw(setwVal) << std::left << velT2;
-            diagfile1 << std::setw(setwVal) << std::left << velT3;
+            diagfile1 << std::setw(setwVal) << std::left << vel_temp_max_y;
+            diagfile1 << std::setw(setwVal) << std::left << vel_temp_max_z;
 
             if (spherical == 1) {
               diagfile1 << std::setw(setwVal) << std::left << Rloc_Tmax;
@@ -513,17 +513,17 @@ Maestro::DiagFile (const int step,
             diagfile2 << std::setw(setwVal) << std::left << t_in;
             diagfile2 << std::setw(setwVal) << std::left << enuc_max;
 
-            const Real coordenuc2 = (AMREX_SPACEDIM <2) ? 0.0 : coord_enucmax[1];
-            const Real coordenuc3 = (AMREX_SPACEDIM <3) ? 0.0 : coord_enucmax[2];
+            const Real coord_enuc_y = (AMREX_SPACEDIM <2) ? 0.0 : coord_enucmax[1];
+            const Real coord_enuc_z = (AMREX_SPACEDIM <3) ? 0.0 : coord_enucmax[2];
             diagfile2 << std::setw(setwVal) << std::left << coord_enucmax[0];
-            diagfile2 << std::setw(setwVal) << std::left << coordenuc2;
-            diagfile2 << std::setw(setwVal) << std::left << coordenuc3;
+            diagfile2 << std::setw(setwVal) << std::left << coord_enuc_y;
+            diagfile2 << std::setw(setwVal) << std::left << coord_enuc_z;
 
-            const Real velenuc2 = (AMREX_SPACEDIM <2) ? 0.0 : vel_enucmax[1];
-            const Real velenuc3 = (AMREX_SPACEDIM <3) ? 0.0 : vel_enucmax[2];
+            const Real vel_enuc_y = (AMREX_SPACEDIM <2) ? 0.0 : vel_enucmax[1];
+            const Real vel_enuc_z = (AMREX_SPACEDIM <3) ? 0.0 : vel_enucmax[2];
             diagfile2 << std::setw(setwVal) << std::left << vel_enucmax[0];
-            diagfile2 << std::setw(setwVal) << std::left << velenuc2;
-            diagfile2 << std::setw(setwVal) << std::left << velenuc3;
+            diagfile2 << std::setw(setwVal) << std::left << vel_enuc_y;
+            diagfile2 << std::setw(setwVal) << std::left << vel_enuc_z;
 
             if (spherical == 1) {
               diagfile2 << std::setw(setwVal) << std::left << Rloc_enucmax;
@@ -577,19 +577,19 @@ Maestro::DiagFile (const int step,
             // temp
             diagfile1_data[index*ndiag1  ] = t_in;
             diagfile1_data[index*ndiag1+1] = T_max;
-            const Real coordT2 = (AMREX_SPACEDIM <2) ? 0.0 : coord_Tmax[1];
-            const Real coordT3 = (AMREX_SPACEDIM <3) ? 0.0 : coord_Tmax[2];
+            const Real coord_temp_max_y = (AMREX_SPACEDIM <2) ? 0.0 : coord_Tmax[1];
+            const Real coord_temp_max_z = (AMREX_SPACEDIM <3) ? 0.0 : coord_Tmax[2];
             diagfile1_data[index*ndiag1+2] = coord_Tmax[0];
-            diagfile1_data[index*ndiag1+3] = coordT2;
-            diagfile1_data[index*ndiag1+4] = coordT3;
-            const Real velT2 = (AMREX_SPACEDIM <2) ? 0.0 : vel_Tmax[1];
-            const Real velT3 = (AMREX_SPACEDIM <3) ? 0.0 : vel_Tmax[2];
+            diagfile1_data[index*ndiag1+3] = coord_temp_max_y;
+            diagfile1_data[index*ndiag1+4] = coord_temp_max_z;
+            const Real vel_temp_max_y = (AMREX_SPACEDIM <2) ? 0.0 : vel_Tmax[1];
+            const Real vel_temp_max_z = (AMREX_SPACEDIM <3) ? 0.0 : vel_Tmax[2];
             diagfile1_data[index*ndiag1+5] = vel_Tmax[0];
-            diagfile1_data[index*ndiag1+6] = velT2;
-            diagfile1_data[index*ndiag1+7] = velT3;
+            diagfile1_data[index*ndiag1+6] = vel_temp_max_y;
+            diagfile1_data[index*ndiag1+7] = vel_temp_max_z;
             diagfile1 << std::setw(setwVal) << std::left << vel_Tmax[0];
-            diagfile1 << std::setw(setwVal) << std::left << velT2;
-            diagfile1 << std::setw(setwVal) << std::left << velT3;
+            diagfile1 << std::setw(setwVal) << std::left << vel_temp_max_y;
+            diagfile1 << std::setw(setwVal) << std::left << vel_temp_max_z;
             if (spherical == 1) {
               diagfile1_data[index*ndiag1+8] = Rloc_Tmax;
               diagfile1_data[index*ndiag1+9] = vr_Tmax;
@@ -599,16 +599,16 @@ Maestro::DiagFile (const int step,
             // enuc
             diagfile2_data[index*ndiag2  ] = t_in;
             diagfile2_data[index*ndiag2+1] = enuc_max;
-            const Real coordenuc2 = (AMREX_SPACEDIM <2) ? 0.0 : coord_Tmax[1];
-            const Real coordenuc3 = (AMREX_SPACEDIM <3) ? 0.0 : coord_Tmax[2];
+            const Real coord_enuc_y = (AMREX_SPACEDIM <2) ? 0.0 : coord_Tmax[1];
+            const Real coord_enuc_z = (AMREX_SPACEDIM <3) ? 0.0 : coord_Tmax[2];
             diagfile2_data[index*ndiag2+2] = coord_enucmax[0];
-            diagfile2_data[index*ndiag2+3] = coordenuc2;
-            diagfile2_data[index*ndiag2+4] = coordenuc3;
-            const Real velenuc2 = (AMREX_SPACEDIM <2) ? 0.0 : vel_enucmax[1];
-            const Real velenuc3 = (AMREX_SPACEDIM <3) ? 0.0 : vel_enucmax[2];
+            diagfile2_data[index*ndiag2+3] = coord_enuc_y;
+            diagfile2_data[index*ndiag2+4] = coord_enuc_z;
+            const Real vel_enuc_y = (AMREX_SPACEDIM <2) ? 0.0 : vel_enucmax[1];
+            const Real vel_enuc_z = (AMREX_SPACEDIM <3) ? 0.0 : vel_enucmax[2];
             diagfile2_data[index*ndiag2+5] = vel_enucmax[0];
-            diagfile2_data[index*ndiag2+6] = velenuc2;
-            diagfile2_data[index*ndiag2+7] = velenuc3;
+            diagfile2_data[index*ndiag2+6] = vel_enuc_y;
+            diagfile2_data[index*ndiag2+7] = vel_enuc_z;
             diagfile2_data[index*ndiag2+8] = Rloc_enucmax;
             diagfile2_data[index*ndiag2+9] = vr_enucmax;
             diagfile2_data[index*ndiag2+10] = nuc_ener;
