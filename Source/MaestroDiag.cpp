@@ -61,8 +61,6 @@ Maestro::DiagFile (const int step,
         // expansion velocity)
         Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,1);
 
-        // compute rho_Hext and rho_Hnuc *was* here
-
     } 
 
     // compute rho_Hext and rho_Hnuc
@@ -320,7 +318,7 @@ Maestro::DiagFile (const int step,
             Mach_max = max(Mach_max, Mach_max_level);
 
             // compute center of domain
-            // (in planar, this will be center of box - dubious utility but saves more if spherical)
+            // (in planar, of dubious utility but saves more if spherical==1 conditionals )
             //Vector<Real> center(3, 0.0);
             Vector<Real> center(AMREX_SPACEDIM, 0.0);
             const Real* probLo = geom[0].ProbLo();
