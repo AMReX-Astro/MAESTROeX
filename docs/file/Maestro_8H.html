@@ -242,7 +242,7 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro5SetupEv">
 <span id="_CPPv3N7Maestro5SetupEv"></span><span id="_CPPv2N7Maestro5SetupEv"></span><span id="Maestro::Setup"></span><span class="target" id="classMaestro_1a18a558d416c39313d564c396ead4fce9"></span>void <code class="sig-name descname">Setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p><ul class="simple">
+<dd><p>Setup the simulation.<ul class="simple">
 <li><p>read in C++/F90 parameters</p></li>
 <li><p>define global C++/F90 variables and initialize network</p></li>
 <li><p>set up boundary conditions</p></li>
@@ -256,7 +256,7 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro4InitEv">
 <span id="_CPPv3N7Maestro4InitEv"></span><span id="_CPPv2N7Maestro4InitEv"></span><span id="Maestro::Init"></span><span class="target" id="classMaestro_1ac9405928d3319e15fd739032fb95454d"></span>void <code class="sig-name descname">Init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p><ul class="simple">
+<dd><p>Initialize the simulation.<ul class="simple">
 <li><p>initialize multifab and base state data</p></li>
 <li><p>perform initial projection</p></li>
 <li><p>perform divu iters</p></li>
@@ -324,78 +324,238 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro15AdvanceTimeStepEb">
 <span id="_CPPv3N7Maestro15AdvanceTimeStepEb"></span><span id="_CPPv2N7Maestro15AdvanceTimeStepEb"></span><span id="Maestro::AdvanceTimeStep__b"></span><span class="target" id="classMaestro_1a28cd0470817dcd413c0baa62a3afc9cd"></span>void <code class="sig-name descname">AdvanceTimeStep</code><span class="sig-paren">(</span>bool <em>is_initIter</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Advance solution at all levels for a single time step. </p>
+<dd><p>Advance solution at all levels for a single time step. This uses the old temporal integration scheme.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">is_initIter</span></code>: is it the initial iteration? </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro20AdvanceTimeStepIrregEb">
 <span id="_CPPv3N7Maestro20AdvanceTimeStepIrregEb"></span><span id="_CPPv2N7Maestro20AdvanceTimeStepIrregEb"></span><span id="Maestro::AdvanceTimeStepIrreg__b"></span><span class="target" id="classMaestro_1a1af64b127c7d89e4fb7901aede4f9374"></span>void <code class="sig-name descname">AdvanceTimeStepIrreg</code><span class="sig-paren">(</span>bool <em>is_initIter</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Advance solution for a single time step with irregular base state spacing. </p>
+<dd><p>Advance solution for a single time step with irregular base state spacing</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">is_initIter</span></code>: is it the initial iteration? </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro22AdvanceTimeStepAverageEb">
 <span id="_CPPv3N7Maestro22AdvanceTimeStepAverageEb"></span><span id="_CPPv2N7Maestro22AdvanceTimeStepAverageEb"></span><span id="Maestro::AdvanceTimeStepAverage__b"></span><span class="target" id="classMaestro_1a1e0f1346cd45de344eddadd8519d7340"></span>void <code class="sig-name descname">AdvanceTimeStepAverage</code><span class="sig-paren">(</span>bool <em>is_initIter</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Advance solution for a single time step with regular base state spacing and new time-stepping scheme </p>
+<dd><p>Advance solution for a single time step with regular base state spacing and new time-stepping scheme</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">is_initIter</span></code>: is it the initial iteration? </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13AdvancePremacERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro13AdvancePremacERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro13AdvancePremacERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::AdvancePremac__Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1aefff044c2471863abaea9204b81d23f9"></span>void <code class="sig-name descname">AdvancePremac</code><span class="sig-paren">(</span>Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>w0_force</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>w0_force_cart</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Compute unprojected mac velocities. </p>
+<dd><p>Compute unprojected mac velocities</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code>: MAC velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0mac</span></code>: MAC base-state velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0_force</span></code>: base-state-velocity force </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0_force_cart</span></code>: base-state-velocity force on cartesian grid </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10MakeUtransERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro10MakeUtransERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro10MakeUtransERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::MakeUtrans__Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR"></span><span class="target" id="classMaestro_1ae3d0e7102380f802fadeacbb82ad8989"></span>void <code class="sig-name descname">MakeUtrans</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>utilde</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>ufull</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>utrans</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Create <code class="docutils literal notranslate"><span class="pre">utrans</span></code>, the transverse velocity. </p>
+<dd><p>Create <code class="docutils literal notranslate"><span class="pre">utrans</span></code>, the transverse velocity</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">utilde</span></code>: perturbed velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ufull</span></code>: full velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">utrans</span></code>: transverse velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0mac</span></code>: MAC base-state velocity </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7VelPredERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro7VelPredERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro7VelPredERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::VelPred__Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1a1475521dc81e25b9f00be96da745e44b"></span>void <code class="sig-name descname">VelPred</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>utilde</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>ufull</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>utrans</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>force</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Predict the normal velocities to the interfaces. We don’t care about the transverse velocities here. The prediction is done piecewise linear (for now)</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">utilde</span></code>: perturbed velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ufull</span></code>: full velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">utrans</span></code>: transverse velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code>: MAC velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0mac</span></code>: MAC base-state velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">force</span></code>: velocity force </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MakeEdgeScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex5BCRecEEEiiiii">
 <span id="_CPPv3N7Maestro12MakeEdgeScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex5BCRecEEEiiiii"></span><span id="_CPPv2N7Maestro12MakeEdgeScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex5BCRecEEEiiiii"></span><span id="Maestro::MakeEdgeScal__Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:MultiFab:CR.i.Vector:BCRec:CR.i.i.i.i.i"></span><span class="target" id="classMaestro_1acbf6fcf4fafeb6754113ebf5c2d8cc79"></span>void <code class="sig-name descname">MakeEdgeScal</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>state</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sedge</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>force</em>, int <em>is_vel</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcs</em>, int <em>nbccomp</em>, int <em>start_scomp</em>, int <em>start_bccomp</em>, int <em>num_comp</em>, int <em>is_conservative</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Calculate scalars on cell edges given cell-centered state. </p>
+<dd><p>Calculate scalars on cell edges given cell-centered state constructs the edge state of a scalar, using a second-order Taylor expansion in space (through <code class="docutils literal notranslate"><span class="pre">dx/2</span></code>) and time (though <code class="docutils literal notranslate"><span class="pre">dt/2</span></code>) (if <code class="docutils literal notranslate"><span class="pre">ppm_type</span> <span class="pre">=</span> <span class="pre">0</span></code>) or using PPM (for <code class="docutils literal notranslate"><span class="pre">ppm_type</span> <span class="pre">=</span> <span class="pre">1,2</span></code>).</p>
+<p>We use only MAC-projected edge velocities in this prediction.</p>
+<p>We are computing all edge states for each variable. This is what is done for the final updates of the state variables and velocity. For velocity, we should set <code class="docutils literal notranslate"><span class="pre">is_vel</span> <span class="pre">=</span> <span class="pre">true</span></code></p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code>: cell-centered scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sedge</span></code>: edge state of scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code>: MAC velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">force</span></code>: velocity force </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_vel</span></code>: set to true if state is a velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcs</span></code>: boundary conditions </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nbccomp</span></code>: number of components of <code class="docutils literal notranslate"><span class="pre">bcs</span></code> </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_scomp</span></code>: index of component of <code class="docutils literal notranslate"><span class="pre">state</span></code> to begin with </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_bccomp</span></code>: index of component of <code class="docutils literal notranslate"><span class="pre">bcs</span></code> to begin with </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_comp</span></code>: number of components to perform calculation for </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_conservative</span></code>: are these conserved quantities? </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MakeRhoXFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorii">
 <span id="_CPPv3N7Maestro12MakeRhoXFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorii"></span><span id="_CPPv2N7Maestro12MakeRhoXFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorii"></span><span id="Maestro::MakeRhoXFlux__Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:MultiFab:R.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.i.i"></span><span class="target" id="classMaestro_1a46310e87078d4861c0efe374fec9eae8"></span>void <code class="sig-name descname">MakeRhoXFlux</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>state</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sflux</em>, Vector&lt;MultiFab&gt; &amp;<em>etarhoflux</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sedge</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_old</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_edge_old</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>r0mac_old</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_new</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_edge_new</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>r0mac_new</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_predicted_edge</em>, int <em>start_comp</em>, int <em>num_comp</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Calculate <code class="docutils literal notranslate"><span class="pre">rhoX</span></code> flux. </p>
+<dd><p>Calculate <code class="docutils literal notranslate"><span class="pre">rhoX</span></code> flux</p>
+<p>Takes the predicted edges states of the scalars and the MAC velocities and computes the flux through the interfaces.</p>
+<p>The construction of the fluxes depends on what form the incoming edge states take. This depends on <code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code>:</p>
+<p><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predict_rhoprime_and_X</span></code>: We have rho’ and X, and need a edge-centered base state to make the final fluxes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predict_rhoX</span></code>: We use the (rho X) edge state directly to compute the fluxes. No base state input needed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predict_rho_and_X</span></code>: The fluxes are computed from the product of the rho and X edge states, again, no base state input needed.</p></li>
+</ul>
+</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code>: cell-centered scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sflux</span></code>: scalar flux </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">etarhoflux</span></code>: <code class="docutils literal notranslate"><span class="pre">eta_rho</span></code> flux </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sedge</span></code>: edge state of scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span><span class="pre">w0mac</span></code>: MAC velocity of full and base-state velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_old</span></code>: old base-state density </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_edge_old</span></code>: old base-state density on cell-edges </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0mac_old</span></code>: old MAC-projected base-state density </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_new</span></code>: new base-state density </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_edge_new</span></code>: new base-state density on cell-edges </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0mac_new</span></code>: new MAC-projected base-state density </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_predicted_edge</span></code>: new base-state density on cell edges </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_comp</span></code>: index of component of <code class="docutils literal notranslate"><span class="pre">state</span></code> to begin with </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_comp</span></code>: number of components to perform calculation for </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MakeRhoHFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro12MakeRhoHFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro12MakeRhoHFluxERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::MakeRhoHFlux__Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.RealVectorCR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR"></span><span class="target" id="classMaestro_1abef4cf23bb862f1c99c05cded98dbac6"></span>void <code class="sig-name descname">MakeRhoHFlux</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>state</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sflux</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sedge</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_old</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_edge_old</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>r0mac_old</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_new</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>r0_edge_new</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>r0mac_new</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rh0_old</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rh0_edge_old</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>rh0mac_old</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rh0_new</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rh0_edge_new</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>rh0mac_new</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>h0mac_old</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>h0mac_new</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Calculate <code class="docutils literal notranslate"><span class="pre">rhoh</span></code> flux. </p>
+<dd><p>Calculate <code class="docutils literal notranslate"><span class="pre">rhoh</span></code> flux</p>
+<p>Takes the predicted edges states of the scalars and the MAC velocities and computes the flux through the interfaces.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code>: cell-centered scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sflux</span></code>: scalar flux </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sedge</span></code>: edge state of scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span><span class="pre">w0mac</span></code>: MAC velocity of full and base-state velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_old</span></code>: old base-state density </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_edge_old</span></code>: old base-state density on cell-edges </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0mac_old</span></code>: old MAC-projected base-state density </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_new</span></code>: new base-state density </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0_edge_new</span></code>: new base-state density on cell-edges </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">r0mac_new</span></code>: new MAC-projected base-state density </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rh0_old</span></code>: old base-state conserved enthalpy </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rh0_edge_old</span></code>: old base-state conserved enthalpy on cell-edges </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rh0mac_old</span></code>: old MAC-projected base-state conserved enthalpy </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rh0_new</span></code>: new base-state conserved enthalpy </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rh0_edge_new</span></code>: new base-state conserved enthalpy on cell-edges </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rh0mac_new</span></code>: new MAC-projected base-state conserved enthalpy </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">h0mac_old</span><span class="pre">h0mac_new</span></code>: base-state primitive enthalpy </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10UpdateScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiiPKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro10UpdateScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiiPKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10UpdateScalERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEEiiPKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::UpdateScal__Vector:MultiFab:CR.Vector:MultiFab:R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:MultiFab:CR.i.i.RealCP.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1afe4cf61cab85cbf4856ce6a172e57556"></span>void <code class="sig-name descname">UpdateScal</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>stateold</em>, Vector&lt;MultiFab&gt; &amp;<em>statenew</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sflux</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>force</em>, int <em>start_scomp</em>, int <em>num_comp</em>, <em class="property">const</em> Real *<em>p0</em> = NULL, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>p0_cart</em> = {}<span class="sig-paren">)</span><br /></dt>
-<dd><p>Given scalar fluxes, update scalars. </p>
+<dd><p>Given scalar fluxes, update scalars</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">stateold</span></code>: cell-centered scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">statenew</span></code>: new scalar flux </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sflux</span></code>: scalar fluxes </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">force</span></code>: velocity force </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_scomp</span></code>: index of component of <code class="docutils literal notranslate"><span class="pre">state</span></code> to begin with </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_comp</span></code>: number of components to perform calculation for </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0</span></code>: base state pressure </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0_cart</span></code>: base state pressure on cartesian grid </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9UpdateVelERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro9UpdateVelERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro9UpdateVelERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::UpdateVel__Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR"></span><span class="target" id="classMaestro_1a7e71742a522a126dce2df138b646a758"></span>void <code class="sig-name descname">UpdateVel</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>uedge</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>force</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>sponge</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Update velocity. </p>
+<dd><p>Update velocity</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code>: MAC velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">uedge</span></code>: edge-based velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">force</span></code>: velocity force </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sponge</span></code>: </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0mac</span></code>: base state MAC velocity </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7AverageERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectori">
 <span id="_CPPv3N7Maestro7AverageERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectori"></span><span id="_CPPv2N7Maestro7AverageERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectori"></span><span id="Maestro::Average__Vector:MultiFab:CR.RealVectorR.i"></span><span class="target" id="classMaestro_1adde9df19174030bd78b7b249c565429d"></span>void <code class="sig-name descname">Average</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>mf</em>, <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>phibar</em>, int <em>comp</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Compute the radial average of a quantitiy. </p>
+<dd><p>Compute the radial average of a quantitiy</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mf</span></code>: MultiFab containing quantity to be averaged </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">phibar</span></code>: Averaged quantity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comp</span></code>: Index of component of <code class="docutils literal notranslate"><span class="pre">mf</span></code> to average </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro15WriteCheckPointEi">
 <span id="_CPPv3N7Maestro15WriteCheckPointEi"></span><span id="_CPPv2N7Maestro15WriteCheckPointEi"></span><span id="Maestro::WriteCheckPoint__i"></span><span class="target" id="classMaestro_1a5e2db9ceb1d392add1a2215eb8c13879"></span>void <code class="sig-name descname">WriteCheckPoint</code><span class="sig-paren">(</span>int <em>step</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Write a checkpoint at timestep <code class="docutils literal notranslate"><span class="pre">step</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ReadCheckPointEv">
@@ -410,23 +570,50 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro13PutInPertFormERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectoriiRKN5amrex6VectorIN5amrex5BCRecEEEb">
 <span id="_CPPv3N7Maestro13PutInPertFormERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectoriiRKN5amrex6VectorIN5amrex5BCRecEEEb"></span><span id="_CPPv2N7Maestro13PutInPertFormERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectoriiRKN5amrex6VectorIN5amrex5BCRecEEEb"></span><span id="Maestro::PutInPertForm__Vector:MultiFab:R.RealVectorCR.i.i.Vector:BCRec:CR.b"></span><span class="target" id="classMaestro_1a88369ce4fadda68cad130b739ddf0a42"></span>void <code class="sig-name descname">PutInPertForm</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>scal</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>s0</em>, int <em>comp</em>, int <em>bccomp</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcs_in</em>, bool <em>flag</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">flag</span></code>, subtract the base state, returning the perturbed quantity. Otherwise, add the base state, returning the full quantity. This version iterates over all levels.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">scal</span></code>: full/perturbed scalar quantity to subtract/add base state to </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s0</span></code>: base state scalar </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comp</span></code>: component of <code class="docutils literal notranslate"><span class="pre">scal</span></code> to perform calculation on </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bccomp</span></code>: component of <code class="docutils literal notranslate"><span class="pre">bcs_in</span></code> to use to enforce boundary conditions </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcs_in</span></code>: boundary conditions </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flag</span></code>: determines whether base state is subtracted (true) or added (false) </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13PutInPertFormEiRN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectoriiRKN5amrex6VectorIN5amrex5BCRecEEEb">
 <span id="_CPPv3N7Maestro13PutInPertFormEiRN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectoriiRKN5amrex6VectorIN5amrex5BCRecEEEb"></span><span id="_CPPv2N7Maestro13PutInPertFormEiRN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectoriiRKN5amrex6VectorIN5amrex5BCRecEEEb"></span><span id="Maestro::PutInPertForm__i.Vector:MultiFab:R.RealVectorCR.i.i.Vector:BCRec:CR.b"></span><span class="target" id="classMaestro_1a11727d119a04bbcec067aa626ea0a20e"></span>void <code class="sig-name descname">PutInPertForm</code><span class="sig-paren">(</span>int <em>level</em>, Vector&lt;MultiFab&gt; &amp;<em>scal</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>s0</em>, int <em>comp</em>, int <em>bccomp</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcs_in</em>, bool <em>flag</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">flag</span></code>, subtract the base state, returning the perturbed quantity. Otherwise, add the base state, returning the full quantity. This version operates only on a single level.</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">level</span></code>: level to perform calculation on </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scal</span></code>: full/perturbed scalar quantity to subtract/add base state to </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s0</span></code>: base state scalar </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comp</span></code>: component of <code class="docutils literal notranslate"><span class="pre">scal</span></code> to perform calculation on </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bccomp</span></code>: component of <code class="docutils literal notranslate"><span class="pre">bcs_in</span></code> to use to enforce boundary conditions </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcs_in</span></code>: boundary conditions </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flag</span></code>: determines whether base state is subtracted (true) or added (false) </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ConvertRhoXToXERN5amrex6VectorIN5amrex8MultiFabEEEb">
 <span id="_CPPv3N7Maestro14ConvertRhoXToXERN5amrex6VectorIN5amrex8MultiFabEEEb"></span><span id="_CPPv2N7Maestro14ConvertRhoXToXERN5amrex6VectorIN5amrex8MultiFabEEEb"></span><span id="Maestro::ConvertRhoXToX__Vector:MultiFab:R.b"></span><span class="target" id="classMaestro_1ae3f55d6000415505d413a1f1b8129871"></span>void <code class="sig-name descname">ConvertRhoXToX</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>scal</em>, bool <em>flag</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Return species mass fraction <code class="docutils literal notranslate"><span class="pre">X</span></code> given the conserved variable <code class="docutils literal notranslate"><span class="pre">rhoX</span></code> </p>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">flag</span></code>, returns species mass fraction <code class="docutils literal notranslate"><span class="pre">X</span></code> given the conserved variable <code class="docutils literal notranslate"><span class="pre">rhoX</span></code>. Otherwise, performs inverse operation </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ConvertRhoHToHERN5amrex6VectorIN5amrex8MultiFabEEEb">
 <span id="_CPPv3N7Maestro14ConvertRhoHToHERN5amrex6VectorIN5amrex8MultiFabEEEb"></span><span id="_CPPv2N7Maestro14ConvertRhoHToHERN5amrex6VectorIN5amrex8MultiFabEEEb"></span><span id="Maestro::ConvertRhoHToH__Vector:MultiFab:R.b"></span><span class="target" id="classMaestro_1a68cf06da2bd4e219c100c2f08a61893a"></span>void <code class="sig-name descname">ConvertRhoHToH</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>scal</em>, bool <em>flag</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Return enthalpy <code class="docutils literal notranslate"><span class="pre">h</span></code> given the conserved variable <code class="docutils literal notranslate"><span class="pre">rhoh</span></code> </p>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">flag</span></code>, return enthalpy <code class="docutils literal notranslate"><span class="pre">h</span></code> given the conserved variable <code class="docutils literal notranslate"><span class="pre">rhoh</span></code>. Otherwise, performs inverse operation </p>
 </dd></dl>
 
 <dl class="function">
@@ -450,7 +637,24 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro14DensityAdvanceEiRN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVector">
 <span id="_CPPv3N7Maestro14DensityAdvanceEiRN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVector"></span><span id="_CPPv2N7Maestro14DensityAdvanceEiRN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVector"></span><span id="Maestro::DensityAdvance__i.Vector:MultiFab:R.Vector:MultiFab:R.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:MultiFab:R.Vector:MultiFab:R.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR"></span><span class="target" id="classMaestro_1ae729e3c6d3a6a857a36967adab412431"></span>void <code class="sig-name descname">DensityAdvance</code><span class="sig-paren">(</span>int <em>which_step</em>, Vector&lt;MultiFab&gt; &amp;<em>scalold</em>, Vector&lt;MultiFab&gt; &amp;<em>scalnew</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sedge</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sflux</em>, Vector&lt;MultiFab&gt; &amp;<em>scal_force</em>, Vector&lt;MultiFab&gt; &amp;<em>etarhoflux</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rho0_predicted_edge</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Advance the density</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">which_step</span></code>: Is this the predictor (1) or corrector (2) step? </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scalold</span></code>: old cell-centered scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scalnew</span></code>: new scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sedge</span></code>: edge-based scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sflux</span></code>: scalar fluxes </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scal_force</span></code>: scalar force </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">etarhoflux</span></code>: <code class="docutils literal notranslate"><span class="pre">eta_rho</span></code> flux </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code>: MAC velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0mac</span></code>: MAC base state velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rho0_predicted_edge</span></code>: base state density predicted to cell edges </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13WriteDiagFileERi">
@@ -479,7 +683,23 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro15EnthalpyAdvanceEiRN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro15EnthalpyAdvanceEiRN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro15EnthalpyAdvanceEiRN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::EnthalpyAdvance__i.Vector:MultiFab:R.Vector:MultiFab:R.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:MultiFab:R.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1a74984ae8b70b5b6511214a5c58367f1d"></span>void <code class="sig-name descname">EnthalpyAdvance</code><span class="sig-paren">(</span>int <em>which_step</em>, Vector&lt;MultiFab&gt; &amp;<em>scalold</em>, Vector&lt;MultiFab&gt; &amp;<em>scalnew</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sedge</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>sflux</em>, Vector&lt;MultiFab&gt; &amp;<em>scal_force</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>thermal</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Advance the enthalpy</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">which_step</span></code>: Is this the predictor (1) or corrector (2) step? </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scalold</span></code>: old cell-centered scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scalnew</span></code>: new scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sedge</span></code>: edge-based scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sflux</span></code>: scalar fluxes </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scal_force</span></code>: scalar force </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code>: MAC velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0mac</span></code>: MAC base state velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thermal</span></code>: thermal term </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9FillPatchEN5amrex4RealERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi">
@@ -492,8 +712,8 @@
 <span id="_CPPv3N7Maestro9FillPatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="_CPPv2N7Maestro9FillPatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="Maestro::FillPatch__i.Real.MultiFabR.Vector:MultiFab:R.Vector:MultiFab:R.i.i.i.i.Vector:BCRec:CR.i"></span><span class="target" id="classMaestro_1af4603eed54d6e563a1e38310acf1008f"></span>void <code class="sig-name descname">FillPatch</code><span class="sig-paren">(</span>int <em>lev</em>, Real <em>time</em>, MultiFab &amp;<em>mf</em>, Vector&lt;MultiFab&gt; &amp;<em>mf_old</em>, Vector&lt;MultiFab&gt; &amp;<em>mf_new</em>, int <em>srccomp</em>, int <em>destcomp</em>, int <em>ncomp</em>, int <em>startbccomp</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcs_in</em>, int <em>variable_type</em> = 0<span class="sig-paren">)</span><br /></dt>
 <dd><p>Compute a new multifab by coping in phi from valid region and filling ghost cells<ul class="simple">
 <li><p>works for single level and 2-level cases (fill fine grid ghost by interpolating from coarse)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">scomp</span></code> is the source component</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dcomp</span></code> is the destination component AND the bc component </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">srccomp</span></code> is the source component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destcomp</span></code> is the destination component AND the bc component </p></li>
 </ul>
 </p>
 </dd></dl>
@@ -503,8 +723,8 @@
 <span id="_CPPv3N7Maestro15FillCoarsePatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="_CPPv2N7Maestro15FillCoarsePatchEiN5amrex4RealERN5amrex8MultiFabERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEEiiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="Maestro::FillCoarsePatch__i.Real.MultiFabR.Vector:MultiFab:R.Vector:MultiFab:R.i.i.i.Vector:BCRec:CR.i"></span><span class="target" id="classMaestro_1ad22d5b7fd0a9c444093f317c2c075ae2"></span>void <code class="sig-name descname">FillCoarsePatch</code><span class="sig-paren">(</span>int <em>lev</em>, Real <em>time</em>, MultiFab &amp;<em>mf</em>, Vector&lt;MultiFab&gt; &amp;<em>mf_old</em>, Vector&lt;MultiFab&gt; &amp;<em>mf_new</em>, int <em>srccomp</em>, int <em>destcomp</em>, int <em>ncomp</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcs</em>, int <em>variable_type</em> = 0<span class="sig-paren">)</span><br /></dt>
 <dd><p>Fill an entire multifab by interpolating from the coarser level<ul class="simple">
 <li><p>this comes into play when a new level of refinement appears</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">scomp</span></code> is the source component</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dcomp</span></code> is the destination component AND the bc component </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">srccomp</span></code> is the source component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">destcomp</span></code> is the destination component AND the bc component </p></li>
 </ul>
 </p>
 </dd></dl>
@@ -513,9 +733,9 @@
 <dt id="_CPPv4N7Maestro7GetDataEiN5amrex4RealERN5amrex6VectorIPN5amrex8MultiFabEEERN5amrex6VectorIN5amrex4RealEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro7GetDataEiN5amrex4RealERN5amrex6VectorIPN5amrex8MultiFabEEERN5amrex6VectorIN5amrex4RealEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro7GetDataEiN5amrex4RealERN5amrex6VectorIPN5amrex8MultiFabEEERN5amrex6VectorIN5amrex4RealEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::GetData__i.Real.Vector:MultiFabP:R.Vector:Real:R.Vector:MultiFab:R.Vector:MultiFab:R"></span><span class="target" id="classMaestro_1af952122e4a5797c522d67e741af130f7"></span>void <code class="sig-name descname">GetData</code><span class="sig-paren">(</span>int <em>lev</em>, Real <em>time</em>, Vector&lt;MultiFab *&gt; &amp;<em>mf</em>, Vector&lt;Real&gt; &amp;<em>mftime</em>, Vector&lt;MultiFab&gt; &amp;<em>mf_old</em>, Vector&lt;MultiFab&gt; &amp;<em>mf_new</em><span class="sig-paren">)</span><br /></dt>
 <dd><p>Utility to copy in data from <code class="docutils literal notranslate"><span class="pre">mf_old</span></code> and/or <code class="docutils literal notranslate"><span class="pre">mf_new</span></code> into <code class="docutils literal notranslate"><span class="pre">mf</span></code><ul class="simple">
-<li><p>if time=t_old we copy mf_old into mf</p></li>
-<li><p>if time=t_new we copy mf_new into mf</p></li>
-<li><p>otherwise copy copy in both <code class="docutils literal notranslate"><span class="pre">mf_old</span></code> and <code class="docutils literal notranslate"><span class="pre">mf_new</span></code> into <code class="docutils literal notranslate"><span class="pre">mf</span></code> and the <code class="docutils literal notranslate"><span class="pre">fillpatch</span></code> routines know to interpolate in time. However in MAESTRO since we don’t subcycle I’m not sure if we need this capability? </p></li>
+<li><p>if <code class="docutils literal notranslate"><span class="pre">time=t_old</span></code> we copy <code class="docutils literal notranslate"><span class="pre">mf_old</span></code> into<code class="docutils literal notranslate"><span class="pre">mf</span></code></p></li>
+<li><p>if <code class="docutils literal notranslate"><span class="pre">time=t_new</span></code> we copy <code class="docutils literal notranslate"><span class="pre">mf_new</span></code> into <code class="docutils literal notranslate"><span class="pre">mf</span></code></p></li>
+<li><p>otherwise copy in both <code class="docutils literal notranslate"><span class="pre">mf_old</span></code> and <code class="docutils literal notranslate"><span class="pre">mf_new</span></code> into <code class="docutils literal notranslate"><span class="pre">mf</span></code> and the <code class="docutils literal notranslate"><span class="pre">fillpatch</span></code> routines know to interpolate in time. </p></li>
 </ul>
 </p>
 </dd></dl>
@@ -523,7 +743,16 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro11AverageDownERN5amrex6VectorIN5amrex8MultiFabEEEii">
 <span id="_CPPv3N7Maestro11AverageDownERN5amrex6VectorIN5amrex8MultiFabEEEii"></span><span id="_CPPv2N7Maestro11AverageDownERN5amrex6VectorIN5amrex8MultiFabEEEii"></span><span id="Maestro::AverageDown__Vector:MultiFab:R.i.i"></span><span class="target" id="classMaestro_1a6048476c7666df3e817f519ba16c68ac"></span>void <code class="sig-name descname">AverageDown</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>mf</em>, int <em>comp</em>, int <em>ncomp</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Set covered coarse cells to be the average of overlying fine cells. </p>
+<dd><p>Set covered coarse cells to be the average of overlying fine cells</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mf</span></code>: MultiFab to average </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comp</span></code>: Index of first component to average </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ncomp</span></code>: Number of components to average </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
@@ -547,38 +776,78 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro16Put1dArrayOnCartERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEii">
 <span id="_CPPv3N7Maestro16Put1dArrayOnCartERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEii"></span><span id="_CPPv2N7Maestro16Put1dArrayOnCartERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEii"></span><span id="Maestro::Put1dArrayOnCart__RealVectorCR.Vector:MultiFab:R.i.i.Vector:BCRec:CR.i.i"></span><span class="target" id="classMaestro_1a49c1bd2e8ac7a9d0a236ea960de0d28a"></span>void <code class="sig-name descname">Put1dArrayOnCart</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>s0</em>, Vector&lt;MultiFab&gt; &amp;<em>s0_cart</em>, int <em>is_input_edge_centered</em>, int <em>is_output_a_vector</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcs</em> = Vector&lt;BCRec&gt;(), int <em>sbccomp</em> = 0, int <em>variable_type</em> = 0<span class="sig-paren">)</span><br /></dt>
-<dd><p>Maps 1d arrays onto multi-D cartesian MultiFabs. </p>
+<dd><p>Maps 1d arrays onto multi-D cartesian MultiFabs</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">s0</span></code>: 1d base state </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s0_cart</span></code>: base state mapped to multi-d cartesian MultiFab </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_input_edge_centered</span></code>: is the input edge-centered? </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_output_a_vector</span></code>: is the output a vector? </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcs</span></code>: boundary conditions </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sbccomp</span></code>: start boundary conditions component </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro16Put1dArrayOnCartEiRK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEi">
 <span id="_CPPv3N7Maestro16Put1dArrayOnCartEiRK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="_CPPv2N7Maestro16Put1dArrayOnCartEiRK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEEiiRKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="Maestro::Put1dArrayOnCart__i.RealVectorCR.Vector:MultiFab:R.i.i.Vector:BCRec:CR.i"></span><span class="target" id="classMaestro_1a9fa0eb91702f4badc30fb8b2abfd2ed4"></span>void <code class="sig-name descname">Put1dArrayOnCart</code><span class="sig-paren">(</span>int <em>level</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>s0</em>, Vector&lt;MultiFab&gt; &amp;<em>s0_cart</em>, int <em>is_input_edge_centered</em>, int <em>is_output_a_vector</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcs</em> = Vector&lt;BCRec&gt;(), int <em>sbccomp</em> = 0<span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Maps 1d arrays onto multi-D cartesian MultiFabs</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">level</span></code>: AMR level to perform calculation on </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s0</span></code>: 1d base state </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s0_cart</span></code>: base state mapped to multi-d cartesian MultiFab </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_input_edge_centered</span></code>: is the input edge-centered? </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_output_a_vector</span></code>: is the output a vector? </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcs</span></code>: boundary conditions </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sbccomp</span></code>: start boundary conditions component </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro5Addw0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex4RealE">
 <span id="_CPPv3N7Maestro5Addw0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex4RealE"></span><span id="_CPPv2N7Maestro5Addw0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex4RealE"></span><span id="Maestro::Addw0__Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealCR"></span><span class="target" id="classMaestro_1afde5ae384ccab93f2cde63ae17e8064c"></span>void <code class="sig-name descname">Addw0</code><span class="sig-paren">(</span>Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>uedge</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> Real &amp;<em>mult</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Add (<code class="docutils literal notranslate"><span class="pre">mult</span></code> times) the MAC-projected base state velocity to the edge-based velocity <code class="docutils literal notranslate"><span class="pre">uedge</span></code></p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">uedge</span></code>: edge based velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w0mac</span></code>: MAC base state velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mult</span></code>: multiplication factor </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9MakeW0macERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro9MakeW0macERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro9MakeW0macERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::MakeW0mac__Vector:array:MultiFab.AMREX_SPACEDIM::R"></span><span class="target" id="classMaestro_1a832cd9793290b8547733d0584b98eae6"></span>void <code class="sig-name descname">MakeW0mac</code><span class="sig-paren">(</span>Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>MAC-project the base state velocity. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9MakeS0macERK10RealVectorRN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro9MakeS0macERK10RealVectorRN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro9MakeS0macERK10RealVectorRN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::MakeS0mac__RealVectorCR.Vector:array:MultiFab.AMREX_SPACEDIM::R"></span><span class="target" id="classMaestro_1a9e9ccbebc1ccc83fc3eccca8aa8c6da2"></span>void <code class="sig-name descname">MakeS0mac</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>s0</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>s0mac</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>MAC-project the base state scalar <code class="docutils literal notranslate"><span class="pre">s0</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10MakeNormalEv">
 <span id="_CPPv3N7Maestro10MakeNormalEv"></span><span id="_CPPv2N7Maestro10MakeNormalEv"></span><span id="Maestro::MakeNormal"></span><span class="target" id="classMaestro_1acaa51b6720b372c902e173f6b385337e"></span>void <code class="sig-name descname">MakeNormal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Create the unit normal across the grids. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14PutDataOnFacesERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi">
 <span id="_CPPv3N7Maestro14PutDataOnFacesERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi"></span><span id="_CPPv2N7Maestro14PutDataOnFacesERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEi"></span><span id="Maestro::PutDataOnFaces__Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::R.i"></span><span class="target" id="classMaestro_1a14dc0240efae4465f80ffc067730cc9a"></span>void <code class="sig-name descname">PutDataOnFaces</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>s_cc</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>face</em>, int <em>harmonic_avg</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Put the cell-centered data <code class="docutils literal notranslate"><span class="pre">s_cc</span></code> on faces by averaging adjacent cells. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13MakeCCtoRadiiEv">
@@ -588,7 +857,8 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MakeVelForceERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEEi">
 <span id="_CPPv3N7Maestro12MakeVelForceERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEEi"></span><span id="_CPPv2N7Maestro12MakeVelForceERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEEi"></span><span id="Maestro::MakeVelForce__Vector:MultiFab:R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:MultiFab:CR.RealVectorCR.RealVectorCR.RealVectorCR.Vector:MultiFab:CR.i"></span><span class="target" id="classMaestro_1a0b066189ee8c93fea4173ed3515de381"></span>void <code class="sig-name descname">MakeVelForce</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>vel_force</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>uedge</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>rho</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rho0</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>grav</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>w0_force</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>w0_force_cart</em>, int <em>do_add_utilde_force</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the velocity force term. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro15ModifyScalForceERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex5BCRecEEEi">
@@ -598,12 +868,14 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro13MakeRhoHForceERN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEiRKi">
 <span id="_CPPv3N7Maestro13MakeRhoHForceERN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEiRKi"></span><span id="_CPPv2N7Maestro13MakeRhoHForceERN5amrex6VectorIN5amrex8MultiFabEEEiRKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEEiRKi"></span><span id="Maestro::MakeRhoHForce__Vector:MultiFab:R.i.Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.i.iCR"></span><span class="target" id="classMaestro_1a7c228f2fdc32c56c869922afc27bb09d"></span>void <code class="sig-name descname">MakeRhoHForce</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>scal_force</em>, int <em>is_prediction</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>thermal</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, int <em>add_thermal</em>, <em class="property">const</em> int &amp;<em>which_step</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the conserved enthalpy force term. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro13MakeGamma1barERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectorRK10RealVector">
 <span id="_CPPv3N7Maestro13MakeGamma1barERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectorRK10RealVector"></span><span id="_CPPv2N7Maestro13MakeGamma1barERKN5amrex6VectorIN5amrex8MultiFabEEER10RealVectorRK10RealVector"></span><span id="Maestro::MakeGamma1bar__Vector:MultiFab:CR.RealVectorR.RealVectorCR"></span><span class="target" id="classMaestro_1aed4f7b23b2427eb272ba82648b4aaf18"></span>void <code class="sig-name descname">MakeGamma1bar</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>scal</em>, <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>gamma1bar</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the horizontal average of <span class="math notranslate nohighlight">\(\Gamma_1\)</span>. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8InitDataEv">
@@ -620,49 +892,80 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro8InitProjEv">
 <span id="_CPPv3N7Maestro8InitProjEv"></span><span id="_CPPv2N7Maestro8InitProjEv"></span><span id="Maestro::InitProj"></span><span class="target" id="classMaestro_1a863e99df051622da60778665e39e44a0"></span>void <code class="sig-name descname">InitProj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Initial projection. </p>
+<dd><p>Performs the initial projection. </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8DivuIterEi">
 <span id="_CPPv3N7Maestro8DivuIterEi"></span><span id="_CPPv2N7Maestro8DivuIterEi"></span><span id="Maestro::DivuIter__i"></span><span class="target" id="classMaestro_1a7b24443370226c944f734e027d7fe1e3"></span>void <code class="sig-name descname">DivuIter</code><span class="sig-paren">(</span>int <em>istep_divu_iter</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Divu iteration. </p>
+<dd><p>Performs the divu iteration. </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8InitIterEv">
 <span id="_CPPv3N7Maestro8InitIterEv"></span><span id="_CPPv2N7Maestro8InitIterEv"></span><span id="Maestro::InitIter"></span><span class="target" id="classMaestro_1a04eb89bd60c3bb43d94d2af46c32dc4d"></span>void <code class="sig-name descname">InitIter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Initial iteration to initialize <code class="docutils literal notranslate"><span class="pre">gradpi</span></code> </p>
+<dd><p>Performs the initial iteration to initialize <code class="docutils literal notranslate"><span class="pre">gradpi</span></code> </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro7MacProjERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKi">
 <span id="_CPPv3N7Maestro7MacProjERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKi"></span><span id="_CPPv2N7Maestro7MacProjERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKi"></span><span id="Maestro::MacProj__Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:MultiFab:R.Vector:MultiFab:CR.RealVectorCR.iCR"></span><span class="target" id="classMaestro_1a6e60c3333605faacd1aaf9994bd03948"></span>void <code class="sig-name descname">MacProj</code><span class="sig-paren">(</span>Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, Vector&lt;MultiFab&gt; &amp;<em>macphi</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>macrhs</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>beta0</em>, <em class="property">const</em> int &amp;<em>is_predictor</em><span class="sig-paren">)</span><br /></dt>
-<dd><p><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code> enters with face-centered, time-centered <code class="docutils literal notranslate"><span class="pre">Utilde^*</span></code> and should leave with <code class="docutils literal notranslate"><span class="pre">Utilde</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">macphi</span></code> is the solution to the elliptic solve and enters as either zero, or the solution to the predictor MAC projection</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">macrhs</span></code> enters as <code class="docutils literal notranslate"><span class="pre">beta0*(S-Sbar)</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">beta0</span></code> is a 1d cell-centered array </p></li>
+<dd><p>Do the MAC projection</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code>: enters with face-centered, time-centered <code class="docutils literal notranslate"><span class="pre">Utilde^*</span></code> and should leave with <code class="docutils literal notranslate"><span class="pre">Utilde</span></code> </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">macphi</span></code>: is the solution to the elliptic solve and enters as either zero, or the solution to the predictor MAC projection </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">macrhs</span></code>: enters as <code class="docutils literal notranslate"><span class="pre">beta0*(S-Sbar)</span></code> </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">beta0</span></code>: is a 1d cell-centered array </p></li>
 </ul>
+</dd>
+</dl>
 </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro16MultFacesByBeta0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKi">
 <span id="_CPPv3N7Maestro16MultFacesByBeta0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKi"></span><span id="_CPPv2N7Maestro16MultFacesByBeta0ERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRK10RealVectorRKi"></span><span id="Maestro::MultFacesByBeta0__Vector:array:MultiFab.AMREX_SPACEDIM::R.RealVectorCR.RealVectorCR.iCR"></span><span class="target" id="classMaestro_1a485d87a6ebc973ce77de070fc2d38de4"></span>void <code class="sig-name descname">MultFacesByBeta0</code><span class="sig-paren">(</span>Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>edge</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>beta0</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>beta0_edge</em>, <em class="property">const</em> int &amp;<em>mult_or_div</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Multiply (or divide) face-centered data by <code class="docutils literal notranslate"><span class="pre">beta0</span></code> </p>
+<dd><p>Multiply (or divide) face-centered data by <code class="docutils literal notranslate"><span class="pre">beta0</span></code></p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">edge</span></code>: face-centered data </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">beta0</span></code>: cell-centered <span class="math notranslate nohighlight">\(\beta_0\)</span> </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">beta0_edge</span></code>: face-centered <span class="math notranslate nohighlight">\(\beta_0\)</span> </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mult_or_div</span></code>: do we multiply or divide? </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro19ComputeMACSolverRHSERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE">
 <span id="_CPPv3N7Maestro19ComputeMACSolverRHSERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="_CPPv2N7Maestro19ComputeMACSolverRHSERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEE"></span><span id="Maestro::ComputeMACSolverRHS__Vector:MultiFab:R.Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR"></span><span class="target" id="classMaestro_1a01fe9a7a82d4878accad0034c2bb7abd"></span>void <code class="sig-name descname">ComputeMACSolverRHS</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>solverrhs</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>macrhs</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Compute the RHS for the solve, <code class="docutils literal notranslate"><span class="pre">RHS</span> <span class="pre">=</span> <span class="pre">macrhs</span> <span class="pre">-</span> <span class="pre">div(beta0*umac)</span></code> </p>
+<dd><p>Compute the RHS for the solve, <code class="docutils literal notranslate"><span class="pre">RHS</span> <span class="pre">=</span> <span class="pre">macrhs</span> <span class="pre">-</span> <span class="pre">div(beta0*umac)</span></code></p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">solverrhs</span></code>: RHS for the solve </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">macrhs</span></code>: <code class="docutils literal notranslate"><span class="pre">macrhs</span></code> term </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umac</span></code>: MAC velocity </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro17AvgFaceBcoeffsInvERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro17AvgFaceBcoeffsInvERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro17AvgFaceBcoeffsInvERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::AvgFaceBcoeffsInv__Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1a2b46136d1f1083391b919ba0331a33a7"></span>void <code class="sig-name descname">AvgFaceBcoeffsInv</code><span class="sig-paren">(</span>Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>facebcoef</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>rhocc</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Average <code class="docutils literal notranslate"><span class="pre">bcoefs</span></code> at faces using inverse of <code class="docutils literal notranslate"><span class="pre">rho</span></code> </p>
+<dd><p>Average <code class="docutils literal notranslate"><span class="pre">bcoefs</span></code> at faces using inverse of <code class="docutils literal notranslate"><span class="pre">rho</span></code></p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">facebcoef</span></code>: face-centered <code class="docutils literal notranslate"><span class="pre">bcoefs</span></code> </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rhocc</span></code>: cell-centered density </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
@@ -674,7 +977,16 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro10MakeEtarhoER10RealVectorR10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro10MakeEtarhoER10RealVectorR10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10MakeEtarhoER10RealVectorR10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeEtarho__RealVectorR.RealVectorR.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1aaa030fa594d0fe2a20a7f3b5ae70c03d"></span>void <code class="sig-name descname">MakeEtarho</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>etarho_edge</em>, <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>etarho_cell</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>etarho_flux</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Compute <code class="docutils literal notranslate"><span class="pre">eta_rho</span></code> at edge- and cell-centers. </p>
+<dd><p>Compute <code class="docutils literal notranslate"><span class="pre">eta_rho</span></code> at edge- and cell-centers</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">etarho_edge</span></code>: face-centered <span class="math notranslate nohighlight">\(\eta_\rho\)</span> </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">etarho_cell</span></code>: cell-centered <span class="math notranslate nohighlight">\(\eta_\rho\)</span> </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">etarho_flux</span></code>: <span class="math notranslate nohighlight">\(\eta_\rho\)</span> flux </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
@@ -715,7 +1027,13 @@
 <dt id="_CPPv4N7Maestro17CreateUvecForProjEiRN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro17CreateUvecForProjEiRN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro17CreateUvecForProjEiRN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::CreateUvecForProj__i.Vector:MultiFab:R.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1a8534bad6cbaf59e56c6c986d3545c9c2"></span>void <code class="sig-name descname">CreateUvecForProj</code><span class="sig-paren">(</span>int <em>proj_type</em>, Vector&lt;MultiFab&gt; &amp;<em>Vproj</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>sig</em><span class="sig-paren">)</span><br /></dt>
 <dd><p>Fill in <code class="docutils literal notranslate"><span class="pre">Vproj</span></code></p>
-<p><code class="docutils literal notranslate"><span class="pre">initial_projection_comp:</span> <span class="pre">Utilde^0</span> <span class="pre">--</span> <span class="pre">uold</span></code> <code class="docutils literal notranslate"><span class="pre">divu_iters_comp:</span> <span class="pre">Utilde^0</span> <span class="pre">--</span> <span class="pre">uold</span></code> <code class="docutils literal notranslate"><span class="pre">pressure_iters_comp:</span> <span class="pre">(Utilde^n+1,*</span> <span class="pre">-</span> <span class="pre">Utilde^n)/dt</span> <span class="pre">--</span> <span class="pre">(unew-uold)/dt</span></code> <code class="docutils literal notranslate"><span class="pre">regular_timestep_comp:</span> <span class="pre">(Utilde^n+1,*</span> <span class="pre">+</span> <span class="pre">dt*gpi/rhohalf)</span> <span class="pre">--</span> <span class="pre">unew</span> <span class="pre">+</span> <span class="pre">dt*gpi/rhohalf</span></code> <code class="docutils literal notranslate"><span class="pre">sig</span></code> contains <code class="docutils literal notranslate"><span class="pre">rhohalf</span></code> if <code class="docutils literal notranslate"><span class="pre">proj_type</span> <span class="pre">==</span> <span class="pre">regular_timestep_comp</span></code> </p>
+<p><code class="docutils literal notranslate"><span class="pre">initial_projection_comp:</span> <span class="pre">Utilde^0</span> <span class="pre">--</span> <span class="pre">uold</span></code> <code class="docutils literal notranslate"><span class="pre">divu_iters_comp:</span> <span class="pre">Utilde^0</span> <span class="pre">--</span> <span class="pre">uold</span></code> <code class="docutils literal notranslate"><span class="pre">pressure_iters_comp:</span> <span class="pre">(Utilde^n+1,*</span> <span class="pre">-</span> <span class="pre">Utilde^n)/dt</span> <span class="pre">--</span> <span class="pre">(unew-uold)/dt</span></code> <code class="docutils literal notranslate"><span class="pre">regular_timestep_comp:</span> <span class="pre">(Utilde^n+1,*</span> <span class="pre">+</span> <span class="pre">dt*gpi/rhohalf)</span> <span class="pre">--</span> <span class="pre">unew</span> <span class="pre">+</span> <span class="pre">dt*gpi/rhohalf</span></code> <dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sig</span></code>: contains <code class="docutils literal notranslate"><span class="pre">rhohalf</span></code> if <code class="docutils literal notranslate"><span class="pre">proj_type</span> <span class="pre">==</span> <span class="pre">regular_timestep_comp</span></code> </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="function">
@@ -726,13 +1044,13 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ComputeGradPhiERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro14ComputeGradPhiERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro14ComputeGradPhiERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::ComputeGradPhi__Vector:MultiFab:R.Vector:MultiFab:R"></span><span class="target" id="classMaestro_1a1d0ee67c15c7be8ec6eef3bdeb1c1ce1"></span>void <code class="sig-name descname">ComputeGradPhi</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>phi</em>, Vector&lt;MultiFab&gt; &amp;<em>gphi</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Given a nodal phi, compute <code class="docutils literal notranslate"><span class="pre">grad(phi)</span></code> at cell centers. </p>
+<dd><p>Given a nodal <code class="docutils literal notranslate"><span class="pre">phi</span></code>, compute <span class="math notranslate nohighlight">\(\nabla(\phi)\)</span> at cell centers. </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro8MakePiCCERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro8MakePiCCERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro8MakePiCCERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakePiCC__Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1af1b179c598d2d1fe60a8755ec3f1d30d"></span>void <code class="sig-name descname">MakePiCC</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>beta0_cart</em><span class="sig-paren">)</span><br /></dt>
-<dd><p>Average nodal pi to cell-centers and put in the Pi component of <code class="docutils literal notranslate"><span class="pre">snew</span></code> </p>
+<dd><p>Average nodal <code class="docutils literal notranslate"><span class="pre">pi</span></code> to cell-centers and put in the <code class="docutils literal notranslate"><span class="pre">Pi</span></code> component of <code class="docutils literal notranslate"><span class="pre">snew</span></code> </p>
 </dd></dl>
 
 <dl class="function">
@@ -901,22 +1219,61 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro9TfromRhoHERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVector">
 <span id="_CPPv3N7Maestro9TfromRhoHERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVector"></span><span id="_CPPv2N7Maestro9TfromRhoHERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVector"></span><span id="Maestro::TfromRhoH__Vector:MultiFab:R.RealVectorCR"></span><span class="target" id="classMaestro_1af08401b4b5497a09d29972eff90b5460"></span>void <code class="sig-name descname">TfromRhoH</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>scal</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the temperature given the density and the enthalpy</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">scal</span></code>: scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0</span></code>: base state pressure </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9TfromRhoPERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectori">
 <span id="_CPPv3N7Maestro9TfromRhoPERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectori"></span><span id="_CPPv2N7Maestro9TfromRhoPERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectori"></span><span id="Maestro::TfromRhoP__Vector:MultiFab:R.RealVectorCR.i"></span><span class="target" id="classMaestro_1ae5290eba2ca99ccf8349036dbbc916f1"></span>void <code class="sig-name descname">TfromRhoP</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>scal</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em>, int <em>updateRhoH</em> = 0<span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the temperature given the density and the pressure</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">scal</span></code>: scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0</span></code>: base state pressure </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro9PfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro9PfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro9PfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::PfromRhoH__Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:MultiFab:R"></span><span class="target" id="classMaestro_1aba3d903fab641ccbb15e31ff370fe315"></span>void <code class="sig-name descname">PfromRhoH</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>state</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>s_old</em>, Vector&lt;MultiFab&gt; &amp;<em>peos</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the pressure given the density and the enthalpy</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code>: scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">s_old</span></code>: scalars at old time step </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peos</span></code>: pressure calculated from the equation of state </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12MachfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro12MachfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro12MachfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MachfromRhoH__Vector:MultiFab:CR.Vector:MultiFab:CR.RealVectorCR.Vector:MultiFab:R"></span><span class="target" id="classMaestro_1a451ed986b02f10a4538bd5ba83d1beeb"></span>void <code class="sig-name descname">MachfromRhoH</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>scal</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>vel</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em>, Vector&lt;MultiFab&gt; &amp;<em>mach</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the Mach number given the density and the enthalpy</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">scal</span></code>: scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vel</span></code>: velocity </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0</span></code>: base state pressure </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mach</span></code>: Mach number </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro16MachfromRhoHSphrERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
@@ -926,7 +1283,18 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro10CsfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro10CsfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10CsfromRhoHERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::CsfromRhoH__Vector:MultiFab:CR.RealVectorCR.Vector:MultiFab:CR.Vector:MultiFab:R"></span><span class="target" id="classMaestro_1afe065d9b2a259ddbf21f4a534eaa5bd7"></span>void <code class="sig-name descname">CsfromRhoH</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>scal</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>p0cart</em>, Vector&lt;MultiFab&gt; &amp;<em>cs</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Calculate the sound speed given the density and the enthalpy</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">scal</span></code>: scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0</span></code>: base state pressure </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0cart</span></code>: base state pressure on cartesian grid </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cs</span></code>: sound speed </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro10ExternInitEv">
@@ -959,27 +1327,63 @@
 <dl class="function">
 <dt id="_CPPv4N7Maestro19MakeExplicitThermalERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectori">
 <span id="_CPPv3N7Maestro19MakeExplicitThermalERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectori"></span><span id="_CPPv2N7Maestro19MakeExplicitThermalERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectori"></span><span id="Maestro::MakeExplicitThermal__Vector:MultiFab:R.Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:MultiFab:CR.RealVectorCR.i"></span><span class="target" id="classMaestro_1a2f81fae0e102f1fa64154523513bad58"></span>void <code class="sig-name descname">MakeExplicitThermal</code><span class="sig-paren">(</span>Vector&lt;MultiFab&gt; &amp;<em>thermal</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>scal</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>Tcoeff</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>hcoeff</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>Xkcoeff</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>pcoeff</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>p0</em>, int <em>temp_formulation</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Compute the quantity: <code class="docutils literal notranslate"><span class="pre">thermal</span> <span class="pre">=</span> <span class="pre">del</span> <span class="pre">dot</span> <span class="pre">kappa</span> <span class="pre">grad</span> <span class="pre">T</span></code></p>
+<p><ul class="simple">
+<li><p>if <code class="docutils literal notranslate"><span class="pre">temp_diffusion_formulation</span> <span class="pre">=</span> <span class="pre">1</span></code>, then we compute this directly.</p></li>
+<li><p>if <code class="docutils literal notranslate"><span class="pre">temp_diffusion_formulation</span> <span class="pre">=</span> <span class="pre">2</span></code>, then we compute the algebraically equivalent form with <code class="docutils literal notranslate"><span class="pre">grad</span> <span class="pre">h</span></code> - <code class="docutils literal notranslate"><span class="pre">grad</span> <span class="pre">X_k</span></code> - <code class="docutils literal notranslate"><span class="pre">grad</span> <span class="pre">p_0</span></code> formulation</p></li>
+</ul>
+</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">thermal</span></code>: thermal term </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scal</span></code>: scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tcoeff</span></code>: temperature coefficient </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hcoeff</span></code>: enthalpy coefficient </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Xkcoeff</span></code>: species coefficients </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pcoeff</span></code>: pressure coefficient </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0</span></code>: base state pressure </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro12ApplyThermalERN5amrex15MLABecLaplacianERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex5BCRecEEEi">
 <span id="_CPPv3N7Maestro12ApplyThermalERN5amrex15MLABecLaplacianERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="_CPPv2N7Maestro12ApplyThermalERN5amrex15MLABecLaplacianERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex5BCRecEEEi"></span><span id="Maestro::ApplyThermal__MLABecLaplacianR.Vector:MultiFab:R.Vector:MultiFab:CR.Vector:MultiFab:R.Vector:BCRec:CR.i"></span><span class="target" id="classMaestro_1a40b0c9eb71ce881fdcbed8ff17f26186"></span>void <code class="sig-name descname">ApplyThermal</code><span class="sig-paren">(</span>MLABecLaplacian &amp;<em>mlabec</em>, Vector&lt;MultiFab&gt; &amp;<em>thermalout</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>coeff</em>, Vector&lt;MultiFab&gt; &amp;<em>phi</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcs</em>, int <em>bccomp</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Use <code class="docutils literal notranslate"><span class="pre">apply()</span></code> to construct the form of the conduction term. <code class="docutils literal notranslate"><span class="pre">apply()</span></code> forms the generic quantity:</p>
+<p><code class="docutils literal notranslate"><span class="pre">(alpha</span> <span class="pre">*</span> <span class="pre">A</span> <span class="pre">-</span> <span class="pre">beta</span> <span class="pre">*</span> <span class="pre">div</span> <span class="pre">B</span> <span class="pre">grad)</span> <span class="pre">phi</span> <span class="pre">=</span> <span class="pre">RHS</span></code> </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro17MakeThermalCoeffsERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro17MakeThermalCoeffsERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro17MakeThermalCoeffsERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeThermalCoeffs__Vector:MultiFab:CR.Vector:MultiFab:R.Vector:MultiFab:R.Vector:MultiFab:R.Vector:MultiFab:R"></span><span class="target" id="classMaestro_1aaaa5f0f5df1cc0cc462f818376e1a70c"></span>void <code class="sig-name descname">MakeThermalCoeffs</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>scal</em>, Vector&lt;MultiFab&gt; &amp;<em>Tcoeff</em>, Vector&lt;MultiFab&gt; &amp;<em>hcoeff</em>, Vector&lt;MultiFab&gt; &amp;<em>Xkcoeff</em>, Vector&lt;MultiFab&gt; &amp;<em>pcoeff</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>create the coefficients for <code class="docutils literal notranslate"><span class="pre">grad{T}</span></code>, <code class="docutils literal notranslate"><span class="pre">grad{h}</span></code>, <code class="docutils literal notranslate"><span class="pre">grad{X_k}</span></code>, and <code class="docutils literal notranslate"><span class="pre">grad{p_0}</span></code> for the thermal diffusion term in the enthalpy equation.</p>
+<p>note: we explicitly fill the ghostcells by looping over them directly</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">scal</span></code>: scalars </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tcoeff</span></code>: temperature coefficient </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hcoeff</span></code>: enthalpy coefficient </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Xkcoeff</span></code>: species coefficients </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pcoeff</span></code>: pressure coefficient </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro14ThermalConductERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro14ThermalConductERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro14ThermalConductERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::ThermalConduct__Vector:MultiFab:CR.Vector:MultiFab:R.Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:MultiFab:CR.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1a0e3ff8da1107348441c8a88501eb5916"></span>void <code class="sig-name descname">ThermalConduct</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>s1</em>, Vector&lt;MultiFab&gt; &amp;<em>s2</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>hcoeff1</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>Xkcoeff1</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>pcoeff1</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>hcoeff2</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>Xkcoeff2</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>pcoeff2</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>ThermalConduct implements thermal diffusion in the enthalpy equation. This is an implicit solve, using the multigrid solver. This updates the enthalpy only. </p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv4N7Maestro15VelocityAdvanceERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">
 <span id="_CPPv3N7Maestro15VelocityAdvanceERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro15VelocityAdvanceERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::VelocityAdvance__Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::R.Vector:array:MultiFab.AMREX_SPACEDIM::CR.RealVectorCR.Vector:MultiFab:CR.RealVectorCR.RealVectorCR.Vector:MultiFab:CR"></span><span class="target" id="classMaestro_1a9b0cc53c69a6f6c8e81c7c499917c11d"></span>void <code class="sig-name descname">VelocityAdvance</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>rhohalf</em>, Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>umac</em>, <em class="property">const</em> Vector&lt;array&lt;MultiFab, AMREX_SPACEDIM&gt;&gt; &amp;<em>w0mac</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>w0_force</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>w0_force_cart</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>rho0_nph</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv410RealVector" title="RealVector">RealVector</a> &amp;<em>grav_cell_nph</em>, <em class="property">const</em> Vector&lt;MultiFab&gt; &amp;<em>sponge</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
+<dd><p>Advance the velocity. </p>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
