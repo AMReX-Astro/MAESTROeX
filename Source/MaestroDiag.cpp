@@ -587,9 +587,6 @@ Maestro::DiagFile (const int step,
             diagfile1_data[index*ndiag1+5] = vel_Tmax[0];
             diagfile1_data[index*ndiag1+6] = vel_temp_max_y;
             diagfile1_data[index*ndiag1+7] = vel_temp_max_z;
-            diagfile1 << std::setw(setwVal) << std::left << vel_Tmax[0];
-            diagfile1 << std::setw(setwVal) << std::left << vel_temp_max_y;
-            diagfile1 << std::setw(setwVal) << std::left << vel_temp_max_z;
             if (spherical == 1) {
               diagfile1_data[index*ndiag1+8] = Rloc_Tmax;
               diagfile1_data[index*ndiag1+9] = vr_Tmax;
