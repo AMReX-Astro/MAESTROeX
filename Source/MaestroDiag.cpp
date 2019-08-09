@@ -596,8 +596,8 @@ Maestro::DiagFile (const int step,
             // enuc
             diagfile2_data[index*ndiag2  ] = t_in;
             diagfile2_data[index*ndiag2+1] = enuc_max;
-            const Real coord_enuc_y = (AMREX_SPACEDIM <2) ? 0.0 : coord_Tmax[1];
-            const Real coord_enuc_z = (AMREX_SPACEDIM <3) ? 0.0 : coord_Tmax[2];
+            const Real coord_enuc_y = (AMREX_SPACEDIM <2) ? 0.0 : coord_enucmax[1];
+            const Real coord_enuc_z = (AMREX_SPACEDIM <3) ? 0.0 : coord_enucmax[2];
             diagfile2_data[index*ndiag2+2] = coord_enucmax[0];
             diagfile2_data[index*ndiag2+3] = coord_enuc_y;
             diagfile2_data[index*ndiag2+4] = coord_enuc_z;
