@@ -1,3 +1,5 @@
+module diag_module
+
 ! diag module for MAESTROeX. 
 ! currently, there are 3 output files:
 !
@@ -23,7 +25,6 @@
 !          total internal energy
 !          velocity components at the center of the star
 !
-module diag_module
 
   use meth_params_module, only: rho_comp, spec_comp, temp_comp, prob_lo, &
        sponge_start_factor, sponge_center_density, base_cutoff_density, &
