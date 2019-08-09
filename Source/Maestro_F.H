@@ -214,40 +214,47 @@ extern "C"
 
     //////////////////////
     // in diag.F90
+
     void diag(const int* lev, const int* lo, const int* hi,
-	      const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
-	      const amrex::Real* rho_Hnuc, const int* hn_lo, const int* hn_hi,
-	      const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi,
-	      const amrex::Real* rho0, const amrex::Real* p0,
-	      const amrex::Real* u, const int* u_lo, const int* u_hi,
-	      const amrex::Real* w0, const amrex::Real* dx,
-	      amrex::Real* Mach_max, amrex::Real* temp_max,
-	      amrex::Real* enuc_max, amrex::Real* Hext_max,
+              const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
+              const amrex::Real* rho_Hnuc, const int* hn_lo, const int* hn_hi,
+              const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi,
+              const amrex::Real* u, const int* u_lo, const int* u_hi,
+              const amrex::Real* w0, const amrex::Real* dx,
+              amrex::Real* T_max, amrex::Real* coord_Tmax, amrex::Real* vel_Tmax,
+              amrex::Real* enuc_max, amrex::Real* coord_enucmax, amrex::Real* vel_enucmax,                                                                                                           
+              amrex::Real* kin_ener, amrex::Real* int_ener, amrex::Real* nuc_ener,
+              amrex::Real* U_max, amrex::Real* Mach_max,
               const int* mask, const int* m_lo, const int* m_hi,
               const int* use_mask);
-
+               
     void diag_sphr(const int* lev, const int* lo, const int* hi,
-		   const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
-		   const amrex::Real* rho_Hnuc, const int* hn_lo, const int* hn_hi,
-		   const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi,
-		   const amrex::Real* u, const int* u_lo, const int* u_hi,
-		   const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
-		   const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
-		   const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
-		   const amrex::Real* w0r, const int* wr_lo, const int* wr_hi,
-		   const amrex::Real* dx,
-		   const amrex::Real* normal, const int* n_lo, const int* n_hi,
-		   amrex::Real* T_max, amrex::Real* coord_Tmax, amrex::Real* vel_Tmax,
-		   amrex::Real* enuc_max, amrex::Real* coord_enucmax, amrex::Real* vel_enucmax,
-		   amrex::Real* kin_ener, amrex::Real* int_ener, amrex::Real* nuc_ener,
-		   amrex::Real* U_max, amrex::Real* Mach_max,
-		   int* ncenter, amrex::Real* T_center, amrex::Real* vel_center,
-                   const int* mask, const int* m_lo, const int* m_hi,
-                   const int* use_mask);
-
+              const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
+              const amrex::Real* rho_Hnuc, const int* hn_lo, const int* hn_hi,
+              const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi,
+              const amrex::Real* u, const int* u_lo, const int* u_hi,
+              const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
+              const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
+              const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
+              const amrex::Real* w0r, const int* wr_lo, const int* wr_hi,
+              const amrex::Real* dx,
+              const amrex::Real* normal, const int* n_lo, const int* n_hi,
+              amrex::Real* T_max, amrex::Real* coord_Tmax, amrex::Real* vel_Tmax,
+              amrex::Real* enuc_max, amrex::Real* coord_enucmax, amrex::Real* vel_enucmax,
+              amrex::Real* kin_ener, amrex::Real* int_ener, amrex::Real* nuc_ener,
+              amrex::Real* U_max, amrex::Real* Mach_max,
+              int* ncenter, amrex::Real* T_center, amrex::Real* vel_center,
+              const int* mask, const int* m_lo, const int* m_hi,
+              const int* use_mask);
+               
     void diag_grav_energy(amrex::Real* grav_ener,
-			  const amrex::Real* rho0,
+                          const amrex::Real* rho0,
                           const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
+               
+    void diag_grav_energy_sphr(amrex::Real* grav_ener,
+                          const amrex::Real* rho0,
+                          const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
+
     //////////////////////
 
     //////////////////////
