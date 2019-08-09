@@ -47,7 +47,7 @@ contains
                        rho_Hext, he_lo, he_hi, &
                        u, u_lo, u_hi, &
                        w0, dx, &
-                       T_max, coord_Tmax, vel_Tmax, &
+                       temp_max, coord_temp_max, vel_temp_max, &
                        enuc_max, coord_enucmax, vel_enucmax, &
                        kin_ener, int_ener, nuc_ener, &
                        U_max, Mach_max, &
@@ -65,7 +65,7 @@ contains
     double precision, intent(in   ) ::    u(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),3)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3)
-    double precision, intent(inout) :: T_max, coord_Tmax(3), vel_Tmax(3)
+    double precision, intent(inout) :: temp_max, coord_temp_max(3), vel_temp_max(3)
     double precision, intent(inout) :: enuc_max, coord_enucmax(3), vel_enucmax(3)
     double precision, intent(inout) :: kin_ener, int_ener, nuc_ener
     double precision, intent(inout) :: U_max, Mach_max
@@ -117,18 +117,18 @@ contains
 #endif
 
             ! max T, location, and velocity at that location (including w0)
-            if ( scal(i,j,k,temp_comp) > T_max ) then
-               T_max         = scal(i,j,k,temp_comp)
-               coord_Tmax(1) = x
-               coord_Tmax(2) = y
-               coord_Tmax(3) = z
-               vel_Tmax(1)   = u(i,j,k,1)
-               vel_Tmax(2)   = u(i,j,k,2)
-               vel_Tmax(3)   = u(i,j,k,3)
+            if ( scal(i,j,k,temp_comp) > temp_max ) then
+               temp_max         = scal(i,j,k,temp_comp)
+               coord_temp_max(1) = x
+               coord_temp_max(2) = y
+               coord_temp_max(3) = z
+               vel_temp_max(1)   = u(i,j,k,1)
+               vel_temp_max(2)   = u(i,j,k,2)
+               vel_temp_max(3)   = u(i,j,k,3)
 #if (AMREX_SPACEDIM == 2)
-               vel_Tmax(2)   = vel_Tmax(2) + 0.5d0*(w0(lev,j) + w0(lev,j+1))
+               vel_temp_max(2)   = vel_temp_max(2) + 0.5d0*(w0(lev,j) + w0(lev,j+1))
 #elif (AMREX_SPACEDIM == 3)
-               vel_Tmax(3)   = vel_Tmax(3) + 0.5d0*(w0(lev,k) + w0(lev,k+1))
+               vel_temp_max(3)   = vel_temp_max(3) + 0.5d0*(w0(lev,k) + w0(lev,k+1))
 #endif
             end if
 
@@ -182,7 +182,7 @@ contains
                        w0r, wr_lo, wr_hi, &
                        dx, &
                        normal, n_lo, n_hi, &
-                       T_max, coord_Tmax, vel_Tmax, &
+                       temp_max, coord_temp_max, vel_temp_max, &
                        enuc_max, coord_enucmax, vel_enucmax, &
                        kin_ener, int_ener, nuc_ener, &
                        U_max, Mach_max, &
@@ -210,7 +210,7 @@ contains
     double precision, intent(in   ) :: dx(3)
     integer         , intent(in   ) :: n_lo(3), n_hi(3)
     double precision, intent(in   ) ::   normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
-    double precision, intent(inout) :: T_max, coord_Tmax(3), vel_Tmax(3)
+    double precision, intent(inout) :: temp_max, coord_temp_max(3), vel_temp_max(3)
     double precision, intent(inout) :: enuc_max, coord_enucmax(3), vel_enucmax(3)
     double precision, intent(inout) :: kin_ener, int_ener, nuc_ener
     double precision, intent(inout) :: U_max, Mach_max
@@ -284,14 +284,14 @@ contains
                 !
                 ! max T, location, and velocity at that location (including w0)
                 !
-                if ( scal(i,j,k,temp_comp) > T_max ) then
-                   T_max         = scal(i,j,k,temp_comp)
-                   coord_Tmax(1) = x
-                   coord_Tmax(2) = y
-                   coord_Tmax(3) = z
-                   vel_Tmax(1)   = u(i,j,k,1)+0.5d0*(w0macx(i,j,k)+w0macx(i+1,j,k))
-                   vel_Tmax(2)   = u(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k))
-                   vel_Tmax(3)   = u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1))
+                if ( scal(i,j,k,temp_comp) > temp_max ) then
+                   temp_max      = scal(i,j,k,temp_comp)
+                   coord_temp_max(1) = x
+                   coord_temp_max(2) = y
+                   coord_temp_max(3) = z
+                   vel_temp_max(1)   = u(i,j,k,1)+0.5d0*(w0macx(i,j,k)+w0macx(i+1,j,k))
+                   vel_temp_max(2)   = u(i,j,k,2)+0.5d0*(w0macy(i,j,k)+w0macy(i,j+1,k))
+                   vel_temp_max(3)   = u(i,j,k,3)+0.5d0*(w0macz(i,j,k)+w0macz(i,j,k+1))
                 end if
                 !
                 ! max enuc
