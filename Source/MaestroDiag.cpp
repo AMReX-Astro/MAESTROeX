@@ -317,9 +317,8 @@ Maestro::DiagFile (const int step,
             U_max = max(U_max, U_max_level);
             Mach_max = max(Mach_max, Mach_max_level);
 
-            // compute center of domain
-            // (in planar, of dubious utility but saves more if spherical==1 conditionals )
-            //Vector<Real> center(3, 0.0);
+#if (AMREX_SPACEDIM == 3)
+            // compute center of the star
             Vector<Real> center(AMREX_SPACEDIM, 0.0);
             const Real* probLo = geom[0].ProbLo();
             const Real* probHi = geom[0].ProbHi();
@@ -327,6 +326,7 @@ Maestro::DiagFile (const int step,
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
                 center[idim] = 0.5*(*(probLo+idim) + *(probHi+idim));
             }
+#endif
 
             // if T_max_level is the new max, then copy the location as well
             if ( T_max_level > T_max ) {
@@ -337,8 +337,9 @@ Maestro::DiagFile (const int step,
                     vel_Tmax[i] = vel_Tmax_level[i];
                 }
 
+#if (AMREX_SPACEDIM == 3)
                 if (spherical == 1) { 
-                  // compute the radius of the bubble from the center
+                  // compute the radius of the bubble from the center of the star
                   Rloc_Tmax = sqrt( (coord_Tmax[0] - center[0])*(coord_Tmax[0] - center[0]) +
                                     (coord_Tmax[1] - center[1])*(coord_Tmax[1] - center[1]) +
                                     (coord_Tmax[2] - center[2])*(coord_Tmax[2] - center[2]) );
@@ -349,6 +350,7 @@ Maestro::DiagFile (const int step,
                             ((coord_Tmax[1] - center[1])/Rloc_Tmax)*vel_Tmax[1] +
                             ((coord_Tmax[2] - center[2])/Rloc_Tmax)*vel_Tmax[2];
                 }
+#endif
 
             }
 
@@ -361,6 +363,7 @@ Maestro::DiagFile (const int step,
                     vel_enucmax[i] = vel_enucmax_level[i];
                 }
 
+#if (AMREX_SPACEDIM == 3)
                 if (spherical == 1) { 
                   // compute the radius of the bubble from the center
                   Rloc_enucmax = sqrt( (coord_enucmax[0] - center[0])*(coord_enucmax[0] - center[0]) +
@@ -373,6 +376,7 @@ Maestro::DiagFile (const int step,
                                ((coord_enucmax[1] - center[1])/Rloc_enucmax)*vel_enucmax[1] +
                                ((coord_enucmax[2] - center[2])/Rloc_enucmax)*vel_enucmax[2];
                 }
+#endif
             }
 
 
