@@ -6,16 +6,16 @@ module diag_module
 !   diag_enuc.out:
 !          peak nuc energy generation rate (erg / g / s)
 !          x/y/z location of peak enuc
-!          velocity components at location of peak enuc (including vr)
-!          radius of peak enuc
+!          velocity components at location of peak enuc (including vr if spherical)
+!          radius of peak enuc (if spherical)
 !          total nuclear energy release (erg / s)
 !
 !   diag_temp.out:          
 !          peak temperature
 !          x/y/z location of peak temperature
-!          velocity components at location of peak temperature (including vr)
-!          radius of peak temperature
-!          central temperature
+!          velocity components at location of peak temperature (including vr if spherical)
+!          radius of peak temperature (if spherical)
+!          central temperature (if spherical)
 !
 !   diag_vel.out:
 !          peak total velocity
@@ -23,7 +23,7 @@ module diag_module
 !          total kinetic energy
 !          gravitational potential energy
 !          total internal energy
-!          velocity components at the center of the star
+!          velocity components at the center of the star (if spherical)
 !
 
   use meth_params_module, only: rho_comp, spec_comp, temp_comp, prob_lo, &
