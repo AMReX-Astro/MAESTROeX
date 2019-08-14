@@ -438,3 +438,169 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
     // fill ghost cells
     FillPatch(t_old,s2,s2,s2,RhoH,RhoH,1,RhoH,bcs_s);
 }
+
+
+// SDC version
+void
+Maestro::ThermalConductSDC (int which_step,
+			    const Vector<MultiFab>& s1,
+			    Vector<MultiFab>& s2,
+			    const RealVector& p0old,
+			    const RealVector& p0new,
+			    const Vector<MultiFab>& hcoeff,
+			    const Vector<MultiFab>& Xkcoeff,
+			    const Vector<MultiFab>& pcoeff)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ThermalConductSDC()",ThermalConductSDC);
+
+    // Dummy coefficient matrix, holds all zeros
+    Vector<MultiFab> Dcoeff(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        Dcoeff[lev].define(grids[lev], dmap[lev], 1, 1);
+        Dcoeff[lev].setVal(0.);
+    }
+
+    // solverrhs will hold solver RHS = (rho h)^2  +
+    //           dt/2 div . ( hcoeff1 grad h^1) -
+    //           dt/2 sum_k div . (Xkcoeff2 grad X_k^2 + Xkcoeff1 grad X_k^1) -
+    //           dt/2 div . ( pcoeff2 grad p_0^new + pcoeff1 grad p_0^old)
+    Vector<MultiFab> solverrhs(finest_level+1);
+    Vector<MultiFab> resid(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        solverrhs[lev].define(grids[lev], dmap[lev], 1, 0);
+        resid[lev].define(grids[lev], dmap[lev], 1, 0);
+    }
+
+    // compute RHS = rho^{(2)}h^{(2')}
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        MultiFab::Copy(solverrhs[lev],s2[lev],RhoH,0,1,0);
+    }
+
+    // compute resid = div(hcoeff1 grad h^1) - sum_k div(Xkcoeff1 grad Xk^1) - div(pcoeff1 grad p0_old)
+    MakeExplicitThermal(resid,s1,Dcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,2);
+
+    // RHS = solverrhs + dt/2 * resid1
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        MultiFab::LinComb(solverrhs[lev],1.0,solverrhs[lev],0,dt/2.0,resid[lev],0,0,1,0);
+    }
+
+    // compute resid = 0 - sum_k div(Xkcoeff2 grad Xk^2) - div(pcoeff2 grad p0_new)
+    MakeExplicitThermal(resid,s2,Dcoeff,Dcoeff,Xkcoeff,pcoeff,p0_new,2);
+
+    // RHS = solverrhs + dt/2 * resid2
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        MultiFab::LinComb(solverrhs[lev],1.0,solverrhs[lev],0,dt/2.0,resid[lev],0,0,1,0);
+    }
+
+    // LHS coefficients for solver
+    Vector<MultiFab> acoef(finest_level+1);
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > face_bcoef(finest_level+1);
+    Vector<MultiFab> phi(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        acoef[lev].define(grids[lev], dmap[lev], 1, 1);
+        AMREX_D_TERM(face_bcoef[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0); ,
+                     face_bcoef[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0); ,
+                     face_bcoef[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0); );
+        phi[lev].define(grids[lev], dmap[lev], 1, 1);
+    }
+
+    // set cell-centered A coefficient to zero
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Copy(acoef[lev],s2[lev],Rho,0,1,1);
+    }
+
+    // average face-centered Bcoefficients
+    PutDataOnFaces(hcoeff, face_bcoef, 1);
+
+    // initialize value of phi to h^(2) as a guess
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Copy(phi[lev],s2[lev],RhoH,0,1,1);
+        MultiFab::Divide(phi[lev],s2[lev],Rho,0,1,1);
+    }
+
+    //
+    // Set up implicit solve using MLABecLaplacian class
+    //
+    LPInfo info;
+    MLABecLaplacian mlabec(geom, grids, dmap, info);
+
+    // order of stencil
+    int linop_maxorder = 2;
+    mlabec.setMaxOrder(linop_maxorder);
+
+    // set boundaries for mlabec using enthalpy bc's
+    std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_lobc;
+    std::array<LinOpBCType,AMREX_SPACEDIM> mlmg_hibc;
+
+    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
+    {
+        if (Geom(0).isPeriodic(idim)) {
+            mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
+        }
+        else {
+            // lo-side BCs
+            if (bcs_s[RhoH].lo(idim) == BCType::foextrap) {
+                mlmg_lobc[idim] = LinOpBCType::Dirichlet;
+            } else if (bcs_s[RhoH].lo(idim) == BCType::ext_dir) {
+                mlmg_lobc[idim] = LinOpBCType::Dirichlet;
+            } else {
+                mlmg_lobc[idim] = LinOpBCType::Neumann;
+            }
+
+            // hi-side BCs
+            if (bcs_s[RhoH].hi(idim) == BCType::foextrap) {
+                mlmg_hibc[idim] = LinOpBCType::Dirichlet;
+            } else if (bcs_s[RhoH].hi(idim) == BCType::ext_dir) {
+                mlmg_hibc[idim] = LinOpBCType::Dirichlet;
+            } else {
+                mlmg_hibc[idim] = LinOpBCType::Neumann;
+            }
+        }
+    }
+
+    mlabec.setDomainBC(mlmg_lobc,mlmg_hibc);
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        mlabec.setLevelBC(lev, &phi[lev]);
+    }
+
+    mlabec.setScalars(1.0, -dt/2.0);
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        mlabec.setACoeffs(lev, acoef[lev]);
+        mlabec.setBCoeffs(lev, amrex::GetArrOfConstPtrs(face_bcoef[lev]));
+    }
+
+    // solve A - dt/2 * div B grad phi = RHS
+
+    // build an MLMG solver
+    MLMG thermal_mlmg(mlabec);
+
+    // set solver parameters
+    thermal_mlmg.setVerbose(mg_verbose);
+    thermal_mlmg.setCGVerbose(cg_verbose);
+
+    // tolerance parameters taken from original MAESTRO fortran code
+    Real thermal_tol_abs = -1.e0;
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        thermal_tol_abs = std::max(thermal_tol_abs, phi[lev].norm0());
+    }
+    const Real solver_tol_abs = eps_mac*thermal_tol_abs;
+    const Real solver_tol_rel = eps_mac;
+
+    // solve for phi
+    thermal_mlmg.solve(GetVecOfPtrs(phi), GetVecOfConstPtrs(solverrhs), solver_tol_rel, solver_tol_abs);
+
+    // load new rho*h into s2
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        MultiFab::Copy(s2[lev],phi[lev],0,RhoH,1,1);
+        MultiFab::Multiply(s2[lev],s2[lev],Rho,RhoH,1,1);
+    }
+
+    // average fine data onto coarser cells
+    AverageDown(s2,RhoH,1);
+
+    // fill ghost cells
+    FillPatch(t_old,s2,s2,s2,RhoH,RhoH,1,RhoH,bcs_s);
+}

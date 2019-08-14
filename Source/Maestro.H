@@ -86,6 +86,10 @@ private:
     // advance solution for a single time step with regular base state spacing
     // and new time-stepping scheme
     void AdvanceTimeStepAverage (bool is_initIter);
+    
+    // advance solution at all levels for a single time step using SDC
+    // instead of Strang splitting
+    void AdvanceTimeStepSDC (bool is_initIter);
 
     // end MaestroAdvance.cpp functions
     ////////////
@@ -233,6 +237,18 @@ private:
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			 const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
 			 const RealVector& rho0_predicted_edge);
+
+    // SDC
+    void DensityAdvanceSDC (int which_step,
+			    amrex::Vector<amrex::MultiFab>& scalold,
+			    amrex::Vector<amrex::MultiFab>& scalnew,
+			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+			    amrex::Vector<amrex::MultiFab>& scal_force,
+			    amrex::Vector<amrex::MultiFab>& etarhoflux,
+			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+			    const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+			    const RealVector& rho0_predicted_edge);
     ////////////////////////
 
     ////////////
@@ -274,6 +290,17 @@ private:
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const amrex::Vector<amrex::MultiFab>& thermal);
+
+    // SDC
+    void EnthalpyAdvanceSDC (int which_step,
+                          amrex::Vector<amrex::MultiFab>& scalold,
+                          amrex::Vector<amrex::MultiFab>& scalnew,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                          amrex::Vector<amrex::MultiFab>& scal_force,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                          const amrex::Vector<amrex::MultiFab>& diff);
     ////////////////////////
 
     ////////////////////////
@@ -685,11 +712,33 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const RealVector& p0,
                 const amrex::Real dt_react);
+    
+    void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
+		   amrex::Vector<amrex::MultiFab>& s_out,
+		   amrex::Vector<amrex::MultiFab>& rho_Hext,
+		   amrex::Vector<amrex::MultiFab>& rho_omegadot,
+		   amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+		   const RealVector& p0,
+		   const amrex::Real dt_react,
+		   const amrex::Vector<amrex::MultiFab>& source);
+    
+    void BurnerSDC (const amrex::Vector<amrex::MultiFab>& s_in,
+		    amrex::Vector<amrex::MultiFab>& s_out,
+		    const amrex::Vector<amrex::MultiFab>& rho_Hext,
+		    amrex::Vector<amrex::MultiFab>& rho_omegadot,
+		    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+		    const RealVector& p0,
+		    const amrex::Real dt_react,
+		    const amrex::Vector<amrex::MultiFab>& source);
 
     // compute heating term, rho_Hext
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
                       const amrex::Vector<amrex::MultiFab>& scal);
 
+    void MakeIntraCoeffs (const amrex::Vector<amrex::MultiFab>& s1,
+			  const amrex::Vector<amrex::MultiFab>& s2,
+			  amrex::Vector<amrex::MultiFab>& cp,
+			  amrex::Vector<amrex::MultiFab>& xi);
     // end MaestroReact.cpp functions
     ////////////
 
@@ -817,6 +866,15 @@ private:
 			 const amrex::Vector<amrex::MultiFab>& hcoeff2,
 			 const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
 			 const amrex::Vector<amrex::MultiFab>& pcoeff2);
+
+    void ThermalConductSDC(int which_step,
+			   const amrex::Vector<amrex::MultiFab>& s1,
+			         amrex::Vector<amrex::MultiFab>& s2,
+			   const RealVector& p0old,
+			   const RealVector& p0new,
+			   const amrex::Vector<amrex::MultiFab>& hcoeff,
+			   const amrex::Vector<amrex::MultiFab>& Xkcoeff,
+			   const amrex::Vector<amrex::MultiFab>& pcoeff);
     ////////////////////////
 
     ////////////////////////
@@ -893,6 +951,7 @@ private:
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
     amrex::Vector<amrex::MultiFab> pi;   // nodal
+    amrex::Vector<amrex::MultiFab> intra; // for sdc
 
     // this only needs to persist leading into the initial pressure iters
     // since we project (beta0^nph S^1 - beta0 S^0) / dt

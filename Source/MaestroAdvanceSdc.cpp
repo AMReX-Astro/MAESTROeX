@@ -20,14 +20,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     Vector<MultiFab>       S_cc_nph(finest_level+1);
     Vector<MultiFab>   rho_omegadot(finest_level+1);
     Vector<MultiFab>       diff_old(finest_level+1);
+    Vector<MultiFab>       diff_new(finest_level+1);
     Vector<MultiFab>       diff_hat(finest_level+1);
     Vector<MultiFab> diff_hterm_old(finest_level+1);
     Vector<MultiFab> diff_hterm_hat(finest_level+1);
     Vector<MultiFab>       rho_Hnuc(finest_level+1);
     Vector<MultiFab>       rho_Hext(finest_level+1);
-    Vector<MultiFab>             s1(finest_level+1);
-    Vector<MultiFab>             s2(finest_level+1);
-    Vector<MultiFab>          intra(finest_level+1);
     Vector<MultiFab>     sdc_source(finest_level+1);
     Vector<MultiFab>           aofs(finest_level+1);
     
@@ -136,14 +134,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	S_cc_nph    [lev].define(grids[lev], dmap[lev],       1,    0);
 	rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec,    0);
 	diff_old    [lev].define(grids[lev], dmap[lev],       1,    0);
+	diff_new    [lev].define(grids[lev], dmap[lev],       1,    0);
 	diff_hat    [lev].define(grids[lev], dmap[lev],       1,    0);
 	diff_hterm_old[lev].define(grids[lev], dmap[lev],     1,    0);
 	diff_hterm_hat[lev].define(grids[lev], dmap[lev],     1,    0);
 	rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1,    0);
 	rho_Hext    [lev].define(grids[lev], dmap[lev],       1,    0);
-	s1          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
-	s2          [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
-	intra       [lev].define(grids[lev], dmap[lev],   Nscal,    0);
 	sdc_source  [lev].define(grids[lev], dmap[lev],   Nscal,    0);
 	aofs        [lev].define(grids[lev], dmap[lev],   Nscal,    0);
 	delta_gamma1_term[lev].define(grids[lev], dmap[lev],  1,    0);
@@ -167,7 +163,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	}
 	delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
 	sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
-	w0cc     [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
+	w0cc    [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
 
 	// face-centered in the dm-direction (planar only)
 	AMREX_D_TERM(etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -249,6 +245,130 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	Print() << "<<< STEP 1 : Compute advection velocities >>>" << std::endl;
     }
 
+    if (t_old == 0.) {
+	// this is either a pressure iteration or the first time step
+	// set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    MultiFab::LinComb(S_cc_nph[lev],0.5,S_cc_old[lev],0,0.5,S_cc_new[lev],0,0,1,0);
+	}
+    }
+    else {
+	// set S_cc_nph = S_cc_old + (dt/2) * dSdt
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    MultiFab::LinComb(S_cc_nph[lev],1.0,S_cc_old[lev],0,0.5*dt,dSdt[lev],0,0,1,0);
+	}
+    }
+    // no ghost cells for S_cc_nph
+    AverageDown(S_cc_nph,0,1);
+
+    // compute p0_minus_peosbar = p0_old - peosbar (for making w0) and
+    // compute delta_p_term = peos_old - p0_old (for RHS of projections)
+    if (dpdt_factor > 0.0) {
+	// peos_old (delta_p_term) now holds the thermodynamic p computed from sold(rho,h,X)
+	PfromRhoH(sold,sold,delta_p_term);
+
+	// compute peosbar = Avg(peos_old)
+        Average(delta_p_term,peosbar,0);
+
+        // compute p0_minus_peosbar = p0_old - peosbar
+        for (int i=0; i<p0_minus_peosbar.size(); ++i) {
+            p0_minus_peosbar[i] = p0_old[i] - peosbar[i];
+        }
+
+	// compute peosbar_cart from peosbar
+        Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+
+        // compute delta_p_term = peos_old - peosbar_cart
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
+        }
+    }
+    else {
+	// these should have no effect if dpdt_factor <= 0
+        std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    delta_p_term[lev].setVal(0.);
+	}
+    }
+    
+/*
+    if (evolve_base_state) {
+
+        if (split_projection) {
+
+            // compute Sbar = average(S_cc_nph)
+            Average(S_cc_nph,Sbar,0);
+
+            // save old-time value
+            w0_old = w0;
+
+            // compute w0, w0_force, and delta_chi_w0
+            is_predictor = 1;
+            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
+                    rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
+                    gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
+                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
+                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+
+            if (spherical == 1) {
+                // put w0 on Cartesian edges
+                MakeW0mac(w0mac);
+            }
+        }
+    }
+*/
+
+    
+    // compute unprojected MAC velocities
+    is_predictor = 1;
+    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+	delta_chi[lev].setVal(0.);
+	macphi   [lev].setVal(0.);
+	delta_gamma1_term[lev].setVal(0.);
+    }
+
+    if (evolve_base_state && !split_projection) {
+	for (int i=0; i<Sbar.size(); ++i) {
+            Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
+	}
+    }
+
+    // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
+    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
+		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
+
+    if (spherical == 1 && evolve_base_state && split_projection) {
+	// subtract w0mac from umac
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+		MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
+	}
+    }
+
+    // wallclock time
+    Real start_total_macproj = ParallelDescriptor::second();
+
+    // MAC projection
+    // includes spherical option in C++ function
+    MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
+
+    // wallclock time
+    Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
+    ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
+
+/*
+    if (spherical == 1 && evolve_base_state && split_projection) {
+	// add w0mac back to umac
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+		MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
+	}
+    }
+*/
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- Predictor
@@ -266,7 +386,123 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	Print() << "<<< STEP 2A : compute advective flux div >>>" << std::endl;
     }
 
+    // no need to advect the base state density
+    rho0_new = rho0_old;
 
+    // set diff to zero
+    for (int lev=0; lev<=finest_level; ++lev) {
+	diff_old[lev].setVal(0.);
+	diff_new[lev].setVal(0.);
+	diff_hat[lev].setVal(0.);
+    }
+
+    // diff is the forcing for rhoh or temperature
+    if (use_thermal_diffusion) {
+	MakeThermalCoeffs(sold,Tcoeff1,hcoeff1,Xkcoeff1,pcoeff1);
+
+	MakeExplicitThermal(diff_old,sold,Tcoeff1,hcoeff1,Xkcoeff1,pcoeff1,p0_old,
+			    temp_diffusion_formulation);
+    }
+
+    // copy sold into shat 
+    // temperature will be overwritten later after enthalpy advance
+    for (int lev=0; lev<=finest_level; ++lev) {
+	MultiFab::Copy(shat[lev],sold[lev],0,0,Nscal,ng_s);
+    }
+
+    if (maestro_verbose >= 1) {
+	Print() << "            :  density_advance >>>" << std::endl;
+    }
+
+    // set sedge and sflux to zero
+    for (int lev=0; lev<=finest_level; ++lev) {
+	for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+	    sedge[lev][idim].setVal(0.);
+	    sflux[lev][idim].setVal(0.);
+	}
+    }
+
+    // advect rhoX and rho
+    DensityAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
+
+/*
+    if (evolve_base_state) {
+	// correct the base state density by "averaging"
+	Average(s2, rho0_new, Rho);
+	compute_cutoff_coords(rho0_new.dataPtr());
+
+	if (use_etarho) {
+            // compute the new etarho
+            if (spherical == 0) {
+                MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
+            } else {
+                MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+            }
+	}
+    }
+
+    // update grav_cell_new
+    if (evolve_base_state) {
+	make_grav_cell(grav_cell_new.dataPtr(),
+		       rho0_new.dataPtr(),
+		       r_cc_loc.dataPtr(),
+		       r_edge_loc.dataPtr());
+    }
+    else {
+*/	grav_cell_new = grav_cell_old;
+/*   }
+
+    // base state pressure update
+    if (evolve_base_state) {
+
+	// set new p0 through HSE
+	p0_new = p0_old;
+
+	enforce_HSE(rho0_new.dataPtr(),
+		    p0_new.dataPtr(),
+		    grav_cell_new.dataPtr(),
+		    r_cc_loc.dataPtr(),
+		    r_edge_loc.dataPtr());
+
+	// compute p0_nph
+	for (int i=0; i<p0_nph.size(); ++i) {
+	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	}
+
+	// hold dp0/dt in psi for enthalpy advance
+	for (int i=0; i<p0_old.size(); ++i) {
+	    psi[i] = (p0_new[i] - p0_old[i])/dt;
+	}
+
+    }
+    else {
+*/	p0_new = p0_old;
+        p0_nph = p0_old;
+/*    }
+
+    // base state enthalpy update
+    if (evolve_base_state) {
+	// compute rhoh0_old by "averaging"
+	Average(s1, rhoh0_old, RhoH);
+	Average(s2, rhoh0_new, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
+    }
+    else {
+*/	rhoh0_new = rhoh0_old;
+//    }
+
+    if (maestro_verbose >= 1) {
+	Print() << "            : enthalpy_advance >>>" << std::endl;
+    }
+
+    EnthalpyAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,umac,w0mac_dummy,diff_old);
+
+    // extract aofs = (shat - sold) / dt - intra
+    for (int lev=0; lev<=finest_level; ++lev) {
+	MultiFab::LinComb(aofs[lev],1.0,shat[lev],0,-1.0,sold[lev],0,0,Nscal,0);
+	aofs[lev].mult(1.0/dt);
+	MultiFab::Subtract(aofs[lev],intra[lev],0,0,Nscal,0);
+    }
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2B (optional) -- compute diffusive flux divergence
     //////////////////////////////////////////////////////////////////////////////
@@ -275,6 +511,13 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	Print() << "<<< STEP 2B : compute diffusive flux div >>>" << std::endl;
     }
 
+    if (use_thermal_diffusion) {
+	// 1 = predictor, 2 = corrector
+	ThermalConductSDC(1,sold,shat,p0_old,p0_new,hcoeff1,Xkcoeff1,pcoeff1);
+
+	MakeExplicitThermal(diff_hat,shat,Tcoeff1,hcoeff1,Xkcoeff1,pcoeff1,p0_new,
+			    temp_diffusion_formulation);
+    }
     
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2C -- advance thermodynamic variables
@@ -284,6 +527,114 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	Print() << "<<< STEP 2C: advance thermo variables >>>" << std::endl;
     }
 
+    // build sdc_source
+    for (int lev=0; lev<=finest_level; ++lev) {
+	sdc_source[lev].setVal(0.);
+	MultiFab::LinComb(sdc_source[lev],0.5,diff_old[lev],0,0.5,diff_hat[lev],0,RhoH,1,0);
+	MultiFab::Add(sdc_source[lev],aofs[lev],0,0,Nscal,0);
+    }
+    
+    // wallclock time
+    Real start_total_react = ParallelDescriptor::second();
+    
+    ReactSDC(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,dt,sdc_source);
+
+    // wallclock time
+    Real end_total_react = ParallelDescriptor::second() - start_total_react;
+    ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
+
+    // extract IR =  [ (snew - sold)/dt - sdc_source ]
+    for (int lev=0; lev<=finest_level; ++lev) {
+	intra[lev].setVal(0.);
+	MultiFab::LinComb(intra[lev],1.0,snew[lev],0,-1.0,sold[lev],0,0,Nscal,0);
+	intra[lev].mult(1.0/dt);
+	MultiFab::Subtract(intra[lev],sdc_source[lev],0,0,Nscal,0);
+    }
+
+    // massage the rhoh intra term into the proper form, depending on
+    // what we are predicting.  Note: we do this before we deal with
+    // the species terms, since some enthalpy types need this default
+    // species intra.
+
+    // first create rhohalf -- a lot of forms need this. 
+    FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
+
+    if (enthalpy_pred_type == predict_rhohprime) {
+
+	Abort("enthalpy_pred_type = predict_rhohprime not supported");
+
+    } else if (enthalpy_pred_type == predict_h) {
+
+	// we want this in terms of h, not (rho h)
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    MultiFab::Divide(intra[lev],rhohalf[lev],0,RhoH,1,0);
+	}
+
+    } else if ((enthalpy_pred_type == predict_T_then_rhohprime) ||
+	       (enthalpy_pred_type == predict_T_then_h)) {
+
+	// for predict_T_*, the intra force needs to be in the temp_comp
+	// slot, since temperature is what is predicted.
+
+	// first make the thermodynamic coefficients at the half-time
+	MakeIntraCoeffs(sold,snew,cphalf,xihalf);
+
+	// overwrite intra(temp_comp).  We want to create
+	// I_T = (1 / (rho c_p)) [ (rhoh_new - rhoh_old)/dt - A_rhoh -
+	//     sum_k xi_k ( (rhoX_new - rhoX_old)/dt - A_rhoX ) ]
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    MultiFab::Copy(intra[lev],intra[lev],RhoH,Temp,1,0);
+	    
+	    for (int comp=0; comp<NumSpec; ++comp) {
+		// multiple xi by intra and store in xi
+		MultiFab::Multiply(xihalf[lev],intra[lev],FirstSpec+comp,comp,1,0);
+
+		// subtract from intra temp
+		MultiFab::Subtract(intra[lev],xihalf[lev],comp,Temp,1,0);
+	    }
+
+	    MultiFab::Divide(intra[lev],rhohalf[lev],0,Temp,1,0);
+	    MultiFab::Divide(intra[lev],cphalf[lev],0,Temp,1,0);
+	}
+
+    }     
+
+    // for some species_pred_types, we need to make intra in terms of
+    // X, NOT rhoX
+    if ( (species_pred_type == predict_rhoprime_and_X) ||
+         (species_pred_type == predict_rho_and_X) ) {
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+		MultiFab::Divide(intra[lev],rhohalf[lev],0,comp,1,0);
+	    }
+	}
+    }
+
+    // compute new-time coefficients and diffusion term
+    if (use_thermal_diffusion) {
+	MakeThermalCoeffs(snew,Tcoeff2,hcoeff2,Xkcoeff2,pcoeff2);
+
+	MakeExplicitThermal(diff_new,snew,Tcoeff2,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
+			    temp_diffusion_formulation);
+    }
+/*
+    if (evolve_base_state) {
+	// compute beta0 and gamma1bar
+	MakeGamma1bar(snew,gamma1bar_new,p0_new);
+	make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+    }
+    else {
+*/	// Just pass beta0 and gamma1bar through if not evolving base state
+	beta0_new = beta0_old;
+	gamma1bar_new = gamma1bar_old;
+//    }
+
+    for(int i=0; i<beta0_nph.size(); ++i) {
+	beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+	gamma1bar_nph[i] = 0.5*(gamma1bar_old[i]+gamma1bar_new[i]);
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 3 -- Update advection velocities

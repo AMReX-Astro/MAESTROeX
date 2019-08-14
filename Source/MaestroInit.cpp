@@ -324,6 +324,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 
 	pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
+	intra[lev].define(grids[lev], dmap[lev], Nscal, 0); // for sdc
 
 	sold              [lev].setVal(0.);
 	snew              [lev].setVal(0.);
@@ -335,6 +336,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	dSdt              [lev].setVal(0.);
 	rhcc_for_nodalproj[lev].setVal(0.);
 	pi                [lev].setVal(0.);
+	intra             [lev].setVal(0.);
 
 	if (spherical == 1) {
 		normal      [lev].define(ba, dm, 3, 1);
