@@ -193,8 +193,6 @@ void
 Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 		   Vector<MultiFab>& s_out,
 		   Vector<MultiFab>& rho_Hext,
-		   Vector<MultiFab>& rho_omegadot,
-		   Vector<MultiFab>& rho_Hnuc,
 		   const RealVector& p0,
 		   const Real dt_in,
 		   const Vector<MultiFab>& source)
@@ -238,20 +236,12 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 
         // do the burning, update rho_omegadot and rho_Hnuc
         // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
-        BurnerSDC(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in,source);
+        BurnerSDC(s_in,s_out,p0,dt_in,source);
 
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Copy(s_out[lev],s_in[lev],Temp,Temp,1,0);
         }
-    }
-    else {
-        // not burning, so we zero rho_omegadot and rho_Hnuc
-        for (int lev=0; lev<=finest_level; ++lev) {
-            rho_omegadot[lev].setVal(0.);
-            rho_Hnuc[lev].setVal(0.);
-        }
-
     }
 
     // if we aren't doing any heating/burning, then just copy the old to the new
@@ -267,8 +257,6 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 
     // average down (no ghost cells)
     AverageDown(rho_Hext,0,1);
-    AverageDown(rho_omegadot,0,NumSpec);
-    AverageDown(rho_Hnuc,0,1);
 
     // now update temperature
     if (use_tfromp) {
@@ -286,9 +274,6 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 }
 void Maestro::BurnerSDC(const Vector<MultiFab>& s_in,
 			Vector<MultiFab>& s_out,
-			const Vector<MultiFab>& rho_Hext,
-			Vector<MultiFab>& rho_omegadot,
-			Vector<MultiFab>& rho_Hnuc,
 			const RealVector& p0,
 			const Real dt_in,
 			const Vector<MultiFab>& source)
@@ -314,10 +299,7 @@ void Maestro::BurnerSDC(const Vector<MultiFab>& s_in,
 
         // get references to the MultiFabs at level lev
         const MultiFab&         s_in_mf =         s_in[lev];
-        MultiFab&        s_out_mf =        s_out[lev];
-        const MultiFab&     rho_Hext_mf =     rho_Hext[lev];
-        MultiFab& rho_omegadot_mf = rho_omegadot[lev];
-        MultiFab&     rho_Hnuc_mf =     rho_Hnuc[lev];
+              MultiFab&        s_out_mf =        s_out[lev];
         const MultiFab& tempbar_cart_mf = tempbar_init_cart[lev];
 
         // create mask assuming refinement ratio = 2
@@ -340,31 +322,29 @@ void Maestro::BurnerSDC(const Vector<MultiFab>& s_in,
             int use_mask = !(lev==finest_level);
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            if (spherical == 1) {
-#pragma gpu box(tileBox)
-                burner_loop_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                 BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]), dt_in,
-                                 BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
-            } else {
-#pragma gpu box(tileBox)
-                burner_loop(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                            lev,
-                            BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                            tempbar_init.dataPtr(), dt_in,
-                            BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
-            }
+	    
+            // if (spherical == 1) {
+// #pragma gpu box(tileBox)
+//                 burner_loop_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+//                                  BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
+//                                  BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
+//                                  BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
+//                                  BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
+//                                  BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
+//                                  BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]), dt_in,
+//                                  BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+//             } else {
+// #pragma gpu box(tileBox)
+//                 burner_loop(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+//                             lev,
+//                             BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
+//                             BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
+//                             BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
+//                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
+//                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
+//                             tempbar_init.dataPtr(), dt_in,
+//                             BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+//             }
         }
     }
 }

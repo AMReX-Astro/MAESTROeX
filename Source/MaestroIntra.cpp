@@ -33,9 +33,6 @@ Maestro::MakeIntraCoeffs (const Vector<MultiFab>& s1,
             const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
 	    
             // make_intra_coeffs(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 	    // 		      BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
@@ -45,4 +42,5 @@ Maestro::MakeIntraCoeffs (const Vector<MultiFab>& s1,
 
     // average down
     AverageDown(cp,0,1);
+    AverageDown(xi,0,1);
 }

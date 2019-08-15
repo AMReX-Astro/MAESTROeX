@@ -131,6 +131,63 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 
 }
 
+// compute only the h term in thermal
+void
+Maestro::MakeExplicitThermalHterm(Vector<MultiFab>& thermal,
+				  const Vector<MultiFab>& scal,
+				  const Vector<MultiFab>& hcoeff) {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeExplicitThermalH()",MakeExplicitThermalH);
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        thermal[lev].setVal(0.);
+    }
+
+    // Variable to store values to be acted upon by (div B grad) operator
+    Vector<MultiFab> phi(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        phi[lev].define(grids[lev], dmap[lev], 1, 1);
+        phi[lev].setVal(0.);
+    }
+
+    // temporary residual variable
+    Vector<MultiFab> resid(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        resid[lev].define(grids[lev], dmap[lev],1, 0);
+        resid[lev].setVal(0.);
+    }
+
+    //
+    // Compute thermal = div B grad phi using MLABecLaplacian class
+    //
+    LPInfo info;
+
+    // turn off multigrid coarsening since no actual solve is performed
+    info.setMaxCoarseningLevel(0);
+
+    MLABecLaplacian mlabec(geom, grids, dmap, info);
+
+    // order of stencil
+    int stencil_order = 2;
+    mlabec.setMaxOrder(stencil_order);
+
+        // 1. Compute div hcoeff grad h
+        mlabec.setScalars(0.0, 1.0);
+
+        // set value of phi
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(phi[lev],scal[lev],RhoH,0,1,1);
+            MultiFab::Divide(phi[lev],scal[lev],Rho,0,1,1);
+        }
+
+        ApplyThermal(mlabec, resid, hcoeff, phi, bcs_s, RhoH);
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
+        }
+
+}
+
 // Use apply() to construct the form of the conduction term.
 // apply() forms the generic quantity:
 //
@@ -443,13 +500,17 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 // SDC version
 void
 Maestro::ThermalConductSDC (int which_step,
-			    const Vector<MultiFab>& s1,
-			    Vector<MultiFab>& s2,
+			    const Vector<MultiFab>& s_old,
+			    Vector<MultiFab>& s_hat,
+			    const Vector<MultiFab>& s_new,
 			    const RealVector& p0old,
 			    const RealVector& p0new,
-			    const Vector<MultiFab>& hcoeff,
-			    const Vector<MultiFab>& Xkcoeff,
-			    const Vector<MultiFab>& pcoeff)
+			    const Vector<MultiFab>& hcoeff1,
+			    const Vector<MultiFab>& Xkcoeff1,
+			    const Vector<MultiFab>& pcoeff1,
+			    const Vector<MultiFab>& hcoeff2,
+			    const Vector<MultiFab>& Xkcoeff2,
+			    const Vector<MultiFab>& pcoeff2)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ThermalConductSDC()",ThermalConductSDC);
@@ -474,11 +535,11 @@ Maestro::ThermalConductSDC (int which_step,
 
     // compute RHS = rho^{(2)}h^{(2')}
     for (int lev = 0; lev <= finest_level; ++lev) {
-        MultiFab::Copy(solverrhs[lev],s2[lev],RhoH,0,1,0);
+        MultiFab::Copy(solverrhs[lev],s_hat[lev],RhoH,0,1,0);
     }
 
     // compute resid = div(hcoeff1 grad h^1) - sum_k div(Xkcoeff1 grad Xk^1) - div(pcoeff1 grad p0_old)
-    MakeExplicitThermal(resid,s1,Dcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,2);
+    MakeExplicitThermal(resid,s_old,Dcoeff,hcoeff1,Xkcoeff1,pcoeff1,p0_old,2);
 
     // RHS = solverrhs + dt/2 * resid1
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -486,7 +547,7 @@ Maestro::ThermalConductSDC (int which_step,
     }
 
     // compute resid = 0 - sum_k div(Xkcoeff2 grad Xk^2) - div(pcoeff2 grad p0_new)
-    MakeExplicitThermal(resid,s2,Dcoeff,Dcoeff,Xkcoeff,pcoeff,p0_new,2);
+    MakeExplicitThermal(resid,s_hat,Dcoeff,Dcoeff,Xkcoeff2,pcoeff2,p0_new,2);
 
     // RHS = solverrhs + dt/2 * resid2
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -507,16 +568,16 @@ Maestro::ThermalConductSDC (int which_step,
 
     // set cell-centered A coefficient to zero
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(acoef[lev],s2[lev],Rho,0,1,1);
+        MultiFab::Copy(acoef[lev],s_hat[lev],Rho,0,1,1);
     }
 
     // average face-centered Bcoefficients
-    PutDataOnFaces(hcoeff, face_bcoef, 1);
+    PutDataOnFaces(hcoeff2, face_bcoef, 1);
 
     // initialize value of phi to h^(2) as a guess
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(phi[lev],s2[lev],RhoH,0,1,1);
-        MultiFab::Divide(phi[lev],s2[lev],Rho,0,1,1);
+        MultiFab::Copy(phi[lev],s_hat[lev],RhoH,0,1,1);
+        MultiFab::Divide(phi[lev],s_hat[lev],Rho,0,1,1);
     }
 
     //
@@ -594,13 +655,13 @@ Maestro::ThermalConductSDC (int which_step,
 
     // load new rho*h into s2
     for (int lev = 0; lev <= finest_level; ++lev) {
-        MultiFab::Copy(s2[lev],phi[lev],0,RhoH,1,1);
-        MultiFab::Multiply(s2[lev],s2[lev],Rho,RhoH,1,1);
+        MultiFab::Copy(s_hat[lev],phi[lev],0,RhoH,1,1);
+        MultiFab::Multiply(s_hat[lev],s_hat[lev],Rho,RhoH,1,1);
     }
 
     // average fine data onto coarser cells
-    AverageDown(s2,RhoH,1);
+    AverageDown(s_hat,RhoH,1);
 
     // fill ghost cells
-    FillPatch(t_old,s2,s2,s2,RhoH,RhoH,1,RhoH,bcs_s);
+    FillPatch(t_old,s_hat,s_hat,s_hat,RhoH,RhoH,1,RhoH,bcs_s);
 }

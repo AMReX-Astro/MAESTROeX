@@ -716,17 +716,12 @@ private:
     void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
 		   amrex::Vector<amrex::MultiFab>& s_out,
 		   amrex::Vector<amrex::MultiFab>& rho_Hext,
-		   amrex::Vector<amrex::MultiFab>& rho_omegadot,
-		   amrex::Vector<amrex::MultiFab>& rho_Hnuc,
 		   const RealVector& p0,
 		   const amrex::Real dt_react,
 		   const amrex::Vector<amrex::MultiFab>& source);
     
     void BurnerSDC (const amrex::Vector<amrex::MultiFab>& s_in,
 		    amrex::Vector<amrex::MultiFab>& s_out,
-		    const amrex::Vector<amrex::MultiFab>& rho_Hext,
-		    amrex::Vector<amrex::MultiFab>& rho_omegadot,
-		    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
 		    const RealVector& p0,
 		    const amrex::Real dt_react,
 		    const amrex::Vector<amrex::MultiFab>& source);
@@ -734,6 +729,11 @@ private:
     // compute heating term, rho_Hext
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
                       const amrex::Vector<amrex::MultiFab>& scal);
+
+    // compute heating terms, rho_omegadot and rho_Hnuc
+    void MakeReactionRates (amrex::Vector<amrex::MultiFab>& rho_omegadot,
+			    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+			    const amrex::Vector<amrex::MultiFab>& scal);
 
     void MakeIntraCoeffs (const amrex::Vector<amrex::MultiFab>& s1,
 			  const amrex::Vector<amrex::MultiFab>& s2,
@@ -868,13 +868,21 @@ private:
 			 const amrex::Vector<amrex::MultiFab>& pcoeff2);
 
     void ThermalConductSDC(int which_step,
-			   const amrex::Vector<amrex::MultiFab>& s1,
-			         amrex::Vector<amrex::MultiFab>& s2,
+			   const amrex::Vector<amrex::MultiFab>& s_old,
+			         amrex::Vector<amrex::MultiFab>& s_hat,
+			   const amrex::Vector<amrex::MultiFab>& s_new,
 			   const RealVector& p0old,
 			   const RealVector& p0new,
-			   const amrex::Vector<amrex::MultiFab>& hcoeff,
-			   const amrex::Vector<amrex::MultiFab>& Xkcoeff,
-			   const amrex::Vector<amrex::MultiFab>& pcoeff);
+			   const amrex::Vector<amrex::MultiFab>& hcoeff1,
+			   const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
+			   const amrex::Vector<amrex::MultiFab>& pcoeff1,
+			   const amrex::Vector<amrex::MultiFab>& hcoeff2,
+			   const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
+			   const amrex::Vector<amrex::MultiFab>& pcoeff2);
+
+    void MakeExplicitThermalHterm (amrex::Vector<amrex::MultiFab>& thermal,
+			       const amrex::Vector<amrex::MultiFab>& scal,
+			       const amrex::Vector<amrex::MultiFab>& hcoeff);
     ////////////////////////
 
     ////////////////////////
