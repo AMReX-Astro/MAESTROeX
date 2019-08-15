@@ -568,7 +568,8 @@ private:
     // perform a nodal projection
     void NodalProj (int proj_type,
                     amrex::Vector<amrex::MultiFab>& rhcc,
-                    int istep_divu_iter=0);
+                    int istep_divu_iter=0,
+		    bool sdc_off=true);
 
     // fill in Vproj
     // initial_projection_comp: Utilde^0                        -- uold
