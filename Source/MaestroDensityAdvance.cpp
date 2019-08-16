@@ -251,21 +251,20 @@ Maestro::DensityAdvance (int which_step,
 
 
 // Density advance for SDC using intra(global var)
-// Work in Progress
 void
 Maestro::DensityAdvanceSDC (int which_step,
-                         Vector<MultiFab>& scalold,
-                         Vector<MultiFab>& scalnew,
-                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-                         Vector<MultiFab>& scal_force,
-                         Vector<MultiFab>& etarhoflux,
-                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                         const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                         const RealVector& rho0_predicted_edge)
+			    Vector<MultiFab>& scalold,
+			    Vector<MultiFab>& scalnew,
+			    Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+			    Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+			    Vector<MultiFab>& scal_force,
+			    Vector<MultiFab>& etarhoflux,
+			    Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			    const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
+			    const RealVector& rho0_predicted_edge)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::DensityAdvance()",DensityAdvance);
+    BL_PROFILE_VAR("Maestro::DensityAdvanceSDC()",DensityAdvanceSDC);
 
     RealVector rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
     RealVector rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
@@ -286,11 +285,22 @@ Maestro::DensityAdvanceSDC (int which_step,
     // Create source terms at time n
     //////////////////////////////////
 
-    // source terms for X and for tracers are zero - do nothing
+    // source terms for X and for tracers include reaction forcing terms
     for (int lev=0; lev<=finest_level; ++lev) {
         scal_force[lev].setVal(0.);
+	MultiFab::Add(scal_force[lev],intra[lev],FirstSpec,FirstSpec,NumSpec,0);
     }
-
+    
+    if (finest_level == 0) {
+	// fill periodic ghost cells
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    scal_force[lev].FillBoundary(geom[lev].periodicity());
+	}
+    }
+    // fill ghost cells behind physical boundaries
+    // !!!!!! uncertain about this
+    FillPatch(t_old,scal_force,scal_force,scal_force,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_f);
+    
     Vector<MultiFab> rho0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -460,8 +470,10 @@ Maestro::DensityAdvanceSDC (int which_step,
     //     4) Update tracer with conservative differencing as well.
     //**************************************************************************
 
+    // reaction forcing terms
     for (int lev=0; lev<=finest_level; ++lev) {
         scal_force[lev].setVal(0.);
+	MultiFab::Add(scal_force[lev],intra[lev],FirstSpec,FirstSpec,NumSpec,0);
     }
 
     // p0 only used in rhoh update so it's an optional parameter

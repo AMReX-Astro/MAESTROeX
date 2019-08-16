@@ -303,20 +303,19 @@ Maestro::EnthalpyAdvance (int which_step,
 
 
 // Enthalpy advance for SDC using intra(global var)
-// Work in Progress
 void
 Maestro::EnthalpyAdvanceSDC (int which_step,
-                          Vector<MultiFab>& scalold,
-                          Vector<MultiFab>& scalnew,
-                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-                          Vector<MultiFab>& scal_force,
-                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                          const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                          const Vector<MultiFab>& thermal)
+			     Vector<MultiFab>& scalold,
+			     Vector<MultiFab>& scalnew,
+			     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+			     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+			     Vector<MultiFab>& scal_force,
+			     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+			     const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
+			     const Vector<MultiFab>& thermal)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
+    BL_PROFILE_VAR("Maestro::EnthalpyAdvanceSDC()",EnthalpyAdvanceSDC);
 
     // Create cell-centered base state quantity
     RealVector h0_old( (max_radial_level+1)*nr_fine );
@@ -388,17 +387,32 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     else if (enthalpy_pred_type == predict_hprime) {
         // first compute h0_old
         // make force for hprime
-        Abort("MaestroEnthalpyAdvance forcing");
+        Abort("MaestroEnthalpyAdvance does not support enthalpy_pred_type == predict_hprime");
     }
     else if (enthalpy_pred_type == predict_T_then_rhohprime ||
              enthalpy_pred_type == predict_T_then_h ||
              enthalpy_pred_type == predict_Tprime_then_h) {
         // make force for temperature
-        Abort("MaestroEnthalpyAdvance forcing");
+        Abort("MaestroEnthalpyAdvance does not support enthalpy_pred_type == predict_T*");
     }
 
+    // source terms for X and for tracers include reaction forcing terms
+    for (int lev=0; lev<=finest_level; ++lev) {
+	MultiFab::Add(scal_force[lev],intra[lev],RhoH,RhoH,1,0);
+    }
+    
+    if (finest_level == 0) {
+	// fill periodic ghost cells
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    scal_force[lev].FillBoundary(geom[lev].periodicity());
+	}
+    }
+    // fill ghost cells behind physical boundaries
+    // !!!!!! uncertain about this
+    FillPatch(t_old,scal_force,scal_force,scal_force,RhoH,RhoH,1,RhoH,bcs_f);
+    
     //////////////////////////////////
-    // Add w0 to MAC velocities
+    // Add w0 to MAC velocities (trans velocities already have w0).
     //////////////////////////////////
 
     Addw0(umac,w0mac,1.);
@@ -590,6 +604,11 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     MakeRhoHForce(scal_force,0,thermal,umac,0,which_step);
 
+    // reaction forcing terms
+    for (int lev=0; lev<=finest_level; ++lev) {
+	MultiFab::Add(scal_force[lev],intra[lev],RhoH,RhoH,1,0);
+    }
+    
     Vector<MultiFab> p0_new_cart(finest_level+1);
     if (spherical == 1) {
         for (int lev=0; lev<=finest_level; ++lev) {

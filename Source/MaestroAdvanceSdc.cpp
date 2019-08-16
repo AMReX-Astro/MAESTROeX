@@ -329,13 +329,13 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	macphi   [lev].setVal(0.);
 	delta_gamma1_term[lev].setVal(0.);
     }
-
+/*
     if (evolve_base_state && !split_projection) {
 	for (int i=0; i<Sbar.size(); ++i) {
             Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
 	}
     }
-
+*/
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
@@ -740,13 +740,13 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	    // compute unprojected MAC velocities
 	    is_predictor = 0;
 	    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
-	    
+/*
 	    if (evolve_base_state && !split_projection) {
 		for (int i=0; i<Sbar.size(); ++i) {
 		    Sbar[i] = 1.0/(gamma1bar_nph[i]*p0_nph[i]) * (p0_nph[i] - p0_old[i])/dt;
 		}
 	    }
-
+*/
 	    // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
 	    MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 			       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
@@ -1099,13 +1099,13 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	    MultiFab::Subtract(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
 	}
     }
-*/
+
     if (evolve_base_state && !split_projection) {
         for (int i=0; i<Sbar.size(); ++i) {
             Sbar[i] = (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
         }
     }
-
+*/
     int proj_type;
 
     // Project the new velocity field
