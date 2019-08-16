@@ -77,6 +77,9 @@ Maestro::Evolve ()
                 Real start_total = ParallelDescriptor::second();
 
 		// advance the solution by dt
+#ifdef SDC
+		AdvanceTimeStepSDC(false);
+#else
 		if (use_exact_base_state) {
 			AdvanceTimeStepIrreg(false);
 		} else if (average_base_state) {
@@ -84,7 +87,8 @@ Maestro::Evolve ()
 		} else {
 			AdvanceTimeStep(false);
 		}
-
+#endif
+		
 		t_old = t_new;
 
         if ( (sum_interval > 0 && istep%sum_interval == 0) ||

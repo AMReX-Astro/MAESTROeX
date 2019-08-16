@@ -464,6 +464,8 @@ private:
 
     // divu iter
     void DivuIter (int istep_divu_iter);
+    // SDC
+    void DivuIterSDC (int istep_divu_iter);
 
     // init iter to initialize gradpi
     void InitIter ();

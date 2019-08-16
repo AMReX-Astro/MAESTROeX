@@ -15,7 +15,9 @@ EBASE := Maestro
 EXTERN_CORE ?=
 
 # need to put any build suffices before Make.defs
-#
+ifeq ($(USE_SDC), TRUE)
+  USERSuffix = .SDC
+endif
 #
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
@@ -78,6 +80,12 @@ ifdef MICROPHYSICS_HOME
    COND_PATH := $(MICROPHYSICS_HOME)/conductivity/$(strip $(CONDUCTIVITY_DIR))
 endif
 
+ifeq ($(USE_REACT), TRUE)
+  DEFINES += -DREACTIONS
+  # we need the compositional derivatives for SDC
+  DEFINES += -DEXTRA_THERMO
+endif
+
 ifeq ($(USE_REACT_SPARSE_JACOBIAN), TRUE)
   DEFINES += -DREACT_SPARSE_JACOBIAN
 
@@ -87,6 +95,10 @@ ifeq ($(USE_REACT_SPARSE_JACOBIAN), TRUE)
   ifeq ($(USE_SPARSE_STOP_ON_OOB), TRUE)
     DEFINES += -DSPARSE_STOP_ON_OOB
   endif
+endif
+
+ifeq ($(USE_SDC), TRUE)
+  DEFINES += -DSDC -DPRIM_SPECIES_HAVE_SOURCES
 endif
 
 # if the EOS / network / conductivity name exists in

@@ -146,7 +146,11 @@ Maestro::Init ()
 		if (init_divu_iter > 0) {
 			for (int i=1; i<=init_divu_iter; ++i) {
 				Print() << "Doing initial divu iteration #" << i << std::endl;
+#ifdef SDC
+				DivuIterSDC(i);
+#else
 				DivuIter(i);
+#endif
 			}
 
 			if (plot_int > 0 || plot_deltat > 0) {
@@ -603,6 +607,145 @@ void Maestro::DivuIter (int istep_divu_iter)
 	}
 }
 
+// SDC
+void Maestro::DivuIterSDC (int istep_divu_iter)
+{
+	// timer for profiling
+	BL_PROFILE_VAR("Maestro::DivuIterSDC()",DivuIterSDC);
+
+	Vector<MultiFab> stemp             (finest_level+1);
+	Vector<MultiFab> rho_Hext          (finest_level+1);
+	Vector<MultiFab> rho_omegadot      (finest_level+1);
+	Vector<MultiFab> rho_Hnuc          (finest_level+1);
+	Vector<MultiFab> thermal           (finest_level+1);
+	Vector<MultiFab> rhohalf           (finest_level+1);
+	Vector<MultiFab> Tcoeff            (finest_level+1);
+	Vector<MultiFab> hcoeff            (finest_level+1);
+	Vector<MultiFab> Xkcoeff           (finest_level+1);
+	Vector<MultiFab> pcoeff            (finest_level+1);
+	Vector<MultiFab> delta_gamma1      (finest_level+1);
+	Vector<MultiFab> delta_gamma1_term (finest_level+1);
+
+	RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
+	RealVector w0_force              ( (max_radial_level+1)*nr_fine );
+	RealVector p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
+	RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
+	RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
+
+	Sbar.shrink_to_fit();
+	w0_force.shrink_to_fit();
+	p0_minus_peosbar.shrink_to_fit();
+	delta_chi_w0.shrink_to_fit();
+	delta_gamma1_termbar.shrink_to_fit();
+
+	std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
+	std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
+	std::fill(w0_force.begin(),             w0_force.end(),             0.);
+	std::fill(psi.begin(),                  psi.end(),                  0.);
+	std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
+	std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
+	std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
+
+	for (int lev=0; lev<=finest_level; ++lev) {
+		stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+		rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
+		rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
+		rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+		thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
+		rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
+		Tcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+		hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+		Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
+		pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+		delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
+		delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
+
+		// divu_iters do not use density weighting
+		rhohalf[lev].setVal(1.);
+	}
+
+	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+
+	if (use_thermal_diffusion) {
+		MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
+
+		MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
+		                    temp_diffusion_formulation);
+	}
+	else {
+		for (int lev=0; lev<=finest_level; ++lev) {
+			thermal[lev].setVal(0.);
+		}
+	}
+
+	// compute S at cell-centers
+	Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
+	          rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+
+	// NOTE: not sure if valid for use_exact_base_state
+	if (evolve_base_state) {
+		if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
+			for(int i=0; i<Sbar.size(); ++i) {
+				Sbar[i] += delta_gamma1_termbar[i];
+			}
+		} else {
+			Average(S_cc_old,Sbar,0);
+
+			// compute Sbar = Sbar + delta_gamma1_termbar
+			if (use_delta_gamma1_term) {
+				for(int i=0; i<Sbar.size(); ++i) {
+					Sbar[i] += delta_gamma1_termbar[i];
+				}
+			}
+
+			int is_predictor = 1;
+			make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
+			        rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+			        p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
+			        p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
+			        etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+			        r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+		}
+	}
+
+	// make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
+	MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+
+	// perform a nodal projection
+	NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
+
+	Real dt_hold = dt;
+
+	// compute new time step
+	EstDt();
+
+	if (maestro_verbose > 0) {
+		Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
+		        << " gives dt = " << dt << std::endl;
+	}
+
+	dt *= init_shrink;
+	if (maestro_verbose > 0) {
+		Print() << "Multiplying dt by init_shrink; dt = " << dt << std::endl;
+	}
+
+	if (dt > dt_hold) {
+		if (maestro_verbose > 0) {
+			Print() << "Ignoring this new dt since it's larger than the previous dt = "
+			        << dt_hold << std::endl;
+		}
+		dt = std::min(dt_hold,dt);
+	}
+
+	if (fixed_dt != -1.0) {
+		// fixed dt
+		dt = fixed_dt;
+		if (maestro_verbose > 0) {
+			Print() << "Setting fixed dt = " << dt << std::endl;
+		}
+	}
+}
+
 void Maestro::InitIter ()
 {
     // timer for profiling
@@ -612,6 +755,9 @@ void Maestro::InitIter ()
     Real start_total = ParallelDescriptor::second();
 
     // advance the solution by dt
+#ifdef SDC
+    AdvanceTimeStepSDC(true);
+#else
     if (use_exact_base_state) {
         AdvanceTimeStepIrreg(true);
     } else if (average_base_state) {
@@ -619,6 +765,7 @@ void Maestro::InitIter ()
     } else {
         AdvanceTimeStep(true);
     }
+#endif
 
     // wallclock time
     Real end_total = ParallelDescriptor::second() - start_total;
