@@ -1,0 +1,117 @@
+
+# INITIAL MODEL
+maestro.model_file = "5peaks_const_grav.dat"
+
+maestro.ppm_type = 2
+maestro.drdxfac = 5
+
+# GRIDDING AND REFINEMENT
+amr.max_level          = 0       # maximum level number allowed
+amr.n_cell             = 128 128
+amr.max_grid_size      = 32
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0    0.0
+geometry.prob_hi     =  1.2e10 1.2e10
+
+maestro.max_step  = 50
+maestro.do_initial_projection = true
+maestro.init_divu_iter        = 3
+maestro.init_iter             = 1
+
+maestro.stop_time = 1.e9
+
+# PLOTFILES
+maestro.plot_base_name  = plt    # root name of plot file
+maestro.plot_int   = 100   # number of timesteps between plot files
+
+# CHECKPOINT
+maestro.check_base_name = chk
+maestro.chk_int         = 1000
+
+# TIME STEPPING
+maestro.cfl       = 0.3    # cfl number for hyperbolic system
+                           # In this test problem, the velocity is
+		           # time-dependent.  We could use 0.9 in
+		           # the 3D test, but need to use 0.7 in 2D
+		           # to satisfy CFL condition.
+maestro.init_shrink = 0.1
+maestro.max_dt_growth = 1.05e0
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 4 4
+maestro.hi_bc = 4 4
+geometry.is_periodic =  0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+
+# DEBUG FOR NAN
+amrex.fpe_trap_invalid = 1       # floating point exception
+
+# tolerances for the initial projection
+maestro.eps_init_proj_cart = 1.e-12
+maestro.eps_init_proj_sph  = 1.e-10
+# tolerances for the divu iterations
+maestro.eps_divu_cart      = 1.e-12
+maestro.eps_divu_sph       = 1.e-10
+maestro.divu_iter_factor   = 100.
+maestro.divu_level_factor  = 10.
+# tolerances for the MAC projection
+maestro.eps_mac            = 1.e-10
+maestro.eps_mac_max        = 1.e-8
+maestro.mac_level_factor   = 10.
+maestro.eps_mac_bottom     = 1.e-3
+# tolerances for the nodal projection
+maestro.eps_hg             = 1.e-10
+maestro.eps_hg_max         = 1.e-9
+maestro.hg_level_factor    = 10.
+maestro.eps_hg_bottom      = 1.e-4
+
+# ALGORITHMIC OPTIONS
+maestro.spherical = 0
+maestro.evolve_base_state = false
+
+maestro.anelastic_cutoff_density = 0.2e0
+maestro.base_cutoff_density = 0.2e0
+maestro.buoyancy_cutoff_factor = 2
+
+maestro.do_sponge = 1
+maestro.sponge_center_density = 1.e0
+maestro.sponge_start_factor = 1.2e0
+maestro.sponge_kappa = 2.e5
+
+maestro.use_soundspeed_firstdt = true
+maestro.use_divu_firstdt = false
+#maestro.fixed_dt = 1.e-5
+
+maestro.grav_const = -5.e4
+
+
+&probin
+
+  ! override the default values of the probin namelist values here
+  velpert_amplitude = 2.d2
+  velpert_radius = 1.0d10
+  velpert_scale = 1.1d10
+  velpert_steep = 1.d0
+
+  !extern
+
+  ! Note that some of the parameters in this
+  ! namelist are specific to the default EOS,
+  ! network, and/or integrator used in the
+  ! makefile. If you try a different set of
+  ! microphysics routines be sure to check that
+  ! the parameters in here are consistent, as
+  ! Fortran does not like seeing unknown variables
+  ! in the namelist.
+
+  use_eos_coulomb = F
+
+/
