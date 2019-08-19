@@ -738,8 +738,8 @@ private:
 			    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
 			    const amrex::Vector<amrex::MultiFab>& scal);
 
-    void MakeIntraCoeffs (const amrex::Vector<amrex::MultiFab>& s1,
-			  const amrex::Vector<amrex::MultiFab>& s2,
+    void MakeIntraCoeffs (const amrex::Vector<amrex::MultiFab>& scal1,
+			  const amrex::Vector<amrex::MultiFab>& scal2,
 			  amrex::Vector<amrex::MultiFab>& cp,
 			  amrex::Vector<amrex::MultiFab>& xi);
     // end MaestroReact.cpp functions

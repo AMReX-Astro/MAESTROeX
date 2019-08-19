@@ -492,6 +492,15 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in make_intra_coeffs.F90
+    void make_intra_coeffs(const int* lo,  const int* hi,
+			   const amrex::Real* scalold, const int* s1_lo, const int* s1_hi,
+			   const amrex::Real* scalnew, const int* s2_lo, const int* s2_hi,
+			   amrex::Real* cp, const int* cp_lo, const int* cp_hi,
+			   amrex::Real* xi, const int* xi_lo, const int* xi_hi);
+    //////////////////////
+
+    //////////////////////
     // in make_explicit_thermal.F90
     void make_thermal_coeffs(const int* lo,  const int* hi,
 			     const amrex::Real* scal, const int* s_lo, const int* s_hi,
