@@ -49,19 +49,16 @@ def get_version():
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
-    'sphinxcontrib.bibtex',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.githubpages',
-    'breathe']
-
-breathe_projects = {
-    "maestroex":"../doxy_files/xml",
-    }
-
-breathe_default_project = "maestroex"
+              'sphinx.ext.mathjax',
+              'sphinx.ext.ifconfig',
+              'sphinx.ext.viewcode',
+              'sphinxcontrib.bibtex',
+              'sphinx.ext.autosummary',
+              'sphinx.ext.githubpages',
+              'breathe',
+              'sphinxfortran.fortran_domain',
+              'sphinxfortran.fortran_autodoc',
+              'sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -80,7 +77,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'MAESTROeX'
-copyright = '2018, MAESTROeX development tem'
+copyright = '2018-2019, MAESTROeX development tem'
 author = 'MAESTROeX development team'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -119,9 +116,11 @@ with open('mathsymbols.tex', 'r') as f:
         macros = re.findall(r'\\newcommand{\\(.*?)}(\[(\d)\])?{(.+)}', line)
         for macro in macros:
             if len(macro[1]) == 0:
-                mathjax_config['TeX']['Macros'][macro[0]] = "{"+macro[3]+"}"
+                mathjax_config['TeX']['Macros'][macro[0]
+                                                ] = "{" + macro[3] + "}"
             else:
-                mathjax_config['TeX']['Macros'][macro[0]] = ["{"+macro[3]+"}", int(macro[2])]
+                mathjax_config['TeX']['Macros'][macro[0]] = [
+                    "{" + macro[3] + "}", int(macro[2])]
 
 
 math_eqref_format = "Eq.{number}"
@@ -151,8 +150,8 @@ html_static_path = ['_static']
 html_context = {
     'css_files': [
         '_static/theme_overrides.css',  # override wide tables in RTD theme
-        ],
-    }
+    ],
+}
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -222,3 +221,32 @@ texinfo_documents = [
      author, 'MAESTROeX', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+
+# -- Options for breathe -------------------------------------------------
+
+breathe_projects = {
+    "maestroex": "../doxy_files/xml",
+}
+
+breathe_default_project = "maestroex"
+
+breathe_default_members = ('members', 'undoc-members', 'protected-members',
+                           'private-members')
+
+breathe_doxygen_config_options = {'EXTRACT_ALL': 'YES',
+                                  'SHOW_USED_FILES': 'YES', 'RECURSIVE': 'YES'
+                                  }
+
+# -- Options for sphinx-fortran -----------------------------------------
+
+fortran_src = [os.path.abspath('preprocessed_files')]
+
+fortran_ext = ['f90', 'F90']
+
+
+# -- Options for intersphinx --------------------------------------------
+
+intersphinx_mapping = {
+    'amrex':  ('https://amrex-codes.github.io/amrex/docs_html/', None)
+}

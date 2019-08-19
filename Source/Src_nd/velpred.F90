@@ -1,10 +1,10 @@
-! velpred is called by advance_premac -- it is used to predict the
-! normal velocities to the interfaces.  We don't care about the
-! transverse velocities here.  The prediction is done piecewise linear (for now)
 
 #include "AMReX_BC_TYPES.H"
 
 module velpred_module
+  ! velpred is called by advance_premac -- it is used to predict the
+  ! normal velocities to the interfaces.  We don't care about the
+  ! transverse velocities here.  The prediction is done piecewise linear (for now)
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate

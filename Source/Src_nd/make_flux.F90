@@ -1,33 +1,32 @@
-! The make_flux routines take the predicted edges states of the scalars
-! and the MAC velocities and compute the fluxes through the
-! interfaces.
-
-! For the species fluxes, the construction of the fluxes depends on
-! what form the incoming edge states take.  This depends on
-! species_pred_type:
-!
-! predict_rhoprime_and_X:
-!    We have rho' and X, and need a edge-centered base state to
-!    make the final fluxes
-!
-! predict_rhoX:
-!    We use the (rho X) edge state directly to compute the fluxes.
-!    No base state input needed.
-!
-! predict_rho_and_X:
-!   The fluxes are computed from the product of the rho and X
-!   edge states, again, no base state input needed.
-!
-!
-! For enthalpy, there are a wide range of quantities that we predict,
-! but they fall into 2 categories.  The enthalpy edge states either
-! contain predictions of h or (rho h)'.  (There is limited support for
-! h' prediction, but it is not well tested).  If we have h, then we
-! construct a rho depending on the species states (i.e. species_pred_type).
-! If we have (rho h)', then we use the base state to make (rho h)_0 on
-! edges.
-
 module make_flux_module
+  ! The make_flux routines take the predicted edges states of the scalars
+  ! and the MAC velocities and compute the fluxes through the
+  ! interfaces.
+  !
+  ! For the species fluxes, the construction of the fluxes depends on
+  ! what form the incoming edge states take.  This depends on
+  ! species_pred_type:
+  !
+  ! predict_rhoprime_and_X:
+  ! We have rho' and X, and need a edge-centered base state to
+  ! make the final fluxes
+  !
+  ! predict_rhoX:
+  ! We use the (rho X) edge state directly to compute the fluxes.
+  ! No base state input needed.
+  !
+  ! predict_rho_and_X:
+  ! The fluxes are computed from the product of the rho and X
+  ! edge states, again, no base state input needed.
+  !
+  !
+  ! For enthalpy, there are a wide range of quantities that we predict,
+  ! but they fall into 2 categories.  The enthalpy edge states either
+  ! contain predictions of h or (rho h)'.  (There is limited support for
+  ! h' prediction, but it is not well tested).  If we have h, then we
+  ! construct a rho depending on the species states (i.e. species_pred_type).
+  ! If we have (rho h)', then we use the base state to make (rho h)_0 on
+  ! edges.
 
   use amrex_error_module
   use amrex_constants_module
@@ -68,6 +67,7 @@ contains
        rho0_predicted_edge, &
        w0, &
        startcomp, endcomp) bind(C,name="make_rhoX_flux_2d")
+    ! Binds to C function ``make_rhoX_flux_2d``
 
     integer         , intent(in   ) :: lev, lo(2), hi(2)
     integer         , intent(in   ) :: fx_lo(2), fx_hi(2), nc_fx
@@ -196,6 +196,7 @@ contains
        rho0_predicted_edge, &
        w0, &
        startcomp, endcomp) bind(C,name="make_rhoX_flux_3d")
+    ! Binds to C function ``make_rhoX_flux_3d``
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
@@ -375,6 +376,7 @@ contains
        rho0_edgey, ry_lo, ry_hi, &
        rho0_edgez, rz_lo, rz_hi, &
        startcomp, endcomp) bind(C,name="make_rhoX_flux_3d_sphr")
+    ! Binds to C function ``make_rhoX_flux_3d_sphr``
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
@@ -544,6 +546,7 @@ contains
        rhoh0_old, rhoh0_edge_old, &
        rhoh0_new, rhoh0_edge_new, &
        w0) bind(C,name="make_rhoh_flux_2d")
+    ! Binds to C function ``make_rhoh_flux_2d``
 
     integer         , intent(in   ) :: lev, lo(2), hi(2)
     integer         , intent(in   ) :: fx_lo(2), fx_hi(2), nc_fx
@@ -705,6 +708,7 @@ contains
        rhoh0_old, rhoh0_edge_old, &
        rhoh0_new, rhoh0_edge_new, &
        w0) bind(C,name="make_rhoh_flux_3d")
+    ! Binds to C function ``make_rhoh_flux_3d``
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
@@ -926,6 +930,7 @@ contains
        h0_edgex, hx_lo, hx_hi, &
        h0_edgey, hy_lo, hy_hi, &
        h0_edgez, hz_lo, hz_hi) bind(C,name="make_rhoh_flux_3d_sphr")
+    ! Binds to C function ``make_rhoh_flux_3d_sphr``
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
@@ -1302,6 +1307,7 @@ contains
        rhoh0_edgex, hx_lo, hx_hi, &
        rhoh0_edgey, hy_lo, hy_hi, &
        rhoh0_edgez, hz_lo, hz_hi) bind(C,name="make_rhoh_flux_3d_sphr_irreg")
+    ! Binds to C function ``make_rhoh_flux_3d_sphr_irreg``
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: fx_lo(3), fx_hi(3), nc_fx
