@@ -185,8 +185,8 @@ contains
        else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
           slx(lo(1),lo(2)-1:hi(2)+1,k) = srx(lo(1),lo(2)-1:hi(2)+1,k)
        else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-          slx(hi(1)+1,lo(2)-1:hi(2)+1,k) = 0.d0
-          srx(hi(1)+1,lo(2)-1:hi(2)+1,k) = 0.d0
+          slx(lo(1),lo(2)-1:hi(2)+1,k) = 0.d0
+          srx(lo(1),lo(2)-1:hi(2)+1,k) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
 #ifndef AMREX_USE_GPU
