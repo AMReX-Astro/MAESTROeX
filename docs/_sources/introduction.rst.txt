@@ -5,27 +5,30 @@ Introduction to MAESTROeX
 History of MAESTROeX
 ====================
 
-MAESTROeX describes the evolution of low Mach number flows that are in
-hydrostatic equilibrium.  MAESTROeX itself derives from MAESTRO, the
-original (pure Fortran) low Mach number stellar hydrodynamics code.
-MAESTROeX is a rewrite of MAESTRO in the C++/Fortran framework of
-AMReX.  Henceforth, we will refer only to MAESTROeX, although some of
-the ideas originated in MAESTRO before the change to MAESTROeX.
+MAESTROeX models the evolution of low Mach number astrophysical
+flows that are in hydrostatic equilibrium.  The name MAESTROeX itself
+derives from MAESTRO, the original (pure Fortran) low Mach number
+stellar hydrodynamics code.  MAESTROeX began as a rewrite MAESTRO
+in the C++/Fortran framework of AMReX, and has since then gained
+additional algorithmic capabilities.  Henceforth, we will refer
+only to MAESTROeX, although many of the ideas originated in
+MAESTRO before the change to MAESTROeX.
 
 The idea for MAESTROeX grew out of our success in applying low Mach
 number combustion methods developed for terrestrial flames
-:cite:`DayBell00` to small-scale astrophysical flames (including
-Landau-Darrieus instability :cite:`SNld`, Rayleigh-Taylor unstable
-flames :cite:`SNrt3d`, and flame-turbulence interactions
-:cite:`SNturb`). Our original small-scale astrophysical combustion
-algorithm is detailed in
+:cite:`DayBell00` to small-scale (non-stratified) astrophysical
+flames such as the Landau-Darrieus instability :cite:`SNld`,
+Rayleigh-Taylor unstable flames :cite:`SNrt3d`, and flame-turbulence
+interactions :cite:`SNturb`. Our original small-scale astrophysical
+combustion algorithm is detailed in
 
 -  *Adaptive Low Mach Number Simulations of Nuclear Flames,*
    J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, & M. Zingale
    2004, JCP, 195, 2, 677 (henceforth BDRWZ) :cite:`SNe`
 
-MAESTROeX was developed initially for modeling the convecting phase in
-a white dwarf preceding the ignition of a Type Ia supernovae.  As
+MAESTROeX was developed initially for modeling the convective phase in
+a Chandrasekhar mass white dwarf preceding the ignition of a
+Type Ia supernovae.  As
 such, we needed to incorporate the compressibility effects due to
 large-scale stratification in the star. The method closest in spirit
 to MAESTROeX is the pseudo-incompressible method of Durran
@@ -55,13 +58,14 @@ papers leading up to the first application to this problem:
    M. Zingale, A. S. Almgren, J. B. Bell, A. Nonaka, & S. E. Woosley
    2009, ApJ, 704, 196 (henceforth paper IV) :cite:`lowMach4`
 
-The multilevel algorithm was originally described in:
+The adaptive mesh refinement version of the algorithm was presented in the
+next papers in the series:
 
 -  *MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar
    Flows,* A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone,
    & M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”) :cite:`multilevel`
 
-The new developments for MAESTROeX are described in:
+The most recent developments for MAESTROeX are described in:
 
 -  *MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver,* D. Fan,
    A. Nonaka, A. S. Almgren, A. Harpole, & M. Zingale, 2019, submitted to ApJ
@@ -106,8 +110,9 @@ Incompressible Hydrodynamics
 ----------------------------
 
 The simplest low Mach number approximation is incompressible
-hydrodynamics. This approximation is formally the :math:`M \rightarrow 0`
-limit of the Navier-Stokes equations. In incompressible hydrodynamics,
+hydrodynamics. This approximation is formally the zero
+Mach number limit (:math:`M \rightarrow 0`)
+of the Navier-Stokes equations. In incompressible hydrodynamics,
 the velocity satisfies a constraint equation:
 
 .. math:: \nabla \cdot \Ub = 0
