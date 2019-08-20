@@ -131,6 +131,25 @@ extern "C"
                           const int* mask, const int* m_lo, const int* m_hi,
                           const int use_mask);
 
+    void burner_loop_sdc(const int* lo, const int* hi,
+			 const int lev,
+			 const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
+			       amrex::Real* s_out,    const int* o_lo, const int* o_hi,
+			 const amrex::Real* source, const int* s_lo, const int* s_hi,
+			 const amrex::Real* p0_in,
+			 const amrex::Real dt_in,
+			 const int* mask, const int* m_lo, const int* m_hi,
+			 const int use_mask);
+
+    void burner_loop_sdc_sphr(const int* lo, const int* hi,
+			      const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
+                                    amrex::Real* s_out,    const int* o_lo, const int* o_hi,
+			      const amrex::Real* source, const int* s_lo, const int* s_hi,
+			      const amrex::Real* p0_cart, const int* t_lo, const int* t_hi,
+			      const amrex::Real dt_in,
+			      const int* mask, const int* m_lo, const int* m_hi,
+			      const int use_mask);
+
     //////////////////////
 
     //////////////////////

@@ -326,4 +326,199 @@ contains
 
   end subroutine burner_loop_sphr
 
+    subroutine burner_loop_sdc(lo, hi, &
+       lev, &
+       s_in,     i_lo, i_hi, &
+       s_out,    o_lo, o_hi, &
+       source, s_lo, s_hi, &
+       p0_in, dt_in, &
+       mask,     m_lo, m_hi, use_mask) &
+       bind (C,name="burner_loop_sdc")
+
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer, value  , intent (in   ) :: lev
+    integer         , intent (in   ) :: i_lo(3), i_hi(3)
+    integer         , intent (in   ) :: o_lo(3), o_hi(3)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: m_lo(3), m_hi(3)
+    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nscal)
+    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nscal)
+    double precision, intent (in   ) ::   source(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
+    double precision, intent (in   ) :: p0_in(0:max_radial_level,0:nr_fine-1)
+    double precision, value, intent (in) :: dt_in
+    integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer, value  , intent (in   ) :: use_mask
+
+    ! local
+    integer          :: i, j, k, r
+    double precision :: rho_in, rho_out, rhoh_in, rhoh_out
+    double precision :: rhox_in(nspec)
+    double precision :: rhox_out(nspec)
+    double precision :: x_test
+    logical          :: cell_valid
+
+    double precision :: sdc_rhoX(nspec)
+    double precision :: sdc_rhoh
+    double precision :: p0
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+
+             ! make sure the cell isn't covered by finer cells
+             cell_valid = .true.
+             if ( use_mask .eq. 1 ) then
+                if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
+             endif
+
+             if (cell_valid) then
+#if (AMREX_SPACEDIM == 2)
+                r = j
+#elif (AMREX_SPACEDIM == 3)
+                r = k
+#endif
+                sdc_rhoX(:) = source(i,j,k,spec_comp:spec_comp+nspec-1)
+                sdc_rhoh = source(i,j,k,rhoh_comp)
+
+                p0 = p0_in(lev,r)
+                
+                rho_in = s_in(i,j,k,rho_comp)
+                rhox_in(1:nspec) = s_in(i,j,k,spec_comp:spec_comp+nspec-1)
+                rhoh_in = s_in(i,j,k,rhoh_comp)
+                
+                ! Fortran doesn't guarantee short-circuit evaluation of logicals
+                ! so we need to test the value of ispec_threshold before using it
+                ! as an index in x_in
+                if (ispec_threshold > 0) then
+                   x_test = rhox_in(ispec_threshold)/rho_in
+                else
+                   x_test = 0.d0
+                endif
+
+                ! if the threshold species is not in the network, then we burn
+                ! normally.  if it is in the network, make sure the mass
+                ! fraction is above the cutoff.
+                if (rho_in > burning_cutoff_density .and.                &
+                     ( ispec_threshold < 0 .or.                       &
+                     (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
+                   !call burner(rhox_in, rhoh_in, dt_in, rhox_out, rhoh_out, sdc_rhoX, sdc_rhoh, p0)
+                else
+                   rho_out = rho_in + sum(sdc_rhoX(1:nspec))*dt_in
+                   rhox_out = rhox_in + sdc_rhoX*dt_in
+                   rhoh_out = rhoh_in + sdc_rhoh*dt_in
+                endif
+
+                ! update the density
+                s_out(i,j,k,rho_comp) = rho_out
+
+                ! update the species
+                s_out(i,j,k,spec_comp:spec_comp+nspec-1) = rhox_out(1:nspec)
+
+                ! update the enthalpy -- include the change due to external heating
+                s_out(i,j,k,rhoh_comp) = rhoh_out
+
+                ! pass the tracers through (currently not implemented)
+
+             endif
+          enddo
+       enddo
+    enddo
+
+  end subroutine burner_loop_sdc
+
+  subroutine burner_loop_sdc_sphr(lo, hi, &
+       s_in,     i_lo, i_hi, &
+       s_out,    o_lo, o_hi, &
+       source,   s_lo, s_hi, &
+       p0_cart, t_lo, t_hi, dt_in, &
+       mask,     m_lo, m_hi, use_mask) &
+       bind (C,name="burner_loop_sdc_sphr")
+
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer         , intent (in   ) :: i_lo(3), i_hi(3)
+    integer         , intent (in   ) :: o_lo(3), o_hi(3)
+    integer         , intent (in   ) :: s_lo(3), s_hi(3)
+    integer         , intent (in   ) :: m_lo(3), m_hi(3)
+    double precision, intent (in   ) ::    s_in (i_lo(1):i_hi(1),i_lo(2):i_hi(2),i_lo(3):i_hi(3),nscal)
+    double precision, intent (inout) ::    s_out(o_lo(1):o_hi(1),o_lo(2):o_hi(2),o_lo(3):o_hi(3),nscal)
+    double precision, intent (in   ) ::   source(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
+    integer         , intent (in   ) :: t_lo(3), t_hi(3)
+    double precision, intent (in   ) :: p0_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
+    double precision, value, intent (in) :: dt_in
+    integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
+    integer, value  , intent (in   ) :: use_mask
+
+    ! local
+    integer          :: i, j, k
+    double precision :: rho_in, rho_out, rhoh_in, rhoh_out
+    double precision :: rhox_in(nspec)
+    double precision :: rhox_out(nspec)
+    double precision :: x_test
+    logical          :: cell_valid
+
+    double precision :: sdc_rhoX(nspec)
+    double precision :: sdc_rhoh
+    double precision :: p0_in
+
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+
+             ! make sure the cell isn't covered by finer cells
+             cell_valid = .true.
+             if ( use_mask .eq. 1 ) then
+                if ( (mask(i,j,k).eq.1) ) cell_valid = .false.
+             endif
+
+             if (cell_valid) then
+                
+                sdc_rhoX(:) = source(i,j,k,spec_comp:spec_comp+nspec-1)
+                sdc_rhoh = source(i,j,k,rhoh_comp)
+
+                p0_in = p0_cart(i,j,k)
+                
+                rho_in = s_in(i,j,k,rho_comp)
+                rhox_in(1:nspec) = s_in(i,j,k,spec_comp:spec_comp+nspec-1)
+                rhoh_in = s_in(i,j,k,rhoh_comp)
+                
+                ! Fortran doesn't guarantee short-circuit evaluation of logicals
+                ! so we need to test the value of ispec_threshold before using it
+                ! as an index in x_in
+                if (ispec_threshold > 0) then
+                   x_test = rhox_in(ispec_threshold)/rho_in
+                else
+                   x_test = 0.d0
+                endif
+
+                ! if the threshold species is not in the network, then we burn
+                ! normally.  if it is in the network, make sure the mass
+                ! fraction is above the cutoff.
+                if (rho_in > burning_cutoff_density .and.                &
+                     ( ispec_threshold < 0 .or.                       &
+                     (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
+                   !call burner(rhox_in, rhoh_in, dt_in, rhox_out, rhoh_out, sdc_rhoX, sdc_rhoh, p0_in)
+                else
+                   rho_out = rho_in + sum(sdc_rhoX(1:nspec))*dt_in
+                   rhox_out = rhox_in + sdc_rhoX*dt_in
+                   rhoh_out = rhoh_in + sdc_rhoh*dt_in
+                endif
+
+                ! update the density
+                s_out(i,j,k,rho_comp) = rho_out
+
+                ! update the species
+                s_out(i,j,k,spec_comp:spec_comp+nspec-1) = rhox_out(1:nspec)
+
+                ! update the enthalpy -- include the change due to external heating
+                s_out(i,j,k,rhoh_comp) = rhoh_out
+
+                ! pass the tracers through (currently not implemented)
+
+             endif
+          enddo
+       enddo
+    enddo
+    
+  end subroutine burner_loop_sdc_sphr
+  
 end module burner_loop_module

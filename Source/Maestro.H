@@ -721,7 +721,7 @@ private:
 		   amrex::Vector<amrex::MultiFab>& rho_Hext,
 		   const RealVector& p0,
 		   const amrex::Real dt_react,
-		   const amrex::Vector<amrex::MultiFab>& source);
+		   amrex::Vector<amrex::MultiFab>& source);
     
     void BurnerSDC (const amrex::Vector<amrex::MultiFab>& s_in,
 		    amrex::Vector<amrex::MultiFab>& s_out,
