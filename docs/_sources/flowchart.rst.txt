@@ -980,10 +980,6 @@ Changes Since the XRB Paper
 Future Considerations
 =====================
 
--  Should we use a predictor-corrector for updating the full-state density?
-   Specifically, after calling **Correct Base**, should we do a full-state density
-   advance and **Correct Base** using the more accurate estimate of :math:`\rho_0^{n+1}`?
-
 -  We are still exploring the effects of ``use_tfromp = F`` for spherical
    problems. We would eventually like to run in this mode, but :math:`T=T(\rho,X_k,p_0)`
    and :math:`T=T(\rho,h,X_k)` drift away from each other more than we would like. Our

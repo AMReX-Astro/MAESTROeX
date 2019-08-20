@@ -1000,9 +1000,6 @@ agreement between the two temperatures.</p></li>
 <div class="section" id="future-considerations">
 <h2>Future Considerations<a class="headerlink" href="#future-considerations" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Should we use a predictor-corrector for updating the full-state density?
-Specifically, after calling <strong>Correct Base</strong>, should we do a full-state density
-advance and <strong>Correct Base</strong> using the more accurate estimate of <span class="math notranslate nohighlight">\(\rho_0^{n+1}\)</span>?</p></li>
 <li><p>We are still exploring the effects of <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code> for spherical
 problems. We would eventually like to run in this mode, but <span class="math notranslate nohighlight">\(T=T(\rho,X_k,p_0)\)</span>
 and <span class="math notranslate nohighlight">\(T=T(\rho,h,X_k)\)</span> drift away from each other more than we would like. Our
