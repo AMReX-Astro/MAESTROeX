@@ -1,3 +1,5 @@
+# xrb_mixed
+
 This setup models convection in the accreted layers (either pure He or
 mixed H/He) on the surface of a neutron star, preceding an X-ray burst.
 
