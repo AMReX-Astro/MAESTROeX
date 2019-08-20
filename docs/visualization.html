@@ -225,11 +225,11 @@
 analysis.  The table below lists the quantities stored in a plotfile.
 Not all of these may be present, dependent on what options were used
 in creating the plotfile.</p>
-<p>By default, plotfiles store double precision data, but if
-<code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">fab.format</span> <span class="pre">=</span> <span class="pre">NATIVE_32</span>
-<span class="pre">`</span></code>
-is set in the inputs file, then the data is
+<p>By default, plotfiles store double precision data, but if:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fab</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="n">NATIVE_32</span>
+</pre></div>
+</div>
+<p>is set in the inputs file, then the data is
 converted to single precision before outputting—this is done to
 reduce file sizes.</p>
 <table class="docutils align-default" id="id2">
@@ -546,12 +546,13 @@ the palette line points to the Palette file, e.g.:</p>
 </div>
 <div class="section" id="visualizing-with-visit">
 <h2>Visualizing with VisIt<a class="headerlink" href="#visualizing-with-visit" title="Permalink to this headline">¶</a></h2>
+<p>VisIt recognizes MAESTROeX plotfiles as being in the BoxLib format.</p>
 </div>
 <div class="section" id="python-visualization-scripts">
 <span id="sec-vis-python"></span><h2>Python visualization scripts<a class="headerlink" href="#python-visualization-scripts" title="Permalink to this headline">¶</a></h2>
 <p>AmrPostprocessing/python provides some simple commandline
-tools for doing visualizations of AMReX plotfiles (note: a subset
-of these are distributed directly with AMReX in amrex/Tools/Py_util/). The main drivers
+tools for doing visualizations of AMReX plotfiles (note: a subset
+of these are distributed directly with AMReX in <code class="docutils literal notranslate"><span class="pre">amrex/Tools/Py_util/</span></code>). The main drivers
 are written in python and use a set of Fortran routines, compiled with
 f2py to interface with the plotfile data. To use the routine,
 you will need to have matplotlib and f2py installed. On a
@@ -560,36 +561,43 @@ machine running Fedora linux, you can install these packages via</p>
 </pre></div>
 </div>
 <p>The library required by the python routines can be built by typing
-’make’ in that directory. If successful, you should find
-a library fsnapshot.so.</p>
-<p>The path to fsnapshot.so should be included in your PYTHONPATH
+<code class="docutils literal notranslate"><span class="pre">make</span></code> in that directory. If successful, you should find
+a library <code class="docutils literal notranslate"><span class="pre">fsnapshot.so</span></code>.</p>
+<p>The path to fsnapshot.so should be included in your <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>
 environment variable. This can be done by adding:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{PYTHONPATH}</span><span class="s2">:/home/user/AmrPostprocessing/python}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{PYTHONPATH}</span><span class="s2">:/path/to/fsnapshot/</span>
 </pre></div>
 </div>
-<p>to your .bashrc.</p>
-<p>It is recommended that you use matplotlib version 1.2.0 or
-higher. If the fonts look strange in the output files, you can try
-installing the lyx-fonts package and deleting your
-.matplotlib directory, and trying again.</p>
+<p>to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code>.</p>
 <div class="section" id="plotsinglevar-py">
 <h3>plotsinglevar.py<a class="headerlink" href="#plotsinglevar-py" title="Permalink to this headline">¶</a></h3>
-<p>plotsinglevar.py does visualizations of 2-d AMReX plotfiles,
+<p><code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code> does visualizations of 2-d AMReX plotfiles,
 and slices through 3-d AMReX plotfiles. A simple plot can be made
 via:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">log</span> <span class="o">-</span><span class="n">o</span> <span class="n">test</span><span class="o">.</span><span class="n">png</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span>
 </pre></div>
 </div>
-<p>This will make a plot of “tfromp” from the plotfile plt00000 with log scaling,
-and store the output in test.png. See Figure <a class="reference external" href="#fig:python">[fig:python]</a>.
+<p>This will make a plot of “tfromp” from the plotfile <code class="docutils literal notranslate"><span class="pre">plt00000</span></code> with log scaling,
+and store the output in <code class="docutils literal notranslate"><span class="pre">test.png</span></code>, as showing the figure below.
 If you don’t do ‘-o’, then a default output filename consisting of the
 plotfile name + component will be used.</p>
+<div class="figure align-center" id="id3">
+<img alt="_images/plt00000_tfromp.png" src="_images/plt00000_tfromp.png" />
+<p class="caption"><span class="caption-text">Plot of reacting_bubble done with the python
+script <code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code>.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
 <p>If you list 2 different variables after the plotfile name, then they
 will be plotted side-by-side in a single figure. For example,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span> <span class="n">enucdot</span>
 </pre></div>
 </div>
-<p>produces the output shown in figure <a class="reference external" href="#fig:python_two">[fig:python_two]</a>.</p>
+<p>produces the output shown below:</p>
+<div class="figure align-center" id="id4">
+<img alt="_images/plt00000_tfromp_enucdot.png" src="_images/plt00000_tfromp_enucdot.png" />
+<p class="caption"><span class="caption-text">Plot of reacting_bubble done with the python script
+<code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code> showing 2 variables plotted from a single
+plotfile.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
 <p>Additional options include ‘-m’ to specify the minimum data
 value, ‘-M’ to specify the maximum data value, and ‘–eps’
 to make an EPS plot instead of PNG. Running the script with no parameters
@@ -615,9 +623,7 @@ plt00000 and other_plt00000 shown on the same axes.</p>
 <div class="section" id="runtimevis-py">
 <h3>runtimevis.py<a class="headerlink" href="#runtimevis-py" title="Permalink to this headline">¶</a></h3>
 <p>The runtimevis.py script is designed to be run from a submission
-script to produce plots from plotfiles as they are produced. This is
-accomplished by hooking it into the process scripts described in
-Chapter <a class="reference external" href="#ch:managingjobs">[ch:managingjobs]</a>.</p>
+script to produce plots from plotfiles as they are produced.</p>
 <p>The script itself reads in an inputs file, vis.in, that
 describes the variables to plot. From 1 to 6 variables can be
 plotting from a plotfile. The script does its best to organize them
