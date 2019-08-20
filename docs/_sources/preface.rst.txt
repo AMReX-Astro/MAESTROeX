@@ -17,6 +17,7 @@ from MAESTROeX (see https://github.com/AMReX-Codes/amrex).
 
 The current version of the MAESTROeX User’s Guide can be found online
 at https://amrex-astro.github.io/MAESTROeX/docs/index.html .
+
 MAESTROeX is developed at the Center for Computational Sciences and
 Engineering at Lawrence Berkeley National Laboratory and at Stony
 Brook University. Development is/was supported by the SciDAC Program
