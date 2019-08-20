@@ -22,7 +22,7 @@ algorithm is detailed in
 
 -  *Adaptive Low Mach Number Simulations of Nuclear Flames,*
    J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, & M. Zingale
-   2004, JCP, 195, 2, 677 (henceforth BDRWZ)
+   2004, JCP, 195, 2, 677 (henceforth BDRWZ) :cite:`SNe`
 
 MAESTROeX was developed initially for modeling the convecting phase in
 a white dwarf preceding the ignition of a Type Ia supernovae.  As
@@ -41,41 +41,47 @@ papers leading up to the first application to this problem:
 -  *Low Mach Number Modeling of Type Ia
    Supernovae. I. Hydrodynamics,* A. S. Almgren, J. B. Bell,
    C. A. Rendleman, & M. Zingale 2006, ApJ, 637, 922 (henceforth
-   paper I)
+   paper I) :cite:`lowMach`
 
 -  *Low Mach Number Modeling of Type Ia Supernovae. II. Energy
    Evolution,* A. S. Almgren, J. B. Bell, C. A. Rendleman, & M. Zingale
-   2006, ApJ, 649, 927 (henceforth paper II)
+   2006, ApJ, 649, 927 (henceforth paper II) :cite:`lowMach2`
 
 -  *Low Mach Number Modeling of Type Ia Supernovae. III. Reactions,*
    A. S. Almgren, J. B. Bell, A. Nonaka, & M. Zingale
-   2008, ApJ, 684, 449 (henceforth paper III)
+   2008, ApJ, 684, 449 (henceforth paper III) :cite:`lowMach3`
 
 -  *Low Mach Number Modeling of Type Ia Supernovae. IV. White Dwarf Convection,*
    M. Zingale, A. S. Almgren, J. B. Bell, A. Nonaka, & S. E. Woosley
-   2009, ApJ, 704, 196 (henceforth paper IV)
+   2009, ApJ, 704, 196 (henceforth paper IV) :cite:`lowMach4`
 
-The current version of the algorithm is described in our
-multilevel paper:
+The multilevel algorithm was originally described in:
 
 -  *MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar
    Flows,* A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone,
-   & M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”)
+   & M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”) :cite:`multilevel`
+
+The new developments for MAESTROeX are described in:
+
+-  *MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver,* D. Fan,
+   A. Nonaka, A. S. Almgren, A. Harpole, & M. Zingale, 2019, submitted to ApJ
+   :cite:`MAESTROeX`
 
 We have many papers that describe applications of the method to Type
 Ia supernovae, X-ray bursts, and stellar evolution. These are listed
 on the main MAESTROeX website.  Some of these papers have appendices
 that describe enhancements to the code—these are noted below.
 
--  *Multidimensional Modeling of Type I X-ray Bursts,*
+-  *Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional
+   Convection Prior to the Outburst of a Pure 4He Accretor,*
    C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, & M. Zingale 2011,
-   ApJ, 728, 118 (henceforth “the XRB paper”)
+   ApJ, 728, 118 (henceforth “the XRB paper”) :cite:`xrb`
 
    This introduces the thermal diffusion portion of the MAESTROeX algorithm.
 
 -  *Comparisons of Two- and Three-Dimensional Convection in
    Type I X-ray Bursts* M. Zingale, C. M. Malone, A. Nonaka,
-   A. S. Almgren, & J. B. Bell 2015, ApJ, 807, 60.
+   A. S. Almgren, & J. B. Bell 2015, ApJ, 807, 60. :cite:`xrb3d`
 
    This has an appendix that describes the Godunov state construction in more
    detail than previous papers.
@@ -83,7 +89,7 @@ that describe enhancements to the code—these are noted below.
 -  *Low Mach Number Modeling of Convection in Helium Shells on
    Sub-Chandrasekhar White Dwarfs II: Bulk Properties of Simple Models,*
    A. M. Jacobs, M. Zingale, A. Nonaka, A. S. Almgren, & J. B. Bell
-   2016, ApJ, 827, 84.
+   2016, ApJ, 827, 84. :cite:`subch2`
 
    This has an appendix that shows some test problems for the alternate energy
    formulation in MAESTROeX.
