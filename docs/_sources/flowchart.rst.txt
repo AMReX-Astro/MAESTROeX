@@ -1,25 +1,53 @@
 .. _ch:flowchart:
 
-**********************
-MAESTROeX Equation Set
-**********************
+************************************
+Model Equations and Numerical Scheme
+************************************
 
-The equation set and solution procedure used by MAESTROeX has evolved
-over time. In this chapter, we outline the algorithm currently
-implemented in the code. The latest published reference for MAESTROeX
-is the multilevel paper :cite:`multilevel`. In this description, we
-make frequent reference to paper I :cite:`lowMach`,
-paper II :cite:`lowMach2`, paper III :cite:`lowMach3`, and
-paper IV :cite:`lowMach4`.
+The equation set and solution procedure used by MAESTROeX has
+changed and improved over time.  In this chapter, we outline the model equations
+and algorithmic options in the code.
+The latest published references for MAESTROeX
+are :cite:`multilevel` and the more recent :cite:`MAESTROeX`.
+These two papers use the same model equations, however the
+more recent paper presents a new, simplified temporal integration scheme.
+
+In this description, we make frequent reference to
+paper I :cite:`lowMach`, paper II :cite:`lowMach2`,
+paper III :cite:`lowMach3`, and paper IV :cite:`lowMach4`.
 
 Summary of the MAESTROeX Equation Set
 =====================================
 
 Here we summarize the equations solved by MAESTROeX. We refer the reader
-to papers I through IV and the multilevel paper for the derivation
-and motivation of the equation set.  Note: this ‘traditional’ algorithm
-uses Strang-splitting for the reactions.
+to papers I through IV for the derivation
+and motivation of the equation set.
+We take the standard equations of reacting, compressible flow, and recast the
+equation of state (EOS) as a divergence constraint on the velocity field.
+The resulting model is a series of evolution equations for mass, momentum,
+and energy, subject to an additional constraint on velocity, with a base state
+density and pressure linked via hydrostatic equilibrium:
 
+.. math::
+   \frac{\partial \rho X_k}{\partial t} + \nabla \cdot (\rho \Ub X_k) = \rho \omegadot_k
+   
+.. math::
+   \frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub +
+      \frac{\beta_0}{\rho} \nabla \left (\frac{p^\prime}{\beta_0} \right ) =
+      -\frac{\rho^\prime}{\rho} |g| \er
+
+.. math::
+   \frac{\partial(\rho h)}{\partial t} =
+      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
+	  
+.. math::
+   \nabla \cdot (\beta_0 \Ub) =
+      \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right ) 
+
+.. math:: \nabla p_0 = -\rho_0 |g| \er
+
+We discuss each of these model equations in further detail below.
+      
 Base State
 ----------
 
