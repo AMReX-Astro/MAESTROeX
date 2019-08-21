@@ -3,6 +3,7 @@ module burner_loop_module
   use amrex_error_module
   use burner_module
   use burn_type_module, only: burn_t, copy_burn_t
+  use sdc_type_module, only: sdc_t
   use network, only: nspec, network_species_index
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, &
        pi_comp, nscal, burner_threshold_cutoff, burner_threshold_species, &
@@ -360,6 +361,8 @@ contains
     double precision :: sdc_rhoX(nspec)
     double precision :: sdc_rhoh
     double precision :: p0
+    
+    type (sdc_t)       :: state_in, state_out
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -401,7 +404,19 @@ contains
                 if (rho_in > burning_cutoff_density .and.                &
                      ( ispec_threshold < 0 .or.                       &
                      (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
-                   !call burner(rhox_in, rhoh_in, dt_in, rhox_out, rhoh_out, sdc_rhoX, sdc_rhoh, p0)
+
+                   state_in % p0  = p0
+                   state_in % rho = rho_in
+                   state_in % y(1:nspec) = rhox_in(1:nspec)
+                   state_in % y(nspec+1) = rhoh_in
+                   state_in % ydot_a(1:nspec) = sdc_rhoX(1:nspec)
+                   state_in % ydot_a(nspec+1) = sdc_rhoh
+                   
+                   call burner(state_in, state_out, dt_in)
+                   
+                   rho_out  = sum(state_out % y(1:nspec))
+                   rhox_out = state_out % y(1:nspec)
+                   rhoh_out = state_out % y(nspec+1)
                 else
                    rho_out = rho_in + sum(sdc_rhoX(1:nspec))*dt_in
                    rhox_out = rhox_in + sdc_rhoX*dt_in
@@ -460,6 +475,9 @@ contains
     double precision :: sdc_rhoh
     double precision :: p0_in
 
+#ifdef SDC
+    type (sdc_t)       :: state_in, state_out
+
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -496,7 +514,20 @@ contains
                 if (rho_in > burning_cutoff_density .and.                &
                      ( ispec_threshold < 0 .or.                       &
                      (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
-                   !call burner(rhox_in, rhoh_in, dt_in, rhox_out, rhoh_out, sdc_rhoX, sdc_rhoh, p0_in)
+
+                   state_in % p0  = p0_in
+                   state_in % rho = rho_in
+                   state_in % y(1:nspec) = rhox_in(1:nspec)
+                   state_in % y(nspec+1) = rhoh_in
+                   state_in % ydot_a(1:nspec) = sdc_rhoX(1:nspec)
+                   state_in % ydot_a(nspec+1) = sdc_rhoh
+
+                   call burner(state_in, state_out, dt_in)
+
+                   rho_out  = sum(state_out % y(1:nspec))
+                   rhox_out = state_out % y(1:nspec)
+                   rhoh_out = state_out % y(nspec+1)
+                   
                 else
                    rho_out = rho_in + sum(sdc_rhoX(1:nspec))*dt_in
                    rhox_out = rhox_in + sdc_rhoX*dt_in
@@ -518,6 +549,7 @@ contains
           enddo
        enddo
     enddo
+#endif
     
   end subroutine burner_loop_sdc_sphr
   
