@@ -2,8 +2,8 @@
 MAESTROeX Architecture
 **********************
 
-MAESTROeX Basics
-==============
+MAESTROeX Basics
+================
 
 MAESTROeX models problems that are in tight hydrostatic equilibrium.
 The fluid state is decomposed into a 1D radial base state that
@@ -42,7 +42,7 @@ The MAESTROeX grids are managed by the AMReX library, which is
 distributed separately.
 
 The MAESTROeX ‘Ecosystem’
-=======================
+=========================
 
 .. raw:: latex
 
@@ -482,10 +482,6 @@ boundaries so the proper nesting is not strict there).
 For parallel computations, the boxes are spread across processors, in
 a fashion designed to put roughly equal amounts of work on each
 processor (load balancing).
-
-.. raw:: latex
-
-   \centering
 
 .. figure:: \archfigpath/data_loc2
    :alt: [fig:dataloc] Some of the different data-centerings:
