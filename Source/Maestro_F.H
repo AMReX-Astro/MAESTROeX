@@ -108,6 +108,7 @@ extern "C"
 
     //////////////////////
     // in burner_loop.f90
+#ifndef SDC
     void burner_loop(const int* lo, const int* hi,
                      const int lev,
                      const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
@@ -130,8 +131,9 @@ extern "C"
                           const amrex::Real dt_in,
                           const int* mask, const int* m_lo, const int* m_hi,
                           const int use_mask);
-
-    void burner_loop_sdc(const int* lo, const int* hi,
+    
+#else
+    void burner_loop(const int* lo, const int* hi,
 			 const int lev,
 			 const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
 			       amrex::Real* s_out,    const int* o_lo, const int* o_hi,
@@ -141,7 +143,7 @@ extern "C"
 			 const int* mask, const int* m_lo, const int* m_hi,
 			 const int use_mask);
 
-    void burner_loop_sdc_sphr(const int* lo, const int* hi,
+    void burner_loop_sphr(const int* lo, const int* hi,
 			      const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
                                     amrex::Real* s_out,    const int* o_lo, const int* o_hi,
 			      const amrex::Real* source, const int* s_lo, const int* s_hi,
@@ -149,7 +151,8 @@ extern "C"
 			      const amrex::Real dt_in,
 			      const int* mask, const int* m_lo, const int* m_hi,
 			      const int use_mask);
-
+#endif
+    
     //////////////////////
 
     //////////////////////

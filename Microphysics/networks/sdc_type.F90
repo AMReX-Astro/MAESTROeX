@@ -46,9 +46,9 @@ module sdc_type_module
      logical :: T_from_eden
 #elif (SDC_METHOD == 2)
      ! Pressure in case we wish to use it for EOS calls
-     real(dp_t) :: p0
+     double precision :: p0
      ! Density is defined by sum(rho*X) = rho in this method
-     real(dp_t) :: rho
+     double precision :: rho
 #endif
 
      integer :: i

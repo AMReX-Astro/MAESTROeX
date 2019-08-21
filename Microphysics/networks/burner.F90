@@ -4,12 +4,13 @@ module burner_module
   use network
   use eos_module
 #ifndef SDC
-  use burn_type_module, only: burn_t
+  use burn_type_module
 #else
 #if (SDC_METHOD == 1)
   use integrator_module
 #elif (SDC_METHOD == 2)
   use sdc_type_module, only: sdc_t
+#endif
 #endif
   use actual_burner_module
 

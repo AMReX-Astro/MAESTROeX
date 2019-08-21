@@ -708,6 +708,14 @@ private:
                 const RealVector& p0,
                 const amrex::Real dt_react);
 
+    void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
+		   amrex::Vector<amrex::MultiFab>& s_out,
+		   amrex::Vector<amrex::MultiFab>& rho_Hext,
+		   const RealVector& p0,
+		   const amrex::Real dt_react,
+		   amrex::Vector<amrex::MultiFab>& source);
+
+#ifndef SDC
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
                 amrex::Vector<amrex::MultiFab>& s_out,
                 const amrex::Vector<amrex::MultiFab>& rho_Hext,
@@ -715,20 +723,15 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const RealVector& p0,
                 const amrex::Real dt_react);
-    
-    void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
-		   amrex::Vector<amrex::MultiFab>& s_out,
-		   amrex::Vector<amrex::MultiFab>& rho_Hext,
-		   const RealVector& p0,
-		   const amrex::Real dt_react,
-		   amrex::Vector<amrex::MultiFab>& source);
-    
-    void BurnerSDC (const amrex::Vector<amrex::MultiFab>& s_in,
-		    amrex::Vector<amrex::MultiFab>& s_out,
-		    const RealVector& p0,
-		    const amrex::Real dt_react,
-		    const amrex::Vector<amrex::MultiFab>& source);
 
+#else
+    void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
+		 amrex::Vector<amrex::MultiFab>& s_out,
+		 const RealVector& p0,
+		 const amrex::Real dt_react,
+		 const amrex::Vector<amrex::MultiFab>& source);
+#endif
+    
     // compute heating term, rho_Hext
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
                       const amrex::Vector<amrex::MultiFab>& scal);

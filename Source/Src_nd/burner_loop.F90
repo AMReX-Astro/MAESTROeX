@@ -33,6 +33,7 @@ contains
 
   end subroutine burner_loop_init
 
+#ifndef SDC
   subroutine burner_loop(lo, hi, &
        lev, &
        s_in,     i_lo, i_hi, &
@@ -327,14 +328,15 @@ contains
 
   end subroutine burner_loop_sphr
 
-    subroutine burner_loop_sdc(lo, hi, &
+#else
+  subroutine burner_loop(lo, hi, &
        lev, &
        s_in,     i_lo, i_hi, &
        s_out,    o_lo, o_hi, &
        source, s_lo, s_hi, &
        p0_in, dt_in, &
        mask,     m_lo, m_hi, use_mask) &
-       bind (C,name="burner_loop_sdc")
+       bind (C,name="burner_loop")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer, value  , intent (in   ) :: lev
@@ -439,15 +441,15 @@ contains
        enddo
     enddo
 
-  end subroutine burner_loop_sdc
+  end subroutine burner_loop
 
-  subroutine burner_loop_sdc_sphr(lo, hi, &
+  subroutine burner_loop_sphr(lo, hi, &
        s_in,     i_lo, i_hi, &
        s_out,    o_lo, o_hi, &
        source,   s_lo, s_hi, &
        p0_cart, t_lo, t_hi, dt_in, &
        mask,     m_lo, m_hi, use_mask) &
-       bind (C,name="burner_loop_sdc_sphr")
+       bind (C,name="burner_loop_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: i_lo(3), i_hi(3)
@@ -475,7 +477,6 @@ contains
     double precision :: sdc_rhoh
     double precision :: p0_in
 
-#ifdef SDC
     type (sdc_t)       :: state_in, state_out
 
     do k = lo(3), hi(3)
@@ -549,8 +550,8 @@ contains
           enddo
        enddo
     enddo
-#endif
     
-  end subroutine burner_loop_sdc_sphr
+  end subroutine burner_loop_sphr
+#endif
   
 end module burner_loop_module

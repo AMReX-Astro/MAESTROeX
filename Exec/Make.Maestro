@@ -104,6 +104,7 @@ SDC_METHOD=2
 
 ifeq ($(USE_SDC), TRUE)
   DEFINES += -DSDC -DPRIM_SPECIES_HAVE_SOURCES
+  DEFINES += -DSDC_METHOD=$(SDC_METHOD)
 endif
 
 # if the EOS / network / conductivity name exists in
