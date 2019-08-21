@@ -66,6 +66,8 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     Vector<MultiFab> rho(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rho[lev].define(grids[lev], dmap[lev], 1, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        rho[lev].setVal(0.);
     }
     Real rho_time = (is_predictor == 1) ? t_old : 0.5*(t_old+t_new);
     FillPatch(rho_time, rho, sold, snew, Rho, 0, 1, Rho, bcs_s);
