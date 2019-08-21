@@ -483,11 +483,9 @@ the effects of corner coupling.</p>
 <li><p>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to y-faces using a full-dimensional extrapolation.</p></li>
 <li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to r-faces using a full-dimensional extrapolation.</p></li>
 </ol>
-<div class="line-block">
-<div class="line">Predict <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces using a 1D extrapolation.</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-24">
+<ul>
+<li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces using a 1D extrapolation.</p>
+<div class="math notranslate nohighlight" id="equation-godunov-24">
 <span class="eqno">(25)<a class="headerlink" href="#equation-godunov-24" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \ut_{L,\ib-\half\eb_y} &amp;=&amp; \ut_{\ib-\eb_y}^n + \left[\half - \frac{\dt}{2h}\max(0,v_{\ib-\eb_y}^n)\right]\Delta_y \ut_{\ib-\eb_y}^n, \\
 \ut_{R,\ib-\half\eb_y} &amp;=&amp; \ut_{\ib} - \left[\half + \frac{\dt}{2h}\min(0,v_{\ib}^n)\right]\Delta_y \ut_{\ib}^n.\end{aligned}\end{split}\]</div>
@@ -499,18 +497,15 @@ the effects of corner coupling.</p>
 \ut_{L,\ib-\half\eb_y}, &amp; v^{\trans}_{\ib-\half\eb_y} &gt; 0, \\
 \ut_{R,\ib-\half\eb_y}, &amp; v^{\trans}_{\ib-\half\eb_y} &lt; 0. \\
 \end{cases}\end{split}\]</div>
-<p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces using a 1D extrapolation.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Predict <span class="math notranslate nohighlight">\(\vt\)</span> to x-faces using a 1D extrapolation.</div>
-<div class="line">Predict <span class="math notranslate nohighlight">\(\vt\)</span> to r-faces using a 1D extrapolation.</div>
-<div class="line">Predict <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces using a 1D extrapolation.</div>
-<div class="line">Predict <span class="math notranslate nohighlight">\(\wt\)</span> to y-faces using a 1D extrapolation.</div>
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces by accounting for <span class="math notranslate nohighlight">\(r\)</span>-derivatives.
-The notation <span class="math notranslate nohighlight">\(\ut_{\ib-\half\eb_y}^{y|r}\)</span> means state <span class="math notranslate nohighlight">\(\ut_{\ib-\half\eb_y}\)</span> that has been updated to account for transverse derives in the r-direction.</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-26">
+</li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to x-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to r-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to y-faces using a 1D extrapolation.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\ut\)</span> to y-faces by accounting for <span class="math notranslate nohighlight">\(r\)</span>-derivatives.
+The notation <span class="math notranslate nohighlight">\(\ut_{\ib-\half\eb_y}^{y|r}\)</span> means state <span class="math notranslate nohighlight">\(\ut_{\ib-\half\eb_y}\)</span> that has been updated to account for transverse derives in the r-direction.</p>
+<div class="math notranslate nohighlight" id="equation-godunov-26">
 <span class="eqno">(27)<a class="headerlink" href="#equation-godunov-26" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \ut_{L,\ib-\half\eb_y}^{y|r} &amp;=&amp; \ut_{L,\ib-\half\eb_y} - \frac{\dt}{6h}\left(w_{\ib-\eb_y+\half\eb_r}^{\trans}+w_{\ib-\eb_y-\half\eb_r}^{\trans}\right)\left(\ut_{\ib-\eb_y+\half\eb_r}-\ut_{\ib-\eb_y-\half\eb_r}\right), \\
 \ut_{R,\ib-\half\eb_y}^{y|r} &amp;=&amp; \ut_{R,\ib-\half\eb_y} - \frac{\dt}{6h}\left(w_{\ib+\half\eb_r}^{\trans}+w_{\ib-\half\eb_r}^{\trans}\right)\left(\ut_{\ib+\half\eb_r}-\ut_{\ib-\half\eb_r}\right).\end{aligned}\end{split}\]</div>
@@ -522,17 +517,14 @@ The notation <span class="math notranslate nohighlight">\(\ut_{\ib-\half\eb_y}^{
 \ut_{L,\ib-\half\eb_y}^{y|r}, &amp; v_{\ib-\half\eb_y}^{\trans} &gt; 0, \\
 \ut_{R,\ib-\half\eb_y}^{y|r}, &amp; v_{\ib-\half\eb_y}^{\trans} &lt; 0.
 \end{cases}\end{split}\]</div>
-<p>Update prediction of <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces by accounting for <span class="math notranslate nohighlight">\(y\)</span>-derivatives.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(\vt\)</span> to x-faces by accounting for <span class="math notranslate nohighlight">\(r\)</span>-derivatives.</div>
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(\vt\)</span> to r-faces by accounting for <span class="math notranslate nohighlight">\(x\)</span>-derivatives.</div>
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces by accounting for <span class="math notranslate nohighlight">\(y\)</span>-derivatives.</div>
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(\wt\)</span> to y-faces by accounting for <span class="math notranslate nohighlight">\(x\)</span>-derivatives.</div>
-<div class="line">Predict <span class="math notranslate nohighlight">\(\ut\)</span> to x-faces using a full-dimensional extrapolation.</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-28">
+</li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces by accounting for <span class="math notranslate nohighlight">\(y\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\vt\)</span> to x-faces by accounting for <span class="math notranslate nohighlight">\(r\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\vt\)</span> to r-faces by accounting for <span class="math notranslate nohighlight">\(x\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\wt\)</span> to x-faces by accounting for <span class="math notranslate nohighlight">\(y\)</span>-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(\wt\)</span> to y-faces by accounting for <span class="math notranslate nohighlight">\(x\)</span>-derivatives.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to x-faces using a full-dimensional extrapolation.</p>
+<div class="math notranslate nohighlight" id="equation-godunov-28">
 <span class="eqno">(29)<a class="headerlink" href="#equation-godunov-28" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \ut_{L,\ib-\half\eb_x}^{\mac,*} = \ut_{L,\ib-\half\eb_x} &amp;-&amp; \frac{\dt}{4h}\left(v_{\ib-\eb_x+\half\eb_y}^{\trans}+v_{\ib-\eb_x-\half\eb_y}^{\trans}\right)\left(\ut_{\ib-\eb_x+\half\eb_y}^{y|r}-\ut_{\ib-\eb_x-\half\eb_y}^{y|r}\right) \nonumber \\
 &amp;-&amp; \frac{\dt}{4h}\left(w_{\ib-\eb_x+\half\eb_r}^{\trans}+w_{\ib-\eb_x-\half\eb_r}^{\trans}\right)\left(\ut_{\ib-\eb_x+\half\eb_r}^{r|y}-\ut_{\ib-\eb_x-\half\eb_r}^{r|y}\right) + \frac{\dt}{2}f_{u,\ib-\eb_x}, \nonumber \\
@@ -547,21 +539,19 @@ The notation <span class="math notranslate nohighlight">\(\ut_{\ib-\half\eb_y}^{
 \ut_{L,\ib-\half\eb_x}^{\mac,*}, &amp; u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} &gt; 0, \\
 \ut_{R,\ib-\half\eb_x}^{\mac,*}, &amp; u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} &lt; 0.
 \end{cases}\end{split}\]</div>
-<p>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to y-faces using a full-dimensional extrapolation.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Predict <span class="math notranslate nohighlight">\(\wt\)</span> to r-faces using a full-dimensional extrapolation.
+</li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\vt\)</span> to y-faces using a full-dimensional extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(\wt\)</span> to r-faces using a full-dimensional extrapolation.
 In this step, make sure you account for the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span>
-term before solving the Riemann problem:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-30">
+term before solving the Riemann problem:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-30">
 <span class="eqno">(31)<a class="headerlink" href="#equation-godunov-30" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \wt_{L,\ib-\half\eb_r}^{\mac,*} &amp;=&amp; \wt_{L,\ib-\half\eb_r}^{\mac,*} -
 \frac{\dt}{4h}\left(\wt^{\trans}_{\ib+\half\eb_r} + \wt^{\trans}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\
 \wt_{R,\ib-\half\eb_r}^{\mac,*} &amp;=&amp; \wt_{R,\ib-\half\eb_r}^{\mac,*} -
 \frac{\dt}{4h}\left(\wt^{\trans}_{\ib-\half\eb_r} + \wt^{\trans}_{\ib-\frac{3}{2}\eb_r}\right)\left(w_{0,\ib-\half\eb_r}-w_{0,\ib-\frac{3}{2}\eb_r}\right)\end{aligned}\end{split}\]</div>
-</div></blockquote>
+</li>
+</ul>
 </div>
 <div class="section" id="d-spherical-case-1">
 <span id="id4"></span><h3>3D Spherical Case<a class="headerlink" href="#d-spherical-case-1" title="Permalink to this headline">¶</a></h3>
@@ -603,11 +593,9 @@ of motion are:</p>
 <li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</p></li>
 <li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a full-dimensional extrapolation.</p></li>
 </ol>
-<div class="line-block">
-<div class="line">Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-32">
+<ul>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-32">
 <span class="eqno">(33)<a class="headerlink" href="#equation-godunov-32" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_r} &amp;=&amp; s_{\ib-\eb_r}^n + \left(\half - \frac{\dt}{2h}w_{\ib-\half\eb_r}^{\mac}\right)\Delta_r s_{\ib-\eb_r}^n, \\
 s_{R,\ib-\half\eb_r} &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{2h}w_{\ib-\half\eb_r}^{\mac}\right)\Delta_r s_{\ib}^n.\end{aligned}\end{split}\]</div>
@@ -625,12 +613,8 @@ s_{R,\ib-\half\eb_r}, &amp; w^{\mac}_{\ib-\half\eb_r} &lt; 0. \\
 s_{L,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n + \frac{\dt}{2}f_{\ib-\eb_x}^n \\
 s_{R,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{\ib}^n - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n + \frac{\dt}{2}f_{\ib}^n \end{aligned}\end{split}\]</div>
 <p>Account for the transverse terms:</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line"><strong>if</strong> is_conservative <strong>then</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-35">
+<p><strong>if</strong> is_conservative <strong>then</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-35">
 <span class="eqno">(36)<a class="headerlink" href="#equation-godunov-35" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_x}^{\edge} -
 \frac{\dt}{2h}\left[\left(w^{\mac}s\right)_{\ib-\eb_x+\half\eb_r} - \left(w^{\mac}s\right)_{\ib-\eb_x-\half\eb_r}\right] - \frac{\dt}{2h}s_{\ib-\eb_x}^{n}\left(u_{\ib-\half\eb_x}^{\mac}-u_{\ib-\frac{3}{2}\eb_x}^{\mac}\right)\nonumber \\
@@ -645,25 +629,19 @@ s_{L,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_x}^{\edge} -
 s_{R,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{R,\ib-\half\eb_x}^{\edge} -
 \frac{\dt}{4h}\left(w^{\mac}_{\ib+\half\eb_r} + w^{\mac}_{\ib-\half\eb_r}\right)\left(s_{\ib+\half\eb_r} - s_{\ib-\half\eb_r}\right)\end{aligned}\end{split}\]</div>
 <p><strong>end if</strong></p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Account for the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term:</div>
-<div class="line"><strong>if</strong> is_vel <strong>and</strong> comp = 2 <strong>then</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-37">
+</li>
+<li><p>Account for the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term:</p>
+<p><strong>if</strong> is_vel <strong>and</strong> comp = 2 <strong>then</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-37">
 <span class="eqno">(38)<a class="headerlink" href="#equation-godunov-37" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_x}^{\edge} -
 \frac{\dt}{4h}\left(\wt^{\mac}_{\ib-\eb_x+\half\eb_r} + \wt^{\mac}_{\ib-\eb_x-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\
 s_{R,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{R,\ib-\half\eb_x}^{\edge} -
 \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}\end{split}\]</div>
 <p><strong>end if</strong></p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>.</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-38">
+</li>
+<li><p>Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>.</p>
+<div class="math notranslate nohighlight" id="equation-godunov-38">
 <span class="eqno">(39)<a class="headerlink" href="#equation-godunov-38" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{\edge} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x}^{\edge} + s_{R,\ib-\half\eb_x}^{\edge}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
@@ -688,13 +666,9 @@ s_{R,\ib-\half\eb_x}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0. \\
 <span class="eqno">(42)<a class="headerlink" href="#equation-godunov-41" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_r}^{\edge} &amp;=&amp;  s_{\ib-\eb_r}^n + \left(\half - \frac{\dt}{2h}w_{\ib-\half\eb_r}^{\mac}\right)\Delta_r s_{\ib-\eb_r}^n + \frac{\dt}{2}f_{\ib-\eb_r}^n \\
 s_{R,\ib-\half\eb_r}^{\edge} &amp;=&amp;  s_{\ib}^n - \left(\half + \frac{\dt}{2h}w_{\ib-\half\eb_r}^{\mac}\right)\Delta_r s_{\ib}^n + \frac{\dt}{2}f_{\ib}^n \end{aligned}\end{split}\]</div>
-<p>Account for the transverse terms:</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line"><strong>if</strong> is_conservative <strong>then</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-42">
+<p>Account for the transverse terms:
+<strong>if</strong> is_conservative <strong>then</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-42">
 <span class="eqno">(43)<a class="headerlink" href="#equation-godunov-42" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_r}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_r}^{\edge} -
 \frac{\dt}{2h}\left[\left(u^{\mac}s\right)_{\ib-\eb_r+\half\eb_x} - \left(u^{\mac}s\right)_{\ib-\eb_r-\half\eb_x}\right] - \frac{\dt}{2h}s_{\ib-\eb_r}^{n}\left(w_{\ib-\half\eb_r}^{\mac}-w_{\ib-\frac{3}{2}\eb_r}^{\mac}\right)\nonumber\\
@@ -709,32 +683,27 @@ s_{L,\ib-\half\eb_r}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_r}^{\edge} -
 s_{R,\ib-\half\eb_r}^{\edge} &amp;=&amp; s_{R,\ib-\half\eb_r}^{\edge} -
 \frac{\dt}{4h}\left(u^{\mac}_{\ib+\half\eb_x} + u^{\mac}_{\ib-\half\eb_x}\right)\left(s_{\ib+\half\eb_x} - s_{\ib-\half\eb_x}\right)\end{aligned}\end{split}\]</div>
 <p><strong>end if</strong></p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Account for the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term:</div>
-<div class="line"><strong>if</strong> is_vel <strong>and</strong> comp = 2 <strong>then</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-44">
+</li>
+<li><p>Account for the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term:
+<strong>if</strong> is_vel <strong>and</strong> comp = 2 <strong>then</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-44">
 <span class="eqno">(45)<a class="headerlink" href="#equation-godunov-44" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_r}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_r}^{\edge} -
 \frac{\dt}{4h}\left(\wt^{\mac}_{\ib-\half\eb_r} + \wt^{\mac}_{\ib-\frac{3}{2}\eb_r}\right)\left(w_{0,\ib-\half\eb_r}-w_{0,\ib-\frac{3}{2}\eb_r}\right) \\
 s_{R,\ib-\half\eb_r}^{\edge} &amp;=&amp; s_{R,\ib-\half\eb_r}^{\edge} -
 \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}\end{split}\]</div>
 <p><strong>end if</strong></p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Upwind based on <span class="math notranslate nohighlight">\(w^{\mac}\)</span>:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-45">
+</li>
+<li><p>Upwind based on <span class="math notranslate nohighlight">\(w^{\mac}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-45">
 <span class="eqno">(46)<a class="headerlink" href="#equation-godunov-45" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_r} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_r} + s_{R,\ib-\half\eb_r}\right), &amp; \left|w^{\mac}_{\ib-\half\eb_r}\right| &lt; \epsilon \\
 u_{L,\ib-\half\eb_r}, &amp; w^{\mac}_{\ib-\half\eb_r} &gt; 0, \\
 u_{R,\ib-\half\eb_r}, &amp; w^{\mac}_{\ib-\half\eb_r} &lt; 0. \\
 \end{cases}\end{split}\]</div>
-</div></blockquote>
+</li>
+</ul>
 </div>
 <div class="section" id="d-cartesian-case-5">
 <span id="id6"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-5" title="Permalink to this headline">¶</a></h3>
@@ -754,11 +723,9 @@ the effects of corner coupling.</p>
 <li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a full-dimensional extrapolation.</p></li>
 <li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a full-dimensional extrapolation.</p></li>
 </ol>
-<div class="line-block">
-<div class="line">Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-46">
+<ul>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</p>
+<div class="math notranslate nohighlight" id="equation-godunov-46">
 <span class="eqno">(47)<a class="headerlink" href="#equation-godunov-46" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x} &amp;=&amp; s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n, \label{3D predict s to left}\\
 s_{R,\ib-\half\eb_x} &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n.\label{3D predict s to right}\end{aligned}\end{split}\]</div>
@@ -770,18 +737,15 @@ s_{R,\ib-\half\eb_x} &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\h
 s_{L,\ib-\half\eb_x}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
 s_{R,\ib-\half\eb_x}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0. \\
 \end{cases}\end{split}\]</div>
-<p>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a 1D extrapolation.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation.</div>
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to x-faces by accounting for y-derivatives.
+</li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a 1D extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to x-faces by accounting for y-derivatives.
 The notation <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^{x|y}\)</span> means “state <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}\)</span>
 that has been updated to account for the transverse derivatives in
-the <span class="math notranslate nohighlight">\(y\)</span>-direction”.</div>
-<div class="line"><strong>if</strong> is_conservative <strong>then</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-48">
+the <span class="math notranslate nohighlight">\(y\)</span>-direction”.</p>
+<p><strong>if</strong> is_conservative <strong>then</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-48">
 <span class="eqno">(49)<a class="headerlink" href="#equation-godunov-48" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{L,\ib-\half\eb_x} - \frac{\dt}{3h}\left[(sv^{\mac})_{\ib-\eb_x+\half\eb_y}-(sv^{\mac})_{\ib-\eb_x-\half\eb_y}\right], \\
 s_{R,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{R,\ib-\half\eb_x} - \frac{\dt}{3h}\left[(sv^{\mac})_{\ib+\half\eb_y}-(sv^{\mac})_{\ib-\half\eb_y}\right].\end{aligned}\end{split}\]</div>
@@ -791,30 +755,24 @@ s_{R,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{R,\ib-\half\eb_x} - \frac{\dt}{3h}\lef
 s_{L,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{L,\ib-\half\eb_x} - \frac{\dt}{6h}\left(v_{\ib-\eb_x+\half\eb_y}^{\mac} + v_{\ib-\eb_x-\half\eb_y}^{\mac}\right)\left(s_{\ib-\eb_x+\half\eb_y} - s_{\ib-\eb_x-\half\eb_y}\right), \\
 s_{R,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{R,\ib-\half\eb_x} - \frac{\dt}{6h}\left(v_{\ib+\half\eb_y}^{\mac} + v_{\ib-\half\eb_y}^{\mac}\right)\left(s_{\ib+\half\eb_y} - s_{\ib-\half\eb_y}\right).\end{aligned}\end{split}\]</div>
 <p><strong>end if</strong></p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-50">
+</li>
+<li><p>Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-50">
 <span class="eqno">(51)<a class="headerlink" href="#equation-godunov-50" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{x|y} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x}^{x|y} + s_{R,\ib-\half\eb_x}^{x|y}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
 s_{L,\ib-\half\eb_x}^{x|y}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
 s_{R,\ib-\half\eb_x}^{x|y}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0.
 \end{cases}\end{split}\]</div>
-<p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to x-faces by accounting for r-derivatives.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to y-faces by accounting for x-derivatives.</div>
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to y-faces by accounting for r-derivatives.</div>
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for x-derivatives.</div>
-<div class="line">Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for y-derivatives.</div>
-<div class="line">Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a full-dimensional extrapolation.</div>
-<div class="line"><strong>if</strong> is_conservative <strong>then</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-51">
+</li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to x-faces by accounting for r-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to y-faces by accounting for x-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to y-faces by accounting for r-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for x-derivatives.</p></li>
+<li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for y-derivatives.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a full-dimensional extrapolation.</p>
+<p><strong>if</strong> is_conservative <strong>then</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-51">
 <span class="eqno">(52)<a class="headerlink" href="#equation-godunov-51" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} = s_{L,\ib-\half\eb_x} &amp;-&amp; \frac{\dt}{2h}\left[(s^{y|r}v^{\mac})_{\ib-\eb_x+\half\eb_y}-({s^{y|r}v^{\mac})_{\ib-\eb_x-\half\eb_y}}\right] \nonumber \\
 &amp;-&amp; \frac{\dt}{2h}\left[(s^{r|y}w^{\mac})_{\ib-\eb_x+\half\eb_r}-({s^{r|y}w^{\mac})_{\ib-\eb_x-\half\eb_r}}\right] \nonumber \\
@@ -831,36 +789,29 @@ s_{L,\ib-\half\eb_x}^{\edge} = s_{L,\ib-\half\eb_x} &amp;-&amp; \frac{\dt}{4h}\l
 s_{R,\ib-\half\eb_x}^{\edge} = s_{R,\ib-\half\eb_x} &amp;-&amp; \frac{\dt}{4h}\left(v_{\ib+\half\eb_y}^{\mac}+v_{\ib-\half\eb_y}^{\mac}\right)\left(s_{\ib+\half\eb_y}^{y|r}-s_{\ib-\half\eb_y}^{y|r}\right) \nonumber \\
 &amp;-&amp; \frac{\dt}{4h}\left(w_{\ib+\half\eb_r}^{\mac}+w_{\ib-\half\eb_r}^{\mac}\right)\left(s_{\ib+\half\eb_r}^{r|y}-s_{\ib-\half\eb_r}^{r|y}\right) + \frac{\dt}{2}f_{\ib}.\end{aligned}\end{split}\]</div>
 <p><strong>end if</strong></p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Account for the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term:</div>
-<div class="line"><strong>if</strong> is_vel <strong>and</strong> comp = 2 <strong>then</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-53">
+</li>
+<li><p>Account for the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term:</p>
+<p><strong>if</strong> is_vel <strong>and</strong> comp = 2 <strong>then</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-53">
 <span class="eqno">(54)<a class="headerlink" href="#equation-godunov-53" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_x}^{\edge} -
 \frac{\dt}{4h}\left(\wt^{\mac}_{\ib-\eb_x+\half\eb_r} + \wt^{\mac}_{\ib-\eb_x-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\
 s_{R,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{R,\ib-\half\eb_x}^{\edge} -
 \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}\end{split}\]</div>
 <p><strong>end if</strong></p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-54">
+</li>
+<li><p>Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-54">
 <span class="eqno">(55)<a class="headerlink" href="#equation-godunov-54" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{\edge} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x}^{\edge} + s_{R,\ib-\half\eb_x}^{\edge}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
 s_{L,\ib-\half\eb_x}^{\edge}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
 s_{R,\ib-\half\eb_x}^{\edge}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0.
 \end{cases}\end{split}\]</div>
-<p>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a full-dimensional extrapolation.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a full-dimensional extrapolation.</div>
-</div>
+</li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to y-faces using a full-dimensional extrapolation.</p></li>
+<li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a full-dimensional extrapolation.</p></li>
+</ul>
 </div>
 <div class="section" id="d-spherical-case-2">
 <span id="id7"></span><h3>3D Spherical Case<a class="headerlink" href="#d-spherical-case-2" title="Permalink to this headline">¶</a></h3>
@@ -875,11 +826,9 @@ the full velocity.</p>
 <h2>Computing <span class="math notranslate nohighlight">\(\Ub^{\mac,*}\)</span> in VARDEN<a class="headerlink" href="#computing-ub-mac-in-varden" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="d-cartesian-case-6">
 <span id="id8"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-6" title="Permalink to this headline">¶</a></h3>
-<div class="line-block">
-<div class="line">We do a 1D Taylor series extrapolation to get both components of velocity at the x-face:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-55">
+<ul>
+<li><p>We do a 1D Taylor series extrapolation to get both components of velocity at the x-face:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-55">
 <span class="eqno">(56)<a class="headerlink" href="#equation-godunov-55" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 u_{L,\ib-\half\eb_x}^{1D} &amp;=&amp; u_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,u_{\ib-\eb_x})\right]\Delta_xu_{\ib-\eb_x}, \label{varden U_L^1D} \\
 u_{R,\ib-\half\eb_x}^{1D} &amp;=&amp; u_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,u_{\ib})\right]\Delta_xu_{\ib}.\end{aligned}\end{split}\]</div>
@@ -904,15 +853,12 @@ u_{R,\ib-\half\eb_x}^{1D}, &amp; u_{L,\ib-\half\eb_x}^{1D} + u_{R,\ib-\half\eb_x
 v_{L,\ib-\half\eb_x}^{1D}, &amp; u_{\ib-\half\eb_x}^{1D} &gt; 0, \\
 v_{R,\ib-\half\eb_x}^{1D}, &amp; u_{\ib-\half\eb_x}^{1D} &lt; 0.
 \end{cases}\label{Transverse Velocity Riemann Problem}\end{split}\]</div>
-<p>We perform analogous operations to compute both components of velocity
-at the y-faces, <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_y}^{1D}\)</span>.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Now we do a full-dimensional extrapolation to get the MAC velocity at
-the x-faces (note that we only compute the normal components):</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-59">
+</li>
+<li><p>We perform analogous operations to compute both components of velocity
+at the y-faces, <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_y}^{1D}\)</span>.</p></li>
+<li><p>Now we do a full-dimensional extrapolation to get the MAC velocity at
+the x-faces (note that we only compute the normal components):</p>
+<div class="math notranslate nohighlight" id="equation-godunov-59">
 <span class="eqno">(60)<a class="headerlink" href="#equation-godunov-59" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 u_{L,\ib-\half\eb_x}^{\mac,*} &amp;=&amp; u_{L,\ib-\half\eb_x}^{1D} - \frac{\dt}{4h}\left(v_{\ib-\eb_x+\half\eb_y}^{1D}+v_{\ib-\eb_x-\half\eb_y}^{1D}\right)\left(u_{\ib-\eb_x+\half\eb_y}^{1D} - u_{\ib-\eb_x-\half\eb_y}^{1D}\right) + \frac{\dt}{2}f_{u,\ib-\eb_x}, \\
 u_{R,\ib-\half\eb_x}^{\mac,*} &amp;=&amp; u_{R,\ib-\half\eb_x}^{1D} - \frac{\dt}{4h}\left(v_{\ib+\half\eb_y}^{1D}+v_{\ib-\half\eb_y}^{1D}\right)\left(u_{\ib+\half\eb_y}^{1D} - u_{\ib-\half\eb_y}^{1D}\right) + \frac{\dt}{2}f_{u,\ib}.\end{aligned}\end{split}\]</div>
@@ -924,21 +870,19 @@ u_{R,\ib-\half\eb_x}^{\mac,*} &amp;=&amp; u_{R,\ib-\half\eb_x}^{1D} - \frac{\dt}
 u_{L,\ib-\half\eb_x}^{\mac,*}, &amp; u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} &gt; 0, \\
 u_{R,\ib-\half\eb_x}^{\mac,*}, &amp; u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} &lt; 0.
 \end{cases}\label{umac Riemann Problem}\end{split}\]</div>
-<p>We perform analogous operations to compute the normal velocity at the
-y-faces, <span class="math notranslate nohighlight">\(v^{\mac,*}_{\ib-\half\eb_y}\)</span>.</p>
-</div></blockquote>
+</li>
+<li><p>We perform analogous operations to compute the normal velocity at the
+y-faces, <span class="math notranslate nohighlight">\(v^{\mac,*}_{\ib-\half\eb_y}\)</span>.</p></li>
+</ul>
 </div>
 <div class="section" id="d-cartesian-case-7">
 <span id="id9"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-7" title="Permalink to this headline">¶</a></h3>
 <p>This is more complicated than the 2D case because we include corner
 coupling. We compute <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_x}^{1D},
 \Ub_{\ib-\half\eb_y}^{1D}\)</span>, and <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_z}^{1D}\)</span> in an
-analogous manner as equations (<a class="reference external" href="#vardenU_L^1D">[varden U_L^1D]</a>)-(<a href="#id10"><span class="problematic" id="id11">`</span></a>[Transverse</p>
-<blockquote>
-<div><p>Velocity Riemann Problem] &lt;#Transverse
-Velocity Riemann Problem&gt;`__). Then we compute an intermediate state,</p>
-</div></blockquote>
-<p><span class="math notranslate nohighlight">\(u_{\ib-\half\eb_y}^{y|z}\)</span>, which is described as “state
+analogous manner as equations (<a class="reference external" href="#vardenU_L^1D">[varden U_L^1D]</a>)-(<a class="reference external" href="#TransverseVelocityRiemannProblem">[Transverse
+Velocity Riemann Problem]</a>). Then we compute an intermediate state,
+<span class="math notranslate nohighlight">\(u_{\ib-\half\eb_y}^{y|z}\)</span>, which is described as “state
 <span class="math notranslate nohighlight">\(u_{\ib-\half\eb_y}^{1D}\)</span> that has been updated to account for the
 transverse derivatives in the z direction”, using:</p>
 <div class="math notranslate nohighlight" id="equation-godunov-61">
@@ -980,7 +924,7 @@ as the <span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in M
 formulation. Here, <span class="math notranslate nohighlight">\(s\)</span> is used in place of either <span class="math notranslate nohighlight">\(\rho, u, v\)</span>, or
 <span class="math notranslate nohighlight">\(w\)</span> (in 3D).</p>
 <div class="section" id="d-cartesian-case-8">
-<span id="id12"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-8" title="Permalink to this headline">¶</a></h3>
+<span id="id10"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-8" title="Permalink to this headline">¶</a></h3>
 <p>The 1D extrapolation is:</p>
 <div class="math notranslate nohighlight" id="equation-godunov-64">
 <span class="eqno">(65)<a class="headerlink" href="#equation-godunov-64" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
@@ -1019,7 +963,7 @@ s_{R,\ib-\half\eb_x}^{\edge}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0.
 <p>We use an analogous procedure to compute <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^{\edge}\)</span>.</p>
 </div>
 <div class="section" id="d-cartesian-case-9">
-<span id="id13"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-9" title="Permalink to this headline">¶</a></h3>
+<span id="id11"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-9" title="Permalink to this headline">¶</a></h3>
 <p>This is more complicated than the 2D case because we include corner
 coupling. We first compute <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^{1D}\)</span>,
 <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^{1D}\)</span>, and <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_z}^{1D}\)</span> in an
@@ -1078,11 +1022,9 @@ We use an analogous procedure to compute both
 </div>
 <div class="section" id="estate-fpu-in-godunov-2d-3d-f">
 <h2>ESTATE_FPU in GODUNOV_2D/3D.f<a class="headerlink" href="#estate-fpu-in-godunov-2d-3d-f" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line">First, the normal predictor.</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-74">
+<ul>
+<li><p>First, the normal predictor.</p>
+<div class="math notranslate nohighlight" id="equation-godunov-74">
 <span class="eqno">(75)<a class="headerlink" href="#equation-godunov-74" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_L^x &amp;=&amp; s_{\ib-\eb_x} + \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \underbrace{\frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x}}_{\text{IF USE\_MINION}} \\
 s_R^x &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \underbrace{\frac{\dt}{2}\text{TFORCES}_{\ib}}_{\text{IF USE\_MINION}}\end{aligned}\end{split}\]</div>
@@ -1098,14 +1040,11 @@ s_R^x &amp;=&amp; s_R^x - \frac{\dt}{2}s_{\ib}\text{DIVU}_{\ib}\end{aligned}\end
 s_L^x, &amp; \text{UEDGE}_{\ib-\half\eb_x} &gt; 0, \\
 s_R^x, &amp; \text{else}. \\
 \end{cases}\label{ESTATE_FPU Upwind}\end{split}\]</div>
-<p>Then, if <span class="math notranslate nohighlight">\(|\text{UEDGE}_{\ib-\half\eb_x}| \le \epsilon\)</span>, we set <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^x = (s_L^x+s_R^x)/2\)</span>. The procedure to obtain <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^y\)</span> is analogous.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Now, the transverse terms.</div>
-<div class="line"><strong>If</strong> ICONSERVE <strong>then:</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-77">
+</li>
+<li><p>Then, if <span class="math notranslate nohighlight">\(|\text{UEDGE}_{\ib-\half\eb_x}| \le \epsilon\)</span>, we set <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^x = (s_L^x+s_R^x)/2\)</span>. The procedure to obtain <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^y\)</span> is analogous.</p></li>
+<li><p>Now, the transverse terms.</p>
+<p><strong>If</strong> ICONSERVE <strong>then:</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-77">
 <span class="eqno">(78)<a class="headerlink" href="#equation-godunov-77" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \text{sedge}_L^x &amp;=&amp; s_{\ib-\eb_x} + \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{\text{VEDGE}_{\ib-\eb_x+\half\eb_y}s_{\ib-\eb_x+\half\eb_y}^y - \text{VEDGE}_{\ib-\eb_x-\half\eb_y}s_{\ib-\eb_x-\half\eb_y}^y}{h_y}\right.\nonumber\\
@@ -1113,13 +1052,10 @@ s_R^x, &amp; \text{else}. \\
 \text{sedge}_R^x &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{\text{VEDGE}_{\ib+\half\eb_y}s_{\ib+\half\eb_y}^y - \text{VEDGE}_{\ib-\half\eb_y}s_{\ib-\half\eb_y}^y}{h_y}\right.\nonumber\\
 &amp;&amp; ~~~~~~~~~~ \left. - \frac{s_{\ib}(\text{VEDGE}_{\ib+\half\eb_y}-\text{VEDGE}_{\ib-\half\eb_y})}{h_y}+s_{\ib}\text{DIVU}_{\ib}\right]\end{aligned}\end{split}\]</div>
-<p>Now, define <span class="math notranslate nohighlight">\(\text{VBAR}_{\ib} = (\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})/2\)</span>.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line"><strong>If</strong> NOT ICONSERVE <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} &lt; 0\)</span> <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VBAR}_{\ib} &lt; 0\)</span> <strong>then:</strong></div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-78">
+</li>
+<li><p>Now, define <span class="math notranslate nohighlight">\(\text{VBAR}_{\ib} = (\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})/2\)</span>.</p>
+<p><strong>If</strong> NOT ICONSERVE <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} &lt; 0\)</span> <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VBAR}_{\ib} &lt; 0\)</span> <strong>then:</strong></p>
+<div class="math notranslate nohighlight" id="equation-godunov-78">
 <span class="eqno">(79)<a class="headerlink" href="#equation-godunov-78" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \text{sedge}_L^x = s_{\ib-\eb_x} &amp;+&amp; \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib-\eb_x}(s_{\ib-\eb_x+\eb_y}-s_{\ib-\eb_x})}{h_y}\right] \label{transverse upwinding 1} \\
@@ -1139,8 +1075,9 @@ s_R^x, &amp; \text{else}. \\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib-\eb_x+\half\eb_y}+\text{VEDGE}_{\ib-\eb_x-\half\eb_y})(s_{\ib-\eb_x+\half\eb_y}-s_{\ib-\eb_x-\half\eb_y})}{2h_y}\right] \\
 \text{sedge}_R^x &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})(s_{\ib+\half\eb_y}-s_{\ib-\half\eb_y})}{2h_y}\right]\label{transverse upwinding 6}\end{aligned}\end{split}\]</div>
-<p>Finally, upwind analogous to equation (<a class="reference external" href="#ESTATE_FPUUpwind">[ESTATE_FPU Upwind]</a>) to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x}\)</span>.</p>
-</div></blockquote>
+</li>
+<li><p>Finally, upwind analogous to equation (<a class="reference external" href="#ESTATE_FPUUpwind">[ESTATE_FPU Upwind]</a>) to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x}\)</span>.</p></li>
+</ul>
 </div>
 <div class="section" id="estate-in-godunov-2d-3d-f">
 <h2>ESTATE in GODUNOV_2D/3D.f<a class="headerlink" href="#estate-in-godunov-2d-3d-f" title="Permalink to this headline">¶</a></h2>
@@ -1176,17 +1113,15 @@ to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x
 </div>
 <div class="section" id="piecewise-parabolic-method-ppm">
 <h2>Piecewise Parabolic Method (PPM)<a class="headerlink" href="#piecewise-parabolic-method-ppm" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line">Consider a scalar, <span class="math notranslate nohighlight">\(s\)</span>, which we wish to predict to time-centered edges.
-The PPM method is an improvement over the piecewise-linear method.
-Using our notation, we modify equations (<a class="reference external" href="#3Dpredictstoleft">[3D predict s to left]</a>) and
-(<a class="reference external" href="#3Dpredictstoright">[3D predict s to right]</a>) in Section
-<a class="reference external" href="#ScalarEdgeStatePredictioninMAESTROeX">4</a> to obtain better estimates
-for the time-centered 1D edge states, <span class="math notranslate nohighlight">\(s_{L/R,\ib-\myhalf\eb_x}\)</span>, etc.. Once these states
-are obtained, we continue with the full-dimensional extrapolations as
-described before.</div>
-<div class="line">The PPM method is described in a series of papers:</div>
-</div>
+<p>Consider a scalar, <span class="math notranslate nohighlight">\(s\)</span>, which we wish to predict to
+time-centered edges.  The PPM method is an improvement over the
+piecewise-linear method.  Using our notation, we modify equations
+(<a class="reference external" href="#3Dpredictstoleft">[3D predict s to left]</a>) and (<a class="reference external" href="#3Dpredictstoright">[3D predict
+s to right]</a>) in Section <a class="reference external" href="#ScalarEdgeStatePredictioninMAESTROeX">4</a> to obtain better estimates for the
+time-centered 1D edge states, <span class="math notranslate nohighlight">\(s_{L/R,\ib-\myhalf\eb_x}\)</span>,
+etc.. Once these states are obtained, we continue with the
+full-dimensional extrapolations as described before.</p>
+<p>The PPM method is described in a series of papers:</p>
 <ul class="simple">
 <li><p>Colella and Woodward 1984 - describes the basic method.</p></li>
 <li><p>Miller and Colella 2002 - describes how to apply PPM to a multidimensional
@@ -1210,11 +1145,11 @@ Phil Colella.</p></li>
 <div class="math notranslate nohighlight" id="equation-godunov-87">
 <span class="eqno">(88)<a class="headerlink" href="#equation-godunov-87" title="Permalink to this equation">¶</a></span>\[\xi = \frac{x - (i-\myhalf)h}{h}, ~ 0 \le \xi \le 1.\]</div>
 </li>
-<li><div class="line-block">
-<div class="line"><strong>Step 3:</strong> Integrate quadratic profiles to get the average value swept over the face
-over time.</div>
-<div class="line">Define the following integrals, where <span class="math notranslate nohighlight">\(\sigma = |u|\Delta t/h\)</span>:</div>
-</div>
+<li><dl class="simple">
+<dt><strong>Step 3:</strong> Integrate quadratic profiles to get the average value swept over the face</dt><dd><p>over time.</p>
+</dd>
+</dl>
+<p>Define the following integrals, where <span class="math notranslate nohighlight">\(\sigma = |u|\Delta t/h\)</span>:</p>
 <blockquote>
 <div><div class="math notranslate nohighlight" id="equation-godunov-88">
 <span class="eqno">(89)<a class="headerlink" href="#equation-godunov-88" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
@@ -1227,12 +1162,9 @@ over time.</div>
 \mathcal{I}_{i,-}(\sigma) &amp;=&amp; s_{j,-} + \frac{\sigma}{2}\left[s_{j,+}-s_{j,-}+\left(1-\frac{2}{3}\sigma\right)s_{6,i}\right].\end{aligned}\end{split}\]</div>
 </div></blockquote>
 </li>
-<li><div class="line-block">
-<div class="line"><strong>Step 4:</strong> Obtain 1D edge states.</div>
-<div class="line">Perform a 1D extrapolation, without source terms, to get
-left and right edge states. Add the source terms later if desired/necessary.</div>
-<div class="line"><br /></div>
-</div>
+<li><p><strong>Step 4:</strong> Obtain 1D edge states.
+Perform a 1D extrapolation, without source terms, to get
+left and right edge states. Add the source terms later if desired/necessary.</p>
 <blockquote>
 <div><div class="math notranslate nohighlight" id="equation-godunov-90">
 <span class="eqno">(91)<a class="headerlink" href="#equation-godunov-90" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
@@ -1295,12 +1227,10 @@ holds, then for that choice of <span class="math notranslate nohighlight">\(\pm 
 </div>
 <div class="section" id="colella-and-sekora-based-approach">
 <span id="sec-colellasekora"></span><h3>Colella and Sekora Based Approach<a class="headerlink" href="#colella-and-sekora-based-approach" title="Permalink to this headline">¶</a></h3>
-<div class="line-block">
-<div class="line">Spatially interpolate <span class="math notranslate nohighlight">\(s\)</span> to edges.
-Use a 4th-order interpolation in space to obtain edge values:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-101">
+<ul>
+<li><p>Spatially interpolate <span class="math notranslate nohighlight">\(s\)</span> to edges.</p>
+<p>Use a 4th-order interpolation in space to obtain edge values:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-101">
 <span class="eqno">(102)<a class="headerlink" href="#equation-godunov-101" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{7}{12}\left(s_{i+1}+s_i\right) - \frac{1}{12}\left(s_{i+2}+s_{i-1}\right).\]</div>
 <p>Then, if <span class="math notranslate nohighlight">\((s_{i+\myhalf}-s_i)(s_{i+1}-s_{i+\myhalf}) &lt; 0\)</span>, we limit <span class="math notranslate nohighlight">\(s_{i+\myhalf}\)</span> using
 a nonlinear combination of approximations to the second derivative.
@@ -1341,13 +1271,10 @@ test if either <span class="math notranslate nohighlight">\(|\alpha_{i,\pm}| &gt
 <span class="math notranslate nohighlight">\((Ds)_{i,\pm} = (Ds)_{i,{\rm face},\pm}\)</span>. Otherwise, set
 <span class="math notranslate nohighlight">\((Ds)_{i,\pm} = (Ds)_{i,{\rm cc},\pm}\)</span>. Finally, we are at an extreumum if
 <span class="math notranslate nohighlight">\((Ds)_{i,+}(Ds)_{i,-} \le 0\)</span>.</p>
-</div></blockquote>
-<div class="line-block">
-<div class="line">Now that we have finished the extremum tests, if we are at an extremum,
-we scale <span class="math notranslate nohighlight">\(\alpha_{i,\pm}\)</span>. First, we define</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-111">
+</li>
+<li><p>Now that we have finished the extremum tests, if we are at an extremum,
+we scale <span class="math notranslate nohighlight">\(\alpha_{i,\pm}\)</span>. First, we define</p>
+<div class="math notranslate nohighlight" id="equation-godunov-111">
 <span class="eqno">(112)<a class="headerlink" href="#equation-godunov-111" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 (D^2s)_{i} &amp;=&amp; 6(\alpha_{i,+}+\alpha_{i,-}) \\
 (D^2s)_{i,L} &amp;=&amp; s_{i-2}-2s_{i-1}+s_{i} \\
@@ -1377,7 +1304,8 @@ If <span class="math notranslate nohighlight">\(s\delta s - \alpha_{i,\mp} \ge 1
 <div class="math notranslate nohighlight" id="equation-godunov-119">
 <span class="eqno">(120)<a class="headerlink" href="#equation-godunov-119" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} =  -2\alpha_{i,\mp}\]</div>
 <p>Finally, <span class="math notranslate nohighlight">\(s_{i,\pm} = s_i + \alpha_{i,\pm}\)</span>.</p>
-</div></blockquote>
+</li>
+</ul>
 </div>
 </div>
 </div>
