@@ -216,28 +216,25 @@
 <p>To handle rotation in MAESTROeX we move to the co-rotating reference frame. Time
 derivatives of a vector in the inertial frame are related to those in the
 co-rotating frame by</p>
-<div class="math notranslate nohighlight" id="equation-rotation-0">
-<span class="eqno">(1)<a class="headerlink" href="#equation-rotation-0" title="Permalink to this equation">¶</a></span>\[\label{eq:derivative relations}
-  \left(\frac{D}{Dt}\right)_\text{i} =
-  \left[\left(\frac{D}{Dt}\right)_\text{rot} + \Omegab\times\ \right],\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-derivative-relations">
+<span class="eqno">(1)<a class="headerlink" href="#equation-eq-derivative-relations" title="Permalink to this equation">¶</a></span>\[\left(\frac{D}{Dt}\right)_\text{i} =
+\left[\left(\frac{D}{Dt}\right)_\text{rot} + \Omegab\times\ \right],\]</div>
 <p>where i(rot) refers to the inertial(co-rotating) frame and <span class="math notranslate nohighlight">\(\Omegab\)</span> is
 the angular velocity vector. Using (<a class="reference external" href="#eq:derivativerelations">[eq:derivative relations]</a>) and
 assuming <span class="math notranslate nohighlight">\(\Omegab\)</span> is constant, we have</p>
-<div class="math notranslate nohighlight" id="equation-rotation-1">
-<span class="eqno">(2)<a class="headerlink" href="#equation-rotation-1" title="Permalink to this equation">¶</a></span>\[\label{eq:rotational velocity relation}
-  \frac{Dv_\text{i}}{Dt} = \frac{Dv_\text{rot}}{Dt} +
-  2\Omegab \times \mathbf{v_\text{rot}} +
-  \Omegab\times\left(\Omegab\times r_\text{rot}\right).\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-rotational-velocity-relation">
+<span class="eqno">(2)<a class="headerlink" href="#equation-eq-rotational-velocity-relation" title="Permalink to this equation">¶</a></span>\[\frac{Dv_\text{i}}{Dt} = \frac{Dv_\text{rot}}{Dt} +
+2\Omegab \times \mathbf{v_\text{rot}} +
+\Omegab\times\left(\Omegab\times r_\text{rot}\right).\]</div>
 <p>Plugging this into the momentum equation and making use of the continuity
 equation we have a momentum equation in the co-rotating frame:</p>
-<div class="math notranslate nohighlight" id="equation-rotation-2">
-<span class="eqno">(3)<a class="headerlink" href="#equation-rotation-2" title="Permalink to this equation">¶</a></span>\[\label{eq:momentum equation with rotation}
-  \frac{\partial(\rho\mathbf{U})}{\partial t} +
-  \nabla\cdot\left(\mathbf{U}(\rho\mathbf{U}) + p \right) =
-  \underbrace{-2\rho\Omegab\times\mathbf{U}}_{\text{Coriolis}} -
-  \underbrace{\rho\Omegab\times\left(\Omegab\times
-    \rb\right)}_{\text{Centrifugal}} -
-  \rho \mathbf{g}.\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-momentum-equation-with-rotation">
+<span class="eqno">(3)<a class="headerlink" href="#equation-eq-momentum-equation-with-rotation" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho\mathbf{U})}{\partial t} +
+\nabla\cdot\left(\mathbf{U}(\rho\mathbf{U}) + p \right) =
+\underbrace{-2\rho\Omegab\times\mathbf{U}}_{\text{Coriolis}} -
+\underbrace{\rho\Omegab\times\left(\Omegab\times
+  \rb\right)}_{\text{Centrifugal}} -
+\rho \mathbf{g}.\]</div>
 <p>The Coriolis and Centrifugal terms are force terms that will be added to
 right hand side of the equations in mk_vel_force. Note that the
 Centrifugal term can be rewritten as a gradient of a potential and absorbed
@@ -257,33 +254,34 @@ clarity. The <span class="math notranslate nohighlight">\(\rb_\text{c}\)</span> 
 geometry module. In spherical, the only runtime parameter of importance
 is rotational_frequency in units of Hz. This specifies the angular
 velocity vector which is assumed to be along the <strong>k</strong> direction:</p>
-<div class="math notranslate nohighlight" id="equation-rotation-3">
-<span class="eqno">(4)<a class="headerlink" href="#equation-rotation-3" title="Permalink to this equation">¶</a></span>\[\Omegab \equiv \Omega \text{\bf k} = 2\pi *
-\left(\text{\tt rotational\_frequency}\right)\text{\bf k}.\]</div>
+<div class="math notranslate nohighlight" id="equation-rotation-0">
+<span class="eqno">(4)<a class="headerlink" href="#equation-rotation-0" title="Permalink to this equation">¶</a></span>\[\Omegab \equiv \Omega {\bf k} = 2\pi *
+\left(\text{rotational_frequency}\right) {\bf k}.\]</div>
 <p>The direction of <span class="math notranslate nohighlight">\(\rb\)</span> is given as the normal vector which is
 passed into mk_vel_force; in particular</p>
-<div class="math notranslate nohighlight" id="equation-rotation-4">
-<span class="eqno">(5)<a class="headerlink" href="#equation-rotation-4" title="Permalink to this equation">¶</a></span>\[\cos\theta \equiv \frac{\rb\cdot\text{\bf k}}{r} =
-\text{\bf normal}\cdot\text{\bf k} = \text{\tt normal}(3).\]</div>
+<div class="math notranslate nohighlight" id="equation-rotation-1">
+<span class="eqno">(5)<a class="headerlink" href="#equation-rotation-1" title="Permalink to this equation">¶</a></span>\[\cos\theta \equiv \frac{\rb\cdot {\bf k}}{r} =
+{\bf normal}\cdot {\bf k} = \text{normal}(3).\]</div>
 <p>The magnitude of <span class="math notranslate nohighlight">\(\rb\)</span> is calculated based on the current zone’s location with
 respect to the center.
 Using this notation we can write the Centrifugal term as</p>
-<div class="math notranslate nohighlight" id="equation-rotation-5">
-<span class="eqno">(6)<a class="headerlink" href="#equation-rotation-5" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-rotation-2">
+<span class="eqno">(6)<a class="headerlink" href="#equation-rotation-2" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
 \Omegab\times\left(\Omegab\times\rb\right) &amp;=
 \left(\Omegab\cdot\rb\right)\Omegab - \left(\Omegab\cdot\Omegab\right)\rb\\
-&amp;= \Omega^2 r *\left[\text{\tt normal}(3)\right]\text{\bf k} -
-\Omega^2 r *\text{\bf normal} = \left(
+&amp;= \Omega^2 r *\left[\text{normal}(3)\right]{\bf k} -
+\Omega^2 r *{\bf normal} = \left(
 \begin{array}{c}
-\Omega^2r*\left[\text{\tt normal}(1)\right]\\
-\Omega^2r*\left[\text{\tt normal}(2)\right]\\
-0 \end{array}\right).\end{aligned}\end{split}\]</div>
+\Omega^2r*\left[\text{normal}(1)\right]\\
+\Omega^2r*\left[\text{normal}(2)\right]\\
+0 \end{array}\right).
+\end{align}\end{split}\]</div>
 <p>The Coriolis term is a straightforward cross-product:</p>
-<div class="math notranslate nohighlight" id="equation-rotation-6">
-<span class="eqno">(7)<a class="headerlink" href="#equation-rotation-6" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-rotation-3">
+<span class="eqno">(7)<a class="headerlink" href="#equation-rotation-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
 \Omegab \times \Ub &amp;= \left|
 \begin{array}{ccc}
-  \text{\bf{i}}&amp;\text{\bf{j}}&amp;\text{\bf{k}}\\
+  {\bf{i}}&amp;{\bf{j}}&amp;{\bf{k}}\\
   0 &amp; 0 &amp; \Omega\\
   u &amp; v &amp; w
 \end{array}\right|\\
@@ -291,8 +289,13 @@ Using this notation we can write the Centrifugal term as</p>
 \begin{array}{c}
 -\Omega v\\ \Omega u \\ 0
 \end{array}
-\right).\end{aligned}\end{split}\]</div>
-<p>[Fig:rotation in spherical]</p>
+\right).
+\end{align}\end{split}\]</div>
+<div class="figure align-center" id="id1">
+<img alt="_images/rotation_spherical.png" src="_images/rotation_spherical.png" />
+<p class="caption"><span class="caption-text">Geometry of rotation when spherical_in <span class="math notranslate nohighlight">\(=1\)</span>. We assume the
+star to be rotating about the <span class="math notranslate nohighlight">\(z\)</span> axis with rotational frequency <span class="math notranslate nohighlight">\(\Omega\)</span>.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="using-plane-parallel-geometry">
 <span id="sec-using-plane-parallel-geometry"></span><h3>Using Plane-Parallel Geometry<a class="headerlink" href="#using-plane-parallel-geometry" title="Permalink to this headline">¶</a></h3>
