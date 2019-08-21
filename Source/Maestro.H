@@ -732,10 +732,6 @@ private:
 		 const amrex::Vector<amrex::MultiFab>& source);
 #endif
     
-    // compute heating term, rho_Hext
-    void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
-                      const amrex::Vector<amrex::MultiFab>& scal);
-
     // compute heating terms, rho_omegadot and rho_Hnuc
     void MakeReactionRates (amrex::Vector<amrex::MultiFab>& rho_omegadot,
 			    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
@@ -745,6 +741,11 @@ private:
 			  const amrex::Vector<amrex::MultiFab>& scal2,
 			  amrex::Vector<amrex::MultiFab>& cp,
 			  amrex::Vector<amrex::MultiFab>& xi);
+
+    // compute heating term, rho_Hext
+    void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
+                      const amrex::Vector<amrex::MultiFab>& scal);
+
     // end MaestroReact.cpp functions
     ////////////
 

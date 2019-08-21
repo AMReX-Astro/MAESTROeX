@@ -765,7 +765,7 @@ extern "C"
     void make_abar(const int* lo, const int* hi,
                  const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
                  amrex::Real* abar, const int* a_lo, const int* a_hi);
-/////////////////////
+    /////////////////////
 
     //////////////////////
     // in make_psi.F90
@@ -788,6 +788,14 @@ extern "C"
     // 			const amrex::Real* p0_old,
     // 			const amrex::Real* p0_new,
     // 			const amrex::Real* dt);
+    //////////////////////
+
+    //////////////////////
+    // in make_reaction_rates.F90
+    void instantaneous_reaction_rates(const int* lo, const int* hi,
+				      amrex::Real* rho_omegadot, const int* o_lo, const int* o_hi,
+				      amrex::Real* rho_Hext, const int* h_lo, const int* h_hi,
+				      const amrex::Real* scal, const int* s_lo, const int* s_hi);
     //////////////////////
 
     //////////////////////
