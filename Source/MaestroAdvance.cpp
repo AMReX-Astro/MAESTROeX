@@ -1053,6 +1053,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // Define rho at half time using the new rho from Step 8
+    for (int lev=0; lev<=finest_level; ++lev) {
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        rhohalf[lev].setVal(0.);
+    }
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
     VelocityAdvance(rhohalf,umac,w0mac,w0_force,w0_force_cart,rho0_nph,grav_cell_nph,sponge);
