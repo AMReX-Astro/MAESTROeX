@@ -517,14 +517,17 @@ Maestro::ThermalConductSDC (int which_step,
 
     // Dummy coefficient matrix, holds all zeros
     Vector<MultiFab> Dcoeff(finest_level+1);
+    Vector<MultiFab> Dcoeff2(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         Dcoeff[lev].define(grids[lev], dmap[lev], 1, 1);
         Dcoeff[lev].setVal(0.);
+	Dcoeff2[lev].define(grids[lev], dmap[lev], NumSpec, 1);
+	Dcoeff2[lev].setVal(0.);
     }
 
-    // solverrhs will hold solver RHS = (rho h)^2  +
+    // solverrhs will hold solver RHS = (rho h)^hat
     //           dt/2 div . ( hcoeff1 grad h^1) -
-    //           dt/2 sum_k div . (Xkcoeff2 grad X_k^2 + Xkcoeff1 grad X_k^1) -
+    //           dt/2 sum_k div . (Xkcoeff2 grad X_k^hat + Xkcoeff1 grad X_k^1) -
     //           dt/2 div . ( pcoeff2 grad p_0^new + pcoeff1 grad p_0^old)
     Vector<MultiFab> solverrhs(finest_level+1);
     Vector<MultiFab> resid(finest_level+1);
@@ -533,27 +536,45 @@ Maestro::ThermalConductSDC (int which_step,
         resid[lev].define(grids[lev], dmap[lev], 1, 0);
     }
 
-    // compute RHS = rho^{(2)}h^{(2')}
+    // compute RHS = (rho h)^hat
+    //             = (rho h)^1 + dt . (aofs + intra)
     for (int lev = 0; lev <= finest_level; ++lev) {
-        MultiFab::Copy(solverrhs[lev],s_hat[lev],RhoH,0,1,0);
+	MultiFab::Copy(solverrhs[lev],s_hat[lev],RhoH,0,1,0);
     }
 
     // compute resid = div(hcoeff1 grad h^1) - sum_k div(Xkcoeff1 grad Xk^1) - div(pcoeff1 grad p0_old)
     MakeExplicitThermal(resid,s_old,Dcoeff,hcoeff1,Xkcoeff1,pcoeff1,p0_old,2);
-
+	
     // RHS = solverrhs + dt/2 * resid1
     for (int lev = 0; lev <= finest_level; ++lev) {
         MultiFab::LinComb(solverrhs[lev],1.0,solverrhs[lev],0,dt/2.0,resid[lev],0,0,1,0);
     }
 
-    // compute resid = 0 - sum_k div(Xkcoeff2 grad Xk^2) - div(pcoeff2 grad p0_new)
-    MakeExplicitThermal(resid,s_hat,Dcoeff,Dcoeff,Xkcoeff2,pcoeff2,p0_new,2);
+    // predictor
+    if (which_step == 1) {
+	// compute resid = 0 - sum_k div(Xkcoeff1 grad Xk^hat) - div(pcoeff1 grad p0_new)
+	MakeExplicitThermal(resid,s_hat,Dcoeff,Dcoeff,Xkcoeff1,pcoeff1,p0_new,2);
+	
+    }
+    // corrector
+    else if (which_step == 2) {
+	// compute resid = div(hcoeff2 grad h2)
+	MakeExplicitThermal(resid,s_new,Dcoeff,hcoeff2,Dcoeff2,Dcoeff,p0_new,2);
 
-    // RHS = solverrhs + dt/2 * resid2
-    for (int lev = 0; lev <= finest_level; ++lev) {
-        MultiFab::LinComb(solverrhs[lev],1.0,solverrhs[lev],0,dt/2.0,resid[lev],0,0,1,0);
+	// RHS = solverrhs + dt/2 * resid
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    MultiFab::Saxpy(solverrhs[lev],dt/2.0,resid[lev],0,0,1,0);
+	}
+	
+	// compute resid = - sum_k div(Xkcoeff2 grad Xk^hat) - div(pcoeff2 grad p0_new)
+	MakeExplicitThermal(resid,s_hat,Dcoeff,Dcoeff,Xkcoeff2,pcoeff2,p0_new,2);
     }
 
+    // RHS = solverrhs + dt/2 * resid
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	MultiFab::LinComb(solverrhs[lev],1.0,solverrhs[lev],0,dt/2.0,resid[lev],0,0,1,0);
+    }
+    
     // LHS coefficients for solver
     Vector<MultiFab> acoef(finest_level+1);
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > face_bcoef(finest_level+1);
@@ -572,7 +593,12 @@ Maestro::ThermalConductSDC (int which_step,
     }
 
     // average face-centered Bcoefficients
-    PutDataOnFaces(hcoeff2, face_bcoef, 1);
+    if (which_step == 1) {
+	PutDataOnFaces(hcoeff1, face_bcoef, 1);
+    }
+    else if (which_step == 2) {
+	PutDataOnFaces(hcoeff2, face_bcoef, 1);
+    }
 
     // initialize value of phi to h^(2) as a guess
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -626,14 +652,20 @@ Maestro::ThermalConductSDC (int which_step,
         mlabec.setLevelBC(lev, &phi[lev]);
     }
 
-    mlabec.setScalars(1.0, -dt/2.0);
+    // set timestep
+    if (which_step == 1) {
+	mlabec.setScalars(1.0, -dt/2.0);
+    }
+    else if (which_step == 2) {
+	mlabec.setScalars(1.0, -dt);
+    }
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         mlabec.setACoeffs(lev, acoef[lev]);
         mlabec.setBCoeffs(lev, amrex::GetArrOfConstPtrs(face_bcoef[lev]));
     }
 
-    // solve A - dt/2 * div B grad phi = RHS
+    // solve A - timestep * div B grad phi = RHS
 
     // build an MLMG solver
     MLMG thermal_mlmg(mlabec);
