@@ -110,6 +110,10 @@ Maestro::WriteCheckPoint (int step) {
 				             amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "dSdt"));
 				VisMF::Write(S_cc_new[lev],
 				             amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "S_cc_new"));
+#ifdef SDC
+				VisMF::Write(intra[lev],
+				             amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "intra"));
+#endif
 		}
 
 		// write out the cell-centered base state
@@ -243,6 +247,7 @@ Maestro::ReadCheckPoint ()
 						rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 
 						pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
+						intra[lev].define(ba, dm, Nscal, 0); // for sdc
 
 						if (spherical == 1) {
 								normal[lev].define(ba, dm, 1, 1);
@@ -268,6 +273,10 @@ Maestro::ReadCheckPoint ()
 				            amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "dSdt"));
 				VisMF::Read(S_cc_old[lev],
 				            amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "S_cc_new"));
+#ifdef SDC
+				VisMF::Read(intra[lev],
+				            amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "intra"));
+#endif
 		}
 
 		// get the elapsed CPU time to now;
