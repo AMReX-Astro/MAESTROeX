@@ -328,7 +328,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 
 	pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
-	intra[lev].define(grids[lev], dmap[lev], Nscal, 0); // for sdc
+	intra[lev].define(ba, dm, Nscal, 0); // for sdc
 
 	sold              [lev].setVal(0.);
 	snew              [lev].setVal(0.);
