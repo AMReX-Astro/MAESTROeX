@@ -6,16 +6,16 @@ maestro.perturb_model = false
 maestro.drdxfac = 5
 
 # PROBLEM SIZE
-geometry.prob_lo     =  0.0      0.0
-geometry.prob_hi     =  0.625e0  5.e0
+geometry.prob_lo     =  0.0      0.0       0.0
+geometry.prob_hi     =  0.625e0  0.625e0   5.e0
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
-maestro.lo_bc = 0 1 2
-maestro.hi_bc = 0 2 2
-geometry.is_periodic =  1 0 0
+maestro.lo_bc = 0 0 1
+maestro.hi_bc = 0 0 2
+geometry.is_periodic =  1 1 0
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
@@ -24,7 +24,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 128 1024
+amr.n_cell             = 32 32 256
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -36,8 +36,8 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.temperr = 6.5e8 6.5e8 6.5e8
 
 # TIME STEPPING
-maestro.max_step  = 30000000
-maestro.stop_time = 5.e-5
+maestro.max_step  = 20
+maestro.stop_time = 1.e0
 maestro.cfl       = 0.5    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
@@ -48,7 +48,7 @@ maestro.cfl       = 0.5    # cfl number for hyperbolic system
 maestro.spherical = 0
 maestro.evolve_base_state = false
 maestro.do_initial_projection = true
-maestro.init_divu_iter        = 2
+maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
 maestro.do_smallscale = true
 maestro.beta0_type = 3
@@ -57,6 +57,7 @@ maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
 maestro.grav_const = 0.e0
+maestro.use_thermal_diffusion = true
 
 maestro.init_shrink = 0.1e0
 maestro.max_dt_growth = 1.2e0
@@ -70,6 +71,7 @@ maestro.plot_int   = -1      # number of timesteps between plot files
 maestro.plot_deltat = 1.e-5
 maestro.small_plot_base_name = smallflame_
 maestro.small_plot_int = 100
+maestro.small_plot_deltat = 1.e-5
 
 # CHECKPOINT
 maestro.check_base_name = chk
@@ -99,13 +101,13 @@ maestro.do_burning = true
 &probin
 
   ! override the default values of the probin namelist values here
-  dens_fuel = 5.d7
-  temp_fuel = 1.d8
-  xc12_fuel = 0.5d0
-  vel_fuel = 1.d5
-  temp_ash = 3.d9
-  interface_pos_frac = 0.125d0
-  smooth_len_frac = 0.025d0
+  dens_fuel = 5.e7
+  temp_fuel = 1.e8
+  xc12_fuel = 0.5e0
+  vel_fuel = 1.e5
+  temp_ash = 3.e9
+  interface_pos_frac = 0.125e0
+  smooth_len_frac = 0.025e0
 
   !extern
 
@@ -118,6 +120,8 @@ maestro.do_burning = true
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  !eos_gamma = 1.6666666d0
+  use_eos_coulomb = T
+
+  !eos_gamma = 1.6666666e0
 
 /
