@@ -21,7 +21,6 @@ contains
        hcoeff, h_lo, h_hi, &
        Xkcoeff, xk_lo, xk_hi, &
        pcoeff, p_lo, p_hi) bind(C,name="make_thermal_coeffs")
-
     ! create the coefficients for grad{T}, grad{h}, grad{X_k}, and grad{p_0}
     ! for the thermal diffusion term in the enthalpy equation.
     !

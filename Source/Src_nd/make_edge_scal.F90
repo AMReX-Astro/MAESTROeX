@@ -1,16 +1,16 @@
-! make_edge_scal constructs the edge state of a scalar, using a
-! second-order Taylor expansion in space (through dx/2) and time
-! (though dt/2) (if ppm_type = 0) or using PPM (for ppm_type = 1,2).
-!
-! We use only MAC-projected edge velocities in this prediction.
-!
-! We are computing all edge states for each variable.  This is what is
-! done for the final updates of the state variables and velocity.  For
-! velocity, we should set is_vel = .true.
 
 #include "AMReX_BC_TYPES.H"
 
 module make_edge_scal_module
+  ! make_edge_scal constructs the edge state of a scalar, using a
+  ! second-order Taylor expansion in space (through dx/2) and time
+  ! (though dt/2) (if ppm_type = 0) or using PPM (for ppm_type = 1,2).
+  !
+  ! We use only MAC-projected edge velocities in this prediction.
+  !
+  ! We are computing all edge states for each variable.  This is what is
+  ! done for the final updates of the state variables and velocity.  For
+  ! velocity, we should set is_vel = .true.
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
@@ -185,8 +185,8 @@ contains
        else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
           slx(lo(1),lo(2)-1:hi(2)+1,k) = srx(lo(1),lo(2)-1:hi(2)+1,k)
        else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-          slx(hi(1)+1,lo(2)-1:hi(2)+1,k) = 0.d0
-          srx(hi(1)+1,lo(2)-1:hi(2)+1,k) = 0.d0
+          slx(lo(1),lo(2)-1:hi(2)+1,k) = 0.d0
+          srx(lo(1),lo(2)-1:hi(2)+1,k) = 0.d0
        else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
        else
 #ifndef AMREX_USE_GPU

@@ -65,9 +65,83 @@ https://amrex-astro.github.io/MAESTROeX/docs/getting_started.html
 
 ## Regression and unit testing
 
-Tests are run nightly and reported here:
+MAESTROeX needs to be tested in tandem with the AMReX and Microphysics
+repo updates.  This testing is done on local machines using the AMReX
+regression test framework
+(https://github.com/AMReX-Codes/regression_testing).  Tests are run
+nightly and reported here:
 
 https://ccse.lbl.gov/pub/RegressionTesting/MAESTROeX/
+http://groot.astro.sunysb.edu/MAESTROeX/test-suite/gfortran/
+
+A number of small unit tests exist in `Exec/UNIT_TESTS` for testing
+physics solvers independently.
+
+
+## Development Model:
+
+Development generally follows the following ideas:
+
+  * New features are committed to the `development` branch.
+
+    Nightly regression testing is used to ensure that no answers
+    change (or if they do, that the changes were expected).
+
+    If a change is critical, we can cherry-pick the commit from
+    `development` to `master`.
+
+  * Contributions are welcomed from anyone.  *Any contributions that
+    have the potential to change answers should be done via pull
+    requests.*   A pull request should be generated from your fork of
+    MAESTROeX and target the `development` branch.  (If you mistakenly
+    target `master`, we can change it for you.)
+
+    If there are a number of small commits making up the PR, we may
+    wish to squash commits upon merge to have a clean history.
+    *Please ensure that your PR title and first post are descriptive,
+    since these will be used for a squashed commit message.*
+
+  * On the first workday of each month, we perform a merge of
+    `development` into `master`, in coordination with `AMReX`,
+    `MAESTROeX`, and `Microphysics`.  For this merge to take place, we
+    need to be passing the regression tests.
+
+    To accommodate this need, we close the merge window into
+    `development` a few days before the merge day.  While the merge
+    window is closed, only bug fixes should be pushed into
+    `development`.  Once the merge from `development` -> `master` is
+    done, the merge window reopens.
+
+
+## Core Developers
+
+People who make a number of substantive contributions will be named
+"core developers" of MAESTROeX.  The criteria for becoming a core
+developer are flexible, but generally involve one of the following:
+
+  * 10 non-merge commits to `MAESTROeX/Source/` or
+    `MAESTROeX/sphinx_docs/` or one of the problems that is not your
+    own science problem *or*
+
+  * addition of a new algorithm / module  *or*
+
+  * substantial input into the code design process or testing
+
+Core developers will be recognized in the following ways:
+
+  * invited to the group's slack team
+
+  * listed in the User's Guide and website as a core developer
+
+  * listed in the author list on the Zenodo DOI for the project
+    (as given in the .zenodo.json file)
+
+  * invited to co-author general code papers / proceedings describing
+    MAESTROeX, its performance, etc.  (Note: science papers will always
+    be left to the science leads to determine authorship).
+
+If a core developer is inactive for 3 years, we may reassess their
+status as a core developer.
 
 
 ## Getting help

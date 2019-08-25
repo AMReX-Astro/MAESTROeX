@@ -2,19 +2,19 @@
 Reaction Networks
 *****************
 
-Introduction to MAESTRO Networks
-================================
+Introduction to MAESTROeX Networks
+==================================
 
-MAESTRO models multiple species, described by the mass density of
+MAESTROeX models multiple species, described by the mass density of
 the fluid, :math:`\rho`, and the mass fraction of the species, :math:`X_k \equiv
 \rho_k/\rho`, where :math:`\rho_k` is the mass density of species :math:`k`. All
-MAESTRO problems, regardless of whether they model reactions, need a
+MAESTROeX problems, regardless of whether they model reactions, need a
 network. In its most basic form, the network supplies the properties
 of the species (atomic mass, atomic number) that are interpreted by
 the equation of state to compute.
 
 Additional networks will be made available in the Microphysics repo [1]_. These
-will have interfaces for both MAESTRO and CASTRO.
+will have interfaces for both MAESTROeX and CASTRO.
 
 Notes of Specific Networks
 ==========================
