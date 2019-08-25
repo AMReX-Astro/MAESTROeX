@@ -65,9 +65,17 @@ https://amrex-astro.github.io/MAESTROeX/docs/getting_started.html
 
 ## Regression and unit testing
 
-Tests are run nightly and reported here:
+MAESTROeX needs to be tested in tandem with the AMReX and Microphysics
+repo updates.  This testing is done on local machines using the AMReX
+regression test framework
+(https://github.com/AMReX-Codes/regression_testing).  Tests are run
+nightly and reported here:
 
 https://ccse.lbl.gov/pub/RegressionTesting/MAESTROeX/
+http://groot.astro.sunysb.edu/MAESTROeX/test-suite/gfortran/
+
+A number of small unit tests exist in `Exec/UNIT_TESTS` for testing
+physics solvers independently.
 
 
 ## Development Model:

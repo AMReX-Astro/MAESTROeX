@@ -340,7 +340,7 @@ the effects of corner coupling.
 
 #. Predict :math:`\wt` to r-faces using a full-dimensional extrapolation.
 
-| Predict :math:`\ut` to y-faces using a 1D extrapolation.
+* Predict :math:`\ut` to y-faces using a 1D extrapolation.
 
   .. math::
 
@@ -359,12 +359,17 @@ the effects of corner coupling.
      \ut_{R,\ib-\half\eb_y}, & v^{\trans}_{\ib-\half\eb_y} < 0. \\
      \end{cases}
 
-  Predict :math:`\ut` to r-faces using a 1D extrapolation.
-| Predict :math:`\vt` to x-faces using a 1D extrapolation.
-| Predict :math:`\vt` to r-faces using a 1D extrapolation.
-| Predict :math:`\wt` to x-faces using a 1D extrapolation.
-| Predict :math:`\wt` to y-faces using a 1D extrapolation.
-| Update prediction of :math:`\ut` to y-faces by accounting for :math:`r`-derivatives.
+* Predict :math:`\ut` to r-faces using a 1D extrapolation.
+
+* Predict :math:`\vt` to x-faces using a 1D extrapolation.
+
+* Predict :math:`\vt` to r-faces using a 1D extrapolation.
+
+* Predict :math:`\wt` to x-faces using a 1D extrapolation.
+
+* Predict :math:`\wt` to y-faces using a 1D extrapolation.
+
+* Update prediction of :math:`\ut` to y-faces by accounting for :math:`r`-derivatives.
   The notation :math:`\ut_{\ib-\half\eb_y}^{y|r}` means state :math:`\ut_{\ib-\half\eb_y}` that has been updated to account for transverse derives in the r-direction.
 
   .. math::
@@ -384,12 +389,12 @@ the effects of corner coupling.
      \ut_{R,\ib-\half\eb_y}^{y|r}, & v_{\ib-\half\eb_y}^{\trans} < 0.
      \end{cases}
 
-  Update prediction of :math:`\ut` to r-faces by accounting for :math:`y`-derivatives.
-| Update prediction of :math:`\vt` to x-faces by accounting for :math:`r`-derivatives.
-| Update prediction of :math:`\vt` to r-faces by accounting for :math:`x`-derivatives.
-| Update prediction of :math:`\wt` to x-faces by accounting for :math:`y`-derivatives.
-| Update prediction of :math:`\wt` to y-faces by accounting for :math:`x`-derivatives.
-| Predict :math:`\ut` to x-faces using a full-dimensional extrapolation.
+* Update prediction of :math:`\ut` to r-faces by accounting for :math:`y`-derivatives.
+* Update prediction of :math:`\vt` to x-faces by accounting for :math:`r`-derivatives.
+* Update prediction of :math:`\vt` to r-faces by accounting for :math:`x`-derivatives.
+* Update prediction of :math:`\wt` to x-faces by accounting for :math:`y`-derivatives.
+* Update prediction of :math:`\wt` to y-faces by accounting for :math:`x`-derivatives.
+* Predict :math:`\ut` to x-faces using a full-dimensional extrapolation.
 
   .. math::
 
@@ -411,8 +416,8 @@ the effects of corner coupling.
      \ut_{R,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} < 0.
      \end{cases}
 
-  Predict :math:`\vt` to y-faces using a full-dimensional extrapolation.
-| Predict :math:`\wt` to r-faces using a full-dimensional extrapolation.
+* Predict :math:`\vt` to y-faces using a full-dimensional extrapolation.
+* Predict :math:`\wt` to r-faces using a full-dimensional extrapolation.
   In this step, make sure you account for the :math:`\partial w_0/\partial r`
   term before solving the Riemann problem:
 
@@ -493,7 +498,7 @@ of motion are:
 
 #. Predict :math:`s` to r-faces using a full-dimensional extrapolation.
 
-| Predict :math:`s` to r-faces using a 1D extrapolation:
+* Predict :math:`s` to r-faces using a 1D extrapolation:
 
   .. math::
 
@@ -521,7 +526,8 @@ of motion are:
      s_{R,\ib-\half\eb_x}^{\edge} &=& s_{\ib}^n - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n + \frac{\dt}{2}f_{\ib}^n \end{aligned}
 
   Account for the transverse terms:
-| **if** is_conservative **then**
+
+  **if** is_conservative **then**
 
   .. math::
 
@@ -543,8 +549,10 @@ of motion are:
      \frac{\dt}{4h}\left(w^{\mac}_{\ib+\half\eb_r} + w^{\mac}_{\ib-\half\eb_r}\right)\left(s_{\ib+\half\eb_r} - s_{\ib-\half\eb_r}\right)\end{aligned}
 
   **end if**
-| Account for the :math:`\partial w_0/\partial r` term:
-| **if** is_vel **and** comp = 2 **then**
+
+* Account for the :math:`\partial w_0/\partial r` term:
+
+  **if** is_vel **and** comp = 2 **then**
 
   .. math::
 
@@ -555,7 +563,8 @@ of motion are:
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}
 
   **end if**
-| Upwind based on :math:`u^{\mac}`.
+
+* Upwind based on :math:`u^{\mac}`.
 
   .. math::
 
@@ -594,7 +603,7 @@ of motion are:
      s_{R,\ib-\half\eb_r}^{\edge} &=&  s_{\ib}^n - \left(\half + \frac{\dt}{2h}w_{\ib-\half\eb_r}^{\mac}\right)\Delta_r s_{\ib}^n + \frac{\dt}{2}f_{\ib}^n \end{aligned}
 
   Account for the transverse terms:
-| **if** is_conservative **then**
+  **if** is_conservative **then**
 
   .. math::
 
@@ -616,8 +625,9 @@ of motion are:
      \frac{\dt}{4h}\left(u^{\mac}_{\ib+\half\eb_x} + u^{\mac}_{\ib-\half\eb_x}\right)\left(s_{\ib+\half\eb_x} - s_{\ib-\half\eb_x}\right)\end{aligned}
 
   **end if**
-| Account for the :math:`\partial w_0/\partial r` term:
-| **if** is_vel **and** comp = 2 **then**
+
+* Account for the :math:`\partial w_0/\partial r` term:
+  **if** is_vel **and** comp = 2 **then**
 
   .. math::
 
@@ -628,7 +638,8 @@ of motion are:
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}
 
   **end if**
-| Upwind based on :math:`w^{\mac}`:
+
+* Upwind based on :math:`w^{\mac}`:
 
   .. math::
 
@@ -675,7 +686,7 @@ the effects of corner coupling.
 
 #. Predict :math:`s` to r-faces using a full-dimensional extrapolation.
 
-| Predict :math:`s` to x-faces using a 1D extrapolation.
+* Predict :math:`s` to x-faces using a 1D extrapolation.
 
   .. math::
 
@@ -694,13 +705,16 @@ the effects of corner coupling.
      s_{R,\ib-\half\eb_x}, & u^{\mac}_{\ib-\half\eb_x} < 0. \\
      \end{cases}
 
-  Predict :math:`s` to y-faces using a 1D extrapolation.
-| Predict :math:`s` to r-faces using a 1D extrapolation.
-| Update prediction of :math:`s` to x-faces by accounting for y-derivatives.
+* Predict :math:`s` to y-faces using a 1D extrapolation.
+
+* Predict :math:`s` to r-faces using a 1D extrapolation.
+
+* Update prediction of :math:`s` to x-faces by accounting for y-derivatives.
   The notation :math:`s_{\ib-\half\eb_x}^{x|y}` means “state :math:`s_{\ib-\half\eb_x}`
   that has been updated to account for the transverse derivatives in
   the :math:`y`-direction”.
-| **if** is_conservative **then**
+
+  **if** is_conservative **then**
 
   .. math::
 
@@ -717,7 +731,8 @@ the effects of corner coupling.
      s_{R,\ib-\half\eb_x}^{x|y} &=& s_{R,\ib-\half\eb_x} - \frac{\dt}{6h}\left(v_{\ib+\half\eb_y}^{\mac} + v_{\ib-\half\eb_y}^{\mac}\right)\left(s_{\ib+\half\eb_y} - s_{\ib-\half\eb_y}\right).\end{aligned}
 
   **end if**
-| Upwind based on :math:`u^{\mac}`:
+
+* Upwind based on :math:`u^{\mac}`:
 
   .. math::
 
@@ -728,13 +743,19 @@ the effects of corner coupling.
      s_{R,\ib-\half\eb_x}^{x|y}, & u^{\mac}_{\ib-\half\eb_x} < 0.
      \end{cases}
 
-  Update prediction of :math:`s` to x-faces by accounting for r-derivatives.
-| Update prediction of :math:`s` to y-faces by accounting for x-derivatives.
-| Update prediction of :math:`s` to y-faces by accounting for r-derivatives.
-| Update prediction of :math:`s` to r-faces by accounting for x-derivatives.
-| Update prediction of :math:`s` to r-faces by accounting for y-derivatives.
-| Predict :math:`s` to x-faces using a full-dimensional extrapolation.
-| **if** is_conservative **then**
+* Update prediction of :math:`s` to x-faces by accounting for r-derivatives.
+
+* Update prediction of :math:`s` to y-faces by accounting for x-derivatives.
+
+* Update prediction of :math:`s` to y-faces by accounting for r-derivatives.
+
+* Update prediction of :math:`s` to r-faces by accounting for x-derivatives.
+
+* Update prediction of :math:`s` to r-faces by accounting for y-derivatives.
+
+* Predict :math:`s` to x-faces using a full-dimensional extrapolation.
+
+  **if** is_conservative **then**
 
   .. math::
 
@@ -758,8 +779,10 @@ the effects of corner coupling.
      &-& \frac{\dt}{4h}\left(w_{\ib+\half\eb_r}^{\mac}+w_{\ib-\half\eb_r}^{\mac}\right)\left(s_{\ib+\half\eb_r}^{r|y}-s_{\ib-\half\eb_r}^{r|y}\right) + \frac{\dt}{2}f_{\ib}.\end{aligned}
 
   **end if**
-| Account for the :math:`\partial w_0/\partial r` term:
-| **if** is_vel **and** comp = 2 **then**
+
+* Account for the :math:`\partial w_0/\partial r` term:
+
+  **if** is_vel **and** comp = 2 **then**
 
   .. math::
 
@@ -770,7 +793,8 @@ the effects of corner coupling.
      \frac{\dt}{4h}\left(\wt^{\mac}_{\ib+\half\eb_r} + \wt^{\mac}_{\ib-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\\end{aligned}
 
   **end if**
-| Upwind based on :math:`u^{\mac}`:
+
+* Upwind based on :math:`u^{\mac}`:
 
   .. math::
 
@@ -781,12 +805,9 @@ the effects of corner coupling.
      s_{R,\ib-\half\eb_x}^{\edge}, & u^{\mac}_{\ib-\half\eb_x} < 0.
      \end{cases}
 
-  Predict :math:`s` to y-faces using a full-dimensional extrapolation.
-| Predict :math:`s` to r-faces using a full-dimensional extrapolation.
+* Predict :math:`s` to y-faces using a full-dimensional extrapolation.
+* Predict :math:`s` to r-faces using a full-dimensional extrapolation.
 
-.. raw:: latex
-
-   \newpage
 
 .. _d-spherical-case-2:
 
@@ -799,10 +820,6 @@ dimensional extrapolation for each direction when predicting velocity
 to faces. As in the plane-parallel case, make sure upwind based on
 the full velocity.
 
-.. raw:: latex
-
-   \newpage
-
 Computing :math:`\Ub^{\mac,*}` in VARDEN
 ========================================
 
@@ -811,7 +828,7 @@ Computing :math:`\Ub^{\mac,*}` in VARDEN
 2D Cartesian Case
 -----------------
 
-| We do a 1D Taylor series extrapolation to get both components of velocity at the x-face:
+* We do a 1D Taylor series extrapolation to get both components of velocity at the x-face:
 
   .. math::
 
@@ -848,9 +865,10 @@ Computing :math:`\Ub^{\mac,*}` in VARDEN
      v_{R,\ib-\half\eb_x}^{1D}, & u_{\ib-\half\eb_x}^{1D} < 0.
      \end{cases}\label{Transverse Velocity Riemann Problem}
 
-  We perform analogous operations to compute both components of velocity
+* We perform analogous operations to compute both components of velocity
   at the y-faces, :math:`\Ub_{\ib-\half\eb_y}^{1D}`.
-| Now we do a full-dimensional extrapolation to get the MAC velocity at
+
+* Now we do a full-dimensional extrapolation to get the MAC velocity at
   the x-faces (note that we only compute the normal components):
 
   .. math::
@@ -870,7 +888,7 @@ Computing :math:`\Ub^{\mac,*}` in VARDEN
      u_{R,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} < 0.
      \end{cases}\label{umac Riemann Problem}
 
-  We perform analogous operations to compute the normal velocity at the
+* We perform analogous operations to compute the normal velocity at the
   y-faces, :math:`v^{\mac,*}_{\ib-\half\eb_y}`.
 
 .. _d-cartesian-case-7:
@@ -882,8 +900,8 @@ This is more complicated than the 2D case because we include corner
 coupling. We compute :math:`\Ub_{\ib-\half\eb_x}^{1D},
 \Ub_{\ib-\half\eb_y}^{1D}`, and :math:`\Ub_{\ib-\half\eb_z}^{1D}` in an
 analogous manner as equations (`[varden U_L^1D] <#varden U_L^1D>`__)-(\ `[Transverse
-  Velocity Riemann Problem] <#Transverse
-  Velocity Riemann Problem>`__). Then we compute an intermediate state,
+Velocity Riemann Problem] <#Transverse
+Velocity Riemann Problem>`__). Then we compute an intermediate state,
 :math:`u_{\ib-\half\eb_y}^{y|z}`, which is described as “state
 :math:`u_{\ib-\half\eb_y}^{1D}` that has been updated to account for the
 transverse derivatives in the z direction”, using:
@@ -925,9 +943,6 @@ Then we use the Riemann solver given above for the 2D case (equation
 obtain :math:`v_{\ib-\half\eb_y}^{\mac,*}` and
 :math:`w_{\ib-\half\eb_z}^{\mac,*}`.
 
-.. raw:: latex
-
-   \newpage
 
 Computing :math:`\Ub^{\edge}` and :math:`\rho^{\edge}` in VARDEN
 ================================================================
@@ -1078,7 +1093,7 @@ We use an analogous procedure to compute both
 ESTATE_FPU in GODUNOV_2D/3D.f
 =============================
 
-| First, the normal predictor.
+* First, the normal predictor.
 
   .. math::
 
@@ -1104,9 +1119,11 @@ ESTATE_FPU in GODUNOV_2D/3D.f
      s_R^x, & \text{else}. \\
      \end{cases}\label{ESTATE_FPU Upwind}
 
-  Then, if :math:`|\text{UEDGE}_{\ib-\half\eb_x}| \le \epsilon`, we set :math:`s_{\ib-\half\eb_x}^x = (s_L^x+s_R^x)/2`. The procedure to obtain :math:`s_{\ib-\half\eb_y}^y` is analogous.
-| Now, the transverse terms.
-| **If** ICONSERVE **then:**
+* Then, if :math:`|\text{UEDGE}_{\ib-\half\eb_x}| \le \epsilon`, we set :math:`s_{\ib-\half\eb_x}^x = (s_L^x+s_R^x)/2`. The procedure to obtain :math:`s_{\ib-\half\eb_y}^y` is analogous.
+
+* Now, the transverse terms.
+
+  **If** ICONSERVE **then:**
 
   .. math::
 
@@ -1118,8 +1135,9 @@ ESTATE_FPU in GODUNOV_2D/3D.f
      && - \frac{\dt}{2}\left[\frac{\text{VEDGE}_{\ib+\half\eb_y}s_{\ib+\half\eb_y}^y - \text{VEDGE}_{\ib-\half\eb_y}s_{\ib-\half\eb_y}^y}{h_y}\right.\nonumber\\
      && ~~~~~~~~~~ \left. - \frac{s_{\ib}(\text{VEDGE}_{\ib+\half\eb_y}-\text{VEDGE}_{\ib-\half\eb_y})}{h_y}+s_{\ib}\text{DIVU}_{\ib}\right]\end{aligned}
 
-  Now, define :math:`\text{VBAR}_{\ib} = (\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})/2`.
-| **If** NOT ICONSERVE **and** :math:`\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} < 0` **and** :math:`\text{VBAR}_{\ib} < 0` **then:**
+* Now, define :math:`\text{VBAR}_{\ib} = (\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})/2`.
+
+  **If** NOT ICONSERVE **and** :math:`\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} < 0` **and** :math:`\text{VBAR}_{\ib} < 0` **then:**
 
   .. math::
 
@@ -1149,11 +1167,8 @@ ESTATE_FPU in GODUNOV_2D/3D.f
      \text{sedge}_R^x &=& s_{\ib} - \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
      && - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})(s_{\ib+\half\eb_y}-s_{\ib-\half\eb_y})}{2h_y}\right]\label{transverse upwinding 6}\end{aligned}
 
-  Finally, upwind analogous to equation (`[ESTATE_FPU Upwind] <#ESTATE_FPU Upwind>`__) to get :math:`\text{sedge}_{\ib-\half\eb_x}`.
+*  Finally, upwind analogous to equation (`[ESTATE_FPU Upwind] <#ESTATE_FPU Upwind>`__) to get :math:`\text{sedge}_{\ib-\half\eb_x}`.
 
-.. raw:: latex
-
-   \newpage
 
 ESTATE in GODUNOV_2D/3D.f
 =========================
@@ -1200,22 +1215,21 @@ terms use upwinding analogous to equations
 instead of UEDGE. Finally, upwind analogous to equation (`[ESTATE Upwind] <#ESTATE Upwind>`__)
 to get :math:`\text{sedge}_{\ib-\half\eb_x}`, but use UEDGE instead of UAD.
 
-.. raw:: latex
-
-   \newpage
 
 Piecewise Parabolic Method (PPM)
 ================================
 
-| Consider a scalar, :math:`s`, which we wish to predict to time-centered edges.
-  The PPM method is an improvement over the piecewise-linear method.
-  Using our notation, we modify equations (`[3D predict s to left] <#3D predict s to left>`__) and
-  (`[3D predict s to right] <#3D predict s to right>`__) in Section
-  `4 <#Scalar Edge State Prediction in MAESTROeX>`__ to obtain better estimates
-  for the time-centered 1D edge states, :math:`s_{L/R,\ib-\myhalf\eb_x}`, etc.. Once these states
-  are obtained, we continue with the full-dimensional extrapolations as
-  described before.
-| The PPM method is described in a series of papers:
+Consider a scalar, :math:`s`, which we wish to predict to
+time-centered edges.  The PPM method is an improvement over the
+piecewise-linear method.  Using our notation, we modify equations
+(`[3D predict s to left] <#3D predict s to left>`__) and (`[3D predict
+s to right] <#3D predict s to right>`__) in Section `4 <#Scalar Edge
+State Prediction in MAESTROeX>`__ to obtain better estimates for the
+time-centered 1D edge states, :math:`s_{L/R,\ib-\myhalf\eb_x}`,
+etc.. Once these states are obtained, we continue with the
+full-dimensional extrapolations as described before.
+
+The PPM method is described in a series of papers:
 
 -  Colella and Woodward 1984 - describes the basic method.
 
@@ -1242,9 +1256,9 @@ Here are the steps for the :math:`x`-direction. For simplicity, we replace the v
 
    .. math:: \xi = \frac{x - (i-\myhalf)h}{h}, ~ 0 \le \xi \le 1.
 
--  | **Step 3:** Integrate quadratic profiles to get the average value swept over the face
+-  **Step 3:** Integrate quadratic profiles to get the average value swept over the face
      over time.
-   | Define the following integrals, where :math:`\sigma = |u|\Delta t/h`:
+   Define the following integrals, where :math:`\sigma = |u|\Delta t/h`:
 
      .. math::
 
@@ -1260,10 +1274,9 @@ Here are the steps for the :math:`x`-direction. For simplicity, we replace the v
         \mathcal{I}_{i,+}(\sigma) &=& s_{j,+} - \frac{\sigma}{2}\left[s_{j,+}-s_{j,-}-\left(1-\frac{2}{3}\sigma\right)s_{6,i}\right], \\
         \mathcal{I}_{i,-}(\sigma) &=& s_{j,-} + \frac{\sigma}{2}\left[s_{j,+}-s_{j,-}+\left(1-\frac{2}{3}\sigma\right)s_{6,i}\right].\end{aligned}
 
--  | **Step 4:** Obtain 1D edge states.
-   | Perform a 1D extrapolation, without source terms, to get
-     left and right edge states. Add the source terms later if desired/necessary.
-   |
+-  **Step 4:** Obtain 1D edge states.
+   Perform a 1D extrapolation, without source terms, to get
+   left and right edge states. Add the source terms later if desired/necessary.
 
      .. math::
 
@@ -1341,7 +1354,8 @@ holds, then for that choice of :math:`\pm = +,-` we set:
 Colella and Sekora Based Approach
 ---------------------------------
 
-| Spatially interpolate :math:`s` to edges.
+* Spatially interpolate :math:`s` to edges.
+
   Use a 4th-order interpolation in space to obtain edge values:
 
   .. math:: s_{i+\myhalf} = \frac{7}{12}\left(s_{i+1}+s_i\right) - \frac{1}{12}\left(s_{i+2}+s_{i-1}\right).
@@ -1396,7 +1410,8 @@ Colella and Sekora Based Approach
   :math:`(Ds)_{i,\pm} = (Ds)_{i,{\rm face},\pm}`. Otherwise, set
   :math:`(Ds)_{i,\pm} = (Ds)_{i,{\rm cc},\pm}`. Finally, we are at an extreumum if
   :math:`(Ds)_{i,+}(Ds)_{i,-} \le 0`.
-| Now that we have finished the extremum tests, if we are at an extremum,
+
+* Now that we have finished the extremum tests, if we are at an extremum,
   we scale :math:`\alpha_{i,\pm}`. First, we define
 
   .. math::
