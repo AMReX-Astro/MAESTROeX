@@ -35,7 +35,11 @@ bibliography: paper.bib
 ---
 
 # Summary
-Many astrophysical flows are highly subsonic. In this regime, sound waves carry sufficiently
+``MAESTROeX`` is a massively parallel, finite-volume C++/F90 solver for low Mach number
+astrophysical flows.  It utilizes the low Mach number equation set allowing for more
+efficient, long-time integration of highly subsonic flows than compressible approaches.
+
+In the highly subsonic regime where many astrophysical flows occur, sound waves carry sufficiently
 little energy that they do not significantly affect the convective dynamics of the system.
 In many of these flows, modeling long-time convective dynamics are of interest, and numerical
 approaches based on compressible hydrodynamics are intractable, even on modern supercomputers.
@@ -43,30 +47,29 @@ One approach to this problem is to use low Mach number models. In a low Mach num
 approach, sound waves are eliminated from the governing equations while retaining
 compressibilitiy effects due to, e.g., nuclear energy release, stratification,
 compositional changes, and thermal diffusion. When the Mach number (the ratio
-of the characteristic fluid velocity over the characteristic sound speed; Ma = U/c) is small,
+of the characteristic fluid velocity over the characteristic sound speed; `Ma = U/c`) is small,
 the resulting system can be numerically integrated with much larger time steps than a
-compressible model. Specifically, the time step increase is at least a factor of ∼ 1/Ma larger.
+compressible model. Specifically, the time step increase is at least a factor of `∼ 1/Ma` larger.
 
-``MAESTROeX`` is a massively parallel, finite-volume C++/F90 solver for low Mach number
-astrophysical flows.  The underlying low Mach number equation set allows for efficient,
-long-time integration for
-highly subsonic flows compared to compressible approaches.  ``MAESTROeX`` is suitable for
-modeling full spherical stars as well as well as planar simulations of dynamics within
-localized regions of a star, and can robustly handle several orders of magnitude of density
-and pressure stratification.  The code leverages the new AMReX software framework [@AMReX]
-for block-structured adaptive mesh refinement (AMR) applications, allowing for scalability
+``MAESTROeX`` is suitable for modeling full spherical stars as well as planar simulations
+of dynamics within localized regions of a star, and can robustly handle several orders of magnitude
+of density and pressure stratification.
+The code leverages the new AMReX software framework [@AMReX] for block-structured
+adaptive mesh refinement (AMR) applications, allowing for scalability
 to large fractions of leadership-class machines.
 Our approach to parallization uses a hybrid MPI/OpenMP approach, with increasing GPU support.
 Microphysics are provided by the Starkiller-Astro libraries [@starkiller].
 The code contains documentation through sphinx, a large suite of test problems, and
 nightly regression tests on a number of architectures.
 
-The numerical algorithm is described in a series of papers (see @maestro; @maestroex; and
-references therein) and couples modules for advection (corner transport upwind),
+Since the series of papers on its predecessor ``MAESTRO`` have been published (see @maestro
+and references therein), numerous developments have been made to ``MAESTROeX`` to
+reduce algorithm complexity and improve parallel performance.
+The current numerical algorithm (@maestroex) couples modules for advection (corner transport upwind),
 reactions (VODE), thermal diffusion (linear solvers / multigrid),
 pressure-projection approaches (linear solvers / multigrid), and spatial mapping routines
 used to define and evolve a one-dimensional hydrostatic base state.
-``MAESTROeX`` has been used to study a number of problems including convection
+``MAESTROeX`` and ``MAESTRO`` have been used to study a number of problems including convection
 in Chandrasekhar mass models for type Ia supernovae, convection in massive stars,
 sub-Chandrasekhar white dwarfs, and type I X-ray bursts.
 
