@@ -1,18 +1,18 @@
-! compute the PPM integrals, Ip and Im.  These are the integrals under
-! the parabolic profile of the reconstructed quantity over the domain
-! that can reach the interface over the timestep dt.
-!
-! Ip captures the amount of the state that can reach the right
-! interface of the cell and Im captures what can reach the left
-! interface of the cell over the step.
-!
-! There are cases here: one (originally called the 'fpu version') uses
-! the MAC velocity for the tracing while the non-fpu versions use the
-! cell-centered velocity.
 
 #include "AMReX_BC_TYPES.H"
 
 module ppm_module
+  ! compute the PPM integrals, Ip and Im.  These are the integrals under
+  ! the parabolic profile of the reconstructed quantity over the domain
+  ! that can reach the interface over the timestep dt.
+  !
+  ! Ip captures the amount of the state that can reach the right
+  ! interface of the cell and Im captures what can reach the left
+  ! interface of the cell over the step.
+  !
+  ! There are cases here: one (originally called the 'fpu version') uses
+  ! the MAC velocity for the tracing while the non-fpu versions use the
+  ! cell-centered velocity.
 
   use amrex_error_module
   use amrex_constants_module
@@ -32,12 +32,11 @@ contains
        Ip,ip_lo,ip_hi,Im,im_lo,im_hi,&
        domlo,domhi,adv_bc,&
        dx,dt,is_umac,comp,bccomp) bind(C,name="ppm_2d")
-
-    implicit none
-
     ! note that u,v here may be the normal cell-centered velocity,
     ! or the MAC velocity.  The is_umac argument tells us which it
     ! is.
+
+    implicit none
 
     integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3),s_lo(3),s_hi(3)
     integer         , intent(in   ) :: u_lo(3),u_hi(3),v_lo(3),v_hi(3)
@@ -129,6 +128,10 @@ contains
              sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
              sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
 
+             ! save for later 
+             sedgel = sp
+             sedger = sm
+
              ! modify using quadratic limiters
              if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
                 sp = s(i,j,k,n)
@@ -140,7 +143,7 @@ contains
              end if
 
              ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
-             if (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
+             if (i .eq. domlo(1)) then
                 if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
                    ! make sure sedge lies in between adjacent cell-centered values
@@ -148,35 +151,34 @@ contains
                    sm = s(i-1,j,k,n)
 
                    ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   sp = &
                         -FIFTH        *s(i-1,j,k,n) &
                         + (THREE/FOUR)*s(i,j,k,n) &
                         + HALF        *s(i+1,j,k,n) &
                         - (ONE/20.0d0)*s(i+2,j,k,n)
 
-                   sedge = max(sedge,min(s(i+1,j,k,n),s(i,j,k,n)))
-                   sedge = min(sedge,max(s(i+1,j,k,n),s(i,j,k,n)))
-
-                   sp = sedge
+                   sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
+                   sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
                 end if
              end if
 
-             if (i .eq. lo(1)+2 .and. lo(1)+1 .eq. domlo(1)) then
+             if (i .eq. domlo(1)+1) then
                 if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
                    ! make sure sedge lies in between adjacent cell-centered values
 
-                   ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   ! use a modified stencil to get sm on the first interior edge
+                   sm = &
                         -FIFTH        *s(i-2,j,k,n) &
                         + (THREE/FOUR)*s(i-1,j,k,n) &
                         + HALF        *s(i,j,k,n) &
                         - (ONE/20.0d0)*s(i+1,j,k,n)
 
-                   sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)))
-                   sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)))
+                   sm = max(sm,min(s(i,j,k,n),s(i-1,j,k,n)))
+                   sm = min(sm,max(s(i,j,k,n),s(i-1,j,k,n)))
 
-                   sm = sedge
+                   ! reset sp on second interior edge
+                   sp = sedgel
 
                    ! modify using quadratic limiters
                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
@@ -190,43 +192,41 @@ contains
                 end if
              end if
 
-             if (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
+             if (i .eq. domhi(1)) then
                 if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
                    ! the value in the first cc ghost cell represents the edge value
                    sp = s(i+1,j,k,n)
 
                    ! make sure sedge lies in between adjacent cell-centered values
                    ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   sm = &
                         -FIFTH        *s(i+1,j,k,n) &
                         + (THREE/FOUR)*s(i,j,k,n) &
                         + HALF        *s(i-1,j,k,n) &
                         - (ONE/20.0d0)*s(i-2,j,k,n)
 
-                   sedge = max(sedge,min(s(i-1,j,k,n),s(i,j,k,n)))
-                   sedge = min(sedge,max(s(i-1,j,k,n),s(i,j,k,n)))
-
-                   sm = sedge
+                   sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)))
+                   sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)))
 
                 end if
              end if
 
-             if (i .eq. hi(1)-2 .and. hi(1)-1 .eq. domhi(1)) then
+             if (i .eq. domhi(1)-1) then
                 if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                    ! make sure sedge lies in between adjacent cell-centered values
-                   ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   ! use a modified stencil to get sp on the first interior edge
+                   sp = &
                         -FIFTH        *s(i+2,j,k,n) &
                         + (THREE/FOUR)*s(i+1,j,k,n) &
                         + HALF        *s(i,j,k,n) &
                         - (ONE/20.0d0)*s(i-1,j,k,n)
 
-                   sedge = max(sedge,min(s(i,j,k,n),s(i+1,j,k,n)))
-                   sedge = min(sedge,max(s(i,j,k,n),s(i+1,j,k,n)))
+                   sp = max(sp,min(s(i,j,k,n),s(i+1,j,k,n)))
+                   sp = min(sp,max(s(i,j,k,n),s(i+1,j,k,n)))
 
-                   ! copy sedge into sp and sm
-                   sp = sedge
+                   ! reset sm on second interior edge
+                   sm = sedger
 
                    ! modify using quadratic limiters
                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
@@ -423,255 +423,250 @@ contains
 
 
              ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
-             ! if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
-             if (lo(1)+1 .eq. domlo(1)) then
-                if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
+             if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
-                   if (i .eq. lo(1)+1) then
+                if (i .eq. domlo(1)) then
 
-                      ! the value in the first cc ghost cell represents the edge value
-                      sm    = s(i-1,j,k,n)
-                      sedge = s(i-1,j,k,n)
+                   ! the value in the first cc ghost cell represents the edge value
+                   sm    = s(i-1,j,k,n)
+                   sedge = s(i-1,j,k,n)
 
-                      ! use a modified stencil to get sedge on the first interior edge
-                      sedger = &
-                           -FIFTH        *s(i-1,j,k,n) &
-                           + (THREE/FOUR)*s(i,j,k,n) &
-                           + HALF        *s(i+1,j,k,n) &
-                           - (ONE/20.0d0)*s(i+2,j,k,n)
+                   ! use a modified stencil to get sedge on the first interior edge
+                   sedger = &
+                        -FIFTH        *s(i-1,j,k,n) &
+                        + (THREE/FOUR)*s(i,j,k,n) &
+                        + HALF        *s(i+1,j,k,n) &
+                        - (ONE/20.0d0)*s(i+2,j,k,n)
 
-                      sedger = max(sedger,min(s(i+1,j,k,n),s(i,j,k,n)))
-                      sedger = min(sedger,max(s(i+1,j,k,n),s(i,j,k,n)))
+                   sedger = max(sedger,min(s(i+1,j,k,n),s(i,j,k,n)))
+                   sedger = min(sedger,max(s(i+1,j,k,n),s(i,j,k,n)))
 
-                      sp = sedger
+                   sp = sedger
 
-                   elseif (i .eq. lo(1)+2) then
+                elseif (i .eq. domlo(1)+1) then
 
-                      ! use a modified stencil to get sedge on the first interior edge
-                      sedge = &
-                           -FIFTH        *s(i-2,j,k,n) &
-                           + (THREE/FOUR)*s(i-1,j,k,n) &
-                           + HALF        *s(i,j,k,n) &
-                           - (ONE/20.0d0)*s(i+1,j,k,n)
+                   ! use a modified stencil to get sedge on the first interior edge
+                   sedge = &
+                        -FIFTH        *s(i-2,j,k,n) &
+                        + (THREE/FOUR)*s(i-1,j,k,n) &
+                        + HALF        *s(i,j,k,n) &
+                        - (ONE/20.0d0)*s(i+1,j,k,n)
 
-                      sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)))
+                   sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)))
+                   sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)))
 
-                   elseif (i .eq. lo(1)+3) then
+                elseif (i .eq. domlo(1)+2) then
 
-                      ! use a modified stencil to get sedge on the first interior edge
-                      sedgel = &
-                           -FIFTH        *s(i-3,j,k,n) &
-                           + (THREE/FOUR)*s(i-2,j,k,n) &
-                           + HALF        *s(i-1,j,k,n) &
-                           - (ONE/20.0d0)*s(i,j,k,n)
+                   ! use a modified stencil to get sedge on the first interior edge
+                   sedgel = &
+                        -FIFTH        *s(i-3,j,k,n) &
+                        + (THREE/FOUR)*s(i-2,j,k,n) &
+                        + HALF        *s(i-1,j,k,n) &
+                        - (ONE/20.0d0)*s(i,j,k,n)
 
-                      sedgel = max(sedgel,min(s(i-1,j,k,n),s(i-2,j,k,n)))
-                      sedgel = min(sedgel,max(s(i-1,j,k,n),s(i-2,j,k,n)))
+                   sedgel = max(sedgel,min(s(i-1,j,k,n),s(i-2,j,k,n)))
+                   sedgel = min(sedgel,max(s(i-1,j,k,n),s(i-2,j,k,n)))
 
-                   endif
+                endif
 
-                   ! apply Colella 2008 limiters to compute sm and sp in the second
-                   ! and third inner cells
+                ! apply Colella 2008 limiters to compute sm and sp in the second
+                ! and third inner cells
 
-                   if (i .eq. lo(1)+2 .or. i .eq. lo(1)+3) then
+                if (i .eq. domlo(1)+1 .or. i .eq. domlo(1)+2) then
 
-                      alphap = sedger-s(i,j,k,n)
-                      alpham = sedge-s(i,j,k,n)
-                      bigp = abs(alphap).gt.TWO*abs(alpham)
-                      bigm = abs(alpham).gt.TWO*abs(alphap)
-                      extremum = .false.
+                   alphap = sedger-s(i,j,k,n)
+                   alpham = sedge-s(i,j,k,n)
+                   bigp = abs(alphap).gt.TWO*abs(alpham)
+                   bigm = abs(alpham).gt.TWO*abs(alphap)
+                   extremum = .false.
 
-                      if (alpham*alphap .ge. ZERO) then
-                         extremum = .true.
-                      else if (bigp .or. bigm) then
-                         ! Possible extremum. We look at cell centered values and face
-                         ! centered values for a change in sign in the differences adjacent to
-                         ! the cell. We use the pair of differences whose minimum magnitude is the
-                         ! largest, and thus least susceptible to sensitivity to roundoff.
-                         dafacem = sedge - sedgel
-                         dafacep = sedgerr - sedge
-                         dabarm = s(i,j,k,n) - s(i-1,j,k,n)
-                         dabarp = s(i+1,j,k,n) - s(i,j,k,n)
-                         dafacemin = min(abs(dafacem),abs(dafacep))
-                         dabarmin= min(abs(dabarm),abs(dabarp))
-                         if (dafacemin.ge.dabarmin) then
-                            dachkm = dafacem
-                            dachkp = dafacep
-                         else
-                            dachkm = dabarm
-                            dachkp = dabarp
-                         endif
-                         extremum = (dachkm*dachkp .le. 0.d0)
-                      end if
-
-                      if (extremum) then
-                         D2  = SIX*(alpham + alphap)
-                         D2L = s(i-2,j,k,n)-TWO*s(i-1,j,k,n)+s(i,j,k,n)
-                         D2R = s(i,j,k,n)-TWO*s(i+1,j,k,n)+s(i+2,j,k,n)
-                         D2C = s(i-1,j,k,n)-TWO*s(i,j,k,n)+s(i+1,j,k,n)
-                         sgn = sign(ONE,D2)
-                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                         D2ABS = max(abs(D2),1.d-10)
-                         alpham = alpham*D2LIM/D2ABS
-                         alphap = alphap*D2LIM/D2ABS
+                   if (alpham*alphap .ge. ZERO) then
+                      extremum = .true.
+                   else if (bigp .or. bigm) then
+                      ! Possible extremum. We look at cell centered values and face
+                      ! centered values for a change in sign in the differences adjacent to
+                      ! the cell. We use the pair of differences whose minimum magnitude is the
+                      ! largest, and thus least susceptible to sensitivity to roundoff.
+                      dafacem = sedge - sedgel
+                      dafacep = sedgerr - sedge
+                      dabarm = s(i,j,k,n) - s(i-1,j,k,n)
+                      dabarp = s(i+1,j,k,n) - s(i,j,k,n)
+                      dafacemin = min(abs(dafacem),abs(dafacep))
+                      dabarmin= min(abs(dabarm),abs(dabarp))
+                      if (dafacemin.ge.dabarmin) then
+                         dachkm = dafacem
+                         dachkp = dafacep
                       else
-                         if (bigp) then
-                            sgn = sign(ONE,alpham)
-                            amax = -alphap**2 / (4*(alpham + alphap))
-                            delam = s(i-1,j,k,n) - s(i,j,k,n)
-                            if (sgn*amax .ge. sgn*delam) then
-                               if (sgn*(delam - alpham).ge.1.d-10) then
-                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                               else
-                                  alphap = -TWO*alpham
-                               endif
-                            endif
-                         end if
-                         if (bigm) then
-                            sgn = sign(ONE,alphap)
-                            amax = -alpham**2 / (4*(alpham + alphap))
-                            delap = s(i+1,j,k,n) - s(i,j,k,n)
-                            if (sgn*amax .ge. sgn*delap) then
-                               if (sgn*(delap - alphap).ge.1.d-10) then
-                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                               else
-                                  alpham = -TWO*alphap
-                               endif
-                            endif
-                         end if
-                      end if
-
-                      sm = s(i,j,k,n) + alpham
-                      sp = s(i,j,k,n) + alphap
-
+                         dachkm = dabarm
+                         dachkp = dabarp
+                      endif
+                      extremum = (dachkm*dachkp .le. 0.d0)
                    end if
+
+                   if (extremum) then
+                      D2  = SIX*(alpham + alphap)
+                      D2L = s(i-2,j,k,n)-TWO*s(i-1,j,k,n)+s(i,j,k,n)
+                      D2R = s(i,j,k,n)-TWO*s(i+1,j,k,n)+s(i+2,j,k,n)
+                      D2C = s(i-1,j,k,n)-TWO*s(i,j,k,n)+s(i+1,j,k,n)
+                      sgn = sign(ONE,D2)
+                      D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                      D2ABS = max(abs(D2),1.d-10)
+                      alpham = alpham*D2LIM/D2ABS
+                      alphap = alphap*D2LIM/D2ABS
+                   else
+                      if (bigp) then
+                         sgn = sign(ONE,alpham)
+                         amax = -alphap**2 / (4*(alpham + alphap))
+                         delam = s(i-1,j,k,n) - s(i,j,k,n)
+                         if (sgn*amax .ge. sgn*delam) then
+                            if (sgn*(delam - alpham).ge.1.d-10) then
+                               alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                            else
+                               alphap = -TWO*alpham
+                            endif
+                         endif
+                      end if
+                      if (bigm) then
+                         sgn = sign(ONE,alphap)
+                         amax = -alpham**2 / (4*(alpham + alphap))
+                         delap = s(i+1,j,k,n) - s(i,j,k,n)
+                         if (sgn*amax .ge. sgn*delap) then
+                            if (sgn*(delap - alphap).ge.1.d-10) then
+                               alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                            else
+                               alpham = -TWO*alphap
+                            endif
+                         endif
+                      end if
+                   end if
+
+                   sm = s(i,j,k,n) + alpham
+                   sp = s(i,j,k,n) + alphap
+
                 end if
              end if
 
-             if (hi(1)-1 .eq. domhi(1)) then
-                if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
+             if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
-                   if (i .eq. hi(1)-1) then
+                if (i .eq. domhi(1)) then
 
-                      ! the value in the first cc ghost cell represents the edge value
-                      sp      = s(i+1,j,k,n)
-                      sedge = s(i+1,j,k,n)
+                   ! the value in the first cc ghost cell represents the edge value
+                   sp      = s(i+1,j,k,n)
+                   sedge = s(i+1,j,k,n)
 
-                      ! use a modified stencil to get sedge on the first interior edge
-                      sedge = &
-                           -FIFTH        *s(i+1,j,k,n) &
-                           + (THREE/FOUR)*s(i,j,k,n) &
-                           + HALF        *s(i-1,j,k,n) &
-                           - (ONE/20.0d0)*s(i-2,j,k,n)
+                   ! use a modified stencil to get sedge on the first interior edge
+                   sedge = &
+                        -FIFTH        *s(i+1,j,k,n) &
+                        + (THREE/FOUR)*s(i,j,k,n) &
+                        + HALF        *s(i-1,j,k,n) &
+                        - (ONE/20.0d0)*s(i-2,j,k,n)
 
-                      sedge = max(sedge,min(s(i-1,j,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i-1,j,k,n),s(i,j,k,n)))
+                   sedge = max(sedge,min(s(i-1,j,k,n),s(i,j,k,n)))
+                   sedge = min(sedge,max(s(i-1,j,k,n),s(i,j,k,n)))
 
-                      sm = sedge
+                   sm = sedge
 
-                   elseif (i .eq. hi(1)-2) then
+                elseif (i .eq. domhi(1)-1) then
 
-                      sedgerr = s(i+2,j,k,n)
+                   sedgerr = s(i+2,j,k,n)
 
-                      sedger = &
-                           -FIFTH        *s(i+2,j,k,n) &
-                           + (THREE/FOUR)*s(i+1,j,k,n) &
-                           + HALF        *s(i,j,k,n) &
-                           - (ONE/20.0d0)*s(i-1,j,k,n)
+                   sedger = &
+                        -FIFTH        *s(i+2,j,k,n) &
+                        + (THREE/FOUR)*s(i+1,j,k,n) &
+                        + HALF        *s(i,j,k,n) &
+                        - (ONE/20.0d0)*s(i-1,j,k,n)
 
-                      sedger = max(sedger,min(s(i,j,k,n),s(i-1,j,k,n)))
-                      sedger = min(sedger,max(s(i,j,k,n),s(i-1,j,k,n)))
+                   sedger = max(sedger,min(s(i,j,k,n),s(i-1,j,k,n)))
+                   sedger = min(sedger,max(s(i,j,k,n),s(i-1,j,k,n)))
 
-                   elseif (i .eq. hi(1)-3) then
+                elseif (i .eq. domhi(1)-2) then
 
-                      sedgerr = &
-                           -FIFTH        *s(i+3,j,k,n) &
-                           + (THREE/FOUR)*s(i+2,j,k,n) &
-                           + HALF        *s(i+1,j,k,n) &
-                           - (ONE/20.0d0)*s(i,j,k,n)
+                   sedgerr = &
+                        -FIFTH        *s(i+3,j,k,n) &
+                        + (THREE/FOUR)*s(i+2,j,k,n) &
+                        + HALF        *s(i+1,j,k,n) &
+                        - (ONE/20.0d0)*s(i,j,k,n)
 
-                      sedgerr = max(sedgerr,min(s(i+1,j,k,n),s(i+2,j,k,n)))
-                      sedgerr = min(sedgerr,max(s(i+1,j,k,n),s(i+2,j,k,n)))
+                   sedgerr = max(sedgerr,min(s(i+1,j,k,n),s(i+2,j,k,n)))
+                   sedgerr = min(sedgerr,max(s(i+1,j,k,n),s(i+2,j,k,n)))
 
-                   endif
+                endif
 
-                   !
-                   ! ! apply Colella 2008 limiters to compute sm and sp in the second
-                   ! ! and third inner cells
+                !
+                ! ! apply Colella 2008 limiters to compute sm and sp in the second
+                ! ! and third inner cells
 
-                   if (i .eq. hi(1)-3 .or. i .eq. hi(1)-2) then
+                if (i .eq. domhi(1)-2 .or. i .eq. domhi(1)-1) then
 
-                      alphap = sedger-s(i,j,k,n)
-                      alpham = sedge-s(i,j,k,n)
-                      bigp = abs(alphap).gt.TWO*abs(alpham)
-                      bigm = abs(alpham).gt.TWO*abs(alphap)
-                      extremum = .false.
+                   alphap = sedger-s(i,j,k,n)
+                   alpham = sedge-s(i,j,k,n)
+                   bigp = abs(alphap).gt.TWO*abs(alpham)
+                   bigm = abs(alpham).gt.TWO*abs(alphap)
+                   extremum = .false.
 
-                      if (alpham*alphap .ge. ZERO) then
-                         extremum = .true.
-                      else if (bigp .or. bigm) then
-                         ! Possible extremum. We look at cell centered values and face
-                         ! centered values for a change in sign in the differences adjacent to
-                         ! the cell. We use the pair of differences whose minimum magnitude is the
-                         ! largest, and thus least susceptible to sensitivity to roundoff.
-                         dafacem = sedge - sedgel
-                         dafacep = sedgerr - sedger
-                         dabarm = s(i,j,k,n) - s(i-1,j,k,n)
-                         dabarp = s(i+1,j,k,n) - s(i,j,k,n)
-                         dafacemin = min(abs(dafacem),abs(dafacep))
-                         dabarmin= min(abs(dabarm),abs(dabarp))
-                         if (dafacemin.ge.dabarmin) then
-                            dachkm = dafacem
-                            dachkp = dafacep
-                         else
-                            dachkm = dabarm
-                            dachkp = dabarp
-                         endif
-                         extremum = (dachkm*dachkp .le. 0.d0)
-                      end if
-
-                      if (extremum) then
-                         D2  = SIX*(alpham + alphap)
-                         D2L = s(i-2,j,k,n)-TWO*s(i-1,j,k,n)+s(i,j,k,n)
-                         D2R = s(i,j,k,n)-TWO*s(i+1,j,k,n)+s(i+2,j,k,n)
-                         D2C = s(i-1,j,k,n)-TWO*s(i,j,k,n)+s(i+1,j,k,n)
-                         sgn = sign(ONE,D2)
-                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                         D2ABS = max(abs(D2),1.d-10)
-                         alpham = alpham*D2LIM/D2ABS
-                         alphap = alphap*D2LIM/D2ABS
+                   if (alpham*alphap .ge. ZERO) then
+                      extremum = .true.
+                   else if (bigp .or. bigm) then
+                      ! Possible extremum. We look at cell centered values and face
+                      ! centered values for a change in sign in the differences adjacent to
+                      ! the cell. We use the pair of differences whose minimum magnitude is the
+                      ! largest, and thus least susceptible to sensitivity to roundoff.
+                      dafacem = sedge - sedgel
+                      dafacep = sedgerr - sedger
+                      dabarm = s(i,j,k,n) - s(i-1,j,k,n)
+                      dabarp = s(i+1,j,k,n) - s(i,j,k,n)
+                      dafacemin = min(abs(dafacem),abs(dafacep))
+                      dabarmin= min(abs(dabarm),abs(dabarp))
+                      if (dafacemin.ge.dabarmin) then
+                         dachkm = dafacem
+                         dachkp = dafacep
                       else
-                         if (bigp) then
-                            sgn = sign(ONE,alpham)
-                            amax = -alphap**2 / (4*(alpham + alphap))
-                            delam = s(i-1,j,k,n) - s(i,j,k,n)
-                            if (sgn*amax .ge. sgn*delam) then
-                               if (sgn*(delam - alpham).ge.1.d-10) then
-                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                               else
-                                  alphap = -TWO*alpham
-                               endif
-                            endif
-                         end if
-                         if (bigm) then
-                            sgn = sign(ONE,alphap)
-                            amax = -alpham**2 / (4*(alpham + alphap))
-                            delap = s(i+1,j,k,n) - s(i,j,k,n)
-                            if (sgn*amax .ge. sgn*delap) then
-                               if (sgn*(delap - alphap).ge.1.d-10) then
-                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                               else
-                                  alpham = -TWO*alphap
-                               endif
-                            endif
-                         end if
-                      end if
-
-                      sm = s(i,j,k,n) + alpham
-                      sp = s(i,j,k,n) + alphap
-
+                         dachkm = dabarm
+                         dachkp = dabarp
+                      endif
+                      extremum = (dachkm*dachkp .le. 0.d0)
                    end if
+
+                   if (extremum) then
+                      D2  = SIX*(alpham + alphap)
+                      D2L = s(i-2,j,k,n)-TWO*s(i-1,j,k,n)+s(i,j,k,n)
+                      D2R = s(i,j,k,n)-TWO*s(i+1,j,k,n)+s(i+2,j,k,n)
+                      D2C = s(i-1,j,k,n)-TWO*s(i,j,k,n)+s(i+1,j,k,n)
+                      sgn = sign(ONE,D2)
+                      D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                      D2ABS = max(abs(D2),1.d-10)
+                      alpham = alpham*D2LIM/D2ABS
+                      alphap = alphap*D2LIM/D2ABS
+                   else
+                      if (bigp) then
+                         sgn = sign(ONE,alpham)
+                         amax = -alphap**2 / (4*(alpham + alphap))
+                         delam = s(i-1,j,k,n) - s(i,j,k,n)
+                         if (sgn*amax .ge. sgn*delam) then
+                            if (sgn*(delam - alpham).ge.1.d-10) then
+                               alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                            else
+                               alphap = -TWO*alpham
+                            endif
+                         endif
+                      end if
+                      if (bigm) then
+                         sgn = sign(ONE,alphap)
+                         amax = -alpham**2 / (4*(alpham + alphap))
+                         delap = s(i+1,j,k,n) - s(i,j,k,n)
+                         if (sgn*amax .ge. sgn*delap) then
+                            if (sgn*(delap - alphap).ge.1.d-10) then
+                               alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                            else
+                               alpham = -TWO*alphap
+                            endif
+                         endif
+                      end if
+                   end if
+
+                   sm = s(i,j,k,n) + alpham
+                   sp = s(i,j,k,n) + alphap
+
                 end if
              end if
              !-------------------------------------------------------------------------
@@ -777,6 +772,10 @@ contains
              sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
              sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
+             ! save for later 
+             sedgel = sp
+             sedger = sm
+
              ! modify using quadratic limiters
              if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
                 sp = s(i,j,k,n)
@@ -788,7 +787,7 @@ contains
              end if
 
              ! different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's
-             if (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
+             if (j .eq. domlo(2)) then
                 if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
                    ! the value in the first cc ghost cell represents the edge value
@@ -807,21 +806,21 @@ contains
              end if
 
              ! different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's
-             if (j .eq. lo(2)+2 .and. lo(2)+1 .eq. domlo(2)) then
+             if (j .eq. domlo(2)+1) then
                 if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
-                   ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   ! use a modified stencil to get sm on the first interior edge
+                   sm = &
                         -FIFTH        *s(i,j-2,k,n) &
                         + (THREE/FOUR)*s(i,j-1,k,n) &
                         + HALF        *s(i,j,k,n) &
                         - (ONE/20.0d0)*s(i,j+1,k,n)
 
-                   sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)))
-                   sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)))
+                   sm = max(sm,min(s(i,j,k,n),s(i,j-1,k,n)))
+                   sm = min(sm,max(s(i,j,k,n),s(i,j-1,k,n)))
 
-                   ! copy sedge into sp and sm
-                   sm = sedge
+                   ! reset sp on second interior edge
+                   sp = sedgel
 
                    ! modify using quadratic limiters
                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
@@ -836,45 +835,42 @@ contains
                 end if
              end if
 
-             if (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
+             if (j .eq. domhi(2)) then
                 if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
                    ! the value in the first cc ghost cell represents the edge value
                    sp = s(i,j+1,k,n)
 
                    ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   sm = &
                         -FIFTH        *s(i,j+1,k,n) &
                         + (THREE/FOUR)*s(i,j,k,n) &
                         + HALF        *s(i,j-1,k,n) &
                         - (ONE/20.0d0)*s(i,j-2,k,n)
 
-                   sedge = max(sedge,min(s(i,j-1,k,n),s(i,j,k,n)))
-                   sedge = min(sedge,max(s(i,j-1,k,n),s(i,j,k,n)))
-                   !
-                   ! ! copy sedge into sp and sm
-                   sm = sedge
+                   sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)))
+                   sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
 
                 end if
              end if
 
-             if (j .eq. hi(2)-2 .and. hi(2)-1 .eq. domhi(2)) then
+             if (j .eq. domhi(2)-1) then
                 if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
-                   ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   ! use a modified stencil to get sp on the first interior edge
+                   sp = &
                         -FIFTH        *s(i,j+2,k,n) &
                         + (THREE/FOUR)*s(i,j+1,k,n) &
                         + HALF        *s(i,j,k,n) &
                         - (ONE/20.0d0)*s(i,j-1,k,n)
 
-                   sedge = max(sedge,min(s(i,j,k,n),s(i,j+1,k,n)))
-                   sedge = min(sedge,max(s(i,j,k,n),s(i,j+1,k,n)))
-                   !
-                   ! ! copy sedge into sp and sm
-                   sp = sedge
-                   !
-                   ! ! modify using quadratic limiters
+                   sp = max(sp,min(s(i,j,k,n),s(i,j+1,k,n)))
+                   sp = min(sp,max(s(i,j,k,n),s(i,j+1,k,n)))
+
+                   ! reset sm on second interior edge
+                   sm = sedger
+                   
+                   ! modify using quadratic limiters
                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
                       sp = s(i,j,k,n)
                       sm = s(i,j,k,n)
@@ -1065,243 +1061,239 @@ contains
              ! end do
 
              ! different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's
-             if (lo(2)+1 .eq. domlo(2)) then
-                if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
+             if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
-                   if (j .eq. lo(2)+1) then
-                      ! the value in the first cc ghost cell represents the edge value
-                      sm    = s(i,j-1,k,n)
+                if (j .eq. domlo(2)) then
+                   ! the value in the first cc ghost cell represents the edge value
+                   sm    = s(i,j-1,k,n)
 
-                      ! use a modified stencil to get sedge on the first interior edge
-                      sp = &
-                           -FIFTH        *s(i,j-1,k,n) &
-                           + (THREE/FOUR)*s(i,j,k,n) &
-                           + HALF        *s(i,j+1,k,n) &
-                           - (ONE/20.0d0)*s(i,j+2,k,n)
+                   ! use a modified stencil to get sedge on the first interior edge
+                   sp = &
+                        -FIFTH        *s(i,j-1,k,n) &
+                        + (THREE/FOUR)*s(i,j,k,n) &
+                        + HALF        *s(i,j+1,k,n) &
+                        - (ONE/20.0d0)*s(i,j+2,k,n)
 
-                      sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
-                      sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
+                   sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
+                   sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
-                   elseif (j .eq. lo(2)+2) then
+                elseif (j .eq. domlo(2)+1) then
 
-                      sedgel = s(i,j-2,k,n)
+                   sedgel = s(i,j-2,k,n)
 
-                      sedge = &
-                           -FIFTH        *s(i,j-2,k,n) &
-                           + (THREE/FOUR)*s(i,j-1,k,n) &
-                           + HALF        *s(i,j,k,n) &
-                           - (ONE/20.0d0)*s(i,j+1,k,n)
+                   sedge = &
+                        -FIFTH        *s(i,j-2,k,n) &
+                        + (THREE/FOUR)*s(i,j-1,k,n) &
+                        + HALF        *s(i,j,k,n) &
+                        - (ONE/20.0d0)*s(i,j+1,k,n)
 
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)))
+                   sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)))
+                   sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)))
 
-                   elseif (j .eq. lo(2)+3) then
+                elseif (j .eq. domlo(2)+2) then
 
-                      ! use a modified stencil to get sedge on the first interior edge
-                      sedgel = &
-                           -FIFTH        *s(i,j-3,k,n) &
-                           + (THREE/FOUR)*s(i,j-2,k,n) &
-                           + HALF        *s(i,j-1,k,n) &
-                           - (ONE/20.0d0)*s(i,j,k,n)
+                   ! use a modified stencil to get sedge on the first interior edge
+                   sedgel = &
+                        -FIFTH        *s(i,j-3,k,n) &
+                        + (THREE/FOUR)*s(i,j-2,k,n) &
+                        + HALF        *s(i,j-1,k,n) &
+                        - (ONE/20.0d0)*s(i,j,k,n)
 
-                      sedgel = max(sedgel,min(s(i,j-1,k,n),s(i,j-2,k,n)))
-                      sedgel = min(sedgel,max(s(i,j-1,k,n),s(i,j-2,k,n)))
+                   sedgel = max(sedgel,min(s(i,j-1,k,n),s(i,j-2,k,n)))
+                   sedgel = min(sedgel,max(s(i,j-1,k,n),s(i,j-2,k,n)))
 
-                   endif
+                endif
 
-                   ! apply Colella 2008 limiters to compute sm and sp in the second
-                   ! and third inner cells
+                ! apply Colella 2008 limiters to compute sm and sp in the second
+                ! and third inner cells
 
-                   if (j .eq. lo(2)+2 .or. j .eq. lo(2)+3) then
+                if (j .eq. domlo(2)+1 .or. j .eq. domlo(2)+2) then
 
-                      alphap = sedger-s(i,j,k,n)
-                      alpham = sedge-s(i,j,k,n)
-                      bigp = abs(alphap).gt.TWO*abs(alpham)
-                      bigm = abs(alpham).gt.TWO*abs(alphap)
-                      extremum = .false.
+                   alphap = sedger-s(i,j,k,n)
+                   alpham = sedge-s(i,j,k,n)
+                   bigp = abs(alphap).gt.TWO*abs(alpham)
+                   bigm = abs(alpham).gt.TWO*abs(alphap)
+                   extremum = .false.
 
-                      if (alpham*alphap .ge. ZERO) then
-                         extremum = .true.
-                      else if (bigp .or. bigm) then
-                         ! Possible extremum. We look at cell centered values and face
-                         ! centered values for a change in sign in the differences adjacent to
-                         ! the cell. We use the pair of differences whose minimum magnitude is the
-                         ! largest, and thus least susceptible to sensitivity to roundoff.
-                         dafacem = sedge - sedgel
-                         dafacep = sedgerr - sedger
-                         dabarm = s(i,j,k,n) - s(i,j-1,k,n)
-                         dabarp = s(i,j+1,k,n) - s(i,j,k,n)
-                         dafacemin = min(abs(dafacem),abs(dafacep))
-                         dabarmin= min(abs(dabarm),abs(dabarp))
-                         if (dafacemin.ge.dabarmin) then
-                            dachkm = dafacem
-                            dachkp = dafacep
-                         else
-                            dachkm = dabarm
-                            dachkp = dabarp
-                         endif
-                         extremum = (dachkm*dachkp .le. 0.d0)
-                      end if
-
-                      if (extremum) then
-                         D2  = SIX*(alpham + alphap)
-                         D2L = s(i,j-2,k,n)-TWO*s(i,j-1,k,n)+s(i,j,k,n)
-                         D2R = s(i,j,k,n)-TWO*s(i,j+1,k,n)+s(i,j+2,k,n)
-                         D2C = s(i,j-1,k,n)-TWO*s(i,j,k,n)+s(i,j+1,k,n)
-                         sgn = sign(ONE,D2)
-                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                         D2ABS = max(abs(D2),1.d-10)
-                         alpham = alpham*D2LIM/D2ABS
-                         alphap = alphap*D2LIM/D2ABS
+                   if (alpham*alphap .ge. ZERO) then
+                      extremum = .true.
+                   else if (bigp .or. bigm) then
+                      ! Possible extremum. We look at cell centered values and face
+                      ! centered values for a change in sign in the differences adjacent to
+                      ! the cell. We use the pair of differences whose minimum magnitude is the
+                      ! largest, and thus least susceptible to sensitivity to roundoff.
+                      dafacem = sedge - sedgel
+                      dafacep = sedgerr - sedger
+                      dabarm = s(i,j,k,n) - s(i,j-1,k,n)
+                      dabarp = s(i,j+1,k,n) - s(i,j,k,n)
+                      dafacemin = min(abs(dafacem),abs(dafacep))
+                      dabarmin= min(abs(dabarm),abs(dabarp))
+                      if (dafacemin.ge.dabarmin) then
+                         dachkm = dafacem
+                         dachkp = dafacep
                       else
-                         if (bigp) then
-                            sgn = sign(ONE,alpham)
-                            amax = -alphap**2 / (4*(alpham + alphap))
-                            delam = s(i,j-1,k,n) - s(i,j,k,n)
-                            if (sgn*amax .ge. sgn*delam) then
-                               if (sgn*(delam - alpham).ge.1.d-10) then
-                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                               else
-                                  alphap = -TWO*alpham
-                               endif
-                            endif
-                         end if
-                         if (bigm) then
-                            sgn = sign(ONE,alphap)
-                            amax = -alpham**2 / (4*(alpham + alphap))
-                            delap = s(i,j+1,k,n) - s(i,j,k,n)
-                            if (sgn*amax .ge. sgn*delap) then
-                               if (sgn*(delap - alphap).ge.1.d-10) then
-                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                               else
-                                  alpham = -TWO*alphap
-                               endif
-                            endif
-                         end if
-                      end if
-
-                      sm = s(i,j,k,n) + alpham
-                      sp = s(i,j,k,n) + alphap
+                         dachkm = dabarm
+                         dachkp = dabarp
+                      endif
+                      extremum = (dachkm*dachkp .le. 0.d0)
                    end if
+
+                   if (extremum) then
+                      D2  = SIX*(alpham + alphap)
+                      D2L = s(i,j-2,k,n)-TWO*s(i,j-1,k,n)+s(i,j,k,n)
+                      D2R = s(i,j,k,n)-TWO*s(i,j+1,k,n)+s(i,j+2,k,n)
+                      D2C = s(i,j-1,k,n)-TWO*s(i,j,k,n)+s(i,j+1,k,n)
+                      sgn = sign(ONE,D2)
+                      D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                      D2ABS = max(abs(D2),1.d-10)
+                      alpham = alpham*D2LIM/D2ABS
+                      alphap = alphap*D2LIM/D2ABS
+                   else
+                      if (bigp) then
+                         sgn = sign(ONE,alpham)
+                         amax = -alphap**2 / (4*(alpham + alphap))
+                         delam = s(i,j-1,k,n) - s(i,j,k,n)
+                         if (sgn*amax .ge. sgn*delam) then
+                            if (sgn*(delam - alpham).ge.1.d-10) then
+                               alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                            else
+                               alphap = -TWO*alpham
+                            endif
+                         endif
+                      end if
+                      if (bigm) then
+                         sgn = sign(ONE,alphap)
+                         amax = -alpham**2 / (4*(alpham + alphap))
+                         delap = s(i,j+1,k,n) - s(i,j,k,n)
+                         if (sgn*amax .ge. sgn*delap) then
+                            if (sgn*(delap - alphap).ge.1.d-10) then
+                               alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                            else
+                               alpham = -TWO*alphap
+                            endif
+                         endif
+                      end if
+                   end if
+
+                   sm = s(i,j,k,n) + alpham
+                   sp = s(i,j,k,n) + alphap
                 end if
              end if
 
-             if (hi(2)-1 .eq. domhi(2)) then
-                if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
+             if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
-                   if (j .eq. hi(2)-1) then
+                if (j .eq. domhi(2)) then
 
-                      sp     = s(i,j+1,k,n)
+                   sp     = s(i,j+1,k,n)
 
-                      ! use a modified stencil to get sedge on the first interior edge
-                      sm = &
-                           -FIFTH        *s(i,j+1,k,n) &
-                           + (THREE/FOUR)*s(i,j,k,n) &
-                           + HALF        *s(i,j-1,k,n) &
-                           - (ONE/20.0d0)*s(i,j-2,k,n)
+                   ! use a modified stencil to get sedge on the first interior edge
+                   sm = &
+                        -FIFTH        *s(i,j+1,k,n) &
+                        + (THREE/FOUR)*s(i,j,k,n) &
+                        + HALF        *s(i,j-1,k,n) &
+                        - (ONE/20.0d0)*s(i,j-2,k,n)
 
-                      sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)))
-                      sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
+                   sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)))
+                   sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
 
-                   elseif (j .eq. hi(2)-2) then
+                elseif (j .eq. domhi(2)-1) then
 
-                      sedgerr = s(i,j+2,k,n)
+                   sedgerr = s(i,j+2,k,n)
 
-                      sedger = &
-                           -FIFTH        *s(i,j+2,k,n) &
-                           + (THREE/FOUR)*s(i,j+1,k,n) &
-                           + HALF        *s(i,j,k,n) &
-                           - (ONE/20.0d0)*s(i,j-1,k,n)
+                   sedger = &
+                        -FIFTH        *s(i,j+2,k,n) &
+                        + (THREE/FOUR)*s(i,j+1,k,n) &
+                        + HALF        *s(i,j,k,n) &
+                        - (ONE/20.0d0)*s(i,j-1,k,n)
 
-                      sedger = max(sedger,min(s(i,j,k,n),s(i,j+1,k,n)))
-                      sedger = min(sedger,max(s(i,j,k,n),s(i,j+1,k,n)))
+                   sedger = max(sedger,min(s(i,j,k,n),s(i,j+1,k,n)))
+                   sedger = min(sedger,max(s(i,j,k,n),s(i,j+1,k,n)))
 
-                   elseif (j .eq. hi(2)-3) then
+                elseif (j .eq. domhi(2)-2) then
 
-                      sedgerr = &
-                           -FIFTH        *s(i,j+3,k,n) &
-                           + (THREE/FOUR)*s(i,j+2,k,n) &
-                           + HALF        *s(i,j+1,k,n) &
-                           - (ONE/20.0d0)*s(i,j,k,n)
+                   sedgerr = &
+                        -FIFTH        *s(i,j+3,k,n) &
+                        + (THREE/FOUR)*s(i,j+2,k,n) &
+                        + HALF        *s(i,j+1,k,n) &
+                        - (ONE/20.0d0)*s(i,j,k,n)
 
-                      sedgerr = max(sedgerr,min(s(i,j+1,k,n),s(i,j+2,k,n)))
-                      sedgerr = min(sedgerr,max(s(i,j+1,k,n),s(i,j+2,k,n)))
+                   sedgerr = max(sedgerr,min(s(i,j+1,k,n),s(i,j+2,k,n)))
+                   sedgerr = min(sedgerr,max(s(i,j+1,k,n),s(i,j+2,k,n)))
 
-                   endif
+                endif
 
-                   ! apply Colella 2008 limiters to compute sm and sp in the second
-                   ! and third inner cells
-                   if (j .eq. hi(2)-3 .or. j .eq. hi(2)-2) then
+                ! apply Colella 2008 limiters to compute sm and sp in the second
+                ! and third inner cells
+                if (j .eq. domhi(2)-2 .or. j .eq. domhi(2)-1) then
 
-                      alphap = sedger-s(i,j,k,n)
-                      alpham = sedge-s(i,j,k,n)
-                      bigp = abs(alphap).gt.TWO*abs(alpham)
-                      bigm = abs(alpham).gt.TWO*abs(alphap)
-                      extremum = .false.
+                   alphap = sedger-s(i,j,k,n)
+                   alpham = sedge-s(i,j,k,n)
+                   bigp = abs(alphap).gt.TWO*abs(alpham)
+                   bigm = abs(alpham).gt.TWO*abs(alphap)
+                   extremum = .false.
 
-                      if (alpham*alphap .ge. ZERO) then
-                         extremum = .true.
-                      else if (bigp .or. bigm) then
-                         ! Possible extremum. We look at cell centered values and face
-                         ! centered values for a change in sign in the differences adjacent to
-                         ! the cell. We use the pair of differences whose minimum magnitude is the
-                         ! largest, and thus least susceptible to sensitivity to roundoff.
-                         dafacem = sedge - sedgel
-                         dafacep = sedgerr - sedger
-                         dabarm = s(i,j,k,n) - s(i,j-1,k,n)
-                         dabarp = s(i,j+1,k,n) - s(i,j,k,n)
-                         dafacemin = min(abs(dafacem),abs(dafacep))
-                         dabarmin= min(abs(dabarm),abs(dabarp))
-                         if (dafacemin.ge.dabarmin) then
-                            dachkm = dafacem
-                            dachkp = dafacep
-                         else
-                            dachkm = dabarm
-                            dachkp = dabarp
-                         endif
-                         extremum = (dachkm*dachkp .le. 0.d0)
-                      end if
-
-                      if (extremum) then
-                         D2  = SIX*(alpham + alphap)
-                         D2L = s(i,j-2,k,n)-TWO*s(i,j-1,k,n)+s(i,j,k,n)
-                         D2R = s(i,j,k,n)-TWO*s(i,j+1,k,n)+s(i,j+2,k,n)
-                         D2C = s(i,j-1,k,n)-TWO*s(i,j,k,n)+s(i,j+1,k,n)
-                         sgn = sign(ONE,D2)
-                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                         D2ABS = max(abs(D2),1.d-10)
-                         alpham = alpham*D2LIM/D2ABS
-                         alphap = alphap*D2LIM/D2ABS
+                   if (alpham*alphap .ge. ZERO) then
+                      extremum = .true.
+                   else if (bigp .or. bigm) then
+                      ! Possible extremum. We look at cell centered values and face
+                      ! centered values for a change in sign in the differences adjacent to
+                      ! the cell. We use the pair of differences whose minimum magnitude is the
+                      ! largest, and thus least susceptible to sensitivity to roundoff.
+                      dafacem = sedge - sedgel
+                      dafacep = sedgerr - sedger
+                      dabarm = s(i,j,k,n) - s(i,j-1,k,n)
+                      dabarp = s(i,j+1,k,n) - s(i,j,k,n)
+                      dafacemin = min(abs(dafacem),abs(dafacep))
+                      dabarmin= min(abs(dabarm),abs(dabarp))
+                      if (dafacemin.ge.dabarmin) then
+                         dachkm = dafacem
+                         dachkp = dafacep
                       else
-                         if (bigp) then
-                            sgn = sign(ONE,alpham)
-                            amax = -alphap**2 / (4*(alpham + alphap))
-                            delam = s(i,j-1,k,n) - s(i,j,k,n)
-                            if (sgn*amax .ge. sgn*delam) then
-                               if (sgn*(delam - alpham).ge.1.d-10) then
-                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                               else
-                                  alphap = -TWO*alpham
-                               endif
-                            endif
-                         end if
-                         if (bigm) then
-                            sgn = sign(ONE,alphap)
-                            amax = -alpham**2 / (4*(alpham + alphap))
-                            delap = s(i,j+1,k,n) - s(i,j,k,n)
-                            if (sgn*amax .ge. sgn*delap) then
-                               if (sgn*(delap - alphap).ge.1.d-10) then
-                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                               else
-                                  alpham = -TWO*alphap
-                               endif
-                            endif
-                         end if
-                      end if
-
-                      sm = s(i,j,k,n) + alpham
-                      sp = s(i,j,k,n) + alphap
+                         dachkm = dabarm
+                         dachkp = dabarp
+                      endif
+                      extremum = (dachkm*dachkp .le. 0.d0)
                    end if
+
+                   if (extremum) then
+                      D2  = SIX*(alpham + alphap)
+                      D2L = s(i,j-2,k,n)-TWO*s(i,j-1,k,n)+s(i,j,k,n)
+                      D2R = s(i,j,k,n)-TWO*s(i,j+1,k,n)+s(i,j+2,k,n)
+                      D2C = s(i,j-1,k,n)-TWO*s(i,j,k,n)+s(i,j+1,k,n)
+                      sgn = sign(ONE,D2)
+                      D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                      D2ABS = max(abs(D2),1.d-10)
+                      alpham = alpham*D2LIM/D2ABS
+                      alphap = alphap*D2LIM/D2ABS
+                   else
+                      if (bigp) then
+                         sgn = sign(ONE,alpham)
+                         amax = -alphap**2 / (4*(alpham + alphap))
+                         delam = s(i,j-1,k,n) - s(i,j,k,n)
+                         if (sgn*amax .ge. sgn*delam) then
+                            if (sgn*(delam - alpham).ge.1.d-10) then
+                               alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                            else
+                               alphap = -TWO*alpham
+                            endif
+                         endif
+                      end if
+                      if (bigm) then
+                         sgn = sign(ONE,alphap)
+                         amax = -alpham**2 / (4*(alpham + alphap))
+                         delap = s(i,j+1,k,n) - s(i,j,k,n)
+                         if (sgn*amax .ge. sgn*delap) then
+                            if (sgn*(delap - alphap).ge.1.d-10) then
+                               alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                            else
+                               alpham = -TWO*alphap
+                            endif
+                         endif
+                      end if
+                   end if
+
+                   sm = s(i,j,k,n) + alpham
+                   sp = s(i,j,k,n) + alphap
                 end if
              end if
 
@@ -1361,15 +1353,15 @@ contains
 
   ! characteristics based on u
   subroutine ppm_3d(lo,hi,s,s_lo,s_hi,nc_s, &
-      u,u_lo,u_hi,v,v_lo,v_hi,w,w_lo,w_hi, &
-      Ip,ip_lo,ip_hi,Im,im_lo,im_hi, &
-      domlo,domhi, &
-      adv_bc,dx,dt,is_umac,comp,bccomp) bind(C,name="ppm_3d")
+       u,u_lo,u_hi,v,v_lo,v_hi,w,w_lo,w_hi, &
+       Ip,ip_lo,ip_hi,Im,im_lo,im_hi, &
+       domlo,domhi, &
+       adv_bc,dx,dt,is_umac,comp,bccomp) bind(C,name="ppm_3d")
 
-      integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3),s_lo(3),s_hi(3)
-      integer         , intent(in   ) :: u_lo(3),u_hi(3),v_lo(3),v_hi(3),w_lo(3),w_hi(3)
-      integer         , intent(in   ) :: im_lo(3),im_hi(3),ip_lo(3),ip_hi(3)
-      integer,   value, intent(in   ) :: nc_s
+    integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3),s_lo(3),s_hi(3)
+    integer         , intent(in   ) :: u_lo(3),u_hi(3),v_lo(3),v_hi(3),w_lo(3),w_hi(3)
+    integer         , intent(in   ) :: im_lo(3),im_hi(3),ip_lo(3),ip_hi(3)
+    integer,   value, intent(in   ) :: nc_s
     double precision, intent(in   ) ::  s(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) ::  u(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
     double precision, intent(in   ) ::  v(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
@@ -1470,6 +1462,10 @@ contains
                 sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
                 sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
 
+                ! save for later 
+                sedgel = sp
+                sedger = sm
+
                 !
                 ! Modify using quadratic limiters.
                 !
@@ -1484,7 +1480,7 @@ contains
 
                 ! Different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's.
                 !
-                if (i .eq. lo(1)+1 .and. lo(1)+1 .eq. domlo(1)) then
+                if (i .eq. domlo(1)) then
                    if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
                       !
@@ -1492,42 +1488,39 @@ contains
                       !
                       sm = s(i-1,j,k,n)
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sp on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i-1,j,k,n) &
+                      sp = -FIFTH     *s(i-1,j,k,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i+1,j,k,n) &
                            - (ONE/20.0d0)*s(i+2,j,k,n)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i+1,j,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i+1,j,k,n),s(i,j,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
 
                    end if
                 end if
 
-                if (i .eq. lo(1)+2 .and. lo(1)+1 .eq. domlo(1)) then
+                if (i .eq. domlo(1) + 1) then
                    if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i-2,j,k,n) &
+                      sm = -FIFTH     *s(i-2,j,k,n) &
                            + (THREE/FOUR)*s(i-1,j,k,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i+1,j,k,n)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)))
+                      sm = max(sm,min(s(i,j,k,n),s(i-1,j,k,n)))
+                      sm = min(sm,max(s(i,j,k,n),s(i-1,j,k,n)))
 
-                      sm = sedge
+                      ! reset sp on second interior edge
+                      sp = sedgel
 
                       !
                       ! Modify using quadratic limiters.
@@ -1544,7 +1537,7 @@ contains
                    end if
                 end if
 
-                if (i .eq. hi(1)-1 .and. hi(1)-1 .eq. domhi(1)) then
+                if (i .eq. domhi(1)) then
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                       ! The value in the first cc ghost cell represents the edge value.
@@ -1552,42 +1545,39 @@ contains
                       sp = s(i+1,j,k,n)
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i+1,j,k,n) &
+                      sm = -FIFTH     *s(i+1,j,k,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i-1,j,k,n) &
                            - (ONE/20.0d0)*s(i-2,j,k,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sm lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i-1,j,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i-1,j,k,n),s(i,j,k,n)))
-
-                      sm = sedge
+                      sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)))
 
                    end if
                 end if
 
-                if (i .eq. hi(1)-2 .and. hi(1)-1 .eq. domhi(1)) then
+                if (i .eq. domhi(1)-1) then
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sp on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i+2,j,k,n) &
+                      sp = -FIFTH     *s(i+2,j,k,n) &
                            + (THREE/FOUR)*s(i+1,j,k,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i-1,j,k,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sp lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i+1,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i+1,j,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j,k,n),s(i+1,j,k,n)))
+                      sp = min(sp,max(s(i,j,k,n),s(i+1,j,k,n)))
+
+                      ! reset sm on second interior edge
+                      sm = sedger
 
                       !
                       ! Modify using quadratic limiters.
@@ -1799,269 +1789,263 @@ contains
                 sp = s(i,j,k,n) + alphap
 
                 ! different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
-                if (lo(1)+1 .eq. domlo(1)) then
-                   if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
+                if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
-                      if (i .eq. lo(1)+1) then
-                         !
-                         ! The value in the first cc ghost cell represents the edge value.
-                         !
-                         sm    = s(i-1,j,k,n)
-
-                         ! use a modified stencil to get sedge on the first interior edge
-                         sp = -FIFTH        *s(i-1,j,k,n) &
-                              + (THREE/FOUR)*s(i,j,k,n) &
-                              + HALF        *s(i+1,j,k,n) &
-                              - (ONE/20.0d0)*s(i+2,j,k,n)
-
-                         ! make sure sedge lies in between adjacent cell-centered values
-                         sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
-                         sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
-
-                     elseif (i .eq. lo(1)+2) then
-
-                         sedgel = s(i-2,j,k,n)
-
-                         ! use a modified stencil to get sedge on the first interior edge
-                         sedge = -FIFTH     *s(i-2,j,k,n) &
-                              + (THREE/FOUR)*s(i-1,j,k,n) &
-                              + HALF        *s(i,j,k,n) &
-                              - (ONE/20.0d0)*s(i+1,j,k,n)
-
-                         ! make sure sedge lies in between adjacent cell-centered values
-                         sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)))
-                         sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)))
-
-                     elseif (i .eq. lo(1)+3) then
-
-                         ! use a modified stencil to get sedge on the first interior edge
-                         sedgel = -FIFTH    *s(i-3,j,k,n) &
-                              + (THREE/FOUR)*s(i-2,j,k,n) &
-                              + HALF        *s(i-1,j,k,n) &
-                              - (ONE/20.0d0)*s(i,j,k,n)
-
-                         ! make sure sedge lies in between adjacent cell-centered values
-                         sedgel = max(sedgel,min(s(i-1,j,k,n),s(i-2,j,k,n)))
-                         sedgel = min(sedgel,max(s(i-1,j,k,n),s(i-2,j,k,n)))
-
-                      endif
-
+                   if (i .eq. domlo(1)) then
                       !
-                      ! Apply Colella 2008 limiters to compute sm and sp in the second
-                      ! and third inner cells.
+                      ! The value in the first cc ghost cell represents the edge value.
+                      !
+                      sm    = s(i-1,j,k,n)
 
-                      if (i .eq. lo(1)+2 .or. i .eq. lo(1)+3) then
+                      ! use a modified stencil to get sedge on the first interior edge
+                      sp = -FIFTH        *s(i-1,j,k,n) &
+                           + (THREE/FOUR)*s(i,j,k,n) &
+                           + HALF        *s(i+1,j,k,n) &
+                           - (ONE/20.0d0)*s(i+2,j,k,n)
 
-                         alphap = sedger-s(i,j,k,n)
-                         alpham = sedge-s(i,j,k,n)
-                         bigp = abs(alphap).gt.TWO*abs(alpham)
-                         bigm = abs(alpham).gt.TWO*abs(alphap)
-                         extremum = .false.
+                      ! make sure sedge lies in between adjacent cell-centered values
+                      sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
 
-                         if (alpham*alphap .ge. ZERO) then
-                            extremum = .true.
-                         else if (bigp .or. bigm) then
-                            ! Possible extremum. We look at cell centered values and face
-                            ! centered values for a change in sign in the differences adjacent to
-                            ! the cell. We use the pair of differences whose minimum magnitude is
-                            ! the largest, and thus least susceptible to sensitivity to roundoff.
-                            dafacem = sedge - sedgel
-                            dafacep = sedgerr - sedger
-                            dabarm = s(i,j,k,n) - s(i-1,j,k,n)
-                            dabarp = s(i+1,j,k,n) - s(i,j,k,n)
-                            dafacemin = min(abs(dafacem),abs(dafacep))
-                            dabarmin= min(abs(dabarm),abs(dabarp))
-                            if (dafacemin.ge.dabarmin) then
-                               dachkm = dafacem
-                               dachkp = dafacep
-                            else
-                               dachkm = dabarm
-                               dachkp = dabarp
-                            endif
-                            extremum = (dachkm*dachkp .le. 0.d0)
-                         end if
+                   elseif (i .eq. domlo(1)+1) then
 
-                         if (extremum) then
-                            D2  = SIX*(alpham + alphap)
-                            D2L = s(i-2,j,k,n)-TWO*s(i-1,j,k,n)+s(i,j,k,n)
-                            D2R = s(i,j,k,n)-TWO*s(i+1,j,k,n)+s(i+2,j,k,n)
-                            D2C = s(i-1,j,k,n)-TWO*s(i,j,k,n)+s(i+1,j,k,n)
-                            sgn = sign(ONE,D2)
-                            D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                            D2ABS = max(abs(D2),1.d-10)
-                            alpham = alpham*D2LIM/D2ABS
-                            alphap = alphap*D2LIM/D2ABS
+                      sedgel = s(i-2,j,k,n)
+
+                      ! use a modified stencil to get sedge on the first interior edge
+                      sedge = -FIFTH     *s(i-2,j,k,n) &
+                           + (THREE/FOUR)*s(i-1,j,k,n) &
+                           + HALF        *s(i,j,k,n) &
+                           - (ONE/20.0d0)*s(i+1,j,k,n)
+
+                      ! make sure sedge lies in between adjacent cell-centered values
+                      sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)))
+                      sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)))
+
+                   elseif (i .eq. domlo(1)+2) then
+
+                      ! use a modified stencil to get sedge on the first interior edge
+                      sedgel = -FIFTH    *s(i-3,j,k,n) &
+                           + (THREE/FOUR)*s(i-2,j,k,n) &
+                           + HALF        *s(i-1,j,k,n) &
+                           - (ONE/20.0d0)*s(i,j,k,n)
+
+                      ! make sure sedge lies in between adjacent cell-centered values
+                      sedgel = max(sedgel,min(s(i-1,j,k,n),s(i-2,j,k,n)))
+                      sedgel = min(sedgel,max(s(i-1,j,k,n),s(i-2,j,k,n)))
+
+                   endif
+
+                   !
+                   ! Apply Colella 2008 limiters to compute sm and sp in the second
+                   ! and third inner cells.
+
+                   if (i .eq. domlo(1)+1 .or. i .eq. domlo(1)+2) then
+
+                      alphap = sedger-s(i,j,k,n)
+                      alpham = sedge-s(i,j,k,n)
+                      bigp = abs(alphap).gt.TWO*abs(alpham)
+                      bigm = abs(alpham).gt.TWO*abs(alphap)
+                      extremum = .false.
+
+                      if (alpham*alphap .ge. ZERO) then
+                         extremum = .true.
+                      else if (bigp .or. bigm) then
+                         ! Possible extremum. We look at cell centered values and face
+                         ! centered values for a change in sign in the differences adjacent to
+                         ! the cell. We use the pair of differences whose minimum magnitude is
+                         ! the largest, and thus least susceptible to sensitivity to roundoff.
+                         dafacem = sedge - sedgel
+                         dafacep = sedgerr - sedger
+                         dabarm = s(i,j,k,n) - s(i-1,j,k,n)
+                         dabarp = s(i+1,j,k,n) - s(i,j,k,n)
+                         dafacemin = min(abs(dafacem),abs(dafacep))
+                         dabarmin= min(abs(dabarm),abs(dabarp))
+                         if (dafacemin.ge.dabarmin) then
+                            dachkm = dafacem
+                            dachkp = dafacep
                          else
-                            if (bigp) then
-                               sgn = sign(ONE,alpham)
-                               amax = -alphap**2 / (4*(alpham + alphap))
-                               delam = s(i-1,j,k,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delam) then
-                                  if (sgn*(delam - alpham).ge.1.d-10) then
-                                     alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                                  else
-                                     alphap = -TWO*alpham
-                                  endif
-                               endif
-                            end if
-                            if (bigm) then
-                               sgn = sign(ONE,alphap)
-                               amax = -alpham**2 / (4*(alpham + alphap))
-                               delap = s(i+1,j,k,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delap) then
-                                  if (sgn*(delap - alphap).ge.1.d-10) then
-                                     alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                                  else
-                                     alpham = -TWO*alphap
-                                  endif
-                               endif
-                            end if
-                         end if
-
-                         sm = s(i,j,k,n) + alpham
-                         sp = s(i,j,k,n) + alphap
-
+                            dachkm = dabarm
+                            dachkp = dabarp
+                         endif
+                         extremum = (dachkm*dachkp .le. 0.d0)
                       end if
+
+                      if (extremum) then
+                         D2  = SIX*(alpham + alphap)
+                         D2L = s(i-2,j,k,n)-TWO*s(i-1,j,k,n)+s(i,j,k,n)
+                         D2R = s(i,j,k,n)-TWO*s(i+1,j,k,n)+s(i+2,j,k,n)
+                         D2C = s(i-1,j,k,n)-TWO*s(i,j,k,n)+s(i+1,j,k,n)
+                         sgn = sign(ONE,D2)
+                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                         D2ABS = max(abs(D2),1.d-10)
+                         alpham = alpham*D2LIM/D2ABS
+                         alphap = alphap*D2LIM/D2ABS
+                      else
+                         if (bigp) then
+                            sgn = sign(ONE,alpham)
+                            amax = -alphap**2 / (4*(alpham + alphap))
+                            delam = s(i-1,j,k,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delam) then
+                               if (sgn*(delam - alpham).ge.1.d-10) then
+                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                               else
+                                  alphap = -TWO*alpham
+                               endif
+                            endif
+                         end if
+                         if (bigm) then
+                            sgn = sign(ONE,alphap)
+                            amax = -alpham**2 / (4*(alpham + alphap))
+                            delap = s(i+1,j,k,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delap) then
+                               if (sgn*(delap - alphap).ge.1.d-10) then
+                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                               else
+                                  alpham = -TWO*alphap
+                               endif
+                            endif
+                         end if
+                      end if
+
+                      sm = s(i,j,k,n) + alpham
+                      sp = s(i,j,k,n) + alphap
+
                    end if
                 end if
 
-                if (hi(1)-1 .eq. domhi(1)) then
-                   if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
+                if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
-                      if (i .eq. hi(1)-1) then
-
-                         !
-                         ! The value in the first cc ghost cell represents the edge value.
-                         !
-                         sp = s(i+1,j,k,n)
-
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sm = -FIFTH        *s(i+1,j,k,n) &
-                              + (THREE/FOUR)*s(i,j,k,n) &
-                              + HALF        *s(i-1,j,k,n) &
-                              - (ONE/20.0d0)*s(i-2,j,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)))
-                         sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)))
-
-
-                     elseif (i .eq. hi(1)-2) then
-
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedger = -FIFTH    *s(i+2,j,k,n) &
-                              + (THREE/FOUR)*s(i+1,j,k,n) &
-                              + HALF        *s(i,j,k,n) &
-                              - (ONE/20.0d0)*s(i-1,j,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedger = max(sedger,min(s(i,j,k,n),s(i+1,j,k,n)))
-                         sedger = min(sedger,max(s(i,j,k,n),s(i+1,j,k,n)))
-
-                     elseif (i .eq. hi(1)-3) then
-
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedgerr = -FIFTH   *s(i+3,j,k,n) &
-                              + (THREE/FOUR)*s(i+2,j,k,n) &
-                              + HALF        *s(i+1,j,k,n) &
-                              - (ONE/20.0d0)*s(i,j,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedgerr = max(sedgerr,min(s(i+1,j,k,n),s(i+2,j,k,n)))
-                         sedgerr = min(sedgerr,max(s(i+1,j,k,n),s(i+2,j,k,n)))
-
-                      endif
+                   if (i .eq. domhi(1)) then
 
                       !
-                      ! Apply Colella 2008 limiters to compute sm and sp in the second
-                      ! and third inner cells.
+                      ! The value in the first cc ghost cell represents the edge value.
+                      !
+                      sp = s(i+1,j,k,n)
 
-                      if (i .eq. hi(1)-2 .or. i .eq. hi(1)-3) then
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sm = -FIFTH        *s(i+1,j,k,n) &
+                           + (THREE/FOUR)*s(i,j,k,n) &
+                           + HALF        *s(i-1,j,k,n) &
+                           - (ONE/20.0d0)*s(i-2,j,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)))
 
-                         alphap = sedger-s(i,j,k,n)
-                         alpham = sedge-s(i,j,k,n)
-                         bigp = abs(alphap).gt.TWO*abs(alpham)
-                         bigm = abs(alpham).gt.TWO*abs(alphap)
-                         extremum = .false.
 
-                         if (alpham*alphap .ge. ZERO) then
-                            extremum = .true.
-                         else if (bigp .or. bigm) then
-                            !
-                            ! Possible extremum. We look at cell centered values and face
-                            ! centered values for a change in sign in the differences adjacent to
-                            ! the cell. We use the pair of differences whose minimum magnitude is
-                            ! the largest, and thus least susceptible to sensitivity to roundoff.
-                            !
-                            dafacem = sedge - sedgel
-                            dafacep = sedgerr - sedger
-                            dabarm = s(i,j,k,n) - s(i-1,j,k,n)
-                            dabarp = s(i+1,j,k,n) - s(i,j,k,n)
-                            dafacemin = min(abs(dafacem),abs(dafacep))
-                            dabarmin= min(abs(dabarm),abs(dabarp))
-                            if (dafacemin.ge.dabarmin) then
-                               dachkm = dafacem
-                               dachkp = dafacep
-                            else
-                               dachkm = dabarm
-                               dachkp = dabarp
-                            endif
-                            extremum = (dachkm*dachkp .le. 0.d0)
-                         end if
+                   elseif (i .eq. domhi(1)-1) then
 
-                         if (extremum) then
-                            D2  = SIX*(alpham + alphap)
-                            D2L = s(i-2,j,k,n)-TWO*s(i-1,j,k,n)+s(i,j,k,n)
-                            D2R = s(i,j,k,n)-TWO*s(i+1,j,k,n)+s(i+2,j,k,n)
-                            D2C = s(i-1,j,k,n)-TWO*s(i,j,k,n)+s(i+1,j,k,n)
-                            sgn = sign(ONE,D2)
-                            D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                            D2ABS = max(abs(D2),1.d-10)
-                            alpham = alpham*D2LIM/D2ABS
-                            alphap = alphap*D2LIM/D2ABS
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedger = -FIFTH    *s(i+2,j,k,n) &
+                           + (THREE/FOUR)*s(i+1,j,k,n) &
+                           + HALF        *s(i,j,k,n) &
+                           - (ONE/20.0d0)*s(i-1,j,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedger = max(sedger,min(s(i,j,k,n),s(i+1,j,k,n)))
+                      sedger = min(sedger,max(s(i,j,k,n),s(i+1,j,k,n)))
+
+                   elseif (i .eq. domhi(1)-2) then
+
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedgerr = -FIFTH   *s(i+3,j,k,n) &
+                           + (THREE/FOUR)*s(i+2,j,k,n) &
+                           + HALF        *s(i+1,j,k,n) &
+                           - (ONE/20.0d0)*s(i,j,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedgerr = max(sedgerr,min(s(i+1,j,k,n),s(i+2,j,k,n)))
+                      sedgerr = min(sedgerr,max(s(i+1,j,k,n),s(i+2,j,k,n)))
+
+                   endif
+
+                   !
+                   ! Apply Colella 2008 limiters to compute sm and sp in the second
+                   ! and third inner cells.
+
+                   if (i .eq. domhi(1)-1 .or. i .eq. domhi(1)-2) then
+
+                      alphap = sedger-s(i,j,k,n)
+                      alpham = sedge-s(i,j,k,n)
+                      bigp = abs(alphap).gt.TWO*abs(alpham)
+                      bigm = abs(alpham).gt.TWO*abs(alphap)
+                      extremum = .false.
+
+                      if (alpham*alphap .ge. ZERO) then
+                         extremum = .true.
+                      else if (bigp .or. bigm) then
+                         !
+                         ! Possible extremum. We look at cell centered values and face
+                         ! centered values for a change in sign in the differences adjacent to
+                         ! the cell. We use the pair of differences whose minimum magnitude is
+                         ! the largest, and thus least susceptible to sensitivity to roundoff.
+                         !
+                         dafacem = sedge - sedgel
+                         dafacep = sedgerr - sedger
+                         dabarm = s(i,j,k,n) - s(i-1,j,k,n)
+                         dabarp = s(i+1,j,k,n) - s(i,j,k,n)
+                         dafacemin = min(abs(dafacem),abs(dafacep))
+                         dabarmin= min(abs(dabarm),abs(dabarp))
+                         if (dafacemin.ge.dabarmin) then
+                            dachkm = dafacem
+                            dachkp = dafacep
                          else
-                            if (bigp) then
-                               sgn = sign(ONE,alpham)
-                               amax = -alphap**2 / (4*(alpham + alphap))
-                               delam = s(i-1,j,k,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delam) then
-                                  if (sgn*(delam - alpham).ge.1.d-10) then
-                                     alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                                  else
-                                     alphap = -TWO*alpham
-                                  endif
-                               endif
-                            end if
-                            if (bigm) then
-                               sgn = sign(ONE,alphap)
-                               amax = -alpham**2 / (4*(alpham + alphap))
-                               delap = s(i+1,j,k,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delap) then
-                                  if (sgn*(delap - alphap).ge.1.d-10) then
-                                     alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                                  else
-                                     alpham = -TWO*alphap
-                                  endif
-                               endif
-                            end if
-                         end if
-
-                         sm = s(i,j,k,n) + alpham
-                         sp = s(i,j,k,n) + alphap
-
+                            dachkm = dabarm
+                            dachkp = dabarp
+                         endif
+                         extremum = (dachkm*dachkp .le. 0.d0)
                       end if
 
-                   end if
+                      if (extremum) then
+                         D2  = SIX*(alpham + alphap)
+                         D2L = s(i-2,j,k,n)-TWO*s(i-1,j,k,n)+s(i,j,k,n)
+                         D2R = s(i,j,k,n)-TWO*s(i+1,j,k,n)+s(i+2,j,k,n)
+                         D2C = s(i-1,j,k,n)-TWO*s(i,j,k,n)+s(i+1,j,k,n)
+                         sgn = sign(ONE,D2)
+                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                         D2ABS = max(abs(D2),1.d-10)
+                         alpham = alpham*D2LIM/D2ABS
+                         alphap = alphap*D2LIM/D2ABS
+                      else
+                         if (bigp) then
+                            sgn = sign(ONE,alpham)
+                            amax = -alphap**2 / (4*(alpham + alphap))
+                            delam = s(i-1,j,k,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delam) then
+                               if (sgn*(delam - alpham).ge.1.d-10) then
+                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                               else
+                                  alphap = -TWO*alpham
+                               endif
+                            endif
+                         end if
+                         if (bigm) then
+                            sgn = sign(ONE,alphap)
+                            amax = -alpham**2 / (4*(alpham + alphap))
+                            delap = s(i+1,j,k,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delap) then
+                               if (sgn*(delap - alphap).ge.1.d-10) then
+                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                               else
+                                  alpham = -TWO*alphap
+                               endif
+                            endif
+                         end if
+                      end if
 
+                      sm = s(i,j,k,n) + alpham
+                      sp = s(i,j,k,n) + alphap
+
+                   end if
                 end if
 
                 !-------------------------------------------------------------------------
@@ -2188,6 +2172,10 @@ contains
                 sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
                 sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
+                ! save for later 
+                sedgel = sp
+                sedger = sm
+
                 !
                 ! Modify using quadratic limiters.
                 !
@@ -2203,7 +2191,7 @@ contains
                 !
                 ! Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
                 !
-                if (j .eq. lo(2)+1 .and. lo(2)+1 .eq. domlo(2)) then
+                if (j .eq. domlo(2)) then
                    if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
                       !
                       ! The value in the first cc ghost cell represents the edge value.
@@ -2212,40 +2200,37 @@ contains
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j-1,k,n) &
+                      sp = -FIFTH     *s(i,j-1,k,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i,j+1,k,n) &
                            - (ONE/20.0d0)*s(i,j+2,k,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sp lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j+1,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i,j+1,k,n),s(i,j,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
                    end if
                 end if
 
-                if (j .eq. lo(2)+2 .and. lo(2)+1 .eq. domlo(2)) then
+                if (j .eq. domlo(2)+1) then
                    if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j-2,k,n) &
+                      sm = -FIFTH     *s(i,j-2,k,n) &
                            + (THREE/FOUR)*s(i,j-1,k,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i,j+1,k,n)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)))
-                      !
-                      sm = sedge
+                      sm = max(sm,min(s(i,j,k,n),s(i,j-1,k,n)))
+                      sm = min(sm,max(s(i,j,k,n),s(i,j-1,k,n)))
+
+                      ! reset sp on second interior edge
+                      sp = sedgel
                       !
                       ! Modify using quadratic limiters.
                       !
@@ -2261,48 +2246,46 @@ contains
                    end if
                 end if
 
-                if (j .eq. hi(2)-1 .and. hi(2)-1 .eq. domhi(2)) then
+                if (j .eq. domhi(2)) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                       !
                       ! The value in the first cc ghost cell represents the edge value.
                       !
                       sp = s(i,j+1,k,n)
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j+1,k,n) &
+                      sm = -FIFTH     *s(i,j+1,k,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i,j-1,k,n) &
                            - (ONE/20.0d0)*s(i,j-2,k,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sm lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j-1,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i,j-1,k,n),s(i,j,k,n)))
-                      !
-                      sm = sedge
+                      sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
 
                    end if
                 end if
 
-                if (j .eq. hi(2)-2 .and. hi(2)-1 .eq. domhi(2)) then
+                if (j .eq. domhi(2)-1) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sp on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j+2,k,n) &
+                      sp = -FIFTH     *s(i,j+2,k,n) &
                            + (THREE/FOUR)*s(i,j+1,k,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i,j-1,k,n)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j+1,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j+1,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j,k,n),s(i,j+1,k,n)))
+                      sp = min(sp,max(s(i,j,k,n),s(i,j+1,k,n)))
+
+                      ! reset sm on second interior edge
+                      sm = sedger
+
                       !
                       ! Modify using quadratic limiters.
                       !
@@ -2518,275 +2501,268 @@ contains
 
                 !
                 ! Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
-                !
-                if (lo(2)+1 .eq. domlo(2)) then
-                   if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
+                if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
-                      if (j .eq. lo(2)+1) then
-
-                         !
-                         ! The value in the first cc ghost cell represents the edge value.
-                         !
-                         sm = s(i,j-1,k,n)
-                         sedge = s(i,j-1,k,n)
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sp = -FIFTH        *s(i,j-1,k,n) &
-                              + (THREE/FOUR)*s(i,j,k,n) &
-                              + HALF        *s(i,j+1,k,n) &
-                              - (ONE/20.0d0)*s(i,j+2,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
-                         sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
-
-                     elseif (j .eq. lo(2)+2) then
-
-                         sedgel = s(i,j-2,k,n)
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedge = -FIFTH     *s(i,j-2,k,n) &
-                              + (THREE/FOUR)*s(i,j-1,k,n) &
-                              + HALF        *s(i,j,k,n) &
-                              - (ONE/20.0d0)*s(i,j+1,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)))
-                         sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)))
-
-                     elseif (j .eq. lo(2)+3) then
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedgel = -FIFTH    *s(i,j-3,k,n) &
-                              + (THREE/FOUR)*s(i,j-2,k,n) &
-                              + HALF        *s(i,j-1,k,n) &
-                              - (ONE/20.0d0)*s(i,j,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedgel = max(sedgel,min(s(i,j-1,k,n),s(i,j-2,k,n)))
-                         sedgel = min(sedgel,max(s(i,j-1,k,n),s(i,j-2,k,n)))
-
-                      endif
+                   if (j .eq. domlo(2)) then
 
                       !
-                      ! Apply Colella 2008 limiters to compute sm and sp in the second
-                      ! and third inner cells.
+                      ! The value in the first cc ghost cell represents the edge value.
+                      !
+                      sm = s(i,j-1,k,n)
+                      sedge = s(i,j-1,k,n)
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sp = -FIFTH        *s(i,j-1,k,n) &
+                           + (THREE/FOUR)*s(i,j,k,n) &
+                           + HALF        *s(i,j+1,k,n) &
+                           - (ONE/20.0d0)*s(i,j+2,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
-                      if (j .eq. lo(2)+2 .or. j .eq. lo(2)+3) then
+                   elseif (j .eq. domlo(2)+1) then
 
-                         alphap = sedger-s(i,j,k,n)
-                         alpham = sedge-s(i,j,k,n)
-                         bigp = abs(alphap).gt.TWO*abs(alpham)
-                         bigm = abs(alpham).gt.TWO*abs(alphap)
-                         extremum = .false.
+                      sedgel = s(i,j-2,k,n)
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedge = -FIFTH     *s(i,j-2,k,n) &
+                           + (THREE/FOUR)*s(i,j-1,k,n) &
+                           + HALF        *s(i,j,k,n) &
+                           - (ONE/20.0d0)*s(i,j+1,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)))
+                      sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)))
 
-                         if (alpham*alphap .ge. ZERO) then
-                            extremum = .true.
-                         else if (bigp .or. bigm) then
-                            !
-                            ! Possible extremum. We look at cell centered values and face
-                            ! centered values for a change in sign in the differences adjacent to
-                            ! the cell. We use the pair of differences whose minimum magnitude is
-                            ! the largest, and thus least susceptible to sensitivity to roundoff.
-                            !
-                            dafacem = sedge - sedgel
-                            dafacep = sedgerr - sedger
-                            dabarm = s(i,j,k,n) - s(i,j-1,k,n)
-                            dabarp = s(i,j+1,k,n) - s(i,j,k,n)
-                            dafacemin = min(abs(dafacem),abs(dafacep))
-                            dabarmin= min(abs(dabarm),abs(dabarp))
-                            if (dafacemin.ge.dabarmin) then
-                               dachkm = dafacem
-                               dachkp = dafacep
-                            else
-                               dachkm = dabarm
-                               dachkp = dabarp
-                            endif
-                            extremum = (dachkm*dachkp .le. 0.d0)
-                         end if
+                   elseif (j .eq. domlo(2)+2) then
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedgel = -FIFTH    *s(i,j-3,k,n) &
+                           + (THREE/FOUR)*s(i,j-2,k,n) &
+                           + HALF        *s(i,j-1,k,n) &
+                           - (ONE/20.0d0)*s(i,j,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedgel = max(sedgel,min(s(i,j-1,k,n),s(i,j-2,k,n)))
+                      sedgel = min(sedgel,max(s(i,j-1,k,n),s(i,j-2,k,n)))
 
-                         if (extremum) then
-                            D2  = SIX*(alpham + alphap)
-                            D2L = s(i,j-2,k,n)-TWO*s(i,j-1,k,n)+s(i,j,k,n)
-                            D2R = s(i,j,k,n)-TWO*s(i,j+1,k,n)+s(i,j+2,k,n)
-                            D2C = s(i,j-1,k,n)-TWO*s(i,j,k,n)+s(i,j+1,k,n)
-                            sgn = sign(ONE,D2)
-                            D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                            D2ABS = max(abs(D2),1.d-10)
-                            alpham = alpham*D2LIM/D2ABS
-                            alphap = alphap*D2LIM/D2ABS
+                   endif
+
+                   !
+                   ! Apply Colella 2008 limiters to compute sm and sp in the second
+                   ! and third inner cells.
+
+                   if (j .eq. domlo(2)+1 .or. j .eq. domlo(2)+2) then
+
+                      alphap = sedger-s(i,j,k,n)
+                      alpham = sedge-s(i,j,k,n)
+                      bigp = abs(alphap).gt.TWO*abs(alpham)
+                      bigm = abs(alpham).gt.TWO*abs(alphap)
+                      extremum = .false.
+
+                      if (alpham*alphap .ge. ZERO) then
+                         extremum = .true.
+                      else if (bigp .or. bigm) then
+                         !
+                         ! Possible extremum. We look at cell centered values and face
+                         ! centered values for a change in sign in the differences adjacent to
+                         ! the cell. We use the pair of differences whose minimum magnitude is
+                         ! the largest, and thus least susceptible to sensitivity to roundoff.
+                         !
+                         dafacem = sedge - sedgel
+                         dafacep = sedgerr - sedger
+                         dabarm = s(i,j,k,n) - s(i,j-1,k,n)
+                         dabarp = s(i,j+1,k,n) - s(i,j,k,n)
+                         dafacemin = min(abs(dafacem),abs(dafacep))
+                         dabarmin= min(abs(dabarm),abs(dabarp))
+                         if (dafacemin.ge.dabarmin) then
+                            dachkm = dafacem
+                            dachkp = dafacep
                          else
-                            if (bigp) then
-                               sgn = sign(ONE,alpham)
-                               amax = -alphap**2 / (4*(alpham + alphap))
-                               delam = s(i,j-1,k,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delam) then
-                                  if (sgn*(delam - alpham).ge.1.d-10) then
-                                     alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                                  else
-                                     alphap = -TWO*alpham
-                                  endif
-                               endif
-                            end if
-                            if (bigm) then
-                               sgn = sign(ONE,alphap)
-                               amax = -alpham**2 / (4*(alpham + alphap))
-                               delap = s(i,j+1,k,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delap) then
-                                  if (sgn*(delap - alphap).ge.1.d-10) then
-                                     alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                                  else
-                                     alpham = -TWO*alphap
-                                  endif
-                               endif
-                            end if
-                         end if
-
-                         sm = s(i,j,k,n) + alpham
-                         sp = s(i,j,k,n) + alphap
-
+                            dachkm = dabarm
+                            dachkp = dabarp
+                         endif
+                         extremum = (dachkm*dachkp .le. 0.d0)
                       end if
+
+                      if (extremum) then
+                         D2  = SIX*(alpham + alphap)
+                         D2L = s(i,j-2,k,n)-TWO*s(i,j-1,k,n)+s(i,j,k,n)
+                         D2R = s(i,j,k,n)-TWO*s(i,j+1,k,n)+s(i,j+2,k,n)
+                         D2C = s(i,j-1,k,n)-TWO*s(i,j,k,n)+s(i,j+1,k,n)
+                         sgn = sign(ONE,D2)
+                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                         D2ABS = max(abs(D2),1.d-10)
+                         alpham = alpham*D2LIM/D2ABS
+                         alphap = alphap*D2LIM/D2ABS
+                      else
+                         if (bigp) then
+                            sgn = sign(ONE,alpham)
+                            amax = -alphap**2 / (4*(alpham + alphap))
+                            delam = s(i,j-1,k,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delam) then
+                               if (sgn*(delam - alpham).ge.1.d-10) then
+                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                               else
+                                  alphap = -TWO*alpham
+                               endif
+                            endif
+                         end if
+                         if (bigm) then
+                            sgn = sign(ONE,alphap)
+                            amax = -alpham**2 / (4*(alpham + alphap))
+                            delap = s(i,j+1,k,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delap) then
+                               if (sgn*(delap - alphap).ge.1.d-10) then
+                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                               else
+                                  alpham = -TWO*alphap
+                               endif
+                            endif
+                         end if
+                      end if
+
+                      sm = s(i,j,k,n) + alpham
+                      sp = s(i,j,k,n) + alphap
 
                    end if
                 end if
 
-                if (hi(2)-1 .eq. domhi(2)) then
-                   if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
+                if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
-                      if (j .eq. hi(2)-1) then
-
-                         !
-                         ! The value in the first cc ghost cell represents the edge value.
-                         !
-                         sp = s(i,j+1,k,n)
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sm  = -FIFTH       *s(i,j+1,k,n) &
-                              + (THREE/FOUR)*s(i,j,k,n) &
-                              + HALF        *s(i,j-1,k,n) &
-                              - (ONE/20.0d0)*s(i,j-2,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sm  = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)))
-                         sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
-
-                     elseif (j .eq. hi(2)-2) then
-
-                         sedgerr = s(i,j+2,k,n)
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedger = -FIFTH    *s(i,j+2,k,n) &
-                              + (THREE/FOUR)*s(i,j+1,k,n) &
-                              + HALF        *s(i,j,k,n) &
-                              - (ONE/20.0d0)*s(i,j-1,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedger = max(sedger,min(s(i,j,k,n),s(i,j+1,k,n)))
-                         sedger = min(sedger,max(s(i,j,k,n),s(i,j+1,k,n)))
-
-                     elseif (j .eq. hi(2)-3) then
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedgerr = -FIFTH   *s(i,j+3,k,n) &
-                              + (THREE/FOUR)*s(i,j+2,k,n) &
-                              + HALF        *s(i,j+1,k,n) &
-                              - (ONE/20.0d0)*s(i,j,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedgerr = max(sedgerr,min(s(i,j+1,k,n),s(i,j+2,k,n)))
-                         sedgerr = min(sedgerr,max(s(i,j+1,k,n),s(i,j+2,k,n)))
-
-                      endif
+                   if (j .eq. domhi(2)) then
 
                       !
-                      ! Apply Colella 2008 limiters to compute sm and sp in the second
-                      ! and third inner cells.
+                      ! The value in the first cc ghost cell represents the edge value.
+                      !
+                      sp = s(i,j+1,k,n)
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sm  = -FIFTH       *s(i,j+1,k,n) &
+                           + (THREE/FOUR)*s(i,j,k,n) &
+                           + HALF        *s(i,j-1,k,n) &
+                           - (ONE/20.0d0)*s(i,j-2,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sm  = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
 
-                      if (j .eq. hi(2)-2 .or. j .eq. hi(2)-3) then
+                   elseif (j .eq. domhi(2)-1) then
 
-                         alphap = sedger-s(i,j,k,n)
-                         alpham = sedge-s(i,j,k,n)
-                         bigp = abs(alphap).gt.TWO*abs(alpham)
-                         bigm = abs(alpham).gt.TWO*abs(alphap)
-                         extremum = .false.
+                      sedgerr = s(i,j+2,k,n)
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedger = -FIFTH    *s(i,j+2,k,n) &
+                           + (THREE/FOUR)*s(i,j+1,k,n) &
+                           + HALF        *s(i,j,k,n) &
+                           - (ONE/20.0d0)*s(i,j-1,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedger = max(sedger,min(s(i,j,k,n),s(i,j+1,k,n)))
+                      sedger = min(sedger,max(s(i,j,k,n),s(i,j+1,k,n)))
 
-                         if (alpham*alphap .ge. ZERO) then
-                            extremum = .true.
-                         else if (bigp .or. bigm) then
-                            !
-                            ! Possible extremum. We look at cell centered values and face
-                            ! centered values for a change in sign in the differences adjacent to
-                            ! the cell. We use the pair of differences whose minimum magnitude is
-                            ! the largest, and thus least susceptible to sensitivity to roundoff.
-                            !
-                            dafacem = sedge - sedgel
-                            dafacep = sedgerr - sedger
-                            dabarm = s(i,j,k,n) - s(i,j-1,k,n)
-                            dabarp = s(i,j+1,k,n) - s(i,j,k,n)
-                            dafacemin = min(abs(dafacem),abs(dafacep))
-                            dabarmin= min(abs(dabarm),abs(dabarp))
-                            if (dafacemin.ge.dabarmin) then
-                               dachkm = dafacem
-                               dachkp = dafacep
-                            else
-                               dachkm = dabarm
-                               dachkp = dabarp
-                            endif
-                            extremum = (dachkm*dachkp .le. 0.d0)
-                         end if
+                   elseif (j .eq. domhi(2)-2) then
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedgerr = -FIFTH   *s(i,j+3,k,n) &
+                           + (THREE/FOUR)*s(i,j+2,k,n) &
+                           + HALF        *s(i,j+1,k,n) &
+                           - (ONE/20.0d0)*s(i,j,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedgerr = max(sedgerr,min(s(i,j+1,k,n),s(i,j+2,k,n)))
+                      sedgerr = min(sedgerr,max(s(i,j+1,k,n),s(i,j+2,k,n)))
 
-                         if (extremum) then
-                            D2  = SIX*(alpham + alphap)
-                            D2L = s(i,j-2,k,n)-TWO*s(i,j-1,k,n)+s(i,j,k,n)
-                            D2R = s(i,j,k,n)-TWO*s(i,j+1,k,n)+s(i,j+2,k,n)
-                            D2C = s(i,j-1,k,n)-TWO*s(i,j,k,n)+s(i,j+1,k,n)
-                            sgn = sign(ONE,D2)
-                            D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                            D2ABS = max(abs(D2),1.d-10)
-                            alpham = alpham*D2LIM/D2ABS
-                            alphap = alphap*D2LIM/D2ABS
+                   endif
+
+                   !
+                   ! Apply Colella 2008 limiters to compute sm and sp in the second
+                   ! and third inner cells.
+
+                   if (j .eq. domhi(2)-1 .or. j .eq. domhi(2)-2) then
+
+                      alphap = sedger-s(i,j,k,n)
+                      alpham = sedge-s(i,j,k,n)
+                      bigp = abs(alphap).gt.TWO*abs(alpham)
+                      bigm = abs(alpham).gt.TWO*abs(alphap)
+                      extremum = .false.
+
+                      if (alpham*alphap .ge. ZERO) then
+                         extremum = .true.
+                      else if (bigp .or. bigm) then
+                         !
+                         ! Possible extremum. We look at cell centered values and face
+                         ! centered values for a change in sign in the differences adjacent to
+                         ! the cell. We use the pair of differences whose minimum magnitude is
+                         ! the largest, and thus least susceptible to sensitivity to roundoff.
+                         !
+                         dafacem = sedge - sedgel
+                         dafacep = sedgerr - sedger
+                         dabarm = s(i,j,k,n) - s(i,j-1,k,n)
+                         dabarp = s(i,j+1,k,n) - s(i,j,k,n)
+                         dafacemin = min(abs(dafacem),abs(dafacep))
+                         dabarmin= min(abs(dabarm),abs(dabarp))
+                         if (dafacemin.ge.dabarmin) then
+                            dachkm = dafacem
+                            dachkp = dafacep
                          else
-                            if (bigp) then
-                               sgn = sign(ONE,alpham)
-                               amax = -alphap**2 / (4*(alpham + alphap))
-                               delam = s(i,j-1,k,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delam) then
-                                  if (sgn*(delam - alpham).ge.1.d-10) then
-                                     alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                                  else
-                                     alphap = -TWO*alpham
-                                  endif
-                               endif
-                            end if
-                            if (bigm) then
-                               sgn = sign(ONE,alphap)
-                               amax = -alpham**2 / (4*(alpham + alphap))
-                               delap = s(i,j+1,k,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delap) then
-                                  if (sgn*(delap - alphap).ge.1.d-10) then
-                                     alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                                  else
-                                     alpham = -TWO*alphap
-                                  endif
-                               endif
-                            end if
-                         end if
-
-                         sm = s(i,j,k,n) + alpham
-                         sp = s(i,j,k,n) + alphap
-
+                            dachkm = dabarm
+                            dachkp = dabarp
+                         endif
+                         extremum = (dachkm*dachkp .le. 0.d0)
                       end if
+
+                      if (extremum) then
+                         D2  = SIX*(alpham + alphap)
+                         D2L = s(i,j-2,k,n)-TWO*s(i,j-1,k,n)+s(i,j,k,n)
+                         D2R = s(i,j,k,n)-TWO*s(i,j+1,k,n)+s(i,j+2,k,n)
+                         D2C = s(i,j-1,k,n)-TWO*s(i,j,k,n)+s(i,j+1,k,n)
+                         sgn = sign(ONE,D2)
+                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                         D2ABS = max(abs(D2),1.d-10)
+                         alpham = alpham*D2LIM/D2ABS
+                         alphap = alphap*D2LIM/D2ABS
+                      else
+                         if (bigp) then
+                            sgn = sign(ONE,alpham)
+                            amax = -alphap**2 / (4*(alpham + alphap))
+                            delam = s(i,j-1,k,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delam) then
+                               if (sgn*(delam - alpham).ge.1.d-10) then
+                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                               else
+                                  alphap = -TWO*alpham
+                               endif
+                            endif
+                         end if
+                         if (bigm) then
+                            sgn = sign(ONE,alphap)
+                            amax = -alpham**2 / (4*(alpham + alphap))
+                            delap = s(i,j+1,k,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delap) then
+                               if (sgn*(delap - alphap).ge.1.d-10) then
+                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                               else
+                                  alpham = -TWO*alphap
+                               endif
+                            endif
+                         end if
+                      end if
+
+                      sm = s(i,j,k,n) + alpham
+                      sp = s(i,j,k,n) + alphap
 
                    end if
                 end if
@@ -2917,6 +2893,10 @@ contains
                 sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)))
                 sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)))
 
+                ! save for later 
+                sedgel = sp
+                sedger = sm
+
                 !
                 ! Modify using quadratic limiters.
                 !
@@ -2931,7 +2911,7 @@ contains
                 !
                 ! Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
                 !
-                if (k .eq. lo(3)+1 .and. lo(3)+1 .eq. domlo(3)) then
+                if (k .eq. domlo(3)) then
                    if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
 
                       ! The value in the first cc ghost cell represents the edge value.
@@ -2939,42 +2919,39 @@ contains
                       sm = s(i,j,k-1,n)
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sp on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j,k-1,n) &
+                      sp = -FIFTH     *s(i,j,k-1,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i,j,k+1,n) &
                            - (ONE/20.0d0)*s(i,j,k+2,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sp lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k+1,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k+1,n),s(i,j,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)))
 
                    end if
                 end if
 
-                if (k .eq. lo(3)+2 .and. lo(3)+1 .eq. domlo(3)) then
+                if (k .eq. domlo(3)+1) then
                    if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j,k-2,n) &
+                      sm = -FIFTH     *s(i,j,k-2,n) &
                            + (THREE/FOUR)*s(i,j,k-1,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i,j,k+1,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sm lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j,k-1,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j,k-1,n)))
-                      !
-                      sm = sedge
+                      sm = max(sm,min(s(i,j,k,n),s(i,j,k-1,n)))
+                      sm = min(sm,max(s(i,j,k,n),s(i,j,k-1,n)))
+
+                      ! reset sp on second interior edge
+                      sp = sedgel
                       !
                       ! Modify using quadratic limiters.
                       !
@@ -2990,7 +2967,7 @@ contains
                    end if
                 end if
 
-                if (k .eq. hi(3)-1 .and. hi(3)-1 .eq. domhi(3)) then
+                if (k .eq. domhi(3)) then
                    if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
 
                       !
@@ -2999,41 +2976,38 @@ contains
                       sp = s(i,j,k+1,n)
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j,k+1,n) &
+                      sm = -FIFTH     *s(i,j,k+1,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i,j,k-1,n) &
                            - (ONE/20.0d0)*s(i,j,k-2,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sm lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k-1,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k-1,n),s(i,j,k,n)))
-                      !
-                      sm = sedge
+                      sm = max(sm,min(s(i,j,k-1,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)))
                    end if
                 end if
 
-                if (k .eq. hi(3)-2 .and. hi(3)-1 .eq. domhi(3)) then
+                if (k .eq. domhi(3)-1) then
                    if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
 
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j,k+2,n) &
+                      sp = -FIFTH     *s(i,j,k+2,n) &
                            + (THREE/FOUR)*s(i,j,k+1,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i,j,k-1,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sp lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j,k+1,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j,k+1,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j,k,n),s(i,j,k+1,n)))
+                      sp = min(sp,max(s(i,j,k,n),s(i,j,k+1,n)))
+
+                      ! reset sm on second interior edge
+                      sm = sedger
 
                       ! Modify using quadratic limiters.
                       !
@@ -3239,278 +3213,271 @@ contains
                 sm = s(i,j,k,n) + alpham
                 sp = s(i,j,k,n) + alphap
 
-                !
                 ! Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
-                !
-                if (lo(3)+1 .eq. domlo(3)) then
-                   if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
+                if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
 
-                      if (k .eq. lo(3)+1) then
+                   if (k .eq. domlo(3)) then
 
-                         !
-                         ! The value in the first cc ghost cell represents the edge value.
-                         !
-                         sm = s(i,j,k-1,n)
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sp = -FIFTH        *s(i,j,k-1,n) &
-                              + (THREE/FOUR)*s(i,j,k,n) &
-                              + HALF        *s(i,j,k+1,n) &
-                              - (ONE/20.0d0)*s(i,j,k+2,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)))
-                         sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)))
+                      !
+                      ! The value in the first cc ghost cell represents the edge value.
+                      !
+                      sm = s(i,j,k-1,n)
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sp = -FIFTH        *s(i,j,k-1,n) &
+                           + (THREE/FOUR)*s(i,j,k,n) &
+                           + HALF        *s(i,j,k+1,n) &
+                           - (ONE/20.0d0)*s(i,j,k+2,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)))
 
-                     elseif (k .eq. lo(3)+2) then
+                   elseif (k .eq. domlo(3)+1) then
 
-                         sedgel = s(i,j,k-2,n)
+                      sedgel = s(i,j,k-2,n)
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedge = -FIFTH     *s(i,j,k-2,n) &
+                           + (THREE/FOUR)*s(i,j,k-1,n) &
+                           + HALF        *s(i,j,k,n) &
+                           - (ONE/20.0d0)*s(i,j,k+1,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedge = max(sedge,min(s(i,j,k,n),s(i,j,k-1,n)))
+                      sedge = min(sedge,max(s(i,j,k,n),s(i,j,k-1,n)))
+
+                   elseif (k .eq. domlo(3)+2) then
+
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedgel = -FIFTH    *s(i,j,k-3,n) &
+                           + (THREE/FOUR)*s(i,j,k-2,n) &
+                           + HALF        *s(i,j,k-1,n) &
+                           - (ONE/20.0d0)*s(i,j,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedgel = max(sedgel,min(s(i,j,k-1,n),s(i,j,k-2,n)))
+                      sedgel = min(sedgel,max(s(i,j,k-1,n),s(i,j,k-2,n)))
+
+                   endif
+
+                   ! Apply Colella 2008 limiters to compute sm and sp in the second
+                   ! and third inner cells.
+
+                   if (k .eq. domlo(3)+1 .or. k .eq. domlo(3)+2) then
+
+                      alphap = sedger-s(i,j,k,n)
+                      alpham = sedge-s(i,j,k,n)
+                      bigp = abs(alphap).gt.TWO*abs(alpham)
+                      bigm = abs(alpham).gt.TWO*abs(alphap)
+                      extremum = .false.
+
+                      if (alpham*alphap .ge. ZERO) then
+                         extremum = .true.
+                      else if (bigp .or. bigm) then
                          !
-                         ! Use a modified stencil to get sedge on the first interior edge.
+                         ! Possible extremum. We look at cell centered values and face
+                         ! centered values for a change in sign in the differences adjacent to
+                         ! the cell. We use the pair of differences whose minimum magnitude is
+                         ! the largest, and thus least susceptible to sensitivity to roundoff.
                          !
-                         sedge = -FIFTH     *s(i,j,k-2,n) &
-                              + (THREE/FOUR)*s(i,j,k-1,n) &
-                              + HALF        *s(i,j,k,n) &
-                              - (ONE/20.0d0)*s(i,j,k+1,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedge = max(sedge,min(s(i,j,k,n),s(i,j,k-1,n)))
-                         sedge = min(sedge,max(s(i,j,k,n),s(i,j,k-1,n)))
-
-                     elseif (k .eq. lo(3)+3) then
-
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedgel = -FIFTH    *s(i,j,k-3,n) &
-                              + (THREE/FOUR)*s(i,j,k-2,n) &
-                              + HALF        *s(i,j,k-1,n) &
-                              - (ONE/20.0d0)*s(i,j,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedgel = max(sedgel,min(s(i,j,k-1,n),s(i,j,k-2,n)))
-                         sedgel = min(sedgel,max(s(i,j,k-1,n),s(i,j,k-2,n)))
-
-                      endif
-
-                      ! Apply Colella 2008 limiters to compute sm and sp in the second
-                      ! and third inner cells.
-
-                      if (k .eq. lo(3)+2 .or. k .eq. lo(3)+3) then
-
-                         alphap = sedger-s(i,j,k,n)
-                         alpham = sedge-s(i,j,k,n)
-                         bigp = abs(alphap).gt.TWO*abs(alpham)
-                         bigm = abs(alpham).gt.TWO*abs(alphap)
-                         extremum = .false.
-
-                         if (alpham*alphap .ge. ZERO) then
-                            extremum = .true.
-                         else if (bigp .or. bigm) then
-                            !
-                            ! Possible extremum. We look at cell centered values and face
-                            ! centered values for a change in sign in the differences adjacent to
-                            ! the cell. We use the pair of differences whose minimum magnitude is
-                            ! the largest, and thus least susceptible to sensitivity to roundoff.
-                            !
-                            dafacem = sedge - sedgel
-                            dafacep = sedgerr - sedger
-                            dabarm = s(i,j,k,n) - s(i,j,k-1,n)
-                            dabarp = s(i,j,k+1,n) - s(i,j,k,n)
-                            dafacemin = min(abs(dafacem),abs(dafacep))
-                            dabarmin= min(abs(dabarm),abs(dabarp))
-                            if (dafacemin.ge.dabarmin) then
-                               dachkm = dafacem
-                               dachkp = dafacep
-                            else
-                               dachkm = dabarm
-                               dachkp = dabarp
-                            endif
-                            extremum = (dachkm*dachkp .le. 0.d0)
-                         end if
-
-                         if (extremum) then
-                            D2  = SIX*(alpham + alphap)
-                            D2L = s(i,j,k-2,n)-TWO*s(i,j,k-1,n)+s(i,j,k,n)
-                            D2R = s(i,j,k,n)-TWO*s(i,j,k+1,n)+s(i,j,k+2,n)
-                            D2C = s(i,j,k-1,n)-TWO*s(i,j,k,n)+s(i,j,k+1,n)
-                            sgn = sign(ONE,D2)
-                            D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                            D2ABS = max(abs(D2),1.d-10)
-                            alpham = alpham*D2LIM/D2ABS
-                            alphap = alphap*D2LIM/D2ABS
+                         dafacem = sedge - sedgel
+                         dafacep = sedgerr - sedger
+                         dabarm = s(i,j,k,n) - s(i,j,k-1,n)
+                         dabarp = s(i,j,k+1,n) - s(i,j,k,n)
+                         dafacemin = min(abs(dafacem),abs(dafacep))
+                         dabarmin= min(abs(dabarm),abs(dabarp))
+                         if (dafacemin.ge.dabarmin) then
+                            dachkm = dafacem
+                            dachkp = dafacep
                          else
-                            if (bigp) then
-                               sgn = sign(ONE,alpham)
-                               amax = -alphap**2 / (4*(alpham + alphap))
-                               delam = s(i,j,k-1,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delam) then
-                                  if (sgn*(delam - alpham).ge.1.d-10) then
-                                     alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                                  else
-                                     alphap = -TWO*alpham
-                                  endif
-                               endif
-                            end if
-                            if (bigm) then
-                               sgn = sign(ONE,alphap)
-                               amax = -alpham**2 / (4*(alpham + alphap))
-                               delap = s(i,j,k+1,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delap) then
-                                  if (sgn*(delap - alphap).ge.1.d-10) then
-                                     alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                                  else
-                                     alpham = -TWO*alphap
-                                  endif
-                               endif
-                            end if
-                         end if
-
-                         sm = s(i,j,k,n) + alpham
-                         sp = s(i,j,k,n) + alphap
-
+                            dachkm = dabarm
+                            dachkp = dabarp
+                         endif
+                         extremum = (dachkm*dachkp .le. 0.d0)
                       end if
+
+                      if (extremum) then
+                         D2  = SIX*(alpham + alphap)
+                         D2L = s(i,j,k-2,n)-TWO*s(i,j,k-1,n)+s(i,j,k,n)
+                         D2R = s(i,j,k,n)-TWO*s(i,j,k+1,n)+s(i,j,k+2,n)
+                         D2C = s(i,j,k-1,n)-TWO*s(i,j,k,n)+s(i,j,k+1,n)
+                         sgn = sign(ONE,D2)
+                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                         D2ABS = max(abs(D2),1.d-10)
+                         alpham = alpham*D2LIM/D2ABS
+                         alphap = alphap*D2LIM/D2ABS
+                      else
+                         if (bigp) then
+                            sgn = sign(ONE,alpham)
+                            amax = -alphap**2 / (4*(alpham + alphap))
+                            delam = s(i,j,k-1,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delam) then
+                               if (sgn*(delam - alpham).ge.1.d-10) then
+                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                               else
+                                  alphap = -TWO*alpham
+                               endif
+                            endif
+                         end if
+                         if (bigm) then
+                            sgn = sign(ONE,alphap)
+                            amax = -alpham**2 / (4*(alpham + alphap))
+                            delap = s(i,j,k+1,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delap) then
+                               if (sgn*(delap - alphap).ge.1.d-10) then
+                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                               else
+                                  alpham = -TWO*alphap
+                               endif
+                            endif
+                         end if
+                      end if
+
+                      sm = s(i,j,k,n) + alpham
+                      sp = s(i,j,k,n) + alphap
 
                    end if
                 end if
 
-                if (hi(3)-1 .eq. domhi(3)) then
-                   if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
+                if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
 
-                      if (k .eq. hi(3)-1) then
-
-                         !
-                         ! The value in the first cc ghost cell represents the edge value.
-                         !
-                         sp = s(i,j,k+1,n)
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sm = -FIFTH        *s(i,j,k+1,n) &
-                              + (THREE/FOUR)*s(i,j,k,n) &
-                              + HALF        *s(i,j,k-1,n) &
-                              - (ONE/20.0d0)*s(i,j,k-2,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sm= max(sm,min(s(i,j,k-1,n),s(i,j,k,n)))
-                         sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)))
-
-                     elseif (k .eq. hi(3)-2) then
-
-                         sedgerr = s(i,j,k+2,n)
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedger = -FIFTH    *s(i,j,k+2,n) &
-                              + (THREE/FOUR)*s(i,j,k+1,n) &
-                              + HALF        *s(i,j,k,n) &
-                              - (ONE/20.0d0)*s(i,j,k-1,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedger = max(sedger,min(s(i,j,k,n),s(i,j,k+1,n)))
-                         sedger = min(sedger,max(s(i,j,k,n),s(i,j,k+1,n)))
-
-                     elseif (k .eq. hi(3)-3) then
-
-                         !
-                         ! Use a modified stencil to get sedge on the first interior edge.
-                         !
-                         sedgerr = -FIFTH   *s(i,j,k+3,n) &
-                              + (THREE/FOUR)*s(i,j,k+2,n) &
-                              + HALF        *s(i,j,k+1,n) &
-                              - (ONE/20.0d0)*s(i,j,k,n)
-                         !
-                         ! Make sure sedge lies in between adjacent cell-centered values.
-                         !
-                         sedgerr = max(sedgerr,min(s(i,j,k+1,n),s(i,j,k+2,n)))
-                         sedgerr = min(sedgerr,max(s(i,j,k+1,n),s(i,j,k+2,n)))
-
-                      endif
+                   if (k .eq. domhi(3)) then
 
                       !
-                      ! Apply Colella 2008 limiters to compute sm and sp in the second
-                      ! and third inner cells.
+                      ! The value in the first cc ghost cell represents the edge value.
                       !
-                      if (k .eq. hi(3)-2 .or. k .eq. hi(3)-3) then
+                      sp = s(i,j,k+1,n)
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sm = -FIFTH        *s(i,j,k+1,n) &
+                           + (THREE/FOUR)*s(i,j,k,n) &
+                           + HALF        *s(i,j,k-1,n) &
+                           - (ONE/20.0d0)*s(i,j,k-2,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sm= max(sm,min(s(i,j,k-1,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)))
 
-                         alphap = sedger-s(i,j,k,n)
-                         alpham = sedge-s(i,j,k,n)
-                         bigp = abs(alphap).gt.TWO*abs(alpham)
-                         bigm = abs(alpham).gt.TWO*abs(alphap)
-                         extremum = .false.
+                   elseif (k .eq. domhi(3)-1) then
 
-                         if (alpham*alphap .ge. ZERO) then
-                            extremum = .true.
-                         else if (bigp .or. bigm) then
-                            !
-                            ! Possible extremum. We look at cell centered values and face
-                            ! centered values for a change in sign in the differences adjacent to
-                            ! the cell. We use the pair of differences whose minimum magnitude is
-                            ! the largest, and thus least susceptible to sensitivity to roundoff.
-                            !
-                            dafacem = sedge - sedgel
-                            dafacep = sedgerr - sedger
-                            dabarm = s(i,j,k,n) - s(i,j,k-1,n)
-                            dabarp = s(i,j,k+1,n) - s(i,j,k,n)
-                            dafacemin = min(abs(dafacem),abs(dafacep))
-                            dabarmin= min(abs(dabarm),abs(dabarp))
-                            if (dafacemin.ge.dabarmin) then
-                               dachkm = dafacem
-                               dachkp = dafacep
-                            else
-                               dachkm = dabarm
-                               dachkp = dabarp
-                            endif
-                            extremum = (dachkm*dachkp .le. 0.d0)
-                         end if
+                      sedgerr = s(i,j,k+2,n)
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedger = -FIFTH    *s(i,j,k+2,n) &
+                           + (THREE/FOUR)*s(i,j,k+1,n) &
+                           + HALF        *s(i,j,k,n) &
+                           - (ONE/20.0d0)*s(i,j,k-1,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedger = max(sedger,min(s(i,j,k,n),s(i,j,k+1,n)))
+                      sedger = min(sedger,max(s(i,j,k,n),s(i,j,k+1,n)))
 
-                         if (extremum) then
-                            D2  = SIX*(alpham + alphap)
-                            D2L = s(i,j,k-2,n)-TWO*s(i,j,k-1,n)+s(i,j,k,n)
-                            D2R = s(i,j,k,n)-TWO*s(i,j,k+1,n)+s(i,j,k+2,n)
-                            D2C = s(i,j,k-1,n)-TWO*s(i,j,k,n)+s(i,j,k+1,n)
-                            sgn = sign(ONE,D2)
-                            D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
-                            D2ABS = max(abs(D2),1.d-10)
-                            alpham = alpham*D2LIM/D2ABS
-                            alphap = alphap*D2LIM/D2ABS
+                   elseif (k .eq. domhi(3)-2) then
+
+                      !
+                      ! Use a modified stencil to get sedge on the first interior edge.
+                      !
+                      sedgerr = -FIFTH   *s(i,j,k+3,n) &
+                           + (THREE/FOUR)*s(i,j,k+2,n) &
+                           + HALF        *s(i,j,k+1,n) &
+                           - (ONE/20.0d0)*s(i,j,k,n)
+                      !
+                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      !
+                      sedgerr = max(sedgerr,min(s(i,j,k+1,n),s(i,j,k+2,n)))
+                      sedgerr = min(sedgerr,max(s(i,j,k+1,n),s(i,j,k+2,n)))
+
+                   endif
+
+                   !
+                   ! Apply Colella 2008 limiters to compute sm and sp in the second
+                   ! and third inner cells.
+                   !
+                   if (k .eq. domhi(3)-1 .or. k .eq. domhi(3)-2) then
+
+                      alphap = sedger-s(i,j,k,n)
+                      alpham = sedge-s(i,j,k,n)
+                      bigp = abs(alphap).gt.TWO*abs(alpham)
+                      bigm = abs(alpham).gt.TWO*abs(alphap)
+                      extremum = .false.
+
+                      if (alpham*alphap .ge. ZERO) then
+                         extremum = .true.
+                      else if (bigp .or. bigm) then
+                         !
+                         ! Possible extremum. We look at cell centered values and face
+                         ! centered values for a change in sign in the differences adjacent to
+                         ! the cell. We use the pair of differences whose minimum magnitude is
+                         ! the largest, and thus least susceptible to sensitivity to roundoff.
+                         !
+                         dafacem = sedge - sedgel
+                         dafacep = sedgerr - sedger
+                         dabarm = s(i,j,k,n) - s(i,j,k-1,n)
+                         dabarp = s(i,j,k+1,n) - s(i,j,k,n)
+                         dafacemin = min(abs(dafacem),abs(dafacep))
+                         dabarmin= min(abs(dabarm),abs(dabarp))
+                         if (dafacemin.ge.dabarmin) then
+                            dachkm = dafacem
+                            dachkp = dafacep
                          else
-                            if (bigp) then
-                               sgn = sign(ONE,alpham)
-                               amax = -alphap**2 / (4*(alpham + alphap))
-                               delam = s(i,j,k-1,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delam) then
-                                  if (sgn*(delam - alpham).ge.1.d-10) then
-                                     alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
-                                  else
-                                     alphap = -TWO*alpham
-                                  endif
-                               endif
-                            end if
-                            if (bigm) then
-                               sgn = sign(ONE,alphap)
-                               amax = -alpham**2 / (4*(alpham + alphap))
-                               delap = s(i,j,k+1,n) - s(i,j,k,n)
-                               if (sgn*amax .ge. sgn*delap) then
-                                  if (sgn*(delap - alphap).ge.1.d-10) then
-                                     alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
-                                  else
-                                     alpham = -TWO*alphap
-                                  endif
-                               endif
-                            end if
-                         end if
-
-                         sm = s(i,j,k,n) + alpham
-                         sp = s(i,j,k,n) + alphap
-
+                            dachkm = dabarm
+                            dachkp = dabarp
+                         endif
+                         extremum = (dachkm*dachkp .le. 0.d0)
                       end if
+
+                      if (extremum) then
+                         D2  = SIX*(alpham + alphap)
+                         D2L = s(i,j,k-2,n)-TWO*s(i,j,k-1,n)+s(i,j,k,n)
+                         D2R = s(i,j,k,n)-TWO*s(i,j,k+1,n)+s(i,j,k+2,n)
+                         D2C = s(i,j,k-1,n)-TWO*s(i,j,k,n)+s(i,j,k+1,n)
+                         sgn = sign(ONE,D2)
+                         D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),ZERO)
+                         D2ABS = max(abs(D2),1.d-10)
+                         alpham = alpham*D2LIM/D2ABS
+                         alphap = alphap*D2LIM/D2ABS
+                      else
+                         if (bigp) then
+                            sgn = sign(ONE,alpham)
+                            amax = -alphap**2 / (4*(alpham + alphap))
+                            delam = s(i,j,k-1,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delam) then
+                               if (sgn*(delam - alpham).ge.1.d-10) then
+                                  alphap = (-TWO*delam - TWO*sgn*sqrt(delam**2 - delam*alpham))
+                               else
+                                  alphap = -TWO*alpham
+                               endif
+                            endif
+                         end if
+                         if (bigm) then
+                            sgn = sign(ONE,alphap)
+                            amax = -alpham**2 / (4*(alpham + alphap))
+                            delap = s(i,j,k+1,n) - s(i,j,k,n)
+                            if (sgn*amax .ge. sgn*delap) then
+                               if (sgn*(delap - alphap).ge.1.d-10) then
+                                  alpham = (-TWO*delap - TWO*sgn*sqrt(delap**2 - delap*alphap))
+                               else
+                                  alpham = -TWO*alphap
+                               endif
+                            endif
+                         end if
+                      end if
+
+                      sm = s(i,j,k,n) + alpham
+                      sp = s(i,j,k,n) + alphap
+
                    end if
                 end if
 

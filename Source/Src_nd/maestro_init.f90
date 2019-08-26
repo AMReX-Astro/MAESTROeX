@@ -1,4 +1,3 @@
-
 module maestro_init_module
 
   use amrex_error_module
@@ -17,6 +16,7 @@ module maestro_init_module
 contains
 
   subroutine maestro_network_init() bind(C, name="maestro_network_init")
+    ! Binds to C function ``maestro_network_init``
 
     use actual_rhs_module, only: actual_rhs_init
     use burner_loop_module, only: burner_loop_init
@@ -32,10 +32,9 @@ contains
   ! :::
 
   subroutine maestro_extern_init() bind(C, name="maestro_extern_init")
-
     ! initialize the external runtime parameters in
     ! extern_probin_module
-
+    ! Binds to C function ``maestro_extern_init``
     use amrex_fort_module, only: rt => amrex_real
     !
     call runtime_init()
@@ -47,10 +46,9 @@ contains
   ! :::
 
   subroutine maestro_conductivity_init() bind(C, name="maestro_conductivity_init")
-
     ! initialize the external runtime parameters in
     ! extern_probin_module
-
+    ! Binds to C function ``maestro_conductivity_init``
     use conductivity_module, only: conductivity_init
 
     call conductivity_init()
@@ -62,6 +60,7 @@ contains
   ! :::
 
   subroutine get_num_spec(nspec_out) bind(C, name="get_num_spec")
+    ! Binds to C function ``get_num_spec``
 
     integer, intent(out) :: nspec_out
 
@@ -74,6 +73,7 @@ contains
   ! :::
 
   subroutine get_spec_names(spec_names,ispec,len) bind(C, name="get_spec_names")
+    ! Binds to C function ``get_spec_names``
 
     integer, intent(in   ) :: ispec
     integer, intent(inout) :: len
@@ -95,6 +95,7 @@ contains
   ! :::
 
   subroutine get_spec_az(ispec,A,Z) bind(C, name="get_spec_az")
+    ! Binds to C function ``get_spec_az``
 
     use network, only: nspec, aion, zion
     use amrex_fort_module, only: rt => amrex_real
@@ -117,6 +118,7 @@ contains
   subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature, &
        Pressure,Nscalars,prob_lo_in,prob_hi_in) &
        bind(C, name="set_method_params")
+    ! Binds to C function ``set_method_params``
 
     integer         , intent(in) :: Density, Enthalpy, FirstSpec, Temperature
     integer         , intent(in) :: Pressure, Nscalars
@@ -182,6 +184,7 @@ contains
   ! :::
 
   subroutine set_rel_eps(rel_eps_in) bind(C,name="set_rel_eps")
+    ! Binds to C function ``set_rel_eps``
 
     double precision, intent(in) :: rel_eps_in
 
@@ -194,6 +197,7 @@ contains
   ! :::
 
   subroutine get_rel_eps(rel_eps_in) bind(C,name="get_rel_eps")
+    ! Binds to C function ``get_rel_eps``
 
     double precision, intent(inout) :: rel_eps_in
 

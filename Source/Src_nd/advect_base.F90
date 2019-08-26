@@ -1,6 +1,5 @@
-! Create the psi term, where psi = D_0 p_0/Dt
-
 module advect_base_module
+  ! Create the psi term, where psi = D_0 p_0/Dt
 
   use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, dr, &

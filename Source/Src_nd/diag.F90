@@ -1,29 +1,28 @@
-! diag module for MAESTROeX.
-! currently, there are 3 output files:
-!
-!   diag_enuc.out:
-!          peak nuc energy generation rate (erg / g / s)
-!          x/y/z location of peak enuc
-!          velocity components at location of peak enuc (including vr)
-!          radius of peak enuc
-!          total nuclear energy release (erg / s)
-!
-!   diag_temp.out:
-!          peak temperature
-!          x/y/z location of peak temperature
-!          velocity components at location of peak temperature (including vr)
-!          radius of peak temperature
-!          central temperature
-!
-!   diag_vel.out:
-!          peak total velocity
-!          peak Mach number
-!          total kinetic energy
-!          gravitational potential energy
-!          total internal energy
-!          velocity components at the center of the star
-!
 module diag_module
+  ! diag module for MAESTROeX.
+  ! currently, there are 3 output files:
+  !
+  ! diag_enuc.out:
+  ! peak nuc energy generation rate (erg / g / s)
+  ! x/y/z location of peak enuc
+  ! velocity components at location of peak enuc (including vr)
+  ! radius of peak enuc
+  ! total nuclear energy release (erg / s)
+  !
+  ! diag_temp.out:
+  ! peak temperature
+  ! x/y/z location of peak temperature
+  ! velocity components at location of peak temperature (including vr)
+  ! radius of peak temperature
+  ! central temperature
+  !
+  ! diag_vel.out:
+  ! peak total velocity
+  ! peak Mach number
+  ! total kinetic energy
+  ! gravitational potential energy
+  ! total internal energy
+  ! velocity components at the center of the star
 
   use meth_params_module, only: rho_comp, spec_comp, temp_comp, prob_lo, &
        sponge_start_factor, sponge_center_density, base_cutoff_density
@@ -51,6 +50,7 @@ contains
                   Mach_max,temp_max,enuc_max,Hext_max, &
                   mask,     m_lo, m_hi, use_mask) &
                   bind(C, name="diag")
+    ! Binds to C function ``diag``
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -157,6 +157,7 @@ contains
                        ncenter, T_center, vel_center, &
                        mask,     m_lo, m_hi, use_mask) &
                        bind(C, name="diag_sphr")
+    ! Binds to C function ``diag_sphr``
 
     integer         , intent(in   ) :: lev, lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3), nc_s
@@ -301,6 +302,7 @@ contains
   subroutine diag_grav_energy(grav_ener, rho0, &
                                r_cc_loc, r_edge_loc) &
        bind(C, name="diag_grav_energy")
+    ! Binds to C function ``diag_grav_energy``
 
     double precision, intent(inout) :: grav_ener
     double precision, intent(in   ) :: rho0(0:max_radial_level,0:nr_fine-1)

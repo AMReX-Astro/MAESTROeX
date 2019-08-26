@@ -75,6 +75,8 @@ Maestro::EstDt ()
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        vel_force[lev].setVal(0.);
     }
 
     int do_add_utilde_force = 0;
@@ -277,6 +279,8 @@ Maestro::FirstDt ()
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        vel_force[lev].setVal(0.);
     }
 
     int do_add_utilde_force = 0;
