@@ -408,7 +408,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // copy sold into shat 
     // temperature will be overwritten later after enthalpy advance
     for (int lev=0; lev<=finest_level; ++lev) {
-	MultiFab::Copy(shat[lev],sold[lev],0,0,Nscal,ng_s);
+	MultiFab::Copy(shat[lev],sold[lev],0,0,Nscal,0);
     }
 
     if (maestro_verbose >= 1) {
@@ -499,8 +499,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // extract aofs = (shat - sold) / dt - intra
     for (int lev=0; lev<=finest_level; ++lev) {
-	MultiFab::LinComb(aofs[lev],1.0,shat[lev],0,-1.0,sold[lev],0,0,Nscal,0);
-	aofs[lev].mult(1.0/dt);
+	MultiFab::LinComb(aofs[lev],1.0/dt,shat[lev],0,-1.0/dt,sold[lev],0,0,Nscal,0);
 	MultiFab::Subtract(aofs[lev],intra[lev],0,0,Nscal,0);
     }
     
@@ -526,7 +525,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     if (maestro_verbose >= 1) {
-	Print() << "<<< STEP 2C: advance thermo variables >>>" << std::endl;
+	Print() << "<<< STEP 2C : advance thermo variables >>>" << std::endl;
     }
 
     // build sdc_source
@@ -548,8 +547,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // extract IR =  [ (snew - sold)/dt - sdc_source ]
     for (int lev=0; lev<=finest_level; ++lev) {
 	intra[lev].setVal(0.);
-	MultiFab::LinComb(intra[lev],1.0,snew[lev],0,-1.0,sold[lev],0,0,Nscal,0);
-	intra[lev].mult(1.0/dt);
+	MultiFab::LinComb(intra[lev],1.0/dt,snew[lev],0,-1.0/dt,sold[lev],0,0,Nscal,0);
 	MultiFab::Subtract(intra[lev],sdc_source[lev],0,0,Nscal,0);
     }
 

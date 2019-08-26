@@ -137,7 +137,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 	    // new and only update the rhoh component with the heating term
 	    // s_out = s_in + dt_in * rho_Hext
             for (int lev=0; lev<=finest_level; ++lev) {
-                MultiFab::Copy(s_out[lev],s_in[lev],0,0,Nscal,0);
+                MultiFab::Copy(s_out[lev],s_in[lev],0,0,Nscal,ng_s);
                 MultiFab::Saxpy(s_out[lev],dt_in,rho_Hext[lev],0,RhoH,1,0);
             }
         }
@@ -158,7 +158,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Copy(s_out[lev],s_in[lev],Temp,Temp,1,0);
+            MultiFab::Copy(s_out[lev],s_in[lev],Temp,Temp,1,ng_s);
         }
     }
 
