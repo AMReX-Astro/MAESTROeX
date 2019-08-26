@@ -52,6 +52,7 @@ maestro.sponge_start_factor = 10.0e0
 maestro.sponge_kappa = 10.0e0
 
 maestro.use_thermal_diffusion = false
+maestro.use_delta_gamma1_term = false
 
 # PLOTFILES
 maestro.plot_base_name  = double_bubble_2d_plt    # root name of plot file

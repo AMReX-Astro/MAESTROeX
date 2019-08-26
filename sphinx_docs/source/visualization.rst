@@ -10,10 +10,10 @@ analysis.  The table below lists the quantities stored in a plotfile.
 Not all of these may be present, dependent on what options were used
 in creating the plotfile.
 
-By default, plotfiles store double precision data, but if
-```
-fab.format = NATIVE_32
-```
+By default, plotfiles store double precision data, but if::
+
+  fab.format = NATIVE_32
+
 is set in the inputs file, then the data is
 converted to single precision before outputting—this is done to
 reduce file sizes.
@@ -163,7 +163,7 @@ reduce file sizes.
 Small vs. regular plotfiles
 --------------------------
 
-MAESTRO can manage two independent sets of plotfiles. This allows you to
+MAESTROeX can manage two independent sets of plotfiles. This allows you to
 output the default plotfiles, which contain a lot of variables, sparsely,
 and output small-plotfiles much more frequently. A small-plotfile is controlled
 by the analogous runtime parameters as the main plotfiles:
@@ -218,14 +218,17 @@ the palette line points to the Palette file, e.g.:
 Visualizing with VisIt
 ======================
 
+VisIt recognizes MAESTROeX plotfiles as being in the BoxLib format.
+
+
 .. _sec:vis:python:
 
 Python visualization scripts
 ============================
 
 AmrPostprocessing/python provides some simple commandline
-tools for doing visualizations of AMReX plotfiles (note: a subset
-of these are distributed directly with AMReX in amrex/Tools/Py_util/). The main drivers
+tools for doing visualizations of AMReX plotfiles (note: a subset
+of these are distributed directly with AMReX in ``amrex/Tools/Py_util/``). The main drivers
 are written in python and use a set of Fortran routines, compiled with
 f2py to interface with the plotfile data. To use the routine,
 you will need to have matplotlib and f2py installed. On a
@@ -236,27 +239,23 @@ machine running Fedora linux, you can install these packages via
     yum install python-matplotlib f2py
 
 The library required by the python routines can be built by typing
-’make’ in that directory. If successful, you should find
-a library fsnapshot.so.
+``make`` in that directory. If successful, you should find
+a library ``fsnapshot.so``.
 
-The path to fsnapshot.so should be included in your PYTHONPATH
+The path to fsnapshot.so should be included in your ``PYTHONPATH``
 environment variable. This can be done by adding:
 
 ::
 
-    export PYTHONPATH="${PYTHONPATH}:/home/user/AmrPostprocessing/python}
+    export PYTHONPATH="${PYTHONPATH}:/path/to/fsnapshot/
 
-to your .bashrc.
+to your ``.bashrc``.
 
-It is recommended that you use matplotlib version 1.2.0 or
-higher. If the fonts look strange in the output files, you can try
-installing the lyx-fonts package and deleting your
-.matplotlib directory, and trying again.
 
 plotsinglevar.py
 ----------------
 
-plotsinglevar.py does visualizations of 2-d AMReX plotfiles,
+``plotsinglevar.py`` does visualizations of 2-d AMReX plotfiles,
 and slices through 3-d AMReX plotfiles. A simple plot can be made
 via:
 
@@ -264,21 +263,16 @@ via:
 
     plotsinglevar.py --log -o test.png plt00000/ tfromp
 
-This will make a plot of “tfromp” from the plotfile plt00000 with log scaling,
-and store the output in test.png. See Figure \ `[fig:python] <#fig:python>`__.
+This will make a plot of “tfromp” from the plotfile ``plt00000`` with log scaling,
+and store the output in ``test.png``, as showing the figure below.
 If you don’t do ‘-o’, then a default output filename consisting of the
 plotfile name + component will be used.
 
-.. raw:: latex
+.. figure:: plt00000_tfromp.png
+   :align: center
 
-   \centering
-
-.. figure:: \visfigpath/plt00000_tfromp
-   :alt: [fig:python] Plot of reacting_bubble done with the python
-   script plotsinglevar.py.
-
-   [fig:python] Plot of reacting_bubble done with the python
-   script plotsinglevar.py.
+   Plot of reacting_bubble done with the python
+   script ``plotsinglevar.py``.
 
 If you list 2 different variables after the plotfile name, then they
 will be plotted side-by-side in a single figure. For example,
@@ -287,20 +281,14 @@ will be plotted side-by-side in a single figure. For example,
 
     plotsinglevar.py plt00000/ tfromp enucdot
 
-produces the output shown in figure \ `[fig:python_two] <#fig:python_two>`__.
+produces the output shown below:
 
-.. raw:: latex
+.. figure:: plt00000_tfromp_enucdot.png 
+   :align: center
 
-   \centering
-
-.. figure:: \visfigpath/plt00000_tfromp_enucdot
-   :alt: [fig:python_two] Plot of reacting_bubble done with the
-   python script plotsinglevar.py showing 2 variables plotted
-   from a single plotfile.
-
-   [fig:python_two] Plot of reacting_bubble done with the
-   python script plotsinglevar.py showing 2 variables plotted
-   from a single plotfile.
+   Plot of reacting_bubble done with the python script
+   ``plotsinglevar.py`` showing 2 variables plotted from a single
+   plotfile.
 
 Additional options include ‘-m’ to specify the minimum data
 value, ‘-M’ to specify the maximum data value, and ‘–eps’
@@ -333,9 +321,7 @@ runtimevis.py
 -------------
 
 The runtimevis.py script is designed to be run from a submission
-script to produce plots from plotfiles as they are produced. This is
-accomplished by hooking it into the process scripts described in
-Chapter \ `[ch:managingjobs] <#ch:managingjobs>`__.
+script to produce plots from plotfiles as they are produced. 
 
 The script itself reads in an inputs file, vis.in, that
 describes the variables to plot. From 1 to 6 variables can be
@@ -359,7 +345,9 @@ log is taken of the data before plotting. The script is then run as:
 
     runtimevis.py plt00000
 
-[sec:vis:yt] Visualizing with yt
+.. _sec:vis_yt:
+
+Visualizing with yt
 ================================
 
 yt is a Python package for analyzing and visualizing simulation data,
@@ -368,5 +356,5 @@ with many other simulation codes). For more
 information, see the yt homepage at http://yt-project.org/ and
 :cite:`yt`.
 
-Some sample scripts that use yt with MAESTRO data are contained in
+Some sample scripts that use yt with MAESTROeX data are contained in
 ``MAESTROeX/Util/yt/``.

@@ -1,12 +1,9 @@
-!
-! Regrid base state variables (ex. psi, etarho, rho0, etc.)
-! 
-! We copy the coarsest level only, interpolate to all
-! the other levels and then copy the valid data from
-! the old arrays onto the new.
-!
-
 module regrid_base_module
+  ! Regrid base state variables (ex. psi, etarho, rho0, etc.)
+  !
+  ! We copy the coarsest level only, interpolate to all
+  ! the other levels and then copy the valid data from
+  ! the old arrays onto the new.
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
@@ -22,6 +19,7 @@ contains
 
   subroutine regrid_base_state_cc(state_cc) &
        bind(C, name="regrid_base_state_cc")
+    ! Binds to C function ``regrid_base_state_cc``
 
     double precision, intent(inout) :: state_cc(0:max_radial_level,0:nr_fine-1)
 
@@ -30,7 +28,7 @@ contains
     double precision, allocatable :: state_temp(:,:)
 
     allocate(state_temp(0:max_radial_level,0:nr_fine-1))
-    
+
     ! copy the coarsest level of the real arrays into the
     ! temp arrays
     state_temp(0,:) = state_cc(0,:)
@@ -61,8 +59,8 @@ contains
        end do
     end do
 
-    
-    ! copy temp array back into the real thing 
+
+    ! copy temp array back into the real thing
     state_cc = state_temp
 
     deallocate(state_temp)
@@ -71,6 +69,7 @@ contains
 
   subroutine regrid_base_state_edge(state_ec) &
        bind(C, name="regrid_base_state_edge")
+    ! Binds to C function ``regrid_base_state_edge``
 
     double precision, intent(inout) :: state_ec(0:max_radial_level,0:nr_fine)
 
@@ -79,11 +78,11 @@ contains
     double precision, allocatable :: state_temp(:,:)
 
     allocate(state_temp(0:max_radial_level,0:nr_fine))
-    
+
     ! copy the coarsest level of the real arrays into the
     ! temp arrays
     state_temp(0,:) = state_ec(0,:)
-    
+
     ! piecewise linear interpolation to fill the edge-centered temp arrays
     do n=1,max_radial_level
        do r=0,nr(n)
@@ -104,12 +103,12 @@ contains
        end do
     end do
 
-    
+
     ! copy temp array back into the real thing
     state_ec = state_temp
 
     deallocate(state_temp)
-    
+
   end subroutine regrid_base_state_edge
 
 end module regrid_base_module

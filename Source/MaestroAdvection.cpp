@@ -40,9 +40,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-#if (AMREX_SPACEDIM >= 2)
 		utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#endif
 #if (AMREX_SPACEDIM == 3)
 		utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
@@ -95,7 +93,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         const MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
               MultiFab& utrans_mf  = utrans[lev][0];
-#if (AMREX_SPACEDIM >= 2)
               MultiFab& vtrans_mf  = utrans[lev][1];
               MultiFab Ip, Im;
               Ip.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
@@ -106,32 +103,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 	const MultiFab& w0macy_mf  = w0mac[lev][1];
 	const MultiFab& w0macz_mf  = w0mac[lev][2];
 #endif
-#endif
-
-        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-
-        // NOTE: don't tile, but threaded in fortran subroutine
-#if (AMREX_SPACEDIM == 1)
-        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            mkutrans_1d(&lev, AMREX_ARLIM_ANYD(domainBox.loVect()),
-                        AMREX_ARLIM_ANYD(domainBox.hiVect()),
-                        AMREX_ARLIM_ANYD(tileBox.loVect()), AMREX_ARLIM_ANYD(tileBox.hiVect()),
-                        BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
-                        BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
-                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
-                        w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
-
-        } // end MFIter loop
-
-#elif (AMREX_SPACEDIM == 2 || AMREX_SPACEDIM == 3)
 
 #ifdef AMREX_USE_CUDA
         int* bc_f = prepare_bc(bcs_u[0].data(), 1);
@@ -431,8 +402,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #ifdef AMREX_USE_CUDA
         clean_bc(bc_f);
 #endif
-
-#endif // end if AMREX_SPACEDIM
     } // end loop over levels
 
     if (finest_level == 0) {
@@ -477,7 +446,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const MultiFab& ufull_mf   = ufull[lev];
               MultiFab& umac_mf    = umac[lev][0];
         const MultiFab& utrans_mf  = utrans[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         const MultiFab& vtrans_mf  = utrans[lev][1];
               MultiFab& vmac_mf    = umac[lev][1];
               MultiFab Ipu, Imu, Ipv, Imv;
@@ -527,35 +495,11 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
     wimhxy.define(grids[lev],dmap[lev],1,1);
     wimhyx.define(grids[lev],dmap[lev],1,1);
 #endif
-#endif
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 
-#if (AMREX_SPACEDIM == 1)
-
-	// NOTE: don't tile, but threaded in fortran subroutine
-        for ( MFIter mfi(utilde_mf); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-
-            velpred_1d(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                        BL_TO_FORTRAN_FAB(utilde_mf[mfi]), utilde_mf.nGrow(),
-                        BL_TO_FORTRAN_FAB(ufull_mf[mfi]), ufull_mf.nGrow(),
-                        BL_TO_FORTRAN_3D(utrans_mf[mfi]),
-                        BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(force_mf[mfi]), force_mf.nGrow(),
-                        w0.dataPtr(), dx, &dt, bcs_u[0].data(), phys_bc.dataPtr());
-        } // end MFIter loop
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
 
 #ifdef AMREX_USE_CUDA
         int* bc_f = prepare_bc(bcs_u[0].data(), 1);
@@ -1273,15 +1217,12 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         const MultiFab& scal_mf   = state[lev];
               MultiFab& sedgex_mf = sedge[lev][0];
         const MultiFab& umac_mf   = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
               MultiFab& sedgey_mf = sedge[lev][1];
         const MultiFab& vmac_mf   = umac[lev][1];
 
 #if (AMREX_SPACEDIM == 3)
               MultiFab& sedgez_mf = sedge[lev][2];
         const MultiFab& wmac_mf   = umac[lev][2];
-
-#endif
 #endif
         const MultiFab& force_mf = force[lev];
 
@@ -1302,9 +1243,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
-#if (AMREX_SPACEDIM == 1)
-                make_edge_scal_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                 make_edge_scal_2d(
 #elif (AMREX_SPACEDIM == 3)
                 make_edge_scal_3d(
@@ -1313,18 +1252,14 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     AMREX_ARLIM_3D(tileBox.loVect()), AMREX_ARLIM_3D(tileBox.hiVect()),
                     BL_TO_FORTRAN_3D(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
                     BL_TO_FORTRAN_3D(sedgex_mf[mfi]), sedgex_mf.nComp(),
-#if (AMREX_SPACEDIM >= 2)
                     BL_TO_FORTRAN_3D(sedgey_mf[mfi]), sedgey_mf.nComp(),
 #if (AMREX_SPACEDIM == 3)
                     BL_TO_FORTRAN_3D(sedgez_mf[mfi]), sedgez_mf.nComp(),
 #endif
-#endif
                     BL_TO_FORTRAN_3D(umac_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
                     BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                     BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-#endif
 #endif
                     umac_mf.nGrow(),
                     BL_TO_FORTRAN_3D(force_mf[mfi]), force_mf.nComp(),
@@ -1375,7 +1310,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 	      MultiFab& sfluxx_mf      = sflux[lev][0];
 	      MultiFab& etarhoflux_mf = etarhoflux[lev];
         const MultiFab& umac_mf        = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
+
               MultiFab& sedgey_mf      = sedge[lev][1];
 	      MultiFab& sfluxy_mf      = sflux[lev][1];
         const MultiFab& vmac_mf        = umac[lev][1];
@@ -1400,7 +1335,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,1);
 	}
 #endif
-#endif
 
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -1419,35 +1353,27 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 	    // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 0) {
 
-#if (AMREX_SPACEDIM == 1)
-		make_rhoX_flux_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
 	        make_rhoX_flux_2d(
 #elif (AMREX_SPACEDIM == 3)
                 make_rhoX_flux_3d(
 #endif
 				  &lev, tileBox.loVect(), tileBox.hiVect(),
 				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 #endif
-#endif
 				  BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
 				  BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
 #endif
-#endif
 				  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-#endif
 #endif
 				  r0_old.dataPtr(), r0_edge_old.dataPtr(),
 				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
@@ -1572,7 +1498,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
               MultiFab& sedgex_mf = sedge[lev][0];
 	      MultiFab& sfluxx_mf = sflux[lev][0];
         const MultiFab& umac_mf   = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
+
               MultiFab& sedgey_mf = sedge[lev][1];
 	      MultiFab& sfluxy_mf = sflux[lev][1];
         const MultiFab& vmac_mf   = umac[lev][1];
@@ -1614,7 +1540,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 	    }
 	}
 #endif
-#endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -1631,34 +1556,26 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 	    // lo/hi coordinates (including ghost cells), and/or the # of components
 	    // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 0) {
-#if (AMREX_SPACEDIM == 1)
-		make_rhoh_flux_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
 		make_rhoh_flux_2d(
 #elif (AMREX_SPACEDIM == 3)
                 make_rhoh_flux_3d(
 #endif
 				  &lev, tileBox.loVect(), tileBox.hiVect(),
 				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 #endif
-#endif
 				  BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
 #endif
-#endif
 				  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-#endif
 #endif
 				  r0_old.dataPtr(), r0_edge_old.dataPtr(),
 				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
@@ -1787,7 +1704,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
         const MultiFab& scalold_mf = stateold[lev];
 	      MultiFab& scalnew_mf = statenew[lev];
         const MultiFab& sfluxx_mf = sflux[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         const MultiFab& sfluxy_mf = sflux[lev][1];
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& sfluxz_mf = sflux[lev][2];
@@ -1798,7 +1714,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     	    MultiFab::Copy(p0_cart_dummy,p0_cart[lev],0,0,1,1);
     	}
     	const MultiFab& p0cart_mf = p0_cart_dummy;
-#endif
 #endif
         const MultiFab& force_mf = force[lev];
 
@@ -1826,11 +1741,9 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     				    BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
     				    BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
     				    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
     				    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
     				    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
-#endif
 #endif
     				    BL_TO_FORTRAN_ANYD(force_mf[mfi]),
     				    p0,
@@ -1868,11 +1781,9 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                     BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
                     BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
                     BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
                     BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                     BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
-#endif
 #endif
                     BL_TO_FORTRAN_ANYD(force_mf[mfi]),
                     AMREX_REAL_ANYD(dx), dt,
@@ -1936,7 +1847,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	      MultiFab& unew_mf = unew[lev];
 	const MultiFab& umac_mf   = umac[lev][0];
         const MultiFab& uedgex_mf = uedge[lev][0];
-#if (AMREX_SPACEDIM >= 2)
 	const MultiFab& vmac_mf   = umac[lev][1];
         const MultiFab& uedgey_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
@@ -1947,7 +1857,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	const MultiFab& w0macx_mf = w0mac[lev][0];
 	const MultiFab& w0macy_mf = w0mac[lev][1];
 	const MultiFab& w0macz_mf = w0mac[lev][2];
-#endif
 #endif
         const MultiFab& force_mf = force[lev];
 	const MultiFab& sponge_mf = sponge[lev];
@@ -1968,18 +1877,14 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 				 BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(unew_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				 BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				 BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
 #endif
-#endif
 				 BL_TO_FORTRAN_ANYD(uedgex_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				 BL_TO_FORTRAN_ANYD(uedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				 BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
-#endif
 #endif
 				 BL_TO_FORTRAN_ANYD(force_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),

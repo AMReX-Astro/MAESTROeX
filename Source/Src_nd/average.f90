@@ -13,7 +13,7 @@ module average_module
 contains
 
   subroutine average(lev,lo,hi,phi,p_lo,p_hi,phisum) bind (C,name="average")
-
+    ! Calculate the horizontal average
 
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: p_lo(3), p_hi(3)
@@ -23,9 +23,7 @@ contains
     ! local
     integer          :: j,k
 
-    if (amrex_spacedim .eq. 1) then
-       phisum(lev,0:nr_fine-1) = sum(phi(lo(1):hi(1),0,0));
-    else if (amrex_spacedim .eq. 2) then
+    if (amrex_spacedim .eq. 2) then
        do j=lo(2),hi(2)
           phisum(lev,j) = phisum(lev,j) + sum(phi(lo(1):hi(1),j,0))
        end do
@@ -38,13 +36,13 @@ contains
   end subroutine average
 
   subroutine divide_phisum_by_ncell(phisum,ncell) bind (C,name="divide_phisum_by_ncell")
+    ! compute phibar by normalizing phisum
 
     double precision, intent(inout) :: phisum(0:max_radial_level,0:nr_fine-1)
     integer         , intent(in   ) ::  ncell(0:max_radial_level)
 
     integer :: n,i,r
 
-    ! compute phibar by normalizing phisum
     do n=0,max_radial_level
        do i=1,numdisjointchunks(n)
           do r=r_start_coord(n,i),r_end_coord(n,i)

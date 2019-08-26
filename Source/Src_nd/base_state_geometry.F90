@@ -1,10 +1,9 @@
-! a module for storing the geometric information so we don't have to pass it
-!
-! This module provides the coordinate value for the left edge of a base-state
-! zone (r_edge_loc) and the zone center (r_cc_loc).  As always, it is assumed that
-! the base state arrays begin with index 0, not 1.
-
 module base_state_geometry_module
+  ! a module for storing the geometric information so we don't have to pass it
+  !
+  ! This module provides the coordinate value for the left edge of a base-state
+  ! zone (r_edge_loc) and the zone center (r_cc_loc).  As always, it is assumed that
+  ! the base state arrays begin with index 0, not 1.
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
@@ -60,6 +59,7 @@ contains
        dx_fine, &
        nr_irreg_in) &
        bind(C, name="init_base_state_geometry")
+    ! Binds to C function ``init_base_state_geometry``
 
     integer          , intent(in   ) :: max_radial_level_in
     integer          , intent(in   ) :: nr_fine_in
@@ -81,7 +81,7 @@ contains
     allocate(nr_fine)
     allocate(dr_fine)
     allocate(nr_irreg)
-    
+
     max_radial_level = max_radial_level_in
     finest_radial_level = max_radial_level ! FIXME - we want to set this after regridding
     nr_fine = nr_fine_in
@@ -125,10 +125,10 @@ contains
        ! compute r_cc_loc, r_edge_loc
        do n = 0,max_radial_level
           do i = 0,nr(n)-1
-             r_cc_loc(n,i) = prob_lo(amrex_spacedim-1) + (dble(i)+HALF)*dr(n)
+             r_cc_loc(n,i) = prob_lo(amrex_spacedim) + (dble(i)+HALF)*dr(n)
           end do
           do i = 0,nr(n)
-             r_edge_loc(n,i) = prob_lo(amrex_spacedim-1) + (dble(i))*dr(n)
+             r_edge_loc(n,i) = prob_lo(amrex_spacedim) + (dble(i))*dr(n)
           end do
        enddo
 
@@ -164,6 +164,7 @@ contains
   subroutine init_base_state_map_sphr(cc_to_r, lo, hi, &
        dx_fine, dx_lev) &
        bind(C, name="init_base_state_map_sphr")
+    ! Binds to C function ``init_base_state_map_sphr``
 
     integer          , intent(in   ) :: lo(3), hi(3)
     double precision , intent(inout) :: cc_to_r(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
@@ -202,6 +203,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine compute_cutoff_coords(rho0) bind(C, name="compute_cutoff_coords")
+    ! Binds to C function ``compute_cutoff_coords``
 
     double precision, intent(in   ) :: rho0(0:max_radial_level,0:nr_fine-1)
 
@@ -352,10 +354,9 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine init_multilevel(tag_array, finest_radial_level_in) bind(C, name="init_multilevel")
-
     ! compute numdisjointchunks, r_start_coord, r_end_coord
     ! FIXME - right now there is one chunk at each level that spans the domain
-
+    ! Binds to C function ``init_multilevel``
     integer, intent(in   ) :: tag_array(0:max_radial_level,0:nr_fine-1)
     integer, intent(in   ) :: finest_radial_level_in
 
@@ -585,6 +586,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine destroy_base_state_geometry() bind(C, name="destroy_base_state_geometry")
+    ! Binds to C function ``destroy_base_state_geometry``
 
     deallocate(max_radial_level)
     deallocate(finest_radial_level)
