@@ -9,6 +9,16 @@ std::string inputs_name = "";
 int main(int argc, char* argv[])
 {
 
+    // check to see if it contains --describe
+    if (argc >= 2) {
+        for (auto i = 1; i < argc; i++) {
+            if (std::string(argv[i]) == "--describe") {
+                Maestro::WriteBuildInfo();
+                return 0;
+            }
+        }
+    }
+
 	// in AMReX.cpp
 	Initialize(argc,argv);
 

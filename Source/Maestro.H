@@ -74,6 +74,9 @@ public:
     /// after restarts.
     static amrex::Real getCPUTime();
 
+    /// Dump build info
+    static void WriteBuildInfo ();
+
 private:
 
     /*
