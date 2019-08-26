@@ -1067,7 +1067,7 @@ Maestro::WriteJobInfo (const std::string& dir) const
 
 		std::string PrettyLine = std::string(78, '=') + "\n";
 		std::string OtherLine = std::string(78, '-') + "\n";
-		std::string SkipSpace = std::string(8, ' ') + "\n";
+		std::string SkipSpace = std::string(8, ' ');
 
 		FullPathJobInfoFile += "/job_info";
 		jobInfoFile.open(FullPathJobInfoFile.c_str(), std::ios::out);

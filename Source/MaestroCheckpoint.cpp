@@ -328,6 +328,11 @@ Maestro::ReadCheckPoint ()
 		}
 
 
+		if (do_smallscale) {
+		    Average(sold,rho0_old,Rho);
+		    compute_cutoff_coords(rho0_old.dataPtr());
+		    std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
+		}
 
 		// BaseFC
 		{

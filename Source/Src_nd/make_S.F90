@@ -89,9 +89,7 @@ contains
                   ( rHext(i,j,k) + rHnuc(i,j,k) + therm(i,j,k) ) &
                   + sigma*xi_term &
                   + pres_term/(eos_state%rho*eos_state%dpdr)
-#if (AMREX_SPACEDIM == 1)
-             r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
 #else
              r = k
@@ -253,9 +251,7 @@ contains
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-             r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
 #elif (AMREX_SPACEDIM == 3)
              r = k
@@ -352,17 +348,6 @@ contains
           correction_cc(i,j,k) = correction_factor*delta_p_term(i,j,k)
        end do
     end do
-#elif (AMREX_SPACEDIM == 1 )
-    k = lo(3)
-    j = lo(2)
-    do i = lo(1),hi(1)
-       if(i .lt. base_cutoff_density_coord(lev)) then
-          correction_factor = beta0(lev,i)*(dpdt_factor/(gamma1bar(lev,i)*p0(lev,i))) / dt
-       else
-          correction_factor = 0.0d0
-       end if
-       correction_cc(i,j,k) = correction_factor*delta_p_term(i,j,k)
-    end do
 #endif
 
   end subroutine create_correction_cc
@@ -452,9 +437,7 @@ contains
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-             r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
 #elif (AMREX_SPACEDIM == 3)
              r = k
@@ -493,17 +476,6 @@ contains
                      (dt*gamma1bar(lev,j)*p0(lev,j))
                 rhcc(i,j,k) = rhcc(i,j,k) + beta0(lev,j) * delta_chi(i,j,k)
              end do
-          end if
-       end do
-
-#elif (AMREX_SPACEDIM == 1)
-       k = lo(3)
-       j = lo(2)
-       do i = lo(1),hi(1)
-          if (i .lt. base_cutoff_density_coord(lev)) then
-             delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / &
-                  (dt*gamma1bar(lev,i)*p0(lev,i))
-             rhcc(i,j,k) = rhcc(i,j,k) + beta0(lev,i) * delta_chi(i,j,k)
           end if
        end do
 #endif
@@ -608,9 +580,7 @@ contains
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
-#if (AMREX_SPACEDIM == 1)
-             r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
 #else
              r = k

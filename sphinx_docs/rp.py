@@ -111,7 +111,7 @@ def make_rest_table(param_files):
                 # this splits the line into separate fields.  A field
                 # is a single word or a pair in parentheses like "(a,
                 # b)"
-                fields = re.findall(r'[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line) 
+                fields = re.findall(r'[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
 
                 current_param.var = fields[0]
                 if current_param.var.startswith("("):
@@ -136,6 +136,7 @@ def make_rest_table(param_files):
         # print the heading
         heading_name = r"namespace: ``{}``".format(nm)
         nmlen = len(heading_name)
+        print(".. _sec:runtime-parameters-tables:\n")
         print(heading_name)
         print(nmlen*"-" + "\n")
 

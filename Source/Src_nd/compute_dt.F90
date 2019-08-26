@@ -374,7 +374,9 @@ contains
        divu,  d_lo, d_hi, &
        p0, gamma1bar) bind (C,name="firstdt")
 
-    integer         , intent(in   ) :: lev
+    use amrex_fort_module, only: amrex_min, amrex_max
+
+    integer, value  , intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
@@ -396,6 +398,8 @@ contains
 
     integer :: pt_index(3)
     type(eos_t) :: eos_state
+
+    !$gpu
 
     eps = 1.d-8
 
@@ -432,7 +436,6 @@ contains
              spdx    = max(spdx,eos_state%cs)
              ux      = max(ux,abs(u(i,j,k,1)))
              pforcex = max(pforcex,abs(force(i,j,k,1)))
-#if (AMREX_SPACEDIM >= 2)
              spdy    = max(spdy,eos_state%cs)
              uy      = max(uy,abs(u(i,j,k,2)))
              pforcey = max(pforcey,abs(force(i,j,k,2)))
@@ -440,7 +443,6 @@ contains
              spdz    = max(spdz,eos_state%cs)
              uz      = max(uz,abs(u(i,j,k,3)))
              pforcez = max(pforcez,abs(force(i,j,k,3)))
-#endif
 #endif
 
           enddo
@@ -451,13 +453,11 @@ contains
 
     ux = ux / dx(1)
     spdx = spdx / dx(1)
-#if (AMREX_SPACEDIM >= 2)
     uy = uy / dx(2)
     spdy = spdy / dx(2)
 #if (AMREX_SPACEDIM == 3)
     uz = uz / dx(3)
     spdz = spdz / dx(3)
-#endif
 #endif
 
     ! use advective constraint unless velocities are zero everywhere

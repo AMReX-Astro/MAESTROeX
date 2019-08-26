@@ -40,10 +40,8 @@ Maestro::EstDt ()
     for (int lev=0; lev<=finest_level; ++lev) {
         umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
         umac_dummy[lev][0].setVal(0.);
-#if (AMREX_SPACEDIM >= 2)
         umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         umac_dummy[lev][1].setVal(0.);
-#endif
 #if (AMREX_SPACEDIM == 3)
         umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
         umac_dummy[lev][2].setVal(0.);
@@ -57,9 +55,7 @@ Maestro::EstDt ()
         // initialize
         for (int lev=0; lev<=finest_level; ++lev) {
             w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-#if (AMREX_SPACEDIM >= 2)
             w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#endif
 #if (AMREX_SPACEDIM == 3)
             w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
@@ -80,6 +76,8 @@ Maestro::EstDt ()
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        vel_force[lev].setVal(0.);
     }
 
     int do_add_utilde_force = 0;
@@ -270,10 +268,8 @@ Maestro::FirstDt ()
     for (int lev=0; lev<=finest_level; ++lev) {
         umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
         umac_dummy[lev][0].setVal(0.);
-#if (AMREX_SPACEDIM >= 2)
         umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         umac_dummy[lev][1].setVal(0.);
-#endif
 #if (AMREX_SPACEDIM == 3)
         umac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
         umac_dummy[lev][2].setVal(0.);
@@ -284,6 +280,8 @@ Maestro::FirstDt ()
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        vel_force[lev].setVal(0.);
     }
 
     int do_add_utilde_force = 0;
@@ -329,6 +327,11 @@ Maestro::FirstDt ()
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
+	{
+
+        Real dt_grid = 1.e99;
+        Real umax_grid = 0.;
+
         for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
 
             Real dt_grid = 1.e99;
@@ -344,15 +347,20 @@ Maestro::FirstDt ()
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0 ) {
-                firstdt(&lev,&dt_grid,&umax_grid,
-                        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                        ZFILL(dx),
-                        BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                        BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                        p0_old.dataPtr(),
-                        gamma1bar_old.dataPtr());
+
+#pragma gpu box(tileBox)
+		firstdt(lev,
+			AMREX_MFITER_REDUCE_MIN(&dt_grid),
+			AMREX_MFITER_REDUCE_MAX(&umax_grid),
+			AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+			AMREX_REAL_ANYD(dx),
+			BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
+			BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
+			BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
+			BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+			p0_old.dataPtr(),
+			gamma1bar_old.dataPtr());
+
             } else {
 #if (AMREX_SPACEDIM == 3)
 
@@ -374,6 +382,7 @@ Maestro::FirstDt ()
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
         }
+	} //end openmp
 
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);

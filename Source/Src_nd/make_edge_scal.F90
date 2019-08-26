@@ -1,16 +1,16 @@
-! make_edge_scal constructs the edge state of a scalar, using a
-! second-order Taylor expansion in space (through dx/2) and time
-! (though dt/2) (if ppm_type = 0) or using PPM (for ppm_type = 1,2).
-!
-! We use only MAC-projected edge velocities in this prediction.
-!
-! We are computing all edge states for each variable.  This is what is
-! done for the final updates of the state variables and velocity.  For
-! velocity, we should set is_vel = .true.
 
 #include "AMReX_BC_TYPES.H"
 
 module make_edge_scal_module
+  ! make_edge_scal constructs the edge state of a scalar, using a
+  ! second-order Taylor expansion in space (through dx/2) and time
+  ! (though dt/2) (if ppm_type = 0) or using PPM (for ppm_type = 1,2).
+  !
+  ! We use only MAC-projected edge velocities in this prediction.
+  !
+  ! We are computing all edge states for each variable.  This is what is
+  ! done for the final updates of the state variables and velocity.  For
+  ! velocity, we should set is_vel = .true.
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
@@ -24,181 +24,6 @@ module make_edge_scal_module
   private
 
 contains
-
-#if (AMREX_SPACEDIM == 1)
-  subroutine make_edge_scal_1d(domlo, domhi, lo, hi, &
-       s,      s_lo, s_hi, nc_s, ng_s, &
-       sedgex, x_lo, x_hi, nc_x, &
-       umac,   u_lo, u_hi, ng_um, &
-       force,  f_lo, f_hi, nc_f, &
-       dx, dt, is_vel, adv_bc, nbccomp, &
-       comp, bccomp, is_conservative) bind(C,name="make_edge_scal_1d")
-
-    integer         , intent(in   ) :: domlo(1), domhi(1), lo(1), hi(1)
-    integer         , intent(in   ) :: s_lo(1), s_hi(1)
-    integer, value,   intent(in   ) :: nc_s, ng_s
-    integer         , intent(in   ) :: x_lo(1), x_hi(1)
-    integer, value,   intent(in   ) :: nc_x
-    integer         , intent(in   ) :: u_lo(1), u_hi(1)
-    integer, value,   intent(in   ) :: ng_um
-    integer         , intent(in   ) :: f_lo(1), f_hi(1)
-    integer, value,   intent(in   ) :: nc_f
-    double precision, intent(in   ) :: s     (s_lo(1):s_hi(1),nc_s)
-    double precision, intent(inout) :: sedgex(x_lo(1):x_hi(1),nc_x)
-    double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1))
-    double precision, intent(in   ) :: force (f_lo(1):f_hi(1),nc_f)
-    double precision, intent(in   ) :: dx(1)
-    double precision, value, intent(in   ) :: dt
-    integer, value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
-    integer         , intent(in   ) :: adv_bc(1,2,nbccomp)
-
-    ! Local variables
-    double precision, pointer :: slopex(:,:)
-
-    double precision :: hx,dt2,dt4,savg,fl,fr
-
-    integer :: i,is,ie
-
-    double precision, pointer :: Ip(:), Ipf(:)
-    double precision, pointer :: Im(:), Imf(:)
-
-    ! these correspond to \mathrm{sedge}_L^x, etc.
-    double precision, pointer:: sedgelx(:),sedgerx(:)
-
-    allocate(Ip(lo(1)-1:hi(1)+1))
-    allocate(Im(lo(1)-1:hi(1)+1))
-
-    allocate(Ipf(lo(1)-1:hi(1)+1))
-    allocate(Imf(lo(1)-1:hi(1)+1))
-
-    allocate(slopex(lo(1)-1:hi(1)+1,1))
-
-    ! Final edge states.
-    ! lo:hi+1 in the normal direction
-    ! lo:hi in the transverse direction
-    allocate(sedgelx(lo(1):hi(1)+1))
-    allocate(sedgerx(lo(1):hi(1)+1))
-
-    is = lo(1)
-    ie = hi(1)
-
-    if (ppm_type .eq. 0) then
-       call slopex_1d(s(:,comp:),slopex,domlo,domhi,lo,hi,ng_s,1,adv_bc(:,:,bccomp:))
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_1d(s(:,comp),ng_s,umac,ng_um,Ip,Im, &
-                    domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
-       if (ppm_trace_forces .eq. 1) then
-          call ppm_1d(force(:,comp),ng_s,umac,ng_um,Ipf,Imf, &
-                       domlo,domhi,lo,hi,adv_bc(:,:,bccomp),dx,dt,.true.)
-       endif
-    end if
-
-    dt2 = HALF*dt
-    dt4 = dt/4.0d0
-
-    hx = dx(1)
-
-    !******************************************************************
-    ! Create sedgelx, etc.
-    !******************************************************************
-
-    ! loop over appropriate x-faces
-    if (ppm_type .eq. 0) then
-       do i=lo(1),hi(1)+1
-          ! make sedgelx, sedgerx with 1D extrapolation
-          sedgelx(i) = s(i-1,comp) + (HALF - dt2*umac(i)/hx)*slopex(i-1,1)
-          sedgerx(i) = s(i  ,comp) - (HALF + dt2*umac(i)/hx)*slopex(i  ,1)
-       enddo
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       do i=lo(1),hi(1)+1
-          ! make sedgelx, sedgerx with 1D extrapolation
-          sedgelx(i) = Ip(i-1)
-          sedgerx(i) = Im(i  )
-       end do
-    end if
-
-    ! loop over appropriate x-faces
-    do i=lo(1),hi(1)+1
-       ! make sedgelx, sedgerx
-       fl = merge(force(i-1,comp), Ipf(i-1), ppm_trace_forces == 0)
-       fr = merge(force(i  ,comp), Imf(i  ), ppm_trace_forces == 0)
-
-       if(is_conservative .eq. 1) then
-          sedgelx(i) = sedgelx(i) &
-               - (dt2/hx)*s(i-1,comp)*(umac(i  )-umac(i-1)) &
-               + dt2*fl
-          sedgerx(i) = sedgerx(i) &
-               - (dt2/hx)*s(i  ,comp)*(umac(i+1)-umac(i  )) &
-               + dt2*fr
-       else
-          sedgelx(i) = sedgelx(i) + dt2*fl
-          sedgerx(i) = sedgerx(i) + dt2*fr
-       end if
-
-       ! make sedgex by solving Riemann problem
-       ! boundary conditions enforced outside of i loop
-       sedgex(i,comp) = merge(sedgelx(i),sedgerx(i),umac(i) .gt. 0.d0)
-       savg = HALF*(sedgelx(i)+sedgerx(i))
-       sedgex(i,comp) = merge(sedgex(i,comp),savg,abs(umac(i)) .gt. rel_eps)
-    enddo
-
-    ! impose lo side bc's
-    if (lo(1) .eq. domlo(1)) then
-       if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
-          sedgex(lo(1),comp) = s(lo(1)-1,comp)
-       else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
-            adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
-          if (is_vel .eq. 1) then
-             sedgex(lo(1),comp) = min(sedgerx(lo(1)),0.d0)
-          else
-             sedgex(lo(1),comp) = sedgerx(lo(1))
-          end if
-       else if (adv_bc(1,1,bccomp) .eq. REFLECT_EVEN) then
-          sedgex(lo(1),comp) = sedgerx(lo(1))
-       else if (adv_bc(1,1,bccomp) .eq. REFLECT_ODD) then
-          sedgex(lo(1),comp) = 0.d0
-       else if (adv_bc(1,1,bccomp) .eq. INT_DIR) then
-       else
-#ifndef AMREX_USE_GPU
-          call amrex_error("make_edge_scal_1d: invalid boundary type adv_bc(1,1)")
-#endif
-       end if
-    end if
-
-    ! impose hi side bc's
-    if (hi(1) .eq. domhi(1)) then
-       if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
-          sedgex(hi(1)+1,comp) = s(hi(1)+1,comp)
-       else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
-            adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
-          if (is_vel .eq. 1) then
-             sedgex(hi(1)+1,comp) = max(sedgelx(hi(1)+1),0.d0)
-          else
-             sedgex(hi(1)+1,comp) = sedgelx(hi(1)+1)
-          end if
-       else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-          sedgex(hi(1)+1,comp) = sedgelx(hi(1)+1)
-       else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
-          sedgex(hi(1)+1,comp) = 0.d0
-       else if (adv_bc(1,2,bccomp) .eq. INT_DIR) then
-       else
-#ifndef AMREX_USE_GPU
-          call amrex_error("make_edge_scal_1d: invalid boundary type adv_bc(1,2)")
-#endif
-       end if
-    end if
-
-    deallocate(Ip)
-    deallocate(Im)
-    deallocate(Ipf)
-    deallocate(Imf)
-    deallocate(slopex)
-    deallocate(sedgelx)
-    deallocate(sedgerx)
-
-  end subroutine make_edge_scal_1d
-#endif
-
 
 #if (AMREX_SPACEDIM == 2)
 subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
@@ -272,7 +97,7 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose lo side bc's
-           if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+           if (i .eq. domlo(1)) then
               if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
                  sl(i,j,k) = s(i-1,j,k,comp)
                  sr(i,j,k) = s(i-1,j,k,comp)
@@ -296,7 +121,7 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose hi side bc's
-           if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+           if (i .eq. domhi(1)+1) then
               if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                  sl(i,j,k) = s(i,j,k,comp)
                  sr(i,j,k) = s(i,j,k,comp)
@@ -343,7 +168,7 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose lo side bc's
-           if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+           if (j .eq. domlo(2)) then
               if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
                  sl(i,j,k) = s(i,j-1,k,comp)
                  sr(i,j,k) = s(i,j-1,k,comp)
@@ -367,7 +192,7 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose hi side bc's
-           if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+           if (j .eq. domhi(2)+1) then
               if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                  sl(i,j,k) = s(i,j,k,comp)
                  sr(i,j,k) = s(i,j,k,comp)
@@ -502,7 +327,7 @@ subroutine make_edge_scal_2d(lo, hi, idir, domlo, domhi, &
            sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(umac(i,j,k)) .gt. rel_eps)
 
            ! impose lo side bc's
-           if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+           if (i .eq. domlo(1)) then
               if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
                  sedge(i,j,k,comp) = s(i-1,j,k,comp)
               else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
@@ -525,7 +350,7 @@ subroutine make_edge_scal_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose hi side bc's
-           if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+           if (i .eq. domhi(1)+1) then
               if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                  sedge(i,j,k,comp) = s(i,j,k,comp)
               else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
@@ -583,7 +408,7 @@ subroutine make_edge_scal_2d(lo, hi, idir, domlo, domhi, &
            sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(vmac(i,j,k)) .gt. rel_eps)
 
            ! impose lo side bc's
-           if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+           if (j .eq. domlo(2)) then
               if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
                  sedge(i,j,k,comp) = s(i,j-1,k,comp)
               else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
@@ -606,7 +431,7 @@ subroutine make_edge_scal_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose hi side bc's
-           if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+           if (j .eq. domhi(2)+1) then
               if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                  sedge(i,j,k,comp) = s(i,j,k,comp)
               else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
@@ -758,7 +583,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+              if (i .eq. domlo(1)) then
                  if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i-1,j,k,comp)
                     sr(i,j,k) = s(i-1,j,k,comp)
@@ -782,7 +607,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. domhi(1)+1) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j,k,comp)
                     sr(i,j,k) = s(i,j,k,comp)
@@ -836,7 +661,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j-1,k,comp)
                     sr(i,j,k) = s(i,j-1,k,comp)
@@ -860,7 +685,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+              if (j .eq. domhi(2)+1) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j,k,comp)
                     sr(i,j,k) = s(i,j,k,comp)
@@ -912,7 +737,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+              if (k .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j,k,comp)
                     sr(i,j,k) = s(i,j,k,comp)
@@ -936,7 +761,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+              if (k .eq. domhi(3)+1) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j,k,comp)
                     sr(i,j,k) = s(i,j,k,comp)
@@ -1093,7 +918,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose lo side bc's
-              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+              if (i .eq. domlo(1)) then
                  if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
                     slxy = s(i-1,j,k,comp)
                     srxy = s(i-1,j,k,comp)
@@ -1117,7 +942,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. domhi(1)+1) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     slxy = s(i,j,k,comp)
                     srxy = s(i,j,k,comp)
@@ -1178,7 +1003,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose lo side bc's
-              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+              if (i .eq. domlo(1)) then
                  if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
                     slxz = s(i-1,j,k,comp)
                     srxz = s(i-1,j,k,comp)
@@ -1202,7 +1027,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. domhi(1)+1) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     slxz = s(i,j,k,comp)
                     srxz = s(i,j,k,comp)
@@ -1264,7 +1089,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose lo side bc's
-              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
                     slyx = s(i,j-1,k,comp)
                     sryx = s(i,j-1,k,comp)
@@ -1288,7 +1113,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+              if (j .eq. domhi(2)+1) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                     slyx = s(i,j,k,comp)
                     sryx = s(i,j,k,comp)
@@ -1350,7 +1175,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose lo side bc's
-              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
                     slyz = s(i,j-1,k,comp)
                     sryz = s(i,j-1,k,comp)
@@ -1374,7 +1199,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+              if (j .eq. domhi(2)+1) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                     slyz = s(i,j,k,comp)
                     sryz = s(i,j,k,comp)
@@ -1436,7 +1261,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose lo side bc's
-              if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+              if (k .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
                     slzx = s(i,j,k-1,comp)
                     srzx = s(i,j,k-1,comp)
@@ -1460,7 +1285,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+              if (k .eq. domhi(3)+1) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
                     slzx = s(i,j,k,comp)
                     srzx = s(i,j,k,comp)
@@ -1522,7 +1347,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose lo side bc's
-              if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+              if (k .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
                     slzy = s(i,j,k-1,comp)
                     srzy = s(i,j,k-1,comp)
@@ -1546,7 +1371,7 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+              if (k .eq. domhi(3)+1) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
                     slzy = s(i,j,k,comp)
                     srzy = s(i,j,k,comp)
@@ -1580,7 +1405,6 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
   endif
 
 end subroutine make_edge_scal_transverse_3d
-
 
 
 subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
@@ -1727,7 +1551,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(umac(i,j,k)).gt.rel_eps)
 
               ! impose lo side bc's
-              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+              if (i .eq. domlo(1)) then
                  if (adv_bc(1,1,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i-1,j,k,comp)
                  else if (adv_bc(1,1,bccomp) .eq. FOEXTRAP .or. &
@@ -1750,7 +1574,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. domhi(1)+1) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
@@ -1829,7 +1653,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(vmac(i,j,k)).gt.rel_eps)
 
               ! impose lo side bc's
-              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. domlo(2)) then
                  if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j-1,k,comp)
                  else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
@@ -1852,7 +1676,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+              if (j .eq. domhi(2)+1) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
@@ -1931,7 +1755,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(wmac(i,j,k)).gt.rel_eps)\
 
               ! impose lo side bc's
-              if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+              if (k .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j,k-1,comp)
                  else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
@@ -1954,7 +1778,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+              if (k .eq. domhi(3)+1) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
@@ -1982,7 +1806,6 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
   end if
 
 end subroutine make_edge_scal_3d
-
 #endif
 
 end module make_edge_scal_module

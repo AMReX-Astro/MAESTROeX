@@ -13,20 +13,7 @@ extern "C"
 
     //////////////////////
     // in make_edge_scal.F90
-#if (AMREX_SPACEDIM == 1)
-    void make_edge_scal_1d(
-                      const int* domlo, const int* domhi,
-                      const int* lo, const int* hi,
-                      const amrex::Real* s,      const int* s_lo, const int* s_hi, const int nc_s, int ng_s,
-                            amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int nc_x,
-                      const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-                      const int ng_um,
-                      const amrex::Real* force,  const int* f_lo, const int* f_hi, const int nc_f,
-                      const amrex::Real* dx, const amrex::Real dt, const int is_vel,
-                      const int* adv_bc, const int nbccomp, const int comp, const int bccomp,
-                      const int is_conservative);
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
   void make_edge_scal_predictor_2d(const int* lo, const int* hi, const int idir,
                     const int* domlo, const int* domhi,
                     const amrex::Real* s, const int* s_lo, const int* s_hi, const int nc_s, int ng_s,
@@ -57,7 +44,6 @@ extern "C"
                     const int is_conservative);
 
 #elif (AMREX_SPACEDIM == 3)
-
     void make_divu(const int* lo, const int* hi,
                       amrex::Real* divu, const int* d_lo, const int* d_hi,
                       const amrex::Real* umac,   const int* u_lo, const int* u_hi,
@@ -131,16 +117,7 @@ extern "C"
 
     //////////////////////
     // in mkutrans.F90
-#if (AMREX_SPACEDIM == 1)
-    void mkutrans_1d(const int* lev, const int* domlo, const int* domhi,
-                      const int* lo, const int* hi,
-                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, int ng_ut,
-                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf, int ng_uf,
-                      amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
-                      const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt,
-                      const int* adv_bc, const int* phys_bc);
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
   void mkutrans_2d(const int* lo, const int* hi,
                     const int lev, const int idir,
                     const int* domlo, const int* domhi,
@@ -230,18 +207,7 @@ extern "C"
 
     //////////////////////
     // in velpred.F90
-#if (AMREX_SPACEDIM == 1)
-    void velpred_1d(const int* lo, const int* hi,
-                      const int lev, const int* domlo, const int* domhi,
-                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int nc_ut, int ng_ut,
-                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int nc_uf, int ng_uf,
-                      const amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
-                      amrex::Real* umac, const int* mu_lo, const int* mu_hi,
-                      const amrex::Real* force, const int* f_lo, const int* f_hi, const int nc_f, int ng_f,
-                      const amrex::Real* w0, const amrex::Real* dx, const amrex::Real dt,
-                      const int* adv_bc, const int* phys_bc);
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
   void velpred_interface_2d(const int* lo, const int* hi,
                     const int idir,
                     const int* domlo, const int* domhi,

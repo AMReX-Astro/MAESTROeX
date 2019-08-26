@@ -356,7 +356,7 @@ enthalpy_pred_type                  int            1            y
 species_pred_type                   int            1		y
 
 # turns on second order correction to delta gamma1 term
-use_delta_gamma1_term               bool            false        y
+use_delta_gamma1_term               bool            true        y
 
 # turn on the etarho term as described in flow chart
 use_etarho                          bool            true

@@ -60,6 +60,8 @@ Maestro::EnthalpyAdvance (int which_step,
     Vector<MultiFab> rhoh0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        rhoh0_old_cart[lev].setVal(0.);
     }
 
     // compute forcing terms
