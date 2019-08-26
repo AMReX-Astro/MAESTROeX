@@ -1,14 +1,13 @@
-! init_base_state is used to initialize the base state arrays from the
-! model file.  The actual reading of the model file is handled by the
-! model_parser_module in Util/
-!
-! Note: The initial base state quantities returned from this routine
-! are only a temporary base state.  These quantities are mapped onto
-! the full 2- or 3-d state in initscaldata.f90 and a new base state is
-! created after initialization by averaging the density and calling
-! enforce_HSE in initialize.f90.
-
 module base_state_module
+  ! init_base_state is used to initialize the base state arrays from the
+  ! model file.  The actual reading of the model file is handled by the
+  ! model_parser_module in Util/
+  !
+  ! Note: The initial base state quantities returned from this routine
+  ! are only a temporary base state.  These quantities are mapped onto
+  ! the full 2- or 3-d state in initscaldata.f90 and a new base state is
+  ! created after initialization by averaging the density and calling
+  ! enforce_HSE in initialize.f90.
 
   use model_parser_module
   use eos_type_module
@@ -33,6 +32,7 @@ contains
 
   subroutine init_base_state(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init) &
        bind(C, name="init_base_state")
+    ! Binds to C function ``init_base_state``
 
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)
@@ -258,6 +258,7 @@ contains
   subroutine init_base_state_irreg(s0_init,p0_init,rho0,rhoh0,p0,tempbar,tempbar_init, &
                                      r_cc_loc, r_edge_loc) &
        bind(C, name="init_base_state_irreg")
+    ! Binds to C function ``init_base_state_irreg``
 
     double precision, intent(inout) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(inout) :: p0_init(0:max_radial_level,0:nr_fine-1)

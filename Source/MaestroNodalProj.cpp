@@ -39,6 +39,8 @@ Maestro::NodalProj (int proj_type,
     Vector<MultiFab> sig(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         sig[lev].define(grids[lev], dmap[lev], 1, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        sig[lev].setVal(0.);
     }
 
     // fill in sig
@@ -48,7 +50,7 @@ Maestro::NodalProj (int proj_type,
     // regular_timestep_comp:   rho^n+1/2 -- (rhoold+rhonew)/2
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
         for (int lev=0; lev<=finest_level; ++lev) {
-            sig[lev].setVal(1.,1);
+            sig[lev].setVal(1.);
         }
     }
     else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
@@ -59,6 +61,8 @@ Maestro::NodalProj (int proj_type,
     Vector<MultiFab> Vproj(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         Vproj[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        Vproj[lev].setVal(0.);
     }
 
     // fill in Vproj

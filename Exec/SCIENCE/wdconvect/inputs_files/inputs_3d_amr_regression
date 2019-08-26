@@ -65,6 +65,8 @@ maestro.use_divu_firstdt = true
 
 maestro.use_tfromp = true
 
+maestro.use_delta_gamma1_term = false
+
 # PLOTFILES
 maestro.plot_base_name  = wdconvect_amr_plt   # root name of plot file
 maestro.plot_int   = 1      # number of timesteps between plot files

@@ -41,9 +41,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-#if (AMREX_SPACEDIM >= 2)
 		utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#endif
 #if (AMREX_SPACEDIM == 3)
 		utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
@@ -109,7 +107,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 	      MultiFab& sfluxx_mf      = sflux[lev][0];
 	      MultiFab& etarhoflux_mf = etarhoflux[lev];
         const MultiFab& umac_mf        = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
+
               MultiFab& sedgey_mf      = sedge[lev][1];
 	      MultiFab& sfluxy_mf      = sflux[lev][1];
         const MultiFab& vmac_mf        = umac[lev][1];
@@ -134,7 +132,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,1);
 	}
 #endif
-#endif
 
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -153,35 +150,27 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 	    // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 0) {
 
-#if (AMREX_SPACEDIM == 1)
-		make_rhoX_flux_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
 	        make_rhoX_flux_2d(
 #elif (AMREX_SPACEDIM == 3)
                 make_rhoX_flux_3d(
 #endif
 				  &lev, tileBox.loVect(), tileBox.hiVect(),
 				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 #endif
-#endif
 				  BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
 				  BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
 #endif
-#endif
 				  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-#endif
 #endif
 				  r0_old.dataPtr(), r0_edge_old.dataPtr(),
 				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
@@ -306,7 +295,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
               MultiFab& sedgex_mf = sedge[lev][0];
 	      MultiFab& sfluxx_mf = sflux[lev][0];
         const MultiFab& umac_mf   = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
+
               MultiFab& sedgey_mf = sedge[lev][1];
 	      MultiFab& sfluxy_mf = sflux[lev][1];
         const MultiFab& vmac_mf   = umac[lev][1];
@@ -348,7 +337,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 	    }
 	}
 #endif
-#endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -365,34 +353,26 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 	    // lo/hi coordinates (including ghost cells), and/or the # of components
 	    // We will also pass "validBox", which specifies the "valid" region.
 	    if (spherical == 0) {
-#if (AMREX_SPACEDIM == 1)
-		make_rhoh_flux_1d(
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
 		make_rhoh_flux_2d(
 #elif (AMREX_SPACEDIM == 3)
                 make_rhoh_flux_3d(
 #endif
 				  &lev, tileBox.loVect(), tileBox.hiVect(),
 				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
 #endif
-#endif
 				  BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
 #endif
-#endif
 				  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-#endif
 #endif
 				  r0_old.dataPtr(), r0_edge_old.dataPtr(),
 				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
@@ -521,7 +501,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
         const MultiFab& scalold_mf = stateold[lev];
 	      MultiFab& scalnew_mf = statenew[lev];
         const MultiFab& sfluxx_mf = sflux[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         const MultiFab& sfluxy_mf = sflux[lev][1];
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& sfluxz_mf = sflux[lev][2];
@@ -532,7 +511,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     	    MultiFab::Copy(p0_cart_dummy,p0_cart[lev],0,0,1,1);
     	}
     	const MultiFab& p0cart_mf = p0_cart_dummy;
-#endif
 #endif
         const MultiFab& force_mf = force[lev];
 
@@ -560,11 +538,9 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     				    BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
     				    BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
     				    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
     				    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
     				    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
-#endif
 #endif
     				    BL_TO_FORTRAN_ANYD(force_mf[mfi]),
     				    p0,
@@ -602,11 +578,9 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                     BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
                     BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
                     BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
                     BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                     BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
-#endif
 #endif
                     BL_TO_FORTRAN_ANYD(force_mf[mfi]),
                     AMREX_REAL_ANYD(dx), dt,
@@ -670,7 +644,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	      MultiFab& unew_mf = unew[lev];
 	const MultiFab& umac_mf   = umac[lev][0];
         const MultiFab& uedgex_mf = uedge[lev][0];
-#if (AMREX_SPACEDIM >= 2)
 	const MultiFab& vmac_mf   = umac[lev][1];
         const MultiFab& uedgey_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
@@ -681,7 +654,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	const MultiFab& w0macx_mf = w0mac[lev][0];
 	const MultiFab& w0macy_mf = w0mac[lev][1];
 	const MultiFab& w0macz_mf = w0mac[lev][2];
-#endif
 #endif
         const MultiFab& force_mf = force[lev];
 	const MultiFab& sponge_mf = sponge[lev];
@@ -702,18 +674,14 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 				 BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(unew_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				 BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				 BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
 #endif
-#endif
 				 BL_TO_FORTRAN_ANYD(uedgex_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
 				 BL_TO_FORTRAN_ANYD(uedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
 				 BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
-#endif
 #endif
 				 BL_TO_FORTRAN_ANYD(force_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),

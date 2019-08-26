@@ -17,7 +17,7 @@ contains
     integer :: n,i,r
 
     if (parallel_IOProcessor()) then
-    
+
        do n=0,max_radial_level
           do i=1,numdisjointchunks(n)
              do r=r_start_coord(n,i),r_end_coord(n,i)
@@ -27,7 +27,7 @@ contains
        end do
 
     end if
-    
+
   end subroutine print_base_cc
 
   subroutine print_base_edge(base) bind(C, name="print_base_edge")
@@ -45,11 +45,11 @@ contains
           end do
        end do
     end if
-    
+
   end subroutine print_base_edge
 
   subroutine print_mf(lev, lo, hi, mf, m_lo, m_hi, nc_m) bind (C,name="print_mf")
-    
+
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3), nc_m
     double precision, intent (inout) :: mf(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3),nc_m)
@@ -64,9 +64,7 @@ contains
     do k = m_lo(3),m_hi(3)
     do j = m_lo(2),m_hi(2)
     do i = m_lo(1),m_hi(1)
-#if (AMREX_SPACEDIM == 1)
-       print*,'lev,i,comp',lev,i,comp,mf(i,j,k,comp)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
        print*,'lev,i,j,comp',lev,i,j,comp,mf(i,j,k,comp)
 #elif (AMREX_SPACEDIM == 3)
        print*,'lev,i,j,k,comp',lev,i,j,k,comp,mf(i,j,k,comp)
@@ -81,7 +79,7 @@ contains
   end subroutine print_mf
 
   subroutine print_edge(lev, lo, hi, mf, m_lo, m_hi, nc_m) bind (C,name="print_edge")
-    
+
     integer         , intent (in   ) :: lev, lo(3), hi(3)
     integer         , intent (in   ) :: m_lo(3), m_hi(3), nc_m
     double precision, intent (inout) :: mf(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3),nc_m)
@@ -96,9 +94,7 @@ contains
     do k = m_lo(3),m_hi(3)
     do j = m_lo(2),m_hi(2)
     do i = m_lo(1),m_hi(1)
-#if (AMREX_SPACEDIM == 1)
-       print*,'lev,i,comp',lev,i,comp,mf(i,j,k,comp)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
        print*,'lev,i,j,comp',lev,i,j,comp,mf(i,j,k,comp)
 #elif (AMREX_SPACEDIM == 3)
        print*,'lev,i,j,k,comp',lev,i,j,k,comp,mf(i,j,k,comp)

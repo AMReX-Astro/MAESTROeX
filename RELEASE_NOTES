@@ -103,3 +103,11 @@ Add BSD-3 license
 Minor bugfixes at initialization
 Add diagnostic outputs of radially averaged profiles
 Add tests: test_stability, code_comp (code comparison project for Exeter)
+
+08-01-2019
+Option to plot gravity
+Added checkpoint at simulation time level option
+Fixed a ppm_type=2 index bug
+GPU ports: FirstDtm EstDt
+Various GPU optimizations
+Boundary condition bugs in make_edge_scal

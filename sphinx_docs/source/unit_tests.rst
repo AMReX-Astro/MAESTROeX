@@ -2,12 +2,12 @@
 Unit Tests
 **********
 
-In addition to the MAESTRO science problems, which use the full
-capabilities of MAESTRO, there are a number of unit tests that
-exercise only specific components of the MAESTRO solvers. These
+In addition to the MAESTROeX science problems, which use the full
+capabilities of MAESTROeX, there are a number of unit tests that
+exercise only specific components of the MAESTROeX solvers. These
 tests have their own drivers (a custom varden.f90) that
 initialize only the data needed for the specific test and call
-specific MAESTRO routines directly.
+specific MAESTROeX routines directly.
 
 test_advect
 ===========
@@ -27,31 +27,30 @@ Note: the BDS advection method does not guarantee that the error be
 independent of the advection direction—small differences can
 arise. What’s happening here is that within each cell BDS is trying
 to define a tri-linear profile for rho subject to the constrants in
-the BDS paper :raw-latex:`\cite{bds3d}` (constraints 1 and 2 on p. 2044 after eq. 3.4). We
+the BDS paper (:cite:`bds3d`) (constraints 1 and 2 on p. 2044 after eq. 3.4). We
 do not solve the L2 minimization problem exactly so we iterate up to
 3 times using a simple heuristic algorithm designed to work toward
 the constraint. The iteration will give different results depending
 on orientation since we work through the corners in arbitrary order.
 
-.. raw:: latex
+.. figure:: dens_2d_orig_density.png
+   :align: center
+   :width: 80%
 
-   \centering
+   Initial Gaussian density profile
 
-|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|
-|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|
-|[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).|
+.. figure:: dens_2d_ppm1_xp_final_density.png
+   :align: center
+   :width: 80%
+
+   density profile after advecting to the right for one period
+
+.. figure:: dens_2d_ppm1_xp_final_abserror.png
+   :align: center
+   :width: 80%
+
+   absolute error between the final and initial density fields,
+   showing the error in the advection scheme
 
 test_average
 ============
@@ -63,7 +62,7 @@ the fill_3d_module module, and then calls average to
 put it back onto a 1D radial array. This way we test the accuracy
 of our procedure to map between the 1D radial and 3D Cartesian
 states. The output from this test was described in detail
-in :raw-latex:`\cite{multilevel}`.
+in :cite:`multilevel`.
 
 test_basestate
 ==============
@@ -75,20 +74,20 @@ the base state velocity, :math:`w_0`, is computed in response to
 the heating and this is used to advect the base state density
 and compute the new pressure, :math:`p_0`. An early version of
 this routine was used for the plane-parallel expansion test
-in :raw-latex:`\cite{lowMach2}`. This version of the test was also shown
-for a spherical, self-gravitating star in :raw-latex:`\cite{multilevel}`.
+in :cite:`lowMach2`. This version of the test was also shown
+for a spherical, self-gravitating star in :cite:`multilevel`.
 
 test_diffusion
 ==============
 
 This test initializes a Gaussian temperature profile and calls
-the thermal diffusion routines in MAESTRO to evolve the state
+the thermal diffusion routines in MAESTROeX to evolve the state
 considering only diffusion. The driver estimates a timestep
 based on the explicit thermal diffusion timescale and loops
 over calls to the thermal diffusion solver. A Gaussian remains
 Gaussian when diffusing, so an explicit error can be computed
 by comparing to the analytic solution. This test is
-described in :raw-latex:`\cite{xrb}`.
+described in :cite:`xrb`.
 
 test_eos
 ========
@@ -102,41 +101,34 @@ either :math:`T` or :math:`\rho` (depending on the type), and stores the new :ma
 stored holding the results and errors. This allows us to determine
 whether the EOS inversion routines are working right.
 
-test_particles
-==============
-
-This test exercises the particle advection routine. A simple
-circular velocity field, with the magnitude increasing with radius
-from the center is initialized. A number of particles are then
-initialized at various radii from the center and they are advected
-for one period. The particle paths should be perfect circles, and
-the final particle position should overlap with the initial
-position.
-
-Particle data is stored separately from the fluid data. Instead
-of being part of the plotfiles, the particle data is outputted
-each timestep into files named timestamp\_, where
-the number indicates which processor did the writing. These
-particle files can be processed and the particle data plotted
-using the python routines in data_processing/python/.
-
-The output from this test can be visualized with the script
-plot.py in the test directory. The output shows the particle
-paths (see figure \ `[fig:unit:particles] <#fig:unit:particles>`__).
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \unitfigpath/particle_paths
-   :alt: [fig:unit:particles]
-   Particle paths for the test_particles problem. The initial
-   position of the particles is marked with an :math:`\times`.
-   :width: 4in
-
-   [fig:unit:particles]
-   Particle paths for the test_particles problem. The initial
-   position of the particles is marked with an :math:`\times`.
+.. test_particles
+.. ==============
+..
+.. This test exercises the particle advection routine. A simple
+.. circular velocity field, with the magnitude increasing with radius
+.. from the center is initialized. A number of particles are then
+.. initialized at various radii from the center and they are advected
+.. for one period. The particle paths should be perfect circles, and
+.. the final particle position should overlap with the initial
+.. position.
+..
+.. Particle data is stored separately from the fluid data. Instead
+.. of being part of the plotfiles, the particle data is outputted
+.. each timestep into files named ``timestamp_NN``, where
+.. the number indicates which processor did the writing. These
+.. particle files can be processed and the particle data plotted
+.. using the python routines in ``data_processing/python/``.
+..
+.. The output from this test can be visualized with the script
+.. plot.py in the test directory. The output shows the particle
+.. paths (see below):
+..
+.. .. figure:: particle_paths.png
+..    :align: center
+..    :width: 80%
+..
+..    Particle paths for the test_particles problem. The initial
+..    position of the particles is marked with an :math:`\times`.
 
 test_projection
 ===============
@@ -148,49 +140,36 @@ This tests the projection routines in 2- and 3-d—either the hgprojection
 scalar differs depending on the boundary conditions (wall and
 periodic are supported currently). Finally, the hgproject routine
 is called to recover the initial divergence-free field.
-Figure \ `[fig:unit:projtest] <#fig:unit:projtest>`__ shows the initial field, polluted
+The figures below show the initial field, polluted
 field, and result of the projection for the hgproject case.
 
-.. raw:: latex
+.. figure:: wall_u_init_x-velocity.png
+   :align: center
+   :width: 60%
 
-   \centering
+   Initial divergence free velocity field (x-component)
 
-|[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.|
-|[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.|
-|[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.|
+.. figure:: wall_u_plus_grad_phi_x-velocity.png
+   :align: center
+   :width: 60%
 
-.. raw:: latex
+   Velocity field plus gradient of a scalar (x-component)
 
-   \centering
+.. figure:: wall_u_new_x-velocity.png
+   :align: center
+   :width: 60%
 
-.. figure:: \unitfigpath/test_project_3d
-   :alt: [fig:unit:projtest3d]
-   Projection test in 3-d showing the x-velocity (left), y-velocity
-   (middle), and z-velocity (right) initially (top row), after the
-   gradient of a scalar is added (center row), and the resulting
-   velocity after the projection. This is with slipwall boundary conditions
-   on all sides, a 2-level grid with an octant refined, and the hgprojection.
-   :height: 8in
+   Resulting velocity after projecting out the non-divergence free
+   portion (x-component).
 
-   [fig:unit:projtest3d]
+This is with slipwall boundary conditions on all sides, a 2-level grid
+with the left half refined and right half coarse, and the hgprojection
+tested.
+
+.. figure:: test_project_3d.png
+   :align: center
+   :width: 80%
+
    Projection test in 3-d showing the x-velocity (left), y-velocity
    (middle), and z-velocity (right) initially (top row), after the
    gradient of a scalar is added (center row), and the resulting
@@ -201,8 +180,8 @@ test_react
 ==========
 
 This simply tests the reaction network by calling
-the MAESTRO react_state routine directly. The network is
-selected in the GNUmakefile by setting the NETWORK_DIR
+the MAESTROeX react_state routine directly. The network is
+selected in the GNUmakefile by setting the ``NETWORK_DIR``
 variable. A 3d cube is setup with density varying on one axis,
 temperature varying on another, and the composition varying on the
 third. The density and temperature ranges are set in the inputs
@@ -211,51 +190,8 @@ file. The composition is read in via an input file.
 A good use of this test is to test whether a burner is threadsafe.
 This is accomplished by compiling with OpenMP (setting OMP=t)
 and the running with 1 thread and multiple threads (this can be done
-by setting the environment variable OMP_NUM_THREADS to the
+by setting the environment variable ``OMP_NUM_THREADS`` to the
 desired number of threads). Since each zone is independent of the
 others, the results should be identical regardless of the number
 of threads. This can be confirmed using the fcompare tool
-in BoxLib/Tools/Postprocessing/F_Src/.
-
-.. |[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).| image:: \unitfigpath/dens_2d_orig_density
-   :height: 1.9in
-.. |[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).| image:: \unitfigpath/dens_2d_ppm1_xp_final_density
-   :height: 1.9in
-.. |[fig:unit:advtest]
-Initial Gaussian density profile (left); density profile after
-advecting to the right for one period (center); absolute error
-between the final and initial density fields, showing the error in
-the advection scheme (right).| image:: \unitfigpath/dens_2d_ppm1_xp_final_abserror
-   :height: 1.9in
-.. |[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.| image:: \unitfigpath/wall_u_init_x-velocity
-   :height: 1.9in
-.. |[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.| image:: \unitfigpath/wall_u_plus_grad_phi_x-velocity
-   :height: 1.9in
-.. |[fig:unit:projtest]
-Initial divergence free velocity field (x-component; left); Velocity
-field plus gradient of a scalar (x-component; center); and resulting
-velocity after projecting out the non-divergence free portion
-(x-component; right). This is with slipwall boundary conditions on
-all sides, a 2-level grid with the left half refined and right half
-coarse, and the hgprojection tested.| image:: \unitfigpath/wall_u_new_x-velocity
-   :height: 1.9in
+in ``BoxLib/Tools/Postprocessing/F_Src/``.

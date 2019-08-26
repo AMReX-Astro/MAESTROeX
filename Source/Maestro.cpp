@@ -40,10 +40,7 @@ int Maestro::predict_hprime           = 5;
 int Maestro::predict_Tprime_then_h    = 6;
 
 // helper IntVects used to define face/nodal MultiFabs
-#if (AMREX_SPACEDIM == 1)
-IntVect Maestro::nodal_flag(1);
-IntVect Maestro::nodal_flag_x(1);
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
 IntVect Maestro::nodal_flag(1,1);
 IntVect Maestro::nodal_flag_x(1,0);
 IntVect Maestro::nodal_flag_y(0,1);

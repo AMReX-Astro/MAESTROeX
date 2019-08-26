@@ -37,10 +37,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             const Box domainBox = geom[lev].Domain();
 
             // compute number of cells at any given height for each level
-            if (AMREX_SPACEDIM==1) {
-                ncell[lev] = 1;
-            }
-            else if (AMREX_SPACEDIM==2) {
+            if (AMREX_SPACEDIM==2) {
                 ncell[lev] = domainBox.bigEnd(0)+1;
             }
             else if (AMREX_SPACEDIM==3) {

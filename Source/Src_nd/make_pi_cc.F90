@@ -29,9 +29,7 @@ contains
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-             pi_cc(i,j,k) = (pi(i,j,k) + pi(i+1,j,k)) / 2.d0
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              pi_cc(i,j,k) = (pi(i,j,k) + pi(i+1,j,k) + pi(i,j+1,k) + pi(i+1,j+1,k)) / 4.d0
 
 #elif (AMREX_SPACEDIM == 3)

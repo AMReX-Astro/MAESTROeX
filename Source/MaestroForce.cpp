@@ -186,13 +186,11 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         MultiFab& scal_force_mf = scal_force[lev];
         const MultiFab& state_mf = state[lev];
         const MultiFab& umac_mf = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         const MultiFab& vmac_mf = umac[lev][1];
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wmac_mf = umac[lev][2];
         const MultiFab& s0cart_mf = s0_cart[lev];
         const MultiFab& divu_mf = divu_cart[lev];
-#endif
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -235,11 +233,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                                   state_mf[mfi].dataPtr(comp),
                                   AMREX_INT_ANYD(state_mf[mfi].loVect()), AMREX_INT_ANYD(state_mf[mfi].hiVect()),
                                   BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-#endif
 #endif
                                   s0.dataPtr(), s0_edge.dataPtr(), w0.dataPtr(),
                                   AMREX_REAL_ANYD(dx), fullform);
@@ -330,9 +326,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_force_mf = scal_force[lev];
-#if (AMREX_SPACEDIM >= 1)
         const MultiFab& umac_mf = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         const MultiFab& vmac_mf = umac[lev][1];
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wmac_mf = umac[lev][2];
@@ -340,8 +334,6 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         const MultiFab& p0macx_mf = p0mac[lev][0];
         const MultiFab& p0macy_mf = p0mac[lev][1];
         const MultiFab& p0macz_mf = p0mac[lev][2];
-#endif
-#endif
 #endif
         const MultiFab& thermal_mf = thermal[lev];
         const MultiFab& psi_mf = psi_cart[lev];
@@ -394,9 +386,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                             scal_force_mf[mfi].dataPtr(RhoH),
                             AMREX_INT_ANYD(scal_force_mf[mfi].loVect()),
                             AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
-#if (AMREX_SPACEDIM == 1)
-                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                             BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
 #elif (AMREX_SPACEDIM == 3)
                             BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),

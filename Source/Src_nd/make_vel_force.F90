@@ -60,9 +60,7 @@ contains
        do j = lo(2),hi(2)
           do i = lo(1),hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-             r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
 #elif (AMREX_SPACEDIM == 3)
              r = k
@@ -91,9 +89,7 @@ contains
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-                r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                 r = j
 #elif (AMREX_SPACEDIM == 3)
                 r = k
@@ -104,10 +100,7 @@ contains
                 else if (r .ge. nr(lev)) then
                    ! do not modify force since dw0/dr=0
                 else
-#if (AMREX_SPACEDIM == 1)
-                   vel_force(i,j,k,1) = vel_force(i,j,k,1) &
-                        - (uedge(i+1,j,k)+uedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                    vel_force(i,j,k,2) = vel_force(i,j,k,2) &
                         - (vedge(i,j+1,k)+vedge(i,j,k))*(w0(lev,r+1)-w0(lev,r)) / (2.d0*dr(lev))
 

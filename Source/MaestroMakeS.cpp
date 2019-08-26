@@ -151,6 +151,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     // average fine data onto coarser cells
     AverageDown(S_cc,0,1);
+    AverageDown(delta_gamma1_term,0,1);
 
     if (use_delta_gamma1_term) {
 
