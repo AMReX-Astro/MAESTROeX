@@ -129,6 +129,10 @@ contains
              sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
              sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
 
+             ! save for later 
+             sedgel = sp
+             sedger = sm
+
              ! modify using quadratic limiters
              if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
                 sp = s(i,j,k,n)
@@ -148,16 +152,14 @@ contains
                    sm = s(i-1,j,k,n)
 
                    ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   sp = &
                         -FIFTH        *s(i-1,j,k,n) &
                         + (THREE/FOUR)*s(i,j,k,n) &
                         + HALF        *s(i+1,j,k,n) &
                         - (ONE/20.0d0)*s(i+2,j,k,n)
 
-                   sedge = max(sedge,min(s(i+1,j,k,n),s(i,j,k,n)))
-                   sedge = min(sedge,max(s(i+1,j,k,n),s(i,j,k,n)))
-
-                   sp = sedge
+                   sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
+                   sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
                 end if
              end if
 
@@ -166,17 +168,18 @@ contains
 
                    ! make sure sedge lies in between adjacent cell-centered values
 
-                   ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   ! use a modified stencil to get sm on the first interior edge
+                   sm = &
                         -FIFTH        *s(i-2,j,k,n) &
                         + (THREE/FOUR)*s(i-1,j,k,n) &
                         + HALF        *s(i,j,k,n) &
                         - (ONE/20.0d0)*s(i+1,j,k,n)
 
-                   sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)))
-                   sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)))
+                   sm = max(sm,min(s(i,j,k,n),s(i-1,j,k,n)))
+                   sm = min(sm,max(s(i,j,k,n),s(i-1,j,k,n)))
 
-                   sm = sedge
+                   ! reset sp on second interior edge
+                   sp = sedgel
 
                    ! modify using quadratic limiters
                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
@@ -197,16 +200,14 @@ contains
 
                    ! make sure sedge lies in between adjacent cell-centered values
                    ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   sm = &
                         -FIFTH        *s(i+1,j,k,n) &
                         + (THREE/FOUR)*s(i,j,k,n) &
                         + HALF        *s(i-1,j,k,n) &
                         - (ONE/20.0d0)*s(i-2,j,k,n)
 
-                   sedge = max(sedge,min(s(i-1,j,k,n),s(i,j,k,n)))
-                   sedge = min(sedge,max(s(i-1,j,k,n),s(i,j,k,n)))
-
-                   sm = sedge
+                   sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)))
+                   sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)))
 
                 end if
              end if
@@ -215,18 +216,18 @@ contains
                 if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                    ! make sure sedge lies in between adjacent cell-centered values
-                   ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   ! use a modified stencil to get sp on the first interior edge
+                   sp = &
                         -FIFTH        *s(i+2,j,k,n) &
                         + (THREE/FOUR)*s(i+1,j,k,n) &
                         + HALF        *s(i,j,k,n) &
                         - (ONE/20.0d0)*s(i-1,j,k,n)
 
-                   sedge = max(sedge,min(s(i,j,k,n),s(i+1,j,k,n)))
-                   sedge = min(sedge,max(s(i,j,k,n),s(i+1,j,k,n)))
+                   sp = max(sp,min(s(i,j,k,n),s(i+1,j,k,n)))
+                   sp = min(sp,max(s(i,j,k,n),s(i+1,j,k,n)))
 
-                   ! copy sedge into sp and sm
-                   sp = sedge
+                   ! reset sm on second interior edge
+                   sm = sedger
 
                    ! modify using quadratic limiters
                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
@@ -772,6 +773,10 @@ contains
              sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
              sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
+             ! save for later 
+             sedgel = sp
+             sedger = sm
+
              ! modify using quadratic limiters
              if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
                 sp = s(i,j,k,n)
@@ -805,18 +810,18 @@ contains
              if (j .eq. domlo(2)+1) then
                 if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
-                   ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   ! use a modified stencil to get sm on the first interior edge
+                   sm = &
                         -FIFTH        *s(i,j-2,k,n) &
                         + (THREE/FOUR)*s(i,j-1,k,n) &
                         + HALF        *s(i,j,k,n) &
                         - (ONE/20.0d0)*s(i,j+1,k,n)
 
-                   sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)))
-                   sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)))
+                   sm = max(sm,min(s(i,j,k,n),s(i,j-1,k,n)))
+                   sm = min(sm,max(s(i,j,k,n),s(i,j-1,k,n)))
 
-                   ! copy sedge into sp and sm
-                   sm = sedge
+                   ! reset sp on second interior edge
+                   sp = sedgel
 
                    ! modify using quadratic limiters
                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
@@ -838,17 +843,14 @@ contains
                    sp = s(i,j+1,k,n)
 
                    ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   sm = &
                         -FIFTH        *s(i,j+1,k,n) &
                         + (THREE/FOUR)*s(i,j,k,n) &
                         + HALF        *s(i,j-1,k,n) &
                         - (ONE/20.0d0)*s(i,j-2,k,n)
 
-                   sedge = max(sedge,min(s(i,j-1,k,n),s(i,j,k,n)))
-                   sedge = min(sedge,max(s(i,j-1,k,n),s(i,j,k,n)))
-                   !
-                   ! ! copy sedge into sp and sm
-                   sm = sedge
+                   sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)))
+                   sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
 
                 end if
              end if
@@ -856,20 +858,20 @@ contains
              if (j .eq. domhi(2)-1) then
                 if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
-                   ! use a modified stencil to get sedge on the first interior edge
-                   sedge = &
+                   ! use a modified stencil to get sp on the first interior edge
+                   sp = &
                         -FIFTH        *s(i,j+2,k,n) &
                         + (THREE/FOUR)*s(i,j+1,k,n) &
                         + HALF        *s(i,j,k,n) &
                         - (ONE/20.0d0)*s(i,j-1,k,n)
 
-                   sedge = max(sedge,min(s(i,j,k,n),s(i,j+1,k,n)))
-                   sedge = min(sedge,max(s(i,j,k,n),s(i,j+1,k,n)))
-                   !
-                   ! ! copy sedge into sp and sm
-                   sp = sedge
-                   !
-                   ! ! modify using quadratic limiters
+                   sp = max(sp,min(s(i,j,k,n),s(i,j+1,k,n)))
+                   sp = min(sp,max(s(i,j,k,n),s(i,j+1,k,n)))
+
+                   ! reset sm on second interior edge
+                   sm = sedger
+                   
+                   ! modify using quadratic limiters
                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) .le. ZERO) then
                       sp = s(i,j,k,n)
                       sm = s(i,j,k,n)
@@ -1461,6 +1463,10 @@ contains
                 sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
                 sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
 
+                ! save for later 
+                sedgel = sp
+                sedger = sm
+
                 !
                 ! Modify using quadratic limiters.
                 !
@@ -1483,21 +1489,17 @@ contains
                       !
                       sm = s(i-1,j,k,n)
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sp on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i-1,j,k,n) &
+                      sp = -FIFTH     *s(i-1,j,k,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i+1,j,k,n) &
                            - (ONE/20.0d0)*s(i+2,j,k,n)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i+1,j,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i+1,j,k,n),s(i,j,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
 
                    end if
                 end if
@@ -1508,17 +1510,18 @@ contains
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i-2,j,k,n) &
+                      sm = -FIFTH     *s(i-2,j,k,n) &
                            + (THREE/FOUR)*s(i-1,j,k,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i+1,j,k,n)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)))
+                      sm = max(sm,min(s(i,j,k,n),s(i-1,j,k,n)))
+                      sm = min(sm,max(s(i,j,k,n),s(i-1,j,k,n)))
 
-                      sm = sedge
+                      ! reset sp on second interior edge
+                      sp = sedgel
 
                       !
                       ! Modify using quadratic limiters.
@@ -1543,19 +1546,17 @@ contains
                       sp = s(i+1,j,k,n)
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i+1,j,k,n) &
+                      sm = -FIFTH     *s(i+1,j,k,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i-1,j,k,n) &
                            - (ONE/20.0d0)*s(i-2,j,k,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sm lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i-1,j,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i-1,j,k,n),s(i,j,k,n)))
-
-                      sm = sedge
+                      sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)))
 
                    end if
                 end if
@@ -1564,21 +1565,20 @@ contains
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sp on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i+2,j,k,n) &
+                      sp = -FIFTH     *s(i+2,j,k,n) &
                            + (THREE/FOUR)*s(i+1,j,k,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i-1,j,k,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sp lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i+1,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i+1,j,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j,k,n),s(i+1,j,k,n)))
+                      sp = min(sp,max(s(i,j,k,n),s(i+1,j,k,n)))
+
+                      ! reset sm on second interior edge
+                      sm = sedger
 
                       !
                       ! Modify using quadratic limiters.
@@ -2172,6 +2172,10 @@ contains
                 sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
                 sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
+                ! save for later 
+                sedgel = sp
+                sedger = sm
+
                 !
                 ! Modify using quadratic limiters.
                 !
@@ -2196,19 +2200,15 @@ contains
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j-1,k,n) &
+                      sp = -FIFTH     *s(i,j-1,k,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i,j+1,k,n) &
                            - (ONE/20.0d0)*s(i,j+2,k,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sp lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j+1,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i,j+1,k,n),s(i,j,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
                    end if
                 end if
@@ -2217,19 +2217,20 @@ contains
                    if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j-2,k,n) &
+                      sm = -FIFTH     *s(i,j-2,k,n) &
                            + (THREE/FOUR)*s(i,j-1,k,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i,j+1,k,n)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)))
-                      !
-                      sm = sedge
+                      sm = max(sm,min(s(i,j,k,n),s(i,j-1,k,n)))
+                      sm = min(sm,max(s(i,j,k,n),s(i,j-1,k,n)))
+
+                      ! reset sp on second interior edge
+                      sp = sedgel
                       !
                       ! Modify using quadratic limiters.
                       !
@@ -2252,19 +2253,17 @@ contains
                       !
                       sp = s(i,j+1,k,n)
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j+1,k,n) &
+                      sm = -FIFTH     *s(i,j+1,k,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i,j-1,k,n) &
                            - (ONE/20.0d0)*s(i,j-2,k,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sm lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j-1,k,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i,j-1,k,n),s(i,j,k,n)))
-                      !
-                      sm = sedge
+                      sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
 
                    end if
                 end if
@@ -2272,21 +2271,21 @@ contains
                 if (j .eq. domhi(2)-1) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sp on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j+2,k,n) &
+                      sp = -FIFTH     *s(i,j+2,k,n) &
                            + (THREE/FOUR)*s(i,j+1,k,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i,j-1,k,n)
                       !
                       ! Make sure sedge lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j+1,k,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j+1,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j,k,n),s(i,j+1,k,n)))
+                      sp = min(sp,max(s(i,j,k,n),s(i,j+1,k,n)))
+
+                      ! reset sm on second interior edge
+                      sm = sedger
+
                       !
                       ! Modify using quadratic limiters.
                       !
@@ -2894,6 +2893,10 @@ contains
                 sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)))
                 sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)))
 
+                ! save for later 
+                sedgel = sp
+                sedger = sm
+
                 !
                 ! Modify using quadratic limiters.
                 !
@@ -2916,21 +2919,17 @@ contains
                       sm = s(i,j,k-1,n)
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sp on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j,k-1,n) &
+                      sp = -FIFTH     *s(i,j,k-1,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i,j,k+1,n) &
                            - (ONE/20.0d0)*s(i,j,k+2,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sp lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k+1,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k+1,n),s(i,j,k,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)))
+                      sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)))
 
                    end if
                 end if
@@ -2939,19 +2938,20 @@ contains
                    if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j,k-2,n) &
+                      sm = -FIFTH     *s(i,j,k-2,n) &
                            + (THREE/FOUR)*s(i,j,k-1,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i,j,k+1,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sm lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j,k-1,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j,k-1,n)))
-                      !
-                      sm = sedge
+                      sm = max(sm,min(s(i,j,k,n),s(i,j,k-1,n)))
+                      sm = min(sm,max(s(i,j,k,n),s(i,j,k-1,n)))
+
+                      ! reset sp on second interior edge
+                      sp = sedgel
                       !
                       ! Modify using quadratic limiters.
                       !
@@ -2976,19 +2976,17 @@ contains
                       sp = s(i,j,k+1,n)
 
                       !
-                      ! Use a modified stencil to get sedge on the first interior edge.
+                      ! Use a modified stencil to get sm on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j,k+1,n) &
+                      sm = -FIFTH     *s(i,j,k+1,n) &
                            + (THREE/FOUR)*s(i,j,k,n) &
                            + HALF        *s(i,j,k-1,n) &
                            - (ONE/20.0d0)*s(i,j,k-2,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sm lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k-1,n),s(i,j,k,n)))
-                      sedge = min(sedge,max(s(i,j,k-1,n),s(i,j,k,n)))
-                      !
-                      sm = sedge
+                      sm = max(sm,min(s(i,j,k-1,n),s(i,j,k,n)))
+                      sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)))
                    end if
                 end if
 
@@ -2998,19 +2996,18 @@ contains
                       !
                       ! Use a modified stencil to get sedge on the first interior edge.
                       !
-                      sedge = -FIFTH     *s(i,j,k+2,n) &
+                      sp = -FIFTH     *s(i,j,k+2,n) &
                            + (THREE/FOUR)*s(i,j,k+1,n) &
                            + HALF        *s(i,j,k,n) &
                            - (ONE/20.0d0)*s(i,j,k-1,n)
                       !
-                      ! Make sure sedge lies in between adjacent cell-centered values.
+                      ! Make sure sp lies in between adjacent cell-centered values.
                       !
-                      sedge = max(sedge,min(s(i,j,k,n),s(i,j,k+1,n)))
-                      sedge = min(sedge,max(s(i,j,k,n),s(i,j,k+1,n)))
-                      !
-                      ! Copy sedge into sp and sm.
-                      !
-                      sp = sedge
+                      sp = max(sp,min(s(i,j,k,n),s(i,j,k+1,n)))
+                      sp = min(sp,max(s(i,j,k,n),s(i,j,k+1,n)))
+
+                      ! reset sm on second interior edge
+                      sm = sedger
 
                       ! Modify using quadratic limiters.
                       !
