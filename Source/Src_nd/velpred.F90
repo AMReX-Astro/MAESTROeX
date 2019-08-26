@@ -1,10 +1,10 @@
-! velpred is called by advance_premac -- it is used to predict the
-! normal velocities to the interfaces.  We don't care about the
-! transverse velocities here.  The prediction is done piecewise linear (for now)
 
 #include "AMReX_BC_TYPES.H"
 
 module velpred_module
+  ! velpred is called by advance_premac -- it is used to predict the
+  ! normal velocities to the interfaces.  We don't care about the
+  ! transverse velocities here.  The prediction is done piecewise linear (for now)
 
   use amrex_error_module
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
@@ -19,160 +19,6 @@ module velpred_module
   private
 
 contains
-
-#if (AMREX_SPACEDIM == 1)
-  subroutine velpred_1d(lev, domlo, domhi, lo, hi, &
-       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
-       umac,   uu_lo, uu_hi, &
-       force,   f_lo,  f_hi, nc_f, ng_f, &
-       w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_1d")
-
-    integer         , intent(in   ) :: lev, domlo(1), domhi(1), lo(1), hi(1)
-    integer         , intent(in   ) :: ut_lo(1), ut_hi(1), nc_ut
-    integer, value,   intent(in   ) :: ng_ut
-    integer         , intent(in   ) :: uf_lo(1), uf_hi(1), nc_uf
-    integer, value,   intent(in   ) :: ng_uf
-    integer         , intent(in   ) :: uu_lo(1), uu_hi(1)
-    integer         , intent(in   ) ::  f_lo(1),  f_hi(1), nc_f
-    integer, value,   intent(in   ) :: ng_f
-    double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),nc_ut)
-    double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),nc_uf)
-    double precision, intent(inout) :: umac(uu_lo(1):uu_hi(1))
-    double precision, intent(in   ) :: force ( f_lo(1): f_hi(1),nc_f)
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: dx(1), dt
-    integer         , intent(in   ) :: adv_bc(1,2,1), phys_bc(1,2) ! dim, lohi, (comp)
-
-    ! Local variables
-    double precision, pointer :: slopex(:,:)
-
-    double precision, pointer :: Ipu(:), Ipf(:)
-    double precision, pointer :: Imu(:), Imf(:)
-
-    ! these correspond to umac_L, etc.
-    double precision, pointer :: umacl(:),umacr(:)
-
-    double precision :: hx, dt2, dt4, uavg
-
-    integer :: i,is,ie
-
-    logical :: test
-
-    allocate(slopex,lo(1)-1,hi(1)+1,1,1)
-
-    allocate(Ipu,lo(1)-1,hi(1)+1)
-    allocate(Imu,lo(1)-1,hi(1)+1)
-
-    allocate(Ipf,lo(1)-1,hi(1)+1)
-    allocate(Imf,lo(1)-1,hi(1)+1)
-
-    allocate(umacl,lo(1),hi(1)+1)
-    allocate(umacr,lo(1),hi(1)+1)
-
-    is = lo(1)
-    ie = hi(1)
-
-    dt2 = HALF*dt
-    dt4 = dt/4.0d0
-
-    hx = dx(1)
-
-    if (ppm_type .eq. 0) then
-       call slopex_1d(utilde,slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc)
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       call ppm_1d(utilde(:,1),ng_ut,ufull(:,1),ng_uf,Ipu,Imu, &
-            domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-       if (ppm_trace_forces .eq. 1) then
-          call ppm_1d(force(:,1),ng_f,ufull(:,1),ng_uf,Ipf,Imf, &
-               domlo,domhi,lo,hi,adv_bc(:,:,1),dx,dt,.false.)
-       endif
-    end if
-
-    !******************************************************************
-    ! Create umac
-    !******************************************************************
-
-    if (ppm_type .eq. 0) then
-       do i=is,ie+1
-          ! extrapolate velocity to left face
-          umacl(i) = utilde(i-1,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,1)))*slopex(i-1,1) &
-               + dt2*force(i-1,1)
-          ! extrapolate velocity to right face
-          umacr(i) = utilde(i  ,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,1)))*slopex(i  ,1) &
-               + dt2*force(i,1)
-       end do
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       if (ppm_trace_forces .eq. 0) then
-          do i=is,ie+1
-             ! extrapolate velocity to left face
-             umacl(i) = Ipu(i-1) + dt2*force(i-1,1)
-             ! extrapolate velocity to right face
-             umacr(i) = Imu(i  ) + dt2*force(i  ,1)
-          end do
-       else
-          do i=is,ie+1
-             ! extrapolate velocity to left face
-             umacl(i) = Ipu(i-1) + dt2*Ipf(i-1)
-             ! extrapolate velocity to right face
-             umacr(i) = Imu(i  ) + dt2*Imf(i  )
-          end do
-       endif
-    end if
-
-    do i=is,ie+1
-       ! solve Riemann problem using full velocity
-       uavg = HALF*(umacl(i)+umacr(i))
-       test = ((umacl(i)+w0(lev,i) .le. ZERO .and. umacr(i)+w0(lev,i) .ge. ZERO) .or. &
-            (abs(umacl(i)+umacr(i)+TWO*w0(lev,i)) .lt. rel_eps))
-       umac(i) = merge(umacl(i),umacr(i),uavg+w0(lev,i) .gt. ZERO)
-       umac(i) = merge(ZERO,umac(i),test)
-    enddo
-
-    ! impose lo side bc's
-    if (lo(1) .eq. domlo(1)) then
-       select case(phys_bc(1,1))
-       case (Inflow)
-          umac(is) = utilde(is-1,1)
-       case (SlipWall, NoSlipWall, Symmetry)
-          umac(is) = ZERO
-       case (Outflow)
-          umac(is) = min(umacr(is),ZERO)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_1d: invalid boundary type phys_bc(1,1)")
-       end select
-    end if
-
-    ! impose hi side bc's
-    if (hi(1) .eq. domhi(1)) then
-       select case(phys_bc(1,2))
-       case (Inflow)
-          umac(ie+1) = utilde(ie+1,1)
-       case (SlipWall, NoSlipWall, Symmetry)
-          umac(ie+1) = ZERO
-       case (Outflow)
-          umac(ie+1) = max(umacl(ie+1),ZERO)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_1d: invalid boundary type phys_bc(1,2)")
-       end select
-    end if
-
-    deallocate(slopex)
-
-    deallocate(Ipu)
-    deallocate(Imu)
-
-    deallocate(Ipf)
-    deallocate(Imf)
-
-    deallocate(umacl)
-    deallocate(umacr)
-
-  end subroutine velpred_1d
-#endif
-
 
 #if (AMREX_SPACEDIM == 2)
 
@@ -264,7 +110,7 @@ subroutine velpred_interface_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose lo side bc's
-           if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+           if (i .eq. domlo(1)) then
               select case(phys_bc(1,1))
               case (Inflow)
                  ul(i,j,k,1:2) = utilde(i-1,j,k,1:2)
@@ -288,7 +134,7 @@ subroutine velpred_interface_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose hi side bc's
-           if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+           if (i .eq. domhi(1)+1) then
               select case(phys_bc(1,2))
               case (Inflow)
                  ul(i,j,k,1:2) = utilde(i,j,k,1:2)
@@ -345,7 +191,7 @@ subroutine velpred_interface_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose lo side bc's
-           if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+           if (j .eq. domlo(2)) then
               select case(phys_bc(2,1))
               case (Inflow)
                  ul(i,j,k,1:2) = utilde(i,j-1,k,1:2)
@@ -369,7 +215,7 @@ subroutine velpred_interface_2d(lo, hi, idir, domlo, domhi, &
            end if
 
            ! impose hi side bc's
-           if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+           if (j .eq. domhi(2)+1) then
               select case(phys_bc(2,2))
               case (Inflow)
                  ul(i,j,k,1:2) = utilde(i,j,k,1:2)
@@ -508,7 +354,7 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
            umac(i,j,k) = merge(ZERO,umac(i,j,k),test)
 
            ! impose lo side bc's
-           if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+           if (i .eq. domlo(1)) then
               select case(phys_bc(1,1))
               case (Inflow)
                  umac(i,j,k) = utilde(i-1,j,k,1)
@@ -525,7 +371,7 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
            end if
 
            ! impose hi side bc's
-           if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+           if (i .eq. domhi(1)+1) then
               select case(phys_bc(1,2))
               case (Inflow)
                  umac(i,j,k) = utilde(i,j,k,1)
@@ -567,7 +413,7 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
            vmac(i,j,k) = merge(ZERO,vmac(i,j,k),test)
 
            ! impose lo side bc's
-           if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+           if (j .eq. domlo(2)) then
               select case(phys_bc(2,1))
               case (Inflow)
                  vmac(i,j,k) = utilde(i,j-1,k,2)
@@ -584,7 +430,7 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
            end if
 
            ! impose hi side bc's
-           if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+           if (j .eq. domhi(2)+1) then
               select case(phys_bc(2,2))
               case (Inflow)
                  vmac(i,j,k) = utilde(i,j,k,2)
@@ -712,7 +558,7 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+              if (i .eq. domlo(1)) then
                  select case(phys_bc(1,1))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i-1,j,k,1:3)
@@ -737,7 +583,7 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. domhi(1)+1) then
                  select case(phys_bc(1,2))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i,j,k,1:)
@@ -813,7 +659,7 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. domlo(2)) then
                  select case(phys_bc(2,1))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i,j-1,k,1:3)
@@ -838,7 +684,7 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+              if (j .eq. domhi(2)+1) then
                  select case(phys_bc(2,2))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i,j,k,1:3)
@@ -914,7 +760,7 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+              if (k .eq. domlo(3)) then
                  select case(phys_bc(3,1))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i,j,k-1,1:3)
@@ -939,7 +785,7 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+              if (k .eq. domhi(3)+1) then
                  select case(phys_bc(3,2))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i,j,k,1:3)
@@ -980,8 +826,6 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
   endif
 
 end subroutine velpred_interface_3d
-
-
 
 
 subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
@@ -1084,7 +928,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                    * (uimhz(i,j  ,k+1,1)-uimhz(i,j  ,k,1))
 
               ! impose lo side bc's
-              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. domlo(2)) then
                  select case(phys_bc(2,1))
                  case (Inflow)
                     ulyz = utilde(i,j-1,k,1)
@@ -1103,7 +947,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+              if (j .eq. domhi(2)+1) then
                  select case(phys_bc(2,2))
                  case (Inflow)
                     ulyz = utilde(i,j,k,1)
@@ -1148,7 +992,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                    * (uimhy(i,j+1,k  ,1)-uimhy(i,j,k  ,1))
 
               ! impose lo side bc's
-              if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+              if (k .eq. domlo(3)) then
                  select case(phys_bc(3,1))
                  case (Inflow)
                     ulzy = utilde(i,j,k-1,1)
@@ -1167,7 +1011,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+              if (k .eq. domhi(3)+1) then
                  select case(phys_bc(3,2))
                  case (Inflow)
                     ulzy = utilde(i,j,k,1)
@@ -1212,7 +1056,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
 
 
               ! impose lo side bc's
-              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+              if (i .eq. domlo(1)) then
                  select case(phys_bc(1,1))
                  case (Inflow)
                     vlxz = utilde(i-1,j,k,2)
@@ -1231,7 +1075,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. domhi(1)+1) then
                  select case(phys_bc(1,2))
                  case (Inflow)
                     vlxz = utilde(i,j,k,2)
@@ -1275,7 +1119,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                    * (uimhx(i+1,j,k  ,2)-uimhx(i,j,k  ,2))
 
               ! impose lo side bc's
-              if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+              if (k .eq. domlo(3)) then
                  select case(phys_bc(3,1))
                  case (Inflow)
                     vlzx = utilde(i,j,k-1,2)
@@ -1294,7 +1138,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               end if
 
               ! impose hi side bc's
-              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+              if (k .eq. domhi(3)+1) then
                  select case(phys_bc(3,2))
                  case (Inflow)
                     vlzx = utilde(i,j,k,2)
@@ -1338,7 +1182,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                    * (uimhy(i  ,j+1,k,3)-uimhy(i  ,j,k,3))
 
               ! impose lo side bc's
-              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+              if (i .eq. domlo(1)) then
                  select case(phys_bc(1,1))
                  case (Inflow)
                     wlxy = utilde(i-1,j,k,3)
@@ -1357,7 +1201,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. domhi(1)+1) then
                  select case(phys_bc(1,2))
                  case (Inflow)
                     wlxy = utilde(i,j,k,3)
@@ -1401,7 +1245,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                    * (uimhx(i+1,j  ,k,3)-uimhx(i,j  ,k,3))
 
               ! impose lo side bc's
-              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. domlo(2)) then
                  select case(phys_bc(2,1))
                  case (Inflow)
                     wlyx = utilde(i,j-1,k,3)
@@ -1420,7 +1264,7 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+              if (j .eq. domhi(2)+1) then
                  select case(phys_bc(2,2))
                  case (Inflow)
                     wlyx = utilde(i,j,k,3)
@@ -1598,7 +1442,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+              if (i .eq. domlo(1)) then
                  select case(phys_bc(1,1))
                  case (Inflow)
                     umac(i,j,k) = utilde(i-1,j,k,1)
@@ -1615,7 +1459,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+              if (i .eq. domhi(1)+1) then
                  select case(phys_bc(1,2))
                  case (Inflow)
                     umac(i,j,k) = utilde(i,j,k,1)
@@ -1679,7 +1523,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+              if (j .eq. domlo(2)) then
                  select case(phys_bc(2,1))
                  case (Inflow)
                     vmac(i,j,k) = utilde(i,j-1,k,2)
@@ -1696,7 +1540,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+              if (j .eq. domhi(2)+1) then
                  select case(phys_bc(2,2))
                  case (Inflow)
                     vmac(i,j,k) = utilde(i,j,k,2)
@@ -1762,7 +1606,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               end if
 
               ! impose hi side bc's
-              if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+              if (k .eq. domlo(3)) then
                  select case(phys_bc(3,1))
                  case (Inflow)
                     wmac(i,j,k) = utilde(i,j,k-1,3)
@@ -1779,7 +1623,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               end if
 
               ! impose lo side bc's
-              if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+              if (k .eq. domhi(3)+1) then
                  select case(phys_bc(3,2))
                  case (Inflow)
                     wmac(i,j,k) = utilde(i,j,k,3)
@@ -1803,8 +1647,5 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
 
 end subroutine velpred_3d
 #endif
-
-
-
 
 end module velpred_module

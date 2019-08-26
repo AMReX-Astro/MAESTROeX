@@ -247,11 +247,9 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     {
         // get references to the MultiFabs at level lev
         MultiFab& xedge_mf = edge[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         MultiFab& yedge_mf = edge[lev][1];
 #if (AMREX_SPACEDIM == 3)
         MultiFab& zedge_mf = edge[lev][2];
-#endif
 #endif
 
         // Must get cell-centered MultiFab boxes for MIter
@@ -269,13 +267,11 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
             // call fortran subroutine
             mult_beta0(&lev,ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
                        BL_TO_FORTRAN_3D(xedge_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
                        BL_TO_FORTRAN_3D(yedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                        BL_TO_FORTRAN_3D(zedge_mf[mfi]),
 #endif
                        beta0_edge.dataPtr(),
-#endif
                        beta0.dataPtr(), &mult_or_div);
 
         }
@@ -304,11 +300,9 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
         MultiFab& solverrhs_mf = solverrhs[lev];
         const MultiFab& macrhs_mf = macrhs[lev];
         const MultiFab& uedge_mf = umac[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         const MultiFab& vedge_mf = umac[lev][1];
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wedge_mf = umac[lev][2];
-#endif
 #endif
 
         // loop over boxes
@@ -328,11 +322,9 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
                            BL_TO_FORTRAN_ANYD(solverrhs_mf[mfi]),
                            BL_TO_FORTRAN_ANYD(macrhs_mf[mfi]),
                            BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
                            BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                            BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
-#endif
 #endif
                            AMREX_REAL_ANYD(dx));
 
@@ -358,11 +350,9 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     {
         // get references to the MultiFabs at level lev
         MultiFab& xbcoef_mf = facebcoef[lev][0];
-#if (AMREX_SPACEDIM >= 2)
         MultiFab& ybcoef_mf = facebcoef[lev][1];
 #if (AMREX_SPACEDIM == 3)
         MultiFab& zbcoef_mf = facebcoef[lev][2];
-#endif
 #endif
 
         // Must get cell-centered MultiFab boxes for MIter
@@ -380,11 +370,9 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
             // call fortran subroutine
             mac_bcoef_face(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()),
                            BL_TO_FORTRAN_3D(xbcoef_mf[mfi]),
-#if (AMREX_SPACEDIM >= 2)
                            BL_TO_FORTRAN_3D(ybcoef_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                            BL_TO_FORTRAN_3D(zbcoef_mf[mfi]),
-#endif
 #endif
                            BL_TO_FORTRAN_3D(rhocc_mf[mfi]));
 

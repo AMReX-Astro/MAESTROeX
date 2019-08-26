@@ -29,9 +29,7 @@ contains
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-             gphi(i,j,k,1) = ( phi(i+1,j,k) - phi(i,j,k) ) / dx(1)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              gphi(i,j,k,1) = 0.5d0*(phi(i+1,j,k) + phi(i+1,j+1,k) - &
                   phi(i  ,j,k) - phi(i  ,j+1,k) ) /dx(1)
              gphi(i,j,k,2) = 0.5d0*(phi(i,j+1,k) + phi(i+1,j+1,k) - &

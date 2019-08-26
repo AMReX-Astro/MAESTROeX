@@ -24,6 +24,8 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 	    // tracing needs more ghost cells
 	    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
 	}
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        vel_force[lev].setVal(0.);
     }
 
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > uedge(finest_level+1);

@@ -1,7 +1,5 @@
-! compute gamma1 for the full state.
-
-
 module make_gamma_module
+  ! compute gamma1 for the full state.
 
   use eos_type_module
   use eos_module
@@ -17,6 +15,7 @@ contains
        gamma, g_lo, g_hi, &
        scal,  s_lo, s_hi, &
        p0) bind(C,name="make_gamma")
+    ! Binds to C function ``make_gamma``
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer  , value, intent (in   ) :: lev
@@ -38,9 +37,7 @@ contains
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
 
-#if (AMREX_SPACEDIM == 1)
-             r = i
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
              r = j
 #elif (AMREX_SPACEDIM == 3)
              r = k
@@ -72,6 +69,7 @@ contains
        gamma, g_lo, g_hi, &
        scal,  s_lo, s_hi, &
        p0_cart, p0_lo, p0_hi) bind(C, name="make_gamma_sphr")
+    ! Binds to C function ``make_gamma_sphr``
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: g_lo(3), g_hi(3)

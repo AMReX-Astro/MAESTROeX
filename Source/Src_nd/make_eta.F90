@@ -1,22 +1,19 @@
-!
-! Compute eta_rho = Avg { rho' U dot e_r }  (see paper III, Eq. 30)
-!
-! We keep make three quantities here:
-!    etarho     is edge-centered
-!    etarho_cc  is cell-centered
-!
-! For plane-parallel geometries, we compute etarho by averaging up
-! interface fluxes (etarho_flux) created in mkflux.  We compute etarho_cc
-! from etarho.
-!
-! For spherical geometries,
-!      We construct a multifab containing {rho' (U dot e_r)} and
-!      use the average routine to put it in cell-centers
-!      on the base state to get etarho_cc.  We compute etarho from these
-!      cell-centered quantites by averaging to the center.
-!
-
 module make_eta_module
+  ! Compute eta_rho = Avg { rho' U dot e_r }  (see paper III, Eq. 30)
+  !
+  ! We keep make three quantities here:
+  ! etarho     is edge-centered
+  ! etarho_cc  is cell-centered
+  !
+  ! For plane-parallel geometries, we compute etarho by averaging up
+  ! interface fluxes (etarho_flux) created in mkflux.  We compute etarho_cc
+  ! from etarho.
+  !
+  ! For spherical geometries,
+  ! We construct a multifab containing {rho' (U dot e_r)} and
+  ! use the average routine to put it in cell-centers
+  ! on the base state to get etarho_cc.  We compute etarho from these
+  ! cell-centered quantites by averaging to the center.
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
   use amrex_constants_module
@@ -34,6 +31,7 @@ contains
 
   subroutine make_etarho_planar(etarho_ec, etarho_cc, &
        etarhosum, ncell) bind(C, name="make_etarho_planar")
+    ! Binds to C function ``make_etarho_planar``
 
     double precision, intent(  out) :: etarho_ec(0:max_radial_level,0:nr_fine)
     double precision, intent(  out) :: etarho_cc(0:max_radial_level,0:nr_fine-1)
@@ -80,6 +78,7 @@ contains
   subroutine sum_etarho(lev, domlo, domhi, lo, hi, &
        etarhoflux, x_lo, x_hi, &
        etarhosum) bind(C, name="sum_etarho")
+    ! Binds to C function ``sum_etarho``
 
     integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
@@ -91,14 +90,7 @@ contains
     logical :: top_edge
 
     ! Sum etarho
-#if (AMREX_SPACEDIM == 1)
-    k = lo(3)
-    j = lo(2)
-    do i=lo(1),hi(1)
-       etarhosum(i,lev) = etarhoflux(i,j,k)
-    end do
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     k = lo(3)
     do j=lo(2),hi(2)
        do i=lo(1),hi(1)
@@ -121,20 +113,7 @@ contains
     ! we only add the contribution at the top edge if we are at the top of the domain
     ! this prevents double counting
     top_edge = .false.
-#if (AMREX_SPACEDIM == 1)
-    do k = 1,numdisjointchunks(lev)
-       if (hi(1) .eq. r_end_coord(lev,k)) then
-          top_edge = .true.
-       end if
-    end do
-    if (top_edge) then
-       k = hi(3)
-       j = hi(2)
-       i = hi(1)+1
-       etarhosum(i,lev) = etarhoflux(i,j,k)
-    end if
-
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     do i=1,numdisjointchunks(lev)
        if (hi(2) .eq. r_end_coord(lev,i)) then
           top_edge = .true.
@@ -186,6 +165,7 @@ contains
        r_cc_loc, r_edge_loc, &
        cc_to_r, ccr_lo, ccr_hi) &
        bind(C, name="construct_eta_cart")
+    ! Binds to C function ``construct_eta_cart``
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: ro_lo(3), ro_hi(3)

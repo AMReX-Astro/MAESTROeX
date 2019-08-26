@@ -65,6 +65,7 @@ maestro.sponge_start_factor = 10.e0
 maestro.sponge_kappa = 10.e0
 
 maestro.use_thermal_diffusion = false
+maestro.use_delta_gamma1_term = false
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12

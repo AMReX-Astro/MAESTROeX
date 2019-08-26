@@ -277,7 +277,7 @@ instead of :math:`h`. This is equivalent to:
     -\nabla\cdot(\rho e\Ub) - p_0 \nabla\cdot\Ub + \rho\Hnuc  \nonumber\end{aligned}
 
 which is identical to solving the energy equation with :math:`p\to p_0`.
-This option is enabled in MAESTRO via
+This option is enabled in MAESTROeX via
 use_eos_e_instead_of_h = T.
 
 Constant :math:`\gamma` Gas
