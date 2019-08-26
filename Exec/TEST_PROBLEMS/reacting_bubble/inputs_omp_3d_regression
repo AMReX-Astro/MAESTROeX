@@ -59,6 +59,7 @@ maestro.sponge_start_factor = 10.e0
 maestro.sponge_kappa = 10.e0
 
 maestro.use_thermal_diffusion = false
+maestro.use_delta_gamma1_term = false
 
 # PLOTFILES
 maestro.plot_base_name  = reacting_bubble_omp_3d_plt    # root name of plot file

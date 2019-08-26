@@ -44,7 +44,7 @@ contains
 
     ! set velocity to zero
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
-    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),2) = vel_fuel
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),AMREX_SPACEDIM) = vel_fuel
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)

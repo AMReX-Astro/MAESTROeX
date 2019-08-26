@@ -22,7 +22,7 @@ The idea behind this forcing term is that if :math:`p_\mathrm{EOS} > p_0` then
 :math:`\nablab \cdotb (\beta_0 \Ub) > 0`, and the cell will evacuate. This
 has the effect of returning us to :math:`p_\mathrm{EOS} = p_0`.
 
-In MAESTRO, we decomponse the velocity into a base state component
+In MAESTROeX, we decomponse the velocity into a base state component
 and a local component. The base state constraint equation is simply
 the horizontal average of the full constraint. Starting with
 :math:`\Ub = \Ubt + w_0 \er` in equation \ `[eq:fullconstraint] <#eq:fullconstraint>`__, we have

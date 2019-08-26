@@ -20,10 +20,9 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    :caption: Using MAESTROeX
 
    getting_started
+   addproblem
    problems
    unit_tests
-   common_parameters
-   architecture
    param_intro
    initial_models
    visualization
@@ -43,7 +42,6 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    .. MESA/instructions
    eta
    pert
-   sdc
    Godunov
    mg
    rotation
@@ -54,8 +52,16 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    enthalpy
 
 .. toctree::
+   :maxdepth: 1
+   :caption: API
 
-   references
+   filelist
+   classlist
+
+.. toctree::
+   :caption: References
+
+   zreferences
 
 Indices and tables
 ==================

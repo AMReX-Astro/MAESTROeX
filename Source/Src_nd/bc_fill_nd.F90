@@ -1,12 +1,11 @@
 module bc_fill_module
-
   ! since this is a .F90 file (instead of .f90) we run this through a C++ preprocessor
   ! for e.g., #if (AMREX_SPACEDIM == 1) statements.
 
   use amrex_error_module
   use amrex_bc_types_module
   use meth_params_module, only: pi_comp
-  
+
   implicit none
 
 contains
@@ -21,9 +20,7 @@ contains
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1),scal_lo(2):scal_hi(2),scal_lo(3):scal_hi(3))
     integer, value, intent(in) :: icomp
 
-#if (AMREX_SPACEDIM == 1)
-    call filcc(scal,scal_lo(1),scal_hi(1),domlo,domhi,dx,gridlo,bc)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     call filcc(scal,scal_lo(1),scal_lo(2),scal_hi(1),scal_hi(2),domlo,domhi,dx,gridlo,bc)
 #else
     call filcc(scal,scal_lo(1),scal_lo(2),scal_lo(3),scal_hi(1),scal_hi(2),scal_hi(3),domlo,domhi,dx,gridlo,bc)
@@ -43,9 +40,7 @@ contains
     double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3))
     integer, value, intent(in) :: icomp
 
-#if (AMREX_SPACEDIM == 1)
-    call filcc(vel,vel_lo(1),vel_hi(1),domlo,domhi,dx,gridlo,bc)
-#elif (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
     call filcc(vel,vel_lo(1),vel_lo(2),vel_hi(1),vel_hi(2),domlo,domhi,dx,gridlo,bc)
 #else
     call filcc(vel,vel_lo(1),vel_lo(2),vel_lo(3),vel_hi(1),vel_hi(2),vel_hi(3),domlo,domhi,dx,gridlo,bc)
@@ -79,12 +74,10 @@ contains
     ilo = domlo(1)
     ihi = domhi(1)
 
-#if AMREX_SPACEDIM >= 2
     js = max(q_lo(2), domlo(2))
     je = min(q_hi(2), domhi(2))
     jlo = domlo(2)
     jhi = domhi(2)
-#endif
 
 #if AMREX_SPACEDIM == 3
     ks = max(q_lo(3), domlo(3))
@@ -98,7 +91,7 @@ contains
        imax = ilo-1
 
        if (bc(1,1) .eq. amrex_bc_ext_dir) then
-          
+
           if (icomp .eq. pi_comp) then
              do k = lo(3), hi(3)
                 do j = lo(2), hi(2)
@@ -110,7 +103,7 @@ contains
           else
              call amrex_error("bc_fill_nd.F90 bc(1,1) - must supply Dirichlet boundary conditions for scalar")
           end if
-          
+
        end if
     end if
 
@@ -131,11 +124,9 @@ contains
           else
              call amrex_error("bc_fill_nd.F90 bc(1,2) - must supply Dirichlet boundary conditions for scalar")
           end if
-          
+
        end if
     end if
-
-#if AMREX_SPACEDIM >= 2
 
     if (lo(2) < jlo) then
        jmin = lo(2)
@@ -154,7 +145,7 @@ contains
           else
              call amrex_error("bc_fill_nd.F90 bc(2,1) - must supply Dirichlet boundary conditions for scalar")
           end if
-          
+
        end if
     end if
 
@@ -178,7 +169,6 @@ contains
 
        end if
     end if
-#endif
 
 #if AMREX_SPACEDIM == 3
 
@@ -199,7 +189,7 @@ contains
           else
              call amrex_error("bc_fill_nd.F90 bc(3,1) - must supply Dirichlet boundary conditions for scalar")
           end if
-          
+
        end if
     end if
 
@@ -220,7 +210,7 @@ contains
           else
              call amrex_error("bc_fill_nd.F90 bc(3,2) - must supply Dirichlet boundary conditions for scalar")
           end if
-          
+
        end if
     end if
 #endif
@@ -252,12 +242,10 @@ contains
     ilo = domlo(1)
     ihi = domhi(1)
 
-#if AMREX_SPACEDIM >= 2
     js = max(q_lo(2), domlo(2))
     je = min(q_hi(2), domhi(2))
     jlo = domlo(2)
     jhi = domhi(2)
-#endif
 
 #if AMREX_SPACEDIM == 3
     ks = max(q_lo(3), domlo(3))
@@ -300,8 +288,6 @@ contains
        end if
     end if
 
-#if AMREX_SPACEDIM >= 2
-
     if (lo(2) < jlo) then
        jmin = lo(2)
        jmax = jlo-1
@@ -335,7 +321,6 @@ contains
 
        end if
     end if
-#endif
 
 #if AMREX_SPACEDIM == 3
 
