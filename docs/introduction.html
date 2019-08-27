@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Model Equations and Numerical Scheme" href="flowchart.html" />
+    <link rel="next" title="Governing Equations" href="flowchart.html" />
     <link rel="prev" title="Preface" href="preface.html" /> 
 </head>
 
@@ -103,10 +103,12 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#projection-methods-101">Projection Methods 101</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lateral-average">Lateral Average</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#notation">Notation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="flowchart.html">Model Equations and Numerical Scheme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
 <ul>
@@ -216,7 +218,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="introduction-to-maestroex">
-<h1>Introduction to MAESTROeX<a class="headerlink" href="#introduction-to-maestroex" title="Permalink to this headline">¶</a></h1>
+<span id="ch-intro"></span><h1>Introduction to MAESTROeX<a class="headerlink" href="#introduction-to-maestroex" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="history-of-maestroex">
 <h2>History of MAESTROeX<a class="headerlink" href="#history-of-maestroex" title="Permalink to this headline">¶</a></h2>
 <p>MAESTROeX models the evolution of low Mach number astrophysical
@@ -432,7 +434,7 @@ are:</p>
 <span class="eqno">(9)<a class="headerlink" href="#equation-incompressible-u" title="Permalink to this equation">¶</a></span>\[\Ub_t = -\Ub \cdot \nabla \Ub + \nabla p\]</div>
 <div class="math notranslate nohighlight" id="equation-introduction-8">
 <span class="eqno">(10)<a class="headerlink" href="#equation-introduction-8" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub = 0\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(\Ub\)</span> represents the velocity vector <a class="footnote-reference brackets" href="#id28" id="id23">1</a> and <span class="math notranslate nohighlight">\(p\)</span> is
+<p>Here, <span class="math notranslate nohighlight">\(\Ub\)</span> represents the velocity vector <a class="footnote-reference brackets" href="#id30" id="id23">1</a> and <span class="math notranslate nohighlight">\(p\)</span> is
 the dynamical pressure. The time-evolution equation for the velocity
 (<a class="reference internal" href="#equation-incompressible-u">Eq.9</a>) can be solved
 using techniques similar to those developed for compressible
@@ -481,16 +483,27 @@ both of these projections.</p>
 velocity constraint equation that captures the compressibility
 due to local sources and large-scale stratification.</p>
 </div>
+<div class="section" id="lateral-average">
+<h2>Lateral Average<a class="headerlink" href="#lateral-average" title="Permalink to this headline">¶</a></h2>
+<p>A key concept in the MAESTROeX equation set and implementation is
+the lateral average.  The lateral average represents the average
+value of a quantity at a given radius in spherical simulations
+(or a given height in planar simulations).  We denote the
+lateral average of a quantity with an overline, e.g.,
+for any quantity <span class="math notranslate nohighlight">\(\phi\)</span>, we denote
+the average of <span class="math notranslate nohighlight">\(\phi\)</span> over a layer at constaint radius
+as <span class="math notranslate nohighlight">\(\overline{\phi}\)</span>.  For spherical problems there is a
+novel interpolation routine we use to average 3D data representing
+a full spherical star into a 1D array representing the average.
+Details can be found in <a class="reference internal" href="zreferences.html#multilevel" id="id28">[NonakaAlmgrenBell+10]</a> and <a class="reference internal" href="zreferences.html#maestroex" id="id29">[FanNonakaAlmgren+19]</a>.</p>
+</div>
 <div class="section" id="notation">
 <h2>Notation<a class="headerlink" href="#notation" title="Permalink to this headline">¶</a></h2>
 <p>Throughout the papers describing MAESTROeX, we’ve largely kept our
 notation consistent. The table below defines the
-frequently-used quantities and provides their units. Additionally,
-for any quantity <span class="math notranslate nohighlight">\(\phi\)</span>, we denote the average of <span class="math notranslate nohighlight">\(\phi\)</span> over a layer
-at constaint radius (or height for plane-parallel simulations) as
-<span class="math notranslate nohighlight">\(\overline{\phi}\)</span>.</p>
-<table class="docutils align-default" id="id29">
-<caption><span class="caption-text">Definition of symbols.</span><a class="headerlink" href="#id29" title="Permalink to this table">¶</a></caption>
+frequently-used quantities and provides their units.</p>
+<table class="docutils align-default" id="id31">
+<caption><span class="caption-text">Definition of symbols.</span><a class="headerlink" href="#id31" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 17%" />
 <col style="width: 54%" />
@@ -674,7 +687,7 @@ species
 </tbody>
 </table>
 <dl class="footnote brackets">
-<dt class="label" id="id28"><span class="brackets"><a class="fn-backref" href="#id23">1</a></span></dt>
+<dt class="label" id="id30"><span class="brackets"><a class="fn-backref" href="#id23">1</a></span></dt>
 <dd><p>Here we see an unfortunate conflict
 of notation between the compressible hydro community and the
 incompressible community. In papers on compressible hydrodynamics,
@@ -693,7 +706,7 @@ incompressible / low speed papers, <span class="math notranslate nohighlight">\(
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="flowchart.html" class="btn btn-neutral float-right" title="Model Equations and Numerical Scheme" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="flowchart.html" class="btn btn-neutral float-right" title="Governing Equations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="preface.html" class="btn btn-neutral float-left" title="Preface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

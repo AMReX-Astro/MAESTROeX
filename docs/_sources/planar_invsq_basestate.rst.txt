@@ -1,4 +1,4 @@
-.. _sec:planarinvsqgravity
+.. _sec:planarinvsqgravity:
 
 **********************************************************
 Modifications for a :math:`1/r^2` Plane-Parallel Basestate
