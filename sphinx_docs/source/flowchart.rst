@@ -1,20 +1,18 @@
 .. _ch:flowchart:
 
-************************************
-Model Equations and Numerical Scheme
-************************************
+*******************
+Governing Equations
+*******************
 
 The equation set and solution procedure used by MAESTROeX has
 changed and improved over time.  In this chapter, we outline the model equations
 and algorithmic options in the code.
 The latest published references for MAESTROeX
-are :cite:`multilevel` and the more recent :cite:`MAESTROeX`.
+are the multilevel paper :cite:`multilevel` and the more recent :cite:`MAESTROeX`.
 These two papers use the same model equations, however the
 more recent paper presents a new, simplified temporal integration scheme.
-
-In this description, we make frequent reference to
-paper I :cite:`lowMach`, paper II :cite:`lowMach2`,
-paper III :cite:`lowMach3`, and paper IV :cite:`lowMach4`.
+In this description, we make frequent reference to papers I-IV
+and the multilevel paper (see § :ref:`ch:intro`).
 
 Summary of the MAESTROeX Equation Set
 =====================================
@@ -24,21 +22,21 @@ to papers I through IV for the derivation
 and motivation of the equation set.
 We take the standard equations of reacting, compressible flow, and recast the
 equation of state (EOS) as a divergence constraint on the velocity field.
-The resulting model is a series of evolution equations for mass, momentum,
-and energy, subject to an additional constraint on velocity, with a base state
+The resulting model is a series of evolution equations for mass, energy,
+and momentum, subject to an additional constraint on velocity, with a base state
 density and pressure linked via hydrostatic equilibrium:
 
 .. math::
    \frac{\partial \rho X_k}{\partial t} + \nabla \cdot (\rho \Ub X_k) = \rho \omegadot_k
    
 .. math::
+   \frac{\partial(\rho h)}{\partial t} =
+      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
+      
+.. math::
    \frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub +
       \frac{\beta_0}{\rho} \nabla \left (\frac{p^\prime}{\beta_0} \right ) =
       -\frac{\rho^\prime}{\rho} |g| \er
-
-.. math::
-   \frac{\partial(\rho h)}{\partial t} =
-      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
 	  
 .. math::
    \nabla \cdot (\beta_0 \Ub) =
@@ -48,30 +46,8 @@ density and pressure linked via hydrostatic equilibrium:
 
 We discuss each of these model equations in further detail below.
       
-Base State
-----------
-
-The stratified atmosphere is characterized by a one-dimensional
-time-dependent base state, defined by a base state density, :math:`\rho_0`,
-and a base state pressure, :math:`p_0`, in hydrostatic equilibrum:
-
-.. math:: \nabla p_0 = -\rho_0 |g| \er
-
-The gravitational acceleration, :math:`g` is either constant or a
-point-mass with a :math:`1/r^2` dependence (see §
-:ref:`sec:planarinvsqgravity`) for plane-parallel geometries, or a
-monopole constructed by integrating the base state density for
-spherical geometries.
-
-For the time-dependence, we will define a base state velocity, :math:`w_0`,
-which will adjust the base state from one hydrostatic equilibrum to
-another in response to heating.
-
-For convenience, we define a base state enthalphy, :math:`h_0`, as needed
-by laterally averaging the full enthalpy, :math:`h`.
-
-Continuity
-----------
+Mass
+----
 
 Conservation of mass gives the same continuity equation we have with
 compressible flow:
@@ -125,46 +101,62 @@ In practice, we correct the drift by simply setting :math:`\rho_0 =
 \overline{\rho}` after the advective update of :math:`\rho`. However we still need to
 explicitly compute :math:`\etarho` since it appears in other equations.
 
-Constraint
-----------
+Energy
+------
 
-The equation of state is cast into an elliptic constraint on the
-velocity field by differentiating :math:`p_0(\rho, s, X_k)` along particle
-paths, giving:
-
-.. math::
-   \nabla \cdot (\beta_0 \Ub) =
-      \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right )
-   :label: eq:U_divergence
-
-where :math:`\beta_0` is a density-like variable that carries background
-stratification, defined as
-
-.. math:: \beta_0(r,t) = \rho_0(0,t)\exp\left(\int_0^r\frac{1}{\gammabar p_0}\frac{\partial p_0}{\partial r'}dr'\right),
-
-and
+Finally, we add an equation for specific enthalpy evolution to our
+system. Strictly speaking this is not necessary to close the system,
+but it becomes convenient at times to define the temperature.
 
 .. math::
-   S = -\sigma\sum_k\xi_k\omegadot_k + \frac{1}{\rho p_\rho}\sum_k p_{X_k}\omegadot_k + \sigma\Hnuc + \sigma\Hext + \frac{\sigma}{\rho} \nabla \cdot \kth \nabla T
-   :label: eq:flow:S
+   \frac{\partial(\rho h)}{\partial t} =
+      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
+   :label: eq:flow:enthalpy
 
-where :math:`p_{X_k} \equiv \left. \partial p / \partial X_k
-\right|_{\rho,T,X_{j,j\ne k}}`, :math:`\xi_k \equiv \left. \partial h /
-\partial X_k \right |_{p,T,X_{j,j\ne k}},
-p_\rho \equiv \left. \partial p/\partial \rho \right |_{T, X_k}`, and
-:math:`\sigma \equiv p_T/(\rho c_p p_\rho)`, with
-:math:`p_T \equiv \left. \partial p / \partial T \right|_{\rho, X_k}` and
-:math:`c_p \equiv \left.  \partial h / \partial T
-\right|_{p,X_k}` is the specific heat at constant pressure. The last
-term is only present if we are using thermal diffusion (``use_thermal_diffusion = T``). In this term, :math:`\kth` is the thermal conductivity.
+We will often expand :math:`Dp_0/Dt` as
 
-In this constraint, :math:`\gammabar` is the lateral average of
-:math:`\Gamma_1 \equiv d\log p / d\log \rho |_s`. Using the lateral average
-here makes it possible to cast the constraint as a
-divergence. :cite:`KP:2012` discuss the general case where we want to
-keep the local variations of :math:`\Gamma_1` (and we explored this in paper
-III). We also look at this in § :ref:`sec_flow_gamma1vary`
+.. math:: \frac{Dp_0}{Dt} = \psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}
 
+where we defined
+
+.. math:: \psi \equiv \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r}
+
+When we are using thermal diffusion, there will be an additional term in
+the enthalpy equation (see § :ref:`sec:flow:diffusion`).
+
+In paper III, we showed that for a plane-parallel atmosphere with
+constant gravity, :math:`\psi = \etarho g`
+
+At times, we will define a temperature equation by writing :math:`h = h(T,p,X_k)`
+and differentiating:
+
+.. math::
+   \frac{DT}{Dt} = \frac{1}{\rho c_p} \left\{ \left(1 - \rho h_p\right) \left
+     [ \psi + (\Ubt \cdotb \er) \frac{\partial p_0}{\partial r} \right ]
+    - \sum_k \rho \xi_k {\omegadot}_k
+    + \rho \Hnuc + \rho \Hext \right \}   .
+   :label: eq:flow:temp
+
+The base state evolution equations for density and enthalpy can be
+found by averaging :eq:`eq:flow:enthalpy`
+over a layer of constant radius, resulting in
+
+.. math::
+   \frac{\partial(\rho h)_0}{\partial t} = -\nabla\cdot\left[(\rho h)_0w_0\eb_r\right] +
+     \psi + \overline{\rho \Hnuc} + \overline{\rho \Hext}.
+   :label: eq:flow:enthalpy_base
+
+Subtracting it from the full enthalpy equation gives:
+
+.. math::
+   \begin{align}
+   \frac{\partial(\rho h)'}{\partial t} = &-\Ub\cdot\nabla(\rho h)' - (\rho h)'\nabla\cdot\Ub -
+     \nabla\cdot\left[(\rho h)_0\Ubt\right] + \nonumber \\ 
+   &\Ubt\cdot\nabla p_0
+      + ( \rho\Hnuc - \overline{\rho \Hnuc}) + (\rho\Hext - \overline{\rho \Hext})
+   \end{align}
+   :label: eq:flow:rhohprime
+	 
 Momentum
 --------
 
@@ -241,6 +233,68 @@ The divergence constraint for :math:`\Ubt` can be found by subtracting
 
 .. math:: \nabla\cdot\left(\beta_0\Ubt\right) = \beta_0\left(S-\Sbar\right).\label{eq:utilde divergence}
 
+Velocity Constraint
+-------------------
+
+The equation of state is cast into an elliptic constraint on the
+velocity field by differentiating :math:`p_0(\rho, s, X_k)` along particle
+paths, giving:
+
+.. math::
+   \nabla \cdot (\beta_0 \Ub) =
+      \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right )
+   :label: eq:U_divergence
+
+where :math:`\beta_0` is a density-like variable that carries background
+stratification, defined as
+
+.. math:: \beta_0(r,t) = \rho_0(0,t)\exp\left(\int_0^r\frac{1}{\gammabar p_0}\frac{\partial p_0}{\partial r'}dr'\right),
+
+and
+
+.. math::
+   S = -\sigma\sum_k\xi_k\omegadot_k + \frac{1}{\rho p_\rho}\sum_k p_{X_k}\omegadot_k + \sigma\Hnuc + \sigma\Hext + \frac{\sigma}{\rho} \nabla \cdot \kth \nabla T
+   :label: eq:flow:S
+
+where :math:`p_{X_k} \equiv \left. \partial p / \partial X_k
+\right|_{\rho,T,X_{j,j\ne k}}`, :math:`\xi_k \equiv \left. \partial h /
+\partial X_k \right |_{p,T,X_{j,j\ne k}},
+p_\rho \equiv \left. \partial p/\partial \rho \right |_{T, X_k}`, and
+:math:`\sigma \equiv p_T/(\rho c_p p_\rho)`, with
+:math:`p_T \equiv \left. \partial p / \partial T \right|_{\rho, X_k}` and
+:math:`c_p \equiv \left.  \partial h / \partial T
+\right|_{p,X_k}` is the specific heat at constant pressure. The last
+term is only present if we are using thermal diffusion (``use_thermal_diffusion = T``). In this term, :math:`\kth` is the thermal conductivity.
+
+In this constraint, :math:`\gammabar` is the lateral average of
+:math:`\Gamma_1 \equiv d\log p / d\log \rho |_s`. Using the lateral average
+here makes it possible to cast the constraint as a
+divergence. :cite:`KP:2012` discuss the general case where we want to
+keep the local variations of :math:`\Gamma_1` (and we explored this in paper
+III). We also look at this in § :ref:`sec_flow_gamma1vary`
+
+Base State
+----------
+
+The stratified atmosphere is characterized by a one-dimensional
+time-dependent base state, defined by a base state density, :math:`\rho_0`,
+and a base state pressure, :math:`p_0`, in hydrostatic equilibrum:
+
+.. math:: \nabla p_0 = -\rho_0 |g| \er
+
+The gravitational acceleration, :math:`g` is either constant or a
+point-mass with a :math:`1/r^2` dependence (see §
+:ref:`sec:planarinvsqgravity`) for plane-parallel geometries, or a
+monopole constructed by integrating the base state density for
+spherical geometries.
+
+For the time-dependence, we will define a base state velocity, :math:`w_0`,
+which will adjust the base state from one hydrostatic equilibrum to
+another in response to heating.
+
+For convenience, we define a base state enthalphy, :math:`h_0`, as needed
+by laterally averaging the full enthalpy, :math:`h`.
+
 Base State Expansion
 --------------------
 
@@ -261,62 +315,6 @@ Then we define
 
 once :math:`w_0` at the old and new times is known, and the advective term is computed explicitly.
 Then we can include this for completeness in the update for :math:`\ut.`
-
-Energy
-------
-
-Finally, we add an equation for specific enthalpy evolution to our
-system. Strictly speaking this is not necessary to close the system,
-but it becomes convenient at times to define the temperature.
-
-.. math::
-   \frac{\partial(\rho h)}{\partial t} =
-      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
-   :label: eq:flow:enthalpy
-
-We will often expand :math:`Dp_0/Dt` as
-
-.. math:: \frac{Dp_0}{Dt} = \psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}
-
-where we defined
-
-.. math:: \psi \equiv \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r}
-
-When we are using thermal diffusion, there will be an additional term in
-the enthalpy equation (see § :ref:`sec:flow:diffusion`).
-
-In paper III, we showed that for a plane-parallel atmosphere with
-constant gravity, :math:`\psi = \etarho g`
-
-At times, we will define a temperature equation by writing :math:`h = h(T,p,X_k)`
-and differentiating:
-
-.. math::
-   \frac{DT}{Dt} = \frac{1}{\rho c_p} \left\{ \left(1 - \rho h_p\right) \left
-     [ \psi + (\Ubt \cdotb \er) \frac{\partial p_0}{\partial r} \right ]
-    - \sum_k \rho \xi_k {\omegadot}_k
-    + \rho \Hnuc + \rho \Hext \right \}   .
-   :label: eq:flow:temp
-
-The base state evolution equations for density and enthalpy can be
-found by averaging :eq:`eq:flow:enthalpy`
-over a layer of constant radius, resulting in
-
-.. math::
-   \frac{\partial(\rho h)_0}{\partial t} = -\nabla\cdot\left[(\rho h)_0w_0\eb_r\right] +
-     \psi + \overline{\rho \Hnuc} + \overline{\rho \Hext}.
-   :label: eq:flow:enthalpy_base
-
-Subtracting it from the full enthalpy equation gives:
-
-.. math::
-   \begin{align}
-   \frac{\partial(\rho h)'}{\partial t} = &-\Ub\cdot\nabla(\rho h)' - (\rho h)'\nabla\cdot\Ub -
-     \nabla\cdot\left[(\rho h)_0\Ubt\right] + \nonumber \\ 
-   &\Ubt\cdot\nabla p_0
-      + ( \rho\Hnuc - \overline{\rho \Hnuc}) + (\rho\Hext - \overline{\rho \Hext})
-   \end{align}
-   :label: eq:flow:rhohprime
 
 .. _Sec:Time Advancement Algorithm:
 
@@ -1013,3 +1011,31 @@ Future Considerations
    and :math:`T=T(\rho,h,X_k)` drift away from each other more than we would like. Our
    attempts at incorporating a ``dpdt_factor`` for spherical problems have not
    been successful.
+
+.. _ch:methodology:
+
+*********************
+Numerical Methodology
+*********************
+
+We give an overview of the original MAESTRO algorithm :cite:`multilevel`,
+as well as the recently introduced new temporal integration
+scheme :cite:`MAESTROeX`.  These schemes share many of the same algorithmic
+modules, however the new scheme is significantly simpler.
+
+To summarize, in the original scheme we integrated the base state evolution
+over the time step, which requires splitting the velocity equation into
+more complicated average and perturbational equations.
+In the new temporal integrator, we eliminated much of this complication
+by introducing a predictor-corrector approach for the base state.
+The key observation is that the base state density is simply the lateral
+average of the full density, so we simply update the base state density
+through averaging routines, rather than predicting the evolution with
+a split velocity formulation, only to have to correct it with the
+averaging operator in the end regardless.
+
+Original Temporal Integrator
+============================
+
+New Temporal Integrator
+=======================

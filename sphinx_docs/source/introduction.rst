@@ -1,3 +1,5 @@
+.. _ch:intro:
+
 *************************
 Introduction to MAESTROeX
 *************************
@@ -301,15 +303,27 @@ The MAESTROeX algorithm builds upon these ideas, using a different
 velocity constraint equation that captures the compressibility
 due to local sources and large-scale stratification.
 
+Lateral Average
+===============
+
+A key concept in the MAESTROeX equation set and implementation is
+the lateral average.  The lateral average represents the average
+value of a quantity at a given radius in spherical simulations
+(or a given height in planar simulations).  We denote the
+lateral average of a quantity with an overline, e.g., 
+for any quantity :math:`\phi`, we denote
+the average of :math:`\phi` over a layer at constaint radius
+as :math:`\overline{\phi}`.  For spherical problems there is a
+novel interpolation routine we use to average 3D data representing
+a full spherical star into a 1D array representing the average.
+Details can be found in :cite:`multilevel` and :cite:`MAESTROeX`.
+
 Notation
 ========
 
 Throughout the papers describing MAESTROeX, we’ve largely kept our
 notation consistent. The table below defines the
-frequently-used quantities and provides their units. Additionally,
-for any quantity :math:`\phi`, we denote the average of :math:`\phi` over a layer
-at constaint radius (or height for plane-parallel simulations) as
-:math:`\overline{\phi}`.
+frequently-used quantities and provides their units.
 
 .. table:: Definition of symbols.
 

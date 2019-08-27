@@ -14,6 +14,7 @@ MAESTROeX: a low Mach number stellar hydrodynamics code
    preface
    introduction
    flowchart
+   methodology
 
 .. toctree::
    :maxdepth: 1
