@@ -318,6 +318,21 @@ novel interpolation routine we use to average 3D data representing
 a full spherical star into a 1D array representing the average.
 Details can be found in :cite:`multilevel` and :cite:`MAESTROeX`.
 
+For the velocity field, we decompose the full velocity field into
+a base state velocity and a local velocity,
+
+.. math:: \Ub = w_0(r,t)\eb_r + \Ubt(\xb,t).
+
+with
+:math:`\overline{(\Ubt\cdot\eb_r)} = 0` and
+:math:`w_0 = \overline{(\Ub\cdot\eb_r)}`.
+In other words, the base state velocity can be thought of as the
+lateral average of the outward radial velocity.  We do not use the
+same spatial averaging operators for this decomposition as we do
+for all other variables; instead we derive an analytic expression
+for the average expansion velocity and numerically integrate to find 
+:math:`w_0`.
+      
 Notation
 ========
 

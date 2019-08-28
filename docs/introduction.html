@@ -496,6 +496,19 @@ as <span class="math notranslate nohighlight">\(\overline{\phi}\)</span>.  For s
 novel interpolation routine we use to average 3D data representing
 a full spherical star into a 1D array representing the average.
 Details can be found in <a class="reference internal" href="zreferences.html#multilevel" id="id28">[NonakaAlmgrenBell+10]</a> and <a class="reference internal" href="zreferences.html#maestroex" id="id29">[FanNonakaAlmgren+19]</a>.</p>
+<p>For the velocity field, we decompose the full velocity field into
+a base state velocity and a local velocity,</p>
+<div class="math notranslate nohighlight" id="equation-introduction-11">
+<span class="eqno">(14)<a class="headerlink" href="#equation-introduction-11" title="Permalink to this equation">¶</a></span>\[\Ub = w_0(r,t)\eb_r + \Ubt(\xb,t).\]</div>
+<p>with
+<span class="math notranslate nohighlight">\(\overline{(\Ubt\cdot\eb_r)} = 0\)</span> and
+<span class="math notranslate nohighlight">\(w_0 = \overline{(\Ub\cdot\eb_r)}\)</span>.
+In other words, the base state velocity can be thought of as the
+lateral average of the outward radial velocity.  We do not use the
+same spatial averaging operators for this decomposition as we do
+for all other variables; instead we derive an analytic expression
+for the average expansion velocity and numerically integrate to find
+<span class="math notranslate nohighlight">\(w_0\)</span>.</p>
 </div>
 <div class="section" id="notation">
 <h2>Notation<a class="headerlink" href="#notation" title="Permalink to this headline">¶</a></h2>
