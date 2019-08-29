@@ -409,7 +409,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     }
     // fill ghost cells behind physical boundaries
     // !!!!!! uncertain about this
-    FillPatch(t_old,scal_force,scal_force,scal_force,RhoH,RhoH,1,RhoH,bcs_f);
+    FillPatch(t_old,scal_force,scal_force,scal_force,RhoH,RhoH,1,RhoH,bcs_s);
     
     //////////////////////////////////
     // Add w0 to MAC velocities (trans velocities already have w0).

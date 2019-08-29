@@ -761,9 +761,7 @@ void Maestro::InitIter ()
     Real start_total = ParallelDescriptor::second();
 
     // advance the solution by dt
-#ifdef SDC
-    AdvanceTimeStepSDC(true);
-#else
+#ifndef SDC
     if (use_exact_base_state) {
         AdvanceTimeStepIrreg(true);
     } else if (average_base_state) {
@@ -771,6 +769,8 @@ void Maestro::InitIter ()
     } else {
         AdvanceTimeStep(true);
     }
+#else
+    AdvanceTimeStepSDC(true);
 #endif
 
     // wallclock time

@@ -126,9 +126,9 @@ Maestro::DensityAdvance (int which_step,
 
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec,1,0);
+                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],FirstSpec,Rho,1,0);
                 for (int ispec=1; ispec<NumSpec; ++ispec) {
-                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec+ispec,1,0);
+                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],FirstSpec+ispec,Rho,1,0);
                 }
             }
         }
@@ -299,7 +299,7 @@ Maestro::DensityAdvanceSDC (int which_step,
     }
     // fill ghost cells behind physical boundaries
     // !!!!!! uncertain about this
-    FillPatch(t_old,scal_force,scal_force,scal_force,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_f);
+    FillPatch(t_old,scal_force,scal_force,scal_force,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_s);
     
     Vector<MultiFab> rho0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -375,7 +375,7 @@ Maestro::DensityAdvanceSDC (int which_step,
 
         MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,1);
     }
-
+    
     // predict rho or rho' at the edges (depending on species_pred_type)
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
@@ -385,9 +385,9 @@ Maestro::DensityAdvanceSDC (int which_step,
 
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec,1,0);
+                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],FirstSpec,Rho,1,0);
                 for (int ispec=1; ispec<NumSpec; ++ispec) {
-                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec+ispec,1,0);
+                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],FirstSpec+ispec,Rho,1,0);
                 }
             }
         }
@@ -403,7 +403,6 @@ Maestro::DensityAdvanceSDC (int which_step,
         // convert X --> (rho X) in scalold
         ConvertRhoXToX(scalold,false);
     }
-
 
     /////////////////////////////////////////////////////////////////
     // Subtract w0 from MAC velocities.
