@@ -73,7 +73,7 @@ maestro.chk_int         = 100
 maestro.eps_init_proj_cart = 1.e-12
 maestro.eps_init_proj_sph  = 1.e-10
 # tolerances for the divu iterations
-maestro.eps_divu_cart      = 1.e-8
+maestro.eps_divu_cart      = 1.e-12
 maestro.eps_divu_sph       = 1.e-10
 maestro.divu_iter_factor   = 100.
 maestro.divu_level_factor  = 10.
