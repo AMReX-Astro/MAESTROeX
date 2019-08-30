@@ -4,20 +4,19 @@
 Governing Equations
 *******************
 
-The equation set and solution procedure used by MAESTROeX has
-changed and improved over time.  In this chapter, we outline the model equations
-and algorithmic options in the code.
-The latest published references for MAESTROeX
-are the multilevel paper :cite:`multilevel` and the more recent :cite:`MAESTROeX`.
-These two papers use the same model equations, however the
-more recent paper, in addition to retaining the original algorithmic
-capability of the previous code, includes an option to use a new,
-simplified temporal integration scheme.
- We distinguish between the
-two temporal integration strategies by referring to them as the "original temporal scheme"
-and "new temporal scheme".
-In this description, we make frequent reference to papers I-IV
-and the multilevel paper (see § :ref:`ch:intro`), which describe the developments of the original
+The equation set and solution procedure used by MAESTROeX has changed
+and improved over time.  In this chapter, we outline the model
+equations and algorithmic options in the code.  The latest published
+references for MAESTROeX are the multilevel paper :cite:`multilevel`
+and the more recent :cite:`MAESTROeX`.  These two papers use the same
+model equations, however the more recent paper, in addition to
+retaining the original algorithmic capability of the previous code,
+includes an option to use a new, simplified temporal integration
+scheme.  We distinguish between the two temporal integration
+strategies by referring to them as the "original temporal scheme" and
+"new temporal scheme".  In this description, we make frequent
+reference to papers I-IV and the multilevel paper (see §
+:ref:`ch:intro`), which describe the developments of the original
 temporal scheme.
 
 Summary of the MAESTROeX Equation Set
