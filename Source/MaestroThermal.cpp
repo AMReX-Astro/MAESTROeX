@@ -396,7 +396,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
         phi[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    // set cell-centered A coefficient to zero
+    // set cell-centered A coefficient to \rho^{(2),*} or \rho^{(2)}
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Copy(acoef[lev],s2[lev],Rho,0,1,1);
     }
@@ -587,7 +587,7 @@ Maestro::ThermalConductSDC (int which_step,
         phi[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    // set cell-centered A coefficient to zero
+    // copy rho^hat=rho^new into acoef
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Copy(acoef[lev],s_hat[lev],Rho,0,1,1);
     }

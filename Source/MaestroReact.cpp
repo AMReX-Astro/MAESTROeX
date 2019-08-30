@@ -152,8 +152,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
     // apply burning term
     if (do_burning) {
 #ifdef SDC
-        // do the burning, update rho_omegadot and rho_Hnuc
-        // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
+        // do the burning, update s_out
         Burner(s_in,s_out,p0,dt_in,source);
 #endif
         // pass temperature through for seeding the temperature update eos call

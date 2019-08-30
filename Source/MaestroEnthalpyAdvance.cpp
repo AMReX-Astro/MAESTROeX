@@ -79,7 +79,7 @@ Maestro::EnthalpyAdvance (int which_step,
         // make force for h by calling mkrhohforce then dividing by rho
         if (enthalpy_pred_type == predict_h) {
             for (int lev=0; lev<=finest_level; ++lev) {
-                MultiFab::Divide(scal_force[lev],scalold[lev],RhoH,Rho,1,1);
+                MultiFab::Divide(scal_force[lev],scalold[lev],Rho,RhoH,1,1);
             }
         }
 
@@ -379,7 +379,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         // make force for h by calling mkrhohforce then dividing by rho
         if (enthalpy_pred_type == predict_h) {
             for (int lev=0; lev<=finest_level; ++lev) {
-                MultiFab::Divide(scal_force[lev],scalold[lev],RhoH,Rho,1,1);
+                MultiFab::Divide(scal_force[lev],scalold[lev],Rho,RhoH,1,1);
             }
         }
 
