@@ -299,7 +299,7 @@ Maestro::DensityAdvanceSDC (int which_step,
     }
     // fill ghost cells behind physical boundaries
     // !!!!!! uncertain about this
-    FillPatch(t_old,scal_force,scal_force,scal_force,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_s);
+    FillPatch(t_old,scal_force,scal_force,scal_force,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_f);
     
     Vector<MultiFab> rho0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
