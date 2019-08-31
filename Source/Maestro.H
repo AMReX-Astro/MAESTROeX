@@ -706,13 +706,15 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const RealVector& p0,
-                const amrex::Real dt_react);
+                const amrex::Real dt_react,
+                const amrex::Real time_react);
 
     void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
 		   amrex::Vector<amrex::MultiFab>& s_out,
 		   amrex::Vector<amrex::MultiFab>& rho_Hext,
 		   const RealVector& p0,
 		   const amrex::Real dt_react,
+		   const amrex::Real time_react,
 		   amrex::Vector<amrex::MultiFab>& source);
 
 #ifndef SDC
@@ -722,13 +724,15 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const RealVector& p0,
-                const amrex::Real dt_react);
+                const amrex::Real dt_react,
+                const amrex::Real time_react);
 
 #else
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
 		 amrex::Vector<amrex::MultiFab>& s_out,
 		 const RealVector& p0,
 		 const amrex::Real dt_react,
+		 const amrex::Real time_react,
 		 const amrex::Vector<amrex::MultiFab>& source);
 #endif
     

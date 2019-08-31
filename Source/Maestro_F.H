@@ -118,6 +118,7 @@ extern "C"
                            amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                      const amrex::Real* tempbar_init_in,
                      const amrex::Real dt_in,
+                     const amrex::Real time_in,
                      const int* mask, const int* m_lo, const int* m_hi,
                      const int use_mask);
 
@@ -129,6 +130,7 @@ extern "C"
                                 amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
                           const amrex::Real* tempbar_init_cart, const int* t_lo, const int* t_hi,
                           const amrex::Real dt_in,
+                          const amrex::Real time_in,
                           const int* mask, const int* m_lo, const int* m_hi,
                           const int use_mask);
     
@@ -140,6 +142,7 @@ extern "C"
 			 const amrex::Real* source, const int* s_lo, const int* s_hi,
 			 const amrex::Real* p0_in,
 			 const amrex::Real dt_in,
+			 const amrex::Real time_in,
 			 const int* mask, const int* m_lo, const int* m_hi,
 			 const int use_mask);
 
@@ -149,6 +152,7 @@ extern "C"
 			      const amrex::Real* source, const int* s_lo, const int* s_hi,
 			      const amrex::Real* p0_cart, const int* t_lo, const int* t_hi,
 			      const amrex::Real dt_in,
+			      const amrex::Real time_in,
 			      const int* mask, const int* m_lo, const int* m_hi,
 			      const int use_mask);
 #endif

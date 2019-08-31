@@ -40,7 +40,7 @@ contains
        rho_Hext, e_lo, e_hi, &
        rho_odot, r_lo, r_hi, &
        rho_Hnuc, n_lo, n_hi, &
-       tempbar_init_in, dt_in, &
+       tempbar_init_in, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
 
@@ -59,6 +59,7 @@ contains
     double precision, intent (inout) :: rho_Hnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: tempbar_init_in(0:max_radial_level,0:nr_fine-1)
     double precision, value, intent (in) :: dt_in
+    double precision, value, intent (in) :: time_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     integer, value  , intent (in   ) :: use_mask
 
@@ -132,7 +133,7 @@ contains
                    state_in % k = k
 
                    call copy_burn_t(state_out, state_in)
-                   call burner(state_in, state_out, dt_in)
+                   call burner(state_in, state_out, dt_in, time_in)
                    do n = 1, nspec
                       x_out(n) = state_out % xn(n)
                    enddo
@@ -193,7 +194,7 @@ contains
        rho_Hext, e_lo, e_hi, &
        rho_odot, r_lo, r_hi, &
        rho_Hnuc, n_lo, n_hi, &
-       tempbar_init_cart, t_lo, t_hi, dt_in, &
+       tempbar_init_cart, t_lo, t_hi, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop_sphr")
 
@@ -212,6 +213,7 @@ contains
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (in   ) :: tempbar_init_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, value, intent (in) :: dt_in
+    double precision, value, intent (in) :: time_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     integer, value  , intent (in   ) :: use_mask
 
@@ -280,7 +282,7 @@ contains
                    state_in % k = k
 
                    call copy_burn_t(state_out, state_in)
-                   call burner(state_in, state_out, dt_in)
+                   call burner(state_in, state_out, dt_in, time_in)
                    do n = 1, nspec
                       x_out(n) = state_out % xn(n)
                    enddo
@@ -341,7 +343,7 @@ contains
        s_in,     i_lo, i_hi, &
        s_out,    o_lo, o_hi, &
        source, s_lo, s_hi, &
-       p0_in, dt_in, &
+       p0_in, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
 
@@ -358,6 +360,7 @@ contains
     double precision, intent (in   ) ::   source(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
     double precision, intent (in   ) :: p0_in(0:max_radial_level,0:nr_fine-1)
     double precision, value, intent (in) :: dt_in
+    double precision, value, intent (in) :: time_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     integer, value  , intent (in   ) :: use_mask
 
@@ -426,7 +429,7 @@ contains
                    state_in % j = j
                    state_in % k = k
                    
-                   call burner(state_in, state_out, dt_in)
+                   call burner(state_in, state_out, dt_in, time_in)
                    
                    rho_out  = sum(state_out % y(1:nspec))
                    rhox_out = state_out % y(1:nspec)
@@ -459,7 +462,7 @@ contains
        s_in,     i_lo, i_hi, &
        s_out,    o_lo, o_hi, &
        source,   s_lo, s_hi, &
-       p0_cart, t_lo, t_hi, dt_in, &
+       p0_cart, t_lo, t_hi, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop_sphr")
 
@@ -476,6 +479,7 @@ contains
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     double precision, intent (in   ) :: p0_cart(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, value, intent (in) :: dt_in
+    double precision, value, intent (in) :: time_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     integer, value  , intent (in   ) :: use_mask
 
@@ -540,7 +544,7 @@ contains
                    state_in % j = j
                    state_in % k = k
 
-                   call burner(state_in, state_out, dt_in)
+                   call burner(state_in, state_out, dt_in, time_in)
 
                    rho_out  = sum(state_out % y(1:nspec))
                    rhox_out = state_out % y(1:nspec)

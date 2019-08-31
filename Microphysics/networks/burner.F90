@@ -39,7 +39,7 @@ contains
 
 
 #ifndef SDC
-  subroutine burner(state_in, state_out, dt)
+  subroutine burner(state_in, state_out, dt, time)
 
     !$acc routine seq
 
@@ -48,12 +48,9 @@ contains
     type (burn_t), intent(inout) :: state_in
     type (burn_t), intent(inout) :: state_out
     double precision, intent(in) :: dt
-
-    double precision :: time
+    double precision, intent(in) :: time
 
     !$gpu
-
-    time = 0.d0
 
     ! Make sure the network and burner have been initialized.
 
@@ -78,7 +75,7 @@ contains
   end subroutine burner
 
 #else
-    subroutine burner(state_in, state_out, dt)
+    subroutine burner(state_in, state_out, dt, time)
 
     !$acc routine seq
 
@@ -87,12 +84,9 @@ contains
     type (sdc_t), intent(inout) :: state_in
     type (sdc_t), intent(inout) :: state_out
     double precision, intent(in) :: dt
-
-    double precision :: time
+    double precision, intent(in) :: time
 
     !$gpu
-
-    time = 0.d0
 
     ! Make sure the network and burner have been initialized.
 

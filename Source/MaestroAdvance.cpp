@@ -218,7 +218,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
 
-    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
@@ -599,7 +599,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
@@ -972,7 +972,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());

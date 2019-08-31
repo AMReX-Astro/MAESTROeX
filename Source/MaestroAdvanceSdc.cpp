@@ -538,7 +538,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
     
-    ReactSDC(sold,snew,rho_Hext,p0_new,dt,sdc_source);
+    ReactSDC(sold,snew,rho_Hext,p0_new,dt,t_old,sdc_source);
 
     // wallclock time
     Real end_total_react = ParallelDescriptor::second() - start_total_react;
@@ -930,7 +930,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	// wallclock time
 	Real start_total_react = ParallelDescriptor::second();
     
-	ReactSDC(sold,snew,rho_Hext,p0_new,dt,sdc_source);
+	ReactSDC(sold,snew,rho_Hext,p0_new,dt,t_old,sdc_source);
 
 	// wallclock time
 	Real end_total_react = ParallelDescriptor::second() - start_total_react;

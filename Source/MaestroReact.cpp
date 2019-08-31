@@ -13,7 +13,8 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 Vector<MultiFab>& rho_omegadot,
                 Vector<MultiFab>& rho_Hnuc,
                 const RealVector& p0,
-                const Real dt_in)
+                const Real dt_in,
+                const Real time_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::React()",React);
@@ -54,7 +55,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 #ifndef SDC
         // do the burning, update rho_omegadot and rho_Hnuc
         // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
-        Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in);
+        Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in,time_in);
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -110,6 +111,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 		   Vector<MultiFab>& rho_Hext,
 		   const RealVector& p0,
 		   const Real dt_in,
+		   const Real time_in,
 		   Vector<MultiFab>& source)
 {
     // timer for profiling
@@ -153,7 +155,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
     if (do_burning) {
 #ifdef SDC
         // do the burning, update s_out
-        Burner(s_in,s_out,p0,dt_in,source);
+        Burner(s_in,s_out,p0,dt_in,time_in,source);
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -198,7 +200,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      Vector<MultiFab>& rho_omegadot,
                      Vector<MultiFab>& rho_Hnuc,
                      const RealVector& p0,
-                     const Real dt_in)
+                     const Real dt_in,
+                     const Real time_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Burner()",Burner);
@@ -258,7 +261,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                                  BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]), dt_in,
+                                 BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]), dt_in, time_in,
                                  BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             } else {
 #pragma gpu box(tileBox)
@@ -269,7 +272,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                             BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                            tempbar_init.dataPtr(), dt_in,
+                            tempbar_init.dataPtr(), dt_in, time_in,
                             BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             }
         }
@@ -282,6 +285,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 		     Vector<MultiFab>& s_out,
 		     const RealVector& p0,
 		     const Real dt_in,
+		     const Real time_in,
 		     const Vector<MultiFab>& source)
 {
     // timer for profiling
@@ -336,7 +340,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 				 BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(source_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(p0_cart_mf[mfi]), dt_in,
+				 BL_TO_FORTRAN_ANYD(p0_cart_mf[mfi]), dt_in, time_in,
 				 BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             } else {
 // #pragma gpu box(tileBox)
@@ -345,7 +349,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 			    BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
 			    BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
 			    BL_TO_FORTRAN_ANYD(source_mf[mfi]), 
-			    p0.dataPtr(), dt_in,
+			    p0.dataPtr(), dt_in, time_in,
 			    BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             }
         }
