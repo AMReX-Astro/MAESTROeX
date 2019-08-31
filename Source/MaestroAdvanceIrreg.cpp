@@ -226,7 +226,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
 
-    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
     // wallclock time
     Real end_total_react = ParallelDescriptor::second() - start_total_react;
@@ -521,7 +521,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
@@ -811,7 +811,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;

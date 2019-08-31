@@ -528,7 +528,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 		rhohalf[lev].setVal(1.);
 	}
 
-	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
 	if (use_thermal_diffusion) {
 		MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
@@ -668,7 +668,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
 		sdc_source[lev].setVal(0.);
 	}
 
-	ReactSDC(sold,stemp,rho_Hext,p0_old,0.5*dt,sdc_source);
+	ReactSDC(sold,stemp,rho_Hext,p0_old,0.5*dt,t_old,sdc_source);
 
 	if (use_thermal_diffusion) {
 		MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
