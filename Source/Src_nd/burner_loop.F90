@@ -127,6 +127,12 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
+#ifdef NONAKA_PLOT
+                   state_in % i = i
+                   state_in % j = j
+                   state_in % k = k
+#endif
+
                    call copy_burn_t(state_out, state_in)
                    call burner(state_in, state_out, dt_in)
                    do n = 1, nspec
@@ -271,6 +277,12 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
+#ifdef NONAKA_PLOT
+                   state_in % i = i
+                   state_in % j = j
+                   state_in % k = k
+#endif
+
                    call copy_burn_t(state_out, state_in)
                    call burner(state_in, state_out, dt_in)
                    do n = 1, nspec
@@ -414,6 +426,11 @@ contains
                    state_in % y(nspec+1) = rhoh_in
                    state_in % ydot_a(1:nspec) = sdc_rhoX(1:nspec)
                    state_in % ydot_a(nspec+1) = sdc_rhoh
+#ifdef NONAKA_PLOT
+                   state_in % i = i
+                   state_in % j = j
+                   state_in % k = k
+#endif
                    
                    call burner(state_in, state_out, dt_in)
                    
@@ -525,6 +542,11 @@ contains
                    state_in % y(nspec+1) = rhoh_in
                    state_in % ydot_a(1:nspec) = sdc_rhoX(1:nspec)
                    state_in % ydot_a(nspec+1) = sdc_rhoh
+#ifdef NONAKA_PLOT
+                   state_in % i = i
+                   state_in % j = j
+                   state_in % k = k
+#endif
 
                    call burner(state_in, state_out, dt_in)
 
