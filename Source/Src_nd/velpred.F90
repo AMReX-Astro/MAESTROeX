@@ -444,30 +444,30 @@ contains
        end select
     end if
 
-    deallocate(slopex)
-    deallocate(slopey)
+    call bl_deallocate(slopex)
+    call bl_deallocate(slopey)
 
-    deallocate(Ipu)
-    deallocate(Imu)
-    deallocate(Ipfx)
-    deallocate(Imfx)
-    deallocate(Ipv)
-    deallocate(Imv)
-    deallocate(Ipfy)
-    deallocate(Imfy)
+    call bl_deallocate(Ipu)
+    call bl_deallocate(Imu)
+    call bl_deallocate(Ipfx)
+    call bl_deallocate(Imfx)
+    call bl_deallocate(Ipv)
+    call bl_deallocate(Imv)
+    call bl_deallocate(Ipfy)
+    call bl_deallocate(Imfy)
 
-    deallocate(ulx)
-    deallocate(urx)
-    deallocate(uimhx)
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+    call bl_deallocate(uimhx)
 
-    deallocate(uly)
-    deallocate(ury)
-    deallocate(uimhy)
+    call bl_deallocate(uly)
+    call bl_deallocate(ury)
+    call bl_deallocate(uimhy)
 
-    deallocate(umacl)
-    deallocate(umacr)
-    deallocate(vmacl)
-    deallocate(vmacr)
+    call bl_deallocate(umacl)
+    call bl_deallocate(umacr)
+    call bl_deallocate(vmacl)
+    call bl_deallocate(vmacr)
 
   end subroutine velpred_2d
 #endif
