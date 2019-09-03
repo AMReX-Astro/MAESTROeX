@@ -445,11 +445,11 @@ extern "C"
 #endif
                       const int* domlo, const int* domhi,
                       const int* lo, const int* hi,
-                      const amrex::Real* s,      const int* s_lo, const int* s_hi, const int* nc_s, int ng_s,
-                            amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int* nc_x,
-                            amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int* nc_y,
+                      const amrex::Real* s,      const int* s_lo, const int* s_hi, const int nc_s, int ng_s,
+                            amrex::Real* sedgex, const int* x_lo, const int* x_hi, const int nc_x,
+                            amrex::Real* sedgey, const int* y_lo, const int* y_hi, const int nc_y,
 #if (AMREX_SPACEDIM == 3)
-                            amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int* nc_z,
+                            amrex::Real* sedgez, const int* z_lo, const int* z_hi, const int nc_z,
 #endif
                       const amrex::Real* umac,   const int* u_lo, const int* u_hi,
                       const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
@@ -457,10 +457,10 @@ extern "C"
                       const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
 #endif
                       int ng_um,
-                      const amrex::Real* force,  const int* f_lo, const int* f_hi, const int* nc_f,
-                      const amrex::Real* dx, const amrex::Real* dt, const int* is_vel,
-                      const int* adv_bc, const int* nbccomp, const int* comp, const int* bccomp,
-                      const int* is_conservative);
+                      const amrex::Real* force,  const int* f_lo, const int* f_hi, const int nc_f,
+                      const amrex::Real* dx, const amrex::Real dt, const int is_vel,
+                      const int* adv_bc, const int nbccomp, const int comp, const int bccomp,
+                      const int is_conservative);
 
     //////////////////////
 
@@ -977,24 +977,35 @@ extern "C"
     //////////////////////
     // in mkutrans.F90
 #if (AMREX_SPACEDIM == 2)
-    void mkutrans_2d(
+  void mkutrans_2d(const int* lo, const int* hi,
+                    const int lev, const int idir,
+                    const int* domlo, const int* domhi,
+                    const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int nc_ut, const int ng_ut,
+                    const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int nc_uf, int const ng_uf,
+                    amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
+                    amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
+                    amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
+                    amrex::Real* Im, const int* im_lo, const int* im_hi,
+                    const amrex::Real* w0, const amrex::Real* dx, const amrex::Real dt,
+                    const int* adv_bc, const int* phys_bc);
+
 #elif (AMREX_SPACEDIM == 3)
-    void mkutrans_3d(
+  void mkutrans_3d(const int* lo, const int* hi,
+                    const int lev, const int idir,
+                    const int* domlo, const int* domhi,
+                    const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int nc_ut, const int ng_ut,
+                    const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int nc_uf, int const ng_uf,
+                    amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
+                    amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
+                    amrex::Real* wtrans, const int* uw_lo, const int* uw_hi,
+                    amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
+                    amrex::Real* Im, const int* im_lo, const int* im_hi,
+    		        const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi,
+    		        const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi,
+    		        const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
+                    const amrex::Real* w0, const amrex::Real* dx, const amrex::Real dt,
+                    const int* adv_bc, const int* phys_bc);
 #endif
-                      const int* lev, const int* domlo, const int* domhi,
-                      const int* lo, const int* hi,
-                      const amrex::Real* utilde,  const int* ut_lo, const int* ut_hi, const int* nc_ut, int ng_ut,
-                      const amrex::Real* ufull,   const int* uf_lo, const int* uf_hi, const int* nc_uf, int ng_uf,
-                      amrex::Real* utrans, const int* uu_lo, const int* uu_hi,
-                      amrex::Real* vtrans, const int* uv_lo, const int* uv_hi,
-#if (AMREX_SPACEDIM == 3)
-                      amrex::Real* wtrans, const int* uw_lo, const int* uw_hi,
-		      const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi,
-		      const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi,
-		      const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
-#endif
-                      const amrex::Real* w0, const amrex::Real* dx, const amrex::Real* dt,
-                      const int* adv_bc, const int* phys_bc);
 
     //////////////////////
 
@@ -1026,6 +1037,37 @@ extern "C"
 			amrex::Real* zface, const int* z_lo, const int* z_hi,
 #endif
 			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
+    //////////////////////
+
+
+    //////////////////////
+    // in ppm.F90
+#if (AMREX_SPACEDIM ==  2)
+    void ppm_2d(const int* lo, const int* hi,
+        const amrex::Real* s,  const int* s_lo, const int* s_hi,
+        const int nc_s,
+        const amrex::Real* u,  const int* u_lo, const int* u_hi,
+        const amrex::Real* v,  const int* v_lo, const int* v_hi,
+        amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
+        amrex::Real* Im, const int* im_lo, const int* im_hi,
+        const int* domlo, const int* domhi,
+        const int* adv_bc,
+        const amrex::Real* dx, const amrex::Real dt,
+        const int is_umac, const int comp, const int bccomp);
+#elif (AMREX_SPACEDIM ==  3)
+    void ppm_3d(const int* lo, const int* hi,
+        const amrex::Real* s,  const int* s_lo, const int* s_hi,
+        const int nc_s,
+        const amrex::Real* u,  const int* u_lo, const int* u_hi,
+        const amrex::Real* v,  const int* v_lo, const int* v_hi,
+        const amrex::Real* w,  const int* w_lo, const int* w_hi,
+        amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
+        amrex::Real* Im, const int* im_lo, const int* im_hi,
+        const int* domlo, const int* domhi,
+        const int* adv_bc,
+        const amrex::Real* dx, const amrex::Real dt,
+        const int is_umac, const int comp, const int bccomp);
+#endif
     //////////////////////
 
     //////////////////////

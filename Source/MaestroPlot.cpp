@@ -1531,7 +1531,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu(tileBox)
+#pragma gpu box(tileBox)
 				make_ad_excess(AMREX_INT_ANYD(tileBox.loVect()),
                                AMREX_INT_ANYD(tileBox.hiVect()),
 				               BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
@@ -1554,7 +1554,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu(tileBox)
+#pragma gpu box(tileBox)
 				make_ad_excess_sphr(AMREX_INT_ANYD(tileBox.loVect()),
 				                    AMREX_INT_ANYD(tileBox.hiVect()),
 				                    BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),

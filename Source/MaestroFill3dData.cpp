@@ -63,6 +63,12 @@ Maestro::Put1dArrayOnCart (int level,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()",Put1dArrayOnCart);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     // get references to the MultiFabs at level lev
     MultiFab& s0_cart_mf = s0_cart[level];
     MultiFab& cc_to_r = cell_cc_to_r[level];
@@ -98,6 +104,11 @@ Maestro::Put1dArrayOnCart (int level,
     				      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
     	}
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
 }
 

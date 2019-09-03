@@ -74,6 +74,16 @@ public:
     /// after restarts.
     static amrex::Real getCPUTime();
 
+
+#ifdef AMREX_USE_CUDA
+///
+/// Minimum CUDA threadblock size for BC fills.
+///
+    static int numBCThreadsMin[3];
+
+    static int minBCThreads(int dir) { return numBCThreadsMin[dir]; }
+#endif
+
     /// Dump build info
     static void WriteBuildInfo ();
 
