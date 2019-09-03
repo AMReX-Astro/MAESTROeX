@@ -135,6 +135,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
@@ -291,66 +292,89 @@ cell-centered velocity.</p>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
 <li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/ppm_type" title="f/meth_params_module/ppm_type"><code class="xref f f-func docutils literal notranslate"><span class="pre">ppm_type()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/rel_eps" title="f/meth_params_module/rel_eps"><code class="xref f f-func docutils literal notranslate"><span class="pre">rel_eps()</span></code></a>)</p></li>
 </ul>
-<p class="rubric">Variables</p>
 <p class="rubric">Subroutines and functions</p>
 <dl class="subroutine">
 <dt id="f/ppm_module/ppm_2d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">ppm_module/</code><code class="sig-name descname">ppm_2d</code><span class="sig-paren">(</span><em class="sig-param">s</em>, <em class="sig-param">ng_s</em>, <em class="sig-param">u</em>, <em class="sig-param">v</em>, <em class="sig-param">ng_u</em>, <em class="sig-param">ip</em>, <em class="sig-param">im</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">is_umac</em><span class="sig-paren">)</span><a class="headerlink" href="#f/ppm_module/ppm_2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">ppm_module/</code><code class="sig-name descname">ppm_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">s</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">nc_s</em>, <em class="sig-param">u</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">v</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">ip</em>, <em class="sig-param">ip_lo</em>, <em class="sig-param">ip_hi</em>, <em class="sig-param">im</em>, <em class="sig-param">im_lo</em>, <em class="sig-param">im_hi</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">is_umac</em>, <em class="sig-param">comp</em>, <em class="sig-param">bccomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/ppm_module/ppm_2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>note that u,v here may be the normal cell-centered velocity,
 or the MAC velocity.  The is_umac argument tells us which it
 is.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> (-(lo(1)-ng_s)+1,-(lo(2)-ng_s)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ng_s</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>u</strong> (-(lo(1)-ng_u)+1,-(lo(2)-ng_u)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v</strong> (-(lo(1)-ng_u)+1,-(lo(2)-ng_u)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ng_u</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ip</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>im</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>domlo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>domhi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>adv_bc</strong> (,)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dx</strong> (*)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>is_umac</strong><em> [</em><em>logical</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>u</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ip</strong> (ip_hi(1)-(ip_lo(1))+1,ip_hi(2)-(ip_lo(2))+1,ip_hi(3)-(ip_lo(3))+1,2)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>ip_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ip_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>im</strong> (im_hi(1)-(im_lo(1))+1,im_hi(2)-(im_lo(2))+1,im_hi(3)-(im_lo(3))+1,2)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>im_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>im_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>adv_bc</strong> (amrex_spacedim,2,amrex_spacedim)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>is_umac</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>comp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>bccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Called from</dt>
-<dd class="field-even"><p><a class="reference internal" href="make_edge_scal_f.html#f/make_edge_scal_module/make_edge_scal_2d" title="f/make_edge_scal_module/make_edge_scal_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_edge_scal_2d()</span></code></a>, <a class="reference internal" href="mkutrans_f.html#f/mkutrans_module/mkutrans_2d" title="f/mkutrans_module/mkutrans_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">mkutrans_2d()</span></code></a>, <a class="reference internal" href="velpred_f.html#f/velpred_module/velpred_2d" title="f/velpred_module/velpred_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_2d()</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="make_edge_scal_f.html#f/make_edge_scal_module/make_edge_scal_2d" title="f/make_edge_scal_module/make_edge_scal_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_edge_scal_2d()</span></code></a>, <a class="reference internal" href="velpred_f.html#f/velpred_module/velpred_2d" title="f/velpred_module/velpred_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_2d()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="subroutine">
 <dt id="f/ppm_module/ppm_3d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">ppm_module/</code><code class="sig-name descname">ppm_3d</code><span class="sig-paren">(</span><em class="sig-param">s</em>, <em class="sig-param">ng_s</em>, <em class="sig-param">u</em>, <em class="sig-param">v</em>, <em class="sig-param">w</em>, <em class="sig-param">ng_u</em>, <em class="sig-param">ip</em>, <em class="sig-param">im</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">is_umac</em><span class="sig-paren">)</span><a class="headerlink" href="#f/ppm_module/ppm_3d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">ppm_module/</code><code class="sig-name descname">ppm_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">s</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">nc_s</em>, <em class="sig-param">u</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">v</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">w</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">ip</em>, <em class="sig-param">ip_lo</em>, <em class="sig-param">ip_hi</em>, <em class="sig-param">im</em>, <em class="sig-param">im_lo</em>, <em class="sig-param">im_hi</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">is_umac</em>, <em class="sig-param">comp</em>, <em class="sig-param">bccomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/ppm_module/ppm_3d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> (-(lo(1)-ng_s )+1,-(lo(2)-ng_s )+1,-(lo(3)-ng_s )+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ng_s</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>u</strong> (-(lo(1)-ng_u )+1,-(lo(2)-ng_u )+1,-(lo(3)-ng_u )+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v</strong> (-(lo(1)-ng_u )+1,-(lo(2)-ng_u )+1,-(lo(3)-ng_u )+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w</strong> (-(lo(1)-ng_u )+1,-(lo(2)-ng_u )+1,-(lo(3)-ng_u )+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ng_u</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ip</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,-(lo(3)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>im</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,-(lo(3)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>domlo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>domhi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>adv_bc</strong> (,)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dx</strong> (*)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>is_umac</strong><em> [</em><em>logical</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>u</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ip</strong> (ip_hi(1)-(ip_lo(1))+1,ip_hi(2)-(ip_lo(2))+1,ip_hi(3)-(ip_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>ip_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ip_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>im</strong> (im_hi(1)-(im_lo(1))+1,im_hi(2)-(im_lo(2))+1,im_hi(3)-(im_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>im_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>im_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>adv_bc</strong> (amrex_spacedim,2,amrex_spacedim)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>is_umac</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>comp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>bccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Called from</dt>
-<dd class="field-even"><p><a class="reference internal" href="make_edge_scal_f.html#f/make_edge_scal_module/make_edge_scal_3d" title="f/make_edge_scal_module/make_edge_scal_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_edge_scal_3d()</span></code></a>, <a class="reference internal" href="mkutrans_f.html#f/mkutrans_module/mkutrans_3d" title="f/mkutrans_module/mkutrans_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">mkutrans_3d()</span></code></a>, <a class="reference internal" href="velpred_f.html#f/velpred_module/velpred_3d" title="f/velpred_module/velpred_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_3d()</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="make_edge_scal_f.html#f/make_edge_scal_module/make_edge_scal_3d" title="f/make_edge_scal_module/make_edge_scal_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_edge_scal_3d()</span></code></a>, <a class="reference internal" href="velpred_f.html#f/velpred_module/velpred_3d" title="f/velpred_module/velpred_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_3d()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
