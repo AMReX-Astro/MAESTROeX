@@ -1,20 +1,23 @@
 .. _ch:flowchart:
 
-************************************
-Model Equations and Numerical Scheme
-************************************
+*******************
+Governing Equations
+*******************
 
-The equation set and solution procedure used by MAESTROeX has
-changed and improved over time.  In this chapter, we outline the model equations
-and algorithmic options in the code.
-The latest published references for MAESTROeX
-are :cite:`multilevel` and the more recent :cite:`MAESTROeX`.
-These two papers use the same model equations, however the
-more recent paper presents a new, simplified temporal integration scheme.
-
-In this description, we make frequent reference to
-paper I :cite:`lowMach`, paper II :cite:`lowMach2`,
-paper III :cite:`lowMach3`, and paper IV :cite:`lowMach4`.
+The equation set and solution procedure used by MAESTROeX has changed
+and improved over time.  In this chapter, we outline the model
+equations and algorithmic options in the code.  The latest published
+references for MAESTROeX are the multilevel paper :cite:`multilevel`
+and the more recent :cite:`MAESTROeX`.  These two papers use the same
+model equations, however the more recent paper, in addition to
+retaining the original algorithmic capability of the previous code,
+includes an option to use a new, simplified temporal integration
+scheme.  We distinguish between the two temporal integration
+strategies by referring to them as the "original temporal scheme" and
+"new temporal scheme".  In this description, we make frequent
+reference to papers I-IV and the multilevel paper (see §
+:ref:`ch:intro`), which describe the developments of the original
+temporal scheme.
 
 Summary of the MAESTROeX Equation Set
 =====================================
@@ -24,21 +27,21 @@ to papers I through IV for the derivation
 and motivation of the equation set.
 We take the standard equations of reacting, compressible flow, and recast the
 equation of state (EOS) as a divergence constraint on the velocity field.
-The resulting model is a series of evolution equations for mass, momentum,
-and energy, subject to an additional constraint on velocity, with a base state
+The resulting model is a series of evolution equations for mass, energy,
+and momentum, subject to an additional constraint on velocity, with a base state
 density and pressure linked via hydrostatic equilibrium:
 
 .. math::
    \frac{\partial \rho X_k}{\partial t} + \nabla \cdot (\rho \Ub X_k) = \rho \omegadot_k
    
 .. math::
+   \frac{\partial(\rho h)}{\partial t} =
+      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
+      
+.. math::
    \frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub +
       \frac{\beta_0}{\rho} \nabla \left (\frac{p^\prime}{\beta_0} \right ) =
       -\frac{\rho^\prime}{\rho} |g| \er
-
-.. math::
-   \frac{\partial(\rho h)}{\partial t} =
-      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
 	  
 .. math::
    \nabla \cdot (\beta_0 \Ub) =
@@ -46,42 +49,58 @@ density and pressure linked via hydrostatic equilibrium:
 
 .. math:: \nabla p_0 = -\rho_0 |g| \er
 
-We discuss each of these model equations in further detail below.
+We discuss each of these equations in further detail below.
       
-Base State
-----------
 
-The stratified atmosphere is characterized by a one-dimensional
-time-dependent base state, defined by a base state density, :math:`\rho_0`,
-and a base state pressure, :math:`p_0`, in hydrostatic equilibrum:
+Lateral Average
+---------------
 
-.. math:: \nabla p_0 = -\rho_0 |g| \er
+A key concept in the MAESTROeX equation set and algorithm is
+the lateral average.  The lateral average represents the average
+value of a quantity at a given radius in spherical simulations
+(or a given height in planar simulations).  We denote the
+lateral average of a quantity with an overline, e.g., 
+for any quantity :math:`\phi`, we denote
+the average of :math:`\phi` over a layer at constaint radius
+as :math:`\overline{\phi}`.  For planar problems this routine is
+a trivial average of all the values at a given height.
+For spherical problems there is a
+novel interpolation routine we use to average 3D data representing
+a full spherical star into a 1D array representing the average.
+Details can be found in :cite:`multilevel` and :cite:`MAESTROeX`.
 
-The gravitational acceleration, :math:`g` is either constant or a
-point-mass with a :math:`1/r^2` dependence (see §
-:ref:`sec:planarinvsqgravity`) for plane-parallel geometries, or a
-monopole constructed by integrating the base state density for
-spherical geometries.
+For the velocity field, we can decompose the full velocity
+field into a base state velocity and a local velocity,
 
-For the time-dependence, we will define a base state velocity, :math:`w_0`,
-which will adjust the base state from one hydrostatic equilibrum to
-another in response to heating.
+.. math:: \Ub = w_0(r,t)\eb_r + \Ubt(\xb,t).
 
-For convenience, we define a base state enthalphy, :math:`h_0`, as needed
-by laterally averaging the full enthalpy, :math:`h`.
-
-Continuity
-----------
+where :math:`r` is a 1D radial coordinate,
+:math:`\xb` is a 3D Cartesian grid coordinate, and
+:math:`\eb_r` is the unit vector in the outward radial direction.
+Note that :math:`\overline{(\Ubt\cdot\eb_r)} = 0` and
+:math:`w_0 = \overline{(\Ub\cdot\eb_r)}`.
+In other words, the base state velocity can be thought of as the
+lateral average of the outward radial velocity.
+For the velocity decompsotion, we do not use the
+same spatial averaging operators used
+for all other variables; instead we derive an analytic expression
+for the average expansion velocity and numerically integrate
+this expression to obtain :math:`w_0`.
+      
+Mass
+----
 
 Conservation of mass gives the same continuity equation we have with
 compressible flow:
 
 .. math::
 
-   \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \Ub) = 0
+   \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \Ub) = 0,
    \label{eq:flow:continuity}
 
-Additionally, we carry species around which can react. The creation and destruction
+where :math:`\rho` is the total mass density.
+Additionally, we model the evolution of individual species that advect and react.
+The creation and destruction
 of the species is described by their create rate, :math:`\omegadot_k`, and the species
 are defined by their mass fractions, :math:`X_k \equiv \rho_k / \rho`, giving
 
@@ -93,7 +112,8 @@ and
 
 .. math:: \sum_k X_k = 1
 
-The base state density evolution equation can be defined by laterally averaging the
+In the original temporal scheme, we need to model the evolution of a base state density,
+:math:`\rho_0`.  The governing equation can be obtained by laterally averaging the
 full continuity equation, giving:
 
 .. math::
@@ -125,46 +145,112 @@ In practice, we correct the drift by simply setting :math:`\rho_0 =
 \overline{\rho}` after the advective update of :math:`\rho`. However we still need to
 explicitly compute :math:`\etarho` since it appears in other equations.
 
-Constraint
+Energy
+------
+
+We model the evolution of specific enthalpy, :math:`h`.
+Strictly speaking this is not necessary to close the system,
+but a user can enable the option to couple the energy with the
+rest of the system by using the enthalpy to define the temperature.
+The advantages of this coupling is an area of active research.
+The evolution equation is
+
+.. math::
+   \frac{\partial(\rho h)}{\partial t} =
+      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
+   :label: eq:flow:enthalpy
+
+where :math:`p_0` is the 1D base state pressure, :math:`\Hnuc` and :math:`\Hext`
+are energy sources due to reactions and user-defined external heating.
+
+When we are using thermal diffusion, there will be an additional term in
+the enthalpy equation (see § :ref:`sec:flow:diffusion`).
+
+In the original temporal scheme, we utlized a base state enthlpy that effectively
+represents the average over a layer; its evolution equation can be
+found by laterally averaging :eq:`eq:flow:enthalpy`
+
+.. math::
+   \frac{\partial(\rho h)_0}{\partial t} = -\nabla\cdot\left[(\rho h)_0w_0\eb_r\right] +
+     \psi + \overline{\rho \Hnuc} + \overline{\rho \Hext}.
+   :label: eq:flow:enthalpy_base
+
+We will often expand :math:`Dp_0/Dt` as
+
+.. math:: \frac{Dp_0}{Dt} = \psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}
+
+where we defined
+
+.. math:: \psi \equiv \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r}
+
+In paper III, we showed that for a plane-parallel atmosphere with
+constant gravity, :math:`\psi = \etarho g`
+
+At times, we will define a temperature equation by writing :math:`h = h(T,p,X_k)`
+and differentiating:
+
+.. math::
+   \frac{DT}{Dt} = \frac{1}{\rho c_p} \left\{ \left(1 - \rho h_p\right) \left
+     [ \psi + (\Ubt \cdotb \er) \frac{\partial p_0}{\partial r} \right ]
+    - \sum_k \rho \xi_k {\omegadot}_k
+    + \rho \Hnuc + \rho \Hext \right \}   .
+   :label: eq:flow:temp
+
+Subtracting it from the full enthalpy equation gives:
+
+.. math::
+   \begin{align}
+   \frac{\partial(\rho h)'}{\partial t} = &-\Ub\cdot\nabla(\rho h)' - (\rho h)'\nabla\cdot\Ub -
+     \nabla\cdot\left[(\rho h)_0\Ubt\right] + \nonumber \\ 
+   &\Ubt\cdot\nabla p_0
+      + ( \rho\Hnuc - \overline{\rho \Hnuc}) + (\rho\Hext - \overline{\rho \Hext})
+   \end{align}
+   :label: eq:flow:rhohprime
+
+Base State
 ----------
 
-The equation of state is cast into an elliptic constraint on the
-velocity field by differentiating :math:`p_0(\rho, s, X_k)` along particle
-paths, giving:
+The stratified atmosphere is characterized by a one-dimensional
+time-dependent base state, defined by a base state density, :math:`\rho_0`,
+and a base state pressure, :math:`p_0`, in hydrostatic equilibrum:
+
+.. math:: \nabla p_0 = -\rho_0 |g| \er
+
+The gravitational acceleration, :math:`g` is either constant or a
+point-mass with a :math:`1/r^2` dependence (see §
+:ref:`sec:planarinvsqgravity`) for plane-parallel geometries, or a
+monopole constructed by integrating the base state density for
+spherical geometries.
+
+For the time-dependence, we will define a base state velocity, :math:`w_0`,
+which will adjust the base state from one hydrostatic equilibrum to
+another in response to heating.
+
+For convenience, we define a base state enthalphy, :math:`h_0`, as needed
+by laterally averaging the full enthalpy, :math:`h`.
+
+Base State Expansion
+--------------------
+
+In practice, we calculate :math:`w_0` by integrating
+the one-dimensional divergence constraint. For a plane-parallel atmosphere, the
+evolution is:
 
 .. math::
-   \nabla \cdot (\beta_0 \Ub) =
-      \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right )
-   :label: eq:U_divergence
+   \frac{\partial w_0}{\partial r} = \Sbar - \frac{1}{\gammabar p_0} \etarho g
+   :label: eq:flow:dw0dr_planar
 
-where :math:`\beta_0` is a density-like variable that carries background
-stratification, defined as
-
-.. math:: \beta_0(r,t) = \rho_0(0,t)\exp\left(\int_0^r\frac{1}{\gammabar p_0}\frac{\partial p_0}{\partial r'}dr'\right),
-
-and
+Then we define
 
 .. math::
-   S = -\sigma\sum_k\xi_k\omegadot_k + \frac{1}{\rho p_\rho}\sum_k p_{X_k}\omegadot_k + \sigma\Hnuc + \sigma\Hext + \frac{\sigma}{\rho} \nabla \cdot \kth \nabla T
-   :label: eq:flow:S
+   - \frac{\beta_0}{\rho_0} \frac{\partial (\pizero/\beta_0)}{\partial r} = \frac{\partial w_0}{\partial t} +
+      w_0 \frac{\partial w_0}{\partial r} ,
+   :label: eq:pizero
 
-where :math:`p_{X_k} \equiv \left. \partial p / \partial X_k
-\right|_{\rho,T,X_{j,j\ne k}}`, :math:`\xi_k \equiv \left. \partial h /
-\partial X_k \right |_{p,T,X_{j,j\ne k}},
-p_\rho \equiv \left. \partial p/\partial \rho \right |_{T, X_k}`, and
-:math:`\sigma \equiv p_T/(\rho c_p p_\rho)`, with
-:math:`p_T \equiv \left. \partial p / \partial T \right|_{\rho, X_k}` and
-:math:`c_p \equiv \left.  \partial h / \partial T
-\right|_{p,X_k}` is the specific heat at constant pressure. The last
-term is only present if we are using thermal diffusion (``use_thermal_diffusion = T``). In this term, :math:`\kth` is the thermal conductivity.
+once :math:`w_0` at the old and new times is known, and the advective term is computed explicitly.
+Then we can include this for completeness in the update for :math:`\ut.`
 
-In this constraint, :math:`\gammabar` is the lateral average of
-:math:`\Gamma_1 \equiv d\log p / d\log \rho |_s`. Using the lateral average
-here makes it possible to cast the constraint as a
-divergence. :cite:`KP:2012` discuss the general case where we want to
-keep the local variations of :math:`\Gamma_1` (and we explored this in paper
-III). We also look at this in § :ref:`sec_flow_gamma1vary`
-
+	 
 Momentum
 --------
 
@@ -172,7 +258,7 @@ The compressible momentum equation (written in terms of velocity is):
 
 .. math:: \rho \frac{\partial \Ub}{\partial t} + \rho \Ub \cdot \nabla \Ub + \nabla p = -\rho |g| \er
 
-Subtracting off the base state, and defining the perturbational
+Subtracting off the equation of hydrostatic equilibrium, and defining the perturbational
 pressure (sometimes called the dynamic pressure) as :math:`\pi \equiv p - p_0`,
 and perturbational density as :math:`\rho' \equiv \rho - \rho_0`, we have:
 
@@ -241,83 +327,159 @@ The divergence constraint for :math:`\Ubt` can be found by subtracting
 
 .. math:: \nabla\cdot\left(\beta_0\Ubt\right) = \beta_0\left(S-\Sbar\right).\label{eq:utilde divergence}
 
-Base State Expansion
---------------------
+Velocity Constraint
+-------------------
 
-In practice, we calculate :math:`w_0` by integrating
-the one-dimensional divergence constraint. For a plane-parallel atmosphere, the
-evolution is:
-
-.. math::
-   \frac{\partial w_0}{\partial r} = \Sbar - \frac{1}{\gammabar p_0} \etarho g
-   :label: eq:flow:dw0dr_planar
-
-Then we define
+The equation of state is cast into an elliptic constraint on the
+velocity field by differentiating :math:`p_0(\rho, s, X_k)` along particle
+paths, giving:
 
 .. math::
-   - \frac{\beta_0}{\rho_0} \frac{\partial (\pizero/\beta_0)}{\partial r} = \frac{\partial w_0}{\partial t} +
-      w_0 \frac{\partial w_0}{\partial r} ,
-   :label: eq:pizero
+   \nabla \cdot (\beta_0 \Ub) =
+      \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right )
+   :label: eq:U_divergence
 
-once :math:`w_0` at the old and new times is known, and the advective term is computed explicitly.
-Then we can include this for completeness in the update for :math:`\ut.`
+where :math:`\beta_0` is a density-like variable that carries background
+stratification, defined as
 
-Energy
-------
+.. math:: \beta_0(r,t) = \rho_0(0,t)\exp\left(\int_0^r\frac{1}{\gammabar p_0}\frac{\partial p_0}{\partial r'}dr'\right),
 
-Finally, we add an equation for specific enthalpy evolution to our
-system. Strictly speaking this is not necessary to close the system,
-but it becomes convenient at times to define the temperature.
+and
 
 .. math::
-   \frac{\partial(\rho h)}{\partial t} =
-      -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
-   :label: eq:flow:enthalpy
+   S = -\sigma\sum_k\xi_k\omegadot_k + \frac{1}{\rho p_\rho}\sum_k p_{X_k}\omegadot_k + \sigma\Hnuc + \sigma\Hext + \frac{\sigma}{\rho} \nabla \cdot \kth \nabla T
+   :label: eq:flow:S
 
-We will often expand :math:`Dp_0/Dt` as
+where :math:`p_{X_k} \equiv \left. \partial p / \partial X_k
+\right|_{\rho,T,X_{j,j\ne k}}`, :math:`\xi_k \equiv \left. \partial h /
+\partial X_k \right |_{p,T,X_{j,j\ne k}},
+p_\rho \equiv \left. \partial p/\partial \rho \right |_{T, X_k}`, and
+:math:`\sigma \equiv p_T/(\rho c_p p_\rho)`, with
+:math:`p_T \equiv \left. \partial p / \partial T \right|_{\rho, X_k}` and
+:math:`c_p \equiv \left.  \partial h / \partial T
+\right|_{p,X_k}` is the specific heat at constant pressure. The last
+term is only present if we are using thermal diffusion (``use_thermal_diffusion = T``). In this term, :math:`\kth` is the thermal conductivity.
 
-.. math:: \frac{Dp_0}{Dt} = \psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}
+In this constraint, :math:`\gammabar` is the lateral average of
+:math:`\Gamma_1 \equiv d\log p / d\log \rho |_s`. Using the lateral average
+here makes it possible to cast the constraint as a
+divergence. :cite:`KP:2012` discuss the general case where we want to
+keep the local variations of :math:`\Gamma_1` (and we explored this in paper
+III). We also look at this in § :ref:`sec_flow_gamma1vary`
+      
+Notation
+========
 
-where we defined
+Throughout the papers describing MAESTROeX, we’ve largely kept our
+notation consistent. The table below defines the
+frequently-used quantities and provides their units.
 
-.. math:: \psi \equiv \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r}
+.. table:: Definition of symbols.
 
-When we are using thermal diffusion, there will be an additional term in
-the enthalpy equation (see § :ref:`sec:flow:diffusion`).
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | symbol                | description                                                           | units                                |
+   +=======================+=======================================================================+======================================+
+   | :math:`c_p`           | specific heat at                                                      | erg g :math:`^{-1}` K :math:`^{-1}`  |
+   |                       | constant pressure                                                     |                                      |
+   |                       | (:math:`c_p \equiv \partial h / \partial T |_{p, X_k}`)               |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`f`             | volume discrepancy                                                    | –                                    |
+   |                       | factor                                                                |                                      |
+   |                       | (:math:`0 \le f \le 1`)                                               |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`g`             | gravitational                                                         | cm s  :math:`^{-2}`                  |
+   |                       | acceleration                                                          |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`h`             | specific enthalpy                                                     | erg g :math:`^{-1}`                  |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\Hext`         | external heating                                                      | erg g :math:`^{-1}` s :math:`^{-1}`  |
+   |                       | energy generation  rate                                               |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\Hnuc`         | nuclear energy                                                        | erg g :math:`^{-1}`                  |
+   |                       | generation rate                                                       | s :math:`^{-1}`                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`h_p`           | :math:`h_p \equiv \partial h/\partial p |_{T,X_k}`                    | cm :math:`^{3}` g :math:`^{-1}`      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\kth`          | thermal conductivity                                                  | erg cm :math:`^{-1}`                 |
+   |                       |                                                                       | s :math:`^{-1}` K :math:`^{-1}`      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`p_0`           | base state pressure                                                   | erg cm  :math:`^{-3}`                |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`p_T`           | :math:`p_T \equiv \partial p / \partial T |_{\rho,X_k}`               | erg cm :math:`^{-3}` K :math:`^{-1}` |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`p_{X_k}`       | :math:`p_{X_k}\equiv\partial p/\partial X_k|_{p,T,X_{j,j\ne k}}`      | erg cm :math:`^{-3}`                 |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`p_\rho`        | :math:`p_\rho \equiv \partial p/\partial \rho |_{T,X_k}`              | erg g :math:`^{-1}`                  |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`q_k`           | specific nuclear                                                      | erg g\ :math:`^{-1}`                 |
+   |                       | binding energy                                                        |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`r`             | radial coordinate (direction of gravity)                              | cm                                   |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`s`             | specific entropy                                                      | erg g :math:`^{-1}` K :math:`^{-1}`  |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`S`             | source term to the                                                    | s :math:`^{-1}`                      |
+   |                       | divergence constraint                                                 |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`t`             | time                                                                  | s                                    |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`T`             | temperature                                                           | K                                    |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\Ub`           | total velocity                                                        | cm s :math:`^{-1}`                   |
+   |                       | (:math:`\Ub = \Ubt + w_0 \eb_r`                                       |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\Ubt`          | local velocity                                                        | cm s :math:`^{-1}`                   |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\uadv`         | advective velocity                                                    | cm s :math:`^{-1}`                   |
+   |                       | (edge-centered)                                                       |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`w_0`           | base state expansion                                                  | cm s\ :math:`^{-1}`                  |
+   |                       | velocity                                                              |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`X_k`           | mass fraction of the                                                  | –                                    |
+   |                       | species                                                               |                                      |
+   |                       | (:math:`\sum_k X_k = 1`)                                              |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\beta_0`       | coefficient to velocity in velocity constraint equation               | g cm :math:`^{-3}`                   |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\Gamma_1`      | first adiabatic exponent                                              | –                                    |
+   |                       | (:math:`\Gamma_1 \equiv d\log p/d\log \rho|_s`)                       |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\etarho`       | :math:`\etarho \equiv \overline{(\rho' \Ub \cdot \eb_r)}`             | g cm :math:`^{-2}` s :math:`^{-1}`   |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\xi_k`         | :math:`\xi_k \equiv \partial h / \partial X_k |_{p,T,X_{j,j\ne k}}`   | erg g :math:`^{-1}`                  |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\pi`           | dynamic pressure                                                      | erg cm :math:`^{-3}`                 |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\pizero`       | base state dynamic pressure                                           | erg cm  :math:`^{-3}`                |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\rho`          | mass density                                                          | g cm :math:`^{-3}`                   |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\rho_0`        | base state mass density                                               | g cm :math:`^{-3}`                   |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\rho'`         | perturbational density                                                | g cm :math:`^{-3}`                   |
+   |                       | (:math:`\rho' = \rho - \rho_0`)                                       |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`(\rho h)_0`    | base state enthalpy density                                           | erg cm :math:`^{-3}`                 |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`(\rho h)'`     | perturbational enthalpy density                                       | erg cm :math:`^{-3}`                 |
+   |                       | :math:`\left [(\rho h)' = \rho h - (\rho h)_0 \right ]`               |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\sigma`        | :math:`\sigma \equiv p_T/(\rho c_p p_\rho)`                           | erg :math:`^{-1}` g                  |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\psi`          | :math:`\psi \equiv D_0 p_0/Dt = \ptl p_0/\ptl t + w_0\ptl p_0/\ptl r` | erg cm :math:`^{-3}`                 |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
+   | :math:`\omegadot_k`   | creation rate for species :math:`k`                                   | s :math:`^{-1}`                      |
+   |                       | (:math:`\omegadot_k \equiv DX_k/Dt`)                                  |                                      |
+   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
 
-In paper III, we showed that for a plane-parallel atmosphere with
-constant gravity, :math:`\psi = \etarho g`
-
-At times, we will define a temperature equation by writing :math:`h = h(T,p,X_k)`
-and differentiating:
-
-.. math::
-   \frac{DT}{Dt} = \frac{1}{\rho c_p} \left\{ \left(1 - \rho h_p\right) \left
-     [ \psi + (\Ubt \cdotb \er) \frac{\partial p_0}{\partial r} \right ]
-    - \sum_k \rho \xi_k {\omegadot}_k
-    + \rho \Hnuc + \rho \Hext \right \}   .
-   :label: eq:flow:temp
-
-The base state evolution equations for density and enthalpy can be
-found by averaging :eq:`eq:flow:enthalpy`
-over a layer of constant radius, resulting in
-
-.. math::
-   \frac{\partial(\rho h)_0}{\partial t} = -\nabla\cdot\left[(\rho h)_0w_0\eb_r\right] +
-     \psi + \overline{\rho \Hnuc} + \overline{\rho \Hext}.
-   :label: eq:flow:enthalpy_base
-
-Subtracting it from the full enthalpy equation gives:
-
-.. math::
-   \begin{align}
-   \frac{\partial(\rho h)'}{\partial t} = &-\Ub\cdot\nabla(\rho h)' - (\rho h)'\nabla\cdot\Ub -
-     \nabla\cdot\left[(\rho h)_0\Ubt\right] + \nonumber \\ 
-   &\Ubt\cdot\nabla p_0
-      + ( \rho\Hnuc - \overline{\rho \Hnuc}) + (\rho\Hext - \overline{\rho \Hext})
-   \end{align}
-   :label: eq:flow:rhohprime
-
+.. [1]
+   Here we see an unfortunate conflict
+   of notation between the compressible hydro community and the
+   incompressible community. In papers on compressible hydrodynamics,
+   :math:`\Ub` will usually mean the vector of conserved quantities. In
+   incompressible / low speed papers, :math:`\Ub` will mean the velocity vector.
+   
 .. _Sec:Time Advancement Algorithm:
 
 Time Advancement Algorithm Ingredients
@@ -1013,3 +1175,31 @@ Future Considerations
    and :math:`T=T(\rho,h,X_k)` drift away from each other more than we would like. Our
    attempts at incorporating a ``dpdt_factor`` for spherical problems have not
    been successful.
+
+.. _ch:methodology:
+
+*********************
+Numerical Methodology
+*********************
+
+We give an overview of the original MAESTRO algorithm :cite:`multilevel`,
+as well as the recently introduced new temporal integration
+scheme :cite:`MAESTROeX`.  These schemes share many of the same algorithmic
+modules, however the new scheme is significantly simpler.
+
+To summarize, in the original scheme we integrated the base state evolution
+over the time step, which requires splitting the velocity equation into
+more complicated average and perturbational equations.
+In the new temporal integrator, we eliminated much of this complication
+by introducing a predictor-corrector approach for the base state.
+The key observation is that the base state density is simply the lateral
+average of the full density, so we simply update the base state density
+through averaging routines, rather than predicting the evolution with
+a split velocity formulation, only to have to correct it with the
+averaging operator in the end regardless.
+
+Original Temporal Integrator
+============================
+
+New Temporal Integrator
+=======================
