@@ -209,13 +209,13 @@ contains
              vtrans(i,j,k) = merge(ZERO,vtrans(i,j,k),test)
           enddo
        enddo
+
     endif
 
   end subroutine mkutrans_2d
 #endif
 
 #if (AMREX_SPACEDIM == 3)
-
   subroutine mkutrans_3d(lo, hi, lev, idir, domlo, domhi, &
        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
