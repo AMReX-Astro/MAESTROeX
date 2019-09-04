@@ -126,9 +126,9 @@ Maestro::DensityAdvance (int which_step,
 
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec,1,0);
+                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],FirstSpec,Rho,1,0);
                 for (int ispec=1; ispec<NumSpec; ++ispec) {
-                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec+ispec,1,0);
+                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],FirstSpec+ispec,Rho,1,0);
                 }
             }
         }

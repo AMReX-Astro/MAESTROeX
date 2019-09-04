@@ -8,7 +8,7 @@ maestro.drdxfac = 5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
-geometry.prob_hi     =  3.125e7 5.e8  5.e8
+geometry.prob_hi     =  7.8125e7 1.25e9  5.e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -89,12 +89,14 @@ maestro.eps_mac_max        = 1.e-8
 maestro.mac_level_factor   = 10.
 maestro.eps_mac_bottom     = 1.e-3
 # tolerances for the nodal projection
-maestro.eps_hg             = 1.e-11
-maestro.eps_hg_max         = 1.e-10
+maestro.eps_hg             = 1.e-9
+maestro.eps_hg_max         = 1.e-8
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
 maestro.do_burning = true
+
+maestro.grav_const = -3.2e-1
 
 &probin
 
