@@ -1,5 +1,5 @@
 ---
-title: 'MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver`
+title: 'MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver'
 tags:
   - C++
   - Fortran90
