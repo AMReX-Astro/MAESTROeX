@@ -619,15 +619,11 @@ extern "C"
 
     //////////////////////
     // in make_gamma.F90
-    void make_gamma(const int* lo, const int* hi, const int lev,
+    void make_gamma(const int* lo, const int* hi, 
                           amrex::Real* gamma, const int* g_lo, const int* g_hi,
                     const amrex::Real* scal,  const int* s_lo, const int* s_hi,
-                    const amrex::Real* p0);
+                    const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi);
 
-    void make_gamma_sphr(const int* lo, const int* hi,
-			 amrex::Real* gamma, const int* g_lo, const int* g_hi,
-			 const amrex::Real* scal, const int* s_lo, const int* s_hi,
-			 const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi);
     //////////////////////
 
     //////////////////////
