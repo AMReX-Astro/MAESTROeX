@@ -77,8 +77,6 @@ contains
 
     logical :: test
 
-    double precision, allocatable :: sedge(:,:,:)
-
     integer :: ip_lo(3), ip_hi(3), im_lo(3), im_hi(3)
 
     ip_lo(:) = (/ lo(1)-1,lo(2)-1,lo(3) /)
@@ -86,32 +84,32 @@ contains
     im_lo(:) = (/ lo(1)-1,lo(2)-1,lo(3) /)
     im_hi(:) = (/ hi(1)+1,hi(2)+1,hi(3) /)
 
-    allocate(slopex(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(slopey(lo(1)-1:hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
+    call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
 
-    allocate(Ipu(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
-    allocate(Imu(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
-    allocate(Ipv(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
-    allocate(Imv(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
+    call bl_allocate(Ipu,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(Imu,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(Ipv,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(Imv,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
 
-    allocate(Ipfx(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
-    allocate(Imfx(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
-    allocate(Ipfy(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2))
-    allocate(Imfy(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2))
+    call bl_allocate(Ipfx,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(Imfx,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(Ipfy,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(Imfy,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
 
-    allocate(  ulx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(  urx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
-    allocate(uimhx(lo(1):hi(1)+1,lo(2)-1:hi(2)+1,lo(3):hi(3),1:2))
+    call bl_allocate(  ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(  urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
 
-    allocate(  uly(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3),1:2))
-    allocate(  ury(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3),1:2))
-    allocate(uimhy(lo(1)-1:hi(1)+1,lo(2):hi(2)+1,lo(3):hi(3),1:2))
+    call bl_allocate(  uly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(  ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3),1,2)
+    call bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3),1,2)
 
-    allocate(umacl(lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3)))
-    allocate(umacr(lo(1):hi(1)+1,lo(2):hi(2),lo(3):hi(3)))
+    call bl_allocate(umacl,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
+    call bl_allocate(umacr,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
 
-    allocate(vmacl(lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3)))
-    allocate(vmacr(lo(1):hi(1),lo(2):hi(2)+1,lo(3):hi(3)))
+    call bl_allocate(vmacl,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
+    call bl_allocate(vmacr,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
 
     is = lo(1)
     ie = hi(1)
@@ -127,8 +125,12 @@ contains
     hy = dx(2)
 
     if (ppm_type .eq. 0) then
-       call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,2,adv_bc)
-       call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,2,adv_bc)
+
+       call slopex_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                    slopex,ip_lo,ip_hi,2,domlo,domhi,2,adv_bc,AMREX_SPACEDIM,1)
+       call slopey_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                    slopey,ip_lo,ip_hi,2,domlo,domhi,2,adv_bc,AMREX_SPACEDIM,1)
+
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
 
        call ppm_2d(ip_lo,ip_hi,utilde,ut_lo,ut_hi,nc_ut, &
@@ -442,33 +444,34 @@ contains
        end select
     end if
 
-    deallocate(slopex)
-    deallocate(slopey)
+    call bl_deallocate(slopex)
+    call bl_deallocate(slopey)
 
-    deallocate(Ipu)
-    deallocate(Imu)
-    deallocate(Ipfx)
-    deallocate(Imfx)
-    deallocate(Ipv)
-    deallocate(Imv)
-    deallocate(Ipfy)
-    deallocate(Imfy)
+    call bl_deallocate(Ipu)
+    call bl_deallocate(Imu)
+    call bl_deallocate(Ipfx)
+    call bl_deallocate(Imfx)
+    call bl_deallocate(Ipv)
+    call bl_deallocate(Imv)
+    call bl_deallocate(Ipfy)
+    call bl_deallocate(Imfy)
 
-    deallocate(ulx)
-    deallocate(urx)
-    deallocate(uimhx)
+    call bl_deallocate(ulx)
+    call bl_deallocate(urx)
+    call bl_deallocate(uimhx)
 
-    deallocate(uly)
-    deallocate(ury)
-    deallocate(uimhy)
+    call bl_deallocate(uly)
+    call bl_deallocate(ury)
+    call bl_deallocate(uimhy)
 
-    deallocate(umacl)
-    deallocate(umacr)
-    deallocate(vmacl)
-    deallocate(vmacr)
+    call bl_deallocate(umacl)
+    call bl_deallocate(umacr)
+    call bl_deallocate(vmacl)
+    call bl_deallocate(vmacr)
 
   end subroutine velpred_2d
 #endif
+
 
 #if (AMREX_SPACEDIM == 3)
   subroutine velpred_3d(lev, domlo, domhi, lo, hi, &
@@ -606,13 +609,15 @@ contains
     hz = dx(3)
 
     if (ppm_type .eq. 0) then
-       !$OMP PARALLEL DO PRIVATE(k)
-       do k = lo(3)-1,hi(3)+1
-          call slopex_2d(utilde(:,:,k,:),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
-          call slopey_2d(utilde(:,:,k,:),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,3,adv_bc)
-       end do
-       !$OMP END PARALLEL DO
-       call slopez_3d(utilde,slopez,domlo,domhi,lo,hi,ng_ut,3,adv_bc)
+
+        call slopex_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                        slopex,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
+        call slopey_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                        slopey,lo-1,hi+1,3,domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
+       call slopez_3d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
+                      slopez,lo-1,hi+1,AMREX_SPACEDIM, &
+                      domlo,domhi,3,adv_bc,AMREX_SPACEDIM,1)
+
     else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
        call ppm_3d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
             ufull(:,:,:,1),uf_lo,uf_hi,ufull(:,:,:,2),uf_lo,uf_hi,ufull(:,:,:,3),uf_lo,uf_hi, &
