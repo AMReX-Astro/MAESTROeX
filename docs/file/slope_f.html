@@ -308,19 +308,26 @@
 <p class="rubric">Subroutines and functions</p>
 <dl class="subroutine">
 <dt id="f/slope_module/slopex_2d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">slope_module/</code><code class="sig-name descname">slopex_2d</code><span class="sig-paren">(</span><em class="sig-param">s</em>, <em class="sig-param">slx</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">ng</em>, <em class="sig-param">nvar</em>, <em class="sig-param">adv_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/slope_module/slopex_2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">slope_module/</code><code class="sig-name descname">slopex_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">s</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">nc_s</em>, <em class="sig-param">slx</em>, <em class="sig-param">sl_lo</em>, <em class="sig-param">sl_hi</em>, <em class="sig-param">nc_sl</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">nvar</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">nbccomp</em>, <em class="sig-param">bccomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/slope_module/slopex_2d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> (-(lo(1)-ng)+1,-(lo(2)-ng)+1,*)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>slx</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
-<li><p><strong>domlo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>domhi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ng</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nvar</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>adv_bc</strong> (,,*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>slx</strong> (sl_hi(1)-(sl_lo(1))+1,sl_hi(2)-(sl_lo(2))+1,sl_hi(3)-(sl_lo(3))+1,nc_sl)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>sl_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>sl_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_sl</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nvar</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>adv_bc</strong> (amrex_spacedim,2,nbccomp)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nbccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>bccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Use </dt>
@@ -334,19 +341,26 @@
 
 <dl class="subroutine">
 <dt id="f/slope_module/slopey_2d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">slope_module/</code><code class="sig-name descname">slopey_2d</code><span class="sig-paren">(</span><em class="sig-param">s</em>, <em class="sig-param">sly</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">ng</em>, <em class="sig-param">nvar</em>, <em class="sig-param">adv_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/slope_module/slopey_2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">slope_module/</code><code class="sig-name descname">slopey_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">s</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">nc_s</em>, <em class="sig-param">sly</em>, <em class="sig-param">sl_lo</em>, <em class="sig-param">sl_hi</em>, <em class="sig-param">nc_sl</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">nvar</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">nbccomp</em>, <em class="sig-param">bccomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/slope_module/slopey_2d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> (-(lo(1)-ng)+1,-(lo(2)-ng)+1,*)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sly</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
-<li><p><strong>domlo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>domhi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ng</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nvar</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>adv_bc</strong> (,,*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sly</strong> (sl_hi(1)-(sl_lo(1))+1,sl_hi(2)-(sl_lo(2))+1,sl_hi(3)-(sl_lo(3))+1,nc_sl)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>sl_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>sl_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_sl</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nvar</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>adv_bc</strong> (amrex_spacedim,2,nbccomp)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nbccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>bccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Use </dt>
@@ -360,19 +374,26 @@
 
 <dl class="subroutine">
 <dt id="f/slope_module/slopez_3d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">slope_module/</code><code class="sig-name descname">slopez_3d</code><span class="sig-paren">(</span><em class="sig-param">s</em>, <em class="sig-param">slz</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">ng</em>, <em class="sig-param">nvar</em>, <em class="sig-param">adv_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/slope_module/slopez_3d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">slope_module/</code><code class="sig-name descname">slopez_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">s</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">nc_s</em>, <em class="sig-param">slz</em>, <em class="sig-param">sl_lo</em>, <em class="sig-param">sl_hi</em>, <em class="sig-param">nc_sl</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">nvar</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">nbccomp</em>, <em class="sig-param">bccomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/slope_module/slopez_3d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> (-(lo(1)-ng)+1,-(lo(2)-ng)+1,-(lo(3)-ng)+1,*)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>slz</strong> (-(lo(1)-1)+1,-(lo(2)-1)+1,-(lo(3)-1)+1,*)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
-<li><p><strong>domlo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>domhi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lo</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ng</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nvar</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>adv_bc</strong> (,,*)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,nc_s)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_s</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>slz</strong> (sl_hi(1)-(sl_lo(1))+1,sl_hi(2)-(sl_lo(2))+1,sl_hi(3)-(sl_lo(3))+1,nc_sl)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>sl_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>sl_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_sl</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nvar</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>adv_bc</strong> (amrex_spacedim,2,nbccomp)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nbccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>bccomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Use </dt>
