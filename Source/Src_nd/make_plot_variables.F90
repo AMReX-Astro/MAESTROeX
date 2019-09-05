@@ -951,60 +951,10 @@ contains
 
   end subroutine make_velrc
 
-  subroutine make_deltagamma(lo,hi,lev,state,s_lo,s_hi,nc_s,p0,gamma1bar,&
-       deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma")
 
-    integer         , intent (in   ) :: lo(3), hi(3)
-    integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3)
-    integer  , value, intent (in   ) :: nc_s
-    integer         , intent (in   ) :: d_lo(3), d_hi(3)
-    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (inout) :: deltagamma(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-
-    ! Local variables
-    integer :: i, j, k, r
-    integer :: pt_index(3)
-    type (eos_t) :: eos_state
-
-    !$gpu
-
-    do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-          do i = lo(1), hi(1)
-
-#if (AMREX_SPACEDIM == 2)
-             r = j
-#elif (AMREX_SPACEDIM == 3)
-             r = k
-#endif
-
-             eos_state%rho   = state(i,j,k,rho_comp)
-             eos_state%T     = state(i,j,k,temp_comp)
-             if (use_pprime_in_tfromp) then
-                eos_state%p     = p0(lev,r) + state(i,j,k,pi_comp)
-             else
-                eos_state%p     = p0(lev,r)
-             endif
-
-             eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-
-             pt_index(:) = (/i, j, k/)
-
-             call eos(eos_input_rp, eos_state, pt_index)
-
-             deltagamma(i,j,k) = eos_state%gam1 - gamma1bar(lev,r)
-          enddo
-       enddo
-    enddo
-
-  end subroutine make_deltagamma
-
-  subroutine make_deltagamma_sphr(lo,hi,state,s_lo,s_hi,nc_s,&
+  subroutine make_deltagamma(lo,hi,state,s_lo,s_hi,nc_s,&
        p0_cart,p_lo,p_hi,gamma1bar_cart,g_lo,g_hi,&
-       deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma_sphr")
+       deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
@@ -1047,8 +997,9 @@ contains
        enddo
     enddo
 
-  end subroutine make_deltagamma_sphr
+  end subroutine make_deltagamma
 
+  
   subroutine make_entropy(lo,hi,lev,state,s_lo,s_hi,nc_s,&
        entropy,d_lo,d_hi) bind(C,name="make_entropy")
 

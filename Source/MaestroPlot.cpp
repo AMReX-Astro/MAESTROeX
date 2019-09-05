@@ -1665,54 +1665,28 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 		const MultiFab& state_mf = state[lev];
 		MultiFab& deltagamma_mf = deltagamma[lev];
 
-		if (spherical == 0) {
+        const MultiFab& p0cart_mf = p0_cart[lev];
+        const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
 
-			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-			for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
 
-				// Get the index space of the valid region
-				const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-				// call fortran subroutine
-				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-				// lo/hi coordinates (including ghost cells), and/or the # of components
-				// We will also pass "validBox", which specifies the "valid" region.
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
-				make_deltagamma(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                lev,
-				                BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-				                p0.dataPtr(), gamma1bar.dataPtr(),
-				                BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
-			}
-
-		} else {
-
-			const MultiFab& p0cart_mf = p0_cart[lev];
-			const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
-
-			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-			for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
-
-				// Get the index space of the valid region
-				const Box& tileBox = mfi.tilebox();
-
-				// call fortran subroutine
-				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-				// lo/hi coordinates (including ghost cells), and/or the # of components
-				// We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-				make_deltagamma_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-				                     BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-				                     BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), BL_TO_FORTRAN_ANYD(gamma1barcart_mf[mfi]),
-				                     BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
-			}
+            make_deltagamma(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                            BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
+                            BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), BL_TO_FORTRAN_ANYD(gamma1barcart_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
+			
 		}
 	}
 

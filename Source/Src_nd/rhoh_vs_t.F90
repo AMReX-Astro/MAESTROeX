@@ -11,89 +11,8 @@ module rhoh_vs_t_module
 
 contains
 
-  subroutine makeTfromRhoH(lo,hi,lev,state,s_lo,s_hi,p0) bind(C,name="makeTfromRhoH")
-
-    integer         , intent (in   ) :: lo(3), hi(3)
-    integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3)
-    double precision, intent (inout) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-
-    ! Local variables
-    integer :: i, j, k, r
-    integer :: pt_index(3)
-    type (eos_t) :: eos_state
-
-    !$gpu
-
-    if (use_eos_e_instead_of_h) then
-
-       do k = lo(3), hi(3)
-          do j = lo(2), hi(2)
-             do i = lo(1), hi(1)
-
-#if (AMREX_SPACEDIM == 2)
-                r = j
-#elif (AMREX_SPACEDIM == 3)
-                r = k
-#endif
-
-                ! (rho, (h->e)) --> T, p
-
-                eos_state%rho   = state(i,j,k,rho_comp)
-                eos_state%T     = state(i,j,k,temp_comp)
-                eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-
-                ! e = h - p/rho
-                eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
-                     p0(lev,r) / state(i,j,k,rho_comp)
-
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_re, eos_state, pt_index)
-
-                state(i,j,k,temp_comp) = eos_state%T
-
-             enddo
-          enddo
-       enddo
-
-    else
-
-       do k = lo(3), hi(3)
-          do j = lo(2), hi(2)
-             do i = lo(1), hi(1)
-
-#if (AMREX_SPACEDIM == 2)
-                r = j
-#elif (AMREX_SPACEDIM == 3)
-                r = k
-#endif
-
-                ! (rho, h) --> T, p
-
-                eos_state%rho   = state(i,j,k,rho_comp)
-                eos_state%T     = state(i,j,k,temp_comp)
-                eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-
-                eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
-
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_rh, eos_state, pt_index)
-
-                state(i,j,k,temp_comp) = eos_state%T
-
-             enddo
-          enddo
-       enddo
-
-    endif
-
-  end subroutine makeTfromRhoH
-
-  subroutine makeTfromRhoH_sphr(lo,hi,state,s_lo,s_hi,p0_cart,p0_lo,p0_hi) &
-       bind(C,name="makeTfromRhoH_sphr")
+  subroutine makeTfromRhoH(lo,hi,state,s_lo,s_hi,p0_cart,p0_lo,p0_hi) &
+       bind(C,name="makeTfromRhoH")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
@@ -160,7 +79,7 @@ contains
 
     endif
 
-  end subroutine makeTfromRhoH_sphr
+  end subroutine makeTfromRhoH
 
   subroutine makeTfromRhoP(lo,hi,lev,state,s_lo,s_hi,p0,updateRhoH) &
        bind(C,name="makeTfromRhoP")

@@ -692,13 +692,7 @@ extern "C"
                         amrex::Real* vorticity, const int* d_lo, const int* d_hi,
                         const int* bc);
 
-    void make_deltagamma(const int* lo, const int* hi, const int lev,
-                        const amrex::Real* state, const int* s_lo, const int* s_hi,
-                        const int nc_s,
-                        const amrex::Real* p0, const amrex::Real* gamma1bar,
-                        amrex::Real* deltagamma, const int* d_lo, const int* d_hi);
-
-    void make_deltagamma_sphr(const int* lo, const int* hi,
+    void make_deltagamma(const int* lo, const int* hi,
                             const amrex::Real* state, const int* s_lo, const int* s_hi,
                             const int nc_s,
                             const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
@@ -1074,11 +1068,7 @@ extern "C"
 
     //////////////////////
     // in rhoh_vs_t.F90
-    void makeTfromRhoH (const int* lo, const int* hi, const int lev,
-                        amrex::Real* state,  const int* s_lo, const int* s_hi,
-                        const amrex::Real* p0);
-
-    void makeTfromRhoH_sphr (const int* lo, const int* hi,
+    void makeTfromRhoH (const int* lo, const int* hi,
 			     amrex::Real* state, const int* s_lo, const int* s_hi,
 			     const amrex::Real* p0, const int* p0_lo, const int* p0_hi);
 
