@@ -70,17 +70,9 @@ contains
 
     k = lo(3)
 
-    ! if (ppm_type .eq. 0) then
-    !    ! call slopex_2d(utilde(:,:,1:1),slopex,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-    !    ! call slopey_2d(utilde(:,:,2:2),slopey,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
-    !
-    !    ! call slopex_2d(utilde(:,:,k,1:1),Ip(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-    !    ! call slopey_2d(utilde(:,:,k,2:2),Im(:,:,k,1:1),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
-    ! else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-    !
-    ! end if
-
     if (idir == 1) then
+
+
 
        !******************************************************************
        ! create utrans
@@ -90,18 +82,15 @@ contains
           do i=lo(1),hi(1)
 
              if (ppm_type .eq. 0) then
-                ! extrapolate to edges
-                ! ul = utilde(i-1,j,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,1)))*slopex(i-1,j,1)
-                ! ur = utilde(i  ,j,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,1)))*slopex(i  ,j,1)
 
                 ulx = utilde(i-1,j,k,1) + (HALF-(dt2/hx)*max(ZERO,ufull(i-1,j,k,1)))*Ip(i-1,j,k,1)
                 urx = utilde(i  ,j,k,1) - (HALF+(dt2/hx)*min(ZERO,ufull(i  ,j,k,1)))*Ip(i  ,j,k,1)
+
              else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                 ! extrapolate to edges
                 ulx = Ip(i-1,j,k,1)
                 urx = Im(i  ,j,k,1)
              end if
-             ! end do
 
              ! impose lo i side bc's
              if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
@@ -163,10 +152,6 @@ contains
 
              if (ppm_type .eq. 0) then
                 ! ! extrapolate to edges
-                ! vly = utilde(i,j-1,2) + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,2)))*slopey(i,j-1,1)
-                ! vry = utilde(i,j  ,2) - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,2)))*slopey(i,j  ,1)
-
-                ! extrapolate to edges
                 vly = utilde(i,j-1,k,2) + (HALF-(dt2/hy)*max(ZERO,ufull(i,j-1,k,2)))*Im(i,j-1,k,1)
                 vry = utilde(i,j  ,k,2) - (HALF+(dt2/hy)*min(ZERO,ufull(i,j  ,k,2)))*Im(i,j  ,k,1)
 
@@ -247,9 +232,9 @@ contains
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
-    integer, value  , intent(in   ) :: lev, idir, nc_ut, ng_ut
+    integer, value  , intent(in   ) :: lev, idir, ng_ut, nc_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3)
-    integer, value  , intent(in   ) :: nc_uf, ng_uf
+    integer, value  , intent(in   ) :: ng_uf, nc_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: uw_lo(3), uw_hi(3)
@@ -271,11 +256,7 @@ contains
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    integer         , intent(in   ) :: adv_bc(3,2,3), phys_bc(3,2) ! dim, lohi, (comp)
-
-    ! double precision, pointer :: slopex(:,:,:,:)
-    ! double precision, pointer :: slopey(:,:,:,:)
-    ! double precision, pointer :: slopez(:,:,:,:)
+    integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,AMREX_SPACEDIM), phys_bc(AMREX_SPACEDIM,2) ! dim, lohi, (comp)
 
     double precision hx,hy,hz,dt2,uavg
 
@@ -283,13 +264,10 @@ contains
 
     integer :: i,j,k
 
-    double precision :: ulx, urx, vly, vry, wlz, wrz
+    double precision :: ulx,urx,vly,vry
+    double precision :: wlz,wrz
 
     !$gpu
-
-    ! call bl_allocate(slopex,lo-1,hi+1,1)
-    ! call bl_allocate(slopey,lo-1,hi+1,1)
-    ! call bl_allocate(slopez,lo-1,hi+1,1)
 
     dt2 = HALF*dt
 
@@ -297,15 +275,8 @@ contains
     hy = dx(2)
     hz = dx(3)
 
-    ! if (ppm_type .eq. 0) then
-    !    ! do k = lo(3)-1,hi(3)+1
-    !    !    call slopex_2d(utilde(:,:,k,1:1),slopex(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,1:1))
-    !    !    call slopey_2d(utilde(:,:,k,2:2),slopey(:,:,k,:),domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,2:2))
-    !    ! end do
-    !    ! call slopez_3d(utilde(:,:,:,3:3),slopez,domlo,domhi,lo,hi,ng_ut,1,adv_bc(:,:,3:3))
-    ! end if
-
     if (idir == 1) then
+
        !******************************************************************
        ! create utrans
        !******************************************************************
@@ -390,9 +361,8 @@ contains
           end do
        end do
 
-       ! call bl_deallocate(slopex)
-
     elseif (idir == 2) then
+
        !******************************************************************
        ! create vtrans
        !******************************************************************
@@ -477,8 +447,8 @@ contains
           enddo
        enddo
 
-       ! call bl_deallocate(slopey)
     else
+
        !******************************************************************
        ! create wtrans
        !******************************************************************
@@ -490,9 +460,9 @@ contains
                 if (ppm_type .eq. 0) then
                    ! extrapolate to edges
                    wlz = utilde(i,j,k-1,3) &
-                        + (HALF-(dt2/hz)*max(ZERO,ufull(i,j,k-1,3)))*Ip(i,j,k-1,3)
+                        + (HALF-(dt2/hz)*max(ZERO,ufull(i,j,k-1,3)))*Im(i,j,k-1,1)
                    wrz = utilde(i,j,k  ,3) &
-                        - (HALF+(dt2/hz)*min(ZERO,ufull(i,j,k  ,3)))*Ip(i,j,k  ,3)
+                        - (HALF+(dt2/hz)*min(ZERO,ufull(i,j,k  ,3)))*Im(i,j,k  ,1)
                 else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
                    ! extrapolate to edges
                    wlz = Ip(i,j,k-1,3)

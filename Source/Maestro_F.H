@@ -456,7 +456,7 @@ extern "C"
 #if (AMREX_SPACEDIM == 3)
                       const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
 #endif
-                      int ng_um,
+                      const int ng_um,
                       const amrex::Real* force,  const int* f_lo, const int* f_hi, const int nc_f,
                       const amrex::Real* dx, const amrex::Real dt, const int is_vel,
                       const int* adv_bc, const int nbccomp, const int comp, const int bccomp,
@@ -1042,7 +1042,7 @@ extern "C"
 
     //////////////////////
     // in ppm.F90
-#if (AMREX_SPACEDIM ==  2)
+#if (AMREX_SPACEDIM == 2)
     void ppm_2d(const int* lo, const int* hi,
         const amrex::Real* s,  const int* s_lo, const int* s_hi,
         const int nc_s,
@@ -1054,7 +1054,7 @@ extern "C"
         const int* adv_bc,
         const amrex::Real* dx, const amrex::Real dt,
         const int is_umac, const int comp, const int bccomp);
-#elif (AMREX_SPACEDIM ==  3)
+#elif (AMREX_SPACEDIM == 3)
     void ppm_3d(const int* lo, const int* hi,
         const amrex::Real* s,  const int* s_lo, const int* s_hi,
         const int nc_s,
@@ -1123,6 +1123,32 @@ extern "C"
                           const amrex::Real* state, const int* s_lo, const int* s_hi,
                           const amrex::Real* p0cart, const int* p_lo, const int* p_hi,
                           amrex::Real* cs, const int* c_lo, const int* c_hi);
+    //////////////////////
+
+    //////////////////////
+    // in slope.F90
+
+    void slopex_2d(const int* lo, const int* hi,
+                   const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
+                   const amrex::Real* slopex, const int* sl_lo, const int* sl_hi,
+                   const int nc_sl,
+                   const int* domlo, const int* domhi,
+                   const int nvar, const int* adv_bc, const int nbccomp, const int bccomp);
+
+   void slopey_2d(const int* lo, const int* hi,
+                  const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
+                  const amrex::Real* slopey, const int* sl_lo, const int* sl_hi,
+                  const int nc_sl,
+                  const int* domlo, const int* domhi,
+                  const int nvar, const int* adv_bc, const int nbccomp, const int bccomp);
+
+    void slopez_3d(const int* lo, const int* hi,
+                  const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
+                  const amrex::Real* slopez, const int* sl_lo, const int* sl_hi,
+                  const int nc_sl,
+                  const int* domlo, const int* domhi,
+                  const int nvar, const int* adv_bc, const int nbccomp, const int bccomp);
+
     //////////////////////
 
     //////////////////////
