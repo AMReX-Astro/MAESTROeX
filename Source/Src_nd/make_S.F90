@@ -225,52 +225,13 @@ contains
 
   end subroutine make_S_cc_sphr
 
-  subroutine make_rhcc_for_nodalproj(lo, hi, lev, &
-       rhcc, c_lo, c_hi, &
-       S_cc,  s_lo, s_hi, &
-       Sbar, beta0, &
-       delta_gamma1_term, dg_lo, dg_hi) bind (C,name="make_rhcc_for_nodalproj")
-
-    integer         , intent (in   ) :: lo(3), hi(3)
-    integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: c_lo(3), c_hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3)
-    integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
-    double precision, intent (inout) :: rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
-    double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
-    double precision, intent (in   ) :: Sbar (0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: delta_gamma1_term (dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
-
-    integer i,j,k,r
-
-    !$gpu
-
-    ! loop over the data
-    do k = lo(3),hi(3)
-       do j = lo(2),hi(2)
-          do i = lo(1),hi(1)
-
-#if (AMREX_SPACEDIM == 2)
-             r = j
-#elif (AMREX_SPACEDIM == 3)
-             r = k
-#endif
-             rhcc(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r) + delta_gamma1_term(i,j,k))
-
-          enddo
-       enddo
-    enddo
-
-  end subroutine make_rhcc_for_nodalproj
-
-  subroutine make_rhcc_for_nodalproj_sphr(lo, hi, &
+  subroutine make_rhcc_for_nodalproj(lo, hi, &
        rhcc, c_lo, c_hi, &
        S_cc, s_lo, s_hi, &
        Sbar_cart, sb_lo, sb_hi, &
        beta0_cart, b_lo, b_hi, &
        delta_gamma1_term, dg_lo, dg_hi) &
-       bind (C,name="make_rhcc_for_nodalproj_sphr")
+       bind (C,name="make_rhcc_for_nodalproj")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
@@ -297,69 +258,16 @@ contains
        end do
     end do
 
-  end subroutine make_rhcc_for_nodalproj_sphr
+  end subroutine make_rhcc_for_nodalproj
 
-  subroutine create_correction_cc(lo, hi, lev, &
-       correction_cc, c_lo, c_hi, &
-       delta_p_term, dp_lo, dp_hi, &
-       beta0, gamma1bar, &
-       p0, dt) &
-       bind (C,name="create_correction_cc")
-
-    integer         , intent(in   ) :: lo(3), hi(3)
-    integer  , value, intent(in   ) :: lev
-    integer         , intent(in   ) :: c_lo(3), c_hi(3)
-    double precision, intent(  out) :: correction_cc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
-    integer         , intent(in   ) :: dp_lo(3), dp_hi(3)
-    double precision, intent(in   ) :: delta_p_term(dp_lo(1):dp_hi(1),dp_lo(2):dp_hi(2),dp_lo(3):dp_hi(3))
-    double precision, intent(in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, value, intent(in   ) :: dt
-
-    ! Local variables
-    integer :: i, j, k, r
-    double precision :: correction_factor
-
-    !$gpu
-
-#if (AMREX_SPACEDIM == 3)
-    do k = lo(3),hi(3)
-       if(k .lt. base_cutoff_density_coord(lev)) then
-          correction_factor = beta0(lev,k)*(dpdt_factor/(gamma1bar(lev,k)*p0(lev,k))) / dt
-       else
-          correction_factor = 0.0d0
-       end if
-       do j = lo(2),hi(2)
-          do i = lo(1),hi(1)
-             correction_cc(i,j,k) = correction_factor*delta_p_term(i,j,k)
-          end do
-       end do
-    end do
-#elif (AMREX_SPACEDIM == 2)
-    k = lo(3)
-    do j = lo(2),hi(2)
-       if(j .lt. base_cutoff_density_coord(lev)) then
-          correction_factor = beta0(lev,j)*(dpdt_factor/(gamma1bar(lev,j)*p0(lev,j))) / dt
-       else
-          correction_factor = 0.0d0
-       end if
-       do i = lo(1),hi(1)
-          correction_cc(i,j,k) = correction_factor*delta_p_term(i,j,k)
-       end do
-    end do
-#endif
-
-  end subroutine create_correction_cc
-
-  subroutine create_correction_cc_sphr(lo, hi, &
+  subroutine create_correction_cc(lo, hi, &
        correction_cc, c_lo, c_hi, &
        delta_p_term, dp_lo, dp_hi, &
        beta0_cart, b_lo, b_hi, &
        gamma1bar_cart, g_lo, g_hi, &
        p0_cart, p_lo, p_hi, &
        rho0_cart, r_lo, r_hi, &
-       dt) bind (C,name="create_correction_cc_sphr")
+       dt) bind (C,name="create_correction_cc")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: c_lo(3), c_hi(3)
@@ -396,95 +304,9 @@ contains
        end do
     end do
 
-  end subroutine create_correction_cc_sphr
+  end subroutine create_correction_cc
 
-  subroutine make_rhcc_for_macproj(lo, hi, lev, &
-       rhcc, c_lo, c_hi, &
-       S_cc,  s_lo, s_hi, &
-       Sbar, beta0, &
-       delta_gamma1_term, dg_lo, dg_hi, &
-       gamma1bar, p0, &
-       delta_p_term, dp_lo, dp_hi, &
-       delta_chi, dc_lo, dc_hi, &
-       dt, is_predictor) bind (C,name="make_rhcc_for_macproj")
-
-    integer         , intent (in   ) :: lo(3), hi(3)
-    integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: c_lo(3), c_hi(3)
-    integer         , intent (in   ) :: s_lo(3), s_hi(3)
-    integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
-    double precision, intent (inout) :: rhcc(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
-    double precision, intent (in   ) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
-    double precision, intent (in   ) :: Sbar (0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: beta0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: delta_gamma1_term (dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
-    double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    integer         , intent (in   ) :: dp_lo(3), dp_hi(3)
-    double precision, intent (in   ) :: delta_p_term(dp_lo(1):dp_hi(1),dp_lo(2):dp_hi(2),dp_lo(3):dp_hi(3))
-    integer         , intent (in   ) :: dc_lo(3), dc_hi(3)
-    double precision, intent (inout) :: delta_chi(dc_lo(1):dc_hi(1),dc_lo(2):dc_hi(2),dc_lo(3):dc_hi(3))
-    double precision, value, intent (in   ) :: dt
-    integer         , value, intent (in   ) :: is_predictor
-
-    ! Local variables
-    integer i,j,k,r
-
-    !$gpu
-
-    ! loop over the data
-    do k = lo(3),hi(3)
-       do j = lo(2),hi(2)
-          do i = lo(1),hi(1)
-
-#if (AMREX_SPACEDIM == 2)
-             r = j
-#elif (AMREX_SPACEDIM == 3)
-             r = k
-#endif
-             rhcc(i,j,k) = beta0(lev,r) * (S_cc(i,j,k) - Sbar(lev,r) + delta_gamma1_term(i,j,k))
-
-          enddo
-       enddo
-    enddo
-
-    if (dpdt_factor .gt. 0.0d0) then
-
-       if (is_predictor .eq. 1) &
-            delta_chi(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = 0.d0
-
-#if (AMREX_SPACEDIM == 3)
-
-       do k = lo(3),hi(3)
-          if (k .lt. base_cutoff_density_coord(lev)) then
-             do j = lo(2),hi(2)
-                do i = lo(1),hi(1)
-                   delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / &
-                        (dt*gamma1bar(lev,k)*p0(lev,k))
-                   rhcc(i,j,k) = rhcc(i,j,k) + beta0(lev,k) * delta_chi(i,j,k)
-                end do
-             end do
-          end if
-       end do
-
-#elif (AMREX_SPACEDIM == 2)
-       k = lo(3)
-       do j = lo(2),hi(2)
-          if (j .lt. base_cutoff_density_coord(lev)) then
-             do i = lo(1),hi(1)
-                delta_chi(i,j,k) = delta_chi(i,j,k) + dpdt_factor * delta_p_term(i,j,k) / &
-                     (dt*gamma1bar(lev,j)*p0(lev,j))
-                rhcc(i,j,k) = rhcc(i,j,k) + beta0(lev,j) * delta_chi(i,j,k)
-             end do
-          end if
-       end do
-#endif
-
-    end if
-
-  end subroutine make_rhcc_for_macproj
-
-  subroutine make_rhcc_for_macproj_sphr(lo, hi, &
+  subroutine make_rhcc_for_macproj(lo, hi, &
        rhcc, c_lo, c_hi, &
        S_cc,  s_lo, s_hi, &
        Sbar_cart, sb_lo, sb_hi, &
@@ -496,7 +318,7 @@ contains
        delta_p_term, dp_lo, dp_hi, &
        delta_chi, dc_lo, dc_hi, &
        dt, is_predictor) &
-       bind (C,name="make_rhcc_for_macproj_sphr")
+       bind (C,name="make_rhcc_for_macproj")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: c_lo(3), c_hi(3)
@@ -554,7 +376,7 @@ contains
 
     end if
 
-  end subroutine make_rhcc_for_macproj_sphr
+  end subroutine make_rhcc_for_macproj
 
   subroutine create_correction_delta_gamma1_term(lo, hi, lev, &
        delta_gamma1_term, dg_lo, dg_hi, &

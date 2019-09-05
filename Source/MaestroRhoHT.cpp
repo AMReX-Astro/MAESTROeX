@@ -79,14 +79,11 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
     Vector<MultiFab> p0_cart(finest_level+1);
 
-    if (spherical == 1) {
-
-        for (int lev=0; lev<=finest_level; ++lev) {
-            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-            p0_cart[lev].setVal(0.);
-        }
-        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+        p0_cart[lev].setVal(0.);
     }
+    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -107,20 +104,12 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            if (spherical == 1) {
+
 #pragma gpu box(tileBox)
-                makeTfromRhoP_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                                   AMREX_INT_ANYD(tileBox.hiVect()),
-                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(p0_mf[mfi]), updateRhoH);
-            } else {
-#pragma gpu box(tileBox)
-                makeTfromRhoP(AMREX_INT_ANYD(tileBox.loVect()),
-                              AMREX_INT_ANYD(tileBox.hiVect()),
-                              lev,
-                              BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                              p0.dataPtr(), updateRhoH);
-            }
+            makeTfromRhoP(AMREX_INT_ANYD(tileBox.loVect()),
+                                AMREX_INT_ANYD(tileBox.hiVect()),
+                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(p0_mf[mfi]), updateRhoH);
         }
     }
 
@@ -339,55 +328,27 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
         const MultiFab& scal_mf = scal[lev];
         MultiFab& cs_mf = cs[lev];
 
-        if (spherical == 0) {
+        const MultiFab& p0cart_mf = p0cart[lev];
 
-            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
-                makeCsfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
-                               AMREX_INT_ANYD(tileBox.hiVect()),
-                               lev,
-                               BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                               p0.dataPtr(),
-                               BL_TO_FORTRAN_ANYD(cs_mf[mfi]));
-            }
-        } else {
-
-            const MultiFab& p0cart_mf = p0cart[lev];
-
-            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-            for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
-
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
-
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                makeCsfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                                    AMREX_INT_ANYD(tileBox.hiVect()),
-                                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(cs_mf[mfi]));
-
-
-            }
+            makeCsfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
+                                AMREX_INT_ANYD(tileBox.hiVect()),
+                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(cs_mf[mfi]));
         }
     }
 

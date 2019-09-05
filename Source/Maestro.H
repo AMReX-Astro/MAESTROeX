@@ -278,15 +278,13 @@ private:
     /// @param force            velocity force
     /// @param start_scomp      index of component of `state` to begin with
     /// @param num_comp         number of components to perform calculation for
-    /// @param p0               base state pressure
     /// @param p0_cart          base state pressure on cartesian grid
     void UpdateScal (const amrex::Vector<amrex::MultiFab>& stateold,
 		     amrex::Vector<amrex::MultiFab>& statenew,
 		     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
 		     const amrex::Vector<amrex::MultiFab>& force,
 		     int start_scomp, int num_comp,
-		     const amrex::Real* p0 = NULL,
-		     const amrex::Vector<amrex::MultiFab>& p0_cart = {});
+		     const amrex::Vector<amrex::MultiFab>& p0_cart);
 
     /// Update velocity
     ///
