@@ -141,12 +141,11 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
     for (int lev=0; lev<=finest_level; ++lev) {
         s0_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-        s0_edge_cart[lev].setVal(0.);
-        w0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+        w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
     if (spherical == 0) {
-        Put1dArrayOnCart(s0_edge,s0_edge_cart,1,0,bcs_f,0,1);
+        Put1dArrayOnCart(s0_edge,s0_edge_cart,0,0,bcs_f,0);
         Put1dArrayOnCart(w0,w0_cart,0,0,bcs_u,0);
     }
 
@@ -183,8 +182,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         const MultiFab& state_mf = state[lev];
         const MultiFab& umac_mf = umac[lev][0];
         const MultiFab& vmac_mf = umac[lev][1];
-        const MultiFab& s0cart_mf = s0_cart[lev];
-        const MultiFab& s0edge_cart_mf = s0_edge_cart[lev];
+        const MultiFab& s0_mf = s0_cart[lev];
+        const MultiFab& s0_edge_mf = s0_edge_cart[lev];
         const MultiFab& w0_mf = w0_cart[lev];
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wmac_mf = umac[lev][2];
@@ -217,8 +216,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                                        BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
                                        BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
                                        BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                       BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
-                                       w0.dataPtr(), AMREX_REAL_ANYD(dx), fullform,
+                                       BL_TO_FORTRAN_ANYD(s0_mf[mfi]),
+                                       AMREX_REAL_ANYD(dx), fullform,
                                        BL_TO_FORTRAN_ANYD(divu_mf[mfi]));
 #else
                 Abort("ModifyScalForce: Spherical is not valid for DIM < 3");
@@ -235,22 +234,10 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #if (AMREX_SPACEDIM == 3)
                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
 #endif
-                                  s0.dataPtr(), s0_edge.dataPtr(), w0.dataPtr(),
+                                  BL_TO_FORTRAN_ANYD(s0_mf[mfi]), 
+                                  BL_TO_FORTRAN_ANYD(s0_edge_mf[mfi]), 
+                                  BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
                                   AMREX_REAL_ANYD(dx), fullform);
-//                 modify_scal_force(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-//                                   scal_force_mf[mfi].dataPtr(comp),
-//                                   AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
-//                                   state_mf[mfi].dataPtr(comp),
-//                                   AMREX_INT_ANYD(state_mf[mfi].loVect()), AMREX_INT_ANYD(state_mf[mfi].hiVect()),
-//                                   BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-// #if (AMREX_SPACEDIM == 3)
-//                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-// #endif
-//                                   BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]), 
-//                                   BL_TO_FORTRAN_ANYD(s0edge_cart_mf[mfi]), 
-//                                   BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
-//                                   AMREX_REAL_ANYD(dx), fullform);
             }
         }
     }

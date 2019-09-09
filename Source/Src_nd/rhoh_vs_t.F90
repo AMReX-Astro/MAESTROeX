@@ -177,107 +177,9 @@ contains
 
   end subroutine makePfromRhoH
 
-  subroutine makeMachfromRhoH(lo,hi,lev,state,s_lo,s_hi,u,u_lo,u_hi, &
-       p0,w0,mach,m_lo,m_hi) bind(C,name="makeMachfromRhoH")
 
-    integer         , intent (in   ) :: lo(3), hi(3)
-    integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3)
-    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
-    integer         , intent (in   ) :: u_lo(3), u_hi(3)
-    double precision, intent (in   ) ::  u(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),3)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: w0(0:max_radial_level,0:nr_fine)
-    integer         , intent (in   ) :: m_lo(3), m_hi(3)
-    double precision, intent (inout) :: mach(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
-
-    ! Local variables
-    integer :: i, j, k, r
-    integer :: pt_index(3)
-    double precision :: vel
-    type (eos_t) :: eos_state
-
-    !$gpu
-
-    if (use_eos_e_instead_of_h) then
-
-       do k = lo(3), hi(3)
-          do j = lo(2), hi(2)
-             do i = lo(1), hi(1)
-
-                ! vel is the magnitude of the velocity, including w0
-#if (AMREX_SPACEDIM == 2)
-                r = j
-                vel = sqrt(  u(i,j,k,1)**2 + &
-                     ( u(i,j,k,2) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
-#elif (AMREX_SPACEDIM == 3)
-                r = k
-                vel = sqrt(  u(i,j,k,1)**2 + &
-                     u(i,j,k,2)**2 + &
-                     ( u(i,j,k,3) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
-#endif
-
-                ! (rho, (h->e)) --> T, p
-
-                eos_state%rho   = state(i,j,k,rho_comp)
-                eos_state%T     = state(i,j,k,temp_comp)
-                eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-
-                ! e = h - p/rho
-                eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
-                     p0(lev,r) / state(i,j,k,rho_comp)
-
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_re, eos_state, pt_index)
-
-                mach(i,j,k) = vel / eos_state%cs
-
-             enddo
-          enddo
-       enddo
-
-    else
-
-       do k = lo(3), hi(3)
-          do j = lo(2), hi(2)
-             do i = lo(1), hi(1)
-
-                ! vel is the magnitude of the velocity, including w0
-#if (AMREX_SPACEDIM == 2)
-                r = j
-                vel = sqrt(  u(i,j,k,1)**2 + &
-                     ( u(i,j,k,2) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
-#elif (AMREX_SPACEDIM == 3)
-                r = k
-                vel = sqrt(  u(i,j,k,1)**2 + &
-                     u(i,j,k,2)**2 + &
-                     ( u(i,j,k,3) + 0.5d0*(w0(lev,r) + w0(lev,r+1)) )**2 )
-#endif
-                ! (rho, h) --> T, p
-
-                eos_state%rho   = state(i,j,k,rho_comp)
-                eos_state%T     = state(i,j,k,temp_comp)
-                eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-
-                eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
-
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_rh, eos_state, pt_index)
-
-                mach(i,j,k) = vel / eos_state%cs
-
-             enddo
-          enddo
-       enddo
-
-    endif
-
-  end subroutine makeMachfromRhoH
-
-  subroutine makeMachfromRhoH_sphr(lo,hi,state,s_lo,s_hi,u,u_lo,u_hi, &
-       p0_cart,p0_lo,p0_hi,w0cart,w_lo,w_hi,mach,m_lo,m_hi) bind(C,name="makeMachfromRhoH_sphr")
+  subroutine makeMachfromRhoH(lo,hi,state,s_lo,s_hi,u,u_lo,u_hi, &
+       p0_cart,p0_lo,p0_hi,w0cart,w_lo,w_hi,mach,m_lo,m_hi) bind(C,name="makeMachfromRhoH")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
@@ -287,7 +189,7 @@ contains
     integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
     double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
     integer         , intent (in   ) :: w_lo(3), w_hi(3)
-    double precision, intent (in   ) :: w0cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),1)
+    double precision, intent (in   ) :: w0cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     integer         , intent (in   ) :: m_lo(3), m_hi(3)
     double precision, intent (inout) :: mach(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     ! Local variables
@@ -305,9 +207,14 @@ contains
              do i = lo(1), hi(1)
 
                 ! vel is the magnitude of the velocity, including w0
+#if (AMREX_SPACEDIM == 2)
+                vel = sqrt(  u(i,j,k,1)**2 + &
+                     ( u(i,j,k,2) + 0.5d0*(w0cart(i,j,k) + w0cart(i,j+1,k)) )**2 )
+#elif (AMREX_SPACEDIM == 3)
                 vel = sqrt(  u(i,j,k,1)**2 + &
                      u(i,j,k,2)**2 + &
-                     ( u(i,j,k,3) + 0.5d0*(w0cart(i,j,k,1) + w0cart(i,j,k+1,1)) )**2 )
+                     ( u(i,j,k,3) + 0.5d0*(w0cart(i,j,k) + w0cart(i,j,k+1)) )**2 )
+#endif
 
                 ! (rho, (h->e)) --> T, p
 
@@ -336,9 +243,14 @@ contains
              do i = lo(1), hi(1)
 
                 ! vel is the magnitude of the velocity, including w0
+#if (AMREX_SPACEDIM == 2)
+                vel = sqrt(  u(i,j,k,1)**2 + &
+                     ( u(i,j,k,2) + 0.5d0*(w0cart(i,j,k) + w0cart(i,j+1,k)) )**2 )
+#elif (AMREX_SPACEDIM == 3)
                 vel = sqrt(  u(i,j,k,1)**2 + &
                      u(i,j,k,2)**2 + &
-                     ( u(i,j,k,3) + 0.5d0*(w0cart(i,j,k,1) + w0cart(i,j,k+1,1)) )**2 )
+                     ( u(i,j,k,3) + 0.5d0*(w0cart(i,j,k) + w0cart(i,j,k+1)) )**2 )
+#endif
                 ! (rho, h) --> T, p
 
                 eos_state%rho   = state(i,j,k,rho_comp)
@@ -359,7 +271,8 @@ contains
 
     endif
 
-  end subroutine makeMachfromRhoH_sphr
+  end subroutine makeMachfromRhoH
+
 
   subroutine makeCsfromRhoH(lo,hi,state,s_lo,s_hi,p0cart,p_lo,p_hi,cs,c_lo,c_hi) &
        bind(C,name="makeCsfromRhoH")

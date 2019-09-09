@@ -53,25 +53,30 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         }
 
         for (int lev=0; lev<=finest_level; ++lev) {
-            gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             gradp0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-            psi_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-
-            gamma1bar_cart[lev].setVal(0.);
-            p0_cart[lev].setVal(0.);
             gradp0_cart[lev].setVal(0.);
-            psi_cart[lev].setVal(0.);
         }
 
         if (use_delta_gamma1_term) {
-            Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
-            Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
             Put1dArrayOnCart(gradp0,gradp0_cart,0,0,bcs_f,0);
-            Put1dArrayOnCart(psi_in,psi_cart,0,0,bcs_f,0);
         }
     }
+        
+    for (int lev=0; lev<=finest_level; ++lev) {
+        gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+        psi_cart[lev].define(grids[lev], dmap[lev], 1, 0);
 
+        gamma1bar_cart[lev].setVal(0.);
+        p0_cart[lev].setVal(0.);
+        psi_cart[lev].setVal(0.);
+    }
+
+    if (use_delta_gamma1_term) {
+        Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(psi_in,psi_cart,0,0,bcs_f,0);
+    }
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -143,7 +148,9 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                           BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
                           BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                           BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
-                          p0.dataPtr(), gamma1bar.dataPtr(), AMREX_REAL_ANYD(dx));
+                          BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
+                          AMREX_REAL_ANYD(dx));
             }
         }
     }
@@ -181,23 +188,13 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
-                if (spherical == 1) {
 #pragma gpu box(tileBox)
-                    create_correction_delta_gamma1_term_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                                             BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
-                                                             BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
-                                                             BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
-                                                             BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
-                                                             BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
-                } else {
-#pragma gpu box(tileBox)
-                    create_correction_delta_gamma1_term(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                                        lev,
-                                                        BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
-                                                        BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
-                                                        gamma1bar.dataPtr(), psi_in.dataPtr(), p0.dataPtr());
-
-                }
+                create_correction_delta_gamma1_term(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                                                    BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
+                                                    BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
+                                                    BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
+                                                    BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
+                                                    BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
             }
         }
 

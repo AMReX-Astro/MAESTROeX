@@ -185,68 +185,13 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 
 void
 Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
-                       const Vector<MultiFab>& vel,
-                       const RealVector& p0,
-                       Vector<MultiFab>& mach)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::MachfromRhoH()",MachfromRhoH);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf = scal[lev];
-        const MultiFab& vel_mf = vel[lev];
-        MultiFab& mach_mf = mach[lev];
-
-        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            makeMachfromRhoH(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),lev,
-                             BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                             BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-                             p0.dataPtr(),w0.dataPtr(),
-                             BL_TO_FORTRAN_ANYD(mach_mf[mfi]));
-        }
-
-    }
-
-    // average down and fill ghost cells
-    AverageDown(mach,0,1);
-    FillPatch(t_old,mach,mach,mach,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-}
-
-void
-Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
                            const Vector<MultiFab>& vel,
                            const RealVector& p0,
                            const Vector<MultiFab>& w0cart,
                            Vector<MultiFab>& mach)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MachfromRhoHSphr()",MachfromRhoHSphr);
+    BL_PROFILE_VAR("Maestro::MachfromRhoH()",MachfromRhoH);
 
     Vector<MultiFab> p0_cart(finest_level+1);
 
@@ -286,7 +231,7 @@ Maestro::MachfromRhoHSphr (const Vector<MultiFab>& scal,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
-            makeMachfromRhoH_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+            makeMachfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
                                   AMREX_INT_ANYD(tileBox.hiVect()),
                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
                                   BL_TO_FORTRAN_ANYD(vel_mf[mfi]),

@@ -47,9 +47,7 @@ Maestro::DensityAdvance (int which_step,
         rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    if (spherical == 1) {
-        Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
-    }
+    Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
 
     // ** density source term **
 

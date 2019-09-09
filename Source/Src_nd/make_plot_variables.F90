@@ -839,14 +839,14 @@ contains
   end subroutine make_vorticity_3d
 
 
-  subroutine make_magvel(lo,hi,lev,vel,v_lo,v_hi,w0,magvel,m_lo,m_hi) bind(C, name="make_magvel")
+  subroutine make_magvel(lo,hi,vel,v_lo,v_hi,w0_cart,w_lo,w_hi,magvel,m_lo,m_hi) bind(C, name="make_magvel")
 
     integer, intent(in) :: lo(3), hi(3)
-    integer, value, intent(in) :: lev
     integer, intent(in) :: v_lo(3), v_hi(3)
+    integer, intent(in) :: w_lo(3), w_hi(3)
     integer, intent(in) :: m_lo(3), m_hi(3)
     double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
-    double precision, intent (in   ) :: w0(0:max_radial_level,0:nr_fine)
+    double precision, intent (in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(inout) :: magvel(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
 
     integer :: i, j, k
@@ -858,11 +858,11 @@ contains
           do i = lo(1), hi(1)
 #if (AMREX_SPACEDIM == 2)
              magvel(i,j,k) = sqrt(  vel(i,j,k,1)**2 + &
-                  ( vel(i,j,k,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
+                  ( vel(i,j,k,2) + 0.5d0*(w0_cart(i,j,k) + w0_cart(i,j+1,k)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
              magvel(i,j,k) = sqrt(  vel(i,j,k,1)**2 + &
                   vel(i,j,k,2)**2 + &
-                  ( vel(i,j,k,3) + 0.5d0*(w0(lev,k) + w0(lev,k+1)) )**2 )
+                  ( vel(i,j,k,3) + 0.5d0*(w0_cart(i,j,k) + w0_cart(i,j,k+1)) )**2 )
 #endif
           enddo
        enddo
@@ -1042,12 +1042,12 @@ contains
   end subroutine make_entropy
 
 
-  subroutine make_divw0(lo,hi,lev,w0,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
+  subroutine make_divw0(lo,hi,w0_cart,w_lo,w_hi,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
 
     integer, intent (in) :: lo(3), hi(3)
-    integer, value, intent (in) :: lev
     integer, intent (in) :: d_lo(3), d_hi(3)
-    double precision, intent (in) :: w0(0:max_radial_level,0:nr_fine)
+    integer, intent(in) :: w_lo(3), w_hi(3)
+    double precision, intent (in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent (in) :: dx(3)
     double precision, intent (inout) :: divw0(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
 
@@ -1060,9 +1060,9 @@ contains
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
 #if (AMREX_SPACEDIM == 2)
-             divw0(i,j,k) = (w0(lev,j+1) - w0(lev,j)) / dx(2)
+             divw0(i,j,k) = (w0_cart(i,j+1,k) - w0_cart(i,j,k)) / dx(2)
 #else
-             divw0(i,j,k) = (w0(lev,k+1) - w0(lev,k)) / dx(3)
+             divw0(i,j,k) = (w0_cart(i,j,k+1) - w0_cart(i,j,k)) / dx(3)
 #endif
           enddo
        enddo

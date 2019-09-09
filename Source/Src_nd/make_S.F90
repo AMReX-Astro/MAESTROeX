@@ -23,7 +23,9 @@ contains
        rHnuc, n_lo, n_hi, &
        rHext, e_lo, e_hi, &
        therm, t_lo, t_hi, &
-       p0, gamma1bar, dx) bind (C,name="make_S_cc")
+       p0_cart, p0_lo, p0_hi, &
+       gamma1bar_cart, g1_lo, g1_hi, &
+       dx) bind (C,name="make_S_cc")
 
     integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -36,6 +38,8 @@ contains
     integer         , intent (in   ) :: n_lo(3), n_hi(3)
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
+    integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
+    integer         , intent (in   ) :: g1_lo(3), g1_hi(3)
     double precision, intent (inout) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
     double precision, intent (inout) :: delta_gamma1(df_lo(1):df_hi(1),df_lo(2):df_hi(2),df_lo(3):df_hi(3))
@@ -45,8 +49,8 @@ contains
     double precision, intent (in   ) :: rHnuc(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3))
     double precision, intent (in   ) :: rHext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
     double precision, intent (in   ) :: therm(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
-    double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
+    double precision, intent (in) :: gamma1bar_cart (g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
     double precision, intent(in   ) :: dx(3)
 
     integer i,j,k,r
@@ -95,18 +99,28 @@ contains
              r = k
 #endif
              if (use_delta_gamma1_term .and. r < anelastic_cutoff_density_coord(lev)) then
+#if (AMREX_SPACEDIM == 2)
                 if (r .eq. 0) then
-                   gradp0 = (p0(lev,r+1) - p0(lev,r))/dx(AMREX_SPACEDIM)
+                   gradp0 = (p0_cart(i,j+1,k) - p0_cart(i,j,k))/dx(AMREX_SPACEDIM)
                 else if (r .eq. nr(lev)-1) then
-                   gradp0 = (p0(lev,r) - p0(lev,r-1))/dx(AMREX_SPACEDIM)
+                   gradp0 = (p0_cart(i,j,k) - p0_cart(i,j-1,k))/dx(AMREX_SPACEDIM)
                 else
-                   gradp0 = 0.5d0*(p0(lev,r+1) - p0(lev,r-1))/dx(AMREX_SPACEDIM)
+                   gradp0 = 0.5d0*(p0_cart(i,j+1,k) - p0_cart(i,j-1,k))/dx(AMREX_SPACEDIM)
                 endif
+#else
+                if (r .eq. 0) then
+                gradp0 = (p0_cart(i,j,k+1) - p0_cart(i,j,k))/dx(AMREX_SPACEDIM)
+                else if (r .eq. nr(lev)-1) then
+                gradp0 = (p0_cart(i,j,k) - p0_cart(i,j,k-1))/dx(AMREX_SPACEDIM)
+                else
+                gradp0 = 0.5d0*(p0_cart(i,j,k+1) - p0_cart(i,j,k-1))/dx(AMREX_SPACEDIM)
+                endif
+#endif
 
-                delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar(lev,r)
+                delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k)
 
-                delta_gamma1_term(i,j,k) = (eos_state%gam1 - gamma1bar(lev,r))*u(i,j,k,AMREX_SPACEDIM)* &
-                     gradp0/(gamma1bar(lev,r)*gamma1bar(lev,r)*p0(lev,r))
+                delta_gamma1_term(i,j,k) = (eos_state%gam1 - gamma1bar_cart(i,j,k))*u(i,j,k,AMREX_SPACEDIM)* &
+                     gradp0/(gamma1bar_cart(i,j,k)**2*p0_cart(i,j,k))
              else
                 delta_gamma1_term(i,j,k) = 0.0d0
                 delta_gamma1(i,j,k) = 0.0d0
@@ -378,49 +392,12 @@ contains
 
   end subroutine make_rhcc_for_macproj
 
-  subroutine create_correction_delta_gamma1_term(lo, hi, lev, &
-       delta_gamma1_term, dg_lo, dg_hi, &
-       delta_gamma1, df_lo, df_hi, &
-       gamma1bar, psi, &
-       p0) bind (C,name="create_correction_delta_gamma1_term")
-
-    integer         , intent(in   ) :: lo(3), hi(3)
-    integer  , value, intent(in   ) :: lev
-    integer         , intent(in   ) :: dg_lo(3), dg_hi(3)
-    double precision, intent(inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
-    integer         , intent(in   ) :: df_lo(3), df_hi(3)
-    double precision, intent(in   ) :: delta_gamma1(df_lo(1):df_hi(1),df_lo(2):df_hi(2),dg_lo(3):df_hi(3))
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: psi(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-
-    ! Local variables
-    integer :: i, j, k, r
-
-    !$gpu
-
-    do k = lo(3),hi(3)
-       do j = lo(2),hi(2)
-          do i = lo(1),hi(1)
-#if (AMREX_SPACEDIM == 2)
-             r = j
-#else
-             r = k
-#endif
-             delta_gamma1_term(i,j,k) = delta_gamma1_term(i,j,k) &
-                  + delta_gamma1(i,j,k)*psi(lev,r)/(gamma1bar(lev,r)**2*p0(lev,r))
-          end do
-       end do
-    end do
-
-  end subroutine create_correction_delta_gamma1_term
-
-  subroutine create_correction_delta_gamma1_term_sphr(lo, hi, &
+  subroutine create_correction_delta_gamma1_term(lo, hi, &
        delta_gamma1_term, dg_lo, dg_hi, &
        delta_gamma1, df_lo, df_hi, &
        gamma1bar_cart, g1_lo, g1_hi, &
        psi_cart, ps_lo, ps_hi, &
-       p0_cart, p0_lo, p0_hi) bind (C,name="create_correction_delta_gamma1_term_sphr")
+       p0_cart, p0_lo, p0_hi) bind (C,name="create_correction_delta_gamma1_term")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: p0_lo(3), p0_hi(3)
@@ -447,6 +424,6 @@ contains
        end do
     end do
 
-  end subroutine create_correction_delta_gamma1_term_sphr
+  end subroutine create_correction_delta_gamma1_term
 
 end module make_S_module

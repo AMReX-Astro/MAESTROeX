@@ -83,6 +83,13 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeUtrans()",MakeUtrans);
 
+    Vector<MultiFab> w0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+    }
+
+    Put1dArrayOnCart(w0,w0_cart,0,0,bcs_u,0);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get the index space and grid spacing of the domain
@@ -99,10 +106,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
               Im.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
 #if (AMREX_SPACEDIM == 3)
               MultiFab& wtrans_mf  = utrans[lev][2];
-	const MultiFab& w0macx_mf  = w0mac[lev][0];
-	const MultiFab& w0macy_mf  = w0mac[lev][1];
-	const MultiFab& w0macz_mf  = w0mac[lev][2];
+        const MultiFab& w0macx_mf  = w0mac[lev][0];
+        const MultiFab& w0macy_mf  = w0mac[lev][1];
+        const MultiFab& w0macz_mf  = w0mac[lev][2];
 #endif
+        const MultiFab& w0_mf = w0_cart[lev];
 
 #ifdef AMREX_USE_CUDA
         int* bc_f = prepare_bc(bcs_u[0].data(), 1);
@@ -191,7 +199,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #pragma gpu box(xbx)
             mkutrans_2d(AMREX_INT_ANYD(xbx.loVect()),
                         AMREX_INT_ANYD(xbx.hiVect()),
-                        lev, 1,
+                        1,
                         AMREX_INT_ANYD(domainBox.loVect()),
                         AMREX_INT_ANYD(domainBox.hiVect()),
                         BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
@@ -200,7 +208,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(Ip[mfi]),
                         BL_TO_FORTRAN_ANYD(Im[mfi]),
-                        w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f,
+                        BL_TO_FORTRAN_ANYD(w0_mf[mfi]), 
+                        AMREX_REAL_ANYD(dx), dt, bc_f,
                         phys_bc.dataPtr());
 
             if (ppm_type == 0) {
@@ -236,7 +245,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #pragma gpu box(ybx)
            mkutrans_2d(AMREX_INT_ANYD(ybx.loVect()),
                        AMREX_INT_ANYD(ybx.hiVect()),
-                       lev, 2,
+                       2,
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),
                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
@@ -245,7 +254,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        BL_TO_FORTRAN_ANYD(vtrans_mf[mfi]),
                        BL_TO_FORTRAN_ANYD(Ip[mfi]),
                        BL_TO_FORTRAN_ANYD(Im[mfi]),
-                       w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f,
+                       BL_TO_FORTRAN_ANYD(w0_mf[mfi]), 
+                       AMREX_REAL_ANYD(dx), dt, bc_f,
                        phys_bc.dataPtr());
 #elif (AMREX_SPACEDIM == 3)
 
@@ -283,7 +293,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #pragma gpu box(xbx)
             mkutrans_3d(AMREX_INT_ANYD(xbx.loVect()),
                         AMREX_INT_ANYD(xbx.hiVect()),
-                        lev, 1,
+                        1,
                         AMREX_INT_ANYD(domainBox.loVect()),
                         AMREX_INT_ANYD(domainBox.hiVect()),
                         BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
@@ -296,7 +306,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                        w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
+                        BL_TO_FORTRAN_ANYD(w0_mf[mfi]), 
+                        AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
 
             // y-direction
             if (ppm_type == 0) {
@@ -332,7 +343,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #pragma gpu box(ybx)
             mkutrans_3d(AMREX_INT_ANYD(ybx.loVect()),
                         AMREX_INT_ANYD(ybx.hiVect()),
-                        lev, 2,
+                        2,
                         AMREX_INT_ANYD(domainBox.loVect()),
                         AMREX_INT_ANYD(domainBox.hiVect()),
                         BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
@@ -345,7 +356,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                        w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
+                        BL_TO_FORTRAN_ANYD(w0_mf[mfi]), 
+                        AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
 
             // z-direction
             if (ppm_type == 0) {
@@ -381,7 +393,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #pragma gpu box(zbx)
             mkutrans_3d(AMREX_INT_ANYD(zbx.loVect()),
                         AMREX_INT_ANYD(zbx.hiVect()),
-                        lev, 3,
+                        3,
                         AMREX_INT_ANYD(domainBox.loVect()),
                         AMREX_INT_ANYD(domainBox.hiVect()),
                         BL_TO_FORTRAN_ANYD(utilde_mf[mfi]), utilde_mf.nComp(), utilde_mf.nGrow(),
@@ -394,7 +406,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                        w0.dataPtr(), AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
+                        BL_TO_FORTRAN_ANYD(w0_mf[mfi]), 
+                        AMREX_REAL_ANYD(dx), dt, bc_f, phys_bc.dataPtr());
 
 #endif
         } // end MFIter loop
@@ -1119,26 +1132,33 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
+    Vector<MultiFab> w0_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+    }
+    Put1dArrayOnCart(w0,w0_cart,0,0,bcs_u,0);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
         const MultiFab& uold_mf = uold[lev];
-	      MultiFab& unew_mf = unew[lev];
-	const MultiFab& umac_mf   = umac[lev][0];
+        MultiFab& unew_mf = unew[lev];
+        const MultiFab& umac_mf   = umac[lev][0];
         const MultiFab& uedgex_mf = uedge[lev][0];
-	const MultiFab& vmac_mf   = umac[lev][1];
+        const MultiFab& vmac_mf   = umac[lev][1];
         const MultiFab& uedgey_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
-	const MultiFab& wmac_mf   = umac[lev][2];
+        const MultiFab& wmac_mf   = umac[lev][2];
         const MultiFab& uedgez_mf = uedge[lev][2];
 
-	// if spherical == 1
-	const MultiFab& w0macx_mf = w0mac[lev][0];
-	const MultiFab& w0macy_mf = w0mac[lev][1];
-	const MultiFab& w0macz_mf = w0mac[lev][2];
+        // if spherical == 1
+        const MultiFab& w0macx_mf = w0mac[lev][0];
+        const MultiFab& w0macy_mf = w0mac[lev][1];
+        const MultiFab& w0macz_mf = w0mac[lev][2];
 #endif
         const MultiFab& force_mf = force[lev];
-	const MultiFab& sponge_mf = sponge[lev];
+        const MultiFab& sponge_mf = sponge[lev];
+        const MultiFab& w0_mf = w0_cart[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -1167,7 +1187,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 #endif
 				 BL_TO_FORTRAN_ANYD(force_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
-				 w0.dataPtr(),
+				 BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
 				 AMREX_REAL_ANYD(dx), dt);
 	    } else {
 #if (AMREX_SPACEDIM == 3)
@@ -1183,7 +1203,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 				      BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
 				      BL_TO_FORTRAN_ANYD(force_mf[mfi]),
 				      BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
-				      w0.dataPtr(),
 				      BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
 				      BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
 				      BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
