@@ -4,6 +4,7 @@ module make_heating_module
   use meth_params_module, only: prob_lo
   use base_state_geometry_module, only: center
   use probin_module, only: heating_factor
+  use amrex_constants_module, only: ZERO, HALF, ONE, M_PI
 
   implicit none
 
@@ -24,19 +25,24 @@ contains
     double precision, intent (in   ) :: dx(3), time
 
     integer :: i, j, k
-    double precision :: x, y, z, r
+    double precision :: y, fheat
+
+    rho_Hext(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = ZERO
 
     do k = lo(3), hi(3)
-        z = prob_lo(3) + (dble(k) + 0.5d0) * dx(3) - center(3)
         do j = lo(2), hi(2)
-            y = prob_lo(2) + (dble(j) + 0.5d0) * dx(2) - center(2)
-            do i = lo(1), hi(1)
-                x = prob_lo(1) + (dble(i) + 0.5d0) * dx(1) - center(1)
+            y = prob_lo(2) + (dble(j) + HALF) * dx(2) - center(2)
 
-                r = sqrt(x**2 + y**2 + z**2)
-
-                rho_Hext(i,j,k) = heating_factor * 6.7d5 * exp(-(r/4.525d10)**2)
-            enddo
+            if (y < 1.125d0 * 4.d8) then 
+                fheat = sin(8.d8 * M_PI * (y/ 4.d8 - ONE))
+    
+                do i = lo(1), hi(1)
+        
+                   ! Source terms
+                   rho_Hext(i,j,k) = heating_factor * fheat
+        
+                end do
+            endif
         enddo
     enddo
 
