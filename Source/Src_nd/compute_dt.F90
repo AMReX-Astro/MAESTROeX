@@ -78,7 +78,7 @@ contains
              spdy = max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0_cart(i,j,k)+w0_cart(i,j+1,k))))
 #elif (AMREX_SPACEDIM == 3)
              spdy = max(spdy ,abs(u(i,j,k,2)))
-             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0_cart(i,j,k)+w0_cart(lev,i,j,k+1))))
+             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0_cart(i,j,k)+w0_cart(i,j,k+1))))
 #endif
           enddo
        enddo

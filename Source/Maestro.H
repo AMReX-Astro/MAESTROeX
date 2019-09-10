@@ -609,7 +609,6 @@ private:
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const RealVector& rho0,
                        const RealVector& grav,
-                       const RealVector& w0_force,
 		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                        int do_add_utilde_force);
 

@@ -81,7 +81,7 @@ Maestro::EstDt ()
 
     int do_add_utilde_force = 0;
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
-                 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
+                 w0_force_cart_dummy,do_add_utilde_force);
 
 #if (AMREX_SPACEDIM == 3)
     // build and initialize grad_p0 for spherical case
@@ -301,7 +301,7 @@ Maestro::FirstDt ()
 
     int do_add_utilde_force = 0;
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
-                 w0_force_dummy,w0_force_cart_dummy,do_add_utilde_force);
+                 w0_force_cart_dummy,do_add_utilde_force);
 
 #if (AMREX_SPACEDIM == 3)
     // build and initialize grad_p0 for spherical case

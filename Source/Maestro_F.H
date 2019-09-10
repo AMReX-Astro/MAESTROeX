@@ -884,8 +884,22 @@ extern "C"
 			     const amrex::Real* vedge, const int* v_lo, const int* v_hi,
 #if (AMREX_SPACEDIM == 3)
 			     const amrex::Real* wedge, const int* w_lo, const int* w_hi,
-			     const amrex::Real* normal, const int* n_lo, const int* n_hi,
 #endif
+			     const amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi,
+			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi,
+			     const amrex::Real* rho0_cart, const int* r0_lo, const int* r0_hi,
+                 const amrex::Real* grav_cart, const int* gr_lo, const int* gr_hi,
+			     const amrex::Real* dx, const int* domhi,
+			     const int do_add_utilde_force);
+#if (AMREX_SPACEDIM == 3)
+    void make_vel_force_sphr(const int* lo, const int* hi,
+			     amrex::Real* vel_force, const int* f_lo, const int* f_hi,
+			     const amrex::Real* gpi, const int* g_lo, const int* g_hi,
+			     const amrex::Real* rho, const int* r_lo, const int* r_hi,
+			     const amrex::Real* uedge, const int* u_lo, const int* u_hi,
+			     const amrex::Real* vedge, const int* v_lo, const int* v_hi,
+			     const amrex::Real* wedge, const int* w_lo, const int* w_hi,
+			     const amrex::Real* normal, const int* n_lo, const int* n_hi,
 			     const amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi,
 			     const amrex::Real* gradw0_cart, const int* gw_lo, const int* gw_hi,
 			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi,
@@ -893,6 +907,7 @@ extern "C"
                  const amrex::Real* grav_cart, const int* gr_lo, const int* gr_hi,
 			     const amrex::Real* dx, const int* domhi,
 			     const int do_add_utilde_force);
+#endif
     //////////////////////
 
     //////////////////////

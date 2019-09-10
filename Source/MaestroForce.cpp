@@ -9,7 +9,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                        const Vector<MultiFab>& rho,
                        const RealVector& rho0,
                        const RealVector& grav_cell,
-                       const RealVector& w0_force,
                        const Vector<MultiFab>& w0_force_cart,
                        int do_add_utilde_force)
 {
@@ -46,7 +45,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
     Put1dArrayOnCart(w0,w0_cart,0,0,bcs_u,0);
     Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_u,0);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,0);
     Put1dArrayOnCart(grav_cell,grav_cart,0,1,bcs_f,0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -80,9 +79,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-
+            if (spherical == 0) {
 #pragma gpu box(tileBox)
-            make_vel_force(AMREX_INT_ANYD(tileBox.loVect()),
+                make_vel_force(AMREX_INT_ANYD(tileBox.loVect()),
                                 AMREX_INT_ANYD(tileBox.hiVect()),
                                 BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
@@ -91,16 +90,36 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
                                 BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
                                 BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
 #endif
                                 BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(gradw0_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
                                 BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
                                 AMREX_REAL_ANYD(dx),
                                 AMREX_INT_ANYD(domainBox.hiVect()),
                                 do_add_utilde_force);
+            } else {
+#if (AMREX_SPACEDIM == 3)        
+#pragma gpu box(tileBox)
+                make_vel_force_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+                                    AMREX_INT_ANYD(tileBox.hiVect()),
+                                    BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
+                                    BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
+                                    BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(gradw0_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
+                                    AMREX_REAL_ANYD(dx),
+                                    AMREX_INT_ANYD(domainBox.hiVect()),
+                                    do_add_utilde_force);
+#endif
+            }
 
         }
     }
