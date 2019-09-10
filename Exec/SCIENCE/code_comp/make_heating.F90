@@ -24,17 +24,22 @@ contains
     double precision, intent (in   ) ::     scal(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent (in   ) :: dx(3), time
 
-    integer :: i, j, k
-    double precision :: y, fheat
+    integer :: i, j, k, r
+    double precision :: z, fheat
 
     rho_Hext(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3)) = ZERO
 
     do k = lo(3), hi(3)
         do j = lo(2), hi(2)
-            y = prob_lo(2) + (dble(j) + HALF) * dx(2) - center(2)
+#if (AMREX_SPACEDIM == 2)
+            r = j
+#else
+            r = k
+#endif
+            z = prob_lo(AMREX_SPACEDIM) + (dble(r) + HALF) * dx(AMREX_SPACEDIM)
 
-            if (y < 1.125d0 * 4.d8) then 
-                fheat = sin(8.d8 * M_PI * (y/ 4.d8 - ONE))
+            if (z < 1.125d0 * 4.d8) then 
+                fheat = sin(8.d8 * M_PI * (z / 4.d8 - ONE))
     
                 do i = lo(1), hi(1)
         

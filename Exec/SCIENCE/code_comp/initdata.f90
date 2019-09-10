@@ -44,34 +44,33 @@ contains
 
     type(eos_t) :: eos_state
 
-    if (parallel_IOProcessor()) then
-       print*,"Create a local copy of initdata.f90 in your build directory"
-       print*,"Here is a sample that initializes v=0 and the scalars using s0"
-    end if
-
-    ! abort program
-    call bl_error("Planar initdata not written")
-
     ! set velocity to zero
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     do k=lo(3),hi(3)
-       z = prob_lo(3) + dx(3)*(dble(k) + HALF) - center(3)
+       z = prob_lo(3) + dx(3)*(dble(k) + HALF)
        do j=lo(2),hi(2)
-          y = prob_lo(2) + dx(2)*(dble(j) + HALF) - center(2)
+          y = prob_lo(2) + dx(2)*(dble(j) + HALF)
 
-          if (y < 1.125d0 * 4.d8) then
-              fheat = sin(8.d0 * M_PI * (y/ 4.d8 - ONE))
-          else
-              fheat = ZERO
-          endif
-
+#if (AMREX_SPACEDIM == 2)
+            if (y < 1.125d0 * 4.d8) then
+                fheat = sin(8.d0 * M_PI * (y/ 4.d8 - ONE))
+            else
+                fheat = ZERO
+            endif
+#else 
+            if (z < 1.125d0 * 4.d8) then
+                fheat = sin(8.d0 * M_PI * (z/ 4.d8 - ONE))
+            else
+                fheat = ZERO
+            endif
+#endif
           do i=lo(1),hi(1)
-             x = prob_lo(1) + dx(1)*(dble(i) + HALF) - center(1)
+             x = prob_lo(1) + dx(1)*(dble(i) + HALF) 
 
              rhopert = 5.d-5 * rho_0 * fheat * (sin(3.d0 * M_PI * x / 4.d8) + &
                                                 cos(M_PI * x / 4.d8)) * &
-                     (sin(3 * M_PI * z/4.d8) - cos(M_PI * z/4.d8))
+                     (sin(3 * M_PI * y/4.d8) - cos(M_PI * y/4.d8))
 
              if (amrex_spacedim .eq. 2) then
                 r = j
