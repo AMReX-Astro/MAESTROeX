@@ -1,7 +1,7 @@
 module make_heating_module
 
   use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
-  use meth_params_module, only: prob_lo
+  use meth_params_module, only: prob_lo, rho_comp
   use base_state_geometry_module, only: center
   use probin_module, only: heating_factor
   use amrex_constants_module, only: ZERO, HALF, ONE, M_PI
@@ -39,12 +39,12 @@ contains
             z = prob_lo(AMREX_SPACEDIM) + (dble(r) + HALF) * dx(AMREX_SPACEDIM)
 
             if (z < 1.125d0 * 4.d8) then 
-                fheat = sin(8.d8 * M_PI * (z / 4.d8 - ONE))
+                fheat = sin(8.d0 * M_PI * (z / 4.d8 - ONE))
     
                 do i = lo(1), hi(1)
         
                    ! Source terms
-                   rho_Hext(i,j,k) = heating_factor * fheat
+                   rho_Hext(i,j,k) = heating_factor * fheat * scal(i,j,k,rho_comp)
         
                 end do
             endif
