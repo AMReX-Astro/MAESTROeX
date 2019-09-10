@@ -44,7 +44,7 @@ contains
                 do i = lo(1), hi(1)
         
                    ! Source terms
-                   rho_Hext(i,j,k) = heating_factor * fheat * scal(i,j,k,rho_comp)
+                   rho_Hext(i,j,k) = heating_factor * fheat 
         
                 end do
             endif
