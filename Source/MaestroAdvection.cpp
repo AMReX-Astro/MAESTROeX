@@ -102,8 +102,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
               MultiFab& utrans_mf  = utrans[lev][0];
               MultiFab& vtrans_mf  = utrans[lev][1];
               MultiFab Ip, Im;
-              Ip.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              Im.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+              Ip.define(grids[lev],dmap[lev],AMREX_SPACEDIM,2);
+              Im.define(grids[lev],dmap[lev],AMREX_SPACEDIM,2);
 #if (AMREX_SPACEDIM == 3)
               MultiFab& wtrans_mf  = utrans[lev][2];
         const MultiFab& w0macx_mf  = w0mac[lev][0];
@@ -113,7 +113,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         const MultiFab& w0_mf = w0_cart[lev];
 
 #ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs_u[0].data(), 1);
+        int* bc_f = prepare_bc(bcs_u[0].data(), AMREX_SPACEDIM);
 #else
         const int* bc_f = bcs_u[0].data();
 #endif
@@ -287,7 +287,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),
                        bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                       1,1);
+                       1,1,AMREX_SPACEDIM);
             }
 
 #pragma gpu box(xbx)
@@ -337,7 +337,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),
                        bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                       2,2);
+                       2,2,AMREX_SPACEDIM);
             }
 
 #pragma gpu box(ybx)
@@ -387,7 +387,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                         AMREX_INT_ANYD(domainBox.loVect()),
                         AMREX_INT_ANYD(domainBox.hiVect()),
                         bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                        3,3);
+                        3,3,AMREX_SPACEDIM);
             }
 
 #pragma gpu box(zbx)

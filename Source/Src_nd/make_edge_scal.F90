@@ -621,12 +621,12 @@ contains
        call ppm_3d(lo-1,hi+1,s,s_lo,s_hi,nc_s, &
                     umac,u_lo,u_hi,vmac,v_lo,v_hi,wmac,w_lo,w_hi, &
                     Ip,lo-1,hi+1,Im,lo-1,hi+1, &
-                    domlo,domhi,adv_bc,dx,dt,1,comp,bccomp)
+                    domlo,domhi,adv_bc,dx,dt,1,comp,bccomp,nbccomp)
        if (ppm_trace_forces .eq. 1) then
           call ppm_3d(lo-1,hi+1,force,f_lo,f_hi,nc_f, &
                         umac,u_lo,u_hi,vmac,v_lo,v_hi,wmac,w_lo,w_hi, &
                         Ipf,lo-1,hi+1,Imf,lo-1,hi+1, &
-                       domlo,domhi,adv_bc,dx,dt,1,comp,bccomp)
+                       domlo,domhi,adv_bc,dx,dt,1,comp,bccomp,nbccomp)
        endif
     end if
 

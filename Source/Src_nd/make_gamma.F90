@@ -51,6 +51,8 @@ contains
              ! dens, pres, and xmass are inputs
              call eos(eos_input_rp, eos_state, pt_index)
 
+            !  write(*,*) "rho = ", eos_state % rho, "p = ", eos_state %p
+
              gamma(i,j,k) = eos_state%gam1
 
           end do
