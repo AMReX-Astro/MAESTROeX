@@ -44,7 +44,7 @@ contains
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
     double precision, intent(in   ) :: dSdt (t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
-    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: p0_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
     double precision, intent(in   ) :: gamma1bar_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
 
@@ -75,10 +75,10 @@ contains
           do i = lo(1), hi(1)
              spdx = max(spdx ,abs(u(i,j,k,1)))
 #if (AMREX_SPACEDIM == 2)
-             spdy = max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0_cart(i,j,k)+w0_cart(i,j+1,k))))
+             spdy = max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0_cart(i,j,k,AMREX_SPACEDIM)+w0_cart(i,j+1,k,AMREX_SPACEDIM))))
 #elif (AMREX_SPACEDIM == 3)
              spdy = max(spdy ,abs(u(i,j,k,2)))
-             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0_cart(i,j,k)+w0_cart(i,j,k+1))))
+             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0_cart(i,j,k,AMREX_SPACEDIM)+w0_cart(i,j,k+1,AMREX_SPACEDIM))))
 #endif
           enddo
        enddo
@@ -87,7 +87,7 @@ contains
     do k = lo(3), hi(3)
         do j = lo(2), hi(2)
            do i = lo(1), hi(1)
-                spdr = max(spdr, abs(w0_cart(i,j,k)))
+                spdr = max(spdr, abs(w0_cart(i,j,k,AMREX_SPACEDIM)))
             enddo
         enddo
     enddo

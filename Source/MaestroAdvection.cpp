@@ -85,10 +85,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
     Vector<MultiFab> w0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        w0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(w0,w0_cart,0,0,bcs_u,0);
+    Put1dArrayOnCart(w0,w0_cart,0,1,bcs_u,0,1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1134,9 +1135,10 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     Vector<MultiFab> w0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        w0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(w0,w0_cart,0,0,bcs_u,0);
+    Put1dArrayOnCart(w0,w0_cart,0,1,bcs_u,0,1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

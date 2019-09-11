@@ -49,7 +49,7 @@ contains
     double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2),uv_lo(3):uv_hi(3))
     double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2)
     double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2)
-    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
@@ -205,9 +205,9 @@ contains
 
              ! solve Riemann problem using full velocity
              uavg = HALF*(vly+vry)
-             test = ((vly+w0_cart(i,j,k) .le. ZERO .and. vry+w0_cart(i,j,k) .ge. ZERO) .or. &
-                  (abs(vly+vry+TWO*w0_cart(i,j,k)) .lt. rel_eps))
-             vtrans(i,j,k) = merge(vly,vry,uavg+w0_cart(i,j,k) .gt. ZERO)
+             test = ((vly+w0_cart(i,j,k,AMREX_SPACEDIM) .le. ZERO .and. vry+w0_cart(i,j,k,AMREX_SPACEDIM) .ge. ZERO) .or. &
+                  (abs(vly+vry+TWO*w0_cart(i,j,k,AMREX_SPACEDIM)) .lt. rel_eps))
+             vtrans(i,j,k) = merge(vly,vry,uavg+w0_cart(i,j,k,AMREX_SPACEDIM) .gt. ZERO)
              vtrans(i,j,k) = merge(ZERO,vtrans(i,j,k),test)
           enddo
        enddo
@@ -256,7 +256,7 @@ contains
     double precision, intent(in   ) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
     double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
     double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
-    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
     integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,AMREX_SPACEDIM), phys_bc(AMREX_SPACEDIM,2) ! dim, lohi, (comp)
@@ -523,9 +523,9 @@ contains
                 else
                    ! solve Riemann problem using full velocity
                    uavg = HALF*(wlz+wrz)
-                   test = ((wlz+w0_cart(i,j,k).le.ZERO .and. wrz+w0_cart(i,j,k).ge.ZERO) .or. &
-                        (abs(wlz+wrz+TWO*w0_cart(i,j,k)) .lt. rel_eps))
-                   wtrans(i,j,k) = merge(wlz,wrz,uavg+w0_cart(i,j,k) .gt. ZERO)
+                   test = ((wlz+w0_cart(i,j,k,AMREX_SPACEDIM).le.ZERO .and. wrz+w0_cart(i,j,k,AMREX_SPACEDIM).ge.ZERO) .or. &
+                        (abs(wlz+wrz+TWO*w0_cart(i,j,k,AMREX_SPACEDIM)) .lt. rel_eps))
+                   wtrans(i,j,k) = merge(wlz,wrz,uavg+w0_cart(i,j,k,AMREX_SPACEDIM) .gt. ZERO)
                    wtrans(i,j,k) = merge(ZERO,wtrans(i,j,k),test)
                 end if
              enddo

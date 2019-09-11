@@ -200,7 +200,7 @@ contains
 #endif
     double precision, intent(in   ) :: s0_cart(s0_lo(1):s0_hi(1),s0_lo(2):s0_hi(2),s0_lo(3):s0_hi(3))
     double precision, intent(in   ) :: s0_edge_cart(se_lo(1):se_hi(1),se_lo(2):se_hi(2),se_lo(3):se_hi(3))
-    double precision, intent(in   ) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2),w0_lo(3):w0_hi(3))
+    double precision, intent(in   ) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2),w0_lo(3):w0_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
     integer  , value, intent(in   ) :: do_fullform
 
@@ -220,14 +220,14 @@ contains
                     +(vmac(i,j+1,k) - vmac(i,j,k)) / dx(2)
 
                 ! add w0 contribution
-                divu = divu + (w0_cart(i,j+1,k)-w0_cart(i,j,k))/dx(AMREX_SPACEDIM)
+                divu = divu + (w0_cart(i,j+1,k,AMREX_SPACEDIM)-w0_cart(i,j,k,AMREX_SPACEDIM))/dx(AMREX_SPACEDIM)
 #elif (AMREX_SPACEDIM == 3)
                 divu = (umac(i+1,j,k) - umac(i,j,k)) / dx(1) &
                     +(vmac(i,j+1,k) - vmac(i,j,k)) / dx(2) &
                     +(wmac(i,j,k+1) - wmac(i,j,k)) / dx(3)
 
                 ! add w0 contribution
-                divu = divu + (w0_cart(i,j,k+1)-w0_cart(i,j,k))/dx(AMREX_SPACEDIM)
+                divu = divu + (w0_cart(i,j,k+1,AMREX_SPACEDIM)-w0_cart(i,j,k,AMREX_SPACEDIM))/dx(AMREX_SPACEDIM)
 #endif
 
                 if (do_fullform .eq. 1) then

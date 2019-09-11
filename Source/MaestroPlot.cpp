@@ -1369,10 +1369,11 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 2);
+        w0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(w0,w0_cart,0,0,bcs_u,0);
+    Put1dArrayOnCart(w0, w0_cart, 0, 1, bcs_u, 0, 1);
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1399,7 +1400,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 				make_magvel(AMREX_INT_ANYD(tileBox.loVect()),
                             AMREX_INT_ANYD(tileBox.hiVect()),
 				            BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-				            BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
+				            BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
 				            BL_TO_FORTRAN_ANYD(magvel_mf[mfi]));
 			}
 
@@ -1772,10 +1773,11 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     Vector<MultiFab> w0_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 2);
+        w0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(w0,w0_cart,0,0,bcs_u,0);
+    Put1dArrayOnCart(w0, w0_cart, 0, 1, bcs_u, 0, 1);
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1802,7 +1804,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 #pragma gpu box(tileBox)
 				make_divw0(AMREX_INT_ANYD(tileBox.loVect()),
                            AMREX_INT_ANYD(tileBox.hiVect()),
-				           BL_TO_FORTRAN_ANYD(w0_mf[mfi]), 
+				           BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
                            AMREX_REAL_ANYD(dx),
 				           BL_TO_FORTRAN_ANYD(divw0_mf[mfi]));
 			}

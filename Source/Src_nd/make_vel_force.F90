@@ -20,7 +20,7 @@ contains
 #if (AMREX_SPACEDIM == 3)
        wedge, w_lo, w_hi, &
 #endif
-       w0_cart, w0_lo, w0_hi, &
+       w0_cart, w0_lo, w0_hi, nc_w0, &
        w0_force_cart, wf_lo, wf_hi, &
        rho0_cart, r0_lo, r0_hi, &
        grav_cart, gr_lo, gr_hi, &
@@ -38,6 +38,7 @@ contains
     integer         , intent (in   ) :: w_lo(3), w_hi(3)
 #endif
     integer         , intent (in   ) :: w0_lo(3), w0_hi(3)
+    integer, value  , intent (in   ) :: nc_w0
     integer         , intent (in   ) :: wf_lo(3), wf_hi(3)
     integer         , intent (in   ) :: r0_lo(3), r0_hi(3)
     integer         , intent (in   ) :: gr_lo(3), gr_hi(3)
@@ -49,7 +50,7 @@ contains
 #if (AMREX_SPACEDIM == 3)
     double precision, intent (in   ) ::     wedge(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
 #endif
-    double precision, intent (in   ) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2),w0_lo(3):w0_hi(3))
+    double precision, intent (in   ) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2),w0_lo(3):w0_hi(3),nc_w0)
     double precision, intent (in   ) :: w0_force_cart(wf_lo(1):wf_hi(1),wf_lo(2):wf_hi(2),wf_lo(3):wf_hi(3),AMREX_SPACEDIM)
     double precision, intent (in   ) ::       rho0_cart(r0_lo(1):r0_hi(1),r0_lo(2):r0_hi(2),r0_lo(3):r0_hi(3))
     double precision, intent (in   ) :: grav_cart(gr_lo(1):gr_hi(1),gr_lo(2):gr_hi(2),gr_lo(3):gr_hi(3),AMREX_SPACEDIM)
@@ -95,7 +96,6 @@ contains
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
 
-
 #if (AMREX_SPACEDIM == 2)
                 r = j
 #else
@@ -108,11 +108,11 @@ contains
                     else
 #if (AMREX_SPACEDIM == 2)
                     vel_force(i,j,k,2) = vel_force(i,j,k,2) &
-                            - (vedge(i,j+1,k)+vedge(i,j,k))*(w0_cart(i,j+1,k)-w0_cart(i,j,k)) / (2.d0*dx(2))
+                            - (vedge(i,j+1,k)+vedge(i,j,k))*(w0_cart(i,j+1,k,AMREX_SPACEDIM)-w0_cart(i,j,k,AMREX_SPACEDIM)) / (2.d0*dx(2))
     
 #else
                     vel_force(i,j,k,3) = vel_force(i,j,k,3) &
-                            - (wedge(i,j,k+1)+wedge(i,j,k))*(w0_cart(i,j,k+1)-w0_cart(i,j,k)) / (2.d0*dx(3))
+                            - (wedge(i,j,k+1)+wedge(i,j,k))*(w0_cart(i,j,k+1,AMREX_SPACEDIM)-w0_cart(i,j,k,AMREX_SPACEDIM)) / (2.d0*dx(3))
 #endif
                 endif
 

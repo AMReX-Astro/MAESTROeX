@@ -661,7 +661,7 @@ extern "C"
     // in make_plot_variables.F90
     void make_magvel(const int* lo, const int* hi,
                      const amrex::Real* vel, const int* v_lo, const int* v_hi,
-                     const amrex::Real* w0, const int* w_lo, const int* w_hi,
+                     const amrex::Real* w0, const int* w_lo, const int* w_hi, const int nc_w0,
                      amrex::Real* magvel, const int* m_lo, const int* m_hi);
 
     void make_magvel_sphr(const int* lo, const int* hi,
@@ -708,7 +708,7 @@ extern "C"
                      amrex::Real* entropy, const int* e_lo, const int* e_hi);
 
     void make_divw0(const int* lo, const int* hi, 
-                    const amrex::Real* w0, const int* w_lo, const int* w_hi,
+                    const amrex::Real* w0, const int* w_lo, const int* w_hi, const int nc_w0,
                     const amrex::Real* dx,
                     amrex::Real* divw0, const int* d_lo, const int* d_hi);
 
@@ -885,7 +885,7 @@ extern "C"
 #if (AMREX_SPACEDIM == 3)
 			     const amrex::Real* wedge, const int* w_lo, const int* w_hi,
 #endif
-			     const amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi,
+			     const amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi, const int nc_w0,
 			     const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi,
 			     const amrex::Real* rho0_cart, const int* r0_lo, const int* r0_hi,
                  const amrex::Real* grav_cart, const int* gr_lo, const int* gr_hi,

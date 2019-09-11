@@ -56,7 +56,7 @@ contains
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
     double precision, intent(in   ) :: sponge (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     integer         , intent(in   ) :: w0_lo(3), w0_hi(3)
-    double precision, intent(in   ) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2),w0_lo(3):w0_hi(3))
+    double precision, intent(in   ) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2),w0_lo(3):w0_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(AMREX_SPACEDIM)
     double precision, value, intent(in   ) :: dt
 
@@ -112,9 +112,9 @@ contains
 
              ! subtract (w0 dot grad) Utilde term
 #if (AMREX_SPACEDIM == 2)
-             w0bar = HALF*(w0_cart(i,j,k) + w0_cart(i,j+1,k))
+             w0bar = HALF*(w0_cart(i,j,k,AMREX_SPACEDIM) + w0_cart(i,j+1,k,AMREX_SPACEDIM))
 #else 
-             w0bar = HALF*(w0_cart(i,j,k) + w0_cart(i,j,k+1))
+             w0bar = HALF*(w0_cart(i,j,k,AMREX_SPACEDIM) + w0_cart(i,j,k+1,AMREX_SPACEDIM))
 #endif
              unew(i,j,k,:) = unew(i,j,k,:) - dt * w0bar * &
 #if (AMREX_SPACEDIM == 2)

@@ -317,16 +317,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             MakeW0mac(w0mac);
         }
 
-        // put w0_force on Cartesian cells
-        Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
+        // // put w0_force on Cartesian cells
+        // Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
 
-    }
-    else {
+    } else {
         // these should have no effect if evolve_base_state = false
         std::fill(Sbar.begin(), Sbar.end(), 0.);
         std::fill(w0_force.begin(), w0_force.end(), 0.);
 
     }
+
+    // put w0_force on Cartesian cells
+    Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 3 -- construct the advective velocity
@@ -740,9 +742,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             MakeW0mac(w0mac);
         }
 
-        // put w0_force on Cartesian cells
-        Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
+        // // put w0_force on Cartesian cells
+        // Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
     }
+
+    // put w0_force on Cartesian cells
+    Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 7 -- redo the construction of the advective velocity using the current w0
