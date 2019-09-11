@@ -164,7 +164,7 @@ contains
     double precision, intent (in   ) ::     wedge(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent (in   ) ::    normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
     double precision, intent (in   ) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2),w0_lo(3):w0_hi(3))
-    double precision, intent (in   ) :: gradw0_cart(gw_lo(1):gw_hi(1),gw_lo(2):gw_hi(2),gw_lo(3):gw_hi(3),AMREX_SPACEDIM)
+    double precision, intent (in   ) :: gradw0_cart(gw_lo(1):gw_hi(1),gw_lo(2):gw_hi(2),gw_lo(3):gw_hi(3))
     double precision, intent (in   ) :: w0_force_cart(wf_lo(1):wf_hi(1),wf_lo(2):wf_hi(2),wf_lo(3):wf_hi(3),AMREX_SPACEDIM)
     double precision, intent (in   ) ::       rho0_cart(r0_lo(1):r0_hi(1),r0_lo(2):r0_hi(2),r0_lo(3):r0_hi(3))
     double precision, intent (in   ) :: grav_cart(gr_lo(1):gr_hi(1),gr_lo(2):gr_hi(2),gr_lo(3):gr_hi(3),AMREX_SPACEDIM)
@@ -216,7 +216,7 @@ contains
                         HALF*(wedge(i,j,k)+wedge(i  ,j,  k+1))*normal(i,j,k,3)
 
                     vel_force(i,j,k,1:3) = vel_force(i,j,k,1:3) - &
-                        Ut_dot_er*gradw0_cart(i,j,k,1:3)*normal(i,j,k,1:3)
+                        Ut_dot_er*gradw0_cart(i,j,k)*normal(i,j,k,1:3)
 
                 end do
             end do
