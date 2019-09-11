@@ -21,456 +21,440 @@ module velpred_module
 contains
 
 #if (AMREX_SPACEDIM == 2)
-  subroutine velpred_2d(lev, domlo, domhi, lo, hi, &
-       utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
-       ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
-       utrans, uu_lo, uu_hi, &
-       vtrans, uv_lo, uv_hi, &
-       umac  , mu_lo, mu_hi, &
-       vmac  , mv_lo, mv_hi, &
-       force,   f_lo,  f_hi, nc_f, ng_f, &
-       w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_2d")
 
-    integer         , intent(in   ) :: lev, domlo(3), domhi(3), lo(3), hi(3)
-    integer         , intent(in   ) :: ut_lo(3), ut_hi(3), nc_ut
-    integer, value,   intent(in   ) :: ng_ut
-    integer         , intent(in   ) :: uf_lo(3), uf_hi(3), nc_uf
-    integer, value,   intent(in   ) :: ng_uf
-    integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
-    integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
-    integer         , intent(in   ) :: mu_lo(3), mu_hi(3)
-    integer         , intent(in   ) :: mv_lo(3), mv_hi(3)
-    integer         , intent(in   ) ::  f_lo(3),  f_hi(3), nc_f
-    integer, value,   intent(in   ) :: ng_f
-    double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
-    double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
-    double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
-    double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2),uv_lo(3):uv_hi(3))
-    double precision, intent(inout) :: umac  (mu_lo(1):mu_hi(1),mu_lo(2):mu_hi(2),mu_lo(3):mu_hi(3))
-    double precision, intent(inout) :: vmac  (mv_lo(1):mv_hi(1),mv_lo(2):mv_hi(2),mv_lo(3):mv_hi(3))
-    double precision, intent(in   ) :: force ( f_lo(1): f_hi(1), f_lo(2): f_hi(2),f_lo(3): f_hi(3),nc_f)
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: dx(3), dt
-    integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
+subroutine velpred_interface_2d(lo, hi, idir, domlo, domhi, &
+     utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+     ufull, uf_lo, uf_hi, nc_uf, ng_uf, &
+     utrans, uu_lo, uu_hi, &
+     Imu, imu_lo, imu_hi, &
+     Ipu, ipu_lo, ipu_hi, &
+     Imv, imv_lo, imv_hi, &
+     Ipv, ipv_lo, ipv_hi, &
+     ul, ul_lo, ul_hi, &
+     ur, ur_lo, ur_hi, &
+     uimh, ui_lo, ui_hi, &
+     dx,dt,adv_bc,phys_bc) bind(C,name="velpred_interface_2d")
 
-    ! Local variables
-    double precision, pointer :: slopex(:,:,:,:)
-    double precision, pointer :: slopey(:,:,:,:)
-
-    double precision, pointer :: Ipu(:,:,:,:), Ipfx(:,:,:,:)
-    double precision, pointer :: Imu(:,:,:,:), Imfx(:,:,:,:)
-    double precision, pointer :: Ipv(:,:,:,:), Ipfy(:,:,:,:)
-    double precision, pointer :: Imv(:,:,:,:), Imfy(:,:,:,:)
-
-    ! these correspond to u_L^x, etc.
-    double precision, pointer :: ulx(:,:,:,:),urx(:,:,:,:),uimhx(:,:,:,:)
-    double precision, pointer :: uly(:,:,:,:),ury(:,:,:,:),uimhy(:,:,:,:)
-
-    ! these correspond to umac_L, etc.
-    double precision, pointer :: umacl(:,:,:),umacr(:,:,:)
-    double precision, pointer :: vmacl(:,:,:),vmacr(:,:,:)
-
-    double precision :: hx, hy, dt2, dt4, uavg, maxu, minu
-    double precision :: fl, fr
-
-    integer :: i,j,k,is,js,ie,je
-
-    logical :: test
-
-    integer :: ip_lo(3), ip_hi(3), im_lo(3), im_hi(3)
-
-    ip_lo(:) = (/ lo(1)-1,lo(2)-1,lo(3) /)
-    ip_hi(:) = (/ hi(1)+1,hi(2)+1,hi(3) /)
-    im_lo(:) = (/ lo(1)-1,lo(2)-1,lo(3) /)
-    im_hi(:) = (/ hi(1)+1,hi(2)+1,hi(3) /)
-
-    call bl_allocate(slopex,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(slopey,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-
-    call bl_allocate(Ipu,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(Imu,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(Ipv,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(Imv,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-
-    call bl_allocate(Ipfx,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(Imfx,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(Ipfy,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(Imfy,lo(1)-1,hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-
-    call bl_allocate(  ulx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(  urx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(uimhx,lo(1),hi(1)+1,lo(2)-1,hi(2)+1,lo(3),hi(3),1,2)
-
-    call bl_allocate(  uly,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(  ury,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3),1,2)
-    call bl_allocate(uimhy,lo(1)-1,hi(1)+1,lo(2),hi(2)+1,lo(3),hi(3),1,2)
-
-    call bl_allocate(umacl,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
-    call bl_allocate(umacr,lo(1),hi(1)+1,lo(2),hi(2),lo(3),hi(3))
-
-    call bl_allocate(vmacl,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
-    call bl_allocate(vmacr,lo(1),hi(1),lo(2),hi(2)+1,lo(3),hi(3))
-
-    is = lo(1)
-    ie = hi(1)
-    js = lo(2)
-    je = hi(2)
-
-    k = lo(3)
-
-    dt2 = HALF*dt
-    dt4 = dt/4.0d0
-
-    hx = dx(1)
-    hy = dx(2)
-
-    if (ppm_type .eq. 0) then
-
-       call slopex_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-                    slopex,ip_lo,ip_hi,2,domlo,domhi,2,adv_bc,AMREX_SPACEDIM,1)
-       call slopey_2d(lo-1,hi+1,utilde,ut_lo,ut_hi,nc_ut, &
-                    slopey,ip_lo,ip_hi,2,domlo,domhi,2,adv_bc,AMREX_SPACEDIM,1)
-
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-
-       call ppm_2d(ip_lo,ip_hi,utilde,ut_lo,ut_hi,nc_ut, &
-            ufull(:,:,:,1),uf_lo,uf_hi, &
-            ufull(:,:,:,2),uf_lo,uf_hi, &
-            Ipu,ip_lo,ip_hi,Imu,im_lo,im_hi, &
-            domlo,domhi,adv_bc,dx,dt,0,1,1)
-       call ppm_2d(ip_lo,ip_hi,utilde,ut_lo,ut_hi,nc_ut, &
-            ufull(:,:,:,1),uf_lo,uf_hi, &
-            ufull(:,:,:,2),uf_lo,uf_hi, &
-            Ipv,ip_lo,ip_hi,Imv,im_lo,im_hi, &
-            domlo,domhi,adv_bc,dx,dt,0,2,2)
-
-       ! trace forces, if necessary.  Note by default the ppm routines
-       ! will trace each component to each interface in all coordinate
-       ! directions, but we really only need the force traced along
-       ! its respective dimension.  This should be simplified later.
-       if (ppm_trace_forces .eq. 1) then
-
-          call ppm_2d(ip_lo,ip_hi,force,f_lo,f_hi,nc_f, &
-          ufull(:,:,:,1),uf_lo,uf_hi, &
-          ufull(:,:,:,2),uf_lo,uf_hi, &
-               Ipfx,ip_lo,ip_hi,Imfx,im_lo,im_hi, &
-               domlo,domhi,adv_bc,dx,dt,0,1,1)
-
-          call ppm_2d(ip_lo,ip_hi,force,f_lo,f_hi,nc_f, &
-               ufull(:,:,:,1),uf_lo,uf_hi, &
-               ufull(:,:,:,2),uf_lo,uf_hi, &
-               Ipfy,ip_lo,ip_hi,Imfy,im_lo,im_hi, &
-               domlo,domhi,adv_bc,dx,dt,0,2,2)
-       endif
-
-    end if
-
-    !******************************************************************
-    ! Create u_{\i-\half\e_x}^x, etc.
-    !******************************************************************
-
-    if (ppm_type .eq. 0) then
-       do j=js-1,je+1
-          do i=is,ie+1
-             maxu = max(ZERO,ufull(i-1,j,k,1))
-             minu = min(ZERO,ufull(i  ,j,k,1))
-             ! extrapolate both components of velocity to left face
-             ulx(i,j,k,1) = utilde(i-1,j,k,1) + (HALF - (dt2/hx)*maxu)*slopex(i-1,j,k,1)
-             ulx(i,j,k,2) = utilde(i-1,j,k,2) + (HALF - (dt2/hx)*maxu)*slopex(i-1,j,k,2)
-             ! extrapolate both components of velocity to right face
-             urx(i,j,k,1) = utilde(i  ,j,k,1) - (HALF + (dt2/hx)*minu)*slopex(i  ,j,k,1)
-             urx(i,j,k,2) = utilde(i  ,j,k,2) - (HALF + (dt2/hx)*minu)*slopex(i  ,j,k,2)
-          end do
-       end do
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       do j=js-1,je+1
-          do i=is,ie+1
-             ! extrapolate both components of velocity to left face
-             ulx(i,j,k,1) = Ipu(i-1,j,k,1)
-             ulx(i,j,k,2) = Ipv(i-1,j,k,1)
-             ! extrapolate both components of velocity to right face
-             urx(i,j,k,1) = Imu(i,j,k,1)
-             urx(i,j,k,2) = Imv(i,j,k,1)
-          end do
-       end do
-    end if
-
-    ! impose lo side bc's
-    if (lo(1) .eq. domlo(1)) then
-       select case(phys_bc(1,1))
-       case (Inflow)
-          ulx(is,js-1:je+1,k,1:2) = utilde(is-1,js-1:je+1,k,1:2)
-          urx(is,js-1:je+1,k,1:2) = utilde(is-1,js-1:je+1,k,1:2)
-       case (SlipWall, Symmetry)
-          ulx(is,js-1:je+1,k,1) = ZERO
-          urx(is,js-1:je+1,k,1) = ZERO
-          ulx(is,js-1:je+1,k,2) = urx(is,js-1:je+1,k,2)
-       case (NoSlipWall)
-          ulx(is,js-1:je+1,k,1:2) = ZERO
-          urx(is,js-1:je+1,k,1:2) = ZERO
-       case (Outflow)
-          urx(is,js-1:je+1,k,1) = min(urx(is,js-1:je+1,k,1),ZERO)
-          urx(is,js-1:je+1,k,1:2) = ulx(is,js-1:je+1,k,1:2)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_2d: invalid boundary type phys_bc(1,1)")
-       end select
-    end if
-
-    ! impose hi side bc's
-    if (hi(1) .eq. domhi(1)) then
-       select case(phys_bc(1,2))
-       case (Inflow)
-          ulx(ie+1,js-1:je+1,k,1:2) = utilde(ie+1,js-1:je+1,k,1:2)
-          urx(ie+1,js-1:je+1,k,1:2) = utilde(ie+1,js-1:je+1,k,1:2)
-       case (SlipWall, Symmetry)
-          ulx(ie+1,js-1:je+1,k,1) = ZERO
-          urx(ie+1,js-1:je+1,k,1) = ZERO
-          urx(ie+1,js-1:je+1,k,2) = ulx(ie+1,js-1:je+1,k,2)
-       case (NoSlipWall)
-          ulx(ie+1,js-1:je+1,k,1:2) = ZERO
-          urx(ie+1,js-1:je+1,k,1:2) = ZERO
-       case (Outflow)
-          ulx(ie+1,js-1:je+1,k,1) = max(ulx(ie+1,js-1:je+1,k,1),ZERO)
-          urx(ie+1,js-1:je+1,k,1:2) = ulx(ie+1,js-1:je+1,k,1:2)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_2d: invalid boundary type phys_bc(1,2)")
-       end select
-    end if
-
-    do j=js-1,je+1
-       do i=is,ie+1
-          ! No need to compute uimhx(:,:,1) since it's equal to utrans-w0
-          ! upwind using full velocity to get transverse component of uimhx
-          ! Note: utrans already contains w0
-          uimhx(i,j,k,2) = merge(ulx(i,j,k,2),urx(i,j,k,2),utrans(i,j,k).gt.ZERO)
-          uavg = HALF*(ulx(i,j,k,2)+urx(i,j,k,2))
-          uimhx(i,j,k,2) = merge(uavg,uimhx(i,j,k,2),abs(utrans(i,j,k)).lt.rel_eps)
-       enddo
-    enddo
-
-    if (ppm_type .eq. 0) then
-       do j=js,je+1
-          do i=is-1,ie+1
-             maxu = max(ZERO,ufull(i,j-1,k,2))
-             minu = min(ZERO,ufull(i,j,k,2))
-             ! extrapolate both components of velocity to left face
-             uly(i,j,k,1) = utilde(i,j-1,k,1) + (HALF-(dt2/hy)*maxu)*slopey(i,j-1,k,1)
-             uly(i,j,k,2) = utilde(i,j-1,k,2) + (HALF-(dt2/hy)*maxu)*slopey(i,j-1,k,2)
-             ! extrapolate both components of velocity to right face
-             ury(i,j,k,1) = utilde(i,j,k,1) - (HALF+(dt2/hy)*minu)*slopey(i,j,k,1)
-             ury(i,j,k,2) = utilde(i,j,k,2) - (HALF+(dt2/hy)*minu)*slopey(i,j,k,2)
-          end do
-       end do
-    else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
-       do j=js,je+1
-          do i=is-1,ie+1
-             ! extrapolate both components of velocity to left face
-             uly(i,j,k,1) = Ipu(i,j-1,k,2)
-             uly(i,j,k,2) = Ipv(i,j-1,k,2)
-             ! extrapolate both components of velocity to right face
-             ury(i,j,k,1) = Imu(i,j,k,2)
-             ury(i,j,k,2) = Imv(i,j,k,2)
-          end do
-       end do
-    end if
-
-    ! impose lo side bc's
-    if (lo(2) .eq. domlo(2)) then
-       select case(phys_bc(2,1))
-       case (Inflow)
-          uly(is-1:ie+1,js,k,1:2) = utilde(is-1:ie+1,js-1,k,1:2)
-          ury(is-1:ie+1,js,k,1:2) = utilde(is-1:ie+1,js-1,k,1:2)
-       case (SlipWall, Symmetry)
-          uly(is-1:ie+1,js,k,1) = ury(is-1:ie+1,js,k,1)
-          uly(is-1:ie+1,js,k,2) = ZERO
-          ury(is-1:ie+1,js,k,2) = ZERO
-       case (NoSlipWall)
-          uly(is-1:ie+1,js,k,1:2) = ZERO
-          ury(is-1:ie+1,js,k,1:2) = ZERO
-       case (Outflow)
-          ury(is-1:ie+1,js,k,2) = min(ury(is-1:ie+1,js,k,2),ZERO)
-          uly(is-1:ie+1,js,k,1:2) = ury(is-1:ie+1,js,k,1:2)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_2d: invalid boundary type phys_bc(2,1)")
-       end select
-    end if
-
-    ! impose hi side bc's
-    if (hi(2) .eq. domhi(2)) then
-       select case(phys_bc(2,2))
-       case (Inflow)
-          uly(is-1:ie+1,je+1,k,1:2) = utilde(is-1:ie+1,je+1,k,1:2)
-          ury(is-1:ie+1,je+1,k,1:2) = utilde(is-1:ie+1,je+1,k,1:2)
-       case (SlipWall, Symmetry)
-          ury(is-1:ie+1,je+1,k,1) = uly(is-1:ie+1,je+1,k,1)
-          uly(is-1:ie+1,je+1,k,2) = ZERO
-          ury(is-1:ie+1,je+1,k,2) = ZERO
-       case (NoSlipWall)
-          uly(is-1:ie+1,je+1,k,1:2) = ZERO
-          ury(is-1:ie+1,je+1,k,1:2) = ZERO
-       case (Outflow)
-          uly(is-1:ie+1,je+1,k,2)   = max(uly(is-1:ie+1,je+1,k,2),ZERO)
-          ury(is-1:ie+1,je+1,k,1:2) = uly(is-1:ie+1,je+1,k,1:2)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_2d: invalid boundary type phys_bc(2,2)")
-       end select
-    end if
-
-    do j=js,je+1
-       do i=is-1,ie+1
-          ! No need to compute uimhy(:,:,2) since it's equal to vtrans-w0
-          ! upwind using full velocity to get transverse component of uimhy
-          ! Note: vtrans already contains w0
-          uimhy(i,j,k,1) = merge(uly(i,j,k,1),ury(i,j,k,1),vtrans(i,j,k).gt.ZERO)
-          uavg = HALF*(uly(i,j,k,1)+ury(i,j,k,1))
-          uimhy(i,j,k,1) = merge(uavg,uimhy(i,j,k,1),abs(vtrans(i,j,k)).lt.rel_eps)
-       enddo
-    enddo
-
-    !******************************************************************
-    ! Create umac and vmac
-    !******************************************************************
-
-    do j=js,je
-       do i=is,ie+1
-          ! use the traced force if ppm_trace_forces = 1
-          fl = merge(force(i-1,j,k,1), Ipfx(i-1,j,k,1), ppm_trace_forces == 0)
-          fr = merge(force(i,j,k,1), Imfx(i,  j,k,1), ppm_trace_forces == 0)
-
-          ! extrapolate to edges
-          umacl(i,j,k) = ulx(i,j,k,1) &
-               - (dt4/hy)*(vtrans(i-1,j+1,k)+vtrans(i-1,j,k)) &
-               * (uimhy(i-1,j+1,k,1)-uimhy(i-1,j,k,1)) + dt2*fl
-          umacr(i,j,k) = urx(i,j,k,1) &
-               - (dt4/hy)*(vtrans(i  ,j+1,k)+vtrans(i  ,j,k)) &
-               * (uimhy(i  ,j+1,k,1)-uimhy(i  ,j,k,1)) + dt2*fr
-
-          ! solve Riemann problem using full velocity
-          uavg = HALF*(umacl(i,j,k)+umacr(i,j,k))
-          test = ((umacl(i,j,k) .le. ZERO .and. umacr(i,j,k) .ge. ZERO) .or. &
-               (abs(umacl(i,j,k)+umacr(i,j,k)) .lt. rel_eps))
-          umac(i,j,k) = merge(umacl(i,j,k),umacr(i,j,k),uavg .gt. ZERO)
-          umac(i,j,k) = merge(ZERO,umac(i,j,k),test)
-       enddo
-    enddo
-
-    ! impose lo side bc's
-    if (lo(1) .eq. domlo(1)) then
-       select case(phys_bc(1,1))
-       case (Inflow)
-          umac(is,js:je,k) = utilde(is-1,js:je,k,1)
-       case (SlipWall, NoSlipWall, Symmetry)
-          umac(is,js:je,k) = ZERO
-       case (Outflow)
-          umac(is,js:je,k) = min(umacr(is,js:je,k),ZERO)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_2d: invalid boundary type phys_bc(1,1)")
-       end select
-    end if
-
-    ! impose hi side bc's
-    if (hi(1) .eq. domhi(1)) then
-       select case(phys_bc(1,2))
-       case (Inflow)
-          umac(ie+1,js:je,k) = utilde(ie+1,js:je,k,1)
-       case (SlipWall, NoSlipWall, Symmetry)
-          umac(ie+1,js:je,k) = ZERO
-       case (Outflow)
-          umac(ie+1,js:je,k) = max(umacl(ie+1,js:je,k),ZERO)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_2d: invalid boundary type phys_bc(1,2)")
-       end select
-    end if
+  integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
+  integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
+  integer, value,   intent(in   ) :: idir, ng_ut, nc_ut
+  integer         , intent(in   ) :: uf_lo(3), uf_hi(3)
+  integer, value,   intent(in   ) :: ng_uf, nc_uf
+  integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
+  integer         , intent(in   ) :: ipu_lo(3), ipu_hi(3)
+  integer         , intent(in   ) :: ipv_lo(3), ipv_hi(3)
+  integer         , intent(in   ) :: imu_lo(3), imu_hi(3)
+  integer         , intent(in   ) :: imv_lo(3), imv_hi(3)
+  integer         , intent(in   ) :: ul_lo(3), ul_hi(3)
+  integer         , intent(in   ) :: ur_lo(3), ur_hi(3)
+  integer         , intent(in   ) :: ui_lo(3), ui_hi(3)
+  double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
+  double precision, intent(in   ) :: ufull(uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
+  double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
+  double precision, intent(in   ) :: Imu (imu_lo(1):imu_hi(1),imu_lo(2):imu_hi(2),imu_lo(3):imu_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: Ipu (ipu_lo(1):ipu_hi(1),ipu_lo(2):ipu_hi(2),ipu_lo(3):ipu_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: Imv (imv_lo(1):imv_hi(1),imv_lo(2):imv_hi(2),imv_lo(3):imv_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: Ipv (ipv_lo(1):ipv_hi(1),ipv_lo(2):ipv_hi(2),ipv_lo(3):ipv_hi(3),AMREX_SPACEDIM)
+  double precision, intent(inout) :: ul (ul_lo(1):ul_hi(1),ul_lo(2):ul_hi(2),ul_lo(3):ul_hi(3),AMREX_SPACEDIM)
+  double precision, intent(inout) :: ur (ur_lo(1):ur_hi(1),ur_lo(2):ur_hi(2),ur_lo(3):ur_hi(3),AMREX_SPACEDIM)
+  double precision, intent(inout) :: uimh (ui_lo(1):ui_hi(1),ui_lo(2):ui_hi(2),ui_lo(3):ui_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: dx(3)
+  double precision, value, intent(in   ) :: dt
+  integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
 
 
-    do j=js,je+1
-       do i=is,ie
-          ! use the traced force if ppm_trace_forces = 1
-          fl = merge(force(i,j-1,k,2), Ipfy(i,j-1,k,2), ppm_trace_forces == 0)
-          fr = merge(force(i,j,k,2), Imfy(i,j,k,2), ppm_trace_forces == 0)
+  double precision :: hx, hy, dt2, dt4, uavg, maxu, minu
+  double precision :: fl, fr
 
-          ! extrapolate to edges
-          vmacl(i,j,k) = uly(i,j,k,2) &
-               - (dt4/hx)*(utrans(i+1,j-1,k)+utrans(i,j-1,k)) &
-               * (uimhx(i+1,j-1,k,2)-uimhx(i,j-1,k,2)) + dt2*fl
-          vmacr(i,j,k) = ury(i,j,k,2) &
-               - (dt4/hx)*(utrans(i+1,j,k)+utrans(i,j,k)) &
-               * (uimhx(i+1,j,k,2)-uimhx(i,j,k,2)) + dt2*fr
+  integer :: i,j,k
 
-          ! solve Riemann problem using full velocity
-          uavg = HALF*(vmacl(i,j,k)+vmacr(i,j,k))
-          test = ((vmacl(i,j,k)+w0(lev,j) .le. ZERO .and. vmacr(i,j,k)+w0(lev,j) .ge. ZERO) .or. &
-               (abs(vmacl(i,j,k)+vmacr(i,j,k)+TWO*w0(lev,j)) .lt. rel_eps))
-          vmac(i,j,k) = merge(vmacl(i,j,k),vmacr(i,j,k),uavg+w0(lev,j) .gt. ZERO)
-          vmac(i,j,k) = merge(ZERO,vmac(i,j,k),test)
+  logical :: test
 
-       enddo
-    enddo
+  !$gpu
 
+  k = lo(3)
 
-    ! impose lo side bc's
-    if (lo(2) .eq. domlo(2)) then
-       select case(phys_bc(2,1))
-       case (Inflow)
-          vmac(is:ie,js,k) = utilde(is:ie,js-1,k,2)
-       case (SlipWall, NoSlipWall, Symmetry)
-          vmac(is:ie,js,k) = ZERO
-       case (Outflow)
-          vmac(is:ie,js,k) = min(vmacr(is:ie,js,k),ZERO)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_2d: invalid boundary type phys_bc(2,1)")
-       end select
-    end if
+  dt2 = HALF*dt
+  dt4 = dt/4.0d0
 
-    ! impose hi side bc's
-    if (hi(2) .eq. domhi(2)) then
-       select case(phys_bc(2,2))
-       case (Inflow)
-          vmac(is:ie,je+1,k) = utilde(is:ie,je+1,k,2)
-       case (SlipWall, NoSlipWall, Symmetry)
-          vmac(is:ie,je+1,k) = ZERO
-       case (Outflow)
-          vmac(is:ie,je+1,k) = max(vmacl(is:ie,je+1,k),ZERO)
-       case (Interior)
-       case  default
-          call amrex_error("velpred_2d: invalid boundary type phys_bc(2,2)")
-       end select
-    end if
+  hx = dx(1)
+  hy = dx(2)
 
-    call bl_deallocate(slopex)
-    call bl_deallocate(slopey)
+  ! NOTE: for ppm_type == 0, slopex == Ipu, slopey == Imv
 
-    call bl_deallocate(Ipu)
-    call bl_deallocate(Imu)
-    call bl_deallocate(Ipfx)
-    call bl_deallocate(Imfx)
-    call bl_deallocate(Ipv)
-    call bl_deallocate(Imv)
-    call bl_deallocate(Ipfy)
-    call bl_deallocate(Imfy)
+  !******************************************************************
+  ! Create u_{\i-\half\e_x}^x, etc.
+  !******************************************************************
 
-    call bl_deallocate(ulx)
-    call bl_deallocate(urx)
-    call bl_deallocate(uimhx)
+  if (idir == 1) then
 
-    call bl_deallocate(uly)
-    call bl_deallocate(ury)
-    call bl_deallocate(uimhy)
+     do j=lo(2),hi(2)
+        do i=lo(1),hi(1)
 
-    call bl_deallocate(umacl)
-    call bl_deallocate(umacr)
-    call bl_deallocate(vmacl)
-    call bl_deallocate(vmacr)
+           if (ppm_type .eq. 0) then
+              maxu = max(ZERO,ufull(i-1,j,k,1))
+              minu = min(ZERO,ufull(i  ,j,k,1))
+              ! extrapolate both components of velocity to left face
+              ul(i,j,k,1) = utilde(i-1,j,k,1) + (HALF - (dt2/hx)*maxu)*Ipu(i-1,j,k,1)
+              ul(i,j,k,2) = utilde(i-1,j,k,2) + (HALF - (dt2/hx)*maxu)*Ipu(i-1,j,k,2)
+              ! extrapolate both components of velocity to right face
+              ur(i,j,k,1) = utilde(i  ,j,k,1) - (HALF + (dt2/hx)*minu)*Ipu(i  ,j,k,1)
+              ur(i,j,k,2) = utilde(i  ,j,k,2) - (HALF + (dt2/hx)*minu)*Ipu(i  ,j,k,2)
+           else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+              ! extrapolate both components of velocity to left face
+              ul(i,j,k,1) = Ipu(i-1,j,k,1)
+              ul(i,j,k,2) = Ipv(i-1,j,k,1)
+              ! extrapolate both components of velocity to right face
+              ur(i,j,k,1) = Imu(i,j,k,1)
+              ur(i,j,k,2) = Imv(i,j,k,1)
+           end if
 
-  end subroutine velpred_2d
+           ! impose lo side bc's
+           if (i .eq. domlo(1)) then
+              select case(phys_bc(1,1))
+              case (Inflow)
+                 ul(i,j,k,1:2) = utilde(i-1,j,k,1:2)
+                 ur(i,j,k,1:2) = utilde(i-1,j,k,1:2)
+              case (SlipWall, Symmetry)
+                 ul(i,j,k,1) = ZERO
+                 ur(i,j,k,1) = ZERO
+                 ul(i,j,k,2) = ur(i,j,k,2)
+              case (NoSlipWall)
+                 ul(i,j,k,1:2) = ZERO
+                 ur(i,j,k,1:2) = ZERO
+              case (Outflow)
+                 ur(i,j,k,1) = min(ur(i,j,k,1),ZERO)
+                 ur(i,j,k,1:2) = ul(i,j,k,1:2)
+              case (Interior)
+              case  default
+#ifndef AMREX_USE_CUDA
+                 call amrex_error("velpred_2d: invalid boundary type phys_bc(1,1)")
 #endif
+              end select
+           end if
+
+           ! impose hi side bc's
+           if (i .eq. domhi(1)+1) then
+              select case(phys_bc(1,2))
+              case (Inflow)
+                 ul(i,j,k,1:2) = utilde(i,j,k,1:2)
+                 ur(i,j,k,1:2) = utilde(i,j,k,1:2)
+              case (SlipWall, Symmetry)
+                 ul(i,j,k,1) = ZERO
+                 ur(i,j,k,1) = ZERO
+                 ur(i,j,k,2) = ul(i,j,k,2)
+              case (NoSlipWall)
+                 ul(i,j,k,1:2) = ZERO
+                 ur(i,j,k,1:2) = ZERO
+              case (Outflow)
+                 ul(i,j,k,1) = max(ul(i,j,k,1),ZERO)
+                 ur(i,j,k,1:2) = ul(i,j,k,1:2)
+              case (Interior)
+              case  default
+#ifndef AMREX_USE_CUDA
+                 call amrex_error("velpred_2d: invalid boundary type phys_bc(1,2)")
+#endif
+              end select
+           end if
+
+           ! No need to compute uimh(:,:,1) since it's equal to utrans-w0
+           ! upwind using full velocity to get transverse component of uimhx
+           ! Note: utrans already contains w0
+           uimh(i,j,k,2) = merge(ul(i,j,k,2),ur(i,j,k,2),utrans(i,j,k).gt.ZERO)
+           uavg = HALF*(ul(i,j,k,2)+ur(i,j,k,2))
+           uimh(i,j,k,2) = merge(uavg,uimh(i,j,k,2),abs(utrans(i,j,k)).lt.rel_eps)
+        enddo
+     enddo
+
+  else ! idir == 2
+
+     do j=lo(2),hi(2)
+        do i=lo(1),hi(1)
+
+           if (ppm_type .eq. 0) then
+
+              maxu = max(ZERO,ufull(i,j-1,k,2))
+              minu = min(ZERO,ufull(i,j,k,2))
+              ! extrapolate both components of velocity to left face
+              ul(i,j,k,1) = utilde(i,j-1,k,1) + (HALF-(dt2/hy)*maxu)*Imv(i,j-1,k,1)
+              ul(i,j,k,2) = utilde(i,j-1,k,2) + (HALF-(dt2/hy)*maxu)*Imv(i,j-1,k,2)
+              ! extrapolate both components of velocity to right face
+              ur(i,j,k,1) = utilde(i,j,k,1) - (HALF+(dt2/hy)*minu)*Imv(i,j,k,1)
+              ur(i,j,k,2) = utilde(i,j,k,2) - (HALF+(dt2/hy)*minu)*Imv(i,j,k,2)
+           else if (ppm_type .eq. 1 .or. ppm_type .eq. 2) then
+              ! extrapolate both components of velocity to left face
+              ul(i,j,k,1) = Ipu(i,j-1,k,2)
+              ul(i,j,k,2) = Ipv(i,j-1,k,2)
+              ! extrapolate both components of velocity to right face
+              ur(i,j,k,1) = Imu(i,j,k,2)
+              ur(i,j,k,2) = Imv(i,j,k,2)
+           end if
+
+           ! impose lo side bc's
+           if (j .eq. domlo(2)) then
+              select case(phys_bc(2,1))
+              case (Inflow)
+                 ul(i,j,k,1:2) = utilde(i,j-1,k,1:2)
+                 ur(i,j,k,1:2) = utilde(i,j-1,k,1:2)
+              case (SlipWall, Symmetry)
+                 ul(i,j,k,1) = ur(i,j,k,1)
+                 ul(i,j,k,2) = ZERO
+                 ur(i,j,k,2) = ZERO
+              case (NoSlipWall)
+                 ul(i,j,k,1:2) = ZERO
+                 ur(i,j,k,1:2) = ZERO
+              case (Outflow)
+                 ur(i,j,k,2) = min(ur(i,j,k,2),ZERO)
+                 ul(i,j,k,1:2) = ur(i,j,k,1:2)
+              case (Interior)
+              case  default
+#ifndef AMREX_USE_CUDA
+                 call amrex_error("velpred_2d: invalid boundary type phys_bc(2,1)")
+#endif
+              end select
+           end if
+
+           ! impose hi side bc's
+           if (j .eq. domhi(2)+1) then
+              select case(phys_bc(2,2))
+              case (Inflow)
+                 ul(i,j,k,1:2) = utilde(i,j,k,1:2)
+                 ur(i,j,k,1:2) = utilde(i,j,k,1:2)
+              case (SlipWall, Symmetry)
+                 ur(i,j,k,1) = ul(i,j,k,1)
+                 ul(i,j,k,2) = ZERO
+                 ur(i,j,k,2) = ZERO
+              case (NoSlipWall)
+                 ul(i,j,k,1:2) = ZERO
+                 ur(i,j,k,1:2) = ZERO
+              case (Outflow)
+                 ul(i,j,k,2)   = max(ul(i,j,k,2),ZERO)
+                 ur(i,j,k,1:2) = ul(i,j,k,1:2)
+              case (Interior)
+              case  default
+#ifndef AMREX_USE_CUDA
+                 call amrex_error("velpred_2d: invalid boundary type phys_bc(2,2)")
+#endif
+              end select
+           end if
+           ! No need to compute uimh(:,:,2) since it's equal to utrans-w0
+           ! upwind using full velocity to get transverse component of uimhy
+           ! Note: utrans already contains w0
+           uimh(i,j,k,1) = merge(ul(i,j,k,1),ur(i,j,k,1),utrans(i,j,k).gt.ZERO)
+           uavg = HALF*(ul(i,j,k,1)+ur(i,j,k,1))
+           uimh(i,j,k,1) = merge(uavg,uimh(i,j,k,1),abs(utrans(i,j,k)).lt.rel_eps)
+        enddo
+     enddo
+
+  endif
+
+end subroutine velpred_interface_2d
+
+
+subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
+     utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
+     utrans, uu_lo, uu_hi, &
+     vtrans, uv_lo, uv_hi, &
+     umac  , mu_lo, mu_hi, &
+     vmac  , mv_lo, mv_hi, &
+     Imf, imf_lo, imf_hi, &
+     Ipf, ipf_lo, ipf_hi, &
+     ulx, ulx_lo, ulx_hi, &
+     urx, urx_lo, urx_hi, &
+     uimhx, uix_lo, uix_hi, &
+     uly, uly_lo, uly_hi, &
+     ury, ury_lo, ury_hi, &
+     uimhy, uiy_lo, uiy_hi, &
+     force,   f_lo,  f_hi, nc_f, ng_f, &
+     w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_2d")
+
+  integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
+  integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
+  integer, value,   intent(in   ) :: lev, idir, ng_ut, nc_ut
+  integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
+  integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
+  integer         , intent(in   ) :: mu_lo(3), mu_hi(3)
+  integer         , intent(in   ) :: mv_lo(3), mv_hi(3)
+  integer         , intent(in   ) :: ipf_lo(3), ipf_hi(3)
+  integer         , intent(in   ) :: imf_lo(3), imf_hi(3)
+  integer         , intent(in   ) :: ulx_lo(3), ulx_hi(3)
+  integer         , intent(in   ) :: urx_lo(3), urx_hi(3)
+  integer         , intent(in   ) :: uix_lo(3), uix_hi(3)
+  integer         , intent(in   ) :: uly_lo(3), uly_hi(3)
+  integer         , intent(in   ) :: ury_lo(3), ury_hi(3)
+  integer         , intent(in   ) :: uiy_lo(3), uiy_hi(3)
+  integer         , intent(in   ) ::  f_lo(3),  f_hi(3)
+  integer, value,   intent(in   ) :: ng_f, nc_f
+  double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
+  double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
+  double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2),uv_lo(3):uv_hi(3))
+  double precision, intent(inout) :: umac  (mu_lo(1):mu_hi(1),mu_lo(2):mu_hi(2),mu_lo(3):mu_hi(3))
+  double precision, intent(inout) :: vmac  (mv_lo(1):mv_hi(1),mv_lo(2):mv_hi(2),mv_lo(3):mv_hi(3))
+  double precision, intent(in   ) :: Imf (imf_lo(1):imf_hi(1),imf_lo(2):imf_hi(2),imf_lo(3):imf_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: Ipf (ipf_lo(1):ipf_hi(1),ipf_lo(2):ipf_hi(2),ipf_lo(3):ipf_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: ulx (ulx_lo(1):ulx_hi(1),ulx_lo(2):ulx_hi(2),ulx_lo(3):ulx_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: urx (urx_lo(1):urx_hi(1),urx_lo(2):urx_hi(2),urx_lo(3):urx_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: uimhx (uix_lo(1):uix_hi(1),uix_lo(2):uix_hi(2),uix_lo(3):uix_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: uly (uly_lo(1):uly_hi(1),uly_lo(2):uly_hi(2),uly_lo(3):uly_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: ury (ury_lo(1):ury_hi(1),ury_lo(2):ury_hi(2),ury_lo(3):ury_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: uimhy (uiy_lo(1):uiy_hi(1),uiy_lo(2):uiy_hi(2),uiy_lo(3):uiy_hi(3),AMREX_SPACEDIM)
+  double precision, intent(in   ) :: force ( f_lo(1): f_hi(1), f_lo(2): f_hi(2),f_lo(3): f_hi(3),nc_f)
+  double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
+  double precision, intent(in   ) :: dx(3)
+  double precision, value, intent(in   ) :: dt
+  integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
+
+  ! these correspond to umac_L, etc.
+  double precision :: umacl,umacr
+  double precision :: vmacl,vmacr
+
+  double precision :: hx, hy, dt2, dt4, uavg
+  double precision :: fl, fr
+
+  integer :: i,j,k
+
+  logical :: test
+
+  !$gpu
+
+  k = lo(3)
+
+  dt2 = HALF*dt
+  dt4 = dt/4.0d0
+
+  hx = dx(1)
+  hy = dx(2)
+
+
+  !******************************************************************
+  ! Create umac and vmac
+  !******************************************************************
+
+  if (idir == 1) then
+
+     do j=lo(2),hi(2)
+        do i=lo(1),hi(1)
+           ! use the traced force if ppm_trace_forces = 1
+           fl = merge(force(i-1,j,k,1), Ipf(i-1,j,k,1), ppm_trace_forces == 0)
+           fr = merge(force(i,j,k,1), Imf(i,  j,k,1), ppm_trace_forces == 0)
+
+           ! extrapolate to edges
+           umacl = ulx(i,j,k,1) &
+                - (dt4/hy)*(vtrans(i-1,j+1,k)+vtrans(i-1,j,k)) &
+                * (uimhy(i-1,j+1,k,1)-uimhy(i-1,j,k,1)) + dt2*fl
+           umacr = urx(i,j,k,1) &
+                - (dt4/hy)*(vtrans(i  ,j+1,k)+vtrans(i  ,j,k)) &
+                * (uimhy(i  ,j+1,k,1)-uimhy(i  ,j,k,1)) + dt2*fr
+
+           ! solve Riemann problem using full velocity
+           uavg = HALF*(umacl+umacr)
+           test = ((umacl .le. ZERO .and. umacr .ge. ZERO) .or. &
+                (abs(umacl+umacr) .lt. rel_eps))
+           umac(i,j,k) = merge(umacl,umacr,uavg .gt. ZERO)
+           umac(i,j,k) = merge(ZERO,umac(i,j,k),test)
+
+           ! impose lo side bc's
+           if (i .eq. domlo(1)) then
+              select case(phys_bc(1,1))
+              case (Inflow)
+                 umac(i,j,k) = utilde(i-1,j,k,1)
+              case (SlipWall, NoSlipWall, Symmetry)
+                 umac(i,j,k) = ZERO
+              case (Outflow)
+                 umac(i,j,k) = min(umacr,ZERO)
+              case (Interior)
+              case  default
+#ifndef AMREX_USE_CUDA
+                 call amrex_error("velpred_2d: invalid boundary type phys_bc(1,1)")
+#endif
+              end select
+           end if
+
+           ! impose hi side bc's
+           if (i .eq. domhi(1)+1) then
+              select case(phys_bc(1,2))
+              case (Inflow)
+                 umac(i,j,k) = utilde(i,j,k,1)
+              case (SlipWall, NoSlipWall, Symmetry)
+                 umac(i,j,k) = ZERO
+              case (Outflow)
+                 umac(i,j,k) = max(umacl,ZERO)
+              case (Interior)
+              case  default
+#ifndef AMREX_USE_CUDA
+                 call amrex_error("velpred_2d: invalid boundary type phys_bc(1,2)")
+#endif
+              end select
+           end if
+        enddo
+     enddo
+
+  else ! idir == 2
+
+     do j=lo(2),hi(2)
+        do i=lo(1),hi(1)
+           ! use the traced force if ppm_trace_forces = 1
+           fl = merge(force(i,j-1,k,2), Ipf(i,j-1,k,2), ppm_trace_forces == 0)
+           fr = merge(force(i,j,k,2), Imf(i,j,k,2), ppm_trace_forces == 0)
+
+           ! extrapolate to edges
+           vmacl = uly(i,j,k,2) &
+                - (dt4/hx)*(utrans(i+1,j-1,k)+utrans(i,j-1,k)) &
+                * (uimhx(i+1,j-1,k,2)-uimhx(i,j-1,k,2)) + dt2*fl
+           vmacr = ury(i,j,k,2) &
+                - (dt4/hx)*(utrans(i+1,j,k)+utrans(i,j,k)) &
+                * (uimhx(i+1,j,k,2)-uimhx(i,j,k,2)) + dt2*fr
+
+           ! solve Riemann problem using full velocity
+           uavg = HALF*(vmacl+vmacr)
+           test = ((vmacl+w0(lev,j) .le. ZERO .and. vmacr+w0(lev,j) .ge. ZERO) .or. &
+                (abs(vmacl+vmacr+TWO*w0(lev,j)) .lt. rel_eps))
+           vmac(i,j,k) = merge(vmacl,vmacr,uavg+w0(lev,j) .gt. ZERO)
+           vmac(i,j,k) = merge(ZERO,vmac(i,j,k),test)
+
+           ! impose lo side bc's
+           if (j .eq. domlo(2)) then
+              select case(phys_bc(2,1))
+              case (Inflow)
+                 vmac(i,j,k) = utilde(i,j-1,k,2)
+              case (SlipWall, NoSlipWall, Symmetry)
+                 vmac(i,j,k) = ZERO
+              case (Outflow)
+                 vmac(i,j,k) = min(vmacr,ZERO)
+              case (Interior)
+              case  default
+#ifndef AMREX_USE_CUDA
+                 call amrex_error("velpred_2d: invalid boundary type phys_bc(2,1)")
+#endif
+              end select
+           end if
+
+           ! impose hi side bc's
+           if (j .eq. domhi(2)+1) then
+              select case(phys_bc(2,2))
+              case (Inflow)
+                 vmac(i,j,k) = utilde(i,j,k,2)
+              case (SlipWall, NoSlipWall, Symmetry)
+                 vmac(i,j,k) = ZERO
+              case (Outflow)
+                 vmac(i,j,k) = max(vmacl,ZERO)
+              case (Interior)
+              case  default
+#ifndef AMREX_USE_CUDA
+                 call amrex_error("velpred_2d: invalid boundary type phys_bc(2,2)")
+#endif
+              end select
+           end if
+
+        enddo
+     enddo
+
+  endif
+
+end subroutine velpred_2d
+#endif
+
+
 
 
 #if (AMREX_SPACEDIM == 3)
