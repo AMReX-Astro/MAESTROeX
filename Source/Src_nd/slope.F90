@@ -234,6 +234,8 @@ contains
 
     !$gpu
 
+    k = s_lo(3)
+
     if (slope_order .eq. 0) then
 
        ! HERE DOING 1ST ORDER
