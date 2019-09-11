@@ -46,7 +46,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
     Put1dArrayOnCart(w0,w0_cart,0,1,bcs_u,0,1);
     Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_u,0,1);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,0);
+    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
     Put1dArrayOnCart(grav_cell,grav_cart,0,1,bcs_f,0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -342,7 +342,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         MakeS0mac(p0, p0mac);
     } 
     Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
 
     make_grav_cell(grav.dataPtr(),
                    rho0.dataPtr(),

@@ -743,11 +743,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         }
 
         // // put w0_force on Cartesian cells
-        // Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
+        Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
     }
-
-    // put w0_force on Cartesian cells
-    Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 7 -- redo the construction of the advective velocity using the current w0

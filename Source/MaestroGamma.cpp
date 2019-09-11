@@ -22,9 +22,8 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 
     for (int lev=0; lev<=finest_level; ++lev) {
         gamma1[lev].define(grids[lev], dmap[lev], 1, 1);
-    }
+        gamma1[lev].setVal(0.);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         p0_cart[lev].setVal(0.);
     }

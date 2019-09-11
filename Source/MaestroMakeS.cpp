@@ -428,7 +428,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
     if (dpdt_factor > 0.0) {
         Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
         Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
-        Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
