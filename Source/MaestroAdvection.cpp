@@ -189,7 +189,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),
                        bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                       1,1);
+                       1,1,AMREX_SPACEDIM);
            }
 
 
@@ -240,7 +240,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),
                        bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                       2,2);
+                       2,2,AMREX_SPACEDIM);
            }
 
 #pragma gpu box(ybx)
@@ -587,7 +587,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                        AMREX_INT_ANYD(domainBox.loVect()),
                        AMREX_INT_ANYD(domainBox.hiVect()),
                        bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                       1,1);
+                       1,1,AMREX_SPACEDIM);
 
                 if (ppm_trace_forces == 1) {
 #pragma gpu box(obx)
@@ -602,7 +602,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                            AMREX_INT_ANYD(domainBox.loVect()),
                            AMREX_INT_ANYD(domainBox.hiVect()),
                            bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                           1,1);
+                           1,1,AMREX_SPACEDIM);
                 }
             }
 
@@ -633,7 +633,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                       AMREX_INT_ANYD(domainBox.loVect()),
                       AMREX_INT_ANYD(domainBox.hiVect()),
                       bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                      2,2);
+                      2,2,AMREX_SPACEDIM);
 
               if (ppm_trace_forces == 1) {
 #pragma gpu box(obx)
@@ -648,7 +648,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                     AMREX_INT_ANYD(domainBox.loVect()),
                     AMREX_INT_ANYD(domainBox.hiVect()),
                     bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                    2,2);
+                    2,2,AMREX_SPACEDIM);
               }
             }
 

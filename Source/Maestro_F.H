@@ -1016,7 +1016,8 @@ extern "C"
         const int* domlo, const int* domhi,
         const int* adv_bc,
         const amrex::Real* dx, const amrex::Real dt,
-        const int is_umac, const int comp, const int bccomp);
+        const int is_umac, const int comp, const int bccomp, 
+        const int nbccomp);
 #elif (AMREX_SPACEDIM == 3)
     void ppm_3d(const int* lo, const int* hi,
         const amrex::Real* s,  const int* s_lo, const int* s_hi,
