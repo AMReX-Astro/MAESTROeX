@@ -272,7 +272,7 @@
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#f/update_scal_module/update_rhoh" title="f/update_scal_module/update_rhoh"><code class="xref f f-func docutils literal notranslate"><span class="pre">update_rhoh()</span></code></a>, <a class="reference internal" href="#f/update_scal_module/update_rhoh_3d_sphr" title="f/update_scal_module/update_rhoh_3d_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">update_rhoh_3d_sphr()</span></code></a>, <a class="reference internal" href="#f/update_scal_module/update_rhox" title="f/update_scal_module/update_rhox"><code class="xref f f-func docutils literal notranslate"><span class="pre">update_rhox()</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#f/update_scal_module/update_rhoh" title="f/update_scal_module/update_rhoh"><code class="xref f f-func docutils literal notranslate"><span class="pre">update_rhoh()</span></code></a>, <a class="reference internal" href="#f/update_scal_module/update_rhox" title="f/update_scal_module/update_rhox"><code class="xref f f-func docutils literal notranslate"><span class="pre">update_rhox()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Required modules</p>
@@ -321,43 +321,7 @@
 
 <dl class="subroutine">
 <dt id="f/update_scal_module/update_rhoh">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">update_scal_module/</code><code class="sig-name descname">update_rhoh</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">sold</em>, <em class="sig-param">so_lo</em>, <em class="sig-param">so_hi</em>, <em class="sig-param">snew</em>, <em class="sig-param">sn_lo</em>, <em class="sig-param">sn_hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">force</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">p0_new</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">nspec</em><span class="sig-paren">)</span><a class="headerlink" href="#f/update_scal_module/update_rhoh" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>sold</strong> (so_hi(1)-(so_lo(1))+1,so_hi(2)-(so_lo(2))+1,so_hi(3)-(so_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>so_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>so_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>snew</strong> (sn_hi(1)-(sn_lo(1))+1,sn_hi(2)-(sn_lo(2))+1,sn_hi(3)-(sn_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>sn_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sn_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxx</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxy</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,y_hi(3)-(y_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxz</strong> (z_hi(1)-(z_lo(1))+1,z_hi(2)-(z_lo(2))+1,z_hi(3)-(z_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>force</strong> (f_hi(1)-(f_lo(1))+1,f_hi(2)-(f_lo(2))+1,f_hi(3)-(f_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>f_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>f_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>p0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>nspec</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="subroutine">
-<dt id="f/update_scal_module/update_rhoh_3d_sphr">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">update_scal_module/</code><code class="sig-name descname">update_rhoh_3d_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sold</em>, <em class="sig-param">so_lo</em>, <em class="sig-param">so_hi</em>, <em class="sig-param">snew</em>, <em class="sig-param">sn_lo</em>, <em class="sig-param">sn_hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">force</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">p0_new_cart</em>, <em class="sig-param">p_lo</em>, <em class="sig-param">p_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">nspec</em><span class="sig-paren">)</span><a class="headerlink" href="#f/update_scal_module/update_rhoh_3d_sphr" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">update_scal_module/</code><code class="sig-name descname">update_rhoh</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sold</em>, <em class="sig-param">so_lo</em>, <em class="sig-param">so_hi</em>, <em class="sig-param">snew</em>, <em class="sig-param">sn_lo</em>, <em class="sig-param">sn_hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">force</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">p0_new_cart</em>, <em class="sig-param">p_lo</em>, <em class="sig-param">p_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">nspec</em><span class="sig-paren">)</span><a class="headerlink" href="#f/update_scal_module/update_rhoh" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

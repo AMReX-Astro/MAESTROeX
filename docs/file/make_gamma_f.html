@@ -274,7 +274,7 @@
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#f/make_gamma_module/make_gamma" title="f/make_gamma_module/make_gamma"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_gamma()</span></code></a>, <a class="reference internal" href="#f/make_gamma_module/make_gamma_sphr" title="f/make_gamma_module/make_gamma_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_gamma_sphr()</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#f/make_gamma_module/make_gamma" title="f/make_gamma_module/make_gamma"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_gamma()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Required modules</p>
@@ -288,30 +288,8 @@
 <p class="rubric">Subroutines and functions</p>
 <dl class="subroutine">
 <dt id="f/make_gamma_module/make_gamma">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_gamma_module/</code><code class="sig-name descname">make_gamma</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">gamma</em>, <em class="sig-param">g_lo</em>, <em class="sig-param">g_hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">p0</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_gamma_module/make_gamma" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_gamma_module/</code><code class="sig-name descname">make_gamma</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">gamma</em>, <em class="sig-param">g_lo</em>, <em class="sig-param">g_hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">p0_cart</em>, <em class="sig-param">p0_lo</em>, <em class="sig-param">p0_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_gamma_module/make_gamma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_gamma</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>gamma</strong> (g_hi(1)-(g_lo(1))+1,g_hi(2)-(g_lo(2))+1,g_hi(3)-(g_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>g_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>g_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>scal</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>p0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="subroutine">
-<dt id="f/make_gamma_module/make_gamma_sphr">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_gamma_module/</code><code class="sig-name descname">make_gamma_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">gamma</em>, <em class="sig-param">g_lo</em>, <em class="sig-param">g_hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">p0_cart</em>, <em class="sig-param">p0_lo</em>, <em class="sig-param">p0_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_gamma_module/make_gamma_sphr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_gamma_sphr</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
