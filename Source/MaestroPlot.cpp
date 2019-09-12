@@ -520,36 +520,34 @@ Maestro::PlotFileMF (const int nPlot,
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 	Vector<MultiFab> w0r_cart(finest_level+1);
 
-	if (spherical == 1) {
+    for (int lev=0; lev<=finest_level; ++lev) {
+        if (spherical == 1) {
+            // w0mac will contain an edge-centered w0 on a Cartesian grid,
+            // for use in computing divergences.
+            AMREX_D_TERM(w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
+                            w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
+                            w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
+            for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+                w0mac[lev][idim].setVal(0.);
+            }
+        }
 
-		for (int lev=0; lev<=finest_level; ++lev) {
-			// w0mac will contain an edge-centered w0 on a Cartesian grid,
-			// for use in computing divergences.
-			AMREX_D_TERM(w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
-			             w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
-			             w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
-			for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-				w0mac[lev][idim].setVal(0.);
-			}
+        // w0r_cart is w0 but onto a Cartesian grid in cell-centered as
+        // a scalar.  Since w0 is the radial expansion velocity, w0r_cart
+        // is the radial w0 in a zone
+        w0r_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        w0r_cart[lev].setVal(0.);
+    }
 
-			// w0r_cart is w0 but onto a Cartesian grid in cell-centered as
-			// a scalar.  Since w0 is the radial expansion velocity, w0r_cart
-			// is the radial w0 in a zone
-			w0r_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-			w0r_cart[lev].setVal(0.);
-		}
+    if (evolve_base_state == 1) {
+        if (spherical == 1) {
+            MakeW0mac(w0mac);
+        }
+        Put1dArrayOnCart(w0,w0r_cart,0,0,bcs_u,0);
+    }
 
-		if (evolve_base_state == 1) {
-			MakeW0mac(w0mac);
-			Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,1);
-		}
-
-		// Mach number
-		MachfromRhoHSphr(s_in,u_in,p0_in,w0r_cart,tempmf);
-	} else {
-		// Mach number
-		MachfromRhoH(s_in,u_in,p0_in,tempmf);
-	}
+    // Mach number
+    MachfromRhoH(s_in,u_in,p0_in,w0r_cart,tempmf);
 
 	// MachNumber
 	for (int i = 0; i <= finest_level; ++i) {
@@ -1357,6 +1355,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #endif
 
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+    Vector<MultiFab> w0_cart(finest_level+1);
 
 #if (AMREX_SPACEDIM == 3)
 	if (spherical == 1) {
@@ -1369,11 +1368,19 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 	}
 #endif
 
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 2);
+        w0_cart[lev].setVal(0.);
+    }
+
+    Put1dArrayOnCart(w0, w0_cart, 0, 1, bcs_u, 0, 1);
+
 	for (int lev=0; lev<=finest_level; ++lev) {
 
 		// get references to the MultiFabs at level lev
 		const MultiFab& vel_mf = vel[lev];
 		MultiFab& magvel_mf = magvel[lev];
+        const MultiFab& w0_mf = w0_cart[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 		if (spherical == 0) {
@@ -1392,9 +1399,8 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #pragma gpu box(tileBox)
 				make_magvel(AMREX_INT_ANYD(tileBox.loVect()),
                             AMREX_INT_ANYD(tileBox.hiVect()),
-                            lev,
 				            BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-				            w0.dataPtr(),
+				            BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
 				            BL_TO_FORTRAN_ANYD(magvel_mf[mfi]));
 			}
 
@@ -1665,54 +1671,28 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 		const MultiFab& state_mf = state[lev];
 		MultiFab& deltagamma_mf = deltagamma[lev];
 
-		if (spherical == 0) {
+        const MultiFab& p0cart_mf = p0_cart[lev];
+        const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
 
-			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-			for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
 
-				// Get the index space of the valid region
-				const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-				// call fortran subroutine
-				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-				// lo/hi coordinates (including ghost cells), and/or the # of components
-				// We will also pass "validBox", which specifies the "valid" region.
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
-				make_deltagamma(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                lev,
-				                BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-				                p0.dataPtr(), gamma1bar.dataPtr(),
-				                BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
-			}
-
-		} else {
-
-			const MultiFab& p0cart_mf = p0_cart[lev];
-			const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
-
-			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-			for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
-
-				// Get the index space of the valid region
-				const Box& tileBox = mfi.tilebox();
-
-				// call fortran subroutine
-				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-				// lo/hi coordinates (including ghost cells), and/or the # of components
-				// We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-				make_deltagamma_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-				                     BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-				                     BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), BL_TO_FORTRAN_ANYD(gamma1barcart_mf[mfi]),
-				                     BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
-			}
+            make_deltagamma(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                            BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
+                            BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), BL_TO_FORTRAN_ANYD(gamma1barcart_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
+			
 		}
 	}
 
@@ -1790,10 +1770,20 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
+    Vector<MultiFab> w0_cart(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 2);
+        w0_cart[lev].setVal(0.);
+    }
+
+    Put1dArrayOnCart(w0, w0_cart, 0, 1, bcs_u, 0, 1);
+
 	for (int lev=0; lev<=finest_level; ++lev) {
 
 		// get references to the MultiFabs at level lev
 		MultiFab& divw0_mf = divw0[lev];
+        const MultiFab& w0_mf = w0_cart[lev];
 
 		if (spherical == 0) {
 
@@ -1813,8 +1803,9 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 				// We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
 				make_divw0(AMREX_INT_ANYD(tileBox.loVect()),
-                           AMREX_INT_ANYD(tileBox.hiVect()),lev,
-				           w0.dataPtr(), AMREX_REAL_ANYD(dx),
+                           AMREX_INT_ANYD(tileBox.hiVect()),
+				           BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
+                           AMREX_REAL_ANYD(dx),
 				           BL_TO_FORTRAN_ANYD(divw0_mf[mfi]));
 			}
 

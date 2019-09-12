@@ -278,15 +278,13 @@ private:
     /// @param force            velocity force
     /// @param start_scomp      index of component of `state` to begin with
     /// @param num_comp         number of components to perform calculation for
-    /// @param p0               base state pressure
     /// @param p0_cart          base state pressure on cartesian grid
     void UpdateScal (const amrex::Vector<amrex::MultiFab>& stateold,
 		     amrex::Vector<amrex::MultiFab>& statenew,
 		     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
 		     const amrex::Vector<amrex::MultiFab>& force,
 		     int start_scomp, int num_comp,
-		     const amrex::Real* p0 = NULL,
-		     const amrex::Vector<amrex::MultiFab>& p0_cart = {});
+		     const amrex::Vector<amrex::MultiFab>& p0_cart);
 
     /// Update velocity
     ///
@@ -611,7 +609,6 @@ private:
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const RealVector& rho0,
                        const RealVector& grav,
-                       const RealVector& w0_force,
 		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                        int do_add_utilde_force);
 
@@ -1036,11 +1033,6 @@ private:
     /// @param p0       base state pressure
     /// @param mach     Mach number
     void MachfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
-                       const amrex::Vector<amrex::MultiFab>& vel,
-                       const RealVector& p0,
-                       amrex::Vector<amrex::MultiFab>& mach);
-
-    void MachfromRhoHSphr (const amrex::Vector<amrex::MultiFab>& scal,
                            const amrex::Vector<amrex::MultiFab>& vel,
                            const RealVector& p0,
                            const amrex::Vector<amrex::MultiFab>& w0cart,
