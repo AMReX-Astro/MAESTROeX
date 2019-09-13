@@ -6,7 +6,7 @@ using namespace amrex;
 
 // print out the contents of a Vector of MultiFabs
 void
-Maestro::PrintMF (Vector<MultiFab>& MF)
+Maestro::PrintMF (const Vector<MultiFab>& MF)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintMF()",PrintMF);
@@ -14,7 +14,7 @@ Maestro::PrintMF (Vector<MultiFab>& MF)
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        MultiFab& MF_mf = MF[lev];
+        const MultiFab& MF_mf = MF[lev];
 
         const BoxArray& ba = MF_mf.boxArray();
         const DistributionMapping& dm = MF_mf.DistributionMap();
@@ -44,7 +44,7 @@ Maestro::PrintMF (Vector<MultiFab>& MF)
 }
 
 void
-Maestro::PrintEdge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
+Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir)
 {
     // timer for profiling
@@ -53,7 +53,7 @@ Maestro::PrintEdge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        MultiFab& EDGE_mf = EDGE[lev][dir];
+        const MultiFab& EDGE_mf = EDGE[lev][dir];
 
         const BoxArray& ba = EDGE_mf.boxArray();
         const DistributionMapping& dm = EDGE_mf.DistributionMap();
@@ -84,7 +84,7 @@ Maestro::PrintEdge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
 }
 
 // utility to write out a multilevel multifab to a plotfile
-void Maestro::WriteMF (Vector<MultiFab>& mf,
+void Maestro::WriteMF (const Vector<MultiFab>& mf,
                        std::string name)
 {
     int nComp = mf[0].nComp();

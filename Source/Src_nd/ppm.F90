@@ -31,7 +31,7 @@ contains
        u,u_lo,u_hi,v,v_lo,v_hi,&
        Ip,ip_lo,ip_hi,Im,im_lo,im_hi,&
        domlo,domhi,adv_bc,&
-       dx,dt,is_umac,comp,bccomp) bind(C,name="ppm_2d")
+       dx,dt,is_umac,comp,bccomp,nbccomp) bind(C,name="ppm_2d")
     ! note that u,v here may be the normal cell-centered velocity,
     ! or the MAC velocity.  The is_umac argument tells us which it
     ! is.
@@ -47,10 +47,10 @@ contains
     double precision, intent(in   ) ::  v(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2)
     double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2)
-    integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,AMREX_SPACEDIM)
+    integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    integer, value, intent(in   ) :: is_umac
+    integer, value, intent(in   ) :: is_umac, nbccomp
 
     ! local
     integer :: i,j,k,n
@@ -1356,7 +1356,7 @@ contains
        u,u_lo,u_hi,v,v_lo,v_hi,w,w_lo,w_hi, &
        Ip,ip_lo,ip_hi,Im,im_lo,im_hi, &
        domlo,domhi, &
-       adv_bc,dx,dt,is_umac,comp,bccomp) bind(C,name="ppm_3d")
+       adv_bc,dx,dt,is_umac,comp,bccomp,nbccomp) bind(C,name="ppm_3d")
 
     integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3),s_lo(3),s_hi(3)
     integer         , intent(in   ) :: u_lo(3),u_hi(3),v_lo(3),v_hi(3),w_lo(3),w_hi(3)
@@ -1368,10 +1368,10 @@ contains
     double precision, intent(in   ) ::  w(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),AMREX_SPACEDIM)
     double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),AMREX_SPACEDIM)
-    integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,AMREX_SPACEDIM)
+    integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    integer,   value, intent(in   ) :: is_umac, comp, bccomp
+    integer,   value, intent(in   ) :: is_umac, comp, bccomp, nbccomp
 
     ! local
     integer :: i,j,k,n
@@ -3536,6 +3536,5 @@ contains
   end subroutine ppm_3d
 
 #endif
-
 
 end module ppm_module

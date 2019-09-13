@@ -1,21 +1,20 @@
 
 # INITIAL MODEL
-maestro.model_file = "hcore.dat"
+maestro.model_file = ""
 
 maestro.drdxfac = 5
-#maestro.ppm_type = 1
 
 # PROBLEM SIZE
-geometry.prob_lo     = -2.8e11  -2.8e11  -2.8e11
-geometry.prob_hi     =  2.8e11   2.8e11   2.8e11
+geometry.prob_lo     = -4.e8  -4.e8   4.e8
+geometry.prob_hi     =  4.e8   4.e8  12.e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
-maestro.lo_bc = 2 2 2
-maestro.hi_bc = 2 2 2
-geometry.is_periodic =  0 0 0
+maestro.lo_bc = 0 0 3
+maestro.hi_bc = 0 0 3
+geometry.is_periodic =  1 1 0
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
@@ -24,21 +23,18 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-#amr.n_cell             = 160 160 160
-#amr.n_cell             = 96 96 96
-amr.n_cell = 192 192 192
-#amr.n_cell = 384 384 384
+#amr.n_cell = 128 128 128
+amr.n_cell = 256 256 256
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
-amr.blocking_factor    = 8       # block factor in grid generation
+amr.blocking_factor    = 32       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
-#maestro.octant = true
 
 # TIME STEPPING
-maestro.max_step  = 1000
-maestro.stop_time = 10000000.
+maestro.max_step  = 10000000
+maestro.stop_time = 1583.1276
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
@@ -46,16 +42,15 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 		           # to satisfy CFL condition.
 
 # ALGORITHMIC OPTIONS
-maestro.spherical = 1
 maestro.evolve_base_state = false
 maestro.do_initial_projection = true
-maestro.init_divu_iter        = 3
+maestro.init_divu_iter        = 1
 maestro.init_iter             = 1
 
 maestro.anelastic_cutoff_density = 1.e-5
 maestro.base_cutoff_density = 1.e-5
 
-maestro.do_sponge = 1
+maestro.do_sponge = 0
 maestro.sponge_center_density = 1.e-3
 maestro.sponge_kappa = 10.e0
 
@@ -69,22 +64,22 @@ maestro.use_exact_base_state = false
 maestro.do_heating = true
 
 # PLOTFILES
-maestro.plot_base_name  = comp_    # root name of plot file
+maestro.plot_base_name  = /home/alice/raid/MAESTROeX/code_comp/plt_    # root name of plot file
 maestro.plot_int   = 50      # number of timesteps between plot files
-#maestro.plot_deltat = 100.0e0
+#maestro.plot_deltat = 50.0e0
 maestro.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 maestro.plot_Hext = true
 
 # CHECKPOINT
-maestro.check_base_name = chk
-maestro.chk_int         = -1
+maestro.check_base_name = /home/alice/raid/MAESTROeX/code_comp/chk_
+maestro.chk_deltat    = 50.0e0
 
 # tolerances for the initial projection
-maestro.eps_init_proj_cart = 1.e-12
-maestro.eps_init_proj_sph  = 1.e-10
+maestro.eps_init_proj_cart = 5.e-12
+maestro.eps_init_proj_sph  = 5.e-10
 # tolerances for the divu iterations
-maestro.eps_divu_cart      = 1.e-12
-maestro.eps_divu_sph       = 1.e-10
+maestro.eps_divu_cart      = 5.e-12
+maestro.eps_divu_sph       = 5.e-10
 maestro.divu_iter_factor   = 100.
 maestro.divu_level_factor  = 10.
 # tolerances for the MAC projection
@@ -93,8 +88,8 @@ maestro.eps_mac_max        = 1.e-8
 maestro.mac_level_factor   = 10.
 maestro.eps_mac_bottom     = 1.e-3
 # tolerances for the nodal projection
-maestro.eps_hg             = 1.e-11
-maestro.eps_hg_max         = 1.e-10
+maestro.eps_hg             = 5.e-11
+maestro.eps_hg_max         = 5.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
@@ -103,7 +98,11 @@ maestro.do_burning = false
 &probin
 
   ! override the default values of the probin namelist values here
-  heating_factor = 1.e2
+  heating_factor = 9.020952262e19
+  g0 = -9.021899571e8
+  rho_0 = 1.82094e6
+  p_0 = 2.7647358e23
+  gamma1 = 1.3e0
 
   !extern
 
@@ -116,7 +115,6 @@ maestro.do_burning = false
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  use_eos_coulomb = T
-  eos_assume_neutral = T
+  eos_gamma = 1.66666667d0
 
 /

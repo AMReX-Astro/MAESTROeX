@@ -1,6 +1,6 @@
-tag_density_1             real 5.e7
-tag_density_2             real 1.e8
-tag_density_3             real 1.e8
-tag_density_3             real 1.e9
-heating_factor            real 1.e3
-sponge_radius             real 2.42e11
+  heating_factor      real 9.020952262e19
+  g0                  real -9.021899571e8
+  rho_0                real 1.82094e6
+  p_0                 real 2.7647358e23
+  gamma1              real 1.3e0
+  

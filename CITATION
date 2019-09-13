@@ -1,7 +1,22 @@
 MAESTROeX derives from MAESTRO.  When citing the code, please cite the
-latest paper below as well as any of the MAESTRO papers appropriate
+two primary alrogithm papers below as well as any of the MAESTRO papers appropriate
 to the discussion.
 
+   @ARTICLE{2019ApJ...submitted,
+       author = {{Fan}, D. and {Nonaka}, A. and {Almgren},
+                  A.~S. and {Harpole}, A. and {Zingale}, M.},
+	title = "{MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver}",
+      journal = {\apj},
+    archivePrefix = "arXiv",
+       eprint = {1908.0363},
+     primaryClass = "astro-ph.SR",
+     keywords = {convection, hydrodynamics, methods: numerical,
+                  nuclear reactions, nucleosynthesis, abundances,
+                  supernovae: general, white dwarfs},
+	 year = 2019,
+      adsnote = {submitted for publication}
+    }
+    
     @ARTICLE{2010ApJS..188..358N,
        author = {{Nonaka}, A. and {Almgren}, A.~S. and {Bell},
                   J.~B. and {Lijewski}, M.~J. and {Malone}, C.~M. and

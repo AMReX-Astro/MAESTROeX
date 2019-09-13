@@ -839,14 +839,15 @@ contains
   end subroutine make_vorticity_3d
 
 
-  subroutine make_magvel(lo,hi,lev,vel,v_lo,v_hi,w0,magvel,m_lo,m_hi) bind(C, name="make_magvel")
+  subroutine make_magvel(lo,hi,vel,v_lo,v_hi,w0_cart,w_lo,w_hi,nc_w0,magvel,m_lo,m_hi) bind(C, name="make_magvel")
 
     integer, intent(in) :: lo(3), hi(3)
-    integer, value, intent(in) :: lev
     integer, intent(in) :: v_lo(3), v_hi(3)
+    integer, intent(in) :: w_lo(3), w_hi(3)
+    integer, value, intent(in) :: nc_w0
     integer, intent(in) :: m_lo(3), m_hi(3)
     double precision, intent(in) :: vel(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3),3)
-    double precision, intent (in   ) :: w0(0:max_radial_level,0:nr_fine)
+    double precision, intent (in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),nc_w0)
     double precision, intent(inout) :: magvel(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
 
     integer :: i, j, k
@@ -858,11 +859,11 @@ contains
           do i = lo(1), hi(1)
 #if (AMREX_SPACEDIM == 2)
              magvel(i,j,k) = sqrt(  vel(i,j,k,1)**2 + &
-                  ( vel(i,j,k,2) + 0.5d0*(w0(lev,j) + w0(lev,j+1)) )**2 )
+                  ( vel(i,j,k,2) + 0.5d0*(w0_cart(i,j,k,AMREX_SPACEDIM) + w0_cart(i,j+1,k,AMREX_SPACEDIM)) )**2 )
 #elif (AMREX_SPACEDIM == 3)
              magvel(i,j,k) = sqrt(  vel(i,j,k,1)**2 + &
                   vel(i,j,k,2)**2 + &
-                  ( vel(i,j,k,3) + 0.5d0*(w0(lev,k) + w0(lev,k+1)) )**2 )
+                  ( vel(i,j,k,3) + 0.5d0*(w0_cart(i,j,k,AMREX_SPACEDIM) + w0_cart(i,j,k+1,AMREX_SPACEDIM)) )**2 )
 #endif
           enddo
        enddo
@@ -951,60 +952,10 @@ contains
 
   end subroutine make_velrc
 
-  subroutine make_deltagamma(lo,hi,lev,state,s_lo,s_hi,nc_s,p0,gamma1bar,&
-       deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma")
 
-    integer         , intent (in   ) :: lo(3), hi(3)
-    integer  , value, intent (in   ) :: lev
-    integer         , intent (in   ) :: s_lo(3), s_hi(3)
-    integer  , value, intent (in   ) :: nc_s
-    integer         , intent (in   ) :: d_lo(3), d_hi(3)
-    double precision, intent (in) :: state(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
-    double precision, intent (in   ) :: p0(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent (inout) :: deltagamma(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-
-    ! Local variables
-    integer :: i, j, k, r
-    integer :: pt_index(3)
-    type (eos_t) :: eos_state
-
-    !$gpu
-
-    do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-          do i = lo(1), hi(1)
-
-#if (AMREX_SPACEDIM == 2)
-             r = j
-#elif (AMREX_SPACEDIM == 3)
-             r = k
-#endif
-
-             eos_state%rho   = state(i,j,k,rho_comp)
-             eos_state%T     = state(i,j,k,temp_comp)
-             if (use_pprime_in_tfromp) then
-                eos_state%p     = p0(lev,r) + state(i,j,k,pi_comp)
-             else
-                eos_state%p     = p0(lev,r)
-             endif
-
-             eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-
-             pt_index(:) = (/i, j, k/)
-
-             call eos(eos_input_rp, eos_state, pt_index)
-
-             deltagamma(i,j,k) = eos_state%gam1 - gamma1bar(lev,r)
-          enddo
-       enddo
-    enddo
-
-  end subroutine make_deltagamma
-
-  subroutine make_deltagamma_sphr(lo,hi,state,s_lo,s_hi,nc_s,&
+  subroutine make_deltagamma(lo,hi,state,s_lo,s_hi,nc_s,&
        p0_cart,p_lo,p_hi,gamma1bar_cart,g_lo,g_hi,&
-       deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma_sphr")
+       deltagamma,d_lo,d_hi) bind(C,name="make_deltagamma")
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
@@ -1047,8 +998,9 @@ contains
        enddo
     enddo
 
-  end subroutine make_deltagamma_sphr
+  end subroutine make_deltagamma
 
+  
   subroutine make_entropy(lo,hi,lev,state,s_lo,s_hi,nc_s,&
        entropy,d_lo,d_hi) bind(C,name="make_entropy")
 
@@ -1091,12 +1043,13 @@ contains
   end subroutine make_entropy
 
 
-  subroutine make_divw0(lo,hi,lev,w0,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
+  subroutine make_divw0(lo,hi,w0_cart,w_lo,w_hi,nc_w0,dx,divw0,d_lo,d_hi) bind(C,name="make_divw0")
 
     integer, intent (in) :: lo(3), hi(3)
-    integer, value, intent (in) :: lev
     integer, intent (in) :: d_lo(3), d_hi(3)
-    double precision, intent (in) :: w0(0:max_radial_level,0:nr_fine)
+    integer, intent(in) :: w_lo(3), w_hi(3)
+    integer, value, intent(in) :: nc_w0
+    double precision, intent (in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),nc_w0)
     double precision, intent (in) :: dx(3)
     double precision, intent (inout) :: divw0(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
 
@@ -1109,9 +1062,9 @@ contains
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
 #if (AMREX_SPACEDIM == 2)
-             divw0(i,j,k) = (w0(lev,j+1) - w0(lev,j)) / dx(2)
+             divw0(i,j,k) = (w0_cart(i,j+1,k,AMREX_SPACEDIM) - w0_cart(i,j,k,AMREX_SPACEDIM)) / dx(2)
 #else
-             divw0(i,j,k) = (w0(lev,k+1) - w0(lev,k)) / dx(3)
+             divw0(i,j,k) = (w0_cart(i,j,k+1,AMREX_SPACEDIM) - w0_cart(i,j,k,AMREX_SPACEDIM)) / dx(3)
 #endif
           enddo
        enddo
