@@ -783,7 +783,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
             // x-direction
             if (ppm_type == 0) {
-                // we're going to reuse Ip here as slopex as it has the
+                // we're going to reuse Ipu here as slopex as it has the
                 // correct number of ghost zones
 #pragma gpu box(obx)
                 slopex_2d(AMREX_INT_ANYD(obx.loVect()),
@@ -832,7 +832,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
             // y-direction
             if (ppm_type == 0) {
-               // we're going to reuse Im here as slopey as it has the
+               // we're going to reuse Imv here as slopey as it has the
                // correct number of ghost zones
 #pragma gpu box(obx)
                slopey_2d(AMREX_INT_ANYD(obx.loVect()),
@@ -881,7 +881,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
             // z-direction
             if (ppm_type == 0) {
-               // we're going to reuse Im here as slopey as it has the
+               // we're going to reuse Imw here as slopey as it has the
                // correct number of ghost zones
 #pragma gpu box(obx)
                slopez_3d(AMREX_INT_ANYD(obx.loVect()),
