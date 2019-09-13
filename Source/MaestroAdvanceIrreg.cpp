@@ -349,15 +349,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && spherical == 1) {
-        // add w0mac back to umac
-        for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
-    }
-
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the full state through dt
     //////////////////////////////////////////////////////////////////////////////
@@ -403,17 +394,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
+    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
     	Average(s2, rho0_new, Rho);
     	compute_cutoff_coords(rho0_new.dataPtr());
-    }
-
-    // compute the new etarho
-    if (evolve_base_state && use_etarho) {
-	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
     }
 
     // update grav_cell_new
@@ -468,7 +454,21 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac_dummy,thermal1);
+    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+
+    if (evolve_base_state && spherical == 1) {
+        // add w0mac back to umac
+        for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+	        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
+	}
+    }
+
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
@@ -666,15 +666,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && spherical == 1) {
-        // add w0mac back to umac
-        for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
-    }
-
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the full state through dt
     //////////////////////////////////////////////////////////////////////////////
@@ -698,17 +689,12 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
+    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
     	Average(s2, rho0_new, Rho);
     	compute_cutoff_coords(rho0_new.dataPtr());
-    }
-
-    // compute the new etarho
-    if (evolve_base_state && use_etarho) {
-	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
     }
 
     // update grav_cell_new, rho0_nph, grav_cell_nph
@@ -765,6 +751,20 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac_dummy,thermal1);
+
+    if (evolve_base_state && spherical == 1) {
+        // add w0mac back to umac
+        for (int lev = 0; lev <= finest_level; ++lev) {
+	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+	        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
+	    }
+	}
+    }
+
+    // compute the new etarho
+    if (evolve_base_state && use_etarho) {
+	MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8a (Option I) -- Add thermal conduction (only enthalpy terms)
