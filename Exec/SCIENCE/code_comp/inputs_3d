@@ -23,7 +23,8 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell = 128 128 128
+#amr.n_cell = 128 128 128
+amr.n_cell = 256 256 256
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -74,11 +75,11 @@ maestro.check_base_name = /home/alice/raid/MAESTROeX/code_comp/chk_
 maestro.chk_deltat    = 50.0e0
 
 # tolerances for the initial projection
-maestro.eps_init_proj_cart = 1.e-12
-maestro.eps_init_proj_sph  = 1.e-10
+maestro.eps_init_proj_cart = 5.e-12
+maestro.eps_init_proj_sph  = 5.e-10
 # tolerances for the divu iterations
-maestro.eps_divu_cart      = 1.e-12
-maestro.eps_divu_sph       = 1.e-10
+maestro.eps_divu_cart      = 5.e-12
+maestro.eps_divu_sph       = 5.e-10
 maestro.divu_iter_factor   = 100.
 maestro.divu_level_factor  = 10.
 # tolerances for the MAC projection
@@ -87,8 +88,8 @@ maestro.eps_mac_max        = 1.e-8
 maestro.mac_level_factor   = 10.
 maestro.eps_mac_bottom     = 1.e-3
 # tolerances for the nodal projection
-maestro.eps_hg             = 1.e-11
-maestro.eps_hg_max         = 1.e-10
+maestro.eps_hg             = 5.e-11
+maestro.eps_hg_max         = 5.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 

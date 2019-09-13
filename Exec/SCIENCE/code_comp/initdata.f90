@@ -52,19 +52,20 @@ contains
        do j=lo(2),hi(2)
           y = prob_lo(2) + dx(2)*(dble(j) + HALF)
 
-#if (AMREX_SPACEDIM == 2)
+          if (amrex_spacedim .eq. 2) then
             if (y < 1.125d0 * 4.d8) then
                 fheat = sin(8.d0 * M_PI * (y/ 4.d8 - ONE))
             else
                 fheat = ZERO
             endif
-#else 
+          else
             if (z < 1.125d0 * 4.d8) then
                 fheat = sin(8.d0 * M_PI * (z/ 4.d8 - ONE))
             else
                 fheat = ZERO
             endif
-#endif
+          endif
+
           do i=lo(1),hi(1)
              x = prob_lo(1) + dx(1)*(dble(i) + HALF) 
 

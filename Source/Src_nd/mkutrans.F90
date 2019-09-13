@@ -20,18 +20,19 @@ module mkutrans_module
 contains
 
 #if (AMREX_SPACEDIM == 2)
-  subroutine mkutrans_2d(lo, hi, lev, idir, domlo, domhi, &
+  subroutine mkutrans_2d(lo, hi, idir, domlo, domhi, &
        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
        utrans, uu_lo, uu_hi, &
        vtrans, uv_lo, uv_hi, &
        Ip, ip_lo, ip_hi, &
        Im, im_lo, im_hi, &
-       w0,dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
+       w0_cart, w_lo, w_hi, &
+       dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_2d")
 
     implicit none
 
-    integer, value, intent(in   ) :: lev, idir
+    integer, value, intent(in   ) :: idir
     integer, intent(in) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
     integer, value  , intent(in   ) :: nc_ut, ng_ut
@@ -41,13 +42,14 @@ contains
     integer         , intent(in   ) :: uv_lo(3), uv_hi(3)
     integer         , intent(in   ) :: ip_lo(3), ip_hi(3)
     integer         , intent(in   ) :: im_lo(3), im_hi(3)
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
     double precision, intent(inout) :: vtrans(uv_lo(1):uv_hi(1),uv_lo(2):uv_hi(2),uv_lo(3):uv_hi(3))
     double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),1:2)
     double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),1:2)
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
     integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
@@ -203,9 +205,9 @@ contains
 
              ! solve Riemann problem using full velocity
              uavg = HALF*(vly+vry)
-             test = ((vly+w0(lev,j) .le. ZERO .and. vry+w0(lev,j) .ge. ZERO) .or. &
-                  (abs(vly+vry+TWO*w0(lev,j)) .lt. rel_eps))
-             vtrans(i,j,k) = merge(vly,vry,uavg+w0(lev,j) .gt. ZERO)
+             test = ((vly+w0_cart(i,j,k,AMREX_SPACEDIM) .le. ZERO .and. vry+w0_cart(i,j,k,AMREX_SPACEDIM) .ge. ZERO) .or. &
+                  (abs(vly+vry+TWO*w0_cart(i,j,k,AMREX_SPACEDIM)) .lt. rel_eps))
+             vtrans(i,j,k) = merge(vly,vry,uavg+w0_cart(i,j,k,AMREX_SPACEDIM) .gt. ZERO)
              vtrans(i,j,k) = merge(ZERO,vtrans(i,j,k),test)
           enddo
        enddo
@@ -216,7 +218,7 @@ contains
 #endif
 
 #if (AMREX_SPACEDIM == 3)
-  subroutine mkutrans_3d(lo, hi, lev, idir, domlo, domhi, &
+  subroutine mkutrans_3d(lo, hi, idir, domlo, domhi, &
        utilde, ut_lo, ut_hi, nc_ut, ng_ut, &
        ufull,  uf_lo, uf_hi, nc_uf, ng_uf, &
        utrans, uu_lo, uu_hi, &
@@ -227,12 +229,12 @@ contains
        w0macx, wx_lo, wx_hi, &
        w0macy, wy_lo, wy_hi, &
        w0macz, wz_lo, wz_hi, &
-       w0, &
+       w0_cart, w_lo, w_hi, &
        dx,dt,adv_bc,phys_bc) bind(C,name="mkutrans_3d")
 
     integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
     integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
-    integer, value  , intent(in   ) :: lev, idir, ng_ut, nc_ut
+    integer, value  , intent(in   ) :: idir, ng_ut, nc_ut
     integer         , intent(in   ) :: uf_lo(3), uf_hi(3)
     integer, value  , intent(in   ) :: ng_uf, nc_uf
     integer         , intent(in   ) :: uu_lo(3), uu_hi(3)
@@ -243,6 +245,7 @@ contains
     integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
     integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
     integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
     double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
     double precision, intent(in   ) :: ufull (uf_lo(1):uf_hi(1),uf_lo(2):uf_hi(2),uf_lo(3):uf_hi(3),nc_uf)
     double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
@@ -253,7 +256,7 @@ contains
     double precision, intent(in   ) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
     double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
     double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
     integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,AMREX_SPACEDIM), phys_bc(AMREX_SPACEDIM,2) ! dim, lohi, (comp)
@@ -520,9 +523,9 @@ contains
                 else
                    ! solve Riemann problem using full velocity
                    uavg = HALF*(wlz+wrz)
-                   test = ((wlz+w0(lev,k).le.ZERO .and. wrz+w0(lev,k).ge.ZERO) .or. &
-                        (abs(wlz+wrz+TWO*w0(lev,k)) .lt. rel_eps))
-                   wtrans(i,j,k) = merge(wlz,wrz,uavg+w0(lev,k) .gt. ZERO)
+                   test = ((wlz+w0_cart(i,j,k,AMREX_SPACEDIM).le.ZERO .and. wrz+w0_cart(i,j,k,AMREX_SPACEDIM).ge.ZERO) .or. &
+                        (abs(wlz+wrz+TWO*w0_cart(i,j,k,AMREX_SPACEDIM)) .lt. rel_eps))
+                   wtrans(i,j,k) = merge(wlz,wrz,uavg+w0_cart(i,j,k,AMREX_SPACEDIM) .gt. ZERO)
                    wtrans(i,j,k) = merge(ZERO,wtrans(i,j,k),test)
                 end if
              enddo

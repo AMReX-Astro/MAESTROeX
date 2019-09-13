@@ -266,7 +266,8 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
      ury, ury_lo, ury_hi, &
      uimhy, uiy_lo, uiy_hi, &
      force,   f_lo,  f_hi, nc_f, ng_f, &
-     w0,dx,dt,adv_bc,phys_bc) bind(C,name="velpred_2d")
+     w0_cart, w_lo, w_hi, &
+     dx,dt,adv_bc,phys_bc) bind(C,name="velpred_2d")
 
   integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
   integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
@@ -283,7 +284,8 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
   integer         , intent(in   ) :: uly_lo(3), uly_hi(3)
   integer         , intent(in   ) :: ury_lo(3), ury_hi(3)
   integer         , intent(in   ) :: uiy_lo(3), uiy_hi(3)
-  integer         , intent(in   ) ::  f_lo(3),  f_hi(3)
+  integer         , intent(in   ) :: f_lo(3),  f_hi(3)
+  integer         , intent(in   ) :: w_lo(3),  w_hi(3)
   integer, value,   intent(in   ) :: ng_f, nc_f
   double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
   double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
@@ -299,7 +301,7 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
   double precision, intent(in   ) :: ury (ury_lo(1):ury_hi(1),ury_lo(2):ury_hi(2),ury_lo(3):ury_hi(3),AMREX_SPACEDIM)
   double precision, intent(in   ) :: uimhy (uiy_lo(1):uiy_hi(1),uiy_lo(2):uiy_hi(2),uiy_lo(3):uiy_hi(3),AMREX_SPACEDIM)
   double precision, intent(in   ) :: force ( f_lo(1): f_hi(1), f_lo(2): f_hi(2),f_lo(3): f_hi(3),nc_f)
-  double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
+  double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3): w_hi(3),AMREX_SPACEDIM)
   double precision, intent(in   ) :: dx(3)
   double precision, value, intent(in   ) :: dt
   integer         , intent(in   ) :: adv_bc(2,2,2), phys_bc(2,2) ! dim, lohi, (comp)
@@ -407,9 +409,9 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
 
            ! solve Riemann problem using full velocity
            uavg = HALF*(vmacl+vmacr)
-           test = ((vmacl+w0(lev,j) .le. ZERO .and. vmacr+w0(lev,j) .ge. ZERO) .or. &
-                (abs(vmacl+vmacr+TWO*w0(lev,j)) .lt. rel_eps))
-           vmac(i,j,k) = merge(vmacl,vmacr,uavg+w0(lev,j) .gt. ZERO)
+           test = ((vmacl+w0_cart(i,j,k,AMREX_SPACEDIM) .le. ZERO .and. vmacr+w0_cart(i,j,k,AMREX_SPACEDIM) .ge. ZERO) .or. &
+                (abs(vmacl+vmacr+TWO*w0_cart(i,j,k,AMREX_SPACEDIM)) .lt. rel_eps))
+           vmac(i,j,k) = merge(vmacl,vmacr,uavg+w0_cart(i,j,k,AMREX_SPACEDIM) .gt. ZERO)
            vmac(i,j,k) = merge(ZERO,vmac(i,j,k),test)
 
            ! impose lo side bc's
@@ -1316,7 +1318,8 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
      wimhxy, wxy_lo, wxy_hi, &
      wimhyx, wyx_lo, wyx_hi, &
      force,   f_lo,  f_hi, nc_f, ng_f, &
-     w0,dx,dt,phys_bc) bind(C,name="velpred_3d")
+     w0_cart, w_lo, w_hi, &
+     dx,dt,phys_bc) bind(C,name="velpred_3d")
 
   integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
   integer         , intent(in   ) :: ut_lo(3), ut_hi(3)
@@ -1341,6 +1344,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
   integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
   integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
   integer         , intent(in   ) ::  f_lo(3),  f_hi(3)
+  integer         , intent(in   ) :: w_lo(3),  w_hi(3)
   integer, value,   intent(in   ) :: ng_f, nc_f
   double precision, intent(in   ) :: utilde(ut_lo(1):ut_hi(1),ut_lo(2):ut_hi(2),ut_lo(3):ut_hi(3),nc_ut)
   double precision, intent(inout) :: utrans(uu_lo(1):uu_hi(1),uu_lo(2):uu_hi(2),uu_lo(3):uu_hi(3))
@@ -1363,7 +1367,7 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
   double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
   double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
   double precision, intent(in   ) :: force ( f_lo(1): f_hi(1), f_lo(2): f_hi(2), f_lo(3): f_hi(3),nc_f)
-  double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
+  double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3): w_hi(3),AMREX_SPACEDIM)
   double precision, intent(in   ) :: dx(3)
   double precision, value, intent(in   ) :: dt
   integer         , intent(in   ) :: phys_bc(3,2) ! dim, lohi, (comp)
@@ -1597,10 +1601,10 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
               else
                  ! solve Riemann problem using full velocity
                  uavg = HALF*(wmacl+wmacr)
-                 test = ((wmacl+w0(lev,k) .le. ZERO .and. &
-                      wmacr+w0(lev,k) .ge. ZERO) .or. &
-                      (abs(wmacl+wmacr+TWO*w0(lev,k)) .lt. rel_eps))
-                 wmac(i,j,k) = merge(wmacl,wmacr,uavg+w0(lev,k) .gt. ZERO)
+                 test = ((wmacl+w0_cart(i,j,k,AMREX_SPACEDIM) .le. ZERO .and. &
+                      wmacr+w0_cart(i,j,k,AMREX_SPACEDIM) .ge. ZERO) .or. &
+                      (abs(wmacl+wmacr+TWO*w0_cart(i,j,k,AMREX_SPACEDIM)) .lt. rel_eps))
+                 wmac(i,j,k) = merge(wmacl,wmacr,uavg+w0_cart(i,j,k,AMREX_SPACEDIM) .gt. ZERO)
                  wmac(i,j,k) = merge(ZERO,wmac(i,j,k),test)
 
               end if
