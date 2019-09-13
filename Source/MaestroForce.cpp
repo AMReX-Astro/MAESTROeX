@@ -329,7 +329,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         psi_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         grav_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-        rho0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         AMREX_D_TERM(p0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
                     p0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
                     p0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );

@@ -1369,7 +1369,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 2);
+        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         w0_cart[lev].setVal(0.);
     }
 

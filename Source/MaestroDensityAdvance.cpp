@@ -44,12 +44,12 @@ Maestro::DensityAdvance (int which_step,
 
     Vector<MultiFab> rho0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
 
     Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
 
-    // ** density source term **
+    // ** density source term **s
 
     // Make source term for rho or rho'
     if (species_pred_type == predict_rhoprime_and_X) {
