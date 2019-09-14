@@ -335,6 +335,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     p0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
         psi_cart[lev].setVal(0.);
         grav_cart[lev].setVal(0.);
+	rho0_cart[lev].setVal(0.);
+	p0_cart[lev].setVal(0.);
     }
 
     Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);

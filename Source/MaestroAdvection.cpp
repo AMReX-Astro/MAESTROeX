@@ -765,7 +765,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
            MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
         }
-
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -783,7 +782,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
             // x-direction
             if (ppm_type == 0) {
-                // we're going to reuse Ip here as slopex as it has the
+                // we're going to reuse Ipu here as slopex as it has the
                 // correct number of ghost zones
 #pragma gpu box(obx)
                 slopex_2d(AMREX_INT_ANYD(obx.loVect()),
@@ -832,7 +831,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
             // y-direction
             if (ppm_type == 0) {
-               // we're going to reuse Im here as slopey as it has the
+               // we're going to reuse Imv here as slopey as it has the
                // correct number of ghost zones
 #pragma gpu box(obx)
                slopey_2d(AMREX_INT_ANYD(obx.loVect()),
@@ -881,7 +880,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
             // z-direction
             if (ppm_type == 0) {
-               // we're going to reuse Im here as slopey as it has the
+               // we're going to reuse Imw here as slopey as it has the
                // correct number of ghost zones
 #pragma gpu box(obx)
                slopez_3d(AMREX_INT_ANYD(obx.loVect()),
