@@ -276,7 +276,7 @@ transverse velocities here.  The prediction is done piecewise linear (for now)</
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#f/velpred_module/velpred_2d" title="f/velpred_module/velpred_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_2d()</span></code></a>, <a class="reference internal" href="#f/velpred_module/velpred_3d" title="f/velpred_module/velpred_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_3d()</span></code></a>, <a class="reference internal" href="#f/velpred_module/velpred_interface_2d" title="f/velpred_module/velpred_interface_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_interface_2d()</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#f/velpred_module/velpred_2d" title="f/velpred_module/velpred_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_2d()</span></code></a>, <a class="reference internal" href="#f/velpred_module/velpred_3d" title="f/velpred_module/velpred_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_3d()</span></code></a>, <a class="reference internal" href="#f/velpred_module/velpred_interface_2d" title="f/velpred_module/velpred_interface_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_interface_2d()</span></code></a>, <a class="reference internal" href="#f/velpred_module/velpred_interface_3d" title="f/velpred_module/velpred_interface_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_interface_3d()</span></code></a>, <a class="reference internal" href="#f/velpred_module/velpred_transverse_3d" title="f/velpred_module/velpred_transverse_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">velpred_transverse_3d()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Required modules</p>
@@ -346,7 +346,7 @@ transverse velocities here.  The prediction is done piecewise linear (for now)</
 
 <dl class="subroutine">
 <dt id="f/velpred_module/velpred_2d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">velpred_module/</code><code class="sig-name descname">velpred_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">idir</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">utilde</em>, <em class="sig-param">ut_lo</em>, <em class="sig-param">ut_hi</em>, <em class="sig-param">nc_ut</em>, <em class="sig-param">ng_ut</em>, <em class="sig-param">utrans</em>, <em class="sig-param">uu_lo</em>, <em class="sig-param">uu_hi</em>, <em class="sig-param">vtrans</em>, <em class="sig-param">uv_lo</em>, <em class="sig-param">uv_hi</em>, <em class="sig-param">umac</em>, <em class="sig-param">mu_lo</em>, <em class="sig-param">mu_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">mv_lo</em>, <em class="sig-param">mv_hi</em>, <em class="sig-param">imf</em>, <em class="sig-param">imf_lo</em>, <em class="sig-param">imf_hi</em>, <em class="sig-param">ipf</em>, <em class="sig-param">ipf_lo</em>, <em class="sig-param">ipf_hi</em>, <em class="sig-param">ulx</em>, <em class="sig-param">ulx_lo</em>, <em class="sig-param">ulx_hi</em>, <em class="sig-param">urx</em>, <em class="sig-param">urx_lo</em>, <em class="sig-param">urx_hi</em>, <em class="sig-param">uimhx</em>, <em class="sig-param">uix_lo</em>, <em class="sig-param">uix_hi</em>, <em class="sig-param">uly</em>, <em class="sig-param">uly_lo</em>, <em class="sig-param">uly_hi</em>, <em class="sig-param">ury</em>, <em class="sig-param">ury_lo</em>, <em class="sig-param">ury_hi</em>, <em class="sig-param">uimhy</em>, <em class="sig-param">uiy_lo</em>, <em class="sig-param">uiy_hi</em>, <em class="sig-param">force</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">nc_f</em>, <em class="sig-param">ng_f</em>, <em class="sig-param">w0</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">phys_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/velpred_module/velpred_2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">velpred_module/</code><code class="sig-name descname">velpred_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">idir</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">utilde</em>, <em class="sig-param">ut_lo</em>, <em class="sig-param">ut_hi</em>, <em class="sig-param">nc_ut</em>, <em class="sig-param">ng_ut</em>, <em class="sig-param">utrans</em>, <em class="sig-param">uu_lo</em>, <em class="sig-param">uu_hi</em>, <em class="sig-param">vtrans</em>, <em class="sig-param">uv_lo</em>, <em class="sig-param">uv_hi</em>, <em class="sig-param">umac</em>, <em class="sig-param">mu_lo</em>, <em class="sig-param">mu_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">mv_lo</em>, <em class="sig-param">mv_hi</em>, <em class="sig-param">imf</em>, <em class="sig-param">imf_lo</em>, <em class="sig-param">imf_hi</em>, <em class="sig-param">ipf</em>, <em class="sig-param">ipf_lo</em>, <em class="sig-param">ipf_hi</em>, <em class="sig-param">ulx</em>, <em class="sig-param">ulx_lo</em>, <em class="sig-param">ulx_hi</em>, <em class="sig-param">urx</em>, <em class="sig-param">urx_lo</em>, <em class="sig-param">urx_hi</em>, <em class="sig-param">uimhx</em>, <em class="sig-param">uix_lo</em>, <em class="sig-param">uix_hi</em>, <em class="sig-param">uly</em>, <em class="sig-param">uly_lo</em>, <em class="sig-param">uly_hi</em>, <em class="sig-param">ury</em>, <em class="sig-param">ury_lo</em>, <em class="sig-param">ury_hi</em>, <em class="sig-param">uimhy</em>, <em class="sig-param">uiy_lo</em>, <em class="sig-param">uiy_hi</em>, <em class="sig-param">force</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">nc_f</em>, <em class="sig-param">ng_f</em>, <em class="sig-param">w0_cart</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">phys_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/velpred_module/velpred_2d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -402,7 +402,9 @@ transverse velocities here.  The prediction is done piecewise linear (for now)</
 <li><p><strong>f_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>ng_f</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0_cart</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1, w_hi(3)-(w_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>adv_bc</strong> (2,2,2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -413,26 +415,145 @@ transverse velocities here.  The prediction is done piecewise linear (for now)</
 </dd></dl>
 
 <dl class="subroutine">
-<dt id="f/velpred_module/velpred_3d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">velpred_module/</code><code class="sig-name descname">velpred_3d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">utilde</em>, <em class="sig-param">ut_lo</em>, <em class="sig-param">ut_hi</em>, <em class="sig-param">nc_ut</em>, <em class="sig-param">ng_ut</em>, <em class="sig-param">ufull</em>, <em class="sig-param">uf_lo</em>, <em class="sig-param">uf_hi</em>, <em class="sig-param">nc_uf</em>, <em class="sig-param">ng_uf</em>, <em class="sig-param">utrans</em>, <em class="sig-param">uu_lo</em>, <em class="sig-param">uu_hi</em>, <em class="sig-param">vtrans</em>, <em class="sig-param">uv_lo</em>, <em class="sig-param">uv_hi</em>, <em class="sig-param">wtrans</em>, <em class="sig-param">uw_lo</em>, <em class="sig-param">uw_hi</em>, <em class="sig-param">umac</em>, <em class="sig-param">mu_lo</em>, <em class="sig-param">mu_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">mv_lo</em>, <em class="sig-param">mv_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">mw_lo</em>, <em class="sig-param">mw_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">wy_lo</em>, <em class="sig-param">wy_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">wz_lo</em>, <em class="sig-param">wz_hi</em>, <em class="sig-param">force</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">nc_f</em>, <em class="sig-param">ng_f</em>, <em class="sig-param">w0</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">adv_bc</em>, <em class="sig-param">phys_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/velpred_module/velpred_3d" title="Permalink to this definition">¶</a></dt>
+<dt id="f/velpred_module/velpred_interface_3d">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">velpred_module/</code><code class="sig-name descname">velpred_interface_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">idir</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">utilde</em>, <em class="sig-param">ut_lo</em>, <em class="sig-param">ut_hi</em>, <em class="sig-param">nc_ut</em>, <em class="sig-param">ng_ut</em>, <em class="sig-param">ufull</em>, <em class="sig-param">uf_lo</em>, <em class="sig-param">uf_hi</em>, <em class="sig-param">nc_uf</em>, <em class="sig-param">ng_uf</em>, <em class="sig-param">utrans</em>, <em class="sig-param">uu_lo</em>, <em class="sig-param">uu_hi</em>, <em class="sig-param">imu</em>, <em class="sig-param">imu_lo</em>, <em class="sig-param">imu_hi</em>, <em class="sig-param">ipu</em>, <em class="sig-param">ipu_lo</em>, <em class="sig-param">ipu_hi</em>, <em class="sig-param">imv</em>, <em class="sig-param">imv_lo</em>, <em class="sig-param">imv_hi</em>, <em class="sig-param">ipv</em>, <em class="sig-param">ipv_lo</em>, <em class="sig-param">ipv_hi</em>, <em class="sig-param">imw</em>, <em class="sig-param">imw_lo</em>, <em class="sig-param">imw_hi</em>, <em class="sig-param">ipw</em>, <em class="sig-param">ipw_lo</em>, <em class="sig-param">ipw_hi</em>, <em class="sig-param">ul</em>, <em class="sig-param">ul_lo</em>, <em class="sig-param">ul_hi</em>, <em class="sig-param">ur</em>, <em class="sig-param">ur_lo</em>, <em class="sig-param">ur_hi</em>, <em class="sig-param">uimh</em>, <em class="sig-param">ui_lo</em>, <em class="sig-param">ui_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">phys_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/velpred_module/velpred_interface_3d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>idir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>utilde</strong> (ut_hi(1)-(ut_lo(1))+1,ut_hi(2)-(ut_lo(2))+1,ut_hi(3)-(ut_lo(3))+1,nc_ut)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ut_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ut_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_ut</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>nc_ut</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>ng_ut</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>ufull</strong> (uf_hi(1)-(uf_lo(1))+1,uf_hi(2)-(uf_lo(2))+1,uf_hi(3)-(uf_lo(3))+1,nc_uf)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>uf_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>uf_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_uf</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>nc_uf</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>ng_uf</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>utrans</strong> (uu_hi(1)-(uu_lo(1))+1,uu_hi(2)-(uu_lo(2))+1,uu_hi(3)-(uu_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>uu_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uu_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imu</strong> (imu_hi(1)-(imu_lo(1))+1,imu_hi(2)-(imu_lo(2))+1,imu_hi(3)-(imu_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imu_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imu_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipu</strong> (ipu_hi(1)-(ipu_lo(1))+1,ipu_hi(2)-(ipu_lo(2))+1,ipu_hi(3)-(ipu_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipu_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipu_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imv</strong> (imv_hi(1)-(imv_lo(1))+1,imv_hi(2)-(imv_lo(2))+1,imv_hi(3)-(imv_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imv_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imv_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipv</strong> (ipv_hi(1)-(ipv_lo(1))+1,ipv_hi(2)-(ipv_lo(2))+1,ipv_hi(3)-(ipv_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipv_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipv_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imw</strong> (imw_hi(1)-(imw_lo(1))+1,imw_hi(2)-(imw_lo(2))+1,imw_hi(3)-(imw_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imw_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imw_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipw</strong> (ipw_hi(1)-(ipw_lo(1))+1,ipw_hi(2)-(ipw_lo(2))+1,ipw_hi(3)-(ipw_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipw_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipw_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ul</strong> (ul_hi(1)-(ul_lo(1))+1,ul_hi(2)-(ul_lo(2))+1,ul_hi(3)-(ul_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>ul_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ul_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ur</strong> (ur_hi(1)-(ur_lo(1))+1,ur_hi(2)-(ur_lo(2))+1,ur_hi(3)-(ur_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>ur_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ur_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uimh</strong> (ui_hi(1)-(ui_lo(1))+1,ui_hi(2)-(ui_lo(2))+1,ui_hi(3)-(ui_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>ui_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ui_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>phys_bc</strong> (3,2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em> :: dim, lohi, (comp)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/velpred_module/velpred_transverse_3d">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">velpred_module/</code><code class="sig-name descname">velpred_transverse_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">base_dir</em>, <em class="sig-param">norm_dir</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">utilde</em>, <em class="sig-param">ut_lo</em>, <em class="sig-param">ut_hi</em>, <em class="sig-param">nc_ut</em>, <em class="sig-param">ng_ut</em>, <em class="sig-param">utrans</em>, <em class="sig-param">uu_lo</em>, <em class="sig-param">uu_hi</em>, <em class="sig-param">vtrans</em>, <em class="sig-param">uv_lo</em>, <em class="sig-param">uv_hi</em>, <em class="sig-param">wtrans</em>, <em class="sig-param">uw_lo</em>, <em class="sig-param">uw_hi</em>, <em class="sig-param">ulx</em>, <em class="sig-param">ulx_lo</em>, <em class="sig-param">ulx_hi</em>, <em class="sig-param">urx</em>, <em class="sig-param">urx_lo</em>, <em class="sig-param">urx_hi</em>, <em class="sig-param">uimhx</em>, <em class="sig-param">uix_lo</em>, <em class="sig-param">uix_hi</em>, <em class="sig-param">uly</em>, <em class="sig-param">uly_lo</em>, <em class="sig-param">uly_hi</em>, <em class="sig-param">ury</em>, <em class="sig-param">ury_lo</em>, <em class="sig-param">ury_hi</em>, <em class="sig-param">uimhy</em>, <em class="sig-param">uiy_lo</em>, <em class="sig-param">uiy_hi</em>, <em class="sig-param">ulz</em>, <em class="sig-param">ulz_lo</em>, <em class="sig-param">ulz_hi</em>, <em class="sig-param">urz</em>, <em class="sig-param">urz_lo</em>, <em class="sig-param">urz_hi</em>, <em class="sig-param">uimhz</em>, <em class="sig-param">uiz_lo</em>, <em class="sig-param">uiz_hi</em>, <em class="sig-param">uimh_trans</em>, <em class="sig-param">uit_lo</em>, <em class="sig-param">uit_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">phys_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/velpred_module/velpred_transverse_3d" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>base_dir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>norm_dir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>utilde</strong> (ut_hi(1)-(ut_lo(1))+1,ut_hi(2)-(ut_lo(2))+1,ut_hi(3)-(ut_lo(3))+1,nc_ut)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ut_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ut_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_ut</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>ng_ut</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>utrans</strong> (uu_hi(1)-(uu_lo(1))+1,uu_hi(2)-(uu_lo(2))+1,uu_hi(3)-(uu_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uu_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uu_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>vtrans</strong> (uv_hi(1)-(uv_lo(1))+1,uv_hi(2)-(uv_lo(2))+1,uv_hi(3)-(uv_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uv_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uv_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wtrans</strong> (uw_hi(1)-(uw_lo(1))+1,uw_hi(2)-(uw_lo(2))+1,uw_hi(3)-(uw_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uw_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uw_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ulx</strong> (ulx_hi(1)-(ulx_lo(1))+1,ulx_hi(2)-(ulx_lo(2))+1,ulx_hi(3)-(ulx_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ulx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ulx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>urx</strong> (urx_hi(1)-(urx_lo(1))+1,urx_hi(2)-(urx_lo(2))+1,urx_hi(3)-(urx_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>urx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>urx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uimhx</strong> (uix_hi(1)-(uix_lo(1))+1,uix_hi(2)-(uix_lo(2))+1,uix_hi(3)-(uix_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uix_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uix_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uly</strong> (uly_hi(1)-(uly_lo(1))+1,uly_hi(2)-(uly_lo(2))+1,uly_hi(3)-(uly_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uly_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uly_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ury</strong> (ury_hi(1)-(ury_lo(1))+1,ury_hi(2)-(ury_lo(2))+1,ury_hi(3)-(ury_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ury_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ury_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uimhy</strong> (uiy_hi(1)-(uiy_lo(1))+1,uiy_hi(2)-(uiy_lo(2))+1,uiy_hi(3)-(uiy_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uiy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uiy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ulz</strong> (ulz_hi(1)-(ulz_lo(1))+1,ulz_hi(2)-(ulz_lo(2))+1,ulz_hi(3)-(ulz_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ulz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ulz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>urz</strong> (urz_hi(1)-(urz_lo(1))+1,urz_hi(2)-(urz_lo(2))+1,urz_hi(3)-(urz_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>urz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>urz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uimhz</strong> (uiz_hi(1)-(uiz_lo(1))+1,uiz_hi(2)-(uiz_lo(2))+1,uiz_hi(3)-(uiz_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uiz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uiz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uimh_trans</strong> (uit_hi(1)-(uit_lo(1))+1,uit_hi(2)-(uit_lo(2))+1,uit_hi(3)-(uit_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>uit_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uit_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>phys_bc</strong> (3,2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em> :: dim, lohi, (comp)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/velpred_module/velpred_3d">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">velpred_module/</code><code class="sig-name descname">velpred_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">idir</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">utilde</em>, <em class="sig-param">ut_lo</em>, <em class="sig-param">ut_hi</em>, <em class="sig-param">nc_ut</em>, <em class="sig-param">ng_ut</em>, <em class="sig-param">utrans</em>, <em class="sig-param">uu_lo</em>, <em class="sig-param">uu_hi</em>, <em class="sig-param">vtrans</em>, <em class="sig-param">uv_lo</em>, <em class="sig-param">uv_hi</em>, <em class="sig-param">wtrans</em>, <em class="sig-param">uw_lo</em>, <em class="sig-param">uw_hi</em>, <em class="sig-param">umac</em>, <em class="sig-param">mu_lo</em>, <em class="sig-param">mu_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">mv_lo</em>, <em class="sig-param">mv_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">mw_lo</em>, <em class="sig-param">mw_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">wy_lo</em>, <em class="sig-param">wy_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">wz_lo</em>, <em class="sig-param">wz_hi</em>, <em class="sig-param">imf</em>, <em class="sig-param">imf_lo</em>, <em class="sig-param">imf_hi</em>, <em class="sig-param">ipf</em>, <em class="sig-param">ipf_lo</em>, <em class="sig-param">ipf_hi</em>, <em class="sig-param">ul</em>, <em class="sig-param">ul_lo</em>, <em class="sig-param">ul_hi</em>, <em class="sig-param">ur</em>, <em class="sig-param">ur_lo</em>, <em class="sig-param">ur_hi</em>, <em class="sig-param">uimhyz</em>, <em class="sig-param">uyz_lo</em>, <em class="sig-param">uyz_hi</em>, <em class="sig-param">uimhzy</em>, <em class="sig-param">uzy_lo</em>, <em class="sig-param">uzy_hi</em>, <em class="sig-param">vimhxz</em>, <em class="sig-param">vxz_lo</em>, <em class="sig-param">vxz_hi</em>, <em class="sig-param">vimhzx</em>, <em class="sig-param">vzx_lo</em>, <em class="sig-param">vzx_hi</em>, <em class="sig-param">wimhxy</em>, <em class="sig-param">wxy_lo</em>, <em class="sig-param">wxy_hi</em>, <em class="sig-param">wimhyx</em>, <em class="sig-param">wyx_lo</em>, <em class="sig-param">wyx_hi</em>, <em class="sig-param">force</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">nc_f</em>, <em class="sig-param">ng_f</em>, <em class="sig-param">w0_cart</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">dt</em>, <em class="sig-param">phys_bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/velpred_module/velpred_3d" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>idir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>utilde</strong> (ut_hi(1)-(ut_lo(1))+1,ut_hi(2)-(ut_lo(2))+1,ut_hi(3)-(ut_lo(3))+1,nc_ut)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ut_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ut_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_ut</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>ng_ut</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>utrans</strong> (uu_hi(1)-(uu_lo(1))+1,uu_hi(2)-(uu_lo(2))+1,uu_hi(3)-(uu_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>uu_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>uu_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -460,20 +581,48 @@ transverse velocities here.  The prediction is done piecewise linear (for now)</
 <li><p><strong>w0macz</strong> (wz_hi(1)-(wz_lo(1))+1,wz_hi(2)-(wz_lo(2))+1,wz_hi(3)-(wz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>wz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>wz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imf</strong> (imf_hi(1)-(imf_lo(1))+1,imf_hi(2)-(imf_lo(2))+1,imf_hi(3)-(imf_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imf_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>imf_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipf</strong> (ipf_hi(1)-(ipf_lo(1))+1,ipf_hi(2)-(ipf_lo(2))+1,ipf_hi(3)-(ipf_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipf_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ipf_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ul</strong> (ul_hi(1)-(ul_lo(1))+1,ul_hi(2)-(ul_lo(2))+1,ul_hi(3)-(ul_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ul_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ul_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ur</strong> (ur_hi(1)-(ur_lo(1))+1,ur_hi(2)-(ur_lo(2))+1,ur_hi(3)-(ur_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ur_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>ur_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uimhyz</strong> (uyz_hi(1)-(uyz_lo(1))+1,uyz_hi(2)-(uyz_lo(2))+1,uyz_hi(3)-(uyz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uyz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uyz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uimhzy</strong> (uzy_hi(1)-(uzy_lo(1))+1,uzy_hi(2)-(uzy_lo(2))+1,uzy_hi(3)-(uzy_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uzy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>uzy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>vimhxz</strong> (vxz_hi(1)-(vxz_lo(1))+1,vxz_hi(2)-(vxz_lo(2))+1,vxz_hi(3)-(vxz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>vxz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>vxz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>vimhzx</strong> (vzx_hi(1)-(vzx_lo(1))+1,vzx_hi(2)-(vzx_lo(2))+1,vzx_hi(3)-(vzx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>vzx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>vzx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wimhxy</strong> (wxy_hi(1)-(wxy_lo(1))+1,wxy_hi(2)-(wxy_lo(2))+1,wxy_hi(3)-(wxy_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wxy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wxy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wimhyx</strong> (wyx_hi(1)-(wyx_lo(1))+1,wyx_hi(2)-(wyx_lo(2))+1,wyx_hi(3)-(wyx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wyx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>wyx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>force</strong> (f_hi(1)-(f_lo(1))+1, f_hi(2)-(f_lo(2))+1, f_hi(3)-(f_lo(3))+1,nc_f)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>f_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>f_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>ng_f</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
-<li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0_cart</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1, w_hi(3)-(w_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>adv_bc</strong> (3,2,3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>phys_bc</strong> (3,2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em> :: dim, lohi, (comp)</p></li>
 </ul>
-</dd>
-<dt class="field-even">Call to</dt>
-<dd class="field-even"><p><a class="reference internal" href="slope_f.html#f/slope_module/slopex_2d" title="f/slope_module/slopex_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">slopex_2d()</span></code></a>, <a class="reference internal" href="slope_f.html#f/slope_module/slopey_2d" title="f/slope_module/slopey_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">slopey_2d()</span></code></a>, <a class="reference internal" href="slope_f.html#f/slope_module/slopez_3d" title="f/slope_module/slopez_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">slopez_3d()</span></code></a>, <a class="reference internal" href="ppm_f.html#f/ppm_module/ppm_3d" title="f/ppm_module/ppm_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">ppm_3d()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
