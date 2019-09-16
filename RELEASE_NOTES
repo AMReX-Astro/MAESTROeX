@@ -111,3 +111,9 @@ Fixed a ppm_type=2 index bug
 GPU ports: FirstDtm EstDt
 Various GPU optimizations
 Boundary condition bugs in make_edge_scal
+
+09-03-2019
+Minor changes to some problem setups and bugfixes
+Remove 1D support (with compile-time error)
+Significant updates to sphinx documentation, including doxygen
+JOSS paper added; ready for submission

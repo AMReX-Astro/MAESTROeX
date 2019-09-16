@@ -182,8 +182,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                      sflux[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0); );
 
         // initialize umac
-        for (int d=0; d < AMREX_SPACEDIM; ++d)
+        for (int d=0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
+        }
+
+        w0_force_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
     }
 
 #if (AMREX_SPACEDIM == 3)
@@ -191,11 +194,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
         w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-    }
-    if (spherical == 1) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            w0_force_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-        }
     }
 #endif
 
@@ -288,12 +286,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             w0mac[lev][d].setVal(0.);
         }
     }
-    if (spherical == 1) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            w0_force_cart[lev].setVal(0.);
-        }
-    }
 #endif
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_force_cart[lev].setVal(0.);
+    }
 
     if (evolve_base_state) {
 
@@ -317,21 +313,23 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
+        // put w0 on Cartesian edges
         if (spherical == 1) {
-            // put w0 on Cartesian edges
             MakeW0mac(w0mac);
-
-            // put w0_force on Cartesian cells
-            Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
         }
 
-    }
-    else {
+        // // put w0_force on Cartesian cells
+        // Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
+
+    } else {
         // these should have no effect if evolve_base_state = false
         std::fill(Sbar.begin(), Sbar.end(), 0.);
         std::fill(w0_force.begin(), w0_force.end(), 0.);
 
     }
+
+    // put w0_force on Cartesian cells
+    Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 3 -- construct the advective velocity
@@ -743,10 +741,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         if (spherical == 1) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
-
-            // put w0_force on Cartesian cells
-            Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
         }
+
+        // // put w0_force on Cartesian cells
+        Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
     }
 
     //////////////////////////////////////////////////////////////////////////////
