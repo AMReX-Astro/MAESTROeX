@@ -126,6 +126,10 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
+                   state_in % i = i
+                   state_in % j = j
+                   state_in % k = k
+                   
                    call copy_burn_t(state_out, state_in)
                    call burner(state_in, state_out, dt_in)
                    do n = 1, nspec
@@ -270,6 +274,10 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
+                   state_in % i = i
+                   state_in % j = j
+                   state_in % k = k
+                   
                    call copy_burn_t(state_out, state_in)
                    call burner(state_in, state_out, dt_in)
                    do n = 1, nspec
