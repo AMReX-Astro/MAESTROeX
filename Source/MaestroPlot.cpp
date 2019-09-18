@@ -350,9 +350,9 @@ Maestro::PlotFileMF (const int nPlot,
 	}
 
 	if (dt_in < small_dt) {
-		React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt);
+	    React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);
 	} else {
-		React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in*0.5);
+	    React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in*0.5, t_in);
 	}
 
 	if (plot_spec || plot_omegadot) {

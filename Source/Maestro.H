@@ -938,15 +938,17 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const RealVector& p0,
-                const amrex::Real dt_react);
+                const amrex::Real dt_react,
+		const amrex::Real time_in);
 
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
-                amrex::Vector<amrex::MultiFab>& s_out,
-                const amrex::Vector<amrex::MultiFab>& rho_Hext,
-                amrex::Vector<amrex::MultiFab>& rho_omegadot,
-                amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                const RealVector& p0,
-                const amrex::Real dt_react);
+		 amrex::Vector<amrex::MultiFab>& s_out,
+		 const amrex::Vector<amrex::MultiFab>& rho_Hext,
+		 amrex::Vector<amrex::MultiFab>& rho_omegadot,
+		 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+		 const RealVector& p0,
+		 const amrex::Real dt_react,
+		 const amrex::Real time_in);
 
     /// Compute heating term, `rho_Hext`
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,

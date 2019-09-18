@@ -519,7 +519,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 		rhohalf[lev].setVal(1.);
 	}
 
-	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
 	if (use_thermal_diffusion) {
 		MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);

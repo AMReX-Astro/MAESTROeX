@@ -73,9 +73,9 @@ Maestro::DiagFile (const int step,
         }
 
         if (dt < small_dt) {
-            React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt);
+            React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);
         } else {
-            React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt*0.5);
+            React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt*0.5, t_in);
         }
 
     } else {
