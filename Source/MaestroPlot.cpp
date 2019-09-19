@@ -1352,7 +1352,6 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #endif
 
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
-    Vector<MultiFab> w0_cart(finest_level+1);
 
 #if (AMREX_SPACEDIM == 3)
     if (spherical == 1) {
@@ -1366,10 +1365,8 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         w0_cart[lev].setVal(0.);
     }
-
     Put1dArrayOnCart(w0, w0_cart, 0, 1, bcs_u, 0, 1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -1767,10 +1764,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
-    Vector<MultiFab> w0_cart(finest_level+1);
-
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         w0_cart[lev].setVal(0.);
     }
 

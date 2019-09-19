@@ -15,13 +15,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeVelForce()",MakeVelForce);
 
-    Vector<MultiFab> w0_cart(finest_level+1);
     Vector<MultiFab> gradw0_cart(finest_level+1);
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         w0_cart[lev].setVal(0.);
 
         gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -157,11 +155,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #endif
 
     Vector<MultiFab> s0_edge_cart(finest_level+1);
-    Vector<MultiFab> w0_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         s0_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         w0_cart[lev].setVal(0.);
     }
 

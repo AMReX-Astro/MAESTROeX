@@ -1217,6 +1217,11 @@ private:
     amrex::Vector<amrex::MultiFab> dSdt;
     amrex::Vector<amrex::MultiFab> pi;   //< nodal
 
+    /// this doesn't have to be persistent, but we make it so that we avoid
+    /// continually creating and filling temporaries
+    /// saves on some flops and data movement (GPU)
+    amrex::Vector<amrex::MultiFab> w0_cart;
+
     /// this only needs to persist leading into the initial pressure iters
     /// since we project `(beta0^nph S^1 - beta0 S^0) / dt`
     /// during a regular time step we overwrite this

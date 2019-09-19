@@ -207,9 +207,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     }
 
     // Construct a cartesian version of w0
-    Vector<MultiFab> w0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         w0_cart[lev].setVal(0.);
     }
 

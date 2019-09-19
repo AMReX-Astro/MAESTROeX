@@ -101,11 +101,9 @@ Maestro::EstDt ()
     Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
 #endif
 
-    Vector<MultiFab> w0_cart(finest_level+1);
     Vector<MultiFab> p0_cart(finest_level+1);
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         w0_cart[lev].setVal(0.);
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
