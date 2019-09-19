@@ -109,7 +109,7 @@ Maestro::EstDt ()
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(w0,w0_cart,0,1,bcs_u,0,1);
+    Put1dArrayOnCart(w0,w0_cart,1,1,bcs_u,0,1);
     Put1dArrayOnCart(p0_old,p0_cart,0,0,bcs_f,0);
     Put1dArrayOnCart(gamma1bar_old,gamma1bar_cart,0,0,bcs_f,0);
 
