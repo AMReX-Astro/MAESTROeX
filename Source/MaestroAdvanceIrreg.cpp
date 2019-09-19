@@ -294,6 +294,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
                 etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
+	// put w0 on Cartesian cell-centers
+	Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
         if (spherical == 1) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
@@ -622,6 +625,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
                 etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
+	// put w0 on Cartesian cell-centers
+	Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
         if (spherical == 1) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);

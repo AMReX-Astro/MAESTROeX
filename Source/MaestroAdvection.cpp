@@ -27,15 +27,18 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	Vector<MultiFab>      ufull(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-		ufull[lev].setVal(0.);
 	}
 
 	// create ufull = uold + w0
-	Put1dArrayOnCart(w0,ufull,1,1,bcs_u,0,1);
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(ufull[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
+        }
+        // fill ufull ghost cells
+        FillPatch(t_old, ufull, ufull, ufull, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 	for (int lev=0; lev<=finest_level; ++lev) {
-		MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
+            MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
 	}
-
+        
 	// create a face-centered MultiFab to hold utrans
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -82,11 +85,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeUtrans()",MakeUtrans);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].setVal(0.);
-    }
-    Put1dArrayOnCart(w0,w0_cart,1,1,bcs_u,0,1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -445,11 +443,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPred()",VelPred);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].setVal(0.);
-    }
-    Put1dArrayOnCart(w0,w0_cart,1,1,bcs_u,0,1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1835,11 +1828,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // turn on GPU
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].setVal(0.);
-    }
-    Put1dArrayOnCart(w0,w0_cart,1,1,bcs_u,0,1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

@@ -206,15 +206,6 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
         Abort("Error: only call MakeW0mac for spherical");
     }
 
-    // Construct a cartesian version of w0
-    for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].setVal(0.);
-    }
-
-    if (w0mac_interp_type == 1) {
-        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
-    }
-
     if (w0mac[0][0].nGrow() != 1) {
         Abort("Error: MakeW0mac assumes one ghost cell");
     }
