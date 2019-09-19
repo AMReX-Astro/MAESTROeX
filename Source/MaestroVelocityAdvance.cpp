@@ -24,6 +24,8 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 	    // tracing needs more ghost cells
 	    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
 	}
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        vel_force[lev].setVal(0.);
     }
 
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > uedge(finest_level+1);
@@ -37,7 +39,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Create the velocity forcing term at time n using rho
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force,w0_force_cart,1);
+    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force_cart,1);
 
     //////////////////////////////////
     // Add w0 to MAC velocities
@@ -61,7 +63,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Now create the force at half-time using rhohalf
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force,w0_force_cart,1);
+    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force_cart,1);
 
     //////////////////////////////////
     // Update the velocity with convective differencing

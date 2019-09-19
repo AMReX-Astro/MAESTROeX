@@ -21,7 +21,9 @@ contains
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
        dSdt,  t_lo, t_hi, &
-       w0, p0, gamma1bar) bind (C,name="estdt")
+       w0_cart, w_lo, w_hi, &
+       p0_cart, p_lo, p_hi, &
+       gamma1bar_cart, g_lo, g_hi) bind (C,name="estdt")
 
     use amrex_fort_module, only: amrex_min, amrex_max
 
@@ -34,21 +36,24 @@ contains
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
     integer         , intent(in   ) :: t_lo(3), t_hi(3)
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
+    integer         , intent(in   ) :: p_lo(3), p_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
     double precision, intent(in   ) :: dSdt (t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
-    double precision, intent(in   ) :: w0       (0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3),AMREX_SPACEDIM)
+    double precision, intent(in   ) :: p0_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
+    double precision, intent(in   ) :: gamma1bar_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
 
     ! local variables
     double precision :: spdx, spdy, spdz, spdr, rho_min
     double precision :: fx, fy, fz, dt_temp
     double precision :: eps,denom,gradp0
     double precision :: a, b, c
-    integer          :: i,j,k,r
+    integer          :: i,j,k
 
     !$gpu
 
@@ -70,24 +75,22 @@ contains
           do i = lo(1), hi(1)
              spdx = max(spdx ,abs(u(i,j,k,1)))
 #if (AMREX_SPACEDIM == 2)
-             spdy = max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0(lev,j)+w0(lev,j+1))))
+             spdy = max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0_cart(i,j,k,AMREX_SPACEDIM)+w0_cart(i,j+1,k,AMREX_SPACEDIM))))
 #elif (AMREX_SPACEDIM == 3)
              spdy = max(spdy ,abs(u(i,j,k,2)))
-             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0(lev,k)+w0(lev,k+1))))
+             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0_cart(i,j,k,AMREX_SPACEDIM)+w0_cart(i,j,k+1,AMREX_SPACEDIM))))
 #endif
           enddo
        enddo
     enddo
 
-#if (AMREX_SPACEDIM == 2)
-    do j = lo(2),hi(2)
-       spdr = max(spdr ,abs(w0(lev,j)))
+    do k = lo(3), hi(3)
+        do j = lo(2), hi(2)
+           do i = lo(1), hi(1)
+                spdr = max(spdr, abs(w0_cart(i,j,k,AMREX_SPACEDIM)))
+            enddo
+        enddo
     enddo
-#elif (AMREX_SPACEDIM == 3)
-    do k = lo(3),hi(3)
-       spdr = max(spdr ,abs(w0(lev,k)))
-    enddo
-#endif
 
     call amrex_max(umax, max(spdx,spdy,spdz,spdr))
 
@@ -131,34 +134,29 @@ contains
     ! divU constraint
     !
     do k = lo(3), hi(3)
-
-#if (AMREX_SPACEDIM == 3)
-       if (k .eq. 0) then
-          gradp0 = (p0(lev,k+1) - p0(lev,k))/dx(3)
-       else if (k .eq. nr(lev)-1) then
-          gradp0 = (p0(lev,k) - p0(lev,k-1))/dx(3)
-       else
-          gradp0 = 0.5d0*(p0(lev,k+1) - p0(lev,k-1))/dx(3)
-       endif
-       r = k
-#endif
-
        do j = lo(2), hi(2)
-
-#if (AMREX_SPACEDIM == 2)
-          if (j .eq. 0) then
-             gradp0 = (p0(lev,j+1) - p0(lev,j))/dx(2)
-          else if (j .eq. nr(lev)-1) then
-             gradp0 = (p0(lev,j) - p0(lev,j-1))/dx(2)
-          else
-             gradp0 = 0.5d0*(p0(lev,j+1) - p0(lev,j-1))/dx(2)
-          endif
-          r = j
-#endif
-
           do i = lo(1), hi(1)
 
-             denom = divU(i,j,k) - u(i,j,k,AMREX_SPACEDIM)*gradp0/(gamma1bar(lev,r)*p0(lev,r))
+
+#if (AMREX_SPACEDIM == 3)
+            if (k .eq. 0) then
+                gradp0 = (p0_cart(i,j,k+1) - p0_cart(i,j,k))/dx(3)
+            else if (k .eq. nr(lev)-1) then
+                gradp0 = (p0_cart(i,j,k) - p0_cart(i,j,k-1))/dx(3)
+            else
+                gradp0 = 0.5d0*(p0_cart(i,j,k+1) - p0_cart(i,j,k-1))/dx(3)
+            endif
+#else
+            if (j .eq. 0) then
+                gradp0 = (p0_cart(i,j+1,k) - p0_cart(i,j,k))/dx(2)
+            else if (j .eq. nr(lev)-1) then
+                gradp0 = (p0_cart(i,j,k) - p0_cart(i,j-1,k))/dx(2)
+            else
+                gradp0 = 0.5d0*(p0_cart(i,j+1,k) - p0_cart(i,j-1,k))/dx(2)
+            endif
+#endif
+
+             denom = divU(i,j,k) - u(i,j,k,AMREX_SPACEDIM)*gradp0/(gamma1bar_cart(i,j,k)*p0_cart(i,j,k))
 
              if (denom > 0.d0) then
                 dt_temp = min(dt_temp, 0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
@@ -202,7 +200,7 @@ contains
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
        dSdt,  t_lo, t_hi, &
-       w0, &
+       w0_cart, w_lo, w_hi, &
        w0macx, x_lo, x_hi, &
        w0macy, y_lo, y_hi, &
        w0macz, z_lo, z_hi, &
@@ -218,6 +216,7 @@ contains
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
     integer         , intent(in   ) :: t_lo(3), t_hi(3)
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
     integer         , intent(in   ) :: g_lo(3), g_hi(3)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     integer         , intent(in   ) :: y_lo(3), y_hi(3)
@@ -231,7 +230,7 @@ contains
     double precision, intent(in   ) :: w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
     double precision, intent(in   ) :: w0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
     double precision, intent(in   ) :: w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
-    double precision, intent(in   ) :: w0       (0:max_radial_level,0:nr_fine)
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
 
     double precision :: spdx, spdy, spdz, spdr, rho_min
     double precision :: gp_dot_u, dt_temp
@@ -277,9 +276,13 @@ contains
        enddo
     enddo
 
-    do k=0,nr_fine
-       spdr = max(spdr ,abs(w0(0,k)))
-    enddo
+    do k = lo(3), hi(3)
+        do j = lo(2), hi(2)
+           do i = lo(1), hi(1)
+                spdr = max(spdr ,abs(w0_cart(i,j,k)))
+           enddo
+        enddo
+     enddo
 
     call amrex_max(umax,max(spdx,spdy,spdz,spdr))
 
@@ -372,7 +375,8 @@ contains
        u,     u_lo, u_hi, nc_u, &
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
-       p0, gamma1bar) bind (C,name="firstdt")
+       p0_cart, p_lo, p_hi, &
+       gamma1bar_cart, g_lo, g_hi) bind (C,name="firstdt")
 
     use amrex_fort_module, only: amrex_min, amrex_max
 
@@ -384,12 +388,14 @@ contains
     integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
+    integer         , intent(in   ) :: p_lo(3), p_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: p0_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
+    double precision, intent(in   ) :: gamma1bar_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
 
     ! local variables
     double precision :: spdx,spdy,spdz,pforcex,pforcey,pforcez,ux,uy,uz
@@ -488,39 +494,41 @@ contains
        dt_divu = 1.d99
 
 #if (AMREX_SPACEDIM == 2)
+        do k = lo(3), hi(3)
+            do j = lo(2), hi(2)
+                do i = lo(1), hi(1)
+                    if (j .eq. 0) then
+                    gradp0 = (p0_cart(i,j+1,k) - p0_cart(i,j,k))/dx(2)
+                    else if (j .eq. nr(lev)-1) then
+                    gradp0 = (p0_cart(i,j,k) - p0_cart(i,j-1,k))/dx(2)
+                    else
+                    gradp0 = 0.5d0*(p0_cart(i,j+1,k) - p0_cart(i,j-1,k))/dx(2)
+                    endif
 
-       do j = lo(2), hi(2)
-          if (j .eq. 0) then
-             gradp0 = (p0(lev,j+1) - p0(lev,j))/dx(2)
-          else if (j .eq. nr(lev)-1) then
-             gradp0 = (p0(lev,j) - p0(lev,j-1))/dx(2)
-          else
-             gradp0 = 0.5d0*(p0(lev,j+1) - p0(lev,j-1))/dx(2)
-          endif
-
-          do i = lo(1), hi(1)
-             denom = divU(i,j,k) - u(i,j,k,2)*gradp0/(gamma1bar(lev,j)*p0(lev,j))
-             if (denom > 0.d0) then
-                dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
-             endif
-          enddo
-       enddo
+                    denom = divU(i,j,k) - u(i,j,k,2)*gradp0/(gamma1bar_cart(i,j,k)*p0_cart(i,j,k))
+                    if (denom > 0.d0) then
+                        dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
+                    endif
+                enddo
+            enddo
+        enddo
 
 
 #elif (AMREX_SPACEDIM == 3)
 
        do k = lo(3), hi(3)
-          if (k .eq. 0) then
-             gradp0 = (p0(lev,k+1) - p0(lev,k))/dx(3)
-          else if (k .eq. nr(lev)-1) then
-             gradp0 = (p0(lev,k) - p0(lev,k-1))/dx(3)
-          else
-             gradp0 = 0.5d0*(p0(lev,k+1) - p0(lev,k-1))/dx(3)
-          endif
-
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
-                denom = divU(i,j,k) - u(i,j,k,3)*gradp0/(gamma1bar(lev,k)*p0(lev,k))
+                if (k .eq. 0) then
+                   gradp0 = (p0_cart(i,j,k+1) - p0_cart(i,j,k))/dx(3)
+                else if (k .eq. nr(lev)-1) then
+                   gradp0 = (p0_cart(i,j,k) - p0_cart(i,j,k-1))/dx(3)
+                else
+                   gradp0 = 0.5d0*(p0_cart(i,j,k+1) - p0_cart(i,j,k-1))/dx(3)
+                endif
+
+                denom = divU(i,j,k) - u(i,j,k,3)*gradp0/(gamma1bar_cart(i,j,k)*p0_cart(i,j,k))
+
                 if (denom > 0.d0) then
                    dt_divu = min(dt_divu,0.4d0*(1.d0 - rho_min/scal(i,j,k,rho_comp))/denom)
                 endif

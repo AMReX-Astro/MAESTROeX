@@ -425,7 +425,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // advect rhoX and rho
     DensityAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
-
+    
 /*
     if (evolve_base_state) {
 	// correct the base state density by "averaging"
@@ -502,7 +502,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	MultiFab::LinComb(aofs[lev],1.0/dt,shat[lev],0,-1.0/dt,sold[lev],0,0,Nscal,0);
 	MultiFab::Subtract(aofs[lev],intra[lev],0,0,Nscal,0);
     }
-    
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2B (optional) -- compute diffusive flux divergence
     //////////////////////////////////////////////////////////////////////////////
@@ -545,12 +545,17 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
 
     // extract IR =  [ (snew - sold)/dt - sdc_source ]
+
     for (int lev=0; lev<=finest_level; ++lev) {
 	intra[lev].setVal(0.);
-	MultiFab::LinComb(intra[lev],1.0/dt,snew[lev],0,-1.0/dt,sold[lev],0,0,Nscal,0);
-	MultiFab::Subtract(intra[lev],sdc_source[lev],0,0,Nscal,0);
+	// species source term
+	MultiFab::LinComb(intra[lev],1.0/dt,snew[lev],FirstSpec,-1.0/dt,sold[lev],FirstSpec,FirstSpec,NumSpec,0);
+	MultiFab::Subtract(intra[lev],sdc_source[lev],FirstSpec,FirstSpec,NumSpec,0);
+	// enthalpy source term
+	MultiFab::LinComb(intra[lev],1.0/dt,snew[lev],RhoH,-1.0/dt,sold[lev],RhoH,RhoH,1,0);
+	MultiFab::Subtract(intra[lev],sdc_source[lev],RhoH,RhoH,1,0);
     }
-
+    
     // massage the rhoh intra term into the proper form, depending on
     // what we are predicting.  Note: we do this before we deal with
     // the species terms, since some enthalpy types need this default
@@ -801,6 +806,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
 	// advect rhoX, rho, and tracers
 	DensityAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
+    
 /*
 	if (evolve_base_state) {
 	    // correct the base state density by "averaging"
@@ -873,8 +879,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
 	// extract aofs = (shat - sold) / dt - intra
 	for (int lev=0; lev<=finest_level; ++lev) {
-	    MultiFab::LinComb(aofs[lev],1.0,shat[lev],0,-1.0,sold[lev],0,0,Nscal,0);
-	    aofs[lev].mult(1.0/dt);
+	    MultiFab::LinComb(aofs[lev],1.0/dt,shat[lev],0,-1.0/dt,sold[lev],0,0,Nscal,0);
 	    MultiFab::Subtract(aofs[lev],intra[lev],0,0,Nscal,0);
 	}
 	
@@ -939,9 +944,18 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	// extract IR =  [ (snew - sold)/dt - sdc_source ]
 	for (int lev=0; lev<=finest_level; ++lev) {
 	    intra[lev].setVal(0.);
-	    MultiFab::LinComb(intra[lev],1.0,snew[lev],0,-1.0,sold[lev],0,0,Nscal,0);
-	    intra[lev].mult(1.0/dt);
-	    MultiFab::Subtract(intra[lev],sdc_source[lev],0,0,Nscal,0);
+	    // species source term
+	    MultiFab::LinComb(intra[lev],1.0/dt,snew[lev],FirstSpec,-1.0/dt,sold[lev],FirstSpec,FirstSpec,NumSpec,0);
+	    MultiFab::Subtract(intra[lev],sdc_source[lev],FirstSpec,FirstSpec,NumSpec,0);
+	    // enthalpy source term
+	    MultiFab::LinComb(intra[lev],1.0/dt,snew[lev],RhoH,-1.0/dt,sold[lev],RhoH,RhoH,1,0);
+	    MultiFab::Subtract(intra[lev],sdc_source[lev],RhoH,RhoH,1,0);
+	}
+	
+	if (is_initIter) {
+	    for (int lev=0; lev<=finest_level; ++lev) {
+		intra[lev].setVal(0.);
+	    }
 	}
 
 	// massage the rhoh intra term into the proper form, depending on

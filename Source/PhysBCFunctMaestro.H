@@ -18,7 +18,7 @@ typedef void (*BndryFunc3DDefaultMaestro)(amrex::Real* data, const int* lo, cons
                                           const int icomp);
 }
 
-//! This version calls function working on array
+/// This version calls function working on array
 class BndryFuncArrayMaestro
     : public amrex::BndryFuncArray
 {

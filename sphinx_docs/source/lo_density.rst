@@ -2,7 +2,7 @@
 Low Density Cutoffs
 *******************
 
-These are working notes for the low density parameters in MAESTRO.
+These are working notes for the low density parameters in MAESTROeX.
 In low density regions, we modify the behavior of the algorithm. Here
 is a summary of some parameters, and a brief description of what they
 do.
@@ -48,16 +48,10 @@ Single-Level Planar or any Spherical
 Here the base state exists as a single one-dimensional array with constant grid
 spacing :math:`\Delta r`. Basically, we set the corresponding coordinate equal to :math:`r` as soon
 as :math:`\rho_0(r)` is less than or equal to that particular cutoff value.
-See Figure `[Fig:Cutoff] <#Fig:Cutoff>`__ for a graphical representation.
+See the figure below for a graphical representation.
 
-.. raw:: latex
-
-   \centering
-
-.. figure:: \lodensfigpath/cutoff
-   :alt: Image of how the cutoff density and cutoff coordinates
-   are related for single-level planar and all spherical problems.
-   :width: 4in
+.. figure:: cutoff.png
+   :align: center
 
    Image of how the cutoff density and cutoff coordinates
    are related for single-level planar and all spherical problems.
@@ -73,22 +67,16 @@ Multilevel Planar
 -----------------
 
 In this case, the base state exists as several one-dimensional arrays, each with
-different grid spacing. Refer to Figure `[Fig:Cutoff_Multi] <#Fig:Cutoff_Multi>`__ in the following examples.
+different grid spacing. Refer to the figure below in the following examples.
 The guiding principle is to check whether :math:`\rho_0` falls below :math:`\rho_{\rm cutoff}` on the finest
 grid first. If not, check the next coarser level. Continue until you reach the base grid.
 Some examples are in order:
 
-.. raw:: latex
-
-   \centering
-
-.. figure:: \lodensfigpath/cutoff_multi
-   :alt: Multilevel cutoff density example.
-   :width: 2in
+.. figure:: cutoff_multi.png
+   :align: center
 
    Multilevel cutoff density example.
 
-[Fig:Cutoff_Multi]
 
 -  | **Example 1:** :math:`\rho_{0,104} > \rho_{\rm cutoff}` and :math:`\rho_{0,105} < \rho_{\rm cutoff}`.
    | cutoff_density_coord(1) = 105

@@ -14,7 +14,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 Vector<MultiFab>& rho_Hnuc,
                 const RealVector& p0,
                 const Real dt_in,
-                const Real time_in)
+		const Real time_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::React()",React);
@@ -201,7 +201,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      Vector<MultiFab>& rho_Hnuc,
                      const RealVector& p0,
                      const Real dt_in,
-                     const Real time_in)
+		     const Real time_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Burner()",Burner);
@@ -261,7 +261,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                                  BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]), dt_in, time_in,
+                                 BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]), dt_in, time_in, 
                                  BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             } else {
 #pragma gpu box(tileBox)
@@ -272,7 +272,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                             BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                            tempbar_init.dataPtr(), dt_in, time_in,
+                            tempbar_init.dataPtr(), dt_in, time_in, 
                             BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             }
         }

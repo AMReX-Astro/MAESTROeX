@@ -25,7 +25,8 @@ contains
 #endif
        force,  f_lo, f_hi, &
        sponge, s_lo, s_hi, &
-       w0, dx, dt) &
+       w0_cart, w0_lo, w0_hi, &
+       dx, dt) &
        bind(C,name="update_velocity")
 
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -54,7 +55,8 @@ contains
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),AMREX_SPACEDIM)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
     double precision, intent(in   ) :: sponge (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
-    double precision, intent(in   ) :: w0     (0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: w0_lo(3), w0_hi(3)
+    double precision, intent(in   ) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2),w0_lo(3):w0_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(AMREX_SPACEDIM)
     double precision, value, intent(in   ) :: dt
 
@@ -109,11 +111,15 @@ contains
 #endif
 
              ! subtract (w0 dot grad) Utilde term
-             w0bar = HALF*(w0(lev,dim) + w0(lev,dim+1))
+#if (AMREX_SPACEDIM == 2)
+             w0bar = HALF*(w0_cart(i,j,k,AMREX_SPACEDIM) + w0_cart(i,j+1,k,AMREX_SPACEDIM))
+#else 
+             w0bar = HALF*(w0_cart(i,j,k,AMREX_SPACEDIM) + w0_cart(i,j,k+1,AMREX_SPACEDIM))
+#endif
              unew(i,j,k,:) = unew(i,j,k,:) - dt * w0bar * &
 #if (AMREX_SPACEDIM == 2)
              (uedgey(i,j+1,k,:) - uedgey(i,j,k,:))/dx(2)
-#elif (AMREX_SPACEDIM == 3)
+#else
              (uedgez(i,j,k+1,:) - uedgez(i,j,k,:))/dx(3)
 #endif
 
@@ -137,7 +143,6 @@ contains
        uedgez, z_lo, z_hi, &
        force,  f_lo, f_hi, &
        sponge, s_lo, s_hi, &
-       w0, &
        w0macx, wx_lo, wx_hi, &
        w0macy, wy_lo, wy_hi, &
        w0macz, wz_lo, wz_hi, &
@@ -164,7 +169,6 @@ contains
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),AMREX_SPACEDIM)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
     double precision, intent(in   ) :: sponge(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
-    double precision, intent(in   ) :: w0    (0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
     double precision, intent(in   ) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
     integer         , intent(in   ) :: wy_lo(3), wy_hi(3)

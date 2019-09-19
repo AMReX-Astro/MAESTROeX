@@ -2,35 +2,6 @@
 Frequently Asked Questions
 **************************
 
-Coding
-======
-
-#. *Why is everything in its own module?*
-
-   If a subroutine is in a Fortran module, then at compile time,
-   there is argument checking. This ensures that the right number
-   and data types of arguments are present. It makes the code safer.
-
-#. *How do tags work when editing source?*
-
-   Tags allow the editor to follow function/subroutine names and
-   automatically switch you to the source code corresponding to that
-   function. Using tags in MAESTRO depends on the editor:
-
-   -  vi:
-
-      In the build directory, type ‘make tags’. Then in
-      vi, move the cursor over a function name and use
-      ``^``-] to bring up the source corresponding to that
-      function. Use ``^``-t to go back. (Here, ``^``-
-      refers to the Control key.)
-
-   -  emacs:
-
-      In the build directory, type ‘make TAGS’. Then in
-      emacs, move the cursor over a function name and use M-. to bring up the source corresponding to that function. Use
-      M-\* to go back. (Here, M- refers to the META key.)
-
 Compiling
 =========
 
@@ -45,15 +16,17 @@ Compiling
    We also rely on the Fortran 95 standard that specifies that any
    local allocated arrays are automatically deallocated when a
    subroutine ends. Fortran 90 does not do this. Most
-   MAESTRO routines rely on this Fortran 95 feature.
+   MAESTROeX routines rely on this Fortran 95 feature.
 
+   
 #. *The code doesn’t compile, but complains right away that there
-   is “No rule to make target ‘fabio_c.c’, needed by ‘t/Linux.gfortran.mpi/c.depends’”*
+   is “No rule to make target ‘AMReX_constants_mod.o’, needed by ‘tmp_build_dir/d/2d.gnu.MPI/f90.depends’”*
 
-   The environment variable AMREX_HOME needs to be the full path
-   to the amrex/ directory. You cannot use ‘:math:`\sim`’ as a shortcut
+   The environment variable ``AMREX_HOME`` needs to be the full path
+   to the ``amrex/`` directory. You cannot use ‘:math:`\sim`’ as a shortcut
    for your home directory.
 
+   
 #. *make issues an error like:*
 
    .. raw:: latex
@@ -81,14 +54,9 @@ Running
            max_step  = 1
            init_iter = 0
            init_divu_iter = 0
-           do_initial_projection = F
+           do_initial_projection = false
 
-   max_step
-   init_iter
-   init_divu_iter
-   do_initial_projection
-
-#. *MAESTRO crashes because the multigrid algorithm fails to
+#. *MAESTROeX crashes because the multigrid algorithm fails to
    converge—how do I get around this?*
 
    Setting general convergence criteria for multigrid is as much
@@ -110,57 +78,59 @@ Running
    slightly, so the righthand side is non-zero.
 
    The tolerances used for the various multigrid solves in the code
-   can be overridden on a problem-by-problem basis by putting a
-   copy of MAESTRO/Source/mg_eps.f90 into the problem directory
-   and resetting the tolerances. The role of each of these tolerances
-   is described in MAESTRO/docs/mg/.
+   can be overridden on a problem-by-problem basis by setting the relevant
+   parameters in the problem's inputs file (see the `solver tolerances` section in the § :ref:`runtime parameters tables<sec:runtime-parameters-tables>`).
 
+   
 #. *Why do the initial projection and “divu” iters sometimes
    have a harder time converging than the multigrid solves in the main algorithm?*
 
    The initial projection and “divu” solve sets the density to :math:`1`
-   (see § \ `[sec:flow:initialization] <#sec:flow:initialization>`__), so the coefficients in the
+   (see § :ref:`sec:Initialization`), so the coefficients in the
    elliptic solve are :math:`O(\beta_0) \sim O(\rho)`. But in the main
    algorithm, the coefficients are :math:`O(\beta_0/\rho) \sim O(1)`. Since
    :math:`\rho` can vary a lot, the variation in the coefficients in the
    initial projection and “divu” solve present a harded linear system
    to solve.
 
+   
 #. *How can I obtain profiling infomation for my run?*
 
    The code is already instrumented with timers. Simply compile with
-   PROF=TRUE in the GNUmakefile, or equvalently do
-   make PROF=t. A file containing a summary of the timings will
-   be output in the run directory.
+   ``TINY_PROFILE=TRUE`` in the ``GNUmakefile``, or equivalently do
+   ``make TINY_PROFILE=TRUE``. A summary of the timings will
+   be output to ``stdout`` at the end of the run.
 
-   An alternate way to get single-processor timings, when using the GCC
-   compilers is to add -pg to the compilation flags for both
-   gfortran and gcc. This can be accomplished by setting:
-
-   ::
-
-           GPROF := t
-
-   in your GNUmakefile. Upon completion, a file
-   names gmon.out will be produced. This can be processed by
-   gprof running
+   With the GNU compliers, you can enabling profiling with ``gprof``
+   by compiling with
 
    ::
 
-           gprof exec-name
+         USE_GPROF=TRUE
 
-   where *exec-name* is the name of the executable. More detailed
-   line-by-line timings can be obtained by using the -l argument
-   to gprof.
+   in your GNUmakefile.
 
-#. *How can I force MAESTRO to abort?*
+   When you run, a file named ``gmon.out`` will be produced. This can
+   be processed with ``gprof`` by running:
 
-   In the output directory, do ‘touch .abort_maestro’. This
+   ::
+
+         gprof exec-name
+
+   where ``exec-name`` is the name of the executable. More detailed
+   line-by-line information can be obtained by passing the ``-l``
+   argument to ``gprof``.
+
+   
+#. *How can I force MAESTROeX to abort?*
+
+   In the output directory, do ``touch .abort_maestro``. This
    will cause the code to write out a final checkpoint file, free up
    any allocated memory, and gracefully exit. Be sure to remove the
-   .abort_maestro file before restarting the code in the
+   ``.abort_maestro`` file before restarting the code in the
    same directory.
 
+   
 #. *When I run I get the error*
 
     ::
@@ -173,6 +143,14 @@ Running
     is built with the helmholtz EoS, but the extern namelist has gamma law
     parameters.
 
+#. *How can I check the compilation parameters of a MAESTROeX executable?*
+
+   The build information (including git hashes, modules, EoS, network, etc.) can be displayed by running the executable as 
+
+   ::
+
+       ./Maestro.exe --display
+
 Debugging
 =========
 
@@ -181,22 +159,24 @@ Debugging
 
    ::
 
-           use fabio_module
+           #include <AMReX_VisMF.H>
 
-           call fabio_ml_multifab_write_d(uold,mla%mba%rr(:,1),"a_uold")
-           call fabio_ml_multifab_write_d(umac(:,1),mla%mba%rr(:,1),"a_umacx")
+           VisMF::Write(uold[0],"a_uold");
+           VisMF::Write(umac[0][0],"a_umacx");
 
-#. *How can I print out a multifab’s contents from within the code?*
+   This plotfile is visualized using Amrvis using the flag ``-mf``.
+	   
+#. *How can I print out a MultiFab’s contents from within the code?*
 
-   There is a print method in multifab_module. This can
+   There is a print subroutine in ``MaestroDebug.cpp`` file. This can
    be simply called as
 
    ::
 
-         call print(a)
+         PrintMF(a);
 
 
-   where a is a multifab (single-level).
+   where ``a`` is a MultiFab (multi-level).
 
 #. *How can I debug a parallel (MPI) job with gdb?*
 
@@ -204,9 +184,9 @@ Debugging
 
    ::
 
-       mpiexec -n 4 xterm -e gdb ./main.Linux.gfortran.mpi.exe
+       mpiexec -n 4 xterm -e gdb ./Maestro2d.gnu.ex
 
-   where the executable needs to be created with the “-g” flag to
+   where the executable needs to be created with the ``-g`` flag to
    the compiler. This will pop up multiple xterms with gdb running
    in each. You need to then issue:
 
@@ -219,8 +199,7 @@ Debugging
 #. *How can I get more information about floating point exceptions?*
 
    AMReX can intercept floating point exceptions and provide a helpful
-   backtrace that shows you where they were generated. See §
-   `[ch:makefiles:special] <#ch:makefiles:special>`__.
+   backtrace file that shows you where they were generated. 
 
 I/O
 ===
@@ -228,26 +207,26 @@ I/O
 #. *How can I tell from a plotfile what runtime parameters were
    used for its run? or when it was created?*
 
-   In each plotfile directory, there is a file called job_info
-   (e.g. plt00000/job_info) that lists the build directory and
+   In each plotfile directory, there is a file called ``job_info``
+   (e.g. ``plt00000/job_info``) that lists the build directory and
    date, as well as the value of every runtime parameter for the run.
 
 #. *How can I force the code to output a plotfile / checkpoint
    file at the next step?*
 
-   In the output directory (where the code is running) do ‘touch
-   .dump_plotfile’. This will create an empty file called
-   .dump_plotfile. At the end of each step, if the code finds
+   In the output directory (where the code is running) do ``touch
+   .dump_plotfile``. This will create an empty file called
+   ``.dump_plotfile.`` At the end of each step, if the code finds
    that file, it will output a plotfile. Simply delete the file to
    restore the code to its normal plotfile behavior.
 
-   Similarly, creating the file .dump_checkpoint will force the
+   Similarly, creating the file ``.dump_checkpoint`` will force the
    output of a checkpoint file.
 
 Algorithm
 =========
 
-#. *Why is MAESTRO so “hard” to use (e.g. as compared to a
+#. *Why is MAESTROeX so “hard” to use (e.g. as compared to a
    compressible code)?*
 
    There are several complexities to the algorithm that don’t have
@@ -255,22 +234,23 @@ Algorithm
    role of the base state and the constraint equation.
 
    Care must be taken to setup an initial model/initial base state that
-   respects the thermodynamics in MAESTRO and is in hydrostatic equilibrium.
-   Best results are attained when the model is processed with the MAESTRO EOS and reset into HSE, as is done in the initial_model routines.
-   Because MAESTRO builds off of the base state, any flaws in that initial
+   respects the thermodynamics in MAESTROeX and is in hydrostatic equilibrium.
+   Best results are attained when the model is processed with the MAESTROeX EOS and reset into HSE, as is done in the initial_model routines.
+   Because MAESTROeX builds off of the base state, any flaws in that initial
    state will influence the subsequent behavior of the algorithm.
 
    The constraint equation brings another complexity not seen in compressible
    codes—information is instantly communicated
    across the grid. In compressible codes you can track down a problem by
    watching where it starts from and watching it move one cell per dt. In
-   MAESTRO things can go wrong in multiple places without it being obvious
+   MAESTROeX things can go wrong in multiple places without it being obvious
    where the root problem is.
 
-#. *In the final projection in the algorithm, we project
-   :math:`U^{n+1}`, using a time-centered :math:`\beta_0`, a time-centered :math:`\rho_0`, but
-   an “:math:`n+1`”-centered :math:`S`. Why then is the resulting :math:`\phi` (which then
-   defines :math:`\pi`) is at “:math:`n+1/2`”?*
+#. *In the final projection in the algorithm, we project* :math:`U^{n+1}` *,
+   using a time-centered* :math:`\beta_0` *, a time-centered* :math:`\rho_0` *, but
+   an* “:math:`n+1`” *-centered* :math:`S` *. Why then is the
+   resulting* :math:`\phi` *(which then defines* :math:`\pi` *) is
+   at* “:math:`n+1/2`” *?*
 
    The short answer to this question is that you should think of this
    as really projecting :math:`(U^{n+1} - U^n)` and the right hand side as having
@@ -281,8 +261,8 @@ Algorithm
 
    So everything is in fact time-centered.
 
-#. *Why is :math:`\gammabar` computed as the average of the full state
-   :math:`\Gamma_1` instead of computed from the base state density and
+#. *Why is* :math:`\gammabar` *computed as the average of the full
+   state* :math:`\Gamma_1` *instead of computed from the base state density and
    pressure via the equation of state?*
 
    The primary reason is that there is no base state composition. The
@@ -294,10 +274,10 @@ Algorithm
 #. *Can I run a full star in 2-d axisymmetric geometry?*
 
    No. This is a design decision. There is no support for axisymmetric
-   coordinates in MAESTRO. Spherical problems must be run in 3-d.
+   coordinates in MAESTROeX. Spherical problems must be run in 3-d.
 
-#. *Why did we switch all the equations over to the
-   :math:`\tilde{\Ub}` form instead of just working with :math:`\Ub`?*
+#. *Why did we switch all the equations over to the* :math:`\tilde{\Ub}` *form
+   instead of just working with* :math:`\Ub` *?*
 
    This is basically a numerical discretization issue. Whenever the base
    state aligns with the grid, you should be able to show that you get
@@ -318,7 +298,7 @@ Algorithm
    mode (because it is an approximate projection) so it is unable to
    remove it. This allows the pattern to slowly build up. There are
    filtering techniques that can be used to remove these modes, but
-   they are not implemented in MAESTRO.
+   they are not implemented in MAESTROeX.
 
 Analysis
 ========
@@ -328,8 +308,7 @@ Analysis
    data. How do I do this?*
 
    One implementation of this can be found in
-   amrex/Tools/Postprocessing/F_Src/tutorial/fwrite2d.f90. This reads in
-   the plotfile data using the plotfile_module that the
-   data_processing routines rely on, but then builds a multifab
-   and writes the data out to a plotfile using the AMReX write
-   routines.
+   ``amrex/Tools/Postprocessing/C_Src/PtwisePltTransform.cpp``. This reads in
+   the plotfile data using the the ``AMReX_DataServices`` class, performs a
+   transformation on the data based on a set of components specified in the
+   command line, and outputs the solution to a new plotfile.
