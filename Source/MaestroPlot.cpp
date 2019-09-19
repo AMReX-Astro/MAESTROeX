@@ -816,7 +816,7 @@ Maestro::PlotFileMF (const int nPlot,
         if (spherical == 1) {
             MakeW0mac(w0mac);
         }
-        Put1dArrayOnCart(w0,w0r_cart,0,0,bcs_u,0);
+        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0);
     }
 
     // Mach number
@@ -1640,7 +1640,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
     for (int lev=0; lev<=finest_level; ++lev) {
         w0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(w0, w0_cart, 0, 1, bcs_u, 0, 1);
+    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -2041,7 +2041,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
         w0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(w0, w0_cart, 0, 1, bcs_u, 0, 1);
+    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
