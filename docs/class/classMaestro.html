@@ -1460,6 +1460,12 @@
 <dd></dd></dl>
 
 <dl class="member">
+<dt id="_CPPv4N7Maestro7w0_cartE">
+<span id="_CPPv3N7Maestro7w0_cartE"></span><span id="_CPPv2N7Maestro7w0_cartE"></span><span id="Maestro::w0_cart__Vector:MultiFab:"></span><span class="target" id="classMaestro_1aaf702371509d1ba764b8616ae2515cac"></span>Vector&lt;MultiFab&gt; <code class="sig-name descname">w0_cart</code><a class="headerlink" href="#_CPPv4N7Maestro7w0_cartE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>this doesn’t have to be persistent, but we make it so that we avoid continually creating and filling temporaries saves on some flops and data movement (GPU) </p>
+</dd></dl>
+
+<dl class="member">
 <dt id="_CPPv4N7Maestro18rhcc_for_nodalprojE">
 <span id="_CPPv3N7Maestro18rhcc_for_nodalprojE"></span><span id="_CPPv2N7Maestro18rhcc_for_nodalprojE"></span><span id="Maestro::rhcc_for_nodalproj__Vector:MultiFab:"></span><span class="target" id="classMaestro_1a7de5bb856914b8d9a8eb32c505c47a57"></span>Vector&lt;MultiFab&gt; <code class="sig-name descname">rhcc_for_nodalproj</code><a class="headerlink" href="#_CPPv4N7Maestro18rhcc_for_nodalprojE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>this only needs to persist leading into the initial pressure iters since we project <code class="docutils literal notranslate"><span class="pre">(beta0^nph</span> <span class="pre">S^1</span> <span class="pre">-</span> <span class="pre">beta0</span> <span class="pre">S^0)</span> <span class="pre">/</span> <span class="pre">dt</span></code> during a regular time step we overwrite this </p>
