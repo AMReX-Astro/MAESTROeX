@@ -173,13 +173,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	w0mac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
 	w0mac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
     }
-    if (spherical == 1) {
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-	}
-    }
 #endif
-
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+	w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	w0_force_cart_dummy[lev].setVal(0.);
+    }
 
     // set etarhoflux_dummy to zero
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -194,13 +193,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	    w0mac_dummy[lev][d].setVal(0.);
 	}
     }
-    if (spherical == 1) {
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    w0_force_cart_dummy[lev].setVal(0.);
-	}
-    }
 #endif
-
+    
     // initialize to zero
     std::fill(Sbar.begin(), Sbar.end(), 0.);
     std::fill(w0.begin()  , w0.end()  , 0.);

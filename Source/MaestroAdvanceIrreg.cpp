@@ -174,7 +174,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 #endif
 
-
     for (int lev=0; lev<=finest_level; ++lev) {
         w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         w0_force_cart_dummy[lev].setVal(0.);

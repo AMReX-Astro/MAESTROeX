@@ -53,7 +53,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         const MultiFab& rho_mf = rho[lev];
         const MultiFab& uedge_mf = uedge[lev][0];
         const MultiFab& vedge_mf = uedge[lev][1];
+#if (AMREX_SPACEDIM == 3)
         const MultiFab& wedge_mf = uedge[lev][2];
+#endif
         const MultiFab& w0_mf = w0_cart[lev];
         const MultiFab& gradw0_mf = gradw0_cart[lev];
         const MultiFab& normal_mf = normal[lev];
@@ -79,22 +81,22 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             if (spherical == 0) {
 #pragma gpu box(tileBox)
                 make_vel_force(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
-                                BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
-                                BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+			       AMREX_INT_ANYD(tileBox.hiVect()),
+			       BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
+			       BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
+			       BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
+			       BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
+			       BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-                                BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+			       BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
 #endif
-                                BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
-                                AMREX_REAL_ANYD(dx),
-                                AMREX_INT_ANYD(domainBox.hiVect()),
-                                do_add_utilde_force);
+			       BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
+			       BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
+			       BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+			       BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
+			       AMREX_REAL_ANYD(dx),
+			       AMREX_INT_ANYD(domainBox.hiVect()),
+			       do_add_utilde_force);
             } else {
 #if (AMREX_SPACEDIM == 3)        
 #pragma gpu box(tileBox)
