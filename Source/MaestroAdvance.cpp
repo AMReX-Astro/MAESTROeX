@@ -302,12 +302,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
+        
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
                 etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
+        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
@@ -317,8 +320,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             MakeW0mac(w0mac);
         }
 
-        // // put w0_force on Cartesian cells
-        // Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
+        // put w0_force on Cartesian cells
+        Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
 
     } else {
         // these should have no effect if evolve_base_state = false
@@ -326,9 +329,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         std::fill(w0_force.begin(), w0_force.end(), 0.);
 
     }
-
-    // put w0_force on Cartesian cells
-    Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 3 -- construct the advective velocity
@@ -722,16 +722,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             }
         }
 
+        base_time_start = ParallelDescriptor::second();
+
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
-
-        base_time_start = ParallelDescriptor::second();
 
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
                 etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+
+        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());

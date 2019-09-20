@@ -651,9 +651,8 @@ Maestro::PlotFileMF (const int nPlot,
 
     if (plot_base_state) {
         // w0
-        Put1dArrayOnCart(w0,tempmf,1,1,bcs_u,0,1);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i],0,dest_comp,AMREX_SPACEDIM);
+            plot_mf_data[i]->copy(w0_cart[i],0,dest_comp,AMREX_SPACEDIM);
         }
         dest_comp += AMREX_SPACEDIM;
 
@@ -1379,11 +1378,6 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].setVal(0.);
-    }
-    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
         const MultiFab& vel_mf = vel[lev];
@@ -1777,12 +1771,6 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     // turn on GPU
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].setVal(0.);
-    }
-
-    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

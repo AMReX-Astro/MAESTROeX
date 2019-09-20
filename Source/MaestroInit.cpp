@@ -573,6 +573,9 @@ void Maestro::DivuIter (int istep_divu_iter)
                     p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
                     etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
                     r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+
+            // put w0 on Cartesian cell-centers
+            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         }
     }
 
