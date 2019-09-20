@@ -618,5 +618,5 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
     }
 
-    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new.dataPtr(), p0_new_cart);
+    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
 }

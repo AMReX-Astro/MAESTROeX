@@ -238,278 +238,6 @@ Maestro::PlotFileMF (const int nPlot,
                      const RealVector& gamma1bar_in,
                      const Vector<MultiFab>& S_cc_in)
 {
-<<<<<<< HEAD
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
-
-	// MultiFab to hold plotfile data
-	Vector<const MultiFab*> plot_mf;
-
-	// temporary MultiFab to hold plotfile data
-	Vector<MultiFab*> plot_mf_data(finest_level+1);
-
-	// temporary MultiFab for calculations
-	Vector<MultiFab> tempmf(finest_level+1);
-	Vector<MultiFab> tempmf_scalar1(finest_level+1);
-	Vector<MultiFab> tempmf_scalar2(finest_level+1);
-	RealVector tempbar_plot ((max_radial_level+1)*nr_fine);
-	tempbar_plot.shrink_to_fit();
-	std::fill(tempbar_plot.begin(), tempbar_plot.end(), 0.);
-
-	int dest_comp = 0;
-
-	// build temporary MultiFab to hold plotfile data
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i] = new MultiFab((s_in[i]).boxArray(),(s_in[i]).DistributionMap(),nPlot,0);
-		tempmf[i].define(grids[i],dmap[i],AMREX_SPACEDIM,0);
-
-		tempmf_scalar1[i].define(grids[i],dmap[i],1,0);
-		tempmf_scalar2[i].define(grids[i],dmap[i],1,0);
-	}
-
-	// velocity
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(u_in[i],0,dest_comp,AMREX_SPACEDIM);
-	}
-	dest_comp += AMREX_SPACEDIM;
-
-	// magvel
-	MakeMagvel(u_in, tempmf);
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
-	}
-	++dest_comp;
-
-	// momentum = magvel * rho
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
-		MultiFab::Multiply(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
-	}
-	++dest_comp;
-
-	// vorticity
-	MakeVorticity(u_in, tempmf);
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
-	}
-	++dest_comp;
-
-	// rho
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],Rho,dest_comp,1);
-	}
-	++dest_comp;
-
-	// rhoh
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],RhoH,dest_comp,1);
-	}
-	++dest_comp;
-
-	// h
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],RhoH,dest_comp,1);
-		MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
-	}
-	++dest_comp;
-
-	// rhoX
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],FirstSpec,dest_comp,NumSpec);
-	}
-	dest_comp += NumSpec;
-
-	if (plot_spec) {
-		// X
-		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy(s_in[i],FirstSpec,dest_comp,NumSpec);
-			for (int comp=0; comp<NumSpec; ++comp) {
-				MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
-			}
-		}
-		dest_comp += NumSpec;
-
-		// abar
-		MakeAbar(s_in, tempmf);
-		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
-		}
-		++dest_comp;
-
-	}
-
-	Vector<MultiFab> stemp             (finest_level+1);
-	Vector<MultiFab> rho_Hext          (finest_level+1);
-	Vector<MultiFab> rho_omegadot      (finest_level+1);
-	Vector<MultiFab> rho_Hnuc          (finest_level+1);
-	Vector<MultiFab> sdc_source        (finest_level+1);
-
-	for (int lev=0; lev<=finest_level; ++lev) {
-		stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-		rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
-		rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
-		rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
-		sdc_source        [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-		
-		sdc_source[lev].setVal(0.);
-	}
-
-#ifndef SDC
-	if (dt_in < small_dt) {
-	    React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_old);
-	} else {
-	    React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in*0.5, t_old);
-	}
-#else	
-	if (dt_in < small_dt) {
-	    ReactSDC(s_in, stemp, rho_Hext, p0_in, small_dt, t_old, sdc_source);
-	} else {
-	    ReactSDC(s_in, stemp, rho_Hext, p0_in, dt_in*0.5, t_old, sdc_source);
-	}
-	
-	MakeReactionRates(rho_omegadot,rho_Hnuc,s_in);
-#endif
-
-	if (plot_spec || plot_omegadot) {
-		// omegadot
-		if (plot_omegadot) {
-			for (int i = 0; i <= finest_level; ++i) {
-				plot_mf_data[i]->copy(rho_omegadot[i],0,dest_comp,NumSpec);
-				for (int comp=0; comp<NumSpec; ++comp) {
-					MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp+comp,1,0);
-				}
-			}
-			dest_comp += NumSpec;
-		}
-	}
-
-	if (plot_Hext) {
-		// Hext
-		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy(rho_Hext[i],0,dest_comp,1);
-			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
-		}
-		++dest_comp;
-	}
-
-	if (plot_Hnuc) {
-		// Hnuc
-		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy(rho_Hnuc[i],0,dest_comp,1);
-			MultiFab::Divide(*plot_mf_data[i],s_in[i],Rho,dest_comp,1,0);
-		}
-		++dest_comp;
-	}
-
-	if (plot_eta) {
-		// eta_rho
-		Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0,1);
-		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
-		}
-		++dest_comp;
-	}
-
-	// compute tfromp
-	TfromRhoP(s_in,p0_in);
-	// tfromp
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
-	}
-	++dest_comp;
-
-	// compute tfromh
-	TfromRhoH(s_in,p0_in);
-	for (int i = 0; i <= finest_level; ++i) {
-		// tfromh
-		plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
-	}
-	++dest_comp;
-
-	// deltap
-	// compute & copy tfromp
-	PfromRhoH(s_in,s_in,tempmf);
-	for (int i = 0; i <= finest_level; ++i) {
-		// tfromh
-		plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
-		MultiFab::Subtract(*plot_mf_data[i],p0_cart[i],0,dest_comp,1,0);
-	}
-	++dest_comp;
-
-	// deltaT
-	// compute & copy tfromp
-	TfromRhoP(s_in,p0_in);
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
-	}
-	// compute tfromh
-	TfromRhoH(s_in,p0_in);
-	// compute deltaT = (tfromp - tfromh) / tfromh
-	for (int i = 0; i <= finest_level; ++i) {
-		MultiFab::Subtract(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
-		MultiFab::Divide(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
-	}
-	++dest_comp;
-
-	// restore tfromp if necessary
-	if (use_tfromp) {
-		TfromRhoP(s_in,p0_in);
-	}
-
-	// pi
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],Pi,dest_comp,1);
-	}
-	++dest_comp;
-
-	// pioverp0
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],Pi,dest_comp,1);
-		MultiFab::Divide(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
-	}
-	++dest_comp;
-
-	// p0pluspi
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],Pi,dest_comp,1);
-		MultiFab::Add(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
-	}
-	++dest_comp;
-
-	if (plot_gpi) {
-		// gpi
-		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy(gpi[i],0,dest_comp,AMREX_SPACEDIM);
-		}
-		dest_comp += AMREX_SPACEDIM;
-	}
-
-	// rhopert
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],Rho,dest_comp,1);
-		MultiFab::Subtract(*plot_mf_data[i],rho0_cart[i],0,dest_comp,1,0);
-	}
-	++dest_comp;
-
-	// rhohpert
-	for (int i = 0; i <= finest_level; ++i) {
-		plot_mf_data[i]->copy(s_in[i],RhoH,dest_comp,1);
-		MultiFab::Subtract(*plot_mf_data[i],rhoh0_cart[i],0,dest_comp,1,0);
-	}
-	++dest_comp;
-
-	// tpert
-	{
-		Average(s_in, tempbar_plot, Temp);
-		Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
-
-		for (int i = 0; i <= finest_level; ++i) {
-			plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
-			MultiFab::Subtract(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
-		}
-	}
-	++dest_comp;
-=======
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
 
@@ -613,19 +341,33 @@ Maestro::PlotFileMF (const int nPlot,
     Vector<MultiFab> rho_Hext          (finest_level+1);
     Vector<MultiFab> rho_omegadot      (finest_level+1);
     Vector<MultiFab> rho_Hnuc          (finest_level+1);
+    Vector<MultiFab> sdc_source        (finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
         rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
         rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+	sdc_source        [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+	
+	sdc_source[lev].setVal(0.);
     }
 
+#ifndef SDC
     if (dt_in < small_dt) {
         React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);
     } else {
         React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in*0.5, t_in);
     }
+#else	
+    if (dt_in < small_dt) {
+	ReactSDC(s_in, stemp, rho_Hext, p0_in, small_dt, t_old, sdc_source);
+    } else {
+	ReactSDC(s_in, stemp, rho_Hext, p0_in, dt_in*0.5, t_old, sdc_source);
+    }
+    
+    MakeReactionRates(rho_omegadot,rho_Hnuc,s_in);
+#endif
 
     if (plot_spec || plot_omegadot) {
         // omegadot
@@ -766,7 +508,6 @@ Maestro::PlotFileMF (const int nPlot,
         }
     }
     ++dest_comp;
->>>>>>> development
 
     if (plot_base_state) {
         // rho0, rhoh0, h0 and p0
