@@ -236,7 +236,7 @@ ensure that the error does not show any directional bias.</p>
 independent of the advection direction—small differences can
 arise. What’s happening here is that within each cell BDS is trying
 to define a tri-linear profile for rho subject to the constrants in
-the BDS paper (<a class="reference internal" href="zreferences.html#bds3d" id="id1">[NonakaMayAlmgrenBell11]</a>) (constraints 1 and 2 on p. 2044 after eq. 3.4). We
+the BDS paper (<a class="bibtex reference internal" href="zreferences.html#bds3d" id="id1">[NonakaMayAlmgrenBell11]</a>) (constraints 1 and 2 on p. 2044 after eq. 3.4). We
 do not solve the L2 minimization problem exactly so we iterate up to
 3 times using a simple heuristic algorithm designed to work toward
 the constraint. The iteration will give different results depending
@@ -264,7 +264,7 @@ the fill_3d_module module, and then calls average to
 put it back onto a 1D radial array. This way we test the accuracy
 of our procedure to map between the 1D radial and 3D Cartesian
 states. The output from this test was described in detail
-in <a class="reference internal" href="zreferences.html#multilevel" id="id2">[NonakaAlmgrenBell+10]</a>.</p>
+in <a class="bibtex reference internal" href="zreferences.html#multilevel" id="id2">[NonakaAlmgrenBell+10]</a>.</p>
 </div>
 <div class="section" id="test-basestate">
 <h2>test_basestate<a class="headerlink" href="#test-basestate" title="Permalink to this headline">¶</a></h2>
@@ -275,8 +275,8 @@ the base state velocity, <span class="math notranslate nohighlight">\(w_0\)</spa
 the heating and this is used to advect the base state density
 and compute the new pressure, <span class="math notranslate nohighlight">\(p_0\)</span>. An early version of
 this routine was used for the plane-parallel expansion test
-in <a class="reference internal" href="zreferences.html#lowmach2" id="id3">[AlmgrenBellRendlemanZingale06b]</a>. This version of the test was also shown
-for a spherical, self-gravitating star in <a class="reference internal" href="zreferences.html#multilevel" id="id4">[NonakaAlmgrenBell+10]</a>.</p>
+in <a class="bibtex reference internal" href="zreferences.html#lowmach2" id="id3">[AlmgrenBellRendlemanZingale06b]</a>. This version of the test was also shown
+for a spherical, self-gravitating star in <a class="bibtex reference internal" href="zreferences.html#multilevel" id="id4">[NonakaAlmgrenBell+10]</a>.</p>
 </div>
 <div class="section" id="test-diffusion">
 <h2>test_diffusion<a class="headerlink" href="#test-diffusion" title="Permalink to this headline">¶</a></h2>
@@ -287,7 +287,7 @@ based on the explicit thermal diffusion timescale and loops
 over calls to the thermal diffusion solver. A Gaussian remains
 Gaussian when diffusing, so an explicit error can be computed
 by comparing to the analytic solution. This test is
-described in <a class="reference internal" href="zreferences.html#xrb" id="id5">[MaloneNonakaAlmgren+11]</a>.</p>
+described in <a class="bibtex reference internal" href="zreferences.html#xrb" id="id5">[MaloneNonakaAlmgren+11]</a>.</p>
 </div>
 <div class="section" id="test-eos">
 <h2>test_eos<a class="headerlink" href="#test-eos" title="Permalink to this headline">¶</a></h2>

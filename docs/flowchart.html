@@ -248,8 +248,8 @@
 <p>The equation set and solution procedure used by MAESTROeX has changed
 and improved over time.  In this chapter, we outline the model
 equations and algorithmic options in the code.  The latest published
-references for MAESTROeX are the multilevel paper <a class="reference internal" href="zreferences.html#multilevel" id="id1">[NonakaAlmgrenBell+10]</a>
-and the more recent <a class="reference internal" href="zreferences.html#maestroex" id="id2">[FanNonakaAlmgren+19]</a>.  These two papers use the same
+references for MAESTROeX are the multilevel paper <a class="bibtex reference internal" href="zreferences.html#multilevel" id="id1">[NonakaAlmgrenBell+10]</a>
+and the more recent <a class="bibtex reference internal" href="zreferences.html#maestroex" id="id2">[FanNonakaAlmgren+19]</a>.  These two papers use the same
 model equations, however the more recent paper, in addition to
 retaining the original algorithmic capability of the previous code,
 includes an option to use a new, simplified temporal integration
@@ -298,7 +298,7 @@ a trivial average of all the values at a given height.
 For spherical problems there is a
 novel interpolation routine we use to average 3D data representing
 a full spherical star into a 1D array representing the average.
-Details can be found in <a class="reference internal" href="zreferences.html#multilevel" id="id3">[NonakaAlmgrenBell+10]</a> and <a class="reference internal" href="zreferences.html#maestroex" id="id4">[FanNonakaAlmgren+19]</a>.</p>
+Details can be found in <a class="bibtex reference internal" href="zreferences.html#multilevel" id="id3">[NonakaAlmgrenBell+10]</a> and <a class="bibtex reference internal" href="zreferences.html#maestroex" id="id4">[FanNonakaAlmgren+19]</a>.</p>
 <p>For the velocity field, we can decompose the full velocity
 field into a base state velocity and a local velocity,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-5">
@@ -449,7 +449,7 @@ and perturbational density as <span class="math notranslate nohighlight">\(\rho'
    -\frac{\rho^\prime}{\rho} |g| \er\]</div>
 <p>This is the form of the momentum equation that we solved in papers
 I–IV and in the multilevel paper.</p>
-<p>Several authors <a class="reference internal" href="zreferences.html#kp-2012" id="id5">[KP12]</a><a class="reference internal" href="zreferences.html#vlbwz-2013" id="id6">[VLB+13]</a> explored the idea of energy
+<p>Several authors <a class="bibtex reference internal" href="zreferences.html#kp-2012" id="id5">[KP12]</a><a class="bibtex reference internal" href="zreferences.html#vlbwz-2013" id="id6">[VLB+13]</a> explored the idea of energy
 conservation in a low Mach number system and found that an additional
 term (which can look like a buoyancy) is needed in the low Mach number
 formulation, yielding:</p>
@@ -516,7 +516,7 @@ term is only present if we are using thermal diffusion (<code class="docutils li
 <p>In this constraint, <span class="math notranslate nohighlight">\(\gammabar\)</span> is the lateral average of
 <span class="math notranslate nohighlight">\(\Gamma_1 \equiv d\log p / d\log \rho |_s\)</span>. Using the lateral average
 here makes it possible to cast the constraint as a
-divergence. <a class="reference internal" href="zreferences.html#kp-2012" id="id7">[KP12]</a> discuss the general case where we want to
+divergence. <a class="bibtex reference internal" href="zreferences.html#kp-2012" id="id7">[KP12]</a> discuss the general case where we want to
 keep the local variations of <span class="math notranslate nohighlight">\(\Gamma_1\)</span> (and we explored this in paper
 III). We also look at this in § <a class="reference internal" href="#sec-flow-gamma1vary"><span class="std std-ref">\Gamma_1 Variation Changes</span></a></p>
 </div>
@@ -722,8 +722,8 @@ incompressible / low speed papers, <span class="math notranslate nohighlight">\(
 </div>
 <div class="section" id="time-advancement-algorithm-ingredients">
 <span id="sec-time-advancement-algorithm"></span><h2>Time Advancement Algorithm Ingredients<a class="headerlink" href="#time-advancement-algorithm-ingredients" title="Permalink to this headline">¶</a></h2>
-<p>The full time advancement algorithm is detailed in <a class="reference internal" href="zreferences.html#multilevel" id="id9">[NonakaAlmgrenBell+10]</a> for the original
-algorithm and <a class="reference internal" href="zreferences.html#maestroex" id="id10">[FanNonakaAlmgren+19]</a> for the new, simplified algorithm.  We do not repeat
+<p>The full time advancement algorithm is detailed in <a class="bibtex reference internal" href="zreferences.html#multilevel" id="id9">[NonakaAlmgrenBell+10]</a> for the original
+algorithm and <a class="bibtex reference internal" href="zreferences.html#maestroex" id="id10">[FanNonakaAlmgren+19]</a> for the new, simplified algorithm.  We do not repeat
 that here.</p>
 <p>The overall flow of the algorithm is depicted in the following flowcharts:</p>
 <div class="figure align-center" id="id16">
@@ -1051,7 +1051,7 @@ First we construct:</p>
 </div>
 <div class="section" id="thermal-diffusion-changes">
 <span id="sec-flow-diffusion"></span><h3>Thermal Diffusion Changes<a class="headerlink" href="#thermal-diffusion-changes" title="Permalink to this headline">¶</a></h3>
-<p>Thermal diffusion was introduced in the XRB <a class="reference internal" href="zreferences.html#xrb" id="id11">[MaloneNonakaAlmgren+11]</a>. This
+<p>Thermal diffusion was introduced in the XRB <a class="bibtex reference internal" href="zreferences.html#xrb" id="id11">[MaloneNonakaAlmgren+11]</a>. This
 introduces a new term to <span class="math notranslate nohighlight">\(S\)</span> as well as the enthalpy equation.
 Treating the enthalpy equation now requires a parabolic solve. We describe
 that process here.</p>
@@ -1193,7 +1193,7 @@ we define <span class="math notranslate nohighlight">\({\bf V} = (\Ubt^{1,\star}
 <div class="math notranslate nohighlight" id="equation-flowchart-61">
 <span class="eqno">(80)<a class="headerlink" href="#equation-flowchart-61" title="Permalink to this equation">¶</a></span>\[L_\beta^\rho \phi = D \left ( \beta_0^{\myhalf} {\bf V} \right) - \beta_0^{\myhalf} \left[ \left(S^{1}-\overline{S^{1}}\right) - \left(S^{0}-\overline{S^{0}}\right) \right]  .\]</div>
 <p>(The motivation for this form of the projection in the initial pressure iterations
-is discussed in <a class="reference internal" href="zreferences.html#almgren-bell-crutchfield" id="id12">[ABC00]</a>.)
+is discussed in <a class="bibtex reference internal" href="zreferences.html#almgren-bell-crutchfield" id="id12">[ABC00]</a>.)
 We discard the new velocity resulting from this, but keep the new
 value for <span class="math notranslate nohighlight">\(\pi^{\myhalf} = \pi^{-\myhalf} + (1 / \dt) \; \phi.\)</span>
 These steps also yield new scalar data at time <span class="math notranslate nohighlight">\(\dt,\)</span> which
@@ -1282,9 +1282,9 @@ been successful.</p></li>
 </div>
 <div class="section" id="numerical-methodology">
 <span id="ch-methodology"></span><h1>Numerical Methodology<a class="headerlink" href="#numerical-methodology" title="Permalink to this headline">¶</a></h1>
-<p>We give an overview of the original MAESTRO algorithm <a class="reference internal" href="zreferences.html#multilevel" id="id13">[NonakaAlmgrenBell+10]</a>,
+<p>We give an overview of the original MAESTRO algorithm <a class="bibtex reference internal" href="zreferences.html#multilevel" id="id13">[NonakaAlmgrenBell+10]</a>,
 as well as the recently introduced new temporal integration
-scheme <a class="reference internal" href="zreferences.html#maestroex" id="id14">[FanNonakaAlmgren+19]</a>.  These schemes share many of the same algorithmic
+scheme <a class="bibtex reference internal" href="zreferences.html#maestroex" id="id14">[FanNonakaAlmgren+19]</a>.  These schemes share many of the same algorithmic
 modules, however the new scheme is significantly simpler.</p>
 <p>To summarize, in the original scheme we integrated the base state evolution
 over the time step, which requires splitting the velocity equation into
