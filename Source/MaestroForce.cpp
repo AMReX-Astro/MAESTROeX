@@ -53,7 +53,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         const MultiFab& rho_mf = rho[lev];
         const MultiFab& uedge_mf = uedge[lev][0];
         const MultiFab& vedge_mf = uedge[lev][1];
+#if (AMREX_SPACEDIM == 3)
         const MultiFab& wedge_mf = uedge[lev][2];
+#endif
         const MultiFab& w0_mf = w0_cart[lev];
         const MultiFab& gradw0_mf = gradw0_cart[lev];
         const MultiFab& normal_mf = normal[lev];
