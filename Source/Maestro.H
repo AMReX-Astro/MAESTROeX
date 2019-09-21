@@ -938,15 +938,17 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const RealVector& p0,
-                const amrex::Real dt_react);
+                const amrex::Real dt_react,
+		const amrex::Real time_in);
 
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
-                amrex::Vector<amrex::MultiFab>& s_out,
-                const amrex::Vector<amrex::MultiFab>& rho_Hext,
-                amrex::Vector<amrex::MultiFab>& rho_omegadot,
-                amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                const RealVector& p0,
-                const amrex::Real dt_react);
+		 amrex::Vector<amrex::MultiFab>& s_out,
+		 const amrex::Vector<amrex::MultiFab>& rho_Hext,
+		 amrex::Vector<amrex::MultiFab>& rho_omegadot,
+		 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+		 const RealVector& p0,
+		 const amrex::Real dt_react,
+		 const amrex::Real time_in);
 
     /// Compute heating term, `rho_Hext`
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
@@ -1214,6 +1216,11 @@ private:
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
     amrex::Vector<amrex::MultiFab> pi;   //< nodal
+
+    /// this doesn't have to be persistent, but we make it so that we avoid
+    /// continually creating and filling temporaries
+    /// saves on some flops and data movement (GPU)
+    amrex::Vector<amrex::MultiFab> w0_cart;
 
     /// this only needs to persist leading into the initial pressure iters
     /// since we project `(beta0^nph S^1 - beta0 S^0) / dt`

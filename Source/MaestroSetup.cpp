@@ -203,6 +203,7 @@ Maestro::Setup ()
     gpi               .resize(max_level+1);
     dSdt              .resize(max_level+1);
     pi                .resize(max_level+1);
+    w0_cart           .resize(max_level+1);
     rhcc_for_nodalproj.resize(max_level+1);
     normal            .resize(max_level+1);
     cell_cc_to_r      .resize(max_level+1);
