@@ -77,10 +77,9 @@ Derivation of :math:`\alpha`
 In paper I, :math:`\alpha` is defined as
 
 .. math::
-
-   \label{eq:alpha}
    \alpha\equiv -\left(
    \frac{(1-\rho h_p)p_T-\rho c_p}{\rho^2c_pp_\rho}\right)
+   :label: eq:alpha
 
 where
 
@@ -100,26 +99,24 @@ system of one species, or a system of many species in chemical (and
 therefore *thermodynamic*) equilibrium. Cox and Giuli (hereafter
 CG) call the former type of system a “simple system” and therefore
 the latter a “non-simple system” in chemical equilibrium. The
-analysis in paper I that reduced `[eq:alpha] <#eq:alpha>`__ to
+analysis in paper I that reduced :eq:`eq:alpha` to
 
 .. math::
-
-   \label{eq:alpha_simp_no_rxn}
    \alpha = \frac{1}{\Gamma_1p_0}
+   :label: eq:alpha_simp_no_rxn
 
 used CG’s discussion of the various adiabatic :math:`\Gamma`\ ’s. However,
 their discussion only pertains to “simple systems” or “non-simple
 systems” in chemical equilibrium. In general, nuclear reactions will
 be important and therefore this analysis needs to be reformed.
 
-Even in the presence of reactions, `[eq:alpha] <#eq:alpha>`__ can be rewritten
+Even in the presence of reactions, :eq:`eq:alpha` can be rewritten
 as was done in paper I:
 
 .. math::
-
-   \label{eq:alpha2}
    \alpha = -\frac{1}{p\chi_\rho c_p}\left[\left(\frac{1}{\rho\chi_\rho}
    - \frac{\rho e_\rho}{p\chi_\rho}\right)\frac{p\chi_T}{T} - c_p\right],
+   :label: eq:alpha2
 
 where
 
@@ -396,7 +393,7 @@ Dividing this by `[eq:cv] <#eq:cv>`__ and using the relation between the
          \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - p\chi_T
          \chi_{X_i}\right]\Gamma_{4,i}\right].\end{aligned}
 
-Plugging `[eq:pchirho] <#eq:pchirho>`__ into `[eq:alpha2] <#eq:alpha2>`__ and rewriting the
+Plugging `[eq:pchirho] <#eq:pchirho>`__ into :eq:`eq:alpha2` and rewriting the
 partial derivative of :math:`e` with the help of `[eq:dedlnrho] <#eq:dedlnrho>`__ we have
 
 .. math::

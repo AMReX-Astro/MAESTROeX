@@ -127,6 +127,7 @@ math_eqref_format = "Eq.{number}"
 math_number_all = True
 num_fig = True
 math_num_fig = True
+numfig = True
 
 # -- Options for HTML output ----------------------------------------------
 
