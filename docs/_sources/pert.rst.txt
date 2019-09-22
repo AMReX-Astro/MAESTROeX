@@ -87,18 +87,20 @@ Basic equations
 The full density evolution equation is
 
 .. math::
-
    \begin{aligned}
    \frac{\partial\rho}{\partial t} &=& -\nabla\cdot(\rho\Ub) \nonumber \\
-   &=& -\Ub\cdot\nabla\rho - \rho\nabla\cdot\Ub \, . \label{rho equation}\end{aligned}
+   &=& -\Ub\cdot\nabla\rho - \rho\nabla\cdot\Ub \, . 
+   \end{aligned}
+   :label: rho equation
 
 The species are evolved according to
 
 .. math::
-
    \begin{aligned}
    \frac{\partial(\rho X_k)}{\partial t} &=& -\nabla\cdot(\rho\Ub X_k) + \rho \omegadot_k \nonumber \\
-   &=& -\Ub\cdot\nabla(\rho X_k) - \rho X_k \nabla\cdot\Ub + \rho \omegadot_k \, . \label{species equation}\end{aligned}
+   &=& -\Ub\cdot\nabla(\rho X_k) - \rho X_k \nabla\cdot\Ub + \rho \omegadot_k \, .
+   \end{aligned}
+   :label: species equation
 
 In practice, only the species evolution equation is evolved, and the
 total density is set as
@@ -114,12 +116,10 @@ subscript ‘edge’ to indicate what quantity was *predicted* to the
 edges. In MAESTROeX, the different methods of computing :math:`(\rho X)` on
 edges are controlled by the ``species_pred_type parameter``. The
 quantities predicted to edges and the
-resulting edge state are shown in the table \ `[table:pred:species] <#table:pred:species>`__
+resulting edge state are shown in the :numref:`table:pred:species`.
 
-.. raw:: latex
 
-   \centering
-
+.. _table:pred:species:
 .. table:: Summary of species edge state construction
 
    +--------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
@@ -150,13 +150,12 @@ We predict both :math:`\rho'` and :math:`\rho_0` to edges separately and later u
 reconstruct :math:`\rho` at edges. The base state density evolution equation is
 
 .. math::
-
    \frac{\partial\rho_0}{\partial t} = -\nabla\cdot(\rho_0 w_0 \eb_r) =
    -w_0\frac{\partial\rho_0}{\partial r}
    \underbrace{-\rho_0\frac{\partial w_0}{\partial r}}_{``\rho_0 ~ \text{force"}}.
-   \label{rho0 equation}
+   :label: rho0 equation
 
-Subtract (`[rho0 equation] <#rho0 equation>`__) from (`[rho equation] <#rho equation>`__) and rearrange
+Subtract :eq:`rho0 equation` from :eq:`rho equation` and rearrange
 terms, noting that :math:`\Ub = \Ubt + w_o\eb_r`, to obtain the
 perturbational density equation,
 
@@ -167,7 +166,7 @@ perturbational density equation,
    \label{rhoprime equation}
 
 We also need :math:`X_k` at the edges. Here, we subtract :math:`X_k \times`
-Eq. \ `[rho equation] <#rho equation>`__ from Eq. \ `[species equation] <#species equation>`__ to obtain
+:eq:`rho equation` from :eq:`species equation` to obtain
 
 .. math:: \frac{\partial X_k}{\partial t} = -\Ub \cdot \nabla X_k + \omegadot_k
 
@@ -191,7 +190,7 @@ Predicting :math:`\rho_0` at edges
 There are two ways to predict :math:`\rho_0` at edges.
 
 #. We call make_edge_state_1d using the underbraced term
-   in (`[rho0 equation] <#rho0 equation>`__) as the forcing. This gives us
+   in :eq:`rho0 equation` as the forcing. This gives us
    :math:`\rho_0^{n+\myhalf,{\rm pred}}`. This term is used to advect :math:`\rho_0`
    in **Advect Base Density**. In plane-parallel geometries, we also use
    :math:`\rho_0^{n+\myhalf,{\rm pred}}` to compute :math:`\etarho`, which will be used
@@ -199,7 +198,7 @@ There are two ways to predict :math:`\rho_0` at edges.
 
 #. We define :math:`\rho_0^{n+\myhalf,{\rm avg}} = (\rho_0^n +
    \rho_0^{(2)})/2`. We compute :math:`\rho_0^{(2)}` from :math:`\rho_0^n` using
-   **Advect Base Density**, which advances equation (`[rho0 equation] <#rho0 equation>`__)
+   **Advect Base Density**, which advances :eq:`rho0 equation`
    through :math:`\Delta t` in time. The :math:`(2)` in the superscript indicates
    that we have not called **Correct Base** yet, which computes
    :math:`\rho_0^{n+1}` from :math:`\rho_0^{(2)}`. We use :math:`\rho_0^{(2)}` rather than
@@ -245,7 +244,7 @@ Method 2: species_pred_type = predict_rhoX
 
 Here we wish to construct :math:`(\rho X_k)_\mathrm{edge}` by predicting
 :math:`(\rho X_k)` to the edges as a single quantity. We recall
-Eq. \ `[species equation] <#species equation>`__:
+:eq:`species equation`:
 
 .. math::
 
@@ -270,12 +269,12 @@ by predicting :math:`\rho` and :math:`X_k` to the edges separately.
 Predicting :math:`X_k` to the edges proceeds exactly as described in
 § \ `2.2.4 <#sec:pert:predict_X>`__.
 
-Predicting the full :math:`\rho` begins with Eq. \ `[rho equation] <#rho equation>`__:
+Predicting the full :math:`\rho` begins with :eq:`rho equation`:
 
 .. math::
-
    \frac{\partial\rho}{\partial t}
-   = -\Ub\cdot\nabla\rho \, \underbrace{- \rho\nabla\cdot\Ub}_{``\rho~\text{force''}} \, . \label{rho equation labeled}
+   = -\Ub\cdot\nabla\rho \, \underbrace{- \rho\nabla\cdot\Ub}_{``\rho~\text{force''}} \, .
+   :label: rho equation labeled
 
 Using this, :math:`\rho` is predicted to the edges using
 ``make_edge_scal`` in ``density_advance``, with the underbraced
@@ -340,36 +339,38 @@ enthalpy equation that does not include the :math:`\rho H_{\rm nuc}` and
 react_state, so our equation becomes
 
 .. math::
-
    \frac{\partial(\rho h)}{\partial t} = -\Ub\cdot\nabla(\rho h) - \rho h\nabla\cdot\Ub
-   + \underbrace{\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla\cdot\kth\nabla T}_{``(\rho h) ~ \text{force}"} \label{rhoh equation}
+   + \underbrace{\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla\cdot\kth\nabla T}_{``(\rho h) ~ \text{force}"}
+   :label: rhoh equation
 
 We define the base state enthalpy evolution equation as
 
 .. math::
-
    \begin{aligned}
    \frac{\partial(\rho h)_0}{\partial t} &=& -\nabla\cdot[(\rho h)_0 w_0\eb_r]
    + \frac{D_0p_0}{Dt} \nonumber \\
    &=& -w_0\frac{\partial(\rho h)_0}{\partial r}
    - \underbrace{(\rho h)_0\frac{\partial w_0}{\partial r}+ \psi}_{``(\rho h)_0 ~ \text{force}"}
-    .\label{rhoh0 equation}\end{aligned}
+    .
+   \end{aligned}
+   :label: rhoh0 equation
 
 Perturbational enthalpy formulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Subtracting (`[rhoh0 equation] <#rhoh0 equation>`__) from (`[rhoh equation] <#rhoh equation>`__) and
+Subtracting :eq:`rhoh0 equation` from :eq:`rhoh equation` and
 rearranging terms gives the perturbational enthalpy equation
 
 .. math::
-
    \begin{aligned}
    \frac{\partial(\rho h)'}{\partial t} &=& -\nabla\cdot[(\rho h)'\Ub]
    - \nabla\cdot[(\rho h)_0\Ubt] + (\Ubt \cdot \er)\frac{\partial p_0}{\partial r}
    + \nabla\cdot\kth\nabla T\nonumber \\
    &=& -\Ub\cdot\nabla(\rho h)' \underbrace{- (\rho h)'\nabla\cdot\Ub
    - \nabla\cdot[(\rho h)_0\Ubt] + (\Ubt \cdot \er)\frac{\partial p_0}{\partial r}
-   + \nabla\cdot\kth\nabla T}_{``(\rho h)' ~ \text{force}"}, \label{rhohprime equation}\end{aligned}
+   + \nabla\cdot\kth\nabla T}_{``(\rho h)' ~ \text{force}"}, 
+   \end{aligned}
+   :label: rhohprime equation
 
 Temperature formulation
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -390,29 +391,27 @@ Again, we neglect the reaction terms, since that will be handled during
 the reaction step, so we can write this as:
 
 .. math::
-
    \frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
    \underbrace{
    + \frac{1}{\rho c_p}\left\{(1-\rho h_p)\left[\psi
    + (\Ubt \cdot \er )\frac{\partial p_0}{\partial r}\right]
    + \nabla \cdot \kth \nabla T \right \} }_{``T~\text{force''}} \, .
-   \label{T equation labeled}
+   :label: T equation labeled
 
 Pure enthalpy formulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A final alternative is to consider an evolution equation for :math:`h`
 alone. This can be derived by expanding the derivative of :math:`(\rho h)`
-in Eq. \ `[rhoh equation] <#rhoh equation>`__ and subtracting off :math:`h \times` the
-continuity equation (Eq. `[rho equation] <#rho equation>`__):
+in :eq:`rhoh equation` and subtracting off :math:`h \times` the
+continuity equation (:eq:`rho equation`):
 
 .. math::
-
    \frac{\partial h}{\partial t} = -\Ub \cdot \nabla h
    \underbrace{+ \frac{1}{\rho}
    \left \{ \psi + (\Ubt \cdot \er )\frac{\partial p_0}{\partial r}
    + \nabla \cdot \kth \nabla T \right \} }_{``h~\text{force''}} \, .
-   \label{h equation labeled}
+   :label: h equation labeled
 
 Prediction requirements
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -426,14 +425,13 @@ depend on ``species_pred_type``.
 
 The general procedure for making the :math:`(\rho h)` edge state is as follows:
 
-#. predict :math:`(rho h)`, :math:`(\rho h)'`, :math:`h`, or :math:`T` to the edges (depending on
-   ``enthalpy_pred_type`` ) using ``make_edge_scal`` and the forces
-   identified in the appropriate evolution equation
-   (Eqs. `[rhohprime equation] <#rhohprime equation>`__, `[T equation labeled] <#T equation labeled>`__, or `[h
-       equation labeled] <#h
-       equation labeled>`__ respectively).
+#. predict :math:`(rho h)`, :math:`(\rho h)'`, :math:`h`, or :math:`T`
+   to the edges (depending on ``enthalpy_pred_type`` ) using
+   ``make_edge_scal`` and the forces identified in the appropriate
+   evolution equation (:eq:`rhohprime equation`, :eq:`T equation
+   labeled`, or :eq:`h equation labeled` respectively).
 
-   The appropriate forces are summaried in table \ `[table:pred:hforce] <#table:pred:hforce>`__.
+   The appropriate forces are summaried in :numref:`table:pred:hforce`.
 
 #. if we predicted :math:`T`, convert this predicted
    edge state to an intermediate “enthalpy” state (the quotes
@@ -458,59 +456,51 @@ it through the velocity field and :math:`S`). As a result, the
 not work. MAESTROeX will abort if the code is run with this
 combination of parameters.
 
-Table \ `[table:pred:hoverview] <#table:pred:hoverview>`__
-gives a summary
-of the ``enthalpy_pred_type`` behavior.
+:numref:`table:pred:hoverview` gives a summary of the
+``enthalpy_pred_type`` behavior.
 
-.. raw:: latex
+.. _table:pred:hforce:
+.. table:: Forcing term into ``make_edge_scal``
 
-   \centering
+   +-----------------------------------+-----------------------------------+
+   | enthalpy_pred_type                | advective force                   |
+   +===================================+===================================+
+   | 0 / predict_rhoh :math:`(\rho h)` | :math:`\left [\psi + (\Ubt \cdot  |
+   |                                   | \er)                              |
+   |                                   |   \frac{\partial p_0}{\partial r} |
+   |                                   |  + \nabla \cdot \kth \nabla T \ri |
+   |                                   | ght ]`                            |
+   +-----------------------------------+-----------------------------------+
+   | 1 / predict_rhohprime             | :math:`-(\rho h)^\prime \; \nabla |
+   | :math:`((\rho h)^\prime)`         |  \cdot (\Ubt+w_0 \er) -           |
+   |                                   |  \nabla \cdot (\Ubt (\rho h)_0) + |
+   |                                   |  (\Ubt \cdot \er) \frac{\partial  |
+   |                                   | p_0}{\partial r} + \nabla \cdot \ |
+   |                                   | kth \nabla T`                     |
+   +-----------------------------------+-----------------------------------+
+   | 2 / predict_h :math:`(h)`         | :math:`\frac{1}{\rho} \left [\psi |
+   |                                   |  + (\Ubt \cdot \er)               |
+   |                                   |   \frac{\partial p_0}{\partial r} |
+   |                                   |  + \nabla \cdot \kth \nabla T \ri |
+   |                                   | ght ]`                            |
+   +-----------------------------------+-----------------------------------+
+   | 3 / predict_T_then_rhohprime      | :math:`\frac{1}{\rho c_p} \left \ |
+   | :math:`(T)`                       | { (1 - \rho h_p)                  |
+   |                                   |    \left [\psi + (\Ubt \cdot \er) |
+   |                                   |  \frac{\partial p_0}{\partial r}  |
+   |                                   | \right ] + \nabla \cdot \kth \nab |
+   |                                   | la T \right \}`                   |
+   +-----------------------------------+-----------------------------------+
+   | 4 / predict_T_then_h :math:`(T)`  | :math:`\frac{1}{\rho c_p} \left\{ |
+   |                                   |  (1 - \rho h_p) \left [\psi + (\U |
+   |                                   | bt \cdot \er)                     |
+   |                                   | \frac{\partial p_0}{\partial r}\r |
+   |                                   | ight ] +  \nabla \cdot \kth \nabl |
+   |                                   | a T \right\}`                     |
+   +-----------------------------------+-----------------------------------+
 
-+-----------------------------------+-----------------------------------+
-| enthalpy_pred_type                | advective force                   |
-+===================================+===================================+
-| 0 / predict_rhoh :math:`(\rho h)` | :math:`\left [\psi + (\Ubt \cdot  |
-|                                   | \er)                              |
-|                                   |   \frac{\partial p_0}{\partial r} |
-|                                   |  + \nabla \cdot \kth \nabla T \ri |
-|                                   | ght ]`                            |
-+-----------------------------------+-----------------------------------+
-| 1 / predict_rhohprime             | :math:`-(\rho h)^\prime \; \nabla |
-| :math:`((\rho h)^\prime)`         |  \cdot (\Ubt+w_0 \er) -           |
-|                                   |  \nabla \cdot (\Ubt (\rho h)_0) + |
-|                                   |  (\Ubt \cdot \er) \frac{\partial  |
-|                                   | p_0}{\partial r} + \nabla \cdot \ |
-|                                   | kth \nabla T`                     |
-+-----------------------------------+-----------------------------------+
-| 2 / predict_h :math:`(h)`         | :math:`\frac{1}{\rho} \left [\psi |
-|                                   |  + (\Ubt \cdot \er)               |
-|                                   |   \frac{\partial p_0}{\partial r} |
-|                                   |  + \nabla \cdot \kth \nabla T \ri |
-|                                   | ght ]`                            |
-+-----------------------------------+-----------------------------------+
-| 3 / predict_T_then_rhohprime      | :math:`\frac{1}{\rho c_p} \left \ |
-| :math:`(T)`                       | { (1 - \rho h_p)                  |
-|                                   |    \left [\psi + (\Ubt \cdot \er) |
-|                                   |  \frac{\partial p_0}{\partial r}  |
-|                                   | \right ] + \nabla \cdot \kth \nab |
-|                                   | la T \right \}`                   |
-+-----------------------------------+-----------------------------------+
-| 4 / predict_T_then_h :math:`(T)`  | :math:`\frac{1}{\rho c_p} \left\{ |
-|                                   |  (1 - \rho h_p) \left [\psi + (\U |
-|                                   | bt \cdot \er)                     |
-|                                   | \frac{\partial p_0}{\partial r}\r |
-|                                   | ight ] +  \nabla \cdot \kth \nabl |
-|                                   | a T \right\}`                     |
-+-----------------------------------+-----------------------------------+
 
-.. raw:: latex
-
-   \small
-
-.. raw:: latex
-
-   \centering
-
+.. _table:pred:hoverview:
 .. table:: Summary of enthalpy edge state construction
 
    +-----------+-----------+-----------+-----------+-----------+-----------+
@@ -692,8 +682,8 @@ Predicting :math:`(\rho h)'` at edges
 
 We define :math:`(\rho h)' = (\rho h)^{(1)} - (\rho h)_0^n`. Then we predict
 :math:`(\rho h)'` to edges using ``make_edge_scal`` in ``enthalpy_advance``
-and the underbraced term in (`[rhohprime equation] <#rhohprime equation>`__) as the forcing (see
-also table \ `[table:pred:hforce] <#table:pred:hforce>`__ for the forcing term).
+and the underbraced term in :eq:`rhohprime equation` as the forcing (see
+also :numref:`table:pred:hforce` for the forcing term).
 The first two terms in :math:`(\rho h)'` force are computed in
 ``modify_scal_force``, and the last two terms are accounted for in
 ``mkrhohforce``. For spherical problems, we have found that a different
@@ -744,8 +734,8 @@ Predicting :math:`h` at edges
 
 We define :math:`h = (\rho h)^{(1)}/\rho^{(1)}`. Then we predict :math:`h` to edges
 using ``make_edge_scal`` in ``enthalpy_advance`` and the
-underbraced term in Eq. \ `[h equation labeled] <#h equation labeled>`__ as the forcing (see
-also table \ `[table:pred:hforce] <#table:pred:hforce>`__). This force is computed by
+underbraced term in :eq:`h equation labeled` as the forcing (see
+also :numref:`table:pred:hforce`. This force is computed by
 ``mkrhohforce`` and then divided by :math:`\rho`. Note: ``mkrhoforce``
 knows about the different ``enthalpy_pred_types`` and computes
 the correct force for this type.
@@ -783,7 +773,7 @@ Predicting :math:`T` at edges
 We predict :math:`T` to edges using ``make_edge_scal`` in
 ``enthalpy_advance`` and the underbraced term in Eq. \ `[T equation
   labeled] <#T equation
-  labeled>`__ as the forcing (see also table \ `[table:pred:hforce] <#table:pred:hforce>`__).
+  labeled>`__ as the forcing (see also :numref:`table:pred:hforce`).
 This force is computed by ``mktempforce``.
 
 Converting :math:`T_\mathrm{edge}` to :math:`(\rho h)'_\mathrm{edge}`
@@ -795,7 +785,7 @@ h)'_\mathrm{edge}`. For the EOS call, we need :math:`X_\mathrm{edge}` and
 :math:`\rho_\mathrm{edge}`. This construction depends on
 ``species_pred_type``, since the species edge states may differ
 between the various prediction types (see the “species quantity”
-column in table \ `[table:pred:hoverview] <#table:pred:hoverview>`__). The EOS inputs are
+column in :numref:`table:pred:hoverview`. The EOS inputs are
 constructed as:
 
 .. raw:: latex
@@ -885,7 +875,7 @@ for all enthalpy_pred_types.
 
 where :math:`\left \langle (\rho h) \right \rangle_\mathrm{edge}` is the
 edge state for :math:`(\rho h)` computed as listed in the final column of
-table \ `[table:pred:hoverview] <#table:pred:hoverview>`__ for the given ``enthalpy_pred_type``
+:numref:`table:pred:hoverview` for the given ``enthalpy_pred_type``
 and ``species_pred_type``.
 
 .. _sec:toyconvect:
