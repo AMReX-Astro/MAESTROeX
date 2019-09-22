@@ -50,7 +50,13 @@ the spherical :math:`\theta` and :math:`\phi` angles at constant radius.
 
 Recall from Paper III that if initially :math:`\overline{\rho'} = 0`,
 there is no guarantee that :math:`\overline{\rho'} = 0` will hold at later
-time. To see this, recall equation (`[eq:Perturbational Density] <#eq:Perturbational Density>`__),
+time. To see this, start with the equation for the perturbational density
+
+.. math::
+   \frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' -
+     \rho'\nabla\cdot\Ub - \nabla\cdot\left(\rho_0\Ubt\right),
+   :label: eq:Perturbational Density
+
 written in a slightly different form:
 
 .. math:: \frac{\partial\rho'}{\partial t} + \nabla\cdot\left(\rho'\Ub\right) = -\nabla\cdot\left(\rho_0\Ubt\right).

@@ -166,10 +166,9 @@ From here we get the general statement
 which must hold for an adiabatic process as well, and therefore we have
 
 .. math::
-
-   \label{eq:gamma1}
-     \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right)
+   \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right)
      + \sum_i\chi_{X_i}\Gamma_{4,i}
+   :label: eq:gamma1
 
 where we use CG’s definition of :math:`\Gamma_1` and :math:`\Gamma_3` and introduce a
 fourth gamma function:
@@ -299,24 +298,22 @@ respect to composition
 Plugging these back into `[eq:gamma3_first] <#eq:gamma3_first>`__ we have
 
 .. math::
-
-   \label{eq:gamma3_second}
-     \Gamma_3-1 = \frac{1}{c_vT}\left[\frac{p}{\rho}\chi_T +\sum_i
+   \Gamma_3-1 = \frac{1}{c_vT}\left[\frac{p}{\rho}\chi_T +\sum_i
        \left(\frac{\partial}{\partial\ln T}\left(
        \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
        \right)_{\rho,X}X_i
        \Gamma_{4,i}\right],
+   :label: eq:gamma3_second
 
 or
 
 .. math::
-
-   \label{eq:cv}
-     c_v = \frac{1}{T(\Gamma_3-1)}\left[\frac{p}{\rho}\chi_T +\sum_i
+   c_v = \frac{1}{T(\Gamma_3-1)}\left[\frac{p}{\rho}\chi_T +\sum_i
        \left(\frac{\partial}{\partial\ln T}\left(
        \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
        \right)_{\rho,X}X_i
        \Gamma_{4,i}\right].
+   :label: eq:cv
 
 We can obtain an expression for the specific heat at constant pressure
 from the enthalpy
@@ -360,8 +357,8 @@ and
 
 .. math:: c_p = \frac{p}{\rho T}\frac{\chi_T^2}{\chi_\rho} + c_v
 
-Dividing this by `[eq:cv] <#eq:cv>`__ and using the relation between the
-:math:`\Gamma`\ ’s, `[eq:gamma1] <#eq:gamma1>`__, we then have
+Dividing this by :eq:`eq:cv` and using the relation between the
+:math:`\Gamma` ’s, :eq:`eq:gamma1`, we then have
 
 .. math::
 
