@@ -254,15 +254,18 @@ average in terms of spherical coordinates,</p>
 the spherical <span class="math notranslate nohighlight">\(\theta\)</span> and <span class="math notranslate nohighlight">\(\phi\)</span> angles at constant radius.</p>
 <p>Recall from Paper III that if initially <span class="math notranslate nohighlight">\(\overline{\rho'} = 0\)</span>,
 there is no guarantee that <span class="math notranslate nohighlight">\(\overline{\rho'} = 0\)</span> will hold at later
-time. To see this, recall equation (<a class="reference external" href="#eq:PerturbationalDensity">[eq:Perturbational Density]</a>),
-written in a slightly different form:</p>
+time. To see this, start with the equation for the perturbational density</p>
+<div class="math notranslate nohighlight" id="equation-eq-perturbational-density">
+<span class="eqno">(120)<a class="headerlink" href="#equation-eq-perturbational-density" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' -
+  \rho'\nabla\cdot\Ub - \nabla\cdot\left(\rho_0\Ubt\right),\]</div>
+<p>written in a slightly different form:</p>
 <div class="math notranslate nohighlight" id="equation-eta-2">
-<span class="eqno">(120)<a class="headerlink" href="#equation-eta-2" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho'}{\partial t} + \nabla\cdot\left(\rho'\Ub\right) = -\nabla\cdot\left(\rho_0\Ubt\right).\]</div>
+<span class="eqno">(121)<a class="headerlink" href="#equation-eta-2" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho'}{\partial t} + \nabla\cdot\left(\rho'\Ub\right) = -\nabla\cdot\left(\rho_0\Ubt\right).\]</div>
 <p>We integrate this over a spherical shell of thickness <span class="math notranslate nohighlight">\(2h\)</span> at radius <span class="math notranslate nohighlight">\(r_0\)</span>, i.e.,
 <span class="math notranslate nohighlight">\(\Omega_H \times (r_0-h, r_0+h)\)</span>, and normalize by the integration
 volume, which is <span class="math notranslate nohighlight">\(\sim 4\pi r_0^2  2h\)</span> for small <span class="math notranslate nohighlight">\(h\)</span>, to obtain:</p>
 <div class="math notranslate nohighlight" id="equation-eta-3">
-<span class="eqno">(121)<a class="headerlink" href="#equation-eta-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(122)<a class="headerlink" href="#equation-eta-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \frac{1}{4\pi r_0^2 2h}\int_{r_0-h}^{r_0+h}r^2 dr\int_{\Omega_H}\left[\frac{\partial\rho'}{\partial t} + \nabla\cdot\left(\rho'\Ub\right)\right]d\Omega
 =&amp; - \frac{1}{4\pi r_0^2 2h}\int_{r_0-h}^{r_0+h}r^2 dr\int_{\Omega_H}\nabla\cdot\left(\rho_0\Ubt\right)d\Omega \nonumber \\
 =&amp; \left. -\frac{1}{4\pi r_0^2 2h}\int_{\Omega_H}\left[\rho_0\left(\Ubt\cdot\eb_r\right)\right]r^2 d\Omega\right|_{r_0-h}^{r_0+h} \nonumber \\
@@ -274,7 +277,7 @@ We see that the right hand side disappears since
 of <span class="math notranslate nohighlight">\(\Ubt\)</span>. Now, expanding the remaining terms and taking the limit as
 <span class="math notranslate nohighlight">\(h\rightarrow 0,\)</span> we can write</p>
 <div class="math notranslate nohighlight" id="equation-eta-4">
-<span class="eqno">(122)<a class="headerlink" href="#equation-eta-4" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(123)<a class="headerlink" href="#equation-eta-4" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 0 =&amp; \lim_{h\rightarrow 0} \frac{1}{4\pi r_0^2 2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H} \left[\frac{\partial \rho'}{\partial t} + \nabla\cdot(\rho'\Ub)\right] d\Omega \nonumber \\
 =&amp; \frac{\partial}{\partial t} \left( \lim_{h\rightarrow 0} \frac{1}{4\pi r_0^2} \frac{1}{2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H}  \rho' d\Omega \right) + \lim_{h\rightarrow 0} \left[\frac{1}{4\pi r_0^2  2h} \int_{r_0-h}^{r_0+h} r^2  dr \int_{\Omega_H}  \nabla \cdot ( \rho' \Ub )  d\Omega\right] \nonumber \\
 =&amp; \frac{\partial}{\partial t} \left(\frac{1}{4\pi} \int_{\Omega_H}  \rho'  d\Omega \right) + \lim_{h\rightarrow 0} \left\{\left.\frac{1}{r_0^2 2h}\left[\frac{1}{4\pi}\int_{\Omega_H} \rho' (\Ub \cdot \eb_r)  d\Omega  \right]  r^2 \right |_{r_0-h}^{r_0+h} \right\} \nonumber  \\
@@ -285,7 +288,7 @@ of <span class="math notranslate nohighlight">\(\Ubt\)</span>. Now, expanding th
 and switching the order of operations as appropriate.</p>
 <p>In short,</p>
 <div class="math notranslate nohighlight" id="equation-eq-rhopbar">
-<span class="eqno">(123)<a class="headerlink" href="#equation-eq-rhopbar" title="Permalink to this equation">¶</a></span>\[\frac{\partial}{\partial t} \overline{\rho'} = - \nabla\cdot\left[\overline{\rho'\left(\Ub\cdot\eb_r\right)}\eb_r\right] = -\nabla\cdot\left(\etarho\eb_r\right),\]</div>
+<span class="eqno">(124)<a class="headerlink" href="#equation-eq-rhopbar" title="Permalink to this equation">¶</a></span>\[\frac{\partial}{\partial t} \overline{\rho'} = - \nabla\cdot\left[\overline{\rho'\left(\Ub\cdot\eb_r\right)}\eb_r\right] = -\nabla\cdot\left(\etarho\eb_r\right),\]</div>
 <p>and thus, <span class="math notranslate nohighlight">\(\etarho = \overline{\left(\rho'\Ub\cdot\eb_r\right)}\)</span>.</p>
 <p>We need both <span class="math notranslate nohighlight">\(\etarho\)</span> alone and its divergence for the
 various terms in the construction of <span class="math notranslate nohighlight">\(w_0\)</span> and the correction to
@@ -302,11 +305,11 @@ in <a class="reference internal" href="#equation-eq-eta">Eq.117</a>. The edge-ce
 <span class="math notranslate nohighlight">\(\eta_{\rho,r+1/2}\)</span> are then constructed by simple
 averaging:</p>
 <div class="math notranslate nohighlight" id="equation-eta-5">
-<span class="eqno">(124)<a class="headerlink" href="#equation-eta-5" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r+1/2} = \frac{\eta_{\rho,r} + \eta_{\rho,r+1}}{2}  .\]</div>
+<span class="eqno">(125)<a class="headerlink" href="#equation-eta-5" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r+1/2} = \frac{\eta_{\rho,r} + \eta_{\rho,r+1}}{2}  .\]</div>
 <p>Instead of differencing <span class="math notranslate nohighlight">\(\eta_{\rho,r+1/2}\)</span> to construct the
-divergence, we instead use <a class="reference internal" href="#equation-eq-rhopbar">Eq.123</a> directly, by writing:</p>
+divergence, we instead use <a class="reference internal" href="#equation-eq-rhopbar">Eq.124</a> directly, by writing:</p>
 <div class="math notranslate nohighlight" id="equation-eta-6">
-<span class="eqno">(125)<a class="headerlink" href="#equation-eta-6" title="Permalink to this equation">¶</a></span>\[\left [ \nabla \cdot (\etarho \er ) \right ]^{n+1/2}
+<span class="eqno">(126)<a class="headerlink" href="#equation-eta-6" title="Permalink to this equation">¶</a></span>\[\left [ \nabla \cdot (\etarho \er ) \right ]^{n+1/2}
 = - \frac{\overline{\rhop^{n+1}} - \overline{\rhop^n}}{\Delta t}
 = - \frac{\overline{\rhop^{n+1}}}{\Delta t}  ,\]</div>
 <p>where we have made use of the fact that <span class="math notranslate nohighlight">\(\overline{\rhop^n} = 0\)</span> by construction.</p>
@@ -332,29 +335,29 @@ divergence, we instead use <a class="reference internal" href="#equation-eq-rhop
 <h2>Plane-Parallel<a class="headerlink" href="#plane-parallel" title="Permalink to this headline">¶</a></h2>
 <p>We first compute a radial edge-centered multifab, <span class="math notranslate nohighlight">\(\etarho^{\rm flux}\)</span>, using</p>
 <div class="math notranslate nohighlight" id="equation-eta-7">
-<span class="eqno">(126)<a class="headerlink" href="#equation-eta-7" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,\ib+\myhalf\eb_r}^{\rm flux} = \left[\left(\Ubt_{\ib+\myhalf\eb_r}^{n+\myhalf}\cdot\eb_r\right) + w_{0,r+\myhalf}^{n+\myhalf}\right] \rho_{\ib+\myhalf\eb_r}^{n+\myhalf} - w_{0,r+\myhalf}^{n+\myhalf}\rho_{0,r+\myhalf}^{n+\myhalf, {\rm pred}}\]</div>
+<span class="eqno">(127)<a class="headerlink" href="#equation-eta-7" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,\ib+\myhalf\eb_r}^{\rm flux} = \left[\left(\Ubt_{\ib+\myhalf\eb_r}^{n+\myhalf}\cdot\eb_r\right) + w_{0,r+\myhalf}^{n+\myhalf}\right] \rho_{\ib+\myhalf\eb_r}^{n+\myhalf} - w_{0,r+\myhalf}^{n+\myhalf}\rho_{0,r+\myhalf}^{n+\myhalf, {\rm pred}}\]</div>
 <p><span class="math notranslate nohighlight">\(\etarhoec\)</span> is the edge-centered “average” value of <span class="math notranslate nohighlight">\(\eta_{\rho}^{\rm flux}\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-eta-8">
-<span class="eqno">(127)<a class="headerlink" href="#equation-eta-8" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r+\myhalf}^{\rm ec} = \overline{\eta_{\rho,\ib+\myhalf\eb_r}^{\rm flux}}\]</div>
+<span class="eqno">(128)<a class="headerlink" href="#equation-eta-8" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r+\myhalf}^{\rm ec} = \overline{\eta_{\rho,\ib+\myhalf\eb_r}^{\rm flux}}\]</div>
 <p><span class="math notranslate nohighlight">\(\etarhocc\)</span> is a cell-centered average of <span class="math notranslate nohighlight">\(\etarhoec\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-eta-9">
-<span class="eqno">(128)<a class="headerlink" href="#equation-eta-9" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r}^{\rm cc} = \frac{\eta_{\rho,r+\myhalf}^{\rm ec} + \eta_{\rho,r-\myhalf}^{\rm ec}}{2}.\]</div>
+<span class="eqno">(129)<a class="headerlink" href="#equation-eta-9" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r}^{\rm cc} = \frac{\eta_{\rho,r+\myhalf}^{\rm ec} + \eta_{\rho,r-\myhalf}^{\rm ec}}{2}.\]</div>
 </div>
 <div class="section" id="spherical">
 <span id="sec-eta-spherical"></span><h2>Spherical<a class="headerlink" href="#spherical" title="Permalink to this headline">¶</a></h2>
 <p>First, construct <span class="math notranslate nohighlight">\(\eta_{\rho}^{\rm cart} =
 [\rho'(\Ubt\cdot\eb_r)]^{n+\myhalf}\)</span> using:</p>
 <div class="math notranslate nohighlight" id="equation-eta-10">
-<span class="eqno">(129)<a class="headerlink" href="#equation-eta-10" title="Permalink to this equation">¶</a></span>\[\left[\frac{\rho^n+\rho^{n+1}}{2}-\left(\frac{\rho_0^n+\rho_0^{n+1}}{2}\right)^{\rm cart}\right] \sum_d\left(\frac{\Ubt_{\ib+\myhalf\eb_d}^{n+\myhalf}\cdot\eb_d+\Ubt_{\ib-\myhalf\eb_d}^{n+\myhalf}\cdot\eb_d}{2}\right)n_d.\]</div>
+<span class="eqno">(130)<a class="headerlink" href="#equation-eta-10" title="Permalink to this equation">¶</a></span>\[\left[\frac{\rho^n+\rho^{n+1}}{2}-\left(\frac{\rho_0^n+\rho_0^{n+1}}{2}\right)^{\rm cart}\right] \sum_d\left(\frac{\Ubt_{\ib+\myhalf\eb_d}^{n+\myhalf}\cdot\eb_d+\Ubt_{\ib-\myhalf\eb_d}^{n+\myhalf}\cdot\eb_d}{2}\right)n_d.\]</div>
 <p>Then, <span class="math notranslate nohighlight">\(\etarhocc\)</span> is the cell-centered average of <span class="math notranslate nohighlight">\(\eta_{\rho}^{\rm cart}\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-eta-11">
-<span class="eqno">(130)<a class="headerlink" href="#equation-eta-11" title="Permalink to this equation">¶</a></span>\[\etarhocc = \overline{\eta_{\rho}^{\rm cart}}.\]</div>
+<span class="eqno">(131)<a class="headerlink" href="#equation-eta-11" title="Permalink to this equation">¶</a></span>\[\etarhocc = \overline{\eta_{\rho}^{\rm cart}}.\]</div>
 <p>On interior faces, <span class="math notranslate nohighlight">\(\etarhoec\)</span> is the average of <span class="math notranslate nohighlight">\(\etarhocc\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-eta-12">
-<span class="eqno">(131)<a class="headerlink" href="#equation-eta-12" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r-\myhalf}^{\rm ec} = \frac{\eta_{\rho,r-1}^{\rm cc} + \eta_{\rho,r}^{\rm cc}}{2}.\]</div>
+<span class="eqno">(132)<a class="headerlink" href="#equation-eta-12" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r-\myhalf}^{\rm ec} = \frac{\eta_{\rho,r-1}^{\rm cc} + \eta_{\rho,r}^{\rm cc}}{2}.\]</div>
 <p>At the upper and lower boundaries, we use</p>
 <div class="math notranslate nohighlight" id="equation-eta-13">
-<span class="eqno">(132)<a class="headerlink" href="#equation-eta-13" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(133)<a class="headerlink" href="#equation-eta-13" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \eta_{\rho,-\myhalf}^{\rm ec} &amp;=&amp; 0, \\
 \eta_{\rho,{\rm nr}-\myhalf}^{\rm ec} &amp;=&amp; \eta_{\rho,{\rm nr}-1}^{\rm cc}.\end{aligned}\end{split}\]</div>
 </div>

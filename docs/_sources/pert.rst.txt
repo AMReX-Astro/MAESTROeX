@@ -160,10 +160,9 @@ terms, noting that :math:`\Ub = \Ubt + w_o\eb_r`, to obtain the
 perturbational density equation,
 
 .. math::
-
    \frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' \underbrace{- \rho'\nabla\cdot\Ub
    - \nabla\cdot(\rho_0\Ubt)}_{\rho' ~ \text{force}} \, .
-   \label{rhoprime equation}
+   :label: rhoprime equation
 
 We also need :math:`X_k` at the edges. Here, we subtract :math:`X_k \times`
 :eq:`rho equation` from :eq:`species equation` to obtain
@@ -178,7 +177,7 @@ Predicting :math:`\rho'` at edges
 
 We define :math:`\rho' = \rho^{(1)} - \rho_0^n`. Then we predict :math:`\rho'` to
 edges using ``make_edge_scal`` in ``density_advance`` and the
-underbraced term in Eq. \ `[rhoprime equation] <#rhoprime equation>`__ as the forcing. This
+underbraced term in :eq:`rhoprime equation` as the forcing. This
 force is computed in ``modify_scal_force``. This prediction is
 done in advective form.
 
@@ -667,7 +666,7 @@ Method 0: enthalpy_pred_type = predict_rhoh
 Here we wish to construct :math:`(\rho h)_\mathrm{edge}` by predicting
 :math:`(\rho h)` to the edges directly. We use ``make_edge_scal`` with
 ``is_conservative = .true.`` on :math:`(\rho h)`, with the underbraced term
-in Eq. \ `[rhoh equation] <#rhoh equation>`__ as the force (computed in ``mkrhohforce``).
+in :eq:`rhoh equation` as the force (computed in ``mkrhohforce``).
 
 Method 1: enthalpy_pred_type = predict_rhohprime
 ------------------------------------------------
@@ -698,11 +697,10 @@ results, namely:
 Predicting :math:`(\rho h)_0` at edges
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We use an analogous procedure described in Section `[Predicting
-rho0 at edges] <#Predicting
-rho0 at edges>`__ for computing :math:`\rho_0^{n+\myhalf,\rm{avg}}` to obtain
-:math:`(\rho h)_0^{n+\myhalf,\rm{avg}}`, i.e.,
-:math:`(\rho h)_0^{n+\myhalf,{\rm avg}} = [(\rho h)_0^{n} + (\rho h)_0^{n+1}]/2`.
+We use an analogous procedure described in Section :ref:`Predicting
+rho0 at edges` for computing :math:`\rho_0^{n+\myhalf,\rm{avg}}` to
+obtain :math:`(\rho h)_0^{n+\myhalf,\rm{avg}}`, i.e., :math:`(\rho
+h)_0^{n+\myhalf,{\rm avg}} = [(\rho h)_0^{n} + (\rho h)_0^{n+1}]/2`.
 
 For spherical, however, instead of computing :math:`(\rho h)_0` on edges
 directly, we compute :math:`\rho_0` and :math:`h_0` separately at the edges, and
@@ -711,10 +709,9 @@ multiply to get :math:`(\rho h)_0`.
 Computing :math:`\rho h` at edges
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We use an analogous procedure described in Section `[Computing rho
-  at edges] <#Computing rho
-  at edges>`__ for computing :math:`\rho` at edges to compute :math:`\rho h` at
-edges.
+We use an analogous procedure described in Section :ref:`Computing rho
+at edges` for computing :math:`\rho` at edges to compute :math:`\rho
+h` at edges.
 
 Method 2: enthalpy_pred_type = predict_h
 ----------------------------------------
