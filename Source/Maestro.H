@@ -18,13 +18,14 @@
 #include <Maestro_F.H>
 
 #ifdef AMREX_USE_CUDA
-#include <AMReX_CudaAllocators.H>
+// #include <AMReX_CudaAllocators.H>
+#include <AMReX_CudaContainers.H>
 #endif
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
 #ifdef AMREX_USE_CUDA
-typedef amrex::Vector< amrex::Real, amrex::CudaManagedAllocator<amrex::Real> > RealVector;
+typedef amrex::Gpu::ManagedVector<amrex::Real> RealVector;
 #else
 typedef amrex::Vector< amrex::Real > RealVector;
 #endif
