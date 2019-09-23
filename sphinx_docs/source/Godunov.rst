@@ -56,9 +56,6 @@ For spherical problems, we compute the radial bin centered gradient using
 Then we put :math:`\partial w_0/\partial r` onto a Cartesian grid
 using put_1d_array_on_cart_3d_sphr.
 
-.. raw:: latex
-
-   \newpage
 
 Computing :math:`\Ubt^{\trans}` in MAESTROeX
 ============================================
@@ -89,9 +86,6 @@ Computing :math:`\Ubt^{\trans}` in MAESTROeX
 
   .. math:: \ut_{R,\ib-\half\eb_x} = \ut_{\ib}^n + \left[\frac{1}{2} - \frac{\dt}{2h}\min(0,\ut_{\ib}^n)\right]\partial\ut_{\ib}^n
 
-.. raw:: latex
-
-   \newpage
 
 2D Cartesian Case
 -----------------
@@ -135,9 +129,6 @@ that we upwind based on the full velocity.
    \wt_{R,\ib-\half\eb_r}, & w_{L,\ib-\half\eb_r} + w_{R,\ib-\half\eb_r} < 0, \\
    \end{cases}
 
-.. raw:: latex
-
-   \newpage
 
 .. _d-cartesian-case-1:
 
@@ -164,9 +155,6 @@ computing :math:`\ut^{\trans}`. We predict :math:`\vt` to y-faces using the
    \vt_{R,\ib-\half\eb_y}, & v_{L,\ib-\half\eb_y} + v_{R,\ib-\half\eb_y} < 0. \\
    \end{cases}
 
-.. raw:: latex
-
-   \newpage
 
 3D Spherical Case
 -----------------
@@ -179,9 +167,6 @@ that the advection velocities, as well as
 the upwind velocity, is done with the full velocity, not the
 perturbational velocity.
 
-.. raw:: latex
-
-   \newpage
 
 Computing :math:`\Ubt^{\mac,*}` in MAESTROeX
 ============================================
@@ -201,9 +186,6 @@ Computing :math:`\Ubt^{\mac,*}` in MAESTROeX
   (:math:`\ut_{\ib-\half\eb_x}^{\trans}`, :math:`\vt_{\ib-\half\eb_y}^{\trans}`,
   and :math:`\wt_{\ib-\half\eb_r}^{\trans}`)
 
-.. raw:: latex
-
-   \newpage
 
 .. _d-cartesian-case-2:
 
@@ -298,9 +280,6 @@ Solve a Riemann problem:
    \wt_{R,\ib-\half\eb_r}^{\mac,*}, & w_L^{\mac,*} + w_R^{\mac,*} < 0.
    \end{cases}
 
-.. raw:: latex
-
-   \newpage
 
 .. _d-cartesian-case-3:
 
@@ -429,9 +408,6 @@ the effects of corner coupling.
      \wt_{R,\ib-\half\eb_r}^{\mac,*} &=& \wt_{R,\ib-\half\eb_r}^{\mac,*} -
      \frac{\dt}{4h}\left(\wt^{\trans}_{\ib-\half\eb_r} + \wt^{\trans}_{\ib-\frac{3}{2}\eb_r}\right)\left(w_{0,\ib-\half\eb_r}-w_{0,\ib-\frac{3}{2}\eb_r}\right)\end{aligned}
 
-.. raw:: latex
-
-   \newpage
 
 .. _d-spherical-case-1:
 
@@ -444,9 +420,6 @@ in the full dimensional extrapolation for each direction.
 As in the plane-parallel case, make sure to upwind using the
 full velocity.
 
-.. raw:: latex
-
-   \newpage
 
 .. _Scalar Edge State Prediction in MAESTROeX:
 
@@ -481,9 +454,6 @@ of motion are:
    && \\
    \frac{\partial\Ubt}{\partial t} &=& -\Ub\cdot\nabla\Ubt \underbrace{- \left(\Ubt\cdot\eb_r\right)\frac{\partial w_0}{\partial r}\eb_r \underbrace{- \frac{1}{\rho}\nabla\pi + \frac{1}{\rho_0}\frac{\partial\pi_0}{\partial r}\eb_r - \frac{(\rho-\rho_0)}{\rho}g\eb_r}_{\hbox{terms included in $\fb_{\Ubt}$}}}_{\hbox{forcing terms}}.\end{aligned}
 
-.. raw:: latex
-
-   \newpage
 
 .. _d-cartesian-case-4:
 
@@ -650,9 +620,6 @@ of motion are:
      u_{R,\ib-\half\eb_r}, & w^{\mac}_{\ib-\half\eb_r} < 0. \\
      \end{cases}
 
-.. raw:: latex
-
-   \newpage
 
 .. _d-cartesian-case-5:
 
@@ -1004,13 +971,13 @@ The extrapolation of a “conserved” :math:`s` to x-faces is:
 Then we upwind based on :math:`u^{\mac}`.
 
 .. math::
-
    s_{\ib-\half\eb_x}^{\edge} =
    \begin{cases}
    \half\left(s_{L,\ib-\half\eb_x}^{\edge} + s_{R,\ib-\half\eb_x}^{\edge}\right), & \left|u^{\mac}_{\ib-\half\eb_x}\right| < \epsilon \\
    s_{L,\ib-\half\eb_x}^{\edge}, & u^{\mac}_{\ib-\half\eb_x} > 0, \\
    s_{R,\ib-\half\eb_x}^{\edge}, & u^{\mac}_{\ib-\half\eb_x} < 0.
-   \end{cases}\label{varden s^edge upwind}
+   \end{cases}
+   :label: varden s^edge upwind
 
 We use an analogous procedure to compute :math:`s_{\ib-\half\eb_y}^{\edge}`.
 
@@ -1083,14 +1050,10 @@ The extrapolation of a “conserved” :math:`s` to x-faces is:
    &+& \frac{\dt}{2h}s_{\ib}\left(v_{\ib+\half\eb_y}^{\mac}-v_{\ib-\half\eb_y}^{\mac}+w_{\ib+\half\eb_z}^{\mac}-w_{\ib-\half\eb_z}^{\mac}\right) \nonumber \\
    &+& \frac{\dt}{2}f_{s,\ib}.\end{aligned}
 
-Then we upwind based on :math:`u^{\mac}`, as in equation
-(`[varden s^edge upwind] <#varden s^edge upwind>`__).
+Then we upwind based on :math:`u^{\mac}`, as in :eq:`varden s^edge upwind`.
 We use an analogous procedure to compute both
 :math:`s_{\ib-\half\eb_y}^{\edge}` and :math:`s_{\ib-\half\eb_z}`.
 
-.. raw:: latex
-
-   \newpage
 
 ESTATE_FPU in GODUNOV_2D/3D.f
 =============================
@@ -1142,12 +1105,17 @@ ESTATE_FPU in GODUNOV_2D/3D.f
   **If** NOT ICONSERVE **and** :math:`\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} < 0` **and** :math:`\text{VBAR}_{\ib} < 0` **then:**
 
   .. math::
+     \begin{align}
+     \text{sedge}_L^x = s_{\ib-\eb_x} &+ \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
+     & - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib-\eb_x}(s_{\ib-\eb_x+\eb_y}-s_{\ib-\eb_x})}{h_y}\right]
+     \end{align}
+     :label: transverse upwinding 1
 
-     \begin{aligned}
-     \text{sedge}_L^x = s_{\ib-\eb_x} &+& \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
-     && - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib-\eb_x}(s_{\ib-\eb_x+\eb_y}-s_{\ib-\eb_x})}{h_y}\right] \label{transverse upwinding 1} \\
-     \text{sedge}_R^x = s_{\ib} &-& \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
-     && - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib}(s_{\ib+\eb_y}-s_{\ib})}{h_y}\right]\end{aligned}
+  .. math::
+     \begin{align}
+     \text{sedge}_R^x = s_{\ib} &- \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
+     & - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib}(s_{\ib+\eb_y}-s_{\ib})}{h_y}\right]
+     \end{align}
 
   **Else If** NOT ICONSERVE **and** :math:`\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} < 0` **and** :math:`\text{VBAR}_{\ib} \ge 0` **then:**
 
@@ -1162,12 +1130,13 @@ ESTATE_FPU in GODUNOV_2D/3D.f
   **Else If** NOT ICONSERVE **and** :math:`\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} \ge 0` **then:**
 
   .. math::
-
-     \begin{aligned}
-     \text{sedge}_L^x &=& s_{\ib-\eb_x} + \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
+     \begin{align}
+     \text{sedge}_L^x &= s_{\ib-\eb_x} + \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
      && - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib-\eb_x+\half\eb_y}+\text{VEDGE}_{\ib-\eb_x-\half\eb_y})(s_{\ib-\eb_x+\half\eb_y}-s_{\ib-\eb_x-\half\eb_y})}{2h_y}\right] \\
      \text{sedge}_R^x &=& s_{\ib} - \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
-     && - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})(s_{\ib+\half\eb_y}-s_{\ib-\half\eb_y})}{2h_y}\right]\label{transverse upwinding 6}\end{aligned}
+     && - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})(s_{\ib+\half\eb_y}-s_{\ib-\half\eb_y})}{2h_y}\right]
+     \end{align}
+     :label: transverse upwinding 6
 
 *  Finally, upwind analogous to :eq:`ESTATE_FPU Upwind` to get :math:`\text{sedge}_{\ib-\half\eb_x}`.
 
@@ -1212,8 +1181,7 @@ Then, if :math:`|\text{UAD}_{\ib-\half\eb_x}| \le \epsilon`, we set :math:`s_{\i
    && - \frac{\dt}{2}\left[\frac{(\text{VAD}_{\ib+\half\eb_y}+\text{VAD}_{\ib-\half\eb_y})(s_{\ib+\half\eb_y}-s_{\ib-\half\eb_y})}{2h_y}\right]\end{aligned}
 
 Note that the 2D and 3D algorithms are different - in 3D the transverse
-terms use upwinding analogous to equations
-(`[transverse upwinding 1] <#transverse upwinding 1>`__)-(\ `[transverse upwinding 6] <#transverse upwinding 6>`__), using UAD
+terms use upwinding analogous to :eq:`transverse upwinding 1`-:eq:`transverse upwinding 6`, using UAD
 instead of UEDGE. Finally, upwind analogous to :eq:`ESTATE Upwind`
 to get :math:`\text{sedge}_{\ib-\half\eb_x}`, but use UEDGE instead of UAD.
 
