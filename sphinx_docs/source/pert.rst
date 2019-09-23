@@ -631,7 +631,7 @@ The combination of ``species_pred_type`` and ``enthalpy_pred_type`` determine ho
 
   * final :math:`(\rho h)` edge state : :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho h)'_\mathrm{edge} \right ]`
 
-* ``species_pred_type = 3`` (``predict_rho_and_X``) } and ``enthalpy_pred_type = 4`` (``predict_T_then_h``)
+* ``species_pred_type = 3`` (``predict_rho_and_X``) and ``enthalpy_pred_type = 4`` (``predict_T_then_h``)
 
   * cell-centered quantity predicted in ``make_edge_scal`` : :math:`T`
 
