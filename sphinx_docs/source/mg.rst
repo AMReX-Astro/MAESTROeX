@@ -401,14 +401,14 @@ data. Both of these are used in MAESTROeX.
 
 The MAC projection operates on the advective velocities predicted at
 the cell-interfaces at the half-time. The edge-centered velocities
-are shown in Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__. If we consider purely
+are shown in :numref:`fig:mg:MAC`. If we consider purely
 incompressible flow, the projection appears as:
 
 .. math:: D G \phi = D U
 
 where :math:`D` is the divergence operator and :math:`G` is the gradient operator.
 In this discretization, :math:`\phi` is cell-centered (see
-Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__). The remaining quantities are discretized as:
+:numref:`fig:mg:MAC`. The remaining quantities are discretized as:
 
 -  :math:`DU` is cell-centered,
 
@@ -418,23 +418,18 @@ Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__). The remaining quantities are discreti
                      \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}
 
 -  :math:`G\phi` is edge-centered, on the MAC grid, as shown in
-   Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__.
+   :numref:`fig:mg:MAC`.
 
--  :math:`DG\phi` is cell-centered, also shown in Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__,
+-  :math:`DG\phi` is cell-centered, also shown in :numref:`fig:mg:MAC`,
    computed from :math:`G\phi` using the same differencing as :math:`DU`.
 
-.. raw:: latex
-
-   \centering
-
-.. figure:: \mgfigpath/MAC_mg2
-   :alt: [fig:mg:MAC] Data centerings for the MAC projection
-   :width: 5.5in
-
-   [fig:mg:MAC] Data centerings for the MAC projection
+.. _fig:mg:MAC:
+.. figure:: MAC_mg2.png
+   :alt: Data centerings for the MAC projection
+   :width: 80%
 
 The HG projection projects the cell-centered velocities at the end of
-the timestep. Here, :math:`\phi` is node-centered. Figure \ `[fig:mg:HG] <#fig:mg:HG>`__
+the timestep. Here, :math:`\phi` is node-centered. :numref:`fig:mg:HG`
 shows the locations of the various quantities involved in the HG
 projection. Again considering simple incompressible flow, we now
 solve:
@@ -455,7 +450,7 @@ following centerings:
                              \frac{\frac{1}{2} (v_{i,j} + v_{i-1,j}) -
                                    \frac{1}{2} (v_{i,j-1} + v_{i-1,j-1})}{\Delta y}
 
--  :math:`G\phi` is cell-centered, as shown in Figure \ `[fig:mg:HG] <#fig:mg:HG>`__.
+-  :math:`G\phi` is cell-centered, as shown in :numref:`fig:mg:HG`.
 
 -  :math:`L\phi` is node-centered. This is a direct discretization of
    the Laplacian operator. By default, MAESTROeX uses a dense stencil
@@ -463,15 +458,10 @@ following centerings:
    stencil can be used (by setting hg_dense_stencil = F). This
    uses 5-points in 2-d, 7-points in 3-d.
 
-   .. raw:: latex
-
-      \centering
-
+   .. _fig:mg:HG:
    .. figure:: \mgfigpath/HG_mg2
-      :alt: [fig:mg:HG] Data centerings for the HG projection
-      :width: 5.5in
-
-      [fig:mg:HG] Data centerings for the HG projection
+      :alt: Data centerings for the HG projection
+      :width: 80%
 
 Convergence Criteria
 ====================

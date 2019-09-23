@@ -203,103 +203,103 @@ Maestro::Init ()
 void
 Maestro::InitData ()
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::InitData()",InitData);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::InitData()",InitData);
 
-	Print() << "Calling InitData()" << std::endl;
+    Print() << "Calling InitData()" << std::endl;
 
-	// read in model file and fill in s0_init and p0_init for all levels
-	if (use_exact_base_state) {
-		init_base_state_irreg(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-		                      rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
-		                      tempbar_init.dataPtr(),
-		                      r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-		std::fill(psi.begin(), psi.end(), 0.);
-	} else {
-		init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-		                rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
-		                tempbar_init.dataPtr());
-	}
+    // read in model file and fill in s0_init and p0_init for all levels
+    if (use_exact_base_state) {
+        init_base_state_irreg(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
+                              rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
+                              tempbar_init.dataPtr(),
+                              r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        std::fill(psi.begin(), psi.end(), 0.);
+    } else {
+        init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
+                        rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
+                        tempbar_init.dataPtr());
+    }
 
-	// calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
-	// that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
-	InitFromScratch(t_old);
+    // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
+    // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
+    InitFromScratch(t_old);
 
-	if (spherical == 0) {
-		// reset tagging array to include buffer zones
-		TagArray();
-	}
+    if (spherical == 0) {
+        // reset tagging array to include buffer zones
+        TagArray();
+    }
 
-	// set finest_radial_level in fortran
-	// compute numdisjointchunks, r_start_coord, r_end_coord
-	init_multilevel(tag_array.dataPtr(),&finest_level);
+    // set finest_radial_level in fortran
+    // compute numdisjointchunks, r_start_coord, r_end_coord
+    init_multilevel(tag_array.dataPtr(),&finest_level);
 
-	// average down data and fill ghost cells
-	AverageDown(sold,0,Nscal);
-	FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
-	AverageDown(uold,0,AMREX_SPACEDIM);
-	FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u,1);
+    // average down data and fill ghost cells
+    AverageDown(sold,0,Nscal);
+    FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
+    AverageDown(uold,0,AMREX_SPACEDIM);
+    FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u,1);
 
-	// free memory in s0_init and p0_init by swapping it
-	// with an empty vector that will go out of scope
-	RealVector s0_swap, p0_swap;
-	std::swap(s0_swap,s0_init);
-	std::swap(p0_swap,p0_init);
+    // free memory in s0_init and p0_init by swapping it
+    // with an empty vector that will go out of scope
+    RealVector s0_swap, p0_swap;
+    std::swap(s0_swap,s0_init);
+    std::swap(p0_swap,p0_init);
 
-	if (fix_base_state) {
-		// compute cutoff coordinates
-		compute_cutoff_coords(rho0_old.dataPtr());
-		make_grav_cell(grav_cell_old.dataPtr(),
-		               rho0_old.dataPtr(),
-		               r_cc_loc.dataPtr(),
-		               r_edge_loc.dataPtr());
-	}
-	else {
+    if (fix_base_state) {
+        // compute cutoff coordinates
+        compute_cutoff_coords(rho0_old.dataPtr());
+        make_grav_cell(grav_cell_old.dataPtr(),
+                       rho0_old.dataPtr(),
+                       r_cc_loc.dataPtr(),
+                       r_edge_loc.dataPtr());
+    }
+    else {
 
-		// first compute cutoff coordinates using initial density profile
-		compute_cutoff_coords(rho0_old.dataPtr());
+        // first compute cutoff coordinates using initial density profile
+        compute_cutoff_coords(rho0_old.dataPtr());
 
-		if (do_smallscale) {
-			// set rho0_old = rhoh0_old = 0.
-			std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
-			std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
-		}
-		else {
-			// set rho0 to be the average
-			Average(sold,rho0_old,Rho);
-			compute_cutoff_coords(rho0_old.dataPtr());
+        if (do_smallscale) {
+            // set rho0_old = rhoh0_old = 0.
+            std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
+            std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
+        }
+        else {
+            // set rho0 to be the average
+            Average(sold,rho0_old,Rho);
+            compute_cutoff_coords(rho0_old.dataPtr());
 
-			// compute gravity
-			make_grav_cell(grav_cell_old.dataPtr(),
-			               rho0_old.dataPtr(),
-			               r_cc_loc.dataPtr(),
-			               r_edge_loc.dataPtr());
+            // compute gravity
+            make_grav_cell(grav_cell_old.dataPtr(),
+                           rho0_old.dataPtr(),
+                           r_cc_loc.dataPtr(),
+                           r_edge_loc.dataPtr());
 
-			// compute p0 with HSE
-			enforce_HSE(rho0_old.dataPtr(),
-			            p0_old.dataPtr(),
-			            grav_cell_old.dataPtr(),
-			            r_cc_loc.dataPtr(),
-			            r_edge_loc.dataPtr());
+            // compute p0 with HSE
+            enforce_HSE(rho0_old.dataPtr(),
+                        p0_old.dataPtr(),
+                        grav_cell_old.dataPtr(),
+                        r_cc_loc.dataPtr(),
+                        r_edge_loc.dataPtr());
 
-			// call eos with r,p as input to recompute T,h
-			TfromRhoP(sold,p0_old,1);
+            // call eos with r,p as input to recompute T,h
+            TfromRhoP(sold,p0_old,1);
 
-			// set rhoh0 to be the average
-			Average(sold,rhoh0_old,RhoH);
-		}
+            // set rhoh0 to be the average
+            Average(sold,rhoh0_old,RhoH);
+        }
 
-		// set tempbar to be the average
-		Average(sold,tempbar,Temp);
-		for (int i=0; i<tempbar.size(); ++i) {
-			tempbar_init[i] = tempbar[i];
-		}
-	}
+        // set tempbar to be the average
+        Average(sold,tempbar,Temp);
+        for (int i=0; i<tempbar.size(); ++i) {
+            tempbar_init[i] = tempbar[i];
+        }
+    }
 
-	// set p0^{-1} = p0_old
-	for (int i=0; i<p0_old.size(); ++i) {
-		p0_nm1[i] = p0_old[i];
-	}
+    // set p0^{-1} = p0_old
+    for (int i=0; i<p0_old.size(); ++i) {
+        p0_nm1[i] = p0_old[i];
+    }
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
@@ -311,295 +311,300 @@ Maestro::InitData ()
 void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                                        const DistributionMapping& dm)
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::MakeNewLevelFromScratch()",MakeNewLevelFromScratch);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeNewLevelFromScratch()",MakeNewLevelFromScratch);
 
-	sold              [lev].define(ba, dm,          Nscal, ng_s);
-	snew              [lev].define(ba, dm,          Nscal, ng_s);
-	uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
-	unew              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
-	S_cc_old          [lev].define(ba, dm,              1,    0);
-	S_cc_new          [lev].define(ba, dm,              1,    0);
-	gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
-	dSdt              [lev].define(ba, dm,              1,    0);
-	rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
+    sold              [lev].define(ba, dm,          Nscal, ng_s);
+    snew              [lev].define(ba, dm,          Nscal, ng_s);
+    uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
+    unew              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
+    S_cc_old          [lev].define(ba, dm,              1,    0);
+    S_cc_new          [lev].define(ba, dm,              1,    0);
+    gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
+    dSdt              [lev].define(ba, dm,              1,    0);
+    w0_cart           [lev].define(ba, dm, AMREX_SPACEDIM,    1);
+    rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 
-	pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
+    pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
 
-	sold              [lev].setVal(0.);
-	snew              [lev].setVal(0.);
-	uold              [lev].setVal(0.);
-	unew              [lev].setVal(0.);
-	S_cc_old          [lev].setVal(0.);
-	S_cc_new          [lev].setVal(0.);
-	gpi               [lev].setVal(0.);
-	dSdt              [lev].setVal(0.);
-	rhcc_for_nodalproj[lev].setVal(0.);
-	pi                [lev].setVal(0.);
+    sold              [lev].setVal(0.);
+    snew              [lev].setVal(0.);
+    uold              [lev].setVal(0.);
+    unew              [lev].setVal(0.);
+    S_cc_old          [lev].setVal(0.);
+    S_cc_new          [lev].setVal(0.);
+    gpi               [lev].setVal(0.);
+    dSdt              [lev].setVal(0.);
+    w0_cart           [lev].setVal(0.);
+    rhcc_for_nodalproj[lev].setVal(0.);
+    pi                [lev].setVal(0.);
 
-	if (spherical == 1) {
-		normal      [lev].define(ba, dm, 3, 1);
-		cell_cc_to_r[lev].define(ba, dm, 1, 0);
-	}
+    if (spherical == 1) {
+        normal      [lev].define(ba, dm, 3, 1);
+        cell_cc_to_r[lev].define(ba, dm, 1, 0);
+    }
 
-	const Real* dx = geom[lev].CellSize();
-	const Real* dx_fine = geom[max_level].CellSize();
+    const Real* dx = geom[lev].CellSize();
+    const Real* dx_fine = geom[max_level].CellSize();
 
-	MultiFab& scal = sold[lev];
-	MultiFab& vel = uold[lev];
-	MultiFab& cc_to_r = cell_cc_to_r[lev];
+    MultiFab& scal = sold[lev];
+    MultiFab& vel = uold[lev];
+    MultiFab& cc_to_r = cell_cc_to_r[lev];
 
-	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+    // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
-	{
-		const Box& tilebox = mfi.tilebox();
-		const int* lo  = tilebox.loVect();
-		const int* hi  = tilebox.hiVect();
+    for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
+    {
+        const Box& tilebox = mfi.tilebox();
+        const int* lo  = tilebox.loVect();
+        const int* hi  = tilebox.hiVect();
 
-		if (spherical == 0) {
-			initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-			         BL_TO_FORTRAN_FAB(scal[mfi]),
-			         BL_TO_FORTRAN_FAB(vel[mfi]),
-			         s0_init.dataPtr(), p0_init.dataPtr(),
-			         ZFILL(dx));
-		} else {
-			init_base_state_map_sphr(BL_TO_FORTRAN_3D(cc_to_r[mfi]),
-			                         ZFILL(dx_fine),
-			                         ZFILL(dx));
+        if (spherical == 0) {
+            initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+                     BL_TO_FORTRAN_FAB(scal[mfi]),
+                     BL_TO_FORTRAN_FAB(vel[mfi]),
+                     s0_init.dataPtr(), p0_init.dataPtr(),
+                     ZFILL(dx));
+        } else {
+            init_base_state_map_sphr(BL_TO_FORTRAN_3D(cc_to_r[mfi]),
+                                     ZFILL(dx_fine),
+                                     ZFILL(dx));
 
-			initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-			              BL_TO_FORTRAN_FAB(scal[mfi]),
-			              BL_TO_FORTRAN_FAB(vel[mfi]),
-			              s0_init.dataPtr(), p0_init.dataPtr(),
-			              ZFILL(dx),
-			              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-			              BL_TO_FORTRAN_3D(cc_to_r[mfi]));
-		}
-	}
+            initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+                          BL_TO_FORTRAN_FAB(scal[mfi]),
+                          BL_TO_FORTRAN_FAB(vel[mfi]),
+                          s0_init.dataPtr(), p0_init.dataPtr(),
+                          ZFILL(dx),
+                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+                          BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+        }
+    }
 
-	if (lev > 0 && reflux_type == 2) {
-		flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
-	}
+    if (lev > 0 && reflux_type == 2) {
+        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+    }
 }
 
 
 void Maestro::InitProj ()
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::InitProj()",InitProj);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::InitProj()",InitProj);
 
-	Vector<MultiFab>       rho_omegadot(finest_level+1);
-	Vector<MultiFab>            thermal(finest_level+1);
-	Vector<MultiFab>           rho_Hnuc(finest_level+1);
-	Vector<MultiFab>           rho_Hext(finest_level+1);
-	Vector<MultiFab>            rhohalf(finest_level+1);
-	Vector<MultiFab>             Tcoeff(finest_level+1);
-	Vector<MultiFab>             hcoeff(finest_level+1);
-	Vector<MultiFab>            Xkcoeff(finest_level+1);
-	Vector<MultiFab>             pcoeff(finest_level+1);
-	Vector<MultiFab>       delta_gamma1(finest_level+1);
-	Vector<MultiFab>  delta_gamma1_term(finest_level+1);
+    Vector<MultiFab>       rho_omegadot(finest_level+1);
+    Vector<MultiFab>            thermal(finest_level+1);
+    Vector<MultiFab>           rho_Hnuc(finest_level+1);
+    Vector<MultiFab>           rho_Hext(finest_level+1);
+    Vector<MultiFab>            rhohalf(finest_level+1);
+    Vector<MultiFab>             Tcoeff(finest_level+1);
+    Vector<MultiFab>             hcoeff(finest_level+1);
+    Vector<MultiFab>            Xkcoeff(finest_level+1);
+    Vector<MultiFab>             pcoeff(finest_level+1);
+    Vector<MultiFab>       delta_gamma1(finest_level+1);
+    Vector<MultiFab>  delta_gamma1_term(finest_level+1);
 
-	RealVector Sbar( (max_radial_level+1)*nr_fine );
-	RealVector delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
-	Sbar.shrink_to_fit();
-	delta_gamma1_termbar.shrink_to_fit();
+    RealVector Sbar( (max_radial_level+1)*nr_fine );
+    RealVector delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
+    Sbar.shrink_to_fit();
+    delta_gamma1_termbar.shrink_to_fit();
 
-	for (int lev=0; lev<=finest_level; ++lev) {
-		rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
-		thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
-		rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
-		rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
-		rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
-		Tcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
-		hcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
-		Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec,    1);
-		pcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
-		delta_gamma1      [lev].define(grids[lev], dmap[lev],       1,    1);
-		delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1,    1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
+        Tcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
+        hcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
+        Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec,    1);
+        pcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
+        delta_gamma1      [lev].define(grids[lev], dmap[lev],       1,    1);
+        delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1,    1);
 
-		// we don't have a legit timestep yet, so we set rho_omegadot,
-		// rho_Hnuc, and rho_Hext to 0
-		rho_omegadot[lev].setVal(0.);
-		rho_Hnuc[lev].setVal(0.);
-		rho_Hext[lev].setVal(0.);
-		delta_gamma1[lev].setVal(0.);
-		delta_gamma1_term[lev].setVal(0.);
+        // we don't have a legit timestep yet, so we set rho_omegadot,
+        // rho_Hnuc, and rho_Hext to 0
+        rho_omegadot[lev].setVal(0.);
+        rho_Hnuc[lev].setVal(0.);
+        rho_Hext[lev].setVal(0.);
+        delta_gamma1[lev].setVal(0.);
+        delta_gamma1_term[lev].setVal(0.);
 
-		// initial projection does not use density weighting
-		rhohalf[lev].setVal(1.);
-	}
+        // initial projection does not use density weighting
+        rhohalf[lev].setVal(1.);
+    }
 
-	// compute thermal diffusion
-	if (use_thermal_diffusion) {
-		MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
+    // compute thermal diffusion
+    if (use_thermal_diffusion) {
+        MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
 
-		MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
-		                    temp_diffusion_formulation);
-	}
-	else {
-		for (int lev=0; lev<=finest_level; ++lev) {
-			thermal[lev].setVal(0.);
-		}
-	}
+        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
+                            temp_diffusion_formulation);
+    }
+    else {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            thermal[lev].setVal(0.);
+        }
+    }
 
-	// compute S at cell-centers
-	Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-	          rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+    // compute S at cell-centers
+    Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
+              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
-	// NOTE: not sure if valid for use_exact_base_state
-	if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
-		// average S into Sbar
-		Average(S_cc_old,Sbar,0);
-	}
+    // NOTE: not sure if valid for use_exact_base_state
+    if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
+        // average S into Sbar
+        Average(S_cc_old,Sbar,0);
+    }
 
-	// make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-	MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
+    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
 
-	// perform a nodal projection
-	NodalProj(initial_projection_comp,rhcc_for_nodalproj);
+    // perform a nodal projection
+    NodalProj(initial_projection_comp,rhcc_for_nodalproj);
 }
 
 
 void Maestro::DivuIter (int istep_divu_iter)
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::DivuIter()",DivuIter);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::DivuIter()",DivuIter);
 
-	Vector<MultiFab> stemp             (finest_level+1);
-	Vector<MultiFab> rho_Hext          (finest_level+1);
-	Vector<MultiFab> rho_omegadot      (finest_level+1);
-	Vector<MultiFab> rho_Hnuc          (finest_level+1);
-	Vector<MultiFab> thermal           (finest_level+1);
-	Vector<MultiFab> rhohalf           (finest_level+1);
-	Vector<MultiFab> Tcoeff            (finest_level+1);
-	Vector<MultiFab> hcoeff            (finest_level+1);
-	Vector<MultiFab> Xkcoeff           (finest_level+1);
-	Vector<MultiFab> pcoeff            (finest_level+1);
-	Vector<MultiFab> delta_gamma1      (finest_level+1);
-	Vector<MultiFab> delta_gamma1_term (finest_level+1);
+    Vector<MultiFab> stemp             (finest_level+1);
+    Vector<MultiFab> rho_Hext          (finest_level+1);
+    Vector<MultiFab> rho_omegadot      (finest_level+1);
+    Vector<MultiFab> rho_Hnuc          (finest_level+1);
+    Vector<MultiFab> thermal           (finest_level+1);
+    Vector<MultiFab> rhohalf           (finest_level+1);
+    Vector<MultiFab> Tcoeff            (finest_level+1);
+    Vector<MultiFab> hcoeff            (finest_level+1);
+    Vector<MultiFab> Xkcoeff           (finest_level+1);
+    Vector<MultiFab> pcoeff            (finest_level+1);
+    Vector<MultiFab> delta_gamma1      (finest_level+1);
+    Vector<MultiFab> delta_gamma1_term (finest_level+1);
 
-	RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
-	RealVector w0_force              ( (max_radial_level+1)*nr_fine );
-	RealVector p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
-	RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
-	RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
+    RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
+    RealVector w0_force              ( (max_radial_level+1)*nr_fine );
+    RealVector p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
+    RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
+    RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
 
-	Sbar.shrink_to_fit();
-	w0_force.shrink_to_fit();
-	p0_minus_peosbar.shrink_to_fit();
-	delta_chi_w0.shrink_to_fit();
-	delta_gamma1_termbar.shrink_to_fit();
+    Sbar.shrink_to_fit();
+    w0_force.shrink_to_fit();
+    p0_minus_peosbar.shrink_to_fit();
+    delta_chi_w0.shrink_to_fit();
+    delta_gamma1_termbar.shrink_to_fit();
 
-	std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
-	std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
-	std::fill(w0_force.begin(),             w0_force.end(),             0.);
-	std::fill(psi.begin(),                  psi.end(),                  0.);
-	std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
-	std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
-	std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
+    std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
+    std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
+    std::fill(w0_force.begin(),             w0_force.end(),             0.);
+    std::fill(psi.begin(),                  psi.end(),                  0.);
+    std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
+    std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
+    std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
 
-	for (int lev=0; lev<=finest_level; ++lev) {
-		stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-		rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
-		rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
-		rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
-		thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
-		rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
-		Tcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
-		hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
-		Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
-		pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
-		delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
-		delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+        thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
+        Tcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
+        delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
 
-		// divu_iters do not use density weighting
-		rhohalf[lev].setVal(1.);
-	}
+        // divu_iters do not use density weighting
+        rhohalf[lev].setVal(1.);
+    }
 
-	React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+    React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
-	if (use_thermal_diffusion) {
-		MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
+    if (use_thermal_diffusion) {
+        MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
 
-		MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
-		                    temp_diffusion_formulation);
-	}
-	else {
-		for (int lev=0; lev<=finest_level; ++lev) {
-			thermal[lev].setVal(0.);
-		}
-	}
+        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
+                            temp_diffusion_formulation);
+    }
+    else {
+        for (int lev=0; lev<=finest_level; ++lev) {
+            thermal[lev].setVal(0.);
+        }
+    }
 
-	// compute S at cell-centers
-	Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-	          rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+    // compute S at cell-centers
+    Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
+              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
-	// NOTE: not sure if valid for use_exact_base_state
-	if (evolve_base_state) {
-		if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-			for(int i=0; i<Sbar.size(); ++i) {
-				Sbar[i] += delta_gamma1_termbar[i];
-			}
-		} else {
-			Average(S_cc_old,Sbar,0);
+    // NOTE: not sure if valid for use_exact_base_state
+    if (evolve_base_state) {
+        if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
+            for(int i=0; i<Sbar.size(); ++i) {
+                Sbar[i] += delta_gamma1_termbar[i];
+            }
+        } else {
+            Average(S_cc_old,Sbar,0);
 
-			// compute Sbar = Sbar + delta_gamma1_termbar
-			if (use_delta_gamma1_term) {
-				for(int i=0; i<Sbar.size(); ++i) {
-					Sbar[i] += delta_gamma1_termbar[i];
-				}
-			}
+            // compute Sbar = Sbar + delta_gamma1_termbar
+            if (use_delta_gamma1_term) {
+                for(int i=0; i<Sbar.size(); ++i) {
+                    Sbar[i] += delta_gamma1_termbar[i];
+                }
+            }
 
-			int is_predictor = 1;
-			make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-			        rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-			        p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-			        p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
-			        etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-			        r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
-		}
-	}
+            int is_predictor = 1;
+            make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
+                    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+                    p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
+                    p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
+                    etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+                    r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
 
-	// make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-	MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+            // put w0 on Cartesian cell-centers
+            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        }
+    }
 
-	// perform a nodal projection
-	NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
+    // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
+    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
 
-	Real dt_hold = dt;
+    // perform a nodal projection
+    NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
 
-	// compute new time step
-	EstDt();
+    Real dt_hold = dt;
 
-	if (maestro_verbose > 0) {
-		Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
-		        << " gives dt = " << dt << std::endl;
-	}
+    // compute new time step
+    EstDt();
 
-	dt *= init_shrink;
-	if (maestro_verbose > 0) {
-		Print() << "Multiplying dt by init_shrink; dt = " << dt << std::endl;
-	}
+    if (maestro_verbose > 0) {
+        Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
+                << " gives dt = " << dt << std::endl;
+    }
 
-	if (dt > dt_hold) {
-		if (maestro_verbose > 0) {
-			Print() << "Ignoring this new dt since it's larger than the previous dt = "
-			        << dt_hold << std::endl;
-		}
-		dt = std::min(dt_hold,dt);
-	}
+    dt *= init_shrink;
+    if (maestro_verbose > 0) {
+        Print() << "Multiplying dt by init_shrink; dt = " << dt << std::endl;
+    }
 
-	if (fixed_dt != -1.0) {
-		// fixed dt
-		dt = fixed_dt;
-		if (maestro_verbose > 0) {
-			Print() << "Setting fixed dt = " << dt << std::endl;
-		}
-	}
+    if (dt > dt_hold) {
+        if (maestro_verbose > 0) {
+            Print() << "Ignoring this new dt since it's larger than the previous dt = "
+                    << dt_hold << std::endl;
+        }
+        dt = std::min(dt_hold,dt);
+    }
+
+    if (fixed_dt != -1.0) {
+        // fixed dt
+        dt = fixed_dt;
+        if (maestro_verbose > 0) {
+            Print() << "Setting fixed dt = " << dt << std::endl;
+        }
+    }
 }
 
 void Maestro::InitIter ()

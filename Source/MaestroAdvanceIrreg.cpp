@@ -39,7 +39,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Vector<MultiFab>   scal_force(finest_level+1);
     Vector<MultiFab>    delta_chi(finest_level+1);
     Vector<MultiFab>       sponge(finest_level+1);
-    Vector<MultiFab>         w0cc(finest_level+1);
 
     // face-centered in the dm-direction (planar only)
     Vector<MultiFab> etarhoflux_dummy(finest_level+1);
@@ -143,7 +142,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 	}
 	delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
 	sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
-	w0cc    [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
 
 	// face-centered in the dm-direction (planar only)
 	AMREX_D_TERM(etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -222,7 +220,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
 
-    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
     // wallclock time
     Real end_total_react = ParallelDescriptor::second() - start_total_react;
@@ -297,6 +295,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
                 etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
+	// put w0 on Cartesian cell-centers
+	Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
         if (spherical == 1) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
@@ -517,7 +518,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
@@ -625,6 +626,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
                 etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
+	// put w0 on Cartesian cell-centers
+	Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
         if (spherical == 1) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
@@ -807,7 +811,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
@@ -867,7 +871,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
 	// put w0 on Cartesian cell-centers
-	Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0, 1);
+	Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -892,8 +896,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state && spherical == 1) {
 	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
-	    MultiFab::Subtract(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
+	    MultiFab::Subtract(uold[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);
+	    MultiFab::Subtract(unew[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);
 	}
     }
 
@@ -963,7 +967,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     if (evolve_base_state && spherical == 1) {
 	// add w0 back to unew
 	for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
+	    MultiFab::Add(unew[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);
 	}
 	AverageDown(unew,0,AMREX_SPACEDIM);
 	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);

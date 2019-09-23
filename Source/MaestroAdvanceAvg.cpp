@@ -39,7 +39,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     Vector<MultiFab>   scal_force(finest_level+1);
     Vector<MultiFab>    delta_chi(finest_level+1);
     Vector<MultiFab>       sponge(finest_level+1);
-    Vector<MultiFab>         w0cc(finest_level+1);
 
     // face-centered in the dm-direction (planar only)
     Vector<MultiFab> etarhoflux_dummy(finest_level+1);
@@ -144,7 +143,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	}
 	delta_chi   [lev].define(grids[lev], dmap[lev],       1,    0);
 	sponge      [lev].define(grids[lev], dmap[lev],       1,    0);
-	w0cc     [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
 
 	// face-centered in the dm-direction (planar only)
 	AMREX_D_TERM(etarhoflux_dummy[lev].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -176,13 +174,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	w0mac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
 	w0mac_dummy[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
     }
-    if (spherical == 1) {
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-	}
-    }
 #endif
-
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+	w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+	w0_force_cart_dummy[lev].setVal(0.);
+    }
 
     // set etarhoflux_dummy to zero
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -195,11 +192,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	for (int d=0; d<AMREX_SPACEDIM; ++d) {
 	    w0mac[lev][d].setVal(0.);
 	    w0mac_dummy[lev][d].setVal(0.);
-	}
-    }
-    if (spherical == 1) {
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    w0_force_cart_dummy[lev].setVal(0.);
 	}
     }
 #endif
@@ -229,7 +221,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
 
-    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
     // wallclock time
     Real end_total_react = ParallelDescriptor::second() - start_total_react;
@@ -307,6 +299,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
                     etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                     r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
+            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
             if (spherical == 1) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);
@@ -533,7 +527,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
@@ -642,6 +636,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
                     etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                     r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
+            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+            
             if (spherical == 1) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);
@@ -834,7 +830,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
@@ -896,10 +892,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
                     etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
                     r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
-            if (spherical == 1) {
-                // put w0 on Cartesian cell-centers
-                Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0, 1);
-            }
+            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
         }
     }
 
@@ -925,8 +919,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (spherical == 1 && evolve_base_state && split_projection) {
 	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
-	    MultiFab::Subtract(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
+	    MultiFab::Subtract(uold[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);
+	    MultiFab::Subtract(unew[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);
 	}
     }
     if (evolve_base_state && !split_projection) {
@@ -1001,7 +995,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (spherical == 1 && evolve_base_state && split_projection) {
     	// add w0 back to unew
     	for (int lev = 0; lev <= finest_level; ++lev) {
-    	    MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
+    	    MultiFab::Add(unew[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);
     	}
     	AverageDown(unew,0,AMREX_SPACEDIM);
     	FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
