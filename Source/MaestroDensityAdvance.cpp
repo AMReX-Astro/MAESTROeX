@@ -13,7 +13,8 @@ Maestro::DensityAdvance (int which_step,
                          Vector<MultiFab>& etarhoflux,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                          const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                         const RealVector& rho0_predicted_edge)
+                         const RealVector& rho0_predicted_edge,
+                         const Vector<MultiFab>& p0_new_cart)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DensityAdvance()",DensityAdvance);
@@ -213,13 +214,6 @@ Maestro::DensityAdvance (int which_step,
     for (int lev=0; lev<=finest_level; ++lev) {
         scal_force[lev].setVal(0.);
     }
-
-    Vector<MultiFab> p0_new_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-    }
-
-    Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
 
     // p0 only used in rhoh update so it's an optional parameter
     UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec, p0_new_cart);

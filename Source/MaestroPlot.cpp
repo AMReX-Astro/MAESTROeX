@@ -350,9 +350,9 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     if (dt_in < small_dt) {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_cart, small_dt, t_in);
     } else {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in*0.5, t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_cart, dt_in*0.5, t_in);
     }
 
     if (plot_spec || plot_omegadot) {
@@ -396,7 +396,7 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     // compute tfromp
-    TfromRhoP(s_in,p0_in);
+    TfromRhoP(s_in,p0_cart);
     // tfromp
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -404,7 +404,7 @@ Maestro::PlotFileMF (const int nPlot,
     ++dest_comp;
 
     // compute tfromh
-    TfromRhoH(s_in,p0_in);
+    TfromRhoH(s_in,p0_cart);
     for (int i = 0; i <= finest_level; ++i) {
         // tfromh
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -423,12 +423,12 @@ Maestro::PlotFileMF (const int nPlot,
 
     // deltaT
     // compute & copy tfromp
-    TfromRhoP(s_in,p0_in);
+    TfromRhoP(s_in,p0_cart);
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
     }
     // compute tfromh
-    TfromRhoH(s_in,p0_in);
+    TfromRhoH(s_in,p0_cart);
     // compute deltaT = (tfromp - tfromh) / tfromh
     for (int i = 0; i <= finest_level; ++i) {
         MultiFab::Subtract(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
@@ -438,7 +438,7 @@ Maestro::PlotFileMF (const int nPlot,
 
     // restore tfromp if necessary
     if (use_tfromp) {
-        TfromRhoP(s_in,p0_in);
+        TfromRhoP(s_in,p0_cart);
     }
 
     // pi
@@ -547,7 +547,7 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     // Mach number
-    MachfromRhoH(s_in,u_in,p0_in,w0r_cart,tempmf);
+    MachfromRhoH(s_in,u_in,p0_cart,w0r_cart,tempmf);
 
     // MachNumber
     for (int i = 0; i <= finest_level; ++i) {
@@ -619,7 +619,7 @@ Maestro::PlotFileMF (const int nPlot,
 
     // soundspeed
     if (plot_cs) {
-        CsfromRhoH(s_in, p0_in, p0_cart, tempmf);
+        CsfromRhoH(s_in, p0_cart, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
         }
@@ -665,7 +665,7 @@ Maestro::PlotFileMF (const int nPlot,
 
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(s_in,Tcoeff,hcoeff,Xkcoeff,pcoeff);
-        MakeExplicitThermal(tempmf,s_in,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_in,0);
+        MakeExplicitThermal(tempmf,s_in,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_cart,0);
     } else {
         for (int lev=0; lev<=finest_level; ++lev) {
             Tcoeff[lev].setVal(0.);

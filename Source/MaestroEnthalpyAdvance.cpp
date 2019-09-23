@@ -12,7 +12,8 @@ Maestro::EnthalpyAdvance (int which_step,
                           Vector<MultiFab>& scal_force,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                           const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                          const Vector<MultiFab>& thermal)
+                          const Vector<MultiFab>& thermal,
+                          const Vector<MultiFab>& p0_new_cart)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
@@ -290,13 +291,6 @@ Maestro::EnthalpyAdvance (int which_step,
     //**************************************************************************
 
     MakeRhoHForce(scal_force,0,thermal,umac,0,which_step);
-
-    Vector<MultiFab> p0_new_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-    }
-
-    Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
 
     UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
 }

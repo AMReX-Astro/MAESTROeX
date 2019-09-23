@@ -72,10 +72,19 @@ Maestro::DiagFile (const int step,
             rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
         }
 
+        Vector<MultiFab> p0_in_cart(finest_level+1);
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            p0_in_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+            p0_in_cart[lev].setVal(0.);
+        }
+
+        Put1dArrayOnCart(p0_in,p0_in_cart,0,0,bcs_f,0);
+
         if (dt < small_dt) {
-            React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);
+            React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in_cart, small_dt, t_in);
         } else {
-            React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt*0.5, t_in);
+            React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in_cart, dt*0.5, t_in);
         }
 
     } else {

@@ -18,7 +18,7 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
                              const Vector<MultiFab>& hcoeff,
                              const Vector<MultiFab>& Xkcoeff,
                              const Vector<MultiFab>& pcoeff,
-                             const RealVector& p0,
+                             const Vector<MultiFab>& p0_cart,
                              int temp_formulation) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeExplicitThermal()",MakeExplicitThermal);
@@ -119,7 +119,9 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
         mlabec.setScalars(0.0, 1.0);
 
         // set value of phi
-        Put1dArrayOnCart(p0, phi, 0, 0, bcs_f,0);
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(phi[lev],p0_cart[lev],0,0,1,1);
+        }
         FillPatch(t_old, phi, phi, phi, 0, 0, 1, 0,bcs_f);
 
         ApplyThermal(mlabec, resid, pcoeff, phi, bcs_f, 0);
@@ -283,7 +285,9 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
                          const Vector<MultiFab>& pcoeff1,
                          const Vector<MultiFab>& hcoeff2,
                          const Vector<MultiFab>& Xkcoeff2,
-                         const Vector<MultiFab>& pcoeff2)
+                         const Vector<MultiFab>& pcoeff2,
+                         const Vector<MultiFab>& p0_old_cart,
+                         const Vector<MultiFab>& p0_new_cart)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ThermalConduct()",ThermalConduct);
@@ -312,7 +316,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
     }
 
     // compute resid = div(hcoeff1 grad h^1) - sum_k div(Xkcoeff1 grad Xk^1) - div(pcoeff1 grad p0_old)
-    MakeExplicitThermal(resid,s1,Dcoeff,hcoeff1,Xkcoeff1,pcoeff1,p0_old,2);
+    MakeExplicitThermal(resid,s1,Dcoeff,hcoeff1,Xkcoeff1,pcoeff1,p0_old_cart,2);
 
     // RHS = solverrhs + dt/2 * resid1
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -320,7 +324,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
     }
 
     // compute resid = 0 - sum_k div(Xkcoeff2 grad Xk^2) - div(pcoeff2 grad p0_new)
-    MakeExplicitThermal(resid,s2,Dcoeff,Dcoeff,Xkcoeff2,pcoeff2,p0_new,2);
+    MakeExplicitThermal(resid,s2,Dcoeff,Dcoeff,Xkcoeff2,pcoeff2,p0_new_cart,2);
 
     // RHS = solverrhs + dt/2 * resid2
     for (int lev = 0; lev <= finest_level; ++lev) {

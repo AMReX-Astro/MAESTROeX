@@ -92,6 +92,15 @@ Maestro::Regrid ()
     	}
     }
 
+    Vector<MultiFab> p0_old_cart(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        p0_old_cart[lev].setVal(0.);
+    }
+
+    Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
+
     // compute cutoff coordinates
     compute_cutoff_coords(rho0_old.dataPtr());
 
@@ -110,23 +119,14 @@ Maestro::Regrid ()
 
     if (use_tfromp) {
         // compute full state T = T(rho,p0,X)
-        TfromRhoP(sold,p0_old,0);
+        TfromRhoP(sold,p0_old_cart,0);
     } else {
         // compute full state T = T(rho,h,X)
-        TfromRhoH(sold,p0_old);
+        TfromRhoH(sold,p0_old_cart);
     }
 
     // force tempbar to be the average of temp
     Average(sold,tempbar,Temp);
-
-    Vector<MultiFab> p0_old_cart(finest_level+1);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        p0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-        p0_old_cart[lev].setVal(0.);
-    }
-
-    Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
 
     // gamma1bar needs to be recomputed
     MakeGamma1bar(sold,gamma1bar_old,p0_old_cart);

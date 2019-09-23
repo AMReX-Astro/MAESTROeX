@@ -412,7 +412,8 @@ private:
 			 amrex::Vector<amrex::MultiFab>& etarhoflux,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			 const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-			 const RealVector& rho0_predicted_edge);
+			 const RealVector& rho0_predicted_edge,
+       const amrex::Vector<amrex::MultiFab>& p0_new_cart);
     ////////////////////////
 
     ////////////
@@ -466,7 +467,8 @@ private:
                           amrex::Vector<amrex::MultiFab>& scal_force,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                          const amrex::Vector<amrex::MultiFab>& thermal);
+                          const amrex::Vector<amrex::MultiFab>& thermal,
+                          const amrex::Vector<amrex::MultiFab>& p0_new_cart);
     ////////////////////////
 
     ////////////////////////
@@ -755,6 +757,7 @@ private:
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal,
                     const RealVector& p0,
+                    const amrex::Vector<amrex::MultiFab>& p0_cart,
                     const RealVector& gamma1bar,
                     RealVector& delta_gamma1_termbar,
                     const RealVector& psi_in);
@@ -774,7 +777,7 @@ private:
                              const RealVector& beta0,
                              const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
                              const RealVector& gamma1bar,
-			                 const RealVector& p0,
+			                 const amrex::Vector<amrex::MultiFab>& p0_cart,
                              const amrex::Vector<amrex::MultiFab>& delta_p_term,
 			                 amrex::Vector<amrex::MultiFab>& delta_chi,
                              int is_predictor);
@@ -783,7 +786,7 @@ private:
 				 const RealVector& rho0,
 				 const RealVector& beta0,
 				 const RealVector& gamma1bar,
-				 const RealVector& p0,
+				 const amrex::Vector<amrex::MultiFab>& p0_cart,
 				 const amrex::Vector<amrex::MultiFab>& delta_p_term);
     // end MaestroMakeS.cpp functions
     ////////////
@@ -938,18 +941,17 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_Hext,
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                const RealVector& p0,
+                const amrex::Vector<amrex::MultiFab>& p0_cart,
                 const amrex::Real dt_react,
-		const amrex::Real time_in);
+                const amrex::Real time_in);
 
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
-		 amrex::Vector<amrex::MultiFab>& s_out,
-		 const amrex::Vector<amrex::MultiFab>& rho_Hext,
-		 amrex::Vector<amrex::MultiFab>& rho_omegadot,
-		 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-		 const RealVector& p0,
-		 const amrex::Real dt_react,
-		 const amrex::Real time_in);
+                amrex::Vector<amrex::MultiFab>& s_out,
+                const amrex::Vector<amrex::MultiFab>& rho_Hext,
+                amrex::Vector<amrex::MultiFab>& rho_omegadot,
+                amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+                const amrex::Real dt_react,
+                const amrex::Real time_in);
 
     /// Compute heating term, `rho_Hext`
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
@@ -1008,16 +1010,16 @@ private:
     /// Calculate the temperature given the density and the enthalpy
     ///
     /// @param scal     scalars
-    /// @param p0       base state pressure
+    /// @param p0_cart  base state pressure
     void TfromRhoH (amrex::Vector<amrex::MultiFab>& scal,
-                    const RealVector& p0);
+                    const amrex::Vector<amrex::MultiFab>& p0_cart);
 
     /// Calculate the temperature given the density and the pressure
     ///
     /// @param scal     scalars
-    /// @param p0       base state pressure
+    /// @param p0_cart  base state pressure
     void TfromRhoP (amrex::Vector<amrex::MultiFab>& scal,
-                    const RealVector& p0,
+                    const amrex::Vector<amrex::MultiFab>& p0_cart,
                     int updateRhoH = 0);
 
     /// Calculate the pressure given the density and the enthalpy
@@ -1033,11 +1035,11 @@ private:
     ///
     /// @param scal     scalars
     /// @param vel      velocity
-    /// @param p0       base state pressure
+    /// @param p0_cart  base state pressure
     /// @param mach     Mach number
     void MachfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
                            const amrex::Vector<amrex::MultiFab>& vel,
-                           const RealVector& p0,
+                           const amrex::Vector<amrex::MultiFab>& p0_cart,
                            const amrex::Vector<amrex::MultiFab>& w0cart,
                            amrex::Vector<amrex::MultiFab>& mach);
 
@@ -1048,7 +1050,6 @@ private:
     /// @param p0cart   base state pressure on cartesian grid
     /// @param cs       sound speed
     void CsfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
-                     const RealVector& p0,
                      const amrex::Vector<amrex::MultiFab>& p0cart,
                      amrex::Vector<amrex::MultiFab>& cs);
     ////////////
@@ -1098,7 +1099,7 @@ private:
 			      const amrex::Vector<amrex::MultiFab>& hcoeff,
 			      const amrex::Vector<amrex::MultiFab>& Xkcoeff,
 			      const amrex::Vector<amrex::MultiFab>& pcoeff,
-			      const RealVector& p0,
+			      const amrex::Vector<amrex::MultiFab>& p0_cart,
 			      int temp_formulation);
 
     /// Use `apply()` to construct the form of the conduction term.
@@ -1138,7 +1139,9 @@ private:
 			 const amrex::Vector<amrex::MultiFab>& pcoeff1,
 			 const amrex::Vector<amrex::MultiFab>& hcoeff2,
 			 const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
-			 const amrex::Vector<amrex::MultiFab>& pcoeff2);
+			 const amrex::Vector<amrex::MultiFab>& pcoeff2,
+       const amrex::Vector<amrex::MultiFab>& p0_old_cart,
+       const amrex::Vector<amrex::MultiFab>& p0_new_cart);
     ////////////////////////
 
     ////////////////////////

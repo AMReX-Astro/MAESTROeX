@@ -15,6 +15,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& rho_Hext,
                     const Vector<MultiFab>& thermal,
                     const RealVector& p0,
+                    const Vector<MultiFab>& p0_cart,
                     const RealVector& gamma1bar,
                     RealVector& delta_gamma1_termbar,
                     const RealVector& psi_in)
@@ -30,7 +31,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     // put 1d base state quantities on cartestian grid for spherical case
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
-    Vector<MultiFab> p0_cart(finest_level+1);
     Vector<MultiFab> gradp0_cart(finest_level+1);
     Vector<MultiFab> psi_cart(finest_level+1);
 
@@ -64,17 +64,14 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         
     for (int lev=0; lev<=finest_level; ++lev) {
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         psi_cart[lev].define(grids[lev], dmap[lev], 1, 0);
 
         gamma1bar_cart[lev].setVal(0.);
-        p0_cart[lev].setVal(0.);
         psi_cart[lev].setVal(0.);
     }
 
     if (use_delta_gamma1_term) {
         Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
-        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
         Put1dArrayOnCart(psi_in,psi_cart,0,0,bcs_f,0);
     }
 
@@ -287,7 +284,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
                                  const RealVector& rho0,
                                  const RealVector& beta0,
                                  const RealVector& gamma1bar,
-                                 const RealVector& p0,
+                                 const Vector<MultiFab>& p0_cart,
                                  const Vector<MultiFab>& delta_p_term)
 {
     // timer for profiling
@@ -308,23 +305,19 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
     }
 
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
-    Vector<MultiFab>        p0_cart(finest_level+1);
     Vector<MultiFab>     beta0_cart(finest_level+1);
     Vector<MultiFab>      rho0_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         beta0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         gamma1bar_cart[lev].setVal(0.);
-        p0_cart[lev].setVal(0.);
         beta0_cart[lev].setVal(0.);
         rho0_cart[lev].setVal(0.);
     }
 
     Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
     Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
     Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
 
@@ -387,7 +380,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const RealVector& beta0,
                              const Vector<MultiFab>& delta_gamma1_term,
                              const RealVector& gamma1bar,
-                             const RealVector& p0,
+                             const Vector<MultiFab>& p0_cart,
                              const Vector<MultiFab>& delta_p_term,
                              Vector<MultiFab>& delta_chi,
                              int is_predictor)
@@ -405,20 +398,17 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
     Vector<MultiFab> Sbar_cart(finest_level+1);
     Vector<MultiFab> beta0_cart(finest_level+1);
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
-    Vector<MultiFab> p0_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         Sbar_cart [lev].define(grids[lev], dmap[lev], 1, 0);
         beta0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
 
         Sbar_cart [lev].setVal(0.);
         beta0_cart[lev].setVal(0.);
         gamma1bar_cart[lev].setVal(0.);
-        p0_cart[lev].setVal(0.);
         rho0_cart[lev].setVal(0.);
     }
 
@@ -427,7 +417,6 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 
     if (dpdt_factor > 0.0) {
         Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
-        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
         Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
     }
 

@@ -291,8 +291,17 @@ Maestro::InitData ()
                         r_cc_loc.dataPtr(),
                         r_edge_loc.dataPtr());
 
+            Vector<MultiFab> p0_old_cart(finest_level+1);
+
+            for (int lev=0; lev<=finest_level; ++lev) {
+                p0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+                p0_old_cart[lev].setVal(0.);
+            }
+
+            Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
+
             // call eos with r,p as input to recompute T,h
-            TfromRhoP(sold,p0_old,1);
+            TfromRhoP(sold,p0_old_cart,1);
 
             // set rhoh0 to be the average
             Average(sold,rhoh0_old,RhoH);
@@ -413,6 +422,7 @@ void Maestro::InitProj ()
     Vector<MultiFab>             pcoeff(finest_level+1);
     Vector<MultiFab>       delta_gamma1(finest_level+1);
     Vector<MultiFab>  delta_gamma1_term(finest_level+1);
+    Vector<MultiFab> p0_old_cart(finest_level+1);
 
     RealVector Sbar( (max_radial_level+1)*nr_fine );
     RealVector delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
@@ -431,6 +441,7 @@ void Maestro::InitProj ()
         pcoeff            [lev].define(grids[lev], dmap[lev],       1,    1);
         delta_gamma1      [lev].define(grids[lev], dmap[lev],       1,    1);
         delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1,    1);
+        p0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
 
         // we don't have a legit timestep yet, so we set rho_omegadot,
         // rho_Hnuc, and rho_Hext to 0
@@ -439,16 +450,19 @@ void Maestro::InitProj ()
         rho_Hext[lev].setVal(0.);
         delta_gamma1[lev].setVal(0.);
         delta_gamma1_term[lev].setVal(0.);
+        p0_old_cart[lev].setVal(0.);
 
         // initial projection does not use density weighting
         rhohalf[lev].setVal(1.);
     }
 
+    Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
+
     // compute thermal diffusion
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
 
-        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
+        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old_cart,
                             temp_diffusion_formulation);
     }
     else {
@@ -459,7 +473,7 @@ void Maestro::InitProj ()
 
     // compute S at cell-centers
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+              rho_Hext,thermal,p0_old,p0_old_cart,gamma1bar_old,delta_gamma1_termbar,psi);
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
@@ -492,6 +506,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<MultiFab> pcoeff            (finest_level+1);
     Vector<MultiFab> delta_gamma1      (finest_level+1);
     Vector<MultiFab> delta_gamma1_term (finest_level+1);
+    Vector<MultiFab> p0_old_cart(finest_level+1);
 
     RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
     RealVector w0_force              ( (max_radial_level+1)*nr_fine );
@@ -526,17 +541,21 @@ void Maestro::DivuIter (int istep_divu_iter)
         pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
         delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
         delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
+        p0_old_cart       [lev].define(grids[lev], dmap[lev], 1, 1);
 
         // divu_iters do not use density weighting
         rhohalf[lev].setVal(1.);
+        p0_old_cart[lev].setVal(0.);
     }
 
-    React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
+    Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
+
+    React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old_cart,0.5*dt,t_old);
 
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
 
-        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
+        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old_cart,
                             temp_diffusion_formulation);
     }
     else {
@@ -547,7 +566,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     // compute S at cell-centers
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+              rho_Hext,thermal,p0_old,p0_old_cart,gamma1bar_old,delta_gamma1_termbar,psi);
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {

@@ -215,8 +215,20 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
+    
+    Vector<MultiFab> p0_old_cart(finest_level+1);
+    Vector<MultiFab> p0_new_cart(finest_level+1);
 
-    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        p0_old_cart[lev].setVal(0.);
+        p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        p0_new_cart[lev].setVal(0.);
+    }
+
+    Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
+
+    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old_cart,0.5*dt,t_old);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
@@ -350,7 +362,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
-                       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
+                       gamma1bar_old,p0_old_cart,delta_p_term,delta_chi,is_predictor);
 
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
@@ -400,7 +412,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1);
 
-        MakeExplicitThermal(thermal1,s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1,p0_old,
+        MakeExplicitThermal(thermal1,s1,Tcoeff,hcoeff1,Xkcoeff1,pcoeff1,p0_old_cart,
                             temp_diffusion_formulation);
     }
     else {
@@ -434,10 +446,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
-    
-    Vector<MultiFab> p0_old_cart(finest_level+1);
-    Vector<MultiFab> p0_new_cart(finest_level+1);
+    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge,p0_new_cart);
 
     if (evolve_base_state) {
 
@@ -482,14 +491,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-        for (int lev=0; lev<=finest_level; ++lev) {
-            p0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-            p0_old_cart[lev].setVal(0.);
-            p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-            p0_new_cart[lev].setVal(0.);
-        }
-
-        Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
         Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
 
         // make psi
@@ -541,13 +542,14 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         rhoh0_new = rhoh0_old;
         grav_cell_new = grav_cell_old;
         p0_new = p0_old;
+        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
     }
 
     if (maestro_verbose >= 1) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1,p0_new_cart);
 
 #ifdef AMREX_USE_CUDA
     auto not_launched = Gpu::notInLaunchRegion();
@@ -570,7 +572,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-        ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1);
+        ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1,p0_old_cart,p0_new_cart);
     }
 
     thermal_time += ParallelDescriptor::second() - thermal_time_start;
@@ -593,10 +595,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s2,p0_new,0);
+        TfromRhoP(s2,p0_new_cart,0);
     }
     else {
-        TfromRhoH(s2,p0_new);
+        TfromRhoH(s2,p0_new_cart);
     }
 
     if (use_thermal_diffusion) {
@@ -621,7 +623,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new_cart,0.5*dt,t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
@@ -630,7 +632,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     misc_time_start = ParallelDescriptor::second();
 
     if (evolve_base_state) {
-        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
         // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new_cart);
 
@@ -675,7 +676,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2);
 
-        MakeExplicitThermal(thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
+        MakeExplicitThermal(thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2,p0_new_cart,
                             temp_diffusion_formulation);
     }
     else {
@@ -686,7 +687,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // compute S at cell-centers
     Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal2,p0_old,gamma1bar_new,delta_gamma1_termbar,psi);
+              rho_Hext,thermal2,p0_old,p0_old_cart,gamma1bar_new,delta_gamma1_termbar,psi);
 
     // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -776,7 +777,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
-                       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
+                       gamma1bar_new,p0_new_cart,delta_p_term,delta_chi,is_predictor);
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
@@ -834,7 +835,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
+    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge,p0_new_cart);
 
     if (evolve_base_state) {
 
@@ -885,6 +886,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                     r_cc_loc.dataPtr(),
                     r_edge_loc.dataPtr());
 
+        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
@@ -898,7 +901,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
 
         } else {
-            Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
             // compute gamma1bar^{(2)} and store it in gamma1bar_temp2
             MakeGamma1bar(s2, gamma1bar_temp2, p0_new_cart);
 
@@ -941,7 +943,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1,p0_new_cart);
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
@@ -960,7 +962,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(s2star,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2);
 
-        ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2);
+        ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2,p0_old_cart,p0_new_cart);
     }
 
     thermal_time += ParallelDescriptor::second() - thermal_time_start;
@@ -978,10 +980,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s2,p0_new,0);
+        TfromRhoP(s2,p0_new_cart,0);
     }
     else {
-        TfromRhoH(s2,p0_new);
+        TfromRhoH(s2,p0_new_cart);
     }
 
     misc_time += ParallelDescriptor::second() - misc_time_start;
@@ -998,7 +1000,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new_cart,0.5*dt,t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
@@ -1007,7 +1009,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     misc_time_start = ParallelDescriptor::second();
 
     if (evolve_base_state) {
-        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
         // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new_cart);
 
@@ -1042,12 +1043,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2);
 
-        MakeExplicitThermal(thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
+        MakeExplicitThermal(thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2,p0_new_cart,
                             temp_diffusion_formulation);
     }
 
     Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
+              rho_Hext,thermal2,p0_new,p0_new_cart,gamma1bar_new,delta_gamma1_termbar,psi);
 
     if (evolve_base_state) {
         Average(S_cc_new,Sbar,0);
@@ -1149,7 +1150,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             }
 
             CorrectRHCCforNodalProj(rhcc_for_nodalproj,rho0_new,beta0_nph,gamma1bar_new,
-                                    p0_new,delta_p_term);
+                                    p0_new_cart,delta_p_term);
         }
     }
 

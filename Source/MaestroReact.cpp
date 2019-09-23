@@ -12,7 +12,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 Vector<MultiFab>& rho_Hext,
                 Vector<MultiFab>& rho_omegadot,
                 Vector<MultiFab>& rho_Hnuc,
-                const RealVector& p0,
+                const Vector<MultiFab>& p0_cart,
                 const Real dt_in,
 		const Real time_in)
 {
@@ -55,7 +55,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
         // do the burning, update rho_omegadot and rho_Hnuc
         // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
-        Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in,time_in);
+        Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,dt_in,time_in);
 
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -89,10 +89,10 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s_out,p0);
+        TfromRhoP(s_out,p0_cart);
     }
     else {
-        TfromRhoH(s_out,p0);
+        TfromRhoH(s_out,p0_cart);
     }
 
 #ifdef AMREX_USE_CUDA
@@ -107,7 +107,6 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot,
                      Vector<MultiFab>& rho_Hnuc,
-                     const RealVector& p0,
                      const Real dt_in,
 		     const Real time_in)
 {

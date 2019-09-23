@@ -5,7 +5,7 @@ using namespace amrex;
 
 void
 Maestro::TfromRhoH (Vector<MultiFab>& scal,
-                    const RealVector& p0)
+                    const Vector<MultiFab>& p0_cart)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoH()",TfromRhoH);
@@ -15,14 +15,6 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
     // turn on GPU
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
-
-    Vector<MultiFab> p0_cart(finest_level+1);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-        p0_cart[lev].setVal(0.);
-    }
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -65,7 +57,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
 void
 Maestro::TfromRhoP (Vector<MultiFab>& scal,
-                    const RealVector& p0,
+                    const Vector<MultiFab>& p0_cart,
                     int updateRhoH)
 {
     // timer for profiling
@@ -76,14 +68,6 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     // turn on GPU
     if (not_launched) Gpu::setLaunchRegion(true);
 #endif
-
-    Vector<MultiFab> p0_cart(finest_level+1);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-        p0_cart[lev].setVal(0.);
-    }
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -186,20 +170,12 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 void
 Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
                            const Vector<MultiFab>& vel,
-                           const RealVector& p0,
+                           const Vector<MultiFab>& p0_cart,
                            const Vector<MultiFab>& w0cart,
                            Vector<MultiFab>& mach)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MachfromRhoH()",MachfromRhoH);
-
-    Vector<MultiFab> p0_cart(finest_level+1);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-        p0_cart[lev].setVal(0.);
-    }
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
 #ifdef AMREX_USE_CUDA
     auto not_launched = Gpu::notInLaunchRegion();
@@ -254,7 +230,6 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 
 void
 Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
-                     const RealVector& p0,
                      const Vector<MultiFab>& p0cart,
                      Vector<MultiFab>& cs)
 {
