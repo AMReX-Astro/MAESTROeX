@@ -182,8 +182,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                      sflux[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0); );
 
         // initialize umac
-        for (int d=0; d < AMREX_SPACEDIM; ++d)
+        for (int d=0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
+        }
+
+        w0_force_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
     }
 
 #if (AMREX_SPACEDIM == 3)
@@ -191,11 +194,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
         w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
         w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-    }
-    if (spherical == 1) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            w0_force_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-        }
     }
 #endif
 
@@ -219,7 +217,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
 
-    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt);
+    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
@@ -288,12 +286,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             w0mac[lev][d].setVal(0.);
         }
     }
-    if (spherical == 1) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            w0_force_cart[lev].setVal(0.);
-        }
-    }
 #endif
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_force_cart[lev].setVal(0.);
+    }
 
     if (evolve_base_state) {
 
@@ -307,26 +303,28 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
+        
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
                 etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
 
+        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
+        // put w0 on Cartesian edges
         if (spherical == 1) {
-            // put w0 on Cartesian edges
             MakeW0mac(w0mac);
-
-            // put w0_force on Cartesian cells
-            Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
         }
 
-    }
-    else {
+        // put w0_force on Cartesian cells
+        Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
+
+    } else {
         // these should have no effect if evolve_base_state = false
         std::fill(Sbar.begin(), Sbar.end(), 0.);
         std::fill(w0_force.begin(), w0_force.end(), 0.);
@@ -611,7 +609,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
@@ -725,16 +723,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             }
         }
 
+        base_time_start = ParallelDescriptor::second();
+
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
-
-        base_time_start = ParallelDescriptor::second();
 
         make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
                 rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
                 gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
                 etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
                 r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+
+        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -743,10 +743,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         if (spherical == 1) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
-
-            // put w0_force on Cartesian cells
-            Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
         }
+
+        // // put w0_force on Cartesian cells
+        Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -984,7 +984,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt);
+    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());

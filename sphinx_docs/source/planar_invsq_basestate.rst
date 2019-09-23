@@ -1,4 +1,4 @@
-.. _sec:planarinvsqgravity
+.. _sec:planarinvsqgravity:
 
 **********************************************************
 Modifications for a :math:`1/r^2` Plane-Parallel Basestate
@@ -102,7 +102,7 @@ Substituting in this expression gives our final result:
    = - \frac{2 w_0 \rho_0 g}{r} - g \frac{\partial \etarho}{\partial r}
 
 Uniform :math:`\dr` Discretization
-----------------------------
+----------------------------------
 
 Collecting all of the :math:`\dw` terms on the left side, our constraint equation
 appears as:
@@ -150,7 +150,7 @@ then:
     F_j &=&  -\frac{2}{r_{j-\myhalf}} (\rho_0 g)_{j-\half}   (\ow)_{j-\half} - \frac{g_{j-\half}}{\dr} \left[ \left( \etarho \right)_{j} - \left( \etarho \right)_{j-1} \right] \end{aligned}
 
 Non-Uniform :math:`\dr` Discretization
---------------------------------
+--------------------------------------
 
 \centering
 ![image](\planeinvsqfigpath/grid2){width="4in"}

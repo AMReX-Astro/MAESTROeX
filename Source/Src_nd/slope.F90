@@ -30,7 +30,7 @@ contains
 
     !$gpu
 
-    k = lo(3)
+    k = s_lo(3)
 
     if (slope_order .eq. 0) then
 
@@ -234,7 +234,7 @@ contains
 
     !$gpu
 
-    k = lo(3)
+    k = s_lo(3)
 
     if (slope_order .eq. 0) then
 

@@ -10,19 +10,17 @@ The base state evolves in response to heating and mixing in the star.
 The density evolution is governed by
 
 .. math::
-
-
    \frac{\partial \rho_0}{\partial t} = -
     \nablab \cdotb \left( \rho_0 w_0 \er \right)
    - \nablab \cdotb \left( \etarho \er \right)  ,
-   \label{eq:rho0upd_new}
+   :label: eq:rho0upd_new
 
 with
 
 .. math::
-
    \etarho(r) = \overline{\left(\rhop \Ubt \cdot \er \right)} = \frac{1}{A(\Omega_H)}
-    \int_{\Omega_H}  (\rhop \Ubt \cdot \er ) \; dA  , \label{eq:eta}
+    \int_{\Omega_H}  (\rhop \Ubt \cdot \er ) \; dA  ,
+   :label: eq:eta
 
 designed to keep the average value of the full density, :math:`\rho`, over a
 layer of constant radius in the star equal to :math:`\rho_0`. To complete
@@ -40,7 +38,7 @@ the multilevel paper, resulting in the following system
    - 4 \pi G \rho_0 \etarho \label{eq:dw0constraint}\end{aligned}
 
 In paper III, we introduced a mixing term, :math:`\etarho`, to the density
-evolution equation (eq. [`[eq:rho0upd_new] <#eq:rho0upd_new>`__]), with the objective of
+evolution equation (:eq:`eq:rho0upd_new`), with the objective of
 keeping the base state density equal to the average of the density
 over a layer. For a spherical base state, it is best to define the
 average in terms of spherical coordinates,
@@ -52,7 +50,13 @@ the spherical :math:`\theta` and :math:`\phi` angles at constant radius.
 
 Recall from Paper III that if initially :math:`\overline{\rho'} = 0`,
 there is no guarantee that :math:`\overline{\rho'} = 0` will hold at later
-time. To see this, recall equation (`[eq:Perturbational Density] <#eq:Perturbational Density>`__),
+time. To see this, start with the equation for the perturbational density
+
+.. math::
+   \frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' -
+     \rho'\nabla\cdot\Ub - \nabla\cdot\left(\rho_0\Ubt\right),
+   :label: eq:Perturbational Density
+
 written in a slightly different form:
 
 .. math:: \frac{\partial\rho'}{\partial t} + \nabla\cdot\left(\rho'\Ub\right) = -\nabla\cdot\left(\rho_0\Ubt\right).
@@ -91,7 +95,9 @@ and switching the order of operations as appropriate.
 
 In short,
 
-.. math:: \frac{\partial}{\partial t} \overline{\rho'} = - \nabla\cdot\left[\overline{\rho'\left(\Ub\cdot\eb_r\right)}\eb_r\right] = -\nabla\cdot\left(\etarho\eb_r\right), \label{eq:rhopbar}
+.. math::
+   \frac{\partial}{\partial t} \overline{\rho'} = - \nabla\cdot\left[\overline{\rho'\left(\Ub\cdot\eb_r\right)}\eb_r\right] = -\nabla\cdot\left(\etarho\eb_r\right),
+   :label: eq:rhopbar
 
 and thus, :math:`\etarho = \overline{\left(\rho'\Ub\cdot\eb_r\right)}`.
 
@@ -107,14 +113,14 @@ Therefore, we take a different approach. We compute :math:`\etarho` by
 constructing the quantity :math:`\rhop \Ubt \cdot \er` in each cell, and then
 use our average routine to construct a 1-d, cell-centered
 :math:`\eta_{\rho,r}` (this is essentially numerically solving the integral
-in Eq. [`[eq:eta] <#eq:eta>`__]). The edge-centered values of :math:`\etarho`,
+in :eq:`eq:eta`. The edge-centered values of :math:`\etarho`,
 :math:`\eta_{\rho,r+1/2}` are then constructed by simple
 averaging:
 
 .. math:: \eta_{\rho,r+1/2} = \frac{\eta_{\rho,r} + \eta_{\rho,r+1}}{2}  .
 
 Instead of differencing :math:`\eta_{\rho,r+1/2}` to construct the
-divergence, we instead use equation (\ `[eq:rhopbar] <#eq:rhopbar>`__) directly, by writing:
+divergence, we instead use :eq:`eq:rhopbar` directly, by writing:
 
 .. math::
 

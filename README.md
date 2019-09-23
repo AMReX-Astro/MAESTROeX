@@ -1,5 +1,7 @@
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Build Status](https://travis-ci.com/AMReX-Astro/MAESTROeX.svg?branch=development)](https://travis-ci.com/AMReX-Astro/MAESTROeX)
 
+[![AMReX](https://amrex-codes.github.io/badges/powered%20by-AMReX-red.svg)](https://amrex-codes.github.io)
+
 # MAESTROeX
 *a C++/F90 low Mach number stellar hydrodynamics code*
 
