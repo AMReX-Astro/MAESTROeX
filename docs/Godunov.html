@@ -726,13 +726,13 @@ the effects of corner coupling.</p>
 </ol>
 <ul>
 <li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a 1D extrapolation.</p>
-<div class="math notranslate nohighlight" id="equation-godunov-46">
-<span class="eqno">(204)<a class="headerlink" href="#equation-godunov-46" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
-s_{L,\ib-\half\eb_x} &amp;=&amp; s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n, \label{3D predict s to left}\\
-s_{R,\ib-\half\eb_x} &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n.\label{3D predict s to right}\end{aligned}\end{split}\]</div>
+<div class="math notranslate nohighlight" id="equation-3d-predict-s-to-left">
+<span class="eqno">(204)<a class="headerlink" href="#equation-3d-predict-s-to-left" title="Permalink to this equation">¶</a></span>\[s_{L,\ib-\half\eb_x} &amp;=&amp; s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n,\]</div>
+<div class="math notranslate nohighlight" id="equation-3d-predict-s-to-right">
+<span class="eqno">(205)<a class="headerlink" href="#equation-3d-predict-s-to-right" title="Permalink to this equation">¶</a></span>\[s_{R,\ib-\half\eb_x} &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n.\]</div>
 <p>Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-47">
-<span class="eqno">(205)<a class="headerlink" href="#equation-godunov-47" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x} =
+<div class="math notranslate nohighlight" id="equation-godunov-46">
+<span class="eqno">(206)<a class="headerlink" href="#equation-godunov-46" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x} + s_{R,\ib-\half\eb_x}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
 s_{L,\ib-\half\eb_x}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
@@ -746,20 +746,20 @@ The notation <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^{x|
 that has been updated to account for the transverse derivatives in
 the <span class="math notranslate nohighlight">\(y\)</span>-direction”.</p>
 <p><strong>if</strong> is_conservative <strong>then</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-48">
-<span class="eqno">(206)<a class="headerlink" href="#equation-godunov-48" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-47">
+<span class="eqno">(207)<a class="headerlink" href="#equation-godunov-47" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{L,\ib-\half\eb_x} - \frac{\dt}{3h}\left[(sv^{\mac})_{\ib-\eb_x+\half\eb_y}-(sv^{\mac})_{\ib-\eb_x-\half\eb_y}\right], \\
 s_{R,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{R,\ib-\half\eb_x} - \frac{\dt}{3h}\left[(sv^{\mac})_{\ib+\half\eb_y}-(sv^{\mac})_{\ib-\half\eb_y}\right].\end{aligned}\end{split}\]</div>
 <p><strong>else</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-49">
-<span class="eqno">(207)<a class="headerlink" href="#equation-godunov-49" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-48">
+<span class="eqno">(208)<a class="headerlink" href="#equation-godunov-48" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{L,\ib-\half\eb_x} - \frac{\dt}{6h}\left(v_{\ib-\eb_x+\half\eb_y}^{\mac} + v_{\ib-\eb_x-\half\eb_y}^{\mac}\right)\left(s_{\ib-\eb_x+\half\eb_y} - s_{\ib-\eb_x-\half\eb_y}\right), \\
 s_{R,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{R,\ib-\half\eb_x} - \frac{\dt}{6h}\left(v_{\ib+\half\eb_y}^{\mac} + v_{\ib-\half\eb_y}^{\mac}\right)\left(s_{\ib+\half\eb_y} - s_{\ib-\half\eb_y}\right).\end{aligned}\end{split}\]</div>
 <p><strong>end if</strong></p>
 </li>
 <li><p>Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-50">
-<span class="eqno">(208)<a class="headerlink" href="#equation-godunov-50" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{x|y} =
+<div class="math notranslate nohighlight" id="equation-godunov-49">
+<span class="eqno">(209)<a class="headerlink" href="#equation-godunov-49" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{x|y} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x}^{x|y} + s_{R,\ib-\half\eb_x}^{x|y}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
 s_{L,\ib-\half\eb_x}^{x|y}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
@@ -773,8 +773,8 @@ s_{R,\ib-\half\eb_x}^{x|y}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0.
 <li><p>Update prediction of <span class="math notranslate nohighlight">\(s\)</span> to r-faces by accounting for y-derivatives.</p></li>
 <li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a full-dimensional extrapolation.</p>
 <p><strong>if</strong> is_conservative <strong>then</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-51">
-<span class="eqno">(209)<a class="headerlink" href="#equation-godunov-51" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-50">
+<span class="eqno">(210)<a class="headerlink" href="#equation-godunov-50" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} = s_{L,\ib-\half\eb_x} &amp;-&amp; \frac{\dt}{2h}\left[(s^{y|r}v^{\mac})_{\ib-\eb_x+\half\eb_y}-({s^{y|r}v^{\mac})_{\ib-\eb_x-\half\eb_y}}\right] \nonumber \\
 &amp;-&amp; \frac{\dt}{2h}\left[(s^{r|y}w^{\mac})_{\ib-\eb_x+\half\eb_r}-({s^{r|y}w^{\mac})_{\ib-\eb_x-\half\eb_r}}\right] \nonumber \\
 &amp;-&amp; \frac{\dt}{2h}s_{\ib-\eb_x}\left(u_{\ib-\half\eb_x}^{\mac}-u_{\ib-\frac{3}{2}\eb_x}^{\mac}\right) + \frac{\dt}{2}f_{\ib-\eb_x}, \\
@@ -782,8 +782,8 @@ s_{R,\ib-\half\eb_x}^{\edge} = s_{R,\ib-\half\eb_x} &amp;-&amp; \frac{\dt}{2h}\l
 &amp;-&amp; \frac{\dt}{2h}\left[(s^{r|y}w^{\mac})_{\ib+\half\eb_r}-({s^{r|y}w^{\mac})_{\ib-\half\eb_r}}\right] \nonumber \\
 &amp;-&amp; \frac{\dt}{2h}s_{\ib}\left(u_{\ib+\half\eb_x}^{\mac}-u_{\ib-\half\eb_x}^{\mac}\right) + \frac{\dt}{2}f_{\ib}.\end{aligned}\end{split}\]</div>
 <p><strong>else</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-52">
-<span class="eqno">(210)<a class="headerlink" href="#equation-godunov-52" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-51">
+<span class="eqno">(211)<a class="headerlink" href="#equation-godunov-51" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} = s_{L,\ib-\half\eb_x} &amp;-&amp; \frac{\dt}{4h}\left(v_{\ib-\eb_x+\half\eb_y}^{\mac}+v_{\ib-\eb_x-\half\eb_y}^{\mac}\right)\left(s_{\ib-\eb_x+\half\eb_y}^{y|r}-s_{\ib-\eb_x-\half\eb_y}^{y|r}\right) \nonumber \\
 &amp;-&amp; \frac{\dt}{4h}\left(w_{\ib-\eb_x+\half\eb_r}^{\mac}+w_{\ib-\eb_x-\half\eb_r}^{\mac}\right)\left(s_{\ib-\eb_x+\half\eb_r}^{r|y}-s_{\ib-\eb_x-\half\eb_r}^{r|y}\right) + \frac{\dt}{2}f_{\ib-\eb_x}, \nonumber \\
 &amp;&amp; \\
@@ -793,8 +793,8 @@ s_{R,\ib-\half\eb_x}^{\edge} = s_{R,\ib-\half\eb_x} &amp;-&amp; \frac{\dt}{4h}\l
 </li>
 <li><p>Account for the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term:</p>
 <p><strong>if</strong> is_vel <strong>and</strong> comp = 2 <strong>then</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-53">
-<span class="eqno">(211)<a class="headerlink" href="#equation-godunov-53" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-52">
+<span class="eqno">(212)<a class="headerlink" href="#equation-godunov-52" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_x}^{\edge} -
 \frac{\dt}{4h}\left(\wt^{\mac}_{\ib-\eb_x+\half\eb_r} + \wt^{\mac}_{\ib-\eb_x-\half\eb_r}\right)\left(w_{0,\ib+\half\eb_r}-w_{0,\ib-\half\eb_r}\right) \\
 s_{R,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{R,\ib-\half\eb_x}^{\edge} -
@@ -802,8 +802,8 @@ s_{R,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{R,\ib-\half\eb_x}^{\edge} -
 <p><strong>end if</strong></p>
 </li>
 <li><p>Upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-54">
-<span class="eqno">(212)<a class="headerlink" href="#equation-godunov-54" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{\edge} =
+<div class="math notranslate nohighlight" id="equation-godunov-53">
+<span class="eqno">(213)<a class="headerlink" href="#equation-godunov-53" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{\edge} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x}^{\edge} + s_{R,\ib-\half\eb_x}^{\edge}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
 s_{L,\ib-\half\eb_x}^{\edge}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
@@ -829,17 +829,17 @@ the full velocity.</p>
 <span id="id8"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-6" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>We do a 1D Taylor series extrapolation to get both components of velocity at the x-face:</p>
+<div class="math notranslate nohighlight" id="equation-varden-u-l-1d">
+<span class="eqno">(214)<a class="headerlink" href="#equation-varden-u-l-1d" title="Permalink to this equation">¶</a></span>\[u_{L,\ib-\half\eb_x}^{1D} = u_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,u_{\ib-\eb_x})\right]\Delta_xu_{\ib-\eb_x},\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-54">
+<span class="eqno">(215)<a class="headerlink" href="#equation-godunov-54" title="Permalink to this equation">¶</a></span>\[u_{R,\ib-\half\eb_x}^{1D} = u_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,u_{\ib})\right]\Delta_xu_{\ib} .\]</div>
 <div class="math notranslate nohighlight" id="equation-godunov-55">
-<span class="eqno">(213)<a class="headerlink" href="#equation-godunov-55" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
-u_{L,\ib-\half\eb_x}^{1D} &amp;=&amp; u_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,u_{\ib-\eb_x})\right]\Delta_xu_{\ib-\eb_x}, \label{varden U_L^1D} \\
-u_{R,\ib-\half\eb_x}^{1D} &amp;=&amp; u_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,u_{\ib})\right]\Delta_xu_{\ib}.\end{aligned}\end{split}\]</div>
+<span class="eqno">(216)<a class="headerlink" href="#equation-godunov-55" title="Permalink to this equation">¶</a></span>\[v_{L,\ib-\half\eb_x}^{1D} = v_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,v_{\ib-\eb_x})\right]\Delta_xv_{\ib-\eb_x},\]</div>
 <div class="math notranslate nohighlight" id="equation-godunov-56">
-<span class="eqno">(214)<a class="headerlink" href="#equation-godunov-56" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
-v_{L,\ib-\half\eb_x}^{1D} &amp;=&amp; v_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,v_{\ib-\eb_x})\right]\Delta_xv_{\ib-\eb_x}, \\
-v_{R,\ib-\half\eb_x}^{1D} &amp;=&amp; v_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,v_{\ib})\right]\Delta_xv_{\ib}.\end{aligned}\end{split}\]</div>
+<span class="eqno">(217)<a class="headerlink" href="#equation-godunov-56" title="Permalink to this equation">¶</a></span>\[v_{R,\ib-\half\eb_x}^{1D} &amp;=&amp; v_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,v_{\ib})\right]\Delta_xv_{\ib}.\]</div>
 <p>We obtain the normal velocity using the Riemann problem:</p>
 <div class="math notranslate nohighlight" id="equation-godunov-57">
-<span class="eqno">(215)<a class="headerlink" href="#equation-godunov-57" title="Permalink to this equation">¶</a></span>\[\begin{split}u_{\ib-\half\eb_x}^{1D} =
+<span class="eqno">(218)<a class="headerlink" href="#equation-godunov-57" title="Permalink to this equation">¶</a></span>\[\begin{split}u_{\ib-\half\eb_x}^{1D} =
 \begin{cases}
 0, &amp; \left(u_{L,\ib-\half\eb_x}^{1D} \le 0 ~~ {\rm AND} ~~ u_{R,\ib-\half\eb_x}^{1D} \ge 0\right) ~~ {\rm OR} ~~ \left|u_{L,\ib-\half\eb_x}^{1D} + u_{R,\ib-\half\eb_x}^{1D}\right| &lt; \epsilon, \\
 u_{L,\ib-\half\eb_x}^{1D}, &amp; u_{L,\ib-\half\eb_x}^{1D} + u_{R,\ib-\half\eb_x}^{1D} &gt; 0, \\
@@ -847,30 +847,30 @@ u_{R,\ib-\half\eb_x}^{1D}, &amp; u_{L,\ib-\half\eb_x}^{1D} + u_{R,\ib-\half\eb_x
 \end{cases}\end{split}\]</div>
 <p>We obtain the transverse velocity by upwinding based on
 <span class="math notranslate nohighlight">\(u_{\ib-\half\eb_x}^{1D}\)</span>:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-58">
-<span class="eqno">(216)<a class="headerlink" href="#equation-godunov-58" title="Permalink to this equation">¶</a></span>\[\begin{split}v_{\ib-\half\eb_x}^{1D} =
+<div class="math notranslate nohighlight" id="equation-transverse-velocity-riemann-problem">
+<span class="eqno">(219)<a class="headerlink" href="#equation-transverse-velocity-riemann-problem" title="Permalink to this equation">¶</a></span>\[\begin{split}v_{\ib-\half\eb_x}^{1D} =
 \begin{cases}
 \half\left(v_{L,\ib-\half\eb_x}^{1D} + v_{R,\ib-\half\eb_x}^{1D}\right), &amp; \left|u_{\ib-\half\eb_x}^{1D}\right| &lt; \epsilon \\
 v_{L,\ib-\half\eb_x}^{1D}, &amp; u_{\ib-\half\eb_x}^{1D} &gt; 0, \\
 v_{R,\ib-\half\eb_x}^{1D}, &amp; u_{\ib-\half\eb_x}^{1D} &lt; 0.
-\end{cases}\label{Transverse Velocity Riemann Problem}\end{split}\]</div>
+\end{cases}\end{split}\]</div>
 </li>
 <li><p>We perform analogous operations to compute both components of velocity
 at the y-faces, <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_y}^{1D}\)</span>.</p></li>
 <li><p>Now we do a full-dimensional extrapolation to get the MAC velocity at
 the x-faces (note that we only compute the normal components):</p>
-<div class="math notranslate nohighlight" id="equation-godunov-59">
-<span class="eqno">(217)<a class="headerlink" href="#equation-godunov-59" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-58">
+<span class="eqno">(220)<a class="headerlink" href="#equation-godunov-58" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 u_{L,\ib-\half\eb_x}^{\mac,*} &amp;=&amp; u_{L,\ib-\half\eb_x}^{1D} - \frac{\dt}{4h}\left(v_{\ib-\eb_x+\half\eb_y}^{1D}+v_{\ib-\eb_x-\half\eb_y}^{1D}\right)\left(u_{\ib-\eb_x+\half\eb_y}^{1D} - u_{\ib-\eb_x-\half\eb_y}^{1D}\right) + \frac{\dt}{2}f_{u,\ib-\eb_x}, \\
 u_{R,\ib-\half\eb_x}^{\mac,*} &amp;=&amp; u_{R,\ib-\half\eb_x}^{1D} - \frac{\dt}{4h}\left(v_{\ib+\half\eb_y}^{1D}+v_{\ib-\half\eb_y}^{1D}\right)\left(u_{\ib+\half\eb_y}^{1D} - u_{\ib-\half\eb_y}^{1D}\right) + \frac{\dt}{2}f_{u,\ib}.\end{aligned}\end{split}\]</div>
 <p>Then we solve a Riemann problem:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-60">
-<span class="eqno">(218)<a class="headerlink" href="#equation-godunov-60" title="Permalink to this equation">¶</a></span>\[\begin{split}u_{\ib-\half\eb_x}^{\mac,*} =
+<div class="math notranslate nohighlight" id="equation-umac-riemann-problem">
+<span class="eqno">(221)<a class="headerlink" href="#equation-umac-riemann-problem" title="Permalink to this equation">¶</a></span>\[\begin{split}u_{\ib-\half\eb_x}^{\mac,*} =
 \begin{cases}
 0, &amp; \left(u_{L,\ib-\half\eb_x}^{\mac,*} \le 0 ~~ {\rm AND} ~~ u_{R,\ib-\half\eb_x}^{\mac,*} \ge 0\right) ~~ {\rm OR} ~~ \left|u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*}\right| &lt; \epsilon, \\
 u_{L,\ib-\half\eb_x}^{\mac,*}, &amp; u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} &gt; 0, \\
 u_{R,\ib-\half\eb_x}^{\mac,*}, &amp; u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} &lt; 0.
-\end{cases}\label{umac Riemann Problem}\end{split}\]</div>
+\end{cases}\end{split}\]</div>
 </li>
 <li><p>We perform analogous operations to compute the normal velocity at the
 y-faces, <span class="math notranslate nohighlight">\(v^{\mac,*}_{\ib-\half\eb_y}\)</span>.</p></li>
@@ -880,19 +880,18 @@ y-faces, <span class="math notranslate nohighlight">\(v^{\mac,*}_{\ib-\half\eb_y
 <span id="id9"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-7" title="Permalink to this headline">¶</a></h3>
 <p>This is more complicated than the 2D case because we include corner
 coupling. We compute <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_x}^{1D},
-\Ub_{\ib-\half\eb_y}^{1D}\)</span>, and <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_z}^{1D}\)</span> in an
-analogous manner as equations (<a class="reference external" href="#vardenU_L^1D">[varden U_L^1D]</a>)-(<a class="reference external" href="#TransverseVelocityRiemannProblem">[Transverse
-Velocity Riemann Problem]</a>). Then we compute an intermediate state,
+\Ub_{\ib-\half\eb_y}^{1D}\)</span>, and <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_z}^{1D}\)</span> in
+an analogous manner as <code class="xref eq docutils literal notranslate"><span class="pre">varden</span> <span class="pre">U_L^1D]</span></code>-<a class="reference internal" href="#equation-transverse-velocity-riemann-problem">Eq.219</a>. Then we compute an intermediate state,
 <span class="math notranslate nohighlight">\(u_{\ib-\half\eb_y}^{y|z}\)</span>, which is described as “state
-<span class="math notranslate nohighlight">\(u_{\ib-\half\eb_y}^{1D}\)</span> that has been updated to account for the
-transverse derivatives in the z direction”, using:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-61">
-<span class="eqno">(219)<a class="headerlink" href="#equation-godunov-61" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<span class="math notranslate nohighlight">\(u_{\ib-\half\eb_y}^{1D}\)</span> that has been updated to account for
+the transverse derivatives in the z direction”, using:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-59">
+<span class="eqno">(222)<a class="headerlink" href="#equation-godunov-59" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 u_{L,\ib-\half\eb_y}^{y|z} &amp;=&amp; u_{L,\ib-\half\eb_y}^{1D} - \frac{\dt}{6h}\left(w_{\ib-\eb_y+\half\eb_z}^{1D}+w_{\ib-\eb_y-\half\eb_z}^{1D}\right)\left(u_{\ib-\eb_y+\half\eb_z}^{1D}-u_{\ib-\eb_y-\half\eb_z}^{1D}\right), \\
 u_{R,\ib-\half\eb_y}^{y|z} &amp;=&amp; u_{R,\ib-\half\eb_y}^{1D} - \frac{\dt}{6h}\left(w_{\ib+\half\eb_z}^{1D}+w_{\ib-\half\eb_z}^{1D}\right)\left(u_{\ib+\half\eb_z}^{1D}-u_{\ib-\half\eb_z}^{1D}\right).\end{aligned}\end{split}\]</div>
 <p>Then upwind based on <span class="math notranslate nohighlight">\(v_{\ib-\half\eb_y}^{1D}\)</span>:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-62">
-<span class="eqno">(220)<a class="headerlink" href="#equation-godunov-62" title="Permalink to this equation">¶</a></span>\[\begin{split}u_{\ib-\half\eb_y}^{y|z} =
+<div class="math notranslate nohighlight" id="equation-godunov-60">
+<span class="eqno">(223)<a class="headerlink" href="#equation-godunov-60" title="Permalink to this equation">¶</a></span>\[\begin{split}u_{\ib-\half\eb_y}^{y|z} =
 \begin{cases}
 \half\left(u_{L,\ib-\half\eb_y}^{y|z} + u_{R,\ib-\half\eb_y}^{y|z}\right), &amp; \left|v_{\ib-\half\eb_y}^{1D}\right| &lt; \epsilon \\
 u_{L,\ib-\half\eb_y}^{y|z}, &amp; v_{\ib-\half\eb_y}^{1D} &gt; 0, \\
@@ -903,14 +902,13 @@ u_{R,\ib-\half\eb_y}^{y|z}, &amp; v_{\ib-\half\eb_y}^{1D} &lt; 0.
 v_{\ib-\half\eb_z}^{z|x}, w_{\ib-\half\eb_x}^{x|y}\)</span>, and
 <span class="math notranslate nohighlight">\(w_{\ib-\half\eb_y}^{y|x}\)</span>. Then we do a full-dimensional
 extrapolation to get the MAC velocities at normal faces:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-63">
-<span class="eqno">(221)<a class="headerlink" href="#equation-godunov-63" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-61">
+<span class="eqno">(224)<a class="headerlink" href="#equation-godunov-61" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 u_{L,\ib-\half\eb_x}^{\mac,*} = u_{L,\ib-\half\eb_x}^{1D} &amp;-&amp; \frac{\dt}{4h}\left(v_{\ib-\eb_x+\half\eb_y}^{1D}+v_{\ib-\eb_x-\half\eb_y}^{1D}\right)\left(u_{\ib-\eb_x+\half\eb_y}^{y|z}-u_{\ib-\eb_x-\half\eb_y}^{y|z}\right) \nonumber \\
 &amp;-&amp; \frac{\dt}{4h}\left(w_{\ib-\eb_x+\half\eb_z}^{1D}+w_{\ib-\eb_x-\half\eb_z}^{1D}\right)\left(u_{\ib-\eb_x+\half\eb_z}^{z|y}-u_{\ib-\eb_x-\half\eb_z}^{z|y}\right) + \frac{\dt}{2}f_{u,\ib-\eb_x}, \\
 u_{R,\ib-\half\eb_x}^{\mac,*} = u_{R,\ib-\half\eb_x}^{1D} &amp;-&amp; \frac{\dt}{4h}\left(v_{\ib+\half\eb_y}^{1D}+v_{\ib-\half\eb_y}^{1D}\right)\left(u_{\ib+\half\eb_y}^{y|z}-u_{\ib-\half\eb_y}^{y|z}\right) \nonumber \\
 &amp;-&amp; \frac{\dt}{4h}\left(w_{\ib+\half\eb_z}^{1D}+w_{\ib-\half\eb_z}^{1D}\right)\left(u_{\ib+\half\eb_z}^{z|y}-u_{\ib-\half\eb_z}^{z|y}\right) + \frac{\dt}{2}f_{u,\ib}.\end{aligned}\end{split}\]</div>
-<p>Then we use the Riemann solver given above for the 2D case (equation
-[<a class="reference external" href="#umacRiemannProblem">[umac Riemann Problem]</a>]) to compute
+<p>Then we use the Riemann solver given above for the 2D case (<a class="reference internal" href="#equation-umac-riemann-problem">Eq.221</a>) to compute
 <span class="math notranslate nohighlight">\(u_{\ib-\half\eb_x}^{\mac,*}\)</span>. We use an analogous procedure to
 obtain <span class="math notranslate nohighlight">\(v_{\ib-\half\eb_y}^{\mac,*}\)</span> and
 <span class="math notranslate nohighlight">\(w_{\ib-\half\eb_z}^{\mac,*}\)</span>.</p>
@@ -927,13 +925,13 @@ formulation. Here, <span class="math notranslate nohighlight">\(s\)</span> is us
 <div class="section" id="d-cartesian-case-8">
 <span id="id10"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-8" title="Permalink to this headline">¶</a></h3>
 <p>The 1D extrapolation is:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-64">
-<span class="eqno">(222)<a class="headerlink" href="#equation-godunov-64" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
-s_{L,\ib-\half\eb_x}^{1D} &amp;=&amp; s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n, \label{varden s_L^1D}\\
-s_{R,\ib-\half\eb_x}^{1D} &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n. \label{varden s_R^1D}\end{aligned}\end{split}\]</div>
+<div class="math notranslate nohighlight" id="equation-varden-s-l-1d">
+<span class="eqno">(225)<a class="headerlink" href="#equation-varden-s-l-1d" title="Permalink to this equation">¶</a></span>\[s_{L,\ib-\half\eb_x}^{1D} = s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n,\]</div>
+<div class="math notranslate nohighlight" id="equation-varden-s-r-1d">
+<span class="eqno">(226)<a class="headerlink" href="#equation-varden-s-r-1d" title="Permalink to this equation">¶</a></span>\[s_{R,\ib-\half\eb_x}^{1D} = s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n.\]</div>
 <p>Then we upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-65">
-<span class="eqno">(223)<a class="headerlink" href="#equation-godunov-65" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{1D} =
+<div class="math notranslate nohighlight" id="equation-godunov-62">
+<span class="eqno">(227)<a class="headerlink" href="#equation-godunov-62" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{1D} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x}^{1D} + s_{R,\ib-\half\eb_x}^{1D}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
 s_{L,\ib-\half\eb_x}^{1D}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
@@ -942,20 +940,20 @@ s_{R,\ib-\half\eb_x}^{1D}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0. \\
 <p>We use an analogous procedure to obtain <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^{1D}\)</span>.
 Now we do a full-dimensional extrapolation of <span class="math notranslate nohighlight">\(s\)</span> to each face. The
 extrapolation of a “non-conserved” <span class="math notranslate nohighlight">\(s\)</span> to x-faces is:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-66">
-<span class="eqno">(224)<a class="headerlink" href="#equation-godunov-66" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-63">
+<span class="eqno">(228)<a class="headerlink" href="#equation-godunov-63" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{L,\ib-\half\eb_x}^{1D} - \frac{\dt}{4h}\left(v_{\ib-\eb_x+\half\eb_y}^{\mac}+v_{\ib-\eb_x-\half\eb_y}^{\mac}\right)\left(s_{\ib-\eb_x+\half\eb_y}^{1D} - s_{\ib-\eb_x-\half\eb_y}^{1D}\right) + \frac{\dt}{2}f_{s,\ib-\eb_x}, \\
 s_{R,\ib-\half\eb_x}^{\edge} &amp;=&amp; s_{R,\ib-\half\eb_x}^{1D} - \frac{\dt}{4h}\left(v_{\ib+\half\eb_y}^{\mac}+v_{\ib-\half\eb_y}^{\mac}\right)\left(s_{\ib+\half\eb_y}^{1D} - s_{\ib-\half\eb_y}^{1D}\right) + \frac{\dt}{2}f_{s,\ib}.\end{aligned}\end{split}\]</div>
 <p>The extrapolation of a “conserved” <span class="math notranslate nohighlight">\(s\)</span> to x-faces is:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-67">
-<span class="eqno">(225)<a class="headerlink" href="#equation-godunov-67" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-64">
+<span class="eqno">(229)<a class="headerlink" href="#equation-godunov-64" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} = s_{L,\ib-\half\eb_x}^{1D} &amp;-&amp; \frac{\dt}{2h}\left[(s^{1D} v^{\mac})_{\ib-\eb_x+\half\eb_y} - (s^{1D} v^{\mac})_{\ib-\eb_x-\half\eb_y}\right] \nonumber \\
 &amp;-&amp; \frac{\dt}{2}s_{\ib-\eb_x}(\nabla\cdot\Ub^{\mac})_{\ib-\eb_x} + \frac{\dt}{2h}s_{\ib-\eb_x}\left(v_{\ib-\eb_x+\half\eb_y}^{\mac} - v_{\ib-\eb_x-\half\eb_y}^{\mac}\right) + \frac{\dt}{2}f_{s,\ib-\eb_x}, \\
 s_{R,\ib-\half\eb_x}^{\edge} = s_{R,\ib-\half\eb_x}^{1D} &amp;-&amp; \frac{\dt}{2h}\left[(s^{1D} v^{\mac})_{\ib+\half\eb_y} - (s^{1D} v^{\mac})_{\ib-\half\eb_y}\right] \nonumber \\
 &amp;-&amp; \frac{\dt}{2}s_{\ib}(\nabla\cdot\Ub^{\mac})_{\ib} + \frac{\dt}{2h}s_{\ib}\left(v_{\ib+\half\eb_y}^{\mac} - v_{\ib-\half\eb_y}^{\mac}\right) + \frac{\dt}{2}f_{s,\ib}.\end{aligned}\end{split}\]</div>
 <p>Then we upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>.</p>
-<div class="math notranslate nohighlight" id="equation-godunov-68">
-<span class="eqno">(226)<a class="headerlink" href="#equation-godunov-68" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{\edge} =
+<div class="math notranslate nohighlight" id="equation-godunov-65">
+<span class="eqno">(230)<a class="headerlink" href="#equation-godunov-65" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{\edge} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x}^{\edge} + s_{R,\ib-\half\eb_x}^{\edge}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
 s_{L,\ib-\half\eb_x}^{\edge}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
@@ -968,24 +966,23 @@ s_{R,\ib-\half\eb_x}^{\edge}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0.
 <p>This is more complicated than the 2D case because we include corner
 coupling. We first compute <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^{1D}\)</span>,
 <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^{1D}\)</span>, and <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_z}^{1D}\)</span> in an
-analogous manner to equations (<a class="reference external" href="#vardens_L^1D">[varden s_L^1D]</a>) and
-(<a class="reference external" href="#vardens_R^1D">[varden s_R^1D]</a>). Then we compute six intermediate states,
+analogous manner to <a class="reference internal" href="#equation-varden-s-l-1d">Eq.225</a> and <a class="reference internal" href="#equation-varden-s-r-1d">Eq.226</a>. Then we compute six intermediate states,
 <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^{x|y}, s_{\ib-\half\eb_x}^{x|z},
 s_{\ib-\half\eb_y}^{y|x}, s_{\ib-\half\eb_y}^{y|z},
 s_{\ib-\half\eb_z}^{z|x}\)</span>, and <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_z}^{z|y}\)</span>. For the
 “non-conservative case”, we use, for example:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-69">
-<span class="eqno">(227)<a class="headerlink" href="#equation-godunov-69" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-66">
+<span class="eqno">(231)<a class="headerlink" href="#equation-godunov-66" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{L,\ib-\half\eb_x}^{1D} - \frac{\dt}{6h}\left(v_{\ib-\eb_x+\half\eb_y}^{\mac} + v_{\ib-\eb_x-\half\eb_y}^{\mac}\right)\left(s_{\ib-\eb_x+\half\eb_y}^{1D} - s_{\ib-\eb_x-\half\eb_y}^{1D}\right), \\
 s_{R,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{R,\ib-\half\eb_x}^{1D} - \frac{\dt}{6h}\left(v_{\ib+\half\eb_y}^{\mac} + v_{\ib-\half\eb_y}^{\mac}\right)\left(s_{\ib+\half\eb_y}^{1D} - s_{\ib-\half\eb_y}^{1D}\right).\end{aligned}\end{split}\]</div>
 <p>For the “conservative” case, we use, for example:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-70">
-<span class="eqno">(228)<a class="headerlink" href="#equation-godunov-70" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-67">
+<span class="eqno">(232)<a class="headerlink" href="#equation-godunov-67" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{L,\ib-\half\eb_x}^{1D} - \frac{\dt}{3h}\left[(sv^{\mac})_{\ib-\eb_x+\half\eb_y}-(sv^{\mac})_{\ib-\eb_x-\half\eb_y}\right], \\
 s_{R,\ib-\half\eb_x}^{x|y} &amp;=&amp; s_{R,\ib-\half\eb_x}^{1D} - \frac{\dt}{3h}\left[(sv^{\mac})_{\ib+\half\eb_y}-(sv^{\mac})_{\ib-\half\eb_y}\right].\end{aligned}\end{split}\]</div>
 <p>Then we upwind based on <span class="math notranslate nohighlight">\(u^{\mac}\)</span>:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-71">
-<span class="eqno">(229)<a class="headerlink" href="#equation-godunov-71" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{x|y} =
+<div class="math notranslate nohighlight" id="equation-godunov-68">
+<span class="eqno">(233)<a class="headerlink" href="#equation-godunov-68" title="Permalink to this equation">¶</a></span>\[\begin{split}s_{\ib-\half\eb_x}^{x|y} =
 \begin{cases}
 \half\left(s_{L,\ib-\half\eb_x}^{x|y} + s_{R,\ib-\half\eb_x}^{x|y}\right), &amp; \left|u^{\mac}_{\ib-\half\eb_x}\right| &lt; \epsilon \\
 s_{L,\ib-\half\eb_x}^{x|y}, &amp; u^{\mac}_{\ib-\half\eb_x} &gt; 0, \\
@@ -994,8 +991,8 @@ s_{R,\ib-\half\eb_x}^{x|y}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0.
 <p>We use an analogous procedure to compute the other five intermediate
 states. Now we do a full-dimensional extrapolation of <span class="math notranslate nohighlight">\(s\)</span> to each
 face. The extrapolation of a “non-conserved” <span class="math notranslate nohighlight">\(s\)</span> to x-faces is:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-72">
-<span class="eqno">(230)<a class="headerlink" href="#equation-godunov-72" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-69">
+<span class="eqno">(234)<a class="headerlink" href="#equation-godunov-69" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} = s_{L,\ib-\half\eb_x}^{1D} &amp;-&amp; \frac{\dt}{4h}\left(v_{\ib-\eb_x+\half\eb_y}^{\mac}+v_{\ib-\eb_x-\half\eb_y}^{\mac}\right)\left(s_{\ib-\eb_x+\half\eb_y}^{y|z}-s_{\ib-\eb_x-\half\eb_y}^{y|z}\right) \nonumber \\
 &amp;-&amp; \frac{\dt}{4h}\left(w_{\ib-\eb_x+\half\eb_z}^{\mac}+w_{\ib-\eb_x-\half\eb_z}^{\mac}\right)\left(s_{\ib-\eb_x+\half\eb_z}^{z|y}-s_{\ib-\eb_x-\half\eb_z}^{z|y}\right) \nonumber \\
 &amp;+&amp; \frac{\dt}{2}f_{s,\ib-\eb_x}, \\
@@ -1003,8 +1000,8 @@ s_{R,\ib-\half\eb_x}^{\edge} = s_{R,\ib-\half\eb_x}^{1D} &amp;-&amp; \frac{\dt}{
 &amp;-&amp; \frac{\dt}{4h}\left(w_{\ib+\half\eb_z}^{\mac}+w_{\ib-\half\eb_z}^{\mac}\right)\left(s_{\ib+\half\eb_z}^{z|y}-s_{\ib-\half\eb_z}^{z|y}\right) \nonumber \\
 &amp;+&amp; \frac{\dt}{2}f_{s,\ib}.\end{aligned}\end{split}\]</div>
 <p>The extrapolation of a “conserved” <span class="math notranslate nohighlight">\(s\)</span> to x-faces is:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-73">
-<span class="eqno">(231)<a class="headerlink" href="#equation-godunov-73" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-70">
+<span class="eqno">(235)<a class="headerlink" href="#equation-godunov-70" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,\ib-\half\eb_x}^{\edge} = s_{L,\ib-\half\eb_x}^{1D} &amp;-&amp; \frac{\dt}{2h}\left[(s^{y|z}v^{\mac})_{\ib-\eb_x+\half\eb_y}-({s^{y|z}v^{\mac})_{\ib-\eb_x-\half\eb_y}}\right] \nonumber \\
 &amp;-&amp; \frac{\dt}{2h}\left[(s^{z|y}w^{\mac})_{\ib-\eb_x+\half\eb_z}-({s^{z|y}w^{\mac})_{\ib-\eb_x-\half\eb_z}}\right] \nonumber \\
 &amp;-&amp; \frac{\dt}{2}s_{\ib-\eb_x}(\nabla\cdot\Ub^{\mac})_{\ib-\eb_x} \nonumber \\
@@ -1025,28 +1022,28 @@ We use an analogous procedure to compute both
 <h2>ESTATE_FPU in GODUNOV_2D/3D.f<a class="headerlink" href="#estate-fpu-in-godunov-2d-3d-f" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p>First, the normal predictor.</p>
-<div class="math notranslate nohighlight" id="equation-godunov-74">
-<span class="eqno">(232)<a class="headerlink" href="#equation-godunov-74" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-71">
+<span class="eqno">(236)<a class="headerlink" href="#equation-godunov-71" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_L^x &amp;=&amp; s_{\ib-\eb_x} + \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \underbrace{\frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x}}_{\text{IF USE\_MINION}} \\
 s_R^x &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \underbrace{\frac{\dt}{2}\text{TFORCES}_{\ib}}_{\text{IF USE\_MINION}}\end{aligned}\end{split}\]</div>
 <p><strong>If</strong> USE_MINION <strong>and</strong> ICONSERVE <strong>then:</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-75">
-<span class="eqno">(233)<a class="headerlink" href="#equation-godunov-75" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-72">
+<span class="eqno">(237)<a class="headerlink" href="#equation-godunov-72" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_L^x &amp;=&amp; s_L^x - \frac{\dt}{2}s_{\ib-\eb_x}\text{DIVU}_{\ib-\eb_x} \\
 s_R^x &amp;=&amp; s_R^x - \frac{\dt}{2}s_{\ib}\text{DIVU}_{\ib}\end{aligned}\end{split}\]</div>
 <p>Apply boundary conditions on <span class="math notranslate nohighlight">\(s_L^x\)</span> and <span class="math notranslate nohighlight">\(s_R^x\)</span>. Then,</p>
-<div class="math notranslate nohighlight" id="equation-godunov-76">
-<span class="eqno">(234)<a class="headerlink" href="#equation-godunov-76" title="Permalink to this equation">¶</a></span>\[\begin{split}\text{s}_{\ib-\half\eb_x}^x =
+<div class="math notranslate nohighlight" id="equation-estate-fpu-upwind">
+<span class="eqno">(238)<a class="headerlink" href="#equation-estate-fpu-upwind" title="Permalink to this equation">¶</a></span>\[\begin{split}\text{s}_{\ib-\half\eb_x}^x =
 \begin{cases}
 s_L^x, &amp; \text{UEDGE}_{\ib-\half\eb_x} &gt; 0, \\
 s_R^x, &amp; \text{else}. \\
-\end{cases}\label{ESTATE_FPU Upwind}\end{split}\]</div>
+\end{cases}\end{split}\]</div>
 </li>
 <li><p>Then, if <span class="math notranslate nohighlight">\(|\text{UEDGE}_{\ib-\half\eb_x}| \le \epsilon\)</span>, we set <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^x = (s_L^x+s_R^x)/2\)</span>. The procedure to obtain <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^y\)</span> is analogous.</p></li>
 <li><p>Now, the transverse terms.</p>
 <p><strong>If</strong> ICONSERVE <strong>then:</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-77">
-<span class="eqno">(235)<a class="headerlink" href="#equation-godunov-77" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-73">
+<span class="eqno">(239)<a class="headerlink" href="#equation-godunov-73" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \text{sedge}_L^x &amp;=&amp; s_{\ib-\eb_x} + \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{\text{VEDGE}_{\ib-\eb_x+\half\eb_y}s_{\ib-\eb_x+\half\eb_y}^y - \text{VEDGE}_{\ib-\eb_x-\half\eb_y}s_{\ib-\eb_x-\half\eb_y}^y}{h_y}\right.\nonumber\\
 &amp;&amp; ~~~~~~~~~~ \left. - \frac{s_{\ib-\eb_x}(\text{VEDGE}_{\ib-\eb_x+\half\eb_y}-\text{VEDGE}_{\ib-\eb_x-\half\eb_y})}{h_y}+s_{\ib-\eb_x}\text{DIVU}_{\ib-\eb_x}\right]\\
@@ -1056,52 +1053,52 @@ s_R^x, &amp; \text{else}. \\
 </li>
 <li><p>Now, define <span class="math notranslate nohighlight">\(\text{VBAR}_{\ib} = (\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})/2\)</span>.</p>
 <p><strong>If</strong> NOT ICONSERVE <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} &lt; 0\)</span> <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VBAR}_{\ib} &lt; 0\)</span> <strong>then:</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-78">
-<span class="eqno">(236)<a class="headerlink" href="#equation-godunov-78" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-74">
+<span class="eqno">(240)<a class="headerlink" href="#equation-godunov-74" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \text{sedge}_L^x = s_{\ib-\eb_x} &amp;+&amp; \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib-\eb_x}(s_{\ib-\eb_x+\eb_y}-s_{\ib-\eb_x})}{h_y}\right] \label{transverse upwinding 1} \\
 \text{sedge}_R^x = s_{\ib} &amp;-&amp; \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib}(s_{\ib+\eb_y}-s_{\ib})}{h_y}\right]\end{aligned}\end{split}\]</div>
 <p><strong>Else If</strong> NOT ICONSERVE <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} &lt; 0\)</span> <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VBAR}_{\ib} \ge 0\)</span> <strong>then:</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-79">
-<span class="eqno">(237)<a class="headerlink" href="#equation-godunov-79" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-75">
+<span class="eqno">(241)<a class="headerlink" href="#equation-godunov-75" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \text{sedge}_L^x = s_{\ib-\eb_x} &amp;+&amp; \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib-\eb_x}(s_{\ib-\eb_x}-s_{\ib-\eb_x-\eb_y})}{h_y}\right] \\
 \text{sedge}_R^x = s_{\ib} &amp;-&amp; \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{\text{VBAR}_{\ib}(s_{\ib}-s_{\ib-\eb_y})}{h_y}\right]\end{aligned}\end{split}\]</div>
 <p><strong>Else If</strong> NOT ICONSERVE <strong>and</strong> <span class="math notranslate nohighlight">\(\text{VEDGE}_{\ib+\half\eb_y}\cdot\text{VEDGE}_{\ib-\half\eb_y} \ge 0\)</span> <strong>then:</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-80">
-<span class="eqno">(238)<a class="headerlink" href="#equation-godunov-80" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-76">
+<span class="eqno">(242)<a class="headerlink" href="#equation-godunov-76" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \text{sedge}_L^x &amp;=&amp; s_{\ib-\eb_x} + \left(\half - \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib-\eb_x+\half\eb_y}+\text{VEDGE}_{\ib-\eb_x-\half\eb_y})(s_{\ib-\eb_x+\half\eb_y}-s_{\ib-\eb_x-\half\eb_y})}{2h_y}\right] \\
 \text{sedge}_R^x &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})(s_{\ib+\half\eb_y}-s_{\ib-\half\eb_y})}{2h_y}\right]\label{transverse upwinding 6}\end{aligned}\end{split}\]</div>
 </li>
-<li><p>Finally, upwind analogous to equation (<a class="reference external" href="#ESTATE_FPUUpwind">[ESTATE_FPU Upwind]</a>) to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x}\)</span>.</p></li>
+<li><p>Finally, upwind analogous to <a class="reference internal" href="#equation-estate-fpu-upwind">Eq.238</a> to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x}\)</span>.</p></li>
 </ul>
 </div>
 <div class="section" id="estate-in-godunov-2d-3d-f">
 <h2>ESTATE in GODUNOV_2D/3D.f<a class="headerlink" href="#estate-in-godunov-2d-3d-f" title="Permalink to this headline">¶</a></h2>
 <p>First, the normal predictor.</p>
-<div class="math notranslate nohighlight" id="equation-godunov-81">
-<span class="eqno">(239)<a class="headerlink" href="#equation-godunov-81" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-77">
+<span class="eqno">(243)<a class="headerlink" href="#equation-godunov-77" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_L^x &amp;=&amp; s_{\ib-\eb_x} + \left(\half - \frac{\dt}{h_x}u_{\ib-\eb_x}\right)\Delta^x s_{\ib-\eb_x} \\
 s_R^x &amp;=&amp; s_{\ib} - \left(\half + \frac{\dt}{h_x}u_{\ib}\right)\Delta^x s_{\ib}\end{aligned}\end{split}\]</div>
 <p><strong>If</strong> USE_MINION <strong>then:</strong></p>
-<div class="math notranslate nohighlight" id="equation-godunov-82">
-<span class="eqno">(240)<a class="headerlink" href="#equation-godunov-82" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-78">
+<span class="eqno">(244)<a class="headerlink" href="#equation-godunov-78" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_L^x &amp;=&amp; s_L^x + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \\
 s_R^x &amp;=&amp; s_R^x + \frac{\dt}{2}\text{TFORCES}_{\ib}\end{aligned}\end{split}\]</div>
 <p>Apply boundary conditions on <span class="math notranslate nohighlight">\(s_L^x\)</span> and <span class="math notranslate nohighlight">\(s_R^x\)</span>. Then,</p>
-<div class="math notranslate nohighlight" id="equation-godunov-83">
-<span class="eqno">(241)<a class="headerlink" href="#equation-godunov-83" title="Permalink to this equation">¶</a></span>\[\begin{split}\text{s}_{\ib-\half\eb_x}^x =
+<div class="math notranslate nohighlight" id="equation-estate-upwind">
+<span class="eqno">(245)<a class="headerlink" href="#equation-estate-upwind" title="Permalink to this equation">¶</a></span>\[\begin{split}\text{s}_{\ib-\half\eb_x}^x =
 \begin{cases}
 s_L^x, &amp; \text{UAD}_{\ib-\half\eb_x} &gt; 0, \\
 s_R^x, &amp; \text{else}. \\
-\end{cases}\label{ESTATE Upwind}\end{split}\]</div>
+\end{cases}\end{split}\]</div>
 <p>Then, if <span class="math notranslate nohighlight">\(|\text{UAD}_{\ib-\half\eb_x}| \le \epsilon\)</span>, we set <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^x = (s_L^x+s_R^x)/2\)</span>.</p>
-<div class="math notranslate nohighlight" id="equation-godunov-84">
-<span class="eqno">(242)<a class="headerlink" href="#equation-godunov-84" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-79">
+<span class="eqno">(246)<a class="headerlink" href="#equation-godunov-79" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \text{sedge}_L^x = s_{\ib-\eb_x} &amp;+&amp; \left(\half - \frac{\dt}{h_x}u_{\ib-\eb_x}\right)\Delta^x s_{\ib-\eb_x} + \frac{\dt}{2}\text{TFORCES}_{\ib-\eb_x} \nonumber\\
 &amp;&amp; - \frac{\dt}{2}\left[\frac{(\text{VAD}_{\ib-\eb_x+\half\eb_y}+\text{VAD}_{\ib-\eb_x-\half\eb_y})(s_{\ib-\eb_x+\half\eb_y}-s_{\ib-\eb_x-\half\eb_y})}{2h_y}\right] \\
 \text{sedge}_R^x = s_{\ib} &amp;-&amp; \left(\half + \frac{\dt}{h_x}u_{\ib}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
@@ -1109,7 +1106,7 @@ s_R^x, &amp; \text{else}. \\
 <p>Note that the 2D and 3D algorithms are different - in 3D the transverse
 terms use upwinding analogous to equations
 (<a class="reference external" href="#transverseupwinding1">[transverse upwinding 1]</a>)-(<a class="reference external" href="#transverseupwinding6">[transverse upwinding 6]</a>), using UAD
-instead of UEDGE. Finally, upwind analogous to equation (<a class="reference external" href="#ESTATEUpwind">[ESTATE Upwind]</a>)
+instead of UEDGE. Finally, upwind analogous to <a class="reference internal" href="#equation-estate-upwind">Eq.245</a>
 to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x}\)</span>, but use UEDGE instead of UAD.</p>
 </div>
 <div class="section" id="piecewise-parabolic-method-ppm">
@@ -1117,8 +1114,7 @@ to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x
 <p>Consider a scalar, <span class="math notranslate nohighlight">\(s\)</span>, which we wish to predict to
 time-centered edges.  The PPM method is an improvement over the
 piecewise-linear method.  Using our notation, we modify equations
-(<a class="reference external" href="#3Dpredictstoleft">[3D predict s to left]</a>) and (<a class="reference external" href="#3Dpredictstoright">[3D predict
-s to right]</a>) in Section <a class="reference external" href="#ScalarEdgeStatePredictioninMAESTROeX">4</a> to obtain better estimates for the
+(<a class="reference internal" href="#equation-3d-predict-s-to-left">Eq.204</a> and <a class="reference internal" href="#equation-3d-predict-s-to-right">Eq.205</a>) in Section <a class="reference external" href="#ScalarEdgeStatePredictioninMAESTROeX">4</a> to obtain better estimates for the
 time-centered 1D edge states, <span class="math notranslate nohighlight">\(s_{L/R,\ib-\myhalf\eb_x}\)</span>,
 etc.. Once these states are obtained, we continue with the
 full-dimensional extrapolations as described before.</p>
@@ -1139,12 +1135,12 @@ Phil Colella.</p></li>
 <span class="math notranslate nohighlight">\(s\)</span> to the hi and lo faces of cell <span class="math notranslate nohighlight">\(i\)</span>, respectively. See Sections
 <a class="reference external" href="#Sec:ColellaWoodward">9.1</a> and <a class="reference external" href="#Sec:ColellaSekora">9.2</a> for the two options.</p></li>
 <li><p><strong>Step 2:</strong> Construct a quadratic profile within each cell.</p>
-<div class="math notranslate nohighlight" id="equation-godunov-85">
-<span class="eqno">(243)<a class="headerlink" href="#equation-godunov-85" title="Permalink to this equation">¶</a></span>\[s_i^I(x) = s_{i,-} + \xi\left[s_{i,+} - s_{i,-} + s_{6,i}(1-\xi)\right],\label{Quadratic Interp}\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-86">
-<span class="eqno">(244)<a class="headerlink" href="#equation-godunov-86" title="Permalink to this equation">¶</a></span>\[s_{6,i}= 6s_{i} - 3\left(s_{i,-}+s_{i,+}\right),\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-87">
-<span class="eqno">(245)<a class="headerlink" href="#equation-godunov-87" title="Permalink to this equation">¶</a></span>\[\xi = \frac{x - (i-\myhalf)h}{h}, ~ 0 \le \xi \le 1.\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-80">
+<span class="eqno">(247)<a class="headerlink" href="#equation-godunov-80" title="Permalink to this equation">¶</a></span>\[s_i^I(x) = s_{i,-} + \xi\left[s_{i,+} - s_{i,-} + s_{6,i}(1-\xi)\right],\label{Quadratic Interp}\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-81">
+<span class="eqno">(248)<a class="headerlink" href="#equation-godunov-81" title="Permalink to this equation">¶</a></span>\[s_{6,i}= 6s_{i} - 3\left(s_{i,-}+s_{i,+}\right),\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-82">
+<span class="eqno">(249)<a class="headerlink" href="#equation-godunov-82" title="Permalink to this equation">¶</a></span>\[\xi = \frac{x - (i-\myhalf)h}{h}, ~ 0 \le \xi \le 1.\]</div>
 </li>
 <li><dl class="simple">
 <dt><strong>Step 3:</strong> Integrate quadratic profiles to get the average value swept over the face</dt><dd><p>over time.</p>
@@ -1152,13 +1148,13 @@ Phil Colella.</p></li>
 </dl>
 <p>Define the following integrals, where <span class="math notranslate nohighlight">\(\sigma = |u|\Delta t/h\)</span>:</p>
 <blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-88">
-<span class="eqno">(246)<a class="headerlink" href="#equation-godunov-88" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div><div class="math notranslate nohighlight" id="equation-godunov-83">
+<span class="eqno">(250)<a class="headerlink" href="#equation-godunov-83" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \mathcal{I}_{i,+}(\sigma) &amp;=&amp; \frac{1}{\sigma h}\int_{(i+\myhalf)h-\sigma h}^{(i+\myhalf)h}s_i^I(x)dx \\
 \mathcal{I}_{i,-}(\sigma) &amp;=&amp; \frac{1}{\sigma h}\int_{(i-\myhalf)h}^{(i-\myhalf)h+\sigma h}s_i^I(x)dx\end{aligned}\end{split}\]</div>
 <p>Plugging in (<a class="reference external" href="#QuadraticInterp">[Quadratic Interp]</a>) gives:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-89">
-<span class="eqno">(247)<a class="headerlink" href="#equation-godunov-89" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-84">
+<span class="eqno">(251)<a class="headerlink" href="#equation-godunov-84" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \mathcal{I}_{i,+}(\sigma) &amp;=&amp; s_{j,+} - \frac{\sigma}{2}\left[s_{j,+}-s_{j,-}-\left(1-\frac{2}{3}\sigma\right)s_{6,i}\right], \\
 \mathcal{I}_{i,-}(\sigma) &amp;=&amp; s_{j,-} + \frac{\sigma}{2}\left[s_{j,+}-s_{j,-}+\left(1-\frac{2}{3}\sigma\right)s_{6,i}\right].\end{aligned}\end{split}\]</div>
 </div></blockquote>
@@ -1167,8 +1163,8 @@ Phil Colella.</p></li>
 Perform a 1D extrapolation, without source terms, to get
 left and right edge states. Add the source terms later if desired/necessary.</p>
 <blockquote>
-<div><div class="math notranslate nohighlight" id="equation-godunov-90">
-<span class="eqno">(248)<a class="headerlink" href="#equation-godunov-90" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div><div class="math notranslate nohighlight" id="equation-godunov-85">
+<span class="eqno">(252)<a class="headerlink" href="#equation-godunov-85" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 s_{L,i-\myhalf} &amp;=&amp;
 \begin{cases}
 \mathcal{I}_{i-1,+}(\sigma), &amp; u_{i-1} ~ \text{or} ~ u_{i-\myhalf}^{\mac} &gt; 0 \\
@@ -1186,88 +1182,88 @@ s_{i}, &amp; \text{else}.
 <span id="sec-colellawoodward"></span><h3>Colella and Woodward Based Approach<a class="headerlink" href="#colella-and-woodward-based-approach" title="Permalink to this headline">¶</a></h3>
 <p>Spatially interpolate <span class="math notranslate nohighlight">\(s\)</span> to edges.
 Use a 4th-order interpolation in space with van Leer limiting to obtain edge values:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-91">
-<span class="eqno">(249)<a class="headerlink" href="#equation-godunov-91" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{1}{2}\left(s_{i} + s_{i+1}\right) - \frac{1}{6}\left(\delta s_{i+1}^{vL} - \delta s_{i}^{vL}\right),\label{eq:CW Edge}\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-92">
-<span class="eqno">(250)<a class="headerlink" href="#equation-godunov-92" title="Permalink to this equation">¶</a></span>\[\delta s_i =
+<div class="math notranslate nohighlight" id="equation-eq-cw-edge">
+<span class="eqno">(253)<a class="headerlink" href="#equation-eq-cw-edge" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{1}{2}\left(s_{i} + s_{i+1}\right) - \frac{1}{6}\left(\delta s_{i+1}^{vL} - \delta s_{i}^{vL}\right),\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-86">
+<span class="eqno">(254)<a class="headerlink" href="#equation-godunov-86" title="Permalink to this equation">¶</a></span>\[\delta s_i =
 \frac{1}{2}\left(s_{i+1}-s_{i-1}\right),\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-93">
-<span class="eqno">(251)<a class="headerlink" href="#equation-godunov-93" title="Permalink to this equation">¶</a></span>\[\begin{split}\delta s_i^{vL} =
+<div class="math notranslate nohighlight" id="equation-godunov-87">
+<span class="eqno">(255)<a class="headerlink" href="#equation-godunov-87" title="Permalink to this equation">¶</a></span>\[\begin{split}\delta s_i^{vL} =
 \begin{cases}
 \text{sign}(\delta s_i)\min\left(|\delta s_i|, ~ 2|s_{i+1}-s_{i}|, ~ 2|s_i-s_{i-1}|\right), &amp; {\rm if} ~ (s_{i+1}-s_i)(s_i-s_{i-1}) &gt; 0,\\
 0, &amp; {\rm otherwise}.
 \end{cases}\end{split}\]</div>
 <p>A more compact way of writing this is</p>
-<div class="math notranslate nohighlight" id="equation-godunov-94">
-<span class="eqno">(252)<a class="headerlink" href="#equation-godunov-94" title="Permalink to this equation">¶</a></span>\[s = \text{sign}(\delta s_i),\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-95">
-<span class="eqno">(253)<a class="headerlink" href="#equation-godunov-95" title="Permalink to this equation">¶</a></span>\[\delta s_i^{vL} = s\max\left\{\min\left[s\delta s_i, 2s(s_{i+1}-s_i),2s(s_i-s_{i-1})\right],0\right\}\]</div>
-<p>Without the limiters, equation (<a class="reference external" href="#eq:CWEdge">[eq:CW Edge]</a>) is the familiar 4th-order spatial interpolation formula:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-96">
-<span class="eqno">(254)<a class="headerlink" href="#equation-godunov-96" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{7}{12}\left(s_{i+1}+s_i\right) - \frac{1}{12}\left(s_{i+2}+s_{i-1}\right).\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-88">
+<span class="eqno">(256)<a class="headerlink" href="#equation-godunov-88" title="Permalink to this equation">¶</a></span>\[s = \text{sign}(\delta s_i),\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-89">
+<span class="eqno">(257)<a class="headerlink" href="#equation-godunov-89" title="Permalink to this equation">¶</a></span>\[\delta s_i^{vL} = s\max\left\{\min\left[s\delta s_i, 2s(s_{i+1}-s_i),2s(s_i-s_{i-1})\right],0\right\}\]</div>
+<p>Without the limiters, <a class="reference internal" href="#equation-eq-cw-edge">Eq.253</a> is the familiar 4th-order spatial interpolation formula:</p>
+<div class="math notranslate nohighlight" id="equation-godunov-90">
+<span class="eqno">(258)<a class="headerlink" href="#equation-godunov-90" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{7}{12}\left(s_{i+1}+s_i\right) - \frac{1}{12}\left(s_{i+2}+s_{i-1}\right).\]</div>
 <p>Next, we must ensure that <span class="math notranslate nohighlight">\(s_{i+\myhalf}\)</span> lies between the adjacent
 cell-centered values:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-97">
-<span class="eqno">(255)<a class="headerlink" href="#equation-godunov-97" title="Permalink to this equation">¶</a></span>\[\min\left(s_{i},s_{i+1}\right) \le s_{i+\myhalf} \le \max\left(s_{i},s_{i+1}\right).\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-91">
+<span class="eqno">(259)<a class="headerlink" href="#equation-godunov-91" title="Permalink to this equation">¶</a></span>\[\min\left(s_{i},s_{i+1}\right) \le s_{i+\myhalf} \le \max\left(s_{i},s_{i+1}\right).\]</div>
 <p>In anticipation of further limiting, we set double-valued face-centered values:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-98">
-<span class="eqno">(256)<a class="headerlink" href="#equation-godunov-98" title="Permalink to this equation">¶</a></span>\[s_{i,+} = s_{i+1,-} = s_{i+\myhalf}.\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-92">
+<span class="eqno">(260)<a class="headerlink" href="#equation-godunov-92" title="Permalink to this equation">¶</a></span>\[s_{i,+} = s_{i+1,-} = s_{i+\myhalf}.\]</div>
 <p>Modify <span class="math notranslate nohighlight">\(s_{i,\pm}\)</span> using a quadratic limiter.
 First, we test whether
 <span class="math notranslate nohighlight">\(s_i\)</span> is a local extreumum with the condition:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-99">
-<span class="eqno">(257)<a class="headerlink" href="#equation-godunov-99" title="Permalink to this equation">¶</a></span>\[\left(s_{i,+}-s_i\right)\left(s_i-s_{i,-}\right) \le 0,\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-93">
+<span class="eqno">(261)<a class="headerlink" href="#equation-godunov-93" title="Permalink to this equation">¶</a></span>\[\left(s_{i,+}-s_i\right)\left(s_i-s_{i,-}\right) \le 0,\]</div>
 <p>If this condition is true, we constrain <span class="math notranslate nohighlight">\(s_{i,\pm}\)</span> by setting
 <span class="math notranslate nohighlight">\(s_{i,+} = s_{i,-} = s_i\)</span>. If not, we then apply a second test to determine
 whether <span class="math notranslate nohighlight">\(s_i\)</span> is sufficiently close to <span class="math notranslate nohighlight">\(s_{i,\pm}\)</span> so that a quadratic
 interpolate would contain a local extremum. We define
 <span class="math notranslate nohighlight">\(\alpha_{i,\pm} = s_{i,\pm} - s_i\)</span>. If one of <span class="math notranslate nohighlight">\(|\alpha_{i,\pm}| \ge 2|\alpha_{i,\mp}|\)</span>
 holds, then for that choice of <span class="math notranslate nohighlight">\(\pm = +,-\)</span> we set:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-100">
-<span class="eqno">(258)<a class="headerlink" href="#equation-godunov-100" title="Permalink to this equation">¶</a></span>\[s_{i,\pm} = 3s_i - 2s_{i,\mp}.\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-94">
+<span class="eqno">(262)<a class="headerlink" href="#equation-godunov-94" title="Permalink to this equation">¶</a></span>\[s_{i,\pm} = 3s_i - 2s_{i,\mp}.\]</div>
 </div>
 <div class="section" id="colella-and-sekora-based-approach">
 <span id="sec-colellasekora"></span><h3>Colella and Sekora Based Approach<a class="headerlink" href="#colella-and-sekora-based-approach" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>Spatially interpolate <span class="math notranslate nohighlight">\(s\)</span> to edges.</p>
 <p>Use a 4th-order interpolation in space to obtain edge values:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-101">
-<span class="eqno">(259)<a class="headerlink" href="#equation-godunov-101" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{7}{12}\left(s_{i+1}+s_i\right) - \frac{1}{12}\left(s_{i+2}+s_{i-1}\right).\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-95">
+<span class="eqno">(263)<a class="headerlink" href="#equation-godunov-95" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{7}{12}\left(s_{i+1}+s_i\right) - \frac{1}{12}\left(s_{i+2}+s_{i-1}\right).\]</div>
 <p>Then, if <span class="math notranslate nohighlight">\((s_{i+\myhalf}-s_i)(s_{i+1}-s_{i+\myhalf}) &lt; 0\)</span>, we limit <span class="math notranslate nohighlight">\(s_{i+\myhalf}\)</span> using
 a nonlinear combination of approximations to the second derivative.
 First, define:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-102">
-<span class="eqno">(260)<a class="headerlink" href="#equation-godunov-102" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-96">
+<span class="eqno">(264)<a class="headerlink" href="#equation-godunov-96" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 (D^2s)_{i+\myhalf} &amp;=&amp; 3\left(s_{i}-2s_{i+\myhalf}+s_{i+1}\right) \\
 (D^2s)_{i+\myhalf,L} &amp;=&amp; s_{i-1}-2s_{i}+s_{i+1} \\
 (D^2s)_{i+\myhalf,R} &amp;=&amp; s_{i}-2s_{i+1}+s_{i+2}\end{aligned}\end{split}\]</div>
 <p>Then, define</p>
-<div class="math notranslate nohighlight" id="equation-godunov-103">
-<span class="eqno">(261)<a class="headerlink" href="#equation-godunov-103" title="Permalink to this equation">¶</a></span>\[s = \text{sign}\left[(D^2s)_{i+\myhalf}\right],\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-104">
-<span class="eqno">(262)<a class="headerlink" href="#equation-godunov-104" title="Permalink to this equation">¶</a></span>\[(D^2s)_{i+\myhalf,\text{lim}} = s\max\left\{\min\left[Cs(D^2s)_{i+\myhalf,L},Cs(D^2s)_{i+\myhalf,R},s(D^2s)_{i+\myhalf}\right],0\right\},\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-97">
+<span class="eqno">(265)<a class="headerlink" href="#equation-godunov-97" title="Permalink to this equation">¶</a></span>\[s = \text{sign}\left[(D^2s)_{i+\myhalf}\right],\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-98">
+<span class="eqno">(266)<a class="headerlink" href="#equation-godunov-98" title="Permalink to this equation">¶</a></span>\[(D^2s)_{i+\myhalf,\text{lim}} = s\max\left\{\min\left[Cs(D^2s)_{i+\myhalf,L},Cs(D^2s)_{i+\myhalf,R},s(D^2s)_{i+\myhalf}\right],0\right\},\]</div>
 <p>where <span class="math notranslate nohighlight">\(C=1.25\)</span> was used in Colella and Sekora. Then,</p>
-<div class="math notranslate nohighlight" id="equation-godunov-105">
-<span class="eqno">(263)<a class="headerlink" href="#equation-godunov-105" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{1}{2}\left(s_{i}+s_{i+1}\right) - \frac{1}{6}(D^2s)_{i+\myhalf,\text{lim}}.\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-99">
+<span class="eqno">(267)<a class="headerlink" href="#equation-godunov-99" title="Permalink to this equation">¶</a></span>\[s_{i+\myhalf} = \frac{1}{2}\left(s_{i}+s_{i+1}\right) - \frac{1}{6}(D^2s)_{i+\myhalf,\text{lim}}.\]</div>
 <p>Now we implement Phil’s new version of the algorithm to eliminate sensitivity to roundoff.
 First we need to detect whether a particular cell corresponds to an “extremum”. There
 are two tests. For the first test, define</p>
-<div class="math notranslate nohighlight" id="equation-godunov-106">
-<span class="eqno">(264)<a class="headerlink" href="#equation-godunov-106" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} = s_{i\pm\myhalf} - s_i.\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-100">
+<span class="eqno">(268)<a class="headerlink" href="#equation-godunov-100" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} = s_{i\pm\myhalf} - s_i.\]</div>
 <p>If <span class="math notranslate nohighlight">\(\alpha_{i,+}\alpha_{i,-} \ge 0\)</span>, then we are at an extremum. We apply the second
 test if either <span class="math notranslate nohighlight">\(|\alpha_{i,\pm}| &gt; 2|\alpha_{i,\mp}|\)</span>. Then, we define:</p>
-<div class="math notranslate nohighlight" id="equation-godunov-107">
-<span class="eqno">(265)<a class="headerlink" href="#equation-godunov-107" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-101">
+<span class="eqno">(269)<a class="headerlink" href="#equation-godunov-101" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 (Ds)_{i,{\rm face},-} &amp;=&amp; s_{i-\myhalf} - s_{i-\sfrac{3}{2}} \\
 (Ds)_{i,{\rm face},+} &amp;=&amp; s_{i+\sfrac{3}{2}} - s_{i+\myhalf}\end{aligned}\end{split}\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-108">
-<span class="eqno">(266)<a class="headerlink" href="#equation-godunov-108" title="Permalink to this equation">¶</a></span>\[(Ds)_{i,{\rm face,min}} = \min\left[\left|(Ds)_{i,{\rm face},-}\right|,\left|(Ds)_{i,{\rm face},+}\right|\right].\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-109">
-<span class="eqno">(267)<a class="headerlink" href="#equation-godunov-109" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-102">
+<span class="eqno">(270)<a class="headerlink" href="#equation-godunov-102" title="Permalink to this equation">¶</a></span>\[(Ds)_{i,{\rm face,min}} = \min\left[\left|(Ds)_{i,{\rm face},-}\right|,\left|(Ds)_{i,{\rm face},+}\right|\right].\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-103">
+<span class="eqno">(271)<a class="headerlink" href="#equation-godunov-103" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 (Ds)_{i,{\rm cc},-} &amp;=&amp; s_{i} - s_{i-1} \\
 (Ds)_{i,{\rm cc},+} &amp;=&amp; s_{i+1} - s_{i}\end{aligned}\end{split}\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-110">
-<span class="eqno">(268)<a class="headerlink" href="#equation-godunov-110" title="Permalink to this equation">¶</a></span>\[(Ds)_{i,{\rm cc,min}} = \min\left[\left|(Ds)_{i,{\rm cc},-}\right|,\left|(Ds)_{i,{\rm cc},+}\right|\right].\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-104">
+<span class="eqno">(272)<a class="headerlink" href="#equation-godunov-104" title="Permalink to this equation">¶</a></span>\[(Ds)_{i,{\rm cc,min}} = \min\left[\left|(Ds)_{i,{\rm cc},-}\right|,\left|(Ds)_{i,{\rm cc},+}\right|\right].\]</div>
 <p>If <span class="math notranslate nohighlight">\((Ds)_{i,{\rm face,min}} \ge (Ds)_{i,{\rm cc,min}}\)</span>, set
 <span class="math notranslate nohighlight">\((Ds)_{i,\pm} = (Ds)_{i,{\rm face},\pm}\)</span>. Otherwise, set
 <span class="math notranslate nohighlight">\((Ds)_{i,\pm} = (Ds)_{i,{\rm cc},\pm}\)</span>. Finally, we are at an extreumum if
@@ -1275,35 +1271,35 @@ test if either <span class="math notranslate nohighlight">\(|\alpha_{i,\pm}| &gt
 </li>
 <li><p>Now that we have finished the extremum tests, if we are at an extremum,
 we scale <span class="math notranslate nohighlight">\(\alpha_{i,\pm}\)</span>. First, we define</p>
-<div class="math notranslate nohighlight" id="equation-godunov-111">
-<span class="eqno">(269)<a class="headerlink" href="#equation-godunov-111" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+<div class="math notranslate nohighlight" id="equation-godunov-105">
+<span class="eqno">(273)<a class="headerlink" href="#equation-godunov-105" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 (D^2s)_{i} &amp;=&amp; 6(\alpha_{i,+}+\alpha_{i,-}) \\
 (D^2s)_{i,L} &amp;=&amp; s_{i-2}-2s_{i-1}+s_{i} \\
 (D^2s)_{i,R} &amp;=&amp; s_{i}-2s_{i+1}+s_{i+2} \\
 (D^2s)_{i,C} &amp;=&amp; s_{i-1}-2s_{i}+s_{i+1}\end{aligned}\end{split}\]</div>
 <p>Then, define</p>
-<div class="math notranslate nohighlight" id="equation-godunov-112">
-<span class="eqno">(270)<a class="headerlink" href="#equation-godunov-112" title="Permalink to this equation">¶</a></span>\[s = \text{sign}\left[(D^2s)_{i}\right],\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-113">
-<span class="eqno">(271)<a class="headerlink" href="#equation-godunov-113" title="Permalink to this equation">¶</a></span>\[(D^2s)_{i,\text{lim}} = \max\left\{\min\left[s(D^2s)_{i},Cs(D^2s)_{i,L},Cs(D^2s)_{i,R},Cs(D^2s)_{i,C}\right],0\right\}.\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-106">
+<span class="eqno">(274)<a class="headerlink" href="#equation-godunov-106" title="Permalink to this equation">¶</a></span>\[s = \text{sign}\left[(D^2s)_{i}\right],\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-107">
+<span class="eqno">(275)<a class="headerlink" href="#equation-godunov-107" title="Permalink to this equation">¶</a></span>\[(D^2s)_{i,\text{lim}} = \max\left\{\min\left[s(D^2s)_{i},Cs(D^2s)_{i,L},Cs(D^2s)_{i,R},Cs(D^2s)_{i,C}\right],0\right\}.\]</div>
 <p>Then,</p>
-<div class="math notranslate nohighlight" id="equation-godunov-114">
-<span class="eqno">(272)<a class="headerlink" href="#equation-godunov-114" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} = \frac{\alpha_{i,\pm}(D^2s)_{i,\text{lim}}}{\max\left[\left|(D^2s)_{i}\right|,1\times 10^{-10}\right]}\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-108">
+<span class="eqno">(276)<a class="headerlink" href="#equation-godunov-108" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} = \frac{\alpha_{i,\pm}(D^2s)_{i,\text{lim}}}{\max\left[\left|(D^2s)_{i}\right|,1\times 10^{-10}\right]}\]</div>
 <p>Otherwise, if we are not at an extremum and <span class="math notranslate nohighlight">\(|\alpha_{i,\pm}| &gt; 2|\alpha_{i,\mp}|\)</span>,
 then define</p>
-<div class="math notranslate nohighlight" id="equation-godunov-115">
-<span class="eqno">(273)<a class="headerlink" href="#equation-godunov-115" title="Permalink to this equation">¶</a></span>\[s = \text{sign}(\alpha_{i,\mp})\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-116">
-<span class="eqno">(274)<a class="headerlink" href="#equation-godunov-116" title="Permalink to this equation">¶</a></span>\[\delta\mathcal{I}_{\text{ext}} = \frac{-\alpha_{i,\pm}^2}{4\left(\alpha_{j,+}+\alpha_{j,-}\right)},\]</div>
-<div class="math notranslate nohighlight" id="equation-godunov-117">
-<span class="eqno">(275)<a class="headerlink" href="#equation-godunov-117" title="Permalink to this equation">¶</a></span>\[\delta s = s_{i\mp 1} - s_i,\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-109">
+<span class="eqno">(277)<a class="headerlink" href="#equation-godunov-109" title="Permalink to this equation">¶</a></span>\[s = \text{sign}(\alpha_{i,\mp})\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-110">
+<span class="eqno">(278)<a class="headerlink" href="#equation-godunov-110" title="Permalink to this equation">¶</a></span>\[\delta\mathcal{I}_{\text{ext}} = \frac{-\alpha_{i,\pm}^2}{4\left(\alpha_{j,+}+\alpha_{j,-}\right)},\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-111">
+<span class="eqno">(279)<a class="headerlink" href="#equation-godunov-111" title="Permalink to this equation">¶</a></span>\[\delta s = s_{i\mp 1} - s_i,\]</div>
 <p>If <span class="math notranslate nohighlight">\(s\delta\mathcal{I}_{\text{ext}} \ge s\delta s\)</span>, then we perform the following test.
 If <span class="math notranslate nohighlight">\(s\delta s - \alpha_{i,\mp} \ge 1\times 10^{-10}\)</span>, then</p>
-<div class="math notranslate nohighlight" id="equation-godunov-118">
-<span class="eqno">(276)<a class="headerlink" href="#equation-godunov-118" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} =  -2\delta s - 2s\left[(\delta s)^2 - \delta s \alpha_{i,\mp}\right]^{\myhalf}\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-112">
+<span class="eqno">(280)<a class="headerlink" href="#equation-godunov-112" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} =  -2\delta s - 2s\left[(\delta s)^2 - \delta s \alpha_{i,\mp}\right]^{\myhalf}\]</div>
 <p>otherwise,</p>
-<div class="math notranslate nohighlight" id="equation-godunov-119">
-<span class="eqno">(277)<a class="headerlink" href="#equation-godunov-119" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} =  -2\alpha_{i,\mp}\]</div>
+<div class="math notranslate nohighlight" id="equation-godunov-113">
+<span class="eqno">(281)<a class="headerlink" href="#equation-godunov-113" title="Permalink to this equation">¶</a></span>\[\alpha_{i,\pm} =  -2\alpha_{i,\mp}\]</div>
 <p>Finally, <span class="math notranslate nohighlight">\(s_{i,\pm} = s_i + \alpha_{i,\pm}\)</span>.</p>
 </li>
 </ul>

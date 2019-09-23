@@ -15,7 +15,7 @@ co-rotating frame by
    :label: eq:derivative relations
 
 where i(rot) refers to the inertial(co-rotating) frame and :math:`\Omegab` is
-the angular velocity vector. Using (`[eq:derivative relations] <#eq:derivative relations>`__) and
+the angular velocity vector. Using :eq:`eq:derivative relations` and
 assuming :math:`\Omegab` is constant, we have
 
 .. math::
@@ -52,7 +52,7 @@ Using Spherical Geometry
 
 In spherical geometry implementing rotation is straightforward as we don’t have
 to worry about special boundary conditions. We assume a geometry as shown in
-Figure `[Fig:rotation in spherical] <#Fig:rotation in spherical>`__ where the primed coordinate system is
+:numref:`Fig:rotation in spherical` where the primed coordinate system is
 the simulation domain coordinate system, the unprimed system is the primed
 system translated by the vector :math:`\rb_\text{c}` and is added here for
 clarity. The :math:`\rb_\text{c}` vector is given by center in the
@@ -106,6 +106,7 @@ The Coriolis term is a straightforward cross-product:
    \right).
    \end{align}
 
+.. _Fig:rotation in spherical:
 .. figure:: rotation_spherical.png
    :align: center
 
