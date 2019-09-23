@@ -1302,7 +1302,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #elif (AMREX_SPACEDIM == 2)
 
 #ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs_u[0].data(), 1);
+        int* bc_f = prepare_bc(bcs[0].data(), 1);
 #else
         const int* bc_f = bcs[0].data();
 #endif
