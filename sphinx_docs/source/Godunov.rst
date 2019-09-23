@@ -689,10 +689,12 @@ the effects of corner coupling.
 * Predict :math:`s` to x-faces using a 1D extrapolation.
 
   .. math::
+     s_{L,\ib-\half\eb_x} &=& s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n,
+    :label: 3D predict s to left
 
-     \begin{aligned}
-     s_{L,\ib-\half\eb_x} &=& s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n, \label{3D predict s to left}\\
-     s_{R,\ib-\half\eb_x} &=& s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n.\label{3D predict s to right}\end{aligned}
+  .. math::
+     s_{R,\ib-\half\eb_x} &=& s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n.
+     :label: 3D predict s to right
 
   Upwind based on :math:`u^{\mac}`:
 
@@ -831,16 +833,17 @@ Computing :math:`\Ub^{\mac,*}` in VARDEN
 * We do a 1D Taylor series extrapolation to get both components of velocity at the x-face:
 
   .. math::
-
-     \begin{aligned}
-     u_{L,\ib-\half\eb_x}^{1D} &=& u_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,u_{\ib-\eb_x})\right]\Delta_xu_{\ib-\eb_x}, \label{varden U_L^1D} \\
-     u_{R,\ib-\half\eb_x}^{1D} &=& u_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,u_{\ib})\right]\Delta_xu_{\ib}.\end{aligned}
+     u_{L,\ib-\half\eb_x}^{1D} = u_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,u_{\ib-\eb_x})\right]\Delta_xu_{\ib-\eb_x},
+     :label:  varden U_L^1D
 
   .. math::
+     u_{R,\ib-\half\eb_x}^{1D} = u_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,u_{\ib})\right]\Delta_xu_{\ib} .
 
-     \begin{aligned}
-     v_{L,\ib-\half\eb_x}^{1D} &=& v_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,v_{\ib-\eb_x})\right]\Delta_xv_{\ib-\eb_x}, \\
-     v_{R,\ib-\half\eb_x}^{1D} &=& v_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,v_{\ib})\right]\Delta_xv_{\ib}.\end{aligned}
+  .. math::
+     v_{L,\ib-\half\eb_x}^{1D} = v_{\ib-\eb_x} + \left[\half - \frac{\dt}{2h}{\rm max}(0,v_{\ib-\eb_x})\right]\Delta_xv_{\ib-\eb_x},
+
+  .. math::
+     v_{R,\ib-\half\eb_x}^{1D} &=& v_{\ib} + \left[\half - \frac{\dt}{2h}{\rm min}(0,v_{\ib})\right]\Delta_xv_{\ib}.
 
   We obtain the normal velocity using the Riemann problem:
 
@@ -857,13 +860,13 @@ Computing :math:`\Ub^{\mac,*}` in VARDEN
   :math:`u_{\ib-\half\eb_x}^{1D}`:
 
   .. math::
-
      v_{\ib-\half\eb_x}^{1D} =
      \begin{cases}
      \half\left(v_{L,\ib-\half\eb_x}^{1D} + v_{R,\ib-\half\eb_x}^{1D}\right), & \left|u_{\ib-\half\eb_x}^{1D}\right| < \epsilon \\
      v_{L,\ib-\half\eb_x}^{1D}, & u_{\ib-\half\eb_x}^{1D} > 0, \\
      v_{R,\ib-\half\eb_x}^{1D}, & u_{\ib-\half\eb_x}^{1D} < 0.
-     \end{cases}\label{Transverse Velocity Riemann Problem}
+     \end{cases}
+     :label: Transverse Velocity Riemann Problem
 
 * We perform analogous operations to compute both components of velocity
   at the y-faces, :math:`\Ub_{\ib-\half\eb_y}^{1D}`.
@@ -880,13 +883,13 @@ Computing :math:`\Ub^{\mac,*}` in VARDEN
   Then we solve a Riemann problem:
 
   .. math::
-
      u_{\ib-\half\eb_x}^{\mac,*} =
      \begin{cases}
      0, & \left(u_{L,\ib-\half\eb_x}^{\mac,*} \le 0 ~~ {\rm AND} ~~ u_{R,\ib-\half\eb_x}^{\mac,*} \ge 0\right) ~~ {\rm OR} ~~ \left|u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*}\right| < \epsilon, \\
      u_{L,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} > 0, \\
      u_{R,\ib-\half\eb_x}^{\mac,*}, & u_{L,\ib-\half\eb_x}^{\mac,*} + u_{R,\ib-\half\eb_x}^{\mac,*} < 0.
-     \end{cases}\label{umac Riemann Problem}
+     \end{cases}
+     :label: umac Riemann Problem
 
 * We perform analogous operations to compute the normal velocity at the
   y-faces, :math:`v^{\mac,*}_{\ib-\half\eb_y}`.
@@ -898,13 +901,12 @@ Computing :math:`\Ub^{\mac,*}` in VARDEN
 
 This is more complicated than the 2D case because we include corner
 coupling. We compute :math:`\Ub_{\ib-\half\eb_x}^{1D},
-\Ub_{\ib-\half\eb_y}^{1D}`, and :math:`\Ub_{\ib-\half\eb_z}^{1D}` in an
-analogous manner as equations (`[varden U_L^1D] <#varden U_L^1D>`__)-(\ `[Transverse
-Velocity Riemann Problem] <#Transverse
-Velocity Riemann Problem>`__). Then we compute an intermediate state,
+\Ub_{\ib-\half\eb_y}^{1D}`, and :math:`\Ub_{\ib-\half\eb_z}^{1D}` in
+an analogous manner as :eq:`varden U_L^1D]`-:eq:`Transverse Velocity
+Riemann Problem`. Then we compute an intermediate state,
 :math:`u_{\ib-\half\eb_y}^{y|z}`, which is described as “state
-:math:`u_{\ib-\half\eb_y}^{1D}` that has been updated to account for the
-transverse derivatives in the z direction”, using:
+:math:`u_{\ib-\half\eb_y}^{1D}` that has been updated to account for
+the transverse derivatives in the z direction”, using:
 
 .. math::
 
@@ -937,8 +939,7 @@ extrapolation to get the MAC velocities at normal faces:
    u_{R,\ib-\half\eb_x}^{\mac,*} = u_{R,\ib-\half\eb_x}^{1D} &-& \frac{\dt}{4h}\left(v_{\ib+\half\eb_y}^{1D}+v_{\ib-\half\eb_y}^{1D}\right)\left(u_{\ib+\half\eb_y}^{y|z}-u_{\ib-\half\eb_y}^{y|z}\right) \nonumber \\
    &-& \frac{\dt}{4h}\left(w_{\ib+\half\eb_z}^{1D}+w_{\ib-\half\eb_z}^{1D}\right)\left(u_{\ib+\half\eb_z}^{z|y}-u_{\ib-\half\eb_z}^{z|y}\right) + \frac{\dt}{2}f_{u,\ib}.\end{aligned}
 
-Then we use the Riemann solver given above for the 2D case (equation
-[`[umac Riemann Problem] <#umac Riemann Problem>`__]) to compute
+Then we use the Riemann solver given above for the 2D case (:eq:`umac Riemann Problem`) to compute
 :math:`u_{\ib-\half\eb_x}^{\mac,*}`. We use an analogous procedure to
 obtain :math:`v_{\ib-\half\eb_y}^{\mac,*}` and
 :math:`w_{\ib-\half\eb_z}^{\mac,*}`.
@@ -962,10 +963,12 @@ formulation. Here, :math:`s` is used in place of either :math:`\rho, u, v`, or
 The 1D extrapolation is:
 
 .. math::
+   s_{L,\ib-\half\eb_x}^{1D} = s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n,
+   :label: varden s_L^1D
 
-   \begin{aligned}
-   s_{L,\ib-\half\eb_x}^{1D} &=& s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n, \label{varden s_L^1D}\\
-   s_{R,\ib-\half\eb_x}^{1D} &=& s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n. \label{varden s_R^1D}\end{aligned}
+.. math::
+   s_{R,\ib-\half\eb_x}^{1D} = s_{\ib} - \left(\half + \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib}^n.
+   :label: varden s_R^1D
 
 Then we upwind based on :math:`u^{\mac}`:
 
@@ -1019,8 +1022,7 @@ We use an analogous procedure to compute :math:`s_{\ib-\half\eb_y}^{\edge}`.
 This is more complicated than the 2D case because we include corner
 coupling. We first compute :math:`s_{\ib-\half\eb_x}^{1D}`,
 :math:`s_{\ib-\half\eb_y}^{1D}`, and :math:`s_{\ib-\half\eb_z}^{1D}` in an
-analogous manner to equations (`[varden s_L^1D] <#varden s_L^1D>`__) and
-(`[varden s_R^1D] <#varden s_R^1D>`__). Then we compute six intermediate states,
+analogous manner to :eq:`varden s_L^1D` and :eq:`varden s_R^1D`. Then we compute six intermediate states,
 :math:`s_{\ib-\half\eb_x}^{x|y}, s_{\ib-\half\eb_x}^{x|z},
 s_{\ib-\half\eb_y}^{y|x}, s_{\ib-\half\eb_y}^{y|z},
 s_{\ib-\half\eb_z}^{z|x}`, and :math:`s_{\ib-\half\eb_z}^{z|y}`. For the
@@ -1112,12 +1114,12 @@ ESTATE_FPU in GODUNOV_2D/3D.f
   Apply boundary conditions on :math:`s_L^x` and :math:`s_R^x`. Then,
 
   .. math::
-
      \text{s}_{\ib-\half\eb_x}^x =
      \begin{cases}
      s_L^x, & \text{UEDGE}_{\ib-\half\eb_x} > 0, \\
      s_R^x, & \text{else}. \\
-     \end{cases}\label{ESTATE_FPU Upwind}
+     \end{cases}
+     :label: ESTATE_FPU Upwind
 
 * Then, if :math:`|\text{UEDGE}_{\ib-\half\eb_x}| \le \epsilon`, we set :math:`s_{\ib-\half\eb_x}^x = (s_L^x+s_R^x)/2`. The procedure to obtain :math:`s_{\ib-\half\eb_y}^y` is analogous.
 
@@ -1167,7 +1169,7 @@ ESTATE_FPU in GODUNOV_2D/3D.f
      \text{sedge}_R^x &=& s_{\ib} - \left(\half + \frac{\dt}{h_x}\text{UEDGE}_{\ib-\half\eb_x}\right)\Delta^x s_{\ib} + \frac{\dt}{2}\text{TFORCES}_{\ib} \nonumber\\
      && - \frac{\dt}{2}\left[\frac{(\text{VEDGE}_{\ib+\half\eb_y}+\text{VEDGE}_{\ib-\half\eb_y})(s_{\ib+\half\eb_y}-s_{\ib-\half\eb_y})}{2h_y}\right]\label{transverse upwinding 6}\end{aligned}
 
-*  Finally, upwind analogous to equation (`[ESTATE_FPU Upwind] <#ESTATE_FPU Upwind>`__) to get :math:`\text{sedge}_{\ib-\half\eb_x}`.
+*  Finally, upwind analogous to :eq:`ESTATE_FPU Upwind` to get :math:`\text{sedge}_{\ib-\half\eb_x}`.
 
 
 ESTATE in GODUNOV_2D/3D.f
@@ -1192,12 +1194,12 @@ First, the normal predictor.
 Apply boundary conditions on :math:`s_L^x` and :math:`s_R^x`. Then,
 
 .. math::
-
    \text{s}_{\ib-\half\eb_x}^x =
    \begin{cases}
    s_L^x, & \text{UAD}_{\ib-\half\eb_x} > 0, \\
    s_R^x, & \text{else}. \\
-   \end{cases}\label{ESTATE Upwind}
+   \end{cases}
+   :label: ESTATE Upwind
 
 Then, if :math:`|\text{UAD}_{\ib-\half\eb_x}| \le \epsilon`, we set :math:`s_{\ib-\half\eb_x}^x = (s_L^x+s_R^x)/2`.
 
@@ -1212,7 +1214,7 @@ Then, if :math:`|\text{UAD}_{\ib-\half\eb_x}| \le \epsilon`, we set :math:`s_{\i
 Note that the 2D and 3D algorithms are different - in 3D the transverse
 terms use upwinding analogous to equations
 (`[transverse upwinding 1] <#transverse upwinding 1>`__)-(\ `[transverse upwinding 6] <#transverse upwinding 6>`__), using UAD
-instead of UEDGE. Finally, upwind analogous to equation (`[ESTATE Upwind] <#ESTATE Upwind>`__)
+instead of UEDGE. Finally, upwind analogous to :eq:`ESTATE Upwind`
 to get :math:`\text{sedge}_{\ib-\half\eb_x}`, but use UEDGE instead of UAD.
 
 
@@ -1222,8 +1224,7 @@ Piecewise Parabolic Method (PPM)
 Consider a scalar, :math:`s`, which we wish to predict to
 time-centered edges.  The PPM method is an improvement over the
 piecewise-linear method.  Using our notation, we modify equations
-(`[3D predict s to left] <#3D predict s to left>`__) and (`[3D predict
-s to right] <#3D predict s to right>`__) in Section `4 <#Scalar Edge
+(:eq:`3D predict s to left` and :eq:`3D predict s to right`) in Section `4 <#Scalar Edge
 State Prediction in MAESTROeX>`__ to obtain better estimates for the
 time-centered 1D edge states, :math:`s_{L/R,\ib-\myhalf\eb_x}`,
 etc.. Once these states are obtained, we continue with the
@@ -1300,7 +1301,9 @@ Colella and Woodward Based Approach
 Spatially interpolate :math:`s` to edges.
 Use a 4th-order interpolation in space with van Leer limiting to obtain edge values:
 
-.. math:: s_{i+\myhalf} = \frac{1}{2}\left(s_{i} + s_{i+1}\right) - \frac{1}{6}\left(\delta s_{i+1}^{vL} - \delta s_{i}^{vL}\right),\label{eq:CW Edge}
+.. math::
+   s_{i+\myhalf} = \frac{1}{2}\left(s_{i} + s_{i+1}\right) - \frac{1}{6}\left(\delta s_{i+1}^{vL} - \delta s_{i}^{vL}\right),
+   :label: eq:CW Edge
 
 .. math::
 
@@ -1321,7 +1324,7 @@ A more compact way of writing this is
 
 .. math:: \delta s_i^{vL} = s\max\left\{\min\left[s\delta s_i, 2s(s_{i+1}-s_i),2s(s_i-s_{i-1})\right],0\right\}
 
-Without the limiters, equation (`[eq:CW Edge] <#eq:CW Edge>`__) is the familiar 4th-order spatial interpolation formula:
+Without the limiters, :eq:`eq:CW Edge` is the familiar 4th-order spatial interpolation formula:
 
 .. math:: s_{i+\myhalf} = \frac{7}{12}\left(s_{i+1}+s_i\right) - \frac{1}{12}\left(s_{i+2}+s_{i-1}\right).
 
