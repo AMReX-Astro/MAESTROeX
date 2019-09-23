@@ -435,6 +435,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
+    
+    Vector<MultiFab> p0_old_cart(finest_level+1);
+    Vector<MultiFab> p0_new_cart(finest_level+1);
 
     if (evolve_base_state) {
 
@@ -479,6 +482,16 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
+        for (int lev=0; lev<=finest_level; ++lev) {
+            p0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+            p0_old_cart[lev].setVal(0.);
+            p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+            p0_new_cart[lev].setVal(0.);
+        }
+
+        Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+
         // make psi
         if (spherical == 0) {
             make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
@@ -490,10 +503,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             }
 
             // compute gamma1bar^{(1)} and store it in gamma1bar_temp1
-            MakeGamma1bar(s1, gamma1bar_temp1, p0_old);
+            MakeGamma1bar(s1, gamma1bar_temp1, p0_old_cart);
 
             // compute gamma1bar^{(2),*} and store it in gamma1bar_temp2
-            MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
+            MakeGamma1bar(s2, gamma1bar_temp2, p0_new_cart);
 
             // compute gamma1bar^{nph,*} and store it in gamma1bar_temp2
             for(int i=0; i<gamma1bar_temp2.size(); ++i) {
@@ -617,8 +630,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     misc_time_start = ParallelDescriptor::second();
 
     if (evolve_base_state) {
+        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
         // compute beta0 and gamma1bar
-        MakeGamma1bar(snew,gamma1bar_new,p0_new);
+        MakeGamma1bar(snew,gamma1bar_new,p0_new_cart);
 
         base_time_start = ParallelDescriptor::second();
 
@@ -884,8 +898,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
 
         } else {
+            Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
             // compute gamma1bar^{(2)} and store it in gamma1bar_temp2
-            MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
+            MakeGamma1bar(s2, gamma1bar_temp2, p0_new_cart);
 
             base_time_start = ParallelDescriptor::second();
 
@@ -992,8 +1007,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     misc_time_start = ParallelDescriptor::second();
 
     if (evolve_base_state) {
+        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
         // compute beta0 and gamma1bar
-        MakeGamma1bar(snew,gamma1bar_new,p0_new);
+        MakeGamma1bar(snew,gamma1bar_new,p0_new_cart);
 
         base_time_start = ParallelDescriptor::second();
 

@@ -638,7 +638,7 @@ private:
     /// Calculate the horizontal average of \f$\Gamma_1\f$
     void MakeGamma1bar (const amrex::Vector<amrex::MultiFab>& scal,
                         RealVector& gamma1bar,
-                        const RealVector& p0);
+                        const amrex::Vector<amrex::MultiFab>& p0_cart);
 
     // end MaestroGamma.cpp functions
     ////////////

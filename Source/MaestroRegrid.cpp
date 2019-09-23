@@ -119,8 +119,17 @@ Maestro::Regrid ()
     // force tempbar to be the average of temp
     Average(sold,tempbar,Temp);
 
+    Vector<MultiFab> p0_old_cart(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        p0_old_cart[lev].setVal(0.);
+    }
+
+    Put1dArrayOnCart(p0_old,p0_old_cart,0,0,bcs_f,0);
+
     // gamma1bar needs to be recomputed
-    MakeGamma1bar(sold,gamma1bar_old,p0_old);
+    MakeGamma1bar(sold,gamma1bar_old,p0_old_cart);
 
     // beta0_old needs to be recomputed
     if (use_exact_base_state) {

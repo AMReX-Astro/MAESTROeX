@@ -531,12 +531,19 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
     ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
+    Vector<MultiFab> p0_new_cart(finest_level+1);
 
     if (evolve_base_state) {
-	// compute beta0 and gamma1bar
-	MakeGamma1bar(snew,gamma1bar_new,p0_new);
-	make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+        for (int lev=0; lev<=finest_level; ++lev) {
+            p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+            p0_new_cart[lev].setVal(0.);
+        }
+        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+
+        // compute beta0 and gamma1bar
+        MakeGamma1bar(snew,gamma1bar_new,p0_new_cart);
+        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+                        gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
     }
     else {
 	// Just pass beta0 and gamma1bar through if not evolving base state
@@ -836,10 +843,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
 
     if (evolve_base_state) {
-	//compute beta0 and gamma1bar
-	MakeGamma1bar(snew,gamma1bar_new,p0_new);
-	make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+        //compute beta0 and gamma1bar
+        MakeGamma1bar(snew,gamma1bar_new,p0_new_cart);
+        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
+                        gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
     }
 
     for(int i=0; i<beta0_nph.size(); ++i) {
