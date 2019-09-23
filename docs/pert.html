@@ -751,7 +751,7 @@ a T right}`</p>
 <tbody>
 <tr class="row-odd"><td><p>species_p
 red_type</p></td>
-<td><p><a href="#id30"><span class="problematic" id="id31">enthalpy_</span></a>
+<td><p><a href="#id39"><span class="problematic" id="id40">enthalpy_</span></a>
 pred_type</p></td>
 <td><p>cell-cent
 ered</p></td>
@@ -865,7 +865,7 @@ m avg}} +</p>
 <p>athrm{edg
 e} right</p>
 <blockquote>
-<div><p>) <a href="#id32"><span class="problematic" id="id33">h_</span></a>mat</p>
+<div><p>) <a href="#id41"><span class="problematic" id="id42">h_</span></a>mat</p>
 </div></blockquote>
 <p>hrm{edge}
 `</p>
@@ -929,7 +929,7 @@ m avg}} +</p>
 <p>athrm{edg
 e} right</p>
 <blockquote>
-<div><p>) <a href="#id34"><span class="problematic" id="id35">h_</span></a>mat</p>
+<div><p>) <a href="#id43"><span class="problematic" id="id44">h_</span></a>mat</p>
 </div></blockquote>
 <p>hrm{edge}
 `</p>
@@ -1322,7 +1322,7 @@ state</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a href="#id36"><span class="problematic" id="id37">predict_rhoprime_and_</span></a>
+<tr class="row-even"><td><p><a href="#id45"><span class="problematic" id="id46">predict_rhoprime_and_</span></a>
 X</p></td>
 <td><p><span class="math notranslate nohighlight">\(\rho_0^{n+\myh
 alf,\rm{avg}} + \rho'
@@ -1411,55 +1411,95 @@ amount of mixing.</p>
 </div>
 <div class="section" id="initial-observations">
 <h3>Initial Observations<a class="headerlink" href="#initial-observations" title="Permalink to this headline">¶</a></h3>
-<p>With <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> there is a large difference
-between <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> and species_pred_type = 2,3 as
-seen in Figure <a class="reference external" href="#fig:spec1_vs_23">[fig:spec1_vs_23]</a>. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> shows
-quick heating (peak T vs. t) and there is ok agreement between <code class="docutils literal notranslate"><span class="pre">tfromh</span></code>
-and <code class="docutils literal notranslate"><span class="pre">tfromp</span></code>. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2,3</span></code> show cooling (peak T vs. t)
-and <code class="docutils literal notranslate"><span class="pre">tfromh</span></code> looks completely unphysical (see Figure
-<a class="reference external" href="#fig:tfromh_unphysical">[fig:tfromh_unphysical]</a>). There are also strange filament type features in
-the momentum plots shown in Figure <a class="reference external" href="#fig:mom_filaments">[fig:mom_filaments]</a>.</p>
-<p>[fig:spec1_vs_23]</p>
-<p>[fig:tfromh_unphysical]</p>
-<p>[fig:mom_filaments]</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> there is a large
+difference between <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> and species_pred_type =
+2,3 as seen in <code class="xref std std-numref docutils literal notranslate"><span class="pre">fig:spec1_vs_23`</span></code>. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code>
+shows quick heating (peak T vs. t) and there is ok agreement between
+<code class="docutils literal notranslate"><span class="pre">tfromh</span></code> and <code class="docutils literal notranslate"><span class="pre">tfromp</span></code>. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2,3</span></code> show cooling
+(peak T vs. t) and <code class="docutils literal notranslate"><span class="pre">tfromh</span></code> looks completely unphysical (see
+<a class="reference internal" href="#fig-tfromh-unphysical"><span class="std std-numref">Fig. 19</span></a>). There are also strange filament type
+features in the momentum plots shown in <a class="reference internal" href="#fig-mom-filaments"><span class="std std-numref">Fig. 20</span></a>.</p>
+<div class="figure align-center" id="id30">
+<span id="fig-spec1-vs-23"></span><img alt="_images/spec1_vs_23.png" src="_images/spec1_vs_23.png" />
+<p class="caption"><span class="caption-number">Fig. 18 </span><span class="caption-text">Compare species_pred_type = 1,2,3 with use_tfromp =
+T, enthalpy_pred_type = 1, cflfac = 0.7</span><a class="headerlink" href="#id30" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id31">
+<span id="fig-tfromh-unphysical"></span><img alt="_images/tfromh_unphysical.png" src="_images/tfromh_unphysical.png" />
+<p class="caption"><span class="caption-number">Fig. 19 </span><span class="caption-text">There are strange filament type features at the bottom of the
+domain. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code>, <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code>,
+<code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code></span><a class="headerlink" href="#id31" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id32">
+<span id="fig-mom-filaments"></span><img alt="_images/mom_filaments.png" src="_images/mom_filaments.png" />
+<p class="caption"><span class="caption-number">Fig. 20 </span><span class="caption-text">There are strange filament type features at the bottom of the
+domain. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code>, <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code>,
+<code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code></span><a class="headerlink" href="#id32" title="Permalink to this image">¶</a></p>
+</div>
 <p>Using <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code> and <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span></code> <span class="math notranslate nohighlight">\(&gt;\)</span> 0 results in many runs
 crashing very quickly and gives unphyiscal temperature profiles as seen in
-Figure <a class="reference external" href="#fig:tfrompF_unphys">[fig:tfrompF_unphys]</a>.</p>
-<p>[fig:tfrompF_unphys]</p>
-<p>[fig:tfrompF_cfl_1vs7]</p>
+<a class="reference internal" href="#fig-tfrompf-unphys"><span class="std std-numref">Fig. 21</span></a>.</p>
+<div class="figure align-center" id="id33">
+<span id="fig-tfrompf-unphys"></span><img alt="_images/tfrompF_unphys.png" src="_images/tfrompF_unphys.png" />
+<p class="caption"><span class="caption-number">Fig. 21 </span><span class="caption-text">Compare <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code> with <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> for
+<code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>, <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span> <span class="pre">=</span> <span class="pre">0.0</span></code>, <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code></span><a class="headerlink" href="#id33" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id34">
+<span id="fig-tfrompf-cfl-1vs7"></span><img alt="_images/tfrompF_cfl_1vs7.png" src="_images/tfrompF_cfl_1vs7.png" />
+<p class="caption"><span class="caption-number">Fig. 22 </span><span class="caption-text">Compare <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code> with <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> for
+<code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>, <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span> <span class="pre">=</span> <span class="pre">0.0</span></code>, <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code></span><a class="headerlink" href="#id34" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="change-cflfac-and-enthalpy-pred-type">
 <h3>Change cflfac and enthalpy_pred_type<a class="headerlink" href="#change-cflfac-and-enthalpy-pred-type" title="Permalink to this headline">¶</a></h3>
-<p>With <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code>,
-there is much less heating (peak T vs. t) than the <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code>
-(default). There is also a lower overall Mach number (see Figure
-<a class="reference external" href="#fig:spec1_cfl_1vs7">[fig:spec1_cfl_1vs7]</a>) with the <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code> and excellent agreement
-between <code class="docutils literal notranslate"><span class="pre">tfromh</span></code> and <code class="docutils literal notranslate"><span class="pre">tfromp</span></code>.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code>, there is much
+less heating (peak T vs. t) than the <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> (default). There
+is also a lower overall Mach number (see <a class="reference internal" href="#fig-spec1-cfl-1vs7"><span class="std std-numref">Fig. 23</span></a>)
+with the <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code> and excellent agreement between <code class="docutils literal notranslate"><span class="pre">tfromh</span></code>
+and <code class="docutils literal notranslate"><span class="pre">tfromp</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>, <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span> <span class="pre">=</span> <span class="pre">0.0</span></code>, <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">3,4</span></code> and
 <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2,3</span></code> shows cooling (as seen in <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code>)
-with a comparable rate of cooling (see Figure <a class="reference external" href="#fig:compare_tfromp">[fig:compare_tfromp]</a>)
+with a comparable rate of cooling (see <a class="reference internal" href="#fig-compare-tfromp"><span class="std std-numref">Fig. 24</span></a>)
 to the <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code> case. The
 largest difference between the two runs is that the <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>
 case shows excellent agreement between <code class="docutils literal notranslate"><span class="pre">tfromh</span></code> and <code class="docutils literal notranslate"><span class="pre">tfromp</span></code> with
-<code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code>. The filaments in the momentum plot of Figure
-<a class="reference external" href="#fig:mom_filaments">[fig:mom_filaments]</a> are still present.</p>
-<p>[fig:spec1_cfl_1vs7]</p>
-<p>[fig:compare_tfromp]</p>
+<code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code>. The filaments in the momentum plot of <a class="reference internal" href="#fig-mom-filaments"><span class="std std-numref">Fig. 20</span></a> are still present.</p>
+<div class="figure align-center" id="id35">
+<span id="fig-spec1-cfl-1vs7"></span><img alt="_images/spec1_cfl_1vs7.png" src="_images/spec1_cfl_1vs7.png" />
+<p class="caption"><span class="caption-number">Fig. 23 </span><span class="caption-text">Illustrate the comparable cooling rates between
+use_tfromp = T and use_tfromp = F with dpdt_factor = 0.0
+using species_pred_type = 2, enthalpy_pred_type = 3,1</span><a class="headerlink" href="#id35" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id36">
+<span id="fig-compare-tfromp"></span><img alt="_images/compare_tfromp.png" src="_images/compare_tfromp.png" />
+<p class="caption"><span class="caption-number">Fig. 24 </span><span class="caption-text">Illustrate the comparable cooling rates between
+use_tfromp = T and use_tfromp = F with dpdt_factor = 0.0
+using species_pred_type = 2, enthalpy_pred_type = 3,1</span><a class="headerlink" href="#id36" title="Permalink to this image">¶</a></p>
+</div>
 <p>For a given <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span></code> and <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>,
 <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code> has a lower Mach number (vs. t) compared to
 <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">3</span></code>.</p>
 <p>Any <code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code> with <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>, <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span> <span class="pre">=</span> <span class="pre">0.0</span></code>
 and <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> shows significant heating, although
 the onset of the heating is delayed in <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2,3</span></code> (see
-Figure <a class="reference external" href="#fig:compare_tF_d0_h1_s123">[fig:compare_tF_d0_h1_s123]</a>). Only
+<a class="reference internal" href="#fig-compare-tf-d0-h1-s123"><span class="std std-numref">Fig. 25</span></a>). Only
 <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> gives good agreement between <code class="docutils literal notranslate"><span class="pre">tfromh</span></code> and
 <code class="docutils literal notranslate"><span class="pre">tfromp</span></code>.</p>
 <p>Comparing <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> and <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code> with
 <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>, <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span> <span class="pre">=</span> <span class="pre">0.0</span></code>, <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code> and
-<code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code> shows good agreement overall (see Figure
-<a class="reference external" href="#fig:tfrompF_cfl_1vs7">[fig:tfrompF_cfl_1vs7]</a>).</p>
-<p>[fig:compare_tF_d0_h1_s123]</p>
-<p>[fig:compare_castro]</p>
+<code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code> shows good agreement overall (see <a class="reference internal" href="#fig-tfrompf-cfl-1vs7"><span class="std std-numref">Fig. 22</span></a>.</p>
+<div class="figure align-center" id="id37">
+<span id="fig-compare-tf-d0-h1-s123"></span><img alt="_images/compare_tF_d0_h1_s123.png" src="_images/compare_tF_d0_h1_s123.png" />
+<p class="caption"><span class="caption-number">Fig. 25 </span><span class="caption-text">Compare the castro.ppm_type CASTRO runs with the
+species_pred_type MAESTROeX runs.</span><a class="headerlink" href="#id37" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id38">
+<span id="fig-compare-castro"></span><img alt="_images/compare_castro.png" src="_images/compare_castro.png" />
+<p class="caption"><span class="caption-number">Fig. 26 </span><span class="caption-text">Compare the castro.ppm_type CASTRO runs with the
+species_pred_type MAESTROeX runs.</span><a class="headerlink" href="#id38" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="additional-runs">
 <h3>Additional Runs<a class="headerlink" href="#additional-runs" title="Permalink to this headline">¶</a></h3>
@@ -1481,7 +1521,7 @@ well with the normal evolve_base_state = T run.</p>
 <h3>toy_convect in CASTRO<a class="headerlink" href="#toy-convect-in-castro" title="Permalink to this headline">¶</a></h3>
 <p>toy_convect was also run using CASTRO with
 castro.ppm_type = 0,1. These runs show temperatures that cool
-off rather than increase (see Figure <a class="reference external" href="#fig:compare_castro">[fig:compare_castro]</a>) which
+off rather than increase (see <a class="reference internal" href="#fig-compare-castro"><span class="std std-numref">Fig. 26</span></a>) which
 suggests using species_pred_type = 2,3 instead of
 species_pred_type = 1.</p>
 </div>

@@ -568,13 +568,13 @@ AMReX—one for cell-centered data and one for node-centered (nodal)
 data. Both of these are used in MAESTROeX.</p>
 <p>The MAC projection operates on the advective velocities predicted at
 the cell-interfaces at the half-time. The edge-centered velocities
-are shown in <a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 18</span></a>. If we consider purely
+are shown in <a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>. If we consider purely
 incompressible flow, the projection appears as:</p>
 <div class="math notranslate nohighlight" id="equation-mg-0">
 <span class="eqno">(278)<a class="headerlink" href="#equation-mg-0" title="Permalink to this equation">¶</a></span>\[D G \phi = D U\]</div>
 <p>where <span class="math notranslate nohighlight">\(D\)</span> is the divergence operator and <span class="math notranslate nohighlight">\(G\)</span> is the gradient operator.
 In this discretization, <span class="math notranslate nohighlight">\(\phi\)</span> is cell-centered (see
-<a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 18</span></a>. The remaining quantities are discretized as:</p>
+<a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>. The remaining quantities are discretized as:</p>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(DU\)</span> is cell-centered,</p>
 <div class="math notranslate nohighlight" id="equation-mg-1">
@@ -582,15 +582,15 @@ In this discretization, <span class="math notranslate nohighlight">\(\phi\)</spa
                \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}\]</div>
 </li>
 <li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is edge-centered, on the MAC grid, as shown in
-<a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 18</span></a>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(DG\phi\)</span> is cell-centered, also shown in <a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 18</span></a>,
+<a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(DG\phi\)</span> is cell-centered, also shown in <a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>,
 computed from <span class="math notranslate nohighlight">\(G\phi\)</span> using the same differencing as <span class="math notranslate nohighlight">\(DU\)</span>.</p></li>
 </ul>
 <div class="figure align-default" id="fig-mg-mac">
 <a class="reference internal image-reference" href="_images/MAC_mg2.png"><img alt="Data centerings for the MAC projection" src="_images/MAC_mg2.png" style="width: 80%;" /></a>
 </div>
 <p>The HG projection projects the cell-centered velocities at the end of
-the timestep. Here, <span class="math notranslate nohighlight">\(\phi\)</span> is node-centered. <a class="reference internal" href="#fig-mg-hg"><span class="std std-numref">Fig. 19</span></a>
+the timestep. Here, <span class="math notranslate nohighlight">\(\phi\)</span> is node-centered. <a class="reference internal" href="#fig-mg-hg"><span class="std std-numref">Fig. 28</span></a>
 shows the locations of the various quantities involved in the HG
 projection. Again considering simple incompressible flow, we now
 solve:</p>
@@ -608,7 +608,7 @@ following centerings:</p>
                        \frac{\frac{1}{2} (v_{i,j} + v_{i-1,j}) -
                              \frac{1}{2} (v_{i,j-1} + v_{i-1,j-1})}{\Delta y}\]</div>
 </li>
-<li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is cell-centered, as shown in <a class="reference internal" href="#fig-mg-hg"><span class="std std-numref">Fig. 19</span></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is cell-centered, as shown in <a class="reference internal" href="#fig-mg-hg"><span class="std std-numref">Fig. 28</span></a>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(L\phi\)</span> is node-centered. This is a direct discretization of
 the Laplacian operator. By default, MAESTROeX uses a dense stencil
 (9-points in 2-d, 27-points in 3-d). Alternately, a <em>cross</em>

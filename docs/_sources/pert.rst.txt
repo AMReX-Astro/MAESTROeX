@@ -892,175 +892,95 @@ amount of mixing.
 Initial Observations
 --------------------
 
-With ``use_tfromp = T`` and ``cflfac = 0.7`` there is a large difference
-between ``species_pred_type = 1`` and species_pred_type = 2,3 as
-seen in Figure `[fig:spec1_vs_23] <#fig:spec1_vs_23>`__. ``species_pred_type = 1`` shows
-quick heating (peak T vs. t) and there is ok agreement between ``tfromh``
-and ``tfromp``. ``species_pred_type = 2,3`` show cooling (peak T vs. t)
-and ``tfromh`` looks completely unphysical (see Figure
-`[fig:tfromh_unphysical] <#fig:tfromh_unphysical>`__). There are also strange filament type features in
-the momentum plots shown in Figure `[fig:mom_filaments] <#fig:mom_filaments>`__.
+With ``use_tfromp = T`` and ``cflfac = 0.7`` there is a large
+difference between ``species_pred_type = 1`` and species_pred_type =
+2,3 as seen in :numref:`fig:spec1_vs_23``. ``species_pred_type = 1``
+shows quick heating (peak T vs. t) and there is ok agreement between
+``tfromh`` and ``tfromp``. ``species_pred_type = 2,3`` show cooling
+(peak T vs. t) and ``tfromh`` looks completely unphysical (see
+:numref:`fig:tfromh_unphysical`). There are also strange filament type
+features in the momentum plots shown in :numref:`fig:mom_filaments`.
 
-.. raw:: latex
 
-   \centering
-
-.. figure:: \pertfigpath/spec1_vs_23
-   :alt: Compare species_pred_type = 1,2,3 with use_tfromp =
-   T, enthalpy_pred_type = 1, cflfac = 0.7
+.. _fig:spec1_vs_23:
+.. figure:: spec1_vs_23.png
+   :align: center
 
    Compare species_pred_type = 1,2,3 with use_tfromp =
    T, enthalpy_pred_type = 1, cflfac = 0.7
 
-[fig:spec1_vs_23]
 
-.. raw:: latex
-
-   \vspace{0pt}
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \pertfigpath/tfromh_unphysical
-   :alt: There are strange filament type features at the bottom of the
-   domain. ``species_pred_type = 2``, ``enthalpy_pred_type = 1``, ``cflfac = 0.7``,
-   ``use_tfromp = T``
+.. _fig:tfromh_unphysical:
+.. figure:: tfromh_unphysical.png
+   :align: center
 
    There are strange filament type features at the bottom of the
    domain. ``species_pred_type = 2``, ``enthalpy_pred_type = 1``, ``cflfac = 0.7``,
    ``use_tfromp = T``
 
-[fig:tfromh_unphysical]
-
-.. raw:: latex
-
-   \hspace{0.5cm}
-
-.. raw:: latex
-
-   \vspace{0pt}
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \pertfigpath/mom_filaments
-   :alt: There are strange filament type features at the bottom of the
-   domain. ``species_pred_type = 2``, ``enthalpy_pred_type = 1``, ``cflfac = 0.7``,
-   ``use_tfromp = T``
+.. _fig:mom_filaments:
+.. figure:: mom_filaments.png
+   :align: center
 
    There are strange filament type features at the bottom of the
    domain. ``species_pred_type = 2``, ``enthalpy_pred_type = 1``, ``cflfac = 0.7``,
    ``use_tfromp = T``
-
-[fig:mom_filaments]
 
 Using ``use_tfromp = F`` and ``dpdt_factor`` :math:`>` 0 results in many runs
 crashing very quickly and gives unphyiscal temperature profiles as seen in
-Figure `[fig:tfrompF_unphys] <#fig:tfrompF_unphys>`__.
+:numref:`fig:tfrompF_unphys`.
 
-.. raw:: latex
 
-   \vspace{0pt}
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \pertfigpath/tfrompF_unphys
-   :alt: Compare cflfac = 0.1 with cflfac = 0.7 for
-   ``use_tfromp = F``, ``dpdt_factor = 0.0``, ``species_pred_type = 2``,
-   ``enthalpy_pred_type = 4``
+.. _fig:tfrompF_unphys:
+.. figure:: tfrompF_unphys.png
+   :align: center
 
    Compare ``cflfac = 0.1`` with ``cflfac = 0.7`` for
    ``use_tfromp = F``, ``dpdt_factor = 0.0``, ``species_pred_type = 2``,
    ``enthalpy_pred_type = 4``
 
-[fig:tfrompF_unphys]
-
-.. raw:: latex
-
-   \hspace{0.5cm}
-
-.. raw:: latex
-
-   \vspace{0pt}
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \pertfigpath/tfrompF_cfl_1vs7
-   :alt: Compare cflfac = 0.1 with cflfac = 0.7 for
-   ``use_tfromp = F``, ``dpdt_factor = 0.0``, ``species_pred_type = 2``,
-   ``enthalpy_pred_type = 4``
+.. _fig:tfrompF_cfl_1vs7:
+.. figure:: tfrompF_cfl_1vs7.png
+   :align: center
 
    Compare ``cflfac = 0.1`` with ``cflfac = 0.7`` for
    ``use_tfromp = F``, ``dpdt_factor = 0.0``, ``species_pred_type = 2``,
    ``enthalpy_pred_type = 4``
 
-[fig:tfrompF_cfl_1vs7]
 
 Change cflfac and enthalpy_pred_type
 ------------------------------------
 
-With ``species_pred_type = 1`` and ``cflfac = 0.1``,
-there is much less heating (peak T vs. t) than the ``cflfac = 0.7``
-(default). There is also a lower overall Mach number (see Figure
-`[fig:spec1_cfl_1vs7] <#fig:spec1_cfl_1vs7>`__) with the ``cflfac = 0.1`` and excellent agreement
-between ``tfromh`` and ``tfromp``.
+With ``species_pred_type = 1`` and ``cflfac = 0.1``, there is much
+less heating (peak T vs. t) than the ``cflfac = 0.7`` (default). There
+is also a lower overall Mach number (see :numref:`fig:spec1_cfl_1vs7`)
+with the ``cflfac = 0.1`` and excellent agreement between ``tfromh``
+and ``tfromp``.
 
 ``use_tfromp = F``, ``dpdt_factor = 0.0``, ``enthalpy_pred_type = 3,4`` and
 ``species_pred_type = 2,3`` shows cooling (as seen in ``use_tfromp = T``)
-with a comparable rate of cooling (see Figure `[fig:compare_tfromp] <#fig:compare_tfromp>`__)
+with a comparable rate of cooling (see :numref:`fig:compare_tfromp`)
 to the ``use_tfromp = T`` case. The
 largest difference between the two runs is that the ``use_tfromp = F``
 case shows excellent agreement between ``tfromh`` and ``tfromp`` with
-``cflfac = 0.7``. The filaments in the momentum plot of Figure
-`[fig:mom_filaments] <#fig:mom_filaments>`__ are still present.
+``cflfac = 0.7``. The filaments in the momentum plot of :numref:`fig:mom_filaments` are still present.
 
-.. raw:: latex
 
-   \vspace{0pt}
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \pertfigpath/spec1_cfl_1vs7
-   :alt: Illustrate the comparable cooling rates between
-   use_tfromp = T and use_tfromp = F with dpdt_factor = 0.0
-   using species_pred_type = 2, enthalpy_pred_type = 3,1
+.. _fig:spec1_cfl_1vs7:
+.. figure:: spec1_cfl_1vs7.png
+   :align: center
 
    Illustrate the comparable cooling rates between
    use_tfromp = T and use_tfromp = F with dpdt_factor = 0.0
    using species_pred_type = 2, enthalpy_pred_type = 3,1
 
-[fig:spec1_cfl_1vs7]
-
-.. raw:: latex
-
-   \hspace{0.5cm}
-
-.. raw:: latex
-
-   \vspace{0pt}
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \pertfigpath/compare_tfromp
-   :alt: Illustrate the comparable cooling rates between
-   use_tfromp = T and use_tfromp = F with dpdt_factor = 0.0
-   using species_pred_type = 2, enthalpy_pred_type = 3,1
+.. _fig:compare_tfromp:
+.. figure:: compare_tfromp.png
+   :align: center
 
    Illustrate the comparable cooling rates between
    use_tfromp = T and use_tfromp = F with dpdt_factor = 0.0
    using species_pred_type = 2, enthalpy_pred_type = 3,1
-
-[fig:compare_tfromp]
 
 For a given ``enthalpy_pred_type`` and ``use_tfromp = F``,
 ``species_pred_type = 2`` has a lower Mach number (vs. t) compared to
@@ -1069,52 +989,28 @@ For a given ``enthalpy_pred_type`` and ``use_tfromp = F``,
 Any ``species_pred_type`` with ``use_tfromp = F``, ``dpdt_factor = 0.0``
 and ``enthalpy_pred_type = 1`` shows significant heating, although
 the onset of the heating is delayed in ``species_pred_type = 2,3`` (see
-Figure `[fig:compare_tF_d0_h1_s123] <#fig:compare_tF_d0_h1_s123>`__). Only
+:numref:`fig:compare_tF_d0_h1_s123`). Only
 ``species_pred_type = 1`` gives good agreement between ``tfromh`` and
 ``tfromp``.
 
 Comparing ``cflfac = 0.7`` and ``cflfac = 0.1`` with
 ``use_tfromp = F``, ``dpdt_factor = 0.0``, ``species_pred_type = 2`` and
-``enthalpy_pred_type = 4`` shows good agreement overall (see Figure
-`[fig:tfrompF_cfl_1vs7] <#fig:tfrompF_cfl_1vs7>`__).
+``enthalpy_pred_type = 4`` shows good agreement overall (see :numref:`fig:tfrompF_cfl_1vs7`.
 
-.. raw:: latex
-
-   \vspace{0pt}
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \pertfigpath/compare_tF_d0_h1_s123
-   :alt: Compare the castro.ppm_type CASTRO runs with the
-   species_pred_type MAESTROeX runs.
+.. _fig:compare_tF_d0_h1_s123:
+.. figure:: compare_tF_d0_h1_s123.png
+   :align: center
 
    Compare the castro.ppm_type CASTRO runs with the
    species_pred_type MAESTROeX runs.
 
-[fig:compare_tF_d0_h1_s123]
-
-.. raw:: latex
-
-   \hspace{0.5cm}
-
-.. raw:: latex
-
-   \vspace{0pt}
-
-.. raw:: latex
-
-   \centering
-
-.. figure:: \pertfigpath/compare_castro
-   :alt: Compare the castro.ppm_type CASTRO runs with the
-   species_pred_type MAESTROeX runs.
+.. _fig:compare_castro:
+.. figure:: compare_castro.png
+   :align: center
 
    Compare the castro.ppm_type CASTRO runs with the
    species_pred_type MAESTROeX runs.
 
-[fig:compare_castro]
 
 Additional Runs
 ---------------
@@ -1139,7 +1035,7 @@ toy_convect in CASTRO
 
 toy_convect was also run using CASTRO with
 castro.ppm_type = 0,1. These runs show temperatures that cool
-off rather than increase (see Figure `[fig:compare_castro] <#fig:compare_castro>`__) which
+off rather than increase (see :numref:`fig:compare_castro`) which
 suggests using species_pred_type = 2,3 instead of
 species_pred_type = 1.
 
