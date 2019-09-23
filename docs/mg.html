@@ -571,14 +571,14 @@ the cell-interfaces at the half-time. The edge-centered velocities
 are shown in <a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>. If we consider purely
 incompressible flow, the projection appears as:</p>
 <div class="math notranslate nohighlight" id="equation-mg-0">
-<span class="eqno">(282)<a class="headerlink" href="#equation-mg-0" title="Permalink to this equation">¶</a></span>\[D G \phi = D U\]</div>
+<span class="eqno">(288)<a class="headerlink" href="#equation-mg-0" title="Permalink to this equation">¶</a></span>\[D G \phi = D U\]</div>
 <p>where <span class="math notranslate nohighlight">\(D\)</span> is the divergence operator and <span class="math notranslate nohighlight">\(G\)</span> is the gradient operator.
 In this discretization, <span class="math notranslate nohighlight">\(\phi\)</span> is cell-centered (see
 <a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>. The remaining quantities are discretized as:</p>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(DU\)</span> is cell-centered,</p>
 <div class="math notranslate nohighlight" id="equation-mg-1">
-<span class="eqno">(283)<a class="headerlink" href="#equation-mg-1" title="Permalink to this equation">¶</a></span>\[(DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
+<span class="eqno">(289)<a class="headerlink" href="#equation-mg-1" title="Permalink to this equation">¶</a></span>\[(DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
                \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}\]</div>
 </li>
 <li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is edge-centered, on the MAC grid, as shown in
@@ -595,7 +595,7 @@ shows the locations of the various quantities involved in the HG
 projection. Again considering simple incompressible flow, we now
 solve:</p>
 <div class="math notranslate nohighlight" id="equation-mg-2">
-<span class="eqno">(284)<a class="headerlink" href="#equation-mg-2" title="Permalink to this equation">¶</a></span>\[L \phi = D U\]</div>
+<span class="eqno">(290)<a class="headerlink" href="#equation-mg-2" title="Permalink to this equation">¶</a></span>\[L \phi = D U\]</div>
 <p>where <span class="math notranslate nohighlight">\(L\)</span> is a discretization of the Laplacian operator. In this
 sense, the HG projection is an <em>approximate projection</em>, that is,
 <span class="math notranslate nohighlight">\(L \neq DG\)</span> (in discretized form). The various operations have the
@@ -603,7 +603,7 @@ following centerings:</p>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(DU\)</span> is node-centered. This is computed as:</p>
 <div class="math notranslate nohighlight" id="equation-mg-3">
-<span class="eqno">(285)<a class="headerlink" href="#equation-mg-3" title="Permalink to this equation">¶</a></span>\[(DU)_{i-1/2,j-1/2} = \frac{\frac{1}{2} (u_{i,j} + u_{i,j-1}) -
+<span class="eqno">(291)<a class="headerlink" href="#equation-mg-3" title="Permalink to this equation">¶</a></span>\[(DU)_{i-1/2,j-1/2} = \frac{\frac{1}{2} (u_{i,j} + u_{i,j-1}) -
                              \frac{1}{2} (u_{i-1,j} + u_{i-1,j-1})}{\Delta x} +
                        \frac{\frac{1}{2} (v_{i,j} + v_{i-1,j}) -
                              \frac{1}{2} (v_{i,j-1} + v_{i-1,j-1})}{\Delta y}\]</div>

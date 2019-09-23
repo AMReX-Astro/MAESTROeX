@@ -424,7 +424,7 @@ depend on ``species_pred_type``.
 
 The general procedure for making the :math:`(\rho h)` edge state is as follows:
 
-#. predict :math:`(rho h)`, :math:`(\rho h)'`, :math:`h`, or :math:`T`
+#. predict :math:`(\rho h)`, :math:`(\rho h)'`, :math:`h`, or :math:`T`
    to the edges (depending on ``enthalpy_pred_type`` ) using
    ``make_edge_scal`` and the forces identified in the appropriate
    evolution equation (:eq:`rhohprime equation`, :eq:`T equation
@@ -455,210 +455,193 @@ it through the velocity field and :math:`S`). As a result, the
 not work. MAESTROeX will abort if the code is run with this
 combination of parameters.
 
-:numref:`table:pred:hoverview` gives a summary of the
-``enthalpy_pred_type`` behavior.
+The behavior of ``enthalpy_pred_type`` is:
 
-.. _table:pred:hforce:
-.. table:: Forcing term into ``make_edge_scal``
+* ``enthalpy_pred_type = 0`` (``predict_rhoh``) :
+  we predict :math:`(\rho h)`.  The advective force is:
 
-   +-----------------------------------+-----------------------------------+
-   | enthalpy_pred_type                | advective force                   |
-   +===================================+===================================+
-   | 0 / predict_rhoh :math:`(\rho h)` | :math:`\left [\psi + (\Ubt \cdot  |
-   |                                   | \er)                              |
-   |                                   |   \frac{\partial p_0}{\partial r} |
-   |                                   |  + \nabla \cdot \kth \nabla T \ri |
-   |                                   | ght ]`                            |
-   +-----------------------------------+-----------------------------------+
-   | 1 / predict_rhohprime             | :math:`-(\rho h)^\prime \; \nabla |
-   | :math:`((\rho h)^\prime)`         |  \cdot (\Ubt+w_0 \er) -           |
-   |                                   |  \nabla \cdot (\Ubt (\rho h)_0) + |
-   |                                   |  (\Ubt \cdot \er) \frac{\partial  |
-   |                                   | p_0}{\partial r} + \nabla \cdot \ |
-   |                                   | kth \nabla T`                     |
-   +-----------------------------------+-----------------------------------+
-   | 2 / predict_h :math:`(h)`         | :math:`\frac{1}{\rho} \left [\psi |
-   |                                   |  + (\Ubt \cdot \er)               |
-   |                                   |   \frac{\partial p_0}{\partial r} |
-   |                                   |  + \nabla \cdot \kth \nabla T \ri |
-   |                                   | ght ]`                            |
-   +-----------------------------------+-----------------------------------+
-   | 3 / predict_T_then_rhohprime      | :math:`\frac{1}{\rho c_p} \left \ |
-   | :math:`(T)`                       | { (1 - \rho h_p)                  |
-   |                                   |    \left [\psi + (\Ubt \cdot \er) |
-   |                                   |  \frac{\partial p_0}{\partial r}  |
-   |                                   | \right ] + \nabla \cdot \kth \nab |
-   |                                   | la T \right \}`                   |
-   +-----------------------------------+-----------------------------------+
-   | 4 / predict_T_then_h :math:`(T)`  | :math:`\frac{1}{\rho c_p} \left\{ |
-   |                                   |  (1 - \rho h_p) \left [\psi + (\U |
-   |                                   | bt \cdot \er)                     |
-   |                                   | \frac{\partial p_0}{\partial r}\r |
-   |                                   | ight ] +  \nabla \cdot \kth \nabl |
-   |                                   | a T \right\}`                     |
-   +-----------------------------------+-----------------------------------+
+  .. math::
+     \left [\psi + (\Ubt \cdot  \er)   \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T \right ]
+
+* ``enthalpy_pred_type = 1`` (``predict_rhohprime``) :
+  we predict :math:`(\rho h)^\prime`.  The advective force is:
+
+  .. math::
+     -(\rho h)^\prime \; \nabla \cdot (\Ubt+w_0 \er) - \nabla \cdot (\Ubt (\rho h)_0) + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T
+
+* ``enthalpy_pred_type = 2`` (``predict_h``) :
+  we predict :math:`h`.  The advective force is:
+
+  .. math::
+     \frac{1}{\rho} \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T \right ]
+
+* ``enthalpy_pred_type = 3`` (``predict_T_then_rhohprime``) :
+  we predict :math:`T`.  The advective force is:
 
 
-.. _table:pred:hoverview:
-.. table:: Summary of enthalpy edge state construction
+  .. math::
+     \frac{1}{\rho c_p} \left \{ (1 - \rho h_p) \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} \right ] + \nabla \cdot \kth \nabla T \right \}
 
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | species_p | enthalpy_ | cell-cent | intermedi | species   | final     |
-   | red_type  | pred_type | ered      | ate       | quantity  | :math:`(\ |
-   |           |           |           |           |           | rho h)`   |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | [-5pt]    |           | quantity  | “enthalpy | available | edge      |
-   |           |           | predicted | ”         | in        | state     |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | [-5pt]    |           | in        | edge      | mkflux    |           |
-   |           |           | make_edge | state     |           |           |
-   |           |           | _scal     |           |           |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 1 /       | 0 /       | :math:`(\ | :math:`(\ | :math:`X_ | :math:`(\ |
-   | predict_r | predict_r | rho h)`   | rho h)_\m | \mathrm{e | rho h)_\m |
-   | hoprime_a | hoh       |           | athrm{edg | dge}`,    | athrm{edg |
-   | nd_X      |           |           | e}`       | :math:`\r | e}`       |
-   |           |           |           |           | ho'_\math |           |
-   |           |           |           |           | rm{edge}` |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 1 /       | 1 /       | :math:`(\ | :math:`(\ | :math:`X_ | :math:`\l |
-   | predict_r | predict_r | rho h)'`  | rho h)'_\ | \mathrm{e | eft [ (\r |
-   | hoprime_a | hohprime  |           | mathrm{ed | dge}`,    | ho h)_0^{ |
-   | nd_X      |           |           | ge}`      | :math:`\r | n+\myhalf |
-   |           |           |           |           | ho'_\math | ,{\rm avg |
-   |           |           |           |           | rm{edge}` | }} + (\rh |
-   |           |           |           |           |           | o h)'_\ma |
-   |           |           |           |           |           | thrm{edge |
-   |           |           |           |           |           | } \right  |
-   |           |           |           |           |           | ]`        |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 1 /       | 2 /       | :math:`h` | :math:`h_ | :math:`X_ | :math:`\l |
-   | predict_r | predict_h |           | \mathrm{e | \mathrm{e | eft ( \rh |
-   | hoprime_a |           |           | dge}`     | dge}`,    | o_0^{n+\m |
-   | nd_X      |           |           |           | :math:`\r | yhalf,{\r |
-   |           |           |           |           | ho'_\math | m avg}} + |
-   |           |           |           |           | rm{edge}` |  \rho'_\m |
-   |           |           |           |           |           | athrm{edg |
-   |           |           |           |           |           | e} \right |
-   |           |           |           |           |           |  ) h_\mat |
-   |           |           |           |           |           | hrm{edge} |
-   |           |           |           |           |           | `         |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 1 /       | 3 /       | :math:`T` | :math:`(\ | :math:`X_ | :math:`\l |
-   | predict_r | predict_T |           | rho h)'_\ | \mathrm{e | eft [ (\r |
-   | hoprime_a | _then_rho |           | mathrm{ed | dge}`,    | ho h)_0^{ |
-   | nd_X      | hprime    |           | ge}`      | :math:`\r | n+\myhalf |
-   |           |           |           |           | ho'_\math | ,{\rm avg |
-   |           |           |           |           | rm{edge}` | }} + (\rh |
-   |           |           |           |           |           | o h)'_\ma |
-   |           |           |           |           |           | thrm{edge |
-   |           |           |           |           |           | } \right  |
-   |           |           |           |           |           | ]`        |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 1 /       | 4 /       | :math:`T` | :math:`h_ | :math:`X_ | :math:`\l |
-   | predict_r | predict_T |           | \mathrm{e | \mathrm{e | eft ( \rh |
-   | hoprime_a | _then_h   |           | dge}`     | dge}`,    | o_0^{n+\m |
-   | nd_X      |           |           |           | :math:`\r | yhalf,{\r |
-   |           |           |           |           | ho'_\math | m avg}} + |
-   |           |           |           |           | rm{edge}` |  \rho'_\m |
-   |           |           |           |           |           | athrm{edg |
-   |           |           |           |           |           | e} \right |
-   |           |           |           |           |           |  ) h_\mat |
-   |           |           |           |           |           | hrm{edge} |
-   |           |           |           |           |           | `         |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 2 /       | 0 /       | :math:`(\ | :math:`(\ | :math:`(\ | :math:`(\ |
-   | predict_r | predict_r | rho h)`   | rho h)_\m | rho X)_\m | rho h)_\m |
-   | hoX       | hoh       |           | athrm{edg | athrm{edg | athrm{edg |
-   |           |           |           | e}`       | e}`,      | e}`       |
-   |           |           |           |           | :math:`\s |           |
-   |           |           |           |           | um(\rho X |           |
-   |           |           |           |           | )_\mathrm |           |
-   |           |           |           |           | {edge}`   |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 2 /       | 1 /       | :math:`(\ | :math:`(\ | :math:`(\ | :math:`\l |
-   | predict_r | predict_r | rho h)'`  | rho h)'_\ | rho X)_\m | eft [ (\r |
-   | hoX       | hohprime  |           | mathrm{ed | athrm{edg | ho h)_0^{ |
-   |           |           |           | ge}`      | e}`,      | n+\myhalf |
-   |           |           |           |           | :math:`\s | ,{\rm avg |
-   |           |           |           |           | um(\rho X | }} + (\rh |
-   |           |           |           |           | )_\mathrm | o h)'_\ma |
-   |           |           |           |           | {edge}`   | thrm{edge |
-   |           |           |           |           |           | } \right  |
-   |           |           |           |           |           | ]`        |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 2 /       | 2 /       | :math:`h` | :math:`h_ | :math:`(\ | :math:`\s |
-   | predict_r | predict_h |           | \mathrm{e | rho X)_\m | um(\rho X |
-   | hoX       |           |           | dge}`     | athrm{edg | )_\mathrm |
-   |           |           |           |           | e}`,      | {edge} h_ |
-   |           |           |           |           | :math:`\s | \mathrm{e |
-   |           |           |           |           | um(\rho X | dge}`     |
-   |           |           |           |           | )_\mathrm |           |
-   |           |           |           |           | {edge}`   |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 2 /       | 3 /       | :math:`T` | :math:`(\ | :math:`(\ | :math:`\l |
-   | predict_r | predict_T |           | rho h)'_\ | rho X)_\m | eft [ (\r |
-   | hoX       | _then_rho |           | mathrm{ed | athrm{edg | ho h)_0^{ |
-   |           | hprime    |           | ge}`      | e}`,      | n+\myhalf |
-   |           |           |           |           | :math:`\s | ,{\rm avg |
-   |           |           |           |           | um(\rho X | }} + (\rh |
-   |           |           |           |           | )_\mathrm | o h)'_\ma |
-   |           |           |           |           | {edge}`   | thrm{edge |
-   |           |           |           |           |           | } \right  |
-   |           |           |           |           |           | ]`        |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 2 /       | 4 /       | :math:`T` | :math:`h_ | :math:`(\ | :math:`\s |
-   | predict_r | predict_T |           | \mathrm{e | rho X)_\m | um(\rho X |
-   | hoX       | _then_h   |           | dge}`     | athrm{edg | )_\mathrm |
-   |           |           |           |           | e}`,      | {edge} h_ |
-   |           |           |           |           | :math:`\s | \mathrm{e |
-   |           |           |           |           | um(\rho X | dge}`     |
-   |           |           |           |           | )_\mathrm |           |
-   |           |           |           |           | {edge}`   |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 3 /       | 0 /       | :math:`(\ | :math:`(\ | :math:`X_ | :math:`(\ |
-   | predict_r | predict_r | rho h)`   | rho h)_\m | \mathrm{e | rho h)_\m |
-   | ho_and_X  | hoh       |           | athrm{edg | dge}`,    | athrm{edg |
-   |           |           |           | e}`       | :math:`\r | e}`       |
-   |           |           |           |           | ho_\mathr |           |
-   |           |           |           |           | m{edge}`  |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 3 /       | 1 /       | :math:`(\ | :math:`(\ | :math:`X_ | :math:`\l |
-   | predict_r | predict_r | rho h)'`  | rho h)'_\ | \mathrm{e | eft [ (\r |
-   | ho_and_X  | hohprime  |           | mathrm{ed | dge}`,    | ho h)_0^{ |
-   |           |           |           | ge}`      | :math:`\r | n+\myhalf |
-   |           |           |           |           | ho_\mathr | ,{\rm avg |
-   |           |           |           |           | m{edge}`  | }} + (\rh |
-   |           |           |           |           |           | o h)'_\ma |
-   |           |           |           |           |           | thrm{edge |
-   |           |           |           |           |           | } \right  |
-   |           |           |           |           |           | ]`        |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 3 /       | 2 /       | :math:`h` | :math:`h_ | :math:`X_ | :math:`\r |
-   | predict_r | predict_h |           | \mathrm{e | \mathrm{e | ho_\mathr |
-   | ho_and_X  |           |           | dge}`     | dge}`,    | m{edge} h |
-   |           |           |           |           | :math:`\r | _\mathrm{ |
-   |           |           |           |           | ho_\mathr | edge}`    |
-   |           |           |           |           | m{edge}`  |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 3 /       | 3 /       | :math:`T` | :math:`(\ | :math:`X_ | :math:`\l |
-   | predict_r | predict_T |           | rho h)'_\ | \mathrm{e | eft [ (\r |
-   | ho_and_X  | _then_rho |           | mathrm{ed | dge}`,    | ho h)_0^{ |
-   |           | hprime    |           | ge}`      | :math:`\r | n+\myhalf |
-   |           |           |           |           | ho_\mathr | ,{\rm avg |
-   |           |           |           |           | m{edge}`  | }} + (\rh |
-   |           |           |           |           |           | o h)'_\ma |
-   |           |           |           |           |           | thrm{edge |
-   |           |           |           |           |           | } \right  |
-   |           |           |           |           |           | ]`        |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
-   | 3 /       | 4 /       | :math:`T` | :math:`h_ | :math:`X_ | :math:`\r |
-   | predict_r | predict_T |           | \mathrm{e | \mathrm{e | ho_\mathr |
-   | ho_and_X  | _then_h   |           | dge}`     | dge}`,    | m{edge} h |
-   |           |           |           |           | :math:`\r | _\mathrm{ |
-   |           |           |           |           | ho_\mathr | edge}`    |
-   |           |           |           |           | m{edge}`  |           |
-   +-----------+-----------+-----------+-----------+-----------+-----------+
+* ``enthalpy_pred_type = 4`` (``predict_T_then_h``) :
+  we predict :math:`T`.  The advective force is:
+
+  .. math::
+     \frac{1}{\rho c_p} \left\{ (1 - \rho h_p) \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}\right ] +  \nabla \cdot \kth \nabla T \right\}
+
+
+The combination of ``species_pred_type`` and ``enthalpy_pred_type`` determine how we construct the edge state.  The variations are:
+
+* ``species_pred_type = 1`` (``predict_rhoprime_and_X``) and ``enthalpy_pred_type = 0`` (``predict_rhoh``) :
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`(\rho h)`
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho'_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`(\rho h)_\mathrm{edge}`
+
+* ``species_pred_type = 1`` (``predict_rhoprime_and\_X``) and ``enthalpy_pred_type = 1`` (``predict_rhohprime``) :
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`(\rho h)'` 
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)'_\mathrm{edge}` 
+ 
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho'_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho h)'_\mathrm{edge} \right ]`
+
+* ``species_pred_type = 1`` (``predict_rhoprime_and_X``) and ``enthalpy_pred_type = 2`` (``predict_h``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`h`
+
+  * intermediate "enthalpy" edge state : :math:`h_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho'_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\left ( \rho_0^{n+\myhalf,{\rm avg}} + \rho'_\mathrm{edge} \right ) h_\mathrm{edge}`
+
+* ``species_pred_type = 1`` (``predict_rhoprime_and_X``) and ``enthalpy_pred_type = 3`` (``predict_T_then_rhohprime``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`T`
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)'_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho'_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho h)'_\mathrm{edge} \right ]`
+
+* ``species_pred_type = 1`` (``predict_rhoprime_and_X``) and ``enthalpy_pred_type = 4`` {``predict_T_then_h``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`T`
+
+  * intermediate "enthalpy" edge state : :math:`h_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho'_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\left ( \rho_0^{n+\myhalf,{\rm avg}} + \rho'_\mathrm{edge} \right ) h_\mathrm{edge}`
+
+* ``species_pred_type = 2`` (``predict_rhoX``) and ``enthalpy_pred_type = 0`` (``predict_rhoh``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`(\rho h)`
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`(\rho X)_\mathrm{edge}`, :math:`\sum(\rho X)_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`(\rho h)_\mathrm{edge}`
+
+* ``species_pred_type = 2`` (``predict_rhoX``) and ``enthalpy_pred_type = 1`` (``predict_rhohprime``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`(\rho h)'`
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)'_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`(\rho X)_\mathrm{edge}`, :math:`\sum(\rho X)_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho h)'_\mathrm{edge} \right ]`
+
+* ``species_pred_type = 2`` (``predict_rhoX``) and ``enthalpy_pred_type = 2`` (``predict_h``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`h`
+
+  * intermediate "enthalpy" edge state : :math:`h_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`(\rho X)_\mathrm{edge}`, :math:`\sum(\rho X)_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\sum(\rho X)_\mathrm{edge} h_\mathrm{edge}`
+
+* ``species_pred_type = 2`` (``predict_rhoX``) and ``enthalpy_pred_type = 3`` (``predict_T_then_rhohprime``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`T$`
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)'_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`(\rho X)_\mathrm{edge}`, :math:`\sum(\rho X)_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho h)'_\mathrm{edge} \right ]`
+
+* ``species_pred_type = 2`` (``predict_rhoX``) and ``enthalpy_pred_type = 4`` (``predict_T_then_h``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`T`
+
+  * intermediate "enthalpy" edge state : :math:`h_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`(\rho X)_\mathrm{edge}`, :math:`\sum(\rho X)_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\sum(\rho X)_\mathrm{edge} h_\mathrm{edge}`
+
+* ``species_pred_type = 3`` (``predict_rho_and_X``) and ``enthalpy_pred_type = 0`` (``predict_rhoh``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`(\rho h)`
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`(\rho h)_\mathrm{edge}`
+
+* ``species_pred_type = 3`` (``predict_rho_and_X``) and ``enthalpy_pred_type = 1`` (``predict_rhohprime``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`(\rho h)'`
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)'_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho h)'_\mathrm{edge} \right ]`
+
+* ``species_pred_type = 3`` (``predict_rho_and_X``) and ``enthalpy_pred_type = 2`` (``predict_h``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`h`
+
+  * intermediate "enthalpy" edge state : :math:`h_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\rho_\mathrm{edge} h_\mathrm{edge}`
+
+* ``species_pred_type = 3`` (``predict_rho_and_X``) and ``enthalpy_pred_type = 3`` (``predict_T_then_rhohprime``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`T`
+
+  * intermediate "enthalpy" edge state : :math:`(\rho h)'_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho h)'_\mathrm{edge} \right ]`
+
+* ``species_pred_type = 3`` (``predict_rho_and_X``) and ``enthalpy_pred_type = 4`` (``predict_T_then_h``)
+
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`T`
+
+  * intermediate "enthalpy" edge state : :math:`h_\mathrm{edge}`
+
+  * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho_\mathrm{edge}`
+
+  * final :math:`(\rho h)` edge state : :math:`\rho_\mathrm{edge} h_\mathrm{edge}`
+
+
 
 Method 0: enthalpy_pred_type = predict_rhoh
 -------------------------------------------
@@ -672,7 +655,7 @@ Method 1: enthalpy_pred_type = predict_rhohprime
 ------------------------------------------------
 
 Here we wish to construct :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho
-  h)'_\mathrm{edge} \right ]` by predicting :math:`(\rho h)'` to the edges.
+h)'_\mathrm{edge} \right ]` by predicting :math:`(\rho h)'` to the edges.
 
 .. _Predicting rhohprime at edges:
 

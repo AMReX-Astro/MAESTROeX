@@ -218,19 +218,19 @@
 derivatives of a vector in the inertial frame are related to those in the
 co-rotating frame by</p>
 <div class="math notranslate nohighlight" id="equation-eq-derivative-relations">
-<span class="eqno">(286)<a class="headerlink" href="#equation-eq-derivative-relations" title="Permalink to this equation">¶</a></span>\[\left(\frac{D}{Dt}\right)_\text{i} =
+<span class="eqno">(292)<a class="headerlink" href="#equation-eq-derivative-relations" title="Permalink to this equation">¶</a></span>\[\left(\frac{D}{Dt}\right)_\text{i} =
 \left[\left(\frac{D}{Dt}\right)_\text{rot} + \Omegab\times\ \right],\]</div>
 <p>where i(rot) refers to the inertial(co-rotating) frame and <span class="math notranslate nohighlight">\(\Omegab\)</span> is
-the angular velocity vector. Using <a class="reference internal" href="#equation-eq-derivative-relations">Eq.286</a> and
+the angular velocity vector. Using <a class="reference internal" href="#equation-eq-derivative-relations">Eq.292</a> and
 assuming <span class="math notranslate nohighlight">\(\Omegab\)</span> is constant, we have</p>
 <div class="math notranslate nohighlight" id="equation-eq-rotational-velocity-relation">
-<span class="eqno">(287)<a class="headerlink" href="#equation-eq-rotational-velocity-relation" title="Permalink to this equation">¶</a></span>\[\frac{Dv_\text{i}}{Dt} = \frac{Dv_\text{rot}}{Dt} +
+<span class="eqno">(293)<a class="headerlink" href="#equation-eq-rotational-velocity-relation" title="Permalink to this equation">¶</a></span>\[\frac{Dv_\text{i}}{Dt} = \frac{Dv_\text{rot}}{Dt} +
 2\Omegab \times \mathbf{v_\text{rot}} +
 \Omegab\times\left(\Omegab\times r_\text{rot}\right).\]</div>
 <p>Plugging this into the momentum equation and making use of the continuity
 equation we have a momentum equation in the co-rotating frame:</p>
 <div class="math notranslate nohighlight" id="equation-eq-momentum-equation-with-rotation">
-<span class="eqno">(288)<a class="headerlink" href="#equation-eq-momentum-equation-with-rotation" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho\mathbf{U})}{\partial t} +
+<span class="eqno">(294)<a class="headerlink" href="#equation-eq-momentum-equation-with-rotation" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho\mathbf{U})}{\partial t} +
 \nabla\cdot\left(\mathbf{U}(\rho\mathbf{U}) + p \right) =
 \underbrace{-2\rho\Omegab\times\mathbf{U}}_{\text{Coriolis}} -
 \underbrace{\rho\Omegab\times\left(\Omegab\times
@@ -256,18 +256,18 @@ geometry module. In spherical, the only runtime parameter of importance
 is rotational_frequency in units of Hz. This specifies the angular
 velocity vector which is assumed to be along the <strong>k</strong> direction:</p>
 <div class="math notranslate nohighlight" id="equation-rotation-0">
-<span class="eqno">(289)<a class="headerlink" href="#equation-rotation-0" title="Permalink to this equation">¶</a></span>\[\Omegab \equiv \Omega {\bf k} = 2\pi *
+<span class="eqno">(295)<a class="headerlink" href="#equation-rotation-0" title="Permalink to this equation">¶</a></span>\[\Omegab \equiv \Omega {\bf k} = 2\pi *
 \left(\text{rotational_frequency}\right) {\bf k}.\]</div>
 <p>The direction of <span class="math notranslate nohighlight">\(\rb\)</span> is given as the normal vector which is
 passed into mk_vel_force; in particular</p>
 <div class="math notranslate nohighlight" id="equation-rotation-1">
-<span class="eqno">(290)<a class="headerlink" href="#equation-rotation-1" title="Permalink to this equation">¶</a></span>\[\cos\theta \equiv \frac{\rb\cdot {\bf k}}{r} =
+<span class="eqno">(296)<a class="headerlink" href="#equation-rotation-1" title="Permalink to this equation">¶</a></span>\[\cos\theta \equiv \frac{\rb\cdot {\bf k}}{r} =
 {\bf normal}\cdot {\bf k} = \text{normal}(3).\]</div>
 <p>The magnitude of <span class="math notranslate nohighlight">\(\rb\)</span> is calculated based on the current zone’s location with
 respect to the center.
 Using this notation we can write the Centrifugal term as</p>
 <div class="math notranslate nohighlight" id="equation-rotation-2">
-<span class="eqno">(291)<a class="headerlink" href="#equation-rotation-2" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
+<span class="eqno">(297)<a class="headerlink" href="#equation-rotation-2" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
 \Omegab\times\left(\Omegab\times\rb\right) &amp;=
 \left(\Omegab\cdot\rb\right)\Omegab - \left(\Omegab\cdot\Omegab\right)\rb\\
 &amp;= \Omega^2 r *\left[\text{normal}(3)\right]{\bf k} -
@@ -279,7 +279,7 @@ Using this notation we can write the Centrifugal term as</p>
 \end{align}\end{split}\]</div>
 <p>The Coriolis term is a straightforward cross-product:</p>
 <div class="math notranslate nohighlight" id="equation-rotation-3">
-<span class="eqno">(292)<a class="headerlink" href="#equation-rotation-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
+<span class="eqno">(298)<a class="headerlink" href="#equation-rotation-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
 \Omegab \times \Ub &amp;= \left|
 \begin{array}{ccc}
   {\bf{i}}&amp;{\bf{j}}&amp;{\bf{k}}\\

@@ -327,9 +327,9 @@ where the subscript “ad” means along an adiabat. We can combine the
 exponents to get the following relation
 
 .. math::
+   \Gamma_1 = \left(\frac{\Gamma_2}{\Gamma_2-1}\right)\left(\Gamma_3-1\right).
+   :label: eq:Gamma relations
 
-   \label{eq:Gamma relations}
-     \Gamma_1 = \left(\frac{\Gamma_2}{\Gamma_2-1}\right)\left(\Gamma_3-1\right).
 
 The adiabatic excess is defined as
 
@@ -351,16 +351,15 @@ gradient can be found from finite differencing the data whereas the
 adiabatic term, :math:`\nabla_\text{ad} = \left(\Gamma_2-1\right) /
 \Gamma_2`, will need to be calculated at each point using
 thermodynamic relations. Our EOS only returns :math:`\Gamma_1` so we need
-find another relation to use with `[eq:Gamma relations] <#eq:Gamma relations>`__ to solve
+find another relation to use with :eq:`eq:Gamma relations` to solve
 for the adiabatic excess.
 
 The Schwarzschild criterion does not care about changes in composition
 and we therefore write :math:`p = p(\rho,T)` and
 
 .. math::
-
-   \label{eq:dp}
-     d\ln p = \chi_\rho d\ln\rho + \chi_T d\ln T
+   d\ln p = \chi_\rho d\ln\rho + \chi_T d\ln T
+   :label: eq:dp
 
 where
 
@@ -369,25 +368,22 @@ where
    \chi_\rho = \left(\frac{d\ln p}{d\ln\rho}\right)_T,\qquad
    \chi_T = \left(\frac{d\ln p}{d\ln T}\right)_\rho.
 
-Dividing `[eq:dp] <#eq:dp>`__ by :math:`d\ln\rho` and taking this along an adiabat
+Dividing :eq:`eq:dp` by :math:`d\ln\rho` and taking this along an adiabat
 we have
 
 .. math::
-
-   \label{eq:dp2}
-     \left(\frac{d\ln p}{d\ln\rho}\right)_\text{ad} = \chi_\rho + \chi_T
+   \left(\frac{d\ln p}{d\ln\rho}\right)_\text{ad} = \chi_\rho + \chi_T
      \left(\frac{d\ln T}{d\ln\rho}\right)_\text{ad}.
+   :label: eq:dp2
 
 Using the :math:`\Gamma`\ ’s, we have
 
 .. math::
+   \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right).
+   :label: eq:Gamma1 relation with Gamma2
 
-   \label{eq:Gamma1 relation with Gamma2}
-     \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right).
-
-Combining `[eq:Gamma relations] <#eq:Gamma relations>`__ and `[eq:Gamma1 relation
-  with Gamma2] <#eq:Gamma1 relation
-  with Gamma2>`__ to eliminate :math:`\Gamma_3`, we have:
+Combining :eq:`eq:Gamma relations` and :eq:`eq:Gamma1 relation with Gamma2`
+to eliminate :math:`\Gamma_3`, we have:
 
 .. math::
 
