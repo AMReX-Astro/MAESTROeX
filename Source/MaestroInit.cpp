@@ -12,191 +12,192 @@ using namespace amrex;
 void
 Maestro::Init ()
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::Init()",Init);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Init()",Init);
 
-	Print() << "Calling Init()" << std::endl;
+    Print() << "Calling Init()" << std::endl;
 
-	if (restart_file == "") {
+    if (restart_file == "") {
 
-		start_step = 1;
+        start_step = 1;
 
-		// fill in multifab and base state data
-		InitData();
+        // fill in multifab and base state data
+        InitData();
 
-		if (plot_int > 0 || plot_deltat > 0) {
+        if (plot_int > 0 || plot_deltat > 0) {
 
-			// Need to fill normal vector to compute velrc in plotfile
-			if (spherical) { MakeNormal(); }
+            // Need to fill normal vector to compute velrc in plotfile
+            if (spherical) { MakeNormal(); }
 
-			Print() << "\nWriting plotfile "<< plot_base_name << "InitData after InitData" << std::endl;
-			WritePlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+            Print() << "\nWriting plotfile "<< plot_base_name << "InitData after InitData" << std::endl;
+            WritePlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
-		} else if (small_plot_int > 0 || small_plot_deltat > 0) {
+        } else if (small_plot_int > 0 || small_plot_deltat > 0) {
 
-			// Need to fill normal vector to compute velrc in plotfile
-			if (spherical) { MakeNormal(); }
+            // Need to fill normal vector to compute velrc in plotfile
+            if (spherical) { MakeNormal(); }
 
-			Print() << "\nWriting small plotfile "<< small_plot_base_name << "InitData after InitData" << std::endl;
-			WriteSmallPlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+            Print() << "\nWriting small plotfile "<< small_plot_base_name << "InitData after InitData" << std::endl;
+            WriteSmallPlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
-		}
-	}
-	else {
-		Print() << "Initializing from checkpoint " << restart_file << std::endl;
+        }
+    }
+    else {
+        Print() << "Initializing from checkpoint " << restart_file << std::endl;
 
-		// read in checkpoint file
-		// this builds (defines) and fills the following MultiFabs:
-		//
-		// snew, unew, gpi, dSdt, S_cc_new
-		//
-		// and also fills in the 1D arrays:
-		//
-		// rho0_new, p0_new, gamma1bar_new, rhoh0_new, beta0_new, psi, tempbar, etarho_cc, tempbar_init
-		ReadCheckPoint();
+        // read in checkpoint file
+        // this builds (defines) and fills the following MultiFabs:
+        //
+        // snew, unew, gpi, dSdt, S_cc_new
+        //
+        // and also fills in the 1D arrays:
+        //
+        // rho0_new, p0_new, gamma1bar_new, rhoh0_new, beta0_new, psi, tempbar, etarho_cc, tempbar_init
+        ReadCheckPoint();
 
-		// build (define) the following MultiFabs (that weren't read in from checkpoint):
-		// snew, unew, S_cc_new, rhcc_for_nodalproj, normal, pi
-		for (int lev=0; lev<=finest_level; ++lev) {
-			snew              [lev].define(grids[lev], dmap[lev],          Nscal, ng_s);
-			unew              [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
-			S_cc_new          [lev].define(grids[lev], dmap[lev],              1,    0);
-			rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],              1,    1);
-			if (spherical == 1) {
-				normal[lev].define(grids[lev], dmap[lev], 3, 1);
-				cell_cc_to_r[lev].define(grids[lev], dmap[lev], 1, 0);
-			}
-			pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
+        // build (define) the following MultiFabs (that weren't read in from checkpoint):
+        // snew, unew, S_cc_new, w0_cart, rhcc_for_nodalproj, normal, pi
+        for (int lev=0; lev<=finest_level; ++lev) {
+            snew              [lev].define(grids[lev], dmap[lev],          Nscal, ng_s);
+            unew              [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+            S_cc_new          [lev].define(grids[lev], dmap[lev],              1,    0);
+            w0_cart           [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM,    1);
+            rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],              1,    1);
+            if (spherical == 1) {
+                normal[lev].define(grids[lev], dmap[lev], 3, 1);
+                cell_cc_to_r[lev].define(grids[lev], dmap[lev], 1, 0);
+            }
+            pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
 
-		}
-	}
+        }
+    }
 
-	// set finest_radial_level in fortran
-	// compute numdisjointchunks, r_start_coord, r_end_coord
-	init_multilevel(tag_array.dataPtr(),&finest_level);
+    // set finest_radial_level in fortran
+    // compute numdisjointchunks, r_start_coord, r_end_coord
+    init_multilevel(tag_array.dataPtr(),&finest_level);
 
-	compute_cutoff_coords(rho0_old.dataPtr());
+    compute_cutoff_coords(rho0_old.dataPtr());
 
-	if (spherical == 1) {
-		MakeNormal();
-		MakeCCtoRadii();
-	}
+    if (spherical == 1) {
+        MakeNormal();
+        MakeCCtoRadii();
+    }
 
-	if (do_sponge) {
-		if (use_exact_base_state) {
-			init_sponge_irreg(rho0_old.dataPtr(),r_cc_loc.dataPtr(),r_edge_loc.dataPtr());
-		} else {
-			init_sponge(rho0_old.dataPtr());
-		}
-	}
+    if (do_sponge) {
+        if (use_exact_base_state) {
+            init_sponge_irreg(rho0_old.dataPtr(),r_cc_loc.dataPtr(),r_edge_loc.dataPtr());
+        } else {
+            init_sponge(rho0_old.dataPtr());
+        }
+    }
 
-	// make gravity
-	make_grav_cell(grav_cell_old.dataPtr(),
-	               rho0_old.dataPtr(),
-	               r_cc_loc.dataPtr(),
-	               r_edge_loc.dataPtr());
+    // make gravity
+    make_grav_cell(grav_cell_old.dataPtr(),
+                   rho0_old.dataPtr(),
+                   r_cc_loc.dataPtr(),
+                   r_edge_loc.dataPtr());
 
-	if (restart_file == "") {
+    if (restart_file == "") {
 
-		// compute gamma1bar
-		MakeGamma1bar(sold,gamma1bar_old,p0_old);
+        // compute gamma1bar
+        MakeGamma1bar(sold,gamma1bar_old,p0_old);
 
-		// compute beta0
-		if (use_exact_base_state) {
-			make_beta0_irreg(beta0_old.dataPtr(),
-			                 rho0_old.dataPtr(),
-			                 p0_old.dataPtr(),
-			                 gamma1bar_old.dataPtr(),
-			                 grav_cell_old.dataPtr(),
-			                 r_cc_loc.dataPtr(),
-			                 r_edge_loc.dataPtr());
-		} else {
-			make_beta0(beta0_old.dataPtr(),
-			           rho0_old.dataPtr(),
-			           p0_old.dataPtr(),
-			           gamma1bar_old.dataPtr(),
-			           grav_cell_old.dataPtr());
-		}
+        // compute beta0
+        if (use_exact_base_state) {
+            make_beta0_irreg(beta0_old.dataPtr(),
+                             rho0_old.dataPtr(),
+                             p0_old.dataPtr(),
+                             gamma1bar_old.dataPtr(),
+                             grav_cell_old.dataPtr(),
+                             r_cc_loc.dataPtr(),
+                             r_edge_loc.dataPtr());
+        } else {
+            make_beta0(beta0_old.dataPtr(),
+                       rho0_old.dataPtr(),
+                       p0_old.dataPtr(),
+                       gamma1bar_old.dataPtr(),
+                       grav_cell_old.dataPtr());
+        }
 
-		// set beta0^{-1} = beta0_old
-		for (int i=0; i<beta0_old.size(); ++i) {
-			beta0_nm1[i] = beta0_old[i];
-		}
+        // set beta0^{-1} = beta0_old
+        for (int i=0; i<beta0_old.size(); ++i) {
+            beta0_nm1[i] = beta0_old[i];
+        }
 
-		// initial projection
-		if (do_initial_projection) {
-			Print() << "Doing initial projection" << std::endl;
-			InitProj();
+        // initial projection
+        if (do_initial_projection) {
+            Print() << "Doing initial projection" << std::endl;
+            InitProj();
 
-			if (plot_int > 0 || plot_deltat > 0) {
-				Print() << "\nWriting plotfile " << plot_base_name << "after_InitProj after InitProj" << std::endl;
+            if (plot_int > 0 || plot_deltat > 0) {
+                Print() << "\nWriting plotfile " << plot_base_name << "after_InitProj after InitProj" << std::endl;
 
-				WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+                WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
-			} else if (small_plot_int > 0 || small_plot_deltat > 0) {
-				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_InitProj after InitProj" << std::endl;
+            } else if (small_plot_int > 0 || small_plot_deltat > 0) {
+                Print() << "\nWriting small plotfile " << small_plot_base_name << "after_InitProj after InitProj" << std::endl;
 
-				WriteSmallPlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-			}
-		}
+                WriteSmallPlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+            }
+        }
 
-		// compute initial time step
-		FirstDt();
+        // compute initial time step
+        FirstDt();
 
-		// divu iters - also update dt at end of each divu_iter
-		if (init_divu_iter > 0) {
-			for (int i=1; i<=init_divu_iter; ++i) {
-				Print() << "Doing initial divu iteration #" << i << std::endl;
-				DivuIter(i);
-			}
+        // divu iters - also update dt at end of each divu_iter
+        if (init_divu_iter > 0) {
+            for (int i=1; i<=init_divu_iter; ++i) {
+                Print() << "Doing initial divu iteration #" << i << std::endl;
+                DivuIter(i);
+            }
 
-			if (plot_int > 0 || plot_deltat > 0) {
-				Print() << "\nWriting plotfile " << plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
-				WritePlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-			} else if (small_plot_int > 0 || small_plot_deltat > 0) {
-				Print() << "\nWriting small plotfile " << small_plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
-				WriteSmallPlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-			}
-		}
+            if (plot_int > 0 || plot_deltat > 0) {
+                Print() << "\nWriting plotfile " << plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
+                WritePlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+            } else if (small_plot_int > 0 || small_plot_deltat > 0) {
+                Print() << "\nWriting small plotfile " << small_plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
+                WriteSmallPlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+            }
+        }
 
-		if (stop_time >= 0. && t_old+dt > stop_time) {
-			dt = std::min(dt,stop_time-t_old);
-			Print() << "Stop time limits dt = " << dt << std::endl;
-		}
+        if (stop_time >= 0. && t_old+dt > stop_time) {
+            dt = std::min(dt,stop_time-t_old);
+            Print() << "Stop time limits dt = " << dt << std::endl;
+        }
 
-		dtold = dt;
-		t_new = t_old + dt;
+        dtold = dt;
+        t_new = t_old + dt;
 
-		// copy S_cc_old into S_cc_new for the pressure iterations
-		for (int lev=0; lev<=finest_level; ++lev) {
-			MultiFab::Copy(S_cc_new[lev],S_cc_old[lev],0,0,1,0);
-		}
+        // copy S_cc_old into S_cc_new for the pressure iterations
+        for (int lev=0; lev<=finest_level; ++lev) {
+            MultiFab::Copy(S_cc_new[lev],S_cc_old[lev],0,0,1,0);
+        }
 
-		// initial (pressure) iters
-		for (int i=1; i<= init_iter; ++i) {
-			Print() << "Doing initial pressure iteration #" << i << std::endl;
-			InitIter();
-		}
+        // initial (pressure) iters
+        for (int i=1; i<= init_iter; ++i) {
+            Print() << "Doing initial pressure iteration #" << i << std::endl;
+            InitIter();
+        }
 
-		if (plot_int > 0 || plot_deltat > 0) {
-			Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
-			WritePlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-		} else if (small_plot_int > 0 || small_plot_deltat > 0) {
-			Print() << "\nWriting small plotfile 0 after all initialization" << std::endl;
-			WriteSmallPlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
-		}
+        if (plot_int > 0 || plot_deltat > 0) {
+            Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
+            WritePlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+        } else if (small_plot_int > 0 || small_plot_deltat > 0) {
+            Print() << "\nWriting small plotfile 0 after all initialization" << std::endl;
+            WriteSmallPlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+        }
 
-		if (chk_int > 0 || chk_deltat > 0) {
-			Print() << "\nWriting checkpoint 0 after all initialization" << std::endl;
-			WriteCheckPoint(0);
-		}
-
-		if (sum_interval > 0  || sum_per > 0) {
-			int index_dummy = 0;
-			Print() << "\nWriting diagnosis file after all initialization" << std::endl;
-			DiagFile(0,t_old,rho0_old,p0_old,uold,sold,index_dummy);
-		}
-	}
+        if (chk_int > 0 || chk_deltat > 0) {
+            Print() << "\nWriting checkpoint 0 after all initialization" << std::endl;
+            WriteCheckPoint(0);
+        }
+		
+        if (sum_interval > 0  || sum_per > 0) {
+            int index_dummy = 0;
+            Print() << "\nWriting diagnosis file after all initialization" << std::endl;
+            DiagFile(0,t_old,rho0_old,p0_old,uold,sold,index_dummy);
+        }
+    }
 }
 
 // fill in multifab and base state data

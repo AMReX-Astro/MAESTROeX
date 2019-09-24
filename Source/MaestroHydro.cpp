@@ -9,24 +9,10 @@ void
 Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                      const Vector<MultiFab>& ufull,
                      Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
-                     const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
+		     const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeUtrans()", MakeUtrans);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
-    Vector<MultiFab> w0_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-        w0_cart[lev].setVal(0.);
-    }
-
-    Put1dArrayOnCart(w0,w0_cart,0,1,bcs_u,0,1);
+    BL_PROFILE_VAR("Maestro::MakeUtrans()",MakeUtrans);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -356,27 +342,22 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
     } // end loop over levels
 
     if (finest_level == 0) {
-        // fill periodic ghost cells
-        for (int lev=0; lev<=finest_level; ++lev) {
-            for (int d=0; d<AMREX_SPACEDIM; ++d) {
-                    utrans[lev][d].FillBoundary(geom[lev].periodicity());
-            }
-        }
+	// fill periodic ghost cells
+	for (int lev=0; lev<=finest_level; ++lev) {
+	    for (int d=0; d<AMREX_SPACEDIM; ++d) {
+				utrans[lev][d].FillBoundary(geom[lev].periodicity());
+	    }
+	}
 
-        // fill ghost cells behind physical boundaries
-        FillUmacGhost(utrans);
+	// fill ghost cells behind physical boundaries
+	FillUmacGhost(utrans);
     } else {
-        // edge_restriction
-        AverageDownFaces(utrans);
+	// edge_restriction
+	AverageDownFaces(utrans);
 
-        // fill ghost cells for all levels
-        FillPatchUedge(utrans);
+	// fill ghost cells for all levels
+	FillPatchUedge(utrans);
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
 }
 
@@ -385,26 +366,11 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                   const Vector<MultiFab>& ufull,
                   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
                   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+		  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                   const Vector<MultiFab>& force)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::VelPred()", VelPred);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
-    Vector<MultiFab> w0_cart(finest_level+1);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-        w0_cart[lev].setVal(0.);
-    }
-
-    Put1dArrayOnCart(w0,w0_cart,0,1,bcs_u,0,1);
+    BL_PROFILE_VAR("Maestro::VelPred()",VelPred);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -713,7 +679,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
            MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
         }
-        
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -1170,11 +1135,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
     // edge_restriction
     AverageDownFaces(umac);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
 }
 
