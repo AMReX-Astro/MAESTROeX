@@ -240,7 +240,7 @@
 C-F interfaces. The AMReX MG will modify the stencil for the Laplacian
 at C-F interfaces to ensure the correct solution to the Poisson equation
 across these interfaces. There is no correction step needed in this
-case (this differs from <a href="#id1"><span class="problematic" id="id2">:raw-latex:`\cite{ricker:2008}`</span></a>).</p>
+case (this differs from <a class="bibtex reference internal" href="zreferences.html#ricker-2008" id="id1">[Ricker08]</a>).</p>
 <p>The MG solver always works with jumps of <span class="math notranslate nohighlight">\(2\times\)</span> between levels. In
 some codes (but not MAESTROeX) we can have jumps of <span class="math notranslate nohighlight">\(4\times\)</span> between
 levels. AMReX uses a mini_cycle in these cases, effectively
@@ -371,7 +371,7 @@ in 2-d and 27-point stencil in 3-d.</p></li>
 all the points in <span class="math notranslate nohighlight">\((i\pm1,j\pm1)\)</span>. The
 derivation of this stencil is based on finite-element ideas, defining
 basis functions on the nodes. This is developed in 2-d in
-<a href="#id3"><span class="problematic" id="id4">:raw-latex:`\cite{almgrenBellSzymczak:1996}`</span></a>.</p></li>
+<a class="bibtex reference internal" href="zreferences.html#almgrenbellszymczak-1996" id="id2">[ABS96]</a>.</p></li>
 <li><p>ND_VATER_STENCIL: this is an alternate dense stencil derived
 using a similar finite-element idea as above, but a different control
 volume.</p></li>
@@ -666,7 +666,7 @@ and have the default values of:</p>
 </tbody>
 </table>
 </li>
-<li><p><em>“divu” iterations</em> (divu_iter called from varden)</p>
+<li><p><em>“divu” iterations</em> (<code class="docutils literal notranslate"><span class="pre">divu_iter</span></code> called from <code class="docutils literal notranslate"><span class="pre">varden</span></code>)</p>
 <p>The “divu” iterations projects the velocity field from the initial
 projection to satisfy the full constraint (including reactions).
 This is an iterative process since the reactions depend on the
@@ -676,34 +676,30 @@ the init_divu_iter runtime parameter.</p>
 <p>The overall tolerance, <span class="math notranslate nohighlight">\(\epsilon_\mathrm{divu}\)</span> depends on the iteration, <span class="math notranslate nohighlight">\(i\)</span>.
 We start with a loose tolerance and progressively get tighter. The
 tolerances (set in divu_iter) are, for Cartesian:</p>
-<div class="line-block">
-<div class="line">lll
-<span class="math notranslate nohighlight">\(\epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll}
-                   \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
-                            &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
-                           \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \\[2mm]
-                   \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
-                            &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
-                           \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} - 1  \\[2mm]
-                   \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
-                            &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
-                           \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter}   \\
-                                 \end{array}
-                  \right .\)</span></div>
-</div>
+<div class="math notranslate nohighlight" id="equation-mg-4">
+<span class="eqno">(292)<a class="headerlink" href="#equation-mg-4" title="Permalink to this equation">¶</a></span>\[\begin{split}\epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll}
+                  \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt                     {divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
+                         &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
+                          \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \\[2mm]
+                  \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
+                           &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
+                          \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} - 1  \\[2mm]
+                  \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
+                           &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
+                          \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter}   \\
+                                \end{array}
+                 \right .\end{split}\]</div>
 <p>and for spherical:</p>
-<div class="line-block">
-<div class="line">ll
-<span class="math notranslate nohighlight">\(\epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll}
-                     \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}^2 &amp;
-                           \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \, \\[2mm]
-                    \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}  &amp;
-                           \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} - 1 \, \\[2mm]
-                    \mathtt{eps\_divu\_sph}  &amp;
-                           \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} \, )\\
-                  \end{array}
-                  \right .\)</span></div>
-</div>
+<div class="math notranslate nohighlight" id="equation-mg-5">
+<span class="eqno">(293)<a class="headerlink" href="#equation-mg-5" title="Permalink to this equation">¶</a></span>\[\begin{split}\epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll}
+                    \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}^2 &amp;
+                          \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \, \\[2mm]
+                   \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}  &amp;
+                          \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} - 1 \, \\[2mm]
+                   \mathtt{eps\_divu\_sph}  &amp;
+                          \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} \, )\\
+                 \end{array}
+                 \right .\end{split}\]</div>
 <p>The various parameters are set in mg_eps.f90 and have the default values of:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -735,17 +731,14 @@ two (optional) thermal diffusion solves, and the final velocity projection.</p>
 velocities to obey the elliptic constraint. This is done both in
 the predictor and corrector portions of the main algorithm.</p>
 <p>There are two tolerances here. The norm of the residual is required
-to be reduced by a relative tolerance of :math:<a href="#id5"><span class="problematic" id="id6">`</span></a>epsilon =</p>
-<blockquote>
-<div><p>min { mathtt{eps_mac_max}, mathtt{eps_mac} cdot
-mathtt{mac_level_factor}^{(mathtt{nlevs}-1)} }`. A separate</p>
-</div></blockquote>
-<p>tolerance is used for the bottom
-solver, :math:<a href="#id7"><span class="problematic" id="id8">`</span></a>epsilon_mathrm{bottom} =</p>
-<blockquote>
-<div><p>mathtt{eps_mac_bottom}`. These parameters are set in</p>
-</div></blockquote>
-<p>mg_eps.f90 and have the default values:</p>
+to be reduced by a relative tolerance of</p>
+<div class="math notranslate nohighlight" id="equation-mg-6">
+<span class="eqno">(294)<a class="headerlink" href="#equation-mg-6" title="Permalink to this equation">¶</a></span>\[\epsilon =
+ \min \{ \mathtt{eps\_mac\_max}, \mathtt{eps\_mac} \cdot
+ \mathtt{mac\_level\_factor}^{(\mathtt{nlevs}-1)} \} .\]</div>
+<p>A separate tolerance is used for the bottom solver,
+<span class="math notranslate nohighlight">\(\epsilon_\mathrm{bottom} = \mathtt{eps\_mac\_bottom}\)</span>. These
+parameters are set in mg_eps.f90 and have the default values:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 47%" />
@@ -775,7 +768,7 @@ of <span class="math notranslate nohighlight">\(U^\mathrm{ADV}\)</span>.</p>
 </li>
 <li><p><em>velocity projection</em></p>
 <dl class="simple">
-<dt>The final velocity projection uses a tolerance of :math:<a href="#id9"><span class="problematic" id="id10">`</span></a>epsilon = min {</dt><dd><p>mathtt{eps_hg_max}, mathtt{eps_hg} cdot mathtt{hg_level_factor}^{(mathtt{nlevs} - 1)} }`. This tolerance</p>
+<dt>The final velocity projection uses a tolerance of :math:<a href="#id3"><span class="problematic" id="id4">`</span></a>epsilon = min {</dt><dd><p>mathtt{eps_hg_max}, mathtt{eps_hg} cdot mathtt{hg_level_factor}^{(mathtt{nlevs} - 1)} }`. This tolerance</p>
 </dd>
 </dl>
 <p>is set in hgproject using the parameter values specified in mg_eps.f90. A separate

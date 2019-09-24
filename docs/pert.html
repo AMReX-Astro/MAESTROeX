@@ -366,9 +366,9 @@ resulting edge state are shown in the <a class="reference internal" href="#table
 <span id="table-pred-species"></span><table class="docutils align-default" id="id11">
 <caption><span class="caption-number">Table 4 </span><span class="caption-text">Summary of species edge state construction</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col style="width: 16%" />
-<col style="width: 25%" />
-<col style="width: 59%" />
+<col style="width: 20%" />
+<col style="width: 24%" />
+<col style="width: 56%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code></p></td>
@@ -377,11 +377,7 @@ in <code class="docutils literal notranslate"><span class="pre">make_edge_scal</
 <td><p><span class="math notranslate nohighlight">\((\rho X_k)\)</span>
 edge state</p></td>
 </tr>
-<tr class="row-even"><td><blockquote>
-<div><p>1 /</p>
-</div></blockquote>
-<p><code class="docutils literal notranslate"><span class="pre">predict_rhoprime_and_X</span></code></p>
-</td>
+<tr class="row-even"><td><p>1 / <code class="docutils literal notranslate"><span class="pre">predict_rhoprime_and_X</span></code></p></td>
 <td><p><span class="math notranslate nohighlight">\(\rho'_\mathrm{edge}\)</span>,
 <span class="math notranslate nohighlight">\((X_k)_\mathrm{edge}\)</span></p></td>
 <td><p><span class="math notranslate nohighlight">\(\left(\rho_0^{n+\myhalf,{\rm avg}} + \rho'_\mathrm{edge} \right)(X_k)_\mathrm{edge}\)</span></p></td>
@@ -513,34 +509,27 @@ force computed in <code class="docutils literal notranslate"><span class="pre">m
 </div>
 <div class="section" id="advancing-rho-x-k">
 <span id="advancing-rhox-k"></span><h3>Advancing <span class="math notranslate nohighlight">\(\rho X_k\)</span><a class="headerlink" href="#advancing-rho-x-k" title="Permalink to this headline">¶</a></h3>
-<div class="line-block">
-<div class="line">The evolution equation for <span class="math notranslate nohighlight">\(\rho X_k\)</span>, ignoring the reaction terms
-that were already accounted for in <code class="docutils literal notranslate"><span class="pre">react_state</span></code>, and the
-associated discretization is</div>
-<div class="line">:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-pert-7">
+<p>The evolution equation for <span class="math notranslate nohighlight">\(\rho X_k\)</span>, ignoring the reaction
+terms that were already accounted for in <code class="docutils literal notranslate"><span class="pre">react_state</span></code>, and the
+associated discretization is:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">predict_rhoprime_and_X</span></code> :</p>
+<div class="math notranslate nohighlight" id="equation-pert-7">
 <span class="eqno">(146)<a class="headerlink" href="#equation-pert-7" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\left({\rho_0}^{n+\myhalf,{\rm avg}}
 + \rho'_\mathrm{edge} \right)(X_k)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
-</div></blockquote>
-<div class="line-block">
-<div class="line">:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-pert-8">
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">predict_rhoX</span></code> :</p>
+<div class="math notranslate nohighlight" id="equation-pert-8">
 <span class="eqno">(147)<a class="headerlink" href="#equation-pert-8" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\left(\rho X_k \right)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
-</div></blockquote>
-<div class="line-block">
-<div class="line">:</div>
-</div>
-<blockquote>
-<div><div class="math notranslate nohighlight" id="equation-pert-9">
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">predict_rho_and_X</span></code> :</p>
+<div class="math notranslate nohighlight" id="equation-pert-9">
 <span class="eqno">(148)<a class="headerlink" href="#equation-pert-9" title="Permalink to this equation">¶</a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\rho_\mathrm{edge} (X_k)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
-</div></blockquote>
+</li>
+</ul>
 </div>
 </div>
 <div class="section" id="energy-evolution">
