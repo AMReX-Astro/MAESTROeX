@@ -421,9 +421,6 @@ contains
     uy      = 0.d0
     uz      = 0.d0
 
-    dt = 1.d99
-    umax = 0.d0
-
     ! loop over the data
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
@@ -455,7 +452,7 @@ contains
        enddo
     enddo
 
-    umax = max(umax,ux,uy,uz)
+    call amrex_max(umax, max(ux,uy,uz))
 
     ux = ux / dx(1)
     spdx = spdx / dx(1)
@@ -469,9 +466,9 @@ contains
     ! use advective constraint unless velocities are zero everywhere
     ! in which case we use the sound speed
     if (ux .ne. 0.d0 .or. uy .ne. 0.d0 .or. uz .ne. 0.d0) then
-       dt = cfl / max(ux,uy,uz)
+       call amrex_min(dt, cfl / max(ux,uy,uz))
     else if (spdx .ne. 0.d0 .or. spdy .ne. 0.d0 .or. spdz .ne. 0.d0) then
-       dt = cfl / max(spdx,spdy,spdz)
+       call amrex_min(dt, cfl / max(spdx,spdy,spdz))
     end if
 
     ! sound speed constraint
@@ -481,14 +478,14 @@ contains
        else
           dt_sound = cfl / max(spdx,spdy,spdz)
        end if
-       dt = min(dt,dt_sound)
+       call amrex_min(dt,dt_sound)
     end if
 
     ! force constraints
-    if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
-    if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
+    if (pforcex > eps) call amrex_min(dt,sqrt(2.0D0*dx(1)/pforcex))
+    if (pforcey > eps) call amrex_min(dt,sqrt(2.0D0*dx(2)/pforcey))
 #if (AMREX_SPACEDIM == 3)
-    if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+    if (pforcez > eps) call amrex_min(dt,sqrt(2.0D0*dx(3)/pforcez))
 #endif
 
     ! divU constraint
@@ -541,7 +538,7 @@ contains
 
 #endif
 
-       dt = min(dt,dt_divu)
+       call amrex_min(dt,dt_divu)
 
     end if
 
@@ -594,9 +591,6 @@ contains
     uy      = 0.d0
     uz      = 0.d0
 
-    dt = 1.d99
-    umax = 0.d0
-
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -625,7 +619,7 @@ contains
        enddo
     enddo
 
-    umax = max(umax,ux,uy,uz)
+    call amrex_max(umax, max(ux,uy,uz))
 
     ux = ux / dx(1)
     uy = uy / dx(2)
@@ -637,9 +631,9 @@ contains
 
     ! advective constraint
     if (ux .ne. 0.d0 .or. uy .ne. 0.d0 .or. uz .ne. 0.d0) then
-       dt = cfl / max(ux,uy,uz)
+       call amrex_min(dt, cfl/max(ux,uy,uz))
     else if (spdx .ne. 0.d0 .and. spdy .ne. 0.d0 .and. spdz .ne. 0.d0) then
-       dt = cfl / max(spdx,spdy,spdz)
+       call amrex_min(dt, cfl/max(spdx,spdy,spdz))
     end if
 
     ! sound speed constraint
@@ -649,13 +643,13 @@ contains
        else
           dt_sound = cfl / max(spdx,spdy,spdz)
        end if
-       dt = min(dt,dt_sound)
+       call amrex_min(dt,dt_sound)
     end if
 
     ! force constraints
-    if (pforcex > eps) dt = min(dt,sqrt(2.0D0*dx(1)/pforcex))
-    if (pforcey > eps) dt = min(dt,sqrt(2.0D0*dx(2)/pforcey))
-    if (pforcez > eps) dt = min(dt,sqrt(2.0D0*dx(3)/pforcez))
+    if (pforcex > eps) call amrex_min(dt,sqrt(2.0D0*dx(1)/pforcex))
+    if (pforcey > eps) call amrex_min(dt,sqrt(2.0D0*dx(2)/pforcey))
+    if (pforcez > eps) call amrex_min(dt,sqrt(2.0D0*dx(3)/pforcez))
 
     ! divU constraint
     if (use_divu_firstdt) then
@@ -681,7 +675,7 @@ contains
           enddo
        enddo
 
-       dt = min(dt,dt_divu)
+       call amrex_min(dt,dt_divu)
 
     end if
 

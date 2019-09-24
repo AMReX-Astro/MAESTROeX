@@ -896,39 +896,6 @@ extern "C"
 			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
     //////////////////////
 
-
-    //////////////////////
-    // in ppm.F90
-#if (AMREX_SPACEDIM == 2)
-    void ppm_2d(const int* lo, const int* hi,
-                const amrex::Real* s,  const int* s_lo, const int* s_hi,
-                const int nc_s,
-                const amrex::Real* u,  const int* u_lo, const int* u_hi,
-                const amrex::Real* v,  const int* v_lo, const int* v_hi,
-                amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
-                amrex::Real* Im, const int* im_lo, const int* im_hi,
-                const int* domlo, const int* domhi,
-                const int* adv_bc,
-                const amrex::Real* dx, const amrex::Real dt,
-                const int is_umac, const int comp, const int bccomp, 
-                const int nbccomp);
-#elif (AMREX_SPACEDIM == 3)
-    void ppm_3d(const int* lo, const int* hi,
-                const amrex::Real* s,  const int* s_lo, const int* s_hi,
-                const int nc_s,
-                const amrex::Real* u,  const int* u_lo, const int* u_hi,
-                const amrex::Real* v,  const int* v_lo, const int* v_hi,
-                const amrex::Real* w,  const int* w_lo, const int* w_hi,
-                amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
-                amrex::Real* Im, const int* im_lo, const int* im_hi,
-                const int* domlo, const int* domhi,
-                const int* adv_bc,
-                const amrex::Real* dx, const amrex::Real dt,
-                const int is_umac, const int comp, const int bccomp, 
-                const int nbccomp);
-#endif
-    //////////////////////
-
     //////////////////////
     // in regrid.f90
     void regrid_base_state_cc(amrex::Real* state_cc);
@@ -962,32 +929,6 @@ extern "C"
                          const amrex::Real* state, const int* s_lo, const int* s_hi,
                          const amrex::Real* p0cart, const int* p_lo, const int* p_hi,
                          amrex::Real* cs, const int* c_lo, const int* c_hi);
-    //////////////////////
-
-    //////////////////////
-    // in slope.F90
-
-    void slopex_2d(const int* lo, const int* hi,
-                   const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
-                   const amrex::Real* slopex, const int* sl_lo, const int* sl_hi,
-                   const int nc_sl,
-                   const int* domlo, const int* domhi,
-                   const int nvar, const int* adv_bc, const int nbccomp, const int bccomp);
-
-   void slopey_2d(const int* lo, const int* hi,
-                  const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
-                  const amrex::Real* slopey, const int* sl_lo, const int* sl_hi,
-                  const int nc_sl,
-                  const int* domlo, const int* domhi,
-                  const int nvar, const int* adv_bc, const int nbccomp, const int bccomp);
-
-    void slopez_3d(const int* lo, const int* hi,
-                  const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
-                  const amrex::Real* slopez, const int* sl_lo, const int* sl_hi,
-                  const int nc_sl,
-                  const int* domlo, const int* domhi,
-                  const int nvar, const int* adv_bc, const int nbccomp, const int bccomp);
-
     //////////////////////
 
     //////////////////////

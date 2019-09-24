@@ -2327,7 +2327,6 @@ contains
                       Im(i,j,k,2) = s(i,j,k,n)
                    end if
 
-
                 else
 
                    sigma = abs(v(i,j,k))*dt/dx(2)

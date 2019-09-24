@@ -333,9 +333,10 @@ Maestro::FirstDt ()
 
     Real umax = 0.;
 
+    Real dt_lev = 1.e99;
+    Real umax_lev = 0.;
+
     for (int lev = 0; lev <= finest_level; ++lev) {
-        Real dt_lev = 1.e99;
-        Real umax_lev = 0.;
 
         // get references to the MultiFabs at level lev
         const MultiFab& uold_mf = uold[lev];
@@ -358,9 +359,6 @@ Maestro::FirstDt ()
         Real umax_grid = 0.;
 
         for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
-
-            Real dt_grid = 1.e99;
-            Real umax_grid = 0.;
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -403,10 +401,11 @@ Maestro::FirstDt ()
                 Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif
             }
-
-            dt_lev = std::min(dt_lev,dt_grid);
-            umax_lev = std::max(umax_lev,umax_grid);
         }
+
+	dt_lev = std::min(dt_lev,dt_grid);
+	umax_lev = std::max(umax_lev,umax_grid);
+
 	} //end openmp
 
         // find the smallest dt over all processors
