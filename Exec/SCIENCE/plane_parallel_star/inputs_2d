@@ -64,7 +64,7 @@ maestro.use_soundspeed_firstdt = true
 maestro.use_divu_firstdt = true
 
 maestro.use_exact_base_state = false
-maestro.use_tfromp = true
+maestro.use_tfromp = false
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
@@ -131,4 +131,9 @@ maestro.grav_const = -3.2e-1
 
   retry_burn = T
 
+  ! Inputs for generating a Nonaka Plot (TM) at specific zone (i,j,k)
+  nonaka_i = 15
+  nonaka_j = 45
+  nonaka_k = 0
+  
 /
