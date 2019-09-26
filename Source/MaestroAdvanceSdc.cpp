@@ -28,6 +28,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     Vector<MultiFab>       rho_Hext(finest_level+1);
     Vector<MultiFab>     sdc_source(finest_level+1);
     Vector<MultiFab>           aofs(finest_level+1);
+    Vector<MultiFab>    intra_rhoh0(finest_level+1);
     
     Vector<MultiFab> delta_gamma1_term(finest_level+1);
     Vector<MultiFab>      delta_gamma1(finest_level+1);
@@ -83,6 +84,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     RealVector     gamma1bar_nph    ( (max_radial_level+1)*nr_fine );
     RealVector delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0_dummy   ( (max_radial_level+1)*nr_fine );
+    RealVector     delta_rhoh0      ( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -103,6 +105,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
     delta_chi_w0_dummy.shrink_to_fit();
+    delta_rhoh0.shrink_to_fit();
 
     int is_predictor;
 
@@ -113,9 +116,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     if (evolve_base_state) {
 	Abort("evolve_base_state not supported with SDC");
-    } else if (enthalpy_pred_type == 1) {
-	Abort("enthalpy_pred_type == 1 not supported with SDC");
-    }
+    } 
 
     if (maestro_verbose > 0) {
     	Print() << "Cell Count:" << std::endl;
@@ -143,6 +144,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	rho_Hext    [lev].define(grids[lev], dmap[lev],       1,    0);
 	sdc_source  [lev].define(grids[lev], dmap[lev],   Nscal,    0);
 	aofs        [lev].define(grids[lev], dmap[lev],   Nscal,    0);
+	intra_rhoh0 [lev].define(grids[lev], dmap[lev],       1,    0);
 	delta_gamma1_term[lev].define(grids[lev], dmap[lev],  1,    0);
 	delta_gamma1[lev].define(grids[lev], dmap[lev],       1,    0);
         peosbar_cart[lev].define(grids[lev], dmap[lev],       1,    0);
@@ -185,6 +187,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	// initialize umac
 	for (int d=0; d < AMREX_SPACEDIM; ++d)
 	    umac[lev][d].setVal(0.);
+
+	// initialize intra_rhoh0
+	intra_rhoh0[lev].setVal(0.);
     }
 
 #if (AMREX_SPACEDIM == 3)
@@ -478,8 +483,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // base state enthalpy update
     if (evolve_base_state) {
 	// compute rhoh0_old by "averaging"
-	Average(s1, rhoh0_old, RhoH);
-	Average(s2, rhoh0_new, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
+	Average(sold, rhoh0_old, RhoH);
     }
     else {
 */	rhoh0_new = rhoh0_old;
@@ -490,7 +494,18 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     }
 
     EnthalpyAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,umac,w0mac_dummy,diff_old);
+/*
+    // base state enthalpy update
+    if (evolve_base_state) {
+	// compute rhoh0_new by "averaging"
+	Average(shat, rhoh0_new, RhoH);
 
+	// store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
+        for (int i=0; i<rhoh0_new.size(); ++i) {
+	    delta_rhoh0[i] = (rhoh0_new[i] - rhoh0_old[i])/dt;
+	}
+    }
+*/
     // extract aofs = (shat - sold) / dt - intra
     for (int lev=0; lev<=finest_level; ++lev) {
 	MultiFab::LinComb(aofs[lev],1.0/dt,shat[lev],0,-1.0/dt,sold[lev],0,0,Nscal,0);
@@ -525,8 +540,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // build sdc_source
     for (int lev=0; lev<=finest_level; ++lev) {
 	sdc_source[lev].setVal(0.);
+	MultiFab::Add(sdc_source[lev],aofs[lev],FirstSpec,FirstSpec,NumSpec,0);
 	MultiFab::LinComb(sdc_source[lev],0.5,diff_old[lev],0,0.5,diff_hat[lev],0,RhoH,1,0);
-	MultiFab::Add(sdc_source[lev],aofs[lev],0,0,Nscal,0);
+	MultiFab::Add(sdc_source[lev],aofs[lev],RhoH,RhoH,1,0);
     }
     
     // wallclock time
@@ -558,9 +574,28 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // first create rhohalf -- a lot of forms need this. 
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
+/*
+    // also update base state enthalpy
+    if (evolve_base_state) {
+	Average(snew, rhoh0_new, RhoH);
+
+	// compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
+	//                       - (rhoh0_hat - rhoh0_old)/dt
+        for (int i=0; i<rhoh0_new.size(); ++i) {
+	    delta_rhoh0[i] = (rhoh0_new[i] - rhoh0_old[i])/dt - delta_rhoh0[i];
+	}
+	Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
+    }
+*/
+
     if (enthalpy_pred_type == predict_rhohprime) {
 
-	Abort("enthalpy_pred_type = predict_rhohprime not supported");
+	// intra is only different from predict_rhoh if rhoh0 is not constant
+	if (evolve_base_state) {	    
+	    for (int lev=0; lev<=finest_level; ++lev) {
+		MultiFab::Subtract(intra[lev],intra_rhoh0[lev],0,RhoH,1,0);
+	    }
+	}
 
     } else if (enthalpy_pred_type == predict_h) {
 
@@ -858,18 +893,24 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 		psi[i] = (p0_new[i] - p0_old[i])/dt;
 	    }
 	}
-	
-	// base state enthalpy averaging
-	if (evolve_base_state) {
-	    Average(s2, rhoh0_new, RhoH);
-	}
 */	
-	// base state enthalpy update
+	// enthalpy update
 	if (maestro_verbose >= 1) {
 	    Print() << "            : enthalpy_advance >>>" << std::endl;
 	}
 	
 	EnthalpyAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,umac,w0mac_dummy,diff_old);
+/*
+        // base state enthalpy update
+        if (evolve_base_state) {
+	    Average(shat, rhoh0_new, RhoH);
+
+	    // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
+            for (int i=0; i<rhoh0_new.size(); ++i) {
+	        delta_rhoh0[i] = (rhoh0_new[i] - rhoh0_old[i])/dt;
+	    }
+        }
+*/
 
 	// extract aofs = (shat - sold) / dt - intra
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -946,12 +987,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	    MultiFab::Subtract(intra[lev],sdc_source[lev],RhoH,RhoH,1,0);
 	}
 	
-	if (is_initIter) {
-	    for (int lev=0; lev<=finest_level; ++lev) {
-		intra[lev].setVal(0.);
-	    }
-	}
-
 	// massage the rhoh intra term into the proper form, depending on
 	// what we are predicting.  Note: we do this before we deal with
 	// the species terms, since some enthalpy types need this default
@@ -959,10 +994,35 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
 	// create rhohalf -- a lot of forms need this. 
 	FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
+/*
+	// also update base state enthalpy
+	if (evolve_base_state) {
+	    Average(snew, rhoh0_new, RhoH);
+	    
+	    // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
+	    //                       - (rhoh0_hat - rhoh0_old)/dt
+	    for (int i=0; i<rhoh0_new.size(); ++i) {
+		delta_rhoh0[i] = (rhoh0_new[i] - rhoh0_old[i])/dt - delta_rhoh0[i];
+	    }
+	    Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
+	}
+*/
 	
+	if (is_initIter) {
+	    for (int lev=0; lev<=finest_level; ++lev) {
+		intra[lev].setVal(0.);
+		intra_rhoh0[lev].setVal(0.);
+	    }
+	}
+
 	if (enthalpy_pred_type == predict_rhohprime) {
 	    
-	    Abort("enthalpy_pred_type = predict_rhohprime not supported");
+	    // intra is only different from predict_rhoh if rhoh0 is not constant
+	    if (evolve_base_state) {	    
+		for (int lev=0; lev<=finest_level; ++lev) {
+		    MultiFab::Subtract(intra[lev],intra_rhoh0[lev],0,RhoH,1,0);
+		}
+	    }
 
 	} else if (enthalpy_pred_type == predict_h) {
 
