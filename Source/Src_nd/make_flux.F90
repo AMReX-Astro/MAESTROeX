@@ -131,18 +131,15 @@ contains
              if (species_pred_type == predict_rhoprime_and_X) then
                 ! edge states are rho' and X.  To make the (rho X) flux,
                 ! we need the edge state of rho0
-                sfluxy(i,j,comp) = &
-                     (vmac(i,j)+w0(lev,j))*(rho0_edge+sedgey(i,j,rho_comp))*sedgey(i,j,comp)
+                sfluxy(i,j,comp) = vmac(i,j)*(rho0_edge+sedgey(i,j,rho_comp))*sedgey(i,j,comp)
 
              else if (species_pred_type == predict_rhoX) then
                 ! edge states are (rho X)
-                sfluxy(i,j,comp) = &
-                     (vmac(i,j)+w0(lev,j))*sedgey(i,j,comp)
+                sfluxy(i,j,comp) = vmac(i,j)*sedgey(i,j,comp)
 
              else if (species_pred_type == predict_rho_and_X) then
                 ! edge state are rho and X
-                sfluxy(i,j,comp) = &
-                     (vmac(i,j)+w0(lev,j))*sedgey(i,j,rho_comp)*sedgey(i,j,comp)
+                sfluxy(i,j,comp) = vmac(i,j)*sedgey(i,j,rho_comp)*sedgey(i,j,comp)
 
              endif
 
@@ -296,16 +293,16 @@ contains
                 if (species_pred_type == predict_rhoprime_and_X) then
                    ! edge states are rho' and X.  To make the (rho X)
                    ! flux, we need the edge state of rho0
-                   sfluxz(i,j,k,comp) = (wmac(i,j,k)+w0(lev,k))* &
+                   sfluxz(i,j,k,comp) = wmac(i,j,k)* &
                         (rho0_edge+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp)
 
                 else if (species_pred_type == predict_rhoX) then
                    ! edge states are (rho X)
-                   sfluxz(i,j,k,comp) = (wmac(i,j,k)+w0(lev,k))*sedgez(i,j,k,comp)
+                   sfluxz(i,j,k,comp) = wmac(i,j,k)*sedgez(i,j,k,comp)
 
                 else if (species_pred_type == predict_rho_and_X) then
                    ! edge states are rho and X
-                   sfluxz(i,j,k,comp) = (wmac(i,j,k)+w0(lev,k))* &
+                   sfluxz(i,j,k,comp) = wmac(i,j,k)* &
                         sedgez(i,j,k,rho_comp)*sedgez(i,j,k,comp)
 
                 endif
@@ -369,9 +366,6 @@ contains
        umac,   u_lo, u_hi, &
        vmac,   v_lo, v_hi, &
        wmac,   w_lo, w_hi, &
-       w0macx, wx_lo, wx_hi, &
-       w0macy, wy_lo, wy_hi, &
-       w0macz, wz_lo, wz_hi, &
        rho0_edgex, rx_lo, rx_hi, &
        rho0_edgey, ry_lo, ry_hi, &
        rho0_edgez, rz_lo, rz_hi, &
@@ -397,12 +391,6 @@ contains
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-    integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
-    double precision, intent(inout) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
-    integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
-    double precision, intent(inout) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
-    integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
-    double precision, intent(inout) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
     integer         , intent(in   ) :: rx_lo(3), rx_hi(3)
     double precision, intent(in   ) :: rho0_edgex(rx_lo(1):rx_hi(1),rx_lo(2):rx_hi(2),rx_lo(3):rx_hi(3))
     integer         , intent(in   ) :: ry_lo(3), ry_hi(3)
@@ -427,17 +415,16 @@ contains
                    ! edge states are rho' and X.  To make the (rho X)
                    ! flux, we need the edge state of rho0
                    ! rho0_edge = HALF*(rho0macx_old(i,j,k)+rho0macx_new(i,j,k))
-                   sfluxx(i,j,k,comp) = (umac(i,j,k) + w0macx(i,j,k)) * &
+                   sfluxx(i,j,k,comp) = umac(i,j,k) * &
                         (rho0_edgex(i,j,k) + sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp)
 
                 else if (species_pred_type == predict_rhoX) then
                    ! edge states are (rho X)
-                   sfluxx(i,j,k,comp) = (umac(i,j,k) + w0macx(i,j,k)) * sedgex(i,j,k,comp)
+                   sfluxx(i,j,k,comp) = umac(i,j,k) * sedgex(i,j,k,comp)
 
                 else if (species_pred_type == predict_rho_and_X) then
                    ! edge states are rho and X
-                   sfluxx(i,j,k,comp) = (umac(i,j,k) + w0macx(i,j,k)) * &
-                        sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp)
+                   sfluxx(i,j,k,comp) = umac(i,j,k) * sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp)
 
                 endif
 
@@ -454,17 +441,16 @@ contains
                    ! edge states are rho' and X.  To make the (rho X)
                    ! flux, we need the edge state of rho0
                    ! rho0_edge = HALF*(rho0macy_old(i,j,k)+rho0macy_new(i,j,k))
-                   sfluxy(i,j,k,comp) = (vmac(i,j,k) + w0macy(i,j,k)) * &
+                   sfluxy(i,j,k,comp) = vmac(i,j,k) * &
                         (rho0_edgey(i,j,k) + sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp)
 
                 else if (species_pred_type == predict_rhoX) then
                    ! edge states are (rho X)
-                   sfluxy(i,j,k,comp) = (vmac(i,j,k) + w0macy(i,j,k)) * sedgey(i,j,k,comp)
+                   sfluxy(i,j,k,comp) = vmac(i,j,k) * sedgey(i,j,k,comp)
 
                 else if (species_pred_type == predict_rho_and_X) then
                    ! edge states are rho and X
-                   sfluxy(i,j,k,comp) = (vmac(i,j,k) + w0macy(i,j,k)) * &
-                        sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp)
+                   sfluxy(i,j,k,comp) = vmac(i,j,k) * sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp)
 
                 endif
 
@@ -481,17 +467,16 @@ contains
                    ! edge states are rho' and X.  To make the (rho X)
                    ! flux, we need the edge state of rho0
                    ! rho0_edge = HALF*(rho0macz_old(i,j,k)+rho0macz_new(i,j,k))
-                   sfluxz(i,j,k,comp) = (wmac(i,j,k) + w0macz(i,j,k)) * &
+                   sfluxz(i,j,k,comp) = wmac(i,j,k) * &
                         (rho0_edgez(i,j,k) + sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp)
 
                 else if (species_pred_type == predict_rhoX) then
                    ! edge states are (rho X)
-                   sfluxz(i,j,k,comp) = (wmac(i,j,k) + w0macz(i,j,k)) * sedgez(i,j,k,comp)
+                   sfluxz(i,j,k,comp) = wmac(i,j,k) * sedgez(i,j,k,comp)
 
                 else if (species_pred_type == predict_rho_and_X) then
                    ! edge states are rho and X
-                   sfluxz(i,j,k,comp) = (wmac(i,j,k) + w0macz(i,j,k)) * &
-                        sedgez(i,j,k,rho_comp)*sedgez(i,j,k,comp)
+                   sfluxz(i,j,k,comp) = wmac(i,j,k) * sedgez(i,j,k,rho_comp)*sedgez(i,j,k,comp)
 
                 endif
 
@@ -646,7 +631,7 @@ contains
              rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
              do i=lo(1),hi(1)
                 sfluxy(i,j,rhoh_comp) = &
-                     (vmac(i,j)+w0(lev,j))*(rho0_edge+sedgey(i,j,rho_comp))*sedgey(i,j,rhoh_comp)
+                     vmac(i,j)*(rho0_edge+sedgey(i,j,rho_comp))*sedgey(i,j,rhoh_comp)
              end do
           end do
 
@@ -655,8 +640,7 @@ contains
           ! density edge state is rho
           do j=lo(2),hi(2)+1
              do i=lo(1),hi(1)
-                sfluxy(i,j,rhoh_comp) = &
-                     (vmac(i,j)+w0(lev,j))*sedgey(i,j,rho_comp)*sedgey(i,j,rhoh_comp)
+                sfluxy(i,j,rhoh_comp) = vmac(i,j)*sedgey(i,j,rho_comp)*sedgey(i,j,rhoh_comp)
              end do
           end do
 
@@ -671,7 +655,7 @@ contains
 
        do j=lo(2),hi(2)+1
           do i=lo(1),hi(1)
-             sfluxy(i,j,rhoh_comp) = (vmac(i,j)+w0(lev,j))*sedgey(i,j,rhoh_comp)
+             sfluxy(i,j,rhoh_comp) = vmac(i,j)*sedgey(i,j,rhoh_comp)
           end do
        end do
 
@@ -680,7 +664,7 @@ contains
        do j=lo(2),hi(2)+1
           rhoh0_edge = HALF*(rhoh0_edge_old(lev,j)+rhoh0_edge_new(lev,j))
           do i=lo(1),hi(1)
-             sfluxy(i,j,rhoh_comp) = (vmac(i,j)+w0(lev,j))*(sedgey(i,j,rhoh_comp)+rhoh0_edge)
+             sfluxy(i,j,rhoh_comp) = vmac(i,j)*(sedgey(i,j,rhoh_comp)+rhoh0_edge)
           end do
        end do
 
@@ -852,7 +836,7 @@ contains
              rho0_edge = HALF*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k))
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-                   sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k)+w0(lev,k))* &
+                   sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)* &
                         (rho0_edge+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,rhoh_comp)
                 end do
              end do
@@ -865,7 +849,7 @@ contains
           do k=lo(3),hi(3)+1
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-                   sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k)+w0(lev,k))* &
+                   sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)* &
                         sedgez(i,j,k,rho_comp)*sedgez(i,j,k,rhoh_comp)
                 end do
              end do
@@ -883,7 +867,7 @@ contains
        do k=lo(3),hi(3)+1
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
-                sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k)+w0(lev,k))*sedgez(i,j,k,rhoh_comp)
+                sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)*sedgez(i,j,k,rhoh_comp)
              end do
           end do
        end do
@@ -895,8 +879,7 @@ contains
           rhoh0_edge = HALF*(rhoh0_edge_old(lev,k)+rhoh0_edge_new(lev,k))
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
-                sfluxz(i,j,k,rhoh_comp) = &
-                     (wmac(i,j,k)+w0(lev,k))*(sedgez(i,j,k,rhoh_comp)+rhoh0_edge)
+                sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)*(sedgez(i,j,k,rhoh_comp)+rhoh0_edge)
              end do
           end do
        end do
@@ -921,9 +904,6 @@ contains
        umac,   u_lo, u_hi, &
        vmac,   v_lo, v_hi, &
        wmac,   w_lo, w_hi, &
-       w0macx, wx_lo, wx_hi, &
-       w0macy, wy_lo, wy_hi, &
-       w0macz, wz_lo, wz_hi, &
        rho0_edgex, rx_lo, rx_hi, &
        rho0_edgey, ry_lo, ry_hi, &
        rho0_edgez, rz_lo, rz_hi, &
@@ -951,12 +931,6 @@ contains
     double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
     integer         , intent(in   ) :: w_lo(3), w_hi(3)
     double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-    integer         , intent(in   ) :: wx_lo(3), wx_hi(3)
-    double precision, intent(in   ) :: w0macx(wx_lo(1):wx_hi(1),wx_lo(2):wx_hi(2),wx_lo(3):wx_hi(3))
-    integer         , intent(in   ) :: wy_lo(3), wy_hi(3)
-    double precision, intent(in   ) :: w0macy(wy_lo(1):wy_hi(1),wy_lo(2):wy_hi(2),wy_lo(3):wy_hi(3))
-    integer         , intent(in   ) :: wz_lo(3), wz_hi(3)
-    double precision, intent(in   ) :: w0macz(wz_lo(1):wz_hi(1),wz_lo(2):wz_hi(2),wz_lo(3):wz_hi(3))
     integer         , intent(in   ) :: rx_lo(3), rx_hi(3)
     double precision, intent(in   ) :: rho0_edgex(rx_lo(1):rx_hi(1),rx_lo(2):rx_hi(2),rx_lo(3):rx_hi(3))
     integer         , intent(in   ) :: ry_lo(3), ry_hi(3)
@@ -994,7 +968,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)+1
 
-                   sfluxx(i,j,k,rhoh_comp) = (umac(i,j,k) + w0macx(i,j,k)) * &
+                   sfluxx(i,j,k,rhoh_comp) = umac(i,j,k) * &
                         (rho0_edgex(i,j,k) + sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp)
 
                 end do
@@ -1009,7 +983,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)+1
 
-                   sfluxx(i,j,k,rhoh_comp) = (umac(i,j,k) + w0macx(i,j,k)) * &
+                   sfluxx(i,j,k,rhoh_comp) = umac(i,j,k) * &
                         sedgex(i,j,k,rho_comp)*sedgex(i,j,k,rhoh_comp)
 
                 end do
@@ -1033,7 +1007,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)+1
 
-                   sfluxx(i,j,k,rhoh_comp) = (umac(i,j,k)+w0macx(i,j,k)) * &
+                   sfluxx(i,j,k,rhoh_comp) = umac(i,j,k) * &
                         (sedgex(i,j,k,rho_comp)+rho0_edgex(i,j,k)) * (sedgex(i,j,k,rhoh_comp)+h0_edgex(i,j,k))
 
                 end do
@@ -1056,7 +1030,7 @@ contains
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)+1
 
-                sfluxx(i,j,k,rhoh_comp) = (umac(i,j,k) + w0macx(i,j,k))*sedgex(i,j,k,rhoh_comp)
+                sfluxx(i,j,k,rhoh_comp) = umac(i,j,k)*sedgex(i,j,k,rhoh_comp)
 
              end do
           end do
@@ -1076,7 +1050,7 @@ contains
                 ! where h_0 is computed from (rho h)_0 / rho_0
 
                 sfluxx(i,j,k,rhoh_comp) = &
-                     (umac(i,j,k)+w0macx(i,j,k))*(rho0_edgex(i,j,k)*h0_edgex(i,j,k)+sedgex(i,j,k,rhoh_comp))
+                     umac(i,j,k)*(rho0_edgex(i,j,k)*h0_edgex(i,j,k)+sedgex(i,j,k,rhoh_comp))
 
              end do
           end do
@@ -1096,7 +1070,7 @@ contains
              do j = lo(2), hi(2)+1
                 do i = lo(1), hi(1)
 
-                   sfluxy(i,j,k,rhoh_comp) = (vmac(i,j,k) + w0macy(i,j,k)) * &
+                   sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k) * &
                         (rho0_edgey(i,j,k) + sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp)
 
                 end do
@@ -1111,7 +1085,7 @@ contains
              do j = lo(2), hi(2)+1
                 do i = lo(1), hi(1)
 
-                   sfluxy(i,j,k,rhoh_comp) = (vmac(i,j,k) + w0macy(i,j,k)) * &
+                   sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k) * &
                         sedgey(i,j,k,rho_comp)*sedgey(i,j,k,rhoh_comp)
 
                 end do
@@ -1135,7 +1109,7 @@ contains
              do j = lo(2), hi(2)+1
                 do i = lo(1), hi(1)
 
-                   sfluxy(i,j,k,rhoh_comp) = (vmac(i,j,k)+w0macy(i,j,k)) * &
+                   sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k) * &
                         (sedgey(i,j,k,rho_comp)+rho0_edgey(i,j,k)) * (sedgey(i,j,k,rhoh_comp)+h0_edgey(i,j,k))
 
                 end do
@@ -1159,7 +1133,7 @@ contains
           do j = lo(2), hi(2)+1
              do i = lo(1), hi(1)
 
-                sfluxy(i,j,k,rhoh_comp) = (vmac(i,j,k) + w0macy(i,j,k))*sedgey(i,j,k,rhoh_comp)
+                sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k)*sedgey(i,j,k,rhoh_comp)
 
              end do
           end do
@@ -1179,7 +1153,7 @@ contains
                 ! where h_0 is computed from (rho h)_0 / rho_0
 
                 sfluxy(i,j,k,rhoh_comp) = &
-                     (vmac(i,j,k)+w0macy(i,j,k))*(rho0_edgey(i,j,k)*h0_edgey(i,j,k)+sedgey(i,j,k,rhoh_comp))
+                     vmac(i,j,k)*(rho0_edgey(i,j,k)*h0_edgey(i,j,k)+sedgey(i,j,k,rhoh_comp))
 
              end do
           end do
@@ -1199,7 +1173,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
 
-                   sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k) + w0macz(i,j,k)) * &
+                   sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k) * &
                         (rho0_edgez(i,j,k) + sedgez(i,j,k,rho_comp))*sedgez(i,j,k,rhoh_comp)
 
                 end do
@@ -1214,7 +1188,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
 
-                   sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k) + w0macz(i,j,k)) * &
+                   sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k) * &
                         sedgez(i,j,k,rho_comp)*sedgez(i,j,k,rhoh_comp)
 
                 end do
@@ -1238,7 +1212,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
 
-                   sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k)+w0macz(i,j,k)) * &
+                   sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k) * &
                         (sedgez(i,j,k,rho_comp)+rho0_edgez(i,j,k)) * (sedgez(i,j,k,rhoh_comp)+h0_edgez(i,j,k))
 
                 end do
@@ -1261,7 +1235,7 @@ contains
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
 
-                sfluxz(i,j,k,rhoh_comp) = (wmac(i,j,k) + w0macz(i,j,k))*sedgez(i,j,k,rhoh_comp)
+                sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)*sedgez(i,j,k,rhoh_comp)
 
              end do
           end do
@@ -1281,7 +1255,7 @@ contains
                 ! where h_0 is computed from (rho h)_0 / rho_0
 
                 sfluxz(i,j,k,rhoh_comp) = &
-                     (wmac(i,j,k)+w0macz(i,j,k))*(rho0_edgez(i,j,k)*h0_edgez(i,j,k)+sedgez(i,j,k,rhoh_comp))
+                     wmac(i,j,k)*(rho0_edgez(i,j,k)*h0_edgez(i,j,k)+sedgez(i,j,k,rhoh_comp))
 
              end do
           end do
