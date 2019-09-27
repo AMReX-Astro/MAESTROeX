@@ -725,7 +725,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
     
     // perform a nodal projection
-    NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
+    NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter,false);
     
     Real dt_hold = dt;
     
