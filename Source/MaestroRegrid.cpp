@@ -303,6 +303,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     const int ng_S = S_cc_new[lev].nGrow();
     const int ng_g = gpi[lev].nGrow();
     const int ng_d = dSdt[lev].nGrow();
+    const int ng_w = w0_cart[lev].nGrow();
     const int ng_r = rhcc_for_nodalproj[lev].nGrow();
     const int ng_p = pi[lev].nGrow();
 
@@ -314,6 +315,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     MultiFab S_cc_old_state          (ba, dm,              1, ng_S);
     MultiFab gpi_state               (ba, dm, AMREX_SPACEDIM, ng_g);
     MultiFab dSdt_state              (ba, dm,              1, ng_d);
+    MultiFab w0_cart_state           (ba, dm, AMREX_SPACEDIM, ng_w);
     MultiFab rhcc_for_nodalproj_state(ba, dm,              1, ng_r);
     MultiFab pi_state                (convert(ba,nodal_flag), dm, 1, ng_p);
 
@@ -335,8 +337,9 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     FillPatch(lev, time, dSdt_state, dSdt, dSdt, 0, 0, 1, 0, bcs_f);
     std::swap(dSdt_state, dSdt[lev]);
 
-    std::swap(rhcc_for_nodalproj_state,rhcc_for_nodalproj[lev]);
-    std::swap(pi_state,pi[lev]);
+    std::swap(           w0_cart_state,            w0_cart[lev]);
+    std::swap(rhcc_for_nodalproj_state, rhcc_for_nodalproj[lev]);
+    std::swap(                pi_state,                 pi[lev]);
 
     if (spherical == 1) {
         const int ng_n = normal[lev].nGrow();
@@ -370,6 +373,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     S_cc_new[lev].define          (ba, dm,              1, 0);
     gpi[lev].define               (ba, dm, AMREX_SPACEDIM, 0);
     dSdt[lev].define              (ba, dm,              1, 0);
+    w0_cart[lev].define           (ba, dm, AMREX_SPACEDIM, 1);
     rhcc_for_nodalproj[lev].define(ba, dm,              1, 1);
 
     pi[lev].define(convert(ba,nodal_flag), dm, 1, 0);     // nodal
@@ -407,6 +411,7 @@ Maestro::ClearLevel (int lev)
     S_cc_new[lev].clear();
     gpi[lev].clear();
     dSdt[lev].clear();
+    w0_cart[lev].clear();
     rhcc_for_nodalproj[lev].clear();
     pi[lev].clear();
     if (spherical == 1) {

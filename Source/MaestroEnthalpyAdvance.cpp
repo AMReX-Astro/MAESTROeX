@@ -59,6 +59,8 @@ Maestro::EnthalpyAdvance (int which_step,
     Vector<MultiFab> rhoh0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        rhoh0_old_cart[lev].setVal(0.);
     }
 
     // compute forcing terms
@@ -290,13 +292,11 @@ Maestro::EnthalpyAdvance (int which_step,
     MakeRhoHForce(scal_force,0,thermal,umac,0,which_step);
 
     Vector<MultiFab> p0_new_cart(finest_level+1);
-    if (spherical == 1) {
-        for (int lev=0; lev<=finest_level; ++lev) {
-            p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-        }
-
-        Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new.dataPtr(), p0_new_cart);
+    Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+
+    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
 }

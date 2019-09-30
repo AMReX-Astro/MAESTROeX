@@ -143,6 +143,14 @@ Running
     is built with the helmholtz EoS, but the extern namelist has gamma law
     parameters.
 
+#. *How can I check the compilation parameters of a MAESTROeX executable?*
+
+   The build information (including git hashes, modules, EoS, network, etc.) can be displayed by running the executable as 
+
+   ::
+
+       ./Maestro.exe --display
+
 Debugging
 =========
 

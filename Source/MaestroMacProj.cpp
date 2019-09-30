@@ -17,7 +17,13 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   const int& is_predictor)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MacProj()",MacProj);
+    BL_PROFILE_VAR("Maestro::MacProj()", MacProj);
+// 
+// #ifdef AMREX_USE_CUDA
+//     auto not_launched = Gpu::notInLaunchRegion();
+//     // turn on GPU
+//     if (not_launched) Gpu::setLaunchRegion(true);
+// #endif
 
     // this will hold solver RHS = macrhs - div(beta0*umac)
     Vector<MultiFab> solverrhs(finest_level+1);
@@ -66,6 +72,8 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     Vector<MultiFab> rho(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rho[lev].define(grids[lev], dmap[lev], 1, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        rho[lev].setVal(0.);
     }
     Real rho_time = (is_predictor == 1) ? t_old : 0.5*(t_old+t_new);
     FillPatch(rho_time, rho, sold, snew, Rho, 0, 1, Rho, bcs_s);
@@ -145,11 +153,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // solve -div B grad phi = RHS
 
-// #ifdef AMREX_USE_CUDA
-//     // turn on GPU
-//     Gpu::setLaunchRegion(true);
-// #endif
-
     // build an MLMG solver
     MLMG mac_mlmg(mlabec);
 
@@ -224,7 +227,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 // #ifdef AMREX_USE_CUDA
 //     // turn off GPU
-//     Gpu::setLaunchRegion(false);
+//     if (not_launched) Gpu::setLaunchRegion(false);
 // #endif
 
 }

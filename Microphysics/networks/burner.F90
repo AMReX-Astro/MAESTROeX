@@ -31,7 +31,7 @@ contains
 
 
 #ifndef SDC
-  subroutine burner(state_in, state_out, dt)
+  subroutine burner(state_in, state_out, dt, time_in)
 
     !$acc routine seq
 
@@ -40,12 +40,11 @@ contains
     type (burn_t), intent(inout) :: state_in
     type (burn_t), intent(inout) :: state_out
     double precision, intent(in) :: dt
+    double precision, intent(in) :: time_in
 
     double precision :: time
 
     !$gpu
-
-    time = 0.d0
 
     ! Make sure the network and burner have been initialized.
 
@@ -65,7 +64,7 @@ contains
 
     ! Do the burning.
 
-    call actual_burner(state_in, state_out, dt, time)
+    call actual_burner(state_in, state_out, dt, time_in)
 
   end subroutine burner
 #endif

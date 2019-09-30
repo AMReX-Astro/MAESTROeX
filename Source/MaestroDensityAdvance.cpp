@@ -45,11 +45,10 @@ Maestro::DensityAdvance (int which_step,
     Vector<MultiFab> rho0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+	rho0_old_cart[lev].setVal(0.);
     }
 
-    if (spherical == 1) {
-        Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
-    }
+    Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
 
     // ** density source term **
 
@@ -126,9 +125,9 @@ Maestro::DensityAdvance (int which_step,
 
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec,1,0);
+                MultiFab::Copy(sedge[lev][idim],sedge[lev][idim],FirstSpec,Rho,1,0);
                 for (int ispec=1; ispec<NumSpec; ++ispec) {
-                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],Rho,FirstSpec+ispec,1,0);
+                    MultiFab::Add(sedge[lev][idim],sedge[lev][idim],FirstSpec+ispec,Rho,1,0);
                 }
             }
         }
@@ -215,36 +214,14 @@ Maestro::DensityAdvance (int which_step,
         scal_force[lev].setVal(0.);
     }
 
+    Vector<MultiFab> p0_new_cart(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+    }
+
+    Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+
     // p0 only used in rhoh update so it's an optional parameter
-    UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec);
-
-    // if (verbose >= 1) {
-    //  Real smin, smax;
-    //  for (int lev=0; lev<=finest_level; ++lev) {
-    //      // Print() << "Level " << lev << std::endl;
-
-    //      for (int comp = FirstSpec; comp < FirstSpec+NumSpec; ++comp) {
-    //      MultiFab::Divide(snew[lev],snew[lev],Rho,comp,1,ng_s);
-
-    //      smin = snew[lev].min(comp);
-    //      smax = snew[lev].max(comp);
-
-    //          Print() << "Last species: " << smin << " " << smax << std::endl;
-
-    //      MultiFab::Multiply(snew[lev],snew[lev],Rho,comp,1,ng_s);
-    //      }
-
-    //      smin = snew[lev].min(Rho);
-    //      smax = snew[lev].max(Rho);
-
-    //      Print() << "Rho: " << smin << " " << smax << std::endl;
-    //  }
-    // }
-
-
-// Print() << "... Level 0 update:" << std::endl;
-// Print() << "... new min/max : density           " << smin[0] << "    " << smax[0] << std::endl;
-// Print() << "... new min/max : " << std::endl;
-// Print() << "... new min/max : tracer            " << std::endl;
+    UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec, p0_new_cart);
 
 }

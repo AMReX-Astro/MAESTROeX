@@ -1,3 +1,5 @@
+.. _ch:intro:
+
 *************************
 Introduction to MAESTROeX
 *************************
@@ -5,27 +7,30 @@ Introduction to MAESTROeX
 History of MAESTROeX
 ====================
 
-MAESTROeX describes the evolution of low Mach number flows that are in
-hydrostatic equilibrium.  MAESTROeX itself derives from MAESTRO, the
-original (pure Fortran) low Mach number stellar hydrodynamics code.
-MAESTROeX is a rewrite of MAESTRO in the C++/Fortran framework of
-AMReX.  Henceforth, we will refer only to MAESTROeX, although some of
-the ideas originated in MAESTRO before the change to MAESTROeX.
+MAESTROeX models the evolution of low Mach number astrophysical
+flows that are in hydrostatic equilibrium.  The name MAESTROeX itself
+derives from MAESTRO, the original (pure Fortran) low Mach number
+stellar hydrodynamics code.  MAESTROeX began as a rewrite MAESTRO
+in the C++/Fortran framework of AMReX, and has since then gained
+additional algorithmic capabilities.  Henceforth, we will refer
+only to MAESTROeX, although many of the ideas originated in
+MAESTRO before the change to MAESTROeX.
 
 The idea for MAESTROeX grew out of our success in applying low Mach
 number combustion methods developed for terrestrial flames
-:cite:`DayBell00` to small-scale astrophysical flames (including
-Landau-Darrieus instability :cite:`SNld`, Rayleigh-Taylor unstable
-flames :cite:`SNrt3d`, and flame-turbulence interactions
-:cite:`SNturb`). Our original small-scale astrophysical combustion
-algorithm is detailed in
+:cite:`DayBell00` to small-scale (non-stratified) astrophysical
+flames such as the Landau-Darrieus instability :cite:`SNld`,
+Rayleigh-Taylor unstable flames :cite:`SNrt3d`, and flame-turbulence
+interactions :cite:`SNturb`. Our original small-scale astrophysical
+combustion algorithm is detailed in
 
 -  *Adaptive Low Mach Number Simulations of Nuclear Flames,*
    J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, & M. Zingale
-   2004, JCP, 195, 2, 677 (henceforth BDRWZ)
+   2004, JCP, 195, 2, 677 (henceforth BDRWZ) :cite:`SNe`
 
-MAESTROeX was developed initially for modeling the convecting phase in
-a white dwarf preceding the ignition of a Type Ia supernovae.  As
+MAESTROeX was developed initially for modeling the convective phase in
+a Chandrasekhar mass white dwarf preceding the ignition of a
+Type Ia supernovae.  As
 such, we needed to incorporate the compressibility effects due to
 large-scale stratification in the star. The method closest in spirit
 to MAESTROeX is the pseudo-incompressible method of Durran
@@ -41,41 +46,48 @@ papers leading up to the first application to this problem:
 -  *Low Mach Number Modeling of Type Ia
    Supernovae. I. Hydrodynamics,* A. S. Almgren, J. B. Bell,
    C. A. Rendleman, & M. Zingale 2006, ApJ, 637, 922 (henceforth
-   paper I)
+   paper I) :cite:`lowMach`
 
 -  *Low Mach Number Modeling of Type Ia Supernovae. II. Energy
    Evolution,* A. S. Almgren, J. B. Bell, C. A. Rendleman, & M. Zingale
-   2006, ApJ, 649, 927 (henceforth paper II)
+   2006, ApJ, 649, 927 (henceforth paper II) :cite:`lowMach2`
 
 -  *Low Mach Number Modeling of Type Ia Supernovae. III. Reactions,*
    A. S. Almgren, J. B. Bell, A. Nonaka, & M. Zingale
-   2008, ApJ, 684, 449 (henceforth paper III)
+   2008, ApJ, 684, 449 (henceforth paper III) :cite:`lowMach3`
 
 -  *Low Mach Number Modeling of Type Ia Supernovae. IV. White Dwarf Convection,*
    M. Zingale, A. S. Almgren, J. B. Bell, A. Nonaka, & S. E. Woosley
-   2009, ApJ, 704, 196 (henceforth paper IV)
+   2009, ApJ, 704, 196 (henceforth paper IV) :cite:`lowMach4`
 
-The current version of the algorithm is described in our
-multilevel paper:
+The adaptive mesh refinement version of the algorithm was presented in the
+next papers in the series:
 
 -  *MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar
    Flows,* A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone,
-   & M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”)
+   & M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”) :cite:`multilevel`
+
+The most recent developments for MAESTROeX are described in:
+
+-  *MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver,* D. Fan,
+   A. Nonaka, A. S. Almgren, A. Harpole, & M. Zingale, 2019, submitted to ApJ
+   :cite:`MAESTROeX`
 
 We have many papers that describe applications of the method to Type
 Ia supernovae, X-ray bursts, and stellar evolution. These are listed
 on the main MAESTROeX website.  Some of these papers have appendices
 that describe enhancements to the code—these are noted below.
 
--  *Multidimensional Modeling of Type I X-ray Bursts,*
+-  *Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional
+   Convection Prior to the Outburst of a Pure 4He Accretor,*
    C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, & M. Zingale 2011,
-   ApJ, 728, 118 (henceforth “the XRB paper”)
+   ApJ, 728, 118 (henceforth “the XRB paper”) :cite:`xrb`
 
    This introduces the thermal diffusion portion of the MAESTROeX algorithm.
 
 -  *Comparisons of Two- and Three-Dimensional Convection in
    Type I X-ray Bursts* M. Zingale, C. M. Malone, A. Nonaka,
-   A. S. Almgren, & J. B. Bell 2015, ApJ, 807, 60.
+   A. S. Almgren, & J. B. Bell 2015, ApJ, 807, 60. :cite:`xrb3d`
 
    This has an appendix that describes the Godunov state construction in more
    detail than previous papers.
@@ -83,7 +95,7 @@ that describe enhancements to the code—these are noted below.
 -  *Low Mach Number Modeling of Convection in Helium Shells on
    Sub-Chandrasekhar White Dwarfs II: Bulk Properties of Simple Models,*
    A. M. Jacobs, M. Zingale, A. Nonaka, A. S. Almgren, & J. B. Bell
-   2016, ApJ, 827, 84.
+   2016, ApJ, 827, 84. :cite:`subch2`
 
    This has an appendix that shows some test problems for the alternate energy
    formulation in MAESTROeX.
@@ -100,8 +112,9 @@ Incompressible Hydrodynamics
 ----------------------------
 
 The simplest low Mach number approximation is incompressible
-hydrodynamics. This approximation is formally the :math:`M \rightarrow 0`
-limit of the Navier-Stokes equations. In incompressible hydrodynamics,
+hydrodynamics. This approximation is formally the zero
+Mach number limit (:math:`M \rightarrow 0`)
+of the Navier-Stokes equations. In incompressible hydrodynamics,
 the velocity satisfies a constraint equation:
 
 .. math:: \nabla \cdot \Ub = 0
@@ -289,119 +302,3 @@ both of these projections.
 The MAESTROeX algorithm builds upon these ideas, using a different
 velocity constraint equation that captures the compressibility
 due to local sources and large-scale stratification.
-
-Notation
-========
-
-Throughout the papers describing MAESTROeX, we’ve largely kept our
-notation consistent. The table below defines the
-frequently-used quantities and provides their units. Additionally,
-for any quantity :math:`\phi`, we denote the average of :math:`\phi` over a layer
-at constaint radius (or height for plane-parallel simulations) as
-:math:`\overline{\phi}`.
-
-.. table:: Definition of symbols.
-
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | symbol                | description                                                           | units                                |
-   +=======================+=======================================================================+======================================+
-   | :math:`c_p`           | specific heat at                                                      | erg g :math:`^{-1}` K :math:`^{-1}`  |
-   |                       | constant pressure                                                     |                                      |
-   |                       | (:math:`c_p \equiv \partial h / \partial T |_{p, X_k}`)               |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`f`             | volume discrepancy                                                    | –                                    |
-   |                       | factor                                                                |                                      |
-   |                       | (:math:`0 \le f \le 1`)                                               |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`g`             | gravitational                                                         | cm s  :math:`^{-2}`                  |
-   |                       | acceleration                                                          |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`h`             | specific enthalpy                                                     | erg g :math:`^{-1}`                  |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\Hext`         | external heating                                                      | erg g :math:`^{-1}` s :math:`^{-1}`  |
-   |                       | energy generation  rate                                               |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\Hnuc`         | nuclear energy                                                        | erg g :math:`^{-1}`                  |
-   |                       | generation rate                                                       | s :math:`^{-1}`                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`h_p`           | :math:`h_p \equiv \partial h/\partial p |_{T,X_k}`                    | cm :math:`^{3}` g :math:`^{-1}`      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\kth`          | thermal conductivity                                                  | erg cm :math:`^{-1}`                 |
-   |                       |                                                                       | s :math:`^{-1}` K :math:`^{-1}`      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`p_0`           | base state pressure                                                   | erg cm  :math:`^{-3}`                |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`p_T`           | :math:`p_T \equiv \partial p / \partial T |_{\rho,X_k}`               | erg cm :math:`^{-3}` K :math:`^{-1}` |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`p_{X_k}`       | :math:`p_{X_k}\equiv\partial p/\partial X_k|_{p,T,X_{j,j\ne k}}`      | erg cm :math:`^{-3}`                 |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`p_\rho`        | :math:`p_\rho \equiv \partial p/\partial \rho |_{T,X_k}`              | erg g :math:`^{-1}`                  |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`q_k`           | specific nuclear                                                      | erg g\ :math:`^{-1}`                 |
-   |                       | binding energy                                                        |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`r`             | radial coordinate (direction of gravity)                              | cm                                   |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`s`             | specific entropy                                                      | erg g :math:`^{-1}` K :math:`^{-1}`  |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`S`             | source term to the                                                    | s :math:`^{-1}`                      |
-   |                       | divergence constraint                                                 |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`t`             | time                                                                  | s                                    |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`T`             | temperature                                                           | K                                    |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\Ub`           | total velocity                                                        | cm s :math:`^{-1}`                   |
-   |                       | (:math:`\Ub = \Ubt + w_0 \eb_r`                                       |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\Ubt`          | local velocity                                                        | cm s :math:`^{-1}`                   |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\uadv`         | advective velocity                                                    | cm s :math:`^{-1}`                   |
-   |                       | (edge-centered)                                                       |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`w_0`           | base state expansion                                                  | cm s\ :math:`^{-1}`                  |
-   |                       | velocity                                                              |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`X_k`           | mass fraction of the                                                  | –                                    |
-   |                       | species                                                               |                                      |
-   |                       | (:math:`\sum_k X_k = 1`)                                              |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\beta_0`       | coefficient to velocity in velocity constraint equation               | g cm :math:`^{-3}`                   |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\Gamma_1`      | first adiabatic exponent                                              | –                                    |
-   |                       | (:math:`\Gamma_1 \equiv d\log p/d\log \rho|_s`)                       |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\etarho`       | :math:`\etarho \equiv \overline{(\rho' \Ub \cdot \eb_r)}`             | g cm :math:`^{-2}` s :math:`^{-1}`   |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\xi_k`         | :math:`\xi_k \equiv \partial h / \partial X_k |_{p,T,X_{j,j\ne k}}`   | erg g :math:`^{-1}`                  |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\pi`           | dynamic pressure                                                      | erg cm :math:`^{-3}`                 |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\pizero`       | base state dynamic pressure                                           | erg cm  :math:`^{-3}`                |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\rho`          | mass density                                                          | g cm :math:`^{-3}`                   |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\rho_0`        | base state mass density                                               | g cm :math:`^{-3}`                   |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\rho'`         | perturbational density                                                | g cm :math:`^{-3}`                   |
-   |                       | (:math:`\rho' = \rho - \rho_0`)                                       |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`(\rho h)_0`    | base state enthalpy density                                           | erg cm :math:`^{-3}`                 |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`(\rho h)'`     | perturbational enthalpy density                                       | erg cm :math:`^{-3}`                 |
-   |                       | :math:`\left [(\rho h)' = \rho h - (\rho h)_0 \right ]`               |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\sigma`        | :math:`\sigma \equiv p_T/(\rho c_p p_\rho)`                           | erg :math:`^{-1}` g                  |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\psi`          | :math:`\psi \equiv D_0 p_0/Dt = \ptl p_0/\ptl t + w_0\ptl p_0/\ptl r` | erg cm :math:`^{-3}`                 |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-   | :math:`\omegadot_k`   | creation rate for species :math:`k`                                   | s :math:`^{-1}`                      |
-   |                       | (:math:`\omegadot_k \equiv DX_k/Dt`)                                  |                                      |
-   +-----------------------+-----------------------------------------------------------------------+--------------------------------------+
-
-.. [1]
-   Here we see an unfortunate conflict
-   of notation between the compressible hydro community and the
-   incompressible community. In papers on compressible hydrodynamics,
-   :math:`\Ub` will usually mean the vector of conserved quantities. In
-   incompressible / low speed papers, :math:`\Ub` will mean the velocity vector.

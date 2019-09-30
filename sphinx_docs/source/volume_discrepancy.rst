@@ -7,9 +7,8 @@ force the system back to the equation of state. We write our velocity
 constraint equation as
 
 .. math::
-
    \nablab \cdotb (\beta_0 \Ub)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .
-   \label{eq:fullconstraint}
+   :label: eq:fullconstraint
 
 Here, :math:`f` is the volume discrepancy factor and ranges from 0 to 1, and
 :math:`p_\mathrm{EOS}` is the thermodynamic pressure as returned by the EOS,
@@ -25,30 +24,26 @@ has the effect of returning us to :math:`p_\mathrm{EOS} = p_0`.
 In MAESTROeX, we decomponse the velocity into a base state component
 and a local component. The base state constraint equation is simply
 the horizontal average of the full constraint. Starting with
-:math:`\Ub = \Ubt + w_0 \er` in equation \ `[eq:fullconstraint] <#eq:fullconstraint>`__, we have
+:math:`\Ub = \Ubt + w_0 \er` in :eq:`eq:fullconstraint`, we have
 
 .. math::
-
    \nablab \cdotb (\beta_0 w_0 \er) + \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .
-   \label{eq:fullconstraint2}
+   :label: eq:fullconstraint2
 
 Averaging this over a layer, we note that :math:`\overline{\nablab \cdotb (\beta_0 \Ubt)} = 0`,
 yielding
 
 .. math::
-
    \nablab \cdotb (\beta_0 w_0 \er)  = \beta_0 \left(\overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \right )
-   \label{eq:w0constraint_vd}
+   :label: eq:w0constraint_vd
 
 and
 
 .. math::
-
    \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \overline{S} + \frac{f}{\gammabar p_0} \frac{p_\mathrm{EOS} - \overline{p_\mathrm{EOS}}}{\Delta t} \right )  .
-   \label{eq:Utconstraint_vd}
+   :label: eq:Utconstraint_vd
 
-In solving the :math:`w_0` evolution equation
-(Eq. [`[eq:w0constraint_vd] <#eq:w0constraint_vd>`__]), we expand the divergence, giving
+In solving the :math:`w_0` evolution :eq:`eq:w0constraint_vd`, we expand the divergence, giving
 
 .. math::
 

@@ -32,21 +32,20 @@ system:
 where we have defined the mass fraction, :math:`X_i = \frac{\rho_i}{\rho}`. Note
 
 .. math::
-
-   \label{eq:mass fraction sums to 1}
-     \sum_i X_i = 1.
+   \sum_i X_i = 1.
+   :label: eq:mass fraction sums to 1
 
 We write the average molar mass and average proton number as:
 
 .. math::
+   \bar{A} = \frac{\sum_i A_i n_i}{\sum_i n_i} = \left(\sum_i X_i\right)
+     \left(\sum_i \frac{X_i}{A_i}\right)^{-1}
+   :label: eq:abar
 
-   \begin{aligned}
-   \label{eq:abar}
-     \bar{A} &= \frac{\sum_i A_i n_i}{\sum_i n_i} = \left(\sum_i X_i\right)
-     \left(\sum_i \frac{X_i}{A_i}\right)^{-1}\\
-     \label{eq:zbar}
-     \bar{Z} &= \frac{\sum_i Z_i n_i}{\sum_i n_i} = \left(\sum_i Z_i
-     \frac{X_i}{A_i}\right)\left(\sum_i \frac{X_i}{A_i}\right)^{-1}.\end{aligned}
+.. math::
+   \bar{Z} &= \frac{\sum_i Z_i n_i}{\sum_i n_i} = \left(\sum_i Z_i
+     \frac{X_i}{A_i}\right)\left(\sum_i \frac{X_i}{A_i}\right)^{-1}.
+   :label: eq:zbar
 
 Our algorithm requires terms involving the derivative thermodynamic variables
 (:math:`p` or :math:`e`, e.g.) with respect to composition. Our EOS does not return such
@@ -60,21 +59,21 @@ to :math:`\bar{A}` and :math:`\bar{Z}`. Using the chain rule, we have
      \frac{\ptl p}{\ptl \bar{A}}\frac{\ptl \bar{A}}{\ptl X_k} + 
      \frac{\ptl p}{\ptl \bar{Z}}\frac{\ptl \bar{Z}}{\ptl X_k}.
 
-From `[eq:abar] <#eq:abar>`__ and `[eq:zbar] <#eq:zbar>`__ we have
+From :eq:`eq:abar` and :eq:`eq:zbar` we have
 
 .. math::
+   \frac{\ptl \bar{A}}{\ptl X_k} = \left(\sum_i \frac{X_i}{A_i}\right)^{-1}
+     - \frac{\bar{A}^2}{A_k} = -\frac{\bar{A}}{A_k}\left(\bar{A} - A_k\right)
+   :label: eq:abar_X_k
 
-   \begin{aligned}
-   \label{eq:abar_X_k}
-     \frac{\ptl \bar{A}}{\ptl X_k} &= \left(\sum_i \frac{X_i}{A_i}\right)^{-1}
-     - \frac{\bar{A}^2}{A_k} = -\frac{\bar{A}}{A_k}\left(\bar{A} - A_k\right)\\
-     \label{eq:zbar_X_k}
-     \frac{\ptl \bar{Z}}{\ptl X_k} &= 
+.. math::
+   \frac{\ptl \bar{Z}}{\ptl X_k} = 
      \left(\frac{Z_k}{A_k}\right)\left(\sum_i \frac{X_i}{A_i}\right)^{-1}
      - \frac{\bar{Z}}{A_k}\left(\sum_i \frac{X_i}{A_i}\right)^{-1} = 
-     -\frac{\bar{A}}{A_k}\left(\bar{Z} - Z_k\right),\end{aligned}
+     -\frac{\bar{A}}{A_k}\left(\bar{Z} - Z_k\right),
+   :label: eq:zbar_X_k
 
-where after differentiation we have used `[eq:mass fraction sums to 1] <#eq:mass fraction sums to 1>`__
+where after differentiation we have used :eq:`eq:mass fraction sums to 1`
 to write
 
 .. math:: \left(\sum_i \frac{X_i}{A_i}\right)^{-1} = \bar{A}.
@@ -89,23 +88,22 @@ We therefore have
      \frac{\ptl p}{\ptl\bar{Z}}.
 
 Before it was brought to our attention by Frank Timmes, we were missing the
-second term in `[eq:abar_X_k] <#eq:abar_X_k>`__. The only place where such terms
+second term in :eq:`eq:abar_X_k`. The only place where such terms
 appear in our algorithm is in a sum over all species, such as:
 
 .. math::
-
-   \label{eq:sum over species}
-     \sum_i p_{X_i}\dot{\omega}_i = 
+   \sum_i p_{X_i}\dot{\omega}_i = 
      -\bar{A}^2\frac{\ptl p}{\ptl\bar{A}}\sum_i \frac{\dot{\omega}_i}{A_i}
      +\bar{A}\frac{\ptl p}{\ptl\bar{A}}\sum_i \dot{\omega}_i
      -\bar{A}\bar{Z}\frac{\ptl p}{\ptl\bar{Z}}\sum_i \frac{\dot{\omega}_i}{A_i}
      +\bar{A}\frac{\ptl p}{\ptl \bar{Z}}\sum_i\frac{Z_i}{A_i}\dot{\omega}_i.
+   :label: eq:sum over species
 
-The second term in `[eq:sum over species] <#eq:sum over species>`__ is identically zero because
+The second term in :eq:`eq:sum over species` is identically zero because
 
 .. math:: \sum_k \dot{\omega}_k \equiv 0.
 
-This second term arises from what was added to `[eq:abar_X_k] <#eq:abar_X_k>`__ by
+This second term arises from what was added to :eq:`eq:abar_X_k` by
 Frank’s correction. Therefore, although important for individual derivatives
 with respect to composition, this correction term has no effect on our
 solution.
@@ -135,9 +133,8 @@ Since the parcel originates at r, :math:`\rho_{parcel}(r) = \rho_{background}(r)
 so the stability criterion is
 
 .. math::
-
    \bigg(\frac{d\rho}{dr}\bigg)_{parcel} > \bigg(\frac{d\rho}{dr}\bigg)_{background}
-   \label{eqn:basicStability}
+   :label: eqn:basicStability
 
 Since the total pressure, :math:`P`, always increases inward in a star in hydrostatic
 equilibrium, we can use :math:`P` instead of :math:`r` as the independent radial variable.
@@ -149,9 +146,8 @@ Using the equation of state :math:`P = P( \rho, T, \bar{\mu})`, where
 :math:`\bar{\mu}` is the average mass per molecule, we can write
 
 .. math::
-
    d \ln P = \frac{\partial \ln P}{\partial \ln \rho} \bigg |_{T, \bar{\mu}}d \ln \rho + \frac{\partial \ln P}{\partial \ln T} \bigg |_{\rho, \bar{\mu}} d \ln T + \frac{\partial \ln P}{\partial \ln \bar{\mu}}\bigg |_{\rho, T} d \ln \bar{\mu}\
-   \label{eqn:lnEOS}
+   :label: eqn:lnEOS
 
 For convenience we introduce
 
@@ -161,7 +157,7 @@ For convenience we introduce
      \chi_T = \frac{\partial \ln P}{\partial \ln T} \bigg |_{\rho,\bar{\mu}} \qquad
      \chi_{\bar{\mu}} = \frac{\partial \ln P}{\partial \ln \bar{\mu}} \bigg |_{\rho, T}
 
-Then we can rearrange `[eqn:lnEOS] <#eqn:lnEOS>`__ to get
+Then we can rearrange :eq:`eqn:lnEOS` to get
 
 .. math::
 
@@ -172,29 +168,28 @@ Then we can rearrange `[eqn:lnEOS] <#eqn:lnEOS>`__ to get
 Then the general stability criterion is
 
 .. math::
-
    \bigg ( \frac{1}{\chi_\rho} - 
      \frac{\chi_T}{\chi_\rho} \frac{d \ln T}{d \ln P}- \frac{\chi_{\bar{\mu}}}{\chi_\rho}
      \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{parcel} < 
      \bigg ( \frac{1}{\chi_\rho} - 
      \frac{\chi_T}{\chi_\rho} \frac{d \ln T}{d \ln P}- \frac{\chi_{\bar{\mu}}}{\chi_\rho}
      \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{background}
-   \label{eqn:genStability}
+   :label: eqn:genStability
 
 Here’s where various assumptions/simplifications get used.
 
-#. If no assumptions are made, you can’t get any further than equation
-   (`[eqn:genStability] <#eqn:genStability>`__). Even in view of an infinitesimally small initial
-   perturbation, you can’t, in general, assume the :math:`\chi`\ ’s in parcel are the same
-   as the :math:`\chi`\ ’s in the background.
-   This applies in the case where nuclear reactions and/or ionization change the
-   composition of the parcel. This case tends not to be of much interest for
-   two reasons. Either composition effects get incorporated implicitly through
-   assuming chemical equilibrium. Or both of these terms can be neglected in the
-   rising parcel. This would be justified if the timescale for reactions
-   is long compared
-   to the convective timescale, and either the same is ture for ionization or the
-   fluid is fully ionized.
+#. If no assumptions are made, you can’t get any further than
+   :eq:`eqn:genStability`. Even in view of an infinitesimally small
+   initial perturbation, you can’t, in general, assume the
+   :math:`\chi`\ ’s in parcel are the same as the :math:`\chi`\ ’s in
+   the background.  This applies in the case where nuclear reactions
+   and/or ionization change the composition of the parcel. This case
+   tends not to be of much interest for two reasons. Either
+   composition effects get incorporated implicitly through assuming
+   chemical equilibrium. Or both of these terms can be neglected in
+   the rising parcel. This would be justified if the timescale for
+   reactions is long compared to the convective timescale, and either
+   the same is ture for ionization or the fluid is fully ionized.
 
 #. If we assume that :math:`\bar{\mu}` remains constant in the parcel, then
    :math:`\frac{d \ln \bar{\mu}}{d \ln P}` drops out for the parcel. In this case,
@@ -232,11 +227,11 @@ Here’s where various assumptions/simplifications get used.
 
    The Scharwzchild criterion can be recast in terms of entropy if
    the EOS is taken as :math:`P(\rho, S)` instead of :math:`P(\rho, T)`. Then, in place
-   of equation (`[eqn:lnEOS] <#eqn:lnEOS>`__) we have
+   of :eq:`eqn:lnEOS` we have
 
    .. math:: d \rho = \frac{\partial \rho}{\partial P} \bigg |_{S} d P + \frac{\partial \rho}{\partial S} \bigg |_{P} dS
 
-   We can subsitute this into equation (`[eqn:basicStability] <#eqn:basicStability>`__) for stability,
+   We can subsitute this into :eq:`eqn:basicStability` for stability,
    and assuming the parcel moves adiabatically, we get
 
    .. math::
@@ -255,9 +250,8 @@ Here’s where various assumptions/simplifications get used.
    The stability criterion then becomes
 
    .. math::
-
       \bigg ( \frac{d S}{d r} \bigg )_{background} > 0 
-      \label{eqn:stabilityEntr}
+      :label: eqn:stabilityEntr
 
 Determining which stability criterion we want to enforce in creating the
 initial model is complicated by the phenomenon of semiconvection, which
@@ -299,7 +293,7 @@ criterion
 
 Although this looks like the Schwarschild criterion (and, because I’m not
 entirely sure on vocabulary, it might even be called the Schwarzchild
-criterion), this does not simplify to equation (`[eqn:stabilityEntr] <#eqn:stabilityEntr>`__)
+criterion), this does not simplify to :eq:`eqn:stabilityEntr`
 because we need to keep the explicit :math:`\bar{\mu}` dependence in the EOS.
 
 The question of whether we’re in chemical equilibrium or not might be a moot
@@ -333,9 +327,9 @@ where the subscript “ad” means along an adiabat. We can combine the
 exponents to get the following relation
 
 .. math::
+   \Gamma_1 = \left(\frac{\Gamma_2}{\Gamma_2-1}\right)\left(\Gamma_3-1\right).
+   :label: eq:Gamma relations
 
-   \label{eq:Gamma relations}
-     \Gamma_1 = \left(\frac{\Gamma_2}{\Gamma_2-1}\right)\left(\Gamma_3-1\right).
 
 The adiabatic excess is defined as
 
@@ -357,16 +351,15 @@ gradient can be found from finite differencing the data whereas the
 adiabatic term, :math:`\nabla_\text{ad} = \left(\Gamma_2-1\right) /
 \Gamma_2`, will need to be calculated at each point using
 thermodynamic relations. Our EOS only returns :math:`\Gamma_1` so we need
-find another relation to use with `[eq:Gamma relations] <#eq:Gamma relations>`__ to solve
+find another relation to use with :eq:`eq:Gamma relations` to solve
 for the adiabatic excess.
 
 The Schwarzschild criterion does not care about changes in composition
 and we therefore write :math:`p = p(\rho,T)` and
 
 .. math::
-
-   \label{eq:dp}
-     d\ln p = \chi_\rho d\ln\rho + \chi_T d\ln T
+   d\ln p = \chi_\rho d\ln\rho + \chi_T d\ln T
+   :label: eq:dp
 
 where
 
@@ -375,25 +368,22 @@ where
    \chi_\rho = \left(\frac{d\ln p}{d\ln\rho}\right)_T,\qquad
    \chi_T = \left(\frac{d\ln p}{d\ln T}\right)_\rho.
 
-Dividing `[eq:dp] <#eq:dp>`__ by :math:`d\ln\rho` and taking this along an adiabat
+Dividing :eq:`eq:dp` by :math:`d\ln\rho` and taking this along an adiabat
 we have
 
 .. math::
-
-   \label{eq:dp2}
-     \left(\frac{d\ln p}{d\ln\rho}\right)_\text{ad} = \chi_\rho + \chi_T
+   \left(\frac{d\ln p}{d\ln\rho}\right)_\text{ad} = \chi_\rho + \chi_T
      \left(\frac{d\ln T}{d\ln\rho}\right)_\text{ad}.
+   :label: eq:dp2
 
 Using the :math:`\Gamma`\ ’s, we have
 
 .. math::
+   \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right).
+   :label: eq:Gamma1 relation with Gamma2
 
-   \label{eq:Gamma1 relation with Gamma2}
-     \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right).
-
-Combining `[eq:Gamma relations] <#eq:Gamma relations>`__ and `[eq:Gamma1 relation
-  with Gamma2] <#eq:Gamma1 relation
-  with Gamma2>`__ to eliminate :math:`\Gamma_3`, we have:
+Combining :eq:`eq:Gamma relations` and :eq:`eq:Gamma1 relation with Gamma2`
+to eliminate :math:`\Gamma_3`, we have:
 
 .. math::
 

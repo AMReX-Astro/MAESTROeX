@@ -254,9 +254,9 @@ but if we solve the evolution equation for :math:`e` we are effectively solving
 The second equation subtracted from the first gives:
 
 .. math::
+   \frac{D (p_0 - p)}{Dt} - (p_0 - p)  \nabla \cdot \Ub = 0,
+   :label: eq:difference between h and e equations
 
-   \label{eq:difference between h and e equations}
-     \frac{D (p_0 - p)}{Dt} - (p_0 - p)  \nabla \cdot \Ub = 0,
 
 but this equation is only true, in general, if :math:`p=p_0`.
 
@@ -287,38 +287,43 @@ Going back to the constant :math:`\gamma`, ideal gas EOS, we can rewrite the
 enthalpy equation as a pressure evolution equation
 
 .. math::
-
    \begin{aligned}
      \frac{\partial\rho h}{\partial t} + \nabla\cdot\left(\rho h\Ub\right) &=& \frac{Dp_0}{Dt} + \rho H {} \nonumber\\
      \frac{\gamma}{\gamma-1}\frac{\partial p}{\partial t} + \frac{\gamma}{\gamma-1}\nabla\cdot\left(p\Ub\right) &=& \frac{Dp_0}{Dt} + \rho H {} \nonumber\\
-     \frac{Dp}{Dt} &=& -p\nabla\cdot\Ub + \frac{\gamma}{\gamma-1}\left(\frac{Dp_0}{Dt}+\rho H\right) \label{eq:H:pressure evolution}.\end{aligned}
+     \frac{Dp}{Dt} &=& -p\nabla\cdot\Ub + \frac{\gamma}{\gamma-1}\left(\frac{Dp_0}{Dt}+\rho H\right)
+   \end{aligned}
+   :label: eq:H:pressure evolution
 
 Similarly, we can derive a pressure evolution equation from the energy equation
 
-.. math:: \frac{Dp}{Dt} = -p\nabla\cdot\Ub - \left(\gamma-1\right)p_0\nabla\cdot\Ub + \rho H \label{eq:e:pressure evolution}
+.. math::
+   \frac{Dp}{Dt} = -p\nabla\cdot\Ub - \left(\gamma-1\right)p_0\nabla\cdot\Ub + \rho H
+   :label: eq:e:pressure evolution
 
 Now, if we further make the assumption that :math:`p_0` is constant,
 :math:`Dp_0/Dt = 0`, then the divergence constraint for such a gas reduces
 to
 
-.. math:: \nabla\cdot\Ub = \frac{\gamma-1}{\gamma p_0}\rho H \label{eq:div constraint for constant gamma}.
+.. math::
+   \nabla\cdot\Ub = \frac{\gamma-1}{\gamma p_0}\rho H .
+   :label: eq:div constraint for constant gamma
 
-Plugging this back into either of `[eq:H:pressure evolution] <#eq:H:pressure evolution>`__ or
-`[eq:e:pressure evolution] <#eq:e:pressure evolution>`__ gives
+Plugging this back into either of :eq:`eq:H:pressure evolution` or
+:eq:`eq:e:pressure evolution` gives
 
-.. math:: \frac{Dp}{Dt} = \frac{\gamma-1}{\gamma}\left(1-\frac{p}{p_0}\right)\rho H. \label{eq:pressure evolution constant gamma}
+.. math::
+   \frac{Dp}{Dt} = \frac{\gamma-1}{\gamma}\left(1-\frac{p}{p_0}\right)\rho H.
+   :label: eq:pressure evolution constant gamma
 
-If :math:`p_0` is assumed constant and using `[eq:div constraint for
-  constant gamma] <#eq:div constraint for
-  constant gamma>`__, the difference between the enthalpy equation and
-the energy equation, `[eq:difference between h and e equations] <#eq:difference between h and e equations>`__,
-can be rewritten as
+If :math:`p_0` is assumed constant and using :eq:`div constraint for
+constant gamma`, the difference between the enthalpy equation and the
+energy equation, :eq:`eq:difference between h and e equations`, can be
+rewritten as
 
 .. math:: -\frac{Dp}{Dt} - \frac{\gamma}{\gamma-1}\left(1-\frac{p}{p_0}\right)\rho H = 0,
 
-where the equality holds from `[eq:pressure evolution constant
-  gamma] <#eq:pressure evolution constant
-  gamma>`__. In other words, for the constant :math:`\gamma` gas we have
+where the equality holds from :eq:`eq:pressure evolution constant
+gamma`. In other words, for the constant :math:`\gamma` gas we have
 :math:`p=p_0` as expected.
 
 Outstanding Questions

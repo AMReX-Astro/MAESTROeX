@@ -1,3 +1,5 @@
+.. _sec:mg:
+
 *********
 Multigrid
 *********
@@ -11,7 +13,7 @@ We solve MG on an AMR hierarchy, which means in places we will encounter
 C-F interfaces. The AMReX MG will modify the stencil for the Laplacian
 at C-F interfaces to ensure the correct solution to the Poisson equation
 across these interfaces. There is no correction step needed in this
-case (this differs from :raw-latex:`\cite{ricker:2008}`).
+case (this differs from :cite:`ricker:2008`).
 
 The MG solver always works with jumps of :math:`2\times` between levels. In
 some codes (but not MAESTROeX) we can have jumps of :math:`4\times` between
@@ -175,7 +177,7 @@ For the nodal solver, the choices are:
    all the points in :math:`(i\pm1,j\pm1)`. The
    derivation of this stencil is based on finite-element ideas, defining
    basis functions on the nodes. This is developed in 2-d in
-   :raw-latex:`\cite{almgrenBellSzymczak:1996}`.
+   :cite:`almgrenBellSzymczak:1996`.
 
 -  ND_VATER_STENCIL: this is an alternate dense stencil derived
    using a similar finite-element idea as above, but a different control
@@ -246,10 +248,6 @@ You should use the special bottom solver (4) whenever possible, even
 if it means changing your gridding strategy (as discussed below) to
 make it more efficient.
 
-.. raw:: latex
-
-   \MarginPar{any simple discussion on why we might choose one of the
-     other bottom solvers?}
 
 Special Bottom Solver
 ~~~~~~~~~~~~~~~~~~~~~
@@ -399,14 +397,14 @@ data. Both of these are used in MAESTROeX.
 
 The MAC projection operates on the advective velocities predicted at
 the cell-interfaces at the half-time. The edge-centered velocities
-are shown in Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__. If we consider purely
+are shown in :numref:`fig:mg:MAC`. If we consider purely
 incompressible flow, the projection appears as:
 
 .. math:: D G \phi = D U
 
 where :math:`D` is the divergence operator and :math:`G` is the gradient operator.
 In this discretization, :math:`\phi` is cell-centered (see
-Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__). The remaining quantities are discretized as:
+:numref:`fig:mg:MAC`. The remaining quantities are discretized as:
 
 -  :math:`DU` is cell-centered,
 
@@ -416,23 +414,18 @@ Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__). The remaining quantities are discreti
                      \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}
 
 -  :math:`G\phi` is edge-centered, on the MAC grid, as shown in
-   Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__.
+   :numref:`fig:mg:MAC`.
 
--  :math:`DG\phi` is cell-centered, also shown in Figure \ `[fig:mg:MAC] <#fig:mg:MAC>`__,
+-  :math:`DG\phi` is cell-centered, also shown in :numref:`fig:mg:MAC`,
    computed from :math:`G\phi` using the same differencing as :math:`DU`.
 
-.. raw:: latex
-
-   \centering
-
-.. figure:: \mgfigpath/MAC_mg2
-   :alt: [fig:mg:MAC] Data centerings for the MAC projection
-   :width: 5.5in
-
-   [fig:mg:MAC] Data centerings for the MAC projection
+.. _fig:mg:MAC:
+.. figure:: MAC_mg2.png
+   :alt: Data centerings for the MAC projection
+   :width: 80%
 
 The HG projection projects the cell-centered velocities at the end of
-the timestep. Here, :math:`\phi` is node-centered. Figure \ `[fig:mg:HG] <#fig:mg:HG>`__
+the timestep. Here, :math:`\phi` is node-centered. :numref:`fig:mg:HG`
 shows the locations of the various quantities involved in the HG
 projection. Again considering simple incompressible flow, we now
 solve:
@@ -453,7 +446,7 @@ following centerings:
                              \frac{\frac{1}{2} (v_{i,j} + v_{i-1,j}) -
                                    \frac{1}{2} (v_{i,j-1} + v_{i-1,j-1})}{\Delta y}
 
--  :math:`G\phi` is cell-centered, as shown in Figure \ `[fig:mg:HG] <#fig:mg:HG>`__.
+-  :math:`G\phi` is cell-centered, as shown in :numref:`fig:mg:HG`.
 
 -  :math:`L\phi` is node-centered. This is a direct discretization of
    the Laplacian operator. By default, MAESTROeX uses a dense stencil
@@ -461,15 +454,10 @@ following centerings:
    stencil can be used (by setting hg_dense_stencil = F). This
    uses 5-points in 2-d, 7-points in 3-d.
 
-   .. raw:: latex
-
-      \centering
-
+   .. _fig:mg:HG:
    .. figure:: \mgfigpath/HG_mg2
-      :alt: [fig:mg:HG] Data centerings for the HG projection
-      :width: 5.5in
-
-      [fig:mg:HG] Data centerings for the HG projection
+      :alt: Data centerings for the HG projection
+      :width: 80%
 
 Convergence Criteria
 ====================
@@ -515,7 +503,7 @@ and the “divu” iterations.
    | spherical: | eps_init_proj_sph  | = :math:`10^{-10}` |
    +------------+--------------------+--------------------+
 
--  *“divu” iterations* (divu_iter called from varden)
+-  *“divu” iterations* (``divu_iter`` called from ``varden``)
 
    The “divu” iterations projects the velocity field from the initial
    projection to satisfy the full constraint (including reactions).
@@ -528,14 +516,10 @@ and the “divu” iterations.
    We start with a loose tolerance and progressively get tighter. The
    tolerances (set in divu_iter) are, for Cartesian:
 
-   .. raw:: latex
-
-      \small
-
-   | lll
-     :math:`\epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll}
-                        \min\, \{& \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
-                                 & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^2 \, \} &
+   .. math::
+      \epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll}
+                        \min\, \{& \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt                     {divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
+                               & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^2 \, \} &
                                 \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \\[2mm]
                         \min\, \{& \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
                                  & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^2 \, \} &
@@ -544,16 +528,12 @@ and the “divu” iterations.
                                  & \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^2 \, \} &
                                 \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter}   \\
                                       \end{array}
-                       \right .`
+                       \right .
 
    and for spherical:
 
-   .. raw:: latex
-
-      \small
-
-   | ll
-     :math:`\epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll}
+   .. math::
+      \epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll}
                           \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}^2 &
                                 \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \, \\[2mm]
                          \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}  &
@@ -561,7 +541,7 @@ and the “divu” iterations.
                          \mathtt{eps\_divu\_sph}  &
                                 \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} \, )\\
                        \end{array}
-                       \right .`
+                       \right .
 
    The various parameters are set in mg_eps.f90 and have the default values of:
 
@@ -585,13 +565,16 @@ two (optional) thermal diffusion solves, and the final velocity projection.
    the predictor and corrector portions of the main algorithm.
 
    There are two tolerances here. The norm of the residual is required
-   to be reduced by a relative tolerance of :math:`\epsilon =
-     \min \{ \mathtt{eps\_mac\_max}, \mathtt{eps\_mac} \cdot
-     \mathtt{mac\_level\_factor}^{(\mathtt{nlevs}-1)} \}`. A separate
-   tolerance is used for the bottom
-   solver, :math:`\epsilon_\mathrm{bottom} =
-     \mathtt{eps\_mac\_bottom}`. These parameters are set in
-   mg_eps.f90 and have the default values:
+   to be reduced by a relative tolerance of 
+
+   .. math:: 
+      \epsilon =
+       \min \{ \mathtt{eps\_mac\_max}, \mathtt{eps\_mac} \cdot
+       \mathtt{mac\_level\_factor}^{(\mathtt{nlevs}-1)} \} .
+
+   A separate tolerance is used for the bottom solver,
+   :math:`\epsilon_\mathrm{bottom} = \mathtt{eps\_mac\_bottom}`. These
+   parameters are set in mg_eps.f90 and have the default values:
 
    +------------------+--------------------+
    | eps_mac          | = :math:`10^{-10}` |
