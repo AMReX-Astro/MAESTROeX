@@ -24,8 +24,8 @@ contains
        rHext, e_lo, e_hi, &
        therm, t_lo, t_hi, &
        p0_cart, p0_lo, p0_hi, &
-       gamma1bar_cart, g1_lo, g1_hi, &
-       dx) bind (C,name="make_S_cc")
+       gradp0_cart, gp0_lo, gp0_hi, &
+       gamma1bar_cart, g1_lo, g1_hi) bind (C,name="make_S_cc")
 
     integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -39,6 +39,7 @@ contains
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
+    integer         , intent (in   ) :: gp0_lo(3), gp0_hi(3)
     integer         , intent (in   ) :: g1_lo(3), g1_hi(3)
     double precision, intent (inout) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
@@ -50,15 +51,15 @@ contains
     double precision, intent (in   ) :: rHext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
     double precision, intent (in   ) :: therm(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
+    double precision, intent (in) :: gradp0_cart (gp0_lo(1):gp0_hi(1),gp0_lo(2):gp0_hi(2),gp0_lo(3):gp0_hi(3))
     double precision, intent (in) :: gamma1bar_cart (g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
-    double precision, intent(in   ) :: dx(3)
 
     integer i,j,k,r
     integer pt_index(3)
     type(eos_t) :: eos_state
 
     integer comp
-    double precision sigma, xi_term, pres_term, gradp0
+    double precision sigma, xi_term, pres_term
 
     !$gpu
 
@@ -99,28 +100,10 @@ contains
              r = k
 #endif
              if (use_delta_gamma1_term .and. r < anelastic_cutoff_density_coord(lev)) then
-#if (AMREX_SPACEDIM == 2)
-                if (r .eq. 0) then
-                   gradp0 = (p0_cart(i,j+1,k) - p0_cart(i,j,k))/dx(AMREX_SPACEDIM)
-                else if (r .eq. nr(lev)-1) then
-                   gradp0 = (p0_cart(i,j,k) - p0_cart(i,j-1,k))/dx(AMREX_SPACEDIM)
-                else
-                   gradp0 = 0.5d0*(p0_cart(i,j+1,k) - p0_cart(i,j-1,k))/dx(AMREX_SPACEDIM)
-                endif
-#else
-                if (r .eq. 0) then
-                gradp0 = (p0_cart(i,j,k+1) - p0_cart(i,j,k))/dx(AMREX_SPACEDIM)
-                else if (r .eq. nr(lev)-1) then
-                gradp0 = (p0_cart(i,j,k) - p0_cart(i,j,k-1))/dx(AMREX_SPACEDIM)
-                else
-                gradp0 = 0.5d0*(p0_cart(i,j,k+1) - p0_cart(i,j,k-1))/dx(AMREX_SPACEDIM)
-                endif
-#endif
-
                 delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k)
 
                 delta_gamma1_term(i,j,k) = (eos_state%gam1 - gamma1bar_cart(i,j,k))*u(i,j,k,AMREX_SPACEDIM)* &
-                     gradp0/(gamma1bar_cart(i,j,k)**2*p0_cart(i,j,k))
+                     gradp0_cart(i,j,k)/(gamma1bar_cart(i,j,k)**2*p0_cart(i,j,k))
              else
                 delta_gamma1_term(i,j,k) = 0.0d0
                 delta_gamma1(i,j,k) = 0.0d0

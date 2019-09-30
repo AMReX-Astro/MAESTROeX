@@ -802,8 +802,8 @@ extern "C"
                    const amrex::Real* rHext, const int* e_lo, const int* e_hi,
                    const amrex::Real* therm, const int* t_lo, const int* t_hi,
                    const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi,
-                   const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
-                   const amrex::Real* dx);
+		   const amrex::Real* gradp0_cart, const int* gp0_lo, const int* gp0_hi,
+                   const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi);
 
      void make_S_cc_sphr(const int* lo, const int* hi,
                          amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
