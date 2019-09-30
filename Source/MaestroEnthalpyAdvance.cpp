@@ -63,7 +63,16 @@ Maestro::EnthalpyAdvance (int which_step,
         rhoh0_old_cart[lev].setVal(0.);
     }
 
-    // compute forcing terms
+    /////////////////////////////////////////////////////////////////
+    // Subtract w0 from MAC velocities (MAC velocities has w0 already).
+    /////////////////////////////////////////////////////////////////
+
+    Addw0(umac,w0mac,-1.);
+
+    /////////////////////////////////////////////////////////////////
+    // Compute forcing terms
+    /////////////////////////////////////////////////////////////////
+    
     if (enthalpy_pred_type == predict_rhohprime) {
         // make force for (rho h)'
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
@@ -173,12 +182,6 @@ Maestro::EnthalpyAdvance (int which_step,
     }
 
     //////////////////////////////////
-    // Subtract w0 from MAC velocities
-    //////////////////////////////////
-
-    Addw0(umac,w0mac,-1.);
-
-    //////////////////////////////////
     // Compute fluxes
     //////////////////////////////////
 
@@ -282,6 +285,12 @@ Maestro::EnthalpyAdvance (int which_step,
         scal_force[lev].setVal(0.,RhoH,1,1);
     }
 
+    //////////////////////////////////
+    // Subtract w0 from MAC velocities
+    //////////////////////////////////
+
+    Addw0(umac,w0mac,-1.);
+
     //**************************************************************************
     //     1) Create (rho h)' force at time n+1/2.
     //          (NOTE: we don't worry about filling ghost cells of the scal_force
@@ -291,6 +300,13 @@ Maestro::EnthalpyAdvance (int which_step,
 
     MakeRhoHForce(scal_force,0,thermal,umac,0,which_step);
 
+    //////////////////////////////////
+    // Add w0 to MAC velocities
+    //////////////////////////////////
+
+    Addw0(umac,w0mac,1.);
+
+    
     Vector<MultiFab> p0_new_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -361,7 +377,16 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    // compute forcing terms
+    /////////////////////////////////////////////////////////////////
+    // Subtract w0 from MAC velocities (MAC velocities has w0 already).
+    /////////////////////////////////////////////////////////////////
+
+    Addw0(umac,w0mac,-1.);
+
+    /////////////////////////////////////////////////////////////////
+    // Compute forcing terms
+    /////////////////////////////////////////////////////////////////
+
     if (enthalpy_pred_type == predict_rhohprime) {
         // make force for (rho h)'
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
@@ -463,12 +488,12 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     if (enthalpy_pred_type == predict_hprime) {
         // convert h' -> h
-        Abort("MaestroEnthalpyAdavnce predict_hprime");
+        Abort("MaestroEnthalpyAdvance predict_hprime");
     }
 
     if (enthalpy_pred_type == predict_Tprime_then_h) {
         // convert T' -> T
-        Abort("MaestroEnthalpyAdavnce predict_Tprime_then_h");
+        Abort("MaestroEnthalpyAdvance predict_Tprime_then_h");
     }
 
     if (enthalpy_pred_type == predict_h ||
@@ -484,12 +509,6 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
         Abort("MaestroEnthalpyAdvance need makeHfromRhoT_edge");
     }
-
-    //////////////////////////////////
-    // Subtract w0 from MAC velocities
-    //////////////////////////////////
-
-    Addw0(umac,w0mac,-1.);
 
     //////////////////////////////////
     // Compute fluxes
@@ -595,6 +614,12 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         scal_force[lev].setVal(0.,RhoH,1,1);
     }
 
+    //////////////////////////////////
+    // Subtract w0 from MAC velocities
+    //////////////////////////////////
+
+    Addw0(umac,w0mac,-1.);
+
     //**************************************************************************
     //     1) Create (rho h)' force at time n+1/2.
     //          (NOTE: we don't worry about filling ghost cells of the scal_force
@@ -608,6 +633,13 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     for (int lev=0; lev<=finest_level; ++lev) {
 	MultiFab::Add(scal_force[lev],intra[lev],RhoH,RhoH,1,0);
     }
+
+    //////////////////////////////////
+    // Add w0 to MAC velocities
+    //////////////////////////////////
+
+    Addw0(umac,w0mac,1.);
+
     
     Vector<MultiFab> p0_new_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {

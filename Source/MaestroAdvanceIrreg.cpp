@@ -329,13 +329,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
 		       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
 
-    if (evolve_base_state && spherical == 1) {
+    if (spherical == 1 && evolve_base_state) {
         // subtract w0mac from umac
-        for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	        MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
+        Addw0(umac,w0mac,-1.);
     }
 
     // wallclock time
@@ -348,6 +344,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
+
+    if (spherical == 1 && evolve_base_state) {
+        // add w0mac back to umac
+	Addw0(umac,w0mac,1.);
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the full state through dt
@@ -455,15 +456,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
-
-    if (evolve_base_state && spherical == 1) {
-        // add w0mac back to umac
-        for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
-    }
 
     // compute the new etarho
     if (evolve_base_state && use_etarho) {
@@ -649,13 +641,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
 		       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
-    if (evolve_base_state && spherical == 1) {
+    if (spherical == 1 && evolve_base_state) {
         // subtract w0mac from umac
-        for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	        MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
+	Addw0(umac,w0mac,-1.);
     }
 
     // wallclock time
@@ -668,6 +656,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // wallclock time
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
+
+    if (spherical == 1 && evolve_base_state) {
+        // add w0mac back to umac
+	Addw0(umac,w0mac,1.);
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the full state through dt
@@ -754,15 +747,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac_dummy,thermal1);
-
-    if (evolve_base_state && spherical == 1) {
-        // add w0mac back to umac
-        for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-	        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
-    }
 
     // compute the new etarho
     if (evolve_base_state && use_etarho) {
@@ -891,7 +875,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         w0 = w0_old;
     }
 
-    if (evolve_base_state && spherical == 1) {
+    if (spherical == 1 && evolve_base_state) {
 	// subtract w0 from uold and unew for nodal projection
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Subtract(uold[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);
@@ -962,7 +946,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && spherical == 1) {
+    if (spherical == 1 && evolve_base_state) {
 	// add w0 back to unew
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    MultiFab::Add(unew[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);

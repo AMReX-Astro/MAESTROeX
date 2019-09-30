@@ -341,11 +341,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 /*
     if (spherical == 1 && evolve_base_state && split_projection) {
 	// subtract w0mac from umac
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-		MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
+	Addw0(umac,w0mac,-1.);
     }
 */
     // wallclock time
@@ -362,11 +358,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 /*
     if (spherical == 1 && evolve_base_state && split_projection) {
 	// add w0mac back to umac
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-		MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
+	Addw0(umac,w0mac,1.);
     }
 */
 
@@ -785,11 +777,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 /*
 	    if (spherical == 1 && evolve_base_state && split_projection) {
 		// subtract w0mac from umac
-		for (int lev = 0; lev <= finest_level; ++lev) {
-		    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-			MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-		    }
-		}
+		Addw0(umac,w0mac,-1.);
 	    }
 */
 	    // wallclock time
@@ -805,12 +793,8 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
 /*
             if (spherical == 1 && evolve_base_state && split_projection) {
-	    // add w0mac back to umac
-	        for (int lev = 0; lev <= finest_level; ++lev) {
-		    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-		        MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-		    }
-	        }
+	        // add w0mac back to umac
+	        Addw0(umac,w0mac,1.);
 	    }
 */
 	} // end sdc_couple_mac_velocity

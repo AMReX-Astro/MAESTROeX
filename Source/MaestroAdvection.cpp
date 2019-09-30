@@ -1414,9 +1414,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 				       BL_TO_FORTRAN_3D(umac_mf[mfi]),
 				       BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 				       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
@@ -1600,28 +1597,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 	    } else {
 
 #if (AMREX_SPACEDIM == 3)
-	        if (use_exact_base_state)
-		{
-		    make_rhoh_flux_3d_sphr_irreg(tileBox.loVect(), tileBox.hiVect(),
-						 BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-						 BL_TO_FORTRAN_3D(umac_mf[mfi]),
-						 BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-						 BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-						 BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-						 BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-						 BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-						 BL_TO_FORTRAN_3D(rhoh0mac_edgex[mfi]),
-						 BL_TO_FORTRAN_3D(rhoh0mac_edgey[mfi]),
-						 BL_TO_FORTRAN_3D(rhoh0mac_edgez[mfi]));
-		}
-		else
-		{
-		    make_rhoh_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
+		  make_rhoh_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
 			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
 			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
@@ -1631,16 +1607,13 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 				       BL_TO_FORTRAN_3D(umac_mf[mfi]),
 				       BL_TO_FORTRAN_3D(vmac_mf[mfi]),
 				       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgex[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
 				       BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
-		}
+		
 #else
 	        Abort("MakeRhoHFlux: Spherical is not valid for DIM < 3");
 #endif

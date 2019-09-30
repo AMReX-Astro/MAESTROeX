@@ -577,9 +577,6 @@ extern "C"
 				const amrex::Real* umac,   const int* u_lo, const int* u_hi,
 				const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
 				const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
-				const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi,
-				const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi,
-				const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
 				const amrex::Real* rho0_edgex, const int* rx_lo, const int* rx_hi,
 				const amrex::Real* rho0_edgey, const int* ry_lo, const int* ry_hi,
 				const amrex::Real* rho0_edgez, const int* rz_lo, const int* rz_hi,
@@ -624,9 +621,6 @@ extern "C"
 				const amrex::Real* umac,   const int* u_lo, const int* u_hi,
 				const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
 				const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
-				const amrex::Real* w0macx, const int* wx_lo, const int* wx_hi,
-				const amrex::Real* w0macy, const int* wy_lo, const int* wy_hi,
-				const amrex::Real* w0macz, const int* wz_lo, const int* wz_hi,
 				const amrex::Real* rho0_edgex, const int* rx_lo, const int* rx_hi,
 				const amrex::Real* rho0_edgey, const int* ry_lo, const int* ry_hi,
 				const amrex::Real* rho0_edgez, const int* rz_lo, const int* rz_hi,
@@ -808,8 +802,8 @@ extern "C"
                    const amrex::Real* rHext, const int* e_lo, const int* e_hi,
                    const amrex::Real* therm, const int* t_lo, const int* t_hi,
                    const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi,
-                   const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
-                   const amrex::Real* dx);
+		   const amrex::Real* gradp0_cart, const int* gp0_lo, const int* gp0_hi,
+                   const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi);
 
      void make_S_cc_sphr(const int* lo, const int* hi,
                          amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
