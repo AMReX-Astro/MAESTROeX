@@ -212,7 +212,6 @@ Maestro::DiagFile (const int step,
         // pick the values corresponding to the maximum.
         int nprocs = ParallelDescriptor::NProcs();
         int ioproc = ParallelDescriptor::IOProcessorNumber();
-
         Vector<Real> T_max_data(nprocs);
 
         if (nprocs == 1) {
@@ -247,7 +246,7 @@ Maestro::DiagFile (const int step,
                 T_max_coords_level[i] = T_max_coords[i];
             }
         } else {
-            ParallelDescriptor::Gather(&T_max_coords[0], 6, &T_max_coords_level[0], 6, ioproc);
+            ParallelDescriptor::Gather(&T_max_coords[0], 2*AMREX_SPACEDIM, &T_max_coords_level[0], 2*AMREX_SPACEDIM, ioproc);
         }
 
         // initialize global variables
