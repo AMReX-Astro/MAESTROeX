@@ -668,7 +668,6 @@ Maestro::WriteDiagFile (int& index)
             for (int icomp=0; icomp<ndiag1; ++icomp) {
                 diagfile1 << std::setw(setwVal) << std::left << diagfile1_data[ii*ndiag1+icomp];
             }
-            Warning("in the endline part");
             diagfile1 << std::endl;
         }
 
