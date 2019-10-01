@@ -15,7 +15,6 @@ Src_nd
    file/compute_grad_phi_f
    file/debug_f
    file/diag_f
-   file/enforce_HSE_f
    file/fill_3d_data_f
    file/fill_umac_ghost_f
    file/initdata_f
@@ -30,7 +29,6 @@ Src_nd
    file/make_explicit_thermal_f
    file/make_flux_f
    file/make_gamma_f
-   file/make_grav_f
    file/make_heating_f
    file/make_pi_cc_f
    file/make_plot_variables_f

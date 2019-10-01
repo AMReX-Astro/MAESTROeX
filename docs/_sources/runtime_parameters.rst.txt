@@ -277,6 +277,9 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``burning_cutoff_density``             | The density below which we disable burning              | -1.0          |
 +----------------------------------------+---------------------------------------------------------+---------------+
+| ``burning_invert_cutoff_density``      | Should we instead disable burning above a certain       | false         |
+|                                        | density?                                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
 | ``buoyancy_cutoff_factor``             | The multiplicative factor (over base\_cutoff\_density)  | 5.0           |
 |                                        | below which we do zero out the buoyancy term in the     |               |
 |                                        | momentum equation.                                      |               |

@@ -315,6 +315,8 @@
 </li>
       <li><a href="file/base_state_geometry_f.html#f/base_state_geometry_module/burning_cutoff_density_coord"><strong>burning_cutoff_density_coord (fortran variable in module base_state_geometry_module)</strong></a>
 </li>
+      <li><a href="file/meth_params_f.html#f/meth_params_module/burning_invert_cutoff_density"><strong>burning_invert_cutoff_density (fortran variable in module meth_params_module)</strong></a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -409,16 +411,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="file/fill_umac_ghost_f.html#f/fill_umac_ghost_module/edge_interp"><strong>edge_interp() (fortran subroutine in module fill_umac_ghost_module)</strong></a>
 </li>
-      <li><a href="file/enforce_HSE_f.html#f/enforce_hse_module/enforce_hse"><strong>enforce_hse() (fortran subroutine in module enforce_hse_module)</strong></a>
-</li>
-      <li><a href="file/enforce_HSE_f.html#f/enforce_hse_module"><strong>enforce_hse_module (module)</strong></a>
-</li>
       <li><a href="file/meth_params_f.html#f/meth_params_module/enthalpy_pred_type"><strong>enthalpy_pred_type (fortran variable in module meth_params_module)</strong></a>
+</li>
+      <li><a href="file/compute_dt_f.html#f/compute_dt_module/estdt"><strong>estdt() (fortran subroutine in module compute_dt_module)</strong></a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="file/compute_dt_f.html#f/compute_dt_module/estdt"><strong>estdt() (fortran subroutine in module compute_dt_module)</strong></a>
-</li>
       <li><a href="file/compute_dt_f.html#f/compute_dt_module/estdt_divu"><strong>estdt_divu() (fortran subroutine in module compute_dt_module)</strong></a>
 </li>
       <li><a href="file/compute_dt_f.html#f/compute_dt_module/estdt_sphr"><strong>estdt_sphr() (fortran subroutine in module compute_dt_module)</strong></a>
@@ -594,6 +592,8 @@
       <li><a href="file/maestro__params_8H.html#_CPPv4N7Maestro24burner_threshold_speciesE">Maestro::burner_threshold_species (C++ member)</a>
 </li>
       <li><a href="file/maestro__params_8H.html#_CPPv4N7Maestro22burning_cutoff_densityE">Maestro::burning_cutoff_density (C++ member)</a>
+</li>
+      <li><a href="file/maestro__params_8H.html#_CPPv4N7Maestro29burning_invert_cutoff_densityE">Maestro::burning_invert_cutoff_density (C++ member)</a>
 </li>
       <li><a href="class/classMaestro.html#_CPPv4N7Maestro12cell_cc_to_rE">Maestro::cell_cc_to_r (C++ member)</a>, <a href="file/Maestro_8H.html#_CPPv4N7Maestro12cell_cc_to_rE">[1]</a>
 </li>
@@ -983,12 +983,12 @@
 </li>
       <li><a href="file/maestro__params_8H.html#_CPPv4N7Maestro9plot_tracE">Maestro::plot_trac (C++ member)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="class/classMaestro.html#_CPPv4N7Maestro12plotDivuIterE">Maestro::plotDivuIter (C++ enumerator)</a>
 </li>
       <li><a href="class/classMaestro.html#_CPPv4N7Maestro13plotfile_flagE">Maestro::plotfile_flag (C++ enum)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="class/classMaestro.html#_CPPv4N7Maestro10PlotFileMFEKiKN5amrex4RealEKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">Maestro::PlotFileMF (C++ function)</a>, <a href="file/Maestro_8H.html#_CPPv4N7Maestro10PlotFileMFEKiKN5amrex4RealEKN5amrex4RealERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorIN5amrex8MultiFabEEERN5amrex6VectorIN5amrex8MultiFabEEERK10RealVectorRK10RealVectorRKN5amrex6VectorIN5amrex8MultiFabEEE">[1]</a>
 </li>
       <li><a href="class/classMaestro.html#_CPPv4N7Maestro12PlotFileNameEKiPNSt6stringE">Maestro::PlotFileName (C++ function)</a>, <a href="file/Maestro_8H.html#_CPPv4N7Maestro12PlotFileNameEKiPNSt6stringE">[1]</a>
@@ -1320,12 +1320,6 @@
       <li><a href="file/make_gamma_f.html#f/make_gamma_module/make_gamma"><strong>make_gamma() (fortran subroutine in module make_gamma_module)</strong></a>
 </li>
       <li><a href="file/make_gamma_f.html#f/make_gamma_module"><strong>make_gamma_module (module)</strong></a>
-</li>
-      <li><a href="file/make_grav_f.html#f/make_grav_module/make_grav_cell"><strong>make_grav_cell() (fortran subroutine in module make_grav_module)</strong></a>
-</li>
-      <li><a href="file/make_grav_f.html#f/make_grav_module/make_grav_edge"><strong>make_grav_edge() (fortran subroutine in module make_grav_module)</strong></a>
-</li>
-      <li><a href="file/make_grav_f.html#f/make_grav_module"><strong>make_grav_module (module)</strong></a>
 </li>
       <li><a href="file/make_heating_f.html#f/make_heating_module/make_heating"><strong>make_heating() (fortran subroutine in module make_heating_module)</strong></a>
 </li>

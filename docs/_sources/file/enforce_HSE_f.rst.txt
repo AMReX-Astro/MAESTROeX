@@ -1,8 +1,0 @@
-enforce_HSE.f90
-===============
-
-enforce\_hse\_module
---------------------
-
-.. f:automodule:: enforce_hse_module
-
