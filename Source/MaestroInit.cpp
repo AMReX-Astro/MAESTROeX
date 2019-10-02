@@ -472,7 +472,12 @@ void Maestro::InitProj ()
     MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
 
     // perform a nodal projection
+#ifndef SDC
     NodalProj(initial_projection_comp,rhcc_for_nodalproj);
+#else
+    NodalProj(initial_projection_comp,rhcc_for_nodalproj,false);
+#endif
+    
 }
 
 
@@ -694,6 +699,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     // compute S at cell-centers
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
 	      rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+
 /*
 	// NOTE: not sure if valid for use_exact_base_state
 	if (evolve_base_state) {
