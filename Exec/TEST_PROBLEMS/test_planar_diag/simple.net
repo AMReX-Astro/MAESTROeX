@@ -1,0 +1,6 @@
+# I've took the simple network for 2-fluid and just commented out
+# Is this the appropriate way to do single fluid?
+
+# name   short name    aion     zion
+   A        A           1.0      1.0
+#   B        B           1.0      1.0
