@@ -1,15 +1,12 @@
 f90EXE_sources += average.f90
 f90EXE_sources += base_state.f90
-F90EXE_sources += base_state_geometry.F90
 #ifdef REACTIONS
 F90EXE_sources += burner_loop.F90
 #endif
 f90EXE_sources += cell_to_edge.f90
-f90EXE_sources += enforce_HSE.f90
 f90EXE_sources += initdata.f90
 f90EXE_sources += inlet_bc.f90
 f90EXE_sources += make_beta0.f90
-f90EXE_sources += make_grav.f90
 f90EXE_sources += make_edge_state.f90
 f90EXE_sources += make_w0.f90
 f90EXE_sources += maestro_init.f90
@@ -17,11 +14,13 @@ f90EXE_sources += rotation.f90
 f90EXE_sources += regrid.f90
 
 F90EXE_sources += advect_base.F90
+F90EXE_sources += base_state_geometry.F90
 F90EXE_sources += bc_fill_nd.F90
 F90EXE_sources += compute_dt.F90
 F90EXE_sources += compute_grad_phi.F90
 F90EXE_sources += debug.F90
 F90EXE_sources += diag.F90
+F90EXE_sources += enforce_HSE.F90
 F90EXE_sources += fill_3d_data.F90
 F90EXE_sources += fill_umac_ghost.F90
 F90EXE_sources += make_flux.F90
@@ -30,6 +29,7 @@ F90EXE_sources += make_edge_scal.F90
 F90EXE_sources += make_explicit_thermal.F90
 F90EXE_sources += make_heating.F90
 F90EXE_sources += make_gamma.F90
+F90EXE_sources += make_grav.F90
 F90EXE_sources += make_pi_cc.F90
 F90EXE_sources += make_plot_variables.F90
 F90EXE_sources += make_psi.F90

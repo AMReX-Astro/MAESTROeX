@@ -303,6 +303,9 @@ base_cutoff_density                 Real               -1.0     y
 # The density below which we disable burning
 burning_cutoff_density              Real               -1.0     y
 
+# Should we instead disable burning above a certain density?
+burning_invert_cutoff_density       bool              false     y
+
 # The multiplicative factor (over base\_cutoff\_density) below which we
 # do zero out the buoyancy term in the momentum equation.
 buoyancy_cutoff_factor              Real               5.0      y

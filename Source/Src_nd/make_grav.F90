@@ -3,17 +3,12 @@ module make_grav_module
   use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, &
                                         max_radial_level, nr, numdisjointchunks, &
-                                        r_start_coord, r_end_coord, finest_radial_level, &
-                                        restrict_base, fill_ghost_base
+                                        r_start_coord, r_end_coord, finest_radial_level
   use meth_params_module, only: spherical, grav_const, base_cutoff_density, &
                                 do_planar_invsq_grav, planar_invsq_mass, do_2d_planar_octant
   use fundamental_constants_module, only: Gconst
 
   implicit none
-
-  private
-
-  public :: make_grav_cell, make_grav_edge
 
 contains
 
@@ -22,6 +17,8 @@ contains
     ! compute the base state gravitational acceleration at the cell
     ! centers.  The base state uses 0-based indexing, so grav_cell
     ! does too.
+
+     use base_state_geometry_module, only: restrict_base, fill_ghost_base
 
     double precision, intent(  out) ::  grav_cell(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::       rho0(0:max_radial_level,0:nr_fine-1)
@@ -230,7 +227,7 @@ contains
 
     end if
 
-    call bl_proffortfuncstop("Maestro::make_grav_cell")
+   !  call bl_proffortfuncstop("Maestro::make_grav_cell")
 
   end subroutine make_grav_cell
 
@@ -239,6 +236,8 @@ contains
     ! compute the base state gravity at the cell edges
     ! grav_edge(0) is the gravitational acceleration at the left edge of zone 0).
     ! The base state uses 0-based indexing, so grav_edge does too.
+
+    use base_state_geometry_module, only: restrict_base, fill_ghost_base
 
     double precision, intent(  out) ::  grav_edge(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::       rho0(0:max_radial_level,0:nr_fine-1)

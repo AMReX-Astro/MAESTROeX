@@ -117,3 +117,11 @@ Minor changes to some problem setups and bugfixes
 Remove 1D support (with compile-time error)
 Significant updates to sphinx documentation, including doxygen
 JOSS paper added; ready for submission
+
+10-01-2019
+Move base state from 1D array to cartesian grid in many subroutines
+Start porting hydro subroutines to GPU (ongoing)
+Bug fix: fill w0_cart based on edge-centered w0, not cell-centered 
+Add option to output Nonaka plot (USE_NONAKA_PLOT)
+Add diagnostics for planar geometries
+Updates to documentation and JOSS paper

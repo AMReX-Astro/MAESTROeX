@@ -222,9 +222,7 @@ we then have
 and
 
 .. math::
-
    \begin{aligned}
-   \label{eq:gamma3_first}
    \left(\frac{d\ln T}{d\ln\rho}\right)_\text{AD} \equiv \Gamma_3-1
    &= \frac{1}{c_vT}\left[
    \frac{p}{\rho} - \left(\frac{\partial e}{\partial\ln\rho}\right)_{T,X} +
@@ -234,7 +232,9 @@ and
        \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
        -
        \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}
-       \right]X_i\Gamma_{4,i}\right]\end{aligned}
+       \right]X_i\Gamma_{4,i}\right]
+   \end{aligned}
+   :label: eq:gamma3_first
 
 Now we need to evaluate :math:`\left(\partial e/\partial \ln\rho\right)_{T,X}`.
 Again using the first law and the fact that :math:`ds=dq/T` is an exact
@@ -295,7 +295,7 @@ respect to composition
      \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
      \right)_{\rho,X}.\end{aligned}
 
-Plugging these back into `[eq:gamma3_first] <#eq:gamma3_first>`__ we have
+Plugging these back into :eq:`eq:gamma3_first` we have
 
 .. math::
    \Gamma_3-1 = \frac{1}{c_vT}\left[\frac{p}{\rho}\chi_T +\sum_i
