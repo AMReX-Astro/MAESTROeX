@@ -64,7 +64,9 @@ maestro.use_soundspeed_firstdt = true
 maestro.use_divu_firstdt = true
 
 maestro.use_exact_base_state = false
-maestro.use_tfromp = true
+maestro.use_tfromp = false
+
+maestro.use_delta_gamma1_term = false
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
@@ -94,7 +96,10 @@ maestro.eps_hg_max         = 1.e-8
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
+# BURNING 
 maestro.do_burning = true
+maestro.burning_cutoff_density = 2.5e7
+maestro.burning_invert_cutoff_density = true
 
 maestro.grav_const = -3.2e-1
 
@@ -109,8 +114,6 @@ maestro.grav_const = -3.2e-1
   tag_density_2 = 1.e8
   tag_density_3 = 1.e8
   tag_density_3 = 1.e9
-  particle_temp_cutoff = 6.e8
-  particle_tpert_threshold = 2.e7
 
   !extern
 
@@ -131,4 +134,9 @@ maestro.grav_const = -3.2e-1
 
   retry_burn = T
 
+  ! Inputs for generating a Nonaka Plot (TM) at specific zone (i,j,k)
+  nonaka_i = 15
+  nonaka_j = 45
+  nonaka_k = 0
+  
 /

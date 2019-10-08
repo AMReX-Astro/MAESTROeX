@@ -17,15 +17,6 @@ extern "C"
 // Define some routines to allow boundary conditions
 // to be passed to offloaded Fortran subroutines
 #ifdef AMREX_USE_CUDA
-    static void set_bc_launch_config()
-    {
-        amrex::Gpu::Device::setNumThreadsMin(Maestro::minBCThreads(0), Maestro::minBCThreads(1), Maestro::minBCThreads(2));
-    }
-
-    static void clean_bc_launch_config()
-    {
-        amrex::Gpu::Device::setNumThreadsMin(1, 1, 1);
-    }
 
     // Return a pointer to bc valid for use in Fortran. For the CPU this is a no-op.
 

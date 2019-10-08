@@ -11,8 +11,6 @@ module enforce_HSE_module
 
   implicit none
 
-  private
-
 contains
 
   subroutine enforce_HSE(rho0,p0,grav_cell,r_cc_loc,r_edge_loc) bind(C, name="enforce_HSE")

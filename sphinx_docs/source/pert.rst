@@ -122,19 +122,19 @@ resulting edge state are shown in the :numref:`table:pred:species`.
 .. _table:pred:species:
 .. table:: Summary of species edge state construction
 
-   +--------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
-   | ``species_pred_type``    | quantities predicted                  | :math:`(\rho X_k)`                                                                          |
-   |                          | in ``make_edge_scal``                 | edge state                                                                                  |
-   +--------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
-   | 1 /                      | :math:`\rho'_\mathrm{edge}`,          | :math:`\left(\rho_0^{n+\myhalf,{\rm avg}} + \rho'_\mathrm{edge} \right)(X_k)_\mathrm{edge}` |
-   |``predict_rhoprime_and_X``| :math:`(X_k)_\mathrm{edge}`           |                                                                                             |
-   +--------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
-   | 2 / ``predict_rhoX``     | :math:`\sum(\rho X_k)_\mathrm{edge}`, | :math:`(\rho X_k)_\mathrm{edge}`                                                            |
-   |                          | :math:`(\rho X_k)_\mathrm{edge}`      |                                                                                             |
-   +--------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
-   | 3 / ``predict_rho_and_X``| :math:`\rho_\mathrm{edge}`,           | :math:`\rho_\mathrm{edge} (X_k)_\mathrm{edge}`                                              |
-   |                          | :math:`(X_k)_\mathrm{edge}`           |                                                                                             |
-   +--------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
+   +---------------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
+   | ``species_pred_type``           | quantities predicted                  | :math:`(\rho X_k)`                                                                          |
+   |                                 | in ``make_edge_scal``                 | edge state                                                                                  |
+   +---------------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
+   | 1 / ``predict_rhoprime_and_X``  | :math:`\rho'_\mathrm{edge}`,          | :math:`\left(\rho_0^{n+\myhalf,{\rm avg}} + \rho'_\mathrm{edge} \right)(X_k)_\mathrm{edge}` |
+   |                                 | :math:`(X_k)_\mathrm{edge}`           |                                                                                             |
+   +---------------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
+   | 2 / ``predict_rhoX``            | :math:`\sum(\rho X_k)_\mathrm{edge}`, | :math:`(\rho X_k)_\mathrm{edge}`                                                            |
+   |                                 | :math:`(\rho X_k)_\mathrm{edge}`      |                                                                                             |
+   +---------------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
+   | 3 / ``predict_rho_and_X``       | :math:`\rho_\mathrm{edge}`,           | :math:`\rho_\mathrm{edge} (X_k)_\mathrm{edge}`                                              |
+   |                                 | :math:`(X_k)_\mathrm{edge}`           |                                                                                             |
+   +---------------------------------+---------------------------------------+---------------------------------------------------------------------------------------------+
 
 We note the labels ``predict_rhoprime_and_X``, ``predict_rhoX``, and
 ``predict_rho_and_X`` are provided by the ``pred_parameters``
@@ -285,23 +285,26 @@ force computed in ``modify_scal_force`` with ``fullform =
 Advancing :math:`\rho X_k`
 --------------------------
 
-| The evolution equation for :math:`\rho X_k`, ignoring the reaction terms
-  that were already accounted for in ``react_state``, and the
-  associated discretization is
-| :
+The evolution equation for :math:`\rho X_k`, ignoring the reaction
+terms that were already accounted for in ``react_state``, and the
+associated discretization is:
+
+* ``species_pred_type = predict_rhoprime_and_X`` :
 
   .. math::
 
      \frac{\partial\rho X_k}{\partial t} =
      -\nabla\cdot\left\{\left[\left({\rho_0}^{n+\myhalf,{\rm avg}}
      + \rho'_\mathrm{edge} \right)(X_k)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.
-| :
+
+* ``species_pred_type = predict_rhoX`` :
 
   .. math::
 
      \frac{\partial\rho X_k}{\partial t} =
      -\nabla\cdot\left\{\left[\left(\rho X_k \right)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.
-| :
+
+* ``species_pred_type = predict_rho_and_X`` :
 
   .. math::
 
