@@ -6,6 +6,15 @@ In this chapter we give an overview of MAESTROeX, including some of the
 standard problems, how to run the code, some basic runtime parameters,
 and how to look at the output.
 
+Requirements
+============
+
+MAESTROeX requires a C++ compiler that supports the C++11 standard, a 
+Fortran compiler that supports the Fortran 2003 standard, and a C compiler 
+that supports the C99 standard. Several compiler suites are supported, included GNU, Intel, PGI and Cray. GNU Make is also required, as is Python 
+(>= 2.7, including 3) and standard tools available in any Unix-like 
+environments (e.g., Perl and ``sed``). 
+
 Quick Start
 ===========
 
