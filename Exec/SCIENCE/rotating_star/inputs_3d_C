@@ -1,6 +1,7 @@
 
 # INITIAL MODEL
-maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6400"
+#maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6400"
+maestro.model_file = "15m_500_sec.hse.6400"
 maestro.perturb_model = false
 
 maestro.drdxfac = 5
