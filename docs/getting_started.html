@@ -99,6 +99,7 @@
 <p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#working-with-the-output">Working with the Output</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#amrvis">Amrvis</a></li>
@@ -221,6 +222,14 @@
 <p>In this chapter we give an overview of MAESTROeX, including some of the
 standard problems, how to run the code, some basic runtime parameters,
 and how to look at the output.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>MAESTROeX requires a C++ compiler that supports the C++11 standard, a
+Fortran compiler that supports the Fortran 2003 standard, and a C compiler
+that supports the C99 standard. Several compiler suites are supported, included GNU, Intel, PGI and Cray. GNU Make is also required, as is Python
+(&gt;= 2.7, including 3) and standard tools available in any Unix-like
+environments (e.g., Perl and <code class="docutils literal notranslate"><span class="pre">sed</span></code>).</p>
+</div>
 <div class="section" id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
 <p>Here we will run the standard reacting_bubble problem (three
