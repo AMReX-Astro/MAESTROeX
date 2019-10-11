@@ -77,10 +77,9 @@ Derivation of :math:`\alpha`
 In paper I, :math:`\alpha` is defined as
 
 .. math::
-
-   \label{eq:alpha}
    \alpha\equiv -\left(
    \frac{(1-\rho h_p)p_T-\rho c_p}{\rho^2c_pp_\rho}\right)
+   :label: eq:alpha
 
 where
 
@@ -100,26 +99,24 @@ system of one species, or a system of many species in chemical (and
 therefore *thermodynamic*) equilibrium. Cox and Giuli (hereafter
 CG) call the former type of system a “simple system” and therefore
 the latter a “non-simple system” in chemical equilibrium. The
-analysis in paper I that reduced `[eq:alpha] <#eq:alpha>`__ to
+analysis in paper I that reduced :eq:`eq:alpha` to
 
 .. math::
-
-   \label{eq:alpha_simp_no_rxn}
    \alpha = \frac{1}{\Gamma_1p_0}
+   :label: eq:alpha_simp_no_rxn
 
 used CG’s discussion of the various adiabatic :math:`\Gamma`\ ’s. However,
 their discussion only pertains to “simple systems” or “non-simple
 systems” in chemical equilibrium. In general, nuclear reactions will
 be important and therefore this analysis needs to be reformed.
 
-Even in the presence of reactions, `[eq:alpha] <#eq:alpha>`__ can be rewritten
+Even in the presence of reactions, :eq:`eq:alpha` can be rewritten
 as was done in paper I:
 
 .. math::
-
-   \label{eq:alpha2}
    \alpha = -\frac{1}{p\chi_\rho c_p}\left[\left(\frac{1}{\rho\chi_\rho}
    - \frac{\rho e_\rho}{p\chi_\rho}\right)\frac{p\chi_T}{T} - c_p\right],
+   :label: eq:alpha2
 
 where
 
@@ -169,10 +166,9 @@ From here we get the general statement
 which must hold for an adiabatic process as well, and therefore we have
 
 .. math::
-
-   \label{eq:gamma1}
-     \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right)
+   \Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right)
      + \sum_i\chi_{X_i}\Gamma_{4,i}
+   :label: eq:gamma1
 
 where we use CG’s definition of :math:`\Gamma_1` and :math:`\Gamma_3` and introduce a
 fourth gamma function:
@@ -226,9 +222,7 @@ we then have
 and
 
 .. math::
-
    \begin{aligned}
-   \label{eq:gamma3_first}
    \left(\frac{d\ln T}{d\ln\rho}\right)_\text{AD} \equiv \Gamma_3-1
    &= \frac{1}{c_vT}\left[
    \frac{p}{\rho} - \left(\frac{\partial e}{\partial\ln\rho}\right)_{T,X} +
@@ -238,7 +232,9 @@ and
        \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
        -
        \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}
-       \right]X_i\Gamma_{4,i}\right]\end{aligned}
+       \right]X_i\Gamma_{4,i}\right]
+   \end{aligned}
+   :label: eq:gamma3_first
 
 Now we need to evaluate :math:`\left(\partial e/\partial \ln\rho\right)_{T,X}`.
 Again using the first law and the fact that :math:`ds=dq/T` is an exact
@@ -299,27 +295,25 @@ respect to composition
      \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
      \right)_{\rho,X}.\end{aligned}
 
-Plugging these back into `[eq:gamma3_first] <#eq:gamma3_first>`__ we have
+Plugging these back into :eq:`eq:gamma3_first` we have
 
 .. math::
-
-   \label{eq:gamma3_second}
-     \Gamma_3-1 = \frac{1}{c_vT}\left[\frac{p}{\rho}\chi_T +\sum_i
+   \Gamma_3-1 = \frac{1}{c_vT}\left[\frac{p}{\rho}\chi_T +\sum_i
        \left(\frac{\partial}{\partial\ln T}\left(
        \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
        \right)_{\rho,X}X_i
        \Gamma_{4,i}\right],
+   :label: eq:gamma3_second
 
 or
 
 .. math::
-
-   \label{eq:cv}
-     c_v = \frac{1}{T(\Gamma_3-1)}\left[\frac{p}{\rho}\chi_T +\sum_i
+   c_v = \frac{1}{T(\Gamma_3-1)}\left[\frac{p}{\rho}\chi_T +\sum_i
        \left(\frac{\partial}{\partial\ln T}\left(
        \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
        \right)_{\rho,X}X_i
        \Gamma_{4,i}\right].
+   :label: eq:cv
 
 We can obtain an expression for the specific heat at constant pressure
 from the enthalpy
@@ -363,8 +357,8 @@ and
 
 .. math:: c_p = \frac{p}{\rho T}\frac{\chi_T^2}{\chi_\rho} + c_v
 
-Dividing this by `[eq:cv] <#eq:cv>`__ and using the relation between the
-:math:`\Gamma`\ ’s, `[eq:gamma1] <#eq:gamma1>`__, we then have
+Dividing this by :eq:`eq:cv` and using the relation between the
+:math:`\Gamma` ’s, :eq:`eq:gamma1`, we then have
 
 .. math::
 
@@ -396,7 +390,7 @@ Dividing this by `[eq:cv] <#eq:cv>`__ and using the relation between the
          \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - p\chi_T
          \chi_{X_i}\right]\Gamma_{4,i}\right].\end{aligned}
 
-Plugging `[eq:pchirho] <#eq:pchirho>`__ into `[eq:alpha2] <#eq:alpha2>`__ and rewriting the
+Plugging `[eq:pchirho] <#eq:pchirho>`__ into :eq:`eq:alpha2` and rewriting the
 partial derivative of :math:`e` with the help of `[eq:dedlnrho] <#eq:dedlnrho>`__ we have
 
 .. math::

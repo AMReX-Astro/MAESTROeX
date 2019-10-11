@@ -1,0 +1,135 @@
+
+# INITIAL MODEL
+maestro.perturb_model = false
+
+maestro.ppm_type = 0
+maestro.max_step  = 10
+maestro.stop_time = 15e3
+maestro.max_dt = 100.0
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0  0.0  0.0
+geometry.prob_hi     =  1.0e9  1.0e9  1.0e9
+
+# PROBLEM SIZE & GEOMETRY
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 0 4 4 
+maestro.hi_bc = 0 4 4
+geometry.is_periodic =  1 0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+
+# DEBUG FOR NAN
+amrex.fpe_trap_invalid = 1       # floating point exception
+
+# REFINEMENT
+amr.n_cell          =  64 64 64 
+amr.max_level       = 0       # maximum level number allowed
+amr.ref_ratio       = 2 2 2 2 # refinement ratio
+amr.blocking_factor = 8       # block factor in grid generation
+amr.max_grid_size   = 128
+maestro.regrid_int     = 2       # how often to regrid
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+
+maestro.regrid_int      = 2       # how often to regrid
+
+# TIME STEP CONTROL
+maestro.cfl         = 0.9    # cfl number for hyperbolic system
+maestro.init_shrink = 0.1e0
+
+# PLOTFILES
+maestro.plot_base_name  = single_level/plt    # root name of plot file
+maestro.plot_int   =  1    # number of timesteps between plot files
+maestro.plot_deltat = 100e0  #0.1e0
+
+maestro.small_plot_base_name  = tmpsingle_level/sml    # root name of plot file
+
+# Diag files
+maestro.sum_interval = 1 # Output diagnostics for every sum_interval steps
+maestro.diag_buf_size = 10
+
+# CHECKPOINT
+maestro.check_base_name = single_level/chk
+maestro.chk_int         = -1
+
+# ALGORITHMIC OPTIONS
+maestro.evolve_base_state = true
+maestro.do_initial_projection = true
+maestro.init_divu_iter        = 1
+maestro.init_iter             = 1
+maestro.do_reflux             = 0 # do we do the hyperbolic reflux
+
+maestro.do_sponge = 0
+maestro.sponge_center_density = 3.e6
+maestro.sponge_start_factor = 10.e0
+maestro.sponge_kappa = 10.e0
+
+maestro.use_thermal_diffusion = false
+
+# tolerances for the initial projection
+maestro.eps_init_proj_cart = 1.e-12
+maestro.eps_init_proj_sph  = 1.e-10
+# tolerances for the divu iterations
+maestro.eps_divu_cart      = 1.e-8
+maestro.eps_divu_sph       = 1.e-10
+maestro.divu_iter_factor   = 100.
+maestro.divu_level_factor  = 10.
+# tolerances for the MAC projection
+#maestro.eps_mac            = 1.e-10
+#maestro.eps_mac_max        = 1.e-8
+#maestro.mac_level_factor   = 10.
+#maestro.eps_mac_bottom     = 1.e-3
+# tolerances for the nodal projection
+maestro.eps_hg             = 1.e-12
+maestro.eps_hg_max         = 1.e-10
+maestro.hg_level_factor    = 10.
+maestro.eps_hg_bottom      = 1.e-4
+
+# HYDRODYNAMICS options
+maestro.anelastic_cutoff_density = 1.e-10
+maestro.base_cutoff_density = 1.e-10
+maestro.grav_const = -3.0e4
+
+# EOS parameters
+maestro.small_temp = 1.e-10
+maestro.small_dens = 1.e-10
+
+# BURNING parameters
+maestro.do_burning = false
+
+# OMP settings
+system.regtest_reduction = 1
+
+
+&probin
+
+  ! override the default values of the probin namelist values here
+  pres_base = 1d13
+  scale_height = 1d9
+  pert_amp = 0.00d0
+  k_hoz = 4.0d0
+  k_vert = 2.0d0
+  do_uniform = .false.
+  do_isentropic = .false.
+  use_p_dens_g = .false.
+  use_p_h_g = .true.
+
+  !extern
+
+  ! Note that some of the parameters in this
+  ! namelist are specific to the default EOS,
+  ! network, and/or integrator used in the
+  ! makefile. If you try a different set of
+  ! microphysics routines be sure to check that
+  ! the parameters in here are consistent, as
+  ! Fortran does not like seeing unknown variables
+  ! in the namelist.
+
+  eos_gamma = 1.6666666666666667d0
+  eos_assume_neutral = T
+  const_conductivity = 0.0d0
+
+/

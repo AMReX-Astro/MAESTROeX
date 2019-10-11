@@ -1,6 +1,7 @@
 
 # INITIAL MODEL
-maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6400"
+#maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6400"
+maestro.model_file = "15m_500_sec.hse.6400"
 maestro.perturb_model = false
 
 maestro.drdxfac = 5
@@ -31,7 +32,7 @@ amr.n_cell             = 64 64 64
 #amr.n_cell = 384 384 384
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
-maestro.regrid_int     = 2       # how often to regrid
+maestro.regrid_int     = 10      # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
@@ -53,8 +54,8 @@ maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
 
-maestro.anelastic_cutoff_density = 1.e6
-maestro.base_cutoff_density = 1.e5
+maestro.anelastic_cutoff_density = 1.e3
+maestro.base_cutoff_density = 1.e1
 
 maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
@@ -97,7 +98,12 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
+# BURNING 
 maestro.do_burning = true
+maestro.small_dens = 1.e3
+maestro.small_temp = 1.e5
+#maestro.burning_cutoff_density = 2.5e7
+#maestro.burning_invert_cutoff_density = true
 
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
@@ -112,11 +118,6 @@ maestro.rotation_radius = 2.e8
   velpert_scale = 1.e7
   velpert_steep = 1.e5
   tag_density_1 = 1.e7
-  tag_density_2 = 1.e8
-  tag_density_3 = 1.e8
-  tag_density_3 = 1.e9
-  particle_temp_cutoff = 6.e8
-  particle_tpert_threshold = 2.e7
 
   !extern
 

@@ -16,10 +16,6 @@ module base_state_geometry_module
 
   implicit none
 
-  private
-
-  public :: restrict_base, fill_ghost_base
-
   ! note that for spherical problems the base state only has one level of refiment,
   ! for for spherical, max_radial_level = finest_radial_level = 0
   ! for planar, max_radial_level is the index of the finest possible radial level
@@ -38,8 +34,8 @@ module base_state_geometry_module
   integer         , allocatable, save, public  :: nr(:)
 
   integer         , allocatable, save, public  :: numdisjointchunks(:)
-  integer         , pointer, save, public  :: r_start_coord(:,:)
-  integer         , pointer, save, public  :: r_end_coord(:,:)
+  integer         , allocatable, save, public  :: r_start_coord(:,:)
+  integer         , allocatable, save, public  :: r_end_coord(:,:)
 
   integer         , allocatable, save, public  :: anelastic_cutoff_density_coord(:)
   integer         , allocatable, save, public  :: base_cutoff_density_coord(:)
@@ -50,6 +46,7 @@ module base_state_geometry_module
   attributes(managed) ::  nr_irreg, center, dr, nr
   attributes(managed) :: base_cutoff_density_coord, anelastic_cutoff_density_coord
   attributes(managed) :: numdisjointchunks
+  attributes(managed) :: r_start_coord, r_end_coord
 #endif
 
 contains
@@ -399,15 +396,15 @@ contains
 
     end do
 
-    if (associated(r_start_coord)) then
-       call bl_deallocate(r_start_coord)
+    if (allocated(r_start_coord)) then
+       deallocate(r_start_coord)
     end if
-    call bl_allocate(r_start_coord,0,finest_radial_level,1,maxchunks)
+    allocate(r_start_coord(0:finest_radial_level,1:maxchunks))
 
-    if (associated(r_end_coord)) then
-       call bl_deallocate(r_end_coord)
+    if (allocated(r_end_coord)) then
+       deallocate(r_end_coord)
     end if
-    call bl_allocate(r_end_coord,0,finest_radial_level,1,maxchunks)
+    allocate(r_end_coord(0:finest_radial_level,1:maxchunks))
 
     if (spherical .eq. 0) then
 
@@ -457,10 +454,12 @@ contains
   subroutine restrict_base(s0,is_cell_centered)
 
     double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1)
-    integer         , intent(in   ) :: is_cell_centered
+    integer  , value, intent(in   ) :: is_cell_centered
 
     ! local
     integer :: n, r, i
+
+    !$gpu
 
     if (is_cell_centered .eq. 1) then
 
@@ -493,11 +492,13 @@ contains
   subroutine fill_ghost_base(s0,is_cell_centered)
 
     double precision, intent(inout) :: s0(0:max_radial_level,0:nr_fine-1)
-    integer         , intent(in   ) :: is_cell_centered
+    integer  , value, intent(in   ) :: is_cell_centered
 
     ! local
     integer          :: n,i,r_crse
     double precision :: del,dpls,dmin,slim,slope
+
+    !$gpu
 
     if (is_cell_centered .eq. 1) then
 
@@ -601,8 +602,8 @@ contains
     deallocate(base_cutoff_density_coord)
     call bl_deallocate(burning_cutoff_density_coord)
     deallocate(numdisjointchunks)
-    call bl_deallocate(r_start_coord)
-    call bl_deallocate(r_end_coord)
+    deallocate(r_start_coord)
+    deallocate(r_end_coord)
 
   end subroutine destroy_base_state_geometry
 

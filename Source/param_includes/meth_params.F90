@@ -55,6 +55,7 @@ module meth_params_module
   double precision , allocatable, save :: anelastic_cutoff_density
   double precision , allocatable, save :: base_cutoff_density
   double precision , allocatable, save :: burning_cutoff_density
+  logical          , allocatable, save :: burning_invert_cutoff_density
   double precision , allocatable, save :: buoyancy_cutoff_factor
   double precision , allocatable, save :: dpdt_factor
   logical          , allocatable, save :: do_planar_invsq_grav
@@ -114,6 +115,7 @@ module meth_params_module
   attributes(managed) :: anelastic_cutoff_density
   attributes(managed) :: base_cutoff_density
   attributes(managed) :: burning_cutoff_density
+  attributes(managed) :: burning_invert_cutoff_density
   attributes(managed) :: buoyancy_cutoff_factor
   attributes(managed) :: dpdt_factor
   attributes(managed) :: do_planar_invsq_grav
@@ -212,6 +214,8 @@ contains
     base_cutoff_density = -1.0d0;
     allocate(burning_cutoff_density)
     burning_cutoff_density = -1.0d0;
+    allocate(burning_invert_cutoff_density)
+    burning_invert_cutoff_density = .false.;
     allocate(buoyancy_cutoff_factor)
     buoyancy_cutoff_factor = 5.0d0;
     allocate(dpdt_factor)
@@ -309,6 +313,7 @@ contains
     call pp%query("anelastic_cutoff_density", anelastic_cutoff_density)
     call pp%query("base_cutoff_density", base_cutoff_density)
     call pp%query("burning_cutoff_density", burning_cutoff_density)
+    call pp%query("burning_invert_cutoff_density", burning_invert_cutoff_density)
     call pp%query("buoyancy_cutoff_factor", buoyancy_cutoff_factor)
     call pp%query("dpdt_factor", dpdt_factor)
     call pp%query("do_planar_invsq_grav", do_planar_invsq_grav)
@@ -434,6 +439,9 @@ contains
     end if
     if (allocated(burning_cutoff_density)) then
         deallocate(burning_cutoff_density)
+    end if
+    if (allocated(burning_invert_cutoff_density)) then
+        deallocate(burning_invert_cutoff_density)
     end if
     if (allocated(buoyancy_cutoff_factor)) then
         deallocate(buoyancy_cutoff_factor)

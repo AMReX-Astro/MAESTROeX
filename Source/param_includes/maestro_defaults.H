@@ -77,6 +77,7 @@ bool        Maestro::plot_sponge_fdamp = false;
 amrex::Real Maestro::anelastic_cutoff_density = -1.0;
 amrex::Real Maestro::base_cutoff_density = -1.0;
 amrex::Real Maestro::burning_cutoff_density = -1.0;
+bool        Maestro::burning_invert_cutoff_density = false;
 amrex::Real Maestro::buoyancy_cutoff_factor = 5.0;
 amrex::Real Maestro::dpdt_factor = 0.0;
 bool        Maestro::do_planar_invsq_grav = false;

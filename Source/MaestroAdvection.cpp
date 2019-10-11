@@ -24,9 +24,11 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
 	// create a MultiFab to hold uold + w0
-	Vector<MultiFab>      ufull(finest_level+1);
+	Vector<MultiFab> ufull(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
+                // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+                ufull[lev].setVal(0.);
 	}
 
 	// create ufull = uold + w0
@@ -751,7 +753,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
            MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
         }
-        
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -1235,6 +1236,29 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
               MultiFab& sedgey_mf = sedge[lev][1];
         const MultiFab& vmac_mf   = umac[lev][1];
 
+        MultiFab Ip, Im, Ipf, Imf;
+        Ip.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Im.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Ipf.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imf.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+        MultiFab slx, srx, simhx;
+        slx.define(grids[lev],dmap[lev],1,1);
+        srx.define(grids[lev],dmap[lev],1,1);
+        simhx.define(grids[lev],dmap[lev],1,1);
+
+        MultiFab sly, sry, simhy;
+        sly.define(grids[lev],dmap[lev],1,1);
+        sry.define(grids[lev],dmap[lev],1,1);
+        simhy.define(grids[lev],dmap[lev],1,1);
+
+        slx.setVal(0.);
+        srx.setVal(0.);
+        simhx.setVal(0.);
+        sly.setVal(0.);
+        sry.setVal(0.);
+        simhy.setVal(0.);
+
 #if (AMREX_SPACEDIM == 3)
               MultiFab& sedgez_mf = sedge[lev][2];
         const MultiFab& wmac_mf   = umac[lev][2];
@@ -1242,7 +1266,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
         const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-
+#if (AMREX_SPACEDIM == 3)
 	// NOTE: don't tile, but threaded in fortran subroutine
         for ( MFIter mfi(scal_mf); mfi.isValid(); ++mfi ) {
 
@@ -1258,30 +1282,198 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
-#if (AMREX_SPACEDIM == 2)
-                make_edge_scal_2d(
-#elif (AMREX_SPACEDIM == 3)
                 make_edge_scal_3d(
-#endif
                     AMREX_ARLIM_3D(domainBox.loVect()), AMREX_ARLIM_3D(domainBox.hiVect()),
                     AMREX_ARLIM_3D(tileBox.loVect()), AMREX_ARLIM_3D(tileBox.hiVect()),
                     BL_TO_FORTRAN_3D(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
                     BL_TO_FORTRAN_3D(sedgex_mf[mfi]), sedgex_mf.nComp(),
                     BL_TO_FORTRAN_3D(sedgey_mf[mfi]), sedgey_mf.nComp(),
-#if (AMREX_SPACEDIM == 3)
                     BL_TO_FORTRAN_3D(sedgez_mf[mfi]), sedgez_mf.nComp(),
-#endif
                     BL_TO_FORTRAN_3D(umac_mf[mfi]),
                     BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
                     BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-#endif
                     umac_mf.nGrow(),
                     BL_TO_FORTRAN_3D(force_mf[mfi]), force_mf.nComp(),
                     dx, dt, is_vel, bcs[0].data(),
                     nbccomp, scomp, bccomp, is_conservative);
             } // end loop over components
         } // end MFIter loop
+
+#elif (AMREX_SPACEDIM == 2)
+
+#ifdef AMREX_USE_CUDA
+        int* bc_f = prepare_bc(bcs[0].data(), 1);
+#else
+        const int* bc_f = bcs[0].data();
+#endif
+        Vector<MultiFab> vec_scal_mf(num_comp);
+        for (int comp=0; comp < num_comp; ++comp) {
+            vec_scal_mf[comp].define(grids[lev],dmap[lev],1,scal_mf.nGrow());
+
+            MultiFab::Copy(vec_scal_mf[comp], scal_mf, start_scomp+comp, 0, 1, scal_mf.nGrow());
+        }
+        
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = amrex::growHi(tileBox,0, 1);
+            const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& mxbx = amrex::growLo(obx,0, -1);
+            const Box& mybx = amrex::growLo(obx,1, -1);
+
+            // Be careful to pass in comp+1 for fortran indexing
+            for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
+
+                int vcomp = scomp - start_scomp - 1;
+
+                int bccomp = start_bccomp + scomp - start_scomp;
+
+                // x-direction
+                if (ppm_type == 0) {
+                    // we're going to reuse Ip here as slopex and Im as slopey
+                    // as they have the correct number of ghost zones
+
+                    // x-direction
+#pragma gpu box(obx)
+                    slopex_2d(AMREX_INT_ANYD(obx.loVect()),
+                           AMREX_INT_ANYD(obx.hiVect()),
+                           BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
+                           vec_scal_mf[vcomp].nComp(),
+                           BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
+                           AMREX_INT_ANYD(domainBox.loVect()),
+                           AMREX_INT_ANYD(domainBox.hiVect()),
+                           1,bc_f,nbccomp,bccomp);
+
+                   // y-direction
+#pragma gpu box(obx)
+                   slopey_2d(AMREX_INT_ANYD(obx.loVect()),
+                          AMREX_INT_ANYD(obx.hiVect()),
+                          BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
+                          vec_scal_mf[vcomp].nComp(),
+                          BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
+                          AMREX_INT_ANYD(domainBox.loVect()),
+                          AMREX_INT_ANYD(domainBox.hiVect()),
+                          1,bc_f,nbccomp,bccomp);
+
+
+                } else {
+#pragma gpu box(obx)
+                    ppm_2d(AMREX_INT_ANYD(obx.loVect()),
+                           AMREX_INT_ANYD(obx.hiVect()),
+                           BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                           scal_mf.nComp(),
+                           BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                           BL_TO_FORTRAN_ANYD(Im[mfi]),
+                           AMREX_INT_ANYD(domainBox.loVect()),
+                           AMREX_INT_ANYD(domainBox.hiVect()),
+                           bc_f, AMREX_REAL_ANYD(dx), dt, true,
+                           scomp, bccomp, nbccomp);
+
+                   if (ppm_trace_forces == 1) {
+#pragma gpu box(obx)
+                       ppm_2d(AMREX_INT_ANYD(obx.loVect()),
+                              AMREX_INT_ANYD(obx.hiVect()),
+                              BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+                              force_mf.nComp(),
+                              BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+                              BL_TO_FORTRAN_ANYD(Imf[mfi]),
+                              AMREX_INT_ANYD(domainBox.loVect()),
+                              AMREX_INT_ANYD(domainBox.hiVect()),
+                              bc_f, AMREX_REAL_ANYD(dx), dt, true,
+                              scomp, bccomp, nbccomp);
+
+                   }
+               }
+
+                // call fortran subroutine
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+                // lo/hi coordinates (including ghost cells), and/or the # of components
+                // We will also pass "validBox", which specifies the "valid" region.
+
+                // x-direction
+#pragma gpu box(mxbx)
+                make_edge_scal_predictor_2d(
+                    AMREX_INT_ANYD(mxbx.loVect()), AMREX_INT_ANYD(mxbx.hiVect()), 1,
+                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
+                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                    BL_TO_FORTRAN_ANYD(Im[mfi]),
+                    BL_TO_FORTRAN_ANYD(slx[mfi]),
+                    BL_TO_FORTRAN_ANYD(srx[mfi]),
+                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
+                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                    nbccomp, scomp, bccomp);
+
+                // y-direction
+#pragma gpu box(mybx)
+                make_edge_scal_predictor_2d(
+                    AMREX_INT_ANYD(mybx.loVect()), AMREX_INT_ANYD(mybx.hiVect()), 2,
+                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
+                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                    BL_TO_FORTRAN_ANYD(Im[mfi]),
+                    BL_TO_FORTRAN_ANYD(sly[mfi]),
+                    BL_TO_FORTRAN_ANYD(sry[mfi]),
+                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
+                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                    nbccomp, scomp, bccomp);
+
+                // x-direction
+#pragma gpu box(xbx)
+                make_edge_scal_2d(
+                    AMREX_INT_ANYD(xbx.loVect()), AMREX_INT_ANYD(xbx.hiVect()),1,
+                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
+                    BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+                    BL_TO_FORTRAN_ANYD(Imf[mfi]),
+                    BL_TO_FORTRAN_ANYD(slx[mfi]),
+                    BL_TO_FORTRAN_ANYD(srx[mfi]),
+                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
+                    BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
+                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                    nbccomp, scomp, bccomp, is_conservative);
+
+                // y-direction
+#pragma gpu box(ybx)
+                make_edge_scal_2d(
+                    AMREX_INT_ANYD(ybx.loVect()), AMREX_INT_ANYD(ybx.hiVect()),2,
+                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
+                    BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+                    BL_TO_FORTRAN_ANYD(Imf[mfi]),
+                    BL_TO_FORTRAN_ANYD(sly[mfi]),
+                    BL_TO_FORTRAN_ANYD(sry[mfi]),
+                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
+                    BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
+                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                    nbccomp, scomp, bccomp, is_conservative);
+            } // end loop over components
+        } // end MFIter loop
+
+#ifdef AMREX_USE_CUDA
+        clean_bc(bc_f);
+#endif
+
+#endif
     } // end loop over levels
 
     // We use edge_restriction for the output velocity if is_vel == 1

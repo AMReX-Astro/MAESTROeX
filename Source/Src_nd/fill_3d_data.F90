@@ -11,11 +11,6 @@ module fill_3d_data_module
 
   implicit none
 
-  ! private :: addw0, addw0_sphr, make_w0mac_sphr, make_s0mac_sphr, &
-  !  make_s0mac_sphr_irreg, make_normal, put_data_on_faces
-  !
-  ! public
-
 contains
 
   subroutine put_1d_array_on_cart(lo, hi, lev, &

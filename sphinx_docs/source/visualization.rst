@@ -161,7 +161,7 @@ reduce file sizes.
 .. _vis:sec:miniplotfile:
 
 Small vs. regular plotfiles
---------------------------
+---------------------------
 
 MAESTROeX can manage two independent sets of plotfiles. This allows you to
 output the default plotfiles, which contain a lot of variables, sparsely,
@@ -348,7 +348,7 @@ log is taken of the data before plotting. The script is then run as:
 .. _sec:vis_yt:
 
 Visualizing with yt
-================================
+===================
 
 yt is a Python package for analyzing and visualizing simulation data,
 and understand that AMReX data from MAESTROeX and CASTRO (along
