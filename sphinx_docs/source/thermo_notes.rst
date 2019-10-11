@@ -43,7 +43,7 @@ We write the average molar mass and average proton number as:
    :label: eq:abar
 
 .. math::
-   \bar{Z} &= \frac{\sum_i Z_i n_i}{\sum_i n_i} = \left(\sum_i Z_i
+   \bar{Z} = \frac{\sum_i Z_i n_i}{\sum_i n_i} = \left(\sum_i Z_i
      \frac{X_i}{A_i}\right)\left(\sum_i \frac{X_i}{A_i}\right)^{-1}.
    :label: eq:zbar
 
