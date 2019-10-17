@@ -1,5 +1,6 @@
 module rhoh_vs_t_module
 
+  use amrex_constants_module
   use eos_type_module
   use eos_module
   use network, only: nspec
@@ -8,6 +9,20 @@ module rhoh_vs_t_module
   use base_state_geometry_module, only:  max_radial_level, nr_fine
 
   implicit none
+
+  private
+  
+  integer, parameter :: predict_rhoh             = 0;
+  integer, parameter :: predict_rhohprime        = 1;
+  integer, parameter :: predict_h                = 2;
+  integer, parameter :: predict_T_then_rhohprime = 3;
+  integer, parameter :: predict_T_then_h         = 4;
+  integer, parameter :: predict_hprime           = 5;
+  integer, parameter :: predict_Tprime_then_h    = 6;
+
+  integer, parameter :: predict_rhoprime_and_X   = 1;
+  integer, parameter :: predict_rhoX             = 2;
+  integer, parameter :: predict_rho_and_X        = 3;
 
 contains
 
@@ -347,6 +362,464 @@ contains
     endif
 
   end subroutine makeCsfromRhoH
+
+
+  subroutine makeHfromRhoT_edge(lo,hi,sedgex,x_lo,x_hi, &
+       sedgey,y_lo,y_hi, &
+#if (AMREX_SPACEDIM == 3)
+       sedgez,z_lo,z_hi, &
+#endif
+       rho0_cart,r_lo,r_hi, &
+       rhoh0_cart,rh_lo,rh_hi, &
+       temp0_cart,t_lo,t_hi, &
+       rho0_edge_cart,re_lo,re_hi, &
+       rhoh0_edge_cart,rhe_lo,rhe_hi, &
+       temp0_edge_cart,te_lo,te_hi) &
+       bind(C,name="makeHfromRhoT_edge")
+    
+    use meth_params_module, only: species_pred_type, enthalpy_pred_type, small_temp
+    
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer         , intent (in   ) :: x_lo(3), x_hi(3)
+    double precision, intent (inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nscal)
+    integer         , intent (in   ) :: y_lo(3), y_hi(3)
+    double precision, intent (inout) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nscal)
+#if (AMREX_SPACEDIM == 3)
+    integer         , intent (in   ) :: z_lo(3), z_hi(3)
+    double precision, intent (inout) :: sedgez(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nscal)
+#endif
+    integer         , intent (in   ) :: r_lo(3), r_hi(3)
+    double precision, intent (in   ) :: rho0_cart (r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
+    integer         , intent (in   ) :: rh_lo(3), rh_hi(3)
+    double precision, intent (in   ) :: rhoh0_cart (rh_lo(1):rh_hi(1),rh_lo(2):rh_hi(2),rh_lo(3):rh_hi(3))
+    integer         , intent (in   ) :: t_lo(3), t_hi(3)
+    double precision, intent (in   ) :: temp0_cart (t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
+    integer         , intent (in   ) :: re_lo(3), re_hi(3)
+    double precision, intent (in   ) :: rho0_edge_cart (re_lo(1):re_hi(1),re_lo(2):re_hi(2),re_lo(3):re_hi(3))
+    integer         , intent (in   ) :: rhe_lo(3), rhe_hi(3)
+    double precision, intent (in   ) :: rhoh0_edge_cart (rhe_lo(1):rhe_hi(1),rhe_lo(2):rhe_hi(2),rhe_lo(3):rhe_hi(3))
+    integer         , intent (in   ) :: te_lo(3), te_hi(3)
+    double precision, intent (in   ) :: temp0_edge_cart (te_lo(1):te_hi(1),te_lo(2):te_hi(2),te_lo(3):te_hi(3))
+
+    ! Local variables
+    integer :: i, j, k
+    integer :: pt_index(3)
+    type (eos_t) :: eos_state
+
+!!$    !$gpu
+
+    ! x-edge
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)+1
+             
+             ! get edge-centered temperature
+             if (enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                eos_state%T = max(sedgex(i,j,k,temp_comp)+temp0_cart(i,j,k),small_temp)
+             else
+                eos_state%T = max(sedgex(i,j,k,temp_comp),small_temp)
+             end if
+
+             ! get edge-centered density and species
+             if (species_pred_type .eq. predict_rhoprime_and_X) then
+                
+                ! interface states are rho' and X
+                eos_state%rho = sedgex(i,j,k,rho_comp) + rho0_cart(i,j,k)
+
+                eos_state%xn(:) = sedgex(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             else if (species_pred_type .eq. predict_rhoX) then
+
+                ! interface states are rho and (rho X)
+                eos_state%rho = sedgex(i,j,k,rho_comp) 
+
+                eos_state%xn(:) = sedgex(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             else if (species_pred_type .eq. predict_rho_and_X) then
+
+                ! interface states are rho and X
+                eos_state%rho = sedgex(i,j,k,rho_comp) 
+
+                eos_state%xn(:) = sedgex(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             endif
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rt, eos_state, pt_index)
+             
+             if (enthalpy_pred_type .eq. predict_T_then_h .or. &
+                 enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                sedgex(i,j,k,rhoh_comp) = eos_state%h
+
+             else if (enthalpy_pred_type .eq. predict_T_then_rhohprime) then
+                sedgex(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h - rhoh0_cart(i,j,k)
+             end if
+
+          enddo
+       enddo
+    enddo
+
+#if (AMREX_SPACEDIM == 2)
+    ! y-edge
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)+1
+          do i = lo(1), hi(1)
+             
+             ! get edge-centered temperature
+             if (enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                eos_state%T = max(sedgey(i,j,k,temp_comp)+temp0_edge_cart(i,j,k),small_temp)
+             else
+                eos_state%T = max(sedgey(i,j,k,temp_comp),small_temp)
+             end if
+
+             ! get edge-centered density and species
+             if (species_pred_type .eq. predict_rhoprime_and_X) then
+                
+                ! interface states are rho' and X
+                eos_state%rho = sedgey(i,j,k,rho_comp) + rho0_edge_cart(i,j,k)
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1) 
+
+             else if (species_pred_type .eq. predict_rhoX) then
+
+                ! interface states are rho and (rho X)
+                eos_state%rho = sedgey(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             else if (species_pred_type .eq. predict_rho_and_X) then
+
+                ! interface states are rho and X
+                eos_state%rho = sedgey(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             endif
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rt, eos_state, pt_index)
+             
+             if (enthalpy_pred_type .eq. predict_T_then_h .or. &
+                 enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                sedgey(i,j,k,rhoh_comp) = eos_state%h
+
+             else if (enthalpy_pred_type .eq. predict_T_then_rhohprime) then
+                sedgey(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h - rhoh0_edge_cart(i,j,k)
+             end if
+             
+          enddo
+       enddo
+    enddo
+    
+#elif (AMREX_SPACEDIM == 3)
+    ! y-edge
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)+1
+          do i = lo(1), hi(1)
+             
+             ! get edge-centered temperature
+             if (enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                eos_state%T = max(sedgey(i,j,k,temp_comp)+temp0_cart(i,j,k),small_temp)
+             else
+                eos_state%T = max(sedgey(i,j,k,temp_comp),small_temp)
+             end if
+
+             ! get edge-centered density and species
+             if (species_pred_type .eq. predict_rhoprime_and_X) then
+                
+                ! interface states are rho' and X
+                eos_state%rho = sedgey(i,j,k,rho_comp) + rho0_cart(i,j,k)
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1) 
+
+             else if (species_pred_type .eq. predict_rhoX) then
+
+                ! interface states are rho and (rho X)
+                eos_state%rho = sedgey(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             else if (species_pred_type .eq. predict_rho_and_X) then
+
+                ! interface states are rho and X
+                eos_state%rho = sedgey(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             endif
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rt, eos_state, pt_index)
+             
+             if (enthalpy_pred_type .eq. predict_T_then_h .or. &
+                 enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                sedgey(i,j,k,rhoh_comp) = eos_state%h
+
+             else if (enthalpy_pred_type .eq. predict_T_then_rhohprime) then
+                sedgey(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h - rhoh0_cart(i,j,k)
+             end if
+             
+          enddo
+       enddo
+    enddo
+
+    ! z-edge
+    do k = lo(3), hi(3)+1
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+                 
+             ! get edge-centered temperature
+             if (enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                eos_state%T = max(sedgez(i,j,k,temp_comp)+temp0_edge_cart(i,j,k),small_temp)
+             else
+                eos_state%T = max(sedgez(i,j,k,temp_comp),small_temp)
+             end if
+
+             ! get edge-centered density and species
+             if (species_pred_type .eq. predict_rhoprime_and_X) then
+
+                ! interface states are rho' and X
+                eos_state%rho = sedgez(i,j,k,rho_comp) + rho0_edge_cart(i,j,k)
+             
+                eos_state%xn(:) = sedgez(i,j,k,spec_comp:spec_comp+nspec-1) 
+
+             else if (species_pred_type .eq. predict_rhoX) then
+
+                ! interface states are rho and (rho X)
+                eos_state%rho = sedgez(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgez(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             else if (species_pred_type .eq. predict_rho_and_X) then
+
+                ! interface states are rho and X
+                eos_state%rho = sedgez(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgez(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             endif
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rt, eos_state, pt_index)
+             
+             if (enthalpy_pred_type .eq. predict_T_then_h .or. &
+                 enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                sedgez(i,j,k,rhoh_comp) = eos_state%h
+             else if (enthalpy_pred_type .eq. predict_T_then_rhohprime) then
+                sedgez(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h - rhoh0_edge_cart(i,j,k)
+             end if
+             
+          enddo
+       enddo
+    enddo
+#endif
+
+  end subroutine makeHfromRhoT_edge
+
+
+  subroutine makeHfromRhoT_edge_sphr(lo,hi,sedgex,x_lo,x_hi, &
+       sedgey,y_lo,y_hi, &
+       sedgez,z_lo,z_hi, &
+       rho0_cart,r_lo,r_hi, &
+       rhoh0_cart,rh_lo,rh_hi, &
+       temp0_cart,t_lo,t_hi) &
+       bind(C,name="makeHfromRhoT_edge_sphr")
+    
+    use meth_params_module, only: species_pred_type, enthalpy_pred_type, small_temp
+    
+    integer         , intent (in   ) :: lo(3), hi(3)
+    integer         , intent (in   ) :: x_lo(3), x_hi(3)
+    double precision, intent (inout) :: sedgex(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nscal)
+    integer         , intent (in   ) :: y_lo(3), y_hi(3)
+    double precision, intent (inout) :: sedgey(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3),nscal)
+    integer         , intent (in   ) :: z_lo(3), z_hi(3)
+    double precision, intent (inout) :: sedgez(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3),nscal)
+    integer         , intent (in   ) :: r_lo(3), r_hi(3)
+    double precision, intent (in   ) :: rho0_cart (r_lo(1):r_hi(1),r_lo(2):r_hi(2),r_lo(3):r_hi(3))
+    integer         , intent (in   ) :: rh_lo(3), rh_hi(3)
+    double precision, intent (in   ) :: rhoh0_cart (rh_lo(1):rh_hi(1),rh_lo(2):rh_hi(2),rh_lo(3):rh_hi(3))
+    integer         , intent (in   ) :: t_lo(3), t_hi(3)
+    double precision, intent (in   ) :: temp0_cart (t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
+
+    ! Local variables
+    integer :: i, j, k
+    double precision :: rho0_edge, rhoh0_edge, temp0_edge
+    
+    integer :: pt_index(3)
+    type (eos_t) :: eos_state
+
+!!$    !$gpu
+
+    ! x-edge
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)+1
+             
+             ! get edge-centered temperature
+             if (enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                temp0_edge = HALF* (temp0_cart(i-1,j,k) + temp0_cart(i,j,k))
+                eos_state%T = max(sedgex(i,j,k,temp_comp)+temp0_edge,small_temp)
+             else
+                eos_state%T = max(sedgex(i,j,k,temp_comp),small_temp)
+             end if
+
+             ! get edge-centered density and species
+             if (species_pred_type .eq. predict_rhoprime_and_X) then
+                
+                ! interface states are rho' and X
+                rho0_edge = HALF * (rho0_cart(i-1,j,k) + rho0_cart(i,j,k))
+                eos_state%rho = sedgex(i,j,k,rho_comp) + rho0_edge
+
+                eos_state%xn(:) = sedgex(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             else if (species_pred_type .eq. predict_rhoX) then
+
+                ! interface states are rho and (rho X)
+                eos_state%rho = sedgex(i,j,k,rho_comp) 
+
+                eos_state%xn(:) = sedgex(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             else if (species_pred_type .eq. predict_rho_and_X) then
+
+                ! interface states are rho and X
+                eos_state%rho = sedgex(i,j,k,rho_comp) 
+
+                eos_state%xn(:) = sedgex(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             endif
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rt, eos_state, pt_index)
+             
+             if (enthalpy_pred_type .eq. predict_T_then_h .or. &
+                 enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                sedgex(i,j,k,rhoh_comp) = eos_state%h
+
+             else if (enthalpy_pred_type .eq. predict_T_then_rhohprime) then
+                rhoh0_edge = HALF * (rhoh0_cart(i-1,j,k) + rhoh0_cart(i,j,k))
+                sedgex(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h - rhoh0_edge
+             end if
+
+          enddo
+       enddo
+    enddo
+
+
+    ! y-edge
+    do k = lo(3), hi(3)
+       do j = lo(2), hi(2)+1
+          do i = lo(1), hi(1)
+             
+             ! get edge-centered temperature
+             if (enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                temp0_edge = HALF * (temp0_cart(i,j-1,k) + temp0_cart(i,j,k))
+                eos_state%T = max(sedgey(i,j,k,temp_comp)+temp0_edge,small_temp)
+             else
+                eos_state%T = max(sedgey(i,j,k,temp_comp),small_temp)
+             end if
+
+             ! get edge-centered density and species
+             if (species_pred_type .eq. predict_rhoprime_and_X) then
+                
+                ! interface states are rho' and X
+                rho0_edge = HALF * (rho0_cart(i,j-1,k) + rho0_cart(i,j,k))
+                eos_state%rho = sedgey(i,j,k,rho_comp) + rho0_edge
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1) 
+
+             else if (species_pred_type .eq. predict_rhoX) then
+
+                ! interface states are rho and (rho X)
+                eos_state%rho = sedgey(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             else if (species_pred_type .eq. predict_rho_and_X) then
+
+                ! interface states are rho and X
+                eos_state%rho = sedgey(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgey(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             endif
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rt, eos_state, pt_index)
+             
+             if (enthalpy_pred_type .eq. predict_T_then_h .or. &
+                 enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                sedgey(i,j,k,rhoh_comp) = eos_state%h
+
+             else if (enthalpy_pred_type .eq. predict_T_then_rhohprime) then
+                rhoh0_edge = HALF * (rhoh0_cart(i,j-1,k) + rhoh0_cart(i,j,k))
+                sedgey(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h - rhoh0_edge
+             end if
+             
+          enddo
+       enddo
+    enddo
+
+    ! z-edge
+    do k = lo(3), hi(3)+1
+       do j = lo(2), hi(2)
+          do i = lo(1), hi(1)
+                 
+             ! get edge-centered temperature
+             if (enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                temp0_edge = HALF * (temp0_cart(i,j,k-1) + temp0_cart(i,j,k))
+                eos_state%T = max(sedgez(i,j,k,temp_comp)+temp0_edge,small_temp)
+             else
+                eos_state%T = max(sedgez(i,j,k,temp_comp),small_temp)
+             end if
+
+             ! get edge-centered density and species
+             if (species_pred_type .eq. predict_rhoprime_and_X) then
+
+                ! interface states are rho' and X
+                rho0_edge = HALF * (rho0_cart(i,j,k-1) + rho0_cart(i,j,k))
+                eos_state%rho = sedgez(i,j,k,rho_comp) + rho0_edge
+             
+                eos_state%xn(:) = sedgez(i,j,k,spec_comp:spec_comp+nspec-1) 
+
+             else if (species_pred_type .eq. predict_rhoX) then
+
+                ! interface states are rho and (rho X)
+                eos_state%rho = sedgez(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgez(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
+
+             else if (species_pred_type .eq. predict_rho_and_X) then
+
+                ! interface states are rho and X
+                eos_state%rho = sedgez(i,j,k,rho_comp)
+
+                eos_state%xn(:) = sedgez(i,j,k,spec_comp:spec_comp+nspec-1)
+
+             endif
+
+             pt_index(:) = (/i, j, k/)
+
+             call eos(eos_input_rt, eos_state, pt_index)
+             
+             if (enthalpy_pred_type .eq. predict_T_then_h .or. &
+                 enthalpy_pred_type .eq. predict_Tprime_then_h) then
+                sedgez(i,j,k,rhoh_comp) = eos_state%h
+             else if (enthalpy_pred_type .eq. predict_T_then_rhohprime) then
+                rhoh0_edge = HALF * (rhoh0_cart(i,j,k-1) + rhoh0_cart(i,j,k))
+                sedgez(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h - rhoh0_edge
+             end if
+             
+          enddo
+       enddo
+    enddo
+    
+  end subroutine makeHfromRhoT_edge_sphr
 
 
 end module rhoh_vs_t_module

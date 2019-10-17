@@ -630,6 +630,11 @@ private:
                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                         int add_thermal,
 			const int &which_step);
+    
+    void MakeTempForce(amrex::Vector<amrex::MultiFab>& temp_force,
+                       const amrex::Vector<amrex::MultiFab>& scal,
+                       const amrex::Vector<amrex::MultiFab>& thermal,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
     ////////////////////////
 
     ////////////
@@ -1051,6 +1056,13 @@ private:
                      const RealVector& p0,
                      const amrex::Vector<amrex::MultiFab>& p0cart,
                      amrex::Vector<amrex::MultiFab>& cs);
+
+    // Calculate the enthalpy at edges given the density and the temperature
+    void HfromRhoTedge (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+			const RealVector& rho0_edge_old,
+			const RealVector& rhoh0_edge_old,
+			const RealVector& rho0_edge_new,
+			const RealVector& rhoh0_edge_new);
     ////////////
 
     ////////////
