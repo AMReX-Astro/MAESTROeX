@@ -422,3 +422,104 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     if (not_launched) Gpu::setLaunchRegion(false);
 #endif
 }
+
+
+void
+Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
+                       const Vector<MultiFab>& scal,
+                       const Vector<MultiFab>& thermal,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
+
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeTempForce()",MakeTempForce);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
+    // if we are doing the prediction, then it only makes sense to be in
+    // this routine if the quantity we are predicting is rhoh', h, or rhoh
+    if (!(enthalpy_pred_type == predict_T_then_rhohprime ||
+	  enthalpy_pred_type == predict_T_then_h ||
+	  enthalpy_pred_type == predict_Tprime_then_h) ) {
+        Abort("ERROR: should only call mktempforce when predicting T' or T");
+    }
+
+    Vector<MultiFab> p0_cart(finest_level+1);
+    Vector<MultiFab> psi_cart(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        psi_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+	p0_cart[lev].setVal(0.);
+        psi_cart[lev].setVal(0.);
+    }
+
+    Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // get references to the MultiFabs at level lev
+        MultiFab& temp_force_mf = temp_force[lev];
+        const MultiFab& umac_mf = umac[lev][0];
+        const MultiFab& vmac_mf = umac[lev][1];
+#if (AMREX_SPACEDIM == 3)
+        const MultiFab& wmac_mf = umac[lev][2];
+#endif
+	const MultiFab& scal_mf = scal[lev];
+        const MultiFab& p0cart_mf = p0_cart[lev];
+        const MultiFab& thermal_mf = thermal[lev];
+        const MultiFab& psi_mf = psi_cart[lev];
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(temp_force_mf, true); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& domainBox = geom[lev].Domain();
+            const Real* dx = geom[lev].CellSize();
+
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
+
+            // if use_exact_base_state or average_base_state,
+            // psi is set to dpdt in advance subroutine
+#pragma gpu box(tileBox)
+            mktempforce(AMREX_INT_ANYD(tileBox.loVect()),
+			AMREX_INT_ANYD(tileBox.hiVect()),
+			lev,
+			temp_force_mf[mfi].dataPtr(Temp),
+			AMREX_INT_ANYD(temp_force_mf[mfi].loVect()),
+			AMREX_INT_ANYD(temp_force_mf[mfi].hiVect()),
+			BL_TO_FORTRAN_ANYD(scal_mf[mfi]), 
+			BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+			BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+#if (AMREX_SPACEDIM == 3)
+			BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+#endif
+			BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
+			BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
+			BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
+			AMREX_REAL_ANYD(dx), 
+			AMREX_INT_ANYD(domainBox.hiVect()));
+        }
+    }
+
+    // average down and fill ghost cells
+    AverageDown(temp_force,Temp,1);
+    FillPatch(t_old,temp_force,temp_force,temp_force,Temp,Temp,1,0,bcs_f);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+}

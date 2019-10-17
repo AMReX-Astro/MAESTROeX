@@ -151,3 +151,7 @@ status as a core developer.
 Join the mailing list to ask for help or stay up-to-date:
 
 https://groups.google.com/forum/#!forum/maestro-help
+
+For answers to frequently asked questions and solutions to common problems, consult the [FAQ section](https://amrex-astro.github.io/MAESTROeX/docs/faq.html) of the User's Guide. 
+
+If you discover any bugs in the code or would like to request further help, then please submit a issue to the MAESTROeX Github repository describing your problem.
