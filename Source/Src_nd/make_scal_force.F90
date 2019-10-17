@@ -284,7 +284,7 @@ contains
                 call eos(eos_input_rt, eos_state, pt_index)
                 
                 dhdp = ONE / scal(i,j,k,rho_comp) + ( scal(i,j,k,rho_comp) * eos_state%dedr - &
-                     eos_state%p / s(i,j,k,rho_comp) ) / ( scal(i,j,k,rho_comp) * eos_state%dpdr )
+                     eos_state%p / scal(i,j,k,rho_comp) ) / ( scal(i,j,k,rho_comp) * eos_state%dpdr )
                 
                 veladv = HALF*(wmac(i,j,k)+wmac(i,j,k+1))
                 
