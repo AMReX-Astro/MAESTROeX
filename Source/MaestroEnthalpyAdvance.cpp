@@ -53,7 +53,7 @@ Maestro::EnthalpyAdvance (int which_step,
     //////////////////////////////////
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        scal_force[lev].setVal(0.,RhoH,1,1);
+        scal_force[lev].setVal(0.);
     }
 
     Vector<MultiFab> rhoh0_old_cart(finest_level+1);
@@ -279,7 +279,7 @@ Maestro::EnthalpyAdvance (int which_step,
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        scal_force[lev].setVal(0.,RhoH,1,1);
+        scal_force[lev].setVal(0.);
     }
 
     //**************************************************************************
