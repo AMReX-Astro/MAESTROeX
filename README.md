@@ -18,6 +18,8 @@ http://amrex-astro.github.io/MAESTROeX/
 
 ## Getting started
 
+- MAESTROeX requires a C++ compiler that supports the C++11 standard, a Fortran compiler that supports the Fortran 2003 standard, and a C compiler that supports the C99 standard. Several compiler suites are supported, including GNU, Intel, PGI and Cray. GNU Make is also required, as is Python (>= 2.7, including 3) and standard tools available in any Unix-like environments (e.g., Perl and `sed`).
+
 - To stay up-to-date with MAESTROeX, you will want to periodically pull changes
 from the repository by typing `git pull`.
 

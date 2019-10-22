@@ -58,13 +58,13 @@ maestro.sponge_kappa = 10.e0
 maestro.use_thermal_diffusion = false
 
 # PLOTFILES
-maestro.plot_base_name  = serial    # root name of plot file
+maestro.plot_base_name  = plt    # root name of plot file
 maestro.plot_int   = 1000      # number of timesteps between plot files
 maestro.plot_deltat = 1e0
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = -1
+maestro.chk_int         = 1000
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
