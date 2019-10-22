@@ -1,11 +1,10 @@
 """
-This script takes two or three plotfiles and a single variable 
+This script takes one, two or three plotfiles and a single variable 
 as arguments and plots contours of the datasets on the same 
 set of axes. 
 """
 
 import yt 
-import numpy as np 
 import sys
 import argparse
 import matplotlib.pyplot as plt
@@ -14,10 +13,13 @@ plt.rcParams["mathtext.fontset"] = "stix"
 
 def contour_compare(plotfiles, outputfile_name, var, norm_axis):
 
+    if len(plotfiles) > 3:
+        sys.exit("contourcompare.py: ERROR: Must provide no more than plotfiles")
+
     # dictionary of coordinates so can map our norm axis
-    geometries = {'cartesian':['x', 'y', 'z'], 
+    geometries = {'cartesian': ['x', 'y', 'z'], 
                   'cylindrical': ['r', 'z', 'theta'], 
-                  'spherical':['r', 'theta', 'phi']}
+                  'spherical': ['r', 'theta', 'phi']}
 
     linestyles = ['-', ':', '--']
 
