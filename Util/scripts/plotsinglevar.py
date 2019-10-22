@@ -90,6 +90,4 @@ if __name__ == "__main__":
     if use_log is None:
         use_log = False
 
-    print(f"max = {args.maximum}")
-
     plot_single_var(args.plotfile, args.outfile, args.variables, use_log, args.norm, args.minimum, args.maximum)
