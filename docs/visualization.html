@@ -111,13 +111,12 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-with-amrvis">Visualizing with Amrvis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-with-visit">Visualizing with VisIt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#python-visualization-scripts">Python visualization scripts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#visualizing-with-yt">Visualizing with yt</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#plotsinglevar-py">plotsinglevar.py</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contourcompare-py">contourcompare.py</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#runtimevis-py">runtimevis.py</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#visualizing-with-yt">Visualizing with yt</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
@@ -549,33 +548,21 @@ the palette line points to the Palette file, e.g.:</p>
 <h2>Visualizing with VisIt<a class="headerlink" href="#visualizing-with-visit" title="Permalink to this headline">¶</a></h2>
 <p>VisIt recognizes MAESTROeX plotfiles as being in the BoxLib format.</p>
 </div>
-<div class="section" id="python-visualization-scripts">
-<span id="sec-vis-python"></span><h2>Python visualization scripts<a class="headerlink" href="#python-visualization-scripts" title="Permalink to this headline">¶</a></h2>
-<p>AmrPostprocessing/python provides some simple commandline
-tools for doing visualizations of AMReX plotfiles (note: a subset
-of these are distributed directly with AMReX in <code class="docutils literal notranslate"><span class="pre">amrex/Tools/Py_util/</span></code>). The main drivers
-are written in python and use a set of Fortran routines, compiled with
-f2py to interface with the plotfile data. To use the routine,
-you will need to have matplotlib and f2py installed. On a
-machine running Fedora linux, you can install these packages via</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">matplotlib</span> <span class="n">f2py</span>
-</pre></div>
-</div>
-<p>The library required by the python routines can be built by typing
-<code class="docutils literal notranslate"><span class="pre">make</span></code> in that directory. If successful, you should find
-a library <code class="docutils literal notranslate"><span class="pre">fsnapshot.so</span></code>.</p>
-<p>The path to fsnapshot.so should be included in your <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>
-environment variable. This can be done by adding:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PYTHONPATH</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">{PYTHONPATH}</span><span class="s2">:/path/to/fsnapshot/</span>
-</pre></div>
-</div>
-<p>to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code>.</p>
+<div class="section" id="visualizing-with-yt">
+<span id="sec-vis-yt"></span><h2>Visualizing with yt<a class="headerlink" href="#visualizing-with-yt" title="Permalink to this headline">¶</a></h2>
+<p>yt is a Python package for analyzing and visualizing simulation data,
+and understand that AMReX data from MAESTROeX and CASTRO (along
+with many other simulation codes). For more
+information, see the yt homepage at <a class="reference external" href="http://yt-project.org/">http://yt-project.org/</a> and
+<a class="bibtex reference internal" href="zreferences.html#yt" id="id1">[TurkSmithOishi+11]</a>.</p>
+<p>Some sample scripts that use yt with MAESTROeX data are contained in
+<code class="docutils literal notranslate"><span class="pre">MAESTROeX/Util/yt/</span></code>.</p>
 <div class="section" id="plotsinglevar-py">
 <h3>plotsinglevar.py<a class="headerlink" href="#plotsinglevar-py" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code> does visualizations of 2-d AMReX plotfiles,
 and slices through 3-d AMReX plotfiles. A simple plot can be made
 via:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">log</span> <span class="o">-</span><span class="n">o</span> <span class="n">test</span><span class="o">.</span><span class="n">png</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">log</span> <span class="o">-</span><span class="n">o</span> <span class="n">test</span><span class="o">.</span><span class="n">png</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span>
 </pre></div>
 </div>
 <p>This will make a plot of “tfromp” from the plotfile <code class="docutils literal notranslate"><span class="pre">plt00000</span></code> with log scaling,
@@ -589,43 +576,41 @@ script <code class="docutils literal notranslate"><span class="pre">plotsingleva
 </div>
 <p>If you list 2 different variables after the plotfile name, then they
 will be plotted side-by-side in a single figure. For example,</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span> <span class="n">enucdot</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">plotsinglevar</span><span class="o">.</span><span class="n">py</span> <span class="n">plt00000</span><span class="o">/</span> <span class="n">tfromp</span> <span class="n">Hnuc</span>
 </pre></div>
 </div>
 <p>produces the output shown below:</p>
 <div class="figure align-center" id="id4">
-<img alt="_images/plt00000_tfromp_enucdot.png" src="_images/plt00000_tfromp_enucdot.png" />
+<img alt="_images/plt00000_tfromp_Hnuc.png" src="_images/plt00000_tfromp_Hnuc.png" />
 <p class="caption"><span class="caption-number">Fig. 15 </span><span class="caption-text">Plot of reacting_bubble done with the python script
 <code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code> showing 2 variables plotted from a single
 plotfile.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </div>
-<p>Additional options include ‘-m’ to specify the minimum data
-value, ‘-M’ to specify the maximum data value, and ‘–eps’
-to make an EPS plot instead of PNG. Running the script with no parameters
-will give the full list available options.</p>
-<p>Limited 3-d support is available. When run as with a plotfile name
+<p>Additional options include ‘-min’ to specify the minimum data
+value, and ‘-max’ to specify the maximum data value. Running the script with
+the flag <code class="docutils literal notranslate"><span class="pre">-h</span></code> will list the available options.</p>
+<p>3-d support is available. When run as with a plotfile name
 and variable, it will plot slices (<span class="math notranslate nohighlight">\(x\)</span>-<span class="math notranslate nohighlight">\(y\)</span>, <span class="math notranslate nohighlight">\(x\)</span>-<span class="math notranslate nohighlight">\(z\)</span>, and <span class="math notranslate nohighlight">\(y\)</span>-<span class="math notranslate nohighlight">\(z\)</span>)
-through the center of the domain. The option ‘–origin’
-will put the slices through the origin.</p>
+through the center of the domain.</p>
 </div>
 <div class="section" id="contourcompare-py">
 <h3>contourcompare.py<a class="headerlink" href="#contourcompare-py" title="Permalink to this headline">¶</a></h3>
-<p>contourcompare.py takes two or three plotfiles and a single variable as arguments
+<p><code class="docutils literal notranslate"><span class="pre">contourcompare.py</span></code> takes two or three plotfiles and a single variable as arguments
 and plots contours of the datasets on the same set of axes. This is
-form comparisons of different runs. Running the script with no parameters
-will give the full list available options.</p>
+facilitates comparisons of different runs. Running the script with the flag <code class="docutils literal notranslate"><span class="pre">-h</span></code>
+will give the full list of available options.</p>
 <p>For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contourcompare</span><span class="o">.</span><span class="n">py</span> <span class="n">tfromp</span> <span class="n">plt00000</span> <span class="n">other_plt00000</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">contourcompare</span><span class="o">.</span><span class="n">py</span> <span class="n">tfromp</span> <span class="n">plt00000</span> <span class="n">other_plt00000</span>
 </pre></div>
 </div>
-<p>will make a contour plot of the variable tfromp from the data in
-plt00000 and other_plt00000 shown on the same axes.</p>
+<p>will make a contour plot of the variable <code class="docutils literal notranslate"><span class="pre">tfromp</span></code> from the data in
+<code class="docutils literal notranslate"><span class="pre">plt00000</span></code> and <code class="docutils literal notranslate"><span class="pre">other_plt00000</span></code> shown on the same axes.</p>
 </div>
 <div class="section" id="runtimevis-py">
 <h3>runtimevis.py<a class="headerlink" href="#runtimevis-py" title="Permalink to this headline">¶</a></h3>
-<p>The runtimevis.py script is designed to be run from a submission
+<p>The <code class="docutils literal notranslate"><span class="pre">runtimevis.py</span></code> script is designed to be run from a submission
 script to produce plots from plotfiles as they are produced.</p>
-<p>The script itself reads in an inputs file, vis.in, that
+<p>The script itself reads in an inputs file, <code class="docutils literal notranslate"><span class="pre">vis.in</span></code>, that
 describes the variables to plot. From 1 to 6 variables can be
 plotting from a plotfile. The script does its best to organize them
 in columns and rows to maximize the plot area. The image is always
@@ -637,23 +622,13 @@ For each variable, a block of the form:</p>
 <span class="n">log</span> <span class="o">=</span> <span class="mi">1</span>
 </pre></div>
 </div>
-<p>is supplied. If min or max are omitted, then the data
-limits are computed automatically. If log is omitted, then no
+<p>is supplied. If <code class="docutils literal notranslate"><span class="pre">min</span></code> or <code class="docutils literal notranslate"><span class="pre">max</span></code> are omitted, then the data
+limits are computed automatically. If <code class="docutils literal notranslate"><span class="pre">log</span></code> is omitted, then no
 log is taken of the data before plotting. The script is then run as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">runtimevis</span><span class="o">.</span><span class="n">py</span> <span class="n">plt00000</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">runtimevis</span><span class="o">.</span><span class="n">py</span> <span class="n">plt00000</span>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="visualizing-with-yt">
-<span id="sec-vis-yt"></span><h2>Visualizing with yt<a class="headerlink" href="#visualizing-with-yt" title="Permalink to this headline">¶</a></h2>
-<p>yt is a Python package for analyzing and visualizing simulation data,
-and understand that AMReX data from MAESTROeX and CASTRO (along
-with many other simulation codes). For more
-information, see the yt homepage at <a class="reference external" href="http://yt-project.org/">http://yt-project.org/</a> and
-<a class="bibtex reference internal" href="zreferences.html#yt" id="id1">[TurkSmithOishi+11]</a>.</p>
-<p>Some sample scripts that use yt with MAESTROeX data are contained in
-<code class="docutils literal notranslate"><span class="pre">MAESTROeX/Util/yt/</span></code>.</p>
 </div>
 </div>
 
