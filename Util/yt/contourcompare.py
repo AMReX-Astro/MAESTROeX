@@ -6,12 +6,14 @@ set of axes.
 
 import yt 
 import sys
+import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams["mathtext.fontset"] = "stix"
 
-def contour_compare(plotfiles, outputfile_name, var, norm_axis):
+def contour_compare(plotfiles, outputfile_name, var, norm_axis, 
+                    nlevels, minimum, maximum):
 
     if len(plotfiles) > 3:
         sys.exit("contourcompare.py: ERROR: Must provide no more than plotfiles")
@@ -23,7 +25,7 @@ def contour_compare(plotfiles, outputfile_name, var, norm_axis):
 
     linestyles = ['-', ':', '--']
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(16,9))
 
     labels = []
     contours = []
@@ -64,11 +66,20 @@ def contour_compare(plotfiles, outputfile_name, var, norm_axis):
 
             ax_labels = coords[1:]
 
-        # draw the contours
-        cntr = ax.contour(X.v, Y.v, dat.v, linestyles=linestyles[i], 
-                          colors=f"C{i}", levels=3)
+        dat = dat.v
+
+        if minimum is not None:
+            dat[dat < minimum] = minimum
+        if maximum is not None:
+            dat[dat > maximum] = maximum
+
+        cntr = ax.contour(X.v, Y.v, dat, linestyles=linestyles[i], 
+                          colors=f"C{i}", levels=nlevels)
         c,_ = cntr.legend_elements()
         contours.append(c[0])
+
+        if pf[-1] == '/':
+            pf = pf[:-1]
         labels.append(pf.split('/')[-1])
 
     ax.set_xlabel(ax_labels[0])
@@ -76,7 +87,7 @@ def contour_compare(plotfiles, outputfile_name, var, norm_axis):
     ax.set_aspect('equal')
     plt.legend(contours, labels)
 
-    fig.savefig(outputfile_name)
+    fig.savefig(outputfile_name, bbox_inches='tight')
 
 
 if __name__ == "__main__":
@@ -86,7 +97,11 @@ if __name__ == "__main__":
     parser.add_argument('variable', type=str, help="variable to plot")
     parser.add_argument('plotfiles', type=str, nargs='+', help="name of plotfile")
     parser.add_argument('-n', '--norm', type=str, default='z', help="Axis normal to the plot")
+    parser.add_argument('-l', '--levels', type=int, default=3, help="Number of levels in contour")
+    parser.add_argument('-min', '--minimum', type=float, help="Set minimum data value")
+    parser.add_argument('-max', '--maximum', type=float, help="Set maximum data value")
+
 
     args = parser.parse_args()
 
-    contour_compare(args.plotfiles, args.outfile, args.variable, args.norm)
+    contour_compare(args.plotfiles, args.outfile, args.variable, args.norm, args.levels, args.minimum, args.maximum)
