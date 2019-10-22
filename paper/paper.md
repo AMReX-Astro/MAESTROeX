@@ -84,5 +84,7 @@ The work at LBNL was supported by the U.S. Department of Energy's Scientific Dis
 Advanced Computing (SciDAC) program under contract No. DE-AC02-05CH11231.
 The work at Stony Brook was supported by DOE/Office of Nuclear Physics grant DE-FG02-87ER40317
 and through the SciDAC program DOE grant DE-SC0017955.
+We also acknowledge contributors to the previous, pure F90 implementation of MAESTRO,
+John Bell (LBL), Chris Malone (LANL), and Michael Lijewski (LBL).
 
 # References
