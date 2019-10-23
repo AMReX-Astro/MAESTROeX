@@ -7,7 +7,7 @@ GPU
 In this chapter, we will present the GPU support in MAESTROeX,
 including necessary build parameters, how to offload a routine
 to GPU, and some basic profiling and debugging options.
-Note that currently MAESTROeX only supports Nvidia GPUs. 
+Note that currently MAESTROeX only supports NVIDIA GPUs. 
 
 Requirements
 ============
@@ -27,21 +27,19 @@ to the GNUmakefile:
 ::
 
       USE_CUDA := TRUE
-      USE_GPU_PRAGMA := TRUE
 
 We also need to set ``USE_OMP = FALSE`` because OpenMP is currently
 not compatible with building with CUDA. 
 ``USE_CUDA = TRUE`` and ``USE_OMP = TRUE`` will fail to compile.
 However, you may use MPI with CUDA for additional parallelization.
 
-Only IBM and PGI support CUDA Fortran, so the compiler should be set as:
+Only the IBM and PGI compilers support CUDA Fortran, so the compiler should be set as:
 
 ::
 
       COMP := pgi 
 
-Finally, the integrator package in microphysics must also be defined
-for full GPU support.
+Finally, the integrator used by the Microphysics library must be set to ``VODE90``:
 
 ::
 
@@ -50,14 +48,14 @@ for full GPU support.
 .. _sec:gpuporting:
     
 Offloading a routine to GPU
-===============
+===========================
 
 In order to offload a routine to the GPU, we insert a ``#pragma gpu``
 statement on the line before the call. This tells the preprocessor to
 generate a CUDA device version of the function, with all the
 additional CUDA GPU management. In addition to this, there are a few
 other modifications required to ensure the function operates correctly
-on the GPU. 
+on the GPU. We summarize these below. 
 
 C++
 ---
@@ -76,7 +74,7 @@ C++
   being passed by value rather than by reference. If you don’t do
   this, the code is liable to segfault
 
-- FArrayBox functions like `setVal()` and `saxpy()` are not on the
+- FArrayBox functions like ``setVal()`` and ``saxpy()`` are not on the
   GPU, so you should explicitly write out these operations in C++.
   The MultiFab counterparts are on the GPU.
 
@@ -91,8 +89,8 @@ To illustrate these modifications, consider the function ``mk_sponge``. To call 
         const Box& tileBox = mfi.tilebox();
 
         mk_sponge(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                  BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
-		  ZFILL(dx), dt);
+                  BL_TO_FORTRAN_3D(sponge_mf[mfi]),
+		  ZFILL(dx), &dt);
      }
 
 Implementing the changes described above to offload this to GPU, this becomes
@@ -112,13 +110,13 @@ Implementing the changes described above to offload this to GPU, this becomes
 Fortran
 -------
 
-- the routine must only operate on a single zone in ``lo:hi``.
+- The routine must only operate on a single zone in ``lo:hi``.
 
-  - even for temporary arrays, you cannot write to an ``i+1`` zone
+  - Even for temporary arrays, you cannot write to an ``i+1`` zone
     (e.g. when doing limiting) -- this will cause a race condition.
-    If necessary do extra computation to avoid the temporaries
+    If necessary, do extra computation to avoid the temporary arrays.
 
-- mark the routine with ``!$gpu``
+- Mark the routine with ``!$gpu``
 
 - If a module defines its own variables, these variables need to be
   ``allocatable`` (even if they are scalars) and marked as
@@ -151,11 +149,11 @@ Fortran
 
 - Make sure the fortran file is ``.F90`` rather than ``.f90`` (and
   remember to update the ``Make.xx`` file to reflect this). If you
-  don’t do this you will see the error ``Label field of continuation
+  don’t do this, you will see the error ``Label field of continuation
   line is not blank``
 
   - This is required as we use the convention that ``.F90`` files are
-    processed by the preprocessor, ``.f90`` files are not. The
+    processed by the preprocessor, and ``.f90`` files are not. The
     preprocessor will therefore only generate the required device
     function if the file has the correct extension.
 
@@ -229,10 +227,10 @@ subroutine ``estdt`` in ``compute_dt.F90``:
 Profiling with GPUs
 ===================
 
-NVIDIA's visual profile, ``nvprof`` is recommended when profiling for GPUs.
+NVIDIA's profiler, ``nvprof``, is recommended when profiling for GPUs.
 It returns data on how long each kernel launch lasted on the GPU,
 the number of threads and registers used, the occupancy of the GPU
-and recommendations for improving the code.  For more information on how to
+and provides recommendations for improving the code.  For more information on how to
 use ``nvprof``, see NVIDIA's User's Guide.
 
 If a quicker profiling method is preferred, AMReX's timers can be used
@@ -246,11 +244,11 @@ contained within. For example:
     BL_PROFILE_VAR("A_NAME", blp);     // Profiling start
     for (MFIter mfi(mf); mfi.isValid(); ++mfi)
     {
-        // gpu works
+        // code that runs on the GPU
     }
     BL_PROFILE_STOP(blp);              // Profiling stop
 
-For now, this is the best way to profile GPU codes using ``TINY_PROFILE = TRUE``.
+For now, this is the best way to profile GPU codes using the compiler flag ``TINY_PROFILE = TRUE``.
 If you require further profiling detail, use ``nvprof``.
 
 .. _sec:gpudebug:
@@ -273,7 +271,7 @@ Basic GPU Debugging
    nvprof ./Maestro2d.xxx
 
 - Run under ``nvprof -o profile%p.nvvp ./Maestro2d.xxx`` for
-  a small problem and examine page faults using nvvp
+  a small problem and examine page faults using NVIDIA's visual profiler, `nvvp`
 		  
 - Run under ``cuda-memcheck``
 

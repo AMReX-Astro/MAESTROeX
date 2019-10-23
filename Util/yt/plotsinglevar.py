@@ -12,6 +12,13 @@ plt.rcParams["mathtext.fontset"] = "stix"
 
 def plot_single_var(plotfile_name, outputfile_name, var_names, 
                     use_log, norm_axis, minimum, maximum):
+
+    if outputfile_name is None:
+        suffix = '_' + '_'.join(var_names) + '.png'
+        if plotfile_name[-1] == '/':
+            outputfile_name = plotfile_name[:-1] + suffix
+        else:
+            outputfile_name = plotfile_name + suffix
         
     # load data 
     ds = yt.load(plotfile_name)
@@ -70,7 +77,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--log', action='store_const', const=True, help="plot with a log scale")
-    parser.add_argument('-o', '--outfile', type=str, default="plot.png", help="name of output file")
+    parser.add_argument('-o', '--outfile', type=str, help="name of output file")
     parser.add_argument('plotfile', type=str, help="name of plotfile")
     parser.add_argument('variables', type=str, nargs='+', help="variable(s) to plot")
     parser.add_argument('-n', '--norm', type=str, default='z', help="Axis normal to the plot")
