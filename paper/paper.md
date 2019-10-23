@@ -41,12 +41,13 @@ bibliography: paper.bib
 ``MAESTROeX`` is a massively parallel, finite-volume C++/F90 solver for low Mach number
 astrophysical flows.  Our code utilizes a low Mach number equation set allowing for more
 efficient, long-time integration of highly subsonic flows compared to compressible approaches.
+The recommended range of applicability is for flows where the Mach number does not exceed ~0.1.
 
 In highly subsonic astrophysical phenomena, sound waves carry sufficiently
 little energy that they do not significantly affect the convective dynamics of the system.
 In many of these flows, modeling long-time convective dynamics are of interest, and numerical
 approaches based on compressible hydrodynamics are intractable, even on modern supercomputers.
-One approach to this problem is to use low Mach number models. In a low Mach number
+One approach to this problem is to use low Mach number models. In our
 approach, asymptotic model equations are employed that do not contain sound waves.
 Our customized low Mach number model retains
 compressibilitiy effects due to, e.g., nuclear energy release, large-scale atmospheric stratification,
@@ -55,6 +56,9 @@ When the Mach number (the ratio of the characteristic fluid
 velocity over the characteristic sound speed; `Ma = U/c`)
 is small, the resulting system can be numerically integrated with much larger time steps than a
 compressible model, i.e., at least a factor of `∼ 1/Ma` larger.
+Furthermore, MAESTROeX provides a significant advantage over anelastic approaches in that our model
+can robustly handle large perturbations in density and temperature.
+For a more detailed comparison to other astrophysical approaches to low Mach number flow, see [@maestroex].
 
 ``MAESTROeX`` is suitable for modeling full spherical stars as well as planar simulations
 of dynamics within localized regions of a star, and can robustly handle several orders of magnitude
@@ -67,10 +71,10 @@ Microphysics are provided by the Starkiller-Astro libraries [@starkiller].
 The code contains documentation through sphinx, a large suite of test problems, and
 nightly regression tests on a number of architectures.
 
-Since the series of papers on its predecessor ``MAESTRO`` have been published (see @maestro
+Since the series of papers on its predecessor ``MAESTRO`` have been published (see [@maestro]
 and references therein), numerous developments have been made to ``MAESTROeX`` to
 reduce algorithm complexity and improve parallel performance.
-The current numerical algorithm (@maestroex) couples modules for advection (corner transport upwind),
+The current numerical algorithm [@maestroex] couples modules for advection (corner transport upwind),
 reactions (VODE), thermal diffusion (linear solvers / multigrid),
 pressure-projection approaches (linear solvers / multigrid), and spatial mapping routines
 used to define and evolve a one-dimensional hydrostatic base state.
@@ -88,3 +92,5 @@ We also acknowledge contributors to the previous, pure F90 implementation of MAE
 John Bell (LBL), Chris Malone (LANL), and Michael Lijewski (LBL).
 
 # References
+
+{% bibliography --cited --file paper.bib  %}
