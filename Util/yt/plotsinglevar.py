@@ -3,7 +3,6 @@ This script produces a slice plot for a given plotfile and variable.
 """
 
 import yt 
-import numpy as np 
 import sys
 import argparse
 from mpl_toolkits.axes_grid1 import AxesGrid
@@ -54,9 +53,6 @@ def plot_single_var(plotfile_name, outputfile_name, var_names,
     # axes.
     for i, var in enumerate(var_names):
 
-        # # make the slice plot 
-        # fig = yt.SlicePlot(ds, norm_axis, var)
-
         p = plots.plots[var]
         p.figure = fig
         p.axes = grid[i].axes 
@@ -66,8 +62,6 @@ def plot_single_var(plotfile_name, outputfile_name, var_names,
         plots.set_log(var, use_log)
 
     plots._setup_plots()
-
-    # plt.tight_layout()
             
     fig.savefig(outputfile_name, bbox_inches='tight')
 
@@ -89,7 +83,5 @@ if __name__ == "__main__":
 
     if use_log is None:
         use_log = False
-
-    print(f"max = {args.maximum}")
 
     plot_single_var(args.plotfile, args.outfile, args.variables, use_log, args.norm, args.minimum, args.maximum)

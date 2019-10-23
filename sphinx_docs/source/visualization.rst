@@ -221,36 +221,19 @@ Visualizing with VisIt
 VisIt recognizes MAESTROeX plotfiles as being in the BoxLib format.
 
 
-.. _sec:vis:python:
+.. _sec:vis_yt:
 
-Python visualization scripts
-============================
+Visualizing with yt
+===================
 
-AmrPostprocessing/python provides some simple commandline
-tools for doing visualizations of AMReX plotfiles (note: a subset
-of these are distributed directly with AMReX in ``amrex/Tools/Py_util/``). The main drivers
-are written in python and use a set of Fortran routines, compiled with
-f2py to interface with the plotfile data. To use the routine,
-you will need to have matplotlib and f2py installed. On a
-machine running Fedora linux, you can install these packages via
+yt is a Python package for analyzing and visualizing simulation data,
+and understand that AMReX data from MAESTROeX and CASTRO (along
+with many other simulation codes). For more
+information, see the yt homepage at http://yt-project.org/ and
+:cite:`yt`.
 
-::
-
-    yum install python-matplotlib f2py
-
-The library required by the python routines can be built by typing
-``make`` in that directory. If successful, you should find
-a library ``fsnapshot.so``.
-
-The path to fsnapshot.so should be included in your ``PYTHONPATH``
-environment variable. This can be done by adding:
-
-::
-
-    export PYTHONPATH="${PYTHONPATH}:/path/to/fsnapshot/
-
-to your ``.bashrc``.
-
+Some sample scripts that use yt with MAESTROeX data are contained in
+``MAESTROeX/Util/yt/``.
 
 plotsinglevar.py
 ----------------
@@ -261,7 +244,7 @@ via:
 
 ::
 
-    plotsinglevar.py --log -o test.png plt00000/ tfromp
+    python plotsinglevar.py --log -o test.png plt00000/ tfromp
 
 This will make a plot of “tfromp” from the plotfile ``plt00000`` with log scaling,
 and store the output in ``test.png``, as showing the figure below.
@@ -279,51 +262,49 @@ will be plotted side-by-side in a single figure. For example,
 
 ::
 
-    plotsinglevar.py plt00000/ tfromp enucdot
+    python plotsinglevar.py plt00000/ tfromp Hnuc
 
 produces the output shown below:
 
-.. figure:: plt00000_tfromp_enucdot.png 
+.. figure:: plt00000_tfromp_Hnuc.png 
    :align: center
 
    Plot of reacting_bubble done with the python script
    ``plotsinglevar.py`` showing 2 variables plotted from a single
    plotfile.
 
-Additional options include ‘-m’ to specify the minimum data
-value, ‘-M’ to specify the maximum data value, and ‘–eps’
-to make an EPS plot instead of PNG. Running the script with no parameters
-will give the full list available options.
+Additional options include ‘-min’ to specify the minimum data
+value, and ‘-max’ to specify the maximum data value. Running the script with 
+the flag ``-h`` will list the available options.
 
-Limited 3-d support is available. When run as with a plotfile name
+3-d support is available. When run as with a plotfile name
 and variable, it will plot slices (:math:`x`-:math:`y`, :math:`x`-:math:`z`, and :math:`y`-:math:`z`)
-through the center of the domain. The option ‘–origin’
-will put the slices through the origin.
+through the center of the domain. 
 
 contourcompare.py
 -----------------
 
-contourcompare.py takes two or three plotfiles and a single variable as arguments
+``contourcompare.py`` takes two or three plotfiles and a single variable as arguments
 and plots contours of the datasets on the same set of axes. This is
-form comparisons of different runs. Running the script with no parameters
-will give the full list available options.
+facilitates comparisons of different runs. Running the script with the flag ``-h``
+will give the full list of available options.
 
 For example:
 
 ::
 
-    contourcompare.py tfromp plt00000 other_plt00000
+    python contourcompare.py tfromp plt00000 other_plt00000
 
-will make a contour plot of the variable tfromp from the data in
-plt00000 and other_plt00000 shown on the same axes.
+will make a contour plot of the variable ``tfromp`` from the data in
+``plt00000`` and ``other_plt00000`` shown on the same axes.
 
 runtimevis.py
 -------------
 
-The runtimevis.py script is designed to be run from a submission
+The ``runtimevis.py`` script is designed to be run from a submission
 script to produce plots from plotfiles as they are produced. 
 
-The script itself reads in an inputs file, vis.in, that
+The script itself reads in an inputs file, ``vis.in``, that
 describes the variables to plot. From 1 to 6 variables can be
 plotting from a plotfile. The script does its best to organize them
 in columns and rows to maximize the plot area. The image is always
@@ -337,24 +318,10 @@ For each variable, a block of the form:
     max = 2
     log = 1
 
-is supplied. If min or max are omitted, then the data
-limits are computed automatically. If log is omitted, then no
+is supplied. If ``min`` or ``max`` are omitted, then the data
+limits are computed automatically. If ``log`` is omitted, then no
 log is taken of the data before plotting. The script is then run as:
 
 ::
 
-    runtimevis.py plt00000
-
-.. _sec:vis_yt:
-
-Visualizing with yt
-===================
-
-yt is a Python package for analyzing and visualizing simulation data,
-and understand that AMReX data from MAESTROeX and CASTRO (along
-with many other simulation codes). For more
-information, see the yt homepage at http://yt-project.org/ and
-:cite:`yt`.
-
-Some sample scripts that use yt with MAESTROeX data are contained in
-``MAESTROeX/Util/yt/``.
+    python runtimevis.py plt00000
