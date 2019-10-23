@@ -25,7 +25,9 @@ contains
        p0_cart, p_lo, p_hi, &
        gamma1bar_cart, g_lo, g_hi) bind (C,name="estdt")
 
-    use amrex_fort_module, only: amrex_min, amrex_max
+    use amrex_constants_module, only: HALF
+    use amrex_fort_module, only: amrex_min ! function
+    use amrex_fort_module, only: amrex_max ! function
 
     integer  , value, intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
@@ -75,10 +77,10 @@ contains
           do i = lo(1), hi(1)
              spdx = max(spdx ,abs(u(i,j,k,1)))
 #if (AMREX_SPACEDIM == 2)
-             spdy = max(spdy ,abs(u(i,j,k,2)+0.5d0*(w0_cart(i,j,k,AMREX_SPACEDIM)+w0_cart(i,j+1,k,AMREX_SPACEDIM))))
+             spdy = max(spdy ,abs(u(i,j,k,2)+HALF*(w0_cart(i,j,k,AMREX_SPACEDIM)+w0_cart(i,j+1,k,AMREX_SPACEDIM))))
 #elif (AMREX_SPACEDIM == 3)
              spdy = max(spdy ,abs(u(i,j,k,2)))
-             spdz = max(spdz ,abs(u(i,j,k,3)+0.5d0*(w0_cart(i,j,k,AMREX_SPACEDIM)+w0_cart(i,j,k+1,AMREX_SPACEDIM))))
+             spdz = max(spdz ,abs(u(i,j,k,3)+HALF*(w0_cart(i,j,k,AMREX_SPACEDIM)+w0_cart(i,j,k+1,AMREX_SPACEDIM))))
 #endif
           enddo
        enddo
@@ -144,7 +146,7 @@ contains
             else if (k .eq. nr(lev)-1) then
                 gradp0 = (p0_cart(i,j,k) - p0_cart(i,j,k-1))/dx(3)
             else
-                gradp0 = 0.5d0*(p0_cart(i,j,k+1) - p0_cart(i,j,k-1))/dx(3)
+                gradp0 = HALF*(p0_cart(i,j,k+1) - p0_cart(i,j,k-1))/dx(3)
             endif
 #else
             if (j .eq. 0) then
@@ -152,7 +154,7 @@ contains
             else if (j .eq. nr(lev)-1) then
                 gradp0 = (p0_cart(i,j,k) - p0_cart(i,j-1,k))/dx(2)
             else
-                gradp0 = 0.5d0*(p0_cart(i,j+1,k) - p0_cart(i,j-1,k))/dx(2)
+                gradp0 = HALF*(p0_cart(i,j+1,k) - p0_cart(i,j-1,k))/dx(2)
             endif
 #endif
 
@@ -179,7 +181,7 @@ contains
              ! which has solution dt = 2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c))
              !
              if (dSdt(i,j,k) .gt. 1.d-20) then
-                a = 0.5d0*scal(i,j,k,rho_comp)*dSdt(i,j,k)
+                a = HALF*scal(i,j,k,rho_comp)*dSdt(i,j,k)
                 b = scal(i,j,k,rho_comp)*divU(i,j,k)
                 c = rho_min - scal(i,j,k,rho_comp)
                 dt_temp = min(dt_temp,0.4d0*2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c)))
@@ -206,7 +208,8 @@ contains
        w0macz, z_lo, z_hi, &
        gp0_cart, g_lo, g_hi) bind (C,name="estdt_sphr")
 
-    use amrex_fort_module, only: amrex_min, amrex_max
+    use amrex_fort_module, only: amrex_min ! function
+    use amrex_fort_module, only: amrex_max ! function
 
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -378,7 +381,8 @@ contains
        p0_cart, p_lo, p_hi, &
        gamma1bar_cart, g_lo, g_hi) bind (C,name="firstdt")
 
-    use amrex_fort_module, only: amrex_min, amrex_max
+    use amrex_fort_module, only: amrex_min ! function
+    use amrex_fort_module, only: amrex_max ! function
 
     integer, value  , intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
@@ -551,7 +555,8 @@ contains
        divu,  d_lo, d_hi, &
        gp0_cart, g_lo, g_hi) bind (C,name="firstdt_sphr")
 
-    use amrex_fort_module, only: amrex_min, amrex_max
+    use amrex_fort_module, only: amrex_min ! function
+    use amrex_fort_module, only: amrex_max ! function
 
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
