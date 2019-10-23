@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gpu.html">GPU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
@@ -249,10 +250,10 @@ not support an <em>else-if</em> clause.</p>
 <li><p><em>How do we turn off all the initial projections to look at the
 initial velocity field as specified in initdata, instead of as
 modified by the velocity constraint?</em></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">max_step</span>  <span class="o">=</span> <span class="mi">1</span>
-<span class="n">init_iter</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">init_divu_iter</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">do_initial_projection</span> <span class="o">=</span> <span class="n">false</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">maestro</span><span class="o">.</span><span class="n">max_step</span>  <span class="o">=</span> <span class="mi">1</span>
+<span class="n">maestro</span><span class="o">.</span><span class="n">init_iter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">maestro</span><span class="o">.</span><span class="n">init_divu_iter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">maestro</span><span class="o">.</span><span class="n">do_initial_projection</span> <span class="o">=</span> <span class="n">false</span>
 </pre></div>
 </div>
 </li>
