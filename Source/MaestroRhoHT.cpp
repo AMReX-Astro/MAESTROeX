@@ -374,18 +374,22 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         rho0_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         rhoh0_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         tempbar_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+	rho0_edge_cart[lev].setVal(0.);
+	rhoh0_edge_cart[lev].setVal(0.);
+	tempbar_edge_cart[lev].setVal(0.);
     }
 
     if (spherical == 0) {
-        Put1dArrayOnCart(rho0_edge,rho0_edge_cart,0,0,bcs_s,Rho);
-        Put1dArrayOnCart(rhoh0_edge,rhoh0_edge_cart,0,0,bcs_s,RhoH);
-        Put1dArrayOnCart(tempbar_edge,tempbar_edge_cart,0,0,bcs_s,Temp);
+        Put1dArrayOnCart(rho0_edge,rho0_edge_cart,1,0,bcs_s,Rho);
+        Put1dArrayOnCart(rhoh0_edge,rhoh0_edge_cart,1,0,bcs_s,RhoH);
+        Put1dArrayOnCart(tempbar_edge,tempbar_edge_cart,1,0,bcs_s,Temp);
     }
 
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
+	const MultiFab& scal_mf = sold[lev];
         MultiFab& sedgex_mf = sedge[lev][0];
         MultiFab& sedgey_mf = sedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
@@ -402,7 +406,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(rho0_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

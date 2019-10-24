@@ -215,7 +215,7 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
             // lo-side BCs
             if (bcs[bccomp].lo(idim) == BCType::foextrap) {
                 // outflow
-                mlmg_lobc[idim] = LinOpBCType::Dirichlet;
+                mlmg_lobc[idim] = LinOpBCType::Neumann;
             } else if (bcs[bccomp].lo(idim) == BCType::ext_dir) {
                 // inflow
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
@@ -226,7 +226,7 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
             // hi-side BCs
             if (bcs[bccomp].hi(idim) == BCType::foextrap) {
                 // outflow
-                mlmg_hibc[idim] = LinOpBCType::Dirichlet;
+                mlmg_hibc[idim] = LinOpBCType::Neumann;
             } else if (bcs[bccomp].hi(idim) == BCType::ext_dir) {
                 // inflow
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
@@ -432,7 +432,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
         else {
             // lo-side BCs
             if (bcs_s[RhoH].lo(idim) == BCType::foextrap) {
-                mlmg_lobc[idim] = LinOpBCType::Dirichlet;
+                mlmg_lobc[idim] = LinOpBCType::Neumann;
             } else if (bcs_s[RhoH].lo(idim) == BCType::ext_dir) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
             } else {
@@ -441,7 +441,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 
             // hi-side BCs
             if (bcs_s[RhoH].hi(idim) == BCType::foextrap) {
-                mlmg_hibc[idim] = LinOpBCType::Dirichlet;
+                mlmg_hibc[idim] = LinOpBCType::Neumann;
             } else if (bcs_s[RhoH].hi(idim) == BCType::ext_dir) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
             } else {
