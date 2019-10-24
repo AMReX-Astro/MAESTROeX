@@ -418,7 +418,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
              enthalpy_pred_type == predict_T_then_h ||
              enthalpy_pred_type == predict_Tprime_then_h) {
         // make force for temperature
-        Abort("MaestroEnthalpyAdvance does not support enthalpy_pred_type == predict_T*");
+        MakeTempForce(scal_force, scalold, thermal, umac);
     }
 
     // source terms for X and for tracers include reaction forcing terms
@@ -458,7 +458,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     if (enthalpy_pred_type == predict_Tprime_then_h) {
         // convert T -> T'
-        Abort("MaestroEnthalpyAdvance predict_Tprime_then_h");
+        PutInPertForm(scalold, tempbar, Temp, 0, bcs_f, true);
     }
 
     // predict either T, h, or (rho h)' at the edges
@@ -493,7 +493,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     if (enthalpy_pred_type == predict_Tprime_then_h) {
         // convert T' -> T
-        Abort("MaestroEnthalpyAdvance predict_Tprime_then_h");
+        PutInPertForm(scalold, tempbar, Temp, Temp, bcs_s, false);
     }
 
     if (enthalpy_pred_type == predict_h ||
@@ -507,7 +507,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     if ( (enthalpy_pred_type == predict_T_then_rhohprime) ||
          (enthalpy_pred_type == predict_T_then_h        ) ||
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
-        Abort("MaestroEnthalpyAdvance need makeHfromRhoT_edge");
+	HfromRhoTedge(sedge,rho0_edge_old,rhoh0_edge_old,rho0_edge_new,rhoh0_edge_new);
     }
 
     //////////////////////////////////
