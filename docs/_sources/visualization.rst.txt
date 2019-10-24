@@ -184,15 +184,9 @@ Visualizing with Amrvis
 =======================
 
 | Amrvis is a tool developed together with AMReX to visualize datasets
-  from codes built around the AMReX library. You can download the
-  Amrvis source from:
-| https://ccse.lbl.gov/Downloads/downloadAmrvis.html
-| Amrvis exists in the C++ AMReX framework, so the build system is
-  slightly different. A different executable is needed for 2- vs. 3-d
-  datasets. Edit the GNUmakefile and set the compilers (probably
-  g++ and gfortran) and the dimensionality, and turn off any
-  of the volume rendering options. You will need to have the Motif library
-  installed on your system (or a replacement, such as lesstif.
+  from codes built around the AMReX library. To 
+  download and build Amrvis, follow the instructions in the AMReX 
+  documentation: https://amrex-codes.github.io/amrex/docs_html/Visualization.html
 
 Once the code is built, you visualize a dataset as:
 

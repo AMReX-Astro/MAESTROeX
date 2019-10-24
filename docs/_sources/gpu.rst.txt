@@ -21,7 +21,7 @@ must have compute capability of >= 6.
 Building GPU Support
 ====================
 
-To build MAESTROeX_with GPU support, add the following arguments
+To build MAESTROeX with GPU support, add the following argument
 to the GNUmakefile:
 
 ::

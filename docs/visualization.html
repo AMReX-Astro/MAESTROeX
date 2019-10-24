@@ -518,15 +518,9 @@ parameter names to be included in the plot file.</p>
 <h2>Visualizing with Amrvis<a class="headerlink" href="#visualizing-with-amrvis" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line">Amrvis is a tool developed together with AMReX to visualize datasets
-from codes built around the AMReX library. You can download the
-Amrvis source from:</div>
-<div class="line"><a class="reference external" href="https://ccse.lbl.gov/Downloads/downloadAmrvis.html">https://ccse.lbl.gov/Downloads/downloadAmrvis.html</a></div>
-<div class="line">Amrvis exists in the C++ AMReX framework, so the build system is
-slightly different. A different executable is needed for 2- vs. 3-d
-datasets. Edit the GNUmakefile and set the compilers (probably
-g++ and gfortran) and the dimensionality, and turn off any
-of the volume rendering options. You will need to have the Motif library
-installed on your system (or a replacement, such as lesstif.</div>
+from codes built around the AMReX library. To
+download and build Amrvis, follow the instructions in the AMReX
+documentation: <a class="reference external" href="https://amrex-codes.github.io/amrex/docs_html/Visualization.html">https://amrex-codes.github.io/amrex/docs_html/Visualization.html</a></div>
 </div>
 <p>Once the code is built, you visualize a dataset as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">amrvis3d</span><span class="o">.</span><span class="n">Linux</span><span class="o">.</span><span class="n">g</span><span class="o">++.</span><span class="n">gfortran</span><span class="o">.</span><span class="n">ex</span> <span class="n">pltfile</span>
