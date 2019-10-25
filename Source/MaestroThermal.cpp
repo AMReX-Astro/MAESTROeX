@@ -517,12 +517,9 @@ Maestro::ThermalConductSDC (int which_step,
 
     // Dummy coefficient matrix, holds all zeros
     Vector<MultiFab> Dcoeff(finest_level+1);
-    Vector<MultiFab> Dcoeff2(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         Dcoeff[lev].define(grids[lev], dmap[lev], 1, 1);
         Dcoeff[lev].setVal(0.);
-	Dcoeff2[lev].define(grids[lev], dmap[lev], NumSpec, 1);
-	Dcoeff2[lev].setVal(0.);
     }
 
     // solverrhs will hold solver RHS = (rho h)^hat
@@ -559,11 +556,11 @@ Maestro::ThermalConductSDC (int which_step,
     // corrector
     else if (which_step == 2) {
 	// compute resid = div(hcoeff2 grad h2)
-	MakeExplicitThermal(resid,s_new,Dcoeff,hcoeff2,Dcoeff2,Dcoeff,p0_new,2);
+	MakeExplicitThermalHterm(resid,s_new,hcoeff2);
 
 	// RHS = solverrhs + dt/2 * resid
 	for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Saxpy(solverrhs[lev],dt/2.0,resid[lev],0,0,1,0);
+	    MultiFab::Saxpy(solverrhs[lev],-dt/2.0,resid[lev],0,0,1,0);
 	}
 	
 	// compute resid = - sum_k div(Xkcoeff2 grad Xk^hat) - div(pcoeff2 grad p0_new)
