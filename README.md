@@ -4,7 +4,6 @@
 
 ![MAESTROeX](https://github.com/AMReX-Astro/MAESTROeX/blob/development/Util/logo/maestroex_200px.png)
 
-# MAESTROeX
 *a C++/F90 low Mach number stellar hydrodynamics code*
 
 MAESTROeX solves the equations of low Mach number hydrodynamics for
