@@ -147,6 +147,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	intra_rhoh0 [lev].define(grids[lev], dmap[lev],       1,    0);
 	delta_gamma1_term[lev].define(grids[lev], dmap[lev],  1,    0);
 	delta_gamma1[lev].define(grids[lev], dmap[lev],       1,    0);
+        peos_old    [lev].define(grids[lev], dmap[lev],       1,    0);
         peosbar_cart[lev].define(grids[lev], dmap[lev],       1,    0);
 	p0_cart     [lev].define(grids[lev], dmap[lev],       1,    0);
 	delta_p_term[lev].define(grids[lev], dmap[lev],       1,    0);
