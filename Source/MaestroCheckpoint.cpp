@@ -233,22 +233,10 @@ Maestro::ReadCheckPoint ()
 
             // build MultiFab data
             sold              [lev].define(ba, dm,          Nscal, ng_s);
-            snew              [lev].define(ba, dm,          Nscal, ng_s);
             uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
-            unew              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
             S_cc_old          [lev].define(ba, dm,              1,    0);
-            S_cc_new          [lev].define(ba, dm,              1,    0);
             gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
             dSdt              [lev].define(ba, dm,              1,    0);
-            w0_cart           [lev].define(ba, dm, AMREX_SPACEDIM,    1);
-            rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
-
-            pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
-
-            if (spherical == 1) {
-                normal[lev].define(ba, dm, 1, 1);
-                cell_cc_to_r[lev].define(ba, dm, 1, 0);
-            }
 
             // build FluxRegister data
             if (lev > 0 && reflux_type == 2) {

@@ -67,8 +67,13 @@ Maestro::Init ()
                 cell_cc_to_r[lev].define(grids[lev], dmap[lev], 1, 0);
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
-
         }
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            w0_cart[lev].setVal(0.);
+        }
+        // put w0 on Cartesian cell-centers
+        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
     }
 
     // set finest_radial_level in fortran
