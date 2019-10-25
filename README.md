@@ -2,6 +2,8 @@
 
 [![AMReX](https://amrex-codes.github.io/badges/powered%20by-AMReX-red.svg)](https://amrex-codes.github.io)
 
+![MAESTROeX](https://github.com/AMReX-Astro/MAESTROeX/blob/development/Util/logo/maestroex_200px.png)
+
 # MAESTROeX
 *a C++/F90 low Mach number stellar hydrodynamics code*
 
