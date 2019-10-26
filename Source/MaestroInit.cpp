@@ -60,7 +60,7 @@ Maestro::Init ()
             snew              [lev].define(grids[lev], dmap[lev],          Nscal, ng_s);
             unew              [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
             S_cc_new          [lev].define(grids[lev], dmap[lev],              1,    0);
-            w0_cart           [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM,    1);
+            w0_cart           [lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM,    2);
             rhcc_for_nodalproj[lev].define(grids[lev], dmap[lev],              1,    1);
             if (spherical == 1) {
                 normal[lev].define(grids[lev], dmap[lev], 3, 1);
@@ -327,7 +327,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     S_cc_new          [lev].define(ba, dm,              1,    0);
     gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
     dSdt              [lev].define(ba, dm,              1,    0);
-    w0_cart           [lev].define(ba, dm, AMREX_SPACEDIM,    1);
+    w0_cart           [lev].define(ba, dm, AMREX_SPACEDIM,    2);
     rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 
     pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
