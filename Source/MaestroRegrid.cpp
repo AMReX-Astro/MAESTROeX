@@ -82,6 +82,12 @@ Maestro::Regrid ()
     	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
     	}
     }
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_cart[lev].setVal(0.);
+    }
+    // put w0 on Cartesian cell-centers
+    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
 
     if (evolve_base_state) {
         // force rho0 to be the average of rho
@@ -382,7 +388,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     S_cc_new[lev].define          (ba, dm,              1, 0);
     gpi[lev].define               (ba, dm, AMREX_SPACEDIM, 0);
     dSdt[lev].define              (ba, dm,              1, 0);
-    w0_cart[lev].define           (ba, dm, AMREX_SPACEDIM, 1);
+    w0_cart[lev].define           (ba, dm, AMREX_SPACEDIM, 2);
     rhcc_for_nodalproj[lev].define(ba, dm,              1, 1);
 
     pi[lev].define(convert(ba,nodal_flag), dm, 1, 0);     // nodal
