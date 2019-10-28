@@ -11,7 +11,7 @@ Maestro::FirstDt ()
 
 	dt = 1.e20;
 
-    if (fixed_dt != -1.0) {
+	if (fixed_dt != -1.0) {
 		// fixed dt
 		dt = fixed_dt;
 		if (maestro_verbose > 0) {
@@ -25,6 +25,16 @@ Maestro::FirstDt ()
 	for (int lev=0; lev<=finest_level; ++lev)
 		vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
 
+	Vector<MultiFab> p0_cart(finest_level+1);
+	Vector<MultiFab> gamma1bar_cart(finest_level+1);
+	for (int lev=0; lev<=finest_level; ++lev) {
+	        p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+		gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+	}
+
+	Put1dArrayOnCart(p0_old,p0_cart,0,0,bcs_f,0);
+	Put1dArrayOnCart(gamma1bar_old,gamma1bar_cart,0,0,bcs_f,0);
+
 	for (int lev = 0; lev <= finest_level; ++lev) {
 		Real dt_lev = 1.e99;
 		Real umax_lev = 0.;
@@ -34,6 +44,8 @@ Maestro::FirstDt ()
 		MultiFab& sold_mf = sold[lev];
 		MultiFab& vel_force_mf = vel_force[lev];
 		MultiFab& S_cc_old_mf = S_cc_old[lev];
+		const MultiFab& p0_mf = p0_cart[lev];
+		const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
 		const MultiFab& cc_to_r = cell_cc_to_r[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -55,15 +67,15 @@ Maestro::FirstDt ()
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
 
-			firstdt(&lev,&dt_grid,&umax_grid,
+			firstdt(lev,&dt_grid,&umax_grid,
 			        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 			        ZFILL(dx),
 			        BL_TO_FORTRAN_FAB(sold_mf[mfi]),
 			        BL_TO_FORTRAN_FAB(uold_mf[mfi]),
 			        BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
 			        BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-			        p0_old.dataPtr(),
-			        gamma1bar_old.dataPtr());
+				BL_TO_FORTRAN_3D(p0_mf[mfi]),
+				BL_TO_FORTRAN_3D(gamma1bar_mf[mfi]));
 
 			dt_lev = std::min(dt_lev,dt_grid);
 		}

@@ -471,7 +471,8 @@ contains
              end do
           end do
 
-       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+       else if (enthalpy_pred_type.eq.predict_rhohprime .or. &
+        enthalpy_pred_type.eq.predict_T_then_rhohprime) then
           ! enthalpy edge state is (rho h)'
           do k=lo(3),hi(3)
              do j=lo(2),hi(2)
@@ -536,7 +537,8 @@ contains
              end do
           end do
 
-       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+       else if (enthalpy_pred_type.eq.predict_rhohprime .or. &
+        enthalpy_pred_type.eq.predict_T_then_rhohprime) then
           ! enthalpy edge state is (rho h)'
           do k=lo(3),hi(3)
              do j=lo(2),hi(2)
@@ -657,7 +659,8 @@ contains
              end do
           end do
 
-       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+       else if (enthalpy_pred_type.eq.predict_rhohprime .or. &
+        enthalpy_pred_type.eq.predict_T_then_rhohprime) then
           ! enthalpy edge state is (rho h)'
 
           do k=lo(3),hi(3)
@@ -726,7 +729,8 @@ contains
              end do
           end do
 
-       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+       else if (enthalpy_pred_type.eq.predict_rhohprime .or. &
+        enthalpy_pred_type.eq.predict_T_then_rhohprime) then
           ! enthalpy edge state is (rho h)'
 
           do k=lo(3),hi(3)
@@ -796,7 +800,8 @@ contains
              end do
           end do
 
-       else if (enthalpy_pred_type.eq.predict_rhohprime) then
+       else if (enthalpy_pred_type.eq.predict_rhohprime .or. &
+        enthalpy_pred_type.eq.predict_T_then_rhohprime) then
           ! enthalpy edge state is (rho h)'
 
           do k=lo(3),hi(3)

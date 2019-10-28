@@ -810,6 +810,19 @@ extern "C"
                      const amrex::Real* psi_cart, const int* ps_lo, const int* ps_hi,
                      const amrex::Real* dx, const int* domhi,
                      const int is_prediction, const int add_thermal);
+    
+    void mktempforce(const int* lo, const int* hi, const int lev,
+                     amrex::Real* temp_force, const int* f_lo, const int* f_hi,
+                     const amrex::Real* scal, const int* s_lo, const int* s_hi,
+                     const amrex::Real* umac,  const int* u_lo, const int* u_hi,
+                     const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
+#if (AMREX_SPACEDIM == 3)
+                     const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
+#endif
+                     const amrex::Real* thermal, const int* t_lo, const int* t_hi,
+                     const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
+                     const amrex::Real* psi_cart, const int* ps_lo, const int* ps_hi,
+                     const amrex::Real* dx, const int* domhi);
     //////////////////////
 
     //////////////////////
@@ -936,6 +949,27 @@ extern "C"
                          const amrex::Real* state, const int* s_lo, const int* s_hi,
                          const amrex::Real* p0cart, const int* p_lo, const int* p_hi,
                          amrex::Real* cs, const int* c_lo, const int* c_hi);
+    
+    void makeHfromRhoT_edge (const int* lo, const int* hi,
+			     amrex::Real* sedgex, const int* x_lo, const int* x_hi,
+			     amrex::Real* sedgey, const int* y_lo, const int* y_hi,
+#if (AMREX_SPACEDIM == 3)
+			     amrex::Real* sedgez, const int* z_lo, const int* z_hi,
+#endif
+			     const amrex::Real* rho0, const int* r_lo, const int* r_hi,
+			     const amrex::Real* rhoh0, const int* rh_lo, const int* rh_hi,
+			     const amrex::Real* temp0, const int* t_lo, const int* t_hi,
+			     const amrex::Real* rho0_edge, const int* re_lo, const int* re_hi,
+			     const amrex::Real* rhoh0_edge, const int* rhe_lo, const int* rhe_hi,
+			     const amrex::Real* temp0_edge, const int* te_lo, const int* te_hi);
+    
+    void makeHfromRhoT_edge_sphr (const int* lo, const int* hi,
+				  amrex::Real* sedgex, const int* x_lo, const int* x_hi,
+				  amrex::Real* sedgey, const int* y_lo, const int* y_hi,
+				  amrex::Real* sedgez, const int* z_lo, const int* z_hi,
+				  const amrex::Real* rho0_edge, const int* r_lo, const int* r_hi,
+				  const amrex::Real* rhoh0_edge, const int* rh_lo, const int* rh_hi,
+				  const amrex::Real* temp0_edge, const int* t_lo, const int* t_hi);
     //////////////////////
 
     //////////////////////
