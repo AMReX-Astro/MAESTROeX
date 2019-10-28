@@ -2,7 +2,8 @@
 
 [![AMReX](https://amrex-codes.github.io/badges/powered%20by-AMReX-red.svg)](https://amrex-codes.github.io)
 
-# MAESTROeX
+![MAESTROeX](https://github.com/AMReX-Astro/MAESTROeX/blob/development/Util/logo/maestroex_200px.png)
+
 *a C++/F90 low Mach number stellar hydrodynamics code*
 
 MAESTROeX solves the equations of low Mach number hydrodynamics for
@@ -17,6 +18,8 @@ http://amrex-astro.github.io/MAESTROeX/
 
 
 ## Getting started
+
+- MAESTROeX requires a C++ compiler that supports the C++11 standard, a Fortran compiler that supports the Fortran 2003 standard, and a C compiler that supports the C99 standard. Several compiler suites are supported, including GNU, Intel, PGI and Cray. GNU Make is also required, as is Python (>= 2.7, including 3) and standard tools available in any Unix-like environments (e.g., Perl and `sed`).
 
 - To stay up-to-date with MAESTROeX, you will want to periodically pull changes
 from the repository by typing `git pull`.
@@ -151,3 +154,7 @@ status as a core developer.
 Join the mailing list to ask for help or stay up-to-date:
 
 https://groups.google.com/forum/#!forum/maestro-help
+
+For answers to frequently asked questions and solutions to common problems, consult the [FAQ section](https://amrex-astro.github.io/MAESTROeX/docs/faq.html) of the User's Guide. 
+
+If you discover any bugs in the code or would like to request further help, then please submit a issue to the MAESTROeX Github repository describing your problem.

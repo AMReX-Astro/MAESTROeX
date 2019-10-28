@@ -339,7 +339,8 @@ YY-MM. We do this on all the other repos in the AMReX-ecosystem,
 including amrex/, Microphysics/, and Castro/.
 
 If you want to contribute to MAESTROeX’s development, issue a pull-request
-through github onto the development branch.
+through GitHub from your fork of MAESTROeX and target the development
+branch. (If you mistakenly target master, we can change it for you.)
 
 Parallel Jobs
 =============

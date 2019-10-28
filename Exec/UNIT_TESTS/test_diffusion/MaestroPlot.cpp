@@ -16,7 +16,8 @@ Maestro::WritePlotFile (const int step,
                         const Vector<Real>& d,
                         const Vector<MultiFab>& state,
                         Vector<MultiFab>& analytic,
-                        const Vector<MultiFab>& err)
+                        const Vector<MultiFab>& err,
+			const bool is_small)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
@@ -24,7 +25,8 @@ Maestro::WritePlotFile (const int step,
 	// wallclock time
 	const Real strt_total = ParallelDescriptor::second();
 
-	std::string plotfilename = PlotFileName(step);
+	std::string plotfilename = plot_base_name;
+	PlotFileName(step, &plotfilename);
 
 	int nPlot = 0;
 	const auto& varnames = PlotFileVarNames(&nPlot);
@@ -64,10 +66,10 @@ Maestro::WritePlotFile (const int step,
 
 
 // get plotfile name
-std::string
-Maestro::PlotFileName (int lev) const
+void
+Maestro::PlotFileName (const int lev, std::string* plotfilename)
 {
-	return Concatenate(plot_base_name, lev, 7);
+	*plotfilename = Concatenate(*plotfilename, lev, 7);
 }
 
 // put together a vector of multifabs for writing
@@ -431,4 +433,70 @@ Maestro::WriteJobInfo (const std::string& dir) const
 			jobinfo_file_name[i] = FullPathJobInfoFile[i];
 
 	}
+}
+
+
+void
+Maestro::WriteBuildInfo ()
+{
+    std::string PrettyLine = std::string(78, '=') + "\n";
+    std::string OtherLine = std::string(78, '-') + "\n";
+    std::string SkipSpace = std::string(8, ' ');
+
+    // build information
+    std::cout << PrettyLine;
+    std::cout << " MAESTROeX Build Information\n";
+    std::cout << PrettyLine;
+
+    std::cout << "build date:    " << buildInfoGetBuildDate() << "\n";
+    std::cout << "build machine: " << buildInfoGetBuildMachine() << "\n";
+    std::cout << "build dir:     " << buildInfoGetBuildDir() << "\n";
+    std::cout << "AMReX dir:     " << buildInfoGetAMReXDir() << "\n";
+
+    std::cout << "\n";
+
+    std::cout << "COMP:          " << buildInfoGetComp() << "\n";
+    std::cout << "COMP version:  " << buildInfoGetCompVersion() << "\n";
+
+    std::cout << "\n";
+
+    std::cout << "C++ compiler:  " << buildInfoGetCXXName() << "\n";
+    std::cout << "C++ flags:     " << buildInfoGetCXXFlags() << "\n";
+
+    std::cout << "\n";
+
+    std::cout << "Fortran comp:  " << buildInfoGetFName() << "\n";
+    std::cout << "Fortran flags: " << buildInfoGetFFlags() << "\n";
+
+    std::cout << "\n";
+
+    std::cout << "Link flags:    " << buildInfoGetLinkFlags() << "\n";
+    std::cout << "Libraries:     " << buildInfoGetLibraries() << "\n";
+
+    std::cout << "\n";
+
+    for (int n = 1; n <= buildInfoGetNumModules(); n++) {
+        std::cout << buildInfoGetModuleName(n) << ": " << buildInfoGetModuleVal(n) << "\n";
+    }
+
+    const char* githash1 = buildInfoGetGitHash(1);
+    const char* githash2 = buildInfoGetGitHash(2);
+    const char* githash3 = buildInfoGetGitHash(3);
+    if (strlen(githash1) > 0) {
+        std::cout << "MAESTROeX git describe: " << githash1 << "\n";
+    }
+    if (strlen(githash2) > 0) {
+        std::cout << "AMReX git describe: " << githash2 << "\n";
+    }
+    if (strlen(githash3) > 0) {
+        std::cout << "Microphysics git describe: " << githash3 << "\n";
+    }
+
+    const char* buildgithash = buildInfoGetBuildGitHash();
+    const char* buildgitname = buildInfoGetBuildGitName();
+    if (strlen(buildgithash) > 0) {
+        std::cout << buildgitname << " git describe: " << buildgithash << "\n";
+    }
+
+    std::cout << "\n\n";
 }
