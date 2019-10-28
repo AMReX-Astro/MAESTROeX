@@ -950,23 +950,17 @@ extern "C"
                          const amrex::Real* p0cart, const int* p_lo, const int* p_hi,
                          amrex::Real* cs, const int* c_lo, const int* c_hi);
     
-    void makeHfromRhoT_edge (const int* lo, const int* hi,
-			     amrex::Real* sedgex, const int* x_lo, const int* x_hi,
-			     amrex::Real* sedgey, const int* y_lo, const int* y_hi,
-#if (AMREX_SPACEDIM == 3)
-			     amrex::Real* sedgez, const int* z_lo, const int* z_hi,
-#endif
-			     const amrex::Real* rho0, const int* r_lo, const int* r_hi,
+    void makeHfromRhoT_edge (const int* lo, const int* hi, const int idir,
+			     amrex::Real* sedge, const int* x_lo, const int* x_hi,    const amrex::Real* rho0, const int* r_lo, const int* r_hi,
 			     const amrex::Real* rhoh0, const int* rh_lo, const int* rh_hi,
 			     const amrex::Real* temp0, const int* t_lo, const int* t_hi,
 			     const amrex::Real* rho0_edge, const int* re_lo, const int* re_hi,
 			     const amrex::Real* rhoh0_edge, const int* rhe_lo, const int* rhe_hi,
 			     const amrex::Real* temp0_edge, const int* te_lo, const int* te_hi);
     
-    void makeHfromRhoT_edge_sphr (const int* lo, const int* hi,
-				  amrex::Real* sedgex, const int* x_lo, const int* x_hi,
-				  amrex::Real* sedgey, const int* y_lo, const int* y_hi,
-				  amrex::Real* sedgez, const int* z_lo, const int* z_hi,
+    void makeHfromRhoT_edge_sphr (const int* lo, const int* hi, 
+                  const int idir,
+				  amrex::Real* sedge, const int* x_lo, const int* x_hi,
 				  const amrex::Real* rho0_edge, const int* r_lo, const int* r_hi,
 				  const amrex::Real* rhoh0_edge, const int* rh_lo, const int* rh_hi,
 				  const amrex::Real* temp0_edge, const int* t_lo, const int* t_hi);
