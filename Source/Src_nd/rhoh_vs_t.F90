@@ -478,7 +478,7 @@ contains
                     else if (species_pred_type .eq. predict_rhoX) then
 
                         ! interface states are rho and (rho X)
-                        eos_state%rho = sedgey(i,j,k,rho_comp)
+                        eos_state%rho = sedge(i,j,k,rho_comp)
 
                         eos_state%xn(:) = sedge(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
