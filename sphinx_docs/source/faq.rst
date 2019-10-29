@@ -51,10 +51,10 @@ Running
 
    ::
 
-           max_step  = 1
-           init_iter = 0
-           init_divu_iter = 0
-           do_initial_projection = false
+           maestro.max_step  = 1
+           maestro.init_iter = 0
+           maestro.init_divu_iter = 0
+           maestro.do_initial_projection = false
 
 #. *MAESTROeX crashes because the multigrid algorithm fails to
    converge—how do I get around this?*

@@ -192,18 +192,31 @@ contains
     if (lo(3) < klo) then
        kmin = lo(3)
        kmax = klo-1
-
+       
        if (bc(3,1) .eq. amrex_bc_ext_dir) then
 
-          do k = kmin, kmax
-             do j = lo(2), hi(2)
-                do i = lo(1), hi(1)
-                   q(i,j,k) = ONE
-                end do
-             end do
-          end do
-
+          ! we only want to apply the BCs where the z-velocity is non-zero
+          if (INLET_VEL .ne. 0.0d0) then
+             ! rho
+             if (icomp .eq. rho_comp) then
+                q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = INLET_RHO
+                ! rhoh
+             else if (icomp .eq. rhoh_comp) then
+                q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = INLET_RHOH
+                ! species
+             else if (icomp >= spec_comp .and. icomp < spec_comp+nspec) then
+                q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = INLET_RHOX(icomp-spec_comp+1)
+                ! temperature
+             else if (icomp .eq. temp_comp) then
+                q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = INLET_TEMP
+             else
+                q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = ZERO
+             endif
+          else
+             q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = ZERO
+          endif
        end if
+
     end if
 
     if (hi(3) > khi) then
@@ -348,13 +361,15 @@ contains
        kmax = klo-1
 
        if (bc(3,1) .eq. amrex_bc_ext_dir) then
-          do k = kmin, kmax
-             do j = lo(2), hi(2)
-                do i = lo(1), hi(1)
-                   q(i,j,k) = ONE
-                end do
-             end do
-          end do
+          
+          ! xvel
+          if (icomp .eq. 1) q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = ZERO
+          ! yvel
+          if (icomp .eq. 2) q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = ZERO
+          ! zvel
+          if (icomp .eq. 3) then
+             q(lo(1):hi(1),lo(2):hi(2),kmin:kmax) = INLET_VEL
+          end if
 
        end if
     end if

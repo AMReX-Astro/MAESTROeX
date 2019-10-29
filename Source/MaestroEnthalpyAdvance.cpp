@@ -54,7 +54,7 @@ Maestro::EnthalpyAdvance (int which_step,
     //////////////////////////////////
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        scal_force[lev].setVal(0.,RhoH,1,1);
+        scal_force[lev].setVal(0.);
     }
 
     Vector<MultiFab> rhoh0_old_cart(finest_level+1);
@@ -96,7 +96,7 @@ Maestro::EnthalpyAdvance (int which_step,
              enthalpy_pred_type == predict_T_then_h ||
              enthalpy_pred_type == predict_Tprime_then_h) {
         // make force for temperature
-        Abort("MaestroEnthalpyAdvance forcing");
+        MakeTempForce(scal_force, scalold, thermal, umac);
     }
 
     //////////////////////////////////
@@ -121,7 +121,7 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_Tprime_then_h) {
         // convert T -> T'
-        Abort("MaestroEnthalpyAdvance predict_Tprime_then_h");
+        PutInPertForm(scalold, tempbar, Temp, 0, bcs_f, true);
     }
 
     // predict either T, h, or (rho h)' at the edges
@@ -156,7 +156,7 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_Tprime_then_h) {
         // convert T' -> T
-        Abort("MaestroEnthalpyAdavnce predict_Tprime_then_h");
+        PutInPertForm(scalold, tempbar, Temp, Temp, bcs_s, false);
     }
 
     if (enthalpy_pred_type == predict_h ||
@@ -170,7 +170,7 @@ Maestro::EnthalpyAdvance (int which_step,
     if ( (enthalpy_pred_type == predict_T_then_rhohprime) ||
          (enthalpy_pred_type == predict_T_then_h        ) ||
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
-        Abort("MaestroEnthalpyAdvance need makeHfromRhoT_edge");
+	HfromRhoTedge(sedge,rho0_edge_old,rhoh0_edge_old,rho0_edge_new,rhoh0_edge_new);
     }
 
     //////////////////////////////////
@@ -280,7 +280,7 @@ Maestro::EnthalpyAdvance (int which_step,
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        scal_force[lev].setVal(0.,RhoH,1,1);
+        scal_force[lev].setVal(0.);
     }
 
     //**************************************************************************

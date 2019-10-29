@@ -23,7 +23,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-#amr.n_cell = 128 128 128
+#amr.n_cell = 128 128 192
 amr.n_cell = 256 256 256
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
@@ -64,8 +64,8 @@ maestro.use_exact_base_state = false
 maestro.do_heating = true
 
 # PLOTFILES
-maestro.plot_base_name  = /home/alice/raid/MAESTROeX/code_comp/plt_    # root name of plot file
-maestro.plot_int   = 50      # number of timesteps between plot files
+maestro.plot_base_name  = /home/alice/raid/MAESTROeX/code_comp/3plt_    # root name of plot file
+maestro.plot_int   = 100      # number of timesteps between plot files
 #maestro.plot_deltat = 50.0e0
 maestro.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 maestro.plot_Hext = true
