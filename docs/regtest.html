@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>MAESTROeX: a low Mach number stellar hydrodynamics code &mdash; MAESTROeX 19.10
+  <title>Regression Testing &mdash; MAESTROeX 19.10
  documentation</title>
   
 
@@ -39,7 +39,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Preface" href="preface.html" /> 
+    <link rel="next" title="File list" href="filelist.html" />
+    <link rel="prev" title="Notes on Enthalpy" href="enthalpy.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,7 +54,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> MAESTROeX
+            <a href="index.html" class="icon icon-home"> MAESTROeX
           
 
           
@@ -111,7 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
@@ -130,7 +131,7 @@
 <li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Regression Testing</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API</span></p>
 <ul>
@@ -154,7 +155,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">MAESTROeX</a>
+          <a href="index.html">MAESTROeX</a>
         
       </nav>
 
@@ -183,15 +184,15 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="#">Docs</a> &raquo;</li>
+      <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>MAESTROeX: a low Mach number stellar hydrodynamics code</li>
+      <li>Regression Testing</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/regtest.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -204,79 +205,44 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="maestroex-a-low-mach-number-stellar-hydrodynamics-code">
-<h1>MAESTROeX: a low Mach number stellar hydrodynamics code<a class="headerlink" href="#maestroex-a-low-mach-number-stellar-hydrodynamics-code" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+  <div class="section" id="regression-testing">
+<h1>Regression Testing<a class="headerlink" href="#regression-testing" title="Permalink to this headline">¶</a></h1>
+<p>Nightly regression tests are run on MAESTROeX using the AMReX
+regression testing framework:
+<a class="reference external" href="https://github.com/amrex-codes/regression_testing/">https://github.com/amrex-codes/regression_testing/</a> .  We use the
+nightly approach rather than continuous integration on github because
+we need to ensure that we test the changes to AMReX and Microphysics
+together with changes in MAESTROeX.</p>
+<p>The basic flow of the regression testing framework is as follows:</p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
-<li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
+<li><p>check out the <code class="docutils literal notranslate"><span class="pre">development</span></code> branch of MAESTROeX, AMReX, and Microphysics</p></li>
+<li><p>for each test we defined:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">realclean</span></code> in the build directory</p></li>
+<li><p>build the executable with any test-specific options (MPI, network, …)</p></li>
+<li><p>run the test using the inputs file listed in the test definition</p></li>
+<li><p>compare zone-by-zone the results of the test to the stored
+benchmark.  Any differences, no matter how small, result in an
+error and test failure</p></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
-<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
-<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gpu.html">GPU</a></li>
-<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</div></blockquote>
+</li>
+<li><p>generate the test results webpage.</p></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
-<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
-<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
-<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
-<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
-<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
-<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
-<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
-<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
-<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
-<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing</a></li>
+<p>Tests are run both at Stony Brook at LBNL and the output is presented here:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>LBNL: <a class="reference external" href="https://ccse.lbl.gov/pub/RegressionTesting/MAESTROeX/">https://ccse.lbl.gov/pub/RegressionTesting/MAESTROeX/</a></p></li>
+<li><p>Stony Brook: <a class="reference external" href="http://groot.astro.sunysb.edu/MAESTROeX/test-suite/gfortran/">http://groot.astro.sunysb.edu/MAESTROeX/test-suite/gfortran/</a></p></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">API</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
-<li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">References</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
-</ul>
-</div>
-<div class="section" id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-</div>
+</div></blockquote>
+<p>If you want to run your own version of the test suite, you can follow
+the quickstart in the <code class="docutils literal notranslate"><span class="pre">regression_testing</span></code> README.  The inputs file used
+at Stony Brook can be used as a starting point and is found here:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/amrex-astro/actual_test_files">https://github.com/amrex-astro/actual_test_files</a></p>
+</div></blockquote>
 </div>
 
 
@@ -287,8 +253,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="preface.html" class="btn btn-neutral float-right" title="Preface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="filelist.html" class="btn btn-neutral float-right" title="File list" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
+      
+        <a href="enthalpy.html" class="btn btn-neutral float-left" title="Notes on Enthalpy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
