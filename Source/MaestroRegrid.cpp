@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -62,7 +63,7 @@ Maestro::Regrid ()
         // valid data in any new grid locations that are created
         // during the regrid.
         for (int i=0; i<rho0_old.size(); ++i) {
-            rho0_temp[i] = rho0_old[i]; 
+            rho0_temp[i] = rho0_old[i];
         }
     }
 

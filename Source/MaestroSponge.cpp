@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -7,7 +8,7 @@ void
 Maestro::MakeSponge (Vector<MultiFab>& sponge)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeSponge()",MakeSponge);
+    BL_PROFILE_VAR("Maestro::MakeSponge()", MakeSponge);
 
 #ifdef AMREX_USE_CUDA
     auto not_launched = Gpu::notInLaunchRegion();
