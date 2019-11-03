@@ -1,14 +1,4 @@
 
-#include <Maestro.H>
-#include <Maestro_F.H>
-#include <MaestroPlot.H>
-
-using namespace amrex;
-
-std::string inputs_name = "";
-
-int main(int argc, char* argv[])
-{
 
     // check to see if it contains --describe
     if (argc >= 2) {
