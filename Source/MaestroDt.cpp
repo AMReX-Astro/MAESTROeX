@@ -96,9 +96,11 @@ Maestro::EstDt ()
     std::fill(gp0.begin(),gp0.end(), 0.);
 
     // divU constraint
-    estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
-	       r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-
+    if (spherical == 1) {
+      estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
+		 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    }
+      
     Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
 #endif
 
@@ -313,7 +315,7 @@ Maestro::FirstDt ()
     std::fill(gp0.begin(),gp0.end(), 0.);
 
     // divU constraint
-    if (use_divu_firstdt) {
+    if (use_divu_firstdt && spherical == 1) {
 	estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
 		   r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
