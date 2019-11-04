@@ -433,8 +433,8 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 				   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
 	    } else {
 #if (AMREX_SPACEDIM == 3)
-		makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-					AMREX_INT_ANYD(tileBox.hiVect()),
+		makeHfromRhoT_edge_sphr((tileBox.loVect()),
+					(tileBox.hiVect()),
 					BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
 					BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
 					BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
