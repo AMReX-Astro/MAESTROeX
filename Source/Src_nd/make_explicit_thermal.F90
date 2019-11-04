@@ -1,7 +1,7 @@
 module make_explicit_thermal_module
 
   use eos_type_module, only : eos_t, eos_input_rt
-  use eos_composition_module, only : eos_comp_t, composition_derivatives
+  use eos_composition_module, only : eos_xderivs_t, composition_derivatives
   use eos_module
   use conductivity_module
   use network, only: nspec
@@ -42,7 +42,7 @@ contains
     ! Local
     integer :: i,j,k,comp
     type (eos_t) :: eos_state
-    type (eos_comp_t) :: eos_comp
+    type (eos_xderivs_t) :: eos_xderivs
 
     !$gpu
 
@@ -84,10 +84,10 @@ contains
                      (1.0d0-eos_state%p/(eos_state%rho*eos_state%dpdr))+ &
                      eos_state%dedr/eos_state%dpdr)
 
-                call composition_derivatives(eos_state, eos_comp)
+                call composition_derivatives(eos_state, eos_xderivs)
 
                 do comp=1,nspec
-                   Xkcoeff(i,j,k,comp) = (eos_state % conductivity/eos_state%cp) * eos_comp % dhdX(comp)
+                   Xkcoeff(i,j,k,comp) = (eos_state % conductivity/eos_state%cp) * eos_xderivs % dhdX(comp)
                 enddo
 
              endif

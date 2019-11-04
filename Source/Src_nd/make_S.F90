@@ -3,7 +3,7 @@ module make_S_module
   use amrex_error_module
   use eos_type_module, only : eos_t, eos_input_rt
   use eos_module
-  use eos_composition_module, only : eos_comp_t, composition_derivatives
+  use eos_composition_module, only : eos_xderivs_t, composition_derivatives
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, dpdt_factor, base_cutoff_density, use_delta_gamma1_term
   use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_density_coord, nr, dr
@@ -57,7 +57,7 @@ contains
     integer i,j,k,r
     integer pt_index(3)
     type(eos_t) :: eos_state
-    type(eos_comp_t) :: eos_comp
+    type(eos_xderivs_t) :: eos_xderivs
 
     integer comp
     double precision sigma, xi_term, pres_term, gradp0
@@ -78,7 +78,7 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state, pt_index)
 
-             call composition_derivatives(eos_state, eos_comp)
+             call composition_derivatives(eos_state, eos_xderivs)
 
              sigma = eos_state%dpdt / &
                   (eos_state%rho * eos_state%cp * eos_state%dpdr)
@@ -87,10 +87,10 @@ contains
              pres_term = 0.d0
              do comp = 1, nspec
                 xi_term = xi_term - &
-                     eos_comp % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
 
                 pres_term = pres_term + &
-                     eos_comp % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
              enddo
 
              S_cc(i,j,k) = (sigma/eos_state%rho) * &
@@ -182,7 +182,7 @@ contains
     integer i,j,k,r
     integer pt_index(3)
     type(eos_t) :: eos_state
-    type(eos_comp_t) :: eos_comp
+    type(eos_xderivs_t) :: eos_xderivs
     integer comp
     double precision sigma, xi_term, pres_term, Ut_dot_er
 
@@ -202,7 +202,7 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state, pt_index)
 
-             call composition_derivatives(eos_state, eos_comp)
+             call composition_derivatives(eos_state, eos_xderivs)
 
              sigma = eos_state%dpdt / &
                   (eos_state%rho * eos_state%cp * eos_state%dpdr)
@@ -211,10 +211,10 @@ contains
              pres_term = 0.d0
              do comp = 1, nspec
                 xi_term = xi_term - &
-                     eos_comp % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
 
                 pres_term = pres_term + &
-                     eos_comp % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
              enddo
 
              S_cc(i,j,k) = (sigma/eos_state%rho) * &
