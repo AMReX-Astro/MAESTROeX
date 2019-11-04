@@ -125,3 +125,11 @@ Bug fix: fill w0_cart based on edge-centered w0, not cell-centered
 Add option to output Nonaka plot (USE_NONAKA_PLOT)
 Add diagnostics for planar geometries
 Updates to documentation and JOSS paper
+
+11-01-2019
+Port 3d hydro subroutine to GPU
+Add enthalpy_pred_type options: predict_T_then_rhohprime, predict_T_then_h, predict_Tprime_then_h
+Updates to documentation for JOSS paper, including new logo
+Add scripts for plotting and comparing plotfiles
+Bugfixes: boundary condition for thermal diffusion, fill w0_cart after restart/regrid
+Update tests: rotating_star, code_comp, multilevel reacting_bubble
