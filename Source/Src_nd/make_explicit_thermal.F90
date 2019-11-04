@@ -1,15 +1,5 @@
 module make_explicit_thermal_module
 
-  use eos_type_module, only : eos_t, eos_input_rt
-  use eos_composition_module, only : eos_xderivs_t, composition_derivatives
-  use eos_module
-  use conductivity_module
-  use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, &
-       buoyancy_cutoff_factor, base_cutoff_density, &
-       limit_conductivity
-  use amrex_constants_module
-
   implicit none
 
   private
@@ -26,6 +16,17 @@ contains
     ! for the thermal diffusion term in the enthalpy equation.
     !
     ! note: we explicitly fill the ghostcells by looping over them directly
+
+    use eos_type_module, only : eos_t, eos_input_rt
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
+    use eos_module
+    use conductivity_module
+    use network, only: nspec
+    use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, &
+        buoyancy_cutoff_factor, base_cutoff_density, &
+        limit_conductivity
+    use amrex_constants_module
+
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)

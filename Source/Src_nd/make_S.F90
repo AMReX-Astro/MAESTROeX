@@ -1,9 +1,6 @@
 module make_S_module
 
   use amrex_error_module
-  use eos_type_module, only : eos_t, eos_input_rt
-  use eos_module
-  use eos_composition_module, only : eos_xderivs_t, composition_derivatives
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, dpdt_factor, base_cutoff_density, use_delta_gamma1_term
   use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_density_coord, nr, dr
@@ -27,6 +24,10 @@ contains
        p0_cart, p0_lo, p0_hi, &
        gamma1bar_cart, g1_lo, g1_hi, &
        dx) bind (C,name="make_S_cc")
+
+    use eos_type_module, only : eos_t, eos_input_rt
+    use eos_module
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
 
     integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -150,6 +151,10 @@ contains
        gradp0_cart, gp0_lo, gp0_hi, &
        gamma1bar_cart, g1_lo, g1_hi, &
        normal, no_lo, no_hi) bind (C,name="make_S_cc_sphr")
+       
+    use eos_type_module, only : eos_t, eos_input_rt
+    use eos_module
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
