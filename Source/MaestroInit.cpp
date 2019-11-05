@@ -651,19 +651,22 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     RealVector w0_force              ( (max_radial_level+1)*nr_fine );
     RealVector p0_minus_pthermbar    ( (max_radial_level+1)*nr_fine );
     RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
+    RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
     
     Sbar.shrink_to_fit();
     w0_force.shrink_to_fit();
     p0_minus_pthermbar.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
+    delta_chi_w0.shrink_to_fit();
     
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
     std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
     std::fill(psi.begin(),                  psi.end(),                  0.);
     std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
-    std::fill(p0_minus_pthermbar.begin(),     p0_minus_pthermbar.end(),     0.);
+    std::fill(p0_minus_pthermbar.begin(),   p0_minus_pthermbar.end(),   0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
+    std::fill(delta_chi_w0.begin(),         delta_chi_w0.end(),         0.);
     
     for (int lev=0; lev<=finest_level; ++lev) {
 	stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
@@ -705,33 +708,32 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
 	      rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
-/*
-	// NOTE: not sure if valid for use_exact_base_state
-	if (evolve_base_state) {
-		if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-			for(int i=0; i<Sbar.size(); ++i) {
-				Sbar[i] += delta_gamma1_termbar[i];
-			}
-		} else {
-			Average(S_cc_old,Sbar,0);
-
-			// compute Sbar = Sbar + delta_gamma1_termbar
-			if (use_delta_gamma1_term) {
-				for(int i=0; i<Sbar.size(); ++i) {
-					Sbar[i] += delta_gamma1_termbar[i];
-				}
-			}
-
-			int is_predictor = 1;
-			make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-			        rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-			        p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-			        p0_minus_pthermbar.dataPtr(), etarho_ec.dataPtr(),
-			        etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-			        r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+    // NOTE: not sure if valid for use_exact_base_state
+    if (evolve_base_state) {
+	if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
+	    for(int i=0; i<Sbar.size(); ++i) {
+		Sbar[i] += delta_gamma1_termbar[i];
+	    }
+	} else {
+	    Average(S_cc_old,Sbar,0);
+	    
+	    // compute Sbar = Sbar + delta_gamma1_termbar
+	    if (use_delta_gamma1_term) {
+		for(int i=0; i<Sbar.size(); ++i) {
+		    Sbar[i] += delta_gamma1_termbar[i];
 		}
+	    }
+	    
+	    int is_predictor = 1;
+	    make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
+		    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+		    p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
+		    p0_minus_pthermbar.dataPtr(), etarho_ec.dataPtr(),
+		    etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+		    r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
 	}
-*/
+    }
+
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
     
