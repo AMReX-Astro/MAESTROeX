@@ -62,7 +62,7 @@ maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 3.333e0
 maestro.sponge_kappa = 10.e0
 
-maestro.init_shrink = 0.01e0
+maestro.init_shrink = 0.01e-3
 maestro.use_soundspeed_firstdt = true
 maestro.use_divu_firstdt = true
 
