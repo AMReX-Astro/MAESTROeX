@@ -17,8 +17,7 @@ contains
     !
     ! note: we explicitly fill the ghostcells by looping over them directly
 
-    use eos_type_module, only : eos_t, eos_input_rt
-    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
+    use eos_type_module, only : eos_t, eos_input_rt, composition_derivatives
     use eos_module
     use conductivity_module
     use network, only: nspec
@@ -43,7 +42,6 @@ contains
     ! Local
     integer :: i,j,k,comp
     type (eos_t) :: eos_state
-    type (eos_xderivs_t) :: eos_xderivs
 
     !$gpu
 
@@ -85,10 +83,8 @@ contains
                      (1.0d0-eos_state%p/(eos_state%rho*eos_state%dpdr))+ &
                      eos_state%dedr/eos_state%dpdr)
 
-                call composition_derivatives(eos_state, eos_xderivs)
-
                 do comp=1,nspec
-                   Xkcoeff(i,j,k,comp) = (eos_state % conductivity/eos_state%cp) * eos_xderivs % dhdX(comp)
+                   Xkcoeff(i,j,k,comp) = (eos_state % conductivity/eos_state%cp) * eos_state % dhdX(comp)
                 enddo
 
              endif
