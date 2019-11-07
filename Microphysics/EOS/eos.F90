@@ -113,7 +113,8 @@ contains
 
     !$acc routine seq
 
-    use eos_type_module, only: eos_t, composition, composition_derivatives
+    use eos_type_module, only: eos_t
+    use eos_composition_module, only : composition, composition_derivatives
     use actual_eos_module, only: actual_eos
     use eos_override_module, only: eos_override
 #if (!(defined(AMREX_USE_CUDA) || defined(AMREX_USE_ACC)))
@@ -156,10 +157,6 @@ contains
     if (.not. has_been_reset) then
        call actual_eos(input, state)
     endif
-
-    ! Get dpdX, dedX, dhdX.
-
-    call composition_derivatives(state)
 
   end subroutine eos
 

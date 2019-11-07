@@ -1,14 +1,5 @@
 module make_explicit_thermal_module
 
-  use eos_type_module
-  use eos_module
-  use conductivity_module
-  use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, &
-       buoyancy_cutoff_factor, base_cutoff_density, &
-       limit_conductivity
-  use amrex_constants_module
-
   implicit none
 
   private
@@ -26,6 +17,17 @@ contains
     !
     ! note: we explicitly fill the ghostcells by looping over them directly
 
+    use eos_type_module, only : eos_t, eos_input_rt
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
+    use eos_module
+    use conductivity_module
+    use network, only: nspec
+    use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, &
+        buoyancy_cutoff_factor, base_cutoff_density, &
+        limit_conductivity
+    use amrex_constants_module
+
+
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: s_lo(3), s_hi(3)
     double precision, intent(in   ) :: scal(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nscal)
@@ -41,6 +43,7 @@ contains
     ! Local
     integer :: i,j,k,comp
     type (eos_t) :: eos_state
+    type (eos_xderivs_t) :: eos_xderivs
 
     !$gpu
 
@@ -82,8 +85,10 @@ contains
                      (1.0d0-eos_state%p/(eos_state%rho*eos_state%dpdr))+ &
                      eos_state%dedr/eos_state%dpdr)
 
+                call composition_derivatives(eos_state, eos_xderivs)
+
                 do comp=1,nspec
-                   Xkcoeff(i,j,k,comp) = (eos_state % conductivity/eos_state%cp)*eos_state%dhdX(comp)
+                   Xkcoeff(i,j,k,comp) = (eos_state % conductivity/eos_state%cp) * eos_xderivs % dhdX(comp)
                 enddo
 
              endif
