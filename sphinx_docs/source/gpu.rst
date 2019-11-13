@@ -48,7 +48,7 @@ The integrator used by the Microphysics library must be set to ``VODE90``:
 Depending on which system you are running on, it may be necessary to specify 
 the CUDA Capability using the ``CUDA_ARCH`` flag. The CUDA Capability will 
 depend on the specific GPU hardware you are running on. On a Linux system, the 
-capability of your device can typically be found by running the ``deviceQuery`` 
+capability of your device can typically be found by compiling and running the ``deviceQuery`` 
 script found in the CUDA samples directory: 
 ``/usr/local/cuda/samples/1_Utilities/deviceQuery`` (its exact location may 
 vary depending on where CUDA is installed on your system). The default value of 
