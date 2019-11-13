@@ -246,8 +246,20 @@ However, you may use MPI with CUDA for additional parallelization.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="p">:</span><span class="o">=</span> <span class="n">pgi</span>
 </pre></div>
 </div>
-<p>Finally, the integrator used by the Microphysics library must be set to <code class="docutils literal notranslate"><span class="pre">VODE90</span></code>:</p>
+<p>The integrator used by the Microphysics library must be set to <code class="docutils literal notranslate"><span class="pre">VODE90</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INTEGRATOR_DIR</span>   <span class="p">:</span><span class="o">=</span> <span class="n">VODE90</span>
+</pre></div>
+</div>
+<p>Depending on which system you are running on, it may be necessary to specify
+the CUDA Capability using the <code class="docutils literal notranslate"><span class="pre">CUDA_ARCH</span></code> flag. The CUDA Capability will
+depend on the specific GPU hardware you are running on. On a Linux system, the
+capability of your device can typically be found by compiling and running the <code class="docutils literal notranslate"><span class="pre">deviceQuery</span></code>
+script found in the CUDA samples directory:
+<code class="docutils literal notranslate"><span class="pre">/usr/local/cuda/samples/1_Utilities/deviceQuery</span></code> (its exact location may
+vary depending on where CUDA is installed on your system). The default value of
+this flag is 70, corresponding to a capability of 7.x. For a device with
+capability 6.x, the flag should be set to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_ARCH</span> <span class="p">:</span><span class="o">=</span> <span class="mi">60</span>
 </pre></div>
 </div>
 </div>
