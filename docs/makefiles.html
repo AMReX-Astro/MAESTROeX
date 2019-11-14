@@ -117,13 +117,15 @@
 <li class="toctree-l3"><a class="reference internal" href="#files-created-at-compile-time">Files Created at Compile-time</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#maestro-problem-options">MAESTRO Problem Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#maestroex-problem-options">MAESTROex Problem Options</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#problem-specific-files">Problem-specific Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#defining-eos-network-and-conductivity-routines">Defining EOS, Network, and Conductivity Routines</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#core-maestro-modules">Core MAESTRO modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core-maestroex-modules">Core MAESTROeX modules</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#special-targets">Special Targets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#print"><code class="docutils literal notranslate"><span class="pre">print-*</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#file-locations"><code class="docutils literal notranslate"><span class="pre">file_locations</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#clean-and-realclean"><code class="docutils literal notranslate"><span class="pre">clean</span></code> and <code class="docutils literal notranslate"><span class="pre">realclean</span></code></a></li>
 </ul>
 </li>
@@ -244,7 +246,7 @@ directory will contain a makefile, <code class="docutils literal notranslate"><s
 necessary information to build the executable.</p>
 <p>We use the build system in AMReX in <code class="docutils literal notranslate"><span class="pre">amrex/Tools/GNUmake</span></code>.  A set of
 MAESTROeX-specific macros are defined in <code class="docutils literal notranslate"><span class="pre">MAESTROeX/Exec/Make.Maestro</span></code>.</p>
-<p>MAESTRO gets the location of the AMReX library through the
+<p>MAESTROeX gets the location of the AMReX library through the
 <code class="docutils literal notranslate"><span class="pre">AMREX_HOME</span></code> variable. This should be set as an environment
 variable in your shell start-up files (e.g. <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or
 <code class="docutils literal notranslate"><span class="pre">.cshrc</span></code>).</p>
@@ -334,8 +336,8 @@ outputs the <code class="docutils literal notranslate"><span class="pre">actual_
 </ul>
 </div>
 </div>
-<div class="section" id="maestro-problem-options">
-<h2>MAESTRO Problem Options<a class="headerlink" href="#maestro-problem-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="maestroex-problem-options">
+<h2>MAESTROex Problem Options<a class="headerlink" href="#maestroex-problem-options" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="problem-specific-files">
 <span id="sec-make-otherfiles"></span><h3>Problem-specific Files<a class="headerlink" href="#problem-specific-files" title="Permalink to this headline">¶</a></h3>
 <p>If a problem has a unique file that is needed as part of the build,
@@ -393,13 +395,13 @@ source.</p>
 </li>
 </ul>
 </div>
-<div class="section" id="core-maestro-modules">
-<h3>Core MAESTRO modules<a class="headerlink" href="#core-maestro-modules" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="core-maestroex-modules">
+<h3>Core MAESTROeX modules<a class="headerlink" href="#core-maestroex-modules" title="Permalink to this headline">¶</a></h3>
 <p>Several modules are included in all MAESTROeX builds by default.
 In addition to the AMReX sources, we also include</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">MAESTRO/constants</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MAESTRO/Source</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MAESTROeX/constants</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MAESTROeX/Source</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Util/model_parser</span></code></p></li>
 </ul>
 <p>The microphysics used may bring in its own dependencies.</p>
@@ -412,8 +414,8 @@ source files.</p>
 </div>
 <div class="section" id="special-targets">
 <h2>Special Targets<a class="headerlink" href="#special-targets" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">print-*</span></code>
-~~~~~~~~~~-</p>
+<div class="section" id="print">
+<h3><code class="docutils literal notranslate"><span class="pre">print-*</span></code><a class="headerlink" href="#print" title="Permalink to this headline">¶</a></h3>
 <p>To see the contents of any variable in the build system, you can build
 the special target <code class="docutils literal notranslate"><span class="pre">print-varname</span></code>, where <code class="docutils literal notranslate"><span class="pre">varname</span></code> is the name of
 the variable. For example, to see what the network directory is, you would
@@ -422,8 +424,9 @@ do:</p>
 </pre></div>
 </div>
 <p>This functionality is useful for debugging the makefiles.</p>
-<p><code class="docutils literal notranslate"><span class="pre">file_locations</span></code>
-~~~~~~~~~~~~~~—-</p>
+</div>
+<div class="section" id="file-locations">
+<h3><code class="docutils literal notranslate"><span class="pre">file_locations</span></code><a class="headerlink" href="#file-locations" title="Permalink to this headline">¶</a></h3>
 <p>Source files are found by searching through the make
 <code class="docutils literal notranslate"><span class="pre">vpath</span></code>. The first instance of the file found in the <code class="docutils literal notranslate"><span class="pre">vpath</span></code>
 is used in the build. To see which files are used and their locations,
@@ -434,6 +437,7 @@ do:</p>
 <p>This will also show any files that aren’t found. Some are expected
 (e.g., <code class="docutils literal notranslate"><span class="pre">extern.F90</span></code> is created at compile time), but other files
 that are not found could indicate an incomplete <code class="docutils literal notranslate"><span class="pre">vpath</span></code>.</p>
+</div>
 <div class="section" id="clean-and-realclean">
 <h3><code class="docutils literal notranslate"><span class="pre">clean</span></code> and <code class="docutils literal notranslate"><span class="pre">realclean</span></code><a class="headerlink" href="#clean-and-realclean" title="Permalink to this headline">¶</a></h3>
 <p>Typing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> deletes the object and module files for the

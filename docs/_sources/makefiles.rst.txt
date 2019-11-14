@@ -17,7 +17,7 @@ necessary information to build the executable.
 We use the build system in AMReX in ``amrex/Tools/GNUmake``.  A set of
 MAESTROeX-specific macros are defined in ``MAESTROeX/Exec/Make.Maestro``.
 
-MAESTRO gets the location of the AMReX library through the
+MAESTROeX gets the location of the AMReX library through the
 ``AMREX_HOME`` variable. This should be set as an environment
 variable in your shell start-up files (e.g. ``.bashrc`` or
 ``.cshrc``).
@@ -118,8 +118,8 @@ Several files are created at build-time:
    in that directory does the actual parsing of the species file and
    outputs the ``actual_network.f90``.
 
-MAESTRO Problem Options
-=======================
+MAESTROex Problem Options
+=========================
 
 .. _sec:make:otherfiles:
 
@@ -189,15 +189,15 @@ in the problem’s ``GNUmakefile``.
    source.
 
 
-Core MAESTRO modules
---------------------
+Core MAESTROeX modules
+----------------------
 
 Several modules are included in all MAESTROeX builds by default.
 In addition to the AMReX sources, we also include 
 
--  ``MAESTRO/constants``
+-  ``MAESTROeX/constants``
 
--  ``MAESTRO/Source``
+-  ``MAESTROeX/Source``
 
 -  ``Util/model_parser``
 
@@ -214,7 +214,7 @@ Special Targets
 
 
 ``print-*``
-~~~~~~~~~~-
+-----------
 
 To see the contents of any variable in the build system, you can build
 the special target ``print-varname``, where ``varname`` is the name of
@@ -226,7 +226,7 @@ do::
 This functionality is useful for debugging the makefiles.
 
 ``file_locations``
-~~~~~~~~~~~~~~----
+------------------
 
 Source files are found by searching through the make
 ``vpath``. The first instance of the file found in the ``vpath``
