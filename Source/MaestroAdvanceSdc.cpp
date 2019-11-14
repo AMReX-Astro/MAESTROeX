@@ -415,49 +415,49 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     
 
     if (evolve_base_state) {
-	// correct the base state density by "averaging"
-	Average(shat, rho0_new, Rho);
-	compute_cutoff_coords(rho0_new.dataPtr());
+   	// correct the base state density by "averaging"
+   	Average(shat, rho0_new, Rho);
+   	compute_cutoff_coords(rho0_new.dataPtr());
     }
 
     // update grav_cell_new
     if (evolve_base_state) {
-	make_grav_cell(grav_cell_new.dataPtr(),
-		       rho0_new.dataPtr(),
-		       r_cc_loc.dataPtr(),
-		       r_edge_loc.dataPtr());
+   	make_grav_cell(grav_cell_new.dataPtr(),
+   		       rho0_new.dataPtr(),
+   		       r_cc_loc.dataPtr(),
+   		       r_edge_loc.dataPtr());
     }
     else {
-	grav_cell_new = grav_cell_old;
+   	grav_cell_new = grav_cell_old;
    }
 
     // base state pressure update
     if (evolve_base_state) {
 
-	// set new p0 through HSE
-	p0_new = p0_old;
+   	// set new p0 through HSE
+   	p0_new = p0_old;
 
-	enforce_HSE(rho0_new.dataPtr(),
-		    p0_new.dataPtr(),
-		    grav_cell_new.dataPtr(),
-		    r_cc_loc.dataPtr(),
-		    r_edge_loc.dataPtr());
+   	enforce_HSE(rho0_new.dataPtr(),
+   		    p0_new.dataPtr(),
+   		    grav_cell_new.dataPtr(),
+   		    r_cc_loc.dataPtr(),
+   		    r_edge_loc.dataPtr());
 
-	// compute p0_nph
-	for (int i=0; i<p0_nph.size(); ++i) {
-	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-	}
+   	// compute p0_nph
+   	for (int i=0; i<p0_nph.size(); ++i) {
+   	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+   	}
 
-	// hold dp0/dt in psi for enthalpy advance
-	for (int i=0; i<p0_old.size(); ++i) {
-	    psi[i] = (p0_new[i] - p0_old[i])/dt;
-	}
+   	// hold dp0/dt in psi for enthalpy advance
+   	for (int i=0; i<p0_old.size(); ++i) {
+   	    psi[i] = (p0_new[i] - p0_old[i])/dt;
+   	}
 
     }
     else {
 	p0_new = p0_old;
         p0_nph = p0_old;
-    }
+   }
 
     // base state enthalpy update
     if (evolve_base_state) {
@@ -504,10 +504,11 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	ThermalConductSDC(1,sold,shat,snew,p0_old,p0_new,hcoeff1,Xkcoeff1,pcoeff1,
 			  hcoeff2,Xkcoeff2,pcoeff2);
 
+	// note p0_new => p0_hat if evolve_base_state = T
 	MakeExplicitThermal(diff_hat,shat,Tcoeff1,hcoeff1,Xkcoeff1,pcoeff1,p0_new,
 			    temp_diffusion_formulation);
     }
-    
+
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2C -- advance thermodynamic variables
     //////////////////////////////////////////////////////////////////////////////
@@ -527,7 +528,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
     
-    ReactSDC(sold,snew,rho_Hext,p0_new,dt,t_old,sdc_source);
+    ReactSDC(sold,snew,rho_Hext,p0_old,dt,t_old,sdc_source);
 
     // wallclock time
     Real end_total_react = ParallelDescriptor::second() - start_total_react;
@@ -578,6 +579,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 		    r_cc_loc.dataPtr(),
 		    r_edge_loc.dataPtr());
 
+   	// compute p0_nph
+   	for (int i=0; i<p0_nph.size(); ++i) {
+   	    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+   	}
+
+   	// hold dp0/dt in psi for Make_S_cc
+   	for (int i=0; i<p0_old.size(); ++i) {
+   	    psi[i] = (p0_new[i] - p0_old[i])/dt;
+   	}
 
 	// update base state enthalpy
 	Average(snew, rhoh0_new, RhoH);
@@ -590,6 +600,14 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
     }
 
+    // now update temperature
+    if (use_tfromp) {
+	TfromRhoP(snew,p0_new);
+    }
+    else {
+	TfromRhoH(snew,p0_new);
+    }
+    
 
     if (enthalpy_pred_type == predict_rhohprime) {
 
@@ -925,6 +943,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 			      hcoeff2,Xkcoeff2,pcoeff2);
 
 	    // compute diff_hat using shat, p0_new, and new coefficients from previous iteration
+	    // note p0_new = p0_hat if evolve_base_state = T
 	    MakeExplicitThermal(diff_hat,shat,Tcoeff2,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
 				temp_diffusion_formulation);
 
@@ -1006,7 +1025,16 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 			r_cc_loc.dataPtr(),
 			r_edge_loc.dataPtr());
 
-	    
+	    // compute p0_nph
+	    for (int i=0; i<p0_nph.size(); ++i) {
+		p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
+	    }
+
+	    // hold dp0/dt in psi for Make_S_cc
+	    for (int i=0; i<p0_old.size(); ++i) {
+		psi[i] = (p0_new[i] - p0_old[i])/dt;
+	    }
+	
 	    // also update base state enthalpy
 	    Average(snew, rhoh0_new, RhoH);
 	    
@@ -1018,6 +1046,14 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	    Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
 	}
 
+	// now update temperature
+	if (use_tfromp) {
+	    TfromRhoP(snew,p0_new);
+	}
+	else {
+	    TfromRhoH(snew,p0_new);
+	}
+	    
 	
 	if (is_initIter) {
 	    for (int lev=0; lev<=finest_level; ++lev) {
