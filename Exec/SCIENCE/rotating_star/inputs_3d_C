@@ -9,14 +9,14 @@ maestro.drdxfac = 5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0e0   0.0e0  0.0e0
-geometry.prob_hi     =   5.e9   5.e9   5.e9
+geometry.prob_hi     =   5.e8   5.e8   5.e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
 maestro.lo_bc = 3 3 3
-maestro.hi_bc = 3 3 3
+maestro.hi_bc = 2 2 2
 geometry.is_periodic =  0 0 0
 
 # VERBOSITY
@@ -62,7 +62,7 @@ maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 3.333e0
 maestro.sponge_kappa = 10.e0
 
-maestro.init_shrink = 0.01e-3
+maestro.init_shrink = 0.001
 maestro.use_soundspeed_firstdt = true
 maestro.use_divu_firstdt = true
 
