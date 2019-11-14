@@ -411,8 +411,8 @@ Maestro::NodalProj (int proj_type,
     FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
     FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
-    if ((proj_type == pressure_iters_comp ||
-	 proj_type == regular_timestep_comp) && sdc_off) {
+    if (proj_type == pressure_iters_comp ||
+	proj_type == regular_timestep_comp) {
         // average pi from nodes to cell-centers and store in the Pi component of snew
         MakePiCC(beta0_cart);
     }
