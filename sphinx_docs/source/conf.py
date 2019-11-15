@@ -80,6 +80,8 @@ project = 'MAESTROeX'
 copyright = '2018-2019, MAESTROeX development tem'
 author = 'MAESTROeX development team'
 
+html_logo = "maestroex_logo.png"
+
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.

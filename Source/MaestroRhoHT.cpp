@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -417,9 +418,8 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             // We will also pass "validBox", which specifies the "valid" region.
 
 	    if (spherical == 0) {
-// #pragma gpu box(tileBox)
-		makeHfromRhoT_edge(AMREX_INT_ANYD(tileBox.loVect()),
-				   AMREX_INT_ANYD(tileBox.hiVect()),
+		makeHfromRhoT_edge((tileBox.loVect()),
+				   (tileBox.hiVect()),
 				   BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
 				   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
@@ -433,9 +433,8 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 				   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
 	    } else {
 #if (AMREX_SPACEDIM == 3)
-// #pragma gpu box(tileBox)
-		makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-					AMREX_INT_ANYD(tileBox.hiVect()),
+		makeHfromRhoT_edge_sphr(tileBox.loVect(),
+					tileBox.hiVect(),
 					BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
 					BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
 					BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),

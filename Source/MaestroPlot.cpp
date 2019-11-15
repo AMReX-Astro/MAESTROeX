@@ -1,4 +1,5 @@
 #include <Maestro.H>
+#include <Maestro_F.H>
 #include <MaestroPlot.H>
 #include <AMReX_buildInfo.H>
 #include <iterator>     // std::istream_iterator
@@ -1107,7 +1108,22 @@ Maestro::WriteJobInfo (const std::string& dir) const
 
         jobInfoFile << "\n\n";
 
+#ifdef AMREX_USE_GPU
+        // This output assumes for simplicity that every rank uses the
+        // same type of GPU.
+
+        jobInfoFile << PrettyLine;
+        jobInfoFile << "GPU Information:       " << "\n";
+        jobInfoFile << PrettyLine;
+
+        jobInfoFile << "GPU model name: " << Gpu::Device::deviceName() << "\n";
+        jobInfoFile << "Number of GPUs used: " << Gpu::Device::numDevicesUsed() << "\n";
+
+        jobInfoFile << "\n\n";
+#endif
+
         // build information
+
         jobInfoFile << PrettyLine;
         jobInfoFile << " Build Information\n";
         jobInfoFile << PrettyLine;
@@ -1680,7 +1696,7 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
                             BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
                             BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), BL_TO_FORTRAN_ANYD(gamma1barcart_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
-			
+
         }
     }
 
