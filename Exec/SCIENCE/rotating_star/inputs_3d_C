@@ -9,7 +9,7 @@ maestro.drdxfac = 5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0e0   0.0e0  0.0e0
-geometry.prob_hi     =   5.e8   5.e8   5.e8
+geometry.prob_hi     =   5.e9   5.e9   5.e9
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
