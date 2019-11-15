@@ -16,11 +16,6 @@
 
 #include <PhysBCFunctMaestro.H>
 
-#ifdef AMREX_USE_CUDA
-// #include <AMReX_CudaAllocators.H>
-#include <AMReX_CudaContainers.H>
-#endif
-
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
 #ifdef AMREX_USE_CUDA
