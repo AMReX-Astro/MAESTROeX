@@ -9,7 +9,7 @@ maestro.drdxfac = 5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0e0   0.0e0  0.0e0
-geometry.prob_hi     =   5.e8   5.e8   5.e8
+geometry.prob_hi     =   5.e9   5.e9   5.e9
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -102,8 +102,8 @@ maestro.eps_hg_bottom      = 1.e-4
 maestro.do_burning = true
 maestro.small_dens = 1.e0
 maestro.small_temp = 1.e5
-#maestro.burning_cutoff_density = 2.5e7
-#maestro.burning_invert_cutoff_density = true
+maestro.burning_cutoff_density = 1e3
+maestro.burning_invert_cutoff_density = true
 
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
@@ -132,22 +132,18 @@ maestro.rotation_radius = 2.e8
 
   use_eos_coulomb = T
 
-  !rtol_spec = 1.e-6
-  !rtol_enuc = 1.e-5
-  !rtol_temp = 1.e-5
-
   retry_burn = T
 
   call_eos_in_rhs = T
-  jacobian = 2
+  jacobian = 1
   
-  atol_spec = 1.e-5
-  atol_temp = 1.e-5
-  atol_enuc = 1.e-5
+  atol_spec = 1.e-6
+  atol_temp = 1.e-6
+  atol_enuc = 1.e-6
 
-  rtol_spec = 1.e-5
-  rtol_temp = 1.e-5
-  rtol_enuc = 1.e-5
+  rtol_spec = 1.e-6
+  rtol_temp = 1.e-6
+  rtol_enuc = 1.e-6
 
   renormalize_abundances = T
 
