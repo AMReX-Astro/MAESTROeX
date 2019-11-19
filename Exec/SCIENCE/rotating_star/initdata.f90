@@ -2,6 +2,7 @@
 module initdata_module
 
   use amrex_mempool_module, only : bl_allocate, bl_deallocate
+  use amrex_error_module, only: amrex_error
   use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use amrex_constants_module
   use network, only: nspec
@@ -48,36 +49,7 @@ contains
     end if
 
     ! abort program
-    call bl_error("Planar initdata not written")
-
-    ! set velocity to zero
-    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
-
-    do k=lo(3),hi(3)
-       do j=lo(2),hi(2)
-          do i=lo(1),hi(1)
-
-             if (amrex_spacedim .eq. 1) then
-                r = i
-             else if (amrex_spacedim .eq. 2) then
-                r = j
-             else if (amrex_spacedim .eq. 3) then
-                r = k
-             end if
-
-             ! set scalars using s0
-             scal(i,j,k,rho_comp)  = s0_init(lev,r,rho_comp)
-             scal(i,j,k,rhoh_comp) = s0_init(lev,r,rhoh_comp)
-             scal(i,j,k,temp_comp) = s0_init(lev,r,temp_comp)
-             scal(i,j,k,spec_comp:spec_comp+nspec-1) = &
-                  s0_init(lev,r,spec_comp:spec_comp+nspec-1)
-
-             ! initialize pi to zero for now
-             scal(i,j,k,pi_comp) = 0.d0
-
-          end do
-       end do
-    end do
+    call amrex_error("Planar initdata not written")
 
   end subroutine initdata
 
