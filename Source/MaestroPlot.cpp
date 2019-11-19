@@ -1906,7 +1906,7 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
                    Vector<MultiFab>& abar)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakePiDivu()",MakeAbar);
+    BL_PROFILE_VAR("Maestro::MakeAbar()",MakeAbar);
 
 #ifdef AMREX_USE_CUDA
     auto not_launched = Gpu::notInLaunchRegion();
