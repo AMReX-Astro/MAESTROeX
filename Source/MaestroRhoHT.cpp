@@ -318,11 +318,11 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::HfromRhoTedge()",HfromRhoTedge);
 
-// #ifdef AMREX_USE_CUDA
-//     auto not_launched = Gpu::notInLaunchRegion();
-//     // turn on GPU
-//     if (not_launched) Gpu::setLaunchRegion(true);
-// #endif
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     Vector<MultiFab> rho0_cart(finest_level+1);
     Vector<MultiFab> rhoh0_cart(finest_level+1);
@@ -411,6 +411,12 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Box& xbx = amrex::growHi(tileBox,0, 1);
+            const Box& ybx = amrex::growHi(tileBox,1, 1);
+#if (AMREX_SPACEDIM == 3)
+            const Box& zbx = amrex::growHi(tileBox,2, 1);
+#endif
+
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -418,25 +424,67 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             // We will also pass "validBox", which specifies the "valid" region.
 
 	    if (spherical == 0) {
-		makeHfromRhoT_edge((tileBox.loVect()),
-				   (tileBox.hiVect()),
+#pragma gpu box(xbx)
+		makeHfromRhoT_edge(AMREX_INT_ANYD(xbx.loVect()),
+				   AMREX_INT_ANYD(xbx.hiVect()),
+                   1,
 				   BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-				   BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
-#endif
 				   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
 				   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
 				   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
 				   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
 				   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
 				   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+
+#pragma gpu box(ybx)
+		makeHfromRhoT_edge(AMREX_INT_ANYD(ybx.loVect()),
+				   AMREX_INT_ANYD(ybx.hiVect()),
+                   2,
+				   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+
+#if (AMREX_SPACEDIM == 3)
+#pragma gpu box(zbx)
+		makeHfromRhoT_edge(AMREX_INT_ANYD(zbx.loVect()),
+				   AMREX_INT_ANYD(zbx.hiVect()),
+                   3,
+				   BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
+				   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+#endif
 	    } else {
 #if (AMREX_SPACEDIM == 3)
-		makeHfromRhoT_edge_sphr(tileBox.loVect(),
-					tileBox.hiVect(),
+#pragma gpu box(xbx)
+		makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(xbx.loVect()),
+					AMREX_INT_ANYD(xbx.hiVect()),
+                    1,
 					BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
+
+#pragma gpu box(ybx)
+		makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(ybx.loVect()),
+					AMREX_INT_ANYD(ybx.hiVect()),
+                    2,
 					BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+					BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
+
+#pragma gpu box(zbx)
+		makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(zbx.loVect()),
+					AMREX_INT_ANYD(zbx.hiVect()),
+					3,
 					BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
 					BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
 					BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
@@ -448,8 +496,8 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 
     }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     if (not_launched) Gpu::setLaunchRegion(false);
-// #endif
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }

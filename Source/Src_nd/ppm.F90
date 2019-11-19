@@ -2347,7 +2347,6 @@ contains
                       Im(i,j,k,2) = s(i,j,k,n)
                    end if
 
-
                 endif
              end do
           end do
